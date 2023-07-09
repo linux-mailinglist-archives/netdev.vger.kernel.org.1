@@ -1,82 +1,152 @@
-Return-Path: <netdev+bounces-16246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB1674C1ED
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 12:30:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F371274C26C
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 13:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15B501C20749
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 10:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26AA528109B
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 11:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC19E468A;
-	Sun,  9 Jul 2023 10:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425004699;
+	Sun,  9 Jul 2023 11:20:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4EA20EB
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 10:30:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 193EEC433C9;
-	Sun,  9 Jul 2023 10:30:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688898620;
-	bh=JNjdE7h2KECVVFRvJju8wvUIdWAf0hYPNyWWMZWiwuE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cta4/LHpwmWC2DGW1rTuvflBNM0PuxedXbH94A5f1yG6Noihxu+ZEqvKF+bypLOKO
-	 8t5IsKUasS4+mXtOGnnumr8lfgjuk3x39881byrMaWByhL5V6RHjycKEiqUBxxZdmV
-	 DfrMziZndtZ6ddnzYcEVFxgioPW6MunbG6Bmre8vC5SSQ0aot4IQRYEUmCf0FW12dS
-	 q/SvBPH0bYT/KLivtdWau31sfIGklBmZ+vBA8UotUpf4PkNqgUfoXvF2x1WhHM00dI
-	 wvQBz82GvO5HCYUDwze/kTk996qE2gdMjivF0/KwdjQ0bCd9cZagoa0lVIRTCkFBg4
-	 0HYsBNF/hUKCw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EF446C395F8;
-	Sun,  9 Jul 2023 10:30:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9A2522E;
+	Sun,  9 Jul 2023 11:20:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FEA8C433C8;
+	Sun,  9 Jul 2023 11:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1688901622;
+	bh=6zncnkh3oAJMqekHpVaKai3KYrNOe/JiEDlSOQ6ezJ0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=aCv3fdQ+k3dmrC4qk/p4Hq5xMSjaxJBJL5OwbTL8VGBED4yARBENu/8Eaa0q0FeQX
+	 lWf+IRui9zZ8w2ML1xTLd4Q0SsaMheBnN6i5yn+VFHXqXdzLenc12+LvfTHubKIhQ3
+	 jnuu1A89QFAS5Xj0tkhu8kSRloT3tn5bDPERpfp4=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Christian Brauner <brauner@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	linux-sctp@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.3 085/431] sctp: add bpf_bypass_getsockopt proto callback
+Date: Sun,  9 Jul 2023 13:10:33 +0200
+Message-ID: <20230709111453.143501955@linuxfoundation.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230709111451.101012554@linuxfoundation.org>
+References: <20230709111451.101012554@linuxfoundation.org>
+User-Agent: quilt/0.67
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: lan743x: select FIXED_PHY
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168889861997.29064.9707742111397535356.git-patchwork-notify@kernel.org>
-Date: Sun, 09 Jul 2023 10:30:19 +0000
-References: <20230708-lan743x-fixed-phy-v1-1-3fd19580546c@kernel.org>
-In-Reply-To: <20230708-lan743x-fixed-phy-v1-1-3fd19580546c@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, Pavithra.Sathyanarayanan@microchip.com,
- rdunlap@infradead.org, stable@vger.kernel.org, netdev@vger.kernel.org
 
-Hello:
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+[ Upstream commit 2598619e012cee5273a2821441b9a051ad931249 ]
 
-On Sat, 08 Jul 2023 15:06:25 +0100 you wrote:
-> The blamed commit introduces usage of fixed_phy_register() but
-> not a corresponding dependency on FIXED_PHY.
-> 
-> This can result in a build failure.
-> 
->  s390-linux-ld: drivers/net/ethernet/microchip/lan743x_main.o: in function `lan743x_phy_open':
->  drivers/net/ethernet/microchip/lan743x_main.c:1514: undefined reference to `fixed_phy_register'
-> 
-> [...]
+Implement ->bpf_bypass_getsockopt proto callback and filter out
+SCTP_SOCKOPT_PEELOFF, SCTP_SOCKOPT_PEELOFF_FLAGS and SCTP_SOCKOPT_CONNECTX3
+socket options from running eBPF hook on them.
 
-Here is the summary with links:
-  - [net] net: lan743x: select FIXED_PHY
-    https://git.kernel.org/netdev/net/c/73c4d1b307ae
+SCTP_SOCKOPT_PEELOFF and SCTP_SOCKOPT_PEELOFF_FLAGS options do fd_install(),
+and if BPF_CGROUP_RUN_PROG_GETSOCKOPT hook returns an error after success of
+the original handler sctp_getsockopt(...), userspace will receive an error
+from getsockopt syscall and will be not aware that fd was successfully
+installed into a fdtable.
 
-You are awesome, thank you!
+As pointed by Marcelo Ricardo Leitner it seems reasonable to skip
+bpf getsockopt hook for SCTP_SOCKOPT_CONNECTX3 sockopt too.
+Because internaly, it triggers connect() and if error is masked
+then userspace will be confused.
+
+This patch was born as a result of discussion around a new SCM_PIDFD interface:
+https://lore.kernel.org/all/20230413133355.350571-3-aleksandr.mikhalitsyn@canonical.com/
+
+Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Stanislav Fomichev <sdf@google.com>
+Cc: Neil Horman <nhorman@tuxdriver.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: linux-sctp@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Suggested-by: Stanislav Fomichev <sdf@google.com>
+Acked-by: Stanislav Fomichev <sdf@google.com>
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Acked-by: Xin Long <lucien.xin@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/sctp/socket.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 218e0982c3707..0932cbf568ee9 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -8280,6 +8280,22 @@ static int sctp_getsockopt(struct sock *sk, int level, int optname,
+ 	return retval;
+ }
+ 
++static bool sctp_bpf_bypass_getsockopt(int level, int optname)
++{
++	if (level == SOL_SCTP) {
++		switch (optname) {
++		case SCTP_SOCKOPT_PEELOFF:
++		case SCTP_SOCKOPT_PEELOFF_FLAGS:
++		case SCTP_SOCKOPT_CONNECTX3:
++			return true;
++		default:
++			return false;
++		}
++	}
++
++	return false;
++}
++
+ static int sctp_hash(struct sock *sk)
+ {
+ 	/* STUB */
+@@ -9649,6 +9665,7 @@ struct proto sctp_prot = {
+ 	.shutdown    =	sctp_shutdown,
+ 	.setsockopt  =	sctp_setsockopt,
+ 	.getsockopt  =	sctp_getsockopt,
++	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
+ 	.sendmsg     =	sctp_sendmsg,
+ 	.recvmsg     =	sctp_recvmsg,
+ 	.bind        =	sctp_bind,
+@@ -9704,6 +9721,7 @@ struct proto sctpv6_prot = {
+ 	.shutdown	= sctp_shutdown,
+ 	.setsockopt	= sctp_setsockopt,
+ 	.getsockopt	= sctp_getsockopt,
++	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
+ 	.sendmsg	= sctp_sendmsg,
+ 	.recvmsg	= sctp_recvmsg,
+ 	.bind		= sctp_bind,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+2.39.2
+
 
 
 
