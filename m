@@ -1,152 +1,137 @@
-Return-Path: <netdev+bounces-16247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F371274C26C
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 13:20:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB27B74C42D
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 14:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26AA528109B
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 11:20:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B199F1C208E8
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 12:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425004699;
-	Sun,  9 Jul 2023 11:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7123E5252;
+	Sun,  9 Jul 2023 12:40:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9A2522E;
-	Sun,  9 Jul 2023 11:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FEA8C433C8;
-	Sun,  9 Jul 2023 11:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1688901622;
-	bh=6zncnkh3oAJMqekHpVaKai3KYrNOe/JiEDlSOQ6ezJ0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aCv3fdQ+k3dmrC4qk/p4Hq5xMSjaxJBJL5OwbTL8VGBED4yARBENu/8Eaa0q0FeQX
-	 lWf+IRui9zZ8w2ML1xTLd4Q0SsaMheBnN6i5yn+VFHXqXdzLenc12+LvfTHubKIhQ3
-	 jnuu1A89QFAS5Xj0tkhu8kSRloT3tn5bDPERpfp4=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Christian Brauner <brauner@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Neil Horman <nhorman@tuxdriver.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	linux-sctp@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.3 085/431] sctp: add bpf_bypass_getsockopt proto callback
-Date: Sun,  9 Jul 2023 13:10:33 +0200
-Message-ID: <20230709111453.143501955@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230709111451.101012554@linuxfoundation.org>
-References: <20230709111451.101012554@linuxfoundation.org>
-User-Agent: quilt/0.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648753FD4
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 12:40:00 +0000 (UTC)
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A8D130;
+	Sun,  9 Jul 2023 05:39:59 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id d9443c01a7336-1b8b2b60731so15055515ad.2;
+        Sun, 09 Jul 2023 05:39:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688906398; x=1691498398;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AunKTef2eVoQgdM8wyqDnspSjgv/YIQnYn6ve6LmJII=;
+        b=DlennG7Y4GQFlVxQjTnTSmmMBJD2potTQ8oqXI3hJyqMdd12UB8A4NhzXtZ83D7Q2j
+         DUa0vbOdQMFGtlu2JzcVhrk+IIUE7x5SBKqkPgGSThLlfPXGKe++HivBdKd/8m5+8DUt
+         rO2rKcwlXEGCLRlT3XbRvr5jFhmVk2s8xCpJEijniNe47NOa4cSCSfhKP3a4ZdpdmTYL
+         tRUBTYXp+wy1L1U5DMbpNc3fPtcXlLI1ceI6qPoFLFiwj59Cxws3/Z10f6CuTtQDy5Cl
+         B+qQ9k76XZuFIOwcviNiKGwcKjeBbp+vTQPV1s46ixATK3SLwFjTedxrqLYhEMcQ1SB4
+         Kglg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688906398; x=1691498398;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AunKTef2eVoQgdM8wyqDnspSjgv/YIQnYn6ve6LmJII=;
+        b=ZAi4l2gYhNDvqBMmV8rHDb5BZ0hSBPi/CefhzrGKm7WEwBeqqjr1DeqsSPkg9R1r5R
+         CqogLvd4zcjsLIlrrfZ7/JxJNUtoYG8O94HZmJ9OMlwU9zfkYZBqVWK4Y/gX6WHWBIaC
+         isDdN7ruEfokqo35ixcHRaWpoYxpP9CgfNon3WZDfiUQDyjFCNIVa22/No3VG+ExhBfH
+         tONuu0a5/mbOwTWPrn+MG0c2ofwUAKIghQ2q+OnHylpjL4LdcYZMCKSjAvWszudMwozA
+         VkMk0WWwTLuVUx2HAdBJF//CTmSDO1qMhm4wO1fGzZD8zXepjH7YyP3e53ivasgSDeX5
+         J4iA==
+X-Gm-Message-State: ABy/qLasTQ7xtkr+ZRbUcqgVLsem4fojAsBlOHg8nRMQzf1db9I9uW1p
+	F3wIPwjDduKPhyXMH6SQ+cOL3vLA8scTJiGr
+X-Google-Smtp-Source: APBJJlEVymbZm7XdprX4gfU/SLXEpyNTedwLKgASfuNwnbJeSLXzAJ7NQOqdPHGELnD+00BxMx2s7Q==
+X-Received: by 2002:a17:902:b58c:b0:1b8:94e9:e7cb with SMTP id a12-20020a170902b58c00b001b894e9e7cbmr7359068pls.21.1688906398236;
+        Sun, 09 Jul 2023 05:39:58 -0700 (PDT)
+Received: from ?IPv6:2409:8a55:301b:e120:1523:3ecb:e154:8f22? ([2409:8a55:301b:e120:1523:3ecb:e154:8f22])
+        by smtp.gmail.com with ESMTPSA id d17-20020a170903231100b001b3d0aff88fsm6249708plh.109.2023.07.09.05.39.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Jul 2023 05:39:57 -0700 (PDT)
+Subject: Re: [PATCH v5 RFC 1/6] page_pool: frag API support for 32-bit arch
+ with 64-bit DMA
+To: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Liang Chen <liangchen.linux@gmail.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ linux-rdma@vger.kernel.org
+References: <20230629120226.14854-1-linyunsheng@huawei.com>
+ <20230629120226.14854-2-linyunsheng@huawei.com>
+ <20230707165921.565b1228@kernel.org>
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+Message-ID: <81a8b412-f2b5-fac9-caa4-149d5bf71510@gmail.com>
+Date: Sun, 9 Jul 2023 20:39:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230707165921.565b1228@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+On 2023/7/8 7:59, Jakub Kicinski wrote:
+> On Thu, 29 Jun 2023 20:02:21 +0800 Yunsheng Lin wrote:
+>> +		/* Return error here to avoid mlx5e_page_release_fragmented()
+>> +		 * calling page_pool_defrag_page() to write to pp_frag_count
+>> +		 * which is overlapped with dma_addr_upper in 'struct page' for
+>> +		 * arch with PAGE_POOL_DMA_USE_PP_FRAG_COUNT being true.
+>> +		 */
+>> +		if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT) {
+>> +			err = -EINVAL;
+>> +			goto err_free_by_rq_type;
+>> +		}
+> 
+> I told you not to do this in a comment on v4.
+> Keep the flag in page pool params and let the creation fail.
 
-[ Upstream commit 2598619e012cee5273a2821441b9a051ad931249 ]
+There seems to be naming disagreement in the previous discussion,
+The simplest way seems to be reuse the
+PAGE_POOL_DMA_USE_PP_FRAG_COUNT and do the checking in the driver
+without introducing new macro or changing macro name.
 
-Implement ->bpf_bypass_getsockopt proto callback and filter out
-SCTP_SOCKOPT_PEELOFF, SCTP_SOCKOPT_PEELOFF_FLAGS and SCTP_SOCKOPT_CONNECTX3
-socket options from running eBPF hook on them.
+Let's be more specific about what is your suggestion here:
+Do you mean keep the PP_FLAG_PAGE_FRAG flag and keep the below
+checking in page_pool_init(), right?
+	if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
+	    pool->p.flags & PP_FLAG_PAGE_FRAG)
+		return -EINVAL;
 
-SCTP_SOCKOPT_PEELOFF and SCTP_SOCKOPT_PEELOFF_FLAGS options do fd_install(),
-and if BPF_CGROUP_RUN_PROG_GETSOCKOPT hook returns an error after success of
-the original handler sctp_getsockopt(...), userspace will receive an error
-from getsockopt syscall and will be not aware that fd was successfully
-installed into a fdtable.
+Isn't it confusing to still say page frag is not supported
+for PAGE_POOL_DMA_USE_PP_FRAG_COUNT being true case when this
+patch will now add support for it, at least from API POV, the
+page_pool_alloc_frag() is always supported now.
 
-As pointed by Marcelo Ricardo Leitner it seems reasonable to skip
-bpf getsockopt hook for SCTP_SOCKOPT_CONNECTX3 sockopt too.
-Because internaly, it triggers connect() and if error is masked
-then userspace will be confused.
+Maybe remove the PP_FLAG_PAGE_FRAG and add a new macro named
+PP_FLAG_PAGE_SPLIT_IN_DRIVER, and do the checking as before in
+page_pool_init() like below?
+	if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
+	    pool->p.flags & PP_FLAG_PAGE_SPLIT_IN_DRIVER)
+		return -EINVAL;
 
-This patch was born as a result of discussion around a new SCM_PIDFD interface:
-https://lore.kernel.org/all/20230413133355.350571-3-aleksandr.mikhalitsyn@canonical.com/
-
-Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Stanislav Fomichev <sdf@google.com>
-Cc: Neil Horman <nhorman@tuxdriver.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: linux-sctp@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Suggested-by: Stanislav Fomichev <sdf@google.com>
-Acked-by: Stanislav Fomichev <sdf@google.com>
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Acked-by: Xin Long <lucien.xin@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/sctp/socket.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 218e0982c3707..0932cbf568ee9 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -8280,6 +8280,22 @@ static int sctp_getsockopt(struct sock *sk, int level, int optname,
- 	return retval;
- }
- 
-+static bool sctp_bpf_bypass_getsockopt(int level, int optname)
-+{
-+	if (level == SOL_SCTP) {
-+		switch (optname) {
-+		case SCTP_SOCKOPT_PEELOFF:
-+		case SCTP_SOCKOPT_PEELOFF_FLAGS:
-+		case SCTP_SOCKOPT_CONNECTX3:
-+			return true;
-+		default:
-+			return false;
-+		}
-+	}
-+
-+	return false;
-+}
-+
- static int sctp_hash(struct sock *sk)
- {
- 	/* STUB */
-@@ -9649,6 +9665,7 @@ struct proto sctp_prot = {
- 	.shutdown    =	sctp_shutdown,
- 	.setsockopt  =	sctp_setsockopt,
- 	.getsockopt  =	sctp_getsockopt,
-+	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
- 	.sendmsg     =	sctp_sendmsg,
- 	.recvmsg     =	sctp_recvmsg,
- 	.bind        =	sctp_bind,
-@@ -9704,6 +9721,7 @@ struct proto sctpv6_prot = {
- 	.shutdown	= sctp_shutdown,
- 	.setsockopt	= sctp_setsockopt,
- 	.getsockopt	= sctp_getsockopt,
-+	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
- 	.sendmsg	= sctp_sendmsg,
- 	.recvmsg	= sctp_recvmsg,
- 	.bind		= sctp_bind,
--- 
-2.39.2
-
-
-
+Or any better suggestion? 
 
