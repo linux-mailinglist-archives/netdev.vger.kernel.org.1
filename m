@@ -1,105 +1,84 @@
-Return-Path: <netdev+bounces-16244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4087874C1D9
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 12:18:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C667174C1DA
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 12:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08EA91C208A3
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 10:18:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00B111C208C3
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 10:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB1E3D8B;
-	Sun,  9 Jul 2023 10:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1F83FF4;
+	Sun,  9 Jul 2023 10:20:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20EB1FCE
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 10:18:40 +0000 (UTC)
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AA9D7;
-	Sun,  9 Jul 2023 03:18:38 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b70bfc8db5so39280901fa.2;
-        Sun, 09 Jul 2023 03:18:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688897917; x=1691489917;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xk2m3eHHg5+WopAG9c1J4W9MrnyvygLtozQpKMScTFo=;
-        b=RRrEkLYFOnIueZb+jlwBNOJq3kxO8jMPoe426E09fImJI0qTLwTNTJVbE2xdiCQleX
-         dzZAyCeTN98xnTgM431CW3zLBrRHUxLAcKxlZcqSygkfbHMwCEQfll83fIh/O151omru
-         2Mu6Z5ZOzAp0dhPGWk/MO0popmI4rCSjqMvW2ZQGknjfLoTA+uJHnQnTf4IxD3B2YJh6
-         iX8GycpTUKy+s/RDG6iIR27M07+T3aUn4nR76u/7UMpaNG1Uci8jsbgncgxdYKeTMQSc
-         LFk3xBFX52X2S5e3RQDOzmq33Eaw7eMsAPM+bEs8VBAsFM49KQqeZbFwegI2SZjf7QMz
-         xsfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688897917; x=1691489917;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xk2m3eHHg5+WopAG9c1J4W9MrnyvygLtozQpKMScTFo=;
-        b=Kctj9iFXKJ7N93AvPBKG6jNlfv2SBf5Ve1BS0s6Q9V/d571ZNMo4vD7XXry4nwAFgB
-         ggOavFb0cPkk5NqCPQAjEDbj8WTgsUnnCpgrZEg3S0LEgAKANqgG+2BDtgoqnJ4lKcOM
-         zxhATtyaiUv0PG6lCPYHqOFg3K9r4FBjR5RL01PqGvTnMPaFI6klLOjqmJr+3TvMyFhM
-         Bd1/hPBRMm3MghjKz18byBpKUXgw+jd6z4uj/YjRh28JR3VS7ITLwgoL22lE1Y2jIFtg
-         L4TaUWB3KBp14Mn+zlTrticuHuzGVqHOnvSPkuVcC6shOeUSt2xSMp6VIL1yVQDPK+Sr
-         fbCw==
-X-Gm-Message-State: ABy/qLbySOaoSJZOmftY45NQT7N6r9fEd90TIxlP0kY7LcOds99G9F49
-	lTl3lORSY4h7WqqlOmI9VIw=
-X-Google-Smtp-Source: APBJJlEBQPPjBt8sE9ybUNfyT1TX5y/I8L3AqziJjP83MpIMRG6iC/bVUpw5cGYBL3gt4Vq9CvzS/Q==
-X-Received: by 2002:a2e:854f:0:b0:2b6:e76b:1e50 with SMTP id u15-20020a2e854f000000b002b6e76b1e50mr6677741ljj.41.1688897916836;
-        Sun, 09 Jul 2023 03:18:36 -0700 (PDT)
-Received: from [192.168.0.107] ([77.126.161.239])
-        by smtp.gmail.com with ESMTPSA id w14-20020a170906b18e00b00992ca779f42sm4625305ejy.97.2023.07.09.03.18.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Jul 2023 03:18:36 -0700 (PDT)
-Message-ID: <a70fa545-8690-0d8a-cb04-421b04c67a61@gmail.com>
-Date: Sun, 9 Jul 2023 13:18:33 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3DF2574
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 10:20:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 27090C433C9;
+	Sun,  9 Jul 2023 10:20:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688898020;
+	bh=J8x95jp9FxyVxxTEkgEjgE5LoqKwFxlmgN+EMIKZtaQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AwOw3KZKXsr2zUYUiiQWp6J1KCZC8iQ5xHEVjK8DPbhja7B5r1LIWJt89KYGsgTwR
+	 Qzc/84TIkdneMSF1irzcVOqQCr/x2JT04x9pb/RTL5rfaU0ezpXUORP1To+emjwBTg
+	 ZFUZy0L/hBJwj6Tw6wLZweRc0OB9edeLRj7AtqQvQ276nyKOgRXGpura6xg0lV9LCA
+	 i8sNSP648CGthGn9HhTfbWZwn2JPXbarAaqCSJ/zM3R37WdB2eJfBBIJTdmW1DiE4+
+	 iZLyWBjglIIyFiV8A4dkU6wggmdH5EH+jtwXrU3MG4/WnEWrItoEs20DsYFtYkRmCv
+	 VTdp6o8a+KDoA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0A153C395D8;
+	Sun,  9 Jul 2023 10:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net] net/mlx5: fix potential memory leak in
- mlx5e_init_rep_rx
-Content-Language: en-US
-To: Zhengchao Shao <shaozhengchao@huawei.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: saeedm@nvidia.com, leon@kernel.org, lkayal@nvidia.co,
- weiyongjun1@huawei.com, yuehaibing@huawei.com,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20230708071307.149100-1-shaozhengchao@huawei.com>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20230708071307.149100-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] ipv6/addrconf: fix a potential refcount underflow for
+ idev
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168889802003.24969.8684110706310843516.git-patchwork-notify@kernel.org>
+Date: Sun, 09 Jul 2023 10:20:20 +0000
+References: <20230708065910.3565820-1-william.xuanziyang@huawei.com>
+In-Reply-To: <20230708065910.3565820-1-william.xuanziyang@huawei.com>
+To: Ziyang Xuan <william.xuanziyang@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ hannes@stressinduktion.org, fbl@redhat.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 08/07/2023 10:13, Zhengchao Shao wrote:
-> The memory pointed to by the priv->rx_res pointer is not freed in the error
-> path of mlx5e_init_rep_rx, which can lead to a memory leak. Fix by freeing
-> the memory in the error path, thereby making the error path identical to
-> mlx5e_cleanup_rep_rx().
+On Sat, 8 Jul 2023 14:59:10 +0800 you wrote:
+> Now in addrconf_mod_rs_timer(), reference idev depends on whether
+> rs_timer is not pending. Then modify rs_timer timeout.
 > 
-> Fixes: af8bbf730068 ("net/mlx5e: Convert mlx5e_flow_steering member of mlx5e_priv to pointer")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> There is a time gap in [1], during which if the pending rs_timer
+> becomes not pending. It will miss to hold idev, but the rs_timer
+> is activated. Thus rs_timer callback function addrconf_rs_timer()
+> will be executed and put idev later without holding idev. A refcount
+> underflow issue for idev can be caused by this.
+> 
+> [...]
 
-Thanks for your patch.
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Here is the summary with links:
+  - [net,v2] ipv6/addrconf: fix a potential refcount underflow for idev
+    https://git.kernel.org/netdev/net/c/06a0716949c2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
