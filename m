@@ -1,168 +1,126 @@
-Return-Path: <netdev+bounces-16240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073AE74C115
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 07:17:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D72E74C11D
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 07:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D244E1C2091B
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 05:17:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35A6F1C2091E
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 05:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6C21C06;
-	Sun,  9 Jul 2023 05:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA8D1FA9;
+	Sun,  9 Jul 2023 05:40:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C237A1FD8
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 05:16:49 +0000 (UTC)
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D6F102;
-	Sat,  8 Jul 2023 22:16:48 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id d9443c01a7336-1b8b4749013so24936295ad.2;
-        Sat, 08 Jul 2023 22:16:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688879808; x=1691471808;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f5IT/4pg2ojRd4xm57HWhrEgHwR41enNj19n7FJ7HSQ=;
-        b=M6th2hcmP2yhN28ewtB2KAsywav6oXtLYTfObWDIyUVcRH2JmHoSX1GBNT9Y1MGboT
-         J0N7FaO9RXNehWOtIMbDhoR9TsIa9I8tn5QDTddEiT9xncgyfG8OQYR0NHEyIY5IrydX
-         FcDOJ6+ymOJJyn7Q7pVgednnypGlgfZA1iwTnJVm9yERN1cWUe6+IPg0ujcWZZj41y/z
-         OQpxZVXY8R1sYRGDBaPwe6LS1YUECU73KOYvqvOXOZvFU1lHIMRZuUPBAXv4EwvfZkLE
-         qS884K9+hv8H8TlAWP2plkTb6yGqpj16ear8ie/CXrj7J3+dgvoQtDU4Kml+0YzrRgiY
-         qYhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688879808; x=1691471808;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5IT/4pg2ojRd4xm57HWhrEgHwR41enNj19n7FJ7HSQ=;
-        b=cUDKrFRLOL0nbkjJc+nSR9XIlrNin5XUhSD16V1rdzswITgFbHLLRwrmlDm3CKPt4F
-         Z095OtgtUjx6cJdR9lflz4R7+05kf1keqwuXvZxM82H4Q568Ylm7IhLxyTR7A46aycnd
-         fXsGecytcFT1Q0ZiptqANtihQRMWdqUYdSJ7RatZ4TS/aTTCoaa41F/7Rgm1Kz6XGes3
-         xnJiSWbzizZBNl+JkxdCzlVlukT4jLvLgrTDOpYBcMu8YG1rUrVob7X8Oi8nY2iR65Ag
-         t6GRkKXk7K82dHTXa0Xnhc7fHXoIHL8Un4AQL5wVggrfTifdnEcBr3zx4q0MLktmDmW8
-         IuZg==
-X-Gm-Message-State: ABy/qLYOt0JlXl1c24QhKBGPEaGS+jgFd0y/wMC8pKOaC1N5Uj/F9M1Y
-	slSml8jeZdmJegDucW2Eh0BVhZgC7WsxMXTrhXA=
-X-Google-Smtp-Source: APBJJlEvHN3XmnInifh1UC3s8BpriGfww6vlI8aI3/l8lfEJntt8m/UB1LDbt6hPZDlePX07akcwpQ==
-X-Received: by 2002:a17:902:d507:b0:1b9:d335:2216 with SMTP id b7-20020a170902d50700b001b9d3352216mr4003737plg.20.1688879807819;
-        Sat, 08 Jul 2023 22:16:47 -0700 (PDT)
-Received: from ?IPv6:2409:8a55:301b:e120:1523:3ecb:e154:8f22? ([2409:8a55:301b:e120:1523:3ecb:e154:8f22])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b001ab12ccc2a7sm5669261pli.98.2023.07.08.22.16.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Jul 2023 22:16:47 -0700 (PDT)
-Subject: Re: [PATCH RFC net-next v4 6/9] iavf: switch to Page Pool
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Yunsheng Lin <linyunsheng@huawei.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Michal Kubiak <michal.kubiak@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Alexander Duyck <alexanderduyck@fb.com>,
- David Christensen <drc@linux.vnet.ibm.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Paul Menzel <pmenzel@molgen.mpg.de>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20230705155551.1317583-1-aleksander.lobakin@intel.com>
- <20230705155551.1317583-7-aleksander.lobakin@intel.com>
- <6b8bc66f-8a02-b6b4-92cc-f8aaf067abd8@huawei.com>
- <bc495d87-3968-495f-c672-bf1bab38524a@intel.com>
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-Message-ID: <4946b9df-66ea-d184-b97c-0ba687e41df8@gmail.com>
-Date: Sun, 9 Jul 2023 13:16:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFE81C06
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 05:40:30 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B93712A
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 22:40:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NzlhFI7PoXlPO6jOxGj7DoJ9XV65SQ+pNfIxRWsSDtE=; b=KHjmhclS/0TUwUpZAj8p2EHE6N
+	sgntn6TUFLqdOJoBs2XDbi5k8MleCl7ZXOy8XVfDLLVeSEEmywSRebTKZbsMoe8Ixpp7BULt5dhQp
+	Lnlv802VzoXPFxbqWEKS42Aw5ugmLYN9fbZg23ESg3GVs/fuIDu3SrNgE8LJYCjIBetKv3YabMIhl
+	cJ+282Bq7Gf89TB1yqraX70ZlBG4Lfd+4G+8b4YiOIPK5PT3u6RwJctmSr14oQ4xrVmH0dISlUkr+
+	lmYaUyN2uSKi+9SiiYNFzn26LJ3TXwrLQ1RoI/gK+wBGBiEdT9Sm9BcLC+f2W0Os6USTjWsPHxH2l
+	erQ7FH2g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54962)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qIN9j-0005Gr-1J;
+	Sun, 09 Jul 2023 06:40:23 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qIN9i-0001cr-Ix; Sun, 09 Jul 2023 06:40:22 +0100
+Date: Sun, 9 Jul 2023 06:40:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: alpha_one_x86@first-world.info, Andrew Lunn <andrew@lunn.ch>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
+Subject: Re: Fw: [Bug 217640] New: 10G SFP+ and 1G Ethernet work at 100M on
+ macchiatobin
+Message-ID: <ZKpIRon2bjdFxcuK@shell.armlinux.org.uk>
+References: <20230707075919.183e6abc@hermes.local>
+ <1ae37aef-299c-400d-9287-ba5ab85637f7@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <bc495d87-3968-495f-c672-bf1bab38524a@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ae37aef-299c-400d-9287-ba5ab85637f7@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/7 0:38, Alexander Lobakin wrote:
-
-...
- 
->>
->>>  /**
->>> @@ -766,13 +742,19 @@ void iavf_free_rx_resources(struct iavf_ring *rx_ring)
->>>   **/
->>>  int iavf_setup_rx_descriptors(struct iavf_ring *rx_ring)
->>>  {
->>> -	struct device *dev = rx_ring->dev;
->>> -	int bi_size;
->>> +	struct page_pool *pool;
->>> +
->>> +	pool = libie_rx_page_pool_create(&rx_ring->q_vector->napi,
->>> +					 rx_ring->count);
->>
->> If a page is able to be spilt between more than one desc, perhaps the
->> prt_ring size does not need to be as big as rx_ring->count.
+On Sat, Jul 08, 2023 at 11:23:03PM +0200, Andrew Lunn wrote:
+> Adding Russell King.
 > 
-> But we doesn't know in advance, right? Esp. given that it's hidden in
-> the lib. But anyway, you can only assume that in regular cases if you
-> always allocate frags of the same size, PP will split pages when 2+
-> frags can fit there or return the whole page otherwise, but who knows
-> what might happen.
-
-It seems intel driver is able to know the size of memory it needs when
-creating the ring/queue/napi/pp, maybe the driver only tell the libie
-how many descs does it use for queue, and libie can adjust it accordingly?
-
-> BTW, with recent recycling optimization, most of recycling is done
-> directly through cache, not ptr_ring. So I'd even say it's safe to start
-> creating smaller ptr_rings in the drivers.
-
-The problem is that we may use more memory than before for certain case
-if we don't limit the size of ptr_ring, unless we can ensure all of
-recycling is done directly through cache, not ptr_ring.
-
+>        Andrew
 > 
->>
->>> +	if (IS_ERR(pool))
->>> +		return PTR_ERR(pool);
->>> +
->>> +	rx_ring->pp = pool;
-> 
-> [...]
-> 
->>>  	/* build an skb around the page buffer */
->>> -	skb = napi_build_skb(va - IAVF_SKB_PAD, truesize);
->>> -	if (unlikely(!skb))
->>> +	skb = napi_build_skb(va, rx_buffer->truesize);
->>> +	if (unlikely(!skb)) {
->>> +		page_pool_put_page(page->pp, page, size, true);
->>
->> Isn't it more correct to call page_pool_put_full_page() here?
->> as we do not know which frag is used for the rx_buffer, and depend
->> on the last released frag to do the syncing, maybe I should mention
->> that in Documentation/networking/page_pool.rst.
-> 
-> Ooof, maybe. My first try with PP frags. So when we use frags, we always
-> must use _full_page() / p.max_len instead of the actual frame size?
+> On Fri, Jul 07, 2023 at 07:59:19AM -0700, Stephen Hemminger wrote:
+> > 
+> > 
+> > Begin forwarded message:
+> > 
+> > Date: Thu, 06 Jul 2023 23:23:02 +0000
+> > From: bugzilla-daemon@kernel.org
+> > To: stephen@networkplumber.org
+> > Subject: [Bug 217640] New: 10G SFP+ and 1G Ethernet work at 100M on macchiatobin
+> > 
+> > 
+> > https://bugzilla.kernel.org/show_bug.cgi?id=217640
+> > 
+> >             Bug ID: 217640
+> >            Summary: 10G SFP+ and 1G Ethernet work at 100M on macchiatobin
+> >            Product: Networking
+> >            Version: 2.5
+> >           Hardware: All
+> >                 OS: Linux
+> >             Status: NEW
+> >           Severity: normal
+> >           Priority: P3
+> >          Component: Other
+> >           Assignee: stephen@networkplumber.org
+> >           Reporter: alpha_one_x86@first-world.info
+> >         Regression: No
+> > 
+> > Hi,
+> > Since I upgrade linux kernel from 5.10.137 to 6.1.38 all my interface of
+> > macchiatobin work at 100M (90 Mbits/sec detected by iperf)
+> > ethtool detect the link at correct speed (10G for SFP+ and 1Gbps for ethernet)
+> > What can be the regression?
 
-Currently, _full_page() / p.max_len must be used to ensure the correct
-dma sync operation.
-But as mentioned in the previous patch, it might be about what is the
-semantics of dma sync operation for page split case.
+I'm on holiday at the moment, so don't expect fast or full replies.
 
-> 
+If ethtool is stating the correct link speed, then it's not a SFP layer
+or phylink layer bug.
+
+I don't see any problem with mvpp2 between Armada 8040 hardware running
+6.3.0 and 6.1.0 kernels - according to iperf3:
+
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  1004 MBytes   842 Mbits/sec   46 sender
+[  5]   0.00-10.00  sec  1001 MBytes   839 Mbits/sec      receiver
+
+That's mcbin <-(copper)-> Clearfog Base <-(fibre)-> Clearfog gt-8k
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
