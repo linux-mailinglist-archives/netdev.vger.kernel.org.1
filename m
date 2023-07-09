@@ -1,53 +1,55 @@
-Return-Path: <netdev+bounces-16276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8F874C609
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:22:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A203674C60A
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4148B281047
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:22:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CB221C209CC
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFABEE570;
-	Sun,  9 Jul 2023 15:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09341E57B;
+	Sun,  9 Jul 2023 15:15:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9D7125A3
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:15:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57E3C433C8;
-	Sun,  9 Jul 2023 15:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4E2125A3
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:15:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E91EC433C8;
+	Sun,  9 Jul 2023 15:15:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688915751;
-	bh=0+28GtzrIPuHO03KXyczCcKzdYj17zvG/2QIUPRKiMY=;
+	s=k20201202; t=1688915755;
+	bh=HNcLdJT+rGUMH2QEx9FvKd4oupmDsOo1k5N5Y0hlCqw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LUHyrVjfmNjcTDbVWxmLNN2QUmXGzGPQf8SNE+i4UK3RhMsPpWiF9a00apz/PpV0r
-	 ZGG1gUbrsYmqkb18rJ7+0zsbUejgBRYPiArxutul1r/qV3S/OApizjJFoyCWamf+1t
-	 gqkUwr0nqJ06Q6IuZAHwZg7Xjip8e4cyuREIFGCHxAwxlp1I6Oyah+0150x+YtzAZt
-	 TRgft9hhyXkq0/HRF997eaJWd+xV66pbojgz6iRXKBauD9/u4pC9dVr6/JuALQzodm
-	 RXE5dBpUZcRwx/V3lobH2pGOZxG3Ln+11Qumu3rtxiKt2+Sevbq20220eb+x1sEvAy
-	 ZMCHk2J+OIzAA==
+	b=F70v8wDPiuoAbv+QRRpWfTSXi3j3Pmkw0zNqL0+b07vtM92LlLoYSVZHUWTuEHdcr
+	 AkhdwlsOX7qPQ+JhwB8zud/R2d2JrgLncjAN6mP+p1/H88p+WgwxdymgUq/zZ2p05q
+	 7f0GVy1XIL+tf5ZIUaNTvjfQ27mcqocRyIdRE2QVIqFTaV+VGYDcjTKhBYLM2LRSv7
+	 LxtSDCVT/b5v/XlJc7WiX+ACvJO0oFmUouxFJXU57wbWMsemHlTavy+Iwm4mtfsfXZ
+	 GGJ76leZeC/9cf+qneG6wogAPlwDXpoxjVaQ/Kr6mRvlEjlpyhcqoCcwvtUkw80Kwa
+	 NWzH7N0j48MAQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ying Hsu <yinghsu@chromium.org>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Hao Chen <chenhao418@huawei.com>,
+	kernel test robot <lkp@intel.com>,
+	Hao Lan <lanhao@huawei.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	jesse.brandeburg@intel.com,
+	yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 09/10] igb: Fix igb_down hung on surprise removal
-Date: Sun,  9 Jul 2023 11:15:27 -0400
-Message-Id: <20230709151528.513775-9-sashal@kernel.org>
+	kuba@kernel.org,
+	guoren@kernel.org,
+	huangguangbin2@huawei.com,
+	netdev@vger.kernel.org,
+	linux-csky@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 10/10] net: hns3: fix strncpy() not using dest-buf length as length issue
+Date: Sun,  9 Jul 2023 11:15:28 -0400
+Message-Id: <20230709151528.513775-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230709151528.513775-1-sashal@kernel.org>
 References: <20230709151528.513775-1-sashal@kernel.org>
@@ -62,87 +64,138 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.120
 Content-Transfer-Encoding: 8bit
 
-From: Ying Hsu <yinghsu@chromium.org>
+From: Hao Chen <chenhao418@huawei.com>
 
-[ Upstream commit 004d25060c78fc31f66da0fa439c544dda1ac9d5 ]
+[ Upstream commit 1cf3d5567f273a8746d1bade00633a93204f80f0 ]
 
-In a setup where a Thunderbolt hub connects to Ethernet and a display
-through USB Type-C, users may experience a hung task timeout when they
-remove the cable between the PC and the Thunderbolt hub.
-This is because the igb_down function is called multiple times when
-the Thunderbolt hub is unplugged. For example, the igb_io_error_detected
-triggers the first call, and the igb_remove triggers the second call.
-The second call to igb_down will block at napi_synchronize.
-Here's the call trace:
-    __schedule+0x3b0/0xddb
-    ? __mod_timer+0x164/0x5d3
-    schedule+0x44/0xa8
-    schedule_timeout+0xb2/0x2a4
-    ? run_local_timers+0x4e/0x4e
-    msleep+0x31/0x38
-    igb_down+0x12c/0x22a [igb 6615058754948bfde0bf01429257eb59f13030d4]
-    __igb_close+0x6f/0x9c [igb 6615058754948bfde0bf01429257eb59f13030d4]
-    igb_close+0x23/0x2b [igb 6615058754948bfde0bf01429257eb59f13030d4]
-    __dev_close_many+0x95/0xec
-    dev_close_many+0x6e/0x103
-    unregister_netdevice_many+0x105/0x5b1
-    unregister_netdevice_queue+0xc2/0x10d
-    unregister_netdev+0x1c/0x23
-    igb_remove+0xa7/0x11c [igb 6615058754948bfde0bf01429257eb59f13030d4]
-    pci_device_remove+0x3f/0x9c
-    device_release_driver_internal+0xfe/0x1b4
-    pci_stop_bus_device+0x5b/0x7f
-    pci_stop_bus_device+0x30/0x7f
-    pci_stop_bus_device+0x30/0x7f
-    pci_stop_and_remove_bus_device+0x12/0x19
-    pciehp_unconfigure_device+0x76/0xe9
-    pciehp_disable_slot+0x6e/0x131
-    pciehp_handle_presence_or_link_change+0x7a/0x3f7
-    pciehp_ist+0xbe/0x194
-    irq_thread_fn+0x22/0x4d
-    ? irq_thread+0x1fd/0x1fd
-    irq_thread+0x17b/0x1fd
-    ? irq_forced_thread_fn+0x5f/0x5f
-    kthread+0x142/0x153
-    ? __irq_get_irqchip_state+0x46/0x46
-    ? kthread_associate_blkcg+0x71/0x71
-    ret_from_fork+0x1f/0x30
+Now, strncpy() in hns3_dbg_fill_content() use src-length as copy-length,
+it may result in dest-buf overflow.
 
-In this case, igb_io_error_detected detaches the network interface
-and requests a PCIE slot reset, however, the PCIE reset callback is
-not being invoked and thus the Ethernet connection breaks down.
-As the PCIE error in this case is a non-fatal one, requesting a
-slot reset can be avoided.
-This patch fixes the task hung issue and preserves Ethernet
-connection by ignoring non-fatal PCIE errors.
+This patch is to fix intel compile warning for csky-linux-gcc (GCC) 12.1.0
+compiler.
 
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Link: https://lore.kernel.org/r/20230620174732.4145155-1-anthony.l.nguyen@intel.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+The warning reports as below:
+
+hclge_debugfs.c:92:25: warning: 'strncpy' specified bound depends on
+the length of the source argument [-Wstringop-truncation]
+
+strncpy(pos, items[i].name, strlen(items[i].name));
+
+hclge_debugfs.c:90:25: warning: 'strncpy' output truncated before
+terminating nul copying as many bytes from a string as its length
+[-Wstringop-truncation]
+
+strncpy(pos, result[i], strlen(result[i]));
+
+strncpy() use src-length as copy-length, it may result in
+dest-buf overflow.
+
+So,this patch add some values check to avoid this issue.
+
+Signed-off-by: Hao Chen <chenhao418@huawei.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/lkml/202207170606.7WtHs9yS-lkp@intel.com/T/
+Signed-off-by: Hao Lan <lanhao@huawei.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/igb/igb_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 31 ++++++++++++++-----
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 29 ++++++++++++++---
+ 2 files changed, 48 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index bff9649d8abd0..3d380dfff7783 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -9447,6 +9447,11 @@ static pci_ers_result_t igb_io_error_detected(struct pci_dev *pdev,
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct igb_adapter *adapter = netdev_priv(netdev);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 3158c08a3aa9c..ff931b8ef569e 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -388,19 +388,36 @@ static void hns3_dbg_fill_content(char *content, u16 len,
+ 				  const struct hns3_dbg_item *items,
+ 				  const char **result, u16 size)
+ {
++#define HNS3_DBG_LINE_END_LEN	2
+ 	char *pos = content;
++	u16 item_len;
+ 	u16 i;
  
-+	if (state == pci_channel_io_normal) {
-+		dev_warn(&pdev->dev, "Non-correctable non-fatal error reported.\n");
-+		return PCI_ERS_RESULT_CAN_RECOVER;
++	if (!len) {
++		return;
++	} else if (len <= HNS3_DBG_LINE_END_LEN) {
++		*pos++ = '\0';
++		return;
 +	}
 +
- 	netif_device_detach(netdev);
+ 	memset(content, ' ', len);
+-	for (i = 0; i < size; i++) {
+-		if (result)
+-			strncpy(pos, result[i], strlen(result[i]));
+-		else
+-			strncpy(pos, items[i].name, strlen(items[i].name));
++	len -= HNS3_DBG_LINE_END_LEN;
  
- 	if (state == pci_channel_io_perm_failure)
+-		pos += strlen(items[i].name) + items[i].interval;
++	for (i = 0; i < size; i++) {
++		item_len = strlen(items[i].name) + items[i].interval;
++		if (len < item_len)
++			break;
++
++		if (result) {
++			if (item_len < strlen(result[i]))
++				break;
++			strscpy(pos, result[i], strlen(result[i]));
++		} else {
++			strscpy(pos, items[i].name, strlen(items[i].name));
++		}
++		pos += item_len;
++		len -= item_len;
+ 	}
+-
+ 	*pos++ = '\n';
+ 	*pos++ = '\0';
+ }
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+index 9cda8b3562b89..9d064efdfd59f 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+@@ -81,16 +81,35 @@ static void hclge_dbg_fill_content(char *content, u16 len,
+ 				   const struct hclge_dbg_item *items,
+ 				   const char **result, u16 size)
+ {
++#define HCLGE_DBG_LINE_END_LEN	2
+ 	char *pos = content;
++	u16 item_len;
+ 	u16 i;
+ 
++	if (!len) {
++		return;
++	} else if (len <= HCLGE_DBG_LINE_END_LEN) {
++		*pos++ = '\0';
++		return;
++	}
++
+ 	memset(content, ' ', len);
++	len -= HCLGE_DBG_LINE_END_LEN;
++
+ 	for (i = 0; i < size; i++) {
+-		if (result)
+-			strncpy(pos, result[i], strlen(result[i]));
+-		else
+-			strncpy(pos, items[i].name, strlen(items[i].name));
+-		pos += strlen(items[i].name) + items[i].interval;
++		item_len = strlen(items[i].name) + items[i].interval;
++		if (len < item_len)
++			break;
++
++		if (result) {
++			if (item_len < strlen(result[i]))
++				break;
++			strscpy(pos, result[i], strlen(result[i]));
++		} else {
++			strscpy(pos, items[i].name, strlen(items[i].name));
++		}
++		pos += item_len;
++		len -= item_len;
+ 	}
+ 	*pos++ = '\n';
+ 	*pos++ = '\0';
 -- 
 2.39.2
 
