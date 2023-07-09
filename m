@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-16277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A203674C60A
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:23:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B25774C60C
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CB221C209CC
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:23:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA9461C209D5
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09341E57B;
-	Sun,  9 Jul 2023 15:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD13F9C3;
+	Sun,  9 Jul 2023 15:16:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4E2125A3
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:15:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E91EC433C8;
-	Sun,  9 Jul 2023 15:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1011FCE
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:16:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D62CFC433C8;
+	Sun,  9 Jul 2023 15:16:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688915755;
-	bh=HNcLdJT+rGUMH2QEx9FvKd4oupmDsOo1k5N5Y0hlCqw=;
+	s=k20201202; t=1688915766;
+	bh=9q0VftGjlhhgwKZQBzEjweR5vkmbEiXhcGML+zUgMxg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F70v8wDPiuoAbv+QRRpWfTSXi3j3Pmkw0zNqL0+b07vtM92LlLoYSVZHUWTuEHdcr
-	 AkhdwlsOX7qPQ+JhwB8zud/R2d2JrgLncjAN6mP+p1/H88p+WgwxdymgUq/zZ2p05q
-	 7f0GVy1XIL+tf5ZIUaNTvjfQ27mcqocRyIdRE2QVIqFTaV+VGYDcjTKhBYLM2LRSv7
-	 LxtSDCVT/b5v/XlJc7WiX+ACvJO0oFmUouxFJXU57wbWMsemHlTavy+Iwm4mtfsfXZ
-	 GGJ76leZeC/9cf+qneG6wogAPlwDXpoxjVaQ/Kr6mRvlEjlpyhcqoCcwvtUkw80Kwa
-	 NWzH7N0j48MAQ==
+	b=oIErQNk23j5vFqJRBrFejdGXYUl3UlZjrb/Yvor0YAufgXpgNUcFDBwRxJOrxESWQ
+	 /U6uoXx3/23dbNlDoKYBpIuolxLaZVfxeYkbR7XA114WMMt2pTYIAwpgPo3KNIi48K
+	 cJZ/ZpwbFCeqcuWhOebaHsdmrTuo8UVkm0FTW26K0fie8d7N7KevtUojU1S7Fa830m
+	 nNtHRGVgR/psO7z3PZQXjIWNT+y19qn0BzimkJGcxc0AWXE41Vp0nm3x1TLvvlrDod
+	 QBTO2n8vaiGyJAZF5ItCCKx7oZPgdZCZh/zFssLTYPGs5m7UoSy+uNzFtzQJ9/vgRP
+	 i4iAtSDO1GLZw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Hao Chen <chenhao418@huawei.com>,
-	kernel test robot <lkp@intel.com>,
-	Hao Lan <lanhao@huawei.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Petr Oros <poros@redhat.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	yisen.zhuang@huawei.com,
-	salil.mehta@huawei.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	guoren@kernel.org,
-	huangguangbin2@huawei.com,
-	netdev@vger.kernel.org,
-	linux-csky@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 10/10] net: hns3: fix strncpy() not using dest-buf length as length issue
-Date: Sun,  9 Jul 2023 11:15:28 -0400
-Message-Id: <20230709151528.513775-10-sashal@kernel.org>
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	jacob.e.keller@intel.com,
+	moshe@nvidia.com,
+	michal.wilczynski@intel.com,
+	vikas.gupta@broadcom.com,
+	shayd@nvidia.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 4/7] devlink: report devlink_port_type_warn source device
+Date: Sun,  9 Jul 2023 11:15:52 -0400
+Message-Id: <20230709151555.513910-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230709151528.513775-1-sashal@kernel.org>
-References: <20230709151528.513775-1-sashal@kernel.org>
+In-Reply-To: <20230709151555.513910-1-sashal@kernel.org>
+References: <20230709151555.513910-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,141 +61,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.120
+X-stable-base: Linux 5.10.186
 Content-Transfer-Encoding: 8bit
 
-From: Hao Chen <chenhao418@huawei.com>
+From: Petr Oros <poros@redhat.com>
 
-[ Upstream commit 1cf3d5567f273a8746d1bade00633a93204f80f0 ]
+[ Upstream commit a52305a81d6bb74b90b400dfa56455d37872fe4b ]
 
-Now, strncpy() in hns3_dbg_fill_content() use src-length as copy-length,
-it may result in dest-buf overflow.
+devlink_port_type_warn is scheduled for port devlink and warning
+when the port type is not set. But from this warning it is not easy
+found out which device (driver) has no devlink port set.
 
-This patch is to fix intel compile warning for csky-linux-gcc (GCC) 12.1.0
-compiler.
+[ 3709.975552] Type was not set for devlink port.
+[ 3709.975579] WARNING: CPU: 1 PID: 13092 at net/devlink/leftover.c:6775 devlink_port_type_warn+0x11/0x20
+[ 3709.993967] Modules linked in: openvswitch nf_conncount nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nfnetlink bluetooth rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache netfs vhost_net vhost vhost_iotlb tap tun bridge stp llc qrtr intel_rapl_msr intel_rapl_common i10nm_edac nfit libnvdimm x86_pkg_temp_thermal mlx5_ib intel_powerclamp coretemp dell_wmi ledtrig_audio sparse_keymap ipmi_ssif kvm_intel ib_uverbs rfkill ib_core video kvm iTCO_wdt acpi_ipmi intel_vsec irqbypass ipmi_si iTCO_vendor_support dcdbas ipmi_devintf mei_me ipmi_msghandler rapl mei intel_cstate isst_if_mmio isst_if_mbox_pci dell_smbios intel_uncore isst_if_common i2c_i801 dell_wmi_descriptor wmi_bmof i2c_smbus intel_pch_thermal pcspkr acpi_power_meter xfs libcrc32c sd_mod sg nvme_tcp mgag200 i2c_algo_bit nvme_fabrics drm_shmem_helper drm_kms_helper nvme syscopyarea ahci sysfillrect sysimgblt nvme_core fb_sys_fops crct10dif_pclmul libahci mlx5_core sfc crc32_pclmul nvme_common drm
+[ 3709.994030]  crc32c_intel mtd t10_pi mlxfw libata tg3 mdio megaraid_sas psample ghash_clmulni_intel pci_hyperv_intf wmi dm_multipath sunrpc dm_mirror dm_region_hash dm_log dm_mod be2iscsi bnx2i cnic uio cxgb4i cxgb4 tls libcxgbi libcxgb qla4xxx iscsi_boot_sysfs iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi fuse
+[ 3710.108431] CPU: 1 PID: 13092 Comm: kworker/1:1 Kdump: loaded Not tainted 5.14.0-319.el9.x86_64 #1
+[ 3710.108435] Hardware name: Dell Inc. PowerEdge R750/0PJ80M, BIOS 1.8.2 09/14/2022
+[ 3710.108437] Workqueue: events devlink_port_type_warn
+[ 3710.108440] RIP: 0010:devlink_port_type_warn+0x11/0x20
+[ 3710.108443] Code: 84 76 fe ff ff 48 c7 03 20 0e 1a ad 31 c0 e9 96 fd ff ff 66 0f 1f 44 00 00 0f 1f 44 00 00 48 c7 c7 18 24 4e ad e8 ef 71 62 ff <0f> 0b c3 cc cc cc cc 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 f6 87
+[ 3710.108445] RSP: 0018:ff3b6d2e8b3c7e90 EFLAGS: 00010282
+[ 3710.108447] RAX: 0000000000000000 RBX: ff366d6580127080 RCX: 0000000000000027
+[ 3710.108448] RDX: 0000000000000027 RSI: 00000000ffff86de RDI: ff366d753f41f8c8
+[ 3710.108449] RBP: ff366d658ff5a0c0 R08: ff366d753f41f8c0 R09: ff3b6d2e8b3c7e18
+[ 3710.108450] R10: 0000000000000001 R11: 0000000000000023 R12: ff366d753f430600
+[ 3710.108451] R13: ff366d753f436900 R14: 0000000000000000 R15: ff366d753f436905
+[ 3710.108452] FS:  0000000000000000(0000) GS:ff366d753f400000(0000) knlGS:0000000000000000
+[ 3710.108453] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 3710.108454] CR2: 00007f1c57bc74e0 CR3: 000000111d26a001 CR4: 0000000000773ee0
+[ 3710.108456] PKRU: 55555554
+[ 3710.108457] Call Trace:
+[ 3710.108458]  <TASK>
+[ 3710.108459]  process_one_work+0x1e2/0x3b0
+[ 3710.108466]  ? rescuer_thread+0x390/0x390
+[ 3710.108468]  worker_thread+0x50/0x3a0
+[ 3710.108471]  ? rescuer_thread+0x390/0x390
+[ 3710.108473]  kthread+0xdd/0x100
+[ 3710.108477]  ? kthread_complete_and_exit+0x20/0x20
+[ 3710.108479]  ret_from_fork+0x1f/0x30
+[ 3710.108485]  </TASK>
+[ 3710.108486] ---[ end trace 1b4b23cd0c65d6a0 ]---
 
-The warning reports as below:
+After patch:
+[  402.473064] ice 0000:41:00.0: Type was not set for devlink port.
+[  402.473064] ice 0000:41:00.1: Type was not set for devlink port.
 
-hclge_debugfs.c:92:25: warning: 'strncpy' specified bound depends on
-the length of the source argument [-Wstringop-truncation]
-
-strncpy(pos, items[i].name, strlen(items[i].name));
-
-hclge_debugfs.c:90:25: warning: 'strncpy' output truncated before
-terminating nul copying as many bytes from a string as its length
-[-Wstringop-truncation]
-
-strncpy(pos, result[i], strlen(result[i]));
-
-strncpy() use src-length as copy-length, it may result in
-dest-buf overflow.
-
-So,this patch add some values check to avoid this issue.
-
-Signed-off-by: Hao Chen <chenhao418@huawei.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/lkml/202207170606.7WtHs9yS-lkp@intel.com/T/
-Signed-off-by: Hao Lan <lanhao@huawei.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Petr Oros <poros@redhat.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Link: https://lore.kernel.org/r/20230615095447.8259-1-poros@redhat.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 31 ++++++++++++++-----
- .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 29 ++++++++++++++---
- 2 files changed, 48 insertions(+), 12 deletions(-)
+ net/core/devlink.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-index 3158c08a3aa9c..ff931b8ef569e 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-@@ -388,19 +388,36 @@ static void hns3_dbg_fill_content(char *content, u16 len,
- 				  const struct hns3_dbg_item *items,
- 				  const char **result, u16 size)
+diff --git a/net/core/devlink.c b/net/core/devlink.c
+index 72047750dcd96..00c6944ed6342 100644
+--- a/net/core/devlink.c
++++ b/net/core/devlink.c
+@@ -8092,7 +8092,10 @@ EXPORT_SYMBOL_GPL(devlink_free);
+ 
+ static void devlink_port_type_warn(struct work_struct *work)
  {
-+#define HNS3_DBG_LINE_END_LEN	2
- 	char *pos = content;
-+	u16 item_len;
- 	u16 i;
- 
-+	if (!len) {
-+		return;
-+	} else if (len <= HNS3_DBG_LINE_END_LEN) {
-+		*pos++ = '\0';
-+		return;
-+	}
-+
- 	memset(content, ' ', len);
--	for (i = 0; i < size; i++) {
--		if (result)
--			strncpy(pos, result[i], strlen(result[i]));
--		else
--			strncpy(pos, items[i].name, strlen(items[i].name));
-+	len -= HNS3_DBG_LINE_END_LEN;
- 
--		pos += strlen(items[i].name) + items[i].interval;
-+	for (i = 0; i < size; i++) {
-+		item_len = strlen(items[i].name) + items[i].interval;
-+		if (len < item_len)
-+			break;
-+
-+		if (result) {
-+			if (item_len < strlen(result[i]))
-+				break;
-+			strscpy(pos, result[i], strlen(result[i]));
-+		} else {
-+			strscpy(pos, items[i].name, strlen(items[i].name));
-+		}
-+		pos += item_len;
-+		len -= item_len;
- 	}
--
- 	*pos++ = '\n';
- 	*pos++ = '\0';
+-	WARN(true, "Type was not set for devlink port.");
++	struct devlink_port *port = container_of(to_delayed_work(work),
++						 struct devlink_port,
++						 type_warn_dw);
++	dev_warn(port->devlink->dev, "Type was not set for devlink port.");
  }
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-index 9cda8b3562b89..9d064efdfd59f 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-@@ -81,16 +81,35 @@ static void hclge_dbg_fill_content(char *content, u16 len,
- 				   const struct hclge_dbg_item *items,
- 				   const char **result, u16 size)
- {
-+#define HCLGE_DBG_LINE_END_LEN	2
- 	char *pos = content;
-+	u16 item_len;
- 	u16 i;
  
-+	if (!len) {
-+		return;
-+	} else if (len <= HCLGE_DBG_LINE_END_LEN) {
-+		*pos++ = '\0';
-+		return;
-+	}
-+
- 	memset(content, ' ', len);
-+	len -= HCLGE_DBG_LINE_END_LEN;
-+
- 	for (i = 0; i < size; i++) {
--		if (result)
--			strncpy(pos, result[i], strlen(result[i]));
--		else
--			strncpy(pos, items[i].name, strlen(items[i].name));
--		pos += strlen(items[i].name) + items[i].interval;
-+		item_len = strlen(items[i].name) + items[i].interval;
-+		if (len < item_len)
-+			break;
-+
-+		if (result) {
-+			if (item_len < strlen(result[i]))
-+				break;
-+			strscpy(pos, result[i], strlen(result[i]));
-+		} else {
-+			strscpy(pos, items[i].name, strlen(items[i].name));
-+		}
-+		pos += item_len;
-+		len -= item_len;
- 	}
- 	*pos++ = '\n';
- 	*pos++ = '\0';
+ static bool devlink_port_type_should_warn(struct devlink_port *devlink_port)
 -- 
 2.39.2
 
