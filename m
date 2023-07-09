@@ -1,53 +1,49 @@
-Return-Path: <netdev+bounces-16259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858CD74C571
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:16:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C2F874C591
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:17:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C35A1C20957
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:16:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042FB280E1E
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6DDF9FA;
-	Sun,  9 Jul 2023 15:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56AEFC00;
+	Sun,  9 Jul 2023 15:14:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA84D8F53;
-	Sun,  9 Jul 2023 15:14:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E37C433CD;
-	Sun,  9 Jul 2023 15:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC620FBEB
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:14:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87CBBC433AD;
+	Sun,  9 Jul 2023 15:14:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688915648;
-	bh=J83B5M0SSjR0PqXCiLMt7aaua6VCIzuHqD3fXFdUn7k=;
+	s=k20201202; t=1688915651;
+	bh=tPlnrUOB44ixW+YBquQhtPmxhbOHRKsLyCXO3Ctx5n8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SJG8QzaRRz4MA/k7MIMD0Eta6Q9uakCHWabMj68ypoCNN0e5LgkqlYjh+AgQ1VzOe
-	 g5s3uyg74yMF3CZUSPaAKyfhmJho5qT9CwkXKW06TcSLDsPOJMG5F3QQlev3kFsBMy
-	 83AYYhlUWX6LMz7caoUEzwh5AowpalLa7hTIDRv6xCWJuUbV2g+ZlJEiBAQ8vOnDJn
-	 Ap6gNzMdLhv9uXApeNUQ4Uz7P3r7R5S5DvduxNfR+Z3HNBa+7VYzYUUJuOpC1C3hy4
-	 RV8h8ZXLnr0y0JWL0ILebV5v0gR2dfHFnhVSnHFp2yqTWnmRKcoovsqkd3PH3LgMG3
-	 nXQfRXmMFYURw==
+	b=fR502gn3j5irkmlOamCCkNlVD5JEpZ6PT9EB/lCFuMuEZoVh00W9kipbtrBZ3LzFv
+	 8Zgs2ADx0G0NDacEnjeIsQIHXcfqYsTcRIanP4iZW7k3eUtb5Pe8pk40fO3R2LPnmY
+	 YYeNHrrtNjlOwV56CvSstUstMQqW6aVWkNl5SwpXs3/5v++Qnb1GwlcGocZ0LpnWbw
+	 lSgOGnPJXum+iRc9B8Vhlk7TxnJZrTYJwmZKdXfQ8kAUDBulsVptuSf7FhwP84XrMl
+	 olHNLtj4N72SFsUamvsAIltoyYFXzjpDIVyS72GAY99oUV59m2LKFuWUr/yh1iiPcu
+	 xo5abzUsdNYUw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Aditi Ghag <aditi.ghag@isovalent.com>,
-	Yonghong Song <yhs@meta.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@nvidia.com>,
 	Sasha Levin <sashal@kernel.org>,
-	edumazet@google.com,
+	jiri@resnulli.us,
 	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
+	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.3 06/22] bpf: tcp: Avoid taking fast sock lock in iterator
-Date: Sun,  9 Jul 2023 11:13:40 -0400
-Message-Id: <20230709151356.513279-6-sashal@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.3 08/22] devlink: make health report on unregistered instance warn just once
+Date: Sun,  9 Jul 2023 11:13:42 -0400
+Message-Id: <20230709151356.513279-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230709151356.513279-1-sashal@kernel.org>
 References: <20230709151356.513279-1-sashal@kernel.org>
@@ -62,150 +58,41 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.3.12
 Content-Transfer-Encoding: 8bit
 
-From: Aditi Ghag <aditi.ghag@isovalent.com>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit 9378096e8a656fb5c4099b26b1370c56f056eab9 ]
+[ Upstream commit 6f4b98147b8dfcabacb19b5c6abd087af66d0049 ]
 
-This is a preparatory commit to replace `lock_sock_fast` with
-`lock_sock`,and facilitate BPF programs executed from the TCP sockets
-iterator to be able to destroy TCP sockets using the bpf_sock_destroy
-kfunc (implemented in follow-up commits).
+Devlink health is involved in error recovery. Machines in bad
+state tend to be fairly unreliable, and occasionally get stuck
+in error loops. Even with a reasonable grace period devlink health
+may get a thousand reports in an hour.
 
-Previously, BPF TCP iterator was acquiring the sock lock with BH
-disabled. This led to scenarios where the sockets hash table bucket lock
-can be acquired with BH enabled in some path versus disabled in other.
-In such situation, kernel issued a warning since it thinks that in the
-BH enabled path the same bucket lock *might* be acquired again in the
-softirq context (BH disabled), which will lead to a potential dead lock.
-Since bpf_sock_destroy also happens in a process context, the potential
-deadlock warning is likely a false alarm.
+In case of reporting on an unregistered devlink instance
+the subsequent reports don't add much value. Switch to
+WARN_ON_ONCE() to avoid flooding dmesg and fleet monitoring
+dashboards.
 
-Here is a snippet of annotated stack trace that motivated this change:
-
-```
-
-Possible interrupt unsafe locking scenario:
-
-      CPU0                    CPU1
-      ----                    ----
- lock(&h->lhash2[i].lock);
-                              local_bh_disable();
-                              lock(&h->lhash2[i].lock);
-kernel imagined possible scenario:
-  local_bh_disable();  /* Possible softirq */
-  lock(&h->lhash2[i].lock);
-*** Potential Deadlock ***
-
-process context:
-
-lock_acquire+0xcd/0x330
-_raw_spin_lock+0x33/0x40
-------> Acquire (bucket) lhash2.lock with BH enabled
-__inet_hash+0x4b/0x210
-inet_csk_listen_start+0xe6/0x100
-inet_listen+0x95/0x1d0
-__sys_listen+0x69/0xb0
-__x64_sys_listen+0x14/0x20
-do_syscall_64+0x3c/0x90
-entry_SYSCALL_64_after_hwframe+0x72/0xdc
-
-bpf_sock_destroy run from iterator:
-
-lock_acquire+0xcd/0x330
-_raw_spin_lock+0x33/0x40
-------> Acquire (bucket) lhash2.lock with BH disabled
-inet_unhash+0x9a/0x110
-tcp_set_state+0x6a/0x210
-tcp_abort+0x10d/0x200
-bpf_prog_6793c5ca50c43c0d_iter_tcp6_server+0xa4/0xa9
-bpf_iter_run_prog+0x1ff/0x340
-------> lock_sock_fast that acquires sock lock with BH disabled
-bpf_iter_tcp_seq_show+0xca/0x190
-bpf_seq_read+0x177/0x450
-
-```
-
-Also, Yonghong reported a deadlock for non-listening TCP sockets that
-this change resolves. Previously, `lock_sock_fast` held the sock spin
-lock with BH which was again being acquired in `tcp_abort`:
-
-```
-watchdog: BUG: soft lockup - CPU#0 stuck for 86s! [test_progs:2331]
-RIP: 0010:queued_spin_lock_slowpath+0xd8/0x500
-Call Trace:
- <TASK>
- _raw_spin_lock+0x84/0x90
- tcp_abort+0x13c/0x1f0
- bpf_prog_88539c5453a9dd47_iter_tcp6_client+0x82/0x89
- bpf_iter_run_prog+0x1aa/0x2c0
- ? preempt_count_sub+0x1c/0xd0
- ? from_kuid_munged+0x1c8/0x210
- bpf_iter_tcp_seq_show+0x14e/0x1b0
- bpf_seq_read+0x36c/0x6a0
-
-bpf_iter_tcp_seq_show
-   lock_sock_fast
-     __lock_sock_fast
-       spin_lock_bh(&sk->sk_lock.slock);
-	/* * Fast path return with bottom halves disabled and * sock::sk_lock.slock held.* */
-
- ...
- tcp_abort
-   local_bh_disable();
-   spin_lock(&((sk)->sk_lock.slock)); // from bh_lock_sock(sk)
-
-```
-
-With the switch to `lock_sock`, it calls `spin_unlock_bh` before returning:
-
-```
-lock_sock
-    lock_sock_nested
-       spin_lock_bh(&sk->sk_lock.slock);
-       :
-       spin_unlock_bh(&sk->sk_lock.slock);
-```
-
-Acked-by: Yonghong Song <yhs@meta.com>
-Acked-by: Stanislav Fomichev <sdf@google.com>
-Signed-off-by: Aditi Ghag <aditi.ghag@isovalent.com>
-Link: https://lore.kernel.org/r/20230519225157.760788-2-aditi.ghag@isovalent.com
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Link: https://lore.kernel.org/r/20230531015523.48961-1-kuba@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/tcp_ipv4.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/devlink/health.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index c87958f979f0a..470c8427a48c2 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2963,7 +2963,6 @@ static int bpf_iter_tcp_seq_show(struct seq_file *seq, void *v)
- 	struct bpf_iter_meta meta;
- 	struct bpf_prog *prog;
- 	struct sock *sk = v;
--	bool slow;
- 	uid_t uid;
- 	int ret;
+diff --git a/net/devlink/health.c b/net/devlink/health.c
+index 0839706d5741a..194340a8bb863 100644
+--- a/net/devlink/health.c
++++ b/net/devlink/health.c
+@@ -480,7 +480,7 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
+ 	int err;
  
-@@ -2971,7 +2970,7 @@ static int bpf_iter_tcp_seq_show(struct seq_file *seq, void *v)
- 		return 0;
+ 	WARN_ON(cmd != DEVLINK_CMD_HEALTH_REPORTER_RECOVER);
+-	WARN_ON(!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED));
++	ASSERT_DEVLINK_REGISTERED(devlink);
  
- 	if (sk_fullsock(sk))
--		slow = lock_sock_fast(sk);
-+		lock_sock(sk);
- 
- 	if (unlikely(sk_unhashed(sk))) {
- 		ret = SEQ_SKIP;
-@@ -2995,7 +2994,7 @@ static int bpf_iter_tcp_seq_show(struct seq_file *seq, void *v)
- 
- unlock:
- 	if (sk_fullsock(sk))
--		unlock_sock_fast(sk, slow);
-+		release_sock(sk);
- 	return ret;
- 
- }
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!msg)
 -- 
 2.39.2
 
