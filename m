@@ -1,128 +1,115 @@
-Return-Path: <netdev+bounces-16288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 717D874C648
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:44:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EAF674C660
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 18:14:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E11172810A2
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:44:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D8E01C20848
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 16:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515D3A951;
-	Sun,  9 Jul 2023 15:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77FEAD38;
+	Sun,  9 Jul 2023 16:14:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A694699
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:44:02 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E09FA
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 08:44:01 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b70404a5a0so55294521fa.2
-        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 08:44:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85855C96
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 16:14:01 +0000 (UTC)
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D52DFD
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 09:14:00 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3a4062577c0so192778b6e.0
+        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 09:14:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688917439; x=1691509439;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1OQhrt8fh17tYTVhYsSZNKsTES/IGVa3gtBLYFCQaEQ=;
-        b=GPphGyYRFg7clXzdfnRuVUm6aHz8F64Fo76bnx0NjAGCl1m+TROIee+OKM99/dZX7m
-         XcPYSmftTwp1yG9BP/tkCt+DDnG+EcJSOkr+5GS3a4TwTB2SLY0T9FXY0hW7/inrgLKR
-         eEZfal2D3OQKDzkJ0acFFozTNTQnSJhkXpBsO5TfB1/IFKCgWp8XBj8tKiIRRHPBg3kS
-         CVYLiCQ9VZdYWo9Mb6jQJfoVr+iXr44FPmFeb1TOH4aTZRnEbaeOm8i/yS2UuqKzoK9g
-         DNUi9/UEprLRZnRZ8jL1HoBgHL9nU/91troMFqYsi5fkytOW8PIHaubnbJBUWLj6FvM5
-         3Hqg==
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688919239; x=1691511239;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4pKNlMWqDYznUvAGWejPHHIg2LL4VA2/8r0XhpwiMXY=;
+        b=X/GMix1fSZ+hPSAfh5dPyRSf0q56WWcfTb9F/vbQs/cZ1eGptx8L1U7t4G2q3aTT3Z
+         mzLZuvTp/nwfA5zjfjd/1b/TASFwpJW6yzUScnqVLk725jc4MQbeZq1cRravKvGDxLaO
+         6G/8VwrKLGtXL2yS+52u6QNmF+PN7RmR31coOm8d0XvA4hmMrDiaoXp9W9ICtRo/J/HR
+         U6gIXHugr5ZRFF4S8fwH+b2X6vaS88+OLcDc3bkqrZBFLbMoqvrYz0UwOkJY/3k8/8EB
+         Gun5LHp5PWG6/nOGruV2bO5Jw8888FkPJdwl2tPwgAQg+ropFP6Z7D7fM/tEYNX6tAGt
+         07Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688917439; x=1691509439;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1OQhrt8fh17tYTVhYsSZNKsTES/IGVa3gtBLYFCQaEQ=;
-        b=OXH1VweGzaMWEcx3i414QkLJrzpGp5UBuoaLo5AwBbSJAAiIiji9SV16x9Zjc4iZk3
-         O5mdDmrlYgukQ+1n4OM+G3Iptwg++8Hz6G/pQTne38cxgfJ8H8inuFNy11YTKomW6fy6
-         zK/+NeF5hHsX3hLa8kXba8uDJ5I00uP4Cy5tNwWqa2ZEn/MvF1U7/g2JdJlsHWyJPFQ7
-         TqJBNQAIS1Q6gfpGFZQ2LT+ntLkH1+kvIfOKvsCPLtnCOzVeHjzTe9sZ+DJOpqfTPAOn
-         bfcDnSiEUO7p8Wus/yJAlih0Z7FdEyr2uIazQPAZJ8Pys3pwacCj6AGWsCcZkVtpTNfR
-         qOYQ==
-X-Gm-Message-State: ABy/qLY6KspGNo2yeF5QYkGOV0fIUvH7ygIX1y3fWx2+Ilg7A1KCC1MF
-	SangsCDTqcJ/zZp6932aA9QVkVQVBNvndh6+C4Fv2RBuEiY=
-X-Google-Smtp-Source: APBJJlGMXSM0/za1Gxn5wfW+ZsLeqprPpFrjuyb3LQ+mjymWahWK4/Tv+wmim+IeEj7ETVaS2SgHWX9rvqenCmeJ/ig=
-X-Received: by 2002:a05:6512:31c4:b0:4fb:db2c:5d77 with SMTP id
- j4-20020a05651231c400b004fbdb2c5d77mr2116646lfe.69.1688917439402; Sun, 09 Jul
- 2023 08:43:59 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688919239; x=1691511239;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4pKNlMWqDYznUvAGWejPHHIg2LL4VA2/8r0XhpwiMXY=;
+        b=a0EwVXJYVKkaWwApuwC09qQa1wxP4iJDVwhoLbAAsvgV0GgSloD7ThLx/pdD8t8Z7r
+         Df9Q1+C0tY29eTn4cRieXBuPYD5UDEhRzzUIVPlFvynfqvht5aRV3AvWrmPx5URESh3t
+         rdy8ASF+QHbuEpkMxKnGLJf/sJyjeF2HH9vWEUi3hVVeAn692TLd9g6HVh2MaWfFbjvy
+         sn4/mFM0z0J2X3M3AF9C0wKqvruMVK8LngmWgU2U+j7oQbZT2ZjcXu9p8TMauqRFQnxU
+         j70VwusGT41fe0/oJPVa3TvRkrhrQKIIfKZnesWVjGSFjUWUrP2sRepx5wdDq31A8Yxi
+         Lnyw==
+X-Gm-Message-State: ABy/qLYwgQBOyfIULDMYI1CwLZXYLXWd8W2TVSFmyeaMB6Fhdlj1pRYx
+	ePP8aKx/8hiYJJCrdtdQ9dECYjDI2P4pvzUFYHs=
+X-Google-Smtp-Source: APBJJlH8OTHRUJ3usFRsESRkMx6bO4WfFJkt99pC/5OU4ySoMClwuDPtzA2+Bh+v8ibX+WVEq3rRIQ==
+X-Received: by 2002:a05:6808:2a04:b0:3a1:de65:8403 with SMTP id ez4-20020a0568082a0400b003a1de658403mr5008002oib.1.1688919239485;
+        Sun, 09 Jul 2023 09:13:59 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f1:e2c1:1622:34af:d3bb:8e9a:95c5])
+        by smtp.gmail.com with ESMTPSA id w14-20020a056808140e00b003a1efec1a6esm3391617oiv.46.2023.07.09.09.13.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jul 2023 09:13:59 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pctammela@mojatatu.com,
+	simon.horman@corigine.com,
+	kernel@mojatatu.com
+Subject: [PATCH net v3 0/2] net: sched: Undo tcf_bind_filter in case of errors in set callbacks
+Date: Sun,  9 Jul 2023 13:13:48 -0300
+Message-Id: <20230709161350.347064-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Nayan Gadre <beejoy.nayan@gmail.com>
-Date: Sun, 9 Jul 2023 21:13:48 +0530
-Message-ID: <CABTgHBsFQo0dvPaNzv+516n3G5_6jU5tvuuZ7HRb5_G8gA3_hw@mail.gmail.com>
-Subject: Behavior of tc for bridged ports
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Experts,
+BPF and flower classifier are calling tcf_bind_filter in their set
+callbacks, but aren't undoing it by calling tcf_unbind_filter if their
+was an error after binding.
 
-I have a wireless router having the client facing interface wlan0 and
-the wired gateway facing interface eth0 under a bridge br0.
+This patch set fixes this by calling tcf_unbind_filter in such cases.
 
-/ # brctl show
-bridge name     bridge id               STP enabled     interfaces
-br0             8000.bce67c4d8fb0       no              eth0
-                                                                           wlan0
+v1 -> v2:
+* Remove blank line after fixes tag
+* Fix reverse xmas tree issues pointed out by Simon
 
-client get IP 192.168.0.105, and server (connected via eth0) has IP
-192.168.0.10.
-On server I run "iperf3 -s -p 5678 -V"
-On client I run "iperf3 -c 192.168.0.10 -p5678 -i1 -tinf"
-All works fine.
+v2 -> v3:
+* Inlined functions cls_bpf_set_parms and fl_set_parms to avoid adding
+  yet another parameter (and a return value at it) to them.
+* Removed similar fixes for u32 and matchall, which will be sent soon,
+  once we find a way to do the fixes without adding a return parameter
+  to their set_parms functions.
 
-Now I want to rate limit the traffic going from wlan0 to eth0 to 5000kbits/sec.
+Victor Nogueira (2):
+  net: sched: cls_bpf: Undo tcf_bind_filter in case of an error
+  net: sched: cls_flower: Undo tcf_bind_filter if fl_set_key fails
 
-I tried to apply a classless qdisc to eth0 port as well as wlan0 port.
-# tc qdisc add dev eth0 root tbf rate 5000kbit latency 50ms burst 15k
-# tc qdisc add dev wlan0 root tbf rate 5000kbit latency 50ms burst 15k
+ net/sched/cls_bpf.c    | 99 ++++++++++++++++++++----------------------
+ net/sched/cls_flower.c | 99 ++++++++++++++++++++----------------------
+ 2 files changed, 94 insertions(+), 104 deletions(-)
 
-However, the qdisc does not take effect.
+-- 
+2.25.1
 
-iperf3 -c 192.168.0.10 -p5678 -i1 -tinf
-Connecting to host 192.168.0.10, port 5678
-[  5] local 192.168.0.105 port 43384 connected to 192.168.0.10 port 5678
-[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-[  5]   0.00-1.00   sec  10.7 MBytes  89.6 Mbits/sec    0    526 KBytes
-[  5]   1.00-2.00   sec  8.95 MBytes  75.1 Mbits/sec    0    560 KBytes
-[  5]   2.00-3.00   sec  9.13 MBytes  76.6 Mbits/sec    0    619 KBytes
-
-/ # tc -s qdisc
-qdisc tbf 8005: dev eth0 root refcnt 5 rate 5Mbit burst 15Kb lat 50ms
- Sent 221305 bytes 469 pkt (dropped 157, overlimits 288 requeues 0)
- backlog 0b 0p requeues 0
-qdisc tbf 8006: dev wlan16 root refcnt 5 rate 5Mbit burst 15Kb lat 50ms
- Sent 7095 bytes 109 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-
-My kernel is 4.4.60, and I checked that qdisc gets activated in the
-egress path after dev_queue_xmit() is called. And for a bridged port,
-the path taken by the packet coming to wlan0 is
-__br_deliver -> br_forward_finish -> br_dev_queue_push_xmit -> dev_queue_xmit.
-
-So the qdisc should have taken effect even in the bridged case. I see
-statistics for eth0 qdisc.
-What am I missing in the tc rule ?
-
-If I apply the same rule on the server and client interfaces then I
-can see rate limiting taking effect. But on the wireless router linux
-bridge it's not working.
-
-Thanks
-N Gadre
 
