@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-16488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F63E74D957
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:54:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF78D74D95F
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2711C1C208C8
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 14:54:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0267D1C20A31
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 14:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C51125BF;
-	Mon, 10 Jul 2023 14:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63C7125CE;
+	Mon, 10 Jul 2023 14:58:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A7B2F2F
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:54:19 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A8DEC4;
-	Mon, 10 Jul 2023 07:54:18 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3fbf1b82d9cso48273525e9.2;
-        Mon, 10 Jul 2023 07:54:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EE53222
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:58:30 +0000 (UTC)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4046CC7;
+	Mon, 10 Jul 2023 07:58:29 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3094910b150so5044149f8f.0;
+        Mon, 10 Jul 2023 07:58:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689000857; x=1691592857;
+        d=gmail.com; s=20221208; t=1689001107; x=1691593107;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bvcwHkM7LCO7a024nl7ZUkA0CE5fAJDEqmEoltxDZF8=;
-        b=G/qarMcW7fFBzgrDu5zSH8J7IilZkk0efzZgM3OS6gXKXTkj/EzjCMgNYO4z9LhzvP
-         zIOdCVpWQxm+gG8mknm1k5ohFJ8fmzqE3p2tON72cH88LPR1BWwspGYCgCtG1izi8fnq
-         dXsXPhtiB5OWJ51DPRKUyfYd8cQH1Crr51CYDJBqjwnj+E3DmTFdTYW/YFqXfWsV/Fq1
-         yR+S7ZJnqTa8ExenmTLYyjq88/huzG5Au/pxN6VBR7TBq1HkXMwIMT2sKlzxoals2B/W
-         NY96aBaHGSckwIzfiAfLWu8OV1V8vYBT7S6Gxzpx2Ys3IPHqo0mg2TdBHa7xBYkRpleb
-         A+IA==
+        bh=YF4N91VO4731Qxuhb6zJZEzEq5eJXvcQG1cnkkQn1R0=;
+        b=c718WTnKC5RcuqbSt2PWn5cWb6II+KZUWRy0H4Bjs1zc2rJxjrco+qt3W+n90c3DSK
+         puZbWWbcKCGrwSiSquoZxxqXYz9peGZw9FSBXI6b5euCpFMugIKKfE2E1yLF6gfiJ2dw
+         L6JanANiI98n54jxUOu/yZ7/aNmJwah0ETL8pNvpZLaZfGe6XFhGfWLoga5AI9i0g5cO
+         O8urv+NhAhTNcJwXvFN72WcpO2TZ1xo2IbwV7mwhCB5TEY3PAjyOax9Qe5roQNSb/G/I
+         q+1uGOwxMoSbIS+8B62vvh7YktD3SrI/XMT1KIAILmR05vXn13w/PdHYMoJ3iujePeiu
+         Oo3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689000857; x=1691592857;
+        d=1e100.net; s=20221208; t=1689001107; x=1691593107;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bvcwHkM7LCO7a024nl7ZUkA0CE5fAJDEqmEoltxDZF8=;
-        b=U3gaejIkFpWIaFlxZjXnGzyEfDayvmeyjnojJ98u9LJqMcrEHOYyVsWOXou/J93oqz
-         5O2lwQbwJy+S7U2rqjVAv5x4aHrkLY7uNgh51NVSixYmgeynysV42ybK6uwnkVDYwctZ
-         5bT4dJNmt4zo0P7Z5TEVl9N2plOir6+t5UlE1y4Hs5Bt4niJ6a08wqFFyzs2FeobIeRF
-         fheeaQb5i1p1C2OcaNOrSjWNz2xeKeX03ZGGaKAktLGBEMWz20RcVrx8qQbMP6qOsgV2
-         QRTvZCdbfcebt9wptbN89UMY165DXqzTTV+uXiCmv/bzZj211sDVG62M5KxhSazqEV5s
-         IHVg==
-X-Gm-Message-State: ABy/qLYwiw+BNNSzU73m5H5JYgQWWfDKPhAGC0zZlj77kYrk0FejJIch
-	ByNVroYqk/2qvIe9Hxmvoec=
-X-Google-Smtp-Source: APBJJlEo2lYuWjQRxe6vAZ11uL6QOzP/K/X4bUawUM2P4R5WwY/eGCznfd28+zuEnX1TtriUzrqhNQ==
-X-Received: by 2002:a05:600c:c8:b0:3fb:b05d:f27c with SMTP id u8-20020a05600c00c800b003fbb05df27cmr10986477wmm.34.1689000856477;
-        Mon, 10 Jul 2023 07:54:16 -0700 (PDT)
+        bh=YF4N91VO4731Qxuhb6zJZEzEq5eJXvcQG1cnkkQn1R0=;
+        b=bBhZv9K1BnOkpMCSpb/h2dwgjc9f0mm3EZvOhgACA4wQVmE8u88eASoI5NN/6Q1/m7
+         DiTNqQMlBqvrp3kkZ24NE61pFF5c41240bX5EdUKlJJAErFO/4dbD43mvbSrnApw9KCU
+         DanppvQZhLCGddVK4MrVci3YbM9UeUo+dK+qhudzd3tq47Vg9ko3FpjdEjQPLDa5veyO
+         KP7gqG9swHCKiTkP/6f0acZyACtHF6VcekclLZxpej7Y3pJHv1b0ZmCHK5ndl3NDJwiU
+         hC7s90f+4gSPVi9l51lpes/cpQo7jVy2AoUVwn0XSlw3YuNEUuZXXNrlZ4FsX/i/9AL+
+         yuLw==
+X-Gm-Message-State: ABy/qLbDaKbBhtuFnZqV5TIZEB1Rsx8L4f10vpm3UuMYQlNxw0kFR/8C
+	5LojH4KlWZAXfiyG9UtdJnpR46xUj04=
+X-Google-Smtp-Source: APBJJlGY4/HeY9i8fA3daSHGlZtUYVxAr8t2ePiTBuBz8noq8I5zGk/M9Akm07p4HVHv/n7ufYh7vA==
+X-Received: by 2002:adf:d08a:0:b0:314:3b68:eac6 with SMTP id y10-20020adfd08a000000b003143b68eac6mr11754512wrh.12.1689001107457;
+        Mon, 10 Jul 2023 07:58:27 -0700 (PDT)
 Received: from debian ([89.238.191.199])
-        by smtp.gmail.com with ESMTPSA id l22-20020a7bc456000000b003fbb5142c4bsm10509928wmi.18.2023.07.10.07.54.10
+        by smtp.gmail.com with ESMTPSA id f18-20020adff992000000b003143c532431sm11938480wrr.27.2023.07.10.07.58.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 07:54:16 -0700 (PDT)
-Date: Mon, 10 Jul 2023 16:54:05 +0200
+        Mon, 10 Jul 2023 07:58:27 -0700 (PDT)
+Date: Mon, 10 Jul 2023 16:58:18 +0200
 From: Richard Gobert <richardbgobert@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	willemdebruijn.kernel@gmail.com, dsahern@kernel.org,
+To: David Ahern <dsahern@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
 	tom@herbertland.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, gal@nvidia.com
 Subject: Re: [PATCH 1/1] net: gro: fix misuse of CB in udp socket lookup
-Message-ID: <20230710145403.GA22009@debian>
+Message-ID: <20230710145817.GB22009@debian>
 References: <20230707121650.GA17677@debian>
  <20230707122627.GA17845@debian>
- <CANn89i+gm=0J3aR_9ikhroQmAvuQ+-dPMH1em9WrmE1o1pfi7w@mail.gmail.com>
+ <1340947f-2f66-e93d-9dab-055e40e1f9f9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +76,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANn89i+gm=0J3aR_9ikhroQmAvuQ+-dPMH1em9WrmE1o1pfi7w@mail.gmail.com>
+In-Reply-To: <1340947f-2f66-e93d-9dab-055e40e1f9f9@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -85,20 +85,20 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thanks, I will send a v2 with the fixes.
+> put your cover letter details in here; no need for a cover letter for a
+> single patch.
 
-> ipv6_rcv() inits
-> 
-> IP6CB(skb)->iif = skb_dst(skb) ?
-> ip6_dst_idev(skb_dst(skb))->dev->ifindex : dev->ifindex;
-> 
-> You chose to always use skb->dev->ifindex instead ?
-> 
-> You might add a comment why it is okay.
+I believe some details are irrelevant to the bugfix itself,
+I prefer to avoid overloading the commit message...
+Do you think there is a specific part of the cover letter that
+should be added to the commit message?
 
-It looks like this assignment ("ip6_dst_idev(skb_dst(skb))->dev->ifindex")
-is relevant only in case of sending traffic on loopback.
-It does not seem relevant in GRO stack.
-That is why I chose to use only the `skb->dev->ifindex` part.
-Do you think that's correct?
+> there are existing iif and sdif lookup functions. I believe this gro
+> path needs a different version, but it should have a comment of when it
+> can be used vs the existing ones. Also, it is small enough to be an
+> inline like the existing ones. e.g., see inet_sdif
+
+I was under the impression the coding style of Linux does not
+encourage placing the inline keyword.
+In which cases do you think I should add it?
 
