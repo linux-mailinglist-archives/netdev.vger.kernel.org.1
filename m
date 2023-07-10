@@ -1,134 +1,96 @@
-Return-Path: <netdev+bounces-16408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54AC774D164
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:27:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1441674D1BD
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:36:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F71C280FC7
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:27:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4A992810CC
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB70D51D;
-	Mon, 10 Jul 2023 09:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069CDDDA1;
+	Mon, 10 Jul 2023 09:36:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46403C8D0;
-	Mon, 10 Jul 2023 09:27:51 +0000 (UTC)
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A678DE;
-	Mon, 10 Jul 2023 02:27:47 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0Vn0blpX_1688981263;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vn0blpX_1688981263)
-          by smtp.aliyun-inc.com;
-          Mon, 10 Jul 2023 17:27:44 +0800
-Message-ID: <1688981109.6377137-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next V1 0/4] virtio_net: add per queue interrupt coalescing support
-Date: Mon, 10 Jul 2023 17:25:09 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Gavin Li <gavinl@nvidia.com>
-Cc: <virtualization@lists.linux-foundation.org>,
- <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>,
- <bpf@vger.kernel.org>,
- <mst@redhat.com>,
- <jasowang@redhat.com>,
- <xuanzhuo@linux.alibaba.com>,
- <davem@davemloft.net>,
- <edumazet@google.com>,
- <kuba@kernel.org>,
- <pabeni@redhat.com>,
- <ast@kernel.org>,
- <daniel@iogearbox.net>,
- <hawk@kernel.org>,
- <john.fastabend@gmail.com>,
- <jiri@nvidia.com>,
- <dtatulea@nvidia.com>,
- "Heng Qi" <hengqi@linux.alibaba.com>
-References: <20230710092005.5062-1-gavinl@nvidia.com>
-In-Reply-To: <20230710092005.5062-1-gavinl@nvidia.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9F4D2E1
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:36:38 +0000 (UTC)
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD2A30E3
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 02:36:17 -0700 (PDT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2630eecfa6dso5399497a91.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 02:36:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688981742; x=1691573742;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0ydRUn+tKaLG1zTzHEXZ2Ybmp5TubgGd03eOnLQcB9w=;
+        b=AgTLp+TQBcJZiJjUZpiFNqqH005X2FlALKh/3KazwK/Y6Usu9l106moMCtwwX6yJ/0
+         WYyZ/lIRnPiqdRiEPf3htWqs/gnatpAVl7NUqxJw5W8I2yC0b5cfFUVNqY+Jxyo/a06C
+         8ZkaCJEfpETkQhjU0dfDMxEbbmjgZzMzByeDW09AflB092CMwyWk4mRZJBWwwQ7JIQET
+         XubsTOnitx+/8tHZP5DOPM9c2pPxdbvgF6/R/bGsKA5QTB0smWDKFm859HgYneWSqKsz
+         q+0RegajRJpq7ytITIZqR04Ev2piyxLFdBMiJtjyhU4ROKgz5wLeU6N4vIB4W02XNStZ
+         RWjQ==
+X-Gm-Message-State: ABy/qLamR5FvuuazZS2mczqJE2p1qbIDbzeNspWCl7BL8XwVLbegSuGh
+	mDGQuVBnb/DJV7MVmZiyKDNk5r9lLeMGMZI68Uth6ZdjCDMC
+X-Google-Smtp-Source: APBJJlFte/aUON1/d+7OQe6PyezOXIdxpLKUCjpp5BSxfk2sXsOXrfOimFbJkWLgfI1py9v9VxR1Zb7iypewj+Cuo1VSsavUc/Ai
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a17:90b:1283:b0:263:f16:3192 with SMTP id
+ fw3-20020a17090b128300b002630f163192mr9969156pjb.3.1688981741807; Mon, 10 Jul
+ 2023 02:35:41 -0700 (PDT)
+Date: Mon, 10 Jul 2023 02:35:41 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c0affc06001eb4b5@google.com>
+Subject: [syzbot] Monthly can report (Jul 2023)
+From: syzbot <syzbot+lista46e1a512a5bfdf1cfa5@syzkaller.appspotmail.com>
+To: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkl@pengutronix.de, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 10 Jul 2023 12:20:01 +0300, Gavin Li <gavinl@nvidia.com> wrote:
+Hello can maintainers/developers,
 
-As far as I know, Heng Qi does that. I'm not sure, it's the same piece.
+This is a 31-day syzbot report for the can subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/can
 
-cc @Heng Qi
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 13 issues are still open and 45 have been fixed so far.
 
-Thanks.
+Some of the still happening issues:
 
+Ref Crashes Repro Title
+<1> 279     Yes   possible deadlock in j1939_sk_queue_drop_all
+                  https://syzkaller.appspot.com/bug?extid=3bd970a1887812621b4c
+<2> 56      Yes   possible deadlock in j1939_session_activate
+                  https://syzkaller.appspot.com/bug?extid=f32cbede7fd867ce0d56
+<3> 10      No    KCSAN: data-race in bcm_can_tx / bcm_tx_setup (3)
+                  https://syzkaller.appspot.com/bug?extid=e1786f049e71693263bf
 
-> Currently, coalescing parameters are grouped for all transmit and receive
-> virtqueues. This patch series add support to set or get the parameters for
-> a specified virtqueue.
->
-> When the traffic between virtqueues is unbalanced, for example, one virtqueue
-> is busy and another virtqueue is idle, then it will be very useful to
-> control coalescing parameters at the virtqueue granularity.
->
-> Example command:
-> $ ethtool -Q eth5 queue_mask 0x1 --coalesce tx-packets 10
-> Would set max_packets=10 to VQ 1.
-> $ ethtool -Q eth5 queue_mask 0x1 --coalesce rx-packets 10
-> Would set max_packets=10 to VQ 0.
-> $ ethtool -Q eth5 queue_mask 0x1 --show-coalesce
->  Queue: 0
->  Adaptive RX: off  TX: off
->  stats-block-usecs: 0
->  sample-interval: 0
->  pkt-rate-low: 0
->  pkt-rate-high: 0
->
->  rx-usecs: 222
->  rx-frames: 0
->  rx-usecs-irq: 0
->  rx-frames-irq: 256
->
->  tx-usecs: 222
->  tx-frames: 0
->  tx-usecs-irq: 0
->  tx-frames-irq: 256
->
->  rx-usecs-low: 0
->  rx-frame-low: 0
->  tx-usecs-low: 0
->  tx-frame-low: 0
->
->  rx-usecs-high: 0
->  rx-frame-high: 0
->  tx-usecs-high: 0
->  tx-frame-high: 0
->
-> In this patch series:
-> Patch-1: Extract interrupt coalescing settings to a structure.
-> Patch-2: Extract get/set interrupt coalesce to a function.
-> Patch-3: Support per queue interrupt coalesce command.
-> Patch-4: Enable per queue interrupt coalesce feature.
->
-> Gavin Li (4):
->   virtio_net: extract interrupt coalescing settings to a structure
->   virtio_net: extract get/set interrupt coalesce to a function
->   virtio_net: support per queue interrupt coalesce command
->   virtio_net: enable per queue interrupt coalesce feature
->
->  drivers/net/virtio_net.c        | 169 ++++++++++++++++++++++++++------
->  include/uapi/linux/virtio_net.h |  14 +++
->  2 files changed, 154 insertions(+), 29 deletions(-)
->
-> --
-> 2.39.1
->
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
