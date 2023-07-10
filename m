@@ -1,155 +1,143 @@
-Return-Path: <netdev+bounces-16515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25FF474DABE
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 879C374DAC9
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 557A62810D6
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F59228123A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF9F12B9A;
-	Mon, 10 Jul 2023 16:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7141C12B9B;
+	Mon, 10 Jul 2023 16:12:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A4C33E3
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:07:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1122BCA
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:07:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689005227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sWiIZe3IQ53PYjOqAGgSM04HvFoUmNUVGs7k+iQr98s=;
-	b=BFbGU9BIE/Y6c2XrrxUkabso142nnTRlWoBwX+1AxVcgR30Fse5kWNS+aIO16bwi21keoU
-	V9GEk+9ePwAqyqf0l0qzp0r9DYrqzX6MDK1T2/A/N3JHnXhCHpZ4YYiLxvaNFHcu82B82Q
-	7UkA/I+am+cRHA7NgGGayCdT4dTjFKQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-575-dIE7LkHCPRCSzsQLlw3dlQ-1; Mon, 10 Jul 2023 12:07:05 -0400
-X-MC-Unique: dIE7LkHCPRCSzsQLlw3dlQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-993d631393fso216963466b.0
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:07:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689005224; x=1691597224;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sWiIZe3IQ53PYjOqAGgSM04HvFoUmNUVGs7k+iQr98s=;
-        b=GjHj2GWezSyynjjKjvUNLgLXxWA777dhQOmcAqiiTs3CxqdT/v81TFYs6sNe6LuZfp
-         hqdNSnlQb1rr0ry3AnyIjvzTQtuvs6jcgscfQFyULU5EACnt15jHi2IGrGuZJ9lraovN
-         FI2awfzG79nCdBwdA3tcRGnvK4+mifgv7TC6dL9glS9D+oJXpvF7SJ1g4/7rQccW/Mc/
-         s3y1gI4IMEICPxhtjxHmjcDswAzUegak+DKoeEQ5+QGwNdi+kEU8dbPvDbIzEMS/LAK7
-         cN0IP9ZMcPgvFsRFB+30X/X8J0tGK38Jn5qRHmPlgWAon8zQ4yjMb/OajWOustdIHtmt
-         cyag==
-X-Gm-Message-State: ABy/qLator8T6TNBq+Fgzgnhqa6GQPO7DCK7bPZRYnHYg2xLGX7YrbOt
-	vD/9SXlJAanj4+zV4keHaFlI0Sq0P76fu4nJlzXOaxdYCNUraRoBH60satUWWiknIi346fM1GoW
-	smmyGuVtjdFC5qrjkRmQuYWsK
-X-Received: by 2002:a17:907:3a4a:b0:991:fef4:bb9 with SMTP id fc10-20020a1709073a4a00b00991fef40bb9mr11668552ejc.58.1689005224144;
-        Mon, 10 Jul 2023 09:07:04 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFf54riBNADGeqj5jE2yAEEGB1xUZ+DB0OZq6xJaA2gRL34/NmWlhtp5FmeAhPsifKS0fXuYA==
-X-Received: by 2002:a17:907:3a4a:b0:991:fef4:bb9 with SMTP id fc10-20020a1709073a4a00b00991fef40bb9mr11668532ejc.58.1689005223861;
-        Mon, 10 Jul 2023 09:07:03 -0700 (PDT)
-Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id i27-20020a170906115b00b00992b2c55c67sm6241656eja.156.2023.07.10.09.07.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jul 2023 09:07:03 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <6a492751-8d35-0c81-dd3e-c32417a2e06e@redhat.com>
-Date: Mon, 10 Jul 2023 18:07:02 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6431F3222
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:12:39 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5865123;
+	Mon, 10 Jul 2023 09:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689005557; x=1720541557;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0SlN/itezSp5S5zjCF2SMzf5gnBS89SJ4xDj94AkcQw=;
+  b=Uu0Ds1em9Lk23LHZobxne2tEvaESDgD3vrZExJS0WizvCzVkChwvH2YF
+   Zx1M4+DhsRvt0igFRNfcE1oHdMN38+Y8hqIw8bedIO9M7NXclWLr9r9cx
+   pwuyzG71FM/4y5GhSoGovaR/CKn03W7ERCn/QYqPj/pPFBa2JsGX9LUOW
+   L8dGO7ho3bzEMLNFvFPL6flQ+4HhKPDER9cXmL8TsjJWaLBezOhEP1cvV
+   FlE8q5hP8sIq7aH3Fk8gD9/ijGApm2n2dqbV0q4weyt6P0WJlIR1W3E5/
+   Mk7MIH9C2o26PUK8J/epFVE6IHD3pSg/wxul959N4kyr948zI/0jnIJzw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="430464657"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="430464657"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 09:11:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="750388713"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="750388713"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga008.jf.intel.com with ESMTP; 10 Jul 2023 09:10:47 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1qItTH-001bF6-2N;
+	Mon, 10 Jul 2023 19:10:43 +0300
+Date: Mon, 10 Jul 2023 19:10:43 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Mark Brown <broonie@kernel.org>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
+	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Andy Gross <agross@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
+	Alain Volmat <alain.volmat@foss.st.com>,
+	Orson Zhai <orsonzhai@gmail.com>,
+	Radu Pirea <radu_nicolae.pirea@upb.ro>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Chunyan Zhang <zhang.lyra@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>
+Subject: Re: [PATCH v2 09/15] spi: Use struct_size() helper
+Message-ID: <ZKwtgwZtUUHGC+S3@smile.fi.intel.com>
+References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
+ <20230710154932.68377-10-andriy.shevchenko@linux.intel.com>
+ <20230710-doze-scared-9f0a2e1a9125-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: brouer@redhat.com, almasrymina@google.com, hawk@kernel.org,
- ilias.apalodimas@linaro.org, edumazet@google.com, dsahern@gmail.com,
- michael.chan@broadcom.com, willemb@google.com
-Subject: Re: [RFC 04/12] net: page_pool: merge page_pool_release_page() with
- page_pool_return_page()
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-References: <20230707183935.997267-1-kuba@kernel.org>
- <20230707183935.997267-5-kuba@kernel.org>
-In-Reply-To: <20230707183935.997267-5-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710-doze-scared-9f0a2e1a9125-mkl@pengutronix.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Jul 10, 2023 at 05:59:55PM +0200, Marc Kleine-Budde wrote:
+> On 10.07.2023 18:49:26, Andy Shevchenko wrote:
 
+...
 
-On 07/07/2023 20.39, Jakub Kicinski wrote:
-> Now that page_pool_release_page() is not exported we can
-> merge it with page_pool_return_page(). I believe that
-> the "Do not replace this with page_pool_return_page()"
-> comment was there in case page_pool_return_page() was
-> not inlined, to avoid two function calls.
+> > +	struct spi_transfer	t[];
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> You might want to use the DECLARE_FLEX_ARRAY helper here.
 
-I forgot the exact reason, but the "avoid two function calls" argument
-makes sense.  As this is no-longer an issues, I'm okay with this change.
+Technically, yes, semantically documentation [1] disagrees with
+you, so I leave it as is.
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+[1]: Documentation/process/deprecated.rst:269
 
-> ---
->   net/core/page_pool.c | 12 ++----------
->   1 file changed, 2 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 2c7cf5f2bcb8..7ca456bfab71 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -492,7 +492,7 @@ static s32 page_pool_inflight(struct page_pool *pool)
->    * a regular page (that will eventually be returned to the normal
->    * page-allocator via put_page).
->    */
-> -static void page_pool_release_page(struct page_pool *pool, struct page *page)
-> +static void page_pool_return_page(struct page_pool *pool, struct page *page)
->   {
->   	dma_addr_t dma;
->   	int count;
-> @@ -518,12 +518,6 @@ static void page_pool_release_page(struct page_pool *pool, struct page *page)
->   	 */
->   	count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
->   	trace_page_pool_state_release(pool, page, count);
-> -}
-> -
-> -/* Return a page to the page allocator, cleaning up our state */
-> -static void page_pool_return_page(struct page_pool *pool, struct page *page)
-> -{
-> -	page_pool_release_page(pool, page);
->   
->   	put_page(page);
->   	/* An optimization would be to call __free_pages(page, pool->p.order)
-> @@ -615,9 +609,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
->   	 * will be invoking put_page.
->   	 */
->   	recycle_stat_inc(pool, released_refcnt);
-> -	/* Do not replace this with page_pool_return_page() */
-> -	page_pool_release_page(pool, page);
-> -	put_page(page);
-> +	page_pool_return_page(pool, page);
->   
->   	return NULL;
->   }
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
 
