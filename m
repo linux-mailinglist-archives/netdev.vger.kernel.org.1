@@ -1,125 +1,202 @@
-Return-Path: <netdev+bounces-16350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B8FD74CE0F
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:20:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E80F974CE59
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAF42280F13
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:20:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB91E280F70
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF22525A;
-	Mon, 10 Jul 2023 07:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E035689;
+	Mon, 10 Jul 2023 07:28:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AA83D8C
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 07:19:59 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8601F9D
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 00:19:58 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qIlBY-0008Dx-Cl; Mon, 10 Jul 2023 09:19:52 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qIlBX-00DMeg-D2; Mon, 10 Jul 2023 09:19:51 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qIlBW-003jmM-E9; Mon, 10 Jul 2023 09:19:50 +0200
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Li Yang <leoyang.li@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	kernel@pengutronix.de,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH net-next v3 8/8] net: ucc_geth: Convert to platform remove callback returning void
-Date: Mon, 10 Jul 2023 09:19:46 +0200
-Message-Id: <20230710071946.3470249-9-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230710071946.3470249-1-u.kleine-koenig@pengutronix.de>
-References: <20230710071946.3470249-1-u.kleine-koenig@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1B3525A
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 07:28:31 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E50AEC;
+	Mon, 10 Jul 2023 00:28:30 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A7MZgX006257;
+	Mon, 10 Jul 2023 07:28:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=IIVbNm70ilZCkUbp/iQj0rFzl6EWpboLhrIAQ60lx2M=;
+ b=gE7VMqP6gyWIjaDstNtDtyySNeiuBUFuCK2hdAE6R/zn8Y7jpB8gH5UgyXAcP/29i8IO
+ 7kg/XD0nIEA6ZNVZEmLISK/yKYjOLMMmuLWovm0WGADvm5+B7SiGqDhp48e5jqRmFWJP
+ H9EO++7uYgC8DK7rRteOq9bFkOA9JX6S2JE7Ag9oFH5qPhMrQt6p6WRhrSsPJ74MQuaz
+ 9dXXzTgd+fsm9SY6cXxnh80i+TpkAhsE1UsFlMv7PJY8sla6IijAnRUBFuZvdpmfmObd
+ ugNhl9iifRqj20BiP8mcnVdNjdrKWwCuyFDwzMeZ6TI5rZvEoAWVAL3ne5IkD5aU2kWJ 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrdhp03mj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Jul 2023 07:28:28 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36A7MmDD007239;
+	Mon, 10 Jul 2023 07:28:27 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrdhp03kc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Jul 2023 07:28:27 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+	by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36A4wgJe023419;
+	Mon, 10 Jul 2023 07:28:25 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3rpye50t4y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Jul 2023 07:28:24 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36A7SLgZ19727028
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Jul 2023 07:28:21 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6A50120043;
+	Mon, 10 Jul 2023 07:28:21 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9825720040;
+	Mon, 10 Jul 2023 07:28:20 +0000 (GMT)
+Received: from [9.171.92.205] (unknown [9.171.92.205])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 10 Jul 2023 07:28:20 +0000 (GMT)
+Message-ID: <df5fe3d295711666bf170d35f5196fe7b880342b.camel@linux.ibm.com>
+Subject: Re: [PATCH net v2 1/3] s390/ism: Fix locking for forwarding of IRQs
+ and events to clients
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Heiko
+ Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander
+ Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Stefan Raspl <raspl@linux.ibm.com>, Jan
+ Karcher <jaka@linux.ibm.com>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date: Mon, 10 Jul 2023 09:28:20 +0200
+In-Reply-To: <ZKlmeDUEZf7F8+HW@corigine.com>
+References: <20230707104359.3324039-1-schnelle@linux.ibm.com>
+	 <20230707104359.3324039-2-schnelle@linux.ibm.com>
+	 <ZKlmeDUEZf7F8+HW@corigine.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1970; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=MWG25xeucMsvR/Be22NB5NNDyCslZbc0Qzb5GVk1pMw=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBkq7EOuqjS5ZFQngt2RKKE2TSEuIZAjWLQTwAI5 10wJrNlKI+JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZKuxDgAKCRCPgPtYfRL+ Tk57B/wJtvoYBqKMuvOct4BqINYr9FSJR3DP/Fgg4GUkIumncV5FCZOX+P0VAQd0+7VlgM4pTz4 tRB5Embp2m/TX2OpCI0olwKBEvEjh5Z3/T37zgDxso2Meh5RHbGJy9n/XGtAZx8eoNWpmSeH+6G uK4ZTH1BYU7VZRbJ9zUp/sE4jilTi1+HBzJGfCg/4ojcs4RLipCIKvkPTMrhlxQ90NNHYMaag6W i65mPyiQfFJphVl3TTM7SgKSZpseae55jnq3Iwq6Sh193fCr8mDU6bvWbizgT4UPR4zijtL/8Ho sOy91FLLe/+3P05qiTTnyhx7AsnCi5bxgiRVyipehEyM6WYG
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kPPOZgAY4A3XDD71YHTwOpORGVsTC3tX
+X-Proofpoint-ORIG-GUID: IQN94oqGDifqOWM75ocf360o29wtmBit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-10_05,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=399 phishscore=0 adultscore=0 mlxscore=0 suspectscore=0
+ clxscore=1011 spamscore=0 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2305260000 definitions=main-2307100064
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is (mostly) ignored
-and this typically results in resource leaks. To improve here there is a
-quest to make the remove callback return void. In the first step of this
-quest all drivers are converted to .remove_new() which already returns
-void.
+On Sat, 2023-07-08 at 14:36 +0100, Simon Horman wrote:
+> On Fri, Jul 07, 2023 at 12:43:57PM +0200, Niklas Schnelle wrote:
+> > The clients array references all registered clients and is protected by
+> > the clients_lock. Besides its use as general list of clients the client=
+s
+> > array is accessed in ism_handle_irq() to forward ISM device events to
+> > clients.
+> >=20
+> > While the clients_lock is taken in the IRQ handler when calling
+> > handle_event() it is however incorrectly not held during the
+> > client->handle_irq() call and for the preceding clients[] access leavin=
+g
+> > it unprotected against concurrent client (un-)registration.
+> >=20
+> > Furthermore the accesses to ism->sba_client_arr[] in ism_register_dmb()
+> > and ism_unregister_dmb() are not protected by any lock. This is
+> > especially problematic as the client ID from the ism->sba_client_arr[]
+> > is not checked against NO_CLIENT and neither is the client pointer
+> > checked.
+> >=20
+> > Instead of expanding the use of the clients_lock further add a separate
+> > array in struct ism_dev which references clients subscribed to the
+> > device's events and IRQs. This array is protected by ism->lock which is
+> > already taken in ism_handle_irq() and can be taken outside the IRQ
+> > handler when adding/removing subscribers or the accessing
+> > ism->sba_client_arr[]. This also means that the clients_lock is no
+> > longer taken in IRQ context.
+> >=20
+> > Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
+> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+>=20
+> ...
+>=20
+> > @@ -71,6 +80,7 @@ int ism_register_client(struct ism_client *client)
+> >  		list_for_each_entry(ism, &ism_dev_list.list, list) {
+> >  			ism->priv[i] =3D NULL;
+> >  			client->add(ism);
+> > +			ism_setup_forwarding(client, ism);
+> >  		}
+> >  	}
+> >  	mutex_unlock(&ism_dev_list.mutex);
+>=20
+> ...
+>=20
+> > @@ -92,6 +102,9 @@ int ism_unregister_client(struct ism_client *client)
+> >  		max_client--;
+> >  	spin_unlock_irqrestore(&clients_lock, flags);
+> >  	list_for_each_entry(ism, &ism_dev_list.list, list) {
+> > +		spin_lock_irqsave(&ism->lock, flags);
+>=20
+> Hi Niklas,
+>=20
+> The lock is taken here.
+>=20
+> > +		/* Stop forwarding IRQs and events */
+> > +		ism->subs[client->id] =3D NULL;
+> >  		for (int i =3D 0; i < ISM_NR_DMBS; ++i) {
+> >  			if (ism->sba_client_arr[i] =3D=3D client->id) {
+> >  				pr_err("%s: attempt to unregister client '%s'"
+> > @@ -101,6 +114,7 @@ int ism_unregister_client(struct ism_client *client=
+)
+> >  				goto out;
+>=20
+> But it does not appear to be released
+> (by the call to spin_unlock_irqrestore() below)
+> if goto out is called here.
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
+Good catch. Yes I screwed this up while splitting the patch up. The
+spin_unlock_irqrestore() is there after patch 3 but should have been
+added in patch 1. As far as I can see all 3 patches have already been
+applied, otherwise I'd send a v3. Thankfully even in the in between
+state this error case can really onlt happen due to driver bugs so
+maybe it's okay?
 
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/net/ethernet/freescale/ucc_geth.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
-index 7a4cb4f07c32..2b3a15f24e7c 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -3753,7 +3753,7 @@ static int ucc_geth_probe(struct platform_device* ofdev)
- 	return err;
- }
- 
--static int ucc_geth_remove(struct platform_device* ofdev)
-+static void ucc_geth_remove(struct platform_device* ofdev)
- {
- 	struct net_device *dev = platform_get_drvdata(ofdev);
- 	struct ucc_geth_private *ugeth = netdev_priv(dev);
-@@ -3767,8 +3767,6 @@ static int ucc_geth_remove(struct platform_device* ofdev)
- 	of_node_put(ugeth->ug_info->phy_node);
- 	kfree(ugeth->ug_info);
- 	free_netdev(dev);
--
--	return 0;
- }
- 
- static const struct of_device_id ucc_geth_match[] = {
-@@ -3787,7 +3785,7 @@ static struct platform_driver ucc_geth_driver = {
- 		.of_match_table = ucc_geth_match,
- 	},
- 	.probe		= ucc_geth_probe,
--	.remove		= ucc_geth_remove,
-+	.remove_new	= ucc_geth_remove,
- 	.suspend	= ucc_geth_suspend,
- 	.resume		= ucc_geth_resume,
- };
--- 
-2.39.2
+>=20
+> >  			}
+> >  		}
+> > +		spin_unlock_irqrestore(&ism->lock, flags);
+> >  	}
+> >  out:
+> >  	mutex_unlock(&ism_dev_list.mutex);
 
 
