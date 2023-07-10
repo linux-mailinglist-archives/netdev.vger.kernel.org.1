@@ -1,154 +1,119 @@
-Return-Path: <netdev+bounces-16332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7FD774CD27
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:36:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 445D174CD37
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FDA9280F38
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:36:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C86280ED0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3FC1FC1;
-	Mon, 10 Jul 2023 06:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA50220E7;
+	Mon, 10 Jul 2023 06:39:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218CB1844
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:36:12 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 005BC1B3;
-	Sun,  9 Jul 2023 23:35:46 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A6HeJ0020521;
-	Mon, 10 Jul 2023 06:35:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=PWd1KtVu5tcz3AGh3rfiYhSla8+qNHDkbbvF41aTXsc=;
- b=W1awHsinyyv18C3rGyIpJanzG0H0FgqQnzmSNW5pSkeqnEQTTC9rDKplclTX/5QgUZ0u
- lmBFh99EoqGio5XM2lk7OONcVUNHo8yszyKO+SMEXLMQOaRg8pYnYfhR2Jz6TnbFkTSh
- XqHfeua/pOfOOWkVoXH+/4B0uUUzHi2sO4I+uPjbS0GTObyaV1tYo9xBJiAKk+GGhgbd
- 0LunPKarh8CZnZg8xHv+XUzXm2q1nIlAUNe7PS/pU7irncLQ8BQw5s8ThbUm5y7Q2oGS
- W1cxWdDAKVEJLKvy005n+6Tz9egvzb3gjLPGR3HFjTtIzmO18Q6w8br+2Gj+jJAGwlmJ DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrckfgb2w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 06:35:17 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36A6I92H022163;
-	Mon, 10 Jul 2023 06:35:16 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrckfgb29-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 06:35:16 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-	by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36A3WV0m000522;
-	Mon, 10 Jul 2023 06:35:14 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rpye50sm6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 06:35:14 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36A6ZBQv39518928
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Jul 2023 06:35:11 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 12C5D2004B;
-	Mon, 10 Jul 2023 06:35:11 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 515F420040;
-	Mon, 10 Jul 2023 06:35:10 +0000 (GMT)
-Received: from [9.171.88.142] (unknown [9.171.88.142])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 10 Jul 2023 06:35:10 +0000 (GMT)
-Message-ID: <99bee917-d874-11af-5c78-30852e057732@linux.ibm.com>
-Date: Mon, 10 Jul 2023 08:35:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF33D1FC1
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:39:23 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 5184E137;
+	Sun,  9 Jul 2023 23:39:20 -0700 (PDT)
+Received: from localhost.localdomain (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 95B15602A11D5;
+	Mon, 10 Jul 2023 14:38:41 +0800 (CST)
+X-MD-Sfrom: suhui@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: Su Hui <suhui@nfschina.com>
+To: wg@grandegger.com,
+	mkl@pengutronix.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	irusskikh@marvell.com,
+	rmody@marvell.com,
+	skalluru@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com,
+	yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	steve.glendinning@shawell.net,
+	iyappan@os.amperecomputing.com,
+	keyur@os.amperecomputing.com,
+	quan@os.amperecomputing.com,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	mostrows@earthlink.net,
+	xeb@mail.ru,
+	qiang.zhao@nxp.com
+Cc: uttenthaler@ems-wuensche.com,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kernel-janitors@vger.kernel.org,
+	wuych <yunchuan@nfschina.com>
+Subject: [PATCH net-next v2 00/10] Remove unnecessary (void*) conversions
+Date: Mon, 10 Jul 2023 14:38:28 +0800
+Message-Id: <20230710063828.172593-1-suhui@nfschina.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH net v2 1/3] s390/ism: Fix locking for forwarding of IRQs
- and events to clients
-To: Simon Horman <simon.horman@corigine.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Stefan Raspl <raspl@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230707104359.3324039-1-schnelle@linux.ibm.com>
- <20230707104359.3324039-2-schnelle@linux.ibm.com>
- <ZKlmeDUEZf7F8+HW@corigine.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <ZKlmeDUEZf7F8+HW@corigine.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6QOGgB02WWj_ZTG2uPXjoaw16H5qB-O5
-X-Proofpoint-ORIG-GUID: VFTRrAy2vO8QxTANaiTDp3vkNj02GDXo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-10_04,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- suspectscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- spamscore=0 mlxlogscore=745 adultscore=0 clxscore=1015 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307100055
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: wuych <yunchuan@nfschina.com>
 
+Changes in v2:
+	move declarations to be reverse xmas tree.
+	compile it in net and net-next branch.
+	remove some error patches in v1.
 
-On 08.07.23 15:36, Simon Horman wrote:
-> On Fri, Jul 07, 2023 at 12:43:57PM +0200, Niklas Schnelle wrote:
-[...]
->> @@ -92,6 +102,9 @@ int ism_unregister_client(struct ism_client *client)
->>  		max_client--;
->>  	spin_unlock_irqrestore(&clients_lock, flags);
->>  	list_for_each_entry(ism, &ism_dev_list.list, list) {
->> +		spin_lock_irqsave(&ism->lock, flags);
-> 
-> Hi Niklas,
-> 
-> The lock is taken here.
-> 
->> +		/* Stop forwarding IRQs and events */
->> +		ism->subs[client->id] = NULL;
->>  		for (int i = 0; i < ISM_NR_DMBS; ++i) {
->>  			if (ism->sba_client_arr[i] == client->id) {
->>  				pr_err("%s: attempt to unregister client '%s'"
->> @@ -101,6 +114,7 @@ int ism_unregister_client(struct ism_client *client)
->>  				goto out;
-> 
-> But it does not appear to be released
-> (by the call to spin_unlock_irqrestore() below)
-> if goto out is called here.
-> 
->>  			}
->>  		}
->> +		spin_unlock_irqrestore(&ism->lock, flags);
->>  	}
->>  out:
->>  	mutex_unlock(&ism_dev_list.mutex);
-> 
+PATCH v1 link:
+https://lore.kernel.org/all/20230628024121.1439149-1-yunchuan@nfschina.com/
 
-Great catch, Simon.
-@Niklas, the missing unlock accidentially got moved to "[PATCH net v2 3/3] s390/ism: Do not unregister clients with registered DMBs"
+wuych (10):
+  net: wan: Remove unnecessary (void*) conversions
+  net: atlantic: Remove unnecessary (void*) conversions
+  net: ppp: Remove unnecessary (void*) conversions
+  net: hns3: remove unnecessary (void*) conversions
+  net: hns: Remove unnecessary (void*) conversions
+  ice: remove unnecessary (void*) conversions
+  ethernet: smsc: remove unnecessary (void*) conversions
+  net: mdio: Remove unnecessary (void*) conversions
+  can: ems_pci: Remove unnecessary (void*) conversions
+  net: bna: Remove unnecessary (void*) conversions
+
+ drivers/net/can/sja1000/ems_pci.c             |  6 +++---
+ .../aquantia/atlantic/hw_atl2/hw_atl2.c       | 12 ++++++------
+ .../atlantic/hw_atl2/hw_atl2_utils_fw.c       |  2 +-
+ drivers/net/ethernet/brocade/bna/bnad.c       | 19 +++++++++----------
+ .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  2 +-
+ drivers/net/ethernet/hisilicon/hns_mdio.c     | 10 +++++-----
+ drivers/net/ethernet/intel/ice/ice_main.c     |  4 ++--
+ drivers/net/ethernet/smsc/smsc911x.c          |  4 ++--
+ drivers/net/ethernet/smsc/smsc9420.c          |  4 ++--
+ drivers/net/mdio/mdio-xgene.c                 |  4 ++--
+ drivers/net/ppp/pppoe.c                       |  4 ++--
+ drivers/net/ppp/pptp.c                        |  4 ++--
+ drivers/net/wan/fsl_ucc_hdlc.c                |  6 +++---
+ 13 files changed, 40 insertions(+), 41 deletions(-)
+
+-- 
+2.30.2
+
 
