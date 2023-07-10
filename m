@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-16640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433D174E1BF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:04:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D9574E1C3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:05:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F301C20C5C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:04:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF1B1C20C41
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AC3171AC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2291174C4;
 	Mon, 10 Jul 2023 23:03:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFD0171A9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66BA174C0
 	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:03:18 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EF62F9;
-	Mon, 10 Jul 2023 16:03:17 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A31D10D
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:03:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=eeNKKnFfqVsbTDrMCi8dJOr2RFY9P/RKFkjoayT3ATo=; b=qjHRJLwzXLCekl5/nn+XtGvqYg
-	T5bZ1vMSQFwsG+GI5HMnt+uJRMYn2OwiCXHSneGISwRBIpd0ndwiWUBOX2WsYzto1H6PIC0VjOGZa
-	zAaUDVnO+MX8Yr4lGoARU5WlQBknH9zLUFp8u0Jd4pn53tb+glXIWJ8zzONM8lYJsdNXR2fkUI5od
-	R/lXRbvintmfFws2ud4QDXuNjKPJX7f0dYS8j2BKcV+W/eN5WvMsZDDHDLTYEN6Wz2CXKdDZkE0Lz
-	D77yg1UuBN7E7q4IswO+Pf3DGFPgNrMK8K+Z3fd3sSI4NbNRLnrK/zvm8Z4hePwoSqVx/ceh+Zr0Q
-	xhA9d7Rg==;
+	bh=u2pYA1XRrYQS8D48dQiK1WJO9vNiX1lIBhn6N2JW9F8=; b=ZJ9SluyNUiBhA2EPF7jKXybAEw
+	P+mUgI+rnfNrBS8OvRKLKvOs1YDWdFSsE01WTFhxXb/MVy175pMKJJtSLu/+3f549vvSvDL1Hsu7m
+	kZ+3ZkRRa5sh0kVFR/Iy0aBK2IACZK0lpsQHbX9OckfLdhXdgtOE8LJsRlhdNAYGsJecIWc6m++h8
+	a7Le84cPRRGiqMdnBXcsk5L75DL+UC3DN5mK+RdftXMT1o9Ce6z07tDAC9rLyEwTEvdabymyKbjKL
+	BUAP3rhpMjF6EA9z1PxRKlC8+16x1qX/p0RWppYn5iQNFQxnY+4XY6/rmOHYDZEpxMx+FT/T7psf+
+	dmRVTWXA==;
 Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qIzuW-00CuO1-3D;
+	id 1qIzuX-00CuO1-1B;
 	Mon, 10 Jul 2023 23:03:17 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: netdev@vger.kernel.org
@@ -42,11 +42,10 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org
-Subject: [PATCH net 06/12] wifi: radiotap: fix kernel-doc notation warnings
-Date: Mon, 10 Jul 2023 16:03:06 -0700
-Message-ID: <20230710230312.31197-7-rdunlap@infradead.org>
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH net 07/12] inet: frags: remove kernel-doc comment marker
+Date: Mon, 10 Jul 2023 16:03:07 -0700
+Message-ID: <20230710230312.31197-8-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230710230312.31197-1-rdunlap@infradead.org>
 References: <20230710230312.31197-1-rdunlap@infradead.org>
@@ -64,43 +63,32 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix a typo (82011 -> 80211) to prevent a kernel-doc warning.
-Add one missing function parameter description to prevent a
-kernel-doc warning.
+Change an errant kernel-doc comment marker (/**) to a regular
+comment to prevent a kernel-doc warning.
 
-ieee80211_radiotap.h:52: warning: expecting prototype for struct ieee82011_radiotap_header. Prototype was for struct ieee80211_radiotap_header instead
-ieee80211_radiotap.h:581: warning: Function parameter or member 'data' not described in 'ieee80211_get_radiotap_len'
+inet_frag.h:33: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
 
-Fixes: 42f82e2e62ae ("wireless: radiotap: rewrite the radiotap header file")
+Fixes: 1ab1934ed80a ("inet: frags: enum the flag definitions and add descriptions")
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- include/net/ieee80211_radiotap.h |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/net/inet_frag.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -- a/include/net/ieee80211_radiotap.h b/include/net/ieee80211_radiotap.h
---- a/include/net/ieee80211_radiotap.h
-+++ b/include/net/ieee80211_radiotap.h
-@@ -21,7 +21,7 @@
- #include <asm/unaligned.h>
+diff -- a/include/net/inet_frag.h b/include/net/inet_frag.h
+--- a/include/net/inet_frag.h
++++ b/include/net/inet_frag.h
+@@ -28,7 +28,7 @@ struct fqdir {
+ 	struct llist_node	free_list;
+ };
  
- /**
-- * struct ieee82011_radiotap_header - base radiotap header
-+ * struct ieee80211_radiotap_header - base radiotap header
-  */
- struct ieee80211_radiotap_header {
- 	/**
-@@ -575,6 +575,7 @@ enum ieee80211_radiotap_eht_usig_tb {
- 
- /**
-  * ieee80211_get_radiotap_len - get radiotap header length
-+ * @data: pointer to the header
-  */
- static inline u16 ieee80211_get_radiotap_len(const char *data)
- {
+-/**
++/*
+  * fragment queue flags
+  *
+  * @INET_FRAG_FIRST_IN: first fragment has arrived
 
