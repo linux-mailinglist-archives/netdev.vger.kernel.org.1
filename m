@@ -1,98 +1,126 @@
-Return-Path: <netdev+bounces-16523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB4B74DB23
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:34:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403D774DB44
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:40:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 739A31C20B10
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:34:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A1528114C
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436DBDF5C;
-	Mon, 10 Jul 2023 16:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DE1125B3;
+	Mon, 10 Jul 2023 16:40:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A30259A
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:34:47 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D7DCC0;
-	Mon, 10 Jul 2023 09:34:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jLGZ8Kt5cT2lpnt9z22M2igMnkaIHF8gwZa/YIMfnqM=; b=z2G0+8/GJfV/RuF2lZu7GATCK4
-	wsXBdaF4/3pPUB5Nyp+xNiYERioTgNDxfkSML5BjoZGDbndl5UpmdyepkYpVVN41wC/CEmLQaWSqv
-	9iPHY5Os1WStwXUKOwkoM6bweMfJ5F8Z6IpqdRJXdKjNKGsGZDFEeRCqMJKusLJ16LRM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qItqK-000xlL-WE; Mon, 10 Jul 2023 18:34:33 +0200
-Date: Mon, 10 Jul 2023 18:34:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Su Hui <suhui@nfschina.com>
-Cc: qiang.zhao@nxp.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, wuych <yunchuan@nfschina.com>
-Subject: Re: [PATCH net-next v2 01/10] net: wan: Remove unnecessary (void*)
- conversions
-Message-ID: <23e98085-8f07-4ee2-8487-8e3b439b69f4@lunn.ch>
-References: <20230710063933.172926-1-suhui@nfschina.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C067FDF5C
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:40:44 +0000 (UTC)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF4D93
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:40:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689007243; x=1720543243;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kGNh3LLkZzizOa2Bb+4qYBPTYxHUrdKtiEUoxBV3it8=;
+  b=deSaE5SqA+p+0mXlDu19pyxgixCytzj9uZKzil1NIUeGuCc+8kaxj4MG
+   rCoTHM+7qtWz3vY1zQ6I3XT5SvexW48ix4U37NpxR+kO7P7xwjxnTnEws
+   KL3nuqNcLLPHjoOv73YORj7mJAeIgks38w33SrhpPgEGQwjGSPhhtCnB7
+   GVWo/tYENrQ8PkNANbatVnTSX3xHAFEeyBV6AeJNyCt00BhrZXrY5JwI1
+   whDRqlH0HKE4tS7ulFOvODIXZbXm89KZ4rKavRpQBRipbmxgFun3VwdK1
+   wFn/PxW2oiNaAOfEQOeCkI4NH9Sy2+W/USQEy75klm8t9AQLObge3AkGJ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="364431359"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="364431359"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 09:40:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="810867144"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="810867144"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2023 09:40:42 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	florian.kauer@linutronix.de,
+	kurt@linutronix.de,
+	vinicius.gomes@intel.com,
+	muhammad.husaini.zulkifli@intel.com,
+	tee.min.tan@linux.intel.com,
+	aravindhan.gunasekaran@intel.com,
+	sasha.neftin@intel.com
+Subject: [PATCH net 0/6][pull request] igc: Fix corner cases for TSN offload
+Date: Mon, 10 Jul 2023 09:34:57 -0700
+Message-Id: <20230710163503.2821068-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710063933.172926-1-suhui@nfschina.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 02:39:33PM +0800, Su Hui wrote:
-> From: wuych <yunchuan@nfschina.com>
-> 
-> Pointer variables of void * type do not require type cast.
-> 
-> Signed-off-by: wuych <yunchuan@nfschina.com>
-> ---
->  drivers/net/wan/fsl_ucc_hdlc.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-> index 47c2ad7a3e42..73c73d8f4bb2 100644
-> --- a/drivers/net/wan/fsl_ucc_hdlc.c
-> +++ b/drivers/net/wan/fsl_ucc_hdlc.c
-> @@ -350,11 +350,11 @@ static int uhdlc_init(struct ucc_hdlc_private *priv)
->  static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
->  {
->  	hdlc_device *hdlc = dev_to_hdlc(dev);
-> -	struct ucc_hdlc_private *priv = (struct ucc_hdlc_private *)hdlc->priv;
-> -	struct qe_bd *bd;
-> -	u16 bd_status;
-> +	struct ucc_hdlc_private *priv = hdlc->priv;
->  	unsigned long flags;
->  	__be16 *proto_head;
-> +	struct qe_bd *bd;
-> +	u16 bd_status;
+Florian Kauer says:
 
-When dealing with existing broken reverse Christmas tree, please don't
-make it worse with a change. But actually fixing it should be in a
-different patch.
+The igc driver supports several different offloading capabilities
+relevant in the TSN context. Recent patches in this area introduced
+regressions for certain corner cases that are fixed in this series.
 
-We want patches to be obviously correct. By removing the cast and
-moving variables around, it is less obvious it is correct, than having
-two patches.
+Each of the patches (except the first one) addresses a different
+regression that can be separately reproduced. Still, they have
+overlapping code changes so they should not be separately applied.
 
-       Andrew
+Especially #4 and #6 address the same observation,
+but both need to be applied to avoid TX hang occurrences in
+the scenario described in the patches.
+
+Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Reviewed-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+The following are changes since commit 8139dccd464aaee4a2c351506ff883733c6ca5a3:
+  udp6: add a missing call into udp_fail_queue_rcv_skb tracepoint
+and are available in the git repository at:
+This series contains updates to
+
+The following are changes since commit 9d0aba98316d00f9c0a4506fc15f5ed9241bc1fd:
+  gve: unify driver name usage
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
+
+Florian Kauer (6):
+  igc: Rename qbv_enable to taprio_offload_enable
+  igc: Do not enable taprio offload for invalid arguments
+  igc: Handle already enabled taprio offload for basetime 0
+  igc: No strict mode in pure launchtime/CBS offload
+  igc: Fix launchtime before start of cycle
+  igc: Fix inserting of empty frame for launchtime
+
+ drivers/net/ethernet/intel/igc/igc.h      |  2 +-
+ drivers/net/ethernet/intel/igc/igc_main.c | 24 ++++++++-------------
+ drivers/net/ethernet/intel/igc/igc_tsn.c  | 26 ++++++++++++++++++++---
+ 3 files changed, 33 insertions(+), 19 deletions(-)
+
+-- 
+2.38.1
+
 
