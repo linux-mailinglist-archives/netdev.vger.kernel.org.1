@@ -1,184 +1,177 @@
-Return-Path: <netdev+bounces-16548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B188374DC8B
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 19:32:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D992774DCAC
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 19:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A1AE1C20B49
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:32:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335B81C20B21
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8621426B;
-	Mon, 10 Jul 2023 17:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB6014272;
+	Mon, 10 Jul 2023 17:44:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509B814267
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:32:07 +0000 (UTC)
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DD5B7
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:32:05 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-443746c638eso1307006137.2
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:32:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEC413AEC
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:44:09 +0000 (UTC)
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A7212E
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:44:07 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-7672303c831so431615485a.2
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:44:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689010324; x=1691602324;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8riEtGipjhQ642ttfyt1rVFepShBRiIDBJTv+VyG4+M=;
-        b=e5quYpejRWBED2qx8j5z54IdQwOMtbDjUzAc5b0hfeOTPydbXYzn3B6lhnRqZVepAM
-         8aBUwcQ7/uqoBA5FrP5k/aPVx6mRFZ5TIEgWsdoBVVeCLcRAR/m9+ndBSqy8K5Cr0KZL
-         svD2I3P4uV0xIpTm0egl2SPPrlzD1ltvYu1/Wk8EJfyogDMywLR7XEkkXyKFHpTv3yDW
-         cZFfMC9QxA0eBbNdsMiMev2d3K3QaqN3uat+XeY8yOX5S6/xj7H3IyUb0tO0CXmEqGKv
-         SxzpQh9LfBPGjwNN6Nmm49rY3FGQrcHo8Je0oI20Gpzu47qpbMOBKXCwB2vf1eXcey5Q
-         NrLw==
+        d=ziepe.ca; s=google; t=1689011047; x=1691603047;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AOnVzen9HDghW2bswxVCUVsZLhlFm73bqh1O1PTU2i4=;
+        b=WLQs6EGun6B4BulXmKogPdCt5oDVFVpE2okzj27FHCHNnLDGIi5Czr14p89ybAaXYJ
+         lhMk1w685GxTpiUrgFlizkUlyNVVz8nobylcjl30cPaLaTPeJE3z6JVgYmXjCN3ss5vo
+         Q82dok6ccsNwR6dZZeC5Uc8sSHaM9gSRZNnou3UkB0vrGQPnuGeSrm1Q/3KZboxAzoVb
+         H13lwGXwQ6e6Km+Dl3IMJxRHMGkEVGEkOp0D+LLl6byPLvxeJpBIju++uVvCt5NYV2/7
+         7w/6QRlieWrNTaKDG74MRdVrZ5SqOcAGw5ip54VjrxKSNLq8BAtYgaaEz7vgDQF4W/kA
+         ufBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689010324; x=1691602324;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8riEtGipjhQ642ttfyt1rVFepShBRiIDBJTv+VyG4+M=;
-        b=SRGUEV5F5qNdF1dyGUKV9tsiyWw8TwDlY2FcpuD3LoD9WJXl+9JwzT+FuDGW75iPJ8
-         CIxyYuxMY+jqAzdjHcqRC7xTTBxE+kmCKpmPxyYUE7MDFaqGQN+7sE5WZBY2m+4A/pb0
-         qH/Dwx7i5dhLW8uKgwq1YxbzsrnfU5LCqRKZKmOyn5jnPcZ9rj2vhsu5dT1BRu9abrmS
-         Oyp5WGPeZ3NgMXZ517CQtra+z68H3BjBYnJUGbPidmi8ZknKie7Y1Qy25RSbWqb7XxM/
-         cNuBVpEMH3YPspLIQ6rvqsxBEZ/VkCBUki+Rzq0GqpJxv12DXXywC9Rv8jpsWBDWohvC
-         7/aA==
-X-Gm-Message-State: ABy/qLbySlNx+eGeHrhM5yoRJTI5yIn/sHaZUIYDP9O/TkkVEqe++LPG
-	5q5QQDP0xrGa3sOM+YbhsOdSRQZid6Q744KNem6RIw==
-X-Google-Smtp-Source: APBJJlE4nnABwVJQMsXHJPE4PUXPX2CdrRdaOtp3AlUHxs33MsoXIbCpHSrqgS8nXCsssbis/afLtnQcawNuZwsY8LY=
-X-Received: by 2002:a67:fd09:0:b0:443:791d:b238 with SMTP id
- f9-20020a67fd09000000b00443791db238mr5639788vsr.9.1689010324553; Mon, 10 Jul
- 2023 10:32:04 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689011047; x=1691603047;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AOnVzen9HDghW2bswxVCUVsZLhlFm73bqh1O1PTU2i4=;
+        b=fYGFw5a7EvP7GkrMYDISx/TM2G30DiTAuLmCgWPHNyU4ZI9Ij6QFfP1ftq2GwW0MFJ
+         9050pvQ71P3Z9AJrA2HWjvBUautxKe416xLzOttQ3Yfo5y9WOL6hQUbnko5g3GfPi5Ce
+         CxN15kOdQTaRCySt8aSCd9bal1ndmpI+n6pOfvRCEP5aiUahxBrAmv4CIp270FcbMhkB
+         I3Ol1pog0C0XzTLCMfEOJJv6oUMS1Y2zIOMlo6PUYXVgGFVtPPzecnT3g59JJ30526OJ
+         Ag18+jRwckXSK7++HzTK+cWn5XnSeWuf14klwTIXD4zRV4XXcvRe9Yqsqq7CoUKqHHx2
+         1isA==
+X-Gm-Message-State: ABy/qLbwdztk5cJtLqVrFk4NRox6u03eVFHJYDa7nrilSxWaa9riNa4x
+	6yRRSF/5qHT9W2YubtQA5iWEbA==
+X-Google-Smtp-Source: APBJJlEadY1dI3vNQ2N0fmgDC+Ual1DpU2psFdVln3u1qHl6Z/3ncb0HysMERESWP4YSo180rdHzZw==
+X-Received: by 2002:a37:b645:0:b0:75d:4e8b:9d19 with SMTP id g66-20020a37b645000000b0075d4e8b9d19mr14672746qkf.26.1689011046739;
+        Mon, 10 Jul 2023 10:44:06 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id o8-20020a0cf4c8000000b0063007ccaf42sm59906qvm.57.2023.07.10.10.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 10:44:06 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qIuvd-0004KO-KO;
+	Mon, 10 Jul 2023 14:44:05 -0300
+Date: Mon, 10 Jul 2023 14:44:05 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Message-ID: <ZKxDZfVAbVHgNgIM@ziepe.ca>
+References: <CAKgT0UeZfbxDYaeUntrQpxHmwCh6zy0dEpjxghiCNxPxv=kdoQ@mail.gmail.com>
+ <72ccf224-7b45-76c5-5ca9-83e25112c9c6@redhat.com>
+ <20230616122140.6e889357@kernel.org>
+ <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com>
+ <20230619110705.106ec599@kernel.org>
+ <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
+ <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
+ <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
+ <ZKNA9Pkg2vMJjHds@ziepe.ca>
+ <CAHS8izNB0qNaU8OTcwDYmeVPtCrEjTTOhwCHtVsLiyhXmPLsXQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230707183935.997267-1-kuba@kernel.org> <CAHS8izPmQRuBfBB2ddna-RHvorvJs7VtVUqCW80MaxPLUtDHGA@mail.gmail.com>
- <20230707154503.57cc834e@kernel.org>
-In-Reply-To: <20230707154503.57cc834e@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 10 Jul 2023 10:31:53 -0700
-Message-ID: <CAHS8izOdqajoPbzPHE-_e1BF+xpVgUphwknPSEqcHDJDcYtKng@mail.gmail.com>
-Subject: Re: [RFC 00/12] net: huge page backed page_pool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	edumazet@google.com, dsahern@gmail.com, michael.chan@broadcom.com, 
-	willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHS8izNB0qNaU8OTcwDYmeVPtCrEjTTOhwCHtVsLiyhXmPLsXQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 7, 2023 at 3:45=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 7 Jul 2023 12:45:26 -0700 Mina Almasry wrote:
-> > > This is an "early PoC" at best. It seems to work for a basic
-> > > traffic test but there's no uAPI and a lot more general polish
-> > > is needed.
-> > >
-> > > The problem we're seeing is that performance of some older NICs
-> > > degrades quite a bit when IOMMU is used (in non-passthru mode).
-> > > There is a long tail of old NICs deployed, especially in PoPs/
-> > > /on edge. From a conversation I had with Eric a few months
-> > > ago it sounded like others may have similar issues. So I thought
-> > > I'd take a swing at getting page pool to feed drivers huge pages.
-> > > 1G pages require hooking into early init via CMA but it works
-> > > just fine.
-> > >
-> > > I haven't tested this with a real workload, because I'm still
-> > > waiting to get my hands on the right machine. But the experiment
-> > > with bnxt shows a ~90% reduction in IOTLB misses (670k -> 70k).
-> >
-> > Thanks for CCing me Jakub. I'm working on a proposal for device memory
-> > TCP, and I recently migrated it to be on top of your pp-provider idea
-> > and I think I can share my test results as well. I had my code working
-> > on top of your slightly older API I found here a few days ago:
-> > https://github.com/kuba-moo/linux/tree/pp-providers
-> >
-> > On top of the old API I had something with all my functionality tests
-> > passing and performance benchmarking hitting ~96.5% line rate (with
-> > all data going straight to the device - GPU - memory, which is the
-> > point of the proposal). Of course, when you look at the code you may
-> > not like the approach and I may need to try something else, which is
-> > perfectly fine, but my current implementation is pp-provider based.
-> >
-> > I'll look into rebasing my changes on top of this RFC and retesting,
-> > but I should share my RFC either way sometime next week maybe. I took
-> > a quick look at the changes you made here, and I don't think you
-> > changed anything that would break my use case.
->
-> Oh, sorry I didn't realize you were working on top of my changes
-> already. Yes, the memory provider API should not have changed much.
-> I mostly reshuffled the MEP code to have both a coherent and
-> non-coherent buddy allocator since then.
->
+On Wed, Jul 05, 2023 at 06:17:39PM -0700, Mina Almasry wrote:
 
-No worries at all. I don't mind rebasing to new versions (and finding
-out if they work for me).
+> Another issue is that in networks with low MTU, we could be DMAing
+> 1400/1500 bytes into each allocation, which is problematic if the
+> allocation is 8K+. I would need to investigate a bit to see if/how to
+> solve that, and we may end up having to split the page and again run
+> into the 'not enough room in struct page' problem.
 
-> > > In terms of the missing parts - uAPI is definitely needed.
-> > > The rough plan would be to add memory config via the netdev
-> > > genl family. Should fit nicely there. Have the config stored
-> > > in struct netdevice. When page pool is created get to the netdev
-> > > and automatically select the provider without the driver even
-> > > knowing.
+You don't have an intree driver to use this with, so who knows, but
+the out of tree GPU drivers tend to use a 64k memory management page
+size, and I don't expect you'd make progress with a design where a 64K
+naturaly sized allocator is producing 4k/8k non-compound pages just
+for netdev. We are still struggling with pagemap support for variable
+page size folios, so there is a bunch of technical blockers before
+drivers could do this.
+
+This is why it is so important to come with a complete in-tree
+solution, as we cannot review this design if your work is done with
+hacked up out of tree drivers.
+
+Fully and properly adding P2P ZONE_DEVICE to a real world driver is a
+pretty big ask still.
+
+> > Or allocate per page memory and do a memdesc like thing..
+> 
+> I need to review memdesc more closely. Do you imagine I add a pointer
+> in struct page that points to the memdesc? 
+
+Pointer to extra memory from the PFN has been the usual meaning of
+memdesc, so doing an interm where the pointer is in the struct page is
+a reasonable starting point.
+
+> > Though overall, you won't find devices creating struct pages for their
+> > P2P memory today, so I'm not sure what the purpose is. Jonathan
+> > already got highly slammed for proposing code to the kernel that was
+> > unusable. Please don't repeat that. Other than a special NVMe use case
+> > the interface for P2P is DMABUF right now and it is not struct page
+> > backed.
 > >
-> > I guess I misunderstood the intent behind the original patches. I
-> > thought you wanted the user to tell the driver what memory provider to
-> > use, and the driver to recreate the page pool with that provider. What
-> > you're saying here sounds much better, and less changes to the driver.
-> >
-> > >  Two problems with that are - 1) if the driver follows
-> > > the recommended flow of allocating new queues before freeing
-> > > old ones we will have page pools created before the old ones
-> > > are gone, which means we'd need to reserve 2x the number of
-> > > 1G pages; 2) there's no callback to the driver to say "I did
-> > > something behind your back, don't worry about it, but recreate
-> > > your queues, please" so the change will not take effect until
-> > > some unrelated change like installing XDP. Which may be fine
-> > > in practice but is a bit odd.
-> >
-> > I have the same problem with device memory TCP. I solved it in a
-> > similar way, doing something else in the driver that triggers
-> > gve_close() & gve_open(). I wonder if the cleanest way to do this is
-> > calling ethtool_ops->reset() or something like that? That was my idea
-> > at least. I haven't tested it, but from reading the code it should do
-> > a gve_close() + gve_open() like I want.
->
-> The prevailing wisdom so far was that close() + open() is not a good
-> idea. Some NICs will require large contiguous allocations for rings
-> and context memory and there's no guarantee that open() will succeed
-> in prod when memory is fragmented. So you may end up with a close()d
-> NIC and a failure to open(), and the machine dropping off the net.
->
-> But if we don't close() before we open() and the memory provider is
-> single consumer we'll have problem #1 :(
->
-> BTW are you planning to use individual queues in prod? I anticipated
-> that for ZC we'll need to tie multiple queues into an RSS context,
-> and then configure at the level of an RSS context.
+> 
+> Our approach is actually to extend DMABUF to provide struct page
+> backed attachment mappings, which as far as I understand sidesteps the
+> issues Jonathan ran into.
 
-Our configuration:
+No DMABUF exporters do this today, so your patch series is just as
+incomplete as the prior ones. Please don't post it as non-RFC,
+unusable code like this must not be merged.
 
-- We designate a number of RX queues as devmem TCP queues.
-- We designate the rest as regular TCP queues.
-- We use RSS to steer all incoming traffic to the regular TCP queues.
-- We use flow steering to steer specific TCP flows to the devmem TCP queues=
-.
+> that supports dmabuf and in fact a lot of my tests use udmabuf to
+> minimize the dependencies. The RFC may come with a udmabuf selftest to
+> showcase that any dmabuf, even a mocked one, would be supported.
 
---=20
-Thanks,
-Mina
+That is not good enough to get merged. You need to get agreement and
+coded merged from actual driver owners of dmabuf exporters that they
+want to support this direction. As above it has surprising road
+blocks outside netdev :\
+
+Jason
 
