@@ -1,46 +1,39 @@
-Return-Path: <netdev+bounces-16616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8CC74E024
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:20:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C60A774E034
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:27:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9867281343
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 21:20:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE4C82812E0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 21:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2E2156E6;
-	Mon, 10 Jul 2023 21:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28C2156F3;
+	Mon, 10 Jul 2023 21:27:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B099C14ABE
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 21:20:35 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E27C0
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:20:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=79UYuT1tQX5ShI3xntPTx2Dgmd2C1ulZ/F+F9vJaDjI=; b=mwveZoBB7Wl7OVhdZzVMzH8A2T
-	PRBH4pMVHZVbZxopCDvsIfhmy13ite2kwbEAYuYQEMZ2DdY2Otmz79BljKSRTcCfftlROq+jhtTu+
-	qAgBwk1w+mxi6EjOY6FcSp0mEc+8/hmubqOCo0CRc5xh/tLl61A6wUtwcFXvYtlMtYTI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qIyJ6-000zB8-77; Mon, 10 Jul 2023 23:20:32 +0200
-Date: Mon, 10 Jul 2023 23:20:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EC2156E6
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 21:27:02 +0000 (UTC)
+Received: from mail11.truemail.it (mail11.truemail.it [IPv6:2001:4b7e:0:8::81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D49B8DE
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:26:59 -0700 (PDT)
+Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id 23205209ED;
+	Mon, 10 Jul 2023 23:26:57 +0200 (CEST)
+Date: Mon, 10 Jul 2023 23:26:55 +0200
+From: Francesco Dolcini <francesco@dolcini.it>
 To: Stefan Eichenberger <eichest@gmail.com>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	francesco.dolcini@toradex.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, francesco.dolcini@toradex.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
 Subject: Re: [PATCH net-next v2 4/4] net: phy: marvell-88q2xxx: add driver
  for the Marvell 88Q2110 PHY
-Message-ID: <2de0a6e1-0946-4d4f-8e57-1406a437b94e@lunn.ch>
+Message-ID: <ZKx3nyiSm73G70Oo@francesco-nb.int.toradex.com>
 References: <20230710205900.52894-1-eichest@gmail.com>
  <20230710205900.52894-5-eichest@gmail.com>
 Precedence: bulk
@@ -52,23 +45,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20230710205900.52894-5-eichest@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +static int mv88q2xxx_soft_reset(struct phy_device *phydev)
-> +{
-> +	return phy_write_mmd(phydev, MDIO_MMD_PCS,
-> +			     MDIO_PCS_1000BT1_CTRL, MDIO_PCS_1000BT1_CTRL_RESET);
-> +}
+On Mon, Jul 10, 2023 at 10:59:00PM +0200, Stefan Eichenberger wrote:
+> Add a driver for the Marvell 88Q2110. This driver is minimalistic, but
+> already allows to detect the link, switch between 100BASE-T1 and
+> 1000BASE-T1 and switch between master and slave mode. Autonegotiation
+> supported by the PHY is not yet implemented.
+> 
+> Signed-off-by: Stefan Eichenberger <eichest@gmail.com>
 
-Does this bit clear on its own when the reset has completed? When
-performing a C22 soft reset, the code polls waiting for the bit to
-clear. Otherwise there is a danger you start writing other registers
-while it is still resetting.
+...
 
 > +static int mv88q2xxx_read_link(struct phy_device *phydev)
 > +{
@@ -82,19 +73,73 @@ while it is still resetting.
 > +		/* Read twice to clear the latched status */
 > +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
 > +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
+> +		/* Read vendor specific Auto-Negotiation status register to get
+> +		 * local and remote receiver status
+> +		 */
+> +		ret2 = phy_read_mmd(phydev, MDIO_MMD_AN, 0x8001);
+> +	} else {
+> +		/* Read vendor specific status registers, the registers are not
+> +		 * documented but they can be found in the Software
+> +		 * Initialization Guide
+> +		 */
+> +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, 0x8109);
+> +		ret2 = phy_read_mmd(phydev, MDIO_MMD_PCS, 0x8108);
+> +	}
+you are ignoring errors from phy_read_mmd() here
 
-This is generally wrong. See for example genphy_update_link() and
-genphy_c45_read_link().
+> +
+> +	/* Check the link status according to Software Initialization Guide */
+> +	return (0x0 != (ret1 & 0x0004)) && (0x0 != (ret2 & 0x3000)) ? 1 : 0;
+> +}
+> +
+> +static int mv88q2xxx_read_status(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	phydev->link = mv88q2xxx_read_link(phydev);
+> +
+> +	ret = genphy_c45_read_pma(phydev);
+> +	if (ret)
+> +		return ret;
+return genphy_c45_read_pma(phydev);
+
+> +static int mv88q2xxx_config_aneg(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_c45_config_aneg(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = mv88q2xxx_soft_reset(phydev);
+> +	if (ret)
+> +		return ret;
+return mv88q2xxx_soft_reset(phydev);
 
 > +static int mv88q2xxx_probe(struct phy_device *phydev)
 > +{
 > +	return 0;
 > +}
+not needed? just remove it, if nothing to be done
 
-If it does nothing, it should not be needed.
+> +static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
+> +{
+> +	u16 value;
+> +
+> +	if (phydev->speed == SPEED_100) {
+> +		/* Read the SQI from the vendor specific receiver status
+> +		 * register
+> +		 */
+> +		value = (phy_read_mmd(phydev, MDIO_MMD_PCS, 0x8230) >> 12) & 0x0F;
+> +	} else {
+> +		/* Read from vendor specific registers, they are not documented
+> +		 * but can be found in the Software Initialization Guide. Only
+> +		 * revisions >= A0 are supported.
+> +		 */
+> +		phy_modify_mmd(phydev, MDIO_MMD_PCS, 0xFC5D, 0x00FF, 0x00AC);
+> +		value = phy_read_mmd(phydev, MDIO_MMD_PCS, 0xfc88) & 0x0F;
+> +	}
 
-    Andrew
+errors from phy_modify_mmd/phy_read_mmd ignored?
 
----
-pw-bot: cr
 
