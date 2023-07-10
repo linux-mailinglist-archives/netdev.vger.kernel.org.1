@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-16648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1E4E74E1D3
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:06:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8122C74E1B3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D19A2813D0
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:06:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11321C20C36
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371BE1774D;
-	Mon, 10 Jul 2023 23:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC2E168B2;
+	Mon, 10 Jul 2023 23:03:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2934A17743
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E35168B0
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:03:16 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B798E42;
-	Mon, 10 Jul 2023 16:03:19 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F63F9
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:03:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=hEmg3A0RYm7ry5jQKFwhBPeFaR0jwydfS2VR7x1r72Y=; b=W3k4lCx1bPdNRNN0M14srtcpat
-	2p26tO4jXRFFQyO45qpXAT83Vjaj9en+Wyg4syI+e6pmY+zV8d7vBiHGSMnMRnvEUq2vvX6zOqnSL
-	3ghf7W0Oq/cblsFUiqQFCcqKC2QoLPLPStw0a9SwIgBi9fH5K+wHzOL81Gm1lYtDdg4vfpJwX5GPK
-	AHt3u9Pm1/YySHr70TzWMhmPFyQZ/I1PSXFjXrq601W5sU3gY0ptzpfHXumxAwQQ+NXuWhpjPtEg2
-	om6bIXqMgTL31pssKF5Z+gexvdcAANlwSgchRSGOIFlKO0JfEkTGfXEjvhd+cVz4ziK/qU2IMwFDr
-	gMDK/7mw==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=9YJYHtPVNWz0vTrE8jX9JgM1vcMFqhu5z9qKG4nWNm8=; b=Zu2lUA+bCUSWwZQPzgtGOJHY+h
+	lHVbBP0F9Mb5bs1EV7JDBBnS6zNdyoefzjwYld0bRCMLY5IgxL+ZtmuQR/5ciDHxYABjmlkWaLaOL
+	JdaghaVOgtPNRG6tOcRvQ60khb7RrTJwNATiIW/vUJE/GaaAmQcYvQXjeGF0BmNup2YkmwjBDdUGP
+	IqQjyquoXFRW9YmDaQsOMpv6E+2cOX7AstvGrC6QJt0WLGnOhABnrq26Ey+FBRAlbAm4sar60jygm
+	zKURhbI7hQl1/xQwgjEP0WeJI2j3IYgjbEiUJc+rYSwBrIWdjzU/Ktmd0Rf3BPbSj9Z7oCjqCaXAw
+	dJTm6qPg==;
 Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qIzuU-00CuO1-0m;
+	id 1qIzuU-00CuO1-2F;
 	Mon, 10 Jul 2023 23:03:14 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: netdev@vger.kernel.org
@@ -42,38 +42,14 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
 	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Dave Taht <dave.taht@bufferbloat.net>,
-	Arkadi Sharshevsky <arkadis@mellanox.com>,
-	Moshe Shemesh <moshe@mellanox.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Yi Yang <yi.y.yang@intel.com>,
-	Jiri Benc <jbenc@redhat.com>,
-	Leslie Monis <lesliemonis@gmail.com>,
-	"Mohit P. Tahiliani" <tahiliani@nitk.edu.in>,
-	Gautam Ramakrishnan <gautamramk@gmail.com>,
-	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Kalle Valo <kvalo@kernel.org>
-Subject: [PATCH net 00/12] net: fix kernel-doc problems in include/net/
-Date: Mon, 10 Jul 2023 16:03:00 -0700
-Message-ID: <20230710230312.31197-1-rdunlap@infradead.org>
+	Andy Gospodarek <andy@greyhouse.net>
+Subject: [PATCH net 01/12] net: bonding: remove kernel-doc comment marker
+Date: Mon, 10 Jul 2023 16:03:01 -0700
+Message-ID: <20230710230312.31197-2-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230710230312.31197-1-rdunlap@infradead.org>
+References: <20230710230312.31197-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,65 +64,34 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix many (but not all) kernel-doc warnings in include/net/.
+Change an errant kernel-doc comment marker (/**) to a regular
+comment to prevent a kernel-doc warning.
 
- [PATCH net 01/12] net: bonding: remove kernel-doc comment marker
- [PATCH net 02/12] wifi: cfg80211: remove dead/unused enum value
- [PATCH net 03/12] net: cfg802154: fix kernel-doc notation warnings
- [PATCH net 04/12] codel: fix kernel-doc notation warnings
- [PATCH net 05/12] devlink: fix kernel-doc notation warnings
- [PATCH net 06/12] wifi: radiotap: fix kernel-doc notation warnings
- [PATCH net 07/12] inet: frags: remove kernel-doc comment marker
- [PATCH net 08/12] net: llc: fix kernel-doc notation warnings
- [PATCH net 09/12] wifi: mac80211: fix kernel-doc notation warning
- [PATCH net 10/12] net: NSH: fix kernel-doc notation warning
- [PATCH net 11/12] pie: fix kernel-doc notation warning
- [PATCH net 12/12] rsi: remove kernel-doc comment marker
+bonding.h:282: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+ * Returns NULL if the net_device does not belong to any of the bond's slaves
 
- include/net/bonding.h            |    2 +-
- include/net/cfg80211.h           |    1 -
- include/net/cfg802154.h          |    3 ++-
- include/net/codel.h              |    4 ++--
- include/net/devlink.h            |   28 ++++++++++++++++------------
- include/net/ieee80211_radiotap.h |    3 ++-
- include/net/inet_frag.h          |    2 +-
- include/net/llc_pdu.h            |    6 ++++--
- include/net/mac80211.h           |    1 +
- include/net/nsh.h                |    2 +-
- include/net/pie.h                |    2 +-
- include/net/rsi_91x.h            |    2 +-
- 12 files changed, 32 insertions(+), 24 deletions(-)
-
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wireless@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>
 Cc: Andy Gospodarek <andy@greyhouse.net>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Alexander Aring <alex.aring@gmail.com>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>
-Cc: Dave Taht <dave.taht@bufferbloat.net>
-Cc: Arkadi Sharshevsky <arkadis@mellanox.com>
-Cc: Moshe Shemesh <moshe@mellanox.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Benjamin Berg <benjamin.berg@intel.com>
-Cc: Yi Yang <yi.y.yang@intel.com>
-Cc: Jiri Benc <jbenc@redhat.com>
-Cc: Leslie Monis <lesliemonis@gmail.com>
-Cc: "Mohit P. Tahiliani" <tahiliani@nitk.edu.in>
-Cc: Gautam Ramakrishnan <gautamramk@gmail.com>
-Cc: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
-Cc: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Cc: Amitkumar Karwar <amit.karwar@redpinesignals.com>
-Cc: Kalle Valo <kvalo@kernel.org>
+---
+ include/net/bonding.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff -- a/include/net/bonding.h b/include/net/bonding.h
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -277,7 +277,7 @@ struct bond_vlan_tag {
+ 	unsigned short	vlan_id;
+ };
+ 
+-/**
++/*
+  * Returns NULL if the net_device does not belong to any of the bond's slaves
+  *
+  * Caller must hold bond lock for read
 
