@@ -1,95 +1,82 @@
-Return-Path: <netdev+bounces-16402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C21A74D0F6
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:04:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57ABA74D142
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05D78280F5B
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:04:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12E90280F6A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AE9101CD;
-	Mon, 10 Jul 2023 09:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD00BDDA1;
+	Mon, 10 Jul 2023 09:21:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1641D11198
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:00:35 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BAB51AB
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 02:00:29 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbea14706eso42956175e9.2
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 02:00:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1688979627; x=1691571627;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o0rWskzXieUZbB116gf4yd7qvzoiqPrQgJ7WLt8WOY8=;
-        b=kIhb6iVdgmZpI7b/3LkKN5H64ZHm72dF2AwRuA6RGp0LXEGkOBGORKjJVJAXV7GOCk
-         cwLbqzHRwnfceM08unaFdJqsXZ6lrLJUnDoHFMutQiU7LCItZgXEM72L3GZVhoytyusH
-         1NMpP+7IXokgxZjtgoi6vdUkIojJWsA6dN3kMB1lmMRaBjOTgeVgkTySpHN3rydyM117
-         M6hWbp+IkDxKUeRimHNGazAijGXbtdZpUz72cPzNhbL5YNMgneYi+J5M6yulXJ7wpWuz
-         yqSYn+SXiB+TfnV/Hi2B4qETNQ+bBzv4rbubW27wqmaFDY77Ncp7c/Cy2pp5eNucZ0hh
-         Bqwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688979627; x=1691571627;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o0rWskzXieUZbB116gf4yd7qvzoiqPrQgJ7WLt8WOY8=;
-        b=EbbaAHwMvtjOodEVcO0aybChsMwqtmQ2sIWppE86hYiou4KRyywfkxr+eyOO51bAaQ
-         qRbn1uS2Fkd0KtRcZ2Pykunx5lf8zdceTWVG11KXdUtYB8DUcP3+gV7UgBfMUIHiCH5T
-         aqxtCflBWm0JNBPy9q7VXQJuYaTRpf/tzxfL/7ocIm+4vlKwTZY3NbkBqgnTM4Oq8jQ9
-         5cAQNfuOQ6pafmJcEWvcqIMw9cKxXmCDiy8uAEeoCPtWKjwxrOwY25KLGYRxJsSgMSZ/
-         oRIcqTw4G5Noh1WWXNLYunDcRht0yTS2/IjHILu0r0hMY6CZ71HHu1tTrXvB6sBWntZJ
-         FLkg==
-X-Gm-Message-State: ABy/qLZdIUt3a5B/u8uPy9zVDscGtkiIv4CLl2BAQclPW/wzWE+51HSL
-	dXhCTbwiqNwsfXhi31JdS2xURw==
-X-Google-Smtp-Source: APBJJlFVEFLv7NsAd9bHXGtmkXrMxRkAN54ouiP3rIZwa1lYBs3dSXHMX0+nk9m4mDprFRyW2m0WTw==
-X-Received: by 2002:a1c:7206:0:b0:3fb:8284:35b0 with SMTP id n6-20020a1c7206000000b003fb828435b0mr9602632wmc.30.1688979627723;
-        Mon, 10 Jul 2023 02:00:27 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:6002:540:6954:abdd])
-        by smtp.gmail.com with ESMTPSA id k6-20020a05600c0b4600b003fc00702f65sm8581045wmr.46.2023.07.10.02.00.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 02:00:27 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH net-next v3 12/12] net: stmmac: replace the en_tx_lpi_clockgating field with a flag
-Date: Mon, 10 Jul 2023 11:00:01 +0200
-Message-Id: <20230710090001.303225-13-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230710090001.303225-1-brgl@bgdev.pl>
-References: <20230710090001.303225-1-brgl@bgdev.pl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77B0D53F;
+	Mon, 10 Jul 2023 09:21:14 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C56A8E;
+	Mon, 10 Jul 2023 02:21:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RZylTb4Pj6pz9xzJBEvw2l/7m5p+jhQxPVjqw0oySABtzOqZgKDmaDD8mB2B/FA4II2WEOTg4srCoh1MCnjDxu8aw9rqSfHhZe0GIZLAIstHMEbkC8cTVjwhl1YRLDSc7zQSy+5Mryx+0a8Vo+sxx82QCsItALFmPNBiKXN6LzUz3sEPfuZ7NkuCdFVJSEJ5L42t6LTjLRIxOBQY1A46pj962r6NC6QSyHAnDwFbXn1jfF++VFuaDY71ZBWZ6hMVrtOFi0ve6KaUXqYiX2DhEtn0SU67xNCZDkFNqLaIIHlZiACP83MeNq3zMM2Aafc75D+uflzgRJ5NJhxSOwizUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6QdgIvHEVDFvfH4Ry7MyAFDnb5ixGI/D1dR9GEMzUq4=;
+ b=cLKR7ScJHkg3IGPKgwXZuKfQ0lacDxR8MV6HELIlgCA1nRbc1Daj+qIkJi9WMFqUZAG8ubEey9MvYmdPRroLztQbQNC3KVmukTL2g1uw4VBh8MyF3Kp7oFr89/FW3f6upu0VuHgaZf2P6opHo3wyC3SPGhJ7zeCZVxDFoPpoZHnpt+7ehGqmgXH0vkzzRYyRDorsPN15sV2rVBLyaxuKnVnratzoTnAMBV3egoFhcU4j5+Fie3FLpJ0+zAll9bkGDyxqdEO2Ju0m1K/Oa58ZVIBCevZizfPKQ6N/DdtIWuV7ktvrS80PVKBvmMoQvdgmuH3iJInrVkzmvRHeXJqU1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6QdgIvHEVDFvfH4Ry7MyAFDnb5ixGI/D1dR9GEMzUq4=;
+ b=Tmq8bp42iRwt+0eBMzFYPSfVYDd6vVJmeNxkPHfCJsRT6FRoaeV/zn39PbUXbmC21/Tms0YgXrGEc1cZPFm12p4Hg938xiTpLyh54UOlrht6mKKvUmj1CqPoDfemAgkH1Cru1r6h8qdh/w/TQtskDTeihkDms+gc+17deV0PeI8Yh+n2fULEAsrCaITYY3bsf5/uTcPQa95r0WRms/cITzoPTJ56houhjwXk1U8r4z9hXOL2KkwkTqz9C/jgFN1l3pW1zzF70gBs3pPWBspS9hU6uyWeIGum9C22oyeuoySltKg7vV9ghe0NGzwQtpC8NMb6IgzwcrcxXzxljyN5gQ==
+Received: from BN9PR03CA0196.namprd03.prod.outlook.com (2603:10b6:408:f9::21)
+ by SJ0PR12MB7006.namprd12.prod.outlook.com (2603:10b6:a03:486::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
+ 2023 09:21:09 +0000
+Received: from BN8NAM11FT099.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:f9:cafe::c0) by BN9PR03CA0196.outlook.office365.com
+ (2603:10b6:408:f9::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30 via Frontend
+ Transport; Mon, 10 Jul 2023 09:21:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT099.mail.protection.outlook.com (10.13.177.197) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.18 via Frontend Transport; Mon, 10 Jul 2023 09:21:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 10 Jul 2023
+ 02:20:48 -0700
+Received: from nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 10 Jul
+ 2023 02:20:43 -0700
+From: Gavin Li <gavinl@nvidia.com>
+To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <john.fastabend@gmail.com>, <jiri@nvidia.com>,
+	<dtatulea@nvidia.com>
+CC: <virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: [PATCH net-next V1 0/4] virtio_net: add per queue interrupt coalescing support
+Date: Mon, 10 Jul 2023 12:20:01 +0300
+Message-ID: <20230710092005.5062-1-gavinl@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,74 +84,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT099:EE_|SJ0PR12MB7006:EE_
+X-MS-Office365-Filtering-Correlation-Id: 89f6122f-0968-45bd-e820-08db8126ff10
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ABOmY2z23mprI7COSWl0vxU93XHRtFMO4l6ywTP2FokSmulC1yjfaXTaPWwqo/l3YbBJuYKz39thRrdV3vCDPuwnDvmi4M5xUijSYH4uP7xH//mMwuizZrjNatSU6I6h0VHaznF2jAcMZ95M4zKQDtPjjasgYDgYV71n1WjSxudxzJb0H/tNuIZA9KorZfkOrYpyVOffs0r722kUFMax29KBqLhpu0bNPRUqmAiiT9mwW775U+p7j2uM4LuPgcthu2qKLagUZxqXBkkxjSAxktijYN4eNzX2JxSgfFc5Mxf4qDk9J0Wbk12v76TV6Ih7SLJsTv4YClrMuWbZGpiMN36xr8EgAb8HRa+69EHA+mzNTLotKE6+OEFqkLj1HF+mlhnaAFybuHqisuG3YpYm+M13f5Iw3RGwAgD//nLNFbWyR8O1Lf8NHSVgqFA2Sv7ehYf/OiGkc9XYjGaRojFaQDQUJMooq1VRsWGJC48ewULj7EkF5tn8+BUHJUyGVAk0y5F+rfqE4cyvNThwANnl2C50E1ZM7gor2eTQ5oiVy1zhu7FdgyR1P4JqezzGzKogq0EcXhGNzmIag3GOv9JVpV4xmFPXyYj2dGi98uz0AoGcs/LMIBjDyY01pz1r5ZTmdg+SxRobfn5Dvj6vjRpy+29xvcIvjNVrq4CoReXDT43lEypBIRUuVxE10pgXdvReUkWoq861nj58oRvazO1WDnazdWtaq7nyjPL01NN0a/wsXiRzTht4FQNOXjhyZEVVTiWQizSru6dVNOsQRbXi9z5OdEQWyASS75twlmydx7hp8ArNZhUiwlQ7JBpRqknZ
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(136003)(39860400002)(376002)(451199021)(46966006)(40470700004)(36840700001)(6666004)(478600001)(7696005)(110136005)(54906003)(16526019)(1076003)(26005)(6286002)(70586007)(186003)(336012)(70206006)(2906002)(82310400005)(41300700001)(6636002)(4326008)(7636003)(316002)(5660300002)(7416002)(8936002)(8676002)(356005)(82740400003)(921005)(2616005)(86362001)(40460700003)(36756003)(47076005)(36860700001)(83380400001)(426003)(40480700001)(55016003)(83996005)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 09:21:08.9064
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89f6122f-0968-45bd-e820-08db8126ff10
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN8NAM11FT099.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7006
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Currently, coalescing parameters are grouped for all transmit and receive
+virtqueues. This patch series add support to set or get the parameters for
+a specified virtqueue.
 
-Drop the boolean field of the plat_stmmacenet_data structure in favor of a
-simple bitfield flag.
+When the traffic between virtqueues is unbalanced, for example, one virtqueue
+is busy and another virtqueue is idle, then it will be very useful to
+control coalescing parameters at the virtqueue granularity.
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 4 ++--
- include/linux/stmmac.h                                | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Example command:
+$ ethtool -Q eth5 queue_mask 0x1 --coalesce tx-packets 10
+Would set max_packets=10 to VQ 1.
+$ ethtool -Q eth5 queue_mask 0x1 --coalesce rx-packets 10
+Would set max_packets=10 to VQ 0.
+$ ethtool -Q eth5 queue_mask 0x1 --show-coalesce
+ Queue: 0
+ Adaptive RX: off  TX: off
+ stats-block-usecs: 0
+ sample-interval: 0
+ pkt-rate-low: 0
+ pkt-rate-high: 0
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 2d68a6e84b0e..efe85b086abe 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -421,7 +421,7 @@ static int stmmac_enable_eee_mode(struct stmmac_priv *priv)
- 	/* Check and enter in LPI mode */
- 	if (!priv->tx_path_in_lpi_mode)
- 		stmmac_set_eee_mode(priv, priv->hw,
--				priv->plat->en_tx_lpi_clockgating);
-+			priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGATING);
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index f51522cb0061..23d53ea04b24 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -466,8 +466,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	plat->force_sf_dma_mode =
- 		of_property_read_bool(np, "snps,force_sf_dma_mode");
- 
--	plat->en_tx_lpi_clockgating =
--		of_property_read_bool(np, "snps,en-tx-lpi-clockgating");
-+	if (of_property_read_bool(np, "snps,en-tx-lpi-clockgating"))
-+		plat->flags |= STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
- 
- 	/* Set the maxmtu to a default of JUMBO_LEN in case the
- 	 * parameter is not present in the device tree.
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index c3769dad8238..ef67dba775d0 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -215,6 +215,7 @@ struct dwmac4_addrs {
- #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
- #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
- #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
-+#define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
- 
- struct plat_stmmacenet_data {
- 	int bus_id;
-@@ -280,7 +281,6 @@ struct plat_stmmacenet_data {
- 	int has_gmac4;
- 	int rss_en;
- 	int mac_port_sel_speed;
--	bool en_tx_lpi_clockgating;
- 	int has_xgmac;
- 	u8 vlan_fail_q;
- 	unsigned int eee_usecs_rate;
+ rx-usecs: 222
+ rx-frames: 0
+ rx-usecs-irq: 0
+ rx-frames-irq: 256
+
+ tx-usecs: 222
+ tx-frames: 0
+ tx-usecs-irq: 0
+ tx-frames-irq: 256
+
+ rx-usecs-low: 0
+ rx-frame-low: 0
+ tx-usecs-low: 0
+ tx-frame-low: 0
+
+ rx-usecs-high: 0
+ rx-frame-high: 0
+ tx-usecs-high: 0
+ tx-frame-high: 0
+
+In this patch series:
+Patch-1: Extract interrupt coalescing settings to a structure.
+Patch-2: Extract get/set interrupt coalesce to a function.
+Patch-3: Support per queue interrupt coalesce command.
+Patch-4: Enable per queue interrupt coalesce feature.
+
+Gavin Li (4):
+  virtio_net: extract interrupt coalescing settings to a structure
+  virtio_net: extract get/set interrupt coalesce to a function
+  virtio_net: support per queue interrupt coalesce command
+  virtio_net: enable per queue interrupt coalesce feature
+
+ drivers/net/virtio_net.c        | 169 ++++++++++++++++++++++++++------
+ include/uapi/linux/virtio_net.h |  14 +++
+ 2 files changed, 154 insertions(+), 29 deletions(-)
+
 -- 
-2.39.2
+2.39.1
 
 
