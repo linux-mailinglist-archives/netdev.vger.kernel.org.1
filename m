@@ -1,49 +1,47 @@
-Return-Path: <netdev+bounces-16341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32C774CD5D
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:42:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33FA474CD5E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:42:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5A101C209CB
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:42:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1F09280FBB
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C91E3FF5;
-	Mon, 10 Jul 2023 06:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADF3523B;
+	Mon, 10 Jul 2023 06:41:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CE653BE
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5B020E7
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:41:50 +0000 (UTC)
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id A9D721BF;
-	Sun,  9 Jul 2023 23:41:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 5C204E67;
+	Sun,  9 Jul 2023 23:41:44 -0700 (PDT)
 Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 4E21A602B2DC6;
-	Mon, 10 Jul 2023 14:41:32 +0800 (CST)
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 42F2E602B2DC6;
+	Mon, 10 Jul 2023 14:41:40 +0800 (CST)
 X-MD-Sfrom: suhui@nfschina.com
 X-MD-SrcIP: 180.167.10.98
 From: Su Hui <suhui@nfschina.com>
-To: iyappan@os.amperecomputing.com,
-	keyur@os.amperecomputing.com,
-	quan@os.amperecomputing.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
+To: wg@grandegger.com,
+	mkl@pengutronix.de,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
+Cc: uttenthaler@ems-wuensche.com,
+	yunchuan@nfschina.com,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	wuych <yunchuan@nfschina.com>
-Subject: [PATCH net-next v2 08/10] net: mdio: Remove unnecessary (void*) conversions
-Date: Mon, 10 Jul 2023 14:41:27 +0800
-Message-Id: <20230710064127.173818-1-suhui@nfschina.com>
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next v2 09/10] can: ems_pci: Remove unnecessary (void*) conversions
+Date: Mon, 10 Jul 2023 14:41:38 +0800
+Message-Id: <20230710064138.173912-1-suhui@nfschina.com>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,31 +62,40 @@ Pointer variables of void * type do not require type cast.
 
 Signed-off-by: wuych <yunchuan@nfschina.com>
 ---
- drivers/net/mdio/mdio-xgene.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/can/sja1000/ems_pci.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/mdio/mdio-xgene.c b/drivers/net/mdio/mdio-xgene.c
-index 7aafc221b5cf..683e8f8319ab 100644
---- a/drivers/net/mdio/mdio-xgene.c
-+++ b/drivers/net/mdio/mdio-xgene.c
-@@ -79,7 +79,7 @@ EXPORT_SYMBOL(xgene_mdio_wr_mac);
+diff --git a/drivers/net/can/sja1000/ems_pci.c b/drivers/net/can/sja1000/ems_pci.c
+index c56e27223e5f..ac86640998a8 100644
+--- a/drivers/net/can/sja1000/ems_pci.c
++++ b/drivers/net/can/sja1000/ems_pci.c
+@@ -148,7 +148,7 @@ static void ems_pci_v1_write_reg(const struct sja1000_priv *priv,
  
- int xgene_mdio_rgmii_read(struct mii_bus *bus, int phy_id, int reg)
+ static void ems_pci_v1_post_irq(const struct sja1000_priv *priv)
  {
--	struct xgene_mdio_pdata *pdata = (struct xgene_mdio_pdata *)bus->priv;
-+	struct xgene_mdio_pdata *pdata = bus->priv;
- 	u32 data, done;
- 	u8 wait = 10;
+-	struct ems_pci_card *card = (struct ems_pci_card *)priv->priv;
++	struct ems_pci_card *card = priv->priv;
  
-@@ -105,7 +105,7 @@ EXPORT_SYMBOL(xgene_mdio_rgmii_read);
+ 	/* reset int flag of pita */
+ 	writel(PITA2_ICR_INT0_EN | PITA2_ICR_INT0,
+@@ -168,7 +168,7 @@ static void ems_pci_v2_write_reg(const struct sja1000_priv *priv,
  
- int xgene_mdio_rgmii_write(struct mii_bus *bus, int phy_id, int reg, u16 data)
+ static void ems_pci_v2_post_irq(const struct sja1000_priv *priv)
  {
--	struct xgene_mdio_pdata *pdata = (struct xgene_mdio_pdata *)bus->priv;
-+	struct xgene_mdio_pdata *pdata = bus->priv;
- 	u32 val, done;
- 	u8 wait = 10;
+-	struct ems_pci_card *card = (struct ems_pci_card *)priv->priv;
++	struct ems_pci_card *card = priv->priv;
  
+ 	writel(PLX_ICSR_ENA_CLR, card->conf_addr + PLX_ICSR);
+ }
+@@ -186,7 +186,7 @@ static void ems_pci_v3_write_reg(const struct sja1000_priv *priv,
+ 
+ static void ems_pci_v3_post_irq(const struct sja1000_priv *priv)
+ {
+-	struct ems_pci_card *card = (struct ems_pci_card *)priv->priv;
++	struct ems_pci_card *card = priv->priv;
+ 
+ 	writel(ASIX_LINTSR_INT0AC, card->conf_addr + ASIX_LINTSR);
+ }
 -- 
 2.30.2
 
