@@ -1,204 +1,225 @@
-Return-Path: <netdev+bounces-16377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526B974CFC8
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:23:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AE174CFD9
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0842B280F83
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:23:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3DB1C209BB
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB06C2C0;
-	Mon, 10 Jul 2023 08:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34444C2EE;
+	Mon, 10 Jul 2023 08:24:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303C233EE
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 08:23:05 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1765291;
-	Mon, 10 Jul 2023 01:23:03 -0700 (PDT)
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A8BaDe027592;
-	Mon, 10 Jul 2023 10:22:23 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=GE6zkKpI6t9uY6L4iGZvQGH0DZZlhk/alBlWR2MxhUs=;
- b=G+4K12NnVLRH60fLRSLye1p6QMQOse6GHGYvmcXkLdfiDUaeFSQxdVHB8IuIaLl3hTIj
- cNhrU2X+aizJuhnIEVZGZ3AtqalmKwy1lusGnOvoDtQS3WL/XPW52RrEXjNw6EgYgYRX
- 7ykkxWK3XJLDKaZW3ywfdgnSJd28+A7BuIgG2xvGBzKbVSK1AorcTFJiX/vb2qrSUU7K
- KbGigglmesbBjV7AwerCwSCze7W6exOddeiEWGNQenh3iQE5kIdzdont68RbEOAeqajB
- dsS/sLb1eB5zRqc8iDpTZ5mswkIA4Czb8vK9LHM+wRn2Vrpy2YeSvgiltQE7LfmEfE58 LQ== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rre8vr37g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 10:22:23 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id C00B010005A;
-	Mon, 10 Jul 2023 10:22:19 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 58FB521BF6A;
-	Mon, 10 Jul 2023 10:22:19 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Mon, 10 Jul
- 2023 10:22:18 +0200
-Message-ID: <fb72b4e4-d5c6-d9be-269d-29aff996001c@foss.st.com>
-Date: Mon, 10 Jul 2023 10:22:10 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CAFA933
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 08:24:08 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8665E76
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 01:23:57 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99342a599e9so548927666b.3
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 01:23:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1688977436; x=1691569436;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lVVTTcakGIJzotpbfodORieW7nDILC8yQwEKuMOUYLA=;
+        b=v8PbxExQdeZ1rHkHw7LZ/7j9U0WaA1dkJRr1esV51tDnEYnz1yXdBnwheipucQw7iU
+         Dwny0J0H5BLnpfGCG5wzHd2FnzlN2eKCW8gMzeSEoxaUGxTKsnw6EvOsEUU4TK67JfFM
+         Fphyzekktczmyd9ASIWTNFAeo2y/sK6qzV5gvKJEWK5UQrHLGo1bEQy410Gg0pjYZAno
+         l+f8A80ndIBgzckm1LdIX5bAeQYPaJaXuB13ipB3GplwZOJY/GVnmBg1MPjebry6Ueg9
+         L5E9ztuma8giElufrDqCE9zHYDHjDcl1vKgQ9QXsO3zircBl8jFsHwzGNf5dL/40PtRb
+         4zSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688977436; x=1691569436;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lVVTTcakGIJzotpbfodORieW7nDILC8yQwEKuMOUYLA=;
+        b=WmKx6aiRbWQa2MHtsmnODOJ/FA+rdnHWkjSgL01/BdFdoOrsFLxDrnn6d66PN5o1ie
+         MoiZxngs6ehArAfBBleZIs7KcqM/bTuYWH3DJxNHIQGj5Zwhgs8XUav9cD8S013ezCDS
+         IGEqU0ZMw2FLHWcrC9DqW/tFZ6pbrCEgHVKXaAXHjRePxKk/i8VqVENzHTKV1bySOY7W
+         bDWD9IIUo7kXSYqQgJpwEi92Q/3W5Y5cyFcYIgZNU/ax9bBOGEDbBL60k5bST2arp/Fb
+         q0dMb5euy5kJqU9VngDXnGU0qjI7mMrWxllcXXD2w8EZK8kgF/cCDli2RBkEk5qa4h76
+         hprA==
+X-Gm-Message-State: ABy/qLZ/tX6gWMoCWNQ30rFCK0O8Mois7galwxf5QioSWC+n0dMcb8up
+	e3n0Z3r21kFsO13ayGaVqH8HeQ==
+X-Google-Smtp-Source: APBJJlF/N78SzaPnYo5KIYgXXWBnknej6T2zV2RqWE8pAe5WopCVgqY0xM4CSFkpZNpYhf0+V/cUNg==
+X-Received: by 2002:a17:906:101e:b0:993:fba5:cdf3 with SMTP id 30-20020a170906101e00b00993fba5cdf3mr5110018ejm.6.1688977436009;
+        Mon, 10 Jul 2023 01:23:56 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id u2-20020a1709063b8200b0098e42bef732sm5733689ejf.183.2023.07.10.01.23.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 01:23:55 -0700 (PDT)
+Date: Mon, 10 Jul 2023 10:23:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>,
+	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
+	"airlied@redhat.com" <airlied@redhat.com>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"idosch@nvidia.com" <idosch@nvidia.com>,
+	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
+	"phil@nwl.cc" <phil@nwl.cc>,
+	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v8 08/10] ice: implement dpll interface to control cgu
+Message-ID: <ZKvAGSwbJWEQmESs@nanopsycho>
+References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
+ <20230609121853.3607724-9-arkadiusz.kubalewski@intel.com>
+ <ZISmmH0jqxZRB4VX@nanopsycho>
+ <DM6PR11MB4657161D2871747A7B404EDD9B5FA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZJLtR0c+tvCbUgri@nanopsycho>
+ <ZJ0hQRcm6S05r8VE@nanopsycho>
+ <DM6PR11MB465726733894C7E64AD3367E9B29A@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
- description in binding files
-Content-Language: en-US
-To: Rob Herring <robh@kernel.org>
-CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
- <20230706145108.GA3858320-robh@kernel.org>
- <0aaace47-1bb4-82c5-57a5-6f5d27eb4d45@foss.st.com>
- <20230707152056.GA317056-robh@kernel.org>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20230707152056.GA317056-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-10_05,2023-07-06_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB465726733894C7E64AD3367E9B29A@DM6PR11MB4657.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 7/7/23 17:20, Rob Herring wrote:
-> On Fri, Jul 07, 2023 at 02:28:28PM +0200, Gatien CHEVALLIER wrote:
->> Hello Rob,
+Mon, Jul 03, 2023 at 02:37:18PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Thursday, June 29, 2023 8:14 AM
 >>
->> On 7/6/23 16:51, Rob Herring wrote:
->>> On Wed, Jul 05, 2023 at 07:27:53PM +0200, Gatien Chevallier wrote:
->>>> feature-domains is an optional property that allows a peripheral to
->>>> refer to one or more feature domain controller(s).
+>>Wed, Jun 21, 2023 at 02:29:59PM CEST, jiri@resnulli.us wrote:
+>>>Mon, Jun 19, 2023 at 10:34:12PM CEST, arkadiusz.kubalewski@intel.com
+>>wrote:
+>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>Sent: Saturday, June 10, 2023 6:37 PM
+>>>>>
+>>>>>Fri, Jun 09, 2023 at 02:18:51PM CEST, arkadiusz.kubalewski@intel.com
+>>>>>wrote:
+>>>>>
+>>>>>[...]
+>>>>>
+>>>>>
+>>>>>>+static int ice_dpll_mode_get(const struct dpll_device *dpll, void *priv,
+>>>>>>+			     enum dpll_mode *mode,
+>>>>>>+			     struct netlink_ext_ack *extack)
+>>>>>>+{
+>>>>>>+	*mode = DPLL_MODE_AUTOMATIC;
+>>>>>
+>>>>>I don't understand how the automatic mode could work with SyncE. The
+>>>>>There is one pin exposed for one netdev. The SyncE daemon should select
+>>>>>exacly one pin. How do you achieve that?
+>>>>>Is is by setting DPLL_PIN_STATE_SELECTABLE on the pin-netdev you want to
+>>>>>select and DPLL_PIN_STATE_DISCONNECTED on the rest?
+>>>>>
+>>>>>
+>>>>>[...]
 >>>>
->>>> Description of this property is added to all peripheral binding files of
->>>> the peripheral under the STM32 firewall controllers. It allows an accurate
->>>> representation of the hardware, where various peripherals are connected
->>>> to this firewall bus. The firewall can then check the peripheral accesses
->>>> before allowing it to probe.
+>>>>AUTOMATIC mode autoselects highest priority valid signal.
+>>>>As you have pointed out, for SyncE selection, the user must be able to
+>>>>manually
+>>>>select a pin state to enable recovery of signal from particular port.
 >>>>
->>>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>>> ---
->>>>
->>>> Disclaimer: Some error with dtbs_check will be observed as I've
->>>> considered the property to be generic, as Rob asked
->>>>
->>>>    Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
->>>>    Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
->>>>    Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
->>>>    Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
->>>>    Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
->>>>    .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
->>>>    Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
->>>>    .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
->>>>    Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
->>>>    .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
->>>>    Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
->>>>    Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
->>>>    Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
->>>>    Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
->>>>    Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
->>>>    .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
->>>>    Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
->>>>    Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
->>>>    Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
->>>>    Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
->>>>    .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
->>>>    Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
->>>>    Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
->>>>    Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
->>>>    24 files changed, 97 insertions(+)
->>>>
->>>> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
->>>> index b767ec72a999..daf8dcaef627 100644
->>>> --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
->>>> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
->>>> @@ -50,6 +50,10 @@ properties:
->>>>      power-domains:
->>>>        maxItems: 1
->>>> +  feature-domains:
->>>> +    minItems: 1
->>>> +    maxItems: 3
+>>>>In "ice" case there are 2 pins for network PHY clock signal recovery, and
+>>>>both
+>>>>are parent pins (MUX-type). There are also 4 pins assigned to netdevs
+>>>>(one per
+>>>>port). Thus passing a signal from PHY to the pin is done through the MUX-
+>>>>pin,
+>>>>by selecting proper state on pin-parent pair (where parent pins is highest
+>>>>prio
+>>>>pin on dpll).
 >>>
->>> What are the 3 entries?
->>>
->>> Rob
+>>>Could you show me some examples please?
 >>
->> I thought I was benefiting from the description of the pattern-property in
->> the RIFSC YAML file. But yes anyway, it seems like it needs some description
->> here as the dependency does not appear in this file.
-> 
-> Humm, that should limit the maximum entries to 2, so 3 would never work
-> (if RIFSC is the parent).
-> 
->> I picked 3 as a maxItems for our ST needs, I'll give it some more thought
->> when coming back with something clearer.
-> 
-> I'd expect you have 1 entry for register bus and 1 entry for DMA bus if
-> there is one. It's block specific for how many entries, so the RIFSC
-> schema should not be setting that. You could possibly say that
-> 'feature-domains' is required for all the child nodes though.
+>>Arkadiusz, could you please reply to this?
+>>Thanks!
+>>
+>
+>Sure, sorry for the delays, let's try that.
+>
+>'ice' use case:
+>Enabling a PHY clock recovery for DPLL_MODE_AUTOMATIC dpll (ID#0) with PHY
+>recovered clock signals (PIN_ID#13) being muxed using MUX-type pin (PIN_ID#2)
+>
+>1. Set MUX-type pin to state selectable and highest priority on a dpll device
+>(or make sure it is already configured):
+>CMD_PIN_SET:
+>	PIN_ID			2
+>	PIN_PARENT_DEVICE	(nest)
+>		ID		0
+>		PIN_STATE	SELECTABLE
+>		PIN_PRIO	0
+>(assume all the other pins have prio >=1)
+>
+>2. Set connected state on a pin-parent_pin tuple where parent is a pin from #1
+>CMD_PIN_SET:
+>	PIN_ID			13
+>	PIN_PARENT_PIN		(nest)
+>		PIN_ID		2
+>		PIN_STATE	CONNECTED
 
-Ok, I will change to not specifying the number of entries in the
-RIFSC YAML file for V2.
+How does this look from the perspective of a SyncE flow. Let's say you
+have eth0 and eth1, both is connected with a DPLL pin. Could you show
+how you select eth0 and then eth1?
 
-> 
-> Rob
-Some hardware blocks may have a firewall ID for their device part and
-another ID for their master part as well. In the end, the number of
-entries could very well vary between different platforms. And the YAML
-files are common to these platforms.
 
-This property could be used for "extra" arguments as well, that are not
-firewall IDs.
 
-What do you suggest between picking a high maxItems value that would
-(hopefully) cover all cases and not specifying maxItems at all? Or maybe
-another property dedicated to such arguments?
-
-Best regards,
-Gatien
+>
+>Thank you!
+>Arkadiusz
+>
+>>>
+>>>
+>>>>
+>>>>Thank you!
+>>>>Arkadiusz
 
