@@ -1,206 +1,358 @@
-Return-Path: <netdev+bounces-16486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E02274D930
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:42:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036EE74D954
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7DC21C20ACA
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 14:42:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8562812C5
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 14:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC63D2EA;
-	Mon, 10 Jul 2023 14:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D389C125A3;
+	Mon, 10 Jul 2023 14:51:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A47F125A3
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:42:42 +0000 (UTC)
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1906C3;
-	Mon, 10 Jul 2023 07:42:40 -0700 (PDT)
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-345ff33d286so24253225ab.3;
-        Mon, 10 Jul 2023 07:42:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689000160; x=1691592160;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9youPIImCCAcdEckdoxFQrNpLYrygdk7W9ZtiP8w15k=;
-        b=RNoulLSZHnHbR/2BYwKnhB6ZCVD59ktpzYmSlC+pFzHu5labOYQjxCMLjg4wmUaXA9
-         5vfXG/4I3tImqbWLvdIksMoDeccqRRvd95Z32GFS3nPDNTnlnPJSrEEj7eJXJ/lWUeVr
-         KE0J6gWiBOMpY2LkMZbDHluq+5lcDdGcHnLJ7RBFruBMlvha04KUuNUfZoQzW+chBW5k
-         tYpEHrU4YrdlJ4bvtl7C/W8gUJqi1OXND3pnVB8oYKf6q004qRo/Ok5OdvnmQ5Zmd0bZ
-         nJHvdsoQNiMnmosuh/Y9qGz6npMn4TZDJsXIpqcogTrhPKfeBcRGSvFNYBmn+el3NcTe
-         /V7w==
-X-Gm-Message-State: ABy/qLb0UTDG/EF+3cYvmQZXUUxjYHEQEXmHqRWXEJnqZ28alAfM/g8I
-	jLTwmVejLmJaAiz/gfQnPg==
-X-Google-Smtp-Source: APBJJlG3K/ro2oZtTnsZ7Banw1CdZJLy4OFKR61udj8GbrxlXMYjo+jeaSBEKYBDTKO2X9W4TkNn0w==
-X-Received: by 2002:a92:502:0:b0:345:c8ce:ff4e with SMTP id q2-20020a920502000000b00345c8ceff4emr11579387ile.3.1689000160019;
-        Mon, 10 Jul 2023 07:42:40 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id x7-20020a92d307000000b00342f537e3c3sm3560577ila.2.2023.07.10.07.42.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 07:42:39 -0700 (PDT)
-Received: (nullmailer pid 1938541 invoked by uid 1000);
-	Mon, 10 Jul 2023 14:42:35 -0000
-Date: Mon, 10 Jul 2023 08:42:35 -0600
-From: Rob Herring <robh@kernel.org>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, 
-	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org, 
-	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, mchehab@kernel.org, 
-	fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, ulf.hansson@linaro.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	hugues.fruchet@foss.st.com, lee@kernel.org, will@kernel.org, 
-	catalin.marinas@arm.com, arnd@kernel.org, richardcochran@gmail.com, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
-	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
- description in binding files
-Message-ID: <20230710144235.GA1922048-robh@kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
- <20230706145108.GA3858320-robh@kernel.org>
- <0aaace47-1bb4-82c5-57a5-6f5d27eb4d45@foss.st.com>
- <20230707152056.GA317056-robh@kernel.org>
- <fb72b4e4-d5c6-d9be-269d-29aff996001c@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66BD3D76
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:51:03 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B581106;
+	Mon, 10 Jul 2023 07:51:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=7iIxcZkXz83i4lz2fQQyDk8MCnaJiYjPow60zsjrwhc=; t=1689000660; x=1690210260; 
+	b=yGTkMPwR2ObmQomiA9g8U14/f5Y1PE/8DL47sptc8e7lZvpONsvepT0x5XyWCBzQulyq7qqYocg
+	6qPx6GnvfNHR0wueW0WbMgZvDL0Ja8wnHj2qnKjciToAUTP3p7aH7RfdRnUNfr64mb8kEU3dJFx84
+	NiPw+nLP++b55tad8kjVKM113dZo4VC//WYoyFn+zyuEFwYwCiQ7zJjgXkL4JK+f+usSIWqjgriZn
+	stqNYMXpI6JHQPFa9rPPWGCXUZqPIGfBNkvJjttQqC9XPv3vVeBBHwdAbjgnc5OY7y+a95LE2zM90
+	XuFFuB79Y6ZxO6yTH3Af0FjBW9cs/vAi2qfg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qIsE4-00EgGl-37;
+	Mon, 10 Jul 2023 16:50:57 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	Xi Ruoyao <xry111@xry111.site>,
+	=?UTF-8?q?Nikl=C4=81vs=20Ko=C4=BCes=C5=86ikovs?= <pinkflames.linux@gmail.com>,
+	Jeff Chua <jeff.chua.linux@gmail.com>,
+	Zhang Rui <rui.zhang@intel.com>
+Subject: [PATCH net] wifi: iwlwifi: remove 'use_tfh' config to fix crash
+Date: Mon, 10 Jul 2023 16:50:39 +0200
+Message-ID: <20230710145038.84186-2-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fb72b4e4-d5c6-d9be-269d-29aff996001c@foss.st.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 10:22:10AM +0200, Gatien CHEVALLIER wrote:
-> 
-> 
-> On 7/7/23 17:20, Rob Herring wrote:
-> > On Fri, Jul 07, 2023 at 02:28:28PM +0200, Gatien CHEVALLIER wrote:
-> > > Hello Rob,
-> > > 
-> > > On 7/6/23 16:51, Rob Herring wrote:
-> > > > On Wed, Jul 05, 2023 at 07:27:53PM +0200, Gatien Chevallier wrote:
-> > > > > feature-domains is an optional property that allows a peripheral to
-> > > > > refer to one or more feature domain controller(s).
-> > > > > 
-> > > > > Description of this property is added to all peripheral binding files of
-> > > > > the peripheral under the STM32 firewall controllers. It allows an accurate
-> > > > > representation of the hardware, where various peripherals are connected
-> > > > > to this firewall bus. The firewall can then check the peripheral accesses
-> > > > > before allowing it to probe.
-> > > > > 
-> > > > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> > > > > ---
-> > > > > 
-> > > > > Disclaimer: Some error with dtbs_check will be observed as I've
-> > > > > considered the property to be generic, as Rob asked
-> > > > > 
-> > > > >    Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
-> > > > >    Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
-> > > > >    Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
-> > > > >    Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
-> > > > >    Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
-> > > > >    .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
-> > > > >    Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
-> > > > >    .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
-> > > > >    Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
-> > > > >    .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
-> > > > >    Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
-> > > > >    Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
-> > > > >    Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
-> > > > >    Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
-> > > > >    Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
-> > > > >    .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
-> > > > >    Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
-> > > > >    Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
-> > > > >    Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
-> > > > >    Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
-> > > > >    .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
-> > > > >    Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
-> > > > >    Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
-> > > > >    Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
-> > > > >    24 files changed, 97 insertions(+)
-> > > > > 
-> > > > > diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> > > > > index b767ec72a999..daf8dcaef627 100644
-> > > > > --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> > > > > +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> > > > > @@ -50,6 +50,10 @@ properties:
-> > > > >      power-domains:
-> > > > >        maxItems: 1
-> > > > > +  feature-domains:
-> > > > > +    minItems: 1
-> > > > > +    maxItems: 3
-> > > > 
-> > > > What are the 3 entries?
-> > > > 
-> > > > Rob
-> > > 
-> > > I thought I was benefiting from the description of the pattern-property in
-> > > the RIFSC YAML file. But yes anyway, it seems like it needs some description
-> > > here as the dependency does not appear in this file.
-> > 
-> > Humm, that should limit the maximum entries to 2, so 3 would never work
-> > (if RIFSC is the parent).
-> > 
-> > > I picked 3 as a maxItems for our ST needs, I'll give it some more thought
-> > > when coming back with something clearer.
-> > 
-> > I'd expect you have 1 entry for register bus and 1 entry for DMA bus if
-> > there is one. It's block specific for how many entries, so the RIFSC
-> > schema should not be setting that. You could possibly say that
-> > 'feature-domains' is required for all the child nodes though.
-> 
-> Ok, I will change to not specifying the number of entries in the
-> RIFSC YAML file for V2.
-> 
-> > 
-> > Rob
-> Some hardware blocks may have a firewall ID for their device part and
-> another ID for their master part as well. In the end, the number of
-> entries could very well vary between different platforms. And the YAML
-> files are common to these platforms.
+From: Johannes Berg <johannes.berg@intel.com>
 
-A given device has a fixed number of buses. Usually 1 or 2. That does 
-*not* vary by platform (unless the device is modified). You could have 
-the same firewall controller and id for multiple buses, but that 
-should not change the number of entries for the device. Now maybe a bus 
-has no firewall on some platforms. In that case, you should make the 
-optional firewall entry the last one, have a null phandle (0 or -1), or 
-use -names to distinguish the entries.
+This is equivalent to 'gen2', and it was always confusing to have
+two identical config entries. The split config patch actually had
+been originally developed after removing 'use_tfh" and didn't add
+the use_tfh in the new configs as they'd later been copied to the
+new files. Thus the easiest way to fix the init crash here now is
+to just remove use_tfh (which is erroneously unset in most of the
+configs now) and use 'gen2' in the code instead.
 
-> This property could be used for "extra" arguments as well, that are not
-> firewall IDs.
+There's possibly still an unwind error in iwl_txq_gen2_init() as
+it crashes if TXQ 0 fails to initialize, but we can deal with it
+later since the original failure is due to the use_tfh confusion.
 
-The arg cells are dictated by the provider and opaque to the client.
+Tested-by: Xi Ruoyao <xry111@xry111.site>
+Reported-and-tested-by: Niklāvs Koļesņikovs <pinkflames.linux@gmail.com>
+Reported-and-tested-by: Jeff Chua <jeff.chua.linux@gmail.com>
+Reported-and-tested-by: Zhang Rui <rui.zhang@intel.com>
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=217622
+Link: https://lore.kernel.org/all/9274d9bd3d080a457649ff5addcc1726f08ef5b2.camel@xry111.site/
+Link: https://lore.kernel.org/all/CAAJw_Zug6VCS5ZqTWaFSr9sd85k%3DtyPm9DEE%2BmV%3DAKoECZM%2BsQ@mail.gmail.com/
+Fixes: 19898ce9cf8a ("wifi: iwlwifi: split 22000.c into multiple files")
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ drivers/net/wireless/intel/iwlwifi/cfg/22000.c  |  5 -----
+ drivers/net/wireless/intel/iwlwifi/iwl-config.h |  2 --
+ drivers/net/wireless/intel/iwlwifi/iwl-fh.h     |  4 ++--
+ drivers/net/wireless/intel/iwlwifi/iwl-trans.c  |  6 +++---
+ drivers/net/wireless/intel/iwlwifi/mvm/mvm.h    |  2 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/trans.c |  4 ++--
+ drivers/net/wireless/intel/iwlwifi/pcie/tx.c    |  2 +-
+ drivers/net/wireless/intel/iwlwifi/queue/tx.c   | 10 +++++-----
+ drivers/net/wireless/intel/iwlwifi/queue/tx.h   |  8 ++++----
+ 9 files changed, 18 insertions(+), 25 deletions(-)
 
-> What do you suggest between picking a high maxItems value that would
-> (hopefully) cover all cases and not specifying maxItems at all? Or maybe
-> another property dedicated to such arguments?
+diff --git a/drivers/net/wireless/intel/iwlwifi/cfg/22000.c b/drivers/net/wireless/intel/iwlwifi/cfg/22000.c
+index aa4320ca4c30..d594694206b3 100644
+--- a/drivers/net/wireless/intel/iwlwifi/cfg/22000.c
++++ b/drivers/net/wireless/intel/iwlwifi/cfg/22000.c
+@@ -84,7 +84,6 @@ const struct iwl_ht_params iwl_22000_ht_params = {
+ 	.mac_addr_from_csr = 0x380,					\
+ 	.ht_params = &iwl_22000_ht_params,				\
+ 	.nvm_ver = IWL_22000_NVM_VERSION,				\
+-	.trans.use_tfh = true,						\
+ 	.trans.rf_id = true,						\
+ 	.trans.gen2 = true,						\
+ 	.nvm_type = IWL_NVM_EXT,					\
+@@ -122,7 +121,6 @@ const struct iwl_ht_params iwl_22000_ht_params = {
+ 
+ const struct iwl_cfg_trans_params iwl_qu_trans_cfg = {
+ 	.mq_rx_supported = true,
+-	.use_tfh = true,
+ 	.rf_id = true,
+ 	.gen2 = true,
+ 	.device_family = IWL_DEVICE_FAMILY_22000,
+@@ -134,7 +132,6 @@ const struct iwl_cfg_trans_params iwl_qu_trans_cfg = {
+ 
+ const struct iwl_cfg_trans_params iwl_qu_medium_latency_trans_cfg = {
+ 	.mq_rx_supported = true,
+-	.use_tfh = true,
+ 	.rf_id = true,
+ 	.gen2 = true,
+ 	.device_family = IWL_DEVICE_FAMILY_22000,
+@@ -146,7 +143,6 @@ const struct iwl_cfg_trans_params iwl_qu_medium_latency_trans_cfg = {
+ 
+ const struct iwl_cfg_trans_params iwl_qu_long_latency_trans_cfg = {
+ 	.mq_rx_supported = true,
+-	.use_tfh = true,
+ 	.rf_id = true,
+ 	.gen2 = true,
+ 	.device_family = IWL_DEVICE_FAMILY_22000,
+@@ -200,7 +196,6 @@ const struct iwl_cfg_trans_params iwl_ax200_trans_cfg = {
+ 	.device_family = IWL_DEVICE_FAMILY_22000,
+ 	.base_params = &iwl_22000_base_params,
+ 	.mq_rx_supported = true,
+-	.use_tfh = true,
+ 	.rf_id = true,
+ 	.gen2 = true,
+ 	.bisr_workaround = 1,
+diff --git a/drivers/net/wireless/intel/iwlwifi/iwl-config.h b/drivers/net/wireless/intel/iwlwifi/iwl-config.h
+index 742096c5a36a..241a9e3f2a1a 100644
+--- a/drivers/net/wireless/intel/iwlwifi/iwl-config.h
++++ b/drivers/net/wireless/intel/iwlwifi/iwl-config.h
+@@ -256,7 +256,6 @@ enum iwl_cfg_trans_ltr_delay {
+  * @xtal_latency: power up latency to get the xtal stabilized
+  * @extra_phy_cfg_flags: extra configuration flags to pass to the PHY
+  * @rf_id: need to read rf_id to determine the firmware image
+- * @use_tfh: use TFH
+  * @gen2: 22000 and on transport operation
+  * @mq_rx_supported: multi-queue rx support
+  * @integrated: discrete or integrated
+@@ -271,7 +270,6 @@ struct iwl_cfg_trans_params {
+ 	u32 xtal_latency;
+ 	u32 extra_phy_cfg_flags;
+ 	u32 rf_id:1,
+-	    use_tfh:1,
+ 	    gen2:1,
+ 	    mq_rx_supported:1,
+ 	    integrated:1,
+diff --git a/drivers/net/wireless/intel/iwlwifi/iwl-fh.h b/drivers/net/wireless/intel/iwlwifi/iwl-fh.h
+index bedd78a47f67..4e4a60ddf9b2 100644
+--- a/drivers/net/wireless/intel/iwlwifi/iwl-fh.h
++++ b/drivers/net/wireless/intel/iwlwifi/iwl-fh.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
+ /*
+- * Copyright (C) 2005-2014, 2018-2021 Intel Corporation
++ * Copyright (C) 2005-2014, 2018-2021, 2023 Intel Corporation
+  * Copyright (C) 2015-2017 Intel Deutschland GmbH
+  */
+ #ifndef __iwl_fh_h__
+@@ -71,7 +71,7 @@
+ static inline unsigned int FH_MEM_CBBC_QUEUE(struct iwl_trans *trans,
+ 					     unsigned int chnl)
+ {
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		WARN_ON_ONCE(chnl >= 64);
+ 		return TFH_TFDQ_CBB_TABLE + 8 * chnl;
+ 	}
+diff --git a/drivers/net/wireless/intel/iwlwifi/iwl-trans.c b/drivers/net/wireless/intel/iwlwifi/iwl-trans.c
+index b1af9359cea5..4bd759432d44 100644
+--- a/drivers/net/wireless/intel/iwlwifi/iwl-trans.c
++++ b/drivers/net/wireless/intel/iwlwifi/iwl-trans.c
+@@ -2,7 +2,7 @@
+ /*
+  * Copyright (C) 2015 Intel Mobile Communications GmbH
+  * Copyright (C) 2016-2017 Intel Deutschland GmbH
+- * Copyright (C) 2019-2021 Intel Corporation
++ * Copyright (C) 2019-2021, 2023 Intel Corporation
+  */
+ #include <linux/kernel.h>
+ #include <linux/bsearch.h>
+@@ -42,7 +42,7 @@ struct iwl_trans *iwl_trans_alloc(unsigned int priv_size,
+ 
+ 	WARN_ON(!ops->wait_txq_empty && !ops->wait_tx_queues_empty);
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		trans->txqs.tfd.addr_size = 64;
+ 		trans->txqs.tfd.max_tbs = IWL_TFH_NUM_TBS;
+ 		trans->txqs.tfd.size = sizeof(struct iwl_tfh_tfd);
+@@ -101,7 +101,7 @@ int iwl_trans_init(struct iwl_trans *trans)
+ 
+ 	/* Some things must not change even if the config does */
+ 	WARN_ON(trans->txqs.tfd.addr_size !=
+-		(trans->trans_cfg->use_tfh ? 64 : 36));
++		(trans->trans_cfg->gen2 ? 64 : 36));
+ 
+ 	snprintf(trans->dev_cmd_pool_name, sizeof(trans->dev_cmd_pool_name),
+ 		 "iwl_cmd_pool:%s", dev_name(trans->dev));
+diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/mvm.h b/drivers/net/wireless/intel/iwlwifi/mvm/mvm.h
+index b83df0631279..b18c91c5dd5d 100644
+--- a/drivers/net/wireless/intel/iwlwifi/mvm/mvm.h
++++ b/drivers/net/wireless/intel/iwlwifi/mvm/mvm.h
+@@ -1450,7 +1450,7 @@ static inline bool iwl_mvm_has_new_station_api(const struct iwl_fw *fw)
+ static inline bool iwl_mvm_has_new_tx_api(struct iwl_mvm *mvm)
+ {
+ 	/* TODO - replace with TLV once defined */
+-	return mvm->trans->trans_cfg->use_tfh;
++	return mvm->trans->trans_cfg->gen2;
+ }
+ 
+ static inline bool iwl_mvm_has_unified_ucode(struct iwl_mvm *mvm)
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+index eacbbdbffb5e..3e988da44973 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+@@ -819,7 +819,7 @@ static int iwl_pcie_load_cpu_sections_8000(struct iwl_trans *trans,
+ 
+ 	iwl_enable_interrupts(trans);
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		if (cpu == 1)
+ 			iwl_write_prph(trans, UREG_UCODE_LOAD_STATUS,
+ 				       0xFFFF);
+@@ -3394,7 +3394,7 @@ iwl_trans_pcie_dump_data(struct iwl_trans *trans,
+ 			u8 tfdidx;
+ 			u32 caplen, cmdlen;
+ 
+-			if (trans->trans_cfg->use_tfh)
++			if (trans->trans_cfg->gen2)
+ 				tfdidx = idx;
+ 			else
+ 				tfdidx = ptr;
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/tx.c b/drivers/net/wireless/intel/iwlwifi/pcie/tx.c
+index 1337fa95f657..790e5b124740 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/tx.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/tx.c
+@@ -364,7 +364,7 @@ void iwl_trans_pcie_tx_reset(struct iwl_trans *trans)
+ 	for (txq_id = 0; txq_id < trans->trans_cfg->base_params->num_of_queues;
+ 	     txq_id++) {
+ 		struct iwl_txq *txq = trans->txqs.txq[txq_id];
+-		if (trans->trans_cfg->use_tfh)
++		if (trans->trans_cfg->gen2)
+ 			iwl_write_direct64(trans,
+ 					   FH_MEM_CBBC_QUEUE(trans, txq_id),
+ 					   txq->dma_addr);
+diff --git a/drivers/net/wireless/intel/iwlwifi/queue/tx.c b/drivers/net/wireless/intel/iwlwifi/queue/tx.c
+index fbacbe9ada15..5bb3cc3367c9 100644
+--- a/drivers/net/wireless/intel/iwlwifi/queue/tx.c
++++ b/drivers/net/wireless/intel/iwlwifi/queue/tx.c
+@@ -985,7 +985,7 @@ void iwl_txq_log_scd_error(struct iwl_trans *trans, struct iwl_txq *txq)
+ 	bool active;
+ 	u8 fifo;
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		IWL_ERR(trans, "Queue %d is stuck %d %d\n", txq_id,
+ 			txq->read_ptr, txq->write_ptr);
+ 		/* TODO: access new SCD registers and dump them */
+@@ -1040,7 +1040,7 @@ int iwl_txq_alloc(struct iwl_trans *trans, struct iwl_txq *txq, int slots_num,
+ 	if (WARN_ON(txq->entries || txq->tfds))
+ 		return -EINVAL;
+ 
+-	if (trans->trans_cfg->use_tfh)
++	if (trans->trans_cfg->gen2)
+ 		tfd_sz = trans->txqs.tfd.size * slots_num;
+ 
+ 	timer_setup(&txq->stuck_timer, iwl_txq_stuck_timer, 0);
+@@ -1347,7 +1347,7 @@ static inline dma_addr_t iwl_txq_gen1_tfd_tb_get_addr(struct iwl_trans *trans,
+ 	dma_addr_t addr;
+ 	dma_addr_t hi_len;
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		struct iwl_tfh_tfd *tfh_tfd = _tfd;
+ 		struct iwl_tfh_tb *tfh_tb = &tfh_tfd->tbs[idx];
+ 
+@@ -1408,7 +1408,7 @@ void iwl_txq_gen1_tfd_unmap(struct iwl_trans *trans,
+ 
+ 	meta->tbs = 0;
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		struct iwl_tfh_tfd *tfd_fh = (void *)tfd;
+ 
+ 		tfd_fh->num_tbs = 0;
+@@ -1625,7 +1625,7 @@ void iwl_txq_reclaim(struct iwl_trans *trans, int txq_id, int ssn,
+ 
+ 		txq->entries[read_ptr].skb = NULL;
+ 
+-		if (!trans->trans_cfg->use_tfh)
++		if (!trans->trans_cfg->gen2)
+ 			iwl_txq_gen1_inval_byte_cnt_tbl(trans, txq);
+ 
+ 		iwl_txq_free_tfd(trans, txq);
+diff --git a/drivers/net/wireless/intel/iwlwifi/queue/tx.h b/drivers/net/wireless/intel/iwlwifi/queue/tx.h
+index eca53bfd326d..1e4a24ab9bab 100644
+--- a/drivers/net/wireless/intel/iwlwifi/queue/tx.h
++++ b/drivers/net/wireless/intel/iwlwifi/queue/tx.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
+ /*
+- * Copyright (C) 2020-2022 Intel Corporation
++ * Copyright (C) 2020-2023 Intel Corporation
+  */
+ #ifndef __iwl_trans_queue_tx_h__
+ #define __iwl_trans_queue_tx_h__
+@@ -38,7 +38,7 @@ static inline void iwl_wake_queue(struct iwl_trans *trans,
+ static inline void *iwl_txq_get_tfd(struct iwl_trans *trans,
+ 				    struct iwl_txq *txq, int idx)
+ {
+-	if (trans->trans_cfg->use_tfh)
++	if (trans->trans_cfg->gen2)
+ 		idx = iwl_txq_get_cmd_index(txq, idx);
+ 
+ 	return (u8 *)txq->tfds + trans->txqs.tfd.size * idx;
+@@ -135,7 +135,7 @@ static inline u8 iwl_txq_gen1_tfd_get_num_tbs(struct iwl_trans *trans,
+ {
+ 	struct iwl_tfd *tfd;
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		struct iwl_tfh_tfd *tfh_tfd = _tfd;
+ 
+ 		return le16_to_cpu(tfh_tfd->num_tbs) & 0x1f;
+@@ -151,7 +151,7 @@ static inline u16 iwl_txq_gen1_tfd_tb_get_len(struct iwl_trans *trans,
+ 	struct iwl_tfd *tfd;
+ 	struct iwl_tfd_tb *tb;
+ 
+-	if (trans->trans_cfg->use_tfh) {
++	if (trans->trans_cfg->gen2) {
+ 		struct iwl_tfh_tfd *tfh_tfd = _tfd;
+ 		struct iwl_tfh_tb *tfh_tb = &tfh_tfd->tbs[idx];
+ 
+-- 
+2.41.0
 
-You should not specify maxItems in the firewall controller binding.
-
-Rob
 
