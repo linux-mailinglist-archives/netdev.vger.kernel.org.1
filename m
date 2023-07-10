@@ -1,111 +1,130 @@
-Return-Path: <netdev+bounces-16344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133C374CDA0
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:49:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D04F74CDAC
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4D16280E03
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:49:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA9DF280F04
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6986440A;
-	Mon, 10 Jul 2023 06:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBFD4420;
+	Mon, 10 Jul 2023 06:53:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD6E3D8C
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:49:39 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F398E
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 23:49:38 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB3B3D90;
+	Mon, 10 Jul 2023 06:53:40 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8791B0;
+	Sun,  9 Jul 2023 23:53:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=8fvJ1dfbOwyaADnJDf9+J3fyVHcrHpGf3d/xdt5Lyu4=; b=j9BhUQDWr6ZygNAq4EeJHP1VkI
+	Lm3sU35eJN4r/kpv0h3UNThFdSJakjfXGO4adMsSd526u7teerzDH4Go1/WZj8K5F/K9spVVq7Ujo
+	pUNlhsyPGcCBmV6pezxxqXTPxHkPwFoBnmFl5ZixV6LWfPe0sONn9Ah4epq5cbEG/UpU6L2BiJq10
+	H7wHD98xKnsSt4HHC+NFJSNR3lk2ja8JDSJr1eyAX67IQFR09EmGKeix92Jx2Cp8qJREWNNAXfrBr
+	UVwJa+Sgv0aGHxN3p3sItsldPXP2b/b2HrMljppBf6IfSWb9oLAeGuPpe0qvvxipXy1YZXPnY3chG
+	4ctB/vnQ==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qIklq-000Foy-96; Mon, 10 Jul 2023 08:53:18 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qIkhz-0004j7-25; Mon, 10 Jul 2023 08:49:19 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 3A4901ECAA5;
-	Mon, 10 Jul 2023 06:49:15 +0000 (UTC)
-Date: Mon, 10 Jul 2023 08:49:14 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Su Hui <suhui@nfschina.com>
-Cc: wg@grandegger.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, uttenthaler@ems-wuensche.com,
-	yunchuan@nfschina.com, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next v2 09/10] can: ems_pci: Remove unnecessary
- (void*) conversions
-Message-ID: <20230710-parachute-dispersal-208e1a406b78-mkl@pengutronix.de>
-References: <20230710064138.173912-1-suhui@nfschina.com>
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qIklp-0002c9-Qa; Mon, 10 Jul 2023 08:53:17 +0200
+Subject: Re: [PATCH bpf-next v3 6/8] bpftool: Extend net dump with tcx progs
+To: Stanislav Fomichev <sdf@google.com>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, john.fastabend@gmail.com, kuba@kernel.org,
+ dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org, davem@davemloft.net,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20230707172455.7634-1-daniel@iogearbox.net>
+ <20230707172455.7634-7-daniel@iogearbox.net> <ZKiENoYiElPyQqrL@google.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <19f6b5cc-75a2-59b5-ce4b-5efc64c0274e@iogearbox.net>
+Date: Mon, 10 Jul 2023 08:53:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vliygvx23paytwk4"
-Content-Disposition: inline
-In-Reply-To: <20230710064138.173912-1-suhui@nfschina.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+In-Reply-To: <ZKiENoYiElPyQqrL@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26964/Sun Jul  9 09:27:43 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 7/7/23 11:31 PM, Stanislav Fomichev wrote:
+> On 07/07, Daniel Borkmann wrote:
+>> Add support to dump fd-based attach types via bpftool. This includes both
+>> the tc BPF link and attach ops programs. Dumped information contain the
+>> attach location, function entry name, program ID and link ID when applicable.
+>>
+>> Example with tc BPF link:
+>>
+>>    # ./bpftool net
+>>    xdp:
+>>
+>>    tc:
+>>    bond0(4) bpf/ingress cil_from_netdev prog id 784 link id 10
+>>    bond0(4) bpf/egress cil_to_netdev prog id 804 link id 11
+>>
+>>    flow_dissector:
+>>
+>>    netfilter:
+>>
+>> Example with tc BPF attach ops:
+>>
+>>    # ./bpftool net
+>>    xdp:
+>>
+>>    tc:
+>>    bond0(4) bpf/ingress cil_from_netdev prog id 654
+>>    bond0(4) bpf/egress cil_to_netdev prog id 672
+>>
+>>    flow_dissector:
+>>
+>>    netfilter:
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> ---
+>>   tools/bpf/bpftool/net.c | 86 +++++++++++++++++++++++++++++++++++++++--
+>>   1 file changed, 82 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/tools/bpf/bpftool/net.c b/tools/bpf/bpftool/net.c
+>> index 26a49965bf71..1ef1e880de61 100644
+>> --- a/tools/bpf/bpftool/net.c
+>> +++ b/tools/bpf/bpftool/net.c
+>> @@ -76,6 +76,11 @@ static const char * const attach_type_strings[] = {
+>>   	[NET_ATTACH_TYPE_XDP_OFFLOAD]	= "xdpoffload",
+>>   };
+>>   
+>> +static const char * const attach_loc_strings[] = {
+>> +	[BPF_TCX_INGRESS]		= "bpf/ingress",
+>> +	[BPF_TCX_EGRESS]		= "bpf/egress",
+> 
+> Any reason we are not doing tcx/ingress & egress? To match the section
+> names.
 
---vliygvx23paytwk4
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 10.07.2023 14:41:38, Su Hui wrote:
-> From: wuych <yunchuan@nfschina.com>
->=20
-> Pointer variables of void * type do not require type cast.
-
-I like the idea. Please add my Acked-by: Marc Kleine-Budde
-<mkl@pengutronix.de>, after you've fixed the issue:
-
-> Signed-off-by: wuych <yunchuan@nfschina.com>
-
-This patch is not Signed-off-by the contributing person.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---vliygvx23paytwk4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmSrqecACgkQvlAcSiqK
-BOiTlQf+KaGq+RQKecV2KZC82/U90JGtuIisVjkNKRh/mMhg+6CPgj37A36dJopA
-B309j3311kHTCuBsPWfD+IXLkOunPKJRGtxL+IxsXWtcAClti6YDG7HqUYGl9Mpi
-f0vyLf1xV60WUFTu6yJ2w6Rn25G79SM+071PWHHgDGqqb2vSYZFIY8d2hhnh/as8
-oKl3x8v+Fskg/so9Z8QKZ3cydmNhH/FOFwu6kNk7ofEzNokpcVQ5Os6Fk6nt5VJT
-HjeB7kAV+JuKO07gyMqZKKPfOm5z4f+tsWB3RkSRnKPMM9J6+U/5Gwl/v7X21+5e
-d8sLIAYPaGagxcB1uQXk9Djy+S3kbg==
-=dqfX
------END PGP SIGNATURE-----
-
---vliygvx23paytwk4--
+Ok, will change for v4 to tcx/{ingress,egress}.
 
