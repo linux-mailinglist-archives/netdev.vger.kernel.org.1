@@ -1,211 +1,165 @@
-Return-Path: <netdev+bounces-16322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE5A374CB31
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:27:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4AFD74CB5C
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E273280F0A
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 04:27:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F2731C208D0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 04:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F99C1FB4;
-	Mon, 10 Jul 2023 04:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF75D179;
+	Mon, 10 Jul 2023 04:45:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFD917F2
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 04:27:06 +0000 (UTC)
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A74E7
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 21:27:05 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-263036d4bc3so2992134a91.2
-        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 21:27:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1688963225; x=1691555225;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2YmNvXBV0FdyhlXnCdd6Y2RZLBHW5ukNKEuU7deAKYY=;
-        b=AC+P/ugKhLoxr6ch1mZjbeflW+KzjEM7OaOv8iVefppOi/jD50Jz7k1bkaXQcyiCSN
-         nbjlUp5owCfL/GEebDAeb0lkg4MGxUH0yRRNccJniKZdeRNu0zpB4G1m0L1KyIA/8RCI
-         PuPokP1zFo0UYtCIsiL47xO/nfd4AmeFevftc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688963225; x=1691555225;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2YmNvXBV0FdyhlXnCdd6Y2RZLBHW5ukNKEuU7deAKYY=;
-        b=cT3pLRLON+5WP8DuadBII4Y0+yM2rdE8bVxkC1HXxwi5o3HDfjKWqaaS/NnVk7Hkwt
-         N3KBfuZoyrZqMgqn3IH2b2Ul2Azo++as5GmAqzEmJaFptI3RM9jgo4BbJxHNizGJz4E2
-         v2LfCTW5rW4NCitgbKCkqaLllFq40f23UQmGi8qK7QdwfKc7CZKvq8XMYQ6s1KN+4qso
-         LMpltpTV/Gtj2vlekScJGMK6zlNGJnsIC8/XldYBTFetoaNzI/mFop5/KjZw87x3/0lJ
-         pKgFpNWPg21SBBfFVD2HLFTWHH5HruAi61GVreRL79m5WZUUqzZe31eXtUWW44R9H9qy
-         4jMA==
-X-Gm-Message-State: ABy/qLZkpih2Le0vpu7Ln6QAQsar8QVzy4HJnOl7c1OxJxpFHBd4/aor
-	veldQW/0CvDsEfIpjdugoLaKM22r6EEPUgp/6jmuGw==
-X-Google-Smtp-Source: APBJJlGuAZux1iX4m+y3DlnmoISwhqarrzOt+I4IL50HqwMGj491pOfyFbD07h+8vIOalrtjkdR1QnEM14Rsj/w2imw=
-X-Received: by 2002:a17:90a:5314:b0:262:c291:4b6c with SMTP id
- x20-20020a17090a531400b00262c2914b6cmr12403002pjh.45.1688963225123; Sun, 09
- Jul 2023 21:27:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1E923A8;
+	Mon, 10 Jul 2023 04:45:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE33C433C8;
+	Mon, 10 Jul 2023 04:45:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688964327;
+	bh=23Pfa5VQdzJCFB47DoTz0zuX9vR9F1OcJztYrLTuvkg=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=eLIlAPzdG0BYcspLLiI0DvQjTsF0yUIfXUx/MhiuWYS/gAnOM0df/yD6e1wmz5m15
+	 7lAPpGfoDV5bMoQ99B65bzn8rUl9X7g0S//acODTz4KD8o4Mrv3fMslC7G8MYQflMZ
+	 piNXRxKWCb21SzAs+vsA+LC1/VQrBbavV7lN3l8PkXMaPog48MkPjdQYjbSjZui0pz
+	 dvL//A3ox/tQ87wlPmaoZ08gIaK7hpUfmXqi7s3Zl9GWbzWwSr9EYAp8ZuOFfHzEX6
+	 NTv0hZ+Cd39qMPwS3gp6sq0lKXvoU0SjFOWdgoQQt3CoDMYVF27MF9ozb2fjPdgWMG
+	 wQR63u1LgzKGA==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id E5190CE00A4; Sun,  9 Jul 2023 21:45:25 -0700 (PDT)
+Date: Sun, 9 Jul 2023 21:45:25 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Hou Tao <houtao@huaweicloud.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org,
+	Network Development <netdev@vger.kernel.org>,
+	bpf <bpf@vger.kernel.org>, Kernel Team <kernel-team@fb.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	David Vernet <void@manifault.com>
+Subject: Re: [PATCH v4 bpf-next 09/14] bpf: Allow reuse from
+ waiting_for_gp_ttrace list.
+Message-ID: <05074f73-9d84-41e8-8368-51311a794636@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
+ <20230706033447.54696-10-alexei.starovoitov@gmail.com>
+ <fe733a7b-3775-947a-23c0-0dadacabdca2@huaweicloud.com>
+ <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
+ <4e0765b7-9054-a33d-8b1e-c986df353848@huaweicloud.com>
+ <CAADnVQJhrbTtuBfexE6NPA6q=cdh1vVxfVQ73ZR2u8ZZWRb+wA@mail.gmail.com>
+ <224322d6-28d3-f3b7-fcac-463e5329a082@huaweicloud.com>
+ <CAADnVQL5O5uzy=sewNJ=NFSGV7JTb3ONHR=V2kWiT1YdN=ax8g@mail.gmail.com>
+ <3f72c4e7-340f-4374-9ebe-f9bffd08c755@paulmck-laptop>
+ <bdfc76dc-459a-7c23-bb23-854742fbd0c3@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230710030711.812898-1-azeemshaikh38@gmail.com>
-In-Reply-To: <20230710030711.812898-1-azeemshaikh38@gmail.com>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Mon, 10 Jul 2023 09:56:53 +0530
-Message-ID: <CALs4sv27N_egw=x+3xwV7f1OOjUov2LfoxQGFfYm_CBBtyx1iw@mail.gmail.com>
-Subject: Re: [PATCH] net: sched: Replace strlcpy with strscpy
-To: Azeem Shaikh <azeemshaikh38@gmail.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, linux-hardening@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000183aef06001a658e"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bdfc76dc-459a-7c23-bb23-854742fbd0c3@huaweicloud.com>
 
---000000000000183aef06001a658e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Sat, Jul 08, 2023 at 03:03:40PM +0800, Hou Tao wrote:
+> Hi,
+> 
+> On 7/8/2023 1:47 AM, Paul E. McKenney wrote:
+> > On Fri, Jul 07, 2023 at 09:11:22AM -0700, Alexei Starovoitov wrote:
+> >> On Thu, Jul 6, 2023 at 9:37 PM Hou Tao <houtao@huaweicloud.com> wrote:
+> SNIP
+> >>> I guess you're assuming that alloc_bulk() from irq_work
+> >>> is running within rcu_tasks_trace critical section,
+> >>> so __free_rcu_tasks_trace() callback will execute after
+> >>> irq work completed?
+> >>> I don't think that's the case.
+> >>> Yes. The following is my original thoughts. Correct me if I was wrong:
+> >>>
+> >>> 1. llist_del_first() must be running concurrently with llist_del_all().
+> >>> If llist_del_first() runs after llist_del_all(), it will return NULL
+> >>> directly.
+> >>> 2. call_rcu_tasks_trace() must happen after llist_del_all(), else the
+> >>> elements in free_by_rcu_ttrace will not be freed back to slab.
+> >>> 3. call_rcu_tasks_trace() will wait for one tasks trace RCU grace period
+> >>> to call __free_rcu_tasks_trace()
+> >>> 4. llist_del_first() in running in an context with irq-disabled, so the
+> >>> tasks trace RCU grace period will wait for the end of llist_del_first()
+> >>>
+> >>> It seems you thought step 4) is not true, right ?
+> >> Yes. I think so. For two reasons:
+> >>
+> >> 1.
+> >> I believe irq disabled region isn't considered equivalent
+> >> to rcu_read_lock_trace() region.
+> >>
+> >> Paul,
+> >> could you clarify ?
+> > You are correct, Alexei.  Unlike vanilla RCU, RCU Tasks Trace does not
+> > count irq-disabled regions of code as readers.
+> 
+> I see. But I still have one question: considering that in current
+> implementation one Tasks Trace RCU grace period implies one vanilla RCU
+> grace period (aka rcu_trace_implies_rcu_gp), so in my naive
+> understanding of RCU, does that mean __free_rcu_tasks_trace() will be
+> invoked after the expiration of current Task Trace RCU grace period,
+> right ? And does it also mean __free_rcu_tasks_trace() will be invoked
+> after the expiration of current vanilla RCU grace period, right ? If
+> these two conditions above are true, does it mean
+> __free_rcu_tasks_trace() will wait for the irq-disabled code reigion ?
 
-On Mon, Jul 10, 2023 at 8:37=E2=80=AFAM Azeem Shaikh <azeemshaikh38@gmail.c=
-om> wrote:
->
-> strlcpy() reads the entire source buffer first.
-> This read may exceed the destination size limit.
-> This is both inefficient and can lead to linear read
-> overflows if a source string is not NUL-terminated [1].
-> In an effort to remove strlcpy() completely [2], replace
-> strlcpy() here with strscpy().
->
-> Direct replacement is safe here since return value of -errno
-> is used to check for truncation instead of sizeof(dest).
->
-> [1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strlcp=
-y
-> [2] https://github.com/KSPP/linux/issues/89
->
-> Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
-> ---
+First, good show digging into the code!
 
-Looks good to me.
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+However, this is guaranteed only if rcu_trace_implies_rcu_gp(), which
+right now happens to return the constant true.  In other words, that is
+an accident of the current implementation.  To rely on this, you must
+check the return value of rcu_trace_implies_rcu_gp() and then have some
+alternative code that does not rely on that synchronize_rcu().
 
->  net/sched/act_api.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> index f7887f42d542..9d3f26bf0440 100644
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -1320,7 +1320,7 @@ struct tc_action_ops *tc_action_load_ops(struct nla=
-ttr *nla, bool police,
->                         return ERR_PTR(err);
->                 }
->         } else {
-> -               if (strlcpy(act_name, "police", IFNAMSIZ) >=3D IFNAMSIZ) =
-{
-> +               if (strscpy(act_name, "police", IFNAMSIZ) < 0) {
->                         NL_SET_ERR_MSG(extack, "TC action name too long")=
-;
->                         return ERR_PTR(-EINVAL);
->                 }
-> --
-> 2.41.0.255.g8b1d071c50-goog
->
->
->
+> > But why not just put an rcu_read_lock_trace() and a matching
+> > rcu_read_unlock_trace() within that irq-disabled region of code?
+> >
+> > For completeness, if it were not for CONFIG_TASKS_TRACE_RCU_READ_MB,
+> > Hou Tao would be correct from a strict current-implementation
+> > viewpoint.  The reason is that, given the current implementation in
+> > CONFIG_TASKS_TRACE_RCU_READ_MB=n kernels, a task must either block or
+> > take an IPI in order for the grace-period machinery to realize that this
+> > task is done with all prior readers.
+> 
+> Thanks for the detailed explanation.
+> 
+> > However, we need to account for the possibility of IPI-free
+> > implementations, for example, if the real-time guys decide to start
+> > making heavy use of BPF sleepable programs.  They would then insist on
+> > getting rid of those IPIs for CONFIG_PREEMPT_RT=y kernels.  At which
+> > point, irq-disabled regions of code will absolutely not act as
+> > RCU tasks trace readers.
+> >
+> > Again, why not just put an rcu_read_lock_trace() and a matching
+> > rcu_read_unlock_trace() within that irq-disabled region of code?
+> >
+> > Or maybe there is a better workaround.
+> 
+> Yes. I think we could use rcu_read_{lock,unlock}_trace to fix the ABA
+> problem for free_by_rcu_ttrace.
 
---000000000000183aef06001a658e
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+That sounds good to me!
 
-MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDBX9eQgKNWxyfhI1kzANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE3NDZaFw0yNTA5MTAwODE3NDZaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDFBhdmFuIENoZWJiaTEoMCYGCSqGSIb3DQEJ
-ARYZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBAK3X+BRR67FR5+Spki/E25HnHoYhm/cC6VA6qHwC3QqBNhCT13zsi1FLLERdKXPRrtVBM6d0
-mfg/0rQJJ8Ez4C3CcKiO1XHcmESeW6lBKxOo83ZwWhVhyhNbGSwcrytDCKUVYBwwxR3PAyXtIlWn
-kDqifgqn3R9r2vJM7ckge8dtVPS0j9t3CNfDBjGw1DhK91fnoH1s7tLdj3vx9ZnKTmSl7F1psK2P
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDrdIDz9m+KpMk4SupsGJ3uoxMbHJ1Re
-FKKOPPu+PVNwMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcx
-MDA0MjcwNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAXlTsm7CBYPvjybXdY5N7MTEUCWsUxp4Uk+9p5ik4DOBcWFNr7
-kJHov0Lakxz9dx3P+egQ6rjsb0Q2w3aXHXRpAgzNYS5FwIqqcr5ls2mmygb7nJizw3Dcvimmbggd
-RW3zpsHb1PH58i5vIV64A2HMnucjEYIwbjyUOstpxeuy/k6863fGhpdqDQFMZTonZmD9CKdq6/Sn
-lgtPgMpglG/sREwgNyXHjhvHPyxbGvQZE5dogOBkIHZUu6gbfUMpmwe+Ye252E9NRcbTnuxszl8X
-ps6B7gBqPjFV3BjWHePDD7ywPB5E2wbq9DcWgWetExhR54l8wLfvFWKyl6ZGXFcb
---000000000000183aef06001a658e--
+							Thanx, Paul
+
+> >> 2.
+> >> Even if 1 is incorrect, in RT llist_del_first() from alloc_bulk()
+> >> runs "in a per-CPU thread in preemptible context."
+> >> See irq_work_run_list.
+> > Agreed, under RT, "interrupt handlers" often run in task context.
+> 
+> Yes, I missed that. I misread alloc_bulk(), and it seems it only does
+> inc_active() for c->free_llist.
+> > 						Thanx, Paul
+> 
 
