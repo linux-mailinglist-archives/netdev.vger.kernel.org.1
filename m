@@ -1,50 +1,52 @@
-Return-Path: <netdev+bounces-16351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9965C74CE10
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:20:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8FD74CE0F
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FE911C2095D
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:20:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAF42280F13
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F09C5699;
-	Mon, 10 Jul 2023 07:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF22525A;
+	Mon, 10 Jul 2023 07:19:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8432D5696
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 07:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AA83D8C
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 07:19:59 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD54DEC
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8601F9D
 	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 00:19:58 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qIlBX-0008Dw-UA; Mon, 10 Jul 2023 09:19:51 +0200
+	id 1qIlBY-0008Dx-Cl; Mon, 10 Jul 2023 09:19:52 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qIlBX-00DMed-5g; Mon, 10 Jul 2023 09:19:51 +0200
+	id 1qIlBX-00DMeg-D2; Mon, 10 Jul 2023 09:19:51 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qIlBW-003jmI-70; Mon, 10 Jul 2023 09:19:50 +0200
+	id 1qIlBW-003jmM-E9; Mon, 10 Jul 2023 09:19:50 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>,
+To: Li Yang <leoyang.li@nxp.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
 	kernel@pengutronix.de,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH net-next v3 7/8] net: gianfar: Convert to platform remove callback returning void
-Date: Mon, 10 Jul 2023 09:19:45 +0200
-Message-Id: <20230710071946.3470249-8-u.kleine-koenig@pengutronix.de>
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: [PATCH net-next v3 8/8] net: ucc_geth: Convert to platform remove callback returning void
+Date: Mon, 10 Jul 2023 09:19:46 +0200
+Message-Id: <20230710071946.3470249-9-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230710071946.3470249-1-u.kleine-koenig@pengutronix.de>
 References: <20230710071946.3470249-1-u.kleine-koenig@pengutronix.de>
@@ -55,7 +57,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1806; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=1nhWu4H76ZPOWWEGeZaE1/TIVhWR/8NGrb8GOm5AGXE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBkq7EMtq8Wy12bAe9/xK7FTjgbwCaoJnLtHLwo0 igLS3RfMZeJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZKuxDAAKCRCPgPtYfRL+ TnshB/9k8JJtWwRN0NYzMBhOcdiVhfHl6QUOCVo7q7vw0WoMajA/20lKHRumIJTqJA+VY2sg4hc g/DjFFWao2zB3bRvauyR/JF+km2T2lgKilkZZagJDQWiTlrWhp95bL0VMFklo1PIR6EnDXdlL0c ffKH5wXmbH+eysRY4/jWkTkJkfijAO++aIS6IvwPBk6PxRPk4luueLoAPhjgY1Hwz47Rczfs3G9 6VPGf/GjKckPWehyan9yoPBaZlCi7qCfy63kp23jtLqk5dEoIuXgfSHJQQ8nY+DxONfseYt8+DX 9fMD9oAxlsWHPMw1+tfnTy9XSrGfALr6frOHY5i3Xn/eja7D
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1970; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=MWG25xeucMsvR/Be22NB5NNDyCslZbc0Qzb5GVk1pMw=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBkq7EOuqjS5ZFQngt2RKKE2TSEuIZAjWLQTwAI5 10wJrNlKI+JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZKuxDgAKCRCPgPtYfRL+ Tk57B/wJtvoYBqKMuvOct4BqINYr9FSJR3DP/Fgg4GUkIumncV5FCZOX+P0VAQd0+7VlgM4pTz4 tRB5Embp2m/TX2OpCI0olwKBEvEjh5Z3/T37zgDxso2Meh5RHbGJy9n/XGtAZx8eoNWpmSeH+6G uK4ZTH1BYU7VZRbJ9zUp/sE4jilTi1+HBzJGfCg/4ojcs4RLipCIKvkPTMrhlxQ90NNHYMaag6W i65mPyiQfFJphVl3TTM7SgKSZpseae55jnq3Iwq6Sh193fCr8mDU6bvWbizgT4UPR4zijtL/8Ho sOy91FLLe/+3P05qiTTnyhx7AsnCi5bxgiRVyipehEyM6WYG
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -80,42 +82,43 @@ Trivially convert this driver from always returning zero in the remove
 callback to the void returning variant.
 
 Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/freescale/gianfar.c | 6 ++----
+ drivers/net/ethernet/freescale/ucc_geth.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index 38d5013c6fed..0c898f9ee358 100644
---- a/drivers/net/ethernet/freescale/gianfar.c
-+++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -3364,7 +3364,7 @@ static int gfar_probe(struct platform_device *ofdev)
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index 7a4cb4f07c32..2b3a15f24e7c 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -3753,7 +3753,7 @@ static int ucc_geth_probe(struct platform_device* ofdev)
  	return err;
  }
  
--static int gfar_remove(struct platform_device *ofdev)
-+static void gfar_remove(struct platform_device *ofdev)
+-static int ucc_geth_remove(struct platform_device* ofdev)
++static void ucc_geth_remove(struct platform_device* ofdev)
  {
- 	struct gfar_private *priv = platform_get_drvdata(ofdev);
- 	struct device_node *np = ofdev->dev.of_node;
-@@ -3381,8 +3381,6 @@ static int gfar_remove(struct platform_device *ofdev)
- 	gfar_free_rx_queues(priv);
- 	gfar_free_tx_queues(priv);
- 	free_gfar_dev(priv);
+ 	struct net_device *dev = platform_get_drvdata(ofdev);
+ 	struct ucc_geth_private *ugeth = netdev_priv(dev);
+@@ -3767,8 +3767,6 @@ static int ucc_geth_remove(struct platform_device* ofdev)
+ 	of_node_put(ugeth->ug_info->phy_node);
+ 	kfree(ugeth->ug_info);
+ 	free_netdev(dev);
 -
 -	return 0;
  }
  
- #ifdef CONFIG_PM
-@@ -3642,7 +3640,7 @@ static struct platform_driver gfar_driver = {
- 		.of_match_table = gfar_match,
+ static const struct of_device_id ucc_geth_match[] = {
+@@ -3787,7 +3785,7 @@ static struct platform_driver ucc_geth_driver = {
+ 		.of_match_table = ucc_geth_match,
  	},
- 	.probe = gfar_probe,
--	.remove = gfar_remove,
-+	.remove_new = gfar_remove,
+ 	.probe		= ucc_geth_probe,
+-	.remove		= ucc_geth_remove,
++	.remove_new	= ucc_geth_remove,
+ 	.suspend	= ucc_geth_suspend,
+ 	.resume		= ucc_geth_resume,
  };
- 
- module_platform_driver(gfar_driver);
 -- 
 2.39.2
 
