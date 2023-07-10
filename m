@@ -1,304 +1,83 @@
-Return-Path: <netdev+bounces-16552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A1874DCD4
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 19:54:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9809874DD26
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7275D1C20B0D
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:54:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD9B1C20A0E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A661427B;
-	Mon, 10 Jul 2023 17:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E9914A92;
+	Mon, 10 Jul 2023 18:14:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094AA13AF9
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:54:00 +0000 (UTC)
-Received: from mail-pl1-f206.google.com (mail-pl1-f206.google.com [209.85.214.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F85187
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:53:58 -0700 (PDT)
-Received: by mail-pl1-f206.google.com with SMTP id d9443c01a7336-1b8a7734734so59341155ad.2
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:53:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689011638; x=1691603638;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s7hVIe12owKpTtlFQGjlo8cdWND75WSN9V3GkFsCPlY=;
-        b=gNGXR+IQUD4or0v8CiW0rI1Ai5W0nVIJvfd0TDviEAK2ZZO3Ao9Dq7nTDkVxwAZOC8
-         EHpiPBsNXbQxUXckykKjGgZB8HO5wjFrdkLmHTOhln11cFvExm7YhbH78J1iK3hUsCxu
-         JJEdDYZKA7Y5sIHFe74SOWorCRbPb8QZAHlBYlrJLVuGkq/oOUDUVjjW2wtF89RfYmE8
-         5f/xTohoYSWq7VN90m2rDU8L2Rbz5bM0jNoipQKe/LLd9dTeTbHQBqSIOLI7/pBqXuTO
-         Oc7LwAH+CDJEIHeKcCLCFTP5eO93d7MGxiPZ4wcyRibGQM1Hylv5RsZ+0edXKCAecTyR
-         k6bA==
-X-Gm-Message-State: ABy/qLbwE09rKC8rGaQEZy5bhzRohJsfh6lOGZJAkuEshWgxCFS5x2bg
-	KrV+Yhp7miWTJL/5O6doYrRKamWtcQMpaD8wJdl7sSOrOw2G
-X-Google-Smtp-Source: APBJJlF20JdbFgJIJ2erkANhjva4OnNJRkaqCIcJELYiOog2zSMJ12R399YCvikukee25Q+HZ2YihzlC8eoh2JmBTrOKP1CVq7ar
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B93B14A88
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 18:14:31 +0000 (UTC)
+Received: from hel-mailgw-01.vaisala.com (hel-mailgw-01.vaisala.com [193.143.230.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE8712A;
+	Mon, 10 Jul 2023 11:14:29 -0700 (PDT)
+Received: from HEL-SMTP.corp.vaisala.com (HEL-SMTP.corp.vaisala.com [172.24.1.225])
+	by hel-mailgw-01.vaisala.com (Postfix) with ESMTP id 03E12601F0B8;
+	Mon, 10 Jul 2023 20:58:13 +0300 (EEST)
+Received: from yocto-vm.localdomain ([172.24.253.44]) by HEL-SMTP.corp.vaisala.com over TLS secured channel with Microsoft SMTPSVC(8.5.9600.16384);
+	 Mon, 10 Jul 2023 20:58:13 +0300
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?= <vesa.jaaskelainen@vaisala.com>
+To: 
+Cc: vesa.jaaskelainen@vaisala.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Davis <afd@ti.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] net: phy: dp83822: Add support for line class driver configuration
+Date: Mon, 10 Jul 2023 20:56:18 +0300
+Message-Id: <20230710175621.8612-1-vesa.jaaskelainen@vaisala.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:dacc:b0:1b8:866f:6fc1 with SMTP id
- q12-20020a170902dacc00b001b8866f6fc1mr13436030plx.0.1689011638072; Mon, 10
- Jul 2023 10:53:58 -0700 (PDT)
-Date: Mon, 10 Jul 2023 10:53:57 -0700
-In-Reply-To: <0000000000008981d905ffa345de@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b57ce3060025aa46@google.com>
-Subject: Re: [syzbot] [can?] possible deadlock in j1939_sk_errqueue (2)
-From: syzbot <syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com>
-To: astrajoan@yahoo.com, davem@davemloft.net, dvyukov@google.com, 
-	edumazet@google.com, ivan.orlov0322@gmail.com, kernel@pengutronix.de, 
-	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@rempel-privat.de, mkl@pengutronix.de, netdev@vger.kernel.org, 
-	o.rempel@pengutronix.de, pabeni@redhat.com, robin@protonic.nl, 
-	skhan@linuxfoundation.org, socketcan@hartkopp.net, 
-	syzkaller-bugs@googlegroups.com, syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 10 Jul 2023 17:58:13.0867 (UTC) FILETIME=[18CC33B0:01D9B358]
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot has found a reproducer for the following issue on:
+Add support to specify either class A or class B (default) for line driver.
 
-HEAD commit:    e40939bbfc68 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=17ce67d8a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c84f463eb74eab24
-dashboard link: https://syzkaller.appspot.com/bug?extid=1591462f226d9cbf0564
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1580fc5ca80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=178f78d4a80000
+Class A: full MLT-3 on both Tx+ and Tx–
+Class B: reduced MLT-3
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/257596b75aaf/disk-e40939bb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9c75b8d61081/vmlinux-e40939bb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8f0233129f4f/Image-e40939bb.gz.xz
+By default the PHY is in Class B mode.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com
+Vesa Jääskeläinen (2):
+  dt-bindings: net: dp83822: Add line driver class selection
+  net: phy: dp83822: Add support for line class driver configuration
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.4.0-rc7-syzkaller-ge40939bbfc68 #0 Not tainted
-------------------------------------------------------
-syz-executor375/6045 is trying to acquire lock:
-ffff0000d2e690d0 (&priv->j1939_socks_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:355 [inline]
-ffff0000d2e690d0 (&priv->j1939_socks_lock){+.-.}-{2:2}, at: j1939_sk_errqueue+0x90/0x144 net/can/j1939/socket.c:1081
+ .../devicetree/bindings/net/ti,dp83822.yaml   |  8 +++++++
+ drivers/net/phy/dp83822.c                     | 22 +++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-but task is already holding lock:
-ffff0000d2e69088 (&priv->active_session_list_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:355 [inline]
-ffff0000d2e69088 (&priv->active_session_list_lock){+.-.}-{2:2}, at: j1939_session_list_lock net/can/j1939/transport.c:238 [inline]
-ffff0000d2e69088 (&priv->active_session_list_lock){+.-.}-{2:2}, at: j1939_cancel_active_session+0x54/0x414 net/can/j1939/transport.c:2183
+-- 
+2.34.1
 
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&priv->active_session_list_lock){+.-.}-{2:2}:
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x48/0x60 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:355 [inline]
-       j1939_session_list_lock net/can/j1939/transport.c:238 [inline]
-       j1939_session_activate+0x60/0x378 net/can/j1939/transport.c:1564
-       j1939_sk_queue_activate_next_locked net/can/j1939/socket.c:181 [inline]
-       j1939_sk_queue_activate_next+0x230/0x3b4 net/can/j1939/socket.c:208
-       j1939_session_deactivate_activate_next net/can/j1939/transport.c:1108 [inline]
-       j1939_session_completed net/can/j1939/transport.c:1222 [inline]
-       j1939_xtp_rx_eoma_one net/can/j1939/transport.c:1395 [inline]
-       j1939_xtp_rx_eoma+0x2c0/0x4c0 net/can/j1939/transport.c:1410
-       j1939_tp_cmd_recv net/can/j1939/transport.c:2099 [inline]
-       j1939_tp_recv+0x714/0xe14 net/can/j1939/transport.c:2144
-       j1939_can_recv+0x5bc/0x930 net/can/j1939/main.c:112
-       deliver net/can/af_can.c:572 [inline]
-       can_rcv_filter+0x308/0x714 net/can/af_can.c:606
-       can_receive+0x338/0x498 net/can/af_can.c:663
-       can_rcv+0x128/0x23c net/can/af_can.c:687
-       __netif_receive_skb_one_core net/core/dev.c:5493 [inline]
-       __netif_receive_skb+0x18c/0x400 net/core/dev.c:5607
-       process_backlog+0x3c0/0x70c net/core/dev.c:5935
-       __napi_poll+0xb4/0x648 net/core/dev.c:6498
-       napi_poll net/core/dev.c:6565 [inline]
-       net_rx_action+0x5e4/0xdc4 net/core/dev.c:6698
-       __do_softirq+0x2d0/0xd54 kernel/softirq.c:571
-       run_ksoftirqd+0x6c/0x158 kernel/softirq.c:939
-       smpboot_thread_fn+0x4b0/0x920 kernel/smpboot.c:164
-       kthread+0x288/0x310 kernel/kthread.c:379
-       ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:853
-
--> #1 (&jsk->sk_session_queue_lock){+.-.}-{2:2}:
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x48/0x60 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:355 [inline]
-       j1939_sk_queue_drop_all+0x4c/0x200 net/can/j1939/socket.c:139
-       j1939_sk_netdev_event_netdown+0xe0/0x144 net/can/j1939/socket.c:1280
-       j1939_netdev_notify+0xf0/0x144 net/can/j1939/main.c:381
-       notifier_call_chain+0x1a4/0x510 kernel/notifier.c:93
-       raw_notifier_call_chain+0x3c/0x50 kernel/notifier.c:461
-       __dev_notify_flags+0x2bc/0x544
-       dev_change_flags+0xd0/0x15c net/core/dev.c:8645
-       do_setlink+0xc68/0x35c8 net/core/rtnetlink.c:2867
-       __rtnl_newlink net/core/rtnetlink.c:3648 [inline]
-       rtnl_newlink+0x1354/0x1b1c net/core/rtnetlink.c:3695
-       rtnetlink_rcv_msg+0x744/0xdb8 net/core/rtnetlink.c:6417
-       netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2546
-       rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6435
-       netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
-       netlink_unicast+0x660/0x8d4 net/netlink/af_netlink.c:1365
-       netlink_sendmsg+0x834/0xb18 net/netlink/af_netlink.c:1913
-       sock_sendmsg_nosec net/socket.c:724 [inline]
-       sock_sendmsg net/socket.c:747 [inline]
-       ____sys_sendmsg+0x568/0x81c net/socket.c:2503
-       ___sys_sendmsg net/socket.c:2557 [inline]
-       __sys_sendmsg+0x26c/0x33c net/socket.c:2586
-       __do_sys_sendmsg net/socket.c:2595 [inline]
-       __se_sys_sendmsg net/socket.c:2593 [inline]
-       __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2593
-       __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
-       invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
-       el0_svc_common+0x138/0x244 arch/arm64/kernel/syscall.c:142
-       do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:191
-       el0_svc+0x4c/0x160 arch/arm64/kernel/entry-common.c:647
-       el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
-       el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
-
--> #0 (&priv->j1939_socks_lock){+.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3113 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3232 [inline]
-       validate_chain kernel/locking/lockdep.c:3847 [inline]
-       __lock_acquire+0x3308/0x7604 kernel/locking/lockdep.c:5088
-       lock_acquire+0x23c/0x71c kernel/locking/lockdep.c:5705
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x48/0x60 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:355 [inline]
-       j1939_sk_errqueue+0x90/0x144 net/can/j1939/socket.c:1081
-       __j1939_session_release net/can/j1939/transport.c:294 [inline]
-       kref_put include/linux/kref.h:65 [inline]
-       j1939_session_put+0xf0/0x4b4 net/can/j1939/transport.c:299
-       j1939_session_deactivate_locked net/can/j1939/transport.c:1086 [inline]
-       j1939_cancel_active_session+0x2ec/0x414 net/can/j1939/transport.c:2194
-       j1939_netdev_notify+0xe8/0x144 net/can/j1939/main.c:380
-       notifier_call_chain+0x1a4/0x510 kernel/notifier.c:93
-       raw_notifier_call_chain+0x3c/0x50 kernel/notifier.c:461
-       __dev_notify_flags+0x2bc/0x544
-       dev_change_flags+0xd0/0x15c net/core/dev.c:8645
-       do_setlink+0xc68/0x35c8 net/core/rtnetlink.c:2867
-       __rtnl_newlink net/core/rtnetlink.c:3648 [inline]
-       rtnl_newlink+0x1354/0x1b1c net/core/rtnetlink.c:3695
-       rtnetlink_rcv_msg+0x744/0xdb8 net/core/rtnetlink.c:6417
-       netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2546
-       rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6435
-       netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
-       netlink_unicast+0x660/0x8d4 net/netlink/af_netlink.c:1365
-       netlink_sendmsg+0x834/0xb18 net/netlink/af_netlink.c:1913
-       sock_sendmsg_nosec net/socket.c:724 [inline]
-       sock_sendmsg net/socket.c:747 [inline]
-       ____sys_sendmsg+0x568/0x81c net/socket.c:2503
-       ___sys_sendmsg net/socket.c:2557 [inline]
-       __sys_sendmsg+0x26c/0x33c net/socket.c:2586
-       __do_sys_sendmsg net/socket.c:2595 [inline]
-       __se_sys_sendmsg net/socket.c:2593 [inline]
-       __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2593
-       __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
-       invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
-       el0_svc_common+0x138/0x244 arch/arm64/kernel/syscall.c:142
-       do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:191
-       el0_svc+0x4c/0x160 arch/arm64/kernel/entry-common.c:647
-       el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
-       el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
-
-other info that might help us debug this:
-
-Chain exists of:
-  &priv->j1939_socks_lock --> &jsk->sk_session_queue_lock --> &priv->active_session_list_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&priv->active_session_list_lock);
-                               lock(&jsk->sk_session_queue_lock);
-                               lock(&priv->active_session_list_lock);
-  lock(&priv->j1939_socks_lock);
-
- *** DEADLOCK ***
-
-2 locks held by syz-executor375/6045:
- #0: ffff80009080db68 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:78 [inline]
- #0: ffff80009080db68 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x700/0xdb8 net/core/rtnetlink.c:6414
- #1: ffff0000d2e69088 (&priv->active_session_list_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:355 [inline]
- #1: ffff0000d2e69088 (&priv->active_session_list_lock){+.-.}-{2:2}, at: j1939_session_list_lock net/can/j1939/transport.c:238 [inline]
- #1: ffff0000d2e69088 (&priv->active_session_list_lock){+.-.}-{2:2}, at: j1939_cancel_active_session+0x54/0x414 net/can/j1939/transport.c:2183
-
-stack backtrace:
-CPU: 1 PID: 6045 Comm: syz-executor375 Not tainted 6.4.0-rc7-syzkaller-ge40939bbfc68 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:233
- show_stack+0x2c/0x44 arch/arm64/kernel/stacktrace.c:240
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
- dump_stack+0x1c/0x28 lib/dump_stack.c:113
- print_circular_bug+0x150/0x1b8 kernel/locking/lockdep.c:2066
- check_noncircular+0x2cc/0x378 kernel/locking/lockdep.c:2188
- check_prev_add kernel/locking/lockdep.c:3113 [inline]
- check_prevs_add kernel/locking/lockdep.c:3232 [inline]
- validate_chain kernel/locking/lockdep.c:3847 [inline]
- __lock_acquire+0x3308/0x7604 kernel/locking/lockdep.c:5088
- lock_acquire+0x23c/0x71c kernel/locking/lockdep.c:5705
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x48/0x60 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:355 [inline]
- j1939_sk_errqueue+0x90/0x144 net/can/j1939/socket.c:1081
- __j1939_session_release net/can/j1939/transport.c:294 [inline]
- kref_put include/linux/kref.h:65 [inline]
- j1939_session_put+0xf0/0x4b4 net/can/j1939/transport.c:299
- j1939_session_deactivate_locked net/can/j1939/transport.c:1086 [inline]
- j1939_cancel_active_session+0x2ec/0x414 net/can/j1939/transport.c:2194
- j1939_netdev_notify+0xe8/0x144 net/can/j1939/main.c:380
- notifier_call_chain+0x1a4/0x510 kernel/notifier.c:93
- raw_notifier_call_chain+0x3c/0x50 kernel/notifier.c:461
- __dev_notify_flags+0x2bc/0x544
- dev_change_flags+0xd0/0x15c net/core/dev.c:8645
- do_setlink+0xc68/0x35c8 net/core/rtnetlink.c:2867
- __rtnl_newlink net/core/rtnetlink.c:3648 [inline]
- rtnl_newlink+0x1354/0x1b1c net/core/rtnetlink.c:3695
- rtnetlink_rcv_msg+0x744/0xdb8 net/core/rtnetlink.c:6417
- netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2546
- rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6435
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x660/0x8d4 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x834/0xb18 net/netlink/af_netlink.c:1913
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg net/socket.c:747 [inline]
- ____sys_sendmsg+0x568/0x81c net/socket.c:2503
- ___sys_sendmsg net/socket.c:2557 [inline]
- __sys_sendmsg+0x26c/0x33c net/socket.c:2586
- __do_sys_sendmsg net/socket.c:2595 [inline]
- __se_sys_sendmsg net/socket.c:2593 [inline]
- __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2593
- __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
- invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
- el0_svc_common+0x138/0x244 arch/arm64/kernel/syscall.c:142
- do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:191
- el0_svc+0x4c/0x160 arch/arm64/kernel/entry-common.c:647
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
