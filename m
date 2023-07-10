@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-16336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4129C74CD40
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:40:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1D474CD49
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:40:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BB51C2095D
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:40:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B1DC1C20841
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F6020E7;
-	Mon, 10 Jul 2023 06:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836BF20E7;
+	Mon, 10 Jul 2023 06:40:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263751FC1
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C5D1FC1
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:40:54 +0000 (UTC)
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 5AF768E;
-	Sun,  9 Jul 2023 23:40:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id AA38B130;
+	Sun,  9 Jul 2023 23:40:52 -0700 (PDT)
 Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 49965602B2DC6;
-	Mon, 10 Jul 2023 14:40:32 +0800 (CST)
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 93B20602B2DC6;
+	Mon, 10 Jul 2023 14:40:43 +0800 (CST)
 X-MD-Sfrom: suhui@nfschina.com
 X-MD-SrcIP: 180.167.10.98
 From: Su Hui <suhui@nfschina.com>
-To: mostrows@earthlink.net,
+To: yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	xeb@mail.ru
+	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	kernel-janitors@vger.kernel.org,
 	wuych <yunchuan@nfschina.com>
-Subject: [PATCH net-next v2 03/10] net: ppp: Remove unnecessary (void*) conversions
-Date: Mon, 10 Jul 2023 14:40:27 +0800
-Message-Id: <20230710064027.173298-1-suhui@nfschina.com>
+Subject: [PATCH net-next v2 04/10] net: hns3: remove unnecessary (void*) conversions
+Date: Mon, 10 Jul 2023 14:40:40 +0800
+Message-Id: <20230710064040.173397-1-suhui@nfschina.com>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,54 +60,23 @@ Pointer variables of void * type do not require type cast.
 
 Signed-off-by: wuych <yunchuan@nfschina.com>
 ---
- drivers/net/ppp/pppoe.c | 4 ++--
- drivers/net/ppp/pptp.c  | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 3b79c603b936..ba8b6bd8233c 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -968,7 +968,7 @@ static int __pppoe_xmit(struct sock *sk, struct sk_buff *skb)
-  ***********************************************************************/
- static int pppoe_xmit(struct ppp_channel *chan, struct sk_buff *skb)
- {
--	struct sock *sk = (struct sock *)chan->private;
-+	struct sock *sk = chan->private;
- 	return __pppoe_xmit(sk, skb);
- }
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+index 407d30ee55d2..36858a72d771 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+@@ -569,8 +569,8 @@ static void hns3_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
  
-@@ -976,7 +976,7 @@ static int pppoe_fill_forward_path(struct net_device_path_ctx *ctx,
- 				   struct net_device_path *path,
- 				   const struct ppp_channel *chan)
+ static u64 *hns3_get_stats_tqps(struct hnae3_handle *handle, u64 *data)
  {
--	struct sock *sk = (struct sock *)chan->private;
-+	struct sock *sk = chan->private;
- 	struct pppox_sock *po = pppox_sk(sk);
- 	struct net_device *dev = po->pppoe_dev;
- 
-diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
-index 32183f24e63f..6b3d3df99549 100644
---- a/drivers/net/ppp/pptp.c
-+++ b/drivers/net/ppp/pptp.c
-@@ -148,7 +148,7 @@ static struct rtable *pptp_route_output(struct pppox_sock *po,
- 
- static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
- {
--	struct sock *sk = (struct sock *) chan->private;
-+	struct sock *sk = chan->private;
- 	struct pppox_sock *po = pppox_sk(sk);
- 	struct net *net = sock_net(sk);
- 	struct pptp_opt *opt = &po->proto.pptp;
-@@ -575,7 +575,7 @@ static int pptp_create(struct net *net, struct socket *sock, int kern)
- static int pptp_ppp_ioctl(struct ppp_channel *chan, unsigned int cmd,
- 	unsigned long arg)
- {
--	struct sock *sk = (struct sock *) chan->private;
-+	struct sock *sk = chan->private;
- 	struct pppox_sock *po = pppox_sk(sk);
- 	struct pptp_opt *opt = &po->proto.pptp;
- 	void __user *argp = (void __user *)arg;
+-	struct hns3_nic_priv *nic_priv = (struct hns3_nic_priv *)handle->priv;
+ 	struct hnae3_knic_private_info *kinfo = &handle->kinfo;
++	struct hns3_nic_priv *nic_priv = handle->priv;
+ 	struct hns3_enet_ring *ring;
+ 	u8 *stat;
+ 	int i, j;
 -- 
 2.30.2
 
