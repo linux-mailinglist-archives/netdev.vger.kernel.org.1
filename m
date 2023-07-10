@@ -1,118 +1,155 @@
-Return-Path: <netdev+bounces-16514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEDF874DABA
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:06:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25FF474DABE
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5902F281342
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:06:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 557A62810D6
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D2312B8F;
-	Mon, 10 Jul 2023 16:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF9F12B9A;
+	Mon, 10 Jul 2023 16:07:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9B812B6B
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:06:27 +0000 (UTC)
-Received: from smtp-42ab.mail.infomaniak.ch (smtp-42ab.mail.infomaniak.ch [IPv6:2001:1600:3:17::42ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0380B1
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:06:24 -0700 (PDT)
-Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4R084t4Y8PzMqNQd;
-	Mon, 10 Jul 2023 16:06:22 +0000 (UTC)
-Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4R084s66tYzMppq8;
-	Mon, 10 Jul 2023 18:06:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1689005182;
-	bh=FT/Iq0DkCVsHjKVPnLtkqhfF27BDGNgGWVrpdACmXk0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TZWMOyKWuN2dIVcNQ0Xt+RBGhwk566pffa1tNEQ5sRkgwBbLskWEWcWDHIDghkdUs
-	 zjV1y8enxIzm0sozCYPfkHXuR5TzvwU5b8ngi+nmwy3z0PQh2eZqp1e4kJK5I6OuUT
-	 FGV9stNmBa9f/ioX9ixR0pUmdhsdazgMw+PMjoOQ=
-Message-ID: <f8f76bff-c434-07f8-8a53-f8a0d69292b1@digikod.net>
-Date: Mon, 10 Jul 2023 18:06:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A4C33E3
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:07:10 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1122BCA
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689005227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sWiIZe3IQ53PYjOqAGgSM04HvFoUmNUVGs7k+iQr98s=;
+	b=BFbGU9BIE/Y6c2XrrxUkabso142nnTRlWoBwX+1AxVcgR30Fse5kWNS+aIO16bwi21keoU
+	V9GEk+9ePwAqyqf0l0qzp0r9DYrqzX6MDK1T2/A/N3JHnXhCHpZ4YYiLxvaNFHcu82B82Q
+	7UkA/I+am+cRHA7NgGGayCdT4dTjFKQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-575-dIE7LkHCPRCSzsQLlw3dlQ-1; Mon, 10 Jul 2023 12:07:05 -0400
+X-MC-Unique: dIE7LkHCPRCSzsQLlw3dlQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-993d631393fso216963466b.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:07:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689005224; x=1691597224;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sWiIZe3IQ53PYjOqAGgSM04HvFoUmNUVGs7k+iQr98s=;
+        b=GjHj2GWezSyynjjKjvUNLgLXxWA777dhQOmcAqiiTs3CxqdT/v81TFYs6sNe6LuZfp
+         hqdNSnlQb1rr0ry3AnyIjvzTQtuvs6jcgscfQFyULU5EACnt15jHi2IGrGuZJ9lraovN
+         FI2awfzG79nCdBwdA3tcRGnvK4+mifgv7TC6dL9glS9D+oJXpvF7SJ1g4/7rQccW/Mc/
+         s3y1gI4IMEICPxhtjxHmjcDswAzUegak+DKoeEQ5+QGwNdi+kEU8dbPvDbIzEMS/LAK7
+         cN0IP9ZMcPgvFsRFB+30X/X8J0tGK38Jn5qRHmPlgWAon8zQ4yjMb/OajWOustdIHtmt
+         cyag==
+X-Gm-Message-State: ABy/qLator8T6TNBq+Fgzgnhqa6GQPO7DCK7bPZRYnHYg2xLGX7YrbOt
+	vD/9SXlJAanj4+zV4keHaFlI0Sq0P76fu4nJlzXOaxdYCNUraRoBH60satUWWiknIi346fM1GoW
+	smmyGuVtjdFC5qrjkRmQuYWsK
+X-Received: by 2002:a17:907:3a4a:b0:991:fef4:bb9 with SMTP id fc10-20020a1709073a4a00b00991fef40bb9mr11668552ejc.58.1689005224144;
+        Mon, 10 Jul 2023 09:07:04 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFf54riBNADGeqj5jE2yAEEGB1xUZ+DB0OZq6xJaA2gRL34/NmWlhtp5FmeAhPsifKS0fXuYA==
+X-Received: by 2002:a17:907:3a4a:b0:991:fef4:bb9 with SMTP id fc10-20020a1709073a4a00b00991fef40bb9mr11668532ejc.58.1689005223861;
+        Mon, 10 Jul 2023 09:07:03 -0700 (PDT)
+Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id i27-20020a170906115b00b00992b2c55c67sm6241656eja.156.2023.07.10.09.07.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jul 2023 09:07:03 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <6a492751-8d35-0c81-dd3e-c32417a2e06e@redhat.com>
+Date: Mon, 10 Jul 2023 18:07:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
- dedicated to network
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: brouer@redhat.com, almasrymina@google.com, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, edumazet@google.com, dsahern@gmail.com,
+ michael.chan@broadcom.com, willemb@google.com
+Subject: Re: [RFC 04/12] net: page_pool: merge page_pool_release_page() with
+ page_pool_return_page()
 Content-Language: en-US
-To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: artem.kuzin@huawei.com, gnoack3000@gmail.com,
- willemdebruijn.kernel@gmail.com, yusongping@huawei.com,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org
-References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
- <20230706145543.1284007-1-mic@digikod.net>
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <20230706145543.1284007-1-mic@digikod.net>
+To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+References: <20230707183935.997267-1-kuba@kernel.org>
+ <20230707183935.997267-5-kuba@kernel.org>
+In-Reply-To: <20230707183935.997267-5-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-On 06/07/2023 16:55, Mickaël Salaün wrote:
-> From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+
+On 07/07/2023 20.39, Jakub Kicinski wrote:
+> Now that page_pool_release_page() is not exported we can
+> merge it with page_pool_return_page(). I believe that
+> the "Do not replace this with page_pool_return_page()"
+> comment was there in case page_pool_return_page() was
+> not inlined, to avoid two function calls.
 > 
-> This patch is a revamp of the v11 tests [1] with new tests (see the
-> "Changes since v11" description).  I (Mickaël) only added the following
-> todo list and the "Changes since v11" sections in this commit message.
-> I think this patch is good but it would appreciate reviews.
-> You can find the diff of my changes here but it is not really readable:
-> https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
-> [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
-> TODO:
-> - Rename all "net_service" to "net_port".
-> - Fix the two kernel bugs found with the new tests.
-> - Update this commit message with a small description of all tests.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+I forgot the exact reason, but the "avoid two function calls" argument
+makes sense.  As this is no-longer an issues, I'm okay with this change.
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+> ---
+>   net/core/page_pool.c | 12 ++----------
+>   1 file changed, 2 insertions(+), 10 deletions(-)
 > 
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 2c7cf5f2bcb8..7ca456bfab71 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -492,7 +492,7 @@ static s32 page_pool_inflight(struct page_pool *pool)
+>    * a regular page (that will eventually be returned to the normal
+>    * page-allocator via put_page).
+>    */
+> -static void page_pool_release_page(struct page_pool *pool, struct page *page)
+> +static void page_pool_return_page(struct page_pool *pool, struct page *page)
+>   {
+>   	dma_addr_t dma;
+>   	int count;
+> @@ -518,12 +518,6 @@ static void page_pool_release_page(struct page_pool *pool, struct page *page)
+>   	 */
+>   	count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
+>   	trace_page_pool_state_release(pool, page, count);
+> -}
+> -
+> -/* Return a page to the page allocator, cleaning up our state */
+> -static void page_pool_return_page(struct page_pool *pool, struct page *page)
+> -{
+> -	page_pool_release_page(pool, page);
+>   
+>   	put_page(page);
+>   	/* An optimization would be to call __free_pages(page, pool->p.order)
+> @@ -615,9 +609,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
+>   	 * will be invoking put_page.
+>   	 */
+>   	recycle_stat_inc(pool, released_refcnt);
+> -	/* Do not replace this with page_pool_return_page() */
+> -	page_pool_release_page(pool, page);
+> -	put_page(page);
+> +	page_pool_return_page(pool, page);
+>   
+>   	return NULL;
+>   }
 
-
-[...]
-
-> +static int bind_variant_addrlen(const int sock_fd,
-> +				const struct service_fixture *const srv,
-> +				const socklen_t addrlen)
-> +{
-> +	int ret;
-> +
-> +	switch (srv->protocol.domain) {
-> +	case AF_UNSPEC:
-> +	case AF_INET:
-> +		ret = bind(sock_fd, &srv->ipv4_addr, addrlen);
-> +		break;
-> +
-> +	case AF_INET6:
-> +		ret = bind(sock_fd, &srv->ipv6_addr, addrlen);
-> +		break;
-> +
-> +	case AF_UNIX:
-> +		ret = bind(sock_fd, &srv->unix_addr, addrlen);
-> +		break;
-> +
-> +	default:
-> +		errno = -EAFNOSUPPORT;
-
-This should be `errno = EAFNOSUPPORT`
-
-> +		return -errno;
-> +	}
-> +
-> +	if (ret < 0)
-> +		return -errno;
-> +	return ret;
 
