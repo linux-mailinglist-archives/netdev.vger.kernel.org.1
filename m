@@ -1,163 +1,109 @@
-Return-Path: <netdev+bounces-16445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3526474D40D
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 12:58:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3506274D42F
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 13:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDBD11C209D4
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:58:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E11C1C203D8
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B1FC2EF;
-	Mon, 10 Jul 2023 10:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD53C2EF;
+	Mon, 10 Jul 2023 11:04:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4428566F
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:58:43 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2046.outbound.protection.outlook.com [40.107.20.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 288AFBA;
-	Mon, 10 Jul 2023 03:58:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RbKLyRb85lFAgkurxZK47UuGJMgrpuAmhrchv8pCQvblHfUCLRUdUMG1WwXebLCdbBU6RhgCIT8DmmK+/PWJkHYqE98N5EfT0E3PZd9jBQ0lsbffvP4ibDzaXJL0hQ5zpldZickWnwunEcM54r5CgHmUwBeaajqjd2YZzoS+flASJOf3WPqv0yn+MJSbsCd0VL9gaGd0WR1LqfxFxmyvGaVnEb0s9n/34xoOpo7f9d1SMoqWyxu0wUtCxZQzDvaOw9M/2s1hUYhBM3C8JI7xp5I0kaDJhXxsy2wopP1NE5CIeEy+e3bo7gz+pCcRc8a+3FZqJBRykDShruW/neWUNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KLW/aCaaiccvEzIyurULonPQUuoBrda8v2prmrkGY98=;
- b=c7kRqKTnl6dvVWA6ez40hjnswlVe7W8RgEBXYXNxqEQwmCZ2yetoleehVzbyBH/ivByoLmR4hwGHF/gcKquKf7nZOIc4FlmuHBmPMp5fq9eHaX3N4F1mYAi9Cs+R0eJD+Lzy5+r3WHeDnzFK1kS2Ac1bg3HGWOdnIdweLJ2pSb6OB7JhoUvaYYXCSKU/ep0Gn5nSmoDznAUufWkSpr/VfRUuTyf0z4Bfs+d3TEh9LbzogSDvhB5jTJlqD5vBhpuw3qqq+fRyPb7MZh/wv+olQi9kmD/gknIwzbL+X3YrvZAG+C/S/IIyVIBqKN2YMp/hqHzg/94wyPy0j/h2jNw1Bw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KLW/aCaaiccvEzIyurULonPQUuoBrda8v2prmrkGY98=;
- b=GnCXJiQzeHsrgdU4E0Zf3UDyEaQB9+HdnR+qO9TaOZr4GmRVL73QyhBv4MO2Dq/FmO0cuvqbtM148rWX49yg9tpSSToCunB0/0r9Og9yJgtgn61JLZUKk4fjdZA6EbKopfdgJiNhJ/DtVHTNahQ3SeasEvZHhyRJxGzLTHK0zRY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by VI1PR04MB7053.eurprd04.prod.outlook.com (2603:10a6:800:12f::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
- 2023 10:58:39 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::cc2a:5d80:9dbd:d850]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::cc2a:5d80:9dbd:d850%6]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
- 10:58:39 +0000
-Date: Mon, 10 Jul 2023 13:58:35 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Lu Hongfei <luhongfei@vivo.com>
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDCF10783
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:04:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D578C433C7;
+	Mon, 10 Jul 2023 11:04:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688987084;
+	bh=TwtuDKEbyYTJYwb5YfWy40545UzZJ3eX6HtXjCq2/DY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F1hoO4AmByvX1+/WmpbkKZwew5eudKc1FQfa/lRAOOwiXQ8zRshL+Oq9bFoJQeu7s
+	 LcEcu9oephfIQANzA4/3cifEEgUeal19PEixt2fvddV8g2XCmGK0fFh3Uc4W+J5uOn
+	 XEO983Rlb7MGqbsEKGjwJjCaRtJ44jxPCT5CF+Iau9ZSof+GY2neKJt0KjAvaY/9jd
+	 RBqd+kDX18tFNSlYceBbrvR3r37PvxSvj3S5DjVmlQqBMkOMXeP2JrMR5z6F5rg6jE
+	 qp2ogGv8JQb+t32ZmOV4oiKG0GwgxT5l0kEjeNVOqRmXVjkyf2EUtnmSnqitny5s3z
+	 HoqJaUtvZLO7w==
+Date: Mon, 10 Jul 2023 12:04:35 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Yang Yingliang <yangyingliang@huawei.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	Kris Bahnsen <kris@embeddedts.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-spi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-amlogic@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Radu Pirea <radu_nicolae.pirea@upb.ro>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-Subject: Re: [PATCH] net: dsa: Removed unneeded of_node_put in
- felix_parse_ports_node
-Message-ID: <20230710105835.4e4pv7nxbatx7ygq@skbuf>
-References: <20230710031859.36784-1-luhongfei@vivo.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710031859.36784-1-luhongfei@vivo.com>
-X-ClientProxiedBy: PAZP264CA0071.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:1fd::6) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Alain Volmat <alain.volmat@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH v1 4/8] spi: Get rid of old SPI_MASTER_NO_.X and
+ SPI_MASTER_MUST_.X
+Message-ID: <1ffd5603-4140-4bf6-bfed-af70a6759bda@sirena.org.uk>
+References: <20230710102751.83314-1-andriy.shevchenko@linux.intel.com>
+ <20230710102751.83314-5-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB7053:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f9660dd-6b4d-438e-d12f-08db81349dd3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	HdDX39162vi3Fi2+PdQgg6+mhcQ9qHUANt2AweW60EV2PiZfYgOCjUrzpQutpDeTozdCYBTlWA9PkFlO6bavt86FEW40UGTCFRVPSx8G7A9aYa7HN1UDpJxiOHTM/4YzlFr1x2+/GhhNT6L7Up2ChuQp9rwJFCe0yLK7DGX7PjMehdZP9rXY9vqPJ2LK6tP+HCyw2gD3XYvFKrfo/St6hDWlTPyqfjBhsS1aUeyQ+lP+NfoXqDnlIbLoLhoQy2PVzQEqJQuHK57XAtwgAwj1aIHSAMFqZcAiF9K+e/+uVecUBXokQT0k15k2Cs64DsWPuxAx03SQiDp/xEJOf0W6QRVFPoeXtaw2OUQuecNjHsc8ENc222qAC7k/o78vgrzomTRKDMiZKA+3uVPRrHOsCZDXZSZdR6PwIODpCYJpC3Y2Ts+v5W4McHpUQbjnAJhmgSppCo4I6/z2JoquRSIJAOqpYUw6vavrSMrQHeomQyfajDF1omnjjW6b8hoRSIlkJp/3uzsfIwpQ95hY0t+g3Vo6OO+7lZQEJ1ni1Z/dxAxSQwPrAenTgRAqB1sInDEF
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(376002)(366004)(39860400002)(136003)(396003)(346002)(451199021)(6486002)(478600001)(6666004)(54906003)(83380400001)(86362001)(2906002)(33716001)(66946007)(1076003)(26005)(6506007)(186003)(9686003)(6512007)(38100700002)(8676002)(4326008)(5660300002)(316002)(6916009)(66556008)(66476007)(41300700001)(8936002)(44832011)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BYn07SLBez5zsJ76tGLe8afdg7vz8P4Jsz40SdCCsC6/OXq0MUstdXTG5I5M?=
- =?us-ascii?Q?3sM+liLxJYVeR03Ie0JIe7OVQqs9HX4mE2QE1WbOzLPJchBZn74SUlUy2lSM?=
- =?us-ascii?Q?vAFfQSuiwmPDhbsOBEMnZVCNDt+8qDWoNVtA/bwcdbE2z+4Mcb6CPVQl7W9J?=
- =?us-ascii?Q?RTcFT7IfVS8kA5aI13P1sidsnWNpCnEMi/z5UCT8HG7u/IjhdHON8aoiRJkH?=
- =?us-ascii?Q?ojapdt3fD55S8SDJPBlU7CQ5JAH2qlM4jZ5ILUgbQ1MknotrnOQvj5fslFOm?=
- =?us-ascii?Q?BCWevf1EDaJIMi0TlgmyQTnELNHFUE9rvwA0cBL9/Z351VgVifgQScV7SYoH?=
- =?us-ascii?Q?MYXL3O8VCK3rKePosaBEdQ8YEgHTUXd1o7fgl2tLX4V864BODCY8DDfx2+2k?=
- =?us-ascii?Q?mJoTRQ7DY48wxxAEs1OCdAj6WVN4Qd7Yo0DQmlJJFuNgtWGqCAvTZcPK4EU8?=
- =?us-ascii?Q?nP9WQstHWYwWxZx9Y5+h8JG+X5P1NMxrazA3SnIHul9A1LZi2uWfYVqONkR/?=
- =?us-ascii?Q?DAh8HhFZRzPMHmEp1dRVtfxMqBEJyhNhukWVgBn8UraxenQ7M+1WEgGffws/?=
- =?us-ascii?Q?tySwXAErFbW3DrjwpY1uBOdE0HY1Ln1WkGIIvngPqPSrgSM5aezE3wiUmsoC?=
- =?us-ascii?Q?xY+zSxgsJsEtNKvhi8bT+HwyVDl7xnN7yYyRwxTe4r/ua2HPVvijMQVBFS2W?=
- =?us-ascii?Q?7SBGEwM/TmyeXf7MfaIsv4uj4QlNchZ79W2iOnWKGf7WNMjmeEQ3B0zIG571?=
- =?us-ascii?Q?zJocnKoyIjxvU1rGOEp6gR6hAyuop5cTDeIKKNi24Bj5spoAvO/bleX2YRmu?=
- =?us-ascii?Q?GfELpfpZbsSyZi63SUuk34TN40GCJOhIuxIyhG5rlhwdnWgRdP3vt6inxyh7?=
- =?us-ascii?Q?K3PPxxfB+j3tFl1v+wmlzuMk7fz4PmrGsN4y2v64g5G1vlvjWkw/0ajZriWD?=
- =?us-ascii?Q?6le/yGL3J0deUzrtjrMq6xOm4bW2naBz3Ujs8zkjlQ9YrAJLneUUlUyE6x2O?=
- =?us-ascii?Q?IG2126gBMdgthT7sKvMUyvehjtvVqqzuvflrNqJd5+d/g+8XX4G+yPaLA3LA?=
- =?us-ascii?Q?QjVUQX1XnhVGOXwep3zgIbAQwLbVlylE4dD0WZbDnNZ5FB0pzkR69wbdachh?=
- =?us-ascii?Q?vznQM7wOoL7NSR+2GqAuJj0v7Va9KdCJn98/YxU2USi8Jwio6eLy3Q7pTzdF?=
- =?us-ascii?Q?3JBH7/RwtoyyeISPTrDDTYfvlHzDy3dKvxMGtjyLWNQxU/5f2KIAaVn4KdTM?=
- =?us-ascii?Q?HUpJTXpnQ6IW1ql0GK34cmGyU7Ag/p/tpdehkEiwf5bNOWPRWrOC7pJppkPW?=
- =?us-ascii?Q?fQSpip2UI+7RqIicja2hEMTK78FPEukT9lItfGGLm2D80LkWCUWu+z+RI7xg?=
- =?us-ascii?Q?RB7Y14+4Ffalctc2GNoYUBw/1ngbwpGF3Bq1NTmbd6wAirDc4w9FW+wMlh99?=
- =?us-ascii?Q?WWpV2kqoxeLm+wdEDeM0afXDzR1N3bwbp2Dhl8WBajiM3zpN5F22t6Lpcsse?=
- =?us-ascii?Q?/TAyzlsAk1rWqFQPfmpSxrBdOTsFtPPbjBjBlUP0P8Prdj4zC01/BZSElDXk?=
- =?us-ascii?Q?J9uwUKBOMqYTXvR8UGXvgL4eBsIVUfd6S/n7F3Qhgpd/mbQYHWEgEK0Pr46s?=
- =?us-ascii?Q?0w=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f9660dd-6b4d-438e-d12f-08db81349dd3
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 10:58:39.3563
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hHL1/3A91hp3jVqjRJUPJXjLmVei6i8K6yepg3+SLwoqlcqeaPFZfXhPOaTlNLaQNQfBiaCTuKDQG+yfgDOKHw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7053
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kWZTJCyyxQE+byGQ"
+Content-Disposition: inline
+In-Reply-To: <20230710102751.83314-5-andriy.shevchenko@linux.intel.com>
+X-Cookie: Do you have lysdexia?
 
-On Mon, Jul 10, 2023 at 11:18:59AM +0800, Lu Hongfei wrote:
-> Remove unnecessary of_node_put from the continue path to prevent
-> child node from being released twice, which could avoid resource
-> leak or other unexpected issues.
-> 
-> Signed-off-by: Lu Hongfei <luhongfei@vivo.com>
-> ---
->  drivers/net/dsa/ocelot/felix.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-> index dee43caee19e..8da46d284e35 100644
-> --- a/drivers/net/dsa/ocelot/felix.c
-> +++ b/drivers/net/dsa/ocelot/felix.c
-> @@ -1286,7 +1286,6 @@ static int felix_parse_ports_node(struct felix *felix,
->  		if (err < 0) {
->  			dev_info(dev, "Unsupported PHY mode %s on port %d\n",
->  				 phy_modes(phy_mode), port);
-> -			of_node_put(child);
->  
->  			/* Leave port_phy_modes[port] = 0, which is also
->  			 * PHY_INTERFACE_MODE_NA. This will perform a
-> -- 
-> 2.39.0
->
 
-Fixes: de879a016a94 ("net: dsa: felix: add functionality when not all ports are supported")
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+--kWZTJCyyxQE+byGQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Mon, Jul 10, 2023 at 01:27:47PM +0300, Andy Shevchenko wrote:
+
+> Convert the users to SPI_CONTROLLER_NO_?X and SPI_CONTROLLER_MUST_.X
+> and kill the not used anymore definitions.
+
+The above is not what this change does:
+
+> -	controller->flags = SPI_MASTER_MUST_RX | SPI_MASTER_MUST_TX;
+> +	controller->flags = SPI_CONTROLLER_MUST_RX | SPI_CONTROLLER_MUST_TX;
+
+--kWZTJCyyxQE+byGQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSr5cIACgkQJNaLcl1U
+h9Ah2wf+KmkGI9qlUKgHUSNXh1DbqoLxbTpYFnFP5xpasapdwBa05UYP3eghOigF
+R9RLm+Z+cOhxpxkEijdYqYKOu94px87YE9vU9+e00ZWaz+X+R8C17kt4hk+9x5pI
+n6ln7unk1TDzZww8TWx81WkEqR6E4uMcYhMfsfjKKDcC6ZOxJu6+h3wWjhkj8q35
+k8NbtIo8bz2TzLqTuNjWsA64H1AxpRqwoT1fLLiZRPrng7Zc4wIP68cX17WSWwqj
++Tn8sO3EBbpYl4vuJircRmezY6Roo1TuLU4M7iIGhGoUrt+jdmoqIDsjQVU4IKIv
+kRGC3WQT0+LuWsoU8vUp0PFt+ntu4w==
+=03Nv
+-----END PGP SIGNATURE-----
+
+--kWZTJCyyxQE+byGQ--
 
