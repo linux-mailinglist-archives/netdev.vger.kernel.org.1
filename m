@@ -1,139 +1,137 @@
-Return-Path: <netdev+bounces-16559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7746D74DD27
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:14:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0ED674DD02
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B3228134C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:14:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D63B2811E7
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985E814A93;
-	Mon, 10 Jul 2023 18:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4691428A;
+	Mon, 10 Jul 2023 18:04:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B98C14A8B
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 18:14:31 +0000 (UTC)
-Received: from hel-mailgw-01.vaisala.com (hel-mailgw-01.vaisala.com [193.143.230.17])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A5012B;
-	Mon, 10 Jul 2023 11:14:29 -0700 (PDT)
-Received: from HEL-SMTP.corp.vaisala.com (HEL-SMTP.corp.vaisala.com [172.24.1.225])
-	by hel-mailgw-01.vaisala.com (Postfix) with ESMTP id A4A34601F18C;
-	Mon, 10 Jul 2023 20:58:20 +0300 (EEST)
-Received: from yocto-vm.localdomain ([172.24.253.44]) by HEL-SMTP.corp.vaisala.com over TLS secured channel with Microsoft SMTPSVC(8.5.9600.16384);
-	 Mon, 10 Jul 2023 20:58:20 +0300
-From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?= <vesa.jaaskelainen@vaisala.com>
-To: 
-Cc: vesa.jaaskelainen@vaisala.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Andrew Davis <afd@ti.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] net: phy: dp83822: Add support for line class driver configuration
-Date: Mon, 10 Jul 2023 20:56:20 +0300
-Message-Id: <20230710175621.8612-3-vesa.jaaskelainen@vaisala.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230710175621.8612-1-vesa.jaaskelainen@vaisala.com>
-References: <20230710175621.8612-1-vesa.jaaskelainen@vaisala.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AB311C8B
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 18:04:10 +0000 (UTC)
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57C618D
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:04:06 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-766fd5f9536so336619885a.3
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:04:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1689012246; x=1691604246;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BT8anRcoBomkCL3eLhDuSMG7VrJUf8etAybJpx2cUmQ=;
+        b=P3qkNZJyr3B9iPQ6tzo+Oph7KFNgQR48WP4GUaBG7LO2uQevnfZqahEoF65sPAugnn
+         MNhWEMJae9jMmX7YMUOhnYiRDETA0ZxJsxaJ3VfekaJodPQ0XE7/CMmAauDvYrE75B7W
+         e6Reiouu8KjXUJZm8YbqiHVuOqgKFmIz9g/N3BOq4+MfXFB+VobVN9UMSj1yq/bM+FvH
+         2vmlEzf/kW7afVr8b6ghNyN0dOyVHo4CIbT0AOP08KVkn04tBq6MnrtyGey8uRxlttek
+         mfECNBxhrEl971vEGY6ftU/fY4U3a2UcgpcCRczCcddHUAy7XCE4ihu65DPMtVkNd2IB
+         CQBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689012246; x=1691604246;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BT8anRcoBomkCL3eLhDuSMG7VrJUf8etAybJpx2cUmQ=;
+        b=l/yXhS1Gi8oWAwKIUEr1wpieZOn7XAq1vGstKtP1zF5NehyM4Q8nBp/+1Ra+i+0dlk
+         6Eavm0blPtYXvI5z7YNI1Mla3gp6CEWTmPRxrIw9UwdNdNGDh5jPezGi4yRFT3lx/i4a
+         JEePo4q0KLZFicTm4PbVOyKtJ6WQGOv00zdsCK78p3kDSxIzEZUZC+FEPYw+4TUC8PT9
+         reaBhcJm5c/4FQ5tRdReA0mSejQOSekBkRqNwoRqAhNMx/MRPyUL8SexGeD2HEX0JE2O
+         rZ2bGD5/XZGlVxm1/d5ILGK5nCkqDNRKwzEa21zFHGMjr5WIShxqsXWjpLECBvHwZkpn
+         O5qQ==
+X-Gm-Message-State: ABy/qLZQDEYLQdvGd643/Q3SqqPntPdPCw8z+dHzx+APD7TUNz/LA1Ae
+	ZZLTfwn92grSxmiZWuqKDq9P+w==
+X-Google-Smtp-Source: APBJJlEkdizBr7UJSHKmwk1Pw53s9bGXZHen90PgCZoTRA4bGUaUV/2iylwD9yRi/UQu94OEzqbZDw==
+X-Received: by 2002:a0c:e108:0:b0:628:6879:ee48 with SMTP id w8-20020a0ce108000000b006286879ee48mr11363899qvk.50.1689012246035;
+        Mon, 10 Jul 2023 11:04:06 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id r17-20020a0c8b91000000b006360931c12fsm65717qva.96.2023.07.10.11.04.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 11:04:05 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qIvEy-0004U3-Vv;
+	Mon, 10 Jul 2023 15:04:04 -0300
+Date: Mon, 10 Jul 2023 15:04:04 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Souradeep Chakrabarti <schakrabarti@microsoft.com>,
+	souradeep chakrabarti <schakrabarti@linux.microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH V4 net] net: mana: Fix MANA VF unload when
+ host is unresponsive
+Message-ID: <ZKxIFK2nQqV9AvIA@ziepe.ca>
+References: <1688374171-10534-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <83ef6401-8736-8416-c898-2fbbb786726e@intel.com>
+ <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+ <7e316b51-be46-96db-84cb-addd28d90b0f@intel.com>
+ <PUZP153MB0788A5F92E65AC9A98AF03AFCC2CA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+ <c7e4a416-9da4-7ff2-2223-589fd66f557d@intel.com>
+ <PUZP153MB0788C7D2376F3271D77CE826CC2CA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+ <cd36e39a-ebb9-706a-87c3-2f76de82f7ca@intel.com>
+ <PH7PR21MB311670231963DE8661C2F178CA2CA@PH7PR21MB3116.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 10 Jul 2023 17:58:20.0539 (UTC) FILETIME=[1CC644B0:01D9B358]
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR21MB311670231963DE8661C2F178CA2CA@PH7PR21MB3116.namprd21.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Line driver can be configured either in Class A or in Class B modes.
+On Thu, Jul 06, 2023 at 01:54:35PM +0000, Haiyang Zhang wrote:
 
-By default the PHY is in Class B mode.
+> > This waiting loop is needed to let the pending Tx packets be sent. If
+> > they weren't sent in 1 second, it most likely makes no sense already
+> > whether they will be sent at all or not -- the destination host won't
+> > wait for them for so long.
+> > You say that it may happen only in case of HW issue. If so, I assume you
+> > need to fix it some way, e.g. do a HW reset or so? If so, why bother
+> > waiting for Tx completions if Tx is hung? You free all skbs later either
+> > way, so there are no leaks.
+> 
+> At that point, we don't actually care if the pending packets are sent or not. 
+> But if we free the queues too soon, and the HW is slow for unexpected 
+> reasons, a delayed completion notice will DMA into the freed memory and 
+> cause corruption. That's why we have a longer waiting time.
 
-Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
----
- drivers/net/phy/dp83822.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Aieiiie that is a horrible HW design to not have a strong fence of DMA.
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index b7cb71817780..5c144d22b64e 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -31,12 +31,17 @@
- #define MII_DP83822_FCSCR	0x14
- #define MII_DP83822_RCSR	0x17
- #define MII_DP83822_RESET_CTRL	0x1f
-+#define MII_DP83822_LDCSEL	0x404
- #define MII_DP83822_GENCFG	0x465
- #define MII_DP83822_SOR1	0x467
- 
- /* GENCFG */
- #define DP83822_SIG_DET_LOW	BIT(0)
- 
-+/* Line Driver Class Selection (LDCSEL) */
-+#define DP83822_LDCSEL_CLASS_A	0x24
-+#define DP83822_LDCSEL_CLASS_B	0x20
-+
- /* Control Register 2 bits */
- #define DP83822_FX_ENABLE	BIT(14)
- 
-@@ -118,6 +123,7 @@ struct dp83822_private {
- 	bool fx_signal_det_low;
- 	int fx_enabled;
- 	u16 fx_sd_enable;
-+	bool line_driver_class_a;
- };
- 
- static int dp83822_set_wol(struct phy_device *phydev,
-@@ -416,6 +422,16 @@ static int dp83822_config_init(struct phy_device *phydev)
- 					MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
- 	}
- 
-+	/* Configure line driver class */
-+	if (dp83822->line_driver_class_a)
-+		/* full MLT-3 on both Tx+ and Tx–.*/
-+		phy_write_mmd(phydev, DP83822_DEVADDR, MII_DP83822_LDCSEL,
-+			      DP83822_LDCSEL_CLASS_A);
-+	else
-+		/* reduced MLT-3 */
-+		phy_write_mmd(phydev, DP83822_DEVADDR, MII_DP83822_LDCSEL,
-+			      DP83822_LDCSEL_CLASS_B);
-+
- 	if (dp83822->fx_enabled) {
- 		err = phy_modify(phydev, MII_DP83822_CTRL_2,
- 				 DP83822_FX_ENABLE, 1);
-@@ -507,6 +523,12 @@ static int dp83822_of_init(struct phy_device *phydev)
- 		dp83822->fx_enabled = device_property_present(dev,
- 							      "ti,fiber-mode");
- 
-+	/* DP83822 defaults to line driver class B - enable configuration for
-+	 * class A
-+	 */
-+	dp83822->line_driver_class_a = device_property_present(dev,
-+							       "ti,line-driver-class-a");
-+
- 	return 0;
- }
- #else
--- 
-2.34.1
+"just wait and hope the HW doesn't UAF the kernel with DMA" is really
+awful.
 
+Jason
 
