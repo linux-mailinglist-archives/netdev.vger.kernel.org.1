@@ -1,424 +1,210 @@
-Return-Path: <netdev+bounces-16597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57D5874DF65
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:36:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7B674DFD0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64829281391
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:36:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66ACD1C20BCA
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462C713AD8;
-	Mon, 10 Jul 2023 20:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B571429A;
+	Mon, 10 Jul 2023 20:50:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F10E6FA9
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 20:36:15 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BEEF195
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 13:36:14 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-579dfae6855so61903867b3.1
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 13:36:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689021373; x=1691613373;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=N8ztVDcyJmOHlzAxJNlJFwjk86y60iqpqyKg27i3OGU=;
-        b=IDnh+N8cbam28LKjjB+QunFpkyfbgJZqYVs4IATTvLhalNBQOzf801sIuHJBSzyMjz
-         iQ8ZHms3XCjIuB9C89ZbAJN7BEflpr4Y/FiUTgblSZP9NARTiUmDeofRndEF6X7DDih8
-         6B09Me4aXmn2rXgQAHMxXu5ESlv+3KKpd6ZYM5l6CMmBInoWRdhevLO2vRUMa3UxlikM
-         nNdKA+9NBbaKCfHkom/a1ivQS9LqvwltyBPDyxAApuFUDdG00p6wEu0TSV4JrmLTjBvX
-         nYRA7Sq0CIwlJWg+98QmU5GTfokwJ+swutNvsVwB3FWGMWYM+2ofTBXsdj5O+E60Gys+
-         v/jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689021373; x=1691613373;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N8ztVDcyJmOHlzAxJNlJFwjk86y60iqpqyKg27i3OGU=;
-        b=YjkDHnJ1axj+ScBp/mhD6itYhpKXeUypC5JJC4XMVqEuyUWBCmRw5wbkyhSIshUaSE
-         y7O3nZChwyEIfHWmmoLVtlIDx4ma1fjCouaZgP2T6ip/VFPIg37crybjuWoVo2NujgTE
-         dZyWn4LYih7m8ZJwmTI87jboGOCoKULVG4ahktsGtmcHdjUnl5LhEhyZDiNfMpKkGbG1
-         lyrjofgvKKVjY1sXbNXijkvSIegtna4zOyVnZCZj3fIO8bZRLq0jCqKsUIcDFdPB14kJ
-         uaQntP7Bqb3ROPuvoKcqVuweO//bdA0wOezRST+I/tnt7fLCkh0ZgXBdV2ba4CbdJ2xB
-         ZHDg==
-X-Gm-Message-State: ABy/qLYcegzjZiGK2d4vAjUgmk7ozZw30/vGzFpMN5BaAS4+tYzmdSsM
-	/IuSZbJUg64hoUV8zIuxDbA=
-X-Google-Smtp-Source: APBJJlEN60/LqKB/oGUKIbjxX4Wf/X2oL8sSGJmEfUSLyo89IjTaniOeCDBiIL2Rk2lHwFsFcIxzNg==
-X-Received: by 2002:a81:5f83:0:b0:576:b52d:4946 with SMTP id t125-20020a815f83000000b00576b52d4946mr14210014ywb.30.1689021373117;
-        Mon, 10 Jul 2023 13:36:13 -0700 (PDT)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:c11f:9814:297e:2db9])
-        by smtp.gmail.com with ESMTPSA id r186-20020a0dcfc3000000b0057a165e6ee1sm175429ywd.35.2023.07.10.13.36.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 13:36:12 -0700 (PDT)
-From: Kui-Feng Lee <thinker.li@gmail.com>
-X-Google-Original-From: Kui-Feng Lee <kuifeng@meta.com>
-To: dsahern@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	martin.lau@linux.dev,
-	kernel-team@meta.com,
-	yhs@meta.com
-Cc: Kui-Feng Lee <kuifeng@meta.com>
-Subject: [PATCH net] net/ipv6: Remove expired routes with a separated list of routes.
-Date: Mon, 10 Jul 2023 13:36:09 -0700
-Message-Id: <20230710203609.520720-1-kuifeng@meta.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2698913AC2
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 20:50:05 +0000 (UTC)
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCE930DA
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 13:49:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689022180; x=1720558180;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TnvmrwUqPmVJyZXjQwswBoqJOGSUFD8gWW3cY8BnlaM=;
+  b=YurD3qfPKuNfZVVVMyo65ASQJBPaZafOA7tIPACflwp/75W9vI4Gj8jx
+   iZul3d99/PLxQLkFmvn6bYEucAaF6qZhSRxhC2BInCJQdWxrCXCOyXwYl
+   PvXs9kGsKaJOAgkdJDIKZukRTHYzbKditpj2xCxXcZ6qe9I3aoQGSS1Dw
+   RqnNIhcIy1E3jQKmby+BS3X1c4G/orekq6BvrRzY2MRskRCdeX5hV7UTR
+   uBtU6EUbWyM7ZXqegPvgXj8sQgtrAI2os44FdXUfFn5HZoua3y+dEAul2
+   x43OyyYOrjQORvmeRMxmWW6fDeGGZRZumjzZ56WhcvckRrNJJAqVA5qcW
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="349258463"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="349258463"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 13:48:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="698151985"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="698151985"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 10 Jul 2023 13:48:10 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 13:48:10 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 13:48:10 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 10 Jul 2023 13:48:10 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MX4iQTkpY7gc0kTMKH1hUsbvrSmA/lvdnpZQrVRB0i9w0emslTcw8GFdMD3nxcDchA83mgmKmrM0kqvTI3mSuCK7bcYs1PRC0IXc41hG4j0Afn4wZjACCBEYM23r0nlhTMTSJhZihBWcy2xzQ98x/iC6yOMEm+E2gNscg2tc6Nr/4WiU2VDqQ24Oe30F4m/EUHZu9zovDJ5k2Nuf1lmVNSBIKXlDeGdyx2Xqbd2ZsbcDtOyYiui4UZ+zXMc3PMXUTxuQ4NfsKmvxBHH5dgpaGBPUUGECcN7SolW7mCibDU9UMlEkJuYSdAelWiQMOnGqXyehBzAtaPsMjs0MVkFm/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ORR1vxjYYQydNaPc65yp9/sqioC9FS2S6sCQ7t25jvQ=;
+ b=INUbjF+dt2CY6HmxDZXa7EHVzyPechB3qOvXf7NlrK8szcok8iV8uu4qnATxBKzRMrjJQMnbWcLu9/S8LNaqP7nqyjO/Xsj/NOLVF8L8OMC1Dbb0K8GMCSq5TjRVq7YWbRf0sqDZ1gFFRoHjuxJBVkTTXlTP5XakrSyGIc33XdhFdBOjQcpcMb8GZWwkZDrqhD82aq9kcNRXWnLLsX0u1y/rIp+dKRWiuNAgEJkkTjrN7B2ZGKNKzDCYH3DrQV5ZtPVZvsh7PZ6RppfMDUoHgwZ4huRIaGxKrKhU8hW+eYlOTZudMlB4SZx59hG2A1iLnyaqHpvkl9TwAdjjyPCWHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN6PR11MB3229.namprd11.prod.outlook.com (2603:10b6:805:ba::28)
+ by PH7PR11MB7026.namprd11.prod.outlook.com (2603:10b6:510:209::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Mon, 10 Jul
+ 2023 20:48:07 +0000
+Received: from SN6PR11MB3229.namprd11.prod.outlook.com
+ ([fe80::bd89:b8fc:2a2f:d617]) by SN6PR11MB3229.namprd11.prod.outlook.com
+ ([fe80::bd89:b8fc:2a2f:d617%4]) with mapi id 15.20.6565.026; Mon, 10 Jul 2023
+ 20:48:07 +0000
+Message-ID: <25d3cd3d-e3c6-d3ef-d15e-8db497b03849@intel.com>
+Date: Mon, 10 Jul 2023 13:48:04 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH iwl-net v3] ice: Fix memory management in
+ ice_ethtool_fdir.c
+Content-Language: en-US
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, mschmidt
+	<mschmidt@redhat.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+References: <20230706091910.124498-1-jedrzej.jagielski@intel.com>
+ <4359387f-297a-7057-d7ed-770dc021086f@intel.com>
+ <DM6PR11MB273133BC65028765D6739FB8F030A@DM6PR11MB2731.namprd11.prod.outlook.com>
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <DM6PR11MB273133BC65028765D6739FB8F030A@DM6PR11MB2731.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0115.namprd03.prod.outlook.com
+ (2603:10b6:303:b7::30) To SN6PR11MB3229.namprd11.prod.outlook.com
+ (2603:10b6:805:ba::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR11MB3229:EE_|PH7PR11MB7026:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1b099c33-7d37-4dae-7c1e-08db8186f72d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: idBcWUIby9uJozn7mCDoZj/Rdo2y4NIyLVvMHo9CZuJyeLjymL3tbz7itMsdrAQ+X4aIwmevEpgw990Dsx3knHqaPJZoE4eUA4aZFVHhQrk00/IkRorpKbyT6CFJG+2kzpwYpfDyEFhCkd2kxFlz4M4SRZ6MJuN+gHIlWkTRYttarx1njsFn3RcIq9CamvyaM2fE1Kmdkuyf2ga6CZFysshCwA+Ah88RxzWO1SiNBv9eM5zAzxWXV+fiRClCrpCUf3sw9R5Y3s/d4Noo5KcH9Jvf9bJ6sl/bzy2bMsqqcHAwbqoCtWrFCMuTzGR4SSGl0WYKPnDUEpy7LUrk+LccU4Nynt4KNjvg4t7Nz5l1EWTv8Ck9Hy4boWVT9TH09a0O60mnnHfBqY8JRkc5RACRQfylzehCWiXbvanBAeBKIYwM7h/Axqgk7hr+WMocK9bf/RV1rLOxzLw1x9ABDc5MtCemaIn9Z/FM/hNADtpH5JrRiKqytYrTv3Y002s2MSnpYljCYbaIDurdFfGM8Ggyzto0xMEF4OXDctsRARg2zgUWiZbtz7VmwK8fUKg9LpJmOiF51H+wQjXC/iBU6f9m9F9/CAJwURX7OkhZBNmaOCQayYvMFepHPTaTfDPI0UPjrHn4rVrtfzX/5UnpxGU/aQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3229.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(346002)(39860400002)(396003)(366004)(451199021)(41300700001)(5660300002)(31686004)(110136005)(54906003)(316002)(8936002)(8676002)(2906002)(6486002)(4326008)(66476007)(66556008)(66946007)(36756003)(6512007)(966005)(6666004)(478600001)(86362001)(186003)(31696002)(2616005)(38100700002)(53546011)(83380400001)(82960400001)(26005)(107886003)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cUtEaThDeE1EenJ6VGwwcXZ5M3l5WWtGM1N6Z1pIT3lDNUpHNzNsZDk3UTVY?=
+ =?utf-8?B?OW9ZZnFoQldOYVEzN210c2NRaUp1YTkxaW15b3BRVlBKa01mMTFwL3FmT3A4?=
+ =?utf-8?B?SVBBUzAvQkxwYXdDM2VkREhwTlRSTzUzYXN4dE8yMTIzUm0yNjNMeHJSbms4?=
+ =?utf-8?B?ZEZYd3Z0L2RMZlFmbkp5MlJhd1AyOVRLR2hOdndHQWp1dUVTVUdiNHhCOXRB?=
+ =?utf-8?B?dzA3Z1VkWjhSM1BCVTZ2R0lZQ2NwdzNqTXdVOXdZcUdIYXBHbmlheWM5MzBx?=
+ =?utf-8?B?eFAyZ2hCU0dYOXBmRUpUOWpxZlh1MkdoUUtzbjhjbG9oZ29vbmg4OC9PZDJH?=
+ =?utf-8?B?eW90V2lLNmR4RzVyYmM0djRZOGhLZnF3NFZEaElRL0Y3QlBNQ2lNeHUvbitz?=
+ =?utf-8?B?aHl0NGFJTC84SzMvUEZaUkZ3UXlYZldwKzJ1b0dvU1dtREY1VEpMODBxczZz?=
+ =?utf-8?B?SGkyTjNTOWpvSHpyeHJwZTFpZWdZUkt1eGtLbWVYUGt3SmpvTnZXOU5GQnYv?=
+ =?utf-8?B?Q01mSGFVRG1DaSt2ckxFYW1jRzhOb2NNUHBQWlk4SG9Rd0c2dW9JOVkyaVRJ?=
+ =?utf-8?B?WXNxakVPTnF4cnZkRmFSajZjdDlvWktJZVdhWmVlVit1K1U3QVluMXdLSUVI?=
+ =?utf-8?B?SE02b1NDenRXM0ZueFlsVEI2UmxwcHBHV1FFQTZZK2tLc3A5dHhXdTVCdE51?=
+ =?utf-8?B?Snk2YURGSXFmR2pCcjU4dy83VmVYTWJjbkU0K2piazRsemQrTTh0ekd1N1Vz?=
+ =?utf-8?B?Vk5STENFL2lXbnRXejkxK3JGK0RzOGwvRFBJMTJNS2NFQXdEdDc2YUpqejFa?=
+ =?utf-8?B?Y1FOekFVSTRLdmtwbGx6VGxaaHVoQlF1QWl5TG1YdVdkUUowczVBaloyQ3Ri?=
+ =?utf-8?B?K0NmSEMzN1NqRTRPOVppcnB6UVp5bGg5UFhjei9rYWdEaENpcWJQSEZFdHJv?=
+ =?utf-8?B?aXB3RjZjMkhyb2x4MjdQRkNhSHR5R2Z6ZHkzWUsybmxPZ012RjkwN25rNDdP?=
+ =?utf-8?B?ZlBxd1BvME9QQUFzRm51S3d2UXFRaGNtRk5uWnVGSFpObFNJSlRBYjIzRFha?=
+ =?utf-8?B?WkM0QjIzOWJjVkdvYzhMdE16Sk1DWU1zOWNWTWtxMUl6eVJEMlU1clRtWEVI?=
+ =?utf-8?B?MmZaZW4xY3FrcXAvcVJFZTZKYUJ4NyszbDE1a2JMY09qYjgwU3E1T3VkaHZY?=
+ =?utf-8?B?L0V1NEhSbE1lYkZoL1IrdFpXenV0ZzBOMWdDRUkyUDg5QkxDSnA0L0xDc1c1?=
+ =?utf-8?B?ZnpEWWU1elcrVk12bkhRUDJEb2RxVUNHRW1ZcGswVDVmL0dzR2w2c1cvMjh3?=
+ =?utf-8?B?UDY4WXBPVHYwZlVGckNSYm9MSlUzK2lXUFM2V1ptdWl6Rk9xckhSY0VNV09T?=
+ =?utf-8?B?YTRnMVJGaU5rMjlYZ3hCcllwclhxZWhMRU53OUZOL01rVU0wZ2NGMWlCM21o?=
+ =?utf-8?B?b1B6UkpuWmZHWVRhcmpRRXN4TXNYSU5JRlpnTFFuZzVtUmE0Rlh6UWU3dGpP?=
+ =?utf-8?B?OWdsMHlNMXJ0QjV5WlRzbitKVkZGNmZhTjR3d00vOGdsOVdyR1FLVTBtc05G?=
+ =?utf-8?B?KzAvZlF2RXlFZVRoL2VwVXlEeHdmbmVnOFgxaXgrUTZtbzYwK3BJRTNQOU56?=
+ =?utf-8?B?bm9abjNwQ3c4c0pZVHhoM3BJQ25jM3V4S3ozZDRHdEJ5Sml2SW91SFA1SjJS?=
+ =?utf-8?B?ZDZqMnFZRVBFRVVFRVZtOUt4bHhOSGtIYlFDaW53eG9LQ2RIaFpOb2FGU0dM?=
+ =?utf-8?B?blU5N1dNUm9KUVhwYThxTVBWYjRqZ0FCTDA3bGpqUS8yNStkbWFkT1AvZnFD?=
+ =?utf-8?B?M0JuN1FOWllxU1FEdExydHlsOGxyZCszbEJuMGpsSUxjY0E0RDVIaTY0R0hr?=
+ =?utf-8?B?OEwrbnRxU2Z6WHhSSGljMitpU3lsQnVqa3hHbTUrSnVmU000SksrUEJjSVlr?=
+ =?utf-8?B?MUJBR2l2Q0Y2aVpLeFZIanUrQTJUWUJ1WDVnWUN0NUZpSmJUQkxDcDdQQ3Z4?=
+ =?utf-8?B?SWpyNGt0MWlNdFFwUmVWQlJYa2FmcWdJSkZFZktnOVJpaGFIb1BWMzJpUXo1?=
+ =?utf-8?B?QUVURmFpd0NDNnl6bkx0K25JMzhwV2RSa09pL0VSTWlFQjNCZFFSQStnbWd0?=
+ =?utf-8?B?QVhaNUFSZElSWWp0YzJIUEVqRlBhVFAxYjZzNTgySkhrUzQrbmlFZ3NVeGhG?=
+ =?utf-8?B?SFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b099c33-7d37-4dae-7c1e-08db8186f72d
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3229.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 20:48:07.7548
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0opgCpGb4z+tgiqIbHkQuS0uFKSxWX9yQYySETUKaZEAJxyM+63MKNS+eepLNg2uPZHH3UvtoflfU8ETNaykoueH2HULVNIFmUL5b4HNpS0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7026
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tree
-can be expensive if the number of routes in a table is big, even if most of
-them are permanent. Checking routes in a separated list of routes having
-expiration will avoid this potential issue.
+On 7/10/2023 5:53 AM, Jagielski, Jedrzej wrote:
 
-Background
-==========
+...
 
-The size of a Linux IPv6 routing table can become a big problem if not
-managed appropriately.  Now, Linux has a garbage collector to remove
-expired routes periodically.  However, this may lead to a situation in
-which the routing path is blocked for a long period due to an
-excessive number of routes.
+>>> -	seg = devm_kzalloc(dev, sizeof(*seg), GFP_KERNEL);
+>>> -	if (!seg)
+>>> -		return -ENOMEM;
+>>> -
+>>> -	tun_seg = devm_kcalloc(dev, ICE_FD_HW_SEG_MAX, sizeof(*tun_seg),
+>>> -			       GFP_KERNEL);
+>>> -	if (!tun_seg) {
+>>> -		devm_kfree(dev, seg);
+>>> -		return -ENOMEM;
+>>> +	seg = kzalloc(sizeof(*seg), GFP_KERNEL);
+>>> +	tun_seg = kcalloc(ICE_FD_HW_SEG_MAX, sizeof(*tun_seg), GFP_KERNEL);
+>>> +	if (!tun_seg || !seg) {
+>>> +		ret = -ENOMEM;
+>>> +		goto exit;
+>>
+>> IIRC individual checks and goto's are preferred over combining them.
+> 
+> For both cases there is the same behavior so it was done due to limit
+> the line redundancy, but if you think it is better to split them up i
+> can do this
 
-For example, years ago, there is a commit about "ICMPv6 Packet too big
-messages". The root cause is that malicious ICMPv6 packets were sent back
-for every small packet sent to them. These packets add routes with an
-expiration time that prompts the GC to periodically check all routes in the
-tables, including permanent ones.
+Please go back to individual checks; I found the previous comment [1].
 
-Why Route Expires
-=================
+"Don't do combined error checking, add appropriate labels for each case."
 
-Users can add IPv6 routes with an expiration time manually. However,
-the Neighbor Discovery protocol may also generate routes that can
-expire.  For example, Router Advertisement (RA) messages may create a
-default route with an expiration time. [RFC 4861] For IPv4, it is not
-possible to set an expiration time for a route, and there is no RA, so
-there is no need to worry about such issues.
+Also, as you're changing the allocation to not use the managed 
+allocation, you're going to need to find the related (non-error) free 
+and change those to be "regular" kfree as well.
 
-Create Routes with Expires
-==========================
+Thanks,
+Tony
 
-You can create routes with expires with the  command.
-
-For example,
-
-    ip -6 route add 2001:b000:591::3 via fe80::5054:ff:fe12:3457 \
-        dev enp0s3 expires 30
-
-The route that has been generated will be deleted automatically in 30
-seconds.
-
-GC of FIB6
-==========
-
-The function called fib6_run_gc() is responsible for performing
-garbage collection (GC) for the Linux IPv6 stack. It checks for the
-expiration of every route by traversing the trees of routing
-tables. The time taken to traverse a routing table increases with its
-size. Holding the routing table lock during traversal is particularly
-undesirable. Therefore, it is preferable to keep the lock for the
-shortest possible duration.
-
-Solution
-========
-
-The cause of the issue is keeping the routing table locked during the
-traversal of large trees. To solve this problem, we can create a separate
-list of routes that have expiration. This will prevent GC from checking
-permanent routes.
-
-Result
-======
-
-We conducted a test to measure the execution times of fib6_gc_timer_cb()
-and observed that it enhances the GC of FIB6. During the test, we added
-permanent routes with the following numbers: 1000, 3000, 6000, and
-9000. Additionally, we added a route with an expiration time.
-
-Here are the average execution times for the kernel without the patch.
- - 120020 ns with 1000 permanent routes
- - 308920 ns with 3000 ...
- - 581470 ns with 6000 ...
- - 855310 ns with 9000 ...
-
-The kernel with the patch consistently takes around 14000 ns to execute,
-regardless of the number of permanent routes that are installed.
-
-Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
----
- include/net/ip6_fib.h |  31 ++++++++-----
- net/ipv6/ip6_fib.c    | 104 ++++++++++++++++++++++++++++++++++++++++--
- net/ipv6/route.c      |   6 +--
- 3 files changed, 123 insertions(+), 18 deletions(-)
-
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 05e6f756feaf..fb4d8bf4b938 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -177,6 +177,8 @@ struct fib6_info {
- 	};
- 	unsigned int			fib6_nsiblings;
- 
-+	struct hlist_node		gc_link;
-+
- 	refcount_t			fib6_ref;
- 	unsigned long			expires;
- 	struct dst_metrics		*fib6_metrics;
-@@ -247,18 +249,19 @@ static inline bool fib6_requires_src(const struct fib6_info *rt)
- 	return rt->fib6_src.plen > 0;
- }
- 
--static inline void fib6_clean_expires(struct fib6_info *f6i)
--{
--	f6i->fib6_flags &= ~RTF_EXPIRES;
--	f6i->expires = 0;
--}
-+void fib6_clean_expires(struct fib6_info *f6i);
-+/* fib6_info must be locked by the caller, and fib6_info->fib6_table can be
-+ * NULL.  If fib6_table is NULL, the fib6_info will no be inserted into the
-+ * list of GC candidates until it is inserted into a table.
-+ */
-+void fib6_clean_expires_locked(struct fib6_info *f6i);
- 
--static inline void fib6_set_expires(struct fib6_info *f6i,
--				    unsigned long expires)
--{
--	f6i->expires = expires;
--	f6i->fib6_flags |= RTF_EXPIRES;
--}
-+void fib6_set_expires(struct fib6_info *f6i, unsigned long expires);
-+/* fib6_info must be locked by the caller, and fib6_info->fib6_table can be
-+ * NULL.
-+ */
-+void fib6_set_expires_locked(struct fib6_info *f6i,
-+			     unsigned long expires);
- 
- static inline bool fib6_check_expired(const struct fib6_info *f6i)
- {
-@@ -267,6 +270,11 @@ static inline bool fib6_check_expired(const struct fib6_info *f6i)
- 	return false;
- }
- 
-+static inline bool fib6_has_expires(const struct fib6_info *f6i)
-+{
-+	return f6i->fib6_flags & RTF_EXPIRES;
-+}
-+
- /* Function to safely get fn->fn_sernum for passed in rt
-  * and store result in passed in cookie.
-  * Return true if we can get cookie safely
-@@ -388,6 +396,7 @@ struct fib6_table {
- 	struct inet_peer_base	tb6_peers;
- 	unsigned int		flags;
- 	unsigned int		fib_seq;
-+	struct hlist_head       tb6_gc_hlist;	/* GC candidates */
- #define RT6_TABLE_HAS_DFLT_ROUTER	BIT(0)
- };
- 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index bac768d36cc1..32292a758722 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -160,6 +160,8 @@ struct fib6_info *fib6_info_alloc(gfp_t gfp_flags, bool with_fib6_nh)
- 	INIT_LIST_HEAD(&f6i->fib6_siblings);
- 	refcount_set(&f6i->fib6_ref, 1);
- 
-+	INIT_HLIST_NODE(&f6i->gc_link);
-+
- 	return f6i;
- }
- 
-@@ -246,6 +248,7 @@ static struct fib6_table *fib6_alloc_table(struct net *net, u32 id)
- 				   net->ipv6.fib6_null_entry);
- 		table->tb6_root.fn_flags = RTN_ROOT | RTN_TL_ROOT | RTN_RTINFO;
- 		inet_peer_base_init(&table->tb6_peers);
-+		INIT_HLIST_HEAD(&table->tb6_gc_hlist);
- 	}
- 
- 	return table;
-@@ -1057,6 +1060,11 @@ static void fib6_purge_rt(struct fib6_info *rt, struct fib6_node *fn,
- 				    lockdep_is_held(&table->tb6_lock));
- 		}
- 	}
-+
-+	if (fib6_has_expires(rt)) {
-+		hlist_del_init(&rt->gc_link);
-+		rt->fib6_flags &= ~RTF_EXPIRES;
-+	}
- }
- 
- /*
-@@ -1118,9 +1126,9 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 				if (!(iter->fib6_flags & RTF_EXPIRES))
- 					return -EEXIST;
- 				if (!(rt->fib6_flags & RTF_EXPIRES))
--					fib6_clean_expires(iter);
-+					fib6_clean_expires_locked(iter);
- 				else
--					fib6_set_expires(iter, rt->expires);
-+					fib6_set_expires_locked(iter, rt->expires);
- 
- 				if (rt->fib6_pmtu)
- 					fib6_metric_set(iter, RTAX_MTU,
-@@ -1480,6 +1488,9 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
- 			list_add(&rt->nh_list, &rt->nh->f6i_list);
- 		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
- 		fib6_start_gc(info->nl_net, rt);
-+
-+		if (fib6_has_expires(rt))
-+			hlist_add_head(&rt->gc_link, &table->tb6_gc_hlist);
- 	}
- 
- out:
-@@ -2267,6 +2278,91 @@ void fib6_clean_all(struct net *net, int (*func)(struct fib6_info *, void *),
- 	__fib6_clean_all(net, func, FIB6_NO_SERNUM_CHANGE, arg, false);
- }
- 
-+void fib6_set_expires(struct fib6_info *f6i, unsigned long expires)
-+{
-+	struct fib6_table *tb6;
-+
-+	tb6 = f6i->fib6_table;
-+	spin_lock_bh(&tb6->tb6_lock);
-+	f6i->expires = expires;
-+	if (!fib6_has_expires(f6i))
-+		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
-+	f6i->fib6_flags |= RTF_EXPIRES;
-+	spin_unlock_bh(&tb6->tb6_lock);
-+}
-+
-+void fib6_set_expires_locked(struct fib6_info *f6i, unsigned long expires)
-+{
-+	struct fib6_table *tb6;
-+
-+	tb6 = f6i->fib6_table;
-+	f6i->expires = expires;
-+	if (tb6 && !fib6_has_expires(f6i))
-+		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
-+	f6i->fib6_flags |= RTF_EXPIRES;
-+}
-+
-+void fib6_clean_expires(struct fib6_info *f6i)
-+{
-+	struct fib6_table *tb6;
-+
-+	tb6 = f6i->fib6_table;
-+	spin_lock_bh(&tb6->tb6_lock);
-+	if (fib6_has_expires(f6i))
-+		hlist_del_init(&f6i->gc_link);
-+	f6i->fib6_flags &= ~RTF_EXPIRES;
-+	f6i->expires = 0;
-+	spin_unlock_bh(&tb6->tb6_lock);
-+}
-+
-+void fib6_clean_expires_locked(struct fib6_info *f6i)
-+{
-+	struct fib6_table *tb6;
-+
-+	tb6 = f6i->fib6_table;
-+	if (tb6 && fib6_has_expires(f6i))
-+		hlist_del_init(&f6i->gc_link);
-+	f6i->fib6_flags &= ~RTF_EXPIRES;
-+	f6i->expires = 0;
-+}
-+
-+static void fib6_gc_table(struct net *net,
-+			  struct fib6_table *tb6,
-+			  int (*func)(struct fib6_info *, void *arg),
-+			  void *arg)
-+{
-+	struct fib6_info *rt;
-+	struct hlist_node *n;
-+	struct nl_info info = {
-+		.nl_net = net,
-+		.skip_notify = false,
-+	};
-+
-+	hlist_for_each_entry_safe(rt, n, &tb6->tb6_gc_hlist, gc_link)
-+		if (func(rt, arg) == -1)
-+			fib6_del(rt, &info);
-+}
-+
-+static void fib6_gc_all(struct net *net,
-+			int (*func)(struct fib6_info *, void *),
-+			void *arg)
-+{
-+	struct fib6_table *table;
-+	struct hlist_head *head;
-+	unsigned int h;
-+
-+	rcu_read_lock();
-+	for (h = 0; h < FIB6_TABLE_HASHSZ; h++) {
-+		head = &net->ipv6.fib_table_hash[h];
-+		hlist_for_each_entry_rcu(table, head, tb6_hlist) {
-+			spin_lock_bh(&table->tb6_lock);
-+			fib6_gc_table(net, table, func, arg);
-+			spin_unlock_bh(&table->tb6_lock);
-+		}
-+	}
-+	rcu_read_unlock();
-+}
-+
- void fib6_clean_all_skip_notify(struct net *net,
- 				int (*func)(struct fib6_info *, void *),
- 				void *arg)
-@@ -2295,7 +2391,7 @@ static int fib6_age(struct fib6_info *rt, void *arg)
- 	 *	Routes are expired even if they are in use.
- 	 */
- 
--	if (rt->fib6_flags & RTF_EXPIRES && rt->expires) {
-+	if (fib6_has_expires(rt) && rt->expires) {
- 		if (time_after(now, rt->expires)) {
- 			RT6_TRACE("expiring %p\n", rt);
- 			return -1;
-@@ -2327,7 +2423,7 @@ void fib6_run_gc(unsigned long expires, struct net *net, bool force)
- 			  net->ipv6.sysctl.ip6_rt_gc_interval;
- 	gc_args.more = 0;
- 
--	fib6_clean_all(net, fib6_age, &gc_args);
-+	fib6_gc_all(net, fib6_age, &gc_args);
- 	now = jiffies;
- 	net->ipv6.ip6_rt_last_gc = now;
- 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 64e873f5895f..a69083563689 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3760,10 +3760,10 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
- 		rt->dst_nocount = true;
- 
- 	if (cfg->fc_flags & RTF_EXPIRES)
--		fib6_set_expires(rt, jiffies +
--				clock_t_to_jiffies(cfg->fc_expires));
-+		fib6_set_expires_locked(rt, jiffies +
-+					clock_t_to_jiffies(cfg->fc_expires));
- 	else
--		fib6_clean_expires(rt);
-+		fib6_clean_expires_locked(rt);
- 
- 	if (cfg->fc_protocol == RTPROT_UNSPEC)
- 		cfg->fc_protocol = RTPROT_BOOT;
--- 
-2.34.1
-
+[1] https://lore.kernel.org/netdev/20221115210239.3a1c05ba@kernel.org/
 
