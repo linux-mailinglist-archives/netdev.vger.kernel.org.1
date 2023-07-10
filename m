@@ -1,106 +1,245 @@
-Return-Path: <netdev+bounces-16562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40AF74DD45
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:23:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05D5574DD51
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E46871C20B53
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:23:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F32F91C20B58
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1960714A87;
-	Mon, 10 Jul 2023 18:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF96814A92;
+	Mon, 10 Jul 2023 18:27:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD7A14290
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 18:23:08 +0000 (UTC)
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AFE180
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:23:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA5113AF9;
+	Mon, 10 Jul 2023 18:27:08 +0000 (UTC)
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F082C197;
+	Mon, 10 Jul 2023 11:27:01 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b6a084a34cso72905051fa.1;
+        Mon, 10 Jul 2023 11:27:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689013386; x=1720549386;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=k1xzDrBpolB/cKF57T6jq2gKg8ggrF6TzxDCqID6R20=;
-  b=cLoFT8WxTkNFc58G3nT7XtaAR+a3qAKgbi7FN2xGuj9ozITsCctDhpSH
-   J/EAKlnKwHb+bKzpof/s72n8gN1BU8KVG3bCBccDihv1xRw2yK4f0pMqp
-   pRSg6V0pl9k//BOVlBr0gF8u7jkGg4hAJvOa/WzZRnoDyBpsdUtKu4qNJ
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.01,195,1684800000"; 
-   d="scan'208";a="15456624"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 18:23:04 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com (Postfix) with ESMTPS id 1B5BE60A26;
-	Mon, 10 Jul 2023 18:23:04 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 10 Jul 2023 18:23:03 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.65.132) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 10 Jul 2023 18:23:01 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Gregorio Maglione <Gregorio.Maglione@city.ac.uk>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Florian Westphal <fw@strlen.de>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: DCCP Deprecation
-Date: Mon, 10 Jul 2023 11:22:53 -0700
-Message-ID: <20230710182253.81446-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CWLP265MB6449FC7D80FB6DDEE9D76DA9C930A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
-References: <CWLP265MB6449FC7D80FB6DDEE9D76DA9C930A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+        d=gmail.com; s=20221208; t=1689013620; x=1691605620;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KPbPbpxBuP7MXSJj64zO3i9Xqo/GriMysSatFQ+eIg4=;
+        b=KVFOzIUygn7LZjAV1J34nMqXmpF1JXG0D3gn4zG269e5hq6a4nxtmvItTjpaweRDFB
+         05a1quaaMZ9kh8A37/M350eBtgSEbVEbSRl+7lY2RuEkaXTdq08JK3c3/zbdJrH1jpLa
+         L/3w9xxvUoBu0IK7d8472NKgqmLXsPy2sbcbIfK3asTXqsWsndlaiUh7mJ/76Zsh3D/G
+         a+pvyFsEHSw2aKGV0yQTnHxo2YJfmLJ56l+MactD6JYcM12vSsoUSjWXc5diDMTKAKxX
+         lzJSbN9vkywh4ydOtb9gSDC9B7oKwSe0QAngdlKHZdeIKnZJK305ItbFSiX57TQKZ9G0
+         oSaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689013620; x=1691605620;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KPbPbpxBuP7MXSJj64zO3i9Xqo/GriMysSatFQ+eIg4=;
+        b=lL3k3ImjUZie6EB5yjrR0YpNANEL/PiShidsWV1wC/CfuBnS+zinp0k4NZ6u/JVoBk
+         bd1xVDjW8Lds2x1KVv6gKZ77cNoVKEOg3obz02/zvGFIvkp2k4SvBjEfAfVP3HgIGuMi
+         5Uoil5/K48NiYCfKmiPK5qDFvAC2ux7mpH6Qf1vSG4S3auLKxSYXqXcFbMT3oBpE1Jfj
+         W8S5D2bVNcgtFS5dEw1ypk4oioGqdDmILkGzHcL9Rhft9T6j2ESbrklx6HvVp+p3+HBP
+         9DB5l3t/985V7iq0kdDAX9jWAx6SZ84c1zSrVhn55GkJ4XYB06gCnfXicPCQEyuQUUYf
+         n5VQ==
+X-Gm-Message-State: ABy/qLYW/rqA5x+y/iKWvTdlPQx8CJ/pbUrCEzSQB/K5K+cfOu9iydaR
+	j5OlB1JZqg6LdK4IIXokaBbnVyf7l7TQsdSKu8E=
+X-Google-Smtp-Source: APBJJlFLMQxTfIsQZU9xYgghhtkliN4vtbmT3N4qaVyC4Ew/0eLInNuRWE09z64ZawnfAqTYytwNOflItyYKj3iyEhQ=
+X-Received: by 2002:a2e:9c4a:0:b0:2b4:8168:2050 with SMTP id
+ t10-20020a2e9c4a000000b002b481682050mr10368186ljj.29.1689013619722; Mon, 10
+ Jul 2023 11:26:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.119.65.132]
-X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+References: <20230707172455.7634-1-daniel@iogearbox.net> <20230707172455.7634-2-daniel@iogearbox.net>
+ <ZKiDKuoovyikz8Mm@google.com> <d67ca0f4-4753-e86f-f8ca-dd515f941ea5@iogearbox.net>
+ <ZKxLY3onuOHepOxt@google.com>
+In-Reply-To: <ZKxLY3onuOHepOxt@google.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 10 Jul 2023 11:26:48 -0700
+Message-ID: <CAADnVQ+2KUg2mgK6f+4L8gL_DJgx2fV3tbF2kX=yjxorLGQ6SA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/8] bpf: Add generic attach/detach/query API
+ for multi-progs
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Joe Stringer <joe@cilium.io>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Mon, Jul 10, 2023 at 11:18=E2=80=AFAM Stanislav Fomichev <sdf@google.com=
+> wrote:
+>
+> On 07/10, Daniel Borkmann wrote:
+> > On 7/7/23 11:27 PM, Stanislav Fomichev wrote:
+> > > On 07/07, Daniel Borkmann wrote:
+> > [...]
+> > > > +static inline struct bpf_mprog_entry *
+> > > > +bpf_mprog_create(const size_t size, const off_t off)
+> > > > +{
+> > > > + struct bpf_mprog_bundle *bundle;
+> > > > + void *ptr;
+> > > > +
+> > > > + BUILD_BUG_ON(size < sizeof(*bundle) + off);
+> > > > + BUILD_BUG_ON(sizeof(bundle->a.fp_items[0]) > sizeof(u64));
+> > > > + BUILD_BUG_ON(ARRAY_SIZE(bundle->a.fp_items) !=3D
+> > > > +              ARRAY_SIZE(bundle->cp_items));
+> > > > +
+> > > > + ptr =3D kzalloc(size, GFP_KERNEL);
+> > > > + if (ptr) {
+> > > > +         bundle =3D ptr + off;
+> > > > +         atomic64_set(&bundle->revision, 1);
+> > > > +         bundle->off =3D off;
+> > > > +         bundle->a.parent =3D bundle;
+> > > > +         bundle->b.parent =3D bundle;
+> > > > +         return &bundle->a;
+> > > > + }
+> > > > + return NULL;
+> > > > +}
+> > > > +
+> > > > +void bpf_mprog_free_rcu(struct rcu_head *rcu);
+> > > > +
+> > > > +static inline void bpf_mprog_free(struct bpf_mprog_entry *entry)
+> > > > +{
+> > > > + struct bpf_mprog_bundle *bundle =3D entry->parent;
+> > > > +
+> > > > + call_rcu(&bundle->rcu, bpf_mprog_free_rcu);
+> > > > +}
+> > >
+> > > Any reason we're doing allocation here? Why not do
+> > > bpf_mprog_init(struct bpf_mprog_bundle *) instead that simply initial=
+izes
+> > > the fields? Then we can move allocation/free part to the caller (tcx)=
+ along
+> > > with rcu_head.
+> > > Feels like it would be a bit more conventional/readable? bpf_mprog_fr=
+ee{,_rcu}
+> > > will also become tcx_free{,_rcu}..
+> > >
+> > > I guess current approach works, but it took me awhile to figure it ou=
+t..
+> > > (maybe it's just me)
+> >
+> > I found this approach quite useful for tcx case since we only fetch the
+> > bpf_mprog_entry for tcx_link_prog_attach et al, but I can take a look t=
+o
+> > see if this looks better and if it does I'll include it.
+> >
+> > > > +static inline void bpf_mprog_mark_ref(struct bpf_mprog_entry *entr=
+y,
+> > > > +                               struct bpf_tuple *tuple)
+> > > > +{
+> > > > + WARN_ON_ONCE(entry->parent->ref);
+> > > > + if (!tuple->link)
+> > > > +         entry->parent->ref =3D tuple->prog;
+> > > > +}
+> > > > +
+> > > > +static inline void bpf_mprog_inc(struct bpf_mprog_entry *entry)
+> > > > +{
+> > > > + entry->parent->count++;
+> > > > +}
+> > > > +
+> > > > +static inline void bpf_mprog_dec(struct bpf_mprog_entry *entry)
+> > > > +{
+> > > > + entry->parent->count--;
+> > > > +}
+> > > > +
+> > > > +static inline int bpf_mprog_max(void)
+> > > > +{
+> > > > + return ARRAY_SIZE(((struct bpf_mprog_entry *)NULL)->fp_items) - 1=
+;
+> > > > +}
+> > > > +
+> > > > +static inline int bpf_mprog_total(struct bpf_mprog_entry *entry)
+> > > > +{
+> > > > + int total =3D entry->parent->count;
+> > > > +
+> > > > + WARN_ON_ONCE(total > bpf_mprog_max());
+> > > > + return total;
+> > > > +}
+> > > > +
+> > > > +static inline bool bpf_mprog_exists(struct bpf_mprog_entry *entry,
+> > > > +                             struct bpf_prog *prog)
+> > > > +{
+> > > > + const struct bpf_mprog_fp *fp;
+> > > > + const struct bpf_prog *tmp;
+> > > > +
+> > > > + bpf_mprog_foreach_prog(entry, fp, tmp) {
+> > > > +         if (tmp =3D=3D prog)
+> > > > +                 return true;
+> > > > + }
+> > > > + return false;
+> > > > +}
+> > > > +
+> > > > +static inline bool bpf_mprog_swap_entries(const int code)
+> > > > +{
+> > > > + return code =3D=3D BPF_MPROG_SWAP ||
+> > > > +        code =3D=3D BPF_MPROG_FREE;
+> > > > +}
+> > > > +
+> > > > +static inline void bpf_mprog_commit(struct bpf_mprog_entry *entry)
+> > > > +{
+> > > > + atomic64_inc(&entry->parent->revision);
+> > > > + synchronize_rcu();
+> > >
+> > > Maybe add a comment on why we need to synchronize_rcu here? In genera=
+l,
+> > > I don't think I have a good grasp of that ->ref member.
+> >
+> > Yeap, will add a comment. For the case where we delete the prog, we mar=
+k
+> > it in bpf_mprog_detach, but we can only drop the reference once the use=
+r
+> > swapped the bpf_mprog_entry and ensured that there are no in-flight use=
+rs
+> > hence both in bpf_mprog_commit.
+> >
+> > [...]
+> > > > +static int bpf_mprog_prog(struct bpf_tuple *tuple,
+> > > > +                   u32 object, u32 flags,
+> > > > +                   enum bpf_prog_type type)
+> > > > +{
+> > > > + bool id =3D flags & BPF_F_ID;
+> > > > + struct bpf_prog *prog;
+> > > > +
+> > > > + if (id)
+> > > > +         prog =3D bpf_prog_by_id(object);
+> > > > + else
+> > > > +         prog =3D bpf_prog_get(object);
+> > > > + if (IS_ERR(prog)) {
+> > >
+> > > [..]
+> > >
+> > > > +         if (!object && !id)
+> > > > +                 return 0;
+> > >
+> > > What's the reason behind this?
+> >
+> > If an fd was passed which is 0 and this was not a program fd, then we d=
+on't error
+> > out and treat it as if no fd was passed.
+>
+> Is this new api an opportunity to fix that fd=3D=3D0? And always treat it=
+ as
+> valid. Or we have some other constrains elsewhere?
 
-CC maintainers
-
-From: "Maglione, Gregorio" <Gregorio.Maglione@city.ac.uk>
-Date: Mon, 10 Jul 2023 12:06:11 +0000
-> Hi Kuniyuki,
-> 
-> I saw the deprecation notice on the DCCP. We are working with a multipath
-> extension of the protocol, and this would likely impact us in the
-> standardisation effort. Do you know whom I must contact to know how I can
-> volunteer to maintain the protocol, and  to get more information about
-> the maintenance process?
-
-I think it would be better to review others' patches or post patches before
-stepping up as a maintainer.
-
-However, this repo seems to have a license issue that cannot be upstreamed
-as is.
-https://github.com/telekom/mp-dccp
-
-
-> 
-> Kind Regards,
-> Greg
+No. There is nothing to fix.
 
