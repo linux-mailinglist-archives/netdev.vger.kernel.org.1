@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-16530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E511574DB59
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:42:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E301E74DB61
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F8D82813B1
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:42:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FCE6280C19
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781B914280;
-	Mon, 10 Jul 2023 16:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B74912B80;
+	Mon, 10 Jul 2023 16:46:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B80114261
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:40:47 +0000 (UTC)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB2FF127
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:40:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B520125CA
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:46:12 +0000 (UTC)
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4910C1A5
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689007245; x=1720543245;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zDzOC5EImGB/L5S7JlMg2RjQhA2BOirGy/SSMk3AcnA=;
-  b=Sx8GA/QZ2dKXx9PJjbgRDp0Y4PHgaCCnoZg6vxNgcMR2DJdYuJE0UorA
-   uwV7ew3uI2UbDCAie5PSQV/iNxusK4u2w4FC3zZP5SJD/MUBeegzrskUD
-   2mCJgzjRoqz+UORUI3eJMAp/t944ySnZ+2y7LEOxOkq2qdbd7tv7iNDJ0
-   WA2affN4zO6NiNDX0cdOTC1oftwZhsK1d/WarhUiYi3lAkNoJ4eLRyfwk
-   QKk2JS78GJW+/bgNvsRlyxf2WyBzOLA2hJMIpHAY+m3wmZuw2hntGIfQ6
-   zFfka1PGYJFviAzs7yoRs0xNnww7K305/JbkS4iIOWIed+C1F3tp4WGRW
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="364431408"
+  t=1689007570; x=1720543570;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pCrTvDY/RaS3ShNY7SD4RERRfOHhU5YnRHyfAY7yZjw=;
+  b=ALwQjI4OOQB8lBiagQ/SNuSqSJRWjJ2wFI7Ib8rnM51om+5Tf0FGxa9K
+   Zl928V9CKLLN762mnaREwh8AaIW3m1s/jdo4IuJ2YXnmfwFqunAcNplvc
+   CsJfdKc+YxAxj3VpjKoqaRKBkertAIGa35NU0W/XrQH5mosnhInl5aYfQ
+   W3+a1CukRuq6aHzV8nDufD4x8q5mMWXqYLSbvOcOdS6JVyphYJBwcdqAJ
+   Nv+wz4Me/GK6UEtURScsj5v6iwtoGWHXAxt4lEHilYilTEhnvtNPcmoV2
+   jlLbDuup+pny0bJ7BzgZy0GUJid3fIxlUoN0OPBIDsJ0zDiSm8nNAfkc6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="349198563"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="364431408"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 09:40:45 -0700
+   d="scan'208";a="349198563"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 09:46:08 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="810867165"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="720755268"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="810867165"
+   d="scan'208";a="720755268"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2023 09:40:44 -0700
+  by orsmga002.jf.intel.com with ESMTP; 10 Jul 2023 09:46:08 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Florian Kauer <florian.kauer@linutronix.de>,
-	anthony.l.nguyen@intel.com,
-	kurt@linutronix.de,
-	vinicius.gomes@intel.com,
-	muhammad.husaini.zulkifli@intel.com,
-	tee.min.tan@linux.intel.com,
-	aravindhan.gunasekaran@intel.com,
-	sasha.neftin@intel.com,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net 6/6] igc: Fix inserting of empty frame for launchtime
-Date: Mon, 10 Jul 2023 09:35:03 -0700
-Message-Id: <20230710163503.2821068-7-anthony.l.nguyen@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/2][pull request] Intel Wired LAN Driver Updates 2023-07-10 (i40e)
+Date: Mon, 10 Jul 2023 09:40:28 -0700
+Message-Id: <20230710164030.2821326-1-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230710163503.2821068-1-anthony.l.nguyen@intel.com>
-References: <20230710163503.2821068-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,123 +70,23 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Florian Kauer <florian.kauer@linutronix.de>
+This series contains updates to i40e driver only.
 
-The insertion of an empty frame was introduced with
-commit db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
-in order to ensure that the current cycle has at least one packet if
-there is some packet to be scheduled for the next cycle.
+Ivan Vecera adds waiting for VF to complete initialization on VF related
+configuration callbacks.
 
-However, the current implementation does not properly check if
-a packet is already scheduled for the current cycle. Currently,
-an empty packet is always inserted if and only if
-txtime >= end_of_cycle && txtime > last_tx_cycle
-but since last_tx_cycle is always either the end of the current
-cycle (end_of_cycle) or the end of a previous cycle, the
-second part (txtime > last_tx_cycle) is always true unless
-txtime == last_tx_cycle.
+The following are changes since commit 6843306689aff3aea608e4d2630b2a5a0137f827:
+  Merge tag 'net-6.5-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
 
-What actually needs to be checked here is if the last_tx_cycle
-was already written within the current cycle, so an empty frame
-should only be inserted if and only if
-txtime >= end_of_cycle && end_of_cycle > last_tx_cycle.
+Ivan Vecera (2):
+  i40e: Add helper for VF inited state check with timeout
+  i40e: Wait for pending VF reset in VF set callbacks
 
-This patch does not only avoid an unnecessary insertion, but it
-can actually be harmful to insert an empty packet if packets
-are already scheduled in the current cycle, because it can lead
-to a situation where the empty packet is actually processed
-as the first packet in the upcoming cycle shifting the packet
-with the first_flag even one cycle into the future, finally leading
-to a TX hang.
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 63 +++++++++++--------
+ 1 file changed, 36 insertions(+), 27 deletions(-)
 
-The TX hang can be reproduced on a i225 with:
-
-    sudo tc qdisc replace dev enp1s0 parent root handle 100 taprio \
-	    num_tc 1 \
-	    map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 \
-	    queues 1@0 \
-	    base-time 0 \
-	    sched-entry S 01 300000 \
-	    flags 0x1 \
-	    txtime-delay 500000 \
-	    clockid CLOCK_TAI
-    sudo tc qdisc replace dev enp1s0 parent 100:1 etf \
-	    clockid CLOCK_TAI \
-	    delta 500000 \
-	    offload \
-	    skip_sock_check
-
-and traffic generator
-
-    sudo trafgen -i traffic.cfg -o enp1s0 --cpp -n0 -q -t1400ns
-
-with traffic.cfg
-
-    #define ETH_P_IP        0x0800
-
-    {
-      /* Ethernet Header */
-      0x30, 0x1f, 0x9a, 0xd0, 0xf0, 0x0e,  # MAC Dest - adapt as needed
-      0x24, 0x5e, 0xbe, 0x57, 0x2e, 0x36,  # MAC Src  - adapt as needed
-      const16(ETH_P_IP),
-
-      /* IPv4 Header */
-      0b01000101, 0,   # IPv4 version, IHL, TOS
-      const16(1028),   # IPv4 total length (UDP length + 20 bytes (IP header))
-      const16(2),      # IPv4 ident
-      0b01000000, 0,   # IPv4 flags, fragmentation off
-      64,              # IPv4 TTL
-      17,              # Protocol UDP
-      csumip(14, 33),  # IPv4 checksum
-
-      /* UDP Header */
-      10,  0, 48, 1,   # IP Src - adapt as needed
-      10,  0, 48, 10,  # IP Dest - adapt as needed
-      const16(5555),   # UDP Src Port
-      const16(6666),   # UDP Dest Port
-      const16(1008),   # UDP length (UDP header 8 bytes + payload length)
-      csumudp(14, 34), # UDP checksum
-
-      /* Payload */
-      fill('W', 1000),
-    }
-
-and the observed message with that is for example
-
- igc 0000:01:00.0 enp1s0: Detected Tx Unit Hang
-   Tx Queue             <0>
-   TDH                  <32>
-   TDT                  <3c>
-   next_to_use          <3c>
-   next_to_clean        <32>
- buffer_info[next_to_clean]
-   time_stamp           <ffff26a8>
-   next_to_watch        <00000000632a1828>
-   jiffies              <ffff27f8>
-   desc.status          <1048000>
-
-Fixes: db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
-Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 4855caa3bae4..9f93f0f4f752 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -1029,7 +1029,7 @@ static __le32 igc_tx_launchtime(struct igc_ring *ring, ktime_t txtime,
- 			*first_flag = true;
- 			ring->last_ff_cycle = baset_est;
- 
--			if (ktime_compare(txtime, ring->last_tx_cycle) > 0)
-+			if (ktime_compare(end_of_cycle, ring->last_tx_cycle) > 0)
- 				*insert_empty = true;
- 		}
- 	}
 -- 
 2.38.1
 
