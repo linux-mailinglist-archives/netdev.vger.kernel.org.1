@@ -1,74 +1,171 @@
-Return-Path: <netdev+bounces-16611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD6474E007
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:10:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CE974E011
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115FD1C20BCB
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 21:10:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F2511C20B88
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 21:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3288156CA;
-	Mon, 10 Jul 2023 21:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDD4156D0;
+	Mon, 10 Jul 2023 21:13:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A321A154BD
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 21:10:23 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60223BF
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:10:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wzX93DPdbi/I0ptc0WjychNbRRKS3el1Bp4+U5jJhkA=; b=MT6ig2M5gD1ILvK3L8+X20lblZ
-	zewdnurKzFTPT8Wn8OtOu9TFXec7z0QrFdhMXv6nvThrF7kJZxPgUOH79yMS83RLweINjcNnfMz3O
-	kfZBdG2NniZ3sKAemfQ0Gz+kTgjvv1zFYwJhBfVN9Ow8Dgfhc+LTHR/gd9f5jvm8NoU0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qIy9B-000z8U-Vz; Mon, 10 Jul 2023 23:10:17 +0200
-Date: Mon, 10 Jul 2023 23:10:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	francesco.dolcini@toradex.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 1/4] net: phy: add the link modes for
- 1000BASE-T1 Ethernet PHY
-Message-ID: <cad4c420-470d-497a-9a1d-a43654af9a7e@lunn.ch>
-References: <20230710205900.52894-1-eichest@gmail.com>
- <20230710205900.52894-2-eichest@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34FD154B2
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 21:13:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0084AC433C8;
+	Mon, 10 Jul 2023 21:13:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689023612;
+	bh=SNGuXVhNbivoJOCwUC7uHYjtrHDLc0B9i+ZJR9cwZpU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EwUyesZZeyufHpoNx9N/EUT74OlHUjWDIOWBlNSte/ul2Z3Vdl2i5Z7SNCsnJq3C4
+	 Ic5EyQRcXdwt9qaGZVuLrvvnftBcLPSBdB/fF4e5pjKzhfbGOrV25IK8sKXOL0i9AG
+	 t3+SkSZJCdrhqDYUHrkamzr1e7vS9XW2IIRISAIRAJxiloSH3D+Q8t4J/MenejQiuT
+	 3J8mRF+qXL8BfiFUBO0/R/DweffdeLsC963zB52/IqjWr3pTZHsboRLmR/h0PeZ4pZ
+	 LWdoNcu/YliyDoiwVY3ahtzCgMtmMaNwRt8W+VhGBMTYtxQfylq+5kK4psArZ7NXQQ
+	 ZIDqjd5ObSdnA==
+From: Dinh Nguyen <dinguyen@kernel.org>
+To: netdev@vger.kernel.org
+Cc: dinguyen@kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	joabreu@synopsys.com,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowskii+dt@linaro.org,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org
+Subject: [PATCH 1/2] arm64: dts: socfpga: change the reset-name of "stmmaceth-ocp" to "ahb"
+Date: Mon, 10 Jul 2023 16:13:12 -0500
+Message-Id: <20230710211313.567761-1-dinguyen@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710205900.52894-2-eichest@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 10, 2023 at 10:58:57PM +0200, Stefan Eichenberger wrote:
-> This patch adds the link modes for the 1000BASE-T1 Ethernet PHYs. It
-> supports 100BASE-T1/1000BASE-T1 in full duplex mode. So far I could not
-> find a 1000BASE-T1 PHY that also supports 10BASE-T1, so this mode is not
-> added.
+The "stmmaceth-ocp" reset line on the SoCFPGA stmmac ethernet driver is
+the same as the "abh" reset on a standard stmmac ethernet.
 
-Is this actually needed? Ideally you want to extend
-genphy_c45_pma_read_abilities() to look in the PHY registers and
-determine what the PHY can do. You should only use .features if it is
-impossible to determine the PHY abilities by reading registers.
+commit ("843f603762a5 dt-bindings: net: snps,dwmac: Add 'ahb'
+reset/reset-name") documented the second reset signal as 'ahb' instead
+of 'stmmaceth-ocp'. Change the reset-names of the SoCFPGA DWMAC driver to
+'ahb'.
 
-	   Andrew
+This also fixes the dtbs_check warning:
+ethernet@ff802000: reset-names:1: 'ahb' was expected
+
+Signed-off-by: Dinh Nguyen <dinguyen@kernel.org>
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi | 6 +++---
+ arch/arm64/boot/dts/altera/socfpga_stratix10.dtsi    | 6 +++---
+ arch/arm64/boot/dts/intel/socfpga_agilex.dtsi        | 6 +++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+index 72c55e5187ca..f36063c57c7f 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+@@ -440,7 +440,7 @@ gmac0: ethernet@ff800000 {
+ 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			snps,axi-config = <&socfpga_axi_setup>;
+ 			status = "disabled";
+ 		};
+@@ -460,7 +460,7 @@ gmac1: ethernet@ff802000 {
+ 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			snps,axi-config = <&socfpga_axi_setup>;
+ 			status = "disabled";
+ 		};
+@@ -480,7 +480,7 @@ gmac2: ethernet@ff804000 {
+ 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			snps,axi-config = <&socfpga_axi_setup>;
+ 			status = "disabled";
+ 		};
+diff --git a/arch/arm64/boot/dts/altera/socfpga_stratix10.dtsi b/arch/arm64/boot/dts/altera/socfpga_stratix10.dtsi
+index 1c846f13539c..439497ab967d 100644
+--- a/arch/arm64/boot/dts/altera/socfpga_stratix10.dtsi
++++ b/arch/arm64/boot/dts/altera/socfpga_stratix10.dtsi
+@@ -153,7 +153,7 @@ gmac0: ethernet@ff800000 {
+ 			interrupt-names = "macirq";
+ 			mac-address = [00 00 00 00 00 00];
+ 			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			clocks = <&clkmgr STRATIX10_EMAC0_CLK>, <&clkmgr STRATIX10_EMAC_PTP_CLK>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			tx-fifo-depth = <16384>;
+@@ -171,7 +171,7 @@ gmac1: ethernet@ff802000 {
+ 			interrupt-names = "macirq";
+ 			mac-address = [00 00 00 00 00 00];
+ 			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			clocks = <&clkmgr STRATIX10_EMAC1_CLK>, <&clkmgr STRATIX10_EMAC_PTP_CLK>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			tx-fifo-depth = <16384>;
+@@ -189,7 +189,7 @@ gmac2: ethernet@ff804000 {
+ 			interrupt-names = "macirq";
+ 			mac-address = [00 00 00 00 00 00];
+ 			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			clocks = <&clkmgr STRATIX10_EMAC2_CLK>, <&clkmgr STRATIX10_EMAC_PTP_CLK>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			tx-fifo-depth = <16384>;
+diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex.dtsi b/arch/arm64/boot/dts/intel/socfpga_agilex.dtsi
+index fc047aef4911..d3adb6a130ae 100644
+--- a/arch/arm64/boot/dts/intel/socfpga_agilex.dtsi
++++ b/arch/arm64/boot/dts/intel/socfpga_agilex.dtsi
+@@ -158,7 +158,7 @@ gmac0: ethernet@ff800000 {
+ 			interrupt-names = "macirq";
+ 			mac-address = [00 00 00 00 00 00];
+ 			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			tx-fifo-depth = <16384>;
+ 			rx-fifo-depth = <16384>;
+ 			snps,multicast-filter-bins = <256>;
+@@ -176,7 +176,7 @@ gmac1: ethernet@ff802000 {
+ 			interrupt-names = "macirq";
+ 			mac-address = [00 00 00 00 00 00];
+ 			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			tx-fifo-depth = <16384>;
+ 			rx-fifo-depth = <16384>;
+ 			snps,multicast-filter-bins = <256>;
+@@ -194,7 +194,7 @@ gmac2: ethernet@ff804000 {
+ 			interrupt-names = "macirq";
+ 			mac-address = [00 00 00 00 00 00];
+ 			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
+-			reset-names = "stmmaceth", "stmmaceth-ocp";
++			reset-names = "stmmaceth", "ahb";
+ 			tx-fifo-depth = <16384>;
+ 			rx-fifo-depth = <16384>;
+ 			snps,multicast-filter-bins = <256>;
+-- 
+2.25.1
+
 
