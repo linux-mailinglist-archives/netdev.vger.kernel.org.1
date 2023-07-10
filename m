@@ -1,196 +1,229 @@
-Return-Path: <netdev+bounces-16474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50BBA74D7AA
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 15:32:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E871D74D7DB
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 15:36:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB6FF281241
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 13:32:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83031281299
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 13:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CA8125B0;
-	Mon, 10 Jul 2023 13:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1871125BD;
+	Mon, 10 Jul 2023 13:36:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646C411C93;
-	Mon, 10 Jul 2023 13:32:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7E3BC433C9;
-	Mon, 10 Jul 2023 13:32:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688995962;
-	bh=ypo6EEC/a10vTp0LME1omXwBE1UiKK/mReyAl6l5UHQ=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=J7Z7W1QfjLNRfgVQcSdKnYFRxtD+3fk+fVeHY9xuci1TKV61DCMVSYVvDG9kwuCBX
-	 g+QpzC0XDkSjeL9nV9+lGdPbp68Q96EXBiPlDNXBynN9HrAz4Y+E89ZYAnFm4gMFob
-	 SGwQAd+JWX6wsLqjr9V4UXCKsBkrO6/s1MT1FJcjDjR0RhV1HnH8M/padgIYfYI3iT
-	 50AKfuQ1Ba3eH+A3TeCdkft2SWR53hIVATzxttJnSld1dtaOLY6XNcMPkiIrdtp3w+
-	 UMgZy7XJf81pa8iQgs3v7vGfymFo80jGgmK2T6kIjmEHcqRaAvCUmLi8QnIHmVmDpT
-	 pZFJemBst7t+w==
-Message-ID: <c4eaff9389fe63ec4e29404ec0d1181b74935426.camel@kernel.org>
-Subject: Re: [PATCH v2 00/89] fs: new accessors for inode->i_ctime
-From: Jeff Layton <jlayton@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: jk@ozlabs.org, arnd@arndb.de, mpe@ellerman.id.au, npiggin@gmail.com, 
- christophe.leroy@csgroup.eu, hca@linux.ibm.com, gor@linux.ibm.com, 
- agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com, 
- gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
- maco@android.com,  joel@joelfernandes.org, cmllamas@google.com,
- surenb@google.com,  dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca,
- leon@kernel.org,  bwarrum@linux.ibm.com, rituagar@linux.ibm.com,
- ericvh@kernel.org, lucho@ionkov.net,  asmadeus@codewreck.org,
- linux_oss@crudebyte.com, dsterba@suse.com,  dhowells@redhat.com,
- marc.dionne@auristor.com, viro@zeniv.linux.org.uk,  raven@themaw.net,
- luisbg@kernel.org, salah.triki@gmail.com,  aivazian.tigran@gmail.com,
- ebiederm@xmission.com, keescook@chromium.org,  clm@fb.com,
- josef@toxicpanda.com, xiubli@redhat.com, idryomov@gmail.com, 
- jaharkes@cs.cmu.edu, coda@cs.cmu.edu, jlbec@evilplan.org, hch@lst.de, 
- nico@fluxnic.net, rafael@kernel.org, code@tyhicks.com, ardb@kernel.org, 
- xiang@kernel.org, chao@kernel.org, huyue2@coolpad.com,
- jefflexu@linux.alibaba.com,  linkinjeon@kernel.org, sj1557.seo@samsung.com,
- jack@suse.com, tytso@mit.edu,  adilger.kernel@dilger.ca,
- jaegeuk@kernel.org, hirofumi@mail.parknet.co.jp,  miklos@szeredi.hu,
- rpeterso@redhat.com, agruenba@redhat.com, richard@nod.at, 
- anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net, 
- mikulas@artax.karlin.mff.cuni.cz, mike.kravetz@oracle.com,
- muchun.song@linux.dev,  dwmw2@infradead.org, shaggy@kernel.org,
- tj@kernel.org,  trond.myklebust@hammerspace.com, anna@kernel.org,
- chuck.lever@oracle.com,  neilb@suse.de, kolga@netapp.com,
- Dai.Ngo@oracle.com, tom@talpey.com,  konishi.ryusuke@gmail.com,
- anton@tuxera.com,  almaz.alexandrovich@paragon-software.com,
- mark@fasheh.com,  joseph.qi@linux.alibaba.com, me@bobcopeland.com,
- hubcap@omnibond.com,  martin@omnibond.com, amir73il@gmail.com,
- mcgrof@kernel.org, yzaikin@google.com,  tony.luck@intel.com,
- gpiccoli@igalia.com, al@alarsen.net, sfrench@samba.org,  pc@manguebit.com,
- lsahlber@redhat.com, sprasad@microsoft.com,  senozhatsky@chromium.org,
- phillip@squashfs.org.uk, rostedt@goodmis.org,  mhiramat@kernel.org,
- dushistov@mail.ru, hdegoede@redhat.com, djwong@kernel.org, 
- dlemoal@kernel.org, naohiro.aota@wdc.com, jth@kernel.org, ast@kernel.org, 
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org,  yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com,  haoluo@google.com, jolsa@kernel.org, hughd@google.com,
- akpm@linux-foundation.org,  davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com,  john.johansen@canonical.com,
- paul@paul-moore.com, jmorris@namei.org,  serge@hallyn.com,
- stephen.smalley.work@gmail.com, eparis@parisplace.org,  jgross@suse.com,
- stern@rowland.harvard.edu, lrh2000@pku.edu.cn, 
- sebastian.reichel@collabora.com, wsa+renesas@sang-engineering.com, 
- quic_ugoswami@quicinc.com, quic_linyyuan@quicinc.com, john@keeping.me.uk, 
- error27@gmail.com, quic_uaggarwa@quicinc.com, hayama@lineo.co.jp,
- jomajm@gmail.com,  axboe@kernel.dk, dhavale@google.com,
- dchinner@redhat.com, hannes@cmpxchg.org,  zhangpeng362@huawei.com,
- slava@dubeyko.com, gargaditya08@live.com, 
- penguin-kernel@I-love.SAKURA.ne.jp, yifeliu@cs.stonybrook.edu, 
- madkar@cs.stonybrook.edu, ezk@cs.stonybrook.edu, yuzhe@nfschina.com, 
- willy@infradead.org, okanatov@gmail.com, jeffxu@chromium.org,
- linux@treblig.org,  mirimmad17@gmail.com, yijiangshan@kylinos.cn,
- yang.yang29@zte.com.cn,  xu.xin16@zte.com.cn, chengzhihao1@huawei.com,
- shr@devkernel.io,  Liam.Howlett@Oracle.com, adobriyan@gmail.com,
- chi.minghao@zte.com.cn,  roberto.sassu@huawei.com, linuszeng@tencent.com,
- bvanassche@acm.org,  zohar@linux.ibm.com, yi.zhang@huawei.com,
- trix@redhat.com, fmdefrancesco@gmail.com,  ebiggers@google.com,
- princekumarmaurya06@gmail.com, chenzhongjin@huawei.com,  riel@surriel.com,
- shaozhengchao@huawei.com, jingyuwang_vip@163.com, 
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, 
- linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org,  linux-afs@lists.infradead.org,
- autofs@vger.kernel.org, linux-mm@kvack.org,  linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org,  codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
- linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com, 
- linux-um@lists.infradead.org, linux-mtd@lists.infradead.org, 
- jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org, 
- linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net, 
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org, 
- linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org, 
- reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org, 
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
- selinux@vger.kernel.org
-Date: Mon, 10 Jul 2023 09:32:23 -0400
-In-Reply-To: <20230710-zudem-entkam-bb508cbd8c78@brauner>
-References: <20230705185812.579118-1-jlayton@kernel.org>
-	 <5e40891f6423feb5b68f025e31f26e9a50ae9390.camel@kernel.org>
-	 <20230710-zudem-entkam-bb508cbd8c78@brauner>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D797125AD
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 13:36:39 +0000 (UTC)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6BAE10D;
+	Mon, 10 Jul 2023 06:36:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688996196; x=1720532196;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=SGQX7u4npo2HlvWnDiqxeD+J6BOLfyB5QlgSg71RnT4=;
+  b=ZL3Vp9t2Q30RWD6UrWXsOAK3ulzxTCitmj32IlvdyK3qUPOlhf6e/p96
+   5Dz+ACalAHSEHl7W2OOp39yH3V4RUSFZhiBp0oxnnU4GKzOBOlLuY48f/
+   FKN5SOXDMFGOFkmP45Y1gtjqG7v56X0gwxbWZjhG7A/lW3hAXyO2k7SO+
+   HeOdOYqCBq927YHPVrcilbAA0qo+WIn4PuApkdqkFq0ssOPVw3HEpLF6x
+   5TzeLrsqZv4+Ydut925zq0ilBF34yCjJyb1rgSo2ixPfo1H/KHdnL4JB0
+   MtBMMIOab2obNUbt6Wc7pPpynWCbJsTSBnMaNx8nf9G7/RDIZug5PXU8q
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="363210942"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="363210942"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 06:36:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="786174569"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="786174569"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga008.fm.intel.com with ESMTP; 10 Jul 2023 06:36:35 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 06:36:35 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 06:36:35 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.109)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 10 Jul 2023 06:36:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QmsLThwQ7vG8RWkyenKnQ5Yl4vgI8QjKfTiThlAjhiG5F4zYuKD+66IMqz//cMgZHmdCcgxj1Ek5k6cbeUHF1zSSuiwZMc24d9OmoGX3WgxAPPZ7egk9s/IyBwZzLS1+7pQgJpbklESrdprR+uFwj4bZQLWXDC7SCog8Vg2580zjMGV3WatAPHM6U/5eI+wYzkQmcz5jG2LlmL7otS8olw6ZhIrwf5Am+s661BTKOnxc6XlofpuohrXteD/xDjKrwmWx0A2Gbm/hQ1k28aR3zfKF98bWF6mtBlZyZbYO1kf7B2Icw60F5AFHThHwxdKbPDllxFWU+x5BAwfCmYJRYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HH9IEQECgW7FF7q41NWLbCMjUtZqj7CDHO7iGV790S4=;
+ b=LQauX/NaEwFoWCNYQ1Jgihm29B4+X3ICrmiS9KusaxIIvlUHBn5kmEtCiE4Xffb0zMxKOnUXFM8T8xajRqan+Rs61qiFOuvvKQLIQgf+0DtlC/nIOEm+NpXLD2zClbVEdNSGOSSwjHVMs9R/63RBYNUc3hiKFqQDUtHmzkzJRt0kw0+BAAXCii8YBOmf1Qu5MCdk8vgLdHwKPgDsqsSB58k/JBDWWjfvEYxBGY1JG47ra69r+bKcmL9rEfMsOFGiHgsmFoogB3ogB0BPZHnrAUK5zFM7fq9pQ8iPBqQXoYGKm0pb8iPj2xQEvb+WaqQoT4LFbjlLOUA+tPWwfv8GeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by DS0PR11MB7804.namprd11.prod.outlook.com (2603:10b6:8:f3::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
+ 2023 13:36:31 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::1ecd:561c:902a:7130]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::1ecd:561c:902a:7130%4]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
+ 13:36:31 +0000
+Message-ID: <95c5ba92-bccd-6a9a-5373-606a482e36a3@intel.com>
+Date: Mon, 10 Jul 2023 15:34:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RFC net-next v4 6/9] iavf: switch to Page Pool
+Content-Language: en-US
+To: Yunsheng Lin <yunshenglin0825@gmail.com>
+CC: Yunsheng Lin <linyunsheng@huawei.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, David Christensen <drc@linux.vnet.ibm.com>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, Paul Menzel <pmenzel@molgen.mpg.de>,
+	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230705155551.1317583-1-aleksander.lobakin@intel.com>
+ <20230705155551.1317583-7-aleksander.lobakin@intel.com>
+ <6b8bc66f-8a02-b6b4-92cc-f8aaf067abd8@huawei.com>
+ <bc495d87-3968-495f-c672-bf1bab38524a@intel.com>
+ <4946b9df-66ea-d184-b97c-0ba687e41df8@gmail.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <4946b9df-66ea-d184-b97c-0ba687e41df8@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU2PR04CA0278.eurprd04.prod.outlook.com
+ (2603:10a6:10:28c::13) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DS0PR11MB7804:EE_
+X-MS-Office365-Filtering-Correlation-Id: b523e307-0173-4889-4747-08db814aab93
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jOp5XhV5SBBq7ixT4tPW0jNQCVFkRhN0r/N+TEVIedwxrBBAoBMtDGfkdcmHGlCUB9tlJn1j2JRfYvVpq8ToVdHFSrGRHDPAuoRmHPStOySMdlCT3bDU/XLZfChYRZOBAG4x/m47SDXtdexb4KQAd0256RFPTtq4KVAE5YGRe8XhnoirH476hptZOmPSUGG19ECJcDgcqOp7RshrZa2ww0VdAeArAr7zMSqgvy+N++6Mls1Hs5aCb+1JYb3hSUnUlflO3u8YzlTJmDrT0ppVRcrPIYX3ISXUTFV6mawbPqpjnPIK+19u83DNufjJxgEkNQF/6umJo18Hg+L/SWqk8zQYx/RTUY0EXRK9N97bxHSZOMP4lup1cpUvbKiLBe7wAbeys1uCtgJTCCmtRvdfwbfRTQwhx7CqlYNYX+RAzF327Ht01E0FRIy67QHRqhJ8DXM6bf8mz/RoXu0P1tnLujaGLrOwk9KMZhrrHJsgUtA0HBjov11/PNQtFNGZ6cWD79lgTE28m73fzml+LIt9AHm7WMp9NH5/AZ3BmfgYXKW3cXJlNzB19rbzydx75HQ8dVgr4QzpePmeQ3d4SnjH3OGLn4twbba44On4iVMjXzUuCq43dRaNXEmj3kQKt1eNy1vuI/CORf4rtBkJtZGJdQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(39860400002)(366004)(376002)(136003)(451199021)(86362001)(31696002)(38100700002)(82960400001)(31686004)(36756003)(6666004)(6486002)(54906003)(6506007)(53546011)(26005)(186003)(6512007)(2616005)(7416002)(5660300002)(2906002)(66556008)(316002)(478600001)(66946007)(8936002)(66476007)(8676002)(83380400001)(4326008)(6916009)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R1hRUFpYelhzR0xvK0lnSVMxRndxL3ozRUdLMXpGK05mRUpPZmRNQzlJSTI2?=
+ =?utf-8?B?MDQwMVFERkhyL2Z3Z1FYbHBvT2hyMEIvUUpHall6bnFjSHNxbkp6N05ETGpG?=
+ =?utf-8?B?V1hOWTJkS0FOQStFVTZ1bit5a2Z0R2dNd1NPY2xvQUlreGQ0UDB4ZG1EbmtW?=
+ =?utf-8?B?L3hhS0hmTTAxVGY0dGx1Nk5XNk1nYWE4MS9kUzQzUHpCUEtRYXdzY3BYTGhU?=
+ =?utf-8?B?NlU1aXkvUlJ2YW5aaEM4ZDlNbmxiMGx4TFVHdDlvQlNHazJiRWlPZ0M2dENo?=
+ =?utf-8?B?dWRwRWdyK0VCczA5bG9hNU8yWTdGcGNLREFBNnlCenVDVS9oVW55dGRZT3RF?=
+ =?utf-8?B?b1EzUCt0TW1IRHQrZG9ZdTlMOU45SjE5Z0dMQnJBbTR4YXVtMTBRaXViVkRQ?=
+ =?utf-8?B?S2dvMVdYcVJlTFhYQXdCUm5uT3hBMktzOGorM0h5WWlsNTZSNitoTno1NXNh?=
+ =?utf-8?B?b25LWG84MEJ5dDVZa3ZXQThKeFFHaHJ4ZkF0U01hamRUNUpKc1JNWEVkSTVw?=
+ =?utf-8?B?SDJ5UTBIa3ZYYlJkV2s2VDk0eVd5WTZhVXpaQWc1eUo2VEZFRlExZFVmVUN6?=
+ =?utf-8?B?a3EvNWh0dnR2Y1RBdENiZjloSy9ReDd4aVZFb0M4VWFaUURMOENtWXNlMXhC?=
+ =?utf-8?B?OStpMXNOMTJySnRNRHlDLzg1KzlJYWptVUQ5eGd5NGhETjVFZy84alRlUE53?=
+ =?utf-8?B?ZVR6b25QcWZWZGhmQ0J4d3RLZnFmWTlUQ25CaEdiTUVrSmxwV3lTOVFJUDRv?=
+ =?utf-8?B?aFEyeUJGcnRTaFlBKzRORjZwWEtPNG9EenVPYTFnaGhsN1JJUWVlZTI4dEwz?=
+ =?utf-8?B?dEsrcE5uOWI4aVhjcmkxb1NFeHNZVlRQdElvOENBU2x3Q2xDVm9BczNTbHh2?=
+ =?utf-8?B?ZnFpR2hOME1aM3A0TEtiMzh1dFlkTDRMbjNCTkFiYXdPdFNGdHYzVG9nKy8r?=
+ =?utf-8?B?Y3NBa1REd0E1WUZxQXMvdng0QnNUTXhXTFA0amg5Y2pYOEVmaXd1dHBnMFU5?=
+ =?utf-8?B?eW9QSjVMSjgrVDJTa2xNM3JFSXhqNzdRZG13d1E3TER4ZHZJMDVHWjVNWmxw?=
+ =?utf-8?B?VmxUUUlTUFNIVFQ5QTBHYkJQY3I1cDJxanlFZHBmdEl3ajJYSEhPRVpKaGxQ?=
+ =?utf-8?B?OHcwVWRpSDZDVitPSlFvWmRYRzFNTmZVTEJCSVpkN3lnNk1takhSM3JtYVgw?=
+ =?utf-8?B?eTROajNrV1ZKTHBwWUl6WjIrbFkyb1FEWGtDZmlFendYVFd4YUhBZTZLYTBL?=
+ =?utf-8?B?ZUNESGlUbmJzM2h1OWVvY2tpeTRSQkkrMHlpU1JLVkdCWkF1VUwvQ1A3ZEs4?=
+ =?utf-8?B?aEd6LzExanNuay9sVzNuVGYxVE9kcmoyM3NVbDYyMDQwNk0vWGZLOUZJMmxE?=
+ =?utf-8?B?QkNXdFpxSmNra0lnRDAyNWtaL290bjF2SmhTZWlvZ09iajVjRi8yT3Bkb3o4?=
+ =?utf-8?B?bkhvQzAxdWFhZHZiZUd2RzlDbmpqb2o0cFk5enl2cXh5c3ZOZEkxL05Fa0N1?=
+ =?utf-8?B?K2dKQjVJWTdsOFBhUzJLd21UbmhCaFBvUFlKcVRDckZLSzNMa3ZEUTVJWXZP?=
+ =?utf-8?B?aWQyRmEyaVZrWUwzOEl2UVk4WkxCRGNGd2NHVE5BM0xWNmYvT0JBUTZNdXRp?=
+ =?utf-8?B?WlJ4ZDREMHF5NU43bkcrTFpza3RZd1JnU3p1OUhRcXhKeHFJV0dMSkd1dDBk?=
+ =?utf-8?B?QjZCeVJjeWFSTndKMi80QXNLSnVUbjR3NFV3dnZWbjFEMG5rTlh6VUxxU0FI?=
+ =?utf-8?B?SFJMWjY4SllUMkNJazV1OFppT29wZmp3TndJanJFYTh4QW5jZHlLcUJJSlcy?=
+ =?utf-8?B?UHkzYnYwSEVseEJMRFY4a2Q5U2d5TXZPMDdyZWVBM0VEUTRRMzA5eDQ2NFBw?=
+ =?utf-8?B?VEl4QUFSNit5TTN4Q1I3cUVYb2czWVVQaG9zV2c5NENCN2NvcXgxR2Z4S1Ju?=
+ =?utf-8?B?alVsQ3VXQ3gyeGZOZlh3WGVOb2owYW04d3YrUlFyWHhZR1lITVgrTGFyQUlz?=
+ =?utf-8?B?YWRmUEFtK0xZRUJCVmZhU29NUGhST2twd3MvUkNiL0lnR3VKL3ZmVmdQZmpn?=
+ =?utf-8?B?OHlKOU1iUmdYMmhHOG5DQVp5ZWc4YU9ha0k4ZnU3eEpTOEhDcXBpNXJqdk5Y?=
+ =?utf-8?B?VXY3b2hGZkRUS0hMcnExRnpBbGJWNTBMcFZ4Tkc4YTNFZUNRT3k1UVBZVits?=
+ =?utf-8?B?T2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b523e307-0173-4889-4747-08db814aab93
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 13:36:31.1641
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B9Y09MGQ+RpOuOqnso1CcVC6BSgslzH2xpXQ2qhioUZcFTlYJUMZsZJi5kcJ4I0UTeu4iL8ys7prZLgmdi5miEqpdghVSyinrSFg0i3Bt5o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7804
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 2023-07-10 at 14:35 +0200, Christian Brauner wrote:
-> On Fri, Jul 07, 2023 at 08:42:31AM -0400, Jeff Layton wrote:
-> > On Wed, 2023-07-05 at 14:58 -0400, Jeff Layton wrote:
-> > > v2:
-> > > - prepend patches to add missing ctime updates
-> > > - add simple_rename_timestamp helper function
-> > > - rename ctime accessor functions as inode_get_ctime/inode_set_ctime_=
-*
-> > > - drop individual inode_ctime_set_{sec,nsec} helpers
-> > >=20
-> >=20
-> > After review by Jan and others, and Jan's ext4 rework, the diff on top
-> > of the series I posted a couple of days ago is below. I don't really
-> > want to spam everyone with another ~100 patch v3 series, but I can if
-> > you think that's best.
-> >=20
-> > Christian, what would you like me to do here?
->=20
-> I picked up the series from the list and folded the fixups you posted
-> here into the respective fs conversion patches. I hope that helps you
-> avoid a resend. You should have received a separate "thank you" mail for
-> all of this.
->=20
-> To each patch that I folded one of the fixlets from below into I added a
-> git note that records a link to your mail here and the respective patch
-> hunk from this mail that I folded into the patch. git.kernel.org will
-> show notes by default. For example,
-> https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/commit/?h=3Dv=
-fs.ctime&id=3D8b0e3c2e99004609a16ba145bcbdfdddb78e220e
-> should show you the note I added. You can also fetch them via
-> git fetch $remote refs/notes/*:refs/notes/*
-> (You probably know that ofc but jic.) if you're interested.
->=20
-> Based on v6.5-rc1 as of today.
->=20
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+Date: Sun, 9 Jul 2023 13:16:39 +0800
 
-Many thanks!!! I'll get to work rebasing the multigrain timestamp series
-on top of that.
+> On 2023/7/7 0:38, Alexander Lobakin wrote:
+> 
+> ...
+>  
+>>>
+>>>>  /**
+>>>> @@ -766,13 +742,19 @@ void iavf_free_rx_resources(struct iavf_ring *rx_ring)
+>>>>   **/
+>>>>  int iavf_setup_rx_descriptors(struct iavf_ring *rx_ring)
+>>>>  {
+>>>> -	struct device *dev = rx_ring->dev;
+>>>> -	int bi_size;
+>>>> +	struct page_pool *pool;
+>>>> +
+>>>> +	pool = libie_rx_page_pool_create(&rx_ring->q_vector->napi,
+>>>> +					 rx_ring->count);
+>>>
+>>> If a page is able to be spilt between more than one desc, perhaps the
+>>> prt_ring size does not need to be as big as rx_ring->count.
+>>
+>> But we doesn't know in advance, right? Esp. given that it's hidden in
+>> the lib. But anyway, you can only assume that in regular cases if you
+>> always allocate frags of the same size, PP will split pages when 2+
+>> frags can fit there or return the whole page otherwise, but who knows
+>> what might happen.
+> 
+> It seems intel driver is able to know the size of memory it needs when
+> creating the ring/queue/napi/pp, maybe the driver only tell the libie
+> how many descs does it use for queue, and libie can adjust it accordingly?
 
-> Btw, both b4 and patchwork somehow treat the series in weird was.
-> IOW, based on the message id of the cover letter I was able to pull most
-> messages except for:
->=20
-> [07/92] fs: add ctime accessors infrastructure
-> [08/92] fs: new helper: simple_rename_timestamp
-> [92/92] fs: rename i_ctime field to __i_ctime
->=20
-> which I pulled in separately. Not sure what the cause of=A0
->=20
-> this is.
+But libie can't say for sure how PP will split pages for it, right?
 
-Good to know.
+> 
+>> BTW, with recent recycling optimization, most of recycling is done
+>> directly through cache, not ptr_ring. So I'd even say it's safe to start
+>> creating smaller ptr_rings in the drivers.
+> 
+> The problem is that we may use more memory than before for certain case
+> if we don't limit the size of ptr_ring, unless we can ensure all of
+> recycling is done directly through cache, not ptr_ring.
+Also not sure I'm following =\
 
-I ended up doing the send in two phases: one for the cover letter and
-infrastructure patches that went to everyone, and one for the per-
-subsystem patches that went do individual maintainers and lists.
+[...]
 
-I suspect that screwed up the message IDs somehow. Hopefully I won't
-need to do a posting like that again soon, but I'll pay closer attention
-to the message id handling next time.
-
-Thanks again!
---=20
-Jeff Layton <jlayton@kernel.org>
+Thanks,
+Olek
 
