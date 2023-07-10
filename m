@@ -1,252 +1,188 @@
-Return-Path: <netdev+bounces-16417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0BCC74D252
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:54:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166AE74D25D
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF021C209E4
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:54:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA0941C209D5
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AF7DDAC;
-	Mon, 10 Jul 2023 09:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D6EDDD5;
+	Mon, 10 Jul 2023 09:58:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B0FA933
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:54:13 +0000 (UTC)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D6864C02;
-	Mon, 10 Jul 2023 02:53:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688982831; x=1720518831;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=E2IK45v9icWY1i6ACfQDVoL1dWsBiiU69FEJa8Njl7Y=;
-  b=EyekJg+Lj53rHS9fDXJDTBLcWoHsnXX6A+YIYiN7wfWb9yBLNXhvHc14
-   H3IvNjNiVnWwiASThCDLOwdy/XbaJtsE2XsZn7di7WZUKJlxkIslqJoz3
-   FNzOITgfMBYn4jPxoTD+fHRcRzlISFoSWk4F07OpsnPtW+rHO3NUF1b7N
-   5WQoZ/d9PNeeYW7nsNnD7dQM62CnpHYq5CeSh4AimFV4n56nXLajILZkp
-   QuZ6GY7TEKYNEfgdIPr5ghI3RNtUr3MPT0kfcU3oEKyn/V83pPH5AthAU
-   k9k3/proVT/TMYMIdphwERMhF+JrPNm+Q87aBrKaJJpYqSUsrG3ujZbsG
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="349102722"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="349102722"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 02:50:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="865287182"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="865287182"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga001.fm.intel.com with ESMTP; 10 Jul 2023 02:50:51 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 10 Jul 2023 02:50:50 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 10 Jul 2023 02:50:50 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 02:50:50 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 10 Jul 2023 02:50:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QZ7+tSuMTS03pCs3yra0lAb0BLoctzFad0oqEfHOVijHefqsWtzZ9nzZNFrom2UJrhXzHRG/+KXQfMiRV3rZ96u+y6TrgvQWTAPfQFPJS0tUkJITjwh4qAj/gt5cay31NNANc8N68P7Pwp3EY/xOMG8VKcOVWVcAHeCoyREgH4zq+xuHsgkef7DE/lHe2TjFCoV3pPwfQw6ztB2c9sDQAli4gt4g1T39CeH4BjNW59g81viiQVQR3uMzou+eCLBA0UY8An1m2tcwtYvsyuvHmbKfDYIgk5VW3zPplTREYglsufAshYlZt4MB45QcswOgxDszFXTtPH0PCfXFDtXtxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hGl7+6ORT2MpiMtxV5Fdnf7mAPRi1F8jNJ2IGE11weE=;
- b=bKmuFWS+SXJ8ls8aqbF5E/a8NH1vudAFk1joo4hFenNyQeT7MHIIcQee+wuem58f4I6FGAChEl3J/3y/gZGG2jmF/S42h3nxfFsyrRZqmb5VcVXpkcxEy4053JDidVZaBQB+FDM3CiHZ8c97l67QOwDsgpqJH4BebTSPsiVsnc4qANdEuDsdsFhBTwCtl+nnvkNP72rrlnegCY1C636Hn5K2CZKFAAa65zfN84qeGK6p2hss/Yiaa36cpV+/7oN/IYd5qp2OKpfx1kaW5gL4SxpUt8U3SlnpxBCjXwBFtY+5WB4rM3rKFYaW6XkzAFxgMzld25MImaHbgOfhwDPTiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- DM4PR11MB5325.namprd11.prod.outlook.com (2603:10b6:5:390::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6565.30; Mon, 10 Jul 2023 09:50:48 +0000
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::24bd:974b:5c01:83d6]) by DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::24bd:974b:5c01:83d6%3]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
- 09:50:48 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: "kuba@kernel.org" <kuba@kernel.org>, "vadfed@meta.com" <vadfed@meta.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"vadfed@fb.com" <vadfed@fb.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "M, Saeed" <saeedm@nvidia.com>,
-	"leon@kernel.org" <leon@kernel.org>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "sj@kernel.org" <sj@kernel.org>,
-	"javierm@redhat.com" <javierm@redhat.com>, "ricardo.canuelo@collabora.com"
-	<ricardo.canuelo@collabora.com>, "mst@redhat.com" <mst@redhat.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>, "Michalik, Michal"
-	<michal.michalik@intel.com>, "gregkh@linuxfoundation.org"
-	<gregkh@linuxfoundation.org>, "jacek.lawrynowicz@linux.intel.com"
-	<jacek.lawrynowicz@linux.intel.com>, "airlied@redhat.com"
-	<airlied@redhat.com>, "ogabbay@kernel.org" <ogabbay@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>, "nipun.gupta@amd.com" <nipun.gupta@amd.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "linux@zary.sk" <linux@zary.sk>,
-	"masahiroy@kernel.org" <masahiroy@kernel.org>,
-	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
-	"geert+renesas@glider.be" <geert+renesas@glider.be>, "Olech, Milena"
-	<milena.olech@intel.com>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "andy.ren@getcruise.com" <andy.ren@getcruise.com>,
-	"razor@blackwall.org" <razor@blackwall.org>, "idosch@nvidia.com"
-	<idosch@nvidia.com>, "lucien.xin@gmail.com" <lucien.xin@gmail.com>,
-	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>, "phil@nwl.cc"
-	<phil@nwl.cc>, "claudiajkang@gmail.com" <claudiajkang@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
-	<mschmidt@redhat.com>, "linux-clk@vger.kernel.org"
-	<linux-clk@vger.kernel.org>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>
-Subject: RE: [RFC PATCH v9 03/10] dpll: core: Add DPLL framework base
- functions
-Thread-Topic: [RFC PATCH v9 03/10] dpll: core: Add DPLL framework base
- functions
-Thread-Index: AQHZpc/+2+ilbDjNIkao6LxAthBNeq+hd5yAgBFjgzA=
-Date: Mon, 10 Jul 2023 09:50:48 +0000
-Message-ID: <DM6PR11MB465793F80239C1C87F1C095A9B30A@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
- <20230623123820.42850-4-arkadiusz.kubalewski@intel.com>
- <ZJ09N2TI4wHrA4rB@nanopsycho>
-In-Reply-To: <ZJ09N2TI4wHrA4rB@nanopsycho>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|DM4PR11MB5325:EE_
-x-ms-office365-filtering-correlation-id: ae91bff2-2a2c-445e-757e-08db812b239e
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: igSfhPum8FbdzVZGmzgEYpxDi88X0xPLqsFo6bdHHyhxsaIcLXfq0YvUPIycpGUkIVAhx4HxzDNpCcBxa+1jCiaTpBgtI/Eh0OD76U7XeAIeH1m12SaudbJ7YbIuOmYnZzDji2w+2Q0Ayw4kLgMzNcSDvtj/OQz+aZfEZNE8VD9r2MVC84A/lYYJCOzOD13h8Mh6MBU5zC+BqdkR6T+lYP3lqbHGPD2PqiH9u4/0CnT/EOnPhgk1q5X4x65iihV6iMBHtx48wXiMMmdzPn+25T2QKUPSHoq1fhKrXrtMh1CnlvTK3ciFNPhHJQ3Z7L5wn4gKr1h7Uc1iaN1ZsYTDmkF1IlP8TPsDuch0BNCd2Rxp4PBUKbEnNHyId64NhPX7e/rmyqqE/ELnFDoVKGKYwOlngEFRIqp2IWgLgmf7il8ITiDroVRE8TA1c2KKbKw765ZM0lR9ADqGA+D/rw9KD0gkXHjauJiffS1VWmX8eiLesx/d++WtL/blbt8o7qPRUvlWtw31k3x541chPAcNWafNXXE+sTbb4krewImnnYPV4dANJfRaxnNyVG7fuQILgu0rWbFtOZfgK+/cdvHN+aFbltjiQWgdXn2GbTQR1w5cXdPS8mHydaaHsjDKGeP+
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(136003)(346002)(396003)(366004)(451199021)(186003)(9686003)(26005)(6506007)(83380400001)(41300700001)(4326008)(64756008)(66446008)(66476007)(2906002)(66556008)(52536014)(316002)(7416002)(5660300002)(7406005)(8936002)(8676002)(6916009)(478600001)(66946007)(7696005)(76116006)(71200400001)(54906003)(55016003)(33656002)(122000001)(82960400001)(38070700005)(38100700002)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?uV90vHJJqg7yEP4wn2MQD1viUa+a6TEFMAi3sWQFCGKBscG+Ru6I13Lv7bpf?=
- =?us-ascii?Q?QKfJPpGWNJcTsqgTAMKG3KBwBkprDCHBGzeWJkqY4EZ9OJziRPrZ1EDJPkAZ?=
- =?us-ascii?Q?ek52iJzaehs7kAaqvKayT51IlnB1JyilVFvX3nV+qSF7duPqd6A7zjUDO62k?=
- =?us-ascii?Q?EwyCBbwLuOzW+SQsz6OKlmm9wS3I8tTJq5BtsOFyR84mDcG0/1Iwr/Tdwz3f?=
- =?us-ascii?Q?rR+ZPJZ4G4WNLT2vPyz2nHHjX03uwcFk21Rs5QuKtN4MQhSS0WMwb3wmafQy?=
- =?us-ascii?Q?nHZvS7z56GxhQU/8Kp2hqP6y0yq1K4W9wKq0NPOM0cVOVnWHXJEFMzc1oUP/?=
- =?us-ascii?Q?1r5ap3fG7u1xKveACpW13JS3bucGjpPv1BsCx1oJVq9oPmsExVkYlP0WOAmR?=
- =?us-ascii?Q?NSoeg7uQbO76gLWnduV3r+UgYmcqDDd3raQyC4sJd/OcR00wHq4QQxu66p4g?=
- =?us-ascii?Q?ftfm7gdk9Zj6LF+Dqa/RXL+pC9AYQXqkM4QbW1Nf3fBWxwDZbZTYmYextKGU?=
- =?us-ascii?Q?5PC/i1o2pP6kllWCZkKtGg90zYIzv80EJ1llRPYmQa1UGxNsDqNuE7k7zVCb?=
- =?us-ascii?Q?XD/TdM59I6rXSqsRaQWt3o0Rc3ruU21uZ7M08zS3DSc1Re+NRRjfTAijbwzz?=
- =?us-ascii?Q?y/YWPru1wytv/dEVmq+ZHS8qis3qIQdIob6s5aWFEHfgw8u5ve2nUvuo/aet?=
- =?us-ascii?Q?VHGbVh7J7I2Dam8ra7AifHqQx6KOnwLIoTZH35dWNeOJ8FUizcfX6bc9cyzq?=
- =?us-ascii?Q?XNk6ZYGPOiw31jQyqdmOZGNIbvsC9A6t0t02rYrPvr6CfIFws7Lws6KcUO+v?=
- =?us-ascii?Q?L2snShiW18L2di/T71AlNNPMedOrbaJkK4PqtbKg0YWPETP3bRR56GS5UWUs?=
- =?us-ascii?Q?bJv1bZd89BymITfa8C+lhV/4jY3vsG5b8vvmIXqTwJDLfDScXWv72Tg0fhju?=
- =?us-ascii?Q?Ay4A+eprJIepSigFJ+eayMXHQFHcF9Z9pC5Uy/4gruthsz/Z/llMvN69Y7Lc?=
- =?us-ascii?Q?VSw1L9QYTirZ4OLhXPHNA1xmbWrrBaL9ezFvXY+vg7pML+z0GRoEAnlNsn7r?=
- =?us-ascii?Q?9Fk6c1h9+NWEARvuC7FRA6dZdB3vQbflfL1yzmilqP3eU8R7VRk+j/pH2KMQ?=
- =?us-ascii?Q?dpFGD/kdbkiSMhcJSUzfW2wxrCYSuQLg9AfXomhOppkmOlXnwSR9iNUCJBqz?=
- =?us-ascii?Q?kyX2/2tHjYniMLsCxiP/IFDXTMYH6H/3ssQv12PTZq6D58VOeB3P6S7MMaqp?=
- =?us-ascii?Q?Et53Qr0iglWOJqIwLN2oNvyFl//BlLSesg0gIdlWqpQfD9jbya37f97OBfnQ?=
- =?us-ascii?Q?e37AtPJVl5RtYw9gqMQlICLmirGAvqRsjjAIPJiKhs+3N35WEcpTGZKjtk9i?=
- =?us-ascii?Q?raFspzt3V5t+I3aMUnY82OX5nuk7FLWNp4AqFr7lxqGgHZ5o90LEy07Lv345?=
- =?us-ascii?Q?qV1dHzwl1zkYo6yIwAQ7j6ObtdVoP5ikic4FLMbuCyRQz9NUAKwiwL56nOkW?=
- =?us-ascii?Q?Kqse50lcxNMQM4xP9scU0QumBvXhm/mQ5YicoJHHkqGsfzrvKI+InrYaqflu?=
- =?us-ascii?Q?lTXJfAmgjmz+PbthLTn5CLATX9wbmsWVJ6XUeziop/wfJeL3SqOGBndbwcKX?=
- =?us-ascii?Q?Gg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA95DDAC
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:58:19 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85662697
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 02:58:17 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qIneV-0006xt-D8; Mon, 10 Jul 2023 11:57:55 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 31B751ECD02;
+	Mon, 10 Jul 2023 09:57:52 +0000 (UTC)
+Date: Mon, 10 Jul 2023 11:57:51 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Judith Mendez <jm@ti.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Schuyler Patton <spatton@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH v10 0/2] Enable multiple MCAN on AM62x
+Message-ID: <20230710-overheat-ruined-12d17707e324-mkl@pengutronix.de>
+References: <20230707204714.62964-1-jm@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae91bff2-2a2c-445e-757e-08db812b239e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2023 09:50:48.3776
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vdkURKb0JAZZh+vIrn+KcGUNvnZERKJIeaXIS9o+71UDNmnI0p4QBvpgZGrsCGaW3NuoxHC4f6llyrAsVEgl9bqkMrV96ycYdApZ/7vqpRo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5325
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="scrncn37d33goitk"
+Content-Disposition: inline
+In-Reply-To: <20230707204714.62964-1-jm@ti.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->From: Jiri Pirko <jiri@resnulli.us>
->Sent: Thursday, June 29, 2023 10:14 AM
->
->Fri, Jun 23, 2023 at 02:38:13PM CEST, arkadiusz.kubalewski@intel.com wrote=
-:
->>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>
->
->One thing I forgot to point out the last time:
->
->[...]
->
->>+int
->>+dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
->>+		  const struct dpll_pin_ops *ops, void *priv)
->>+{
->>+	int ret;
->>+
->>+	if (WARN_ON(!ops) ||
->>+	    WARN_ON(!ops->state_on_dpll_get) ||
->>+	    WARN_ON(!ops->direction_get))
->
->Please add check that you don't register to dpll instance which is
->unregistered. Similar check needs to be added to pin_on_pin register.
->
->Also, make sure you don't unregister dpll device/pin which has child
->pins registered under it.
->
 
-Fixed for v10.
+--scrncn37d33goitk
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thank you!
-Arkadiusz
+On 07.07.2023 15:47:12, Judith Mendez wrote:
+> On AM62x there are two MCANs in MCU domain. The MCANs in MCU domain
+> were not enabled since there is no hardware interrupt routed to A53
+> GIC interrupt controller. Therefore A53 Linux cannot be interrupted
+> by MCU MCANs.
+>=20
+> This solution instantiates a hrtimer with 1 ms polling interval
+> for MCAN device when there is no hardware interrupt property in
+> DTB MCAN node. The hrtimer generates a recurring software interrupt
+> which allows to call the isr. The isr will check if there is pending
+> transaction by reading a register and proceed normally if there is.
+> MCANs with hardware interrupt routed to A53 Linux will continue to
+> use the hardware interrupt as expected.
+>=20
+> Timer polling method was tested on both classic CAN and CAN-FD
+> at 125 KBPS, 250 KBPS, 1 MBPS and 2.5 MBPS with 4 MBPS bitrate
+> switching.
+>=20
+> Letency and CPU load benchmarks were tested on 3x MCAN on AM62x.
 
->
->>+		return -EINVAL;
->>+
->>+	mutex_lock(&dpll_lock);
->>+	if (WARN_ON(!(dpll->module =3D=3D pin->module &&
->>+		      dpll->clock_id =3D=3D pin->clock_id)))
->>+		ret =3D -EINVAL;
->>+	else
->>+		ret =3D __dpll_pin_register(dpll, pin, ops, priv);
->>+	mutex_unlock(&dpll_lock);
->>+
->>+	return ret;
->>+}
->
->[...]
+Latency
+
+> 1 MBPS timer polling interval is the better timer polling interval
+> since it has comparable latency to hardware interrupt with the worse
+> case being 1ms + CAN frame propagation time and CPU load is not
+> substantial. Latency can be improved further with less than 1 ms
+> polling intervals, howerver it is at the cost of CPU usage since CPU
+
+However
+
+> load increases at 0.5 ms.
+>=20
+> Note that in terms of power, enabling MCU MCANs with timer-polling
+> implementation might have negative impact since we will have to wake
+> up every 1 ms whether there are CAN packets pending in the RX FIFO or
+> not. This might prevent the CPU from entering into deeper idle states
+> for extended periods of time.
+>=20
+> v9:
+> Link: https://lore.kernel.org/linux-can/20230419223323.20384-1-jm@ti.com/=
+T/#t
+>=20
+> v8:
+> Link: https://lore.kernel.org/linux-can/20230530224820.303619-1-jm@ti.com=
+/T/#t
+>=20
+> v7:
+> Link: https://lore.kernel.org/linux-can/20230523023749.4526-1-jm@ti.com/T=
+/#t
+>=20
+> v6:
+> Link: https://lore.kernel.org/linux-can/20230518193613.15185-1-jm@ti.com/=
+T/#t
+>=20
+> v5:
+> Link: https://lore.kernel.org/linux-can/20230510202952.27111-1-jm@ti.com/=
+T/#t
+>=20
+> v4:
+> Link: https://lore.kernel.org/linux-can/c3395692-7dbf-19b2-bd3f-31ba86fa4=
+ac9@linaro.org/T/#t
+
+The link doesn't point to v4, fixed.
+
+> v2:
+> Link: https://lore.kernel.org/linux-can/20230424195402.516-1-jm@ti.com/T/=
+#t
+>=20
+> V1:
+> Link: https://lore.kernel.org/linux-can/19d8ae7f-7b74-a869-a818-93b74d106=
+709@ti.com/T/#t
+
+Was there a v1? That link doesn't point to it, removed.
+
+>=20
+> RFC:
+> Link: https://lore.kernel.org/linux-can/52a37e51-4143-9017-42ee-8d17c6702=
+8e3@ti.com/T/#t
+
+Doesn't point to RFC, fixed.
+
+Applied to linux-can-next/testing.
+
+Thanks,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--scrncn37d33goitk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmSr1hwACgkQvlAcSiqK
+BOhHqwgAstPyKnj9LCXokgj8mdcICYHPuXIsk0LtOYpArWkekPcaAJgv6u4sBjlT
+HhHksfmbomzyYUmbwfm3lynXBFRJoHacN8oXfiDBv6DwXVJNyGqFq77GqezyJTTv
+9TNbSartJEYnRSgHuzWiVr5OzPqmCq/kL4Lv5J2OV6yjFCF8spG/bcxbt0tv6KYp
+J2/24b884jYeHEKZ+2rjUiKBphXZd0A7Uo0qsjVE86hVKsuh1ng43bQ4Oj16layp
+DexZYAZK4ODY+kJxVRF9upZwXFgCRs8+zef4vMOytpjPF7ctkjnaBLiuA61gfj0C
+JNPBYja4NGINDjk2KyztqsnVqBGffw==
+=Y7y0
+-----END PGP SIGNATURE-----
+
+--scrncn37d33goitk--
 
