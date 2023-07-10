@@ -1,359 +1,295 @@
-Return-Path: <netdev+bounces-16633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9BCB74E177
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:37:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3C2474E17A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:38:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83546281488
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:36:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69F4F280E63
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A841168AE;
-	Mon, 10 Jul 2023 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BC61640D;
+	Mon, 10 Jul 2023 22:38:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89000171A1
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 22:35:33 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE15E56
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:34:56 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c6ab0d1b1dcso5203621276.0
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:34:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7313114AAF;
+	Mon, 10 Jul 2023 22:38:40 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0F01B7;
+	Mon, 10 Jul 2023 15:38:33 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b717e9d423so25429691fa.1;
+        Mon, 10 Jul 2023 15:38:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689028463; x=1691620463;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQJYRa4cYbFlxJ1mDmha+0HxPANtp6LWuy6ed2Yjbu4=;
-        b=CetzuFarHJgPUiGBwDAWLpdzt0w3V9hQbqMPhuZfIenfXirykHD2HLGYdWQSkINvJh
-         xJG2uW65yyAAb+o06RvuUp3WpLKZAzNYnV7EddNjt5dfXFCFq8AZmqCWdcr58enYZIQE
-         n5JK8gg0yI5kVZJS/Tnc0gRJy7edUPwC0tcHLkojiMtzkNIt/J3L+ITk1kszc47h7Vz7
-         7HfhvqbXuGyD3D189Y0m4jp9NOnOMRg/24QxNfglicfLYXQlHIKScA6XdF716DYeVEDF
-         C2/NnZaF4OaiJaWHPvY80aoJTwZFVHVTEJFSi6QbKnAMO9h++YLyvxmo53PBx0z1bgkV
-         UbJg==
+        d=gmail.com; s=20221208; t=1689028712; x=1691620712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FLhc+8iQ18pIdp7kioEWi77pUhxv0tRudw10iOddaHs=;
+        b=ScFuFv9S8RDqNXI/m1gh0HYYo1t4tPl5cAARer50mGtNrpeQPFm/++8xuZDhb3V7kJ
+         qvywfUSNr+h/+59kctbPaID3BKoTMickVANw+6/re7IDjQGjFaHTBxF1wHcwy83/HLdg
+         68KIEP5e6gsrORtjVD8SEblt9bwCK2oL2dQ7xB/GQn+KRFdykuSXDIKWhdO1m8qHKdat
+         v1aWNiibjRMeUp3n/yru/0Rbt/kfLNTf809WOnsgZtcYizJ/lv3Uhqnscw1S+qPQMF+Y
+         MGZzWMYYL48mP5XFhRZ+SMC7xoPA7kx120rE9ltqy5e2WDju06P6ET4HkKi/x2ffRAvR
+         Mt6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689028463; x=1691620463;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQJYRa4cYbFlxJ1mDmha+0HxPANtp6LWuy6ed2Yjbu4=;
-        b=SiIEhfJmLEvUM7XDudzZvuqUPBEAhWJ7hhTd0abA4XTHjXtr9X9V2Em3IWgPabAkpj
-         QlcfWEuSvZEATHmeKJGrXtJczO8JJQ3HbJ55tQtF3MoLZqfOyDu+7jqxbGgajWsnQbXH
-         41lo3cuFIu1BkaToOH1TNQcHHqU6xjsOFF//tZVcMgZWkVvYXyK/JZTtctaEGhXRRS8l
-         TtZEuOYDFqkOpKtMpnxEgTVg+z2y+sE1XSdSvap7b4DuclL+3UIZxTz20kl+laH8WYeM
-         lq/2W+bmWvIWPDM9j+o1bbZLI+s72n4ocIh5lWtlve1miAD+4fOQfJTWGVp9F89RJA5M
-         kXDA==
-X-Gm-Message-State: ABy/qLZKb7eKPUhunAS2cSlDeq1mBku8Fl5yOH3xyqvzGvojzuqvgLTz
-	txO4d1h51TK4fKurwbcYubJQa6Ts3PTKoatxlw==
-X-Google-Smtp-Source: APBJJlHJiw9FD0eEFF7lSrjMDR+hUHliNX9UFzA9i3ufkboc97+XMgqpqjgotP7HgV453EARzYkdxteZjWVekbKkug==
-X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:4c0f:bfb6:9942:8c53])
- (user=almasrymina job=sendgmr) by 2002:a25:4252:0:b0:c6f:6ffe:f904 with SMTP
- id p79-20020a254252000000b00c6f6ffef904mr50579yba.9.1689028463039; Mon, 10
- Jul 2023 15:34:23 -0700 (PDT)
-Date: Mon, 10 Jul 2023 15:33:01 -0700
-In-Reply-To: <20230710223304.1174642-1-almasrymina@google.com>
+        d=1e100.net; s=20221208; t=1689028712; x=1691620712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FLhc+8iQ18pIdp7kioEWi77pUhxv0tRudw10iOddaHs=;
+        b=JXiEUq5oZveErKLhikgnM/s7W7QGLKztUoEAdVeYjYyTX0zJYPZ+mWQzjpcKBOZVPv
+         B+UvOFfjKmf26vymYLVWuIUE0crp5K/PYI2g2g18CfcFzePpo1GUZD/kaIxqaB6sTrQY
+         LSABSsOModo71PdlJXRzWejYkK3DTbyWhJSitaRDRtgWXk2RBzWtLzJgrsIMs0ZsRSBs
+         Lbn0ZQsiPaOO/GtRy78QSkwSxLgl/QfWFGSghetNqWCN8XKtYiP6StDqoCIzrw8VA/7Q
+         XL9DJrpmBr0Z63AxCey5uQJNwZ6OF3Y70392OO033myh7GUwJtXemAnSNS8q/qIeS8yk
+         nTfw==
+X-Gm-Message-State: ABy/qLZJdq4ryN5WGd/ApZyxv4qoSAgugqHo7Z1n2bMa19T4eEcpoOAJ
+	kSkeR1Xa05So50R+++I30FfYGvYqV0S0JNSwD83yiRaL
+X-Google-Smtp-Source: APBJJlGkFnD1OJ4vwrfR5O50vgOlH5VeUb4OqXhEAc6ogY7kPiITR5nk+IvxL13Sfutjog8Z9er/YNSkKlRLLgOGXws=
+X-Received: by 2002:a2e:a490:0:b0:2b6:b943:4361 with SMTP id
+ h16-20020a2ea490000000b002b6b9434361mr6631837lji.22.1689028711727; Mon, 10
+ Jul 2023 15:38:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230710223304.1174642-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.41.0.390.g38632f3daf-goog
-Message-ID: <20230710223304.1174642-11-almasrymina@google.com>
-Subject: [RFC PATCH 10/10] memory-provider: add dmabuf devmem provider
-From: Mina Almasry <almasrymina@google.com>
-To: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
-	netdev@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, jgg@ziepe.ca
+MIME-Version: 1.0
+References: <20230707172455.7634-1-daniel@iogearbox.net> <20230707172455.7634-2-daniel@iogearbox.net>
+ <ZKiDKuoovyikz8Mm@google.com> <d67ca0f4-4753-e86f-f8ca-dd515f941ea5@iogearbox.net>
+ <ZKxLY3onuOHepOxt@google.com> <CAADnVQ+2KUg2mgK6f+4L8gL_DJgx2fV3tbF2kX=yjxorLGQ6SA@mail.gmail.com>
+ <CAKH8qBs8gX-K9dzXku9aa4GfB4CGVjsfx05FvDXFuNFPxq+OXQ@mail.gmail.com>
+ <CAADnVQK8ptJ5Gv7Ty2AsZt-58r4UMNfR5PA9QBZAye5iqUGWvQ@mail.gmail.com> <CAKH8qBu0u_HuuGCW=vjQp4nsMB4QFtgza7A9VAdbPFzAvAyorg@mail.gmail.com>
+In-Reply-To: <CAKH8qBu0u_HuuGCW=vjQp4nsMB4QFtgza7A9VAdbPFzAvAyorg@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 10 Jul 2023 15:38:20 -0700
+Message-ID: <CAADnVQ+g=7EdpHK5U4u_JSsGBgNXSq63Dbh84dQKiWGpqMX6qg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/8] bpf: Add generic attach/detach/query API
+ for multi-progs
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Joe Stringer <joe@cilium.io>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use Jakub's memory provider PoC API:
-https://github.com/kuba-moo/linux/tree/pp-providers
+On Mon, Jul 10, 2023 at 2:14=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
+ wrote:
+>
+> On Mon, Jul 10, 2023 at 1:16=E2=80=AFPM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Mon, Jul 10, 2023 at 12:00=E2=80=AFPM Stanislav Fomichev <sdf@google=
+.com> wrote:
+> > >
+> > > On Mon, Jul 10, 2023 at 11:27=E2=80=AFAM Alexei Starovoitov
+> > > <alexei.starovoitov@gmail.com> wrote:
+> > > >
+> > > > On Mon, Jul 10, 2023 at 11:18=E2=80=AFAM Stanislav Fomichev <sdf@go=
+ogle.com> wrote:
+> > > > >
+> > > > > On 07/10, Daniel Borkmann wrote:
+> > > > > > On 7/7/23 11:27 PM, Stanislav Fomichev wrote:
+> > > > > > > On 07/07, Daniel Borkmann wrote:
+> > > > > > [...]
+> > > > > > > > +static inline struct bpf_mprog_entry *
+> > > > > > > > +bpf_mprog_create(const size_t size, const off_t off)
+> > > > > > > > +{
+> > > > > > > > + struct bpf_mprog_bundle *bundle;
+> > > > > > > > + void *ptr;
+> > > > > > > > +
+> > > > > > > > + BUILD_BUG_ON(size < sizeof(*bundle) + off);
+> > > > > > > > + BUILD_BUG_ON(sizeof(bundle->a.fp_items[0]) > sizeof(u64))=
+;
+> > > > > > > > + BUILD_BUG_ON(ARRAY_SIZE(bundle->a.fp_items) !=3D
+> > > > > > > > +              ARRAY_SIZE(bundle->cp_items));
+> > > > > > > > +
+> > > > > > > > + ptr =3D kzalloc(size, GFP_KERNEL);
+> > > > > > > > + if (ptr) {
+> > > > > > > > +         bundle =3D ptr + off;
+> > > > > > > > +         atomic64_set(&bundle->revision, 1);
+> > > > > > > > +         bundle->off =3D off;
+> > > > > > > > +         bundle->a.parent =3D bundle;
+> > > > > > > > +         bundle->b.parent =3D bundle;
+> > > > > > > > +         return &bundle->a;
+> > > > > > > > + }
+> > > > > > > > + return NULL;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +void bpf_mprog_free_rcu(struct rcu_head *rcu);
+> > > > > > > > +
+> > > > > > > > +static inline void bpf_mprog_free(struct bpf_mprog_entry *=
+entry)
+> > > > > > > > +{
+> > > > > > > > + struct bpf_mprog_bundle *bundle =3D entry->parent;
+> > > > > > > > +
+> > > > > > > > + call_rcu(&bundle->rcu, bpf_mprog_free_rcu);
+> > > > > > > > +}
+> > > > > > >
+> > > > > > > Any reason we're doing allocation here? Why not do
+> > > > > > > bpf_mprog_init(struct bpf_mprog_bundle *) instead that simply=
+ initializes
+> > > > > > > the fields? Then we can move allocation/free part to the call=
+er (tcx) along
+> > > > > > > with rcu_head.
+> > > > > > > Feels like it would be a bit more conventional/readable? bpf_=
+mprog_free{,_rcu}
+> > > > > > > will also become tcx_free{,_rcu}..
+> > > > > > >
+> > > > > > > I guess current approach works, but it took me awhile to figu=
+re it out..
+> > > > > > > (maybe it's just me)
+> > > > > >
+> > > > > > I found this approach quite useful for tcx case since we only f=
+etch the
+> > > > > > bpf_mprog_entry for tcx_link_prog_attach et al, but I can take =
+a look to
+> > > > > > see if this looks better and if it does I'll include it.
+> > > > > >
+> > > > > > > > +static inline void bpf_mprog_mark_ref(struct bpf_mprog_ent=
+ry *entry,
+> > > > > > > > +                               struct bpf_tuple *tuple)
+> > > > > > > > +{
+> > > > > > > > + WARN_ON_ONCE(entry->parent->ref);
+> > > > > > > > + if (!tuple->link)
+> > > > > > > > +         entry->parent->ref =3D tuple->prog;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline void bpf_mprog_inc(struct bpf_mprog_entry *e=
+ntry)
+> > > > > > > > +{
+> > > > > > > > + entry->parent->count++;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline void bpf_mprog_dec(struct bpf_mprog_entry *e=
+ntry)
+> > > > > > > > +{
+> > > > > > > > + entry->parent->count--;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline int bpf_mprog_max(void)
+> > > > > > > > +{
+> > > > > > > > + return ARRAY_SIZE(((struct bpf_mprog_entry *)NULL)->fp_it=
+ems) - 1;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline int bpf_mprog_total(struct bpf_mprog_entry *=
+entry)
+> > > > > > > > +{
+> > > > > > > > + int total =3D entry->parent->count;
+> > > > > > > > +
+> > > > > > > > + WARN_ON_ONCE(total > bpf_mprog_max());
+> > > > > > > > + return total;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline bool bpf_mprog_exists(struct bpf_mprog_entry=
+ *entry,
+> > > > > > > > +                             struct bpf_prog *prog)
+> > > > > > > > +{
+> > > > > > > > + const struct bpf_mprog_fp *fp;
+> > > > > > > > + const struct bpf_prog *tmp;
+> > > > > > > > +
+> > > > > > > > + bpf_mprog_foreach_prog(entry, fp, tmp) {
+> > > > > > > > +         if (tmp =3D=3D prog)
+> > > > > > > > +                 return true;
+> > > > > > > > + }
+> > > > > > > > + return false;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline bool bpf_mprog_swap_entries(const int code)
+> > > > > > > > +{
+> > > > > > > > + return code =3D=3D BPF_MPROG_SWAP ||
+> > > > > > > > +        code =3D=3D BPF_MPROG_FREE;
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +static inline void bpf_mprog_commit(struct bpf_mprog_entry=
+ *entry)
+> > > > > > > > +{
+> > > > > > > > + atomic64_inc(&entry->parent->revision);
+> > > > > > > > + synchronize_rcu();
+> > > > > > >
+> > > > > > > Maybe add a comment on why we need to synchronize_rcu here? I=
+n general,
+> > > > > > > I don't think I have a good grasp of that ->ref member.
+> > > > > >
+> > > > > > Yeap, will add a comment. For the case where we delete the prog=
+, we mark
+> > > > > > it in bpf_mprog_detach, but we can only drop the reference once=
+ the user
+> > > > > > swapped the bpf_mprog_entry and ensured that there are no in-fl=
+ight users
+> > > > > > hence both in bpf_mprog_commit.
+> > > > > >
+> > > > > > [...]
+> > > > > > > > +static int bpf_mprog_prog(struct bpf_tuple *tuple,
+> > > > > > > > +                   u32 object, u32 flags,
+> > > > > > > > +                   enum bpf_prog_type type)
+> > > > > > > > +{
+> > > > > > > > + bool id =3D flags & BPF_F_ID;
+> > > > > > > > + struct bpf_prog *prog;
+> > > > > > > > +
+> > > > > > > > + if (id)
+> > > > > > > > +         prog =3D bpf_prog_by_id(object);
+> > > > > > > > + else
+> > > > > > > > +         prog =3D bpf_prog_get(object);
+> > > > > > > > + if (IS_ERR(prog)) {
+> > > > > > >
+> > > > > > > [..]
+> > > > > > >
+> > > > > > > > +         if (!object && !id)
+> > > > > > > > +                 return 0;
+> > > > > > >
+> > > > > > > What's the reason behind this?
+> > > > > >
+> > > > > > If an fd was passed which is 0 and this was not a program fd, t=
+hen we don't error
+> > > > > > out and treat it as if no fd was passed.
+> > > > >
+> > > > > Is this new api an opportunity to fix that fd=3D=3D0? And always =
+treat it as
+> > > > > valid. Or we have some other constrains elsewhere?
+> > > >
+> > > > No. There is nothing to fix.
+> > >
+> > > Care to elaborate? Do we want to preserve it for consistency? Or is
+> > > there some concern with asking people to put relative_fd=3D-1 when do=
+ing
+> > > the call?
+> > > I'm fine either way; trying to understand where it's coming from. I
+> > > remember it was discussed briefly at lsfmmbpf, but don't remember the
+> > > details..
+> >
+> > 0 is invalid bpf object (prog, map, link). There is nothing to "fix".
+>
+> It's more like it's a conditionally invalid bpf object (fd in this case) =
+:-)
+>
+> bpf_program__attach_tcx(..., { ..., relative_fd =3D 0, ... }); //
+> returns ok and doesn't use relative_fd
+> dup2(prog_fd, 0);
+> bpf_program__attach_tcx(..., { ..., relative_fd =3D 0, ... }); // this
+> will use prog_fd duped at 0
 
-To implement a dmabuf devmem memory provider. The provider allocates
-NET_RX dmabuf pages to the page pool. This abstracts any custom memory
-allocation or freeing changes for devmem TCP from drivers using the
-page pool.
+It shouldn't. I haven't checked the code, but if the patch does that
+it's a bug.
 
-The memory provider allocates NET_RX pages from the
-dmabuf pages provided by the driver. These pages are ZONE_DEVICE pages
-with the sg dma_addrs stored in the zone_device_data entry in the page.
-The page pool entries in struct page are in a union with the ZONE_DEVICE
-entries, and - without special handling - the page pool would
-accidentally overwrite the data in the ZONE_DEVICE fields.
-
-To solve this, the memory provider converts the page from a ZONE_DEVICE
-page to a ZONE_NORMAL page upon giving it to the page pool, and converts
-it back to ZONE_DEVICE page upon getting it back from the page pool.
-This is safe to do because the NET_RX pages are dmabuf pages created to
-hold the dma_addr in the dma_buf_map_attachement sg_table entries, and
-are only used with code that handles them specifically.
-
-However, since dmabuf pages can now also be page pool page, we need
-to update 2 places to detect this correctly:
-
-1. is_dma_buf_page() needs to be updated to correctly detect dmabuf
-   pages after they've been inserted into the pool.
-
-2. dma_buf_page_to_dma_addr() needs to be updated. For page pool pages,
-   the dma_addr exists in page->dma_addr. For non page pool pages, the
-   dma_addr exists in page->zone_device_data.
-
-Signed-off-by: Mina Almasry <almasrymina@google.com>
----
- include/linux/dma-buf.h |  29 ++++++++++-
- include/net/page_pool.h |  20 ++++++++
- net/core/page_pool.c    | 104 ++++++++++++++++++++++++++++++++++++----
- 3 files changed, 143 insertions(+), 10 deletions(-)
-
-diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-index 93228a2fec47..896359fa998d 100644
---- a/include/linux/dma-buf.h
-+++ b/include/linux/dma-buf.h
-@@ -692,15 +692,26 @@ static inline bool is_dma_buf_pages_file(struct file *file)
- 
- struct page *dma_buf_pages_net_rx_alloc(struct dma_buf_pages *priv);
- 
-+static inline bool is_dma_buf_page_net_rx(struct page *page)
-+{
-+	struct dma_buf_pages *priv;
-+
-+	return (is_page_pool_page(page) && (priv = page->pp->mp_priv) &&
-+		priv->pgmap.ops == &dma_buf_pgmap_ops);
-+}
-+
- static inline bool is_dma_buf_page(struct page *page)
- {
- 	return (is_zone_device_page(page) && page->pgmap &&
--		page->pgmap->ops == &dma_buf_pgmap_ops);
-+		page->pgmap->ops == &dma_buf_pgmap_ops) ||
-+	       is_dma_buf_page_net_rx(page);
- }
- 
- static inline dma_addr_t dma_buf_page_to_dma_addr(struct page *page)
- {
--	return (dma_addr_t)page->zone_device_data;
-+	return is_dma_buf_page_net_rx(page) ?
-+		       (dma_addr_t)page->dma_addr :
-+		       (dma_addr_t)page->zone_device_data;
- }
- 
- static inline int dma_buf_map_sg(struct device *dev, struct scatterlist *sg,
-@@ -718,6 +729,16 @@ static inline int dma_buf_map_sg(struct device *dev, struct scatterlist *sg,
- 
- 	return nents;
- }
-+
-+static inline bool is_dma_buf_pages_priv(void *ptr)
-+{
-+	struct dma_buf_pages *priv = (struct dma_buf_pages *)ptr;
-+
-+	if (!priv || priv->pgmap.ops != &dma_buf_pgmap_ops)
-+		return false;
-+
-+	return true;
-+}
- #else
- static inline bool is_dma_buf_page(struct page *page)
- {
-@@ -745,6 +766,10 @@ static inline struct page *dma_buf_pages_net_rx_alloc(struct dma_buf_pages *priv
- 	return NULL;
- }
- 
-+static inline bool is_dma_buf_pages_priv(void *ptr)
-+{
-+	return false;
-+}
- #endif
- 
- 
-diff --git a/include/net/page_pool.h b/include/net/page_pool.h
-index 7b6668479baf..a57757a13cc8 100644
---- a/include/net/page_pool.h
-+++ b/include/net/page_pool.h
-@@ -157,6 +157,7 @@ enum pp_memory_provider_type {
- 	PP_MP_HUGE_SPLIT, /* 2MB, online page alloc */
- 	PP_MP_HUGE, /* 2MB, all memory pre-allocated */
- 	PP_MP_HUGE_1G, /* 1G pages, MEP, pre-allocated */
-+	PP_MP_DMABUF_DEVMEM, /* dmabuf devmem provider */
- };
- 
- struct pp_memory_provider_ops {
-@@ -170,6 +171,7 @@ extern const struct pp_memory_provider_ops basic_ops;
- extern const struct pp_memory_provider_ops hugesp_ops;
- extern const struct pp_memory_provider_ops huge_ops;
- extern const struct pp_memory_provider_ops huge_1g_ops;
-+extern const struct pp_memory_provider_ops dmabuf_devmem_ops;
- 
- struct page_pool {
- 	struct page_pool_params p;
-@@ -420,4 +422,22 @@ static inline void page_pool_nid_changed(struct page_pool *pool, int new_nid)
- 		page_pool_update_nid(pool, new_nid);
- }
- 
-+static inline bool is_page_pool_page(struct page *page)
-+{
-+	/* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
-+	 * in order to preserve any existing bits, such as bit 0 for the
-+	 * head page of compound page and bit 1 for pfmemalloc page, so
-+	 * mask those bits for freeing side when doing below checking,
-+	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
-+	 * to avoid recycling the pfmemalloc page.
-+	 */
-+	if (unlikely((page->pp_magic & ~0x3UL) != PP_SIGNATURE))
-+		return false;
-+
-+	if (!page->pp)
-+		return false;
-+
-+	return true;
-+}
-+
- #endif /* _NET_PAGE_POOL_H */
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index df3f431fcff3..e626d4e309c1 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -236,6 +236,9 @@ static int page_pool_init(struct page_pool *pool,
- 	case PP_MP_HUGE_1G:
- 		pool->mp_ops = &huge_1g_ops;
- 		break;
-+	case PP_MP_DMABUF_DEVMEM:
-+		pool->mp_ops = &dmabuf_devmem_ops;
-+		break;
- 	default:
- 		err = -EINVAL;
- 		goto free_ptr_ring;
-@@ -975,14 +978,7 @@ bool page_pool_return_skb_page(struct page *page, bool napi_safe)
- 
- 	page = compound_head(page);
- 
--	/* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
--	 * in order to preserve any existing bits, such as bit 0 for the
--	 * head page of compound page and bit 1 for pfmemalloc page, so
--	 * mask those bits for freeing side when doing below checking,
--	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
--	 * to avoid recycling the pfmemalloc page.
--	 */
--	if (unlikely((page->pp_magic & ~0x3UL) != PP_SIGNATURE))
-+	if (!is_page_pool_page(page))
- 		return false;
- 
- 	pp = page->pp;
-@@ -1538,3 +1534,95 @@ const struct pp_memory_provider_ops huge_1g_ops = {
- 	.alloc_pages		= mp_huge_1g_alloc_pages,
- 	.release_page		= mp_huge_1g_release,
- };
-+
-+/*** "Dmabuf devmem page" ***/
-+
-+/* Dmabuf devmem memory provider allocates DMA_BUF_PAGES_NET_RX pages which are
-+ * backing the dma_buf_map_attachment() from the NIC to the device memory.
-+ *
-+ * These pages are wrappers around the dma_addr of the sg entries in the
-+ * sg_table returned from dma_buf_map_attachment(). They can be passed to the
-+ * networking stack, which will generate devmem skbs from them and process them
-+ * correctly.
-+ */
-+static int mp_dmabuf_devmem_init(struct page_pool *pool)
-+{
-+	struct dma_buf_pages *priv;
-+
-+	priv = pool->mp_priv;
-+	if (!is_dma_buf_pages_priv(priv))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static void mp_dmabuf_devmem_destroy(struct page_pool *pool)
-+{
-+}
-+
-+static struct page *mp_dmabuf_devmem_alloc_pages(struct page_pool *pool,
-+						 gfp_t gfp)
-+{
-+	struct dma_buf_pages *priv = pool->mp_priv;
-+	dma_addr_t dma_addr;
-+	struct page *page;
-+
-+	page = dma_buf_pages_net_rx_alloc(priv);
-+	if (!page)
-+		return page;
-+
-+	/* It shouldn't be possible for the allocation to give us a page not
-+	 * belonging to this page_pool's pgmap.
-+	 */
-+	BUG_ON(page->pgmap != &priv->pgmap);
-+
-+	/* netdev_rxq_alloc_dma_buf_page() allocates a ZONE_DEVICE page.
-+	 * Prepare to convert it into a page_pool page. We need to hold pgmap
-+	 * and zone_device_data (which holds the dma_addr).
-+	 *
-+	 * DMA_BUF_PAGES_NET_RX are dmabuf pages created specifically to wrap
-+	 * the dma_addr of the sg_table into a struct page. These pages are
-+	 * used by code specifically equipped to handle them, so this
-+	 * conversation from ZONE_DEVICE page to page pool page should be safe.
-+	 */
-+	dma_addr = (dma_addr_t)page->zone_device_data;
-+
-+	set_page_zone(page, ZONE_NORMAL);
-+	page->pp_magic = 0;
-+	page_pool_set_pp_info(pool, page);
-+
-+	page->dma_addr = dma_addr;
-+
-+	return page;
-+}
-+
-+static bool mp_dmabuf_devmem_release_page(struct page_pool *pool,
-+		struct page *page)
-+{
-+	struct dma_buf_pages *priv = pool->mp_priv;
-+	unsigned long dma_addr = page->dma_addr;
-+
-+	page_pool_clear_pp_info(page);
-+
-+	/* As the page pool releases the page, restore it back to a ZONE_DEVICE
-+	 * page so it gets freed according to the
-+	 * page->pgmap->ops->page_free().
-+	 */
-+	set_page_zone(page, ZONE_DEVICE);
-+	page->zone_device_data = (void*)dma_addr;
-+	page->pgmap = &priv->pgmap;
-+	put_page(page);
-+
-+	/* Return false here as we don't want the page pool touching the page
-+	 * after it's released to us.
-+	 */
-+	return false;
-+}
-+
-+const struct pp_memory_provider_ops dmabuf_devmem_ops = {
-+	.init			= mp_dmabuf_devmem_init,
-+	.destroy		= mp_dmabuf_devmem_destroy,
-+	.alloc_pages		= mp_dmabuf_devmem_alloc_pages,
-+	.release_page		= mp_dmabuf_devmem_release_page,
-+};
-+EXPORT_SYMBOL(dmabuf_devmem_ops);
--- 
-2.41.0.390.g38632f3daf-goog
-
+> It seems like it might a bit cleaner to explicitly ask for -1:
+> bpf_program__attach_tcx(..., { ..., relative_fd =3D -1, ... });
+>
+> But whatever, it works anyway, and that's how it's been done elsewhere
+> it seems, so I'm not gonna waste our time on it.
 
