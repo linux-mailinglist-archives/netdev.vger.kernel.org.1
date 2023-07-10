@@ -1,260 +1,194 @@
-Return-Path: <netdev+bounces-16493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A494E74DA16
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:42:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD50474DA6C
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF2A52812B2
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 15:42:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 847D5281304
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 15:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB0912B76;
-	Mon, 10 Jul 2023 15:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D629B13AEC;
+	Mon, 10 Jul 2023 15:49:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6FE2F2F
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:42:27 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2081.outbound.protection.outlook.com [40.107.92.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10727B1
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 08:42:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mbW6AV8jkhfgVDDdx7VW0QaiVKyWH6SG792zV0IRf7qUoDAwb+j30a+LldoDrJIqzqDCXKo8oR5BcBdw0F80UFH9eU5PCBn/HZ+mu6e+J++yMDqWWFnlVvr5GSWkX3se6ZIDotgMvNODYfuJWW1R0HnryzQS8191NFoRHT4Tv2Iu2BOK9i7XOMovuCjDiySwFkk8qeXG8lD7Y6hFzbWGGIlkaMNfHdzZpqyC2g2pP2O6Jebkks8zUsDxbGIltfoQf3klePcT69vG47AhkVoZsVbDHxf+AFiLyKpGcqySHvLExYPv72S5F0vw6PJYKiqFkHwcZwPikiZS5am+vLkKgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C/WRwx0uKuTeMGFwCtfZ+QL30TOUUebOoq286GdU1AA=;
- b=Pp/gGKO7BcExAlgXOeYL/uOpClZumSdognOgHNs82bqBGvVAPYnKA/MJD5erkP1EAuruTmetSJrZWJoXhRexyAXI73HIiayNCF0R9dVzxGtXWs/7D9Qb1AAO9siuq/lPzuPpsAvNH8IMA4dELM0aBi6qTWM1AIkv4Z8nCOu7zDeGt1q3MT7itZwS88wUDQ37raovO//D9MvDbegaG674MIEtl63SnfHoHunrgwBHGlkaMCQ1kqMmS05gYSnuJ7PwHfESsC9jKMMBcTA7jktYR7L44l0eaAdbM8hqL0Yl/jwC9wWP2Z9lkUS8Lp7+sSWm/4djC9IeJiszjqiYmB6VyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C/WRwx0uKuTeMGFwCtfZ+QL30TOUUebOoq286GdU1AA=;
- b=nVIimpip/gc98vsUGcR27N1AhBDoGVfUMPNyjRXKg8C/QflvSfvNv+xrN/pzlZyLEEAfrJ7cD8TBK+UJ8Ov31PHiNq3AE1De1nZ1FAmB0ub/m70wFYs6rEH6q/kx6SLIvX79PUHiE8kwE2JYUQh5822T/umlyH8efr/KyMnDFB4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- MN0PR12MB6365.namprd12.prod.outlook.com (2603:10b6:208:3c2::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
- 2023 15:42:23 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::818a:c10c:ce4b:b3d6]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::818a:c10c:ce4b:b3d6%4]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
- 15:42:23 +0000
-Message-ID: <82bf6210-6615-5d33-e3c5-808cfa8cba6d@amd.com>
-Date: Mon, 10 Jul 2023 08:42:19 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH virtio 1/4] pds_vdpa: reset to vdpa specified mac
-Content-Language: en-US
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, virtualization@lists.linux-foundation.org,
- brett.creeley@amd.com, netdev@vger.kernel.org, drivers@pensando.io,
- Allen Hubbe <allen.hubbe@amd.com>
-References: <20230630003609.28527-1-shannon.nelson@amd.com>
- <20230630003609.28527-2-shannon.nelson@amd.com>
- <CACGkMEthwPRtawkpJMZ5o+H=pOxGszaxOsmKuRH4LkPXrfzRoA@mail.gmail.com>
- <92b6697b-4d33-457d-b9b5-ec16926cd9fa@amd.com>
- <CACGkMEtyJajf=xTmna66CbxxaYVXmeo5+dyw__wqrB=EwfdeqQ@mail.gmail.com>
-From: Shannon Nelson <shannon.nelson@amd.com>
-In-Reply-To: <CACGkMEtyJajf=xTmna66CbxxaYVXmeo5+dyw__wqrB=EwfdeqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BYAPR02CA0009.namprd02.prod.outlook.com
- (2603:10b6:a02:ee::22) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88A113AE3
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:49:37 +0000 (UTC)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CCD6120;
+	Mon, 10 Jul 2023 08:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689004175; x=1720540175;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qyXZ9l/eDXJvwNtej9Cq3pKS54WfQZS0AfJJYPgySOQ=;
+  b=YD034t0iWhNNRDSR5CNWBLBVZqqkLiHq0H9nmZsm0SeXKdYZJBYwIQdN
+   6UUf3gzcqyoHjy2BbpSI15PZxt5963grIkQnwyGHYsBZKINgib9vXNSHD
+   0GEOPkv+spm9aIsFuTgpk9FrgX4XvYOWGsPHbHy7qtYhV8380oCOkDu2v
+   RY44WJNMv3CzWTak46NNAjccZSqilXugKCW2HXFaPpPqFrPo6hKuFOPH7
+   8ZhjZXnwIsSdhLYY9mljLwhrKON5vAdoQrjEL2z8m5cxN+wFpNZE3S2PL
+   kI+7gimYbri54DwRPfOkX0ePgWJfN8e46pP7YtwGuqYmhI9aDyFnKn9h4
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="366955196"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="366955196"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 08:49:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="671015610"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="671015610"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga003.jf.intel.com with ESMTP; 10 Jul 2023 08:49:29 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 115861FC; Mon, 10 Jul 2023 18:49:33 +0300 (EEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Mark Brown <broonie@kernel.org>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
+	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-spi@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Sanjay R Mehta <sanju.mehta@amd.com>,
+	Radu Pirea <radu_nicolae.pirea@upb.ro>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Orson Zhai <orsonzhai@gmail.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Chunyan Zhang <zhang.lyra@gmail.com>,
+	Alain Volmat <alain.volmat@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH v2 00/15] spi: Header and core clean up and refactoring
+Date: Mon, 10 Jul 2023 18:49:17 +0300
+Message-Id: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MN0PR12MB6365:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7388152-ade2-4b8f-859f-08db815c40d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IEhzTRQkYXyySbzyM8UD2k/aAVznviaT+vgk0eGpAQ0fY+ODfH3VVMdZdu4F3Sy3vpp3plf+cbZefbdUeMeHXsJ9zwr8V1/+QZ9lvloXGHSYKboAfoapEvH41+qiACKWfQ388oc07Kv5Ep0G7pMEtPoxT9yEBH6E6AbrgsyubIDsYnPmqDW3tkwCb1YlWuf+den6rY5dlEt0rY3EGtZfyNnOiQ9vuPJyNT27tDqFAjaljjp3tqZR8gAGDvhqAVKJmOUWkOq5pLicw9oXBc2V3d5pexmNWmcTUDxo8NHM19ngTwyec/8aS0RUbq7V4lsbzqoq4fUjDeOsIauKSuIb2YPQgj4ewESEgOKla891LFI79ziOPgqH39R/BJYbQGmUiAWOpm2SAyAomZowdo0EY4Fg9JV3BJ74gaC3lPTHTf5kL/Nin95xXnJamzAKOxeJgYtpaRfA8Seb0Skv/DyshH4H1kW/okKCiuhg/xVrEaQkpPG7Z7A+wy3EzPBxk/q6+XviPzUODXof6rdifqOTH0iQHuJvgoBD+bq0MDEDtgnRVKpU5PKPVRzCfdkwmTjQc+mAegORF56jiasWx/oapE546MYkgXa23xyAh26KFn5ePiHP8tK+l+Jd9T/0vsXZ/i5SaNHNny3dY7pBDCoFEg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(366004)(376002)(39860400002)(136003)(451199021)(31686004)(4326008)(6666004)(478600001)(83380400001)(2616005)(31696002)(86362001)(36756003)(2906002)(44832011)(26005)(6512007)(53546011)(6506007)(6486002)(186003)(38100700002)(66946007)(66476007)(66556008)(6916009)(316002)(41300700001)(8676002)(8936002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cEJUVE5Zb01sWnUwQ2pHdStDQ24wOUhkQUs2SWNlajN5RTVzbmZaZC9GcEp0?=
- =?utf-8?B?WlRpeEQxRHFaQ0JGL3FTRFlMenNXUFZ0YWVJTk13THR1UWxwdU9yWVNwbjVj?=
- =?utf-8?B?V0dUVjlRTmNib0J1VDIyL1R1RXZWQ3E2QnMvUS92d0JpWlU5RTdEMW80NVJp?=
- =?utf-8?B?R2l4cG15N3c3MkhacVZ2d3ZVa1c1dGRIZEtQRlRMRGYvMC9WRm1JK2c5TzVF?=
- =?utf-8?B?d3dpcWk0NGlQbHdGOGJVZHU1SG9Jdk5TenlKeHdtSlk1bHl1M2FXbHI4MnJS?=
- =?utf-8?B?enJJR3YvdmI1QXgyKzk4L1V4a1VNek0wKytZajFlczQ5Q01SQ2tXeVhhdnls?=
- =?utf-8?B?MU5mcSt6TjltbFBvU3FVYW5QTmRVODdiTVY1U3JFT3BWaVZLcDhzZXRwMXE1?=
- =?utf-8?B?TkM1U2pYTmpPN2JoMHJ2NXd4TklLTEZhZ1lkUHVIMXNKc0YzV0FMSFZHZFRR?=
- =?utf-8?B?TFBjVGxKUDJ5aVBwU3h5S1VlcG1XdTdWR0wya3FwbmFBTDlpUjFjZEpqRmZU?=
- =?utf-8?B?b05xSUhiOVRUSkFTb3dFbFFPSjRoVnpmRDNnTWF0YjA3UEgrV0cyOXBoOEcy?=
- =?utf-8?B?eG9kMFBqRUZ5ZmRIci9JUmlyNDV0VDVoNWVpVUh5VGJLRjVKQWhITGFPYlpn?=
- =?utf-8?B?WlJRU0duelZWZDA3WXpQa1dzS0JKcFAyU3B3VWdxc0FTMlpReks5cjdEa1RK?=
- =?utf-8?B?Vm8vTFd5UTJRSHk1b0lLQ3ArWStvN0FQS0I1UGxaRExHVGRYYmtSYmlGNEY1?=
- =?utf-8?B?SWlaYVRhZlRJeERIWmRxeEFoM1loRy95Skg4ZFRZa2NIaFp1TFRxR1FLa29o?=
- =?utf-8?B?bE5IN3RqU1hpSWp3UEFzcjF3ejRFakFXRVQ3UmlZajFYT2p3TVhPTjZOa2Zq?=
- =?utf-8?B?aFJLdVlZRVd5WEdTamMwUDlBYjJOQXN0VTJkU3RSNzYzMmZvYVhmb1FMWGQ4?=
- =?utf-8?B?SjYrNXFrRkE3TDFQT0d0TkFhc1JJSnpTL0ZUTFYrV2dZcHBESjFSSFVyUW0r?=
- =?utf-8?B?ZDNLR2FEa0Z3b29PRU00R2MyeDhkR0NQQmNwMTM5ZE5DSTNJZm9mZnZBcW5i?=
- =?utf-8?B?QXcwZ2FOTUVYbWUzekdHQ291R2VITEJFcnVuZDIzZmQzY1ZYczJLSVJDdWlo?=
- =?utf-8?B?a0czWHZ1Z0RtQXBpMEFQZ2M4Q1VlUDdYdnFCNFc5ZEkvclhxOVBKN2tVUHI0?=
- =?utf-8?B?Z2FWbW9QSXNEbnpxQzFtUittWE11OWtmS0RDRWVIVUo5UHFIS3o5NFFWSEdo?=
- =?utf-8?B?RDk2MzR2RUFNajBJblVPTHFxNy8zQXNteHl3Z0t1NXFvUjJBOUdKMEJBUnJP?=
- =?utf-8?B?T1NDR3phZU5LN2dlM0REclRUeFBpZUlMbjNqL2szZzlwWXdUSytwZk5aYzNJ?=
- =?utf-8?B?cFBSY3BER3RWZnNnMzF0UFdXeUdiZnllZmE2MGpQTHlwa3d4TXZ2T0crRUN3?=
- =?utf-8?B?ZWVmc1lIMkQyM3M1d0VuU3k0WjVsNWlYTmdKcnRiRzdUdjlQYy9ZWUdCMjc3?=
- =?utf-8?B?TmEzUjV3eFZHalRUQXBjdGpJaFZQNzRRVHFyUm10OUNEZzgzbzN4dGJQT0Uy?=
- =?utf-8?B?RmIxZXpjVEpoNVRjTzZTTjB4cHJJT1VuT1lHcVoyN1A1dUl5aE9SM3hTanpw?=
- =?utf-8?B?VVFNUVFpZXdnS3Y5Mmlkbzk2REpKbEx0bmIrbDRCaFRDVzAwaGlqbSszUis1?=
- =?utf-8?B?K3pQa2VhUktJYTZ6U20zZENmSnZuT0t6V04xQkRSSVNHTWJsNW9BYWlYekVz?=
- =?utf-8?B?SmpDZVY1ZXl3SzFsbXJIdjlSWHlYSW56aTBkUXJ6aDFIUkRLRXJXU1lISE1F?=
- =?utf-8?B?RVlnR29tdm1jNVlMK0FkRVJILzVsSnBwMHVlSXplb2VXcElXR0tnMEJDNmtV?=
- =?utf-8?B?aUVvWnUxZVY3bXN2ODFERTNFV0htOXYxU3ltUVQxUHByZHBUWDMrbkp3L1Vy?=
- =?utf-8?B?dVo1ZDV5ZnQxd0lhMGgyVWV1L3JYc2FVRkpranlsK3BIQklidU05NjJZSE4x?=
- =?utf-8?B?dEhKM241SUZNbUphS001RGRYV2tOM0RCQTN5RzgxcTQvdjE3ZXRaem52b1lE?=
- =?utf-8?B?V1daSEFjN2xCNFk1MmJ3amcxR3ZpMnM4YSthU1M1ZW9XODVzRWM5K2daYTNB?=
- =?utf-8?Q?ioy0BQ9LObU6OBMeJ4uQ1EZZK?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7388152-ade2-4b8f-859f-08db815c40d7
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 15:42:23.0019
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3frwtlYYXOSyM9r+qCzo50IgTUcebPI2gi8nDyH6l80on8bN4DlcSSx7LvoGEqDu7PtAdgkC7rzyVwexzOPUtA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6365
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/9/23 8:04 PM, Jason Wang wrote:
-> 
-> On Sat, Jul 8, 2023 at 4:12 AM Shannon Nelson <shannon.nelson@amd.com> wrote:
->>
->>
->>
->> On 7/7/23 12:33 AM, Jason Wang wrote:
->>> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->>>
->>>
->>> On Fri, Jun 30, 2023 at 8:36 AM Shannon Nelson <shannon.nelson@amd.com> wrote:
->>>>
->>>> From: Allen Hubbe <allen.hubbe@amd.com>
->>>>
->>>> When the vdpa device is reset, also reinitialize it with the mac address
->>>> that was assigned when the device was added.
->>>>
->>>> Fixes: 151cc834f3dd ("pds_vdpa: add support for vdpa and vdpamgmt interfaces")
->>>> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
->>>> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
->>>> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
->>>> ---
->>>>    drivers/vdpa/pds/vdpa_dev.c | 16 ++++++++--------
->>>>    drivers/vdpa/pds/vdpa_dev.h |  1 +
->>>>    2 files changed, 9 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/drivers/vdpa/pds/vdpa_dev.c b/drivers/vdpa/pds/vdpa_dev.c
->>>> index 5071a4d58f8d..e2e99bb0be2b 100644
->>>> --- a/drivers/vdpa/pds/vdpa_dev.c
->>>> +++ b/drivers/vdpa/pds/vdpa_dev.c
->>>> @@ -409,6 +409,8 @@ static void pds_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
->>>>                           pdsv->vqs[i].avail_idx = 0;
->>>>                           pdsv->vqs[i].used_idx = 0;
->>>>                   }
->>>> +
->>>> +               pds_vdpa_cmd_set_mac(pdsv, pdsv->mac);
->>>
->>> So this is not necessarily called during reset. So I think we need to
->>> move it to pds_vdpa_reset()?
->>
->> pds_vdpa_reset() calls pds_vdpa_set_status() with a status=0, so this is
->> already covered.
-> 
-> Yes, but pds_vdpa_set_status() will be called when status is not zero?
+Various cleanups and refactorings of the SPI header and core parts
+united in a single series. It also touches drivers under SPI subsystem
+folder on the pure renaming purposes of some constants.
 
-Yes, but the set_mac is only done with status==0, whether called by 
-reset or called when some other thing calls set_status with status==0.
+No functional change intended.
 
-sln
+Changelog v2:
+- added new patches 3,4,5,10,13,14
+- massaged comment and kernel doc in patch 9
+- split used to be patch 4 to patches 11,12
+- covered a few things in SPI core in patch 15
+- amended commit message for above (Mark)
+- reshuffled patches in the series for better logical grouping
 
+Andy Shevchenko (15):
+  spi: Remove unneeded OF node NULL checks
+  spi: Drop duplicate IDR allocation code in spi_register_controller()
+  spi: Replace if-else-if by bitops and multiplications
+  spi: Replace open coded spi_controller_xfer_timeout()
+  spi: Remove code duplication in spi_add_device_locked()
+  spi: Use sysfs_emit() to instead of s*printf()
+  spi: Sort headers alphabetically
+  spi: Clean up headers
+  spi: Use struct_size() helper
+  spi: Use predefined constants from bits.h and units.h
+  spi: Get rid of old SPI_MASTER_NO_TX & SPI_MASTER_NO_RX
+  spi: Get rid of old SPI_MASTER_MUST_TX & SPI_MASTER_MUST_RX
+  spi: Rename SPI_MASTER_GPIO_SS to SPI_CONTROLLER_GPIO_SS
+  spi: Convert to SPI_CONTROLLER_HALF_DUPLEX
+  spi: Fix spelling typos and acronyms capitalization
 
-> 
-> Thanks
-> 
->>
->> sln
->>
->>>
->>> The rest looks good.
->>>
->>> Thanks
->>>
->>>>           }
->>>>
->>>>           if (status & ~old_status & VIRTIO_CONFIG_S_FEATURES_OK) {
->>>> @@ -532,7 +534,6 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
->>>>           struct device *dma_dev;
->>>>           struct pci_dev *pdev;
->>>>           struct device *dev;
->>>> -       u8 mac[ETH_ALEN];
->>>>           int err;
->>>>           int i;
->>>>
->>>> @@ -617,19 +618,18 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
->>>>            * or set a random mac if default is 00:..:00
->>>>            */
->>>>           if (add_config->mask & BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
->>>> -               ether_addr_copy(mac, add_config->net.mac);
->>>> -               pds_vdpa_cmd_set_mac(pdsv, mac);
->>>> +               ether_addr_copy(pdsv->mac, add_config->net.mac);
->>>>           } else {
->>>>                   struct virtio_net_config __iomem *vc;
->>>>
->>>>                   vc = pdsv->vdpa_aux->vd_mdev.device;
->>>> -               memcpy_fromio(mac, vc->mac, sizeof(mac));
->>>> -               if (is_zero_ether_addr(mac)) {
->>>> -                       eth_random_addr(mac);
->>>> -                       dev_info(dev, "setting random mac %pM\n", mac);
->>>> -                       pds_vdpa_cmd_set_mac(pdsv, mac);
->>>> +               memcpy_fromio(pdsv->mac, vc->mac, sizeof(pdsv->mac));
->>>> +               if (is_zero_ether_addr(pdsv->mac)) {
->>>> +                       eth_random_addr(pdsv->mac);
->>>> +                       dev_info(dev, "setting random mac %pM\n", pdsv->mac);
->>>>                   }
->>>>           }
->>>> +       pds_vdpa_cmd_set_mac(pdsv, pdsv->mac);
->>>>
->>>>           for (i = 0; i < pdsv->num_vqs; i++) {
->>>>                   pdsv->vqs[i].qid = i;
->>>> diff --git a/drivers/vdpa/pds/vdpa_dev.h b/drivers/vdpa/pds/vdpa_dev.h
->>>> index a1bc37de9537..cf02df287fc4 100644
->>>> --- a/drivers/vdpa/pds/vdpa_dev.h
->>>> +++ b/drivers/vdpa/pds/vdpa_dev.h
->>>> @@ -39,6 +39,7 @@ struct pds_vdpa_device {
->>>>           u64 req_features;               /* features requested by vdpa */
->>>>           u8 vdpa_index;                  /* rsvd for future subdevice use */
->>>>           u8 num_vqs;                     /* num vqs in use */
->>>> +       u8 mac[ETH_ALEN];               /* mac selected when the device was added */
->>>>           struct vdpa_callback config_cb;
->>>>           struct notifier_block nb;
->>>>    };
->>>> --
->>>> 2.17.1
->>>>
->>>
->>
-> 
+ drivers/spi/spi-amd.c             |   2 +-
+ drivers/spi/spi-at91-usart.c      |   2 +-
+ drivers/spi/spi-ath79.c           |   2 +-
+ drivers/spi/spi-atmel.c           |   4 +-
+ drivers/spi/spi-bitbang-txrx.h    |  16 +--
+ drivers/spi/spi-bitbang.c         |   8 +-
+ drivers/spi/spi-cavium-thunderx.c |   2 +-
+ drivers/spi/spi-davinci.c         |   2 +-
+ drivers/spi/spi-dw-core.c         |   2 +-
+ drivers/spi/spi-falcon.c          |   2 +-
+ drivers/spi/spi-fsl-lpspi.c       |   2 +-
+ drivers/spi/spi-gpio.c            |  10 +-
+ drivers/spi/spi-imx.c             |   2 +-
+ drivers/spi/spi-lp8841-rtc.c      |  10 +-
+ drivers/spi/spi-meson-spicc.c     |   2 +-
+ drivers/spi/spi-mt65xx.c          |   2 +-
+ drivers/spi/spi-mxs.c             |   2 +-
+ drivers/spi/spi-omap-uwire.c      |   2 +-
+ drivers/spi/spi-orion.c           |   2 +-
+ drivers/spi/spi-pci1xxxx.c        |   2 +-
+ drivers/spi/spi-pic32-sqi.c       |   2 +-
+ drivers/spi/spi-pic32.c           |   2 +-
+ drivers/spi/spi-qcom-qspi.c       |   2 +-
+ drivers/spi/spi-rb4xx.c           |   2 +-
+ drivers/spi/spi-rockchip-sfc.c    |   2 +-
+ drivers/spi/spi-rockchip.c        |   2 +-
+ drivers/spi/spi-sifive.c          |   2 +-
+ drivers/spi/spi-slave-mt27xx.c    |   2 +-
+ drivers/spi/spi-sprd-adi.c        |   2 +-
+ drivers/spi/spi-stm32.c           |   2 +-
+ drivers/spi/spi-ti-qspi.c         |   2 +-
+ drivers/spi/spi-xcomm.c           |   2 +-
+ drivers/spi/spi-xtensa-xtfpga.c   |   2 +-
+ drivers/spi/spi.c                 | 204 ++++++++++++------------------
+ include/linux/spi/spi.h           | 198 +++++++++++++++++------------
+ include/trace/events/spi.h        |   2 +-
+ 36 files changed, 247 insertions(+), 261 deletions(-)
+
+-- 
+2.40.0.1.gaa8946217a0b
+
 
