@@ -1,165 +1,89 @@
-Return-Path: <netdev+bounces-16323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4AFD74CB5C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:45:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5205B74CB7E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:04:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F2731C208D0
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 04:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2971C2089A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 05:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF75D179;
-	Mon, 10 Jul 2023 04:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED467210C;
+	Mon, 10 Jul 2023 05:04:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1E923A8;
-	Mon, 10 Jul 2023 04:45:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE33C433C8;
-	Mon, 10 Jul 2023 04:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4A3179
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 05:04:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9DBC433C8;
+	Mon, 10 Jul 2023 05:04:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688964327;
-	bh=23Pfa5VQdzJCFB47DoTz0zuX9vR9F1OcJztYrLTuvkg=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=eLIlAPzdG0BYcspLLiI0DvQjTsF0yUIfXUx/MhiuWYS/gAnOM0df/yD6e1wmz5m15
-	 7lAPpGfoDV5bMoQ99B65bzn8rUl9X7g0S//acODTz4KD8o4Mrv3fMslC7G8MYQflMZ
-	 piNXRxKWCb21SzAs+vsA+LC1/VQrBbavV7lN3l8PkXMaPog48MkPjdQYjbSjZui0pz
-	 dvL//A3ox/tQ87wlPmaoZ08gIaK7hpUfmXqi7s3Zl9GWbzWwSr9EYAp8ZuOFfHzEX6
-	 NTv0hZ+Cd39qMPwS3gp6sq0lKXvoU0SjFOWdgoQQt3CoDMYVF27MF9ozb2fjPdgWMG
-	 wQR63u1LgzKGA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id E5190CE00A4; Sun,  9 Jul 2023 21:45:25 -0700 (PDT)
-Date: Sun, 9 Jul 2023 21:45:25 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Hou Tao <houtao@huaweicloud.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org,
-	Network Development <netdev@vger.kernel.org>,
-	bpf <bpf@vger.kernel.org>, Kernel Team <kernel-team@fb.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	David Vernet <void@manifault.com>
-Subject: Re: [PATCH v4 bpf-next 09/14] bpf: Allow reuse from
- waiting_for_gp_ttrace list.
-Message-ID: <05074f73-9d84-41e8-8368-51311a794636@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
- <20230706033447.54696-10-alexei.starovoitov@gmail.com>
- <fe733a7b-3775-947a-23c0-0dadacabdca2@huaweicloud.com>
- <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
- <4e0765b7-9054-a33d-8b1e-c986df353848@huaweicloud.com>
- <CAADnVQJhrbTtuBfexE6NPA6q=cdh1vVxfVQ73ZR2u8ZZWRb+wA@mail.gmail.com>
- <224322d6-28d3-f3b7-fcac-463e5329a082@huaweicloud.com>
- <CAADnVQL5O5uzy=sewNJ=NFSGV7JTb3ONHR=V2kWiT1YdN=ax8g@mail.gmail.com>
- <3f72c4e7-340f-4374-9ebe-f9bffd08c755@paulmck-laptop>
- <bdfc76dc-459a-7c23-bb23-854742fbd0c3@huaweicloud.com>
+	s=k20201202; t=1688965457;
+	bh=p8YNjR5FTTbYpldel0JyzfCWG3L7Lf5CN238TGr/nxA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WJTx68/Zxf/bU3IANW7O+cWZUDIolnUEvYVYDSDs3yx+XAgGWvbWn8nQBOCdKOpJK
+	 rl/AmC5DvIy/PM1OJmYgvWR0datPINSx0nNZZIJcg1g0+GpbPWxR2YHp+MQjgmfgvx
+	 7FdiMG9tI3o/vz/cf0bdEDfqGo/NodVPiK8qyRuNyPwzJtxDzGVkZRtmxLHE6eM4iX
+	 skG6awDb1RF/wlU5DkOAfWIPVQVkWTVxPCZ4spZcaMGWVZEavHJabuZe1x/QUnWbgL
+	 zrroN06K8Bc1/jTNPmc4j36bYxjEEcRB+ibdWQjdBIj7OoE1MkcnNOjLKVnSTZaTZ+
+	 GFDAc5/7bs0YQ==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Andy Gross <agross@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [RESEND PATCH v2 0/5] arm64: dts: qcom: enable ethernet on sa8775p-ride
+Date: Sun,  9 Jul 2023 22:07:00 -0700
+Message-ID: <168896565968.1376307.18127304044280221873.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230622120142.218055-1-brgl@bgdev.pl>
+References: <20230622120142.218055-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <bdfc76dc-459a-7c23-bb23-854742fbd0c3@huaweicloud.com>
 
-On Sat, Jul 08, 2023 at 03:03:40PM +0800, Hou Tao wrote:
-> Hi,
-> 
-> On 7/8/2023 1:47 AM, Paul E. McKenney wrote:
-> > On Fri, Jul 07, 2023 at 09:11:22AM -0700, Alexei Starovoitov wrote:
-> >> On Thu, Jul 6, 2023 at 9:37 PM Hou Tao <houtao@huaweicloud.com> wrote:
-> SNIP
-> >>> I guess you're assuming that alloc_bulk() from irq_work
-> >>> is running within rcu_tasks_trace critical section,
-> >>> so __free_rcu_tasks_trace() callback will execute after
-> >>> irq work completed?
-> >>> I don't think that's the case.
-> >>> Yes. The following is my original thoughts. Correct me if I was wrong:
-> >>>
-> >>> 1. llist_del_first() must be running concurrently with llist_del_all().
-> >>> If llist_del_first() runs after llist_del_all(), it will return NULL
-> >>> directly.
-> >>> 2. call_rcu_tasks_trace() must happen after llist_del_all(), else the
-> >>> elements in free_by_rcu_ttrace will not be freed back to slab.
-> >>> 3. call_rcu_tasks_trace() will wait for one tasks trace RCU grace period
-> >>> to call __free_rcu_tasks_trace()
-> >>> 4. llist_del_first() in running in an context with irq-disabled, so the
-> >>> tasks trace RCU grace period will wait for the end of llist_del_first()
-> >>>
-> >>> It seems you thought step 4) is not true, right ?
-> >> Yes. I think so. For two reasons:
-> >>
-> >> 1.
-> >> I believe irq disabled region isn't considered equivalent
-> >> to rcu_read_lock_trace() region.
-> >>
-> >> Paul,
-> >> could you clarify ?
-> > You are correct, Alexei.  Unlike vanilla RCU, RCU Tasks Trace does not
-> > count irq-disabled regions of code as readers.
-> 
-> I see. But I still have one question: considering that in current
-> implementation one Tasks Trace RCU grace period implies one vanilla RCU
-> grace period (aka rcu_trace_implies_rcu_gp), so in my naive
-> understanding of RCU, does that mean __free_rcu_tasks_trace() will be
-> invoked after the expiration of current Task Trace RCU grace period,
-> right ? And does it also mean __free_rcu_tasks_trace() will be invoked
-> after the expiration of current vanilla RCU grace period, right ? If
-> these two conditions above are true, does it mean
-> __free_rcu_tasks_trace() will wait for the irq-disabled code reigion ?
 
-First, good show digging into the code!
-
-However, this is guaranteed only if rcu_trace_implies_rcu_gp(), which
-right now happens to return the constant true.  In other words, that is
-an accident of the current implementation.  To rely on this, you must
-check the return value of rcu_trace_implies_rcu_gp() and then have some
-alternative code that does not rely on that synchronize_rcu().
-
-> > But why not just put an rcu_read_lock_trace() and a matching
-> > rcu_read_unlock_trace() within that irq-disabled region of code?
-> >
-> > For completeness, if it were not for CONFIG_TASKS_TRACE_RCU_READ_MB,
-> > Hou Tao would be correct from a strict current-implementation
-> > viewpoint.  The reason is that, given the current implementation in
-> > CONFIG_TASKS_TRACE_RCU_READ_MB=n kernels, a task must either block or
-> > take an IPI in order for the grace-period machinery to realize that this
-> > task is done with all prior readers.
+On Thu, 22 Jun 2023 14:01:37 +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Thanks for the detailed explanation.
+> Bjorn,
 > 
-> > However, we need to account for the possibility of IPI-free
-> > implementations, for example, if the real-time guys decide to start
-> > making heavy use of BPF sleepable programs.  They would then insist on
-> > getting rid of those IPIs for CONFIG_PREEMPT_RT=y kernels.  At which
-> > point, irq-disabled regions of code will absolutely not act as
-> > RCU tasks trace readers.
-> >
-> > Again, why not just put an rcu_read_lock_trace() and a matching
-> > rcu_read_unlock_trace() within that irq-disabled region of code?
-> >
-> > Or maybe there is a better workaround.
+> Now that all other bits and pieces are in next, I'm resending the reviewed
+> DTS patches for pick up. This enables one of the 1Gb ethernet ports on
+> sa8775p-ride.
 > 
-> Yes. I think we could use rcu_read_{lock,unlock}_trace to fix the ABA
-> problem for free_by_rcu_ttrace.
+> [...]
 
-That sounds good to me!
+Applied, thanks!
 
-							Thanx, Paul
+[1/5] arm64: dts: qcom: sa8775p: add the SGMII PHY node
+      commit: 683ef77158cbb56ede2a524751b150cec340128a
+[2/5] arm64: dts: qcom: sa8775p: add the first 1Gb ethernet interface
+      commit: ff499a0fbb2352bff15d75c13afe46decf90d7eb
+[3/5] arm64: dts: qcom: sa8775p-ride: enable the SerDes PHY
+      commit: 5ef26fb8b3ed72cc5beb6461c258127e3a388247
+[4/5] arm64: dts: qcom: sa8775p-ride: add pin functions for ethernet0
+      commit: 48c99529998026e21a78f84261d24c0b93c1027e
+[5/5] arm64: dts: qcom: sa8775p-ride: enable ethernet0
+      commit: 120ab6c06f69b39e54c949542fa85fd49ff51278
 
-> >> 2.
-> >> Even if 1 is incorrect, in RT llist_del_first() from alloc_bulk()
-> >> runs "in a per-CPU thread in preemptible context."
-> >> See irq_work_run_list.
-> > Agreed, under RT, "interrupt handlers" often run in task context.
-> 
-> Yes, I missed that. I misread alloc_bulk(), and it seems it only does
-> inc_active() for c->free_llist.
-> > 						Thanx, Paul
-> 
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
