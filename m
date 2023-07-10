@@ -1,99 +1,218 @@
-Return-Path: <netdev+bounces-16412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E0474D1B7
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:35:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAAA174D209
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:46:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 809C51C208B8
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:35:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0CE2810BC
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC94101EA;
-	Mon, 10 Jul 2023 09:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4C1DDA4;
+	Mon, 10 Jul 2023 09:45:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0F2101D1
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:35:01 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15385135
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 02:35:00 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4QzzNd0PSsz1FDmq;
-	Mon, 10 Jul 2023 17:34:25 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 10 Jul
- 2023 17:34:56 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <steffen.klassert@secunet.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<shaozhengchao@huawei.com>
-Subject: [PATCH net 3/3] ip_vti: fix potential slab-use-after-free in decode_session6
-Date: Mon, 10 Jul 2023 17:40:53 +0800
-Message-ID: <20230710094053.3302181-4-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230710094053.3302181-1-shaozhengchao@huawei.com>
-References: <20230710094053.3302181-1-shaozhengchao@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED69DDA1
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 09:45:57 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1E8C10CA;
+	Mon, 10 Jul 2023 02:45:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688982355; x=1720518355;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=d7exP4plSIxF5xH78Efzg3zwyfsggIgaiFqM7HOOUxc=;
+  b=fbdV+zhfXF3nQ4p5r4f1UefLBKZJWyyNRNs/OdgE+WKwGFLqRglWid/y
+   OalPugNy2P0/pZNzRUFA5unlu6wl7o++odWI9zgkSyftqnoFeZtjxsEfj
+   aaStX+kA5BQdkmi0QSaGK4vZDeWEJPORb7WmtfQjq7cBdAcknlZvOD3Vv
+   JkoJye0U5xBSVpLLnp8pbzLV/drSRLtcr8KC5Ojrp15Z9IkjPLf8c/dYk
+   wwuMJhzrHfIKez+NazVqxO6oUxALCVl1lj32kd3kEaMXIpkgcRjf9YhHV
+   ge/NwBPxXAtme5MuiSxrgmk8xZhRMYV41T1zzBRny4ul9q3uUUFSUSZ59
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="427994079"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="427994079"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 02:45:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="670886326"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="670886326"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga003.jf.intel.com with ESMTP; 10 Jul 2023 02:45:54 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 02:45:54 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 02:45:53 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 02:45:53 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.108)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 10 Jul 2023 02:45:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hdlwYf/Eai3PL2hJSwVq4P1iiLeEAvA50tMHJTOQf+HmOU0YOyORkDH+u0Lg6T+7S8m9lTUmOaYcu53kVVxOBLNbYf5+aNNKR7nax1jOpdvC14hNOIHgwrR3jiAeW3Lqzj82hfnBi9MK970BoDR9MLE8xHAiQwJP8juYt8o6yyO/ZVd1o2REDhy47KS160/1KRHaVJdwRNgqUe7NP+87LOPFSv8wWFc0H2VtBSxYK1tj3A7KX7Rn6DYUTI20UeDL7+DFtlETm+s0TgUV/uAvISA+ZtoRxWomTSBmT1vRbUVnHzNk63legb9zOV1DPmuitOgzMO1zi9Yxz/kV5vpZWw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8QzlNQM7etd2Vc4zuNBZetsVI5/8fGZG2jbTmNkIu/U=;
+ b=b/3WqiBztK0ZnAT/AMwrLxoDSvnfAOGCJtUESiRzyC4eQ+cc0wH/vdJ25ylt72ZuIE29WFykYRliXavIJ7KFUYKUbKbVgYOMMD06hiaAOduaixwhIFapMEyHdBhv9HWpBjMrvzfZutLYgYvfQPUqSxQsZQZ7kOSd2KVNB9mgCWdLjgPZ8tLPukooSb1U9TQ1XeC5k7B8kAT6uJf6jOa95GQuysIKTIXq6lCC8KYGfiN/9iFrK73j/IAhGkV05taqmGilmC+YIKVna5zbyf24Lps/jv5qbZzyEQ7lPu+4MSnvRq185Y7NTMlXCleGFC4HiK3g7lOUnNRaGnA2DjYQ/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ DM4PR11MB5325.namprd11.prod.outlook.com (2603:10b6:5:390::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6565.30; Mon, 10 Jul 2023 09:45:46 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::24bd:974b:5c01:83d6]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::24bd:974b:5c01:83d6%3]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
+ 09:45:46 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "jiri@resnulli.us" <jiri@resnulli.us>, "vadfed@meta.com"
+	<vadfed@meta.com>, "jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "vadfed@fb.com" <vadfed@fb.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "M, Saeed" <saeedm@nvidia.com>,
+	"leon@kernel.org" <leon@kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>, "ricardo.canuelo@collabora.com"
+	<ricardo.canuelo@collabora.com>, "mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>, "Michalik, Michal"
+	<michal.michalik@intel.com>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "jacek.lawrynowicz@linux.intel.com"
+	<jacek.lawrynowicz@linux.intel.com>, "airlied@redhat.com"
+	<airlied@redhat.com>, "ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, "nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>, "Olech, Milena"
+	<milena.olech@intel.com>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>, "idosch@nvidia.com"
+	<idosch@nvidia.com>, "lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>, "phil@nwl.cc"
+	<phil@nwl.cc>, "claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
+	<mschmidt@redhat.com>, "linux-clk@vger.kernel.org"
+	<linux-clk@vger.kernel.org>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: RE: [RFC PATCH v9 01/10] dpll: documentation on DPLL subsystem
+ interface
+Thread-Topic: [RFC PATCH v9 01/10] dpll: documentation on DPLL subsystem
+ interface
+Thread-Index: AQHZpc/1HqWZmXZSIkW1j8k3PlGshq+gvrKAgBIcCpA=
+Date: Mon, 10 Jul 2023 09:45:45 +0000
+Message-ID: <DM6PR11MB4657FEDD367D6E9A9E0D3A209B30A@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
+	<20230623123820.42850-2-arkadiusz.kubalewski@intel.com>
+ <20230628141153.15709d97@kernel.org>
+In-Reply-To: <20230628141153.15709d97@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|DM4PR11MB5325:EE_
+x-ms-office365-filtering-correlation-id: 4cbf8185-f044-4651-4323-08db812a6f5a
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: K71Uyy6qrJlKqdwUMmegyMz45iVMPCB2ABwy3l2G/hu4fvQHOoymSyWBA0d9QcavQy+jh2GJIbk4KaXiFXe4g2sTRkXHhuuTvMoQW85AEy9XoEjxlrzPMGgCgYcmurKS/ZqA+ed8IJcugn+9FRpQauLwhUUtj3+FIFXut5jH/iwEGgWwbGUEhBKOYI7Tp7GaHXPJ6lCphcg6rG3kNEMyYkPgta2KGK7urH/T8A1lDR7uuek2UatYu2vUid00Tp4vXXQ7DbvoBD2jRtCs7SqjxsgW4qN8slKutB86veYq9P+6t2/wDC55WKRTW/pnslzer+eHXzlZ/IJisQacK2Ve6MRlBNH8kljgJNLj8+i2v7VoC7qJ68kDVek5/HV4XHOr+Sfyk7xzx0tcDjVEbL/fWVN5k4hXaypiVL/58tMKoqbDrgHy/3lIGgBIpEajKLppnOjaa6qY3DULXJSITtSrcgPbKqQDmQkze+QJDcaKkZ+bgIouf9R0ypu3SOXQ46MxyZhHbEIJmB6s0QGsxiIbyLyQ5NcgwpX8BMaa/CSdTY/5xnC+1gDZmjEROC4cjY49M0qLi7p0H9xlM5aNWLgZj+4QsLlS9XeQoJkNjI8y/KbbXV+/2dsEup/3i3eVHt0D
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(136003)(346002)(396003)(366004)(451199021)(186003)(9686003)(26005)(6506007)(83380400001)(41300700001)(4744005)(4326008)(64756008)(66446008)(66476007)(2906002)(66556008)(52536014)(316002)(7416002)(5660300002)(7406005)(8936002)(8676002)(6916009)(478600001)(66946007)(7696005)(76116006)(71200400001)(54906003)(55016003)(33656002)(122000001)(82960400001)(38070700005)(38100700002)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sPILxzvz1I1aS9pj43WQ6OpB5vdpUjvIzbivY639JtBwrTH1PuY8uu1J6mX5?=
+ =?us-ascii?Q?f+jSaFbik4pRe8QmHPRSdzsHdGB+tSceQeuMXxGR57zOJPT+rtB0IRQX1mYx?=
+ =?us-ascii?Q?IAGTbsmU3M82R+vO+p9vFtJk0gf8Z2hrAaWBJq1SL+owPCc+q5wxfUFGVFv1?=
+ =?us-ascii?Q?+WhVQE6ZmE9zg8oeZIt0+H3/lQEAD7oSd/a8D1sByIjkWxfgm3YbJDaa9bRs?=
+ =?us-ascii?Q?aCmbS8XS4kxOPjpSa9C0I3g62+cpgLToXkqm3X/0L8kmpoYlLElP9tWVIB3F?=
+ =?us-ascii?Q?aZB2QkR8xL9JXK/+evY374V9hLjl6hT+ai1pJnfORr6omaRGBQZiIjUkvEpo?=
+ =?us-ascii?Q?nIXAANd9Vin3ucSNz9wO7IhUOxI3WofYJqM0/oBn7EZH/+85G0aZOMRQfCUc?=
+ =?us-ascii?Q?h/lZHX5s4hBplbmhraLvhGzjUfSvkv3Ta4UljxCL4wTQ/nivdg1hDLlbSjFE?=
+ =?us-ascii?Q?0q5xq9x2psQpbhh/t2WnfdmmiRwXvudu6HAesaEHFJ+5n4j2d4tQ2IO3JeAG?=
+ =?us-ascii?Q?I22IkHDwkUwz/O0dOakMQ1hzXqcnBKK08sBypc26lOiV8d2Kfh6w7OvdXNZZ?=
+ =?us-ascii?Q?K0d//8wf3xrWD3D4cGilvxuICRwrQa5vF8pZ9kgbWRumRvJSdnA9T8xafY9g?=
+ =?us-ascii?Q?LDKgSgkVl7B9L8PkpkG3QU6MZy8CLmAWNKpTSDYb7iq7RBnnM7i8WQKRBjx2?=
+ =?us-ascii?Q?ZOSR1zdr9sKpkzld3Rke7Qbx4juh2gL+f3UjwUa8Xd8SMKk3XIMP6dgpq0q8?=
+ =?us-ascii?Q?KulIn2tDVPJedoYgLQZL06oRHbjYZufZ7gGyrmqEMj6uinJgeBU0uOmyTzHC?=
+ =?us-ascii?Q?zsOVJbKglWhu4mIn+4gBO+fLPyGg+tQRHNePKckJSskMmto6hGfvk9oZtfO8?=
+ =?us-ascii?Q?V+qLlWs0n1e6HQNWPiXrXo1hs2TO00LZSKw9QTefCNRIujQRgHsyjn4mzW8O?=
+ =?us-ascii?Q?cSjVz+UJj3s1PCmX9rYNjUJFxdoLTSIBv9t84/syUs9tNB62UCjK5WeF85B/?=
+ =?us-ascii?Q?LhEX4mBbIOgWSo9rn/VPRhmL8Oe1ZhXZ7y39f6g3jTOuZmmHoJ4TIxUP89+c?=
+ =?us-ascii?Q?iIFlB+cubICAUu3GTRo93sSIfyUvq9lkgF4Lklbc/sYq7PJ4Ppad+fe/FFLi?=
+ =?us-ascii?Q?cdlz4Y2e92cYzB7MXV0zIMlPN+9E7TvIBvNsPwgJ2SEr91yrkVz7rPoEaPKq?=
+ =?us-ascii?Q?o/96yoQ3yCmKlFNrko15jWNOLJeu5K8dremEHJnoTbtv4EXLZk+AWqdw9qSk?=
+ =?us-ascii?Q?rYNqe6kxglfWjzrclPHrg+6aGbN9mJrZxBLUgil/MoswfCtw3X4XaqhsDx2I?=
+ =?us-ascii?Q?h9CPAk3vQIDq7JL0k643wmeh59J3lXjY4hNPoOXSnuaLqrKWURHBL8b4S7hL?=
+ =?us-ascii?Q?cb5EX+Zi3gpECNIxFWrOvnmIRdv1Qxa4jX0jnnuMt44gx9cbcl7W2EDIeivK?=
+ =?us-ascii?Q?YVo+zA/LjItoDA15mSRdiqY9uk9a0XDl5hRwUifZimZ3T5UQw9R/t1t0Fykn?=
+ =?us-ascii?Q?hW5JE+6lMofIhD0C1nWOsTJXkoITlDMkGzJNfsDmnRjRhSwAyvV0YQcozfq4?=
+ =?us-ascii?Q?9HZA23sgeWm5rUcgZqAD69Fuy1jpXDjVrCDtCIKNqtDmTkTTiub84BnR5grU?=
+ =?us-ascii?Q?3w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4cbf8185-f044-4651-4323-08db812a6f5a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2023 09:45:45.9630
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FkOiiQcixzjzFIGen4Equ4WAy+nUhiXiQy0Bx4OFjlNjt9r0zDYgx37nBlb/dr17ZoyaOKfI78WdL/uZRSzdmHGaq5QJi5dza9oxolOdyhI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5325
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When ip_vti device is set to the qdisc of the sfb type, the cb field
-of the sent skb may be modified during enqueuing. Then,
-slab-use-after-free may occur when ip_vti device sends IPv6 packets.
-As commit f855691975bb ("xfrm6: Fix the nexthdr offset in
-_decode_session6.") showed, xfrm_decode_session was originally intended
-only for the receive path. IP6CB(skb)->nhoff is not set during
-transmission. Therefore, set the cb field in the skb to 0 before
-sending packets.
+>From: Jakub Kicinski <kuba@kernel.org>
+>Sent: Wednesday, June 28, 2023 11:12 PM
+>
+>On Fri, 23 Jun 2023 14:38:11 +0200 Arkadiusz Kubalewski wrote:
+>> +    'pin-parent': [{'pin-id': 2, 'pin-state': 'connected'},
+>> +                   {'pin-id': 3, 'pin-state': 'disconnected'},
+>> +                   {'id': 0, 'pin-direction': 'input'},
+>> +                   {'id': 1, 'pin-direction': 'input'}],
+>
+>This bit of documentation is out of date now, right?
 
-Fixes: f855691975bb ("xfrm6: Fix the nexthdr offset in _decode_session6.")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- net/ipv4/ip_vti.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+True, fixed for v10.
 
-diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
-index 53bfd8af6920..d1e7d0ceb7ed 100644
---- a/net/ipv4/ip_vti.c
-+++ b/net/ipv4/ip_vti.c
-@@ -287,12 +287,12 @@ static netdev_tx_t vti_tunnel_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	switch (skb->protocol) {
- 	case htons(ETH_P_IP):
--		xfrm_decode_session(skb, &fl, AF_INET);
- 		memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
-+		xfrm_decode_session(skb, &fl, AF_INET);
- 		break;
- 	case htons(ETH_P_IPV6):
--		xfrm_decode_session(skb, &fl, AF_INET6);
- 		memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
-+		xfrm_decode_session(skb, &fl, AF_INET6);
- 		break;
- 	default:
- 		goto tx_err;
--- 
-2.34.1
-
+Thank you!
+Arkadiusz
 
