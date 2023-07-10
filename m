@@ -1,98 +1,127 @@
-Return-Path: <netdev+bounces-16647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D9774E1D1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:06:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 022EF74E249
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BD71281481
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:06:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7FF91C20C6B
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3490B1774C;
-	Mon, 10 Jul 2023 23:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440B6168B2;
+	Mon, 10 Jul 2023 23:45:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292EE17742
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:03:21 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC1CEE48
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=EyhtIl8iNwnZ53cBhS0nr/S/j3djORhPgE1jFYLM2BY=; b=NH5798TI+tbxZ7e0scBfTXwoNu
-	9zte4Yy069Wnwl+tw+oOS5tBRKoDcr1mA5xug4WRCE12xyMuFb//fJusl/V02QdzTKOy941OBpygy
-	gy+lPhUBa45DwLeXmJRMYqDyGMEVxr9xrgc/U/8vX2q7cElqUYE9biCR6/jRR/EaHB+glcVj15HsF
-	DMCFR8HKZILkUCQsu6ggxHp5gx+LwZElsKnyBS5K5+HqBs+x+h2juX6w8tYiZ1JzDFMIDI2PqKkYc
-	/vp1wcpiNXsaZT0sKu5xv1HnbkjOP5265VIQuZItglbWANlc31DMKasAHqBGCevDwcesboicStQKe
-	plvh73Ag==;
-Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qIzuZ-00CuO1-1z;
-	Mon, 10 Jul 2023 23:03:19 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Kalle Valo <kvalo@kernel.org>
-Subject: [PATCH net 12/12] rsi: remove kernel-doc comment marker
-Date: Mon, 10 Jul 2023 16:03:12 -0700
-Message-ID: <20230710230312.31197-13-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230710230312.31197-1-rdunlap@infradead.org>
-References: <20230710230312.31197-1-rdunlap@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291BE14AAF;
+	Mon, 10 Jul 2023 23:45:47 +0000 (UTC)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6367F19A;
+	Mon, 10 Jul 2023 16:45:44 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b702319893so79876691fa.3;
+        Mon, 10 Jul 2023 16:45:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689032742; x=1691624742;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lOzkIFoqf25CqB9hUyPl1DnkRcrfld+HOSpLgyRrDcI=;
+        b=ZdWzHzRengZ9OTY5kYzIhNizMIm4bJBEhtBcpNLzYf8bkufwXdpeZzSjumeSma1n7K
+         XC2HvBGNTrYT7QAMvIQIHwpwCf75tsGFftgIaUUv02L6P/cLIvW8+2iQVl2nwII1gK8D
+         iWhWIQHbIK4ESR5cShCFBrJjjbRS1aNbz6et5bmomCrEOxZ+TB1KFdA3zgvMuhAexklA
+         JWwyVgGFwB7hhXIbXEZqvsSgIqjBaenaPPHzDTH2OzNNc54b7pGLIPx8emn6EI5fwRmF
+         4r46gtvcR0mN6dt4DmzKUP4FZ1ghVaQXJqWk6HvGMAa+AHku5sxKf6l+6v53jk3t0Oxh
+         OziA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689032742; x=1691624742;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lOzkIFoqf25CqB9hUyPl1DnkRcrfld+HOSpLgyRrDcI=;
+        b=kfMvgNuFC17vOibYVtTesaowZpKmx+EFqOcfa0Asfx5bOpFPtDTod1JT9GfgbVtLZ5
+         7kAZ4wo/mlwqKTN38qgOY7aWL51HEtgE0wHzTXkzqsjAn1OMrW6fy5mOIv3WkOmxyDv8
+         hj5nt5x9RI9r6Cg4fJ1hNvKBefuIban0i+7y7G7VyjhON98SmeWCtXqsh7ZhEdsQ/Ykn
+         8QZ2KJnoI2iUBY+wrrFGh7bMYmet7kPn3lW5KT5N4uzpPIgwnxAJloi07AUDxVjbbrSo
+         OouzeeoJeU5EccZWKuEdP7++5DvUhMmFS0CqMzB8zaYK/oAR2Ob+XG615sY+3Jaml8mL
+         rHgA==
+X-Gm-Message-State: ABy/qLa07zOuEAZ5W5N+llRc5nSKgDfyKGTvSbNLrC1K0mtFLNDQGdYe
+	AiSeXpIXcAMMrxGYLpBqFsd4QHGKOjBaS1Km+iA=
+X-Google-Smtp-Source: APBJJlFULHT8iLhB9w681CsXgyMHt2EsFqaBNl+XwT2OviAPgDtyoJbasP6q7D6vPnHpAvi/reCyP4wyfRqLiqoZsqE=
+X-Received: by 2002:a2e:780d:0:b0:2b6:d582:5a0 with SMTP id
+ t13-20020a2e780d000000b002b6d58205a0mr11825737ljc.12.1689032742222; Mon, 10
+ Jul 2023 16:45:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230708040750.72570-1-hffilwlqm@gmail.com> <20230708040750.72570-3-hffilwlqm@gmail.com>
+In-Reply-To: <20230708040750.72570-3-hffilwlqm@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 10 Jul 2023 16:45:30 -0700
+Message-ID: <CAADnVQK5RLqVhc9AxaCSuQxFRDAb8wohmUDNrYEViXLf5mEMNQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 2/2] bpf: Introduce bpf user log
+To: Leon Hwang <hffilwlqm@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Yizhou Tang <tangyeechou@gmail.com>, kernel-patches-bot@fb.com, 
+	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Change an errant kernel-doc comment marker (/**) to a regular
-comment to prevent a kernel-doc warning.
+On Fri, Jul 7, 2023 at 9:08=E2=80=AFPM Leon Hwang <hffilwlqm@gmail.com> wro=
+te:
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 34fa334938ba5..8a458cfcd91bd 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -1549,7 +1549,6 @@ union bpf_attr {
+>                 };
+>                 __u32           attach_type;    /* attach type */
+>                 __u32           flags;          /* extra flags */
+> -               struct bpf_generic_user_log log; /* user log */
+>                 union {
+>                         __u32           target_btf_id;  /* btf_id of targ=
+et to attach to */
+>                         struct {
+> @@ -1585,6 +1584,9 @@ union bpf_attr {
+>                                 __s32           priority;
+>                                 __u32           flags;
+>                         } netfilter;
+> +                       struct {
+> +                               struct bpf_generic_user_log ulog; /* user=
+ log */
+> +                       } xdp;
 
-rsi_91x.h:3: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
- * Copyright (c) 2017 Redpine Signals Inc.
+1.
+You cannot break api in patch 1 and fix it in patch 2.
 
-Fixes: 4c10d56a76bb ("rsi: add header file rsi_91x")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
-Cc: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Cc: Amitkumar Karwar <amit.karwar@redpinesignals.com>
-Cc: Kalle Valo <kvalo@kernel.org>
----
- include/net/rsi_91x.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+2.
+libbpf side is missing.
 
-diff -- a/include/net/rsi_91x.h b/include/net/rsi_91x.h
---- a/include/net/rsi_91x.h
-+++ b/include/net/rsi_91x.h
-@@ -1,4 +1,4 @@
--/**
-+/*
-  * Copyright (c) 2017 Redpine Signals Inc.
-  *
-  * Permission to use, copy, modify, and/or distribute this software for any
+3.
+selftest is missing.
+
+4.
+bpf_vlog_finalize() should be used and error propagated back through
+link_create.
+Same api must be used: log_level, log_size, log_buf, log_true_size.
+
+But considering all that I agree with Daniel Xu that
+tracepoint would be better here.
 
