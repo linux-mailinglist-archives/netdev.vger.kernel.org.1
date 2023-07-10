@@ -1,225 +1,184 @@
-Return-Path: <netdev+bounces-16378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27AE174CFD9
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:24:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2BEE74D021
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:38:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3DB1C209BB
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:24:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E1D41C20A11
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34444C2EE;
-	Mon, 10 Jul 2023 08:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0478441B;
+	Mon, 10 Jul 2023 08:38:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CAFA933
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 08:24:08 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8665E76
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 01:23:57 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99342a599e9so548927666b.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 01:23:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1688977436; x=1691569436;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lVVTTcakGIJzotpbfodORieW7nDILC8yQwEKuMOUYLA=;
-        b=v8PbxExQdeZ1rHkHw7LZ/7j9U0WaA1dkJRr1esV51tDnEYnz1yXdBnwheipucQw7iU
-         Dwny0J0H5BLnpfGCG5wzHd2FnzlN2eKCW8gMzeSEoxaUGxTKsnw6EvOsEUU4TK67JfFM
-         Fphyzekktczmyd9ASIWTNFAeo2y/sK6qzV5gvKJEWK5UQrHLGo1bEQy410Gg0pjYZAno
-         l+f8A80ndIBgzckm1LdIX5bAeQYPaJaXuB13ipB3GplwZOJY/GVnmBg1MPjebry6Ueg9
-         L5E9ztuma8giElufrDqCE9zHYDHjDcl1vKgQ9QXsO3zircBl8jFsHwzGNf5dL/40PtRb
-         4zSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688977436; x=1691569436;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lVVTTcakGIJzotpbfodORieW7nDILC8yQwEKuMOUYLA=;
-        b=WmKx6aiRbWQa2MHtsmnODOJ/FA+rdnHWkjSgL01/BdFdoOrsFLxDrnn6d66PN5o1ie
-         MoiZxngs6ehArAfBBleZIs7KcqM/bTuYWH3DJxNHIQGj5Zwhgs8XUav9cD8S013ezCDS
-         IGEqU0ZMw2FLHWcrC9DqW/tFZ6pbrCEgHVKXaAXHjRePxKk/i8VqVENzHTKV1bySOY7W
-         bDWD9IIUo7kXSYqQgJpwEi92Q/3W5Y5cyFcYIgZNU/ax9bBOGEDbBL60k5bST2arp/Fb
-         q0dMb5euy5kJqU9VngDXnGU0qjI7mMrWxllcXXD2w8EZK8kgF/cCDli2RBkEk5qa4h76
-         hprA==
-X-Gm-Message-State: ABy/qLZ/tX6gWMoCWNQ30rFCK0O8Mois7galwxf5QioSWC+n0dMcb8up
-	e3n0Z3r21kFsO13ayGaVqH8HeQ==
-X-Google-Smtp-Source: APBJJlF/N78SzaPnYo5KIYgXXWBnknej6T2zV2RqWE8pAe5WopCVgqY0xM4CSFkpZNpYhf0+V/cUNg==
-X-Received: by 2002:a17:906:101e:b0:993:fba5:cdf3 with SMTP id 30-20020a170906101e00b00993fba5cdf3mr5110018ejm.6.1688977436009;
-        Mon, 10 Jul 2023 01:23:56 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id u2-20020a1709063b8200b0098e42bef732sm5733689ejf.183.2023.07.10.01.23.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 01:23:55 -0700 (PDT)
-Date: Mon, 10 Jul 2023 10:23:53 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>,
-	"vadfed@meta.com" <vadfed@meta.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"vadfed@fb.com" <vadfed@fb.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"sj@kernel.org" <sj@kernel.org>,
-	"javierm@redhat.com" <javierm@redhat.com>,
-	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
-	"airlied@redhat.com" <airlied@redhat.com>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux@zary.sk" <linux@zary.sk>,
-	"masahiroy@kernel.org" <masahiroy@kernel.org>,
-	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
-	"geert+renesas@glider.be" <geert+renesas@glider.be>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"idosch@nvidia.com" <idosch@nvidia.com>,
-	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
-	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
-	"phil@nwl.cc" <phil@nwl.cc>,
-	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
-Subject: Re: [RFC PATCH v8 08/10] ice: implement dpll interface to control cgu
-Message-ID: <ZKvAGSwbJWEQmESs@nanopsycho>
-References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
- <20230609121853.3607724-9-arkadiusz.kubalewski@intel.com>
- <ZISmmH0jqxZRB4VX@nanopsycho>
- <DM6PR11MB4657161D2871747A7B404EDD9B5FA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZJLtR0c+tvCbUgri@nanopsycho>
- <ZJ0hQRcm6S05r8VE@nanopsycho>
- <DM6PR11MB465726733894C7E64AD3367E9B29A@DM6PR11MB4657.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05502F29
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 08:38:43 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 628811708;
+	Mon, 10 Jul 2023 01:38:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g/HM83Vpr9DONnqFZx/gqx3Xzr5d5B1XHqH5p0to18/SwrZRZuM0CW+pgIzJutHPpZKOgFAyaR/6zyhGL+kr69fRgCzEOVRPrSaj0DykEH5nP/Ntk1WVoo2YGCQjJBCbN81yrm2WlPl4yXejUUGI4JeYYCS04Uqy8I8aX4zSbJUKN1kbzvp79q2vkXUkFsnSYWFBBtlkI3wamAyW6zdlXz9dv0Hucv0E6RWwOXr0+9+74YWIoowpYZRWXyktBm5FiqyTZ/Xmi1zHwLSVX+Nyx4nZxWmD8u6pb86Nwb8LwK+QyfJgv10HTPmn1lo8TKeitwEYZBF4ckgUTHLwx/VFCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b1ZLqjyGsEfXdeQl6wdnj0y+tZzPHKhAmMCjn2mDj8I=;
+ b=YmAjdSfTkyeSQww+hm8FtgU9GilpuY7A/nb508LmQTyXD/lXK83UzENDewBMPUPp05gLEu7qqfdc7RK/sNXOmMCRPI3XDlPxYNckyGUFNyaUSOY+LZUjbGKc3HBmt5T1pM4Cp4/2AD6DJkgkbKJmdAWlozMcovr3Gl34Qk9C+eSPpgdLWTF/+n8agBCcfvLVbolWHsIeRdijn/m9uGeRULJ3TMDzuLpvcv98G0hsDPQu+wvvkX0kNFphHd9UHzb4d7p4arAoNs+pLhR6dX7r5S0hSJHxEjyXETYeTgURcs/O5QohcEpxBXvVpmuGfgJGNLpgg4fslnI0PBlbkUOi7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b1ZLqjyGsEfXdeQl6wdnj0y+tZzPHKhAmMCjn2mDj8I=;
+ b=19dD0zvy82HOl/2cd/0DHOoSOZVtYB0/lRsWCSoUMKDfZo93UEVf2f2oDClPLmG4XivxA+oxKeeYRb+2xbU2ZcS+tgWrNjSpDRBX9zk1QvgxddttUBgFjXTB8606k6vikXyiK/0dNoesFXU1i80/qVFM9K8v5pTzIbo+bkcZzfc=
+Received: from MW4PR03CA0004.namprd03.prod.outlook.com (2603:10b6:303:8f::9)
+ by MN2PR12MB4303.namprd12.prod.outlook.com (2603:10b6:208:198::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
+ 2023 08:38:26 +0000
+Received: from CO1NAM11FT003.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:8f:cafe::ad) by MW4PR03CA0004.outlook.office365.com
+ (2603:10b6:303:8f::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31 via Frontend
+ Transport; Mon, 10 Jul 2023 08:38:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT003.mail.protection.outlook.com (10.13.175.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6588.18 via Frontend Transport; Mon, 10 Jul 2023 08:38:26 +0000
+Received: from equan-buildpc.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Mon, 10 Jul
+ 2023 03:38:17 -0500
+From: Evan Quan <evan.quan@amd.com>
+To: <rafael@kernel.org>, <lenb@kernel.org>, <Alexander.Deucher@amd.com>,
+	<Christian.Koenig@amd.com>, <Xinhui.Pan@amd.com>, <airlied@gmail.com>,
+	<daniel@ffwll.ch>, <johannes@sipsolutions.net>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<Mario.Limonciello@amd.com>, <mdaenzer@redhat.com>,
+	<maarten.lankhorst@linux.intel.com>, <tzimmermann@suse.de>,
+	<hdegoede@redhat.com>, <jingyuwang_vip@163.com>, <Lijo.Lazar@amd.com>,
+	<jim.cromie@gmail.com>, <bellosilicio@gmail.com>, <andrealmeid@igalia.com>,
+	<trix@redhat.com>, <jsg@jsg.id.au>, <arnd@arndb.de>, <andrew@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<amd-gfx@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, Evan Quan
+	<evan.quan@amd.com>
+Subject: [PATCH V6 0/9] Enable Wifi RFI interference mitigation feature support
+Date: Mon, 10 Jul 2023 16:36:32 +0800
+Message-ID: <20230710083641.2132264-1-evan.quan@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB465726733894C7E64AD3367E9B29A@DM6PR11MB4657.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT003:EE_|MN2PR12MB4303:EE_
+X-MS-Office365-Filtering-Correlation-Id: d2d5f2cf-71cd-4416-0117-08db8121079e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TIyrvubnZbCFJjUTrfSXcNkLYsunFNUz1XPu1zHj7py6ty+oODmYeciF7/TRBgaXkH2AlcDHiNsmrr1b4t6U/T88N6tM3PimHqQzSXNyJZml+RJirbl6VF9/4rGqNcJEg68GTdNY4Bn2EsXBrBS+CIwpmhJGweUXRnFx20qa5xnWPgj5RFRVmrC/c+c5bQls0+JejzX8YJZuQX3kf2+zj082XIlsyT69117PpfcQ7xwdib/Ba5ZlRwWXwc0VK/X4v6MPMKgto7lfF/VsjYtDiRu1JrUTXmw+dq6ysE7hUGzyAqFt3oiu26FNTp/FLgoMaH/xReFM3nrkVF5KFLF13VDZGL+HVWlffX4tcFm83O72WUMMqP3mkvLcnWOUKDaHxkUxF+lXiKjU5WYY4aWe3iJsHophZOgfkb5lIALZE+TDYGt8Yy0/PLj3z2S5lIudY8tuU5lIQpHX2cTPVToP9MWrStLd7rCfquR0MvWZzfJC9m0U9muJpr6NDh1fEUve8UVQY9WhNTZxLkGj2n2qy2WmH6oLPgKgQnXsSMVA0qL7K+OzPRRvKAAjECZ04sFCJsUB7na3XdIfiUfw4ehoiKCH9zY2e5+24Yt8oM0zb2oOJJE8+2hVQrfQrIvSHq1b+B6aLnUWzhK3iKY5TLA3lxKGGKDlTM7LCHGB3i2qume4TDITQGksy2YGz/022QQECuO/MuiHZ8k2mKLZxuONN/mJieLx+el+Ffq48XAx0fZss8XgvU8HYnUmTwHY6MkrVJxsOn00sojqLwsoX7jtUHvCbcJzloD5y69ZO4D+jVLjo5r3DpvI0SZfwMEsZZM6cdRfngCxvvP/bPNWK/RYkA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(376002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(86362001)(82310400005)(82740400003)(40460700003)(40480700001)(36756003)(6666004)(7696005)(110136005)(54906003)(70206006)(70586007)(81166007)(356005)(921005)(36860700001)(16526019)(26005)(186003)(1076003)(2616005)(44832011)(7416002)(5660300002)(316002)(2906002)(478600001)(8676002)(8936002)(47076005)(336012)(426003)(83380400001)(4326008)(41300700001)(36900700001)(83996005)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 08:38:26.3194
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2d5f2cf-71cd-4416-0117-08db8121079e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1NAM11FT003.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4303
+X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mon, Jul 03, 2023 at 02:37:18PM CEST, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Thursday, June 29, 2023 8:14 AM
->>
->>Wed, Jun 21, 2023 at 02:29:59PM CEST, jiri@resnulli.us wrote:
->>>Mon, Jun 19, 2023 at 10:34:12PM CEST, arkadiusz.kubalewski@intel.com
->>wrote:
->>>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>>Sent: Saturday, June 10, 2023 6:37 PM
->>>>>
->>>>>Fri, Jun 09, 2023 at 02:18:51PM CEST, arkadiusz.kubalewski@intel.com
->>>>>wrote:
->>>>>
->>>>>[...]
->>>>>
->>>>>
->>>>>>+static int ice_dpll_mode_get(const struct dpll_device *dpll, void *priv,
->>>>>>+			     enum dpll_mode *mode,
->>>>>>+			     struct netlink_ext_ack *extack)
->>>>>>+{
->>>>>>+	*mode = DPLL_MODE_AUTOMATIC;
->>>>>
->>>>>I don't understand how the automatic mode could work with SyncE. The
->>>>>There is one pin exposed for one netdev. The SyncE daemon should select
->>>>>exacly one pin. How do you achieve that?
->>>>>Is is by setting DPLL_PIN_STATE_SELECTABLE on the pin-netdev you want to
->>>>>select and DPLL_PIN_STATE_DISCONNECTED on the rest?
->>>>>
->>>>>
->>>>>[...]
->>>>
->>>>AUTOMATIC mode autoselects highest priority valid signal.
->>>>As you have pointed out, for SyncE selection, the user must be able to
->>>>manually
->>>>select a pin state to enable recovery of signal from particular port.
->>>>
->>>>In "ice" case there are 2 pins for network PHY clock signal recovery, and
->>>>both
->>>>are parent pins (MUX-type). There are also 4 pins assigned to netdevs
->>>>(one per
->>>>port). Thus passing a signal from PHY to the pin is done through the MUX-
->>>>pin,
->>>>by selecting proper state on pin-parent pair (where parent pins is highest
->>>>prio
->>>>pin on dpll).
->>>
->>>Could you show me some examples please?
->>
->>Arkadiusz, could you please reply to this?
->>Thanks!
->>
->
->Sure, sorry for the delays, let's try that.
->
->'ice' use case:
->Enabling a PHY clock recovery for DPLL_MODE_AUTOMATIC dpll (ID#0) with PHY
->recovered clock signals (PIN_ID#13) being muxed using MUX-type pin (PIN_ID#2)
->
->1. Set MUX-type pin to state selectable and highest priority on a dpll device
->(or make sure it is already configured):
->CMD_PIN_SET:
->	PIN_ID			2
->	PIN_PARENT_DEVICE	(nest)
->		ID		0
->		PIN_STATE	SELECTABLE
->		PIN_PRIO	0
->(assume all the other pins have prio >=1)
->
->2. Set connected state on a pin-parent_pin tuple where parent is a pin from #1
->CMD_PIN_SET:
->	PIN_ID			13
->	PIN_PARENT_PIN		(nest)
->		PIN_ID		2
->		PIN_STATE	CONNECTED
+Due to electrical and mechanical constraints in certain platform designs there may
+be likely interference of relatively high-powered harmonics of the (G-)DDR memory
+clocks with local radio module frequency bands used by Wifi 6/6e/7. To mitigate
+possible RFI interference producers can advertise the frequencies in use and
+consumers can use this information to avoid using these frequencies for
+sensitive features.
 
-How does this look from the perspective of a SyncE flow. Let's say you
-have eth0 and eth1, both is connected with a DPLL pin. Could you show
-how you select eth0 and then eth1?
+The whole patch set is based on Linux 6.4. With some brief introductions as below:
+Patch1 - 2:  Core functionality setup for WBRF feature support
+Patch3 - 4:  Bring WBRF support to wifi subsystem.
+Patch5 - 9:  Bring WBRF support to AMD graphics driver.
 
 
+Evan Quan (9):
+  drivers core: Add support for Wifi band RF mitigations
+  driver core: add ACPI based WBRF mechanism introduced by AMD
+  cfg80211: expose nl80211_chan_width_to_mhz for wide sharing
+  wifi: mac80211: Add support for ACPI WBRF
+  drm/amd/pm: update driver_if and ppsmc headers for coming wbrf feature
+  drm/amd/pm: setup the framework to support Wifi RFI mitigation feature
+  drm/amd/pm: add flood detection for wbrf events
+  drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.0
+  drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
 
->
->Thank you!
->Arkadiusz
->
->>>
->>>
->>>>
->>>>Thank you!
->>>>Arkadiusz
+ drivers/acpi/Makefile                         |   2 +
+ drivers/acpi/amd_wbrf.c                       | 269 ++++++++++++++++++
+ drivers/base/Kconfig                          |  37 +++
+ drivers/base/Makefile                         |   1 +
+ drivers/base/wbrf.c                           | 250 ++++++++++++++++
+ drivers/gpu/drm/amd/amdgpu/amdgpu.h           |   1 +
+ drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c       |  19 ++
+ drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     | 213 ++++++++++++++
+ drivers/gpu/drm/amd/pm/swsmu/inc/amdgpu_smu.h |  33 +++
+ .../inc/pmfw_if/smu13_driver_if_v13_0_0.h     |  14 +-
+ .../inc/pmfw_if/smu13_driver_if_v13_0_7.h     |  14 +-
+ .../pm/swsmu/inc/pmfw_if/smu_v13_0_0_ppsmc.h  |   3 +-
+ .../pm/swsmu/inc/pmfw_if/smu_v13_0_7_ppsmc.h  |   3 +-
+ drivers/gpu/drm/amd/pm/swsmu/inc/smu_types.h  |   3 +-
+ drivers/gpu/drm/amd/pm/swsmu/inc/smu_v13_0.h  |   3 +
+ .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |   9 +
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |  60 ++++
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |  59 ++++
+ drivers/gpu/drm/amd/pm/swsmu/smu_internal.h   |   3 +
+ include/linux/acpi_amd_wbrf.h                 |  24 ++
+ include/linux/ieee80211.h                     |   1 +
+ include/linux/wbrf.h                          |  72 +++++
+ include/net/cfg80211.h                        |   8 +
+ net/mac80211/Makefile                         |   2 +
+ net/mac80211/chan.c                           |   9 +
+ net/mac80211/ieee80211_i.h                    |  19 ++
+ net/mac80211/main.c                           |   2 +
+ net/mac80211/wbrf.c                           | 103 +++++++
+ net/wireless/chan.c                           |   3 +-
+ 29 files changed, 1233 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/acpi/amd_wbrf.c
+ create mode 100644 drivers/base/wbrf.c
+ create mode 100644 include/linux/acpi_amd_wbrf.h
+ create mode 100644 include/linux/wbrf.h
+ create mode 100644 net/mac80211/wbrf.c
+
+-- 
+2.34.1
+
 
