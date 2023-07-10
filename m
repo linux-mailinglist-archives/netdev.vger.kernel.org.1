@@ -1,567 +1,274 @@
-Return-Path: <netdev+bounces-16465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE6474D5E8
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 14:41:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DBBF74D602
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 14:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61243281220
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 12:41:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D540228106B
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 12:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B045107B5;
-	Mon, 10 Jul 2023 12:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB8710961;
+	Mon, 10 Jul 2023 12:53:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF61C8F9;
-	Mon, 10 Jul 2023 12:41:45 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 589E011A;
-	Mon, 10 Jul 2023 05:41:38 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vn4CUGS_1688992893;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vn4CUGS_1688992893)
-          by smtp.aliyun-inc.com;
-          Mon, 10 Jul 2023 20:41:34 +0800
-Message-ID: <1688992712.1534917-3-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v11 10/10] virtio_net: merge dma operation for one page
-Date: Mon, 10 Jul 2023 20:38:32 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-11-xuanzhuo@linux.alibaba.com>
- <20230710051818-mutt-send-email-mst@kernel.org>
- <1688984310.480753-2-xuanzhuo@linux.alibaba.com>
- <20230710075534-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230710075534-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A885580C
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 12:53:48 +0000 (UTC)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A20EE5
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 05:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688993624; x=1720529624;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=olVRqiLZvBl08odmZMqm8uO575lwtRWt5OKPd4210Ag=;
+  b=jr6Lo1/iS4D3suvProNeR1d8wLA6SuCNaiXw/SapUbd+cpDj6lFsYWaH
+   MHVH1lVjCPM1aSq1cSD13JHzQYk85Ycyi3JJk+uUesBQcaPU/qW2VjQTR
+   GfdhyV4QLD+dkAkFX+qKWArvsGjBtbFhjNzE66czVkd+Hbmcd5FKj4EUr
+   aMPTJYA+kyzQNpEJJX+zijy03ws+6i/B2PUujiiiRKQCV1bwaca+SQTUr
+   tOBJdyriof+RfjEF9Ra8FU03YdMXJ/HtzhId3qOKDhCNblitWU4Sv586g
+   4Bo+7LTCjjadCYXUZcY2ECCPsdDVqCxCvMO30SCMS0vKtGdbpR0bac299
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="366907348"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="366907348"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 05:53:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="834260119"
+X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
+   d="scan'208";a="834260119"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga002.fm.intel.com with ESMTP; 10 Jul 2023 05:53:44 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 05:53:43 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 05:53:43 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 10 Jul 2023 05:53:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CUKEj41Suyr88kIWaezmGkKvMIG5yxG3frQtr+dNC6x1+44Wy1ZMz//BGJXJn0bjJixsrRFlFSgFRd/BRoaFECrGZDwW4MwnaqojozzFXs0+iF78aOjT57YJDbySe/47jmk/VEiZJJ6Y2bty+we2VZhHVf8fFllSkmPEcNr//eEIdnXbAjMFudXDvJ1+DGOMOdwXi80AowYvcSuzv9UWct5lIDYokckyQ3ZeFtbl8zcS0NIHPitc84n4f8bFPY1jpoQ1kqaLfrNo2nHn2OvAF0uVvNFW5X7AeSe1Yupdzyo6Yu7khRMMhPJ0YCsWRulc59gv8b3dK1j2EG49DeacKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=olVRqiLZvBl08odmZMqm8uO575lwtRWt5OKPd4210Ag=;
+ b=V0B8aPcUoUvfFypG2MRKeHdzyaiQunoL7+b3olSTrRXpNJbJhxppPREr9obmlQo1y5lT1gawkDcnDyPWA3jzcb8Cx03jf0aMV2vyJcOdSHA2+RNqpDgVoAS5ExGVo4btCxc/ry9hEchQqcbRLsn8NNjN9mHU9FzFXVlgl4ry0xbbdGi+N00l4hVLj//udqX/PbyAQKDcRufg8unj4vqjWqR7LeiI+RXFzh035QgGJ9H9rRQg/p1Kvwca3R8cSyzMo3tesZdaVdZzs3+g57Slj375U4s/IUicBfjagyleBVrxKcNlDMOMgR0aRqqoXXAAS51+oMk67+OdisjNF804iA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB2731.namprd11.prod.outlook.com (2603:10b6:5:c3::25) by
+ PH7PR11MB8570.namprd11.prod.outlook.com (2603:10b6:510:2ff::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6565.30; Mon, 10 Jul 2023 12:53:41 +0000
+Received: from DM6PR11MB2731.namprd11.prod.outlook.com
+ ([fe80::43c6:1db:cf90:a994]) by DM6PR11MB2731.namprd11.prod.outlook.com
+ ([fe80::43c6:1db:cf90:a994%4]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
+ 12:53:41 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, mschmidt
+	<mschmidt@redhat.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: RE: [PATCH iwl-net v3] ice: Fix memory management in
+ ice_ethtool_fdir.c
+Thread-Topic: [PATCH iwl-net v3] ice: Fix memory management in
+ ice_ethtool_fdir.c
+Thread-Index: AQHZr+vhEndH1gdKJ0+JkM5AXYf9cq+ujWoAgARtl5A=
+Date: Mon, 10 Jul 2023 12:53:41 +0000
+Message-ID: <DM6PR11MB273133BC65028765D6739FB8F030A@DM6PR11MB2731.namprd11.prod.outlook.com>
+References: <20230706091910.124498-1-jedrzej.jagielski@intel.com>
+ <4359387f-297a-7057-d7ed-770dc021086f@intel.com>
+In-Reply-To: <4359387f-297a-7057-d7ed-770dc021086f@intel.com>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB2731:EE_|PH7PR11MB8570:EE_
+x-ms-office365-filtering-correlation-id: aa5f4b62-c1a9-405c-eb0e-08db8144afdf
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: sR1vZ4WAWsNMCQ5p88vtfNfQYXRHxRqCF4OTg3qy9XAYRJEJbvq4F61AWGGU1bNqKspRSL06mmjwb6+DQSqq6TChBZI8p+EQtbuUmR3f9FVdHIkZwdtiGso3abVJKf/0zviXsMWqz8MWogcGlnlYNpoKCkzk59jbIGmXLRvdbE/QC0IBYprs1CCGl0Ar+1jEoAWS8r1D8K1bCRXJXZLEZFwUUB1m7CWdz0K7tGZ7ibFvAbj8Xpzio3p9LOiVL4w35fnD5cOhqsoR/If1/0fHscjG+0mAU4LsbekISjzWrYVrzttiivN874cxWsX34SJ+B6E/qS4GTC5FrYbUqwE/Zfgnr5vxkeZwn4WPvC8wjJtFzOTe5M5FIk+zfb0OvdIj+1JUy/d5wHd0KNRd46FaR9fFiaznTOvfyfihZcUCbeVDFQo38ecizioyqXpo2IN85D8zbICkK1KumYq4qrEKJzdX86SScrHiy0tayOspg5EmAJhrCp1nHLue8cocAuofWwWEcYKcris1SSpbGHPQDWNIHErcQM8sxGebbPyKO81GYzTOeAA1z4mJub3DWettXEqeNbLfOzM+x52SRoMI6Ll6nm1DUWmaHJ0TbphcaJc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB2731.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(136003)(346002)(396003)(366004)(451199021)(186003)(9686003)(26005)(6506007)(966005)(107886003)(83380400001)(41300700001)(4326008)(64756008)(66446008)(66476007)(2906002)(66556008)(52536014)(316002)(5660300002)(8936002)(8676002)(478600001)(66946007)(7696005)(76116006)(71200400001)(110136005)(54906003)(55016003)(33656002)(122000001)(82960400001)(38070700005)(38100700002)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?S1huR3ZkWnU4cGVSaTBvblBId25FTTVIdmZBWEQvSmxPVXhyV09vakloSG9k?=
+ =?utf-8?B?RS9TZUhBMFd4M3FueGZ0d3BmV0QwdXBpRCtFdWxpRUFvb3J5NkhseEoxMzlH?=
+ =?utf-8?B?Q0ZwTXYwQys1R3NvRC8vTnhVbWxoNFNuVlpWcGJ3VWNmTnhxNDJjWitQOS8r?=
+ =?utf-8?B?NXc1d2ZwTUZyYk9SdkEvdEJ2QnNGa1VtWTFjc3BFTWQzUHU2c0xZVmtCOG51?=
+ =?utf-8?B?cEt2QllSbmN2K0ZyWG1LV2U2VHhvcWZ2T0hkMXVsVERCMnBEU1pvd1N0c2Js?=
+ =?utf-8?B?Y3hHRUc1MlpKanhIOGtZaUdUeElDajAxcWI3WTlBN3lIMVA3dmUxOXRxajRj?=
+ =?utf-8?B?ZHVYUEZtZ0kyRjJ0WEx0ZUdIRUJXZzRBRnEzUTN3dEE4RjZjZXhWNk43cXZZ?=
+ =?utf-8?B?NGhhbkpxQzdIQmJQTHNqRzB4Q01uTXEyS2QvMDZadmNPOFhoQjNIeFBXQmpn?=
+ =?utf-8?B?ckZHbWVDcnp5WXQyYjc1Y2dOdFZsTDYvYXBkWjljcStSYkxVQVJRRmY4amJJ?=
+ =?utf-8?B?RGVpN1hYTVE2TjI2QW10djV0L1JFT0hiekh1MXRCZTV6MmczTDFoUVpkV2Qy?=
+ =?utf-8?B?U2tHOTl0QzAxaHU4Smh3ZVB2Zk51NEJkclZSTUw5dEJBN3dyWUdqNEs0VGc4?=
+ =?utf-8?B?dTc2dDRpSTQxems2Qkp5TW0rYzZESlhuSGo3elVBRFFxSW9FckJudEVvdU5h?=
+ =?utf-8?B?ZG44cWU0eE1ENkU5RE9aZy9HbDdmaXN5R0JIb3dmRVYvTmtVYnoybUJtRmZC?=
+ =?utf-8?B?Rll0bzhBVkI3SVFER3Z4VE1nTjdmQnhKdEpxQzZYSUU1cWg5Nm9WWkFQK0px?=
+ =?utf-8?B?VittcGRwcitMbGxwWnJYUU9Tcmw3WlMxRlQ1eUtXaGhxOWpFdDZ0VEpRMXI1?=
+ =?utf-8?B?amRDeG5YUHliNENMNzNYaVYvYkRBdWR0a3FrSlJ0ZmRlWkl1UmhadnlodlB0?=
+ =?utf-8?B?cGJydEtBdTZIQ09WcmU3VHhkK0lWUVcwVWhnbkpuRERCM2xUOVlJWUk2cVRV?=
+ =?utf-8?B?NHV4R0pDNG1uM3dxRFRiU2R6emhjV1crdGhMeW1IR1lZOTlRdW03YWc2S1Yr?=
+ =?utf-8?B?MTk2bEs5KzgrSVlUclJ5bzRHVnFzamxzVDJBR0lOR1ZvUUtpOThZRUc4WDVX?=
+ =?utf-8?B?WTN0T2dtUG5YUEZGVm45TlNITnNmZmQyNVVHbUFJT1FPY0VRSk81cElYVUFV?=
+ =?utf-8?B?T3IyWlVsbTlTUTZKWi8zbHRLZHZIY2dxZ3d5Uml1SWVxd1pSY3F1bWRqa3A1?=
+ =?utf-8?B?SjJSZnB4V3RTRHRTODVwVTRGYlZvYm9Eb3RHeW40bENhV3gwTlNUOW1EcjJl?=
+ =?utf-8?B?RkZ3OHJYaituWTJlQlVMSlA4TVp6TS9qZGEyTGQ0R0ZWaDh4Y3JjVW16RVUx?=
+ =?utf-8?B?aWtTWEdLT01TZ1NOZERWMDJhSm5oMFhZVnRCcGMwZFo0SmFmZFBiYm1LTWpp?=
+ =?utf-8?B?bEhkaUtITGZWazB6Z2I3MThYT1NqblE2UnF3blRuRlVaS05LT3JRZ3VmcTFJ?=
+ =?utf-8?B?WHJqRWxMV1hvZEZOdG9TRmIzQVJpMGx0NDF2THJnS3lEODB1L2k4dXNhVmp1?=
+ =?utf-8?B?c2lMTDdGaDdMOUg3U3hZOEUzV2FjMHNjRnJRN212MkF0bmEraXhPd2k4aCtM?=
+ =?utf-8?B?OUoxUTAyT0Y4WHU2TUc0eElKNXdxM0k3RlEzNkREM2VvVm9sZWFUSnM5aXJD?=
+ =?utf-8?B?enpiN1ZJWkRqeFhjMGN0V0xmbGp0ekhLdDF4S2E4clJreERid3ZUQ0dlWkJD?=
+ =?utf-8?B?SGswdnU4aEhPdU1wNGN2TDIzWU9nbzhyRVVyQVRJM2hOVWhaK2NMOUJIeFRm?=
+ =?utf-8?B?NWg3aHZhRVhVeDBUeUttNW4vRVFiWjJJaGg2VDJWQmU4NzJLVHI1YU1HSHR5?=
+ =?utf-8?B?MXdkVG9CMnI3SGtTNFdBb3FLaFdFY090dGVDcVdzM29vUnZtU3BwTnFWdVNv?=
+ =?utf-8?B?Mmx1Sk5STVBGUjhZTDBDbnY4SWdzSlIranhKejVSYjQ3ZEVvTVJ2dDBYMjFJ?=
+ =?utf-8?B?OGNWb0djZEVxU25ZTWZ6dEdwU1MyMXlPZkN0bU14Q1JUMkJxZWRpbFBZTTZB?=
+ =?utf-8?B?WHhMTG85TkFWS0txdysvcWVCRmpEY0N1MllkZHpEUjlSSWROeE9FdzJlYmVl?=
+ =?utf-8?Q?slLnjmQhMslnOdmARVkQPRCo4?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB2731.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa5f4b62-c1a9-405c-eb0e-08db8144afdf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2023 12:53:41.0970
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PsmTgEEcwzCeEkBzDKnaycSmqDRb8MqDy8nhRLw8tsSx7biadzkx/8om6Z9RFlytNYRZPp7H2iwfe6Bu/mxCgqNH53PhLt0Ob7zC0aUrkIc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8570
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 10 Jul 2023 07:59:03 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Mon, Jul 10, 2023 at 06:18:30PM +0800, Xuan Zhuo wrote:
-> > On Mon, 10 Jul 2023 05:40:21 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Mon, Jul 10, 2023 at 11:42:37AM +0800, Xuan Zhuo wrote:
-> > > > Currently, the virtio core will perform a dma operation for each
-> > > > operation. Although, the same page may be operated multiple times.
-> > > >
-> > > > The driver does the dma operation and manages the dma address based the
-> > > > feature premapped of virtio core.
-> > > >
-> > > > This way, we can perform only one dma operation for the same page. In
-> > > > the case of mtu 1500, this can reduce a lot of dma operations.
-> > > >
-> > > > Tested on Aliyun g7.4large machine, in the case of a cpu 100%, pps
-> > > > increased from 1893766 to 1901105. An increase of 0.4%.
-> > >
-> > > what kind of dma was there? an IOMMU? which vendors? in which mode
-> > > of operation?
-> >
-> >
-> > Do you mean this:
-> >
-> > [    0.470816] iommu: Default domain type: Passthrough
-> >
->
-> With passthrough, dma API is just some indirect function calls, they do
-> not affect the performance a lot.
-
-
-Yes, this benefit is worthless. I seem to have done a meaningless thing. The
-overhead of DMA I observed is indeed not too high.
-
-Thanks.
-
-
->
-> Try e.g. bounce buffer. Which is where you will see a problem: your
-> patches won't work.
->
->
-> > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > >
-> > > This kind of difference is likely in the noise.
-> >
-> > It's really not high, but this is because the proportion of DMA under perf top
-> > is not high. Probably that much.
->
-> So maybe not worth the complexity.
->
-> > >
-> > >
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 283 ++++++++++++++++++++++++++++++++++++---
-> > > >  1 file changed, 267 insertions(+), 16 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index 486b5849033d..4de845d35bed 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -126,6 +126,27 @@ static const struct virtnet_stat_desc virtnet_rq_stats_desc[] = {
-> > > >  #define VIRTNET_SQ_STATS_LEN	ARRAY_SIZE(virtnet_sq_stats_desc)
-> > > >  #define VIRTNET_RQ_STATS_LEN	ARRAY_SIZE(virtnet_rq_stats_desc)
-> > > >
-> > > > +/* The bufs on the same page may share this struct. */
-> > > > +struct virtnet_rq_dma {
-> > > > +	struct virtnet_rq_dma *next;
-> > > > +
-> > > > +	dma_addr_t addr;
-> > > > +
-> > > > +	void *buf;
-> > > > +	u32 len;
-> > > > +
-> > > > +	u32 ref;
-> > > > +};
-> > > > +
-> > > > +/* Record the dma and buf. */
-> > >
-> > > I guess I see that. But why?
-> > > And these two comments are the extent of the available
-> > > documentation, that's not enough I feel.
-> > >
-> > >
-> > > > +struct virtnet_rq_data {
-> > > > +	struct virtnet_rq_data *next;
-> > >
-> > > Is manually reimplementing a linked list the best
-> > > we can do?
-> >
-> > Yes, we can use llist.
-> >
-> > >
-> > > > +
-> > > > +	void *buf;
-> > > > +
-> > > > +	struct virtnet_rq_dma *dma;
-> > > > +};
-> > > > +
-> > > >  /* Internal representation of a send virtqueue */
-> > > >  struct send_queue {
-> > > >  	/* Virtqueue associated with this send _queue */
-> > > > @@ -175,6 +196,13 @@ struct receive_queue {
-> > > >  	char name[16];
-> > > >
-> > > >  	struct xdp_rxq_info xdp_rxq;
-> > > > +
-> > > > +	struct virtnet_rq_data *data_array;
-> > > > +	struct virtnet_rq_data *data_free;
-> > > > +
-> > > > +	struct virtnet_rq_dma *dma_array;
-> > > > +	struct virtnet_rq_dma *dma_free;
-> > > > +	struct virtnet_rq_dma *last_dma;
-> > > >  };
-> > > >
-> > > >  /* This structure can contain rss message with maximum settings for indirection table and keysize
-> > > > @@ -549,6 +577,176 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
-> > > >  	return skb;
-> > > >  }
-> > > >
-> > > > +static void virtnet_rq_unmap(struct receive_queue *rq, struct virtnet_rq_dma *dma)
-> > > > +{
-> > > > +	struct device *dev;
-> > > > +
-> > > > +	--dma->ref;
-> > > > +
-> > > > +	if (dma->ref)
-> > > > +		return;
-> > > > +
-> > >
-> > > If you don't unmap there is no guarantee valid data will be
-> > > there in the buffer.
-> > >
-> > > > +	dev = virtqueue_dma_dev(rq->vq);
-> > > > +
-> > > > +	dma_unmap_page(dev, dma->addr, dma->len, DMA_FROM_DEVICE);
-> > >
-> > >
-> > >
-> > >
-> > >
-> > > > +
-> > > > +	dma->next = rq->dma_free;
-> > > > +	rq->dma_free = dma;
-> > > > +}
-> > > > +
-> > > > +static void *virtnet_rq_recycle_data(struct receive_queue *rq,
-> > > > +				     struct virtnet_rq_data *data)
-> > > > +{
-> > > > +	void *buf;
-> > > > +
-> > > > +	buf = data->buf;
-> > > > +
-> > > > +	data->next = rq->data_free;
-> > > > +	rq->data_free = data;
-> > > > +
-> > > > +	return buf;
-> > > > +}
-> > > > +
-> > > > +static struct virtnet_rq_data *virtnet_rq_get_data(struct receive_queue *rq,
-> > > > +						   void *buf,
-> > > > +						   struct virtnet_rq_dma *dma)
-> > > > +{
-> > > > +	struct virtnet_rq_data *data;
-> > > > +
-> > > > +	data = rq->data_free;
-> > > > +	rq->data_free = data->next;
-> > > > +
-> > > > +	data->buf = buf;
-> > > > +	data->dma = dma;
-> > > > +
-> > > > +	return data;
-> > > > +}
-> > > > +
-> > > > +static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
-> > > > +{
-> > > > +	struct virtnet_rq_data *data;
-> > > > +	void *buf;
-> > > > +
-> > > > +	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
-> > > > +	if (!buf || !rq->data_array)
-> > > > +		return buf;
-> > > > +
-> > > > +	data = buf;
-> > > > +
-> > > > +	virtnet_rq_unmap(rq, data->dma);
-> > > > +
-> > > > +	return virtnet_rq_recycle_data(rq, data);
-> > > > +}
-> > > > +
-> > > > +static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
-> > > > +{
-> > > > +	struct virtnet_rq_data *data;
-> > > > +	void *buf;
-> > > > +
-> > > > +	buf = virtqueue_detach_unused_buf(rq->vq);
-> > > > +	if (!buf || !rq->data_array)
-> > > > +		return buf;
-> > > > +
-> > > > +	data = buf;
-> > > > +
-> > > > +	virtnet_rq_unmap(rq, data->dma);
-> > > > +
-> > > > +	return virtnet_rq_recycle_data(rq, data);
-> > > > +}
-> > > > +
-> > > > +static int virtnet_rq_map_sg(struct receive_queue *rq, void *buf, u32 len)
-> > > > +{
-> > > > +	struct virtnet_rq_dma *dma = rq->last_dma;
-> > > > +	struct device *dev;
-> > > > +	u32 off, map_len;
-> > > > +	dma_addr_t addr;
-> > > > +	void *end;
-> > > > +
-> > > > +	if (likely(dma) && buf >= dma->buf && (buf + len <= dma->buf + dma->len)) {
-> > > > +		++dma->ref;
-> > > > +		addr = dma->addr + (buf - dma->buf);
-> > > > +		goto ok;
-> > > > +	}
-> > >
-> > > So this is the meat of the proposed optimization. I guess that
-> > > if the last buffer we allocated happens to be in the same page
-> > > as this one then they can both be mapped for DMA together.
-> >
-> > Since we use page_frag, the buffers we allocated are all continuous.
-> >
-> > > Why last one specifically? Whether next one happens to
-> > > be close depends on luck. If you want to try optimizing this
-> > > the right thing to do is likely by using a page pool.
-> > > There's actually work upstream on page pool, look it up.
-> >
-> > As we discussed in another thread, the page pool is first used for xdp. Let's
-> > transform it step by step.
-> >
-> > Thanks.
->
-> ok so this should wait then?
->
-> > >
-> > > > +
-> > > > +	end = buf + len - 1;
-> > > > +	off = offset_in_page(end);
-> > > > +	map_len = len + PAGE_SIZE - off;
-> > > > +
-> > > > +	dev = virtqueue_dma_dev(rq->vq);
-> > > > +
-> > > > +	addr = dma_map_page_attrs(dev, virt_to_page(buf), offset_in_page(buf),
-> > > > +				  map_len, DMA_FROM_DEVICE, 0);
-> > > > +	if (addr == DMA_MAPPING_ERROR)
-> > > > +		return -ENOMEM;
-> > > > +
-> > > > +	dma = rq->dma_free;
-> > > > +	rq->dma_free = dma->next;
-> > > > +
-> > > > +	dma->ref = 1;
-> > > > +	dma->buf = buf;
-> > > > +	dma->addr = addr;
-> > > > +	dma->len = map_len;
-> > > > +
-> > > > +	rq->last_dma = dma;
-> > > > +
-> > > > +ok:
-> > > > +	sg_init_table(rq->sg, 1);
-> > > > +	rq->sg[0].dma_address = addr;
-> > > > +	rq->sg[0].length = len;
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > > +static int virtnet_rq_merge_map_init(struct virtnet_info *vi)
-> > > > +{
-> > > > +	struct receive_queue *rq;
-> > > > +	int i, err, j, num;
-> > > > +
-> > > > +	/* disable for big mode */
-> > > > +	if (!vi->mergeable_rx_bufs && vi->big_packets)
-> > > > +		return 0;
-> > > > +
-> > > > +	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > +		err = virtqueue_set_premapped(vi->rq[i].vq);
-> > > > +		if (err)
-> > > > +			continue;
-> > > > +
-> > > > +		rq = &vi->rq[i];
-> > > > +
-> > > > +		num = virtqueue_get_vring_size(rq->vq);
-> > > > +
-> > > > +		rq->data_array = kmalloc_array(num, sizeof(*rq->data_array), GFP_KERNEL);
-> > > > +		if (!rq->data_array)
-> > > > +			goto err;
-> > > > +
-> > > > +		rq->dma_array = kmalloc_array(num, sizeof(*rq->dma_array), GFP_KERNEL);
-> > > > +		if (!rq->dma_array)
-> > > > +			goto err;
-> > > > +
-> > > > +		for (j = 0; j < num; ++j) {
-> > > > +			rq->data_array[j].next = rq->data_free;
-> > > > +			rq->data_free = &rq->data_array[j];
-> > > > +
-> > > > +			rq->dma_array[j].next = rq->dma_free;
-> > > > +			rq->dma_free = &rq->dma_array[j];
-> > > > +		}
-> > > > +	}
-> > > > +
-> > > > +	return 0;
-> > > > +
-> > > > +err:
-> > > > +	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > +		struct receive_queue *rq;
-> > > > +
-> > > > +		rq = &vi->rq[i];
-> > > > +
-> > > > +		kfree(rq->dma_array);
-> > > > +		kfree(rq->data_array);
-> > > > +	}
-> > > > +
-> > > > +	return -ENOMEM;
-> > > > +}
-> > > > +
-> > > >  static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
-> > > >  {
-> > > >  	unsigned int len;
-> > > > @@ -835,7 +1033,7 @@ static struct page *xdp_linearize_page(struct receive_queue *rq,
-> > > >  		void *buf;
-> > > >  		int off;
-> > > >
-> > > > -		buf = virtqueue_get_buf(rq->vq, &buflen);
-> > > > +		buf = virtnet_rq_get_buf(rq, &buflen, NULL);
-> > > >  		if (unlikely(!buf))
-> > > >  			goto err_buf;
-> > > >
-> > > > @@ -1126,7 +1324,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
-> > > >  		return -EINVAL;
-> > > >
-> > > >  	while (--*num_buf > 0) {
-> > > > -		buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx);
-> > > > +		buf = virtnet_rq_get_buf(rq, &len, &ctx);
-> > > >  		if (unlikely(!buf)) {
-> > > >  			pr_debug("%s: rx error: %d buffers out of %d missing\n",
-> > > >  				 dev->name, *num_buf,
-> > > > @@ -1351,7 +1549,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
-> > > >  	while (--num_buf) {
-> > > >  		int num_skb_frags;
-> > > >
-> > > > -		buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx);
-> > > > +		buf = virtnet_rq_get_buf(rq, &len, &ctx);
-> > > >  		if (unlikely(!buf)) {
-> > > >  			pr_debug("%s: rx error: %d buffers out of %d missing\n",
-> > > >  				 dev->name, num_buf,
-> > > > @@ -1414,7 +1612,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
-> > > >  err_skb:
-> > > >  	put_page(page);
-> > > >  	while (num_buf-- > 1) {
-> > > > -		buf = virtqueue_get_buf(rq->vq, &len);
-> > > > +		buf = virtnet_rq_get_buf(rq, &len, NULL);
-> > > >  		if (unlikely(!buf)) {
-> > > >  			pr_debug("%s: rx error: %d buffers missing\n",
-> > > >  				 dev->name, num_buf);
-> > > > @@ -1529,6 +1727,7 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
-> > > >  	unsigned int xdp_headroom = virtnet_get_headroom(vi);
-> > > >  	void *ctx = (void *)(unsigned long)xdp_headroom;
-> > > >  	int len = vi->hdr_len + VIRTNET_RX_PAD + GOOD_PACKET_LEN + xdp_headroom;
-> > > > +	struct virtnet_rq_data *data;
-> > > >  	int err;
-> > > >
-> > > >  	len = SKB_DATA_ALIGN(len) +
-> > > > @@ -1539,11 +1738,34 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
-> > > >  	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
-> > > >  	get_page(alloc_frag->page);
-> > > >  	alloc_frag->offset += len;
-> > > > -	sg_init_one(rq->sg, buf + VIRTNET_RX_PAD + xdp_headroom,
-> > > > -		    vi->hdr_len + GOOD_PACKET_LEN);
-> > > > -	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
-> > > > +
-> > > > +	if (rq->data_array) {
-> > > > +		err = virtnet_rq_map_sg(rq, buf + VIRTNET_RX_PAD + xdp_headroom,
-> > > > +					vi->hdr_len + GOOD_PACKET_LEN);
-> > > > +		if (err)
-> > > > +			goto map_err;
-> > > > +
-> > > > +		data = virtnet_rq_get_data(rq, buf, rq->last_dma);
-> > > > +	} else {
-> > > > +		sg_init_one(rq->sg, buf + VIRTNET_RX_PAD + xdp_headroom,
-> > > > +			    vi->hdr_len + GOOD_PACKET_LEN);
-> > > > +		data = (void *)buf;
-> > > > +	}
-> > > > +
-> > > > +	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, data, ctx, gfp);
-> > > >  	if (err < 0)
-> > > > -		put_page(virt_to_head_page(buf));
-> > > > +		goto add_err;
-> > > > +
-> > > > +	return err;
-> > > > +
-> > > > +add_err:
-> > > > +	if (rq->data_array) {
-> > > > +		virtnet_rq_unmap(rq, data->dma);
-> > > > +		virtnet_rq_recycle_data(rq, data);
-> > > > +	}
-> > > > +
-> > > > +map_err:
-> > > > +	put_page(virt_to_head_page(buf));
-> > > >  	return err;
-> > > >  }
-> > > >
-> > > > @@ -1620,6 +1842,7 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
-> > > >  	unsigned int headroom = virtnet_get_headroom(vi);
-> > > >  	unsigned int tailroom = headroom ? sizeof(struct skb_shared_info) : 0;
-> > > >  	unsigned int room = SKB_DATA_ALIGN(headroom + tailroom);
-> > > > +	struct virtnet_rq_data *data;
-> > > >  	char *buf;
-> > > >  	void *ctx;
-> > > >  	int err;
-> > > > @@ -1650,12 +1873,32 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
-> > > >  		alloc_frag->offset += hole;
-> > > >  	}
-> > > >
-> > > > -	sg_init_one(rq->sg, buf, len);
-> > > > +	if (rq->data_array) {
-> > > > +		err = virtnet_rq_map_sg(rq, buf, len);
-> > > > +		if (err)
-> > > > +			goto map_err;
-> > > > +
-> > > > +		data = virtnet_rq_get_data(rq, buf, rq->last_dma);
-> > > > +	} else {
-> > > > +		sg_init_one(rq->sg, buf, len);
-> > > > +		data = (void *)buf;
-> > > > +	}
-> > > > +
-> > > >  	ctx = mergeable_len_to_ctx(len + room, headroom);
-> > > > -	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
-> > > > +	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, data, ctx, gfp);
-> > > >  	if (err < 0)
-> > > > -		put_page(virt_to_head_page(buf));
-> > > > +		goto add_err;
-> > > > +
-> > > > +	return 0;
-> > > > +
-> > > > +add_err:
-> > > > +	if (rq->data_array) {
-> > > > +		virtnet_rq_unmap(rq, data->dma);
-> > > > +		virtnet_rq_recycle_data(rq, data);
-> > > > +	}
-> > > >
-> > > > +map_err:
-> > > > +	put_page(virt_to_head_page(buf));
-> > > >  	return err;
-> > > >  }
-> > > >
-> > > > @@ -1775,13 +2018,13 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
-> > > >  		void *ctx;
-> > > >
-> > > >  		while (stats.packets < budget &&
-> > > > -		       (buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx))) {
-> > > > +		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
-> > > >  			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, &stats);
-> > > >  			stats.packets++;
-> > > >  		}
-> > > >  	} else {
-> > > >  		while (stats.packets < budget &&
-> > > > -		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
-> > > > +		       (buf = virtnet_rq_get_buf(rq, &len, NULL)) != NULL) {
-> > > >  			receive_buf(vi, rq, buf, len, NULL, xdp_xmit, &stats);
-> > > >  			stats.packets++;
-> > > >  		}
-> > > > @@ -3514,6 +3757,9 @@ static void virtnet_free_queues(struct virtnet_info *vi)
-> > > >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > >  		__netif_napi_del(&vi->rq[i].napi);
-> > > >  		__netif_napi_del(&vi->sq[i].napi);
-> > > > +
-> > > > +		kfree(vi->rq[i].data_array);
-> > > > +		kfree(vi->rq[i].dma_array);
-> > > >  	}
-> > > >
-> > > >  	/* We called __netif_napi_del(),
-> > > > @@ -3591,9 +3837,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
-> > > >  	}
-> > > >
-> > > >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > -		struct virtqueue *vq = vi->rq[i].vq;
-> > > > -		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
-> > > > -			virtnet_rq_free_unused_buf(vq, buf);
-> > > > +		struct receive_queue *rq = &vi->rq[i];
-> > > > +
-> > > > +		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
-> > > > +			virtnet_rq_free_unused_buf(rq->vq, buf);
-> > > >  		cond_resched();
-> > > >  	}
-> > > >  }
-> > > > @@ -3767,6 +4014,10 @@ static int init_vqs(struct virtnet_info *vi)
-> > > >  	if (ret)
-> > > >  		goto err_free;
-> > > >
-> > > > +	ret = virtnet_rq_merge_map_init(vi);
-> > > > +	if (ret)
-> > > > +		goto err_free;
-> > > > +
-> > > >  	cpus_read_lock();
-> > > >  	virtnet_set_affinity(vi);
-> > > >  	cpus_read_unlock();
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
->
+RnJvbTogTmd1eWVuLCBBbnRob255IEwgPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPiANClNl
+bnQ6IEZyaSwgNyBKdWx5IDIwMjMgMTk6MTYNCj5PbiA3LzYvMjAyMyAyOjE5IEFNLCBKZWRyemVq
+IEphZ2llbHNraSB3cm90ZToNCj4+IEZpeCBldGh0b29sIEZESVIgbG9naWMgdG8gbm90IHVzZSBt
+ZW1vcnkgYWZ0ZXIgaXRzIHJlbGVhc2UuDQo+PiBJbiB0aGUgaWNlX2V0aHRvb2xfZmRpci5jIGZp
+bGUgdGhlcmUgYXJlIDIgc3BvdHMgd2hlcmUgY29kZSBjYW4gcmVmZXIgDQo+PiB0byBwb2ludGVy
+cyB3aGljaCBtYXkgYmUgbWlzc2luZy4NCj4+IA0KPj4gSW4gdGhlIGljZV9jZmdfZmRpcl94dHJj
+dF9zZXEoKSBmdW5jdGlvbiBzZWcgbWF5IGJlIGZyZWVkIGJ1dCBldmVuIA0KPj4gdGhlbiBtYXkg
+YmUgc3RpbGwgdXNlZCBieSBtZW1jcHkoJnR1bl9zZWdbMV0sIHNlZywgc2l6ZW9mKCpzZWcpKS4N
+Cj4+IA0KPj4gSW4gdGhlIGljZV9hZGRfZmRpcl9ldGh0b29sKCkgZnVuY3Rpb24gc3RydWN0IGlj
+ZV9mZGlyX2ZsdHIgKmlucHV0IG1heSANCj4+IGZpcnN0IGZhaWwgdG8gYmUgYWRkZWQgdmlhIGlj
+ZV9mZGlyX3VwZGF0ZV9saXN0X2VudHJ5KCkgYnV0IHRoZW4gbWF5IA0KPj4gYmUgZGVsZXRlZCBi
+eSBpY2VfZmRpcl91cGRhdGVfbGlzdF9lbnRyeS4NCj4+IA0KPj4gVGVybWluYXRlIGluIGJvdGgg
+Y2FzZXMgd2hlbiB0aGUgcmV0dXJuZWQgdmFsdWUgb2YgdGhlIHByZXZpb3VzIA0KPj4gb3BlcmF0
+aW9uIGlzIG90aGVyIHRoYW4gMCwgZnJlZSBtZW1vcnkgYW5kIGRvbid0IHVzZSBpdCBhbnltb3Jl
+Lg0KPj4gDQo+PiBSZXBsYWNlIG1hbmFnZWQgbWVtb3J5IGFsbG9jIHdpdGgga3phbGxvYy9rZnJl
+ZSBpbg0KPj4gaWNlX2NmZ19mZGlyX3h0cmN0X3NlcSgpIHNpbmNlIHNlZy90dW5fc2VnIGFyZSB1
+c2VkIG9ubHkgYnkgDQo+PiBpY2VfZmRpcl9zZXRfaHdfZmx0cl9ydWxlKCkuDQo+PiANCj4+IFJl
+cG9ydGVkLWJ5OiBNaWNoYWwgU2NobWlkdCA8bXNjaG1pZHRAcmVkaGF0LmNvbT4NCj4+IExpbms6
+IGh0dHBzOi8vYnVnemlsbGEucmVkaGF0LmNvbS9zaG93X2J1Zy5jZ2k/aWQ9MjIwODQyMw0KPj4g
+Rml4ZXM6IGNhYzJhMjdjZDlhYiAoImljZTogU3VwcG9ydCBJUHY0IEZsb3cgRGlyZWN0b3IgZmls
+dGVycyIpDQo+PiBSZXZpZXdlZC1ieTogUHJ6ZW1layBLaXRzemVsIDxwcnplbXlzbGF3LmtpdHN6
+ZWxAaW50ZWwuY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogSmVkcnplaiBKYWdpZWxza2kgPGplZHJ6
+ZWouamFnaWVsc2tpQGludGVsLmNvbT4NCj4+IC0tLQ0KPj4gdjI6IGV4dGVuZCBDQyBsaXN0LCBm
+aXggZnJlZWluZyBtZW1vcnkgYmVmb3JlIHJldHVybg0KPj4gdjM6IGNvcnJlY3QgdHlwb3MgaW4g
+dGhlIGNvbW1pdCBtc2cNCj4+IC0tLQ0KPj4gICAuLi4vbmV0L2V0aGVybmV0L2ludGVsL2ljZS9p
+Y2VfZXRodG9vbF9mZGlyLmMgfCA2MiArKysrKysrKystLS0tLS0tLS0tDQo+PiAgIDEgZmlsZSBj
+aGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAzNCBkZWxldGlvbnMoLSkNCj4+IA0KPj4gZGlmZiAt
+LWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2ljZS9pY2VfZXRodG9vbF9mZGlyLmMg
+DQo+PiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2ljZS9pY2VfZXRodG9vbF9mZGlyLmMN
+Cj4+IGluZGV4IGVhZDZkNTBmYzBhZC4uNjE5YjMyZjRiYzUzIDEwMDY0NA0KPj4gLS0tIGEvZHJp
+dmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWNlL2ljZV9ldGh0b29sX2ZkaXIuYw0KPj4gKysrIGIv
+ZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWNlL2ljZV9ldGh0b29sX2ZkaXIuYw0KPj4gQEAg
+LTEyMDQsMjEgKzEyMDQsMTYgQEAgaWNlX2NmZ19mZGlyX3h0cmN0X3NlcShzdHJ1Y3QgaWNlX3Bm
+ICpwZiwgc3RydWN0IGV0aHRvb2xfcnhfZmxvd19zcGVjICpmc3AsDQo+PiAgIAkJICAgICAgIHN0
+cnVjdCBpY2VfcnhfZmxvd191c2VyZGVmICp1c2VyKQ0KPj4gICB7DQo+PiAgIAlzdHJ1Y3QgaWNl
+X2Zsb3dfc2VnX2luZm8gKnNlZywgKnR1bl9zZWc7DQo+PiAtCXN0cnVjdCBkZXZpY2UgKmRldiA9
+IGljZV9wZl90b19kZXYocGYpOw0KPj4gICAJZW51bSBpY2VfZmx0cl9wdHlwZSBmbHRyX2lkeDsN
+Cj4+ICAgCXN0cnVjdCBpY2VfaHcgKmh3ID0gJnBmLT5odzsNCj4+ICAgCWJvb2wgcGVyZmVjdF9m
+aWx0ZXI7DQo+PiAgIAlpbnQgcmV0Ow0KPj4gICANCj4+IC0Jc2VnID0gZGV2bV9remFsbG9jKGRl
+diwgc2l6ZW9mKCpzZWcpLCBHRlBfS0VSTkVMKTsNCj4+IC0JaWYgKCFzZWcpDQo+PiAtCQlyZXR1
+cm4gLUVOT01FTTsNCj4+IC0NCj4+IC0JdHVuX3NlZyA9IGRldm1fa2NhbGxvYyhkZXYsIElDRV9G
+RF9IV19TRUdfTUFYLCBzaXplb2YoKnR1bl9zZWcpLA0KPj4gLQkJCSAgICAgICBHRlBfS0VSTkVM
+KTsNCj4+IC0JaWYgKCF0dW5fc2VnKSB7DQo+PiAtCQlkZXZtX2tmcmVlKGRldiwgc2VnKTsNCj4+
+IC0JCXJldHVybiAtRU5PTUVNOw0KPj4gKwlzZWcgPSBremFsbG9jKHNpemVvZigqc2VnKSwgR0ZQ
+X0tFUk5FTCk7DQo+PiArCXR1bl9zZWcgPSBrY2FsbG9jKElDRV9GRF9IV19TRUdfTUFYLCBzaXpl
+b2YoKnR1bl9zZWcpLCBHRlBfS0VSTkVMKTsNCj4+ICsJaWYgKCF0dW5fc2VnIHx8ICFzZWcpIHsN
+Cj4+ICsJCXJldCA9IC1FTk9NRU07DQo+PiArCQlnb3RvIGV4aXQ7DQo+DQo+SUlSQyBpbmRpdmlk
+dWFsIGNoZWNrcyBhbmQgZ290bydzIGFyZSBwcmVmZXJyZWQgb3ZlciBjb21iaW5pbmcgdGhlbS4N
+Cg0KRm9yIGJvdGggY2FzZXMgdGhlcmUgaXMgdGhlIHNhbWUgYmVoYXZpb3Igc28gaXQgd2FzIGRv
+bmUgZHVlIHRvIGxpbWl0DQp0aGUgbGluZSByZWR1bmRhbmN5LCBidXQgaWYgeW91IHRoaW5rIGl0
+IGlzIGJldHRlciB0byBzcGxpdCB0aGVtIHVwIGkgDQpjYW4gZG8gdGhpcw0KDQo+DQo+PiAgIAl9
+DQo+PiAgIA0KPj4gICAJc3dpdGNoIChmc3AtPmZsb3dfdHlwZSAmIH5GTE9XX0VYVCkgeyBAQCAt
+MTI2NCw3ICsxMjU5LDcgQEAgDQo+PiBpY2VfY2ZnX2ZkaXJfeHRyY3Rfc2VxKHN0cnVjdCBpY2Vf
+cGYgKnBmLCBzdHJ1Y3QgZXRodG9vbF9yeF9mbG93X3NwZWMgKmZzcCwNCj4+ICAgCQlyZXQgPSAt
+RUlOVkFMOw0KPj4gICAJfQ0KPj4gICAJaWYgKHJldCkNCj4+IC0JCWdvdG8gZXJyX2V4aXQ7DQo+
+PiArCQlnb3RvIGV4aXQ7DQo+PiAgIA0KPj4gICAJLyogdHVubmVsIHNlZ21lbnRzIGFyZSBzaGlm
+dGVkIHVwIG9uZS4gKi8NCj4+ICAgCW1lbWNweSgmdHVuX3NlZ1sxXSwgc2VnLCBzaXplb2YoKnNl
+ZykpOyBAQCAtMTI4MSw0MiArMTI3NiwzOSBAQCANCj4+IGljZV9jZmdfZmRpcl94dHJjdF9zZXEo
+c3RydWN0IGljZV9wZiAqcGYsIHN0cnVjdCBldGh0b29sX3J4X2Zsb3dfc3BlYyAqZnNwLA0KPj4g
+ICAJCQkJICAgICBJQ0VfRkxPV19GTERfT0ZGX0lOVkFMKTsNCj4+ICAgCX0NCj4+ICAgDQo+PiAt
+CS8qIGFkZCBmaWx0ZXIgZm9yIG91dGVyIGhlYWRlcnMgKi8NCj4+ICAgCWZsdHJfaWR4ID0gaWNl
+X2V0aHRvb2xfZmxvd190b19mbHRyKGZzcC0+Zmxvd190eXBlICYgfkZMT1dfRVhUKTsNCj4+ICsN
+Cj4+ICsJaWYgKHBlcmZlY3RfZmlsdGVyKQ0KPj4gKwkJc2V0X2JpdChmbHRyX2lkeCwgaHctPmZk
+aXJfcGVyZmVjdF9mbHRyKTsNCj4+ICsJZWxzZQ0KPj4gKwkJY2xlYXJfYml0KGZsdHJfaWR4LCBo
+dy0+ZmRpcl9wZXJmZWN0X2ZsdHIpOw0KPj4gKw0KPj4gKwkvKiBhZGQgZmlsdGVyIGZvciBvdXRl
+ciBoZWFkZXJzICovDQo+PiAgIAlyZXQgPSBpY2VfZmRpcl9zZXRfaHdfZmx0cl9ydWxlKHBmLCBz
+ZWcsIGZsdHJfaWR4LA0KPj4gICAJCQkJCUlDRV9GRF9IV19TRUdfTk9OX1RVTik7DQo+PiAtCWlm
+IChyZXQgPT0gLUVFWElTVCkNCj4+IC0JCS8qIFJ1bGUgYWxyZWFkeSBleGlzdHMsIGZyZWUgbWVt
+b3J5IGFuZCBjb250aW51ZSAqLw0KPj4gLQkJZGV2bV9rZnJlZShkZXYsIHNlZyk7DQo+PiAtCWVs
+c2UgaWYgKHJldCkNCj4+ICsJaWYgKHJldCA9PSAtRUVYSVNUKSB7DQo+PiArCQkvKiBSdWxlIGFs
+cmVhZHkgZXhpc3RzLCBmcmVlIG1lbW9yeSBhbmQgY291bnQgYXMgc3VjY2VzcyAqLw0KPj4gKwkJ
+cmV0ID0gMDsNCj4+ICsJCWdvdG8gZXhpdDsNCj4+ICsJfSBlbHNlIGlmIChyZXQpIHsNCj4+ICAg
+CQkvKiBjb3VsZCBub3Qgd3JpdGUgZmlsdGVyLCBmcmVlIG1lbW9yeSAqLw0KPj4gLQkJZ290byBl
+cnJfZXhpdDsNCj4+ICsJCXJldCA9IC1FT1BOT1RTVVBQOw0KPj4gKwkJZ290byBleGl0Ow0KPj4g
+Kwl9DQo+PiAgIA0KPj4gICAJLyogbWFrZSB0dW5uZWxlZCBmaWx0ZXIgSFcgZW50cmllcyBpZiBw
+b3NzaWJsZSAqLw0KPj4gICAJbWVtY3B5KCZ0dW5fc2VnWzFdLCBzZWcsIHNpemVvZigqc2VnKSk7
+DQo+PiAgIAlyZXQgPSBpY2VfZmRpcl9zZXRfaHdfZmx0cl9ydWxlKHBmLCB0dW5fc2VnLCBmbHRy
+X2lkeCwNCj4+ICAgCQkJCQlJQ0VfRkRfSFdfU0VHX1RVTik7DQo+PiAtCWlmIChyZXQgPT0gLUVF
+WElTVCkgew0KPj4gKwlpZiAocmV0ID09IC1FRVhJU1QpDQo+PiAgIAkJLyogUnVsZSBhbHJlYWR5
+IGV4aXN0cywgZnJlZSBtZW1vcnkgYW5kIGNvdW50IGFzIHN1Y2Nlc3MgKi8NCj4+IC0JCWRldm1f
+a2ZyZWUoZGV2LCB0dW5fc2VnKTsNCj4+ICAgCQlyZXQgPSAwOw0KPj4gLQl9IGVsc2UgaWYgKHJl
+dCkgew0KPj4gLQkJLyogY291bGQgbm90IHdyaXRlIHR1bm5lbCBmaWx0ZXIsIGJ1dCBvdXRlciBm
+aWx0ZXIgZXhpc3RzICovDQo+PiAtCQlkZXZtX2tmcmVlKGRldiwgdHVuX3NlZyk7DQo+PiAtCX0N
+Cj4+ICAgDQo+PiAtCWlmIChwZXJmZWN0X2ZpbHRlcikNCj4+IC0JCXNldF9iaXQoZmx0cl9pZHgs
+IGh3LT5mZGlyX3BlcmZlY3RfZmx0cik7DQo+PiAtCWVsc2UNCj4+IC0JCWNsZWFyX2JpdChmbHRy
+X2lkeCwgaHctPmZkaXJfcGVyZmVjdF9mbHRyKTsNCj4+ICtleGl0Og0KPj4gKwlrZnJlZSh0dW5f
+c2VnKTsNCj4+ICsJa2ZyZWUoc2VnKTsNCj4NCj5QcmV2aW91c2x5LCBzdWNjZXNzIHdvdWxkIG5v
+dCBmcmVlIHRoZXNlLiBUaGV5IGxvb2sgdG8gYmUgc2V0IGludG8gaHdfcHJvZiB2aWENCmljZV9m
+ZGlyX3NldF9od19mbHRyX3J1bGUoKS4gSXMgaXQgc2FmZSB0byBiZSBmcmVlaW5nIHRoZW0gbm93
+Pw0KDQpZZWFoLCBJIHdpbGwgcmVzdG9yZSB0aGUgcHJldmlvdXMgYXBwcm9hY2ggdG8gYXZvaWQg
+Y29uZnVzaW9uDQoNCj4NCj4+ICAgCXJldHVybiByZXQ7DQo+PiAtDQo+PiAtZXJyX2V4aXQ6DQo+
+PiAtCWRldm1fa2ZyZWUoZGV2LCB0dW5fc2VnKTsNCj4+IC0JZGV2bV9rZnJlZShkZXYsIHNlZyk7
+DQo+PiAtDQo+PiAtCXJldHVybiAtRU9QTk9UU1VQUDsNCj4+ICAgfQ0KPj4gICANCj4+ICAgLyoq
+DQo+PiBAQCAtMTkxNCw3ICsxOTA2LDkgQEAgaW50IGljZV9hZGRfZmRpcl9ldGh0b29sKHN0cnVj
+dCBpY2VfdnNpICp2c2ksIHN0cnVjdCBldGh0b29sX3J4bmZjICpjbWQpDQo+PiAgIAlpbnB1dC0+
+Y29tcF9yZXBvcnQgPSBJQ0VfRlhEX0ZMVFJfUVcwX0NPTVBfUkVQT1JUX1NXX0ZBSUw7DQo+PiAg
+IA0KPj4gICAJLyogaW5wdXQgc3RydWN0IGlzIGFkZGVkIHRvIHRoZSBIVyBmaWx0ZXIgbGlzdCAq
+Lw0KPj4gLQlpY2VfZmRpcl91cGRhdGVfbGlzdF9lbnRyeShwZiwgaW5wdXQsIGZzcC0+bG9jYXRp
+b24pOw0KPj4gKwlyZXQgPSBpY2VfZmRpcl91cGRhdGVfbGlzdF9lbnRyeShwZiwgaW5wdXQsIGZz
+cC0+bG9jYXRpb24pOw0KPj4gKwlpZiAocmV0KQ0KPj4gKwkJZ290byByZWxlYXNlX2xvY2s7DQo+
+PiAgIA0KPj4gICAJcmV0ID0gaWNlX2ZkaXJfd3JpdGVfYWxsX2ZsdHIocGYsIGlucHV0LCB0cnVl
+KTsNCj4+ICAgCWlmIChyZXQpDQo=
 
