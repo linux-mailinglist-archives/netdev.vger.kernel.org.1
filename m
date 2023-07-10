@@ -1,57 +1,38 @@
-Return-Path: <netdev+bounces-16450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5991874D469
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 13:19:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 793F574D47D
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 13:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89CDC1C20A05
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:19:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33F552811AF
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 11:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D63107A4;
-	Mon, 10 Jul 2023 11:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DA7107A4;
+	Mon, 10 Jul 2023 11:23:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A05AC2EF
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:19:55 +0000 (UTC)
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A63ADE;
-	Mon, 10 Jul 2023 04:19:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688987994; x=1720523994;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=h3akaffE4c4ikxI/bpe287xBwIcWxxQpigcUNq0Wefs=;
-  b=kKjkc0pJadGT2DdPvJepMciV4XE5Y577eb9LvTp//t2BSQVIPf0TKsm4
-   jypJWvKoJDRpvvL/LODxi+HQJBnSx2pKRpBlWW0NKTsDEw1KlCaVyfnuG
-   Ac8bmzbOrzNdOZP7hzbs3SrGTMysqfQaQ4HIQp9sSX0tNd9HH+pW0P+qa
-   fDWlh4yqXiTT7NVc3nPGGKmqchXNxbgW+v2G7TDD2wsBa6pj93swR2rGl
-   kcv6Y+l296CMGM0HS3u/2cyeuxRm34eJzodOe55g/MwwWKMSMrlIKgUT/
-   dpRzn+RPAe8koIA2BaOO9qj1D8HePBRRIQWsk1cTzzf1637V725GEdi1O
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="343910841"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="343910841"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 04:19:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="720666509"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="720666509"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga002.jf.intel.com with ESMTP; 10 Jul 2023 04:19:46 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qIovf-001XRG-1b;
-	Mon, 10 Jul 2023 14:19:43 +0300
-Date: Mon, 10 Jul 2023 14:19:43 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D9E10949
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:23:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9F29C433C7;
+	Mon, 10 Jul 2023 11:23:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688988188;
+	bh=rVbOiKgyxND9mKZk3rAKjAS4exnyG60MuJg/qoml1Vw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NmQJc/tPCMy3i5v1VlHdRroye/CciPC/ZvFOKcppf3TZf0qRJ3dgdRYwmDVOMOmqP
+	 VHTHnUz3SjT2CkGo2po+jFLM51kzErpdYTDzbIh1ssyixtC39WoS5AEx1AHhOh2rUT
+	 oGH0Cj/eImkEiRwQY+a6G/4uTBojRaP1c3PpTvWdlPa8OmIjqYJiqIt27qBeoOyByD
+	 uIezS9sRdsa2l0+EXR9NmvWwdDucaVOT+HG9neus16SKNTI7aq5f6UxW++970eT5gb
+	 zfoX4LNe9GA9UuIFwotHUiqYP63tgZEO9J8trRSJc2+FmmGG2Hl/AKVEk1ykYfoY0k
+	 6E9c0qXH0JqVA==
+Date: Mon, 10 Jul 2023 12:22:59 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Cc: Yang Yingliang <yangyingliang@huawei.com>,
 	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
 	Kris Bahnsen <kris@embeddedts.com>,
@@ -79,53 +60,65 @@ Cc: Yang Yingliang <yangyingliang@huawei.com>,
 	Richard Cochran <richardcochran@gmail.com>
 Subject: Re: [PATCH v1 4/8] spi: Get rid of old SPI_MASTER_NO_.X and
  SPI_MASTER_MUST_.X
-Message-ID: <ZKvpT9M5B8QmyGo+@smile.fi.intel.com>
+Message-ID: <353027bf-6d2a-40de-9e18-8553864b343c@sirena.org.uk>
 References: <20230710102751.83314-1-andriy.shevchenko@linux.intel.com>
  <20230710102751.83314-5-andriy.shevchenko@linux.intel.com>
  <1ffd5603-4140-4bf6-bfed-af70a6759bda@sirena.org.uk>
  <ZKvmkAP5ZuT6lGLN@smile.fi.intel.com>
- <bb3b9ef2-0a32-4f8a-8d92-06d47875b562@sirena.org.uk>
+ <ZKvnPXl9H+cQR8Ok@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SoPr26CyLWhD+5za"
+Content-Disposition: inline
+In-Reply-To: <ZKvnPXl9H+cQR8Ok@smile.fi.intel.com>
+X-Cookie: Do you have lysdexia?
+
+
+--SoPr26CyLWhD+5za
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bb3b9ef2-0a32-4f8a-8d92-06d47875b562@sirena.org.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 12:10:03PM +0100, Mark Brown wrote:
+On Mon, Jul 10, 2023 at 02:10:53PM +0300, Andy Shevchenko wrote:
 > On Mon, Jul 10, 2023 at 02:08:00PM +0300, Andy Shevchenko wrote:
 > > On Mon, Jul 10, 2023 at 12:04:35PM +0100, Mark Brown wrote:
 > > > On Mon, Jul 10, 2023 at 01:27:47PM +0300, Andy Shevchenko wrote:
-> > > 
+
 > > > > Convert the users to SPI_CONTROLLER_NO_?X and SPI_CONTROLLER_MUST_.X
 > > > > and kill the not used anymore definitions.
-> 
+
 > > > The above is not what this change does:
-> 
+
 > > How to improve it? I was sure that the form of "converting to something and
 > > something" is clear...
-> 
+
+> A wild guess, maybe you meant to split to two changes, one per each macro group?
+
+No, doing TX and RX in one commit is fine.
+
 > > > > -	controller->flags = SPI_MASTER_MUST_RX | SPI_MASTER_MUST_TX;
 > > > > +	controller->flags = SPI_CONTROLLER_MUST_RX | SPI_CONTROLLER_MUST_TX;
-> 
-> The change here is not the change that is described above.
 
-Okay, than you for elaboration and review. With the assumed split it should be
-addressed. Besides that, should I resend the entire series or only this one?
+What part of the above change is replacing _NO_ with _MUST_?
 
--- 
-With Best Regards,
-Andy Shevchenko
+--SoPr26CyLWhD+5za
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSr6hIACgkQJNaLcl1U
+h9AMOgf+KMPcMsJntwEWI8UJ7/re0uGZ3D9fX1qeb76OfxTqQ5bt1PsIzRULHkqL
+pEOuOVnEu3HTSuNnMgEyy0ms1PA7+yFFiMWSdYlZy02GpNeD8FY/VFwOM9dR4pte
+UWnlYD6vJK8wffaEnxtKF5F2gOah96lH3Yws15T1IN8/YbK5wzCnJ2R5XWgm5Ka6
+zIFhD0cZ077/Z1hO9SJrqAKPpTLLr1KtyC7ZHsvN2YE5+bzvELKFqPSyt3HPy61r
+v+QdG7vRj8/tNW2Hn4lpLR8g9tz5JSMFLhxcyg9TRz67jSiOxM/utfw2IY+Q8DB8
+YvmjuYpF+tbhIo7G3bYNULQS39HNSQ==
+=ZD6G
+-----END PGP SIGNATURE-----
+
+--SoPr26CyLWhD+5za--
 
