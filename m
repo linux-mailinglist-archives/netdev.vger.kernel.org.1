@@ -1,240 +1,293 @@
-Return-Path: <netdev+bounces-16622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A10874E0F6
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:23:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E2A74E13A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25FC61C20C0B
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:23:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51D9B1C20C0E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081D816423;
-	Mon, 10 Jul 2023 22:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2616A13ADB;
+	Mon, 10 Jul 2023 22:33:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65C4156CD;
-	Mon, 10 Jul 2023 22:23:33 +0000 (UTC)
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F184A197;
-	Mon, 10 Jul 2023 15:23:31 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4f95bf5c493so7422860e87.3;
-        Mon, 10 Jul 2023 15:23:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A032F26
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 22:33:39 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B691B7
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:33:36 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-57704aa6c69so55245757b3.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:33:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689027810; x=1691619810;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8aC5j+4htVlsymnJcEKPXKllCMhmhfroAZbbpDtPHC8=;
-        b=Zyl/4HO2Ne5t2DhjrqWBoFuYOrKHSWz0Lw771twH/TmMn7zv8lW5iUh35uhhWya1L1
-         /5GIumtcaWqd4nooQ4nnRdY7Z7jxFf/v6Enq5yvN/f9/1pjv7JPQVloE1XgQ54dpiIay
-         lguZHH8XazPn8EnylQPHy4ZUKJqZP38ZBGQp2MSsD4SLgtfjwF71lTdn0Cr9CisnBu28
-         RX6dRsaoQB9rCf9EA1BWxXTbC7Ji1pBxIVpFPxk3d5g1ICDYnPcH1pJt6nUrWFLqS777
-         8TbZsouhMQHYRs93lViWXY1HeokmlxrLbUhOSJU3GIKSccPAScQNNAMyx9/dIEetZ6AB
-         Ovxg==
+        d=google.com; s=20221208; t=1689028416; x=1691620416;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vww/pYdC1DJeva2AfnXbGu4C5u6TgbMhBMBTAdXoxfg=;
+        b=tYuqkf1i1ML5V4o25T0vWw2AWYvTHmOdYjkPseY2zygasjrULUgRP0lpwslZq4BlNn
+         r1p4R05iJaCaBeDKpj43UQs0ywurMXa8xm/jLGob/nvAh3tjpHM1PVLFapsJwR/ka1YV
+         OCsLUyi/uoR6UBz4oCwsZPYuOl7NB6tSRitea5cmk6T+xQOOyfhtosCAuCmmHP3pASl3
+         FTJcJXa6DUCUieE5FhnpIjd11iJE7Eyy6HtGjsye3wuVkng9TA1g9wlYGDtVF3B0KaVO
+         3HzZZK95D11PQUMva7mNWvWl66mMUrB5ooxHO0g24qTp1JovuF4cWpSDU4WzfBUUTKLM
+         wSig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689027810; x=1691619810;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8aC5j+4htVlsymnJcEKPXKllCMhmhfroAZbbpDtPHC8=;
-        b=N5XAfhWt9/DX6eg507HKb++UOkFaJWsyIhdYIJEZ28qf05nOVjlcsm7rvAmHg+bQ8G
-         E9LL0hiikZ03KvBNdjjnlIgrCEDl4nmrKIfmUu2dEsikIU+JnfoHsY/mNqu3fe0XZOmf
-         GM9hRxFpkQDazHau6Xt72+jlXSKIHkviLQkrCz7EWPJ5mb/Zfscq65oqumVn7qPKFZCE
-         1NAIwEbX6o2D1EATA1lqN+wV7Tf3z/Fib1Q92fvyFpJmHxB+DkZTOhlQl5SV8LNJ6YvK
-         QNqKidNJ70Qw8spNLXGqimuttqPu/0YNulwNUvEM/B2SHvwh1oxRPniVkMVQ9zcFIYxn
-         w+AQ==
-X-Gm-Message-State: ABy/qLZ/WXhfr66hmWwywispFAuficw1WogLMwk6m5jh8xW5KQok50qF
-	3JYgj05t3q/S/uAhoFI4be5aZRfFbzvYTAjsS5U=
-X-Google-Smtp-Source: APBJJlFN8x2+wNX9Pho+Hycdeec6GrCe2Cvkl7Ri3UGz5HVuMNJf+5MAy7NpYDUo/9jVs0jVfN+yny92KrUU259H1vw=
-X-Received: by 2002:a05:6512:3593:b0:4f9:d272:5847 with SMTP id
- m19-20020a056512359300b004f9d2725847mr10480467lfr.68.1689027809871; Mon, 10
- Jul 2023 15:23:29 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689028416; x=1691620416;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vww/pYdC1DJeva2AfnXbGu4C5u6TgbMhBMBTAdXoxfg=;
+        b=JmQFQ/6uY0cbFtf36B0wi0kDyVT+0slXXfff8SipVLOThts8XJrAZ/9yIwxRYOAc9S
+         vcI5mzxv7gh5V9YNzZ+xWHNEIK2p3CODl3qJsIjW1TIeGPwesQcfN55itiv+mkdqxKEP
+         Ck2a4A93Q6PwRSzEWhnPTuYPhoydePnBTmQZrnKtiqSu5Zg66Og+fQfLFVVf3KDieocA
+         DlXUuz+8Byx5hVTBESKq3fFqpIODS4msf4XO2638zI+lkQTgncrIFA3NWiRE+QJ++vF/
+         88wBXcSQr4WrhmNwVBDkb5JFaaXEObYB8vzwvGuOnsvVjctdG9x01PVPJ9I3m+QFw/8D
+         QQ6Q==
+X-Gm-Message-State: ABy/qLaeJJLBg0ysD4aU+NQTb7A5hqAd1th45Yjsbwc+xZsPrAHM1S/I
+	uKfmW5SGiN/za4b4KMYQGyhQBmBvAyVdvHe0+w==
+X-Google-Smtp-Source: APBJJlEO8eLcuFuH8wVnMQWAHkbzZWQHuwFwsGmDwYpzfNPSGiEWAwrAUfjiTOVp1l1HiHVrM6vyb9Q+AKeZ71Ccyg==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:4c0f:bfb6:9942:8c53])
+ (user=almasrymina job=sendgmr) by 2002:a81:ad44:0:b0:565:9e73:f937 with SMTP
+ id l4-20020a81ad44000000b005659e73f937mr67586ywk.4.1689028416099; Mon, 10 Jul
+ 2023 15:33:36 -0700 (PDT)
+Date: Mon, 10 Jul 2023 15:32:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230708040750.72570-1-hffilwlqm@gmail.com> <20230708040750.72570-2-hffilwlqm@gmail.com>
-In-Reply-To: <20230708040750.72570-2-hffilwlqm@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 10 Jul 2023 15:23:17 -0700
-Message-ID: <CAEf4BzZxS8sxr47GoXU0ZrwgZtp7drc5cehCOFrbx3-=n-1aFg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/2] bpf: Introduce bpf generic log
-To: Leon Hwang <hffilwlqm@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	hawk@kernel.org, tangyeechou@gmail.com, kernel-patches-bot@fb.com, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.390.g38632f3daf-goog
+Message-ID: <20230710223304.1174642-1-almasrymina@google.com>
+Subject: [RFC PATCH 00/10] Device Memory TCP
+From: Mina Almasry <almasrymina@google.com>
+To: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	netdev@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, jgg@ziepe.ca
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 7, 2023 at 9:08=E2=80=AFPM Leon Hwang <hffilwlqm@gmail.com> wro=
-te:
->
-> Currently, excluding verifier, users are unable to obtain detailed error
-> information when issues occur in BPF syscall.
->
-> To overcome this limitation, bpf generic log is introduced to provide
-> error details similar to the verifier. This enhancement will enable the
-> reporting of error details along with the corresponding errno in BPF
-> syscall.
->
-> Essentially, bpf generic log functions as a mechanism similar to netlink,
-> enabling the transmission of error messages to user space. This
-> mechanism greatly enhances the usability of BPF syscall by allowing
-> users to access comprehensive error messages instead of relying solely
-> on errno.
->
-> This patch specifically addresses the error reporting in dev_xdp_attach()
-> . With this patch, the error messages will be transferred to user space
-> like the netlink approach. Hence, users will be able to check the error
-> message along with the errno.
->
-> Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
-> ---
->  include/linux/bpf.h            | 30 ++++++++++++++++++++++++++++++
->  include/uapi/linux/bpf.h       |  6 ++++++
->  kernel/bpf/log.c               | 33 +++++++++++++++++++++++++++++++++
->  net/core/dev.c                 | 11 ++++++++++-
->  tools/include/uapi/linux/bpf.h |  6 ++++++
->  5 files changed, 85 insertions(+), 1 deletion(-)
->
+* TL;DR:
 
-Just curious, what's wrong with struct bpf_verifier_log for
-implementing "generic log"? bpf_log, bpf_vlog_reset, bpf_vlog_finalize
-are quite generic, I think. Why invent yet another structure? Existing
-code and struct support rotating log, if necessary.
+Device memory TCP (devmem TCP) is a proposal for transferring data to and/o=
+r
+from device memory efficiently, without bouncing the data to a host memory
+buffer.
 
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index 360433f14496a..7d2124a537943 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -3107,4 +3107,34 @@ static inline gfp_t bpf_memcg_flags(gfp_t flags)
->         return flags;
->  }
->
-> +#define BPF_GENERIC_TMP_LOG_SIZE       256
-> +
-> +struct bpf_generic_log {
-> +       char            kbuf[BPF_GENERIC_TMP_LOG_SIZE];
-> +       char __user     *ubuf;
-> +       u32             len_used;
-> +       u32             len_total;
-> +};
-> +
-> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
-> +                       const char *fmt, ...);
-> +static inline void bpf_generic_log_init(struct bpf_generic_log *log,
-> +                       const struct bpf_generic_user_log *ulog)
-> +{
-> +       log->ubuf =3D (char __user *) (unsigned long) ulog->log_buf;
-> +       log->len_total =3D ulog->log_size;
-> +       log->len_used =3D 0;
-> +}
-> +
-> +#define BPF_GENERIC_LOG_WRITE(log, ulog, fmt, ...)     do {    \
-> +       const char *____fmt =3D (fmt);                            \
-> +       bpf_generic_log_init(log, ulog);                        \
-> +       bpf_generic_log_write(log, ____fmt, ##__VA_ARGS__);     \
-> +} while (0)
-> +
-> +#define BPF_GENERIC_ULOG_WRITE(ulog, fmt, ...) do {                    \
-> +       struct bpf_generic_log ____log;                                 \
-> +       BPF_GENERIC_LOG_WRITE(&____log, ulog, fmt, ##__VA_ARGS__);      \
-> +} while (0)
-> +
->  #endif /* _LINUX_BPF_H */
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 60a9d59beeabb..34fa334938ba5 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -1318,6 +1318,11 @@ struct bpf_stack_build_id {
->         };
->  };
->
-> +struct bpf_generic_user_log {
-> +       __aligned_u64   log_buf;    /* user supplied buffer */
-> +       __u32           log_size;   /* size of user buffer */
-> +};
-> +
->  #define BPF_OBJ_NAME_LEN 16U
->
->  union bpf_attr {
-> @@ -1544,6 +1549,7 @@ union bpf_attr {
->                 };
->                 __u32           attach_type;    /* attach type */
->                 __u32           flags;          /* extra flags */
-> +               struct bpf_generic_user_log log; /* user log */
+* Problem:
 
-I think explicit triplet of log_level (should be log_flags, but too
-late, probably), log_size, and log_buf is less error prone and more in
-sync with other two commands that accept log (BPF_PROG_LOAD and
-BPF_BTF_LOAD).
+A large amount of data transfers have device memory as the source and/or
+destination. Accelerators drastically increased the volume of such transfer=
+s.
+Some examples include:
+- ML accelerators transferring large amounts of training data from storage =
+into
+  GPU/TPU memory. In some cases ML training setup time can be as long as 50=
+% of
+  TPU compute time, improving data transfer throughput & efficiency can hel=
+p
+  improving GPU/TPU utilization.
 
->                 union {
->                         __u32           target_btf_id;  /* btf_id of targ=
-et to attach to */
->                         struct {
-> diff --git a/kernel/bpf/log.c b/kernel/bpf/log.c
-> index 850494423530e..be56b153bbf0b 100644
-> --- a/kernel/bpf/log.c
-> +++ b/kernel/bpf/log.c
-> @@ -325,3 +325,36 @@ __printf(2, 3) void bpf_log(struct bpf_verifier_log =
-*log,
->         va_end(args);
->  }
->  EXPORT_SYMBOL_GPL(bpf_log);
-> +
-> +static inline void __bpf_generic_log_write(struct bpf_generic_log *log, =
-const char *fmt,
-> +                                     va_list args)
-> +{
-> +       unsigned int n;
-> +
-> +       n =3D vscnprintf(log->kbuf, BPF_GENERIC_TMP_LOG_SIZE, fmt, args);
-> +
-> +       WARN_ONCE(n >=3D BPF_GENERIC_TMP_LOG_SIZE - 1,
-> +                 "bpf generic log truncated - local buffer too short\n")=
-;
-> +
-> +       n =3D min(log->len_total - log->len_used - 1, n);
-> +       log->kbuf[n] =3D '\0';
-> +
-> +       if (!copy_to_user(log->ubuf + log->len_used, log->kbuf, n + 1))
-> +               log->len_used +=3D n;
-> +       else
-> +               log->ubuf =3D NULL;
-> +}
-> +
+- Distributed training, where ML accelerators, such as GPUs on different ho=
+sts,
+  exchange data among them.
 
-please see bpf_verifier_vlog() in kernel/bpf/log.c. We don't want to
-maintain another (even if light) version of it.
+- Distributed raw block storage applications transfer large amounts of data=
+ with
+  remote SSDs, much of this data does not require host processing.
 
-> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
-> +                                    const char *fmt, ...)
-> +{
-> +       va_list args;
-> +
-> +       if (!log->ubuf || !log->len_total)
-> +               return;
-> +
-> +       va_start(args, fmt);
-> +       __bpf_generic_log_write(log, fmt, args);
-> +       va_end(args);
-> +}
+Today, the majority of the Device-to-Device data transfers the network are
+implemented as the following low level operations: Device-to-Host copy,
+Host-to-Host network transfer, and Host-to-Device copy.
 
-[...]
+The implementation is suboptimal, especially for bulk data transfers, and c=
+an
+put significant strains on system resources, such as host memory bandwidth,
+PCIe bandwidth, etc. One important reason behind the current state is the
+kernel=E2=80=99s lack of semantics to express device to network transfers.=
+=C2=A0
+
+* Proposal:
+
+In this patch series we attempt to optimize this use case by implementing
+socket APIs that enable the user to:
+
+1. send device memory across the network directly, and
+2. receive incoming network packets directly into device memory.
+
+Packet _payloads_ go directly from the NIC to device memory for receive and=
+ from
+device memory to NIC for transmit.
+Packet _headers_ go to/from host memory and are processed by the TCP/IP sta=
+ck
+normally. The NIC _must_ support header split to achieve this.
+
+Advantages:
+
+- Alleviate host memory bandwidth pressure, compared to existing
+ network-transfer + device-copy semantics.
+
+- Alleviate PCIe BW pressure, by limiting data transfer to the lowest level
+  of the PCIe tree, compared to traditional path which sends data through t=
+he
+  root complex.
+
+With this proposal we're able to reach ~96.6% line rate speeds with data se=
+nt
+and received directly from/to device memory.
+
+* Patch overview:
+
+** Part 1: struct paged device memory
+
+Currently the standard for device memory sharing is DMABUF, which doesn't
+generate struct pages. On the other hand, networking stack (skbs, drivers, =
+and
+page pool) operate on pages. We have 2 options:
+
+1. Generate struct pages for dmabuf device memory, or,
+2. Modify the networking stack to understand a new memory type.
+
+This proposal implements option #1. We implement a small framework to gener=
+ate
+struct pages for an sg_table returned from dma_buf_map_attachment(). The su=
+pport
+added here should be generic and easily extended to other use cases interes=
+ted
+in struct paged device memory. We use this framework to generate pages that=
+ can
+be used in the networking stack.
+
+** Part 2: recvmsg() & sendmsg() APIs
+
+We define user APIs for the user to send and receive these dmabuf pages.
+
+** part 3: support for unreadable skb frags
+
+Dmabuf pages are not accessible by the host; we implement changes throughpu=
+t the
+networking stack to correctly handle skbs with unreadable frags.
+
+** part 4: page pool support
+
+We piggy back on Jakub's page pool memory providers idea:
+https://github.com/kuba-moo/linux/tree/pp-providers
+
+It allows the page pool to define a memory provider that provides the
+page allocation and freeing. It helps abstract most of the device memory TC=
+P
+changes from the driver.
+
+This is not strictly necessary, the driver can choose to allocate dmabuf pa=
+ges
+and use them directly without going through the page pool (if acceptable to
+their maintainers).
+
+Not included with this RFC is the GVE devmem TCP support, just to
+simplify the review. Code available here if desired:
+https://github.com/mina/linux/tree/tcpdevmem
+
+This RFC is built on top of v6.4-rc7 with Jakub's pp-providers changes
+cherry-picked.
+
+* NIC dependencies:
+
+1. (strict) Devmem TCP require the NIC to support header split, i.e. the
+   capability to split incoming packets into a header + payload and to put
+   each into a separate buffer. Devmem TCP works by using dmabuf pages
+   for the packet payload, and host memory for the packet headers.
+
+2. (optional) Devmem TCP works better with flow steering support & RSS supp=
+ort,
+   i.e. the NIC's ability to steer flows into certain rx queues. This allow=
+s the
+   sysadmin to enable devmem TCP on a subset of the rx queues, and steer
+   devmem TCP traffic onto these queues and non devmem TCP elsewhere.
+
+The NIC I have access to with these properties is the GVE with DQO support
+running in Google Cloud, but any NIC that supports these features would suf=
+fice.
+I may be able to help reviewers bring up devmem TCP on their NICs.
+
+* Testing:
+
+The series includes a udmabuf kselftest that show a simple use case of
+devmem TCP and validates the entire data path end to end without
+a dependency on a specific dmabuf provider.
+
+Not included in this series is our devmem TCP benchmark, which
+transfers data to/from GPU dmabufs directly.
+
+With this implementation & benchmark we're able to reach ~96.6% line rate
+speeds with 4 GPU/NIC pairs running bi-direction traffic, with all the
+packet payloads going straight to the GPU memory (no host buffer bounce).
+
+** Test Setup
+
+Kernel: v6.4-rc7, with this RFC and Jakub's memory provider API
+cherry-picked locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Benchmark: custom devmem TCP benchmark not yet open sourced.
+
+Mina Almasry (10):
+  dma-buf: add support for paged attachment mappings
+  dma-buf: add support for NET_RX pages
+  dma-buf: add support for NET_TX pages
+  net: add support for skbs with unreadable frags
+  tcp: implement recvmsg() RX path for devmem TCP
+  net: add SO_DEVMEM_DONTNEED setsockopt to release RX pages
+  tcp: implement sendmsg() TX path for for devmem tcp
+  selftests: add ncdevmem, netcat for devmem TCP
+  memory-provider: updates core provider API for devmem TCP
+  memory-provider: add dmabuf devmem provider
+
+ drivers/dma-buf/dma-buf.c              | 444 ++++++++++++++++
+ include/linux/dma-buf.h                | 142 +++++
+ include/linux/netdevice.h              |   1 +
+ include/linux/skbuff.h                 |  34 +-
+ include/linux/socket.h                 |   1 +
+ include/net/page_pool.h                |  21 +
+ include/net/sock.h                     |   4 +
+ include/net/tcp.h                      |   6 +-
+ include/uapi/asm-generic/socket.h      |   6 +
+ include/uapi/linux/dma-buf.h           |  12 +
+ include/uapi/linux/uio.h               |  10 +
+ net/core/datagram.c                    |   3 +
+ net/core/page_pool.c                   | 111 +++-
+ net/core/skbuff.c                      |  81 ++-
+ net/core/sock.c                        |  47 ++
+ net/ipv4/tcp.c                         | 262 +++++++++-
+ net/ipv4/tcp_input.c                   |  13 +-
+ net/ipv4/tcp_ipv4.c                    |   8 +
+ net/ipv4/tcp_output.c                  |   5 +-
+ net/packet/af_packet.c                 |   4 +-
+ tools/testing/selftests/net/.gitignore |   1 +
+ tools/testing/selftests/net/Makefile   |   1 +
+ tools/testing/selftests/net/ncdevmem.c | 693 +++++++++++++++++++++++++
+ 23 files changed, 1868 insertions(+), 42 deletions(-)
+ create mode 100644 tools/testing/selftests/net/ncdevmem.c
+
+--=20
+2.41.0.390.g38632f3daf-goog
+
 
