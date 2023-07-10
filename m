@@ -1,89 +1,181 @@
-Return-Path: <netdev+bounces-16595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDC5274DF33
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 878C674DEE0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 22:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15C481C20B9F
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:28:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26B221C20B8E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2948154B0;
-	Mon, 10 Jul 2023 20:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804EE1549A;
+	Mon, 10 Jul 2023 20:12:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E6C14A9B
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 20:28:14 +0000 (UTC)
-Received: from mx2.n90.eu (mx.n90.eu [65.21.251.117])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03F513E
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 13:28:12 -0700 (PDT)
-Received: by mx2.n90.eu (Postfix, from userid 182)
-	id 2EC081000E4CE; Mon, 10 Jul 2023 20:27:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n90.eu; s=default;
-	t=1689020879; bh=zWNoJjF1BDBexScrwPnN++PNX+oiTRWa7GVE3/ElKuI=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to;
-	b=gnP5XdOMNYzrTiXetHtrqClkwP6geBEOrX+ZpC2NxktjwKsiGM1TyRCpPqbhpX2VF
-	 bLYfXk9V64QTLOkqrTjK6IptjmXvBWVlOicAa9hMq2HC91ZwA497nCrzUBLoCHet8w
-	 seRb2P//qGQ0tlpCJHGWZTGfKIzyFmZBq6+8pLaYG4+pL3dYJ1VKcDWp77KhU0WLqU
-	 JFjIEBP2AuyOM6eaWhrE3OGTApeXRH8uxRB5hjdUAZcelEml3Ql2aIuLSgyJQAKkpF
-	 K1r7LxfwgGSCyxAtZqQleDICMmpSEXr6/OjhREwI9TDBFSLphlDaiSZflH8PQnOc7/
-	 w2fFkpeIDR6Aw==
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-Received: from spica (unknown [172.20.188.202])
-	by mx2.n90.eu (Postfix) with ESMTP id 920B01000E4CB;
-	Mon, 10 Jul 2023 20:27:58 +0000 (UTC)
-References: <875y6rrdik.fsf@n90.eu>
- <9c25971b-78e9-956f-95a5-38e688240ef6@nvidia.com>
-User-agent: mu4e 1.10.4; emacs 30.0.50
-From: Aleksander Trofimowicz <alex@n90.eu>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [bug] failed to enable eswitch SRIOV in mlx5_device_enable_sriov()
-Date: Mon, 10 Jul 2023 20:10:12 +0000
-In-reply-to: <9c25971b-78e9-956f-95a5-38e688240ef6@nvidia.com>
-X-Mailer: boring 1.0
-Message-ID: <87ilarpl4p.fsf@n90.eu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCD423CC;
+	Mon, 10 Jul 2023 20:12:28 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7EEEBB;
+	Mon, 10 Jul 2023 13:12:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=69n6LDb5XRAMx+wapwbSO3DwQt+OxxZALsW2iH04xAA=; b=achuNBhLPEtazRfwOTSt9OUh6h
+	qhmVJjRwanpAJ1pHZg9EFFFUJqjLLYnvautTxaxFiS2Ya0p6OqzYWTI0CDkLKEN+Q3YyaYRiZey0q
+	AhlWpSxc/HbJFazE9Fa7V3k529q9H4NY6+F8ByBSz/TpWxiFtxb7BAANBzqXiRdQWy0eUP2XzOlCQ
+	CfBbmMkXe9G4BERSjAxpgsMD2mdpnajjH7w91DveLIHfsX8atQD9PO9QuZdoLl3XkbfggIYvJ8DoW
+	99RDTWb9tNgmtIbv+hEeKduAJEbBh6FRQSLnENN/KBA8nGFfLn3Pu2qPZWJJL0SMBmZfvfhYJQm9U
+	WHb4/qAg==;
+Received: from 12.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.12] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qIxFA-000E33-D0; Mon, 10 Jul 2023 22:12:24 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: ast@kernel.org
+Cc: andrii@kernel.org,
+	martin.lau@linux.dev,
+	razor@blackwall.org,
+	sdf@google.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	dxu@dxuuu.xyz,
+	joe@cilium.io,
+	toke@kernel.org,
+	davem@davemloft.net,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH bpf-next v4 0/8] BPF link support for tc BPF programs
+Date: Mon, 10 Jul 2023 22:12:10 +0200
+Message-Id: <20230710201218.19460-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26965/Mon Jul 10 09:29:40 2023)
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi Mark,
+This series adds BPF link support for tc BPF programs. We initially
+presented the motivation, related work and design at last year's LPC
+conference in the networking & BPF track [0], and a recent update on
+our progress of the rework during this year's LSF/MM/BPF summit [1].
+The main changes are in first two patches and the last two have an
+extensive batch of test cases we developed along with it, please see
+individual patches for details. We tested this series with tc-testing
+selftest suite as well as BPF CI/selftests. Thanks!
 
-Mark Bloch <mbloch@nvidia.com> writes:
+v3 -> v4:
+  - Fix bpftool output to display tcx/{ingress,egress} (Stan)
+  - Documentation around API, BPF_MPROG_* return codes and locking
+    expectations (Stan, Alexei)
+  - Change _after and _before to have the same semantics for return
+    value (Alexei)
+  - Rework mprog initialization and move allocation/free one layer
+    up into tcx to simplify the code (Stan)
+  - Add comment on synchronize_rcu and parent->ref (Stan)
+  - Add comment on bpf_mprog_pos_() helpers wrt target position (Stan)
+v2 -> v3:
+  - Removal of BPF_F_FIRST/BPF_F_LAST from control UAPI (Toke, Stan)
+  - Along with that full rework of bpf_mprog internals to simplify
+    dependency management, looks much nicer now imho
+  - Just single bpf_mprog_cp instead of two (Andrii)
+  - atomic64_t for revision counter (Andrii)
+  - Evaluate target position and reject on conflicts (Andrii)
+  - Keep track of actual count in bpf_mprob_bundle (Andrii)
+  - Make combo of REPLACE and BEFORE/AFTER work (Andrii)
+  - Moved miniq as first struct member (Jamal)
+  - Rework tcx_link_attach with regards to rtnl (Jakub, Andrii)
+  - Moved wrappers after bpf_prog_detach_ops (Andrii)
+  - Removed union for relative_fd and friends for opts and link in
+    libbpf (Andrii)
+  - Add doc comments to attach/detach/query libbpf APIs (Andrii)
+  - Dropped SEC_ATTACHABLE_OPT (Andrii)
+  - Add an OPTS_ZEROED check to bpf_link_create (Andrii)
+  - Keep opts as the last argument in bpf_program_attach_fd (Andrii)
+  - Rework bpf_program_attach_fd (Andrii)
+  - Remove OPTS_GET before we checked OPTS_VALID in
+    bpf_program__attach_tcx (Andrii)
+  - Add `size_t :0;` to prevent compiler from leaving garbage (Andrii)
+  - Add helper macro to clear opts structs which I found useful
+    when writing tests
+  - Rework of both opts and link test cases to accommodate for changes
+v1 -> v2:
+  - Rework of almost entire series to remove prio from UAPI and switch
+    to better control directives BPF_F_FIRST/BPF_F_LAST/BPF_F_BEFORE/
+    BPF_F_AFTER (Alexei, Toke, Stan, Andrii)
+  - Addition of big test suite to cover all corner cases
 
-> On 10/07/2023 18:25, Aleksander Trofimowicz wrote:
->>
->> I've noticed a regression in the mlx5_core driver: defining VFs via
->> /sys/bus/pci/devices/.../sriov_numvfs is no longer possible.
->>
->> Upon a write call the following error is returned:
->>
->>
->> Jul 10 11:07:44 server kernel: mlx5_core 0000:c1:00.0: mlx5_cmd_out_err:803:(pid 1097): QUERY_HCA_CAP(0x100) op_mod(0x40) failed, status bad parameter(0x3), syndrome (0x5add95), err(-22)
->> Jul 10 11:07:44 server kernel: mlx5_core 0000:c1:00.0: mlx5_device_enable_sriov:82:(pid 1097): failed to enable eswitch SRIOV (-22)
->> Jul 10 11:07:44 server kernel: mlx5_core 0000:c1:00.0: mlx5_sriov_enable:168:(pid 1097): mlx5_device_enable_sriov failed : -22
->>
->
-> This should fix the issue:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c?id=6496357aa5f710eec96f91345b9da1b37c3231f6
->
-Indeed, it should. Thanks for pointing the fix out.
+  [0] https://lpc.events/event/16/contributions/1353/
+  [1] http://vger.kernel.org/bpfconf2023_material/tcx_meta_netdev_borkmann.pdf
 
---
-Kind regards,
-Aleksander Trofimowicz
+Daniel Borkmann (8):
+  bpf: Add generic attach/detach/query API for multi-progs
+  bpf: Add fd-based tcx multi-prog infra with link support
+  libbpf: Add opts-based attach/detach/query API for tcx
+  libbpf: Add link-based API for tcx
+  libbpf: Add helper macro to clear opts structs
+  bpftool: Extend net dump with tcx progs
+  selftests/bpf: Add mprog API tests for BPF tcx opts
+  selftests/bpf: Add mprog API tests for BPF tcx links
+
+ MAINTAINERS                                   |    5 +-
+ include/linux/bpf_mprog.h                     |  352 +++
+ include/linux/netdevice.h                     |   15 +-
+ include/linux/skbuff.h                        |    4 +-
+ include/net/sch_generic.h                     |    2 +-
+ include/net/tcx.h                             |  199 ++
+ include/uapi/linux/bpf.h                      |   70 +-
+ kernel/bpf/Kconfig                            |    1 +
+ kernel/bpf/Makefile                           |    3 +-
+ kernel/bpf/mprog.c                            |  427 ++++
+ kernel/bpf/syscall.c                          |   83 +-
+ kernel/bpf/tcx.c                              |  351 +++
+ net/Kconfig                                   |    5 +
+ net/core/dev.c                                |  267 +-
+ net/core/filter.c                             |    4 +-
+ net/sched/Kconfig                             |    4 +-
+ net/sched/sch_ingress.c                       |   61 +-
+ tools/bpf/bpftool/net.c                       |   86 +-
+ tools/include/uapi/linux/bpf.h                |   70 +-
+ tools/lib/bpf/bpf.c                           |  124 +-
+ tools/lib/bpf/bpf.h                           |   97 +-
+ tools/lib/bpf/libbpf.c                        |   74 +-
+ tools/lib/bpf/libbpf.h                        |   16 +
+ tools/lib/bpf/libbpf.map                      |    2 +
+ tools/lib/bpf/libbpf_common.h                 |   11 +
+ .../selftests/bpf/prog_tests/tc_helpers.h     |   72 +
+ .../selftests/bpf/prog_tests/tc_links.c       | 1604 ++++++++++++
+ .../selftests/bpf/prog_tests/tc_opts.c        | 2182 +++++++++++++++++
+ .../selftests/bpf/progs/test_tc_link.c        |   40 +
+ 29 files changed, 6002 insertions(+), 229 deletions(-)
+ create mode 100644 include/linux/bpf_mprog.h
+ create mode 100644 include/net/tcx.h
+ create mode 100644 kernel/bpf/mprog.c
+ create mode 100644 kernel/bpf/tcx.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_links.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_opts.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tc_link.c
+
+-- 
+2.34.1
+
 
