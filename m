@@ -1,140 +1,122 @@
-Return-Path: <netdev+bounces-16441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67EB974D38E
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 12:32:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD2474D395
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 12:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21666280EEE
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:32:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECEE9281271
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 10:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56401079D;
-	Mon, 10 Jul 2023 10:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E1A3D61;
+	Mon, 10 Jul 2023 10:34:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948A82AB28
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:31:15 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6791AE2;
-	Mon, 10 Jul 2023 03:30:50 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A6C3Ak021884;
-	Mon, 10 Jul 2023 03:30:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=Ht0zG3SbuK8XFLIxJVSHU6f9E9fnWCCCBF1cwN6I8+k=;
- b=C4xTBNk4+rsv4RdMFMwHpmE68X+RvLYqqA36/koS52T+7ucEdhqNR1B1KKZUOVpwiLq2
- ls8pLwgeVHfRRnsG6BClgvgX83nzuVEOFRsraa/iY/ydu3N0uPqGKOoxbvs2Oi9aZXOZ
- 6pp83opENIZUspeaBHzaxHXxYA9+YsXWK2a8XySPsZdepw6ef+yNKPsTNcGW41zGJeD8
- g5jmxZOS4CND8Hsiu0k/kL5uYriVSfZEsm5bexHIrS24feJh7uRhRo5Nk+rk9m82I91L
- EM7SVbM6hw8Lq8LzuuBsRI60efjkk4TwKfMtEPE9SYXo4v551iSEPGzIqBF/YHnBy+AY TQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rq7ajv3qg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 03:30:36 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 10 Jul
- 2023 03:30:34 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 10 Jul 2023 03:30:34 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 0F27C3F7069;
-	Mon, 10 Jul 2023 03:30:30 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH V5] octeontx2-pf: Add additional check for MCAM rules
-Date: Mon, 10 Jul 2023 16:00:27 +0530
-Message-ID: <20230710103027.2244139-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C58E10957
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 10:34:00 +0000 (UTC)
+Received: from xry111.site (xry111.site [89.208.246.23])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9085ED1;
+	Mon, 10 Jul 2023 03:33:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1688985230;
+	bh=Qd7Jq6PV9bUrlUetZdlFipTTG5XNVHRahk+7pTupUnY=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=hnWfx1femhGVzcnMKSnDNf5xgExdFaoCKOuaJ7ctT8uwiVSpSlPmmIAI906gmEQ+4
+	 0owCsZvwTSPxqkE5OG0BhsTeRBEFCnEw61/oroH4BdFCoDwDucZwRFDJsYpLsNac3a
+	 nZkP5TXtpTvOEY4bvFfgSRt+BdyWIKfa6EDfvFUg=
+Received: from [192.168.124.11] (unknown [113.140.11.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 7226465AB5;
+	Mon, 10 Jul 2023 06:33:47 -0400 (EDT)
+Message-ID: <2856be90ec133a2bafd5f11e537f8d589d0f8cb9.camel@xry111.site>
+Subject: Re: [RFC PATCH] wifi: iwlwifi: remove 'use_tfh' config to fix crash
+From: Xi Ruoyao <xry111@xry111.site>
+To: Jeff Chua <jeff.chua.linux@gmail.com>, "Zhang, Rui" <rui.zhang@intel.com>
+Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, 
+ "johannes@sipsolutions.net" <johannes@sipsolutions.net>, "Berg, Johannes"
+ <johannes.berg@intel.com>,  Larry Finger <Larry.Finger@lwfinger.net>,
+ Gregory Greenman <gregory.greenman@intel.com>, Kalle Valo
+ <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Linux Networking <netdev@vger.kernel.org>, Bagas
+ Sanjaya <bagasdotme@gmail.com>, lkml <linux-kernel@vger.kernel.org>
+Date: Mon, 10 Jul 2023 18:33:45 +0800
+In-Reply-To: <CAAJw_Zuo1L3yTP-PVgdW74uYg=R7YxXF0hA5s0Gfm1bCqC90RQ@mail.gmail.com>
+References: <20230709181323.12085-2-johannes@sipsolutions.net>
+	 <19f7bc7f43922c257238127d5fe84ea01cf2be79.camel@intel.com>
+	 <CAAJw_Zuo1L3yTP-PVgdW74uYg=R7YxXF0hA5s0Gfm1bCqC90RQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: -qDacU7kfu9c9CqdMDMTKKPRdi4zztPP
-X-Proofpoint-GUID: -qDacU7kfu9c9CqdMDMTKKPRdi4zztPP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-10_08,2023-07-06_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Due to hardware limitation, MCAM drop rule with
-ether_type == 802.1Q and vlan_id == 0 is not supported. Hence rejecting
-such rules.
+On Mon, 2023-07-10 at 18:16 +0800, Jeff Chua wrote:
+> On Mon, Jul 10, 2023 at 9:53=E2=80=AFAM Zhang, Rui <rui.zhang@intel.com> =
+wrote:
+> >=20
+> > On Sun, 2023-07-09 at 20:13 +0200, Johannes Berg wrote:
+> > > From: Johannes Berg <johannes.berg@intel.com>
+> > >=20
+> > > This is equivalent to 'gen2', and it's confusing to have two
+> > > of the same configs. The split config patch actually had been
+> > > originally developed after this, and didn't add the use_tfh
+> > > in the new configs because they were copied to the new files
+> > > after ...
+> > >=20
+> > > There's clearly still an unwind error in iwl_txq_gen2_init()
+> > > since it crashes if something fails there, but the reason it
+> > > fails in the first place is due to the gen2/use_tfh confusion.
+> > >=20
+> > > Reported-by: Jeff Chua <jeff.chua.linux@gmail.com>
+> > > Reported-by: "Zhang, Rui" <rui.zhang@intel.com>
+> > > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D217622
+> > > Link:
+> > > https://lore.kernel.org/all/9274d9bd3d080a457649ff5addcc1726f08ef5b2.=
+camel@xry111.site/
+> > > Link:
+> > > https://lore.kernel.org/all/CAAJw_Zug6VCS5ZqTWaFSr9sd85k%3DtyPm9DEE%2=
+BmV%3DAKoECZM%2BsQ@mail.gmail.com/
+> > > Fixes: 19898ce9cf8a ("wifi: iwlwifi: split 22000.c into multiple
+> > > files")
+> > > Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> >=20
+> > Hi, Johannes,
+> >=20
+> > Thanks for the patch. It fixes the problem on my side.
+> >=20
+> > Tested-by: Zhang Rui <rui.zhang@intel.com>
+> >=20
+> > thanks,
+> > rui
+>=20
+>=20
+> Johannes,
+>=20
+> Fixed as well! Thank you!
 
-Fixes: dce677da57c0 ("octeontx2-pf: Add vlan-etype to ntuple filters")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
-changes since v4:
-- Reformatted text in file otx2_tc.c as per review comment.
+Works for me too, thanks!
 
- .../ethernet/marvell/octeontx2/nic/otx2_flows.c   |  8 ++++++++
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c  | 15 +++++++++++++++
- 2 files changed, 23 insertions(+)
+Tested-by: Xi Ruoyao <xry111@xry111.site>
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 10e11262d48a..2d7713a1a153 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -872,6 +872,14 @@ static int otx2_prepare_flow_request(struct ethtool_rx_flow_spec *fsp,
- 				return -EINVAL;
- 
- 			vlan_etype = be16_to_cpu(fsp->h_ext.vlan_etype);
-+
-+			/* Drop rule with vlan_etype == 802.1Q
-+			 * and vlan_id == 0 is not supported
-+			 */
-+			if (vlan_etype == ETH_P_8021Q && !fsp->m_ext.vlan_tci &&
-+			    fsp->ring_cookie == RX_CLS_FLOW_DISC)
-+				return -EINVAL;
-+
- 			/* Only ETH_P_8021Q and ETH_P_802AD types supported */
- 			if (vlan_etype != ETH_P_8021Q &&
- 			    vlan_etype != ETH_P_8021AD)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 044cc211424e..d3498f3ecaac 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -604,6 +604,21 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 			return -EOPNOTSUPP;
- 		}
- 
-+		if (!match.mask->vlan_id) {
-+			struct flow_action_entry *act;
-+			int i;
-+
-+			flow_action_for_each(i, act, &rule->action) {
-+				if (act->id == FLOW_ACTION_DROP) {
-+					netdev_err(nic->netdev,
-+						   "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
-+						   ntohs(match.key->vlan_tpid),
-+						   match.key->vlan_id);
-+					return -EOPNOTSUPP;
-+				}
-+			}
-+		}
-+
- 		if (match.mask->vlan_id ||
- 		    match.mask->vlan_dei ||
- 		    match.mask->vlan_priority) {
--- 
-2.25.1
-
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
 
