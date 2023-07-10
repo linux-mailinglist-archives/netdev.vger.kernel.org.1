@@ -1,200 +1,96 @@
-Return-Path: <netdev+bounces-16651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB0974E24E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:49:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A17EB74E255
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:52:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD1A1281465
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:49:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8FF02814A6
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02184168B4;
-	Mon, 10 Jul 2023 23:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F80168C2;
+	Mon, 10 Jul 2023 23:52:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2741154B1
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:49:30 +0000 (UTC)
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0C41B0
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:49:28 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-635dd1b52a2so30002096d6.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:49:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEF816422;
+	Mon, 10 Jul 2023 23:52:53 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC95CA9;
+	Mon, 10 Jul 2023 16:52:49 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b703c900e3so78178821fa.1;
+        Mon, 10 Jul 2023 16:52:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689032967; x=1691624967;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=C1+7UfAMLI/Nu08LQwOr0R45kQ38N0MvpsViC9OWNis=;
-        b=lOjm4Lx/2UPcQ0vl1fIalkQvnZK8D4gJI18w5QRFNsP45noSZ/Hlwqq9fLf6qno8S0
-         GvM986sAXOOWD+3KlsW4spYFl1h5PPJyrFeDcdlNkEDclq35TvtosJh62CTCTkoRD9GK
-         MqGXs6RSufFFgYmbGJAlQr1lrEr/1f2OYUXg5i3nLAJvb7ECX/2/AfZpA3lyMOZeND1n
-         lFl8txf7CyG92a7kngcJ7Vq6bV3YMDykveds9sCnMS+V3OZ/EyLY8FCZCXVFPUP4B0LH
-         qdqAHT53dGIFQ6ev9mJkB5oMnZhst31KWNYei6EFEyMLWMXAOhxl5/HniRY/5EQC+kez
-         oVfw==
+        d=gmail.com; s=20221208; t=1689033168; x=1691625168;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a48Oh9lap8k90JkfFlJ0CQL2t/AVf5j1IPeKUYcNruk=;
+        b=dLW6mg/fAeH2HDDo4ghyXvvDUqKQgfKbiFAyU/i9v3TPIixY1E4YvH+4iTL84wEf4n
+         AMVCCQIILkBbc7w89nPq+8Y7o1rpHWKqkyvmyIsoomQ3beeu30kuescRe7brg145YK01
+         8oK9NaPxMsDKdUFbC6ObeQCvucbGXzCZFXiUIaH7n+grsqkK2yLe4GUCPyv8TxaclRK7
+         y4C2xSnBuqJGicFPibucCNo9ebh2UZb/VWoi6SvT9QwqT3LrE+GkDdAnXnif4v+LU/SJ
+         QN48llbJnXVHXhwRxSilF8nZ7vHcxjrWXSK6VTzOrPoDL4JLZ6S2XpFtSjVJg8lwLCUI
+         i4Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689032967; x=1691624967;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C1+7UfAMLI/Nu08LQwOr0R45kQ38N0MvpsViC9OWNis=;
-        b=iHJmithaznTIokvTlnTer0thpIMq+iePz9hG+gHYO9WK0k0o8+eXRsccAd+VAD7PVU
-         iEt0wskIM/XzfaXRzwt/NGHiBWM6rhvDhVa6eYG2tz5uM2+dqcebOV6G93pkhKD8wGUU
-         hDp21fnKymnaPrpzT7brtaFRs8ARHWQ6ZkKMS3CDxFQi4L4ORp87aIlNuneNK0l26ien
-         OM9BLthWoItHTX2E0uvEtjp1hA26mzyLzS+Otx2EP1f6Ookk6XHrAn8+K8c8S6YFlwEu
-         puTOV0c7Aji6cRBqSr+AQuQ6SbjPZZgslVFI+AzbddpaD1UClzYeNM5SbCpeFSovAtkT
-         xiDw==
-X-Gm-Message-State: ABy/qLaGsVWhMuc91ApiAPVt12/lyC5JGeK3qx6BPrNOk7E5aS2ekwWo
-	OTIVEpCVQodwCPpOEsYjQ5gOVg==
-X-Google-Smtp-Source: APBJJlEaSNhVB0rSanYyr8pEV+vVSyEFUXx0WrPVnHkD5VoRVa+WNmm9a90Aeu3n/gnPT2vgrqrtcw==
-X-Received: by 2002:a0c:b3ce:0:b0:636:fda0:a23 with SMTP id b14-20020a0cb3ce000000b00636fda00a23mr10701191qvf.27.1689032967061;
-        Mon, 10 Jul 2023 16:49:27 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id u14-20020a0c8dce000000b00632191a70a2sm370778qvb.103.2023.07.10.16.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 16:49:26 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1qJ0dB-00063Y-Eu;
-	Mon, 10 Jul 2023 20:49:25 -0300
-Date: Mon, 10 Jul 2023 20:49:25 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mina Almasry <almasrymina@google.com>, Christoph Hellwig <hch@lst.de>,
-	John Hubbard <jhubbard@nvidia.com>,
-	Dan Williams <dan.j.williams@intel.com>
-Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Shayne Chen <shayne.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Jonathan Lemon <jonathan.lemon@gmail.com>
-Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
- page_pool: remove PP_FLAG_PAGE_FRAG flag)
-Message-ID: <ZKyZBbKEpmkFkpWV@ziepe.ca>
-References: <20230616122140.6e889357@kernel.org>
- <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com>
- <20230619110705.106ec599@kernel.org>
- <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
- <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
- <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
- <ZKNA9Pkg2vMJjHds@ziepe.ca>
- <CAHS8izNB0qNaU8OTcwDYmeVPtCrEjTTOhwCHtVsLiyhXmPLsXQ@mail.gmail.com>
- <ZKxDZfVAbVHgNgIM@ziepe.ca>
- <CAHS8izO3h3yh=CLJgzhLwCVM4SLgf64nnmBtGrXs=vxuJQHnMQ@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1689033168; x=1691625168;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a48Oh9lap8k90JkfFlJ0CQL2t/AVf5j1IPeKUYcNruk=;
+        b=NOtE4I7cSyubG7bqtwROHKMirqattL92IRVGl5ILUGo0QBpzhnwMXW203XOB8WBEKo
+         9xwIEMJqyLCPtARJySMGHandK+/mK7U2hqDaiQuffe6ERzJtc7vbckwK8XqX4mqGVSnd
+         tkA/pH954uQLdsw/3UKIDgcEO9Rsy975GS1kzDcEEHEDv2TXoTK99qlLthg7yQoLbIG9
+         GOyPM8Rxs/ypucZhoDqotBDut/6EhKLfRBoZ/RaQBFzjU2QgcWF3/Yg7s29xRsRjYTTA
+         qwhulzzz0L0RdipDZsRxP+e43PNcye77g/g6Cd/DEZhFCpz/YtMS889c0sDVToBvgYmd
+         rZ8w==
+X-Gm-Message-State: ABy/qLY5wMS71CIuJGo2W3JPPc+Mp+jd4uNMa9cR21DdaJqjEfm7areT
+	VwB+XwQCsnRCSeGEFjAaAOJ+Hj9diM7WtAZSGUE=
+X-Google-Smtp-Source: APBJJlG6A9sggnezmiO7MOCjZS92bLzmtokuuujhOPKs8lYUkXmPn0DPcL7jBGURG/TAx+AXA9WDJ9vLFU7SQ0qU778=
+X-Received: by 2002:a2e:7e12:0:b0:2b7:1b63:4657 with SMTP id
+ z18-20020a2e7e12000000b002b71b634657mr4892215ljc.37.1689033167679; Mon, 10
+ Jul 2023 16:52:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izO3h3yh=CLJgzhLwCVM4SLgf64nnmBtGrXs=vxuJQHnMQ@mail.gmail.com>
+References: <20230710174636.1174684-1-kuba@kernel.org>
+In-Reply-To: <20230710174636.1174684-1-kuba@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 10 Jul 2023 16:52:36 -0700
+Message-ID: <CAADnVQLKJ0L1Xb5ieFo32c32NuUe89e9N_xD7hyMXUf3h8O-8g@mail.gmail.com>
+Subject: Re: [PATCH net] docs: netdev: update the URL of the status page
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: "David S. Miller" <davem@davemloft.net>, Network Development <netdev@vger.kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 04:02:59PM -0700, Mina Almasry wrote:
-> On Mon, Jul 10, 2023 at 10:44 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Wed, Jul 05, 2023 at 06:17:39PM -0700, Mina Almasry wrote:
-> >
-> > > Another issue is that in networks with low MTU, we could be DMAing
-> > > 1400/1500 bytes into each allocation, which is problematic if the
-> > > allocation is 8K+. I would need to investigate a bit to see if/how to
-> > > solve that, and we may end up having to split the page and again run
-> > > into the 'not enough room in struct page' problem.
-> >
-> > You don't have an intree driver to use this with, so who knows, but
-> > the out of tree GPU drivers tend to use a 64k memory management page
-> > size, and I don't expect you'd make progress with a design where a 64K
-> > naturaly sized allocator is producing 4k/8k non-compound pages just
-> > for netdev. We are still struggling with pagemap support for variable
-> > page size folios, so there is a bunch of technical blockers before
-> > drivers could do this.
-> >
-> > This is why it is so important to come with a complete in-tree
-> > solution, as we cannot review this design if your work is done with
-> > hacked up out of tree drivers.
-> >
-> 
-> I think you're assuming the proposal requires dma-buf exporter driver
-> changes, and I have a 'hacked up out of tree driver' not visible to
-> you.
+On Mon, Jul 10, 2023 at 10:46=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> Move the status page from vger to the same server as mailbot.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> BPF folks, I see a mention of the status page in your FAQ, too,
+> but I'm leaving it to you to update, cause I'm not sure how
+> up to date that section is.
 
-Oh, I thought it was obvious what you did in patch 1 was a total
-non-starter when I said you can't abuse the ZONE_DEVICE pages like
-this.
+Ohh. Thanks for headsup. That part of bpf_devel_QA.rst is outdated.
 
-You must create ZONE_DEVICE P2P pages, not MEMORY_DEVICE_PRIVATE to
-represent P2P memory, and you can't do that automatically from the
-dmabuf core code.
-
-Without doing this the DMA API doesn't actually work properly because
-it doesn't have enough information to know about what the underlying
-exporter is.
-
-The entire point of DEVICE_PRIVATE is that the page content, and
-access to the page's physical location, is *explicitly* unavailable to
-anyone but the pgmap owner.
-
-> > Fully and properly adding P2P ZONE_DEVICE to a real world driver is a
-> > pretty big ask still.
-> 
-> There is no such ask.
-
-Well, there is from me if you want to use stuct pages as handles for
-P2P memory. That is what we have defined in the pgmap area.
-
-Also I should warn you that your 'option 2' is being NAK'd by
-Christoph for now, we are not adding any new code around DMABUF's
-hacky use of NULL sg_page scatterlist for P2P memory either. I've been
-working on solutions here but it is slow going.
-
-> On dma-buf changes required. I do need approval from the dma-buf
-> maintainers,
-
-It is a neat hack, of sorts, to abuse DEVICE_PRIVATE to create struct
-pages for the exclusive use of pagepool - but you need more approval
-than just dmabuf maintainers to abuse the pgmap framework like
-this.
-
-At least from my position I want to see MEMORY_DEVICE_PCI_P2PDMA used
-to represent P2P memory. You haven't CC'd anyone from the mm community
-so I've added some people here to see if there are other opinions.
-
-To be clear, you need an explicit ack from mm people on the abusive
-use of pgmap in patch 1.
-
-I know it is not what you want to hear, but there are actual reasons
-why the P2P DMA problem has been festering for so long, and hacky
-quick fixes like this are not going to be enough..
-
-Jason
+Daniel,
+since you wrote it back in 2017, could you update it to our new scheme?
 
