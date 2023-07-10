@@ -1,137 +1,88 @@
-Return-Path: <netdev+bounces-16553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0ED674DD02
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:04:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D20074DD19
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 20:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D63B2811E7
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:04:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E8E281126
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4691428A;
-	Mon, 10 Jul 2023 18:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698DA14292;
+	Mon, 10 Jul 2023 18:10:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AB311C8B
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 18:04:10 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57C618D
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:04:06 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-766fd5f9536so336619885a.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:04:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E75F14290
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 18:10:03 +0000 (UTC)
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A886F128
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:10:01 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4fb7b2e3dacso7575971e87.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 11:10:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689012246; x=1691604246;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BT8anRcoBomkCL3eLhDuSMG7VrJUf8etAybJpx2cUmQ=;
-        b=P3qkNZJyr3B9iPQ6tzo+Oph7KFNgQR48WP4GUaBG7LO2uQevnfZqahEoF65sPAugnn
-         MNhWEMJae9jMmX7YMUOhnYiRDETA0ZxJsxaJ3VfekaJodPQ0XE7/CMmAauDvYrE75B7W
-         e6Reiouu8KjXUJZm8YbqiHVuOqgKFmIz9g/N3BOq4+MfXFB+VobVN9UMSj1yq/bM+FvH
-         2vmlEzf/kW7afVr8b6ghNyN0dOyVHo4CIbT0AOP08KVkn04tBq6MnrtyGey8uRxlttek
-         mfECNBxhrEl971vEGY6ftU/fY4U3a2UcgpcCRczCcddHUAy7XCE4ihu65DPMtVkNd2IB
-         CQBQ==
+        d=gmail.com; s=20221208; t=1689012600; x=1691604600;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0y0QnBCtE+6dspZdtNusgaiPuJYJ/+guSWc4VqPxJn4=;
+        b=pXnP/rj3FxkOpm1npOLwh33cGMkWAHTc71iJBggi6fKWsSKCT9Zqd2d91D0lOutpRj
+         E9navVx4voIWi13wcegLu7MGNBPH/kA8pEMl3CnyxcyTXxgl1nvK81tKaExoEcjZc/3U
+         SnjEF4hF4yle0O8vSGZc6TAVGUmOSYOJpLLUpPUGRVa6rZ9icEU6htSCYbMoG+jUA5dN
+         7ZPGzOEuDss7U/id72gh/vmcWE1IvqVByxifODsqMNvNHaFIdCCidLAGjv5oWkYzfeSW
+         ZWoYdPSithmgnN3SmDFrLaRJLj2E+FZasSKnaMbqITO5lQ+vPEbxjCcnPih4zT9ts4WV
+         UWyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689012246; x=1691604246;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BT8anRcoBomkCL3eLhDuSMG7VrJUf8etAybJpx2cUmQ=;
-        b=l/yXhS1Gi8oWAwKIUEr1wpieZOn7XAq1vGstKtP1zF5NehyM4Q8nBp/+1Ra+i+0dlk
-         6Eavm0blPtYXvI5z7YNI1Mla3gp6CEWTmPRxrIw9UwdNdNGDh5jPezGi4yRFT3lx/i4a
-         JEePo4q0KLZFicTm4PbVOyKtJ6WQGOv00zdsCK78p3kDSxIzEZUZC+FEPYw+4TUC8PT9
-         reaBhcJm5c/4FQ5tRdReA0mSejQOSekBkRqNwoRqAhNMx/MRPyUL8SexGeD2HEX0JE2O
-         rZ2bGD5/XZGlVxm1/d5ILGK5nCkqDNRKwzEa21zFHGMjr5WIShxqsXWjpLECBvHwZkpn
-         O5qQ==
-X-Gm-Message-State: ABy/qLZQDEYLQdvGd643/Q3SqqPntPdPCw8z+dHzx+APD7TUNz/LA1Ae
-	ZZLTfwn92grSxmiZWuqKDq9P+w==
-X-Google-Smtp-Source: APBJJlEkdizBr7UJSHKmwk1Pw53s9bGXZHen90PgCZoTRA4bGUaUV/2iylwD9yRi/UQu94OEzqbZDw==
-X-Received: by 2002:a0c:e108:0:b0:628:6879:ee48 with SMTP id w8-20020a0ce108000000b006286879ee48mr11363899qvk.50.1689012246035;
-        Mon, 10 Jul 2023 11:04:06 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id r17-20020a0c8b91000000b006360931c12fsm65717qva.96.2023.07.10.11.04.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 11:04:05 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1qIvEy-0004U3-Vv;
-	Mon, 10 Jul 2023 15:04:04 -0300
-Date: Mon, 10 Jul 2023 15:04:04 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Souradeep Chakrabarti <schakrabarti@microsoft.com>,
-	souradeep chakrabarti <schakrabarti@linux.microsoft.com>,
-	KY Srinivasan <kys@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH V4 net] net: mana: Fix MANA VF unload when
- host is unresponsive
-Message-ID: <ZKxIFK2nQqV9AvIA@ziepe.ca>
-References: <1688374171-10534-1-git-send-email-schakrabarti@linux.microsoft.com>
- <83ef6401-8736-8416-c898-2fbbb786726e@intel.com>
- <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
- <7e316b51-be46-96db-84cb-addd28d90b0f@intel.com>
- <PUZP153MB0788A5F92E65AC9A98AF03AFCC2CA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
- <c7e4a416-9da4-7ff2-2223-589fd66f557d@intel.com>
- <PUZP153MB0788C7D2376F3271D77CE826CC2CA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
- <cd36e39a-ebb9-706a-87c3-2f76de82f7ca@intel.com>
- <PH7PR21MB311670231963DE8661C2F178CA2CA@PH7PR21MB3116.namprd21.prod.outlook.com>
+        d=1e100.net; s=20221208; t=1689012600; x=1691604600;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0y0QnBCtE+6dspZdtNusgaiPuJYJ/+guSWc4VqPxJn4=;
+        b=XQTTkc3SenVZHOoYgUVUPm6pz3ejGHSg9klW8wJX7fgxFMVvtta2wksk3goA7P5OBS
+         pMTdNhrGikjn1wG3LADJJ7xCUs4pDQMOOApFFH3NoI/3eIe7GKAILGp4kMBBx8Lru0O3
+         Zne6Gl3s8nk8FWvRLb+fjJZHm+ogPYClf66z9dGTjGIthTsOMFsMtc9Rx7BdSEPlaS6n
+         kkRfYUw8HRS/ikY4k6PTqtt3QKWVceILnn3C9+/qZu8tbwo8jjm1rJSrVLxUCIejhR3W
+         OG0IwITwZisFA97mZcfbwNkO6HR0NtP5qb9uRazrGxa+0BceG7jxIXrdgqkqpyAqvDFj
+         ovaQ==
+X-Gm-Message-State: ABy/qLYntDGQ3g1faXs/N/tt8EpH7S8606AhGvxBJ1QMXKWUEpEsgGm3
+	Skvh9xsAb6peKnRzITLC3sSoTMU1uCSMbORcMH8=
+X-Google-Smtp-Source: APBJJlF1AZwoIAemAKurcDmG/ty3g8O7NrutT+9xIYRYHEDytWWx7RrTj19+Ec9puY5sDsESSr2Q04WEcBVKk1s3OYk=
+X-Received: by 2002:a19:5f5a:0:b0:4f8:e4e9:499e with SMTP id
+ a26-20020a195f5a000000b004f8e4e9499emr10285174lfj.12.1689012599663; Mon, 10
+ Jul 2023 11:09:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH7PR21MB311670231963DE8661C2F178CA2CA@PH7PR21MB3116.namprd21.prod.outlook.com>
+References: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
+ <20230710123556.gufuowtkre652fdp@skbuf> <CABikg9zfGVEJsWf7eq=K5oKQozt86LLn-rzMaVmycekXkQEa8Q@mail.gmail.com>
+ <20230710153827.jhdbl5xh3stslz3u@skbuf>
+In-Reply-To: <20230710153827.jhdbl5xh3stslz3u@skbuf>
+From: Sergei Antonov <saproj@gmail.com>
+Date: Mon, 10 Jul 2023 21:09:48 +0300
+Message-ID: <CABikg9xc5PryyT+b=3JsJoHppe+tfOs+BWrq+kETQK99A-DG=g@mail.gmail.com>
+Subject: Re: Regression: supported_interfaces filling enforcement
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, rmk+kernel@armlinux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 06, 2023 at 01:54:35PM +0000, Haiyang Zhang wrote:
+On Mon, 10 Jul 2023 at 18:38, Vladimir Oltean <olteanv@gmail.com> wrote:
 
-> > This waiting loop is needed to let the pending Tx packets be sent. If
-> > they weren't sent in 1 second, it most likely makes no sense already
-> > whether they will be sent at all or not -- the destination host won't
-> > wait for them for so long.
-> > You say that it may happen only in case of HW issue. If so, I assume you
-> > need to fix it some way, e.g. do a HW reset or so? If so, why bother
-> > waiting for Tx completions if Tx is hung? You free all skbs later either
-> > way, so there are no leaks.
-> 
-> At that point, we don't actually care if the pending packets are sent or not. 
-> But if we free the queues too soon, and the HW is slow for unexpected 
-> reasons, a delayed completion notice will DMA into the freed memory and 
-> cause corruption. That's why we have a longer waiting time.
+> That being said, given the kind of bugs I've seen uncovered in this
+> driver recently, I'd say it would be ridiculous to play pretend - you're
+> probably one of its only users. You can probably be a bit aggressive,
+> remove support for incomplete device trees, see if anyone complains, and
+> they do, revert the removal.
 
-Aieiiie that is a horrible HW design to not have a strong fence of DMA.
-
-"just wait and hope the HW doesn't UAF the kernel with DMA" is really
-awful.
-
-Jason
+Can mv88e6060 functionality be transferred to mv88e6xxx?
 
