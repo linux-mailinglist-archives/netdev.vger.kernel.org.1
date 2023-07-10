@@ -1,128 +1,134 @@
-Return-Path: <netdev+bounces-16618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6014874E04C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:35:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E62674E04E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 23:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AA0F1C20B80
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 21:35:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57FFB28133E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 21:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D2316400;
-	Mon, 10 Jul 2023 21:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED8A16407;
+	Mon, 10 Jul 2023 21:36:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13AC7156D5
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 21:35:32 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09233E0
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:35:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CE7156F4
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 21:36:23 +0000 (UTC)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB29E0
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:36:22 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-666ecb21fb8so8427486b3a.1
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 14:36:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689024931; x=1720560931;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=beisRCXapZM/AG5FDrwm4tiLb4mnWpF2N3asnxQk7os=;
-  b=ONL2kufSc/SV5We0UmMxrAQENVvDXJC1ldDhfxug5FFn4EWRY8AsrYR2
-   0b8LYlQzYHmbSyMCh1IyF3vMXpc1WsdzFkA7L6fH3RMjmo+I+zxFUSUzA
-   i+Hj52PLpM718WNZ03YOd4bEgHbbvNWodo8CCdXdK3i3/82q3unu1LjjV
-   s=;
-X-IronPort-AV: E=Sophos;i="6.01,195,1684800000"; 
-   d="scan'208";a="15416963"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 21:35:28 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id 97300804E2;
-	Mon, 10 Jul 2023 21:35:24 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 10 Jul 2023 21:35:23 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.65.132) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 10 Jul 2023 21:35:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next] ipv6: rpl: Remove redundant skb_dst_drop().
-Date: Mon, 10 Jul 2023 14:35:11 -0700
-Message-ID: <20230710213511.5364-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=google.com; s=20221208; t=1689024981; x=1691616981;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/QG81dWOU8+2ZMkJte6cgGvEOzd5BwfWPVokHYZjTCI=;
+        b=YVhfLbBTU4JQlqdFpX2Ac0IgNx/KSHgY/Ejx2BdoDE/MLijjJYYMBBwq6Ge8MevxjD
+         EEfd4626N9pgSJJiqdeOyu1+EHmFMw8fh/GUKqiT8HvaQg6JVVwKxh1wrSdJzin4Vr/Z
+         JV6Y9FF44gvlIobv+bgjxcKa2uDrZzEL293g2lXwFqZjK1zbfG4NGPMkepmdk89iC3IZ
+         TU4S/lHGUj4LFO6qvZ5xNXoauDexLCzPXYDFBWH4XSfxBvpFTA65emmBgFfDntbIv3vc
+         JQwRFFdb8TwKqE3lpN8gtn96Go4HkixsjBHYumLD9yaYpGrMNXgoP9XKL5KhyvIlrZ1s
+         OpXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689024981; x=1691616981;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/QG81dWOU8+2ZMkJte6cgGvEOzd5BwfWPVokHYZjTCI=;
+        b=CRObVlYlpA61uF9CHMGDqkxrVSmm+PcxXnyLSa8MMxTYMXWP5IM1oBnTPcNB4lTz2E
+         GIPlBS/u8qWrhJGFYZRqYzoxRBEWjThoHSZ+jf/FYg4cQ06mgnhFtWpaFSFrZGgdCd8O
+         FbI+jqw7zs25tGe0FLTYquH2b5E+6THb+kVR/DsVlTQLW/tKZnF9Y0gNsbS7ijmFPQgS
+         O/4q47evqozYSAC8CVbdHqJhK3cpsJKv6Y8LSqrrEIFPEgPOXazduwTb9LUuT6btJ7c/
+         tYeaR47xE0OdNuZlUWDEBOZtj3DB+eAiNUFkh13FBtqeAbzfnt3wksZ7c9dIQPA3kWzE
+         RY9A==
+X-Gm-Message-State: ABy/qLZBqwhbHDWpw+lq1BS3FNh4L3cw68BdDs9dn6rw1YTthCCryEfL
+	Ey7tSHQzqzaoZbuc8IWwRS576nCwGI4=
+X-Google-Smtp-Source: APBJJlHIuDFrwsAjRxk1OL9H4JWUY+yazFv9EjV7KH84+DIRy01I9YCDp3Q6Nc1wAFBQaSPiE5gAOrH7j9k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2392:b0:674:1663:1283 with SMTP id
+ f18-20020a056a00239200b0067416631283mr18725049pfc.1.1689024981471; Mon, 10
+ Jul 2023 14:36:21 -0700 (PDT)
+Date: Mon, 10 Jul 2023 14:36:19 -0700
+In-Reply-To: <20230626113540-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.119.65.132]
-X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <000000000000df3e3b05ff02fe20@google.com> <20230626031411-mutt-send-email-mst@kernel.org>
+ <216718d1-1e32-9ebc-bd5e-96beab3fdc1b@oracle.com> <20230626113540-mutt-send-email-mst@kernel.org>
+Message-ID: <ZKx509XelfwPIkhX@google.com>
+Subject: Re: [syzbot] [net?] [virt?] [kvm?] KASAN: slab-use-after-free Read in __vhost_vq_attach_worker
+From: Sean Christopherson <seanjc@google.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Mike Christie <michael.christie@oracle.com>, 
+	syzbot <syzbot+8540db210d403f1aa214@syzkaller.appspotmail.com>, jasowang@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RPL code has a pattern where skb_dst_drop() is called before
-ip6_route_input().
+On Mon, Jun 26, 2023, Michael S. Tsirkin wrote:
+> On Mon, Jun 26, 2023 at 10:03:25AM -0500, Mike Christie wrote:
+> > On 6/26/23 2:15 AM, Michael S. Tsirkin wrote:
+> > > On Mon, Jun 26, 2023 at 12:06:54AM -0700, syzbot wrote:
+> > >> Hello,
+> > >>
+> > >> syzbot found the following issue on:
+> > >>
+> > >> HEAD commit:    8d2be868b42c Add linux-next specific files for 20230623
+> > >> git tree:       linux-next
+> > >> console+strace: https://syzkaller.appspot.com/x/log.txt?x=12872950a80000
+> > >> kernel config:  https://syzkaller.appspot.com/x/.config?x=d8ac8dd33677e8e0
+> > >> dashboard link: https://syzkaller.appspot.com/bug?extid=8540db210d403f1aa214
+> > >> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> > >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c1b70f280000
+> > >> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=122ee4cb280000
+> > >>
+> > >> Downloadable assets:
+> > >> disk image: https://storage.googleapis.com/syzbot-assets/2a004483aca3/disk-8d2be868.raw.xz
+> > >> vmlinux: https://storage.googleapis.com/syzbot-assets/5688cb13b277/vmlinux-8d2be868.xz
+> > >> kernel image: https://storage.googleapis.com/syzbot-assets/76de0b63bc53/bzImage-8d2be868.xz
+> > >>
+> > >> The issue was bisected to:
+> > >>
+> > >> commit 21a18f4a51896fde11002165f0e7340f4131d6a0
+> > >> Author: Mike Christie <michael.christie@oracle.com>
+> > >> Date:   Tue Jun 13 01:32:46 2023 +0000
+> > >>
+> > >>     vhost: allow userspace to create workers
+> > >>
+> > >> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=130850bf280000
+> > >> final oops:     https://syzkaller.appspot.com/x/report.txt?x=108850bf280000
+> > >> console output: https://syzkaller.appspot.com/x/log.txt?x=170850bf280000
+> > >>
+> > >> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > >> Reported-by: syzbot+8540db210d403f1aa214@syzkaller.appspotmail.com
+> > >> Fixes: 21a18f4a5189 ("vhost: allow userspace to create workers")
+> > > 
+> > > Mike, would appreciate prompt attention to this as I am preparing
+> > > a pull request for the merge window and need to make a
+> > > decision on whether to include your userspace-controlled
+> > > threading patchset.
+> > > 
+> > 
+> > Do you want me to resubmit the patchset or submit a patch against your vhost
+> > branch?
+> 
+> Resubmit pls.
 
-However, ip6_route_input() calls skb_dst_drop() internally,
-so we need not call skb_dst_drop() before ip6_route_input().
+Closing this out from syzbot's perspective since v9 (now in linux-next and Linus'
+tree) added back Mike's fix.
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv6/exthdrs.c      | 2 --
- net/ipv6/rpl_iptunnel.c | 3 +--
- 2 files changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index 202fc3aaa83c..f4bfccae003c 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -612,8 +612,6 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
- 
- 	kfree(buf);
- 
--	skb_dst_drop(skb);
--
- 	ip6_route_input(skb);
- 
- 	if (skb_dst(skb)->error) {
-diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
-index b1c028df686e..a013b92cbb86 100644
---- a/net/ipv6/rpl_iptunnel.c
-+++ b/net/ipv6/rpl_iptunnel.c
-@@ -272,8 +272,6 @@ static int rpl_input(struct sk_buff *skb)
- 	dst = dst_cache_get(&rlwt->cache);
- 	preempt_enable();
- 
--	skb_dst_drop(skb);
--
- 	if (!dst) {
- 		ip6_route_input(skb);
- 		dst = skb_dst(skb);
-@@ -284,6 +282,7 @@ static int rpl_input(struct sk_buff *skb)
- 			preempt_enable();
- 		}
- 	} else {
-+		skb_dst_drop(skb);
- 		skb_dst_set(skb, dst);
- 	}
- 
--- 
-2.30.2
-
+#syz invalid
 
