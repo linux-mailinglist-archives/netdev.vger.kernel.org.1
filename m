@@ -1,127 +1,160 @@
-Return-Path: <netdev+bounces-16305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD4474CA48
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 05:16:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B46574CA4F
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 05:19:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62D331C20930
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 03:16:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 766AB1C20847
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 03:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130F217F2;
-	Mon, 10 Jul 2023 03:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A5917F3;
+	Mon, 10 Jul 2023 03:19:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016AB17D2
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 03:16:48 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD37FB
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 20:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688959006;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a62DSLSpXeASP7dYpa5HsA33PutQ3KjJO6C/G/Q8iAk=;
-	b=EtDC9taNDHxe3UhqS0Y14C9GRRrvbHW+ueIqProwcxJlRByuZtx+cnvnRc7Z+G7cq9wh87
-	wU5+SGTKeEdB3+kJ+G22FYsTIEf30g1tID9cqbrtAlJhwKGWro5WCVQVlKI7XiccCJngZH
-	P42ZiJogMaJfuwV5F7AvW0EP+f4sVCc=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-VD7rjbhSPgOPpiseE_ovLA-1; Sun, 09 Jul 2023 23:16:45 -0400
-X-MC-Unique: VD7rjbhSPgOPpiseE_ovLA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b6cf671d94so33348411fa.1
-        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 20:16:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688959004; x=1691551004;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a62DSLSpXeASP7dYpa5HsA33PutQ3KjJO6C/G/Q8iAk=;
-        b=EsOKjxtqALEdZRwr1Wg5GbPKGmogwaIBbks7cDXTOpixzNfWRr5ZcEvaewYE+UcBOh
-         mtCRD8Nd96nHUF3Aj6aojbV8J4+qzHK3a/3pkLzNYhGaUgfTGAoibm+XAard9VJFjfsu
-         lkLguXjOlCC2gqMJ/Ol65KIVXXFvGKkYN6akACMm3d/nISk3JPNqB8arN/NgdAakWZjh
-         EB83/tXgXUyNDkTXr2vgk55pteo5uKA48pzG+JgFPDcW5eJRZKtGoVupILLSTIYvi6T2
-         y5pY/3WkHem+Xusr7WcYPFW+mlNmTkOWzpkYbbMLHrMnepJ3ZRG0rzcFfcVp0bY/5CQf
-         v7Ew==
-X-Gm-Message-State: ABy/qLYcZ9nD0Ll74cBk6R6+hUsNBPtYF1GZHMVVRgRBRYxZB3BG5QLw
-	akiFwuAzem6XDjHiDWWvUK9UlxrJdoAQQAWQ9PqIOd1px+msP19Y7me3B51QcxtDaAXFNGzqG2D
-	kN25kGCqnCevOJYSntWkXi1hdTcxxwiI0
-X-Received: by 2002:a05:651c:1025:b0:2b6:a22f:9fb9 with SMTP id w5-20020a05651c102500b002b6a22f9fb9mr8375731ljm.27.1688959004008;
-        Sun, 09 Jul 2023 20:16:44 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEnVegvrkpNt0TR6XRnujYIiNrsRYYJzxc37gJtNWKUE7a5YX0jPBMxs0gFC9cJdQNoUf+kMZdSTNMkLAa3IKo=
-X-Received: by 2002:a05:651c:1025:b0:2b6:a22f:9fb9 with SMTP id
- w5-20020a05651c102500b002b6a22f9fb9mr8375700ljm.27.1688959002988; Sun, 09 Jul
- 2023 20:16:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3495817F2
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 03:19:17 +0000 (UTC)
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2115.outbound.protection.outlook.com [40.107.117.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98445EC;
+	Sun,  9 Jul 2023 20:19:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eZPaHIvcXjPlrIaYHE81xK9/WPDKxUdkKEPcJWs1N0G/XC7x1uGu9JMfNlEGTdb7htWWjR43m+2gHbpIxDPn2XcnSdoI/S/J9oHRISCg6Mdr8Vi9M6l2cp6Nm1TVU5hCb85hJvyHC+3Xg3HXyMRk1vBZn7yXdic3mxEAYAZqFLh8k9BFBCExuNVw8Z2N4ucFKz3zm+w5MaFoM66+carqX42+DD8X2Kd+s4pT/099YpBut/FrKhRTZ2gkbIE/pCG13mahOGYnilUym3IvaK2ke5/yaKlyhhIdeoqA6BzUpSdV9A9ivQYtobuPkHq5xhDMAj9QoG2qKoTunSvwxOMwOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sxa8InV55vWyEERTbPTwvBYLSIN4XvPwJyu9WVea+8I=;
+ b=D+91F8kS2VDGf9vhtMnFHIXijMXF7dMUzkVCTcFAjhuUFp95jfcciH2F6hpDF4oAbi/+iyPAXQTqC1bpPfX3fKRnPtBoD/0DpHeQQ9EMqPMpEECQ9kRz8DgWyTKcaojs5b28o5ie+jgo14D5FzOmjcgclDNsiq7RHWFAjVfnQkNXoOaDIf3qEke+6saBG9Vfu/b4zru/eKY+d6IUBLku1OKAVYlsWsJzaA0vC0j0DrvuKTHvEgtIbesgYLoV69M29yU+XVGsutC0eXDXtJ9ytp4YhLFl55MTb64Yn3X4zpCnVVoUVgaQCFUsGpg4LI9TmzqD671NkkApeIZM3gPJ5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sxa8InV55vWyEERTbPTwvBYLSIN4XvPwJyu9WVea+8I=;
+ b=KnqM9/Kx3MtVondCermaS4k77tc+XEjUoCYtCmq8VEvdyfrwZBQD6SlS4PoltOrNOo2GImYT17FhN5qPDP2n25Bz6YDbmfTIit3lO+RRxmxhQ+fGExXcec2b85S7PPnVcjPJAeY5BVfrZdd3dowGRUuJ+zXj+tVO3zceIaar7b6vh8WjVDx2l7ZsmZ3NwERZZ1hyiyMclTKG+vkpYBk/OX1ZbzoZ2eB7j7wXuZkerkDzZ3+EErWrQVcGpu5qWWsrXLI43i53GPih/lmAA/iqQYwyQy+YXpDnVr9bBUb3jLEE6B4YDcSmYdiJFwTMI9AdENOk7Vax1tjYSfslDHsKPw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from TYZPR06MB6697.apcprd06.prod.outlook.com (2603:1096:400:451::6)
+ by TYSPR06MB6606.apcprd06.prod.outlook.com (2603:1096:400:481::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
+ 2023 03:19:11 +0000
+Received: from TYZPR06MB6697.apcprd06.prod.outlook.com
+ ([fe80::8586:be41:eaad:7c03]) by TYZPR06MB6697.apcprd06.prod.outlook.com
+ ([fe80::8586:be41:eaad:7c03%7]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
+ 03:19:11 +0000
+From: Lu Hongfei <luhongfei@vivo.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	luhongfei@vivo.com
+Subject: [PATCH] net: dsa: Removed unneeded of_node_put in felix_parse_ports_node
+Date: Mon, 10 Jul 2023 11:18:59 +0800
+Message-Id: <20230710031859.36784-1-luhongfei@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYAPR01CA0066.jpnprd01.prod.outlook.com
+ (2603:1096:404:2b::30) To TYZPR06MB6697.apcprd06.prod.outlook.com
+ (2603:1096:400:451::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230706231718.54198-1-shannon.nelson@amd.com>
-In-Reply-To: <20230706231718.54198-1-shannon.nelson@amd.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 10 Jul 2023 11:16:32 +0800
-Message-ID: <CACGkMEuD9DgK7CEp0cW-he3FAbzDVsvnhvouLWAMv9bUrq+ATA@mail.gmail.com>
-Subject: Re: [PATCH virtio] pds_vdpa: protect Makefile from unconfigured debugfs
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: rdunlap@infradead.org, mst@redhat.com, 
-	virtualization@lists.linux-foundation.org, brett.creeley@amd.com, 
-	netdev@vger.kernel.org, drivers@pensando.io, sfr@canb.auug.org.au, 
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR06MB6697:EE_|TYSPR06MB6606:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba25be94-1963-42e4-8c6b-08db80f46dfa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/1Cdf2b4W0/RKuLmjRjceHP8MZskZwPvOo7S/ZKlnQUFCa/61fk4nk6jd9RhoAhoFFvVsZfWlWf8WhtgE+UbuNJ1/r0l5gw6v3JOGFcC4HXtVt5qzvdfk39z+vM3eYqTAebxZHygbrnKLFa33pMjRzxkD7ABDbo8gQZTmJFokwgsQI5b5emTZ0WZIz0z/7dLCOow4eDNekE/D0W1rjl4Hs7Bb94VK0Pxc1DyVYmSUHHVcwM+vJmFV7V+z87Wfp7C/+1XTnkYiQ93kz73FF/mMS9asb5tv6HCPkbajzoCHN5MiZnVMzEJ+eAUkrlGkE6ulaJC9bJQu+UJ/g6N/tR3gDe/0pSVlZnawP7MDeres+0LsJ3w1WlkhWngPvMWf5TEj766BvQF5yC/ukyRnitBovSlbeOtKV5hxW8aFeNkwFx7McjVnimyGERJMOKS3bm5onUsko9PqghjAWEeMUnp3r2LZE/Lo/LKMplyVvZUFBcsSmxh7b6ydj90RI0Ubfe9xph5Y7gSB7xbp8gon1+bHAJJC002JcOZtPHS5QvbJdndRhY5sliwM3R2WodIaFl0+opOV10OB0U+y5tESSfv9p70SFIZMuYjsuCd1l434g4NBNMbCX9MAkgoYIW28Bir
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB6697.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(376002)(39860400002)(366004)(451199021)(86362001)(38350700002)(38100700002)(36756003)(6666004)(6486002)(52116002)(110136005)(921005)(107886003)(1076003)(6506007)(26005)(186003)(6512007)(2616005)(7416002)(5660300002)(316002)(2906002)(66556008)(478600001)(66946007)(8676002)(8936002)(83380400001)(4744005)(4326008)(66476007)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5aRKIn0KF7UY5lJ4ugK06Mimt/DR6X1KPgsxcequZt6pyIj+X2iMv1NzSAH2?=
+ =?us-ascii?Q?C3OwYn+nqZqVEBuTv35gmUaGVmYJlN9nFtzMaUGQFXr1E9ECA4de2mdSmWfy?=
+ =?us-ascii?Q?EpWKGacAZQ72xRkU8pIjmiBGZXi5LA12cKMu7+F8VXZK1FrsPVxjI1Yf82xj?=
+ =?us-ascii?Q?TSikEmD2xj8BoZaNIJ0O/wrJeiClQmLLj8+hEmVKUdA7Ec5UIZHQ6io6clk4?=
+ =?us-ascii?Q?slatw52nsNvtx9ejiQXRQ8QPi29uju4i6TbYBAnGtq38q8puj6Jvvf0BiLVl?=
+ =?us-ascii?Q?X2LuHv9wbllYtKdofC+Ld8x0tXGA7RqIXasGkttUoerASPLyOH5nQ/F0EWZd?=
+ =?us-ascii?Q?T2eeR8Yb0OIyFRyhszPn48YFCkDCwedbKt+lhNUDZhSQF2vPeAJ3xk+PFCOn?=
+ =?us-ascii?Q?gxXvser8jo4wH9k7lhmyxKoWmsgLUxuVX6CzLciVsilWlO2YYobLIC/KZKoV?=
+ =?us-ascii?Q?+BRM7a6eUfc7O7RCEo0i5Re3S3weC8bdms3uHglRnIvHg946tir6UwDxyFnB?=
+ =?us-ascii?Q?YCYTWZplc0HcHcB+2a27fP/2Pl3AS6y1Y2IiijnIcbQz2o0zSnX0fMLyjLgN?=
+ =?us-ascii?Q?U35d70VOoqDBQS+TOIaGbDX1DuuU2pRVM2yZzjB5uZK8dBvKCmJIIt74lqR7?=
+ =?us-ascii?Q?ZxE77O9plYvG7/LGQhpgqdYlVundSAeInZvw8qGwdnENa+bVPnNF0XlGkmJj?=
+ =?us-ascii?Q?AKUfC0zpptZ4i+dk5ZH+I68b4uu5UcTa8mKhfpyLMhPPlxQXzrZ1vuVsu8qX?=
+ =?us-ascii?Q?MpU+jH9+110PIKzlhH83GnRm4uxzGPlS2HC0Q2nOZOyY2pefH/u/vfvIvVBA?=
+ =?us-ascii?Q?xoeKqwLy3Y0BRy8crbtxkFR2I8WwuVWgLTNvHRlUpkNFcnpkkLJANfATubFf?=
+ =?us-ascii?Q?w1QnkQ99Fc1pu8sVcFUNelvlxN6yKq9vyrDJ1LHlxDa88AbBwASaqa6WF8aX?=
+ =?us-ascii?Q?6vqn6w53x6Xs6gEJlEYOt+ny81rni6+Utx5xYa76N9lHeATAm6UKchmH9eRh?=
+ =?us-ascii?Q?q+qenZ4t3ibK+FRvDw522VHwOBaB3luVgRrbqC4i3vY0aYxqa8QeQ+mYoBzz?=
+ =?us-ascii?Q?9jxCS9GHcH4Cjk0tZ0ghqWwBWjPdmc1NK/b65qH9BhxKjBHlOUr2QKcNbBaH?=
+ =?us-ascii?Q?cWLPYzIfrR07A3VsGz5vWjkThQRdPeRcsZFe291h7Xe2u7s0JsJJ2rshbFmE?=
+ =?us-ascii?Q?LtS6I20LhFfAO9fpdZDl57M6PHnXXGGaRUsmUpb4j8LIwro04fCjDOrrsA3l?=
+ =?us-ascii?Q?Cb9nIC2dcBZABU/HO9q4mvOVsPandeEyxj8IuRrQmnx7SlclqkQJWVaSz1vd?=
+ =?us-ascii?Q?lSYcXqN84zsgvsDOiXqXbW9e5bJLwp8dpqhcaaqSk2nFztTF9m4xmXbG1nXX?=
+ =?us-ascii?Q?aGSeBd/uOtdc8FF9Me/QN6AAJAEfxlLqWL1h5Zjx0mVut6AGjTBACgXXyoJ+?=
+ =?us-ascii?Q?lzs2dCX2GyneLTFclOrwfRqZxskBN5oyiXa66LF0nUw8d7j0ZkH6snSz/M8U?=
+ =?us-ascii?Q?T9SXaXTvKEvS5cWD8IAPvuJLhcqKXZApC2VGiZXv9lhADDXcKA7SxnsIjk/6?=
+ =?us-ascii?Q?U5O38bFjvAYBSRUAtg1MoVFTCQY5wzVVjpY2n1d2?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba25be94-1963-42e4-8c6b-08db80f46dfa
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB6697.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 03:19:11.5612
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T/GgNjrA17pT3X01kf2xcyq42BGIswKyUHnYomYmBBsrCNlroZZoao0QVot2HjUTDkVUPeY88iKPSHhpWShA2w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6606
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 7, 2023 at 7:17=E2=80=AFAM Shannon Nelson <shannon.nelson@amd.c=
-om> wrote:
->
-> debugfs.h protects itself from an undefined DEBUG_FS, so it is
-> not necessary to check it in the driver code or the Makefile.
-> The driver code had been updated for this, but the Makefile had
-> missed the update.
->
-> Link: https://lore.kernel.org/linux-next/fec68c3c-8249-7af4-5390-0495386a=
-76f9@infradead.org/
-> Fixes: a16291b5bcbb ("pds_vdpa: Add new vDPA driver for AMD/Pensando DSC"=
-)
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+Remove unnecessary of_node_put from the continue path to prevent
+child node from being released twice, which could avoid resource
+leak or other unexpected issues.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Lu Hongfei <luhongfei@vivo.com>
+---
+ drivers/net/dsa/ocelot/felix.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Thanks
-
-> ---
->  drivers/vdpa/pds/Makefile | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/vdpa/pds/Makefile b/drivers/vdpa/pds/Makefile
-> index 2e22418e3ab3..c2d314d4614d 100644
-> --- a/drivers/vdpa/pds/Makefile
-> +++ b/drivers/vdpa/pds/Makefile
-> @@ -5,6 +5,5 @@ obj-$(CONFIG_PDS_VDPA) :=3D pds_vdpa.o
->
->  pds_vdpa-y :=3D aux_drv.o \
->               cmds.o \
-> +             debugfs.o \
->               vdpa_dev.o
-> -
-> -pds_vdpa-$(CONFIG_DEBUG_FS) +=3D debugfs.o
-> --
-> 2.17.1
->
+diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+index dee43caee19e..8da46d284e35 100644
+--- a/drivers/net/dsa/ocelot/felix.c
++++ b/drivers/net/dsa/ocelot/felix.c
+@@ -1286,7 +1286,6 @@ static int felix_parse_ports_node(struct felix *felix,
+ 		if (err < 0) {
+ 			dev_info(dev, "Unsupported PHY mode %s on port %d\n",
+ 				 phy_modes(phy_mode), port);
+-			of_node_put(child);
+ 
+ 			/* Leave port_phy_modes[port] = 0, which is also
+ 			 * PHY_INTERFACE_MODE_NA. This will perform a
+-- 
+2.39.0
 
 
