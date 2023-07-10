@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-16543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73AD474DC13
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 19:16:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDCE74DC3A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 19:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 994031C20B37
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE4D5280BE9
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E3013AF0;
-	Mon, 10 Jul 2023 17:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E3E13AFA;
+	Mon, 10 Jul 2023 17:21:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615E4107B4
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:16:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 607EFC433C8;
-	Mon, 10 Jul 2023 17:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5FB107B4
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:21:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7CBC433C7;
+	Mon, 10 Jul 2023 17:21:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689009395;
-	bh=CgnlYd6F8QNT9n++b/k47msx5swkm6/AbNv02cH7FqM=;
+	s=k20201202; t=1689009717;
+	bh=CpTuLljbdaBkyoyitx9Zt2kT2mpNPwthrmEzA4FZh0k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nCNLRwD0ouHI8pJTPN00LKshCADBsrezjsyCWSHlUtPA86QMcTtmuANY2THapc+ya
-	 rkH5tcQmXa5WkKmxP1SPoeLDBnKChb3smPLszGKE/fOJpIoKZHw2XHyVjIgwHTZ/1z
-	 MufgsvMGmS7UeltSFfqOX5aakYX6Oi9D+fdx6r4xTwDjZDukvdOJHqT+HXAuPx0WPm
-	 TWMpwYu5OvJq0RnyxMb5KHCGmQeKSlmlgHlItZHKy5JjIjq74cV332HHX8EX4US9YN
-	 7LvxZOQBp61R6AEZ7cokvT4lucM8T0YliBj7nuBwioqSX1VDucIF209VQysfZBVMCk
-	 jUIpbFJ9ng45w==
-Date: Mon, 10 Jul 2023 18:16:22 +0100
+	b=jH9O9AHymoIzZncRhS0boDcQENihuPJ9tiOMacCBW9S1HyXoS4fmk05l3yiGNAo2K
+	 KI1hyt+ZX+7NEHBvWCqXjT4yNe/LtAsjRDwPWtbPDyinDXBlqwNxiz4igGDEvFujjT
+	 HvuvVf7zfJpIqBT2DHBv4rYYp+mzBEGWoHelZgtBRzC5a9ODbB3jbYPRYOu+MpK8DF
+	 3DKPCT3xy2bGoPblEhEFYavUFRlVpmVElN1x+riHF3GGBKfZ16h5m4CDQWCrPt/Kv/
+	 vK54neWN9FR7qTjWY6hgaJiuvxPLSkqkKUC983rTnSx7XHJONotnyRARakAtXoacgn
+	 BzkLNw5lEztpw==
+Date: Mon, 10 Jul 2023 18:21:44 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
@@ -80,11 +80,10 @@ Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 05/15] spi: Remove code duplication in
- spi_add_device_locked()
-Message-ID: <7557bada-3076-4d6e-a5c5-d368433706e2@sirena.org.uk>
+Subject: Re: [PATCH v2 08/15] spi: Clean up headers
+Message-ID: <54bb9fe7-fb62-4c2e-ae36-d2c10648ee27@sirena.org.uk>
 References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-6-andriy.shevchenko@linux.intel.com>
+ <20230710154932.68377-9-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,68 +91,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="smwEq19A8LfCcchg"
+	protocol="application/pgp-signature"; boundary="w5h1T0k99Bnkn5Gc"
 Content-Disposition: inline
-In-Reply-To: <20230710154932.68377-6-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20230710154932.68377-9-andriy.shevchenko@linux.intel.com>
 X-Cookie: Do you have lysdexia?
 
 
---smwEq19A8LfCcchg
+--w5h1T0k99Bnkn5Gc
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 10, 2023 at 06:49:22PM +0300, Andy Shevchenko wrote:
-> Seems by unknown reason, probably some kind of mis-rebase,
-> the commit 0c79378c0199 ("spi: add ancillary device support")
-> adds a dozen of duplicating lines of code. Drop them.
->=20
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/spi/spi.c | 11 -----------
->  1 file changed, 11 deletions(-)
->=20
-> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-> index c99ee4164f11..46cbda383228 100644
-> --- a/drivers/spi/spi.c
-> +++ b/drivers/spi/spi.c
-> @@ -712,17 +712,6 @@ EXPORT_SYMBOL_GPL(spi_add_device);
->  static int spi_add_device_locked(struct spi_device *spi)
->  {
->  	struct spi_controller *ctlr =3D spi->controller;
-> -	struct device *dev =3D ctlr->dev.parent;
-> -
-> -	/* Chipselects are numbered 0..max; validate. */
-> -	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
-> -		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
-> -			ctlr->num_chipselect);
-> -		return -EINVAL;
-> -	}
-> -
-> -	/* Set the bus ID string */
-> -	spi_dev_set_name(spi);
+On Mon, Jul 10, 2023 at 06:49:25PM +0300, Andy Shevchenko wrote:
+> There is a few things done:
+> - include only the headers we are direct user of
+> - when pointer is in use, provide a forward declaration
+> - add missing headers
+> - group generic headers and subsystem headers
+> - sort each group alphabetically
 
-I see that this is duplicating spi_add_device() (and we really could do
-better with code sharing there I think) but I can't immediately see
-where the duplication that's intended to be elimiated is here - where
-else in the one call path that spi_add_device_locked() has would we do
-the above?  Based on the changelog I was expecting to see some
-duplicated code in the function itself.
+The previous commit was supposed to be sorting things and AFAICT did
+so...
 
---smwEq19A8LfCcchg
+> +struct spi_device_id;
+
+Why are we adding this given that there's also an inclusion of
+mod_devicetable that you didn't remove?
+
+--w5h1T0k99Bnkn5Gc
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSsPOUACgkQJNaLcl1U
-h9DBUwf9Euy3I6rYQCugpUDlBhWVoSMMz7t1ATFjPAfJAReJsl7tNz8zO3ZIBKvo
-DT0wuXofoowlS3XkS80I3NNL7wRjCktrPJnRHSBr/n15W3VCvz7cA+vkKlJdt60d
-vqLIOGnEqqPBftrOwUjsobHicO0YhL47AxOStev3fjlhFEbS0RrIpvCsVsRI1HDs
-5MalNotHe8wd+ujY4p9wUX9c2EZvSWQAE4XUBml+faspwunMGqKbjE+srfTbz+eB
-bkym8H1s/H5a/SQn5ya4y6dkDZ0jR9hz4H3HxMm4C/KgUJRnZXiIgNRtghmsQNys
-LGdv8LQz0S452H4iaGYZlWdB4IEu1w==
-=KWBr
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSsPicACgkQJNaLcl1U
+h9CPUAf/RRQIrb0PfZnRSA7kc94fTv5rQbNfPboY9/94tcd2SIZjbZezvGfMuSZp
+6KHTd2Kkiwzya3J0dExwrNiIzmVrIGl+uWJWbvppEpglEeE0BNrEl1a9mRgzaQUk
+Ys7HqCSSbbtJqGSlgQAODJPS7eaPIw1ChR5Wv5B+4AlUGavA+iCrwDK+TD0dFZpQ
+ovdLIOvU+8RA2XrWSPmDSi4ywOFt9I70VxOWbR9rbfQcvXLRaJA1FOJa2ZArMhHy
+CULubdIfA4BO7mOmyLX63DXgjZqu703oW4W5RFmjc+sa9xmoSdlCYflpgXX/xSqG
+VmDSPECCeUQc9NZwlOM4i7+iPwCymQ==
+=E/m2
 -----END PGP SIGNATURE-----
 
---smwEq19A8LfCcchg--
+--w5h1T0k99Bnkn5Gc--
 
