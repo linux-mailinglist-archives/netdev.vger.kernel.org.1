@@ -1,71 +1,138 @@
-Return-Path: <netdev+bounces-16536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2DE674DBA9
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E721174DBBC
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B0EA280F4A
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:55:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1854280F6A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB00134C9;
-	Mon, 10 Jul 2023 16:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF17134DD;
+	Mon, 10 Jul 2023 16:57:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97941125CA;
-	Mon, 10 Jul 2023 16:55:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2EADC433C8;
-	Mon, 10 Jul 2023 16:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46208107B4
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:57:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 013E7C433C8;
+	Mon, 10 Jul 2023 16:57:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689008121;
-	bh=92QedKxPnNh0nRPl+lEtvbAjvdZYrtCfYJAIUUcekKY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h9XLo4wu7lBg0N5oGAc759RbT0fju5NSf+fRgRNGKv5KrBtoihuXqUzVUUs7BXkMw
-	 ZTgs8YaMAjE28qU+zL1jrVmXhmRFPr41gUPd7zAtoFlb6E4x1xOYNCv9R4K9puEZDv
-	 LyRhqxK7QNLgDUVVH3hO4494TbUbjgeLhgDu7ATjo6SP0SMnXbTTjGMmTkAIzkSHCf
-	 xfx4unSSVitYNuZF3CC+e1Oqbqyry2HOEdBgxpcRF1BRiUje4z2s8/M+RgkICU4Al+
-	 jjcovcDLDMrNRkfxxoce5M8+MCQFoTtism9s18iuPBMlfK5LQm0/nzMPovRKHYFPh9
-	 eI9H1aqDZYMcA==
-Date: Mon, 10 Jul 2023 09:55:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Andrew
- Lunn <andrew@lunn.ch>, Ross Maynard <bids.7405@bigpond.com>, Dave Jones
- <davej@codemonkey.org.uk>, Bagas Sanjaya <bagasdotme@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>,
- Linux USB <linux-usb@vger.kernel.org>, Oliver Neukum <oneukum@suse.com>
-Subject: Re: 3 more broken Zaurii - SL-5600, A300, C700
-Message-ID: <20230710095519.5056c98b@kernel.org>
-In-Reply-To: <ac957af4-f265-3ba0-0373-3a71d134a57e@leemhuis.info>
-References: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
-	<50f4c10d-260c-cb98-e7d2-124f5519fa68@gmail.com>
-	<e1fdc435-089c-8ce7-d536-ce3780a4ba95@leemhuis.info>
-	<ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
-	<62a9e058-c853-1fcd-5663-e2e001f881e9@bigpond.com>
-	<14fd48c8-3955-c933-ab6f-329e54da090f@bigpond.com>
-	<05a229e8-b0b6-4d29-8561-70d02f6dc31b@lunn.ch>
-	<ac957af4-f265-3ba0-0373-3a71d134a57e@leemhuis.info>
+	s=k20201202; t=1689008234;
+	bh=IIro+PYudoCpsNeH2Llkq/gmEiqeLq8TswCPO5UnD6k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p7yUWoNb8JNe5qIMp13em9m8Rzsc1ghhta/kWFSe5/qi4pD5l1Kdd3nTIbhSAnB41
+	 W8C1J2axQqESm/vo5JFAn+FCzJ9O92y9klVgFoPPFBocvgHANqPMFGPKWSy1cah2AJ
+	 6B66a+6OSbM4vJnoAPeTpJQU1ZveA0PYXoTV6fut7sflD58+Jtel0GfBpq6p2nXiCt
+	 M0xsvZQxCC0EolQkXizKejaZaayP6VSNsobrYWwUH758W9Nr9zRBh1oYMDG5FsShL0
+	 zQI22BV9Iz/Ww1LFbCTyWKHKLILGMYlknCcvjk0BqOW9V/aTLFc+59pabBeheGKNwr
+	 5euI/OtpKjArA==
+Date: Mon, 10 Jul 2023 17:56:59 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
+	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Radu Pirea <radu_nicolae.pirea@upb.ro>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Orson Zhai <orsonzhai@gmail.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Chunyan Zhang <zhang.lyra@gmail.com>,
+	Alain Volmat <alain.volmat@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH v2 03/15] spi: Replace if-else-if by bitops and
+ multiplications
+Message-ID: <24e71654-bc79-42ac-86d1-4e6100f6893a@sirena.org.uk>
+References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
+ <20230710154932.68377-4-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="fI+fdz2D5/EEE42m"
+Content-Disposition: inline
+In-Reply-To: <20230710154932.68377-4-andriy.shevchenko@linux.intel.com>
+X-Cookie: Do you have lysdexia?
 
-On Sun, 9 Jul 2023 06:36:32 +0200 Linux regression tracking (Thorsten
-Leemhuis) wrote:
-> To chime in here: I most agree, but FWIW, it broke more than a decade
-> ago in v3.0, so maybe this is better suited for net-next. But of course
-> that up to the -net maintainers.
 
-I'm surprised to see you suggest -next for a fix to a user reported bug.
-IMO it's very firmly net material.
+--fI+fdz2D5/EEE42m
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Mon, Jul 10, 2023 at 06:49:20PM +0300, Andy Shevchenko wrote:
+
+> -		if (xfer->bits_per_word <= 8)
+> -			maxsize = maxwords;
+> -		else if (xfer->bits_per_word <= 16)
+> -			maxsize = 2 * maxwords;
+> -		else
+> -			maxsize = 4 * maxwords;
+> -
+> +		maxsize = maxwords * roundup_pow_of_two(BITS_TO_BYTES(xfer->bits_per_word));
+
+This will change the behaviour if bits_per_word is more than 32.  That
+is validated out elsewhere but I shouldn't have had to go around
+checking the code to confirm that this is the case.  This is the sort of
+thing that should be highlighted when doing this sort of edge case
+stylistic change.
+
+--fI+fdz2D5/EEE42m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSsOFsACgkQJNaLcl1U
+h9A2Ywf+KXUPki4n4OHbYfUF8KSXIYSkZGLAugrUbcI1dW/wY8+0fLYP8+4w9V+j
+f81LA7/NDs1aRdnIEAvy6JRWhsUGKyHHKw42xpXD6MqtamipzOaVSYaL2Hr3ZuqC
+22p4KuNl0BAuHc+iyOWLpX7/btG8mweyZNWYjDbaB3duv4usx8Pis5kQu9HrTvfw
+e1repiQ4pqd5PGfhReO1fGbR6QIhoswiEm/9yfkZTQs1HAIOpRAePL2XPZD3sBuj
+pehvlOvP2yRq1fOxYVWGxXH8dhavS5t/mUlzyTYI7VxMD2HUZD1EiZ2uYcmntUEl
+y8tiLDQIFQRb++F+IFf0SjU+vXe0UQ==
+=tuUl
+-----END PGP SIGNATURE-----
+
+--fI+fdz2D5/EEE42m--
 
