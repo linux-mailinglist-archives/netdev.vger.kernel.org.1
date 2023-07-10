@@ -1,33 +1,38 @@
-Return-Path: <netdev+bounces-16340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B193474CD57
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:41:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D32C774CD5D
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 08:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA5E280EFB
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:41:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5A101C209CB
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 06:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E448F3D8C;
-	Mon, 10 Jul 2023 06:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C91E3FF5;
+	Mon, 10 Jul 2023 06:41:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99DE3C29
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CE653BE
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 06:41:39 +0000 (UTC)
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 8E80D1A8;
-	Sun,  9 Jul 2023 23:41:21 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id A9D721BF;
+	Sun,  9 Jul 2023 23:41:35 -0700 (PDT)
 Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 9FDBE602A8713;
-	Mon, 10 Jul 2023 14:41:17 +0800 (CST)
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 4E21A602B2DC6;
+	Mon, 10 Jul 2023 14:41:32 +0800 (CST)
 X-MD-Sfrom: suhui@nfschina.com
 X-MD-SrcIP: 180.167.10.98
 From: Su Hui <suhui@nfschina.com>
-To: steve.glendinning@shawell.net,
+To: iyappan@os.amperecomputing.com,
+	keyur@os.amperecomputing.com,
+	quan@os.amperecomputing.com,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
@@ -36,9 +41,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	kernel-janitors@vger.kernel.org,
 	wuych <yunchuan@nfschina.com>
-Subject: [PATCH net-next v2 07/10] ethernet: smsc: remove unnecessary (void*) conversions
-Date: Mon, 10 Jul 2023 14:41:15 +0800
-Message-Id: <20230710064115.173735-1-suhui@nfschina.com>
+Subject: [PATCH net-next v2 08/10] net: mdio: Remove unnecessary (void*) conversions
+Date: Mon, 10 Jul 2023 14:41:27 +0800
+Message-Id: <20230710064127.173818-1-suhui@nfschina.com>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,54 +64,31 @@ Pointer variables of void * type do not require type cast.
 
 Signed-off-by: wuych <yunchuan@nfschina.com>
 ---
- drivers/net/ethernet/smsc/smsc911x.c | 4 ++--
- drivers/net/ethernet/smsc/smsc9420.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/mdio/mdio-xgene.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/smsc/smsc911x.c b/drivers/net/ethernet/smsc/smsc911x.c
-index 174dc8908b72..c362bff3cb83 100644
---- a/drivers/net/ethernet/smsc/smsc911x.c
-+++ b/drivers/net/ethernet/smsc/smsc911x.c
-@@ -552,7 +552,7 @@ static void smsc911x_mac_write(struct smsc911x_data *pdata,
- /* Get a phy register */
- static int smsc911x_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
- {
--	struct smsc911x_data *pdata = (struct smsc911x_data *)bus->priv;
-+	struct smsc911x_data *pdata = bus->priv;
- 	unsigned long flags;
- 	unsigned int addr;
- 	int i, reg;
-@@ -591,7 +591,7 @@ static int smsc911x_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
- static int smsc911x_mii_write(struct mii_bus *bus, int phyaddr, int regidx,
- 			   u16 val)
- {
--	struct smsc911x_data *pdata = (struct smsc911x_data *)bus->priv;
-+	struct smsc911x_data *pdata = bus->priv;
- 	unsigned long flags;
- 	unsigned int addr;
- 	int i, reg;
-diff --git a/drivers/net/ethernet/smsc/smsc9420.c b/drivers/net/ethernet/smsc/smsc9420.c
-index 71fbb358bb7d..3b26f1d86beb 100644
---- a/drivers/net/ethernet/smsc/smsc9420.c
-+++ b/drivers/net/ethernet/smsc/smsc9420.c
-@@ -102,7 +102,7 @@ static inline void smsc9420_pci_flush_write(struct smsc9420_pdata *pd)
+diff --git a/drivers/net/mdio/mdio-xgene.c b/drivers/net/mdio/mdio-xgene.c
+index 7aafc221b5cf..683e8f8319ab 100644
+--- a/drivers/net/mdio/mdio-xgene.c
++++ b/drivers/net/mdio/mdio-xgene.c
+@@ -79,7 +79,7 @@ EXPORT_SYMBOL(xgene_mdio_wr_mac);
  
- static int smsc9420_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
+ int xgene_mdio_rgmii_read(struct mii_bus *bus, int phy_id, int reg)
  {
--	struct smsc9420_pdata *pd = (struct smsc9420_pdata *)bus->priv;
-+	struct smsc9420_pdata *pd = bus->priv;
- 	unsigned long flags;
- 	u32 addr;
- 	int i, reg = -EIO;
-@@ -140,7 +140,7 @@ static int smsc9420_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
- static int smsc9420_mii_write(struct mii_bus *bus, int phyaddr, int regidx,
- 			   u16 val)
+-	struct xgene_mdio_pdata *pdata = (struct xgene_mdio_pdata *)bus->priv;
++	struct xgene_mdio_pdata *pdata = bus->priv;
+ 	u32 data, done;
+ 	u8 wait = 10;
+ 
+@@ -105,7 +105,7 @@ EXPORT_SYMBOL(xgene_mdio_rgmii_read);
+ 
+ int xgene_mdio_rgmii_write(struct mii_bus *bus, int phy_id, int reg, u16 data)
  {
--	struct smsc9420_pdata *pd = (struct smsc9420_pdata *)bus->priv;
-+	struct smsc9420_pdata *pd = bus->priv;
- 	unsigned long flags;
- 	u32 addr;
- 	int i, reg = -EIO;
+-	struct xgene_mdio_pdata *pdata = (struct xgene_mdio_pdata *)bus->priv;
++	struct xgene_mdio_pdata *pdata = bus->priv;
+ 	u32 val, done;
+ 	u8 wait = 10;
+ 
 -- 
 2.30.2
 
