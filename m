@@ -1,150 +1,60 @@
-Return-Path: <netdev+bounces-16517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71E974DAD1
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:13:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BD1E74DAD6
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 18:15:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86442281304
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:13:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1459281303
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 16:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA198134A5;
-	Mon, 10 Jul 2023 16:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8AB134AF;
+	Mon, 10 Jul 2023 16:15:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDE612B8F
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:13:29 +0000 (UTC)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2723618D;
-	Mon, 10 Jul 2023 09:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689005604; x=1720541604;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hcRhvsNpzCZm3Sd7nNPgrDaCtucecy1QPHYWw64ui6o=;
-  b=gNhFXiXfjwNq5lgOn1LfATXCkYjrkUiekdloO+VlxgQAGwAowpuqnero
-   LqwzCM58mwnIEo6x/vxNUY2goK7aOXUgMv0fr7tkztR6hfBI1DnMgLE9q
-   +Jpx4d2Uyv67chiRtr0ioR8ixqTjMXI9XWukYXc1cBgoJowFte1TAeoNM
-   FlAybTb6Hr4INO6T8ZDJ3joMZNvW8dugQm9OqLbOzuE5+MQiSBmZUOJD/
-   pNOTl3oz/wHthzgZ3zrrrmlXXKNUQe6/uNM0QNkhpRV0ZDF71heDNUJMA
-   0aDyyYGf6IoE9nWwExq8QuAYseXWicb+7ZNPpwqeDAyiGeTCigvmEXSgY
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="354244117"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="354244117"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 09:12:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="790844445"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="790844445"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Jul 2023 09:12:26 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qItUs-001bGm-39;
-	Mon, 10 Jul 2023 19:12:22 +0300
-Date: Mon, 10 Jul 2023 19:12:22 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Mark Brown <broonie@kernel.org>,
-	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Andy Gross <agross@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>
-Subject: Re: [PATCH v2 09/15] spi: Use struct_size() helper
-Message-ID: <ZKwt5utuGaCf5nmT@smile.fi.intel.com>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-10-andriy.shevchenko@linux.intel.com>
- <20230710-doze-scared-9f0a2e1a9125-mkl@pengutronix.de>
- <ZKwtgwZtUUHGC+S3@smile.fi.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548613222
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 16:15:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5836DC433C7;
+	Mon, 10 Jul 2023 16:15:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689005746;
+	bh=EnHiiTkYovbRCqP6GjWdTZK3cChn2ZgTf/L/xSKlxg8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qsXqxqLtPs5Kh7AH2qMcLa6/7Hf6Kx9qDckz7k49WWVlUY5f9qoXDq6IuC8Kt59Qo
+	 tKivWokTCFCjmICnjs6cladxP4VxbaDp8j0oMlg8hQjlqjTHc0ZKHVZ9AzPzZk73UB
+	 4B8cmDgBKIjSMCsYsnumgCbNGvr1FzNwesOfbsVY4DTz/UZiB+cOW/jq7BtVrshItP
+	 E8CMr/zhwj8vLXkqRI8NWJXd0sEhkkiZTorh0XgJBxy6tJydlK006/bsTgivdQZgnf
+	 bUqyV1Sq8ePyXa3hdPuNza45a+rUfyTmqthAVSh6G/dg/6o8Xl/eZmHKN50IgQj+a0
+	 3xvT7zXk3lXVg==
+Date: Mon, 10 Jul 2023 09:15:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lee Jones <lee@kernel.org>, s.shtylyov@omp.ru
+Cc: Zheng Wang <zyytlz.wz@163.com>, davem@davemloft.net,
+ linyunsheng@huawei.com, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ hackerzheng666@gmail.com, 1395428693sheep@gmail.com, alex000young@gmail.com
+Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
+Message-ID: <20230710091545.5df553fc@kernel.org>
+In-Reply-To: <20230710114253.GA132195@google.com>
+References: <20230311180630.4011201-1-zyytlz.wz@163.com>
+	<20230710114253.GA132195@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKwtgwZtUUHGC+S3@smile.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 10, 2023 at 07:10:43PM +0300, Andy Shevchenko wrote:
-> On Mon, Jul 10, 2023 at 05:59:55PM +0200, Marc Kleine-Budde wrote:
-> > On 10.07.2023 18:49:26, Andy Shevchenko wrote:
+On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
+> For better or worse, it looks like this issue was assigned a CVE.
 
-...
+Ugh, what a joke. 
 
-> > > +	struct spi_transfer	t[];
-> > 
-> > You might want to use the DECLARE_FLEX_ARRAY helper here.
-> 
-> Technically, yes, semantically documentation [1] disagrees with
-
-"and [2]"
-
-> you, so I leave it as is.
-> 
-> [1]: Documentation/process/deprecated.rst:269
-
-[2]: Documentation/process/deprecated.rst:350
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Sergey, could you take a look at fixing this properly?
 
