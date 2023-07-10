@@ -1,160 +1,180 @@
-Return-Path: <netdev+bounces-16306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B46574CA4F
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 05:19:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5659C74CAB2
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 05:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 766AB1C20847
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 03:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89B02280E97
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 03:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A5917F3;
-	Mon, 10 Jul 2023 03:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5752917FF;
+	Mon, 10 Jul 2023 03:42:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3495817F2
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 03:19:17 +0000 (UTC)
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2115.outbound.protection.outlook.com [40.107.117.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98445EC;
-	Sun,  9 Jul 2023 20:19:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eZPaHIvcXjPlrIaYHE81xK9/WPDKxUdkKEPcJWs1N0G/XC7x1uGu9JMfNlEGTdb7htWWjR43m+2gHbpIxDPn2XcnSdoI/S/J9oHRISCg6Mdr8Vi9M6l2cp6Nm1TVU5hCb85hJvyHC+3Xg3HXyMRk1vBZn7yXdic3mxEAYAZqFLh8k9BFBCExuNVw8Z2N4ucFKz3zm+w5MaFoM66+carqX42+DD8X2Kd+s4pT/099YpBut/FrKhRTZ2gkbIE/pCG13mahOGYnilUym3IvaK2ke5/yaKlyhhIdeoqA6BzUpSdV9A9ivQYtobuPkHq5xhDMAj9QoG2qKoTunSvwxOMwOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sxa8InV55vWyEERTbPTwvBYLSIN4XvPwJyu9WVea+8I=;
- b=D+91F8kS2VDGf9vhtMnFHIXijMXF7dMUzkVCTcFAjhuUFp95jfcciH2F6hpDF4oAbi/+iyPAXQTqC1bpPfX3fKRnPtBoD/0DpHeQQ9EMqPMpEECQ9kRz8DgWyTKcaojs5b28o5ie+jgo14D5FzOmjcgclDNsiq7RHWFAjVfnQkNXoOaDIf3qEke+6saBG9Vfu/b4zru/eKY+d6IUBLku1OKAVYlsWsJzaA0vC0j0DrvuKTHvEgtIbesgYLoV69M29yU+XVGsutC0eXDXtJ9ytp4YhLFl55MTb64Yn3X4zpCnVVoUVgaQCFUsGpg4LI9TmzqD671NkkApeIZM3gPJ5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sxa8InV55vWyEERTbPTwvBYLSIN4XvPwJyu9WVea+8I=;
- b=KnqM9/Kx3MtVondCermaS4k77tc+XEjUoCYtCmq8VEvdyfrwZBQD6SlS4PoltOrNOo2GImYT17FhN5qPDP2n25Bz6YDbmfTIit3lO+RRxmxhQ+fGExXcec2b85S7PPnVcjPJAeY5BVfrZdd3dowGRUuJ+zXj+tVO3zceIaar7b6vh8WjVDx2l7ZsmZ3NwERZZ1hyiyMclTKG+vkpYBk/OX1ZbzoZ2eB7j7wXuZkerkDzZ3+EErWrQVcGpu5qWWsrXLI43i53GPih/lmAA/iqQYwyQy+YXpDnVr9bBUb3jLEE6B4YDcSmYdiJFwTMI9AdENOk7Vax1tjYSfslDHsKPw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from TYZPR06MB6697.apcprd06.prod.outlook.com (2603:1096:400:451::6)
- by TYSPR06MB6606.apcprd06.prod.outlook.com (2603:1096:400:481::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Mon, 10 Jul
- 2023 03:19:11 +0000
-Received: from TYZPR06MB6697.apcprd06.prod.outlook.com
- ([fe80::8586:be41:eaad:7c03]) by TYZPR06MB6697.apcprd06.prod.outlook.com
- ([fe80::8586:be41:eaad:7c03%7]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
- 03:19:11 +0000
-From: Lu Hongfei <luhongfei@vivo.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AA217F2;
+	Mon, 10 Jul 2023 03:42:43 +0000 (UTC)
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277B4C2;
+	Sun,  9 Jul 2023 20:42:41 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0VmxH3ZP_1688960557;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VmxH3ZP_1688960557)
+          by smtp.aliyun-inc.com;
+          Mon, 10 Jul 2023 11:42:38 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: virtualization@lists.linux-foundation.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com,
-	luhongfei@vivo.com
-Subject: [PATCH] net: dsa: Removed unneeded of_node_put in felix_parse_ports_node
-Date: Mon, 10 Jul 2023 11:18:59 +0800
-Message-Id: <20230710031859.36784-1-luhongfei@vivo.com>
-X-Mailer: git-send-email 2.39.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYAPR01CA0066.jpnprd01.prod.outlook.com
- (2603:1096:404:2b::30) To TYZPR06MB6697.apcprd06.prod.outlook.com
- (2603:1096:400:451::6)
+	bpf@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH vhost v11 00/10] virtio core prepares for AF_XDP
+Date: Mon, 10 Jul 2023 11:42:27 +0800
+Message-Id: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYZPR06MB6697:EE_|TYSPR06MB6606:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba25be94-1963-42e4-8c6b-08db80f46dfa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	/1Cdf2b4W0/RKuLmjRjceHP8MZskZwPvOo7S/ZKlnQUFCa/61fk4nk6jd9RhoAhoFFvVsZfWlWf8WhtgE+UbuNJ1/r0l5gw6v3JOGFcC4HXtVt5qzvdfk39z+vM3eYqTAebxZHygbrnKLFa33pMjRzxkD7ABDbo8gQZTmJFokwgsQI5b5emTZ0WZIz0z/7dLCOow4eDNekE/D0W1rjl4Hs7Bb94VK0Pxc1DyVYmSUHHVcwM+vJmFV7V+z87Wfp7C/+1XTnkYiQ93kz73FF/mMS9asb5tv6HCPkbajzoCHN5MiZnVMzEJ+eAUkrlGkE6ulaJC9bJQu+UJ/g6N/tR3gDe/0pSVlZnawP7MDeres+0LsJ3w1WlkhWngPvMWf5TEj766BvQF5yC/ukyRnitBovSlbeOtKV5hxW8aFeNkwFx7McjVnimyGERJMOKS3bm5onUsko9PqghjAWEeMUnp3r2LZE/Lo/LKMplyVvZUFBcsSmxh7b6ydj90RI0Ubfe9xph5Y7gSB7xbp8gon1+bHAJJC002JcOZtPHS5QvbJdndRhY5sliwM3R2WodIaFl0+opOV10OB0U+y5tESSfv9p70SFIZMuYjsuCd1l434g4NBNMbCX9MAkgoYIW28Bir
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB6697.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(376002)(39860400002)(366004)(451199021)(86362001)(38350700002)(38100700002)(36756003)(6666004)(6486002)(52116002)(110136005)(921005)(107886003)(1076003)(6506007)(26005)(186003)(6512007)(2616005)(7416002)(5660300002)(316002)(2906002)(66556008)(478600001)(66946007)(8676002)(8936002)(83380400001)(4744005)(4326008)(66476007)(41300700001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5aRKIn0KF7UY5lJ4ugK06Mimt/DR6X1KPgsxcequZt6pyIj+X2iMv1NzSAH2?=
- =?us-ascii?Q?C3OwYn+nqZqVEBuTv35gmUaGVmYJlN9nFtzMaUGQFXr1E9ECA4de2mdSmWfy?=
- =?us-ascii?Q?EpWKGacAZQ72xRkU8pIjmiBGZXi5LA12cKMu7+F8VXZK1FrsPVxjI1Yf82xj?=
- =?us-ascii?Q?TSikEmD2xj8BoZaNIJ0O/wrJeiClQmLLj8+hEmVKUdA7Ec5UIZHQ6io6clk4?=
- =?us-ascii?Q?slatw52nsNvtx9ejiQXRQ8QPi29uju4i6TbYBAnGtq38q8puj6Jvvf0BiLVl?=
- =?us-ascii?Q?X2LuHv9wbllYtKdofC+Ld8x0tXGA7RqIXasGkttUoerASPLyOH5nQ/F0EWZd?=
- =?us-ascii?Q?T2eeR8Yb0OIyFRyhszPn48YFCkDCwedbKt+lhNUDZhSQF2vPeAJ3xk+PFCOn?=
- =?us-ascii?Q?gxXvser8jo4wH9k7lhmyxKoWmsgLUxuVX6CzLciVsilWlO2YYobLIC/KZKoV?=
- =?us-ascii?Q?+BRM7a6eUfc7O7RCEo0i5Re3S3weC8bdms3uHglRnIvHg946tir6UwDxyFnB?=
- =?us-ascii?Q?YCYTWZplc0HcHcB+2a27fP/2Pl3AS6y1Y2IiijnIcbQz2o0zSnX0fMLyjLgN?=
- =?us-ascii?Q?U35d70VOoqDBQS+TOIaGbDX1DuuU2pRVM2yZzjB5uZK8dBvKCmJIIt74lqR7?=
- =?us-ascii?Q?ZxE77O9plYvG7/LGQhpgqdYlVundSAeInZvw8qGwdnENa+bVPnNF0XlGkmJj?=
- =?us-ascii?Q?AKUfC0zpptZ4i+dk5ZH+I68b4uu5UcTa8mKhfpyLMhPPlxQXzrZ1vuVsu8qX?=
- =?us-ascii?Q?MpU+jH9+110PIKzlhH83GnRm4uxzGPlS2HC0Q2nOZOyY2pefH/u/vfvIvVBA?=
- =?us-ascii?Q?xoeKqwLy3Y0BRy8crbtxkFR2I8WwuVWgLTNvHRlUpkNFcnpkkLJANfATubFf?=
- =?us-ascii?Q?w1QnkQ99Fc1pu8sVcFUNelvlxN6yKq9vyrDJ1LHlxDa88AbBwASaqa6WF8aX?=
- =?us-ascii?Q?6vqn6w53x6Xs6gEJlEYOt+ny81rni6+Utx5xYa76N9lHeATAm6UKchmH9eRh?=
- =?us-ascii?Q?q+qenZ4t3ibK+FRvDw522VHwOBaB3luVgRrbqC4i3vY0aYxqa8QeQ+mYoBzz?=
- =?us-ascii?Q?9jxCS9GHcH4Cjk0tZ0ghqWwBWjPdmc1NK/b65qH9BhxKjBHlOUr2QKcNbBaH?=
- =?us-ascii?Q?cWLPYzIfrR07A3VsGz5vWjkThQRdPeRcsZFe291h7Xe2u7s0JsJJ2rshbFmE?=
- =?us-ascii?Q?LtS6I20LhFfAO9fpdZDl57M6PHnXXGGaRUsmUpb4j8LIwro04fCjDOrrsA3l?=
- =?us-ascii?Q?Cb9nIC2dcBZABU/HO9q4mvOVsPandeEyxj8IuRrQmnx7SlclqkQJWVaSz1vd?=
- =?us-ascii?Q?lSYcXqN84zsgvsDOiXqXbW9e5bJLwp8dpqhcaaqSk2nFztTF9m4xmXbG1nXX?=
- =?us-ascii?Q?aGSeBd/uOtdc8FF9Me/QN6AAJAEfxlLqWL1h5Zjx0mVut6AGjTBACgXXyoJ+?=
- =?us-ascii?Q?lzs2dCX2GyneLTFclOrwfRqZxskBN5oyiXa66LF0nUw8d7j0ZkH6snSz/M8U?=
- =?us-ascii?Q?T9SXaXTvKEvS5cWD8IAPvuJLhcqKXZApC2VGiZXv9lhADDXcKA7SxnsIjk/6?=
- =?us-ascii?Q?U5O38bFjvAYBSRUAtg1MoVFTCQY5wzVVjpY2n1d2?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba25be94-1963-42e4-8c6b-08db80f46dfa
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB6697.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 03:19:11.5612
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T/GgNjrA17pT3X01kf2xcyq42BGIswKyUHnYomYmBBsrCNlroZZoao0QVot2HjUTDkVUPeY88iKPSHhpWShA2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6606
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Git-Hash: 39991abed41c
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Remove unnecessary of_node_put from the continue path to prevent
-child node from being released twice, which could avoid resource
-leak or other unexpected issues.
+## About DMA APIs
 
-Signed-off-by: Lu Hongfei <luhongfei@vivo.com>
----
- drivers/net/dsa/ocelot/felix.c | 1 -
- 1 file changed, 1 deletion(-)
+Now, virtio may can not work with DMA APIs when virtio features do not have
+VIRTIO_F_ACCESS_PLATFORM.
 
-diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-index dee43caee19e..8da46d284e35 100644
---- a/drivers/net/dsa/ocelot/felix.c
-+++ b/drivers/net/dsa/ocelot/felix.c
-@@ -1286,7 +1286,6 @@ static int felix_parse_ports_node(struct felix *felix,
- 		if (err < 0) {
- 			dev_info(dev, "Unsupported PHY mode %s on port %d\n",
- 				 phy_modes(phy_mode), port);
--			of_node_put(child);
- 
- 			/* Leave port_phy_modes[port] = 0, which is also
- 			 * PHY_INTERFACE_MODE_NA. This will perform a
--- 
-2.39.0
+1. I tried to let DMA APIs return phy address by virtio-device. But DMA APIs just
+   work with the "real" devices.
+2. I tried to let xsk support callballs to get phy address from virtio-net
+   driver as the dma address. But the maintainers of xsk may want to use dma-buf
+   to replace the DMA APIs. I think that may be a larger effort. We will wait
+   too long.
+
+So rethinking this, firstly, we can support premapped-dma only for devices with
+VIRTIO_F_ACCESS_PLATFORM. In the case of af-xdp, if the users want to use it,
+they have to update the device to support VIRTIO_F_RING_RESET, and they can also
+enable the device's VIRTIO_F_ACCESS_PLATFORM feature.
+
+Thanks for the help from Christoph.
+
+=================
+
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good.
+
+ENV: Qemu with vhost.
+
+                   vhost cpu | Guest APP CPU |Guest Softirq CPU | PPS
+-----------------------------|---------------|------------------|------------
+xmit by sockperf:     90%    |   100%        |                  |  318967
+xmit by xsk:          100%   |   30%         |   33%            | 1192064
+recv by sockperf:     100%   |   68%         |   100%           |  692288
+recv by xsk:          100%   |   33%         |   43%            |  771670
+
+Before achieving the function of Virtio-Net, we also have to let virtio core
+support these features:
+
+1. virtio core support premapped
+2. virtio core support reset per-queue
+
+=================
+
+After introducing premapping, I added an example to virtio-net. virtio-net can
+merge dma mappings through this feature. @Jason
+
+
+Please review.
+
+Thanks.
+
+v11
+ 1. virtio-net merges dma operates based on the feature premapped
+ 2. A better way to handle the map error with the premapped
+
+v10:
+ 1. support to set vq to premapped mode, then the vq just handles the premapped request.
+ 2. virtio-net support to do dma mapping in advance
+
+v9:
+ 1. use flag to distinguish the premapped operations. no do judgment by sg.
+
+v8:
+ 1. vring_sg_address: check by sg_page(sg) not dma_address. Because 0 is a valid dma address
+ 2. remove unused code from vring_map_one_sg()
+
+v7:
+ 1. virtqueue_dma_dev() return NULL when virtio is without DMA API.
+
+v6:
+ 1. change the size of the flags to u32.
+
+v5:
+ 1. fix for error handler
+ 2. add flags to record internal dma mapping
+
+v4:
+ 1. rename map_inter to dma_map_internal
+ 2. fix: Excess function parameter 'vq' description in 'virtqueue_dma_dev'
+
+v3:
+ 1. add map_inter to struct desc state to reocrd whether virtio core do dma map
+
+v2:
+ 1. based on sgs[0]->dma_address to judgment is premapped
+ 2. based on extra.addr to judgment to do unmap for no-indirect desc
+ 3. based on indir_desc to judgment to do unmap for indirect desc
+ 4. rename virtqueue_get_dma_dev to virtqueue_dma_dev
+
+v1:
+ 1. expose dma device. NO introduce the api for dma and sync
+ 2. split some commit for review.
+
+
+
+
+
+Xuan Zhuo (10):
+  virtio_ring: check use_dma_api before unmap desc for indirect
+  virtio_ring: put mapping error check in vring_map_one_sg
+  virtio_ring: introduce virtqueue_set_premapped()
+  virtio_ring: support add premapped buf
+  virtio_ring: introduce virtqueue_dma_dev()
+  virtio_ring: skip unmap for premapped
+  virtio_ring: correct the expression of the description of
+    virtqueue_resize()
+  virtio_ring: separate the logic of reset/enable from virtqueue_resize
+  virtio_ring: introduce virtqueue_reset()
+  virtio_net: merge dma operation for one page
+
+ drivers/net/virtio_net.c     | 283 +++++++++++++++++++++++++++++++++--
+ drivers/virtio/virtio_ring.c | 257 ++++++++++++++++++++++++-------
+ include/linux/virtio.h       |   6 +
+ 3 files changed, 478 insertions(+), 68 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
