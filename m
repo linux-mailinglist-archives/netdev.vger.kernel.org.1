@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-16502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B2A74DA6E
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:52:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B7574DA70
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 17:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A5861C20B0A
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 15:52:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AC6A28131E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 15:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A613C13AF4;
-	Mon, 10 Jul 2023 15:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E881427E;
+	Mon, 10 Jul 2023 15:49:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5911426E
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F6F1426E
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 15:49:40 +0000 (UTC)
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8427A11B;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C4411F;
 	Mon, 10 Jul 2023 08:49:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1689004178; x=1720540178;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=eCA4jmpHdK4tCQy+WYVaMHkZ61alyGNaPi2evxW0e9A=;
-  b=TW8bhZ2/YU0tXHvrewa13TF9ysBkfsnpXX5Z+Ih09L1Zw3AiZvNGZz+g
-   BB01KLpIVFBCnOeFx2fv8J4tqj5GbV+TnxaO9y2I2cW6g+rVnGCep1ynR
-   5Ix1H2S8LKt61MtAF9p7qm3K4VApqe68gifLDMhCoXo0anQ7RURwzuo5g
-   KDgHIq32Gh6hVVmkOs6k3CwzkDRJ05VypapFLuXAfF0Qf3ZgYTFSRVxD8
-   C5V1EgTkMGIwYL1DHvgg/kgviCWrm6TYEyoKJDuVFundCHtgt/Ia8j9FW
-   BCXUyTqmD59RfytwM5wRflgYnnEWiWZQVM/UR9fA4k4jpXYZRPxi0cAo6
+  bh=2ECimbLN3Odgvy6H4NztBc0veTLSWVtVr1a7U9ECQf8=;
+  b=Y5CPZ4nQ8B9Ljt4Z5eeLlLLk+ZQEyX3BW8tMNz+itVPfTC6HApO8fJFc
+   2M6lVRPgVIGcniPFnMkr/L4hfKNTnJ/UoiUwXa+gVvKct2Atf+k84KRFe
+   8LEOL9lO6qI+8kRrstW3+/cGzvPET65KlDwKSYralbHUZKixD45Ppfh4E
+   kHL/F+MTpHySe1sVXd3kFFtn1XXFGxjU1QZtYRsnuUQbRitH2Ybp3JNN2
+   yRBtSZk72sypaIi4FFyE7Sny6jtIab5RloLrMSwzCbkWpeUxiNCGAS8m6
+   /UK91z0ZufkRnUBD4TnL/0zAZlIaBaeU6cSVQxB22GX02FkMDOwwQ3EHI
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="349185306"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="349185307"
 X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="349185306"
+   d="scan'208";a="349185307"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 08:49:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="844921891"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="844921892"
 X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="844921891"
+   d="scan'208";a="844921892"
 Received: from black.fi.intel.com ([10.237.72.28])
   by orsmga004.jf.intel.com with ESMTP; 10 Jul 2023 08:49:37 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 9C17069F; Mon, 10 Jul 2023 18:49:34 +0300 (EEST)
+	id AC4E86B9; Mon, 10 Jul 2023 18:49:34 +0300 (EEST)
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Mark Brown <broonie@kernel.org>,
 	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
@@ -101,9 +101,9 @@ Cc: Sanjay R Mehta <sanju.mehta@amd.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH v2 08/15] spi: Clean up headers
-Date: Mon, 10 Jul 2023 18:49:25 +0300
-Message-Id: <20230710154932.68377-9-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v2 09/15] spi: Use struct_size() helper
+Date: Mon, 10 Jul 2023 18:49:26 +0300
+Message-Id: <20230710154932.68377-10-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
 In-Reply-To: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
 References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
@@ -120,68 +120,64 @@ X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There is a few things done:
-- include only the headers we are direct user of
-- when pointer is in use, provide a forward declaration
-- add missing headers
-- group generic headers and subsystem headers
-- sort each group alphabetically
+Prefer struct_size() over open-coded versions.
 
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- include/linux/spi/spi.h | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ include/linux/spi/spi.h | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/include/linux/spi/spi.h b/include/linux/spi/spi.h
-index 2026eae97329..c9479badf38c 100644
+index c9479badf38c..9fb8efb068c6 100644
 --- a/include/linux/spi/spi.h
 +++ b/include/linux/spi/spi.h
-@@ -6,27 +6,41 @@
- #ifndef __LINUX_SPI_H
- #define __LINUX_SPI_H
- 
--#include <linux/acpi.h>
- #include <linux/bits.h>
- #include <linux/completion.h>
-+#include <linux/container_of.h>
- #include <linux/device.h>
--#include <linux/gpio/consumer.h>
-+#include <linux/export.h>
- #include <linux/kthread.h>
-+#include <linux/limits.h>
-+#include <linux/list.h>
-+#include <linux/minmax.h>
+@@ -17,6 +17,7 @@
+ #include <linux/minmax.h>
  #include <linux/mod_devicetable.h>
-+#include <linux/mutex.h>
+ #include <linux/mutex.h>
++#include <linux/overflow.h>
  #include <linux/scatterlist.h>
  #include <linux/slab.h>
-+#include <linux/smp.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
- #include <linux/u64_stats_sync.h>
+ #include <linux/smp.h>
+@@ -1095,6 +1096,8 @@ struct spi_transfer {
+  * @state: for use by whichever driver currently owns the message
+  * @resources: for resource management when the spi message is processed
+  * @prepared: spi_prepare_message was called for the this message
++ * @t: for use with spi_message_alloc() when message and transfers have
++ *	been allocated together
+  *
+  * A @spi_message is used to execute an atomic sequence of data transfers,
+  * each represented by a struct spi_transfer.  The sequence is "atomic"
+@@ -1147,6 +1150,9 @@ struct spi_message {
  
-+#include <asm/byteorder.h>
+ 	/* List of spi_res reources when the spi message is processed */
+ 	struct list_head        resources;
 +
- #include <uapi/linux/spi/spi.h>
++	/* For embedding transfers into the memory of the message */
++	struct spi_transfer	t[];
+ };
  
-+struct acpi_device;
- struct dma_chan;
--struct software_node;
-+struct gpio_desc;
- struct ptp_system_timestamp;
-+struct software_node;
-+
- struct spi_controller;
--struct spi_transfer;
- struct spi_controller_mem_ops;
- struct spi_controller_mem_caps;
-+struct spi_device_id;
- struct spi_message;
-+struct spi_transfer;
+ static inline void spi_message_init_no_memset(struct spi_message *m)
+@@ -1207,16 +1213,13 @@ static inline struct spi_message *spi_message_alloc(unsigned ntrans, gfp_t flags
+ {
+ 	struct spi_message *m;
  
- /*
-  * INTERFACES between SPI master-side drivers and SPI slave protocol handlers,
+-	m = kzalloc(sizeof(struct spi_message)
+-			+ ntrans * sizeof(struct spi_transfer),
+-			flags);
++	m = kzalloc(struct_size(m, t, ntrans), flags);
+ 	if (m) {
+ 		unsigned i;
+-		struct spi_transfer *t = (struct spi_transfer *)(m + 1);
+ 
+ 		spi_message_init_no_memset(m);
+-		for (i = 0; i < ntrans; i++, t++)
+-			spi_message_add_tail(t, m);
++		for (i = 0; i < ntrans; i++)
++			spi_message_add_tail(&m->t[i], m);
+ 	}
+ 	return m;
+ }
 -- 
 2.40.0.1.gaa8946217a0b
 
