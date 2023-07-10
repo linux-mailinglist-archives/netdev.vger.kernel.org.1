@@ -1,202 +1,121 @@
-Return-Path: <netdev+bounces-16359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E80F974CE59
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8DDC74CE61
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 09:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB91E280F70
-	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:28:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 909B1280F68
+	for <lists+netdev@lfdr.de>; Mon, 10 Jul 2023 07:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E035689;
-	Mon, 10 Jul 2023 07:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00A05689;
+	Mon, 10 Jul 2023 07:29:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1B3525A
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 07:28:31 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E50AEC;
-	Mon, 10 Jul 2023 00:28:30 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A7MZgX006257;
-	Mon, 10 Jul 2023 07:28:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=IIVbNm70ilZCkUbp/iQj0rFzl6EWpboLhrIAQ60lx2M=;
- b=gE7VMqP6gyWIjaDstNtDtyySNeiuBUFuCK2hdAE6R/zn8Y7jpB8gH5UgyXAcP/29i8IO
- 7kg/XD0nIEA6ZNVZEmLISK/yKYjOLMMmuLWovm0WGADvm5+B7SiGqDhp48e5jqRmFWJP
- H9EO++7uYgC8DK7rRteOq9bFkOA9JX6S2JE7Ag9oFH5qPhMrQt6p6WRhrSsPJ74MQuaz
- 9dXXzTgd+fsm9SY6cXxnh80i+TpkAhsE1UsFlMv7PJY8sla6IijAnRUBFuZvdpmfmObd
- ugNhl9iifRqj20BiP8mcnVdNjdrKWwCuyFDwzMeZ6TI5rZvEoAWVAL3ne5IkD5aU2kWJ 9g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrdhp03mj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 07:28:28 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36A7MmDD007239;
-	Mon, 10 Jul 2023 07:28:27 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrdhp03kc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 07:28:27 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-	by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36A4wgJe023419;
-	Mon, 10 Jul 2023 07:28:25 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3rpye50t4y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jul 2023 07:28:24 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36A7SLgZ19727028
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Jul 2023 07:28:21 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6A50120043;
-	Mon, 10 Jul 2023 07:28:21 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9825720040;
-	Mon, 10 Jul 2023 07:28:20 +0000 (GMT)
-Received: from [9.171.92.205] (unknown [9.171.92.205])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 10 Jul 2023 07:28:20 +0000 (GMT)
-Message-ID: <df5fe3d295711666bf170d35f5196fe7b880342b.camel@linux.ibm.com>
-Subject: Re: [PATCH net v2 1/3] s390/ism: Fix locking for forwarding of IRQs
- and events to clients
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Alexandra Winter
- <wintera@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander
- Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Stefan Raspl <raspl@linux.ibm.com>, Jan
- Karcher <jaka@linux.ibm.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date: Mon, 10 Jul 2023 09:28:20 +0200
-In-Reply-To: <ZKlmeDUEZf7F8+HW@corigine.com>
-References: <20230707104359.3324039-1-schnelle@linux.ibm.com>
-	 <20230707104359.3324039-2-schnelle@linux.ibm.com>
-	 <ZKlmeDUEZf7F8+HW@corigine.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C432D79DC
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 07:29:48 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83966127
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 00:29:46 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fbfa811667so21695525e9.1
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 00:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1688974185; x=1691566185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2jy5zTnsEjclW0IAo6TI4KH09ecPC4N8l96twGj5N0E=;
+        b=OBAbthM1v1c78/ZzCyTdIpwTdHirp2JVWB3eDHKM3yppE8P3aW7bDozXCSbCfWCGvo
+         aUJhkV9MOOBlgcArpIE7XMWjWnsRdnWwGgRD7j1RpPrD6eiToYHeHf0/kHKrsAl7vs9Q
+         0LVNAuVBm9Ag0wKK7btutonbmGXnR2ZHigLTSRfxBYaD6A3CvlGEsVGLMurOCq3bsgXN
+         kT2XnduE6CYa7eSe9Cm105uUZIE1A28AyWSzVEhqkOhUbrp6kdT/+8dDEGqEYo0mlC0N
+         +p/NmuArdn1E3yfJPZxONsLJNo47TFfmB+uq37uCzOY1HYBrZaypYGD2le0rnusaQ9Wu
+         fGVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688974185; x=1691566185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2jy5zTnsEjclW0IAo6TI4KH09ecPC4N8l96twGj5N0E=;
+        b=k1sOwULbZMQvO9B1bjZFoax6WLncLuX78Le5P/x+TPZdaI1iabz83dcF/mo4ALKL8k
+         cAQPPPYQ8IS8RVUQYe10W5ZgpXSp1gw0jpL0hrFjfJH9cLkuIS0Nn3PjIFdWxnYQQgDw
+         v0JNeslJFyyC/NNzCfTArg5hNZU29BVxiwBrghANQxV9gDpQPnyED1YrDDYJRcmd1ruq
+         xDr8mU4Pa8vaL6ZSc+b4zplKv3F8fbidxzs9L75PZitGKnPZ+wj2Z1Bwx+Xls6LH0qYE
+         88U73bv+7rmuwquPGIdrmEBpQ7sq9z2oieZPkpjqx9q7XfD90oHriL/49i+p2cUk3GSj
+         gEAw==
+X-Gm-Message-State: ABy/qLYcRpZoN7V/wYNvvbDLb8LfdTPqriM7vX/XtZOKp2Vxiq8yDSey
+	cAmYZCp8rnpvPYpmZjAGQLV7KQ==
+X-Google-Smtp-Source: APBJJlHVp1/4Jh3pSjHcnXhiWDH/u3GR3xaCfeHhiOKMO2azzBEjQPQEy5nxXANY+hMDz9a27mSt/A==
+X-Received: by 2002:adf:f592:0:b0:314:1d6:8aa7 with SMTP id f18-20020adff592000000b0031401d68aa7mr10971747wro.29.1688974184893;
+        Mon, 10 Jul 2023 00:29:44 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id v12-20020adfe4cc000000b003143cb109d5sm10790399wrm.14.2023.07.10.00.29.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 00:29:43 -0700 (PDT)
+Date: Mon, 10 Jul 2023 10:29:39 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Su Hui <suhui@nfschina.com>
+Cc: qiang.zhao@nxp.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, wuych <yunchuan@nfschina.com>
+Subject: Re: [PATCH net-next v2 01/10] net: wan: Remove unnecessary (void*)
+ conversions
+Message-ID: <45519aec-6ec8-49e5-b5b2-1b52d336288c@kadam.mountain>
+References: <20230710063933.172926-1-suhui@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kPPOZgAY4A3XDD71YHTwOpORGVsTC3tX
-X-Proofpoint-ORIG-GUID: IQN94oqGDifqOWM75ocf360o29wtmBit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-10_05,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=399 phishscore=0 adultscore=0 mlxscore=0 suspectscore=0
- clxscore=1011 spamscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2305260000 definitions=main-2307100064
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710063933.172926-1-suhui@nfschina.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, 2023-07-08 at 14:36 +0100, Simon Horman wrote:
-> On Fri, Jul 07, 2023 at 12:43:57PM +0200, Niklas Schnelle wrote:
-> > The clients array references all registered clients and is protected by
-> > the clients_lock. Besides its use as general list of clients the client=
-s
-> > array is accessed in ism_handle_irq() to forward ISM device events to
-> > clients.
-> >=20
-> > While the clients_lock is taken in the IRQ handler when calling
-> > handle_event() it is however incorrectly not held during the
-> > client->handle_irq() call and for the preceding clients[] access leavin=
-g
-> > it unprotected against concurrent client (un-)registration.
-> >=20
-> > Furthermore the accesses to ism->sba_client_arr[] in ism_register_dmb()
-> > and ism_unregister_dmb() are not protected by any lock. This is
-> > especially problematic as the client ID from the ism->sba_client_arr[]
-> > is not checked against NO_CLIENT and neither is the client pointer
-> > checked.
-> >=20
-> > Instead of expanding the use of the clients_lock further add a separate
-> > array in struct ism_dev which references clients subscribed to the
-> > device's events and IRQs. This array is protected by ism->lock which is
-> > already taken in ism_handle_irq() and can be taken outside the IRQ
-> > handler when adding/removing subscribers or the accessing
-> > ism->sba_client_arr[]. This also means that the clients_lock is no
-> > longer taken in IRQ context.
-> >=20
-> > Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
-> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
->=20
-> ...
->=20
-> > @@ -71,6 +80,7 @@ int ism_register_client(struct ism_client *client)
-> >  		list_for_each_entry(ism, &ism_dev_list.list, list) {
-> >  			ism->priv[i] =3D NULL;
-> >  			client->add(ism);
-> > +			ism_setup_forwarding(client, ism);
-> >  		}
-> >  	}
-> >  	mutex_unlock(&ism_dev_list.mutex);
->=20
-> ...
->=20
-> > @@ -92,6 +102,9 @@ int ism_unregister_client(struct ism_client *client)
-> >  		max_client--;
-> >  	spin_unlock_irqrestore(&clients_lock, flags);
-> >  	list_for_each_entry(ism, &ism_dev_list.list, list) {
-> > +		spin_lock_irqsave(&ism->lock, flags);
->=20
-> Hi Niklas,
->=20
-> The lock is taken here.
->=20
-> > +		/* Stop forwarding IRQs and events */
-> > +		ism->subs[client->id] =3D NULL;
-> >  		for (int i =3D 0; i < ISM_NR_DMBS; ++i) {
-> >  			if (ism->sba_client_arr[i] =3D=3D client->id) {
-> >  				pr_err("%s: attempt to unregister client '%s'"
-> > @@ -101,6 +114,7 @@ int ism_unregister_client(struct ism_client *client=
-)
-> >  				goto out;
->=20
-> But it does not appear to be released
-> (by the call to spin_unlock_irqrestore() below)
-> if goto out is called here.
+On Mon, Jul 10, 2023 at 02:39:33PM +0800, Su Hui wrote:
+> From: wuych <yunchuan@nfschina.com>
+        ^^^^^
+This doesn't look like a real name.
 
-Good catch. Yes I screwed this up while splitting the patch up. The
-spin_unlock_irqrestore() is there after patch 3 but should have been
-added in patch 1. As far as I can see all 3 patches have already been
-applied, otherwise I'd send a v3. Thankfully even in the in between
-state this error case can really onlt happen due to driver bugs so
-maybe it's okay?
+> 
+> Pointer variables of void * type do not require type cast.
+> 
+> Signed-off-by: wuych <yunchuan@nfschina.com>
+> ---
+>  drivers/net/wan/fsl_ucc_hdlc.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
+> index 47c2ad7a3e42..73c73d8f4bb2 100644
+> --- a/drivers/net/wan/fsl_ucc_hdlc.c
+> +++ b/drivers/net/wan/fsl_ucc_hdlc.c
+> @@ -350,11 +350,11 @@ static int uhdlc_init(struct ucc_hdlc_private *priv)
+>  static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
+>  {
+>  	hdlc_device *hdlc = dev_to_hdlc(dev);
+> -	struct ucc_hdlc_private *priv = (struct ucc_hdlc_private *)hdlc->priv;
+> -	struct qe_bd *bd;
+> -	u16 bd_status;
+> +	struct ucc_hdlc_private *priv = hdlc->priv;
+>  	unsigned long flags;
+>  	__be16 *proto_head;
+> +	struct qe_bd *bd;
+> +	u16 bd_status;
 
->=20
-> >  			}
-> >  		}
-> > +		spin_unlock_irqrestore(&ism->lock, flags);
-> >  	}
-> >  out:
-> >  	mutex_unlock(&ism_dev_list.mutex);
+Don't move the other variables around.  That's unrelated to the cast.
+(Same applies to all the other patches).
+
+regards,
+dan carpenter
 
 
