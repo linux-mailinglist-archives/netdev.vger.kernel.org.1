@@ -1,160 +1,119 @@
-Return-Path: <netdev+bounces-16788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7537274EB02
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:43:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5205F74EB37
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5B01C20F14
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:43:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C929C2815E9
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80B118014;
-	Tue, 11 Jul 2023 09:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A3518017;
+	Tue, 11 Jul 2023 09:55:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C8F174E5;
-	Tue, 11 Jul 2023 09:43:08 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC753A4;
-	Tue, 11 Jul 2023 02:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=cIYxaT2JpAhwLaJ52gKkMlK74+PCbIgj/z/gLFd8aqU=; b=DonVZnuIeBd/85SRR5JVKmzGGd
-	Hv1+xbOu6lIXj/4HUVGsJLVuqceasVah/SG05atf2VeaB9SY6iUVEp4X7mqRVxRml8ZY9aaKFOKf2
-	25hysJcx6LxNr7NYVG2zGtbw1tXrRAp0XphQ8Sxplccqq4rwGK5y+YeQVVDU9D90v4qaCoClwmoly
-	4Lvj2aui/JD4DLOCdJpyPtGjBPH0l5nrgfdZSh3nAZmQ0jFIFcm3FUnH2a3NhCxu00O/lkhvrcG45
-	k9f9m1DeqF/VyIJk6HlFHwdpTRoluK5I/nx9iOa6tnT0eeKTCtVSvelbPrW9jUKylurLIXwMQ/DmC
-	JhMbYAZA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qJ9tX-0005re-5d; Tue, 11 Jul 2023 11:42:55 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qJ9tW-000S2D-M6; Tue, 11 Jul 2023 11:42:54 +0200
-Subject: Re: [PATCH bpf-next v4 5/8] libbpf: Add helper macro to clear opts
- structs
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
- kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
- davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20230710201218.19460-1-daniel@iogearbox.net>
- <20230710201218.19460-6-daniel@iogearbox.net>
- <CAEf4BzYBCHp6x_4mwjduHidJDfQ94-p2gnGSS+V3oAtqg9xsMQ@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <5f9fcbe4-5736-4631-5d91-99ae6697f8bf@iogearbox.net>
-Date: Tue, 11 Jul 2023 11:42:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA0D14299
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 09:55:58 +0000 (UTC)
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85612A8;
+	Tue, 11 Jul 2023 02:55:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689069357; x=1720605357;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Eu5iZ0jjghh5xc/XHtgk1oWVm52GiK/SZSOg8TCA4+s=;
+  b=azkGVysXlg4gN1eMvJK3KYT/shC4DYFoEGMAjdBTD8D606Ity/0axVFw
+   By/aQRvqMq9vA4NScvufyM4lg0BUnWk8w1AddaIWNH88t+p1t70WLfM6N
+   4ODj9YO4Wr2gYamxh7JG4sdddCYwlMpWwev4dphw7+rsJkqEJXM2IV79B
+   lHtEN7ZzLBRcS2eo5kG2C+befgLGh+kJCjFA5X6W59dA9eSLYHw6EnFP2
+   n9bdjW/pjfEs+jC34TCgmwuZiWv9Dx/HzZyDKBc1mrsEx7GyrSe9ebr00
+   +Dy4wB1IwBP0LG/I3IEZHSzdfanKM50GbeteDfaIDdguOqhgOrHQ8Obei
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="349385344"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="349385344"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 02:55:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="1051723761"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="1051723761"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by fmsmga005.fm.intel.com with ESMTP; 11 Jul 2023 02:55:31 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	chuck.lever@oracle.com
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next] tools: ynl-gen: fix parse multi-attr enum attribute
+Date: Tue, 11 Jul 2023 11:53:23 +0200
+Message-Id: <20230711095323.121131-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEf4BzYBCHp6x_4mwjduHidJDfQ94-p2gnGSS+V3oAtqg9xsMQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26966/Tue Jul 11 09:28:31 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/11/23 6:02 AM, Andrii Nakryiko wrote:
-> On Mon, Jul 10, 2023 at 1:12 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>
->> Add a small and generic LIBBPF_OPTS_CLEAR() helper macros which clears
->> an opts structure and reinitializes its .sz member to place the structure
->> size. I found this very useful when developing selftests, but it is also
->> generic enough as a macro next to the existing LIBBPF_OPTS() which hides
->> the .sz initialization, too.
->>
->> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->> ---
->>   tools/lib/bpf/libbpf_common.h | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/tools/lib/bpf/libbpf_common.h b/tools/lib/bpf/libbpf_common.h
->> index 9a7937f339df..eb180023aa97 100644
->> --- a/tools/lib/bpf/libbpf_common.h
->> +++ b/tools/lib/bpf/libbpf_common.h
->> @@ -70,4 +70,15 @@
->>                  };                                                          \
->>          })
->>
->> +/* Helper macro to clear a libbpf options struct
->> + *
->> + * Small helper macro to reset all fields and to reinitialize the common
->> + * structure size member.
->> + */
->> +#define LIBBPF_OPTS_CLEAR(NAME)                                                    \
->> +       do {                                                                \
->> +               memset(&NAME, 0, sizeof(NAME));                             \
->> +               NAME.sz = sizeof(NAME);                                     \
->> +       } while (0)
->> +
-> 
-> This is fine, but I think you can go a half-step further and have
-> something even more universal and useful. Something like this:
-> 
-> 
-> #define LIBBPF_OPTS_RESET(NAME, ...)
->      do {
->          memset(&NAME, 0, sizeof(NAME));
->          NAME = (typeof(NAME)) {
->              .sz = sizeof(struct TYPE),
->              __VA_ARGS__
->          };
->       while (0);
-> 
-> I actually haven't tried if that typeof() trick works, but I hope it does :)
+When attribute is enum type and marked as multi-attr, the netlink respond
+is not parsed, fails with stack trace:
+File "/root/arek/linux-dpll/tools/net/ynl/lib/ynl.py", line 600, in dump
+  return self._op(method, vals, dump=True)
+File "/root/arek/linux-dpll/tools/net/ynl/lib/ynl.py", line 586, in _op
+  rsp_msg = self._decode(gm.raw_attrs, op.attr_set.name)
+File "/root/arek/linux-dpll/tools/net/ynl/lib/ynl.py", line 453, in _decode
+  self._decode_enum(rsp, attr_spec)
+File "/root/arek/linux-dpll/tools/net/ynl/lib/ynl.py", line 410, in _decode_enum
+  value = enum.entries_by_val[raw - i].name
+TypeError: unsupported operand type(s) for -: 'list' and 'int'
+error: 1
 
-It does, I've used this in BPF code for Cilium, too. ;)
+Allow succesfull parse of multi-attr enums by decoding and assigning their
+names into response in the _decode_enum(..) function.
 
-> Then your LIBBPF_OPTS_CLEAR() is just LIBBPF_OPTS_RESET(x). But you
-> can also re-initialize:
-> 
-> LIBBPF_OPTS_RESET(x, .flags = 123, .prog_fd = 456);
-> 
-> It's more in line with LIBBPF_OPTS() itself in capabilities, except it
-> works on existing variable.
+Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+---
+ tools/net/ynl/lib/ynl.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Agree, changed into ...
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 3b343d6cbbc0..553d82dd6382 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -407,7 +407,14 @@ class YnlFamily(SpecFamily):
+                 raw >>= 1
+                 i += 1
+         else:
+-            value = enum.entries_by_val[raw - i].name
++            if attr_spec.is_multi:
++                for index in range(len(raw)):
++                    if (type(raw[index]) == int):
++                        enum_name = enum.entries_by_val[raw[index] - i].name
++                        rsp[attr_spec['name']][index] = enum_name
++                return
++            else:
++                value = enum.entries_by_val[raw - i].name
+         rsp[attr_spec['name']] = value
+ 
+     def _decode_binary(self, attr, attr_spec):
+-- 
+2.37.3
 
-/* Helper macro to clear and optionally reinitialize libbpf options struct
-  *
-  * Small helper macro to reset all fields and to reinitialize the common
-  * structure size member. Values provided by users in struct initializer-
-  * syntax as varargs can be provided as well to reinitialize options struct
-  * specific members.
-  */
-#define LIBBPF_OPTS_RESET(NAME, ...)                                        \
-         do {                                                                \
-                 memset(&NAME, 0, sizeof(NAME));                             \
-                 NAME = (typeof(NAME)) {                                     \
-                         .sz = sizeof(NAME),                                 \
-                         __VA_ARGS__                                         \
-                 };                                                          \
-         } while (0)
-
-... and updated all the test cases.
-
-Thanks,
-Daniel
 
