@@ -1,189 +1,132 @@
-Return-Path: <netdev+bounces-16836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 752A874EEF0
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:32:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC7B74EF1B
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:38:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A586C1C20F7B
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:32:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54D001C20D6B
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE732168AA;
-	Tue, 11 Jul 2023 12:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09AD17755;
+	Tue, 11 Jul 2023 12:38:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A117318C02
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 12:32:18 +0000 (UTC)
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A80170E;
-	Tue, 11 Jul 2023 05:31:50 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b6f943383eso89454491fa.2;
-        Tue, 11 Jul 2023 05:31:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689078626; x=1691670626;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PF44NEqyxP0uEPvVdBdUhZoOyhnmXaRRtdBTolupizs=;
-        b=SBnTfmlUAjKWCRn3fyds5WJnq/rFhCyNY0inIr58sbmQdnr0ekqm/rRHOpDPaGy/KO
-         B5+bnED3EocI70B/1Liqfviz84UQamIYXCfhBLJdAwpngn8GsImdPLHw3RB6cx2k3qLl
-         nSGU6gtvVw3/VsXZCkMPykBjpKDuKmimIVto3O71KEXoVSR8sXs9wWBC1yWjR9VJRV7y
-         Wiz8QKW407Y9wEjIJVzHwlxfi2RJhdAg86N/DwGw/jxMsF0gA+NEhyREeEq19FirWzm/
-         TqVILtBOKMHlbGVQP5ypx9ZxmExDySMPGPYIR/gAUwwQJjSdRAbKTqb1KbxEGl8qDyoh
-         Eb8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689078626; x=1691670626;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PF44NEqyxP0uEPvVdBdUhZoOyhnmXaRRtdBTolupizs=;
-        b=Wx/jnBmhVE1jQ5jrjbbacZ8TLn5VsJx0GuztMGkwsPMDY0xnjAeu2JNICuubWKiCF0
-         8ITWeSCUoalCCG+YtJ3RKl/kcmVY2hcps7SfG5KHwLnlCol2TH29YM5C6RZabft68uyf
-         gm4aC2WfOgglcyRqMlrbjHYAmBt9S78Umm+JOHHlhCsZU+hjZEEJlaCHtaYkr7VRUU3e
-         A/83Sxsy/IrZlvPci9BcZrBOWQmwbzGsxjdZ3lEq4RZ2nCWvl7DlfTK01HMJ9WxskJ5v
-         zDsfSvkt3GXMF7yW2agAvBe5MNWI+8nrWHmqEFz1emIcVoCsfExzY+zIVNcTQ5YnAbRn
-         M56Q==
-X-Gm-Message-State: ABy/qLblTUsS/QBgwrVsGf6swtsAz/wUo3UVCAOsYgzt7kRE4yr4K4z9
-	RatHO7kuN5rQvy4h3FTfy6ecnNAhI1vMYg==
-X-Google-Smtp-Source: APBJJlEGAsotaRV20l259BaTNO1He84gEShKxa1gOSyhZTOSrSYKw2njibp5AmXp10CkNfmdPINRWg==
-X-Received: by 2002:a2e:8eca:0:b0:2b6:dc50:19ac with SMTP id e10-20020a2e8eca000000b002b6dc5019acmr13901724ljl.31.1689078625694;
-        Tue, 11 Jul 2023 05:30:25 -0700 (PDT)
-Received: from mobilestation ([85.249.18.12])
-        by smtp.gmail.com with ESMTPSA id j17-20020a2e6e11000000b002b6ee75648fsm441355ljc.12.2023.07.11.05.30.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 05:30:24 -0700 (PDT)
-Date: Tue, 11 Jul 2023 15:30:19 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Mark Brown <broonie@kernel.org>, 
-	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, Yang Yingliang <yangyingliang@huawei.com>, 
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>, Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>, 
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Sanjay R Mehta <sanju.mehta@amd.com>, Radu Pirea <radu_nicolae.pirea@upb.ro>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Claudiu Beznea <claudiu.beznea@microchip.com>, Tudor Ambarus <tudor.ambarus@linaro.org>, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Kevin Hilman <khilman@baylibre.com>, 
-	Jerome Brunet <jbrunet@baylibre.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Heiko Stuebner <heiko@sntech.de>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Orson Zhai <orsonzhai@gmail.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Chunyan Zhang <zhang.lyra@gmail.com>, 
-	Alain Volmat <alain.volmat@foss.st.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Max Filippov <jcmvbkbc@gmail.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 13/15] spi: Rename SPI_MASTER_GPIO_SS to
- SPI_CONTROLLER_GPIO_SS
-Message-ID: <tvm772o6uqndgyjvycv27qouqq76crpre5tyqcnanaautqjjwn@pydiwhjzhbgd>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-14-andriy.shevchenko@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D14A20
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 12:38:13 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7591A1736;
+	Tue, 11 Jul 2023 05:37:53 -0700 (PDT)
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36BAmxwL018566;
+	Tue, 11 Jul 2023 14:36:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=iEhiiDAE5VGpzYoUKMDzsWW+FQbM/7CMQsKlEZM++LU=;
+ b=DCavd3BD8Ib/w2kzYs4c7q/cj8Hkq7PqNT4020gfru75qfHko1knOyyxZEvCj7/zjzAt
+ 6J1fd0CgaQqbPifmabIATh76imkZmt7Q31Qo1BTgatMGwdqwh9SPU2EieSAk/E3VPTtR
+ X8O3s4+eYPLC2YnlYAaKjgsO7Sac/c9LlA+wUBDSzAg2um2/Cb4bJHMYdPZGSzRSl7di
+ IyRYDuYEcI4QkkwhiEkkT4RuYMQZkOAayuHOJWfIDEM0oEKF8v1OpMOiXJt0O9gtb59f
+ SRT8HOLyDWYuBURXScMMluBWe7Ovi1D2G6zYZpiwcepM2gghJqH53ZmUIoMvjF1LKlM1 vw== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rs311t6rv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Jul 2023 14:36:14 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 08ED4100058;
+	Tue, 11 Jul 2023 14:36:13 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 801DF2248B2;
+	Tue, 11 Jul 2023 14:36:12 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 11 Jul
+ 2023 14:36:12 +0200
+Message-ID: <6fa4ea12-bc7d-4977-8b7e-bfbea2ef2955@foss.st.com>
+Date: Tue, 11 Jul 2023 14:36:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710154932.68377-14-andriy.shevchenko@linux.intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v1] ARM: dts: stm32: prtt1c: Add PoDL PSE regulator nodes
+Content-Language: en-US
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?=
+	<jerome.pouiller@silabs.com>
+CC: <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>
+References: <20230323123242.3763673-1-o.rempel@pengutronix.de>
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20230323123242.3763673-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-11_06,2023-07-11_01,2023-05-22_02
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 06:49:30PM +0300, Andy Shevchenko wrote:
-> Rename SPI_MASTER_GPIO_SS to SPI_CONTROLLER_GPIO_SS and
-> convert the users to SPI_CONTROLLER_GPIO_SS to follow
+Hi Oleksij
 
-* I'm not an expert in English, but imo the next would look a
-* bit more readable:
-* convert s/the users to SPI_CONTROLLER_GPIO_SS/the code to using SPI_CONTROLLER_GPIO_SS
-
-> the new naming shema.
-
-s/shema/schema
-
+On 3/23/23 13:32, Oleksij Rempel wrote:
+> This commit introduces Power over Data Line (PoDL) Power Source
+> Equipment (PSE) regulator nodes to the PRTT1C devicetree. The addition
+> of these nodes enables support for PoDL in PRTT1C devices, allowing
+> power delivery and data transmission over a single twisted pair.
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> The new PoDL PSE regulator nodes provide voltage capability information
+> of the current board design, which can be used as a hint for system
+> administrators when configuring and managing power settings. This
+> update enhances the versatility and simplifies the power management of
+> PRTT1C devices while ensuring compatibility with connected Powered
+> Devices (PDs).
+> 
+> After applying this patch, the power delivery can be controlled from
+> user space with a patched [1] ethtool version using the following commands:
+>    ethtool --set-pse t1l2 podl-pse-admin-control enable
+> to enable power delivery, and
+>    ethtool --show-pse t1l2
+> to display the PoDL PSE settings.
+> 
+> By integrating PoDL PSE support into the PRTT1C devicetree, users can
+> benefit from streamlined power and data connections in their
+> deployments, improving overall system efficiency and reducing cabling
+> complexity.
+> 
+> [1] https://lore.kernel.org/all/20230317093024.1051999-1-o.rempel@pengutronix.de/
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 > ---
-[...]
 
->  drivers/spi/spi-dw-core.c  | 2 +-
+Applied on stm32-next.
 
-[...]
+cheers
+Alex
 
-> diff --git a/drivers/spi/spi-dw-core.c b/drivers/spi/spi-dw-core.c
-> index a8ba41ad4541..45f5acc26b1d 100644
-> --- a/drivers/spi/spi-dw-core.c
-> +++ b/drivers/spi/spi-dw-core.c
-> @@ -932,7 +932,7 @@ int dw_spi_add_host(struct device *dev, struct dw_spi *dws)
->  	if (dws->mem_ops.exec_op)
->  		master->mem_ops = &dws->mem_ops;
->  	master->max_speed_hz = dws->max_freq;
-> -	master->flags = SPI_MASTER_GPIO_SS;
-> +	master->flags = SPI_CONTROLLER_GPIO_SS;
->  	master->auto_runtime_pm = true;
->  
->  	/* Get default rx sample delay */
 
-For the DW APB/AHB SSI driver:
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
--Serge(y)
 
-[...]
-
-> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-> index 06a92a3a5746..bcabae98cb7c 100644
-> --- a/drivers/spi/spi.c
-> +++ b/drivers/spi/spi.c
-> @@ -995,7 +995,7 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
->  				gpiod_set_value_cansleep(spi_get_csgpiod(spi, 0), activate);
->  		}
->  		/* Some SPI masters need both GPIO CS & slave_select */
-> -		if ((spi->controller->flags & SPI_MASTER_GPIO_SS) &&
-> +		if ((spi->controller->flags & SPI_CONTROLLER_GPIO_SS) &&
->  		    spi->controller->set_cs)
->  			spi->controller->set_cs(spi, !enable);
->  	} else if (spi->controller->set_cs) {
-> @@ -3020,7 +3020,7 @@ static int spi_get_gpio_descs(struct spi_controller *ctlr)
->  
->  	ctlr->unused_native_cs = ffs(~native_cs_mask) - 1;
->  
-> -	if ((ctlr->flags & SPI_MASTER_GPIO_SS) && num_cs_gpios &&
-> +	if ((ctlr->flags & SPI_CONTROLLER_GPIO_SS) && num_cs_gpios &&
->  	    ctlr->max_native_cs && ctlr->unused_native_cs >= ctlr->max_native_cs) {
->  		dev_err(dev, "No unused native chip select available\n");
->  		return -EINVAL;
-> diff --git a/include/linux/spi/spi.h b/include/linux/spi/spi.h
-> index cdc3addfe117..43f6c3f71a76 100644
-> --- a/include/linux/spi/spi.h
-> +++ b/include/linux/spi/spi.h
-> @@ -578,8 +578,7 @@ struct spi_controller {
->  #define SPI_CONTROLLER_NO_TX		BIT(2)	/* Can't do buffer write */
->  #define SPI_CONTROLLER_MUST_RX		BIT(3)	/* Requires rx */
->  #define SPI_CONTROLLER_MUST_TX		BIT(4)	/* Requires tx */
-> -
-> -#define SPI_MASTER_GPIO_SS		BIT(5)	/* GPIO CS must select slave */
-> +#define SPI_CONTROLLER_GPIO_SS		BIT(5)	/* GPIO CS must select slave */
->  
->  	/* Flag indicating if the allocation of this struct is devres-managed */
->  	bool			devm_allocated;
-> -- 
-> 2.40.0.1.gaa8946217a0b
-> 
 
