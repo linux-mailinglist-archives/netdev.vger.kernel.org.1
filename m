@@ -1,201 +1,574 @@
-Return-Path: <netdev+bounces-16699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535ED74E6FD
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:13:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0767274E74F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:28:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 746CA1C20BB8
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 06:13:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22DB31C20B76
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 06:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B971640C;
-	Tue, 11 Jul 2023 06:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79181643C;
+	Tue, 11 Jul 2023 06:28:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2933D7B
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:13:46 +0000 (UTC)
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C02C4
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:13:43 -0700 (PDT)
-X-QQ-mid: bizesmtp70t1689056015t9p7fibz
-Received: from wxdbg.localdomain.com ( [183.128.130.21])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 11 Jul 2023 14:13:08 +0800 (CST)
-X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: SFhf6fKhx/+6pWEfW5teZ1S9u5R34FZw8DCl751SqqVcHfjrn1QzFffbibt/q
-	Kx3ROUAXaHfPfGMPX3RbWTTufPwqjlcCy8cJPV3TT5Bhz4FEtN/tfFu/5khWAbiTMM+j+im
-	tN2pV4A48LECHMRDuJz1s2UH039UnYeg3JOL6izoYw0vxVEHMg4DB5khoUWBWpqjGdnXyAJ
-	2GJmeo0rEHE3AcJPV4CsjAAwZtIIcCjeP5nkP6qN8HIw6QFqHSqGhBICjC/NWXEArvsnLXk
-	41pZsq0xBFkVoiW3Y4D6Pju9mq1w+NzjjSGXQQXaRSsrI2Vi1BphtXFRTh+sIuSBE4ytApN
-	KmpVHM/JmW9+M+vtcI82Aso9Xuk7yBCSH5XQAUowM85tJsbxYY=
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 11223655557796289168
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3] net: txgbe: change LAN reset mode
-Date: Tue, 11 Jul 2023 14:26:23 +0800
-Message-Id: <20230711062623.3058-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9307B16432
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:28:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC6AAE51
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 23:28:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689056910;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PeHLmRMmw6WcINSUxpVuTDAzADhiHuJNoMm940CL0J8=;
+	b=GN4rXK+fdpHI7aOnv02aVCrP/Woz3Rk0j2rxurMHY1mYpdsGX9mYRiTVk5uqeIkq+JRf5d
+	BV9KkDwYsefq8Q6NU5lDUDdX6hzqe9q39rOEPN91paQaJqm5dPCaokr/PvZS6hTQBGMbXg
+	amqF/wZY2DPrP9pm5DSku2SVnot6c+o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-583-h4DBs5PsOOGOkerZ78GOjg-1; Tue, 11 Jul 2023 02:28:26 -0400
+X-MC-Unique: h4DBs5PsOOGOkerZ78GOjg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36F2F101A54E;
+	Tue, 11 Jul 2023 06:28:26 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.211])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F0B3E200AD6E;
+	Tue, 11 Jul 2023 06:28:22 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: jinjian.song@fibocom.com,
+	haijun.liu@mediatek.com,
+	jtornosm@redhat.com
+Subject: [PATCH] net: wwan: t7xx: Add AP CLDMA
+Date: Tue, 11 Jul 2023 08:28:13 +0200
+Message-ID: <20230711062817.6108-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The old way to do LAN reset is sending reset command to firmware. Once
-firmware performs reset, it reconfigures what it needs.
+At this moment with the current status, t7xx is not functional due to
+problems like this after connection, if there is no activity:
+[   57.370534] mtk_t7xx 0000:72:00.0: [PM] SAP suspend error: -110
+[   57.370581] mtk_t7xx 0000:72:00.0: can't suspend
+    (t7xx_pci_pm_runtime_suspend [mtk_t7xx] returned -110)
+because after this, the traffic no longer works.
 
-In the new firmware versions, veto bit is introduced for NCSI/LLDP to
-block PHY domain in LAN reset. At this point, writing register of LAN
-reset directly makes the same effect as the old way. And it does not
-reset MNG domain, so that veto bit does not change.
+The complete series 'net: wwan: t7xx: fw flashing & coredump support'
+was reverted because of issues with the pci implementation.
+In order to have at least the modem working, it would be enough if just
+the first commit of the series is re-applied:
+d20ef656f994 net: wwan: t7xx: Add AP CLDMA
+With that, the Application Processor would be controlled, correctly
+suspended and the commented problems would be fixed (I am testing here
+like this with no related issue).
 
-And this change is compatible with old firmware versions, since veto
-bit was never used.
+This commit is independent of the others and not related to the
+commented pci implementation for the new features: fw flashing and
+coredump collection.
 
-Fixes: b08012568ebb ("net: txgbe: Reset hardware")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Use v2 patch version of d20ef656f994 as JinJian Song suggests
+(https://patchwork.kernel.org/project/netdevbpf/patch/20230105154215.198828-1-m.chetan.kumar@linux.intel.com/).
+
+Original text from the commit that would be re-applied:
+
+    d20ef656f994 net: wwan: t7xx: Add AP CLDMA
+    Author: Haijun Liu <haijun.liu@mediatek.com>
+    Date:   Tue Aug 16 09:53:28 2022 +0530
+
+    The t7xx device contains two Cross Layer DMA (CLDMA) interfaces to
+    communicate with AP and Modem processors respectively. So far only
+    MD-CLDMA was being used, this patch enables AP-CLDMA.
+
+    Rename small Application Processor (sAP) to AP.
+
+    Signed-off-by: Haijun Liu <haijun.liu@mediatek.com>
+    Co-developed-by: Madhusmita Sahu <madhusmita.sahu@intel.com>
+    Signed-off-by: Madhusmita Sahu <madhusmita.sahu@intel.com>
+    Signed-off-by: Moises Veleta <moises.veleta@linux.intel.com>
+    Signed-off-by: Devegowda Chandrashekar <chandrashekar.devegowda@intel.com>
+    Signed-off-by: M Chetan Kumar <m.chetan.kumar@linux.intel.com>
+    Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+    Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+    Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
+Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 ---
-v2 -> v3:
-- post to net-next
-v1 -> v2:
-- detail commit log
----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 65 -------------------
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |  1 -
- drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |  8 +--
- 3 files changed, 4 insertions(+), 70 deletions(-)
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.c     | 17 +++--
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.h     |  2 +-
+ drivers/net/wwan/t7xx/t7xx_mhccif.h        |  1 +
+ drivers/net/wwan/t7xx/t7xx_modem_ops.c     | 76 +++++++++++++++++-----
+ drivers/net/wwan/t7xx/t7xx_modem_ops.h     |  2 +
+ drivers/net/wwan/t7xx/t7xx_port.h          |  6 +-
+ drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c |  8 ++-
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c    | 18 ++++-
+ drivers/net/wwan/t7xx/t7xx_reg.h           |  2 +-
+ drivers/net/wwan/t7xx/t7xx_state_monitor.c | 13 +++-
+ drivers/net/wwan/t7xx/t7xx_state_monitor.h |  2 +
+ 11 files changed, 116 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 39a9aeee7aab..8f5bba0778c6 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -431,71 +431,6 @@ int wx_read_ee_hostif_buffer(struct wx *wx,
- }
- EXPORT_SYMBOL(wx_read_ee_hostif_buffer);
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
+index aec3a18d44bd..4f56d8cc0aea 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
++++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
+@@ -1066,13 +1066,18 @@ static void t7xx_hw_info_init(struct cldma_ctrl *md_ctrl)
+ 	struct t7xx_cldma_hw *hw_info = &md_ctrl->hw_info;
+ 	u32 phy_ao_base, phy_pd_base;
  
--/**
-- *  wx_calculate_checksum - Calculate checksum for buffer
-- *  @buffer: pointer to EEPROM
-- *  @length: size of EEPROM to calculate a checksum for
-- *  Calculates the checksum for some buffer on a specified length.  The
-- *  checksum calculated is returned.
-- **/
--static u8 wx_calculate_checksum(u8 *buffer, u32 length)
--{
--	u8 sum = 0;
--	u32 i;
+-	if (md_ctrl->hif_id != CLDMA_ID_MD)
+-		return;
 -
--	if (!buffer)
--		return 0;
--
--	for (i = 0; i < length; i++)
--		sum += buffer[i];
--
--	return (u8)(0 - sum);
--}
--
--/**
-- *  wx_reset_hostif - send reset cmd to fw
-- *  @wx: pointer to hardware structure
-- *
-- *  Sends reset cmd to firmware through the manageability
-- *  block.
-- **/
--int wx_reset_hostif(struct wx *wx)
--{
--	struct wx_hic_reset reset_cmd;
--	int ret_val = 0;
--	int i;
--
--	reset_cmd.hdr.cmd = FW_RESET_CMD;
--	reset_cmd.hdr.buf_len = FW_RESET_LEN;
--	reset_cmd.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
--	reset_cmd.lan_id = wx->bus.func;
--	reset_cmd.reset_type = (u16)wx->reset_type;
--	reset_cmd.hdr.checksum = 0;
--	reset_cmd.hdr.checksum = wx_calculate_checksum((u8 *)&reset_cmd,
--						       (FW_CEM_HDR_LEN +
--							reset_cmd.hdr.buf_len));
--
--	for (i = 0; i <= FW_CEM_MAX_RETRIES; i++) {
--		ret_val = wx_host_interface_command(wx, (u32 *)&reset_cmd,
--						    sizeof(reset_cmd),
--						    WX_HI_COMMAND_TIMEOUT,
--						    true);
--		if (ret_val != 0)
--			continue;
--
--		if (reset_cmd.hdr.cmd_or_resp.ret_status ==
--		    FW_CEM_RESP_STATUS_SUCCESS)
--			ret_val = 0;
--		else
--			ret_val = -EFAULT;
--
--		break;
--	}
--
--	return ret_val;
--}
--EXPORT_SYMBOL(wx_reset_hostif);
--
+-	phy_ao_base = CLDMA1_AO_BASE;
+-	phy_pd_base = CLDMA1_PD_BASE;
+-	hw_info->phy_interrupt_id = CLDMA1_INT;
+ 	hw_info->hw_mode = MODE_BIT_64;
++
++	if (md_ctrl->hif_id == CLDMA_ID_MD) {
++		phy_ao_base = CLDMA1_AO_BASE;
++		phy_pd_base = CLDMA1_PD_BASE;
++		hw_info->phy_interrupt_id = CLDMA1_INT;
++	} else {
++		phy_ao_base = CLDMA0_AO_BASE;
++		phy_pd_base = CLDMA0_PD_BASE;
++		hw_info->phy_interrupt_id = CLDMA0_INT;
++	}
++
+ 	hw_info->ap_ao_base = t7xx_pcie_addr_transfer(pbase->pcie_ext_reg_base,
+ 						      pbase->pcie_dev_reg_trsl_addr, phy_ao_base);
+ 	hw_info->ap_pdn_base = t7xx_pcie_addr_transfer(pbase->pcie_ext_reg_base,
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
+index 47a35e552da7..4410bac6993a 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
++++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
+@@ -34,7 +34,7 @@
  /**
-  *  wx_init_eeprom_params - Initialize EEPROM params
-  *  @wx: pointer to hardware structure
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-index 1f93ca32c921..0c4756e6ee06 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-@@ -14,7 +14,6 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
- int wx_read_ee_hostif(struct wx *wx, u16 offset, u16 *data);
- int wx_read_ee_hostif_buffer(struct wx *wx,
- 			     u16 offset, u16 words, u16 *data);
--int wx_reset_hostif(struct wx *wx);
- void wx_init_eeprom_params(struct wx *wx);
- void wx_get_mac_addr(struct wx *wx, u8 *mac_addr);
- void wx_init_rx_addrs(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-index 0772eb14eabf..6e130d1f7a7b 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-@@ -257,16 +257,16 @@ static void txgbe_reset_misc(struct wx *wx)
- int txgbe_reset_hw(struct wx *wx)
+  * enum cldma_id - Identifiers for CLDMA HW units.
+  * @CLDMA_ID_MD: Modem control channel.
+- * @CLDMA_ID_AP: Application Processor control channel (not used at the moment).
++ * @CLDMA_ID_AP: Application Processor control channel.
+  * @CLDMA_NUM:   Number of CLDMA HW units available.
+  */
+ enum cldma_id {
+diff --git a/drivers/net/wwan/t7xx/t7xx_mhccif.h b/drivers/net/wwan/t7xx/t7xx_mhccif.h
+index 209b386bc088..20c50dce9fc3 100644
+--- a/drivers/net/wwan/t7xx/t7xx_mhccif.h
++++ b/drivers/net/wwan/t7xx/t7xx_mhccif.h
+@@ -25,6 +25,7 @@
+ 			 D2H_INT_EXCEPTION_CLEARQ_DONE |	\
+ 			 D2H_INT_EXCEPTION_ALLQ_RESET |		\
+ 			 D2H_INT_PORT_ENUM |			\
++			 D2H_INT_ASYNC_AP_HK |			\
+ 			 D2H_INT_ASYNC_MD_HK)
+ 
+ void t7xx_mhccif_mask_set(struct t7xx_pci_dev *t7xx_dev, u32 val);
+diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+index 7d0f5e4f0a78..24e7d491468e 100644
+--- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
++++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+@@ -44,6 +44,7 @@
+ #include "t7xx_state_monitor.h"
+ 
+ #define RT_ID_MD_PORT_ENUM	0
++#define RT_ID_AP_PORT_ENUM	1
+ /* Modem feature query identification code - "ICCC" */
+ #define MD_FEATURE_QUERY_ID	0x49434343
+ 
+@@ -298,6 +299,7 @@ static void t7xx_md_exception(struct t7xx_modem *md, enum hif_ex_stage stage)
+ 	}
+ 
+ 	t7xx_cldma_exception(md->md_ctrl[CLDMA_ID_MD], stage);
++	t7xx_cldma_exception(md->md_ctrl[CLDMA_ID_AP], stage);
+ 
+ 	if (stage == HIF_EX_INIT)
+ 		t7xx_mhccif_h2d_swint_trigger(t7xx_dev, H2D_CH_EXCEPTION_ACK);
+@@ -426,7 +428,7 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
+ 		if (ft_spt_st != MTK_FEATURE_MUST_BE_SUPPORTED)
+ 			return -EINVAL;
+ 
+-		if (i == RT_ID_MD_PORT_ENUM)
++		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM)
+ 			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data);
+ 	}
+ 
+@@ -456,12 +458,12 @@ static int t7xx_core_reset(struct t7xx_modem *md)
+ 	return 0;
+ }
+ 
+-static void t7xx_core_hk_handler(struct t7xx_modem *md, struct t7xx_fsm_ctl *ctl,
++static void t7xx_core_hk_handler(struct t7xx_modem *md, struct t7xx_sys_info *core_info,
++				 struct t7xx_fsm_ctl *ctl,
+ 				 enum t7xx_fsm_event_state event_id,
+ 				 enum t7xx_fsm_event_state err_detect)
  {
- 	int status;
-+	u32 val;
+ 	struct t7xx_fsm_event *event = NULL, *event_next;
+-	struct t7xx_sys_info *core_info = &md->core_md;
+ 	struct device *dev = &md->t7xx_dev->pdev->dev;
+ 	unsigned long flags;
+ 	int ret;
+@@ -531,19 +533,33 @@ static void t7xx_md_hk_wq(struct work_struct *work)
+ 	t7xx_cldma_start(md->md_ctrl[CLDMA_ID_MD]);
+ 	t7xx_fsm_broadcast_state(ctl, MD_STATE_WAITING_FOR_HS2);
+ 	md->core_md.handshake_ongoing = true;
+-	t7xx_core_hk_handler(md, ctl, FSM_EVENT_MD_HS2, FSM_EVENT_MD_HS2_EXIT);
++	t7xx_core_hk_handler(md, &md->core_md, ctl, FSM_EVENT_MD_HS2, FSM_EVENT_MD_HS2_EXIT);
++}
++
++static void t7xx_ap_hk_wq(struct work_struct *work)
++{
++	struct t7xx_modem *md = container_of(work, struct t7xx_modem, ap_handshake_work);
++	struct t7xx_fsm_ctl *ctl = md->fsm_ctl;
++
++	 /* Clear the HS2 EXIT event appended in t7xx_core_reset(). */
++	t7xx_fsm_clr_event(ctl, FSM_EVENT_AP_HS2_EXIT);
++	t7xx_cldma_stop(md->md_ctrl[CLDMA_ID_AP]);
++	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_AP]);
++	t7xx_cldma_start(md->md_ctrl[CLDMA_ID_AP]);
++	md->core_ap.handshake_ongoing = true;
++	t7xx_core_hk_handler(md, &md->core_ap, ctl, FSM_EVENT_AP_HS2, FSM_EVENT_AP_HS2_EXIT);
+ }
  
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = wx_stop_adapter(wx);
- 	if (status != 0)
- 		return status;
+ void t7xx_md_event_notify(struct t7xx_modem *md, enum md_event_id evt_id)
+ {
+ 	struct t7xx_fsm_ctl *ctl = md->fsm_ctl;
+-	void __iomem *mhccif_base;
+ 	unsigned int int_sta;
+ 	unsigned long flags;
  
--	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
--	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP)))
--		wx_reset_hostif(wx);
--
-+	val = WX_MIS_RST_LAN_RST(wx->bus.func);
-+	wr32(wx, WX_MIS_RST, val | rd32(wx, WX_MIS_RST));
-+	WX_WRITE_FLUSH(wx);
- 	usleep_range(10, 100);
+ 	switch (evt_id) {
+ 	case FSM_PRE_START:
+-		t7xx_mhccif_mask_clr(md->t7xx_dev, D2H_INT_PORT_ENUM);
++		t7xx_mhccif_mask_clr(md->t7xx_dev, D2H_INT_PORT_ENUM | D2H_INT_ASYNC_MD_HK |
++						   D2H_INT_ASYNC_AP_HK);
+ 		break;
  
- 	status = wx_check_flash_load(wx, TXGBE_SPI_ILDR_STATUS_LAN_SW_RST(wx->bus.func));
+ 	case FSM_START:
+@@ -556,16 +572,26 @@ void t7xx_md_event_notify(struct t7xx_modem *md, enum md_event_id evt_id)
+ 			ctl->exp_flg = true;
+ 			md->exp_id &= ~D2H_INT_EXCEPTION_INIT;
+ 			md->exp_id &= ~D2H_INT_ASYNC_MD_HK;
++			md->exp_id &= ~D2H_INT_ASYNC_AP_HK;
+ 		} else if (ctl->exp_flg) {
+ 			md->exp_id &= ~D2H_INT_ASYNC_MD_HK;
+-		} else if (md->exp_id & D2H_INT_ASYNC_MD_HK) {
+-			queue_work(md->handshake_wq, &md->handshake_work);
+-			md->exp_id &= ~D2H_INT_ASYNC_MD_HK;
+-			mhccif_base = md->t7xx_dev->base_addr.mhccif_rc_base;
+-			iowrite32(D2H_INT_ASYNC_MD_HK, mhccif_base + REG_EP2RC_SW_INT_ACK);
+-			t7xx_mhccif_mask_set(md->t7xx_dev, D2H_INT_ASYNC_MD_HK);
++			md->exp_id &= ~D2H_INT_ASYNC_AP_HK;
+ 		} else {
+-			t7xx_mhccif_mask_clr(md->t7xx_dev, D2H_INT_ASYNC_MD_HK);
++			void __iomem *mhccif_base = md->t7xx_dev->base_addr.mhccif_rc_base;
++
++			if (md->exp_id & D2H_INT_ASYNC_MD_HK) {
++				queue_work(md->handshake_wq, &md->handshake_work);
++				md->exp_id &= ~D2H_INT_ASYNC_MD_HK;
++				iowrite32(D2H_INT_ASYNC_MD_HK, mhccif_base + REG_EP2RC_SW_INT_ACK);
++				t7xx_mhccif_mask_set(md->t7xx_dev, D2H_INT_ASYNC_MD_HK);
++			}
++
++			if (md->exp_id & D2H_INT_ASYNC_AP_HK) {
++				queue_work(md->handshake_wq, &md->ap_handshake_work);
++				md->exp_id &= ~D2H_INT_ASYNC_AP_HK;
++				iowrite32(D2H_INT_ASYNC_AP_HK, mhccif_base + REG_EP2RC_SW_INT_ACK);
++				t7xx_mhccif_mask_set(md->t7xx_dev, D2H_INT_ASYNC_AP_HK);
++			}
+ 		}
+ 		spin_unlock_irqrestore(&md->exp_lock, flags);
+ 
+@@ -578,6 +604,7 @@ void t7xx_md_event_notify(struct t7xx_modem *md, enum md_event_id evt_id)
+ 
+ 	case FSM_READY:
+ 		t7xx_mhccif_mask_set(md->t7xx_dev, D2H_INT_ASYNC_MD_HK);
++		t7xx_mhccif_mask_set(md->t7xx_dev, D2H_INT_ASYNC_AP_HK);
+ 		break;
+ 
+ 	default:
+@@ -629,6 +656,12 @@ static struct t7xx_modem *t7xx_md_alloc(struct t7xx_pci_dev *t7xx_dev)
+ 	md->core_md.feature_set[RT_ID_MD_PORT_ENUM] &= ~FEATURE_MSK;
+ 	md->core_md.feature_set[RT_ID_MD_PORT_ENUM] |=
+ 		FIELD_PREP(FEATURE_MSK, MTK_FEATURE_MUST_BE_SUPPORTED);
++
++	INIT_WORK(&md->ap_handshake_work, t7xx_ap_hk_wq);
++	md->core_ap.feature_set[RT_ID_AP_PORT_ENUM] &= ~FEATURE_MSK;
++	md->core_ap.feature_set[RT_ID_AP_PORT_ENUM] |=
++		FIELD_PREP(FEATURE_MSK, MTK_FEATURE_MUST_BE_SUPPORTED);
++
+ 	return md;
+ }
+ 
+@@ -640,6 +673,7 @@ int t7xx_md_reset(struct t7xx_pci_dev *t7xx_dev)
+ 	md->exp_id = 0;
+ 	t7xx_fsm_reset(md);
+ 	t7xx_cldma_reset(md->md_ctrl[CLDMA_ID_MD]);
++	t7xx_cldma_reset(md->md_ctrl[CLDMA_ID_AP]);
+ 	t7xx_port_proxy_reset(md->port_prox);
+ 	md->md_init_finish = true;
+ 	return t7xx_core_reset(md);
+@@ -669,6 +703,10 @@ int t7xx_md_init(struct t7xx_pci_dev *t7xx_dev)
+ 	if (ret)
+ 		goto err_destroy_hswq;
+ 
++	ret = t7xx_cldma_alloc(CLDMA_ID_AP, t7xx_dev);
++	if (ret)
++		goto err_destroy_hswq;
++
+ 	ret = t7xx_fsm_init(md);
+ 	if (ret)
+ 		goto err_destroy_hswq;
+@@ -681,12 +719,16 @@ int t7xx_md_init(struct t7xx_pci_dev *t7xx_dev)
+ 	if (ret)
+ 		goto err_uninit_ccmni;
+ 
+-	ret = t7xx_port_proxy_init(md);
++	ret = t7xx_cldma_init(md->md_ctrl[CLDMA_ID_AP]);
+ 	if (ret)
+ 		goto err_uninit_md_cldma;
+ 
++	ret = t7xx_port_proxy_init(md);
++	if (ret)
++		goto err_uninit_ap_cldma;
++
+ 	ret = t7xx_fsm_append_cmd(md->fsm_ctl, FSM_CMD_START, 0);
+-	if (ret) /* fsm_uninit flushes cmd queue */
++	if (ret) /* t7xx_fsm_uninit() flushes cmd queue */
+ 		goto err_uninit_proxy;
+ 
+ 	t7xx_md_sys_sw_init(t7xx_dev);
+@@ -696,6 +738,9 @@ int t7xx_md_init(struct t7xx_pci_dev *t7xx_dev)
+ err_uninit_proxy:
+ 	t7xx_port_proxy_uninit(md->port_prox);
+ 
++err_uninit_ap_cldma:
++	t7xx_cldma_exit(md->md_ctrl[CLDMA_ID_AP]);
++
+ err_uninit_md_cldma:
+ 	t7xx_cldma_exit(md->md_ctrl[CLDMA_ID_MD]);
+ 
+@@ -722,6 +767,7 @@ void t7xx_md_exit(struct t7xx_pci_dev *t7xx_dev)
+ 
+ 	t7xx_fsm_append_cmd(md->fsm_ctl, FSM_CMD_PRE_STOP, FSM_CMD_FLAG_WAIT_FOR_COMPLETION);
+ 	t7xx_port_proxy_uninit(md->port_prox);
++	t7xx_cldma_exit(md->md_ctrl[CLDMA_ID_AP]);
+ 	t7xx_cldma_exit(md->md_ctrl[CLDMA_ID_MD]);
+ 	t7xx_ccmni_exit(t7xx_dev);
+ 	t7xx_fsm_uninit(md);
+diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.h b/drivers/net/wwan/t7xx/t7xx_modem_ops.h
+index 7469ed636ae8..abe633cf7adc 100644
+--- a/drivers/net/wwan/t7xx/t7xx_modem_ops.h
++++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.h
+@@ -66,10 +66,12 @@ struct t7xx_modem {
+ 	struct cldma_ctrl		*md_ctrl[CLDMA_NUM];
+ 	struct t7xx_pci_dev		*t7xx_dev;
+ 	struct t7xx_sys_info		core_md;
++	struct t7xx_sys_info		core_ap;
+ 	bool				md_init_finish;
+ 	bool				rgu_irq_asserted;
+ 	struct workqueue_struct		*handshake_wq;
+ 	struct work_struct		handshake_work;
++	struct work_struct		ap_handshake_work;
+ 	struct t7xx_fsm_ctl		*fsm_ctl;
+ 	struct port_proxy		*port_prox;
+ 	unsigned int			exp_id;
+diff --git a/drivers/net/wwan/t7xx/t7xx_port.h b/drivers/net/wwan/t7xx/t7xx_port.h
+index 8ea9079af997..4ae8a00a8532 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port.h
++++ b/drivers/net/wwan/t7xx/t7xx_port.h
+@@ -36,9 +36,13 @@
+ /* Channel ID and Message ID definitions.
+  * The channel number consists of peer_id(15:12) , channel_id(11:0)
+  * peer_id:
+- * 0:reserved, 1: to sAP, 2: to MD
++ * 0:reserved, 1: to AP, 2: to MD
+  */
+ enum port_ch {
++	/* to AP */
++	PORT_CH_AP_CONTROL_RX = 0x1000,
++	PORT_CH_AP_CONTROL_TX = 0x1001,
++
+ 	/* to MD */
+ 	PORT_CH_CONTROL_RX = 0x2000,
+ 	PORT_CH_CONTROL_TX = 0x2001,
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+index 68430b130a67..ae632ef96698 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+@@ -167,8 +167,12 @@ static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
+ 	case CTL_ID_HS2_MSG:
+ 		skb_pull(skb, sizeof(*ctrl_msg_h));
+ 
+-		if (port_conf->rx_ch == PORT_CH_CONTROL_RX) {
+-			ret = t7xx_fsm_append_event(ctl, FSM_EVENT_MD_HS2, skb->data,
++		if (port_conf->rx_ch == PORT_CH_CONTROL_RX ||
++		    port_conf->rx_ch == PORT_CH_AP_CONTROL_RX) {
++			int event = port_conf->rx_ch == PORT_CH_CONTROL_RX ?
++				    FSM_EVENT_MD_HS2 : FSM_EVENT_AP_HS2;
++
++			ret = t7xx_fsm_append_event(ctl, event, skb->data,
+ 						    le32_to_cpu(ctrl_msg_h->data_length));
+ 			if (ret)
+ 				dev_err(port->dev, "Failed to append Handshake 2 event");
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+index 894b1d11b2c9..274846d39fbf 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+@@ -48,7 +48,7 @@
+ 	     i < (proxy)->port_count;		\
+ 	     i++, (p) = &(proxy)->ports[i])
+ 
+-static const struct t7xx_port_conf t7xx_md_port_conf[] = {
++static const struct t7xx_port_conf t7xx_port_conf[] = {
+ 	{
+ 		.tx_ch = PORT_CH_UART2_TX,
+ 		.rx_ch = PORT_CH_UART2_RX,
+@@ -89,6 +89,14 @@ static const struct t7xx_port_conf t7xx_md_port_conf[] = {
+ 		.path_id = CLDMA_ID_MD,
+ 		.ops = &ctl_port_ops,
+ 		.name = "t7xx_ctrl",
++	}, {
++		.tx_ch = PORT_CH_AP_CONTROL_TX,
++		.rx_ch = PORT_CH_AP_CONTROL_RX,
++		.txq_index = Q_IDX_CTRL,
++		.rxq_index = Q_IDX_CTRL,
++		.path_id = CLDMA_ID_AP,
++		.ops = &ctl_port_ops,
++		.name = "t7xx_ap_ctrl",
+ 	},
+ };
+ 
+@@ -428,6 +436,9 @@ static void t7xx_proxy_init_all_ports(struct t7xx_modem *md)
+ 		if (port_conf->tx_ch == PORT_CH_CONTROL_TX)
+ 			md->core_md.ctl_port = port;
+ 
++		if (port_conf->tx_ch == PORT_CH_AP_CONTROL_TX)
++			md->core_ap.ctl_port = port;
++
+ 		port->t7xx_dev = md->t7xx_dev;
+ 		port->dev = &md->t7xx_dev->pdev->dev;
+ 		spin_lock_init(&port->port_update_lock);
+@@ -442,7 +453,7 @@ static void t7xx_proxy_init_all_ports(struct t7xx_modem *md)
+ 
+ static int t7xx_proxy_alloc(struct t7xx_modem *md)
+ {
+-	unsigned int port_count = ARRAY_SIZE(t7xx_md_port_conf);
++	unsigned int port_count = ARRAY_SIZE(t7xx_port_conf);
+ 	struct device *dev = &md->t7xx_dev->pdev->dev;
+ 	struct port_proxy *port_prox;
+ 	int i;
+@@ -456,7 +467,7 @@ static int t7xx_proxy_alloc(struct t7xx_modem *md)
+ 	port_prox->dev = dev;
+ 
+ 	for (i = 0; i < port_count; i++)
+-		port_prox->ports[i].port_conf = &t7xx_md_port_conf[i];
++		port_prox->ports[i].port_conf = &t7xx_port_conf[i];
+ 
+ 	port_prox->port_count = port_count;
+ 	t7xx_proxy_init_all_ports(md);
+@@ -481,6 +492,7 @@ int t7xx_port_proxy_init(struct t7xx_modem *md)
+ 	if (ret)
+ 		return ret;
+ 
++	t7xx_cldma_set_recv_skb(md->md_ctrl[CLDMA_ID_AP], t7xx_port_proxy_recv_skb);
+ 	t7xx_cldma_set_recv_skb(md->md_ctrl[CLDMA_ID_MD], t7xx_port_proxy_recv_skb);
+ 	return 0;
+ }
+diff --git a/drivers/net/wwan/t7xx/t7xx_reg.h b/drivers/net/wwan/t7xx/t7xx_reg.h
+index 7c1b81091a0f..c41d7d094c08 100644
+--- a/drivers/net/wwan/t7xx/t7xx_reg.h
++++ b/drivers/net/wwan/t7xx/t7xx_reg.h
+@@ -56,7 +56,7 @@
+ #define D2H_INT_RESUME_ACK			BIT(12)
+ #define D2H_INT_SUSPEND_ACK_AP			BIT(13)
+ #define D2H_INT_RESUME_ACK_AP			BIT(14)
+-#define D2H_INT_ASYNC_SAP_HK			BIT(15)
++#define D2H_INT_ASYNC_AP_HK			BIT(15)
+ #define D2H_INT_ASYNC_MD_HK			BIT(16)
+ 
+ /* Register base */
+diff --git a/drivers/net/wwan/t7xx/t7xx_state_monitor.c b/drivers/net/wwan/t7xx/t7xx_state_monitor.c
+index 0bcca08ff2bd..80edb8e75a6a 100644
+--- a/drivers/net/wwan/t7xx/t7xx_state_monitor.c
++++ b/drivers/net/wwan/t7xx/t7xx_state_monitor.c
+@@ -285,8 +285,9 @@ static int fsm_routine_starting(struct t7xx_fsm_ctl *ctl)
+ 	t7xx_fsm_broadcast_state(ctl, MD_STATE_WAITING_FOR_HS1);
+ 	t7xx_md_event_notify(md, FSM_START);
+ 
+-	wait_event_interruptible_timeout(ctl->async_hk_wq, md->core_md.ready || ctl->exp_flg,
+-					 HZ * 60);
++	wait_event_interruptible_timeout(ctl->async_hk_wq,
++					 (md->core_md.ready && md->core_ap.ready) ||
++					  ctl->exp_flg, HZ * 60);
+ 	dev = &md->t7xx_dev->pdev->dev;
+ 
+ 	if (ctl->exp_flg)
+@@ -297,6 +298,13 @@ static int fsm_routine_starting(struct t7xx_fsm_ctl *ctl)
+ 		if (md->core_md.handshake_ongoing)
+ 			t7xx_fsm_append_event(ctl, FSM_EVENT_MD_HS2_EXIT, NULL, 0);
+ 
++		fsm_routine_exception(ctl, NULL, EXCEPTION_HS_TIMEOUT);
++		return -ETIMEDOUT;
++	} else if (!md->core_ap.ready) {
++		dev_err(dev, "AP handshake timeout\n");
++		if (md->core_ap.handshake_ongoing)
++			t7xx_fsm_append_event(ctl, FSM_EVENT_AP_HS2_EXIT, NULL, 0);
++
+ 		fsm_routine_exception(ctl, NULL, EXCEPTION_HS_TIMEOUT);
+ 		return -ETIMEDOUT;
+ 	}
+@@ -335,6 +343,7 @@ static void fsm_routine_start(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_command
+ 		return;
+ 	}
+ 
++	t7xx_cldma_hif_hw_init(md->md_ctrl[CLDMA_ID_AP]);
+ 	t7xx_cldma_hif_hw_init(md->md_ctrl[CLDMA_ID_MD]);
+ 	fsm_finish_command(ctl, cmd, fsm_routine_starting(ctl));
+ }
+diff --git a/drivers/net/wwan/t7xx/t7xx_state_monitor.h b/drivers/net/wwan/t7xx/t7xx_state_monitor.h
+index b1af0259d4c5..b6e76f3903c8 100644
+--- a/drivers/net/wwan/t7xx/t7xx_state_monitor.h
++++ b/drivers/net/wwan/t7xx/t7xx_state_monitor.h
+@@ -38,10 +38,12 @@ enum t7xx_fsm_state {
+ enum t7xx_fsm_event_state {
+ 	FSM_EVENT_INVALID,
+ 	FSM_EVENT_MD_HS2,
++	FSM_EVENT_AP_HS2,
+ 	FSM_EVENT_MD_EX,
+ 	FSM_EVENT_MD_EX_REC_OK,
+ 	FSM_EVENT_MD_EX_PASS,
+ 	FSM_EVENT_MD_HS2_EXIT,
++	FSM_EVENT_AP_HS2_EXIT,
+ 	FSM_EVENT_MAX
+ };
+ 
 -- 
-2.27.0
+2.41.0
 
 
