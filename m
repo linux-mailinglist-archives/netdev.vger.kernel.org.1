@@ -1,161 +1,102 @@
-Return-Path: <netdev+bounces-16661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C8774E2E9
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:01:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A687174E30A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686661C20C7B
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB1CE281423
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56BDB382;
-	Tue, 11 Jul 2023 01:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7E138A;
+	Tue, 11 Jul 2023 01:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A522196
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 01:01:11 +0000 (UTC)
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E53CE;
-	Mon, 10 Jul 2023 18:01:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1689037267;
-	bh=B4DwB8zOKuSyVO8uxq9Dy+tWno5pkUGZDOX2npkrOD0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FqgRuQwsI8m5TJWRKxGQU19rmC2knnq0gj7qmZEsQwbK+Fje37fEzCqEcAyjKJDji
-	 rKninmF78dATO6nX5GwjJJI6iimcmp0EXe808LB/JOt3Krcle4+1MWAhxHVth0VDeW
-	 BTPBecpJkPr5av6LNy8D32qp8NtDzjr0T9ojG6JaBXfvUWELqRyM8xBxBL2N812/YI
-	 SNOZKn2SMKF+Xpa7iSXee9xKHt2QMOjRGMrKDM8iM+lc0UykkWst6RZdL9RDzUgZPC
-	 dkBi501Qvi4pU4KW3b89L0oILpMbL6F/jTg22kpPIoMJJwM2EFuvPyqNcIQjQ8wQSR
-	 h3AwpOEL5wm7g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4R0Mxt43rfz4whq;
-	Tue, 11 Jul 2023 11:01:06 +1000 (AEST)
-Date: Tue, 11 Jul 2023 11:01:05 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: "Michael S. Tsirkin" <mst@redhat.com>, David Miller
- <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>
-Subject: Re: linux-next: manual merge of the vhost tree with the net-next
- tree
-Message-ID: <20230711110105.467f896d@canb.auug.org.au>
-In-Reply-To: <20230623130443.6c9a481e@canb.auug.org.au>
-References: <20230623130443.6c9a481e@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A653382;
+	Tue, 11 Jul 2023 01:10:26 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0D810C1;
+	Mon, 10 Jul 2023 18:10:09 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b6f9edac8dso77615991fa.3;
+        Mon, 10 Jul 2023 18:10:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689037780; x=1691629780;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ynUCCAwIsl1Knhawj6TPxHdOw1pZmTll5Cp5Uex+0IE=;
+        b=Wspu0Rw0rq4G+yiT/xcrDqPKF9DuPIpcT4Hwu09vhMoNJ/sUP8l3WPmRhgomBLSpG9
+         HeLd27oJKMV/ySIqjmqs3GQQUh6XwGit8BR640LihItLdaMOTxTwnK7zCfbogQQpr5Zj
+         /hoLmqgsW+3mJPBXI4CmDSSv44w/FlGBq+WC0zMpcp+hO8b03SBrK7gUrrgWB9PUlgFQ
+         +eLAKHoA/DzgiBh/GNTyrGMRWeoJNo4o4gA2Fc1NI1q3ccV8RXuybgpUjYeY5ap3T1E0
+         4NNJ69pDBB5nRbw2xtHOFpN9StfXLEMqhN84/dnozhdxJbre4JcDH7yUhP0c5xPIgICz
+         ChKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689037780; x=1691629780;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ynUCCAwIsl1Knhawj6TPxHdOw1pZmTll5Cp5Uex+0IE=;
+        b=VyGFKF/QHJbTU1kBTGFgA6WTYnqS+Q6efKgcCTPz55cv1ilMudpHJiz/MnfHkMeay5
+         oGcLffmQ/AMBI8VIJhpvS1q1OU2EYoy9L1i1Cm8SNvopHaBVXPjxDCbo+D91M6YWKko1
+         YCQXidI9H/CtNXB9lP9XnVp5Lb+z/Aphe8UREolwGJrXYrj+6XqdewZ5BVjqr3yuk+3u
+         RxXOdd2f4dLEeblLxXqWrKlWBlkpvhk29TJ5ugedwL+41bvKi8tfVxBqrw5dy9giBBXe
+         2hPvaLbHK6gPTseDaR6opTgqWRzbNDOzW7yl7k8sMUrtx9IpY3L1qXNd97HV6XbxX6g2
+         NNaw==
+X-Gm-Message-State: ABy/qLaEGosR2vGpjL+4uQ89B7J4f0XC+ZMqbSIbaAHidc449b079jIb
+	xF3Qy46nXmn/APwJwHaOG0+ZZKRst/7EyML4z6DD6isL
+X-Google-Smtp-Source: APBJJlGfk/0uBNhDBcz+njgSqPxjFnfVmGtc7ljfQQOeW1XdVcK06I65ylABsXv4uRC0EJKZFcqzd9sATTq3icIHxLw=
+X-Received: by 2002:a2e:9d16:0:b0:2b6:e958:5700 with SMTP id
+ t22-20020a2e9d16000000b002b6e9585700mr5857244lji.4.1689037779714; Mon, 10 Jul
+ 2023 18:09:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/vYM/I6ZyNfC9j0yYpl4QqtM";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230706204650.469087-1-maciej.fijalkowski@intel.com> <20230706204650.469087-11-maciej.fijalkowski@intel.com>
+In-Reply-To: <20230706204650.469087-11-maciej.fijalkowski@intel.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 10 Jul 2023 18:09:28 -0700
+Message-ID: <CAADnVQLKDratBrgvwHzXZBW9chH9SBXPhnXpExYwu0BbRVFPjQ@mail.gmail.com>
+Subject: Re: [PATCH v5 bpf-next 10/24] xsk: add new netlink attribute
+ dedicated for ZC max frags
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	"Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>, Simon Horman <simon.horman@corigine.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/vYM/I6ZyNfC9j0yYpl4QqtM
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-On Fri, 23 Jun 2023 13:04:43 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
+On Thu, Jul 6, 2023 at 1:47=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
 >
-> Today's linux-next merge of the vhost tree got a conflict in:
->=20
->   drivers/net/virtio_net.c
->=20
-> between commit:
->=20
->   80f50f918c6e ("virtio_net: separate the logic of freeing the rest merge=
-able buf")
->=20
-> from the net-next tree and commit:
->=20
->   21081476b808 ("virtio_net: support dma premapped")
+> Introduce new netlink attribute NETDEV_A_DEV_XDP_ZC_MAX_SEGS that will
+> carry maximum fragments that underlying ZC driver is able to handle on
+> TX side. It is going to be included in netlink response only when driver
+> supports ZC. Any value higher than 1 implies multi-buffer ZC support on
+> underlying device.
+>
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-This is now commit
+I suspect something in this patch makes XDP bonding test fail.
+See BPF CI.
 
-  c8dc5b9adff9 ("virtio_net: support dma premapped")
-
-> from the vhost tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
-> diff --cc drivers/net/virtio_net.c
-> index 0db14f6b87d3,d67b36fdba0d..000000000000
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@@ -1128,28 -1136,6 +1233,28 @@@ err
->   	return NULL;
->   }
->  =20
->  +static void mergeable_buf_free(struct receive_queue *rq, int num_buf,
->  +			       struct net_device *dev,
->  +			       struct virtnet_rq_stats *stats)
->  +{
->  +	struct page *page;
->  +	void *buf;
->  +	int len;
->  +
->  +	while (num_buf-- > 1) {
-> - 		buf =3D virtqueue_get_buf(rq->vq, &len);
-> ++		buf =3D virtnet_rq_get_buf(rq, &len, NULL);
->  +		if (unlikely(!buf)) {
->  +			pr_debug("%s: rx error: %d buffers missing\n",
->  +				 dev->name, num_buf);
->  +			dev->stats.rx_length_errors++;
->  +			break;
->  +		}
->  +		stats->bytes +=3D len;
->  +		page =3D virt_to_head_page(buf);
->  +		put_page(page);
->  +	}
->  +}
->  +
->   /* Why not use xdp_build_skb_from_frame() ?
->    * XDP core assumes that xdp frags are PAGE_SIZE in length, while in
->    * virtio-net there are 2 points that do not match its requirements:
-
-This is now a conflict between the vhost tree and Linus' tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/vYM/I6ZyNfC9j0yYpl4QqtM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSsqdEACgkQAVBC80lX
-0GyZPwf/cFvPmsfrNh9BzsRVjwY6977gPEoHeWXeTWzEamrXxH9+UOS3MTsf1NN5
-uBJb1Rm0aRlrsfShLxBK4T5R72fjuRIGlr1W5xesLn69O4uRnMcPpCB4FfZRFU8A
-5rywlnAQVJjt/AgQkjOKhaxzC52h9msxHAvNNwqtYRp6o3ysLumE2WcPoIX8AtCZ
-I50pnZ94DJIwS+APgaNL7q/yNZl7UezYcXbhmHQqg02Tgp4sYfoE0lkFo6jGXkjW
-u9whwIXx+uctvAUzQUFpxijZmUrD9U19X9h245jZJRu+T/oh7jJDDPEVyoZd8ihE
-R5SgjBc7rFEFuIJHnlLVcOkovYZFaA==
-=uY7L
------END PGP SIGNATURE-----
-
---Sig_/vYM/I6ZyNfC9j0yYpl4QqtM--
+I can reproduce the failure locally as well.
+test_progs -t bond
+works without the series and fails with them.
 
