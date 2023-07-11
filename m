@@ -1,141 +1,175 @@
-Return-Path: <netdev+bounces-16982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7441B74FBF2
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:54:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907D374FBF7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5FF1C20E43
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:54:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 452012809E3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728F51ED4D;
-	Tue, 11 Jul 2023 23:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7211ED45;
+	Tue, 11 Jul 2023 23:57:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645C21DDE5
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:54:30 +0000 (UTC)
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E567F170F
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:54:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A98D1DDE5
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:57:02 +0000 (UTC)
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F3B170F
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:57:00 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3a337ddff16so4844756b6e.0
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:57:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689119669; x=1720655669;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=S31tc4n4Ui6HS+LailK8v4AO1tjvB2dHTdcwzIgGBFk=;
-  b=fsaCeF2b7BODBn9dkEYnt0kziFvuHCDiVjV0clIAnMGJmsoxSjCMBoH8
-   CSwkfkWb2GXz3kL4abrqFs0BugDi6bBGUWWsWBQdMvBLFKaSGUgncdw9M
-   R2MIxvdnJPoXLu7AGRJynRyg/X07EqAkndj3I9Bydy4csWnkC1vZ9c2CA
-   M=;
-X-IronPort-AV: E=Sophos;i="6.01,198,1684800000"; 
-   d="scan'208";a="659347303"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 23:54:28 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com (Postfix) with ESMTPS id D1D4C60CBB;
-	Tue, 11 Jul 2023 23:54:27 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 23:54:27 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.35) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 23:54:24 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov
-	<razor@blackwall.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: "Eric W. Biederman" <ebiederm@xmission.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, <bridge@lists.linux-foundation.org>, Harry Coin
-	<hcoin@quietfountain.com>
-Subject: [PATCH v1 net] bridge: Return an error when enabling STP in netns.
-Date: Tue, 11 Jul 2023 16:54:15 -0700
-Message-ID: <20230711235415.92166-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=ziepe.ca; s=google; t=1689119819; x=1691711819;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=leJKi4u06YRTzo0lBrUW1GjV6mczJ561dFwtREQL+Dg=;
+        b=DXK8WidcvmvzjeVYH/6WijviZ73toBOmyVp9mIOd03ZD+R3rHWdoxQSvE5e9wD1KCJ
+         9mK/DDwssbLXSnouE8MAwnVDe+VkRcpQSrinJNmyu0FnYmd+CKVNA1F34dvSGu5lfZwy
+         cyr25JKjczwfRObdI7oARPE9gHghtmOAegQpocDq/APkFl+1PNSXGJo1xP2SNdGpJGtv
+         /nEQL7vqxVxYsTwIY7luylFSj8xoTEsYM9t5cm2HxYfPwTnzx8rs4qClhieKHRjwL54Q
+         8sya8gM8UB4rmOcx/i0v01+HlH4cbtNGlO2x9kzZaZUcFmUL9dtfGxX7fDRkv+FMzf1u
+         InjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689119819; x=1691711819;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=leJKi4u06YRTzo0lBrUW1GjV6mczJ561dFwtREQL+Dg=;
+        b=mDH/3gXGNRZUk/fYLOHPIWknnBDvfVzSBD/GnwOTU0s2ejdPdpYhbSlX4LqFDWRgUh
+         yGHYb1KISZwRuBkVMMYHHS7Nmc7LtFTQ1zPQQOSKYPSV2BQH7tz4z+JTI6la8SQjSKrT
+         h2bKzMQIs2PRSt9DQ9FDN3tt6nj/CXGPIm+yXV+cp1olcagKYA8UYChCCxbQGTUyTvHo
+         atRrF3vLXLZn2FhkPszP/KyLM0vi6YS1vaEDtfvYvMs9Gu+GKTC+QVr1KaAeouaYU/F9
+         QB2BlEMa40TPNFAqthGcAClnFIdUD+B1rUGojhEISXMAktLmEEb8D7gmrTHK4uMjIyWA
+         jfNw==
+X-Gm-Message-State: ABy/qLYk73ucL/FZOle609AI11T64Ffy9tTq8YX26NEwlzk33imZtrpQ
+	GmESn0hsS7YhNWk5ukSgEPyRBg==
+X-Google-Smtp-Source: APBJJlHPVDwycmPbbNO1kwHaGDMrzsNQAmVLFppzVomF/d82yUMQJxrek5vJqs3gAPlID0cxcW6lxg==
+X-Received: by 2002:a05:6808:11cf:b0:3a3:fa64:b543 with SMTP id p15-20020a05680811cf00b003a3fa64b543mr9841890oiv.12.1689119819344;
+        Tue, 11 Jul 2023 16:56:59 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id x11-20020a63b34b000000b005533c53f550sm1952223pgt.45.2023.07.11.16.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 16:56:58 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qJNE0-000KOY-Hj;
+	Tue, 11 Jul 2023 20:56:56 -0300
+Date: Tue, 11 Jul 2023 20:56:56 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Mina Almasry <almasrymina@google.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Message-ID: <ZK3sSMSVWM5EbHLG@ziepe.ca>
+References: <ZKyZBbKEpmkFkpWV@ziepe.ca>
+ <20230711042708.GA18658@lst.de>
+ <20230710215906.49514550@kernel.org>
+ <20230711050445.GA19323@lst.de>
+ <ZK1FbjG+VP/zxfO1@ziepe.ca>
+ <20230711090047.37d7fe06@kernel.org>
+ <ZK2Gh2qGxlpZexCM@ziepe.ca>
+ <20230711100636.63b0a88a@kernel.org>
+ <ZK2k9YQiXTtcGhp0@ziepe.ca>
+ <20230711133420.5df88f02@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.35]
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711133420.5df88f02@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When we create an L2 loop on a bridge in netns, we will see packets storm
-even if STP is enabled.
+On Tue, Jul 11, 2023 at 01:34:20PM -0700, Jakub Kicinski wrote:
 
-  # unshare -n
-  # ip link add br0 type bridge
-  # ip link add veth0 type veth peer name veth1
-  # ip link set veth0 master br0 up
-  # ip link set veth1 master br0 up
-  # ip link set br0 type bridge stp_state 1
-  # ip link set br0 up
-  # sleep 30
-  # ip -s link show br0
-  2: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-      link/ether b6:61:98:1c:1c:b5 brd ff:ff:ff:ff:ff:ff
-      RX: bytes  packets  errors  dropped missed  mcast
-      956553768  12861249 0       0       0       12861249  <-. Keep
-      TX: bytes  packets  errors  dropped carrier collsns     |  increasing
-      1027834    11951    0       0       0       0         <-'   rapidly
+> > Yep. At the high end open standards based ethernet has also notably
+> > "failed" as well. Every switch vendor now offers their own proprietary
+> > ecosystem on a whole bunch of different axis. They all present
+> > "ethernet" toward the host but the host often needs to work in a
+> > special way to really take full advantage of the proprietary fabric
+> > behaviors.
+> 
+> I'm not familiar with "high end open standards based on ethernet", would
+> those be some RDMA / storage things? For TCP/IP networks pretty much
+> the only things that matter in a switch are bandwidth, size of buffers,
+> power... Implementation stuff.
 
-This is because llc_rcv() drops all packets in non-root netns and BPDU
-is dropped.
+I would say when you are getting into ethernet deployments with 25 or
+51 Tbps switches directly connected to hosts running at >100G you are
+getting into the high end side of things.
 
-Let's show an error when enabling STP in netns.
+These are very expensive networks. They run complex congestion
+provoking workloads. They have sophisticated multi-pathing. They often
+use use a non-blocking topology. Congestion management is important.
 
-  # unshare -n
-  # ip link add br0 type bridge
-  # ip link set br0 type bridge stp_state 1
-  Error: bridge: STP can't be enabled in non-root netns.
+Making this work with good utilization, and low tail latency is a
+really hard problem. Many of the solutions come with switch features
+supporting it.
 
-Note this commit will be reverted later when we namespacify the whole LLC
-infra.
+You'd proably say these are not TCP focused networks, even though they
+are based on ethernet and IP.
 
-Fixes: e730c15519d0 ("[NET]: Make packet reception network namespace safe")
-Suggested-by: Harry Coin <hcoin@quietfountain.com>
-Link: https://lore.kernel.org/netdev/0f531295-e289-022d-5add-5ceffa0df9bc@quietfountain.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/bridge/br_stp_if.c | 5 +++++
- 1 file changed, 5 insertions(+)
+So I think of them as high end "standards based" ethernet and IP
+looking networks that have proprietary elements mixed in throughout.
 
-diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
-index 75204d36d7f9..a807996ac56b 100644
---- a/net/bridge/br_stp_if.c
-+++ b/net/bridge/br_stp_if.c
-@@ -201,6 +201,11 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
- {
- 	ASSERT_RTNL();
- 
-+	if (!net_eq(dev_net(br->dev), &init_net)) {
-+		NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in non-root netns");
-+		return -EINVAL;
-+	}
-+
- 	if (br_mrp_enabled(br)) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "STP can't be enabled if MRP is already enabled");
--- 
-2.30.2
+Right now there is a bit of a press war between vendors on 'ethernet
+for AI'. Both Broadcom and NVIDIA are taking techonlogies that were
+originally built for TCP ethernet networks and remixing/speeding them
+up to run roce workloads effectively. There is alot more information
+available now without NDA that shows some detail on this space.
 
+AWS's SRD multipathing, Broadcom "AI Ethernet" and NVIDIA's Spectrum-X
+spring to mind as topical to what these sorts of ethernet networks
+are.
+
+> A lot of "standardization" efforts are just attempts to prove to 
+> a buyers that an ecosystem exists.
+
+Heh, that was probably more true years ago. These days it seems like
+some standardization is also being done so the large hyperscalers can
+improve their Approved Vendors List.
+
+I suppose as long as the result is something we can implement openly
+in Linux the motivation for standardization is less important.
+
+Jason
 
