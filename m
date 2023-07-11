@@ -1,103 +1,181 @@
-Return-Path: <netdev+bounces-16860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A658374F0B9
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:53:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C36BF74F0CA
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:55:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B61B2817C5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:53:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3036E2817D6
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5984118C36;
-	Tue, 11 Jul 2023 13:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAE718C39;
+	Tue, 11 Jul 2023 13:55:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1D018C2C
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:53:37 +0000 (UTC)
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A17194
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:53:35 -0700 (PDT)
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-563afee3369so3492778eaf.3
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:53:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E38618C36
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:55:42 +0000 (UTC)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8E594;
+	Tue, 11 Jul 2023 06:55:40 -0700 (PDT)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-579ed2829a8so61177867b3.1;
+        Tue, 11 Jul 2023 06:55:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689083615; x=1691675615;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gCTVwmB5J6a5dx6XYxqF53hqOsGWkSYIyrPo76Icn50=;
-        b=KkhXRWAHQ4bLI/XpZYt8FuK3pgHIB/Mmpi70vHn0MH0Xe8k6tEeB5fBFCVTct09erT
-         kAzlhfg+TraxXiImBieVRFgP4m5JnMqvZvz/aZ6SXqQnB8IN+LZ10C5RZ7TEOu9GDLWP
-         loCDJTHusJEEU0zTFdR6RjBepRVa+Y2R+ta0IKk8oKLkFMAO1ECcyzlT5WS/2uovWVfD
-         OH2mOKTnJbGVe9ofVgvWmqfVKu8OcAjzBRloj8Har/HI7mVfJ5docW7HftklI5D5KrNY
-         TGL//J/r+EY9+3uTjiGb1eJfEAbDVDis49EsF5cqvVfg9XYwTNlT7krgWW/Xj8UpOsHo
-         W7hQ==
-X-Gm-Message-State: ABy/qLbMLsO8nK3yjSHpBO3m8t12g5U08ELrjDh1d4pDJ7W3Pycfz8w1
-	1WbFBgopwrmIdrUGhv04BZ/a8EZNUEisxw+NltaVWovQGKWV
-X-Google-Smtp-Source: APBJJlECruf66V+JyRtf/KQM/NOn3dy9C/Lb8k9+y2hASr80eBt7evZQjebFhxPNCMT+nnvVQAppHWH3WgcG/RDwIiq/YDiQySGh
+        d=1e100.net; s=20221208; t=1689083740; x=1691675740;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZXQMJc+mkFZtu2vLefW5Re8NpovkJxJKped5EUiUKOE=;
+        b=BtAaeM1r57mlTwANqrQdgSLT/BQzCsFQlocFdyHWa89EhRx/Tske8E/0U75RZXV/s1
+         vMyOFmR/2tI6KuRUXLHUKv4udaytrpPO6K3Fxy7kVfvnnBEFQMP1Ae5MfZuJKVuanSAl
+         0WygyPjzqFgohifL9lHygDSKSTwS6dX8GALt0KV1Jyqo+hEGDwHMIQcAbMEyiApjeDzZ
+         Q+mPxd6jF1+rjlyYvx06uYH7W3okrwsmfAtX0LGSuc/JGrlCBa7B4F2D8QXAgmHfKZz7
+         DC5P65Erc4VsIyW0Zy0MZTg0+mK6947XvoiBOxjgASDtC0xBppxfVYAcDFpeFnr90Z1w
+         Serw==
+X-Gm-Message-State: ABy/qLaFdqm9/3UmzRWN9Mp+o8X9X/Eg2BvChVvN3stetv8wyVdYUq8z
+	dp5K2aHCf1XZkRiXwGUur7aGl961CU8XjA==
+X-Google-Smtp-Source: APBJJlG2SP6QbX+lb4Zp1K7VfQDqff8Wq2bAVPCyWAjRlgmsdN76O/U7mI3WXYO0nzlsMPEK4vnd5w==
+X-Received: by 2002:a0d:d383:0:b0:561:b8a1:e7ef with SMTP id v125-20020a0dd383000000b00561b8a1e7efmr17947283ywd.41.1689083739787;
+        Tue, 11 Jul 2023 06:55:39 -0700 (PDT)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
+        by smtp.gmail.com with ESMTPSA id l10-20020a81d54a000000b0056ffdec590csm569466ywj.41.2023.07.11.06.55.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jul 2023 06:55:39 -0700 (PDT)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-577497ec6c6so61279067b3.2;
+        Tue, 11 Jul 2023 06:55:39 -0700 (PDT)
+X-Received: by 2002:a81:6e8b:0:b0:570:85b2:e6dd with SMTP id
+ j133-20020a816e8b000000b0057085b2e6ddmr17111816ywc.17.1689083738977; Tue, 11
+ Jul 2023 06:55:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:aca:db54:0:b0:3a2:214d:3da9 with SMTP id
- s81-20020acadb54000000b003a2214d3da9mr1601278oig.10.1689083614942; Tue, 11
- Jul 2023 06:53:34 -0700 (PDT)
-Date: Tue, 11 Jul 2023 06:53:34 -0700
-In-Reply-To: <000000000000de1eec059692c021@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000dd5c040600366c6f@google.com>
-Subject: Re: [syzbot] KASAN: use-after-free Write in j1939_sock_pending_del
-From: syzbot <syzbot+07bb74aeafc88ba7d5b4@syzkaller.appspotmail.com>
-To: bst@pengutronix.de, dania@coconnect-ltd.com, davem@davemloft.net, 
-	dev.kurt@vandijck-laurijssen.be, ecathinds@gmail.com, kernel@pengutronix.de, 
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@rempel-privat.de, lkp@intel.com, maxime.jayat@mobile-devices.fr, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, nogikh@google.com, 
-	o.rempel@pengutronix.de, robin@protonic.nl, socketcan@hartkopp.net, 
-	syzkaller-bugs@googlegroups.com
+References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
+In-Reply-To: <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 11 Jul 2023 15:55:26 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+Message-ID: <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+Subject: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2 6/7]
+ workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
+To: Tejun Heo <tj@kernel.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
+	Linux PM list <linux-pm@vger.kernel.org>, 
+	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
+	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This bug is marked as fixed by commit:
-can: j1939: socket: rework socket locking for
+Hi Tejun,
 
-But I can't find it in the tested trees[1] for more than 90 days.
-Is it a correct commit? Please update it by replying:
+On Fri, May 12, 2023 at 9:54=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
+> Workqueue now automatically marks per-cpu work items that hog CPU for too
+> long as CPU_INTENSIVE, which excludes them from concurrency management an=
+d
+> prevents stalling other concurrency-managed work items. If a work functio=
+n
+> keeps running over the thershold, it likely needs to be switched to use a=
+n
+> unbound workqueue.
+>
+> This patch adds a debug mechanism which tracks the work functions which
+> trigger the automatic CPU_INTENSIVE mechanism and report them using
+> pr_warn() with exponential backoff.
+>
+> v2: Drop bouncing through kthread_worker for printing messages. It was to
+>     avoid introducing circular locking dependency but wasn't effective as=
+ it
+>     still had pool lock -> wci_lock -> printk -> pool lock loop. Let's ju=
+st
+>     print directly using printk_deferred().
+>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Suggested-by: Peter Zijlstra <peterz@infradead.org>
 
-#syz fix: exact-commit-title
+Thanks for your patch, which is now commit 6363845005202148
+("workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
+mechanism") in v6.5-rc1.
 
-Until then the bug is still considered open and new crashes with
-the same signature are ignored.
+I guess you are interested to know where this triggers.
+I enabled CONFIG_WQ_CPU_INTENSIVE_REPORT=3Dy, and tested
+the result on various machines...
 
-Kernel: Linux
-Dashboard link: https://syzkaller.appspot.com/bug?extid=07bb74aeafc88ba7d5b4
+SH/R-Mobile:
 
----
-[1] I expect the commit to be present in:
+  workqueue: genpd_power_off_work_fn hogged CPU for >10000us 4 times,
+consider switching to WQ_UNBOUND
 
-1. for-kernelci branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+Atmark Techno Armadillo800-EVA with shmob_drm:
 
-2. master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+  workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 16
+times, consider switching to WQ_UNBOUND
 
-3. master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+R-Car Gen2:
 
-4. main branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+  workqueue: rtc_timer_do_work hogged CPU for >10000us 4 times,
+consider switching to WQ_UNBOUND
 
-The full list of 9 trees can be found at
-https://syzkaller.appspot.com/upstream/repos
+R-Car Gen2/Gen3:
+
+  workqueue: pm_runtime_work hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
+
+R-Car Gen3:
+
+  workqueue: kfree_rcu_work hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
+
+OrangeCrab/Linux-on-LiteX-VexRiscV with ht16k33 14-seg display and ssd130xd=
+rmfb:
+
+  workqueue: check_lifetime hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
+  workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 1024
+times, consider switching to WQ_UNBOUND
+  workqueue: fb_flashcursor hogged CPU for >10000us 128 times,
+consider switching to WQ_UNBOUND
+  workqueue: ht16k33_seg14_update hogged CPU for >10000us 128 times,
+consider switching to WQ_UNBOUND
+  workqueue: mmc_rescan hogged CPU for >10000us 128 times, consider
+switching to WQ_UNBOUND
+
+Atari (ARAnyM):
+
+  workqueue: ata_sff_pio_task hogged CPU for >10000us 64 times,
+consider switching to WQ_UNBOUND
+
+The OrangeCrab is a slow machine, so it's not that surprising to see these
+messages...
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
