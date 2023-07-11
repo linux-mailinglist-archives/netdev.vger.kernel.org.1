@@ -1,121 +1,151 @@
-Return-Path: <netdev+bounces-16655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2119674E27A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:14:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 460EA74E284
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:23:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FC7E1C20C4B
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:14:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76BA11C20C36
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5DB363;
-	Tue, 11 Jul 2023 00:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C5F194;
+	Tue, 11 Jul 2023 00:23:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF350361
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 00:14:45 +0000 (UTC)
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F67FFB
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:14:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AC6191;
+	Tue, 11 Jul 2023 00:23:26 +0000 (UTC)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA241A8;
+	Mon, 10 Jul 2023 17:23:24 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso2798770b3a.2;
+        Mon, 10 Jul 2023 17:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689034484; x=1720570484;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8/GTH1UD5rohElzwZnuTrt2lQwLVVXmI38sXXvpkKUI=;
-  b=H2JzBlCSPDIYG9MOXyg3b3WzWJ4OtKELypI3sSNAl+Nl5ctZNQzLzWES
-   k83VuugldDsIGR6mMF1AGSJ22AHcO5SCFaRcO6CtqWHcpYVAtm2gy//Wv
-   AIaFfziV6MC/14hCKe+WQRtpea2twtHS+xsxXcMjEH5SvjlT18x6knHnL
-   E=;
-X-IronPort-AV: E=Sophos;i="6.01,195,1684800000"; 
-   d="scan'208";a="346012548"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1box-1dm6-7f722725.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 00:14:41 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1box-1dm6-7f722725.us-east-1.amazon.com (Postfix) with ESMTPS id C80B886FED;
-	Tue, 11 Jul 2023 00:14:37 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 00:14:37 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.65.132) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 00:14:34 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pctammela@mojatatu.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <jhs@mojatatu.com>,
-	<jiri@resnulli.us>, <kuba@kernel.org>, <mysuryan@cisco.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <vijaynsu@cisco.com>,
-	<xiyou.wangcong@gmail.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net] net/sched: make psched_mtu() RTNL-less safe
-Date: Mon, 10 Jul 2023 17:14:26 -0700
-Message-ID: <20230711001426.24422-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230711000429.558248-1-pctammela@mojatatu.com>
-References: <20230711000429.558248-1-pctammela@mojatatu.com>
+        d=gmail.com; s=20221208; t=1689035004; x=1691627004;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJexsnAviZKaD4R6So1yQqblAXVnUemiWagepXo9BkY=;
+        b=G+20GWBl6qoZiT4bB/05q04cx5SsOD/cpfs8ZXD8OR+EMY8A0OO8dgm58bbnlah13b
+         N+MpPTnPq056IRIzneTrxqvnrbX0kuq5+yjEvp0RZwvOKHRFDQD8WylXZw3BfgE4BsV6
+         AZPeYmx79erNvUCCivmyFqabf2lpNALPQ5uiMlVQA5z5v4bhmGPbFTGUsOyq1t6zsf7M
+         RFShTeuEO/zgGvnP+5/3DMDBeE3ytrI9S73GP9dfr3H9D5rLGojee3k3Bd3OjRg8WxAk
+         tFSz2e8LhGEPsXjh3CufUBdHIeQ311vJ8QLXYYjAJTqeYD9gzRMmeK+YszvS7cZAnNkx
+         0mMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689035004; x=1691627004;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QJexsnAviZKaD4R6So1yQqblAXVnUemiWagepXo9BkY=;
+        b=asAFCDglNexlRouqbnHtGNl53ml6b/4K9Z/TvQ32EmyelGozOGe4VntKXZpdCzVW0w
+         jmQlH4Yqx34BPQGz5EwDe48vBSuh+WfpeTfmUGNYzDubvYd7cLrDgmI0gXcBzGXAQ81K
+         x17gVILBdH9bSrC4bTurRpK2mzntz9XMdwIfsTcE/8Ya3UCmxsxIscHD0cYpbch2nDv0
+         P1zNwJEM4vGlGWqiyH4yohLbqYnzFJGCtVyRSsdCHD9+cWvXNMKyQ9b/7rAqCcUxPXkt
+         VbKJvkLPLQO7vn98XcHM6OFBtPpb8cmWmoWdFBAdR3336dGlckmItvYuxQDOLapyyZnc
+         l9KA==
+X-Gm-Message-State: ABy/qLbNacnuVH1Dm0hCB0z0Bhi8qAb8/5/uzDilg7AS/l6KFXXBHD0J
+	Sfhz9uxqEUjls35TKExZoGM=
+X-Google-Smtp-Source: APBJJlFtjQhrmd78YmfBm4R20CNBQ7EcN5C+FxkjjCwpmTvqaFkAudVmPEaMvDxWG4uOrjlVfRK6Ig==
+X-Received: by 2002:a05:6a00:1593:b0:65e:ec60:b019 with SMTP id u19-20020a056a00159300b0065eec60b019mr13513481pfk.25.1689035003994;
+        Mon, 10 Jul 2023 17:23:23 -0700 (PDT)
+Received: from MacBook-Pro-8.local ([2620:10d:c090:400::5:9b44])
+        by smtp.gmail.com with ESMTPSA id j15-20020aa7800f000000b00666e883757fsm364497pfi.123.2023.07.10.17.23.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 17:23:23 -0700 (PDT)
+Date: Mon, 10 Jul 2023 17:23:20 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+	razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+	kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
+	davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v4 1/8] bpf: Add generic attach/detach/query API
+ for multi-progs
+Message-ID: <20230711002320.bp4mlb4at45vkrqt@MacBook-Pro-8.local>
+References: <20230710201218.19460-1-daniel@iogearbox.net>
+ <20230710201218.19460-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.119.65.132]
-X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710201218.19460-2-daniel@iogearbox.net>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Pedro Tammela <pctammela@mojatatu.com>
-Date: Mon, 10 Jul 2023 21:04:29 -0300
-> Eric Dumazet says[1]:
-> ---
+On Mon, Jul 10, 2023 at 10:12:11PM +0200, Daniel Borkmann wrote:
+> + *
+> + *   struct bpf_mprog_entry *entry, *peer;
+> + *   int ret;
+> + *
+> + *   // bpf_mprog user-side lock
+> + *   // fetch active @entry from attach location
+> + *   [...]
+> + *   ret = bpf_mprog_attach(entry, [...]);
+> + *   if (ret >= 0) {
+> + *       peer = bpf_mprog_peer(entry);
+> + *       if (bpf_mprog_swap_entries(ret))
+> + *           // swap @entry to @peer at attach location
+> + *       bpf_mprog_commit(entry);
+> + *       ret = 0;
+> + *   } else {
+> + *       // error path, bail out, propagate @ret
+> + *   }
+> + *   // bpf_mprog user-side unlock
+> + *
+> + *  Detach case:
+> + *
+> + *   struct bpf_mprog_entry *entry, *peer;
+> + *   bool release;
+> + *   int ret;
+> + *
+> + *   // bpf_mprog user-side lock
+> + *   // fetch active @entry from attach location
+> + *   [...]
+> + *   ret = bpf_mprog_detach(entry, [...]);
+> + *   if (ret >= 0) {
+> + *       release = ret == BPF_MPROG_FREE;
+> + *       peer = release ? NULL : bpf_mprog_peer(entry);
+> + *       if (bpf_mprog_swap_entries(ret))
+> + *           // swap @entry to @peer at attach location
+> + *       bpf_mprog_commit(entry);
+> + *       if (release)
+> + *           // free bpf_mprog_bundle
+> + *       ret = 0;
+> + *   } else {
+> + *       // error path, bail out, propagate @ret
+> + *   }
+> + *   // bpf_mprog user-side unlock
 
-I think we shouldn't use `---` here, or the message below will
-be dropped while merging.
+Thanks for the doc. It helped a lot.
+And when it's contained like this it's easier to discuss api.
+It seems bpf_mprog_swap_entries() is trying to abstract the error code
+away, but BPF_MPROG_FREE leaks out and tcx_entry_needs_release()
+captures it with extra miniq_active twist, which I don't understand yet.
+bpf_mprog_peer() is also leaking a bit of implementation detail.
+Can we abstract it further, like:
 
-
-> Speaking of psched_mtu(), I see that net/sched/sch_pie.c is using it
-> without holding RTNL, so dev->mtu can be changed underneath.
-> KCSAN could issue a warning.
-> ---
-> 
-> Annotate dev->mtu with READ_ONCE() so KCSAN don't issue a warning.
-> 
-> [1] https://lore.kernel.org/all/CANn89iJoJO5VtaJ-2=_d2aOQhb0Xw8iBT_Cxqp2HyuS-zj6azw@mail.gmail.com/
-> 
-> Fixes: d4b36210c2e6 ("net: pkt_sched: PIE AQM scheme")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> ---
->  include/net/pkt_sched.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
-> index e98aac9d5ad5..15960564e0c3 100644
-> --- a/include/net/pkt_sched.h
-> +++ b/include/net/pkt_sched.h
-> @@ -134,7 +134,7 @@ extern const struct nla_policy rtm_tca_policy[TCA_MAX + 1];
->   */
->  static inline unsigned int psched_mtu(const struct net_device *dev)
->  {
-> -	return dev->mtu + dev->hard_header_len;
-> +	return READ_ONCE(dev->mtu) + dev->hard_header_len;
->  }
->  
->  static inline struct net *qdisc_net(struct Qdisc *q)
-> -- 
-> 2.39.2
+ret = bpf_mprog_detach(entry, [...], &new_entry);
+if (ret >= 0) {
+   if (entry != new_entry)
+     // swap @entry to @new_entry at attach location
+   bpf_mprog_commit(entry);
+   if (!new_entry)
+     // free bpf_mprog_bundle
+}
+and make bpf_mprog_peer internal to mprog. It will also allow removing
+BPF_MPROG_FREE vs SWAP distinction. peer is hidden.
+   if (entry != new_entry)
+      // update
+also will be easier to read inside tcx code without looking into mprog details.
 
