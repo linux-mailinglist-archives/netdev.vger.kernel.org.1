@@ -1,152 +1,66 @@
-Return-Path: <netdev+bounces-16686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20BB774E5A4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 06:02:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C0C74E5BC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 06:14:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5306D28162C
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 04:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A8FF1C20D34
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 04:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971794422;
-	Tue, 11 Jul 2023 04:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA9F4423;
+	Tue, 11 Jul 2023 04:14:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FE33C28;
-	Tue, 11 Jul 2023 04:02:26 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0D1E42;
-	Mon, 10 Jul 2023 21:02:19 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f4b2bc1565so8175071e87.2;
-        Mon, 10 Jul 2023 21:02:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689048138; x=1691640138;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c/bqIvBWP0Vc31nnjqB0//tzgjYO0px2TJafgW9vm5w=;
-        b=GkRcWJs+DiK6fWtziTeO4u3Kbwd4mWCi2N1c+O4kMrH32zvAnoRzj5kxG6UwA1Qlay
-         +mo8pMsgNY0yazf1c4MQvSK+7xx9oq4PdBNasVssCtAsHvNeQVoV2CJi1M6K2Bf5hNDR
-         swwsnOblY9bwy4DbwyanYzd9MUtQsNcGq1A6iSCLgNGp2mQUVwoS2/N7EyYpTc+BEd+7
-         h6aMfbQYZ8mcsUW4QnXBE8Ph4zjbYRPqi/LVIIFsqocOlSAWb+wmsfUaCLeRJpYHm7Uo
-         WytWftqbvIZ09xMSFwAJ/wLTD0oJExUlSU3fCaCKzoDAEHlEXFxJUMO75nmzUPiJZJP8
-         6ebQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689048138; x=1691640138;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c/bqIvBWP0Vc31nnjqB0//tzgjYO0px2TJafgW9vm5w=;
-        b=CMZTbx0LSFWLpL+knfiVU8Oi/Ge+dFqGINiCUSnomXFI3tQ6cEkvjYGQsVP1o1CitT
-         L2EKvF1Q2tvbvQkbsC9PlwZIBUyg4H8Ppi/uOOTu+Y6JWDAPkE+GVSNA7Je5TREhVTuI
-         tZGzfwKYAiDmKZiyhTSOA7az2l4MT0ffTYwoe5Z79CyVB+2TbIjbl9078NqUZzFp4Qj/
-         e1RNc1kWccVjxPhe0T6MKzYKVmvsqz2tsrGKxiStDPZxP6GeLDMu3SjBfn2R4ht2Hqz+
-         H8wDEYGwmisOr+3h99O/c+SoXPAPaV08HcUC5SMUqf9WF5/UP+HkOhay2hpRMP/AJ5aP
-         lyBQ==
-X-Gm-Message-State: ABy/qLZzVShUOjqWFru+X4e6lWFPmWmfqRsYsAf8Gbk8hZQjgK6XKwAQ
-	oj3c79ag0sgfnbYyqS+APckmVqQWBETalyOy8YA=
-X-Google-Smtp-Source: APBJJlFe4nkrNFIrhStPNzTSn/NrxTnQnj4Q8af+lJNpHH4V3pQvF3BXg1txpWkpf5bbscZsUyo3fhPn8HKjTeLwtzk=
-X-Received: by 2002:a05:6512:5ce:b0:4f9:5ca5:f1a6 with SMTP id
- o14-20020a05651205ce00b004f95ca5f1a6mr11293431lfo.17.1689048137493; Mon, 10
- Jul 2023 21:02:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39803D7B
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 04:14:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 518CAC433C8;
+	Tue, 11 Jul 2023 04:14:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689048877;
+	bh=/NT8j5dTImyDDiBcLBerEKRFvktbfWBQTuwILJurgBw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k0xb7wdHITbH1KagxXY1mBrMYPgJq56cnkg4HXbW0CUrZHkV5XYIv3hUqnD0YBEyz
+	 aKCRNr8QUZGt5oJxktjEmbt7E+5oitUhUgBlYPgV9l4GtsXLcG4zLtOAtdq6fnCZBl
+	 0ECV5QSqWAY6ZYuU3zuOiztQ0BbX7x8xagbdtqzHbei8JOh/orw9z6aXyGAg2+ywrb
+	 bfhq1lDYMHzpTObWkGwvewiElTMpF4KPWcitBtwgizYcG8Y/KiOe1cMsdLr/QNCLNT
+	 4TksycOHPTSJ5ghE16r6tvjJeEoTslpekyNRyfldKWHtcLDkL6lI0JI1FD01mmaclR
+	 fu8yC0RtYuvxA==
+Date: Tue, 11 Jul 2023 09:44:32 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, joabreu@synopsys.com,
+	alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
+	bhupesh.sharma@linaro.org, linux-arm-msm@vger.kernel.org,
+	andersson@kernel.org
+Subject: Re: [PATCH net-next] MAINTAINERS: Add another mailing list for
+ QUALCOMM ETHQOS ETHERNET DRIVER
+Message-ID: <ZKzXKCpoN0Zz4cCs@matsya>
+References: <20230710195240.197047-1-ahalaney@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230710201218.19460-1-daniel@iogearbox.net> <20230710201218.19460-6-daniel@iogearbox.net>
-In-Reply-To: <20230710201218.19460-6-daniel@iogearbox.net>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 10 Jul 2023 21:02:05 -0700
-Message-ID: <CAEf4BzYBCHp6x_4mwjduHidJDfQ94-p2gnGSS+V3oAtqg9xsMQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 5/8] libbpf: Add helper macro to clear opts structs
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, 
-	razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org, 
-	davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710195240.197047-1-ahalaney@redhat.com>
 
-On Mon, Jul 10, 2023 at 1:12=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> Add a small and generic LIBBPF_OPTS_CLEAR() helper macros which clears
-> an opts structure and reinitializes its .sz member to place the structure
-> size. I found this very useful when developing selftests, but it is also
-> generic enough as a macro next to the existing LIBBPF_OPTS() which hides
-> the .sz initialization, too.
->
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  tools/lib/bpf/libbpf_common.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/tools/lib/bpf/libbpf_common.h b/tools/lib/bpf/libbpf_common.=
-h
-> index 9a7937f339df..eb180023aa97 100644
-> --- a/tools/lib/bpf/libbpf_common.h
-> +++ b/tools/lib/bpf/libbpf_common.h
-> @@ -70,4 +70,15 @@
->                 };                                                       =
-   \
->         })
->
-> +/* Helper macro to clear a libbpf options struct
-> + *
-> + * Small helper macro to reset all fields and to reinitialize the common
-> + * structure size member.
-> + */
-> +#define LIBBPF_OPTS_CLEAR(NAME)                                         =
-           \
-> +       do {                                                             =
-   \
-> +               memset(&NAME, 0, sizeof(NAME));                          =
-   \
-> +               NAME.sz =3D sizeof(NAME);                                =
-     \
-> +       } while (0)
-> +
+On 10-07-23, 14:50, Andrew Halaney wrote:
+> linux-arm-msm is the list most people subscribe to in order to receive
+> updates about Qualcomm related drivers. Make sure changes for the
+> Qualcomm ethernet driver make it there.
 
-This is fine, but I think you can go a half-step further and have
-something even more universal and useful. Something like this:
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-
-#define LIBBPF_OPTS_RESET(NAME, ...)
-    do {
-        memset(&NAME, 0, sizeof(NAME));
-        NAME =3D (typeof(NAME)) {
-            .sz =3D sizeof(struct TYPE),
-            __VA_ARGS__
-        };
-     while (0);
-
-I actually haven't tried if that typeof() trick works, but I hope it does :=
-)
-
-
-Then your LIBBPF_OPTS_CLEAR() is just LIBBPF_OPTS_RESET(x). But you
-can also re-initialize:
-
-LIBBPF_OPTS_RESET(x, .flags =3D 123, .prog_fd =3D 456);
-
-It's more in line with LIBBPF_OPTS() itself in capabilities, except it
-works on existing variable.
-
-
->  #endif /* __LIBBPF_LIBBPF_COMMON_H */
-> --
-> 2.34.1
->
+-- 
+~Vinod
 
