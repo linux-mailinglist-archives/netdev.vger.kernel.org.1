@@ -1,224 +1,122 @@
-Return-Path: <netdev+bounces-16936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B28074F746
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:34:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFEB674F75D
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A6828191E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:34:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFEDF1C20E95
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0291E512;
-	Tue, 11 Jul 2023 17:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F8E1E516;
+	Tue, 11 Jul 2023 17:38:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720661DDF8
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:34:07 +0000 (UTC)
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE95E6C;
-	Tue, 11 Jul 2023 10:34:05 -0700 (PDT)
-Received: from mercury (dyndsl-091-248-213-212.ewe-ip-backbone.de [91.248.213.212])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: sre)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id 0EC6C6606FD7;
-	Tue, 11 Jul 2023 18:34:04 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1689096844;
-	bh=xTQ0mmZSKT6xaRW2cSSnwsyXZRn21W+fLOIKOFiv5HU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H4apaSnHRDvSkpSCkk+wyU65Ngqr9P5JyDBeie6RLPAeIF/a84cxGH59ddGSbX5qw
-	 63kfAbpaiUnhKnAjL7v46VWmzE4FkX9fEEyauEpMkG3DYbKmfvZvGjPGtA+xeI6swf
-	 kjXbLmO76/FOA8FnaeGqaVHoSCSKZ347Op8QNSbAV1AHFtd/woPULZ7cp0Xe7t6lvK
-	 j+oEiKCypr4OaNiLGZi4zRujwMiEhT9wkldDGMRFDyKdZJ0dEmjL8X+4AzL1KA1Sn6
-	 6BSpra8CwZ37kLECStDWmCD4Br675HzuR2KsJ6ZFQzDp7r6efy1uSO15+pqJdv0f+r
-	 Or4DZYoJuC/iQ==
-Received: by mercury (Postfix, from userid 1000)
-	id B8CBE106765E; Tue, 11 Jul 2023 19:34:01 +0200 (CEST)
-Date: Tue, 11 Jul 2023 19:34:01 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Mark Brown <broonie@kernel.org>,
-	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v3 04/14] spi: Remove code duplication in
- spi_add_device*()
-Message-ID: <20230711173401.kz7or6ucurhoe4er@mercury.elektranox.org>
-References: <20230711171756.86736-1-andriy.shevchenko@linux.intel.com>
- <20230711171756.86736-5-andriy.shevchenko@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9827A17FE0
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:38:08 +0000 (UTC)
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id AD5DAE77
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:38:01 -0700 (PDT)
+Received: (qmail 1366713 invoked by uid 1000); 11 Jul 2023 13:38:00 -0400
+Date: Tue, 11 Jul 2023 13:38:00 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Oliver Neukum <oneukum@suse.com>, netdev@vger.kernel.org,
+  USB mailing list <linux-usb@vger.kernel.org>
+Subject: [PATCH] net: usbnet: Fix WARNING in usbnet_start_xmit/usb_submit_urb
+Message-ID: <38ff51d4-2734-4dd7-8638-ae2fc8572c0d@rowland.harvard.edu>
+References: <000000000000a56e9105d0cec021@google.com>
+ <000000000000e298cd05fecc07d4@google.com>
+ <0f685f2f-06df-4cf2-9387-34f5e3c8b7b7@rowland.harvard.edu>
+ <7330e6c0-eb73-499e-8699-dc1754d90cad@rowland.harvard.edu>
+ <413fb529-477c-7ac9-881e-550b4613d38c@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nr4764lrwkknwz4l"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230711171756.86736-5-andriy.shevchenko@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <413fb529-477c-7ac9-881e-550b4613d38c@suse.com>
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The syzbot fuzzer identified a problem in the usbnet driver:
 
---nr4764lrwkknwz4l
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+usb 1-1: BOGUS urb xfer, pipe 3 != type 1
+WARNING: CPU: 0 PID: 754 at drivers/usb/core/urb.c:504 usb_submit_urb+0xed6/0x1880 drivers/usb/core/urb.c:504
+Modules linked in:
+CPU: 0 PID: 754 Comm: kworker/0:2 Not tainted 6.4.0-rc7-syzkaller-00014-g692b7dc87ca6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Workqueue: mld mld_ifc_work
+RIP: 0010:usb_submit_urb+0xed6/0x1880 drivers/usb/core/urb.c:504
+Code: 7c 24 18 e8 2c b4 5b fb 48 8b 7c 24 18 e8 42 07 f0 fe 41 89 d8 44 89 e1 4c 89 ea 48 89 c6 48 c7 c7 a0 c9 fc 8a e8 5a 6f 23 fb <0f> 0b e9 58 f8 ff ff e8 fe b3 5b fb 48 81 c5 c0 05 00 00 e9 84 f7
+RSP: 0018:ffffc9000463f568 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff88801eb28000 RSI: ffffffff814c03b7 RDI: 0000000000000001
+RBP: ffff8881443b7190 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000003
+R13: ffff88802a77cb18 R14: 0000000000000003 R15: ffff888018262500
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000556a99c15a18 CR3: 0000000028c71000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ usbnet_start_xmit+0xfe5/0x2190 drivers/net/usb/usbnet.c:1453
+ __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+ xmit_one net/core/dev.c:3578 [inline]
+ dev_hard_start_xmit+0x187/0x700 net/core/dev.c:3594
+...
 
-Hi,
+This bug is caused by the fact that usbnet trusts the bulk endpoint
+addresses its probe routine receives in the driver_info structure, and
+it does not check to see that these endpoints actually exist and have
+the expected type and directions.
 
-On Tue, Jul 11, 2023 at 08:17:46PM +0300, Andy Shevchenko wrote:
-> The commit 0c79378c0199 ("spi: add ancillary device support")
-> added a dozen of duplicating lines of code. We may move them
-> to the __spi_add_device(). Note, that the code may be called
-> under the mutex.
->=20
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+The fix is simply to add such a check.
 
-Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+Reported-and-tested-by: syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-usb/000000000000a56e9105d0cec021@google.com/
+Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+CC: Oliver Neukum <oneukum@suse.com>
 
--- Sebastian
+---
 
-> ---
->  drivers/spi/spi.c | 32 ++++++++++----------------------
->  1 file changed, 10 insertions(+), 22 deletions(-)
->=20
-> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-> index 6d74218cf38e..876d40d2c708 100644
-> --- a/drivers/spi/spi.c
-> +++ b/drivers/spi/spi.c
-> @@ -631,6 +631,16 @@ static int __spi_add_device(struct spi_device *spi)
->  	struct device *dev =3D ctlr->dev.parent;
->  	int status;
-> =20
-> +	/* Chipselects are numbered 0..max; validate. */
-> +	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
-> +		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
-> +			ctlr->num_chipselect);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Set the bus ID string */
-> +	spi_dev_set_name(spi);
-> +
->  	/*
->  	 * We need to make sure there's no other device with this
->  	 * chipselect **BEFORE** we call setup(), else we'll trash
-> @@ -689,19 +699,8 @@ static int __spi_add_device(struct spi_device *spi)
->  int spi_add_device(struct spi_device *spi)
->  {
->  	struct spi_controller *ctlr =3D spi->controller;
-> -	struct device *dev =3D ctlr->dev.parent;
->  	int status;
-> =20
-> -	/* Chipselects are numbered 0..max; validate. */
-> -	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
-> -		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
-> -			ctlr->num_chipselect);
-> -		return -EINVAL;
-> -	}
-> -
-> -	/* Set the bus ID string */
-> -	spi_dev_set_name(spi);
-> -
->  	mutex_lock(&ctlr->add_lock);
->  	status =3D __spi_add_device(spi);
->  	mutex_unlock(&ctlr->add_lock);
-> @@ -712,17 +711,6 @@ EXPORT_SYMBOL_GPL(spi_add_device);
->  static int spi_add_device_locked(struct spi_device *spi)
->  {
->  	struct spi_controller *ctlr =3D spi->controller;
-> -	struct device *dev =3D ctlr->dev.parent;
-> -
-> -	/* Chipselects are numbered 0..max; validate. */
-> -	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
-> -		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
-> -			ctlr->num_chipselect);
-> -		return -EINVAL;
-> -	}
-> -
-> -	/* Set the bus ID string */
-> -	spi_dev_set_name(spi);
-> =20
->  	WARN_ON(!mutex_is_locked(&ctlr->add_lock));
->  	return __spi_add_device(spi);
-> --=20
-> 2.40.0.1.gaa8946217a0b
->=20
+ drivers/net/usb/usbnet.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
---nr4764lrwkknwz4l
-Content-Type: application/pgp-signature; name="signature.asc"
+Index: usb-devel/drivers/net/usb/usbnet.c
+===================================================================
+--- usb-devel.orig/drivers/net/usb/usbnet.c
++++ usb-devel/drivers/net/usb/usbnet.c
+@@ -1775,6 +1775,9 @@ usbnet_probe (struct usb_interface *udev
+ 	} else if (!info->in || !info->out)
+ 		status = usbnet_get_endpoints (dev, udev);
+ 	else {
++		u8		ep_addrs[3] = {
++			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0};
++
+ 		dev->in = usb_rcvbulkpipe (xdev, info->in);
+ 		dev->out = usb_sndbulkpipe (xdev, info->out);
+ 		if (!(info->flags & FLAG_NO_SETINT))
+@@ -1784,6 +1787,8 @@ usbnet_probe (struct usb_interface *udev
+ 		else
+ 			status = 0;
+ 
++		if (status == 0 && !usb_check_bulk_endpoints(udev, ep_addrs))
++			status = -EINVAL;
+ 	}
+ 	if (status >= 0 && dev->status)
+ 		status = init_status (dev, udev);
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmStkn4ACgkQ2O7X88g7
-+pormhAAnK4ipkeSKHu0xl8agX+r1Ks97iOFEMGG8+gzX4xY/hXNKVPfgpoWdNZa
-rN+CMPEFa2M5kKdm7v6s7wv2A/R0bRMIwUrHhMxAVBKQSNlp47s2N/PBkCgghK7x
-dOCmH/DDN17c1ODn8FJUD/WO5p1/grLRg1mUoNQvVqLVz7jQBx+oOZxG1Fm2e5pb
-suAySbAqDtYVper0iqZhu1BwDjFxj7l/+kXhJWt+mtgFq1shfCwdfK+gm9Z1hJ4B
-kDa1PZSzlIbs8znfYFu8n7gPJIN/nplWGmWgFAbwex3GxdZbSrO58X4m2B0fooFg
-xQ3w3b710ONolovhZktxkx7nibXjJiVFQwgS7BPRquCjCEok5jNmuyVJmu9Pud0s
-nRDWYic0TKErHny9NYCTwdJQX5ZkDIV9QpjVyp5FR7e/ylT8chmX1LwnsKZSd91j
-TN9+lh3yU6BjbjopIAFAhP5BvYeYMI2tvbXpCC3iiqGno53AZUyP5dXBupB/zri7
-bwN6fXNXsuVX0JJH3CHCm13ZK9IFY8GHGqLJBUulYVyaXSLOimXhi/l6bkkhvzxN
-IKpuSWUPTxAVu9q5LxsOWS45GXR0oWiiKL7tOcaX1yJypn+5lKy+4yStvF0cER9d
-NdLreesrYaGS2zSH4qIA7m8dd2oaqPtYCa1VHzxRfLcNsnyCoXY=
-=zPs/
------END PGP SIGNATURE-----
-
---nr4764lrwkknwz4l--
 
