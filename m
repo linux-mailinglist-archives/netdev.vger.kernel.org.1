@@ -1,205 +1,231 @@
-Return-Path: <netdev+bounces-16979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E54474FBBA
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0BAF74FB74
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 00:56:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 198C91C20E11
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83B43281551
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 22:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED62D1ED32;
-	Tue, 11 Jul 2023 23:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4521EA76;
+	Tue, 11 Jul 2023 22:56:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6C21DDFD
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:10:55 +0000 (UTC)
-X-Greylist: delayed 599 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 11 Jul 2023 16:10:54 PDT
-Received: from cheetah.elm.relay.mailchannels.net (cheetah.elm.relay.mailchannels.net [23.83.212.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C3ACF
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:10:53 -0700 (PDT)
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 0BAE126157F
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 22:52:20 +0000 (UTC)
-Received: from pdx1-sub0-mail-a234.dreamhost.com (unknown [127.0.0.6])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 69031261704
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 22:52:18 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1689115938; a=rsa-sha256;
-	cv=none;
-	b=2N9SQj05MnTpg3GAP1uqc4UkprhRPCKfOW84bLrmDYc/iRS2o/bisAKgWoOP7V5gH/pLXB
-	IrONb8O6It9/wA2uGcoY8w6WbUFHLgmfy19Zt0He6ATXNiybdDDovcPr+y4TaNHQzztAmZ
-	/sbDlTG7ZzSTSVex0DfyetoU/nlQKfdp3BFe4L651uTmemJ7R1mOg/h4RQAeHwZB4S0VIO
-	ZNifS83GfoSC1Invai95iEiWQ0htbJYRuTwS6Quqw6DZP+7Zn1xZOt0bivSeeXWtUWfokA
-	gynrMMB8SDLWEyFgf3/K0cMrIsrHRDaGs8KndLU3ha6WbpSxIOOhOjvCFcUryA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1689115938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=XV8yVFLS5zMgqY/+/PS/KFJu/og6DkPIRq5kY6V6N08=;
-	b=vtZB/S5aqF/4vW97FNYFh3u/yt0S4nT8jiIwdVBPFHQsAjWZKKxwYfonXfOzMWfGIC4LxR
-	iotlwMQAUS4GxfJXmjL0LX/Dz6fKRLEB61TaI2xebtu8PXMgOKMlvRLw8vCE5NlePf4hLD
-	QCWR8MqT9u8O+jDBUFK18yClM/dB18TSgSNb034ZGfIsPKKPHfXp9Trv4HpXLogRHvRnsY
-	czvC3xSLNpL3yUyoviBOdWBjzVpp377mWoiiA+FlyraEnW+NCh+HZQNpu0nSemCVNoxrjQ
-	cqSPMveTy15fswrcpL/Wu4UhRaBhjUqB+nF7QC2qwQhGnS9kNw0+3+aFJB5nGw==
-ARC-Authentication-Results: i=1;
-	rspamd-7d9c4d5c9b-kprkf;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MC-Relay: Good
-X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MailChannels-Auth-Id: dreamhost
-X-Lonely-Keen: 11fe075458cbed9d_1689115939694_2894248095
-X-MC-Loop-Signature: 1689115939694:1113142804
-X-MC-Ingress-Time: 1689115939693
-Received: from pdx1-sub0-mail-a234.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.103.24.120 (trex/6.9.1);
-	Tue, 11 Jul 2023 22:52:19 +0000
-Received: from kmjvbox (unknown [71.198.86.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kjlx@templeofstupid.com)
-	by pdx1-sub0-mail-a234.dreamhost.com (Postfix) with ESMTPSA id 4R0x2m1CpPz12t
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 15:52:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
-	s=dreamhost; t=1689115936;
-	bh=XV8yVFLS5zMgqY/+/PS/KFJu/og6DkPIRq5kY6V6N08=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=CttG4FAtMe7nJzvGrVpLzPnS4lSDLwydVef8srYLzGTtqb6JyBP1Q1RMr9e9ZDE94
-	 0GPkqExwHk5JDXfHiI63zyEtUa9WgUj7ijxSrxFwP2lrFXPOBM8rtnbEGH0IttDzy+
-	 eJ1q77E6AjGNVfzcAZpRCggXERTuT3HPgIJFyAnc=
-Received: from johansen (uid 1000)
-	(envelope-from kjlx@templeofstupid.com)
-	id e00cb
-	by kmjvbox (DragonFly Mail Agent v0.12);
-	Tue, 11 Jul 2023 15:52:10 -0700
-Date: Tue, 11 Jul 2023 15:52:10 -0700
-From: Krister Johansen <kjlx@templeofstupid.com>
-To: Shay Agroskin <shayagr@amazon.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: ena: fix shift-out-of-bounds in exponential
- backoff
-Message-ID: <20230711225210.GA2088@templeofstupid.com>
-References: <20230711013621.GE1926@templeofstupid.com>
- <pj41zllefmpbw7.fsf@u95c7fd9b18a35b.ant.amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE3182D0
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 22:56:42 +0000 (UTC)
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A41310DF
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 15:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689116201; x=1720652201;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Y+qnV3OCFHWd50ua7CBHDeY2WGrf3SruMwH96ymp+3s=;
+  b=tgl31Tp/OduobOO/pHSSVZNyte5pqJ47TNsI9+aKcDApOP/P1yf8aCbR
+   V2Bi2JQHOvbbdG0UqJrn9DNAq5f+9BGJKmPWSSu93848x1b1QTKS2hsGU
+   8mrDPzvVxypvAikOnHw8s+rv49ldNZ+WrvgWmRPtDOAqaX38PhCkmjGv7
+   U=;
+X-IronPort-AV: E=Sophos;i="6.01,197,1684800000"; 
+   d="scan'208";a="659340202"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 22:56:35 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com (Postfix) with ESMTPS id F302680FF5;
+	Tue, 11 Jul 2023 22:56:34 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 11 Jul 2023 22:56:34 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 11 Jul 2023 22:56:32 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <hcoin@quietfountain.com>
+CC: <andrew@lunn.ch>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: llc needs namespace awareness asap, was Re: Patch fixing STP if bridge in non-default namespace.
+Date: Tue, 11 Jul 2023 15:56:24 -0700
+Message-ID: <20230711225624.85902-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <0f531295-e289-022d-5add-5ceffa0df9bc@quietfountain.com>
+References: <0f531295-e289-022d-5add-5ceffa0df9bc@quietfountain.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <pj41zllefmpbw7.fsf@u95c7fd9b18a35b.ant.amazon.com>
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.35]
+X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 08:47:32PM +0300, Shay Agroskin wrote:
-> 
-> Krister Johansen <kjlx@templeofstupid.com> writes:
-> 
-> > diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c
-> > b/drivers/net/ethernet/amazon/ena/ena_com.c
-> > index 451c3a1b6255..633b321d7fdd 100644
-> > --- a/drivers/net/ethernet/amazon/ena/ena_com.c
-> > +++ b/drivers/net/ethernet/amazon/ena/ena_com.c
-> > @@ -35,6 +35,8 @@
-> >  #define ENA_REGS_ADMIN_INTR_MASK 1
-> > +#define ENA_MAX_BACKOFF_DELAY_EXP 16U
+From: Harry Coin <hcoin@quietfountain.com>
+Date: Tue, 11 Jul 2023 17:44:20 -0500
+> On 7/11/23 16:51, Kuniyuki Iwashima wrote:
+> > From: Harry Coin<hcoin@quietfountain.com>
+> > Date: Tue, 11 Jul 2023 16:40:03 -0500
+> >> On 7/11/23 15:44, Andrew Lunn wrote:
+> >>>>>>>> The current llc_rcv.c around line 166 in net/llc/llc_input.c  has
+> >>>>>>>>
+> >>>>>>>>             if (!net_eq(dev_net(dev), &init_net))
+> >>>>>>>>                     goto drop;
+> >>>>>>>>
+> >>>> Thank you!  When you offer your patches, and you hear worries about being
+> >>>> 'invasive', it's worth asking 'compared to what' -- since the 'status quo'
+> >>>> is every bridge with STP in a non default namespace with a loop in it
+> >>>> somewhere will freeze every connected system more solid than ice in
+> >>>> Antarctica.
+> >>> https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+> >>>
+> >>> say:
+> >>>
+> >>> o It must be obviously correct and tested.
+> >>> o It cannot be bigger than 100 lines, with context.
+> >>> o It must fix only one thing.
+> >>> o It must fix a real bug that bothers people (not a, "This could be a problem..." type thing).
+> >>>
+> >>> git blame shows:
+> >>>
+> >>> commit 721499e8931c5732202481ae24f2dfbf9910f129
+> >>> Author: YOSHIFUJI Hideaki<yoshfuji@linux-ipv6.org>
+> >>> Date:   Sat Jul 19 22:34:43 2008 -0700
+> >>>
+> >>>       netns: Use net_eq() to compare net-namespaces for optimization.
+> >>>
+> >>> diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
+> >>> index 1c45f172991e..57ad974e4d94 100644
+> >>> --- a/net/llc/llc_input.c
+> >>> +++ b/net/llc/llc_input.c
+> >>> @@ -150,7 +150,7 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
+> >>>           int (*rcv)(struct sk_buff *, struct net_device *,
+> >>>                      struct packet_type *, struct net_device *);
+> >>>    
+> >>> -       if (dev_net(dev) != &init_net)
+> >>> +       if (!net_eq(dev_net(dev), &init_net))
+> >>>                   goto drop;
+> >>>    
+> >>>           /*
+> >>>
+> >>> So this is just an optimization.
+> >>>
+> >>> The test itself was added in
+> >>>
+> >>> ommit e730c15519d09ea528b4d2f1103681fa5937c0e6
+> >>> Author: Eric W. Biederman<ebiederm@xmission.com>
+> >>> Date:   Mon Sep 17 11:53:39 2007 -0700
+> >>>
+> >>>       [NET]: Make packet reception network namespace safe
+> >>>       
+> >>>       This patch modifies every packet receive function
+> >>>       registered with dev_add_pack() to drop packets if they
+> >>>       are not from the initial network namespace.
+> >>>       
+> >>>       This should ensure that the various network stacks do
+> >>>       not receive packets in a anything but the initial network
+> >>>       namespace until the code has been converted and is ready
+> >>>       for them.
+> >>>       
+> >>>       Signed-off-by: Eric W. Biederman<ebiederm@xmission.com>
+> >>>       Signed-off-by: David S. Miller<davem@davemloft.net>
+> >>>
+> >>> So that was over 15 years ago.
+> >>>
+> >>> It appears it has not bothered people for over 15 years.
+> >>>
+> >>> Lets wait until we get to see the actual fix. We can then decide how
+> >>> simple/hard it is to back port to stable, if it fulfils the stable
+> >>> rules or not.
+> >>>
+> >>>         Andrew
+> >> Andrew, fair enough.  In the time until it's fixed, the kernel folks
+> >> should publish an advisory and block any attempt to set bridge stp state
+> >> to other than 0 if in a non-default namespace. The alternative is a
+> >> packet flood at whatever the top line speed is should there be a loop
+> >> somewhere in even one connected link.
+> > Like this ?  Someone who didn't notice the issue might complain about
+> > it as regression.
+> >
+> > ---8<---
+> > diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
+> > index 75204d36d7f9..a807996ac56b 100644
+> > --- a/net/bridge/br_stp_if.c
+> > +++ b/net/bridge/br_stp_if.c
+> > @@ -201,6 +201,11 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
+> >   {
+> >   	ASSERT_RTNL();
+> >   
+> > +	if (!net_eq(dev_net(br->dev), &init_net)) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in non-root netns");
+> > +		return -EINVAL;
+> > +	}
 > > +
-> >  #define ENA_MIN_ADMIN_POLL_US 100
-> >  #define ENA_MAX_ADMIN_POLL_US 5000
-> > @@ -536,6 +538,7 @@ static int ena_com_comp_status_to_errno(struct
-> > ena_com_admin_queue *admin_queue,
-> >    static void ena_delay_exponential_backoff_us(u32 exp, u32  delay_us)
-> >  {
-> > +	exp = min_t(u32, exp, ENA_MAX_BACKOFF_DELAY_EXP);
-> >  	delay_us = max_t(u32, ENA_MIN_ADMIN_POLL_US, delay_us);
-> >  	delay_us = min_t(u32, delay_us * (1U << exp),  ENA_MAX_ADMIN_POLL_US);
-> >  	usleep_range(delay_us, 2 * delay_us);
+> >   	if (br_mrp_enabled(br)) {
+> >   		NL_SET_ERR_MSG_MOD(extack,
+> >   				   "STP can't be enabled if MRP is already enabled");
+> > ---8<---
 > 
-> Hi, thanks for submitting this patch (:
-
-Absolutely; thanks for the review!
-
-> Going over the logic here, the driver sleeps for `delay_us` micro-seconds in
-> each iteration that this function gets called.
+> Something like that, but to your point about regression -- It a 
+> statistically good bet there are many bridges with STP enabled in 
+> non-default name spaces that simply have no loops in L2 BUT these are 
+> 'buried'  inside docker images or prepackaged setups that work 'just 
+> fine standalone' and also 'in lab namespaces (that just don't have L2 
+> loops...) and so that don't hit the bug.  These users are one "cable 
+> click to an open port already connected somewhere they can't see" away 
+> from bringing down every computer on their entire link (like me, been 
+> there, it's not a happy week for anyone...), they just don't know it.  
+> And their vendors 'trust STP, so that can't be it' --- but it is.
 > 
-> For an exp = 14 it'd sleep (I added units notation)
-> delay_us * (2 ^ exp) us = 100 * (2 ^ 14) us = (10 * (2 ^ 14)) / (1000000) s
-> = 1.6 s
+> If the patch above gets installed-- then packagers downstream will have 
+> to respond with effort to add code to turn off STP if finding themselves 
+> in a namespace, and not if not.   They will be displeased at having to 
+> accommodate then de-accommodate when the fix lands.   As a 'usually 
+> downstream of the kernel' developer, I'd rather be warned than blocked.
+
+Ok, will post the diff above as a formal patch shortly.
+
+
 > 
-> For an exp = 15 it'd sleep
-> (10 * (2 ^ 15)) / (1000000) = 3.2s
+> Looking at those dates... wow!  I expect other os kernels and standalone 
+> switch vendors would see fixing this one as a removing a reliability 
+> advantage they've had for a long time.
 > 
-> To even get close to an overflow value, say exp=29 the driver would sleep in
-> a single iteration
-> 53687 s = 14.9 hours.
+> Perhaps a broadcast advisory "Until this is fixed, your site will have a 
+> packet flood worse than an internal DDOS attack if there's a loop in a 
+> link layer and if even one docker image or prepackaged project uses a 
+> net bridge with STP enabled and is deployed in a non-default netns / net 
+> namespace.   Check with your package vendors if you're not sure.  You'll 
+> avoid this problem if your link layer layout chart is tree-and-branch 
+> without even one crosslink."   Yup, that'll be somewhat less than 
+> popular.  But better warned and awaiting a fix than blocked.
 > 
-> The driver should stop trying to get a response from the device after a
-> timeout period received from the device which is 3 seconds by default.
+> How hard can the fix be?  Instead of dropping the packet if in the 
+> non-default namespace, as each device is in a namespace it should be 
+> fine to pass the packet only to listeners in the same namespace as the 
+> device that received the packet.  Back in the day this code was written, 
+> it was probably 'hard to know' among the multicast subscribers what 
+> namespace they were in.
 > 
-> The point being, it seems very unlikely to hit this overflow. Did you
-> experience it or was the issue discovered by a static analyzer ?
+>   I suspect the impact of this fix on existing code will be minor since 
+> the only effect will be packets appearing where they were expected 
+> before but not received.
 
-No, no use of fuzzing or static analysis.  This was hit on a production
-instance that was having ENA trouble.
-
-I'm apparently reading the code differently.  I thought this line:
-
-> >  	delay_us = min_t(u32, delay_us * (1U << exp),  ENA_MAX_ADMIN_POLL_US);
-
-Was going to cap that delay_us at (delay_us * (1U << exp)) or
-5000us, whichever is smaller.  By that measure, if delay_us is 100 and
-ENA_MAX_ADMIN_POLL_US is 5000, this should start getting capped after
-exp = 6, correct?  By my estimate, that puts it at between 160ms and
-320ms of sleeping before one could hit this problem.
-
-I went and pulled the logs out of the archive and have the following
-timeline.  This is seconds from boot as reported by dmesg:
-
-   11244.226583 - ena warns TX not completed on time, 10112000 usecs since
-    last napi execution, missing tx timeout val of 5000 msec
-   
-   11245.190453 - netdev watchdog fires
-   
-   11245.190781 - ena records Transmit timeout
-   11245.250739 - ena records Trigger reset on
-   
-   11246.812620 - UBSAN message to console
-   
-   11248.590441 - ena reports Reset inidication didn't turn off
-   11250.633545 - ena reports failure to reset device
-   12013.529338 - last logline before new boot
-
-While the difference between the panic and the trigger reset is more
-than 320ms, it is definitely on the order of seconds instead of hours.
-
-> Regarding the patch itself, I don't mind adding it since exp=16 limit should
-> be more than enough to wait for the device's response.
-> Reviewed-by: Shay Agroskin <shayagr@amazon.com>
-
-Thanks,
-
--K
+Looking around the code, fixing the issue will not be so hard,
+but we should be careful so that we will not leak frames that
+should have been invisible.
 
