@@ -1,158 +1,295 @@
-Return-Path: <netdev+bounces-16866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C49174F128
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:06:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FEF74F139
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:09:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E401C20F67
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:06:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85C6D1C20DF5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8440319BA1;
-	Tue, 11 Jul 2023 14:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEC519BAD;
+	Tue, 11 Jul 2023 14:08:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E4C14AB5
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:06:38 +0000 (UTC)
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1BF79E;
-	Tue, 11 Jul 2023 07:06:36 -0700 (PDT)
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6b711c3ad1fso4686128a34.0;
-        Tue, 11 Jul 2023 07:06:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689084396; x=1691676396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JtrkZvukDlSziDN0KAKNR+HUJU/841tM48VnLXRDDo8=;
-        b=E0N5tqHigGPruoL2OipUVobpIf9hqdDDMV7POeXa1hvOx/8WegYkYYvn94MTxxKxJB
-         kz47DRPK9wkaxvKzUSaY/Y5NlpuFvJrZGr9WdXtD9WeHuH1QPn6YfSKm2WXdsQ4C/nJ+
-         wGf9iWDQJevFgkRbJVqy2mhM7TzViwcncDXgJ22Kl0qGyfrLCaUyT5k+sNh9RqGx34Gx
-         pdLGBeyBUw4jhdjtVHTGavhSKH3cbKBPalYtCzo3KDQIVwi6Iu1tcNpWzbZ7KHdC8Prn
-         jyuMsehIt3AeI6jMw4g86lWQZy9DYYpg0qGYUZoHXk7+nM07DGLlBBk9a/xtkNBH33zs
-         ShZg==
-X-Gm-Message-State: ABy/qLbsxYrWnbJ+5hYqjKPUD1ObgOhYkc0vm0/kt6yZAz2DQ889PHUF
-	B5c8bhSWUQelj8p6zepVpdl6RlP5cApBRw==
-X-Google-Smtp-Source: APBJJlHk6JvYY7usor+bMX+25K9L8lRHpC1MM+kzOkVK2RhHg0e+lmulc9h6UW2o6cwVtHPj090TVw==
-X-Received: by 2002:a05:6870:b608:b0:1b0:7078:58ad with SMTP id cm8-20020a056870b60800b001b0707858admr17820465oab.38.1689084395878;
-        Tue, 11 Jul 2023 07:06:35 -0700 (PDT)
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com. [209.85.210.45])
-        by smtp.gmail.com with ESMTPSA id e3-20020a056870944300b001a6a3f99691sm1029564oal.27.2023.07.11.07.06.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 07:06:35 -0700 (PDT)
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6b87d505e28so4671725a34.2;
-        Tue, 11 Jul 2023 07:06:35 -0700 (PDT)
-X-Received: by 2002:a9d:560a:0:b0:6b8:83ca:560a with SMTP id
- e10-20020a9d560a000000b006b883ca560amr13140949oti.18.1689084395442; Tue, 11
- Jul 2023 07:06:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F130914AB5;
+	Tue, 11 Jul 2023 14:08:55 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6828A1718;
+	Tue, 11 Jul 2023 07:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=KvskEr1+W018J0txnL09dpVdxdmlYOmO19RB1YOkiX4=; b=QzzxCCWiGG/VQxMp0cx8ETfcYe
+	ee9q511MvrIs6KEeFeXKl9Q2Ab8xIVQIj9sxOsDxAeWwx1OBTvYuGPgtlZpa8ID81ZlSN+SHcev4i
+	kxUk6BU6T25lL1ujp3sz2yPkbm19g6v7qtrfT9SxTfcWgd5PC0XFXhBJdn476WJzoUPPi5H9Dsz6c
+	nl6/xsvq367h3aRnl51pfqKmZv0js4zblg88EMKBfOyCp4tAoXQF4f3ZV5TnZazAOX34Ft5IRpDw2
+	MapqoAOPu0wn0Kt4tk5APqsOrr3v2UefrmXVHTBQdBZbqJvhthK/4IgdGh3E7gKKTcaWNuQuMYSip
+	BkRX6wKQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qJE2G-0000Zl-8q; Tue, 11 Jul 2023 16:08:12 +0200
+Received: from [81.6.34.132] (helo=localhost.localdomain)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qJE2F-000FCG-PN; Tue, 11 Jul 2023 16:08:11 +0200
+Subject: Re: [PATCH bpf-next v4 4/8] libbpf: Add link-based API for tcx
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+ kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
+ davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20230710201218.19460-1-daniel@iogearbox.net>
+ <20230710201218.19460-5-daniel@iogearbox.net>
+ <CAEf4Bzb_qyd9KbNU6=vs=H3Nbqt6QNNo++JVRCUrQ9aFW4psMA@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <a98f7531-b8a9-909b-0eb3-38bf26d79115@iogearbox.net>
+Date: Tue, 11 Jul 2023 16:08:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org> <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
-In-Reply-To: <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 11 Jul 2023 16:06:22 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
-Message-ID: <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
-To: Tejun Heo <tj@kernel.org>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
-	Linux PM list <linux-pm@vger.kernel.org>, 
-	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+In-Reply-To: <CAEf4Bzb_qyd9KbNU6=vs=H3Nbqt6QNNo++JVRCUrQ9aFW4psMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26966/Tue Jul 11 09:28:31 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 3:55=E2=80=AFPM Geert Uytterhoeven <geert@linux-m68=
-k.org> wrote:
->
-> Hi Tejun,
->
-> On Fri, May 12, 2023 at 9:54=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
-> > Workqueue now automatically marks per-cpu work items that hog CPU for t=
-oo
-> > long as CPU_INTENSIVE, which excludes them from concurrency management =
-and
-> > prevents stalling other concurrency-managed work items. If a work funct=
-ion
-> > keeps running over the thershold, it likely needs to be switched to use=
- an
-> > unbound workqueue.
-> >
-> > This patch adds a debug mechanism which tracks the work functions which
-> > trigger the automatic CPU_INTENSIVE mechanism and report them using
-> > pr_warn() with exponential backoff.
-> >
-> > v2: Drop bouncing through kthread_worker for printing messages. It was =
-to
-> >     avoid introducing circular locking dependency but wasn't effective =
-as it
-> >     still had pool lock -> wci_lock -> printk -> pool lock loop. Let's =
-just
-> >     print directly using printk_deferred().
-> >
-> > Signed-off-by: Tejun Heo <tj@kernel.org>
-> > Suggested-by: Peter Zijlstra <peterz@infradead.org>
->
-> Thanks for your patch, which is now commit 6363845005202148
-> ("workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
-> mechanism") in v6.5-rc1.
->
-> I guess you are interested to know where this triggers.
-> I enabled CONFIG_WQ_CPU_INTENSIVE_REPORT=3Dy, and tested
-> the result on various machines...
+On 7/11/23 6:00 AM, Andrii Nakryiko wrote:
+> On Mon, Jul 10, 2023 at 1:12 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> Implement tcx BPF link support for libbpf.
+>>
+>> The bpf_program__attach_fd() API has been refactored slightly in order to pass
+>> bpf_link_create_opts pointer as input.
+>>
+>> A new bpf_program__attach_tcx() has been added on top of this which allows for
+>> passing all relevant data via extensible struct bpf_tcx_opts.
+>>
+>> The program sections tcx/ingress and tcx/egress correspond to the hook locations
+>> for tc ingress and egress, respectively.
+>>
+>> For concrete usage examples, see the extensive selftests that have been
+>> developed as part of this series.
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> ---
+>>   tools/lib/bpf/bpf.c      | 19 ++++++++++--
+>>   tools/lib/bpf/bpf.h      |  5 ++++
+>>   tools/lib/bpf/libbpf.c   | 62 ++++++++++++++++++++++++++++++++++------
+>>   tools/lib/bpf/libbpf.h   | 16 +++++++++++
+>>   tools/lib/bpf/libbpf.map |  1 +
+>>   5 files changed, 92 insertions(+), 11 deletions(-)
+>>
+> 
+> Pretty minor nits, I think ifindex move to be mandatory argument is
+> the most consequential, as it's an API. With that addressed, please
+> add my ack for next rev
+> 
+> Acked-by: Andrii Nakryiko <andrii@kernel.org>
+> 
+>> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+>> index 3dfc43b477c3..d513c226b9aa 100644
+>> --- a/tools/lib/bpf/bpf.c
+>> +++ b/tools/lib/bpf/bpf.c
+>> @@ -717,9 +717,9 @@ int bpf_link_create(int prog_fd, int target_fd,
+>>                      const struct bpf_link_create_opts *opts)
+>>   {
+>>          const size_t attr_sz = offsetofend(union bpf_attr, link_create);
+>> -       __u32 target_btf_id, iter_info_len;
+>> +       __u32 target_btf_id, iter_info_len, relative_id;
+>> +       int fd, err, relative;
+> 
+> nit: maybe make these new vars local to the TCX cases branch below?
+> 
+>>          union bpf_attr attr;
+>> -       int fd, err;
+>>
+>>          if (!OPTS_VALID(opts, bpf_link_create_opts))
+>>                  return libbpf_err(-EINVAL);
+>> @@ -781,6 +781,21 @@ int bpf_link_create(int prog_fd, int target_fd,
+>>                  if (!OPTS_ZEROED(opts, netfilter))
+>>                          return libbpf_err(-EINVAL);
+>>                  break;
+>> +       case BPF_TCX_INGRESS:
+>> +       case BPF_TCX_EGRESS:
+>> +               relative = OPTS_GET(opts, tcx.relative_fd, 0);
+>> +               relative_id = OPTS_GET(opts, tcx.relative_id, 0);
+>> +               if (relative > 0 && relative_id)
+>> +                       return libbpf_err(-EINVAL);
+>> +               if (relative_id) {
+>> +                       relative = relative_id;
+>> +                       attr.link_create.flags |= BPF_F_ID;
+>> +               }
+> 
+> Well, I have the same nit as in the previous patch, this "relative =
+> relative_id" is both confusing because of naming asymmetry (no
+> relative_fd throws me off), and also unnecessary updating of the
+> state. link_create.flags |= BPF_F_ID is inevitable, but the rest can
+> be more straightforward, IMO
+> 
+>> +               attr.link_create.tcx.relative_fd = relative;
+>> +               attr.link_create.tcx.expected_revision = OPTS_GET(opts, tcx.expected_revision, 0);
+>> +               if (!OPTS_ZEROED(opts, tcx))
+>> +                       return libbpf_err(-EINVAL);
+>> +               break;
+>>          default:
+>>                  if (!OPTS_ZEROED(opts, flags))
+>>                          return libbpf_err(-EINVAL);
+> 
+> [...]
+> 
+>> +struct bpf_link *
+>> +bpf_program__attach_tcx(const struct bpf_program *prog,
+>> +                       const struct bpf_tcx_opts *opts)
+>> +{
+>> +       LIBBPF_OPTS(bpf_link_create_opts, link_create_opts);
+>> +       __u32 relative_id, flags;
+>> +       int ifindex, relative_fd;
+>> +
+>> +       if (!OPTS_VALID(opts, bpf_tcx_opts))
+>> +               return libbpf_err_ptr(-EINVAL);
+>> +
+>> +       relative_id = OPTS_GET(opts, relative_id, 0);
+>> +       relative_fd = OPTS_GET(opts, relative_fd, 0);
+>> +       flags = OPTS_GET(opts, flags, 0);
+>> +       ifindex = OPTS_GET(opts, ifindex, 0);
+>> +
+>> +       /* validate we don't have unexpected combinations of non-zero fields */
+>> +       if (!ifindex) {
+>> +               pr_warn("prog '%s': target netdevice ifindex cannot be zero\n",
+>> +                       prog->name);
+>> +               return libbpf_err_ptr(-EINVAL);
+>> +       }
+> 
+> given ifindex is non-optional, then it makes more sense to have it as
+> a mandatory argument between prog and opts in
+> bpf_program__attach_tcx(), instead of as a field of an opts struct
 
-> OrangeCrab/Linux-on-LiteX-VexRiscV with ht16k33 14-seg display and ssd130=
-xdrmfb:
->
->   workqueue: check_lifetime hogged CPU for >10000us 4 times, consider
-> switching to WQ_UNBOUND
->   workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 1024
-> times, consider switching to WQ_UNBOUND
->   workqueue: fb_flashcursor hogged CPU for >10000us 128 times,
-> consider switching to WQ_UNBOUND
->   workqueue: ht16k33_seg14_update hogged CPU for >10000us 128 times,
-> consider switching to WQ_UNBOUND
->   workqueue: mmc_rescan hogged CPU for >10000us 128 times, consider
-> switching to WQ_UNBOUND
+Agree, and it will also be more in line with bpf_program__attach_xdp() one
+which has ifindex as 2nd param too.
 
-Got one more after a while:
+I also implemented the rest of the suggestions in here for v5, thanks!
 
-workqueue: neigh_managed_work hogged CPU for >10000us 4 times,
-consider switching to WQ_UNBOUND
+>> +       if (relative_fd > 0 && relative_id) {
+> 
+> this asymmetrical check is a bit distracting. And also, if someone
+> specifies negative FD and positive ID, that's also a bad combo and we
+> shouldn't just ignore invalid FD, right? So I'd have a nice and clean
+> 
+> if (relative_fd && relative_id) { /* bad */ }
+> 
+>> +               pr_warn("prog '%s': relative_fd and relative_id cannot be set at the same time\n",
+>> +                       prog->name);
+>> +               return libbpf_err_ptr(-EINVAL);
+>> +       }
+>> +       if (relative_id)
+>> +               flags |= BPF_F_ID;
+> 
+> I think bpf_link_create() will add this flag anyways, so can drop this
+> adjustment logic here?
+> 
+>> +
+>> +       link_create_opts.tcx.expected_revision = OPTS_GET(opts, expected_revision, 0);
+>> +       link_create_opts.tcx.relative_fd = relative_fd;
+>> +       link_create_opts.tcx.relative_id = relative_id;
+>> +       link_create_opts.flags = flags;
+>> +
+>> +       /* target_fd/target_ifindex use the same field in LINK_CREATE */
+>> +       return bpf_program_attach_fd(prog, ifindex, "tc", &link_create_opts);
+> 
+> s/tc/tcx/ ?
+> 
+>>   }
+>>
+>>   struct bpf_link *bpf_program__attach_freplace(const struct bpf_program *prog,
+>> @@ -11917,11 +11956,16 @@ struct bpf_link *bpf_program__attach_freplace(const struct bpf_program *prog,
+>>          }
+>>
+>>          if (target_fd) {
+>> +               LIBBPF_OPTS(bpf_link_create_opts, target_opts);
+>> +
+>>                  btf_id = libbpf_find_prog_btf_id(attach_func_name, target_fd);
+>>                  if (btf_id < 0)
+>>                          return libbpf_err_ptr(btf_id);
+>>
+>> -               return bpf_program__attach_fd(prog, target_fd, btf_id, "freplace");
+>> +               target_opts.target_btf_id = btf_id;
+>> +
+>> +               return bpf_program_attach_fd(prog, target_fd, "freplace",
+>> +                                            &target_opts);
+>>          } else {
+>>                  /* no target, so use raw_tracepoint_open for compatibility
+>>                   * with old kernels
+>> diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
+>> index 10642ad69d76..33f60a318e81 100644
+>> --- a/tools/lib/bpf/libbpf.h
+>> +++ b/tools/lib/bpf/libbpf.h
+>> @@ -733,6 +733,22 @@ LIBBPF_API struct bpf_link *
+>>   bpf_program__attach_netfilter(const struct bpf_program *prog,
+>>                                const struct bpf_netfilter_opts *opts);
+>>
+>> +struct bpf_tcx_opts {
+>> +       /* size of this struct, for forward/backward compatibility */
+>> +       size_t sz;
+>> +       int ifindex;
+> 
+> is ifindex optional or it's expected to always be specified? If the
+> latter, then I'd move ifindex out of opts and make it second arg of
+> bpf_program__attach_tcx, between prog and opts
+> 
+>> +       __u32 flags;
+>> +       __u32 relative_fd;
+>> +       __u32 relative_id;
+>> +       __u64 expected_revision;
+>> +       size_t :0;
+>> +};
+>> +#define bpf_tcx_opts__last_field expected_revision
+>> +
+>> +LIBBPF_API struct bpf_link *
+>> +bpf_program__attach_tcx(const struct bpf_program *prog,
+>> +                       const struct bpf_tcx_opts *opts);
+>> +
+>>   struct bpf_map;
+>>
+>>   LIBBPF_API struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map);
+>> diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
+>> index a95d39bbef90..2a2db5c78048 100644
+>> --- a/tools/lib/bpf/libbpf.map
+>> +++ b/tools/lib/bpf/libbpf.map
+>> @@ -397,4 +397,5 @@ LIBBPF_1.3.0 {
+>>                  bpf_obj_pin_opts;
+>>                  bpf_program__attach_netfilter;
+>>                  bpf_prog_detach_opts;
+>> +               bpf_program__attach_tcx;
+> 
+> heh, now we definitely screwed up sorting ;)
+> 
+>>   } LIBBPF_1.2.0;
+> 
+>> --
+>> 2.34.1
+>>
+> 
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
