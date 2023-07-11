@@ -1,117 +1,160 @@
-Return-Path: <netdev+bounces-16785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3440074EAF8
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:42:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7537274EB02
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3EA6280DEE
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:42:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5B01C20F14
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA003182C7;
-	Tue, 11 Jul 2023 09:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80B118014;
+	Tue, 11 Jul 2023 09:43:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE82A182B3
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 09:37:22 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201471BCB;
-	Tue, 11 Jul 2023 02:36:57 -0700 (PDT)
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36B9VC3t032505;
-	Tue, 11 Jul 2023 09:36:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=qcppdkim1;
- bh=4uw/iduItdQzF8mL4viogNDU8G/22wARpV6uWpygvKQ=;
- b=L/AKka1Y1JRAiM7mZKyfswakmT0OXbNkh7Zg+c3M81rdE6vIxw5Paq4ydWLZMG5QYBuT
- 3z/+tVMyBydMdxHV3e7ZyoJmOh93vDDYtbqHaSi5aKVn9AJVcy6AafLy/X9Shd1FaYn2
- ENxCnLxYsmrGLM2WPU2BAc198cmH7lJOGOMcpHOnrtjwCdGNRSkzNiNYJwA/uFBvI/Zt
- 1Dpf9aQyMhVuwFnTQegGjuxG9PFie1ws4jHtHAkwO2DL7ZJpnKyMTxDpqZW4XZArcksR
- oizNOtoFfEXn4ASfwAzwltPOUHE5sWrH3bRYnuM4e8kIf6BU3PRQCIOJ8kaCX7JhQCaE DA== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rs459g1y6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jul 2023 09:36:32 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36B9aV45018544
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jul 2023 09:36:31 GMT
-Received: from devipriy-linux.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 02:36:24 -0700
-From: Devi Priya <quic_devipriy@quicinc.com>
-To: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
-        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <netdev@vger.kernel.org>
-CC: <quic_saahtoma@quicinc.com>
-Subject: [PATCH 6/6] arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
-Date: Tue, 11 Jul 2023 15:05:29 +0530
-Message-ID: <20230711093529.18355-7-quic_devipriy@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230711093529.18355-1-quic_devipriy@quicinc.com>
-References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C8F174E5;
+	Tue, 11 Jul 2023 09:43:08 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC753A4;
+	Tue, 11 Jul 2023 02:43:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=cIYxaT2JpAhwLaJ52gKkMlK74+PCbIgj/z/gLFd8aqU=; b=DonVZnuIeBd/85SRR5JVKmzGGd
+	Hv1+xbOu6lIXj/4HUVGsJLVuqceasVah/SG05atf2VeaB9SY6iUVEp4X7mqRVxRml8ZY9aaKFOKf2
+	25hysJcx6LxNr7NYVG2zGtbw1tXrRAp0XphQ8Sxplccqq4rwGK5y+YeQVVDU9D90v4qaCoClwmoly
+	4Lvj2aui/JD4DLOCdJpyPtGjBPH0l5nrgfdZSh3nAZmQ0jFIFcm3FUnH2a3NhCxu00O/lkhvrcG45
+	k9f9m1DeqF/VyIJk6HlFHwdpTRoluK5I/nx9iOa6tnT0eeKTCtVSvelbPrW9jUKylurLIXwMQ/DmC
+	JhMbYAZA==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qJ9tX-0005re-5d; Tue, 11 Jul 2023 11:42:55 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qJ9tW-000S2D-M6; Tue, 11 Jul 2023 11:42:54 +0200
+Subject: Re: [PATCH bpf-next v4 5/8] libbpf: Add helper macro to clear opts
+ structs
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+ kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
+ davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20230710201218.19460-1-daniel@iogearbox.net>
+ <20230710201218.19460-6-daniel@iogearbox.net>
+ <CAEf4BzYBCHp6x_4mwjduHidJDfQ94-p2gnGSS+V3oAtqg9xsMQ@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <5f9fcbe4-5736-4631-5d91-99ae6697f8bf@iogearbox.net>
+Date: Tue, 11 Jul 2023 11:42:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: cBxfNUyRzsrfKZHqtDprlPNszJqoXqZZ
-X-Proofpoint-GUID: cBxfNUyRzsrfKZHqtDprlPNszJqoXqZZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-11_04,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=838
- priorityscore=1501 impostorscore=0 spamscore=0 adultscore=0 bulkscore=0
- mlxscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307110085
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <CAEf4BzYBCHp6x_4mwjduHidJDfQ94-p2gnGSS+V3oAtqg9xsMQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26966/Tue Jul 11 09:28:31 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Build Qualcomm IPQ9574 NSSCC driver.
+On 7/11/23 6:02 AM, Andrii Nakryiko wrote:
+> On Mon, Jul 10, 2023 at 1:12 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> Add a small and generic LIBBPF_OPTS_CLEAR() helper macros which clears
+>> an opts structure and reinitializes its .sz member to place the structure
+>> size. I found this very useful when developing selftests, but it is also
+>> generic enough as a macro next to the existing LIBBPF_OPTS() which hides
+>> the .sz initialization, too.
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> ---
+>>   tools/lib/bpf/libbpf_common.h | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+>>
+>> diff --git a/tools/lib/bpf/libbpf_common.h b/tools/lib/bpf/libbpf_common.h
+>> index 9a7937f339df..eb180023aa97 100644
+>> --- a/tools/lib/bpf/libbpf_common.h
+>> +++ b/tools/lib/bpf/libbpf_common.h
+>> @@ -70,4 +70,15 @@
+>>                  };                                                          \
+>>          })
+>>
+>> +/* Helper macro to clear a libbpf options struct
+>> + *
+>> + * Small helper macro to reset all fields and to reinitialize the common
+>> + * structure size member.
+>> + */
+>> +#define LIBBPF_OPTS_CLEAR(NAME)                                                    \
+>> +       do {                                                                \
+>> +               memset(&NAME, 0, sizeof(NAME));                             \
+>> +               NAME.sz = sizeof(NAME);                                     \
+>> +       } while (0)
+>> +
+> 
+> This is fine, but I think you can go a half-step further and have
+> something even more universal and useful. Something like this:
+> 
+> 
+> #define LIBBPF_OPTS_RESET(NAME, ...)
+>      do {
+>          memset(&NAME, 0, sizeof(NAME));
+>          NAME = (typeof(NAME)) {
+>              .sz = sizeof(struct TYPE),
+>              __VA_ARGS__
+>          };
+>       while (0);
+> 
+> I actually haven't tried if that typeof() trick works, but I hope it does :)
 
-Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
----
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+It does, I've used this in BPF code for Cilium, too. ;)
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 9ce0f1554f4d..d10083da2401 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1180,6 +1180,7 @@ CONFIG_IPQ_GCC_5332=y
- CONFIG_IPQ_GCC_6018=y
- CONFIG_IPQ_GCC_8074=y
- CONFIG_IPQ_GCC_9574=y
-+CONFIG_IPQ_NSSCC_9574=y
- CONFIG_MSM_GCC_8916=y
- CONFIG_MSM_GCC_8994=y
- CONFIG_MSM_MMCC_8994=m
--- 
-2.17.1
+> Then your LIBBPF_OPTS_CLEAR() is just LIBBPF_OPTS_RESET(x). But you
+> can also re-initialize:
+> 
+> LIBBPF_OPTS_RESET(x, .flags = 123, .prog_fd = 456);
+> 
+> It's more in line with LIBBPF_OPTS() itself in capabilities, except it
+> works on existing variable.
 
+Agree, changed into ...
+
+/* Helper macro to clear and optionally reinitialize libbpf options struct
+  *
+  * Small helper macro to reset all fields and to reinitialize the common
+  * structure size member. Values provided by users in struct initializer-
+  * syntax as varargs can be provided as well to reinitialize options struct
+  * specific members.
+  */
+#define LIBBPF_OPTS_RESET(NAME, ...)                                        \
+         do {                                                                \
+                 memset(&NAME, 0, sizeof(NAME));                             \
+                 NAME = (typeof(NAME)) {                                     \
+                         .sz = sizeof(NAME),                                 \
+                         __VA_ARGS__                                         \
+                 };                                                          \
+         } while (0)
+
+... and updated all the test cases.
+
+Thanks,
+Daniel
 
