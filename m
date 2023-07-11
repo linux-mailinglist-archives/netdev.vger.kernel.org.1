@@ -1,213 +1,209 @@
-Return-Path: <netdev+bounces-16829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF01074ED73
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:59:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E956774ED7F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9309F2817EB
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:59:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E933F28181E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89A518B19;
-	Tue, 11 Jul 2023 11:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E241B18B1A;
+	Tue, 11 Jul 2023 12:01:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9657718B10;
-	Tue, 11 Jul 2023 11:58:59 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662B410C4;
-	Tue, 11 Jul 2023 04:58:57 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4R0fXr087Mz4f41Rq;
-	Tue, 11 Jul 2023 19:58:52 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.67.175.61])
-	by APP1 (Coremail) with SMTP id cCh0CgBX6DL7Q61kp17yMw--.23183S2;
-	Tue, 11 Jul 2023 19:58:52 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Xu Kuohai <xukuohai@huawei.com>,
-	Pu Lehui <pulehui@huawei.com>,
-	Pu Lehui <pulehui@huaweicloud.com>
-Subject: [PATCH bpf] bpf: cpumap: Fix memory leak in cpu_map_update_elem
-Date: Tue, 11 Jul 2023 19:58:48 +0800
-Message-Id: <20230711115848.2701559-1-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B1C18AFD
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 12:01:39 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48F110EF;
+	Tue, 11 Jul 2023 05:01:36 -0700 (PDT)
+Received: from mercury (dyndsl-091-248-213-212.ewe-ip-backbone.de [91.248.213.212])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 3D3D5660700F;
+	Tue, 11 Jul 2023 13:01:35 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1689076895;
+	bh=VpEG3ri1MmPk1vvBqKyVzFd1wmdbrZrML5Y0FqY4wUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HQDJgxlTR8vo1RaEsB3D+nH2+IRG9QN4tbrCrAaA85UTPwMmgGSzMeLBmp8bq8Ej6
+	 pgwZP23sqCYBHYEmhmfwkK6ZwddZDGY5nvAyjCHRxCLhh+PU1kHLVi4qEYii04KpmG
+	 cZIBzK40pXQjgo62B5RaZ5YhAs3eAX9lyz/b27cO1rLw+fmbUEzB/bIkdWz6tNdnsD
+	 l37m5GS8joB/wsoJ81rU7USdQhqBwTSytws8Gf8fo6kkpx4AITWu33A+o3yUYXuRI2
+	 WpJS6erpP2P9LRQMv/o3BmpdZLgyRs0csbkK1sM9hkgaBX9fGW0SBkbzX/Ag+Cs0tn
+	 nvbJMMzvoOh0A==
+Received: by mercury (Postfix, from userid 1000)
+	id 34BCD106765E; Tue, 11 Jul 2023 14:01:33 +0200 (CEST)
+Date: Tue, 11 Jul 2023 14:01:33 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Mark Brown <broonie@kernel.org>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
+	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Radu Pirea <radu_nicolae.pirea@upb.ro>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Orson Zhai <orsonzhai@gmail.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Chunyan Zhang <zhang.lyra@gmail.com>,
+	Alain Volmat <alain.volmat@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH v2 05/15] spi: Remove code duplication in
+ spi_add_device_locked()
+Message-ID: <20230711120133.45drgk46y4cz7aut@mercury.elektranox.org>
+References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
+ <20230710154932.68377-6-andriy.shevchenko@linux.intel.com>
+ <7557bada-3076-4d6e-a5c5-d368433706e2@sirena.org.uk>
+ <ZK03rBqoQ0IZz617@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBX6DL7Q61kp17yMw--.23183S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJw4fuF43Cw1kWw43Gr18Grg_yoW7Jw1UpF
-	WrJr1UGr40qw4Du3y8t3WrJr10vr1kua4UJ34fG3yFyF1DG3WDXFy8GFWxJrZxurs5ury7
-	Xwsrt3yqg3ykJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
-	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-	fUOmhFUUUUU
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="fcthwhge3iyvg2gl"
+Content-Disposition: inline
+In-Reply-To: <ZK03rBqoQ0IZz617@smile.fi.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Pu Lehui <pulehui@huawei.com>
 
-Syzkaller reported a memory leak as follows:
+--fcthwhge3iyvg2gl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-BUG: memory leak
-unreferenced object 0xff110001198ef748 (size 192):
-  comm "syz-executor.3", pid 17672, jiffies 4298118891 (age 9.906s)
-  hex dump (first 32 bytes):
-    00 00 00 00 4a 19 00 00 80 ad e3 e4 fe ff c0 00  ....J...........
-    00 b2 d3 0c 01 00 11 ff 28 f5 8e 19 01 00 11 ff  ........(.......
-  backtrace:
-    [<ffffffffadd28087>] __cpu_map_entry_alloc+0xf7/0xb00
-    [<ffffffffadd28d8e>] cpu_map_update_elem+0x2fe/0x3d0
-    [<ffffffffadc6d0fd>] bpf_map_update_value.isra.0+0x2bd/0x520
-    [<ffffffffadc7349b>] map_update_elem+0x4cb/0x720
-    [<ffffffffadc7d983>] __se_sys_bpf+0x8c3/0xb90
-    [<ffffffffb029cc80>] do_syscall_64+0x30/0x40
-    [<ffffffffb0400099>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+Hi,
 
-BUG: memory leak
-unreferenced object 0xff110001198ef528 (size 192):
-  comm "syz-executor.3", pid 17672, jiffies 4298118891 (age 9.906s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffffadd281f0>] __cpu_map_entry_alloc+0x260/0xb00
-    [<ffffffffadd28d8e>] cpu_map_update_elem+0x2fe/0x3d0
-    [<ffffffffadc6d0fd>] bpf_map_update_value.isra.0+0x2bd/0x520
-    [<ffffffffadc7349b>] map_update_elem+0x4cb/0x720
-    [<ffffffffadc7d983>] __se_sys_bpf+0x8c3/0xb90
-    [<ffffffffb029cc80>] do_syscall_64+0x30/0x40
-    [<ffffffffb0400099>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+On Tue, Jul 11, 2023 at 02:06:20PM +0300, Andy Shevchenko wrote:
+> On Mon, Jul 10, 2023 at 06:16:22PM +0100, Mark Brown wrote:
+> > On Mon, Jul 10, 2023 at 06:49:22PM +0300, Andy Shevchenko wrote:
+> > > Seems by unknown reason, probably some kind of mis-rebase,
+> > > the commit 0c79378c0199 ("spi: add ancillary device support")
+> > > adds a dozen of duplicating lines of code. Drop them.
+> > >=20
+> > > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> > > ---
+> > >  drivers/spi/spi.c | 11 -----------
+> > >  1 file changed, 11 deletions(-)
+> > >=20
+> > > diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
+> > > index c99ee4164f11..46cbda383228 100644
+> > > --- a/drivers/spi/spi.c
+> > > +++ b/drivers/spi/spi.c
+> > > @@ -712,17 +712,6 @@ EXPORT_SYMBOL_GPL(spi_add_device);
+> > >  static int spi_add_device_locked(struct spi_device *spi)
+> > >  {
+> > >  	struct spi_controller *ctlr =3D spi->controller;
+> > > -	struct device *dev =3D ctlr->dev.parent;
+> > > -
+> > > -	/* Chipselects are numbered 0..max; validate. */
+> > > -	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
+> > > -		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
+> > > -			ctlr->num_chipselect);
+> > > -		return -EINVAL;
+> > > -	}
+> > > -
+> > > -	/* Set the bus ID string */
+> > > -	spi_dev_set_name(spi);
+> >=20
+> > I see that this is duplicating spi_add_device() (and we really could do
+> > better with code sharing there I think) but I can't immediately see
+> > where the duplication that's intended to be elimiated is here - where
+> > else in the one call path that spi_add_device_locked() has would we do
+> > the above?  Based on the changelog I was expecting to see some
+> > duplicated code in the function itself.
+>=20
+> Oh, by some reason Sebastian wasn't in this rather long Cc list.
+> Added him.
+>=20
+> Reading again I don't see any useful explanation why that piece of code h=
+as to
+> be duplicated among these two functions. It's 100% a copy.
+>=20
+> Sebastian, can you shed some light here?
 
-BUG: memory leak
-unreferenced object 0xff1100010fd93d68 (size 8):
-  comm "syz-executor.3", pid 17672, jiffies 4298118891 (age 9.906s)
-  hex dump (first 8 bytes):
-    00 00 00 00 00 00 00 00                          ........
-  backtrace:
-    [<ffffffffade5db3e>] kvmalloc_node+0x11e/0x170
-    [<ffffffffadd28280>] __cpu_map_entry_alloc+0x2f0/0xb00
-    [<ffffffffadd28d8e>] cpu_map_update_elem+0x2fe/0x3d0
-    [<ffffffffadc6d0fd>] bpf_map_update_value.isra.0+0x2bd/0x520
-    [<ffffffffadc7349b>] map_update_elem+0x4cb/0x720
-    [<ffffffffadc7d983>] __se_sys_bpf+0x8c3/0xb90
-    [<ffffffffb029cc80>] do_syscall_64+0x30/0x40
-    [<ffffffffb0400099>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+The patch in this thread is obviously wrong. It results in the
+checks never beeing called for spi_add_device_locked(). The copy is
+in spi_add_device() and those two are not calling into each other.
 
-In the cpu_map_update_elem flow, when kthread_stop is called before
-calling the threadfn of rcpu->kthread, since the KTHREAD_SHOULD_STOP bit
-of kthread has been set by kthread_stop, the threadfn of rcpu->kthread
-will never be executed, and rcpu->refcnt will never be 0, which will
-lead to the allocated rcpu, rcpu->queue and rcpu->queue->queue cannot be
-released.
+But it should be fine to move the code to the start of
+__spi_add_device(), which allows removing the duplication. In that
+case the code will be run with the add_lock held, which is probably
+what I was worried about two years ago. Looking at it again, the
+lock is held anyways in case of spi_add_device_locked().
 
-Calling kthread_stop before executing kthread's threadfn will return
--EINTR. We can complete the release of memory resources in this state.
+Greetings,
 
-Fixes: 6710e1126934 ("bpf: introduce new bpf cpu map type BPF_MAP_TYPE_CPUMAP")
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
----
- kernel/bpf/cpumap.c | 40 ++++++++++++++++++++++++----------------
- 1 file changed, 24 insertions(+), 16 deletions(-)
+-- Sebastian
 
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 8a33e8747a0e..6ae02be7a48e 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -122,22 +122,6 @@ static void get_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
- 	atomic_inc(&rcpu->refcnt);
- }
- 
--/* called from workqueue, to workaround syscall using preempt_disable */
--static void cpu_map_kthread_stop(struct work_struct *work)
--{
--	struct bpf_cpu_map_entry *rcpu;
--
--	rcpu = container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
--
--	/* Wait for flush in __cpu_map_entry_free(), via full RCU barrier,
--	 * as it waits until all in-flight call_rcu() callbacks complete.
--	 */
--	rcu_barrier();
--
--	/* kthread_stop will wake_up_process and wait for it to complete */
--	kthread_stop(rcpu->kthread);
--}
--
- static void __cpu_map_ring_cleanup(struct ptr_ring *ring)
- {
- 	/* The tear-down procedure should have made sure that queue is
-@@ -165,6 +149,30 @@ static void put_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
- 	}
- }
- 
-+/* called from workqueue, to workaround syscall using preempt_disable */
-+static void cpu_map_kthread_stop(struct work_struct *work)
-+{
-+	struct bpf_cpu_map_entry *rcpu;
-+	int err;
-+
-+	rcpu = container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
-+
-+	/* Wait for flush in __cpu_map_entry_free(), via full RCU barrier,
-+	 * as it waits until all in-flight call_rcu() callbacks complete.
-+	 */
-+	rcu_barrier();
-+
-+	/* kthread_stop will wake_up_process and wait for it to complete */
-+	err = kthread_stop(rcpu->kthread);
-+	if (err) {
-+		/* kthread_stop may be called before cpu_map_kthread_run
-+		 * is executed, so we need to release the memory related
-+		 * to rcpu.
-+		 */
-+		put_cpu_map_entry(rcpu);
-+	}
-+}
-+
- static void cpu_map_bpf_prog_run_skb(struct bpf_cpu_map_entry *rcpu,
- 				     struct list_head *listp,
- 				     struct xdp_cpumap_stats *stats)
--- 
-2.25.1
+--fcthwhge3iyvg2gl
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmStRJIACgkQ2O7X88g7
++pp6dQ//QWqSMddfA8JIA4/cd4pYKRoojbIso2JQaAhIWBB48KjH/GX7xoNCH4Ig
+MRloAncuXxqH1quGGpphBRJL2bAKVRcinKKtYdwCyM6P422hjD5GqVDKOr2H1u2f
+4+wWcKeKNk5ect4iYj/kRZYYpdlJzxK1hsd7bCwBCz3I0k7rlxqIg5td7e/7Q7CC
+4bvNEtL0Ub1iB+vzDNoqNKN48Bp87xr+kM1wSDsDhPqf1TrTmxgOFIYNmy2x+XuV
+20ZRE4olEfUMFlPNNCaAurOPVZmclVstzBUwRhU7uVBH4/ZnbY02wsklP0D8SbV8
+inFOurRiLtWaRSQfkwMEF2DAp4l5a6eWVyuy5Rf0mdVmgq9bgeXFycbiYkOM6Gsz
+aQ0g5SV64PYZSwPljucB28GrWfLdDNlp693elljAeDElhbF1bqhbVozqhkyfH5Ih
+J4wpwr/DgZaW31B0V/sQVlJTIRtjAmIRgydid81aaSOzXmW0B+Pu74EU/cMNcy0f
+iSGRdSPX+eA5OPNHQWPz1RQvJOHMVrMBXTdSCeVzZdV4VSTZSv9/LL922e9qK2DB
+yGQTeUox+5d2hdcQlSmo+LQGhiZiiJ9qoVWPsWjhNwbb3fh3HCSP9X/BJHNNGzqr
+WU6SN8gRjCaL3/i5pT08DOL6WdKhn/qo8EzCnOBxloSjD2uF1Ic=
+=v6T3
+-----END PGP SIGNATURE-----
+
+--fcthwhge3iyvg2gl--
 
