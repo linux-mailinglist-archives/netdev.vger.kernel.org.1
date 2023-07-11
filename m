@@ -1,177 +1,224 @@
-Return-Path: <netdev+bounces-16935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84D6874F731
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:25:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B28074F746
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B49D21C20FD1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:25:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A6828191E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F52E1E508;
-	Tue, 11 Jul 2023 17:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0291E512;
+	Tue, 11 Jul 2023 17:34:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A92D17FE0
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:25:24 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D87241BB;
-	Tue, 11 Jul 2023 10:25:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E8SS2CYuBCBZOebMhvGbN2G/OIYZjIb4IjhyrP2SB84xhipH/8vqUzE8nomVT/nDu1bPD+NhOTWyNg+DPjxuPOQz3zrxt7tMe/5QxuhOsQdnuoHPwu2u0DUBsh1cWjBG4lapr3XPOh2mJIsbII/DBSYS7pg7yTCcbXQwKny+C80UKcxFChNO3Y+lfPVczfNnrPShgQ6eHa39D0JQBgYmT8Gs47v1OKxaIc8MCYUlNlhO3527qq1t5qE3w3jMQiTxh1oTSjIAFNNVLYcENjx49FRnenu7by2i4XBBP6tP5Z4bNNQCZl7o8xhuE7nKuIbjS344/6q9BuNYfNFBTQP9qA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4y+re6ONZ553vKGeW3MM5fjpxsV5Qv0GFjYYZfQVfUY=;
- b=U8M4tKkcv+Ku9CqqlC1+BMpcgsKMtTG9mLnLbsqV267KnrMlXlGb7ZfryzMWHxZR4/RU0CYo80CwzKb4UZ1CATY/bnxo5Q7pyB92WaFzYCTZq+SoEc+jtdrp1U3gPzmSexYAN4CQgwHsRHLpzVgkbhU20ag8s/oLFeyHbra0FiOXcGD5lGada+S+Irbww+ccG94KscotkyFOKQj4085JeA5WjIDsQBjqr5Fu87+CO0pgMOjBeEjM3pbwGpCALMAd1tzJu1uJyXjH43CxAZCVNkFlPqlSAX4Q+GsBoP8rESLhUaIOgdkh96GH3GhcXj/8dZVbNLIZxhBKWuX1JpLc7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4y+re6ONZ553vKGeW3MM5fjpxsV5Qv0GFjYYZfQVfUY=;
- b=Qu3Zy1T+2nXs3PQlH2cCetR17t9h3vUiOopv5cvvGhNY89ihIIhKJ8yN//RX3aJQYWYbuSTisUuEnBSkSPNb/pEA/TlFX+a94u/a7d9YwY/OZKwimRnwFJvQTJCaVf1WkM7ZUy9r15kXHOd3k6nhkKarO/Dw1/zRM3UFivs7m8I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY3PR13MB4884.namprd13.prod.outlook.com (2603:10b6:a03:354::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Tue, 11 Jul
- 2023 17:25:19 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.017; Tue, 11 Jul 2023
- 17:25:19 +0000
-Date: Tue, 11 Jul 2023 18:25:12 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kalle Valo <kvalo@kernel.org>, linux-wireless@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] wifi: airo: avoid uninitialized warning in
- airo_get_rate()
-Message-ID: <ZK2QeBZKWi0Q6vuW@corigine.com>
-References: <20230709133154.26206-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230709133154.26206-1-rdunlap@infradead.org>
-X-ClientProxiedBy: LNXP265CA0090.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:76::30) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720661DDF8
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:34:07 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE95E6C;
+	Tue, 11 Jul 2023 10:34:05 -0700 (PDT)
+Received: from mercury (dyndsl-091-248-213-212.ewe-ip-backbone.de [91.248.213.212])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 0EC6C6606FD7;
+	Tue, 11 Jul 2023 18:34:04 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1689096844;
+	bh=xTQ0mmZSKT6xaRW2cSSnwsyXZRn21W+fLOIKOFiv5HU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H4apaSnHRDvSkpSCkk+wyU65Ngqr9P5JyDBeie6RLPAeIF/a84cxGH59ddGSbX5qw
+	 63kfAbpaiUnhKnAjL7v46VWmzE4FkX9fEEyauEpMkG3DYbKmfvZvGjPGtA+xeI6swf
+	 kjXbLmO76/FOA8FnaeGqaVHoSCSKZ347Op8QNSbAV1AHFtd/woPULZ7cp0Xe7t6lvK
+	 j+oEiKCypr4OaNiLGZi4zRujwMiEhT9wkldDGMRFDyKdZJ0dEmjL8X+4AzL1KA1Sn6
+	 6BSpra8CwZ37kLECStDWmCD4Br675HzuR2KsJ6ZFQzDp7r6efy1uSO15+pqJdv0f+r
+	 Or4DZYoJuC/iQ==
+Received: by mercury (Postfix, from userid 1000)
+	id B8CBE106765E; Tue, 11 Jul 2023 19:34:01 +0200 (CEST)
+Date: Tue, 11 Jul 2023 19:34:01 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Mark Brown <broonie@kernel.org>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
+	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Radu Pirea <radu_nicolae.pirea@upb.ro>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Orson Zhai <orsonzhai@gmail.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Chunyan Zhang <zhang.lyra@gmail.com>,
+	Alain Volmat <alain.volmat@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH v3 04/14] spi: Remove code duplication in
+ spi_add_device*()
+Message-ID: <20230711173401.kz7or6ucurhoe4er@mercury.elektranox.org>
+References: <20230711171756.86736-1-andriy.shevchenko@linux.intel.com>
+ <20230711171756.86736-5-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB4884:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09da4e10-b299-44a1-64f4-08db8233cc6a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	aESLwaYMhbdJD3+8FHsONcPCY4zgDBY5HE3PeUH09kpWHc58wdUUtG8aDomqq6X8qzkQal8ZjO3RWlve6joPQVDDVqOt668++Lofl6tAwSYRiEFkH+CANdo5s//AoDBGccHpxbgo9dOuHITrm007Koux4hKnNMmiV75zmYAkleTObOWPaYeoWV/TUpvLv0BN0ufXGn4p8HgVpddcktc8bowfRAUaITGKfLCPHve56gmm0EN9zjcMfL6B6lQ5idU29OX4uizwfdJ2XJXuHB97a2c/QJ6Y0MUcFv0NED3Y4Hi6NVCSkb298ohb+DrSAgiwbBbUmyWZ27GFHHNGCch87BRg/5qMBZvai/k1RoxNIDZiGxst4VwhdaFgGUFaJsOdFI+gXNmyOCQbOdJQ9knvAge0KBCq3MuHJPeMmnjpfctZmqxT+n47ESraJyyiOFk697XfVOZ4saX3WltbPvhxyGo2NlkIvMSTV24+/SRcbC8vKQg7a7pB9WDTf8uN9WASeYIwqRMPHaIdQWAHtpHJrw+tkz1h49n/AEg//HI8ncS5u14Sp8HKlSMYbNtbOCb/epx2X/0+7gSMmAgMatNzbpGQsCijwUQ47osc3XctQ7U=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39840400004)(376002)(366004)(451199021)(478600001)(36756003)(86362001)(38100700002)(6666004)(54906003)(84970400001)(6486002)(6512007)(8676002)(8936002)(44832011)(5660300002)(7416002)(2906002)(316002)(4326008)(6916009)(66556008)(66476007)(41300700001)(66946007)(2616005)(6506007)(26005)(83380400001)(186003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?08hegpWuPylQG49MBfGzD+gfs3N3I9Q8jtrDhjDzEEx/gTQI3/P9p2waUo0N?=
- =?us-ascii?Q?03bx2z523RWAO0LMOkvAmitpJohVmrNhCpSW4xr4pevUSLWJ8K1KZE95CSR9?=
- =?us-ascii?Q?O9cYiCORxT6xoLsZoa+1w4mhcOYYuF3qqRi3sjLlliZ2oIifjeOVSSaef7xS?=
- =?us-ascii?Q?YKbHrdRs7UmnF6C8v15Y3SaUxMroaDkr275cg14qwBmQj6YCxatRyusggAcM?=
- =?us-ascii?Q?xhiAdSxHPYuZ71KcN83chbdq6ALNSp7NitdI/+i/uxHZsBwVwf9NiSHCH8T8?=
- =?us-ascii?Q?Xw66aMOuMcwMW92CCz3O1Pt4pX7C3XozR9vNRsB0yMg2tw2nov+nqj+Dvcoi?=
- =?us-ascii?Q?FVIl0vtNOfMxVZlU9iwdF4gQkcR8nQS9o4xQK25uJh6G79I4tpzq1tFYW4ee?=
- =?us-ascii?Q?FKMH5GIZ6umrzNt06qn27APQnQC4SkFc3YRCVUdvHRJvK6eVtyD+8uBOxIaG?=
- =?us-ascii?Q?pphWwA64oDFUp9jtFAjB+NgO7+yG1yaeRzixcIypkjCD0zBL0rpxcKqheo0l?=
- =?us-ascii?Q?twyVKXrnBqSeYtu8s8t/azTESafeeTUp86nCXDUfUdCDuzDtmQi95WFqKDDM?=
- =?us-ascii?Q?XYDNkzaYHuQipdfPECkeSvftrhUOL18RpwbbTIszn+f/ylwv/amAbtpL8Jfq?=
- =?us-ascii?Q?9dx9u5a4ElHtMrwbZOPtVZGH+uAr+FsJ5e9fkQuLlpssyMtuhFanRXlNfPL+?=
- =?us-ascii?Q?biXCRl1fiBtAGL0Bf2RHY1P3sk63twosF9Y6alfbuDbY2qcGibmX26dtCoLX?=
- =?us-ascii?Q?RFHMAcvJcWcwg6BlfXxDFvUkKhbxj7DOGNGeM8WyPfz/J4aZuhsyaoOSXKB9?=
- =?us-ascii?Q?wlLveQIVGDWMS5mqDDHWUDW0NpfzyouMzI1sQlY8njddPVnmyu6StuNJ+hbp?=
- =?us-ascii?Q?XkxLjX6JsD9ZXIfhabE7IbtMzT1N2z7c0AJ5/v9iFN2ordPf2Ows8jjDb3W6?=
- =?us-ascii?Q?OltcU9j/vjuqq9TX+if1ubadMpwVbju2nsO2xPANql4Frmh+HHpcqP6SonBr?=
- =?us-ascii?Q?LkzZCgf1BACtkuBA4V8Q5vm6b39DVtBZFOWs6zYcxiVL2qkhl8DgpS/cPKI2?=
- =?us-ascii?Q?Vx6u0DbpmVfAwIw4/06SM3CDTsw0wsFUX3HOlDEx9nqXQCbchcTeKKv85p0M?=
- =?us-ascii?Q?8eF61A0quWTo4on06Ah8HUFLb9GIKyAkmdS0E9VC3AnJLlVWq8zYFFMYTo7p?=
- =?us-ascii?Q?E/HHkyCAoorxm3koAl/BxTWEjF8WVYFv6AM1fHd+0N3XBXSujTe855KamzUy?=
- =?us-ascii?Q?HXcHk65ec1TTcpg0NUTLM8MNZeREt7i1MR69MpidBWemeA7gwfA7KFoP/0IK?=
- =?us-ascii?Q?FXtZx7LhOleSCsiJNabcKix8mzLmdpd3hPPUyI9UGELMarYd5yb/oqr/wQl2?=
- =?us-ascii?Q?ZxqgJ5o+COb1f5QvjG8iRgxHKW/e0LLiEmLoM3ter6/Hzfzx4zlubs5JeTs2?=
- =?us-ascii?Q?lizaoTGwFRiEpKUdLCafkJsq6OOowWv8RGqIkPZIfLv5NwhgMTty/wBh2P9+?=
- =?us-ascii?Q?rLkrSd1jmg1gyZXBTxpV3JAcCo3GrVm3hX1leVNcRsyP1Pn1AHhSIic/KA/D?=
- =?us-ascii?Q?5SKmYS+1zUQljs8QIIPCvsZ651BqWQgtl4bw/ddI+61xcBAxFqbaE1XpIaQ8?=
- =?us-ascii?Q?vA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09da4e10-b299-44a1-64f4-08db8233cc6a
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 17:25:18.9384
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eagEkZKewLFtqcINSaRLVytw2pXDcs1RYqKBod7F8PPKMV/NlrReFwUPVfzvcMSfyRCVws7REFQLrWRHzYxEkeGQw7Bwp8Okceitrp+x1U8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB4884
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nr4764lrwkknwz4l"
+Content-Disposition: inline
+In-Reply-To: <20230711171756.86736-5-andriy.shevchenko@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 09, 2023 at 06:31:54AM -0700, Randy Dunlap wrote:
-> Quieten a gcc (11.3.0) build error or warning by checking the function
-> call status and returning -EBUSY if the function call failed.
-> This is similar to what several other wireless drivers do for the
-> SIOCGIWRATE ioctl call when there is a locking problem.
-> 
-> drivers/net/wireless/cisco/airo.c: error: 'status_rid.currentXmitRate' is used uninitialized [-Werror=uninitialized]
 
-Hi Randy,
+--nr4764lrwkknwz4l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-There seem to be other calls to readStatusRid() in the same file
-with similar properties. Perhaps it would be best to fix them too?
+Hi,
 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Link: lore.kernel.org/r/39abf2c7-24a-f167-91da-ed4c5435d1c4@linux-m68k.org
-> Cc: Kalle Valo <kvalo@kernel.org>
-> Cc: linux-wireless@vger.kernel.org
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
+On Tue, Jul 11, 2023 at 08:17:46PM +0300, Andy Shevchenko wrote:
+> The commit 0c79378c0199 ("spi: add ancillary device support")
+> added a dozen of duplicating lines of code. We may move them
+> to the __spi_add_device(). Note, that the code may be called
+> under the mutex.
+>=20
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+
+Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+
+-- Sebastian
+
 > ---
->  drivers/net/wireless/cisco/airo.c |    5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff -- a/drivers/net/wireless/cisco/airo.c b/drivers/net/wireless/cisco/airo.c
-> --- a/drivers/net/wireless/cisco/airo.c
-> +++ b/drivers/net/wireless/cisco/airo.c
-> @@ -6157,8 +6157,11 @@ static int airo_get_rate(struct net_devi
->  	struct iw_param *vwrq = &wrqu->bitrate;
->  	struct airo_info *local = dev->ml_priv;
->  	StatusRid status_rid;		/* Card status info */
-> +	int ret;
->  
-> -	readStatusRid(local, &status_rid, 1);
-> +	ret = readStatusRid(local, &status_rid, 1);
-> +	if (ret)
-> +		return -EBUSY;
->  
->  	vwrq->value = le16_to_cpu(status_rid.currentXmitRate) * 500000;
->  	/* If more than one rate, set auto */
-> 
+>  drivers/spi/spi.c | 32 ++++++++++----------------------
+>  1 file changed, 10 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
+> index 6d74218cf38e..876d40d2c708 100644
+> --- a/drivers/spi/spi.c
+> +++ b/drivers/spi/spi.c
+> @@ -631,6 +631,16 @@ static int __spi_add_device(struct spi_device *spi)
+>  	struct device *dev =3D ctlr->dev.parent;
+>  	int status;
+> =20
+> +	/* Chipselects are numbered 0..max; validate. */
+> +	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
+> +		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
+> +			ctlr->num_chipselect);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Set the bus ID string */
+> +	spi_dev_set_name(spi);
+> +
+>  	/*
+>  	 * We need to make sure there's no other device with this
+>  	 * chipselect **BEFORE** we call setup(), else we'll trash
+> @@ -689,19 +699,8 @@ static int __spi_add_device(struct spi_device *spi)
+>  int spi_add_device(struct spi_device *spi)
+>  {
+>  	struct spi_controller *ctlr =3D spi->controller;
+> -	struct device *dev =3D ctlr->dev.parent;
+>  	int status;
+> =20
+> -	/* Chipselects are numbered 0..max; validate. */
+> -	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
+> -		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
+> -			ctlr->num_chipselect);
+> -		return -EINVAL;
+> -	}
+> -
+> -	/* Set the bus ID string */
+> -	spi_dev_set_name(spi);
+> -
+>  	mutex_lock(&ctlr->add_lock);
+>  	status =3D __spi_add_device(spi);
+>  	mutex_unlock(&ctlr->add_lock);
+> @@ -712,17 +711,6 @@ EXPORT_SYMBOL_GPL(spi_add_device);
+>  static int spi_add_device_locked(struct spi_device *spi)
+>  {
+>  	struct spi_controller *ctlr =3D spi->controller;
+> -	struct device *dev =3D ctlr->dev.parent;
+> -
+> -	/* Chipselects are numbered 0..max; validate. */
+> -	if (spi_get_chipselect(spi, 0) >=3D ctlr->num_chipselect) {
+> -		dev_err(dev, "cs%d >=3D max %d\n", spi_get_chipselect(spi, 0),
+> -			ctlr->num_chipselect);
+> -		return -EINVAL;
+> -	}
+> -
+> -	/* Set the bus ID string */
+> -	spi_dev_set_name(spi);
+> =20
+>  	WARN_ON(!mutex_is_locked(&ctlr->add_lock));
+>  	return __spi_add_device(spi);
+> --=20
+> 2.40.0.1.gaa8946217a0b
+>=20
+
+--nr4764lrwkknwz4l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmStkn4ACgkQ2O7X88g7
++pormhAAnK4ipkeSKHu0xl8agX+r1Ks97iOFEMGG8+gzX4xY/hXNKVPfgpoWdNZa
+rN+CMPEFa2M5kKdm7v6s7wv2A/R0bRMIwUrHhMxAVBKQSNlp47s2N/PBkCgghK7x
+dOCmH/DDN17c1ODn8FJUD/WO5p1/grLRg1mUoNQvVqLVz7jQBx+oOZxG1Fm2e5pb
+suAySbAqDtYVper0iqZhu1BwDjFxj7l/+kXhJWt+mtgFq1shfCwdfK+gm9Z1hJ4B
+kDa1PZSzlIbs8znfYFu8n7gPJIN/nplWGmWgFAbwex3GxdZbSrO58X4m2B0fooFg
+xQ3w3b710ONolovhZktxkx7nibXjJiVFQwgS7BPRquCjCEok5jNmuyVJmu9Pud0s
+nRDWYic0TKErHny9NYCTwdJQX5ZkDIV9QpjVyp5FR7e/ylT8chmX1LwnsKZSd91j
+TN9+lh3yU6BjbjopIAFAhP5BvYeYMI2tvbXpCC3iiqGno53AZUyP5dXBupB/zri7
+bwN6fXNXsuVX0JJH3CHCm13ZK9IFY8GHGqLJBUulYVyaXSLOimXhi/l6bkkhvzxN
+IKpuSWUPTxAVu9q5LxsOWS45GXR0oWiiKL7tOcaX1yJypn+5lKy+4yStvF0cER9d
+NdLreesrYaGS2zSH4qIA7m8dd2oaqPtYCa1VHzxRfLcNsnyCoXY=
+=zPs/
+-----END PGP SIGNATURE-----
+
+--nr4764lrwkknwz4l--
 
