@@ -1,157 +1,120 @@
-Return-Path: <netdev+bounces-16958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF86274F94D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 22:47:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FDC674F984
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C3CD1C21063
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:47:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4686C2813EE
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 21:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED521E514;
-	Tue, 11 Jul 2023 20:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBE81EA97;
+	Tue, 11 Jul 2023 21:01:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCE619BDF
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 20:47:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 245DB1987
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:47:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689108419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s4WnwWEWs/PWwc+6zWRXmlvXFfzoTik2Yf9g1/Rp5QY=;
-	b=D4XcY5L6qhEDVA2r84UcoMCDZhod9JQRIM7VqkkR/ce7UDjBMECWX84ySD1Wi4K8jetj9m
-	l0vw6woWElBkZ9RMV6KD/SdXsggBR0G8jeDXs4iXkWHi05S3Jj42JxIIBqJ6QDUWse3hqt
-	M53ZKhrxqBNTBzxRRsoMCLe7cFuDX+s=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-562-cQ5nioz9OICDcD51Jcz3-A-1; Tue, 11 Jul 2023 16:46:58 -0400
-X-MC-Unique: cQ5nioz9OICDcD51Jcz3-A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0807D3C1D603;
-	Tue, 11 Jul 2023 20:46:58 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.34.58])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A367200AD6E;
-	Tue, 11 Jul 2023 20:46:57 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Eric Garver <eric@garver.life>
-Cc: Ilya Maximets <i.maximets@ovn.org>,  Jakub Kicinski <kuba@kernel.org>,
-  netdev@vger.kernel.org,  dev@openvswitch.org,  Paolo Abeni
- <pabeni@redhat.com>,  Eric Dumazet <edumazet@google.com>,  "David S.
- Miller" <davem@davemloft.net>,  Adrian Moreno <amorenoz@redhat.com>,
-  Eelco Chaudron <echaudro@redhat.com>
-Subject: Re: [ovs-dev] [PATCH net-next 2/2] net: openvswitch: add drop action
-References: <20230629203005.2137107-1-eric@garver.life>
-	<20230629203005.2137107-3-eric@garver.life>
-	<f7tr0plgpzb.fsf@redhat.com>
-	<ZKbITj-FWGqRkwtr@egarver-thinkpadt14sgen1.remote.csb>
-	<6060b37e-579a-76cb-b853-023cb1a25861@ovn.org>
-	<20230707080025.7739e499@kernel.org>
-	<eb01326d-5b30-2d58-f814-45cd436c581a@ovn.org>
-	<dec509a4-3e36-e256-b8c0-74b7eed48345@ovn.org>
-	<20230707150610.4e6e1a4d@kernel.org>
-	<096871e8-3c0b-d5d7-8e68-833ba26b3882@ovn.org>
-	<ZKxMJOdz8LoAA-A5@egarver-thinkpadt14sgen1.remote.csb>
-Date: Tue, 11 Jul 2023 16:46:56 -0400
-In-Reply-To: <ZKxMJOdz8LoAA-A5@egarver-thinkpadt14sgen1.remote.csb> (Eric
-	Garver's message of "Mon, 10 Jul 2023 14:21:24 -0400")
-Message-ID: <f7tpm4ych1b.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAFA1E503
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 21:01:16 +0000 (UTC)
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB4C10DD
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:01:15 -0700 (PDT)
+Received: by mail-oo1-xc33.google.com with SMTP id 006d021491bc7-563531a3ad2so3881220eaf.3
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:01:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689109274; x=1691701274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PWtgP0F96XopLJUgU33QB+JNpam+NY91Ci7wRgILuXw=;
+        b=oiKNOuQPMCIf5QygVa3bYHLcO2dryBAjGdjbur2MTTHGTx/9miSKoXdskxOowm/UY7
+         VTalneuFY3Bhc11O2eb8dcA2Ru1mBn/dvUFmxkyu6z14kVrlp0D13BsmY/9rK4d78ceQ
+         mAhQEuAdLlg386vA+TZXbtJr1kZE3RbuM/C1IMIRVf7Q42Fnn5VyzooTh2ijGJYSL3/u
+         mfLjM4d8fDWV0deM6K1odEMSy32Jfy+Vf17ehB5DXCcOK33r6PQR4b48n4BnC1XPyewG
+         4R/M+F37sQTQslqxrrfE77uqebPvIYA6alMLSdAngOvYs9JCup1Ue2ta9/EtbpXW+g5m
+         7flA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689109274; x=1691701274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PWtgP0F96XopLJUgU33QB+JNpam+NY91Ci7wRgILuXw=;
+        b=mEXUQT4adl5bQNdgy3LcalPyAG+QrXGA+8fGi008YpTXh8wn7vhuQY6DgnjkahMUmH
+         sL+UxJB/a0h330JyMd9AhBsdAwW5phKLCoLgNFv2hq/f8SXlmTGtS1GOAibIgavEQ/Ve
+         smvNYpiV2vHDie/91T7wqYq2jGJiS8Q3SMfQ0dvqW3PYWF4weMfuCurLzxzxZMDLoXGc
+         0j9yjOQQuwesmK8SF5ao5Yr6gD6wY8DvD/MMRb1LoTFjP9GQLTvIVbyI04KSZ3ig0gYK
+         zjDV3rTQk/fn9mfcBNeqGQVIH8pkbOMKMdzLgS9Sk6eQYVFXc6umZJg2CXlvbhqM8eZ/
+         iF2Q==
+X-Gm-Message-State: ABy/qLZMgsw3d//dU8FqOe6lIH22FtZ2MciEEI80h8fnVFaWd1okOs4Y
+	AL4xDeeEl6cted8E+BSSifBJey1xIKkfxyDqRyk=
+X-Google-Smtp-Source: APBJJlF7tF6ZEVPBpzMsXMeI7J9kaLJUpN3/+OoRLmSuRMD4STqi7kA3EZMR80QQLvc/SOyfRiz5/g==
+X-Received: by 2002:a05:6808:1aa8:b0:3a3:7db0:3a46 with SMTP id bm40-20020a0568081aa800b003a37db03a46mr14554276oib.7.1689109274377;
+        Tue, 11 Jul 2023 14:01:14 -0700 (PDT)
+Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:d1e8:1b90:7e91:3217])
+        by smtp.gmail.com with ESMTPSA id d5-20020a05680808e500b003a1e965bf39sm1290575oic.2.2023.07.11.14.01.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 14:01:14 -0700 (PDT)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	shaozhengchao@huawei.com,
+	victor@mojatatu.com,
+	simon.horman@corigine.com,
+	paolo.valente@unimore.it,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net v3 0/4] net/sched: fixes for sch_qfq
+Date: Tue, 11 Jul 2023 18:00:59 -0300
+Message-Id: <20230711210103.597831-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Eric Garver <eric@garver.life> writes:
+Patch 1 fixes a regression introduced in 6.4 where the MTU size could be
+bigger than 'lmax'.
 
-> On Mon, Jul 10, 2023 at 06:51:19PM +0200, Ilya Maximets wrote:
->> On 7/8/23 00:06, Jakub Kicinski wrote:
->> > On Fri, 7 Jul 2023 18:04:36 +0200 Ilya Maximets wrote:
->> >>>> That already exists, right? Johannes added it in the last release for WiFi.  
->> >>>
->> >>> I'm not sure.  The SKB_DROP_REASON_SUBSYS_MAC80211_UNUSABLE behaves similarly
->> >>> to that on a surface.  However, looking closer, any value that can be passed
->> >>> into ieee80211_rx_handlers_result() and ends up in the kfree_skb_reason() is
->> >>> kind of defined in net/mac80211/drop.h, unless I'm missing something (very
->> >>> possible, because I don't really know wifi code).
->> >>>
->> >>> The difference, I guess, is that for openvswitch values will be provided by
->> >>> the userpsace application via netlink interface.  It'll be just a number not
->> >>> defined anywhere in the kernel.  Only the subsystem itself will be defined
->> >>> in order to occupy the range.  Garbage in, same garbage out, from the kernel's
->> >>> perspective.  
->> >>
->> >> To be clear, I think, not defining them in this particular case is better.
->> >> Definition of every reason that userspace can come up with will add extra
->> >> uAPI maintenance cost/issues with no practical benefits.  Values are not
->> >> going to be used for anything outside reporting a drop reason and subsystem
->> >> offset is not part of uAPI anyway.
->> > 
->> > Ah, I see. No, please don't stuff user space defined values into 
->> > the drop reason. The reasons are for debugging the kernel stack 
->> > itself. IOW it'd be abuse not reuse.
->> 
->> Makes sense.  I wasn't sure that's a good solution from a kernel perspective
->> either.  It's better than defining all these reasons, IMO, but it's not good
->> enough to be considered acceptable, I agree.
->> 
->> How about we define just 2 reasons, e.g. OVS_DROP_REASON_EXPLICIT_ACTION and
->> OVS_DROP_REASON_EXPLICIT_ACTION_WITH_ERROR (exact names can be different) ?
->> One for an explicit drop action with a zero argument and one for an explicit
->> drop with non-zero argument.
->> 
->> The exact reason for the error can be retrieved by other means, i.e by looking
->> at the datapath flow dump or OVS logs/traces.
->> 
->> This way we can give a user who is catching packet drop traces a signal that
->> there was something wrong with an OVS flow and they can look up exact details
->> from the userspace / flow dump.
->> 
->> The point being, most of the flows will have a zero as a drop action argument,
->> i.e. a regular explicit packet drop.  It will be hard to figure out which flow
->> exactly we're hitting without looking at the full flow dump.  And if the value
->> is non-zero, then it should be immediately obvious which flow is to blame from
->> the dump, as we should not have a lot of such flows.
->> 
->> This would still allow us to avoid a maintenance burden of defining every case,
->> which are fairly meaningless for the kernel itself, while having 99% of the
->> information we may need.
->> 
->> Jakub, do you think this will be acceptable?
->> 
->> Eric, Adrian, Aaron, do you see any problems with such implementation?
->
-> I see no problems. I'm content with this approach.
+Patch 3 fixes an issue where the code doesn't account for qdisc_pkt_len()
+returning a size bigger then 'lmax'.
 
-+1
+Patches 2 and 4 are selftests for the issues above.
 
->> P.S. There is a plan to add more drop reasons for other places in openvswitch
->>      module to catch more regular types of drops like memory issues or upcall
->>      failures.  So, the drop reason subsystem can be extended later.
->>      The explicit drop action is a bit of an odd case here.
->> 
->> Best regards, Ilya Maximets.
->> 
+v2 -> v3:
+ - Added Eric tags
+ - Addressed issue in patch 4 pointed by Shaozheng
+
+v1 -> v2:
+ - Added another fix and selftest for sch_qfq
+ - Addressed comment by Simon
+ - Added Jamal acks and Shaozheng tested by
+
+Pedro Tammela (4):
+  net/sched: sch_qfq: reintroduce lmax bound check for MTU
+  selftests: tc-testing: add tests for qfq mtu sanity check
+  net/sched: sch_qfq: account for stab overhead in qfq_enqueue
+  selftests: tc-testing: add test for qfq with stab overhead
+
+ net/sched/sch_qfq.c                           | 18 +++-
+ .../tc-testing/tc-tests/qdiscs/qfq.json       | 86 +++++++++++++++++++
+ 2 files changed, 101 insertions(+), 3 deletions(-)
+
+-- 
+2.39.2
 
 
