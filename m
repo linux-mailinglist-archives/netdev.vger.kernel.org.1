@@ -1,144 +1,92 @@
-Return-Path: <netdev+bounces-16733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D461F74E93C
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:37:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D00574E95E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 103BC1C20C3D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:37:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C581C20C66
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A7914AB5;
-	Tue, 11 Jul 2023 08:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0304174C0;
+	Tue, 11 Jul 2023 08:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF542134C8
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 08:37:54 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2A398
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 01:37:52 -0700 (PDT)
-Message-ID: <7005af42-e546-6a7c-015f-037a5f0e08a9@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1689064670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VP5DDhHDH7Z6xQfUSr62zDjPhEDhJObHWYpffygtjCE=;
-	b=XC5pkhUh8sb/j37Ddbptwqu1qVnVnSvkR+/szLzWmKdX0bymKIZOwfXEnj7FgxrlXSVI/p
-	iXPMifSLmMWUW3dICarZVzRk0Iyfp8a1F2Ee9YiXF/lPUyYo3z5G4HOb+Wqak33PCype9v
-	9wHrkImEgSWSosi1/B9mF/psMf3RPnEpCmI9pQEUsy52RgrZwjliXMPtXNiqNMbRXE7eDu
-	00UuRi3tz6nD6Oqodp8+CD4EcMcCY1hiB9wpH3S5srNIlnCViRZ78HUnRRnOpoXGS0HFgj
-	eihkcjlg2UlXXvFL/Tv5mf9osbDqhVF+AKbEFGswd9vCiNq+7PiuoOkxbzl2bQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1689064670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VP5DDhHDH7Z6xQfUSr62zDjPhEDhJObHWYpffygtjCE=;
-	b=j4cE5AeDFUZmbLnxPOQjegDKQv20ktIg2Zmp7X+CPz7WlLzmwaTfKA6lf+wFWrINH2pc4o
-	zUkMdRoac45RBnCQ==
-Date: Tue, 11 Jul 2023 10:37:48 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D3D5246;
+	Tue, 11 Jul 2023 08:50:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88CDDC433C9;
+	Tue, 11 Jul 2023 08:50:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689065421;
+	bh=/k5olDGpbnyZ4n9IScGnO/ghFsMW4z+IdHliHFazRfY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QQdaVSMQf4Cl2d1URQhv/st9xBAGVyHlQnIRt+bNnJON7uqdHNVD1T6FxqBY7s+Vf
+	 a2zcnX0dkaZBEYvxMgbS1H21aLNWqAfsdhs/IeCborE4VgQZ5Zu3W1cYJ9T9I+lHkL
+	 vDi6be6VxrsmJUd1yA+UX+4kYRDmWh8UBK2EFqI5atIu2nXPkE+uoezEc0vjS0IA1v
+	 8DEa0uMpjD2fTBdbLyMOCZ6a0Kr7h3urVQpvFd7aTWP6Mq/WkhlX6cSMpywmnkDMSx
+	 m7nqPLZL5A1azKj/Tad4gi8k4Tw5/DMFdj2ThNB33pS8WUwRHrRwr6cESa/aNPXuT9
+	 9S82HvLTXZGSg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 69161C4167B;
+	Tue, 11 Jul 2023 08:50:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, kurt@linutronix.de,
- vinicius.gomes@intel.com, muhammad.husaini.zulkifli@intel.com,
- tee.min.tan@linux.intel.com, aravindhan.gunasekaran@intel.com,
- sasha.neftin@intel.com, Naama Meir <naamax.meir@linux.intel.com>
-References: <20230710163503.2821068-1-anthony.l.nguyen@intel.com>
- <20230710163503.2821068-6-anthony.l.nguyen@intel.com>
- <20230711070902.GF41919@unreal>
-From: Florian Kauer <florian.kauer@linutronix.de>
-Subject: Re: [PATCH net 5/6] igc: Fix launchtime before start of cycle
-In-Reply-To: <20230711070902.GF41919@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V2 net 0/4] net: fec: fix some issues of ndo_xdp_xmit()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168906542142.15715.5308120032595362444.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Jul 2023 08:50:21 +0000
+References: <20230706081012.2278063-1-wei.fang@nxp.com>
+In-Reply-To: <20230706081012.2278063-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ netdev@vger.kernel.org, linux-imx@nxp.com, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
 
-On 11.07.23 09:09, Leon Romanovsky wrote:
-> On Mon, Jul 10, 2023 at 09:35:02AM -0700, Tony Nguyen wrote:
->> From: Florian Kauer <florian.kauer@linutronix.de>
->>
->> It is possible (verified on a running system) that frames are processed
->> by igc_tx_launchtime with a txtime before the start of the cycle
->> (baset_est).
->>
->> However, the result of txtime - baset_est is written into a u32,
->> leading to a wrap around to a positive number. The following
->> launchtime > 0 check will only branch to executing launchtime = 0
->> if launchtime is already 0.
->>
->> Fix it by using a s32 before checking launchtime > 0.
->>
->> Fixes: db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
->> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
->> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
->> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
->> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
->> ---
->>  drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
->> index 5d24930fed8f..4855caa3bae4 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_main.c
->> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
->> @@ -1016,7 +1016,7 @@ static __le32 igc_tx_launchtime(struct igc_ring *ring, ktime_t txtime,
->>  	ktime_t base_time = adapter->base_time;
->>  	ktime_t now = ktime_get_clocktai();
->>  	ktime_t baset_est, end_of_cycle;
->> -	u32 launchtime;
->> +	s32 launchtime;
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu,  6 Jul 2023 16:10:08 +0800 you wrote:
+> From: Wei Fang <wei.fang@nxp.com>
 > 
-> The rest of igc_tx_launchtime() function is very questionable,
-> as ktime_sub_ns() returns ktime_t which is s64.
+> We encountered some issues when testing the ndo_xdp_xmit() interface
+> of the fec driver on i.MX8MP and i.MX93 platforms. These issues are
+> easy to reproduce, and the specific reproduction steps are as follows.
 > 
->   1049         launchtime = ktime_sub_ns(txtime, baset_est);
->   1050         if (launchtime > 0)
->   1051                 div_s64_rem(launchtime, cycle_time, &launchtime);
->   1052         else
->   1053                 launchtime = 0;
->   1054
->   1055         return cpu_to_le32(launchtime);
+> step1: The ethernet port of a board (board A) is connected to the EQOS
+> port of i.MX8MP/i.MX93, and the FEC port of i.MX8MP/i.MX93 is connected
+> to another ethernet port, such as a switch port.
 > 
+> [...]
 
-If I understand correctly, ktime_sub_ns(txtime, baset_est) will only return
-something larger than s32 max if cycle_time is larger than s32 max and if that
-is the case everything will be broken anyway since the corresponding hardware
-register only holds 30 bits.
+Here is the summary with links:
+  - [V2,net,1/4] net: fec: dynamically set the NETDEV_XDP_ACT_NDO_XMIT feature of XDP
+    https://git.kernel.org/netdev/net/c/be7ecbe7ec7d
+  - [V2,net,2/4] net: fec: recycle pages for transmitted XDP frames
+    https://git.kernel.org/netdev/net/c/20f797399035
+  - [V2,net,3/4] net: fec: increase the size of tx ring and update tx_wake_threshold
+    https://git.kernel.org/netdev/net/c/56b3c6ba53d0
+  - [V2,net,4/4] net: fec: use netdev_err_once() instead of netdev_err()
+    https://git.kernel.org/netdev/net/c/84a109471987
 
-However, I do not see on first inspection where that case is properly handled
-(probably just by rejecting the TAPRIO schedule).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Can someone with more experience in that area please jump in?
 
-Thanks,
-Florian
-
-> 
->>  	s64 n;
->>  
->>  	n = div64_s64(ktime_sub_ns(now, base_time), cycle_time);
->> -- 
->> 2.38.1
->>
->>
 
