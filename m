@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-16980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C342374FBD2
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:25:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7330274FBE7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F354B1C2040E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:25:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E87F28186E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0A81ED44;
-	Tue, 11 Jul 2023 23:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB291ED49;
+	Tue, 11 Jul 2023 23:45:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C0419BBE
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:25:10 +0000 (UTC)
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8DE0E7E
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:25:07 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-55ba895d457so3236729a12.0
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:25:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D877737A;
+	Tue, 11 Jul 2023 23:45:34 +0000 (UTC)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17AB8170F;
+	Tue, 11 Jul 2023 16:45:33 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b6f52e1c5cso100362361fa.1;
+        Tue, 11 Jul 2023 16:45:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689117907; x=1691709907;
+        d=gmail.com; s=20221208; t=1689119131; x=1691711131;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vjl/p6TfEuAEGTGhoCvTJev9/k2QieEkED5ztCWsQvw=;
-        b=eeSYzPYXng3ALfv56WXNa7sBb5UZb+g2FuutmlZDYec75/hK07M4fMAR6badnB+c4Z
-         xqOaPnHDsH2re48KWzUNGaeLvdZZ6RqjhnOyFyR90CW7MPbGIlqgpiZ2rLYZ+QXZouDP
-         T6bBZghjTl+a6bOZhz8uR8lLEzhcra8hFQgKUXQ4T6/RkCMQxTYdbfEhuj3bQLafR/xP
-         Rju8eWKzOibbZPQkBE+sKMBFfOVK/OEdXKmmBMd9nHSOUex4o/8r1L7nLGLg/qCcpETF
-         DDTcTUogK6YVLwZv8UgS/+gWsr0ru8eYN2zcKl934TKbDhstc9pto9mJE7GtEfCYj+7c
-         vxMw==
+        bh=+zTxAvjlhktR9PL2oZvvoBlvbtdwZFY9QvnpTkujuU8=;
+        b=AGEO9HXfaIbJQ7ofhvW3xwCsBS0WkFw7t45G0uAU8NO1N/AxQMI/Gos5p+6YmNPcvf
+         DU3qxmmKGhw6N/9pkqz+JoUdV58QzlOugaxovfqMmnBbCg3k5neSy7R4FI1S+6rgD00l
+         r9SJpbTb1cQBih8e1wMGhiBE5RHoQAXT11TMEvW+/JoXddPewT4E5ED/KU+Tsdi8ClAQ
+         ThhYJlwpK8/V+ZkFtFaEU2GI7P2X7eXNVJ5/t4arlKb4geUIjemcWbKKR48ZGjFbJXUn
+         BOa/Fa8pzSUnf+dLmhJY6X52sQXZOR/6Xjl1jmyfgorNyDaZ/Ey+dGnfKhrC8wL3pBgk
+         aGuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689117907; x=1691709907;
+        d=1e100.net; s=20221208; t=1689119131; x=1691711131;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vjl/p6TfEuAEGTGhoCvTJev9/k2QieEkED5ztCWsQvw=;
-        b=QvfDSpDW9HoS7qN3o/wQBPaW74KOnpa+3/Pjos1Vd64NpMI3HaduIlykKACqV2LkWQ
-         6ADKSSm/BpMAm4zBN4qI6Ac0CQdUJ29HhrhZOhjMz/vnmo1+UBpGOvblq8ZwylexrWur
-         hbub4avTFqbCJsiHeHYvyg0w26yZPBj28FCsOTifaHRNw2v25YzDY/GIB34vNLHJJtBH
-         XqdqlbruUBt4S9I/3z6MBuQQeTFFW1fKrwFZPflYcsXn1dH9yleotL34/CUqoLP2driY
-         lDCRQmfsDtZXwUWby+t7v7s200Pa+5Bf0G86P2WpsoMKCRaSdEm+bJP+44wXuAjgePLX
-         jqeQ==
-X-Gm-Message-State: ABy/qLZ9lg8UObJRrri6L4m6tjqxOzl54TkbObox0LMc2v2daQ4gT2O1
-	Yk3l83t1jeMTdJ5aRecFM5xxvpdH2Usj2ebV24SIxw==
-X-Google-Smtp-Source: APBJJlFbOGo5te+kAJKnSNfpGTq/05Y/zj9ffclbvX7sqta/MhhloEK0KgQmWnotVpW76yAMJHFd1tpddN6ypahu/50=
-X-Received: by 2002:a17:90b:906:b0:263:71f0:1569 with SMTP id
- bo6-20020a17090b090600b0026371f01569mr12562030pjb.3.1689117907240; Tue, 11
- Jul 2023 16:25:07 -0700 (PDT)
+        bh=+zTxAvjlhktR9PL2oZvvoBlvbtdwZFY9QvnpTkujuU8=;
+        b=W8F/57+Fvqrxaf4ZbaJHmNTnGqENXzXG7F4TagM9PXH/lgnUnknsYAw7XxAKmBZ8SL
+         OLbehSoK/4tNCJTpRFeVTtIxF3t/nI58tlKn9tIZPoczQEI3qh4EzuWyKMyoPf4ysk4t
+         72MUL1jPryCNMFhs99PsHTtSU8q3yPwxHGOQnYsLf5HT1ThDinln9TTqENpZ6/uXMeBO
+         FkW06UHtb14el9q92yIml/bGR62exF1o8KGAi9ObYrgAihERMZuu2eepgKB3xbjqHTAB
+         1zT+FdMTeizh6KjvfCSbp+PGxtxnxpCpvsmlp8m8crxIbr7e5gqZkgciZLYR1X087b57
+         HGjg==
+X-Gm-Message-State: ABy/qLZclJKyaGaLCyfXLDwav+3Bjwd6kO2WSzT1mYuogJPxfKpzIM35
+	RWPSwhf8bbItlxQxd+CCx4DTwQunuKerL3CdhKA=
+X-Google-Smtp-Source: APBJJlGE+uC1mEmv8AQTOheCuEb6XBItUj2JCShbtjgva6tNHtuqjeqVI91Dl9Tu8Q2XetMZ5idi/JjEdaIsSV1/9Ww=
+X-Received: by 2002:a2e:380b:0:b0:2b6:fe55:7318 with SMTP id
+ f11-20020a2e380b000000b002b6fe557318mr17039943lja.12.1689119130740; Tue, 11
+ Jul 2023 16:45:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,125 +60,156 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20230707193006.1309662-1-sdf@google.com> <20230707193006.1309662-10-sdf@google.com>
- <20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local>
-In-Reply-To: <20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Tue, 11 Jul 2023 16:24:54 -0700
-Message-ID: <CAKH8qBtawUTjFQ=hhTzXa2zTBwOpxurjhduxZV+eUg8rnJUJVw@mail.gmail.com>
+ <20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local> <CAKH8qBtawUTjFQ=hhTzXa2zTBwOpxurjhduxZV+eUg8rnJUJVw@mail.gmail.com>
+In-Reply-To: <CAKH8qBtawUTjFQ=hhTzXa2zTBwOpxurjhduxZV+eUg8rnJUJVw@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 11 Jul 2023 16:45:19 -0700
+Message-ID: <CAADnVQKnWCYjOQA-=61pDP4TQ-LKC7S-tOSX9Lm6tB3vJcf4dw@mail.gmail.com>
 Subject: Re: [RFC bpf-next v3 09/14] net/mlx5e: Implement devtx kfuncs
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, hawk@kernel.org, netdev@vger.kernel.org, 
-	xdp-hints@xdp-project.net
+To: Stanislav Fomichev <sdf@google.com>
+Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, xdp-hints@xdp-project.net
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 3:57=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+On Tue, Jul 11, 2023 at 4:25=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
+ wrote:
 >
-> On Fri, Jul 07, 2023 at 12:30:01PM -0700, Stanislav Fomichev wrote:
-> > +
-> > +static int mlx5e_devtx_request_l4_checksum(const struct devtx_ctx *_ct=
-x,
-> > +                                        u16 csum_start, u16 csum_offse=
-t)
-> > +{
-> > +     const struct mlx5e_devtx_ctx *ctx =3D (void *)_ctx;
-> > +     struct mlx5_wqe_eth_seg *eseg;
-> > +
-> > +     if (unlikely(!ctx->wqe))
-> > +             return -ENODATA;
-> > +
-> > +     eseg =3D &ctx->wqe->eth;
-> > +
-> > +     switch (csum_offset) {
-> > +     case sizeof(struct ethhdr) + sizeof(struct iphdr) + offsetof(stru=
-ct udphdr, check):
-> > +     case sizeof(struct ethhdr) + sizeof(struct ipv6hdr) + offsetof(st=
+> On Tue, Jul 11, 2023 at 3:57=E2=80=AFPM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Fri, Jul 07, 2023 at 12:30:01PM -0700, Stanislav Fomichev wrote:
+> > > +
+> > > +static int mlx5e_devtx_request_l4_checksum(const struct devtx_ctx *_=
+ctx,
+> > > +                                        u16 csum_start, u16 csum_off=
+set)
+> > > +{
+> > > +     const struct mlx5e_devtx_ctx *ctx =3D (void *)_ctx;
+> > > +     struct mlx5_wqe_eth_seg *eseg;
+> > > +
+> > > +     if (unlikely(!ctx->wqe))
+> > > +             return -ENODATA;
+> > > +
+> > > +     eseg =3D &ctx->wqe->eth;
+> > > +
+> > > +     switch (csum_offset) {
+> > > +     case sizeof(struct ethhdr) + sizeof(struct iphdr) + offsetof(st=
 ruct udphdr, check):
-> > +             /* Looks like HW/FW is doing parsing, so offsets are larg=
-ely ignored. */
-> > +             eseg->cs_flags =3D MLX5_ETH_WQE_L3_CSUM | MLX5_ETH_WQE_L4=
-_CSUM;
-> > +             break;
-> > +     default:
-> > +             return -EINVAL;
-> > +     }
->
-> I think this proves my point: csum is not generalizable even across veth =
-and mlx5.
-> Above is a square peg that tries to fit csum_start/offset api (that makes=
- sense from SW pov)
-> into HW that has different ideas about csum-ing.
->
-> Here is what mlx5 does:
-> mlx5e_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struct sk_buff *skb,
->                             struct mlx5e_accel_tx_state *accel,
->                             struct mlx5_wqe_eth_seg *eseg)
-> {
->         if (unlikely(mlx5e_ipsec_txwqe_build_eseg_csum(sq, skb, eseg)))
->                 return;
->
->         if (likely(skb->ip_summed =3D=3D CHECKSUM_PARTIAL)) {
->                 eseg->cs_flags =3D MLX5_ETH_WQE_L3_CSUM;
->                 if (skb->encapsulation) {
->                         eseg->cs_flags |=3D MLX5_ETH_WQE_L3_INNER_CSUM |
->                                           MLX5_ETH_WQE_L4_INNER_CSUM;
->                         sq->stats->csum_partial_inner++;
->                 } else {
->                         eseg->cs_flags |=3D MLX5_ETH_WQE_L4_CSUM;
->                         sq->stats->csum_partial++;
->                 }
->
-> How would you generalize that into csum api that will work across NICs ?
->
-> My answer stands: you cannot.
->
-> My proposal again:
-> add driver specifc kfuncs and hooks for things like csum.
-
-I do see your point, but to also give you my perspective: I have no
-clue what those _CSUM tx bits do (as a non-mlx employee). And what
-kind of packets they support (initial patch doesn't give any info).
-We can definitely expose mlx5 specific request_l4_checksum(bool encap)
-which does things similar to mlx5e_txwqe_build_eseg_csum, but then,
-what does it _actually_ do? It obviously can't checksum arbitrary
-packet formats (because it has this inner/outer selection bit), so
-there is really no way for me to provide a per-driver kfunc api. Maybe
-the vendors can?
-
-So having csum_start/csum_offset abstraction which works with fixed
-offsets seems like at least it correctly sets the expectation for BPF
-program writers.
-The vendors are already supposed to conform to this start/offset API for sk=
-b.
-
-But back to your point: should we maybe try to meet somewhere in the middle=
+> > > +     case sizeof(struct ethhdr) + sizeof(struct ipv6hdr) + offsetof(=
+struct udphdr, check):
+> > > +             /* Looks like HW/FW is doing parsing, so offsets are la=
+rgely ignored. */
+> > > +             eseg->cs_flags =3D MLX5_ETH_WQE_L3_CSUM | MLX5_ETH_WQE_=
+L4_CSUM;
+> > > +             break;
+> > > +     default:
+> > > +             return -EINVAL;
+> > > +     }
+> >
+> > I think this proves my point: csum is not generalizable even across vet=
+h and mlx5.
+> > Above is a square peg that tries to fit csum_start/offset api (that mak=
+es sense from SW pov)
+> > into HW that has different ideas about csum-ing.
+> >
+> > Here is what mlx5 does:
+> > mlx5e_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struct sk_buff *skb=
+,
+> >                             struct mlx5e_accel_tx_state *accel,
+> >                             struct mlx5_wqe_eth_seg *eseg)
+> > {
+> >         if (unlikely(mlx5e_ipsec_txwqe_build_eseg_csum(sq, skb, eseg)))
+> >                 return;
+> >
+> >         if (likely(skb->ip_summed =3D=3D CHECKSUM_PARTIAL)) {
+> >                 eseg->cs_flags =3D MLX5_ETH_WQE_L3_CSUM;
+> >                 if (skb->encapsulation) {
+> >                         eseg->cs_flags |=3D MLX5_ETH_WQE_L3_INNER_CSUM =
+|
+> >                                           MLX5_ETH_WQE_L4_INNER_CSUM;
+> >                         sq->stats->csum_partial_inner++;
+> >                 } else {
+> >                         eseg->cs_flags |=3D MLX5_ETH_WQE_L4_CSUM;
+> >                         sq->stats->csum_partial++;
+> >                 }
+> >
+> > How would you generalize that into csum api that will work across NICs =
 ?
-1. We try to provide "generic" offload kfuncs; for mlx5, we'll have
-this mlx5e_devtx_request_l4_checksum which works for fixed offsets
-2. We also let vendors do device-specific "extensions" where devices
-deviate too much: bpf_request_RAW_mlx5e_l4_checksum(bool encap)
-This can give BPF authors opportunity to write somewhat portable
-programs and also use vendor specific apis when/if needed.
+> >
+> > My answer stands: you cannot.
+> >
+> > My proposal again:
+> > add driver specifc kfuncs and hooks for things like csum.
+>
+> I do see your point, but to also give you my perspective: I have no
+> clue what those _CSUM tx bits do (as a non-mlx employee). And what
+> kind of packets they support (initial patch doesn't give any info).
+> We can definitely expose mlx5 specific request_l4_checksum(bool encap)
+> which does things similar to mlx5e_txwqe_build_eseg_csum, but then,
+> what does it _actually_ do? It obviously can't checksum arbitrary
+> packet formats (because it has this inner/outer selection bit), so
+> there is really no way for me to provide a per-driver kfunc api. Maybe
+> the vendors can?
+>
+> So having csum_start/csum_offset abstraction which works with fixed
+> offsets seems like at least it correctly sets the expectation for BPF
+> program writers.
+> The vendors are already supposed to conform to this start/offset API for =
+skb.
+>
+> But back to your point: should we maybe try to meet somewhere in the midd=
+le?
+> 1. We try to provide "generic" offload kfuncs; for mlx5, we'll have
+> this mlx5e_devtx_request_l4_checksum which works for fixed offsets
 
-I think we had a similar idea for rx side: have generic kfuncs, but
-also let vendors experiment with custom kfuncs if they want to
-differentiate.
-WDYT? Can it give us the best things from both sides?
+But it doesn't.
+Even if you add a check for csum_start (that's missing in the patch)
+there need to be a way to somehow figure out
+whether skb->encapsulation is true and set appropriate flags.
+Otherwise this request csum will do "something" that only the HW vendor kno=
+ws.
+That would be even harder to debug for bpf prog writers.
 
-> Kuba,
-> since you nacked driver specific stuff please suggest a way to unblock th=
-is stalemate.
+So instead of helping bpf prog devs it will actively hurt them.
+
+Another example. If bpf prog was developed and tested on veth
+it will work for some values of csum_offset on real HW and will -EINVAL
+for the other values.
+Just horrible user experience comparing to the case where
+the user knows that each netdev is potentially different and
+_has_ to develop and test their prog on the given HW NIC and
+not assume that the kernel can "do the right thing".
+This csum exercise is clear example that kernel is not in a position
+to do so.
+For timestamp it's arguable, but for csum there is no generic api that
+kernel can apply universally to NICs.
+
+> 2. We also let vendors do device-specific "extensions" where devices
+> deviate too much: bpf_request_RAW_mlx5e_l4_checksum(bool encap)
+> This can give BPF authors opportunity to write somewhat portable
+> programs and also use vendor specific apis when/if needed.
+>
+> I think we had a similar idea for rx side: have generic kfuncs, but
+> also let vendors experiment with custom kfuncs if they want to
+> differentiate.
+> WDYT? Can it give us the best things from both sides?
+>
+> > Kuba,
+> > since you nacked driver specific stuff please suggest a way to unblock =
+this stalemate.
 
