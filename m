@@ -1,113 +1,122 @@
-Return-Path: <netdev+bounces-16681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB0B74E53C
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 05:22:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F86C74E53E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 05:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CFD62815FB
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:22:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0DC2815D8
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7D83D60;
-	Tue, 11 Jul 2023 03:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E540A3D6E;
+	Tue, 11 Jul 2023 03:23:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6D8361
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:22:31 +0000 (UTC)
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E94C0
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 20:22:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689045750; x=1720581750;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gk+BSQCTgU460AjZTRJ9IFdqrksmYw8s0l20noMhbHE=;
-  b=ToIPfG4T57nfHyepr9AyppD4Bybk0rLeJK7xubey6WnWPIuEsCKvFGIe
-   KsUQrZBS/WWFmoA2plc1IvR/lEJppQ3Qc/BwBzLWUutHzcKCmm6SRVP8G
-   K5LjvvS7/U1qinx+LgHS6zHRGYbpum4fv3pDajy1hOAYUaelYxvDLFslb
-   0=;
-X-IronPort-AV: E=Sophos;i="6.01,195,1684800000"; 
-   d="scan'208";a="226036609"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 03:22:28 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com (Postfix) with ESMTPS id 18D60806B3;
-	Tue, 11 Jul 2023 03:22:28 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 03:22:27 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.65.132) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 03:22:25 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <hcoin@quietfountain.com>
-CC: <netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: Patch fixing STP if bridge in non-default namespace.
-Date: Mon, 10 Jul 2023 20:22:17 -0700
-Message-ID: <20230711032217.46485-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <608c37f9-34b1-85e6-2b4b-2a0389dd3d47@quietfountain.com>
-References: <608c37f9-34b1-85e6-2b4b-2a0389dd3d47@quietfountain.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EEC3C2F
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:23:40 +0000 (UTC)
+Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC962C0;
+	Mon, 10 Jul 2023 20:23:36 -0700 (PDT)
+Received: from localhost.localdomain (unknown [39.174.92.167])
+	by mail-app4 (Coremail) with SMTP id cS_KCgBHTQ0Ry6xkZRACCQ--.54427S4;
+	Tue, 11 Jul 2023 11:22:59 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH v1] netfilter: conntrack: validate cta_ip via parsing
+Date: Tue, 11 Jul 2023 11:22:57 +0800
+Message-Id: <20230711032257.3561166-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgBHTQ0Ry6xkZRACCQ--.54427S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr47WF1rGrW8WF43Ww1UGFg_yoW8Ar13pa
+	4FgasrK39rJr40qw4Duw18WF9rCF4kZry5ur9IyaySyF1Dtw1j9ayrGF9xur13CFWkXr42
+	vF4YqF45J3WUCaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+	J5UUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.119.65.132]
-X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Harry Coin <hcoin@quietfountain.com>
-Date: Mon, 10 Jul 2023 08:35:08 -0500
-> Notice without access to link-level multicast address 01:80:C2:00:00:00, 
-> the STP loop-avoidance feature of bridges fails silently, leading to 
-> packet storms if loops exist in the related L2.  The Linux kernel's 
-> latest code silently drops BPDU STP packets if the bridge is in a 
-> non-default namespace.
-> 
-> The current llc_rcv.c around line 166 in net/llc/llc_input.c  has
-> 
->         if (!net_eq(dev_net(dev), &init_net))
->                 goto drop;
-> 
-> Which, when commented out, fixes this bug.  A search on &init_net may 
-> reveal many similar artifacts left over from the early days of namespace 
-> implementation.
+In current ctnetlink_parse_tuple_ip() function, nested parsing and
+validation is splitting as two parts. This is unnecessary as the
+nla_parse_nested_deprecated function supports validation in the fly.
+These two finially reach same place __nla_validate_parse with same
+validate flag.
 
-I think just removing the part is not sufficient and will introduce a bug
-in another place.
+nla_parse_nested_deprecated
+  __nla_parse(.., NL_VALIDATE_LIBERAL, ..)
+    __nla_validate_parse
 
-As you found, llc has the same test in another place.  For example, when
-you create an AF_LLC socket, it has to be in the root netns.  But if you
-remove the test in llc_rcv() only, it seems llc_recv() would put a skb for
-a child netns into sk's recv queue that is in the default netns.
+nla_validate_nested_deprecated
+  __nla_validate_nested(.., NL_VALIDATE_LIBERAL, ..)
+    __nla_validate
+      __nla_validate_parse
 
-  - llc_rcv
-    - if (net_eq(dev_net(dev), &init_net))
-      - goto drop
-    - sap_handler / llc_sap_handler
-      - sk = llc_lookup_dgram
-      - llc_sap_rcv
-        - llc_sap_state_process
-	  - sock_queue_rcv_skb
+This commit removes the call to nla_validate_nested_deprecated and pass
+cta_ip_nla_policy when do parsing.
 
-So, we need to namespacify the whole llc infra.
+Fixes: 8cb081746c03 ("netlink: make validation more configurable for future strictness")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+ net/netfilter/nf_conntrack_netlink.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+index 69c8c8c7e9b8..334db22199c1 100644
+--- a/net/netfilter/nf_conntrack_netlink.c
++++ b/net/netfilter/nf_conntrack_netlink.c
+@@ -1321,15 +1321,11 @@ static int ctnetlink_parse_tuple_ip(struct nlattr *attr,
+ 	struct nlattr *tb[CTA_IP_MAX+1];
+ 	int ret = 0;
+ 
+-	ret = nla_parse_nested_deprecated(tb, CTA_IP_MAX, attr, NULL, NULL);
++	ret = nla_parse_nested_deprecated(tb, CTA_IP_MAX, attr,
++					  cta_ip_nla_policy, NULL);
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	ret = nla_validate_nested_deprecated(attr, CTA_IP_MAX,
+-					     cta_ip_nla_policy, NULL);
+-	if (ret)
+-		return ret;
+-
+ 	switch (tuple->src.l3num) {
+ 	case NFPROTO_IPV4:
+ 		ret = ipv4_nlattr_to_tuple(tb, tuple, flags);
+-- 
+2.17.1
+
 
