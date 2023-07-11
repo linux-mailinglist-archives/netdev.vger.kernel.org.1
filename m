@@ -1,122 +1,131 @@
-Return-Path: <netdev+bounces-16682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F86C74E53E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 05:23:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DFF974E545
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 05:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0DC2815D8
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:23:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56ECF28160F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E540A3D6E;
-	Tue, 11 Jul 2023 03:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8CD3D7B;
+	Tue, 11 Jul 2023 03:25:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EEC3C2F
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:23:40 +0000 (UTC)
-Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC962C0;
-	Mon, 10 Jul 2023 20:23:36 -0700 (PDT)
-Received: from localhost.localdomain (unknown [39.174.92.167])
-	by mail-app4 (Coremail) with SMTP id cS_KCgBHTQ0Ry6xkZRACCQ--.54427S4;
-	Tue, 11 Jul 2023 11:22:59 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v1] netfilter: conntrack: validate cta_ip via parsing
-Date: Tue, 11 Jul 2023 11:22:57 +0800
-Message-Id: <20230711032257.3561166-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cS_KCgBHTQ0Ry6xkZRACCQ--.54427S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tr47WF1rGrW8WF43Ww1UGFg_yoW8Ar13pa
-	4FgasrK39rJr40qw4Duw18WF9rCF4kZry5ur9IyaySyF1Dtw1j9ayrGF9xur13CFWkXr42
-	vF4YqF45J3WUCaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
-	J5UUUUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437AD3C28
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:25:33 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F283EC0
+	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 20:25:31 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-66872dbc2efso1379429b3a.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 20:25:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689045931; x=1689650731;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VTPICtZv0ey6kXaVeAxcQKq3vO1QN6CzNYrpdY3BizQ=;
+        b=TPMULHxXWeZsxKUOsrkhb81Wg5kYvZQfwbx9vby5fn6GOu1JcP2YwoC+D/pk7bwBaa
+         e2xD7O5dvEeuJnFhPdnHAVpv6LA3x/iV8fQDSfmwuUSHwi2otZGULt3BFaCLYdiheamM
+         GpFwQP7+lv168wXoljF41uOHNsZsJdEX7UH9eVILjZIWipLrubZthzx4YWnB10CMkiwn
+         F4Jtyt9RQLvWNkLVCg5kk0+nlkBqCXtck8dF6mp0Tbo4zMWRX2qQn5nq2lfxQVm8CaR+
+         b14KLP4n4H/PzkkpWGstvCRKN/6RRBFTw6Fw6TDXsh+8TBQcsnsfqaJ4PLcEPjVAHPsf
+         z0yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689045931; x=1689650731;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VTPICtZv0ey6kXaVeAxcQKq3vO1QN6CzNYrpdY3BizQ=;
+        b=W2zTzPa/FscZb4vfDChP2sjn9WnnGfRYZK7MCZ6lvccPiW78Nuz+A1zOmvXnqgD+WS
+         BjauVq/wWslwTRVbV+qT8fTrM7oskofxZ05pYATneIULncsr32foIKJBzsMoNlOEfTdB
+         zYZy/5iCTpUTLbvlD/LuH6bG2m+o7nIOWUNkIkjUoBMqbfUAmKRsF3S60Xs9n/vRrxNt
+         JnxOJsHKqHFoJ7dyK7xL3LX/l6kh7QFGt1p6lMUwKzJqQRdq9z90V5gOeF/8HfFR4MMR
+         hUextCDb7IM79v3+6ciFkc1SF3Let4xaAVBkHBv7x63f+pN1Vn0p1QWVPEnIaXf9Ea13
+         FhfA==
+X-Gm-Message-State: ABy/qLaUzerHncNL34QoOkFNBbxqt72NcytParosZLyV0o0p1S3bAPHI
+	qslosOBYrgfFBActjcZCiUQb8uN+s3oo4w==
+X-Google-Smtp-Source: APBJJlHf3bMFh+8WeO2GieI+Pb1L27Cf6i/f3ljprdmuaUVS3RsLEYaWDeRkDIMVROPxtIAVZ3Av4A==
+X-Received: by 2002:a17:902:da92:b0:1b3:d8ac:8db3 with SMTP id j18-20020a170902da9200b001b3d8ac8db3mr18054611plx.6.1689045931267;
+        Mon, 10 Jul 2023 20:25:31 -0700 (PDT)
+Received: from mi.mioffice.cn ([43.224.245.236])
+        by smtp.gmail.com with ESMTPSA id c2-20020a170902b68200b001b9be3b94e5sm610379pls.303.2023.07.10.20.25.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 20:25:30 -0700 (PDT)
+From: Jian Wen <wenjianhn@gmail.com>
+X-Google-Original-From: Jian Wen <wenjian1@xiaomi.com>
+To: edumazet@google.com,
+	davem@davemloft.net
+Cc: Jian Wen <wenjian1@xiaomi.com>,
+	netdev@vger.kernel.org,
+	wenjianhn@gmail.com
+Subject: [PATCH v2 net-next] tcp: add a scheduling point in established_get_first()
+Date: Tue, 11 Jul 2023 11:24:05 +0800
+Message-Id: <20230711032405.3253025-1-wenjian1@xiaomi.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230630071827.2078604-1-wenjian1@xiaomi.com>
+References: <20230630071827.2078604-1-wenjian1@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-In current ctnetlink_parse_tuple_ip() function, nested parsing and
-validation is splitting as two parts. This is unnecessary as the
-nla_parse_nested_deprecated function supports validation in the fly.
-These two finially reach same place __nla_validate_parse with same
-validate flag.
+Kubernetes[1] is going to stick with /proc/net/tcp for a while.
 
-nla_parse_nested_deprecated
-  __nla_parse(.., NL_VALIDATE_LIBERAL, ..)
-    __nla_validate_parse
+This commit reduces the scheduling latency introduced by
+established_get_first(), similar to commit acffb584cda7 ("net: diag:
+add a scheduling point in inet_diag_dump_icsk()").
 
-nla_validate_nested_deprecated
-  __nla_validate_nested(.., NL_VALIDATE_LIBERAL, ..)
-    __nla_validate
-      __nla_validate_parse
+In our environment, the scheduling latency affects the performance of
+latency-sensitive services like Redis.
 
-This commit removes the call to nla_validate_nested_deprecated and pass
-cta_ip_nla_policy when do parsing.
+Changes in V2 :
+ - call cond_resched() before checking if a bucket is empty as
+   suggested by Eric Dumazet
+ - removed the delay of synchronize_net() from the commit message
 
-Fixes: 8cb081746c03 ("netlink: make validation more configurable for future strictness")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
+[1] https://github.com/google/cadvisor/blob/v0.47.2/container/libcontainer/handler.go#L130
+
+Signed-off-by: Jian Wen <wenjian1@xiaomi.com>
 ---
- net/netfilter/nf_conntrack_netlink.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ net/ipv4/tcp_ipv4.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-index 69c8c8c7e9b8..334db22199c1 100644
---- a/net/netfilter/nf_conntrack_netlink.c
-+++ b/net/netfilter/nf_conntrack_netlink.c
-@@ -1321,15 +1321,11 @@ static int ctnetlink_parse_tuple_ip(struct nlattr *attr,
- 	struct nlattr *tb[CTA_IP_MAX+1];
- 	int ret = 0;
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index fd365de4d5ff..cecd5a135e64 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -57,6 +57,7 @@
+ #include <linux/init.h>
+ #include <linux/times.h>
+ #include <linux/slab.h>
++#include <linux/sched.h>
  
--	ret = nla_parse_nested_deprecated(tb, CTA_IP_MAX, attr, NULL, NULL);
-+	ret = nla_parse_nested_deprecated(tb, CTA_IP_MAX, attr,
-+					  cta_ip_nla_policy, NULL);
- 	if (ret < 0)
- 		return ret;
+ #include <net/net_namespace.h>
+ #include <net/icmp.h>
+@@ -2446,6 +2447,8 @@ static void *established_get_first(struct seq_file *seq)
+ 		struct hlist_nulls_node *node;
+ 		spinlock_t *lock = inet_ehash_lockp(hinfo, st->bucket);
  
--	ret = nla_validate_nested_deprecated(attr, CTA_IP_MAX,
--					     cta_ip_nla_policy, NULL);
--	if (ret)
--		return ret;
--
- 	switch (tuple->src.l3num) {
- 	case NFPROTO_IPV4:
- 		ret = ipv4_nlattr_to_tuple(tb, tuple, flags);
++		cond_resched();
++
+ 		/* Lockless fast path for the common case of empty buckets */
+ 		if (empty_bucket(hinfo, st))
+ 			continue;
 -- 
-2.17.1
+2.25.1
 
 
