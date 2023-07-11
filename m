@@ -1,51 +1,63 @@
-Return-Path: <netdev+bounces-16872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E98C774F200
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:23:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A874B74F1B3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:19:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253221C20F70
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:23:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A498D28181F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F05319BBB;
-	Tue, 11 Jul 2023 14:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886A319BB3;
+	Tue, 11 Jul 2023 14:19:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A0D14AB5
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:23:45 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24B61718
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689085356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S2e0wUM/sdkEvMSMHJiuupQ8qcMYkXyrDarJeT0G2Zc=;
-	b=IF8tgVIqMa3wy/Q8CJBG2fFzQjqfoIQi70iVb6f26Xw9OFZiHORk67SIP+OXqQLSziATT0
-	MsnvAYtBeNBffFuUfCOlUrog7a+IIlTvfwwxRGCQIc2h21j56Ml6za6SzjogLUPCpuGoEN
-	Vb0pjd3e7egkuxs3cjHJEDdIvEX61fc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-nSLEsZUzOaafrIBJDdnmXQ-1; Tue, 11 Jul 2023 10:22:31 -0400
-X-MC-Unique: nSLEsZUzOaafrIBJDdnmXQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E8181C3725A;
-	Tue, 11 Jul 2023 14:18:47 +0000 (UTC)
-Received: from [10.39.208.24] (unknown [10.39.208.24])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 636D44CD0C6;
-	Tue, 11 Jul 2023 14:18:45 +0000 (UTC)
-Message-ID: <8c1f1d67-4b81-f33d-bbc0-1c84ad05e183@redhat.com>
-Date: Tue, 11 Jul 2023 16:18:43 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744D014AB5
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:19:49 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30CDE1999
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:19:28 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fc0aecf15bso32392715e9.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:19:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1689085166; x=1691677166;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+8+AYxhOC9+QFLEcw26kNzr9G5hqgdDEzPKb+UZOi+g=;
+        b=h04+Ct45Yx5uJfpduFKD34QBpkW/G4NLQZe4KtT54CDtHleK1ake11F1rwqWisgC//
+         UQCn3lS5/7rNckTT4cm/OupRX2fCzuHEG6xX0hBpdGeoHdVZxTqLZ5c+3/hSEnrwcPg5
+         hUUlNsR4+FFcyyMzW52jOzGGf4grcJYYMJrk7JiYpvjdms1g88n4O6LldWt4OcapVLz5
+         BJeth4EEUeWIN/RrWxOHCnyxnLQGToOqBpBXfTBbPjqFxE/1MS4G+/VcdATJNoest9lw
+         qSAnYiflxZZbtWaBDDEUMXEiha0R6r1jTgENNmyUFqa3RvCyTc0oF7W7T9cq8ogOiihI
+         k9gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689085166; x=1691677166;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+8+AYxhOC9+QFLEcw26kNzr9G5hqgdDEzPKb+UZOi+g=;
+        b=Df21OfARrj1/X5PUTFtGcyRFgUDka9D4G51b0ht5pVGyvU1MjKS9GpE/Vwl8zcqPZE
+         lAtSEk0FuonJ239cIetL3bTUrCIDzLk60g/o9EonPqnxdNY2AzMWB4RaTCkqGJWeGxdX
+         HLvp8B6n8ygCKrteb87yqq78p5VyVxFqG0VgcYB9wsS3PDuAG9Wn7L7ankstRuyRPKd7
+         ZXZ/sfYiM+V6ceWzwOSEl92Yk01BkUAUAtjegYq5sYX1ZB80hQXwwUeWVwxIaQfyH+ly
+         sqhib+wWfZYHKGB4i1tdSGQWRg8c4ygpaGI9t392gtuXF1mQjq+L7cIt48aPTjZUQ6HM
+         QXNw==
+X-Gm-Message-State: ABy/qLbvKOVqqbjqX+HsiZrXmSjWNQBNrrx8n/04+di7jypFfftff3l5
+	u4yCAgbBPj8R0OshF4LfgOYwzw==
+X-Google-Smtp-Source: APBJJlGgPvMCyU1sS9b/7oa8vwMRWreVGkPlrPT/JhwbMIqTfCN7GmuhAjh8z60EtPozGKrQuj6wrg==
+X-Received: by 2002:a1c:6a03:0:b0:3fb:a576:3212 with SMTP id f3-20020a1c6a03000000b003fba5763212mr16266211wmc.39.1689085166489;
+        Tue, 11 Jul 2023 07:19:26 -0700 (PDT)
+Received: from ?IPV6:2a02:8011:e80c:0:cdfe:66c0:7817:c4f5? ([2a02:8011:e80c:0:cdfe:66c0:7817:c4f5])
+        by smtp.gmail.com with ESMTPSA id z22-20020a7bc7d6000000b003fbcdba1a63sm2671791wmk.12.2023.07.11.07.19.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jul 2023 07:19:26 -0700 (PDT)
+Message-ID: <f7dd8bef-87c0-123b-c14e-d278fbc7dbe3@isovalent.com>
+Date: Tue, 11 Jul 2023 15:19:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,109 +65,190 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US
-To: Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
- xieyongji@bytedance.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20230628065919.54042-1-lulu@redhat.com>
- <20230628065919.54042-3-lulu@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Subject: Re: [RFC 2/4] vduse: Add file operation for mmap
-In-Reply-To: <20230628065919.54042-3-lulu@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ Thunderbird/102.13.0
+Subject: Re: [PATCH bpf-next v4 6/8] bpftool: Extend net dump with tcx progs
+Content-Language: en-GB
+To: Daniel Borkmann <daniel@iogearbox.net>, ast@kernel.org
+Cc: andrii@kernel.org, martin.lau@linux.dev, razor@blackwall.org,
+ sdf@google.com, john.fastabend@gmail.com, kuba@kernel.org, dxu@dxuuu.xyz,
+ joe@cilium.io, toke@kernel.org, davem@davemloft.net, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20230710201218.19460-1-daniel@iogearbox.net>
+ <20230710201218.19460-7-daniel@iogearbox.net>
+From: Quentin Monnet <quentin@isovalent.com>
+In-Reply-To: <20230710201218.19460-7-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 6/28/23 08:59, Cindy Lu wrote:
-> From: Your Name <you@example.com>
+2023-07-10 22:12 UTC+0200 ~ Daniel Borkmann <daniel@iogearbox.net>
+> Add support to dump fd-based attach types via bpftool. This includes both
+> the tc BPF link and attach ops programs. Dumped information contain the
+> attach location, function entry name, program ID and link ID when applicable.
 > 
-> Add the operation for mmap, The user space APP will
-> use this function to map the pages to userspace
+> Example with tc BPF link:
 > 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+>   # ./bpftool net
+>   xdp:
+> 
+>   tc:
+>   bond0(4) tcx/ingress cil_from_netdev prog id 784 link id 10
+>   bond0(4) tcx/egress cil_to_netdev prog id 804 link id 11
+> 
+>   flow_dissector:
+> 
+>   netfilter:
+> 
+> Example with tc BPF attach ops:
+> 
+>   # ./bpftool net
+>   xdp:
+> 
+>   tc:
+>   bond0(4) tcx/ingress cil_from_netdev prog id 654
+>   bond0(4) tcx/egress cil_to_netdev prog id 672
+> 
+>   flow_dissector:
+> 
+>   netfilter:
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+
+Reviewed-by: Quentin Monnet <quentin@isovalent.com>
+
+Thank you!
+
+If you respin, would you mind updating the docs please
+(Documentation/bpftool-net.rst), I realise it says that "bpftool net"
+only dumps for tc and XDP, but that's not true any more since we have
+the flow dissector, netfilter programs, and now tcx. The examples are
+out-of-date too, but updating them doesn't have to be part of this PR.
+
 > ---
->   drivers/vdpa/vdpa_user/vduse_dev.c | 49 ++++++++++++++++++++++++++++++
->   1 file changed, 49 insertions(+)
+>  tools/bpf/bpftool/net.c | 86 +++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 82 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-> index f845dc46b1db..1b833bf0ae37 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -1313,6 +1313,54 @@ static struct vduse_dev *vduse_dev_get_from_minor(int minor)
->   	return dev;
->   }
->   
-> +
-> +static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
-> +{
-> +	struct vduse_dev *dev = vmf->vma->vm_file->private_data;
-> +	struct vm_area_struct *vma = vmf->vma;
-> +	u16 index = vma->vm_pgoff;
-> +
-> +	struct vdpa_reconnect_info *info;
-> +	info = &dev->reconnect_info[index];
-> +
-> +	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> +	if (remap_pfn_range(vma, vmf->address & PAGE_MASK, PFN_DOWN(info->addr),
-> +			    PAGE_SIZE, vma->vm_page_prot))
-> +		return VM_FAULT_SIGBUS;
-> +	return VM_FAULT_NOPAGE;
-> +}
-> +
-> +static const struct vm_operations_struct vduse_vm_ops = {
-> +	.fault = vduse_vm_fault,
+> diff --git a/tools/bpf/bpftool/net.c b/tools/bpf/bpftool/net.c
+> index 26a49965bf71..22af0a81458c 100644
+> --- a/tools/bpf/bpftool/net.c
+> +++ b/tools/bpf/bpftool/net.c
+> @@ -76,6 +76,11 @@ static const char * const attach_type_strings[] = {
+>  	[NET_ATTACH_TYPE_XDP_OFFLOAD]	= "xdpoffload",
+>  };
+>  
+> +static const char * const attach_loc_strings[] = {
+> +	[BPF_TCX_INGRESS]		= "tcx/ingress",
+> +	[BPF_TCX_EGRESS]		= "tcx/egress",
 > +};
 > +
-> +static int vduse_mmap(struct file *file, struct vm_area_struct *vma)
+>  const size_t net_attach_type_size = ARRAY_SIZE(attach_type_strings);
+>  
+>  static enum net_attach_type parse_attach_type(const char *str)
+> @@ -422,8 +427,80 @@ static int dump_filter_nlmsg(void *cookie, void *msg, struct nlattr **tb)
+>  			      filter_info->devname, filter_info->ifindex);
+>  }
+>  
+> -static int show_dev_tc_bpf(int sock, unsigned int nl_pid,
+> -			   struct ip_devname_ifindex *dev)
+> +static const char *flags_strings(__u32 flags)
 > +{
-> +	struct vduse_dev *dev = file->private_data;
-> +	struct vdpa_reconnect_info *info;
-> +	unsigned long index = vma->vm_pgoff;
-> +
-> +	if (vma->vm_end - vma->vm_start != PAGE_SIZE)
-> +		return -EINVAL;
-> +	if ((vma->vm_flags & VM_SHARED) == 0)
-> +		return -EINVAL;
-> +
-> +	if (index > 65535)
-> +		return -EINVAL;
-
-You declare an array of 64 entries in patch 1, so it can overflow.
-
-> +
-> +	info = &dev->reconnect_info[index];
-> +	if (info->addr & (PAGE_SIZE - 1))
-> +		return -EINVAL;
-> +	if (vma->vm_end - vma->vm_start != info->size) {
-> +		return -ENOTSUPP;
-> +	}
-> +
-> +	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> +	vma->vm_ops = &vduse_vm_ops;
-> +
-> +	return 0;
+> +	return json_output ? "none" : "";
 > +}
 > +
->   static int vduse_dev_open(struct inode *inode, struct file *file)
->   {
->   	int ret;
-> @@ -1345,6 +1393,7 @@ static const struct file_operations vduse_dev_fops = {
->   	.unlocked_ioctl	= vduse_dev_ioctl,
->   	.compat_ioctl	= compat_ptr_ioctl,
->   	.llseek		= noop_llseek,
-> +	.mmap		= vduse_mmap,
->   };
->   
->   static struct vduse_dev *vduse_dev_create(void)
+> +static int __show_dev_tc_bpf_name(__u32 id, char *name, size_t len)
+> +{
+> +	struct bpf_prog_info info = {};
+> +	__u32 ilen = sizeof(info);
+> +	int fd, ret;
+> +
+> +	fd = bpf_prog_get_fd_by_id(id);
+> +	if (fd < 0)
+> +		return fd;
+> +	ret = bpf_obj_get_info_by_fd(fd, &info, &ilen);
+> +	if (ret < 0)
+> +		goto out;
+> +	ret = -ENOENT;
+> +	if (info.name[0]) {
+> +		get_prog_full_name(&info, fd, name, len);
+> +		ret = 0;
+> +	}
+> +out:
+> +	close(fd);
+> +	return ret;
+> +}
+> +
+> +static void __show_dev_tc_bpf(const struct ip_devname_ifindex *dev,
+> +			      const enum bpf_attach_type loc)
+> +{
+> +	__u32 prog_flags[64] = {}, link_flags[64] = {}, i;
+> +	__u32 prog_ids[64] = {}, link_ids[64] = {};
+> +	LIBBPF_OPTS(bpf_prog_query_opts, optq);
+> +	char prog_name[MAX_PROG_FULL_NAME];
+> +	int ret;
+> +
+> +	optq.prog_ids = prog_ids;
+> +	optq.prog_attach_flags = prog_flags;
+> +	optq.link_ids = link_ids;
+> +	optq.link_attach_flags = link_flags;
+> +	optq.count = ARRAY_SIZE(prog_ids);
+> +
+> +	ret = bpf_prog_query_opts(dev->ifindex, loc, &optq);
+> +	if (ret)
+> +		return;
+> +	for (i = 0; i < optq.count; i++) {
+> +		NET_START_OBJECT;
+> +		NET_DUMP_STR("devname", "%s", dev->devname);
+> +		NET_DUMP_UINT("ifindex", "(%u)", dev->ifindex);
+> +		NET_DUMP_STR("kind", " %s", attach_loc_strings[loc]);
+> +		ret = __show_dev_tc_bpf_name(prog_ids[i], prog_name,
+> +					     sizeof(prog_name));
+> +		if (!ret)
+> +			NET_DUMP_STR("name", " %s", prog_name);
+> +		NET_DUMP_UINT("prog_id", " prog id %u", prog_ids[i]);
+
+I was unsure at first about having two words for "prog id", or "link id"
+below (we use "prog_id" for netfilter, for example), but I see it leaves
+you the opportunity to append the flags, if any, without additional
+keywords so... why not.
+
+> +		if (prog_flags[i])
+> +			NET_DUMP_STR("prog_flags", "%s", flags_strings(prog_flags[i]));
+> +		if (link_ids[i])
+> +			NET_DUMP_UINT("link_id", " link id %u",
+> +				      link_ids[i]);
+> +		if (link_flags[i])
+> +			NET_DUMP_STR("link_flags", "%s", flags_strings(link_flags[i]));
+> +		NET_END_OBJECT_FINAL;
+> +	}
+> +}
+> +
+> +static void show_dev_tc_bpf(struct ip_devname_ifindex *dev)
+> +{
+> +	__show_dev_tc_bpf(dev, BPF_TCX_INGRESS);
+> +	__show_dev_tc_bpf(dev, BPF_TCX_EGRESS);
+> +}
+> +
+> +static int show_dev_tc_bpf_classic(int sock, unsigned int nl_pid,
+> +				   struct ip_devname_ifindex *dev)
+>  {
+>  	struct bpf_filter_t filter_info;
+>  	struct bpf_tcinfo_t tcinfo;
+> @@ -790,8 +867,9 @@ static int do_show(int argc, char **argv)
+>  	if (!ret) {
+>  		NET_START_ARRAY("tc", "%s:\n");
+>  		for (i = 0; i < dev_array.used_len; i++) {
+> -			ret = show_dev_tc_bpf(sock, nl_pid,
+> -					      &dev_array.devices[i]);
+> +			show_dev_tc_bpf(&dev_array.devices[i]);
+> +			ret = show_dev_tc_bpf_classic(sock, nl_pid,
+> +						      &dev_array.devices[i]);
+>  			if (ret)
+>  				break;
+>  		}
 
 
