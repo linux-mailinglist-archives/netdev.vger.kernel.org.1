@@ -1,137 +1,157 @@
-Return-Path: <netdev+bounces-16957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C0774F948
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 22:46:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF86274F94D
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 22:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DBBA2819A5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:46:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C3CD1C21063
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938C41E504;
-	Tue, 11 Jul 2023 20:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED521E514;
+	Tue, 11 Jul 2023 20:47:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883071FCF
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 20:46:12 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C973170C
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:45:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=3lB6Z3GmffaWNBmcR2tw3C1mtOECVCo5Iz9+OUD73tQ=; b=rl
-	5O+BYEaBAWaKyqkjNHgZt93S1HTBMoaHzfg4d1R42oK1MBcYAswXOpyXgY3SYg9mqu0U2NM/OS8mg
-	OhzKFufM5RPv4Lot1XEYIULd/r3eMSVcEaWoOJHWQIBGVV4qByD0TYWGqIuc2/dGAA914FMnlpo2o
-	hE4SUz7552NP2vQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qJKE0-0014Ws-6l; Tue, 11 Jul 2023 22:44:44 +0200
-Date: Tue, 11 Jul 2023 22:44:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Harry Coin <hcoin@quietfountain.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org
-Subject: Re: llc needs namespace awareness asap, was Re: Patch fixing STP if
- bridge in non-default namespace.
-Message-ID: <cacc74f8-5b40-4d89-a411-a6852ea60e7d@lunn.ch>
-References: <f01739c8-8f59-97d6-4edc-f2e88885bb73@quietfountain.com>
- <20230711183206.54744-1-kuniyu@amazon.com>
- <3dceb664-0dd5-d46b-2431-b235cbd7752f@quietfountain.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCE619BDF
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 20:47:15 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 245DB1987
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:47:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689108419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s4WnwWEWs/PWwc+6zWRXmlvXFfzoTik2Yf9g1/Rp5QY=;
+	b=D4XcY5L6qhEDVA2r84UcoMCDZhod9JQRIM7VqkkR/ce7UDjBMECWX84ySD1Wi4K8jetj9m
+	l0vw6woWElBkZ9RMV6KD/SdXsggBR0G8jeDXs4iXkWHi05S3Jj42JxIIBqJ6QDUWse3hqt
+	M53ZKhrxqBNTBzxRRsoMCLe7cFuDX+s=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-562-cQ5nioz9OICDcD51Jcz3-A-1; Tue, 11 Jul 2023 16:46:58 -0400
+X-MC-Unique: cQ5nioz9OICDcD51Jcz3-A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0807D3C1D603;
+	Tue, 11 Jul 2023 20:46:58 +0000 (UTC)
+Received: from RHTPC1VM0NT (unknown [10.22.34.58])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A367200AD6E;
+	Tue, 11 Jul 2023 20:46:57 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Eric Garver <eric@garver.life>
+Cc: Ilya Maximets <i.maximets@ovn.org>,  Jakub Kicinski <kuba@kernel.org>,
+  netdev@vger.kernel.org,  dev@openvswitch.org,  Paolo Abeni
+ <pabeni@redhat.com>,  Eric Dumazet <edumazet@google.com>,  "David S.
+ Miller" <davem@davemloft.net>,  Adrian Moreno <amorenoz@redhat.com>,
+  Eelco Chaudron <echaudro@redhat.com>
+Subject: Re: [ovs-dev] [PATCH net-next 2/2] net: openvswitch: add drop action
+References: <20230629203005.2137107-1-eric@garver.life>
+	<20230629203005.2137107-3-eric@garver.life>
+	<f7tr0plgpzb.fsf@redhat.com>
+	<ZKbITj-FWGqRkwtr@egarver-thinkpadt14sgen1.remote.csb>
+	<6060b37e-579a-76cb-b853-023cb1a25861@ovn.org>
+	<20230707080025.7739e499@kernel.org>
+	<eb01326d-5b30-2d58-f814-45cd436c581a@ovn.org>
+	<dec509a4-3e36-e256-b8c0-74b7eed48345@ovn.org>
+	<20230707150610.4e6e1a4d@kernel.org>
+	<096871e8-3c0b-d5d7-8e68-833ba26b3882@ovn.org>
+	<ZKxMJOdz8LoAA-A5@egarver-thinkpadt14sgen1.remote.csb>
+Date: Tue, 11 Jul 2023 16:46:56 -0400
+In-Reply-To: <ZKxMJOdz8LoAA-A5@egarver-thinkpadt14sgen1.remote.csb> (Eric
+	Garver's message of "Mon, 10 Jul 2023 14:21:24 -0400")
+Message-ID: <f7tpm4ych1b.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3dceb664-0dd5-d46b-2431-b235cbd7752f@quietfountain.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > > > > The current llc_rcv.c around line 166 in net/llc/llc_input.c  has
-> > > > > 
-> > > > >           if (!net_eq(dev_net(dev), &init_net))
-> > > > >                   goto drop;
-> > > > > 
+Eric Garver <eric@garver.life> writes:
 
-> Thank you!  When you offer your patches, and you hear worries about being
-> 'invasive', it's worth asking 'compared to what' -- since the 'status quo' 
-> is every bridge with STP in a non default namespace with a loop in it
-> somewhere will freeze every connected system more solid than ice in
-> Antarctica.
+> On Mon, Jul 10, 2023 at 06:51:19PM +0200, Ilya Maximets wrote:
+>> On 7/8/23 00:06, Jakub Kicinski wrote:
+>> > On Fri, 7 Jul 2023 18:04:36 +0200 Ilya Maximets wrote:
+>> >>>> That already exists, right? Johannes added it in the last release for WiFi.  
+>> >>>
+>> >>> I'm not sure.  The SKB_DROP_REASON_SUBSYS_MAC80211_UNUSABLE behaves similarly
+>> >>> to that on a surface.  However, looking closer, any value that can be passed
+>> >>> into ieee80211_rx_handlers_result() and ends up in the kfree_skb_reason() is
+>> >>> kind of defined in net/mac80211/drop.h, unless I'm missing something (very
+>> >>> possible, because I don't really know wifi code).
+>> >>>
+>> >>> The difference, I guess, is that for openvswitch values will be provided by
+>> >>> the userpsace application via netlink interface.  It'll be just a number not
+>> >>> defined anywhere in the kernel.  Only the subsystem itself will be defined
+>> >>> in order to occupy the range.  Garbage in, same garbage out, from the kernel's
+>> >>> perspective.  
+>> >>
+>> >> To be clear, I think, not defining them in this particular case is better.
+>> >> Definition of every reason that userspace can come up with will add extra
+>> >> uAPI maintenance cost/issues with no practical benefits.  Values are not
+>> >> going to be used for anything outside reporting a drop reason and subsystem
+>> >> offset is not part of uAPI anyway.
+>> > 
+>> > Ah, I see. No, please don't stuff user space defined values into 
+>> > the drop reason. The reasons are for debugging the kernel stack 
+>> > itself. IOW it'd be abuse not reuse.
+>> 
+>> Makes sense.  I wasn't sure that's a good solution from a kernel perspective
+>> either.  It's better than defining all these reasons, IMO, but it's not good
+>> enough to be considered acceptable, I agree.
+>> 
+>> How about we define just 2 reasons, e.g. OVS_DROP_REASON_EXPLICIT_ACTION and
+>> OVS_DROP_REASON_EXPLICIT_ACTION_WITH_ERROR (exact names can be different) ?
+>> One for an explicit drop action with a zero argument and one for an explicit
+>> drop with non-zero argument.
+>> 
+>> The exact reason for the error can be retrieved by other means, i.e by looking
+>> at the datapath flow dump or OVS logs/traces.
+>> 
+>> This way we can give a user who is catching packet drop traces a signal that
+>> there was something wrong with an OVS flow and they can look up exact details
+>> from the userspace / flow dump.
+>> 
+>> The point being, most of the flows will have a zero as a drop action argument,
+>> i.e. a regular explicit packet drop.  It will be hard to figure out which flow
+>> exactly we're hitting without looking at the full flow dump.  And if the value
+>> is non-zero, then it should be immediately obvious which flow is to blame from
+>> the dump, as we should not have a lot of such flows.
+>> 
+>> This would still allow us to avoid a maintenance burden of defining every case,
+>> which are fairly meaningless for the kernel itself, while having 99% of the
+>> information we may need.
+>> 
+>> Jakub, do you think this will be acceptable?
+>> 
+>> Eric, Adrian, Aaron, do you see any problems with such implementation?
+>
+> I see no problems. I'm content with this approach.
 
-https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
++1
 
-say:
+>> P.S. There is a plan to add more drop reasons for other places in openvswitch
+>>      module to catch more regular types of drops like memory issues or upcall
+>>      failures.  So, the drop reason subsystem can be extended later.
+>>      The explicit drop action is a bit of an odd case here.
+>> 
+>> Best regards, Ilya Maximets.
+>> 
 
-o It must be obviously correct and tested.
-o It cannot be bigger than 100 lines, with context.
-o It must fix only one thing.
-o It must fix a real bug that bothers people (not a, "This could be a problem..." type thing).
-
-git blame shows:
-
-commit 721499e8931c5732202481ae24f2dfbf9910f129
-Author: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
-Date:   Sat Jul 19 22:34:43 2008 -0700
-
-    netns: Use net_eq() to compare net-namespaces for optimization.
-
-diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
-index 1c45f172991e..57ad974e4d94 100644
---- a/net/llc/llc_input.c
-+++ b/net/llc/llc_input.c
-@@ -150,7 +150,7 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
-        int (*rcv)(struct sk_buff *, struct net_device *,
-                   struct packet_type *, struct net_device *);
- 
--       if (dev_net(dev) != &init_net)
-+       if (!net_eq(dev_net(dev), &init_net))
-                goto drop;
- 
-        /*
-
-So this is just an optimization.
-
-The test itself was added in
-
-ommit e730c15519d09ea528b4d2f1103681fa5937c0e6
-Author: Eric W. Biederman <ebiederm@xmission.com>
-Date:   Mon Sep 17 11:53:39 2007 -0700
-
-    [NET]: Make packet reception network namespace safe
-    
-    This patch modifies every packet receive function
-    registered with dev_add_pack() to drop packets if they
-    are not from the initial network namespace.
-    
-    This should ensure that the various network stacks do
-    not receive packets in a anything but the initial network
-    namespace until the code has been converted and is ready
-    for them.
-    
-    Signed-off-by: Eric W. Biederman <ebiederm@xmission.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
-
-So that was over 15 years ago.
-
-It appears it has not bothered people for over 15 years.
-
-Lets wait until we get to see the actual fix. We can then decide how
-simple/hard it is to back port to stable, if it fulfils the stable
-rules or not.
-
-      Andrew
 
