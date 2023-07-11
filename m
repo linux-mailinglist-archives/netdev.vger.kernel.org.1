@@ -1,198 +1,214 @@
-Return-Path: <netdev+bounces-16941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCD674F7B1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:00:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3821074F780
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A3B31C20FD7
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:00:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADC8428183F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE97E1E533;
-	Tue, 11 Jul 2023 18:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4C41E521;
+	Tue, 11 Jul 2023 17:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18A81E518
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 18:00:10 +0000 (UTC)
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5257410EF;
-	Tue, 11 Jul 2023 11:00:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF961E508
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:50:29 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E03D10D4
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:50:27 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1b9e8e5b12dso13859715ad.3
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:50:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689098409; x=1720634409;
-  h=references:from:to:cc:subject:date:in-reply-to:
-   message-id:mime-version;
-  bh=9yPOK7BnNqeb8GutZgVy93yP3NTZhQh0Yi9tzYYJVFM=;
-  b=UX0MLWt3GgtxMEgIeZ2zOIBzOEqlYSyBVz7t52lDYLgZfiryDPqFQ6uP
-   HBC4CeAf0dLryr153Knk4s2+Tou1fnLKeP1SJwVJpyilT/Ow+lhVhNYDK
-   NhrOqIApezCaZYrY76GNrduy9mLAdyyR0hns2+aYVp7BkXt2XEEsDNcct
-   A=;
-X-IronPort-AV: E=Sophos;i="6.01,197,1684800000"; 
-   d="scan'208";a="659285490"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 18:00:03 +0000
-Received: from EX19D007EUA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id 6728F466CE;
-	Tue, 11 Jul 2023 18:00:00 +0000 (UTC)
-Received: from EX19D028EUB003.ant.amazon.com (10.252.61.31) by
- EX19D007EUA002.ant.amazon.com (10.252.50.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 17:59:53 +0000
-Received: from u95c7fd9b18a35b.ant.amazon.com.amazon.com (10.85.143.174) by
- EX19D028EUB003.ant.amazon.com (10.252.61.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 11 Jul 2023 17:59:48 +0000
-References: <20230711013621.GE1926@templeofstupid.com>
-User-agent: mu4e 1.10.3; emacs 28.2
-From: Shay Agroskin <shayagr@amazon.com>
-To: Krister Johansen <kjlx@templeofstupid.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Arthur
- Kiyanovski" <akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, "Noam
- Dagan" <ndagan@amazon.com>, Saeed Bishara <saeedb@amazon.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: ena: fix shift-out-of-bounds in exponential
- backoff
-Date: Tue, 11 Jul 2023 20:47:32 +0300
-In-Reply-To: <20230711013621.GE1926@templeofstupid.com>
-Message-ID: <pj41zllefmpbw7.fsf@u95c7fd9b18a35b.ant.amazon.com>
+        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1689097827; x=1691689827;
+        h=message-id:to:from:cc:in-reply-to:subject:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0Od3z6lgfWejEpTrv/o+yIiM7PB4PG6s5bm3VIUVJmM=;
+        b=1zCEm0TjXOYNc1rfynH2/Z3AWqGj+miHradfJaypI3bSJbOdjV2r1avpSHroQEKCe9
+         tO2en3v9lK5eH4qRsiYhkSCvF98UdNUpWmmok+gVcZRrorSJUCl6ZRJbqWy4I9QmgmSh
+         BsDLqjI6hU/oc42a2F3ZZQjPiKvjkf+12jgv2ViXY8mnKzfJ61IYpBBII/6MY4RtFWzZ
+         VxxUIidOK1z0wquGM9bac6Dzycj21Rog/GA/ahYcuzf1+9PEkzRmYrhpbtzs4blgznUT
+         Tnjx5BXciXrGi9N9Xx3dVkF1hfa3bDp2emg4L95UOrd8XOSGJ2tc7a/wFe2QfZUUrFwr
+         /+Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689097827; x=1691689827;
+        h=message-id:to:from:cc:in-reply-to:subject:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0Od3z6lgfWejEpTrv/o+yIiM7PB4PG6s5bm3VIUVJmM=;
+        b=Zopc0x8pfH5xx2slgk9uHERKX/OfZpIcQkerFUTnUAWuMLg+MQetU8A3cDXED037QP
+         a57f38XhFPrKCE3OvNfPqeS9dtV7Hz2TLlAa/iFBS8aGzAgADZbj8IaDBOes62o3x2Vg
+         Kkka1+1gUr59vUP/VleirKPJeygv5LhmWmDR69lqJjMGlXo0Ek6gdr8qkE6iLzbA95R3
+         ixWoGADQW14hl53TgU1Qk41fLeKbZ3pfriX1JI55IFyDkyulDEt81rFOFeTeoAx5l3o4
+         LL7pzKnpDKHrzajPc5uNUu5hdTuOtWqFL0Y2W4VRZz08ieBW6975tc28Mcj90OqVMWZK
+         hP4g==
+X-Gm-Message-State: ABy/qLYk5jBEAgP+qi+fSz3WNrBDN7cOFjH+Pvim8ApTuUH2HSKzukSs
+	sYuv7zb3RTx7pa+0I/cNpa/ZsA==
+X-Google-Smtp-Source: APBJJlG2w3IH9uUrApfSKSdlopd7bGHAnrQwSQSpa6WXOfuGbTR3QFr6z8ZN7CEPBQUKhz7Dqx+r0Q==
+X-Received: by 2002:a17:903:447:b0:1b8:a31b:ac85 with SMTP id iw7-20020a170903044700b001b8a31bac85mr15502963plb.41.1689097826708;
+        Tue, 11 Jul 2023 10:50:26 -0700 (PDT)
+Received: from localhost ([50.38.6.230])
+        by smtp.gmail.com with ESMTPSA id ja1-20020a170902efc100b001b1a2c14a4asm2221425plb.38.2023.07.11.10.50.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 10:50:26 -0700 (PDT)
+Date: Tue, 11 Jul 2023 10:50:26 -0700 (PDT)
+X-Google-Original-Date: Tue, 11 Jul 2023 10:49:36 PDT (-0700)
+Subject:     Re: [PATCH bpf] riscv, bpf: Fix inconsistent JIT image generation
+In-Reply-To: <20230710074131.19596-1-bjorn@kernel.org>
+CC: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org,
+  netdev@vger.kernel.org, Bjorn Topel <bjorn@rivosinc.com>, martin.lau@linux.dev, song@kernel.org,
+  yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+  haoluo@google.com, jolsa@kernel.org, pulehui@huawei.com, luke.r.nels@gmail.com, xi.wang@gmail.com,
+  linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux@rivosinc.com
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: bjorn@kernel.org
+Message-ID: <mhng-37770bfd-e982-4b87-a202-7cc08005b483@palmer-ri-x1c9a>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,PP_MIME_FAKE_ASCII_TEXT,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; format=flowed
-X-Originating-IP: [10.85.143.174]
-X-ClientProxiedBy: EX19D032UWB002.ant.amazon.com (10.13.139.190) To
- EX19D028EUB003.ant.amazon.com (10.252.61.31)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-
-Krister Johansen <kjlx@templeofstupid.com> writes:
-
-> The ENA adapters on our instances occasionally reset.  Once 
-> recently
-> logged a UBSAN failure to console in the process:
+On Mon, 10 Jul 2023 00:41:31 PDT (-0700), bjorn@kernel.org wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
 >
->   UBSAN: shift-out-of-bounds in 
->   build/linux/drivers/net/ethernet/amazon/ena/ena_com.c:540:13
->   shift exponent 32 is too large for 32-bit type 'unsigned int'
->   CPU: 28 PID: 70012 Comm: kworker/u72:2 Kdump: loaded not 
->   tainted 5.15.117
->   Hardware name: Amazon EC2 c5d.9xlarge/, BIOS 1.0 10/16/2017
->   Workqueue: ena ena_fw_reset_device [ena]
->   Call Trace:
->   <TASK>
->   dump_stack_lvl+0x4a/0x63
->   dump_stack+0x10/0x16
->   ubsan_epilogue+0x9/0x36
->   __ubsan_handle_shift_out_of_bounds.cold+0x61/0x10e
->   ? __const_udelay+0x43/0x50
->   ena_delay_exponential_backoff_us.cold+0x16/0x1e [ena]
->   wait_for_reset_state+0x54/0xa0 [ena]
->   ena_com_dev_reset+0xc8/0x110 [ena]
->   ena_down+0x3fe/0x480 [ena]
->   ena_destroy_device+0xeb/0xf0 [ena]
->   ena_fw_reset_device+0x30/0x50 [ena]
->   process_one_work+0x22b/0x3d0
->   worker_thread+0x4d/0x3f0
->   ? process_one_work+0x3d0/0x3d0
->   kthread+0x12a/0x150
->   ? set_kthread_struct+0x50/0x50
->   ret_from_fork+0x22/0x30
->   </TASK>
+> In order to generate the prologue and epilogue, the BPF JIT needs to
+> know which registers that are clobbered. Therefore, the during
+> pre-final passes, the prologue is generated after the body of the
+> program body-prologue-epilogue. Then, in the final pass, a proper
+> prologue-body-epilogue JITted image is generated.
 >
-> Apparently, the reset delays are getting so large they can 
-> trigger a
-> UBSAN panic.
+> This scheme has worked most of the time. However, for some large
+> programs with many jumps, e.g. the test_kmod.sh BPF selftest with
+> hardening enabled (blinding constants), this has shown to be
+> incorrect. For the final pass, when the proper prologue-body-epilogue
+> is generated, the image has not converged. This will lead to that the
+> final image will have incorrect jump offsets. The following is an
+> excerpt from an incorrect image:
 >
-> Looking at the code, the current timeout is capped at 5000us. 
-> Using a
-> base value of 100us, the current code will overflow after 
-> (1<<29).  Even
-> at values before 32, this function wraps around, perhaps
-> unintentionally.
+>   | ...
+>   |     3b8:       00c50663                beq     a0,a2,3c4 <.text+0x3c4>
+>   |     3bc:       0020e317                auipc   t1,0x20e
+>   |     3c0:       49630067                jalr    zero,1174(t1) # 20e852 <.text+0x20e852>
+>   | ...
+>   |  20e84c:       8796                    c.mv    a5,t0
+>   |  20e84e:       6422                    c.ldsp  s0,8(sp)    # Epilogue start
+>   |  20e850:       6141                    c.addi16sp      sp,16
+>   |  20e852:       853e                    c.mv    a0,a5       # Incorrect jump target
+>   |  20e854:       8082                    c.jr    ra
 >
-> Cap the value of the exponent used for this backoff at (1<<16) 
-> which is
-> larger than currently necessary, but large enough to support 
-> bigger
-> values in the future.
+> The image has shrunk, and the epilogue offset is incorrect in the
+> final pass.
 >
-> Cc: stable@vger.kernel.org
-> Fixes: 4bb7f4cf60e3 ("net: ena: reduce driver load time")
-> Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+> Correct the problem by always generating proper prologue-body-epilogue
+> outputs, which means that the first pass will only generate the body
+> to track what registers that are touched.
+>
+> Fixes: 2353ecc6f91f ("bpf, riscv: add BPF JIT for RV64G")
+> Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
 > ---
->  drivers/net/ethernet/amazon/ena/ena_com.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/riscv/net/bpf_jit.h      |  6 +++---
+>  arch/riscv/net/bpf_jit_core.c | 19 +++++++++++++------
+>  2 files changed, 16 insertions(+), 9 deletions(-)
 >
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c 
-> b/drivers/net/ethernet/amazon/ena/ena_com.c
-> index 451c3a1b6255..633b321d7fdd 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_com.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_com.c
-> @@ -35,6 +35,8 @@
->  
->  #define ENA_REGS_ADMIN_INTR_MASK 1
->  
-> +#define ENA_MAX_BACKOFF_DELAY_EXP 16U
+> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
+> index bf9802a63061..2717f5490428 100644
+> --- a/arch/riscv/net/bpf_jit.h
+> +++ b/arch/riscv/net/bpf_jit.h
+> @@ -69,7 +69,7 @@ struct rv_jit_context {
+>  	struct bpf_prog *prog;
+>  	u16 *insns;		/* RV insns */
+>  	int ninsns;
+> -	int body_len;
+> +	int prologue_len;
+>  	int epilogue_offset;
+>  	int *offset;		/* BPF to RV */
+>  	int nexentries;
+> @@ -216,8 +216,8 @@ static inline int rv_offset(int insn, int off, struct rv_jit_context *ctx)
+>  	int from, to;
+>
+>  	off++; /* BPF branch is from PC+1, RV is from PC */
+> -	from = (insn > 0) ? ctx->offset[insn - 1] : 0;
+> -	to = (insn + off > 0) ? ctx->offset[insn + off - 1] : 0;
+> +	from = (insn > 0) ? ctx->offset[insn - 1] : ctx->prologue_len;
+> +	to = (insn + off > 0) ? ctx->offset[insn + off - 1] : ctx->prologue_len;
+>  	return ninsns_rvoff(to - from);
+>  }
+>
+> diff --git a/arch/riscv/net/bpf_jit_core.c b/arch/riscv/net/bpf_jit_core.c
+> index 737baf8715da..7a26a3e1c73c 100644
+> --- a/arch/riscv/net/bpf_jit_core.c
+> +++ b/arch/riscv/net/bpf_jit_core.c
+> @@ -44,7 +44,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
+>  	unsigned int prog_size = 0, extable_size = 0;
+>  	bool tmp_blinded = false, extra_pass = false;
+>  	struct bpf_prog *tmp, *orig_prog = prog;
+> -	int pass = 0, prev_ninsns = 0, prologue_len, i;
+> +	int pass = 0, prev_ninsns = 0, i;
+>  	struct rv_jit_data *jit_data;
+>  	struct rv_jit_context *ctx;
+>
+> @@ -83,6 +83,12 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
+>  		prog = orig_prog;
+>  		goto out_offset;
+>  	}
 > +
->  #define ENA_MIN_ADMIN_POLL_US 100
->  
->  #define ENA_MAX_ADMIN_POLL_US 5000
-> @@ -536,6 +538,7 @@ static int 
-> ena_com_comp_status_to_errno(struct ena_com_admin_queue 
-> *admin_queue,
->  
->  static void ena_delay_exponential_backoff_us(u32 exp, u32 
->  delay_us)
->  {
-> +	exp = min_t(u32, exp, ENA_MAX_BACKOFF_DELAY_EXP);
->  	delay_us = max_t(u32, ENA_MIN_ADMIN_POLL_US, delay_us);
->  	delay_us = min_t(u32, delay_us * (1U << exp), 
->  ENA_MAX_ADMIN_POLL_US);
->  	usleep_range(delay_us, 2 * delay_us);
+> +	if (build_body(ctx, extra_pass, NULL)) {
+> +		prog = orig_prog;
+> +		goto out_offset;
+> +	}
+> +
+>  	for (i = 0; i < prog->len; i++) {
+>  		prev_ninsns += 32;
+>  		ctx->offset[i] = prev_ninsns;
+> @@ -91,12 +97,15 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
+>  	for (i = 0; i < NR_JIT_ITERATIONS; i++) {
+>  		pass++;
+>  		ctx->ninsns = 0;
+> +
+> +		bpf_jit_build_prologue(ctx);
+> +		ctx->prologue_len = ctx->ninsns;
+> +
+>  		if (build_body(ctx, extra_pass, ctx->offset)) {
+>  			prog = orig_prog;
+>  			goto out_offset;
+>  		}
+> -		ctx->body_len = ctx->ninsns;
+> -		bpf_jit_build_prologue(ctx);
+> +
+>  		ctx->epilogue_offset = ctx->ninsns;
+>  		bpf_jit_build_epilogue(ctx);
+>
+> @@ -162,10 +171,8 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
+>
+>  	if (!prog->is_func || extra_pass) {
+>  		bpf_jit_binary_lock_ro(jit_data->header);
+> -		prologue_len = ctx->epilogue_offset - ctx->body_len;
+>  		for (i = 0; i < prog->len; i++)
+> -			ctx->offset[i] = ninsns_rvoff(prologue_len +
+> -						      ctx->offset[i]);
+> +			ctx->offset[i] = ninsns_rvoff(ctx->offset[i]);
+>  		bpf_prog_fill_jited_linfo(prog, ctx->offset);
+>  out_offset:
+>  		kfree(ctx->offset);
+>
+> base-commit: 496720b7cfb6574a8f6f4d434f23e3d1e6cfaeb9
 
-Hi, thanks for submitting this patch (:
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
 
-Going over the logic here, the driver sleeps for `delay_us` 
-micro-seconds in each iteration that this function gets called.
+I'm assuming this is aimed at the BPF tree, but LMK if you guys want me 
+to pick it up -- I've already got something for this week, so it's easy 
+on my end.  I'm dropping it from my queue and patchwork for now, though.
 
-For an exp = 14 it'd sleep (I added units notation)
-delay_us * (2 ^ exp) us = 100 * (2 ^ 14) us = (10 * (2 ^ 14)) / 
-(1000000) s = 1.6 s
-
-For an exp = 15 it'd sleep
-(10 * (2 ^ 15)) / (1000000) = 3.2s
-
-To even get close to an overflow value, say exp=29 the driver 
-would sleep in a single iteration
-53687 s = 14.9 hours.
-
-The driver should stop trying to get a response from the device 
-after a timeout period received from the device which is 3 seconds 
-by default.
-
-The point being, it seems very unlikely to hit this overflow. Did 
-you experience it or was the issue discovered by a static analyzer 
-?
-
-Regarding the patch itself, I don't mind adding it since exp=16 
-limit should be more than enough to wait for the device's 
-response.
-Reviewed-by: Shay Agroskin <shayagr@amazon.com>
-
-Thanks,
-Shay
+Thanks for the fix!
 
