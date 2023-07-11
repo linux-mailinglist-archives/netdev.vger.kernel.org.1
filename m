@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-16900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4BD74F5FF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:47:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D457574F600
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:47:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EDBC1C20FDF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:47:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E6292816B4
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23291DDCD;
-	Tue, 11 Jul 2023 16:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C4B1DDFD;
+	Tue, 11 Jul 2023 16:45:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF601DDC2
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:45:46 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2046.outbound.protection.outlook.com [40.107.93.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D96CA2707
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 09:45:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13741DDC2
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:45:47 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB49270B
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 09:45:26 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BWQaELT6nW1ODZ4WiXmSQaSX4SDVe20//rYXFpIQRgYu2fAda8Y9hX4r/qpj7p7V0x2L+nvXT/iA5M44NV/SEZrO7dGrId+jtKP/Zqx20o9UheNaZg0N20nqCXfQgpHGlJnS5xmvrFNK/BxPZkdktm2cCzZXgMEBghrEoeASIgia1pbaQBpMGagZT8p1aOnU382t03NQpNzq1RnDC2WVpYQXqEivvBrZOR9B/4OCocOXF297eb9UT+KN2p5PrB1tZGzyHeYRuj4rqYTJKLcC/UHwPHOiJOG7as/EjiedfjeYbZO1s+UtFpbvR8UVxGT86HSDvZUo1QXV2t+hJv7Q5w==
+ b=cFdWhIvEfDoD2e8o+l/XmhEkBpG8Ql1ijeq07265dhdv8SCZAxj/8dXDOkcYX62OiB+t4LR8MVqKgae1ncP0G7GKt4IOnUczm5fzh8ngHWqnxqdibvlpJZcKO4SwruxkGxQRS3QV9ImVRAUF7ejcZm74d+FH+aVUvyPWNsEGce/EG0S3+H449TowqQKo55cfx8eYA8qMmc0M76zpCSz+Wz2lwBgny1Pcny42ILdzhMmVP+mrAhzMY4hw0m6jKUfrHwF5f8AnvnduRmymDdbSapW0Q33VcEGU93nkWrm9ihUSgUz5q8yfVS6cMYzYrDG1Tei47KTi/8RHGBrCmktDvg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZOssHaa1bRucqKGXMR0UCAIoR09fxUacvi2UICywhmQ=;
- b=b9H/MdHr1vQSWt/zPtz9tFbvXts+ii7eju/qM2smbpldg/2JwiqLX+InY7Y/AvhSxyIRywEgnvORVwR9eQ7jmq8ZRIlpH+luQXT5GwNTRmMekntevCX4AdQT09eIjkMlpH/rl5/7SuBA8yEOe3oEj9Sa+OiUap6pONTDEu9vvPlBkyEuXy5Bgws/QwKmFSlij7xO1MQYgv5mhSd2NXTP9Nn0XECc49Gz9OsFjOukO/KL/akJglW5rThUsPfzDx/6gNxdsW9EocZfjDuuVMm0DnTih+FdSc8xIqW9ZQFGjKZpWvy6jGhAMonA1gePTsqE8mGHHEvApSqT/EipYsNmCQ==
+ bh=FL6ZZcLQ70GrHoXl6hQ7O25Wo8YLZ2FfaPrF7Mg2F/E=;
+ b=eL6Qj5vc9PcrQYouQzW2vMnZgd5RAkUsGmqkcSLbZTSF/6asEndUQqieqyH9Y4EWMNex3wD18u/keJq/S93UapCqOprcU8RPhgezH1imoUi5nSkRC5uO8y+gc4tV9yZ8IlZrsb+7VJmNGi9ecQGhi952TpaTumZpgbr9TD+mm/USQStmeE7cfSje1rTRjMUHZtrSAUwOd1FpF+zNTxHnrjd9I+0GPIqBVkQ3Af/o3O/CLYL6dfGiKfr+2OJ2nCiEsOAqA7Kbh44qj7ZY+K1AVs0dNLy1FF9nGFd3oVvfgV9T8PW1BaF/RhhWYlfarkm9ZSp4TRwJN9uOqhiYXU6Amg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZOssHaa1bRucqKGXMR0UCAIoR09fxUacvi2UICywhmQ=;
- b=AMPes3J6UYh/d+ejakG9X+xG2qSp79Og0jYXJvx2KbaNNkjK3u0q7ED/9xEBzVeA13u44brrYdF+kPsBlIPuQsjf+Negf1Bw+nuudAuiau9uty1vp59fc46uYrof27F5T5Uezn+fcvfbRczzsCkWEl2B9Yzi0oEqu1QVfG5PDKxfVa9bSnTgaBSNEAWzJBC0mrVddd2gxTrv3YerUOV1eIRV2yzeDL7kl1tNEuLVQkrlGFgbV4ADiv8+p+jlaKpUiYvFMLvjmkp8K5UqqigV4nKeiqWQwheCNZEvQ1r9ORSZJ3b7dhAHn5MRZG984UcUTNMX4HHH9vOdok/JDEYM4Q==
-Received: from DS7PR06CA0031.namprd06.prod.outlook.com (2603:10b6:8:54::11) by
- SJ0PR12MB6686.namprd12.prod.outlook.com (2603:10b6:a03:479::22) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=FL6ZZcLQ70GrHoXl6hQ7O25Wo8YLZ2FfaPrF7Mg2F/E=;
+ b=d5uSAsSWtd1XmXTg2fhZPI8YO5J8n0ylV0ac4wymt+frXyrP87W6mN98wsnZAv207Ev3MUB769EahLZQCUMVdWB3hJTqAoOVDd+uGp9iFBNZzSqSHzaesoeaD/zXvzRXlIWSNOEMhNU5jVXix4AZq6fOA16FM5PokcrrqkuYUN7txIqNqVhgT0AG3tAxONyp8i1YmgvWtr48tg+ePWDHfXN9hV4lSpx2fFWYz0TLc935ZPGsnIh4ycPymEAnDf+ab51Okgw6bAeIacNS5iBvN/B0ZJFKVSHuAgMS+9deBgazKRqsrImKElJqSc3yW2kmCcPplkiQ4GdKytJ5uWlUWg==
+Received: from MWH0EPF00056D09.namprd21.prod.outlook.com
+ (2603:10b6:30f:fff2:0:1:0:9) by DS0PR12MB8294.namprd12.prod.outlook.com
+ (2603:10b6:8:f4::16) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Tue, 11 Jul
  2023 16:44:51 +0000
-Received: from DM6NAM11FT033.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:54:cafe::6f) by DS7PR06CA0031.outlook.office365.com
- (2603:10b6:8:54::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.32 via Frontend
- Transport; Tue, 11 Jul 2023 16:44:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+Received: from CO1NAM11FT055.eop-nam11.prod.protection.outlook.com
+ (2a01:111:f400:7eab::205) by MWH0EPF00056D09.outlook.office365.com
+ (2603:1036:d20::b) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.13 via Frontend
+ Transport; Tue, 11 Jul 2023 16:44:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DM6NAM11FT033.mail.protection.outlook.com (10.13.172.221) with Microsoft SMTP
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT055.mail.protection.outlook.com (10.13.175.129) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.20 via Frontend Transport; Tue, 11 Jul 2023 16:44:50 +0000
+ 15.20.6588.20 via Frontend Transport; Tue, 11 Jul 2023 16:44:46 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 11 Jul 2023
- 09:44:35 -0700
+ 09:44:38 -0700
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 11 Jul
- 2023 09:44:33 -0700
+ 2023 09:44:35 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next 04/10] mlxsw: spectrum_port_range: Add devlink resource support
-Date: Tue, 11 Jul 2023 18:43:57 +0200
-Message-ID: <7945e0c715dc5efb1617f45f7560c1f1bd0bcf8a.1689092769.git.petrm@nvidia.com>
+Subject: [PATCH net-next 05/10] mlxsw: spectrum_acl: Add port range key element
+Date: Tue, 11 Jul 2023 18:43:58 +0200
+Message-ID: <f0423f6ee9e36c6b0a426bc9995f42223c48f2db.1689092769.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <cover.1689092769.git.petrm@nvidia.com>
 References: <cover.1689092769.git.petrm@nvidia.com>
@@ -90,26 +90,26 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT033:EE_|SJ0PR12MB6686:EE_
-X-MS-Office365-Filtering-Correlation-Id: f6abd26b-4614-4b91-0edd-08db822e254e
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT055:EE_|DS0PR12MB8294:EE_
+X-MS-Office365-Filtering-Correlation-Id: 490b8cd4-382d-4769-5dfc-08db822e22dc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	csilugC8YWotTpyG2CPxySbCWuR1MR++B4Bd4hkJomxPYcR82cZCHuqr84FXAla42xUTMWdNoDnUAH3HIJHmQUMVcQ+XkpiMmZwftdBE11p07biGg/RUnV8yVy6hLkr0h6Qhr+27iDZq6Ph5IesrvnUCxDG/DAooWKtJwRS1s5/avUejnY6Qb9rQoS7hEKKnTo7mIjGf6rDfSHsi9HTwE5U7O6aau7KNlaC2OEiagyhNN3vvjQNPsJSHWInE7ghkOIX09nXu6pDpSBsJJSo/moxFVDNezDo3+4i5iiriEnWn/ss8VdtLSl060WM5T1ePitD2R66MQn3aJJaBFjn0PyV/DEjVBjCiiqkCuNEkyHvDXTKdyniFVwA1eRsA//lNFU1H53aVvCyYphq2eRLWK0yK3uiFGcvYruqPbW4J/4HzEuCenBSOEdG62difgs71NTR0RrEQr21kVskGpG7ei9UU1GdG2APz4LCFFyuI9hvQ3Qq1lw/DDkxcl9GFEWBGnzB/QeZY2Y7jrUaIWraJOL8trk/54WLoyNhHCpH1y3wJ7qiZGdGAtsUiL5zA8Rwiw16aexdg2yIL9VYnHUzrSbXjfvad8cRhbYhZGhk01HnUDPz414mPCOLispfRcoPL18movq/SfRjo66VyfrSMpLOdmpELB1OnnVA1YPyweODpdUhqn6H4Jx1xwsIKqqScuIlBrisopi/RsEwANT3I+qUeikBE39wwctqeXXtCDhhTyRmoQP3DIYlvA9xfByfx
+	ErWY0W46mky1RguDSn35UTMVdborhNPy01iNoLI4XTw77Z346TyjGEFK2C/nkMMdtfXzaJND4sWh7MZOfmeJ8s+Bvp9eADjdtlPzzDqT2KZP8kwGFVU5mJurk8ICH1laB6tEAoonFkiBc9FSpi8wXlYAKHrZqtmNlY1idtT6SC4hhTdc/fUrinXHeBsxyaZ7LMFJKEOLTyG0iZSAOCQX158M3ifTwewLQkDDehc8orqCoY6Da50KlXAtL1cgpCUjcbAyOaLTLQzDkI9YNPEfRBiH4nG0ZOcsB+dl1KSWs56btJx26M4+3ClIJaSros4VU7kQ+f+g+bxU8STH/LVHR4LfAK8pBuofSi8vzTolHgkUw8HyLIBXx6084yQ70CvgJFnV3ct884c95dWz1m0l4jNaMdheKCbBXFXic1zpYJAtheHhmeIBlgfQC5cNBKqe38G5b2B7zg+LyM1P32FvJILtGIscb9nkYJSJHo94ZfYcsRSEj3TBSRMToz3qSPofUuVfrfSX+cPdLQ+doh5siTibxOl1+V6bWIGOs31u+ZhEiri0HHmFRMDAPCaNGq0U4rf7KWiixpH7Y4mgywPWc85iE9sMG7cNQ8yR7PyWcdAIpvYyV5f0dVw6r05SQ61/L0B7/YDWEGDmvXAK4TQ92qNJdzQqracrgxnU5XCmiQRoKZTUU/AowWvzoi4hS9QU3jwa/UHIPB037jVGhBWhQ1+FzHM44+I2lXxslkWsZAPECSMtOKQt0Lmm4TKZX1Hg
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(41300700001)(36860700001)(2906002)(4326008)(70206006)(70586007)(5660300002)(82740400003)(356005)(7636003)(86362001)(478600001)(8676002)(316002)(8936002)(6666004)(47076005)(82310400005)(107886003)(36756003)(26005)(83380400001)(426003)(336012)(186003)(16526019)(40460700003)(110136005)(54906003)(40480700001)(2616005);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(39860400002)(396003)(346002)(451199021)(36840700001)(40470700004)(46966006)(8676002)(8936002)(36860700001)(5660300002)(47076005)(2616005)(83380400001)(66574015)(16526019)(186003)(107886003)(26005)(86362001)(41300700001)(6666004)(82310400005)(336012)(426003)(316002)(356005)(7636003)(36756003)(2906002)(40460700003)(70586007)(70206006)(82740400003)(40480700001)(4326008)(110136005)(54906003)(478600001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 16:44:50.7473
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 16:44:46.7093
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6abd26b-4614-4b91-0edd-08db822e254e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 490b8cd4-382d-4769-5dfc-08db822e22dc
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DM6NAM11FT033.eop-nam11.prod.protection.outlook.com
+	CO1NAM11FT055.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6686
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8294
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -120,163 +120,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Ido Schimmel <idosch@nvidia.com>
 
-Expose via devlink-resource the maximum number of port range registers
-and their current occupancy. Besides the observability benefits, this
-resource will be used by subsequent patches for scale and occupancy
-tests.
+Add the port range key element to supported key blocks so that it could
+be used to match on the output of the port range registers. Each bit in
+the element can be used to match on the output of the port range
+register with the corresponding index.
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlxsw/spectrum.c    | 30 +++++++++++++++++++
- .../net/ethernet/mellanox/mlxsw/spectrum.h    |  1 +
- .../mellanox/mlxsw/spectrum_port_range.c      | 19 ++++++++++++
- 3 files changed, 50 insertions(+)
+ drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c     | 1 +
+ drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h     | 1 +
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c | 3 +++
+ 3 files changed, 5 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index c0edcc91f178..86e2f0ed64d3 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -3739,6 +3739,26 @@ static int mlxsw_sp_resources_rifs_register(struct mlxsw_core *mlxsw_core)
- 				      &size_params);
- }
- 
-+static int
-+mlxsw_sp_resources_port_range_register(struct mlxsw_core *mlxsw_core)
-+{
-+	struct devlink *devlink = priv_to_devlink(mlxsw_core);
-+	struct devlink_resource_size_params size_params;
-+	u64 max;
-+
-+	if (!MLXSW_CORE_RES_VALID(mlxsw_core, ACL_MAX_L4_PORT_RANGE))
-+		return -EIO;
-+
-+	max = MLXSW_CORE_RES_GET(mlxsw_core, ACL_MAX_L4_PORT_RANGE);
-+	devlink_resource_size_params_init(&size_params, max, max, 1,
-+					  DEVLINK_RESOURCE_UNIT_ENTRY);
-+
-+	return devl_resource_register(devlink, "port_range_registers", max,
-+				      MLXSW_SP_RESOURCE_PORT_RANGE_REGISTERS,
-+				      DEVLINK_RESOURCE_ID_PARENT_TOP,
-+				      &size_params);
-+}
-+
- static int mlxsw_sp1_resources_register(struct mlxsw_core *mlxsw_core)
- {
- 	int err;
-@@ -3767,8 +3787,13 @@ static int mlxsw_sp1_resources_register(struct mlxsw_core *mlxsw_core)
- 	if (err)
- 		goto err_resources_rifs_register;
- 
-+	err = mlxsw_sp_resources_port_range_register(mlxsw_core);
-+	if (err)
-+		goto err_resources_port_range_register;
-+
- 	return 0;
- 
-+err_resources_port_range_register:
- err_resources_rifs_register:
- err_resources_rif_mac_profile_register:
- err_policer_resources_register:
-@@ -3806,8 +3831,13 @@ static int mlxsw_sp2_resources_register(struct mlxsw_core *mlxsw_core)
- 	if (err)
- 		goto err_resources_rifs_register;
- 
-+	err = mlxsw_sp_resources_port_range_register(mlxsw_core);
-+	if (err)
-+		goto err_resources_port_range_register;
-+
- 	return 0;
- 
-+err_resources_port_range_register:
- err_resources_rifs_register:
- err_resources_rif_mac_profile_register:
- err_policer_resources_register:
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
-index fe6c6e02a484..a74652ea4d7c 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
-@@ -69,6 +69,7 @@ enum mlxsw_sp_resource_id {
- 	MLXSW_SP_RESOURCE_SINGLE_RATE_POLICERS,
- 	MLXSW_SP_RESOURCE_RIF_MAC_PROFILES,
- 	MLXSW_SP_RESOURCE_RIFS,
-+	MLXSW_SP_RESOURCE_PORT_RANGE_REGISTERS,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
+index f0b2963ebac3..7870327d921b 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
+@@ -43,6 +43,7 @@ static const struct mlxsw_afk_element_info mlxsw_afk_element_infos[] = {
+ 	MLXSW_AFK_ELEMENT_INFO_BUF(DST_IP_32_63, 0x38, 4),
+ 	MLXSW_AFK_ELEMENT_INFO_BUF(DST_IP_0_31, 0x3C, 4),
+ 	MLXSW_AFK_ELEMENT_INFO_U32(FDB_MISS, 0x40, 0, 1),
++	MLXSW_AFK_ELEMENT_INFO_U32(L4_PORT_RANGE, 0x40, 1, 16),
  };
  
- struct mlxsw_sp_port;
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_port_range.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_port_range.c
-index a12a62632721..2d193de12be6 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_port_range.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_port_range.c
-@@ -5,6 +5,7 @@
- #include <linux/netlink.h>
- #include <linux/refcount.h>
- #include <linux/xarray.h>
-+#include <net/devlink.h>
- 
- #include "spectrum.h"
- 
-@@ -17,6 +18,7 @@ struct mlxsw_sp_port_range_reg {
- struct mlxsw_sp_port_range_core {
- 	struct xarray prr_xa;
- 	struct xa_limit prr_ids;
-+	atomic_t prr_count;
+ struct mlxsw_afk {
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h
+index 65a4abadc7db..2eac7582c31a 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h
+@@ -36,6 +36,7 @@ enum mlxsw_afk_element {
+ 	MLXSW_AFK_ELEMENT_VIRT_ROUTER_MSB,
+ 	MLXSW_AFK_ELEMENT_VIRT_ROUTER_LSB,
+ 	MLXSW_AFK_ELEMENT_FDB_MISS,
++	MLXSW_AFK_ELEMENT_L4_PORT_RANGE,
+ 	MLXSW_AFK_ELEMENT_MAX,
  };
  
- static int
-@@ -71,6 +73,8 @@ mlxsw_sp_port_range_reg_create(struct mlxsw_sp *mlxsw_sp,
- 		goto err_reg_configure;
- 	}
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c
+index 4dea39f2b304..b7f58605b6c7 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c
+@@ -31,12 +31,14 @@ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_l2_smac_ex[] = {
  
-+	atomic_inc(&pr_core->prr_count);
-+
- 	return prr;
+ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv4_sip[] = {
+ 	MLXSW_AFK_ELEMENT_INST_BUF(SRC_IP_0_31, 0x00, 4),
++	MLXSW_AFK_ELEMENT_INST_U32(L4_PORT_RANGE, 0x04, 16, 16),
+ 	MLXSW_AFK_ELEMENT_INST_U32(IP_PROTO, 0x08, 0, 8),
+ 	MLXSW_AFK_ELEMENT_INST_U32(SRC_SYS_PORT, 0x0C, 0, 16),
+ };
  
- err_reg_configure:
-@@ -85,6 +89,7 @@ static void mlxsw_sp_port_range_reg_destroy(struct mlxsw_sp *mlxsw_sp,
- {
- 	struct mlxsw_sp_port_range_core *pr_core = mlxsw_sp->pr_core;
+ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv4_dip[] = {
+ 	MLXSW_AFK_ELEMENT_INST_BUF(DST_IP_0_31, 0x00, 4),
++	MLXSW_AFK_ELEMENT_INST_U32(L4_PORT_RANGE, 0x04, 16, 16),
+ 	MLXSW_AFK_ELEMENT_INST_U32(IP_PROTO, 0x08, 0, 8),
+ 	MLXSW_AFK_ELEMENT_INST_U32(SRC_SYS_PORT, 0x0C, 0, 16),
+ };
+@@ -205,6 +207,7 @@ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_l4_0[] = {
  
-+	atomic_dec(&pr_core->prr_count);
- 	xa_erase(&pr_core->prr_xa, prr->index);
- 	kfree(prr);
- }
-@@ -145,6 +150,13 @@ void mlxsw_sp_port_range_reg_put(struct mlxsw_sp *mlxsw_sp, u8 prr_index)
- 	mlxsw_sp_port_range_reg_destroy(mlxsw_sp, prr);
- }
+ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_l4_2[] = {
+ 	MLXSW_AFK_ELEMENT_INST_U32(TCP_FLAGS, 0x04, 16, 9), /* TCP_CONTROL + TCP_ECN */
++	MLXSW_AFK_ELEMENT_INST_U32(L4_PORT_RANGE, 0x04, 0, 16),
+ };
  
-+static u64 mlxsw_sp_port_range_reg_occ_get(void *priv)
-+{
-+	struct mlxsw_sp_port_range_core *pr_core = priv;
-+
-+	return atomic_read(&pr_core->prr_count);
-+}
-+
- int mlxsw_sp_port_range_init(struct mlxsw_sp *mlxsw_sp)
- {
- 	struct mlxsw_sp_port_range_core *pr_core;
-@@ -168,6 +180,11 @@ int mlxsw_sp_port_range_init(struct mlxsw_sp *mlxsw_sp)
- 	pr_core->prr_ids.max = max - 1;
- 	xa_init_flags(&pr_core->prr_xa, XA_FLAGS_ALLOC);
- 
-+	devl_resource_occ_get_register(priv_to_devlink(core),
-+				       MLXSW_SP_RESOURCE_PORT_RANGE_REGISTERS,
-+				       mlxsw_sp_port_range_reg_occ_get,
-+				       pr_core);
-+
- 	return 0;
- }
- 
-@@ -175,6 +192,8 @@ void mlxsw_sp_port_range_fini(struct mlxsw_sp *mlxsw_sp)
- {
- 	struct mlxsw_sp_port_range_core *pr_core = mlxsw_sp->pr_core;
- 
-+	devl_resource_occ_get_unregister(priv_to_devlink(mlxsw_sp->core),
-+					 MLXSW_SP_RESOURCE_PORT_RANGE_REGISTERS);
- 	WARN_ON(!xa_empty(&pr_core->prr_xa));
- 	xa_destroy(&pr_core->prr_xa);
- 	kfree(pr_core);
+ static const struct mlxsw_afk_block mlxsw_sp2_afk_blocks[] = {
 -- 
 2.40.1
 
