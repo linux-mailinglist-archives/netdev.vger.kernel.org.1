@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-16807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8C5374EC12
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:58:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F37D374EC18
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:59:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B77AB1C20E37
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:58:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD3AE281693
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E4B18011;
-	Tue, 11 Jul 2023 10:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A44182B8;
+	Tue, 11 Jul 2023 10:59:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A77E174CD
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:58:30 +0000 (UTC)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20DF19B;
-	Tue, 11 Jul 2023 03:58:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93C018011
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:59:13 +0000 (UTC)
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B17710E3;
+	Tue, 11 Jul 2023 03:59:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689073109; x=1720609109;
+  t=1689073143; x=1720609143;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=lIHyBeHEaNenp9Q/l2JAcaQuyI3ymSNUAckdiFell2M=;
-  b=aSDhIFMueOPnwVS7Ho6a6OIntXPb4+TbR8av8tsm7N95ZF0HZvBNOrjE
-   6IYDKI8Noo4KEC9bjea4tOfDBZw7+Is1haF4dzE/Lhk/AH2xCsqUR7RhD
-   rw9HxOXIUWPylC8POOQphS1jmQDGgYb/JL1I3v44IvjCMzks+Q/feoNi2
-   32RjOfZWWZ5qO9zM3XX0FbQGqD3n7QxD8Zwoh/76qRnViLx8ducan/skg
-   gjgorJxdWER81EIUlIqRCqhk48WACRer5ZCZeCCnGT2JMwI370n4lDlCU
-   O2aCNRtbAJDyaNdfxwQMN+cFvv4UzNPiDwnJiAY7sDzLgZ2y6CEOfedZU
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="368087275"
+  bh=+zeFSMPLY2Z95wTb4g4rf/2HnStio6yWOtQ5rXla3Pk=;
+  b=mTNTKDu7LA+Zt1wBLxFqLkILl1YdNUY6QDnzQYtnSr7jte9LeHFAftz2
+   8rMzbhp7MAt+jLSlRkCvmDK7uiTwJJEvPjLUlXBppb6bff5lk3XMJDQbc
+   3t50eAeQfSQjP6zL8FaNHlp+y3iUjZP9PFW24U+XIlJole21Uk0BBJKa3
+   wQ6VlOUI+WenLDX6jcnLSbMXKlyvhoIybxJC1bR0JGuipjwiYyHp5+0mv
+   G/FjrEsO2GXOEM4J6kOH+aAPWbZccn2Eso4hK74NSBsZpmhjr6D6lgmVL
+   kAS2NKLwMZE07iHahbWQUphJ6Erxhth3gGvyxvTpx53tZNv8XnYHqxOZ5
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="450948914"
 X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="368087275"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 03:58:28 -0700
+   d="scan'208";a="450948914"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 03:59:01 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="724404293"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="721055869"
 X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="724404293"
+   d="scan'208";a="721055869"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga007.fm.intel.com with ESMTP; 11 Jul 2023 03:58:16 -0700
+  by orsmga002.jf.intel.com with ESMTP; 11 Jul 2023 03:58:49 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.96)
 	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qJB4O-001p51-1q;
-	Tue, 11 Jul 2023 13:58:12 +0300
-Date: Tue, 11 Jul 2023 13:58:12 +0300
+	id 1qJB4v-001p5g-2V;
+	Tue, 11 Jul 2023 13:58:45 +0300
+Date: Tue, 11 Jul 2023 13:58:45 +0300
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Mark Brown <broonie@kernel.org>
 Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
@@ -99,12 +99,12 @@ Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 02/15] spi: Drop duplicate IDR allocation code in
- spi_register_controller()
-Message-ID: <ZK01xAqLc8AGFDo/@smile.fi.intel.com>
+Subject: Re: [PATCH v2 03/15] spi: Replace if-else-if by bitops and
+ multiplications
+Message-ID: <ZK015fKTOK5wjck+@smile.fi.intel.com>
 References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-3-andriy.shevchenko@linux.intel.com>
- <97f3436a-78ca-4a94-a409-ef04bd3b593f@sirena.org.uk>
+ <20230710154932.68377-4-andriy.shevchenko@linux.intel.com>
+ <24e71654-bc79-42ac-86d1-4e6100f6893a@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,45 +113,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <97f3436a-78ca-4a94-a409-ef04bd3b593f@sirena.org.uk>
+In-Reply-To: <24e71654-bc79-42ac-86d1-4e6100f6893a@sirena.org.uk>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 06:09:00PM +0100, Mark Brown wrote:
-> On Mon, Jul 10, 2023 at 06:49:19PM +0300, Andy Shevchenko wrote:
+On Mon, Jul 10, 2023 at 05:56:59PM +0100, Mark Brown wrote:
+> On Mon, Jul 10, 2023 at 06:49:20PM +0300, Andy Shevchenko wrote:
 > 
-> > Refactor spi_register_controller() to drop duplicate IDR allocation.
-> > Instead of if-else-if branching use two sequential if:s, which allows
-> > to re-use the logic of IDR allocation in all cases.
+> > -		if (xfer->bits_per_word <= 8)
+> > -			maxsize = maxwords;
+> > -		else if (xfer->bits_per_word <= 16)
+> > -			maxsize = 2 * maxwords;
+> > -		else
+> > -			maxsize = 4 * maxwords;
+> > -
+> > +		maxsize = maxwords * roundup_pow_of_two(BITS_TO_BYTES(xfer->bits_per_word));
 > 
-> For legibility this should have been split into a separate factoring out
-> of the shared code and rewriting of the logic, that'd make it trivial to
-> review.
+> This will change the behaviour if bits_per_word is more than 32.  That
+> is validated out elsewhere but I shouldn't have had to go around
+> checking the code to confirm that this is the case.  This is the sort of
+> thing that should be highlighted when doing this sort of edge case
+> stylistic change.
 
-Should I do that for v3?
-
-> > -		mutex_lock(&board_lock);
-> > -		id = idr_alloc(&spi_master_idr, ctlr, first_dynamic,
-> > -			       0, GFP_KERNEL);
-> > -		mutex_unlock(&board_lock);
-> > -		if (WARN(id < 0, "couldn't get idr"))
-> > -			return id;
-> > -		ctlr->bus_num = id;
-> > +		status = spi_controller_id_alloc(ctlr, first_dynamic, 0);
-> > +		if (status)
-> > +			return status;
-> 
-> The original does not do the remapping of return codes that the previous
-> two copies do...
-
-Yes, I had to mention this in the commit message that in my opinion this makes
-no difference. With the dynamically allocated aliases the absence of the slot
-has the same effect as in the other cases.
+Right, I have to add this into commit message of v3.
 
 -- 
 With Best Regards,
