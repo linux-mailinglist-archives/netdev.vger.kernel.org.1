@@ -1,169 +1,134 @@
-Return-Path: <netdev+bounces-16796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCCEF74EB87
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:11:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8011574EB73
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:06:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5DA41C20DC4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:11:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F189F2812A4
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAE9182B6;
-	Tue, 11 Jul 2023 10:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3672C182AF;
+	Tue, 11 Jul 2023 10:06:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26BD182AA
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:11:52 +0000 (UTC)
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3843399
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689070311; x=1720606311;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xKofiLXnxe4wy6v0Z65u/Y52tDYtw8t8riMKkQ2RpTI=;
-  b=XFIuEUhJg77Wm6Kkws1YCCbsMRlKzU3gZjhAXfyGLHR1nX/sD2LX4xsi
-   w+lEoUUR0IE5y8Zlm9+vOeSGWJga1xGD2PE3ULRvZ4aNTJtYqTBwaWdVR
-   A/QXK88Wqc2pKTaiuxE8vTHas+BnPPRDnvMq96SyHHlgYZkUUFeGeJ7F7
-   XGbJbqjWPTQ82UXxEGuehsmxnyEf0bQMrzf9LPNnUhE1kiUjruOwCLRcO
-   jn9i20EqZy5MxkqiSUQP3HhCGvYtw8W1zttKdNVrLaQdhPF/uZbxBgf7j
-   2n66qUaStm3bt2c4yJXni/Gr9TvKR5fm3zezhd1fvCVm/diqDsXkJx2am
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="362042094"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="362042094"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 03:11:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="865694791"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="865694791"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by fmsmga001.fm.intel.com with ESMTP; 11 Jul 2023 03:11:49 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v4] ice: Fix memory management in ice_ethtool_fdir.c
-Date: Tue, 11 Jul 2023 12:04:50 +0200
-Message-Id: <20230711100450.30492-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F34174E5
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:06:44 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAB46A9
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:06:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689070003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2TPO/FGU+Mk707Xj0q9XxQIOD+qFso8ut3H7Imu4kbE=;
+	b=chtgGb+lGHfQYdWF39eTNYeeMrukjYywLsX4xTiLUoYt0pH7iPEewjeRAEv/hVu2I4uuTv
+	AWpszfsPbl6MhRXyCW/dZFnzrq23uF4Uotv4BQ7W8QbXY9dvns7H7n25bIlT+mlmTwZhv3
+	D3Cf6mk9L/rW3bA8nxOTyoCupvmJmWY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-31-f4DQhBK3P5CZToVfIlj2sQ-1; Tue, 11 Jul 2023 06:06:41 -0400
+X-MC-Unique: f4DQhBK3P5CZToVfIlj2sQ-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7672918d8a4so142935685a.0
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 03:06:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689070001; x=1691662001;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2TPO/FGU+Mk707Xj0q9XxQIOD+qFso8ut3H7Imu4kbE=;
+        b=Z/U4g/5s/zFPTeX9X8EOoh15Qmhw2Jluw3vLO5mKMdJJMPoEANL4oeRKdLz5VGy2S6
+         vQT+fnDbqyyXx1XjeeeEx2DikJMa0z5RaNLiMRS3bQfIm+GQVbWmeK7VuvZRt3gZHbEU
+         8U7AbAikQAmsLFm1jceMQmzUZfp9331/5G275baGbPOw2/phhCGTFIa+ZVcCIfMESTlk
+         W7S+63AOo1zXjSQHfuRiTgm/z6jqIWPLQxCJ9ODDPpm6hLRjdi2phkAuSL/lwx8ZC1r5
+         BaQOok+qBVUxUpj2++mzVyH+f7NNPzY2YeiQom5EU7ZSzh09mAG5AynDaG+TmWgOtEzp
+         uBJA==
+X-Gm-Message-State: ABy/qLbiX+tOJHzRhB3RFsd4U1JJ5f+I6DWAQdRAQxZ9K9Xx/2hCqQJ+
+	nh5bsxoLSr/aLC5npZe/fkgmJ2j5E6Sy/1vJ1WcJ+UiKIFUYffX7dRIwdlkt/CkBbxmc9145Gmi
+	PVDhEe+j1y1Aqm1Qx
+X-Received: by 2002:a05:620a:4712:b0:766:f972:73da with SMTP id bs18-20020a05620a471200b00766f97273damr15420020qkb.1.1689070001268;
+        Tue, 11 Jul 2023 03:06:41 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGKrjDQ/0JCKjdt4Y/ASekfonypXOA8dCTTcevQrHl2uYE0Np3ZdFY3oYabtGolKXcdV91H1g==
+X-Received: by 2002:a05:620a:4712:b0:766:f972:73da with SMTP id bs18-20020a05620a471200b00766f97273damr15420001qkb.1.1689070001010;
+        Tue, 11 Jul 2023 03:06:41 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-235-188.dyn.eolo.it. [146.241.235.188])
+        by smtp.gmail.com with ESMTPSA id d7-20020a05620a136700b00767c961eb47sm821091qkl.43.2023.07.11.03.06.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 03:06:40 -0700 (PDT)
+Message-ID: <0cb1b68794529c4d4493b5891f6dc0e9a3a03331.camel@redhat.com>
+Subject: Re: DCCP Deprecation
+From: Paolo Abeni <pabeni@redhat.com>
+To: "Maglione, Gregorio" <Gregorio.Maglione@city.ac.uk>, Kuniyuki Iwashima
+	 <kuniyu@amazon.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Florian Westphal <fw@strlen.de>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Stephen Hemminger
+ <stephen@networkplumber.org>, "Rakocevic, Veselin"
+ <Veselin.Rakocevic.1@city.ac.uk>,  "Markus.Amend@telekom.de"
+ <Markus.Amend@telekom.de>, "nathalie.romo-moreno@telekom.de"
+ <nathalie.romo-moreno@telekom.de>
+Date: Tue, 11 Jul 2023 12:06:36 +0200
+In-Reply-To: <CWLP265MB6449543ADBE7B64F5FE1D9F8C931A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+References: 
+	<CWLP265MB6449FC7D80FB6DDEE9D76DA9C930A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+	 <20230710182253.81446-1-kuniyu@amazon.com>
+	 <20230710133132.7c6ada3a@hermes.local>
+	 <CWLP265MB6449543ADBE7B64F5FE1D9F8C931A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix ethtool FDIR logic to not use memory after its release.
-In the ice_ethtool_fdir.c file there are 2 spots where code can
-refer to pointers which may be missing.
+Hi,
 
-In the ice_cfg_fdir_xtrct_seq() function seg may be freed but
-even then may be still used by memcpy(&tun_seg[1], seg, sizeof(*seg)).
+Please send plain text messages, and do proper quoting.
 
-In the ice_add_fdir_ethtool() function struct ice_fdir_fltr *input
-may first fail to be added via ice_fdir_update_list_entry() but then
-may be deleted by ice_fdir_update_list_entry.
+On Tue, 2023-07-11 at 09:31 +0000, Maglione, Gregorio wrote:
+> The IETF marks MP-DCCP as EXP and is set to mark is as PS soon.
+> Removing DCCP from the kernel would likely impact PS standardisation
+> or better. If the reason for removal is the lack of a maintainers,
+> then I have sufficient time for bug fixing and syzbot testing.
 
-Terminate in both cases when the returned value of the previous
-operation is other than 0, free memory and don't use it anymore.
+As Kuniyuki noted, a relevant record of contributions to netdev would
+help/be appreciated/customary before proposing stepping-in as
+maintainer of some networking components.
 
-Reported-by: Michal Schmidt <mschmidt@redhat.com>
-Link: https://bugzilla.redhat.com/show_bug.cgi?id=2208423
-Fixes: cac2a27cd9ab ("ice: Support IPv4 Flow Director filters")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
-v2: extend CC list, fix freeing memory before return
-v3: correct typos in the commit msg
-v4: restore devm() approach
----
- .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 30 +++++++++++--------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+> If, as Jakub suggests, DCCP has no users other than MP-DCCP, and as
+> such shouldn't be maintained,=C2=A0
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index ead6d50fc0ad..b6308780362b 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -1281,16 +1281,25 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
- 				     ICE_FLOW_FLD_OFF_INVAL);
- 	}
- 
--	/* add filter for outer headers */
- 	fltr_idx = ice_ethtool_flow_to_fltr(fsp->flow_type & ~FLOW_EXT);
-+
-+	if (perfect_filter)
-+		set_bit(fltr_idx, hw->fdir_perfect_fltr);
-+	else
-+		clear_bit(fltr_idx, hw->fdir_perfect_fltr);
-+
-+	/* add filter for outer headers */
- 	ret = ice_fdir_set_hw_fltr_rule(pf, seg, fltr_idx,
- 					ICE_FD_HW_SEG_NON_TUN);
--	if (ret == -EEXIST)
--		/* Rule already exists, free memory and continue */
--		devm_kfree(dev, seg);
--	else if (ret)
-+	if (ret == -EEXIST) {
-+		/* Rule already exists, free memory and count as success */
-+		ret = 0;
-+		goto err_exit;
-+	} else if (ret) {
- 		/* could not write filter, free memory */
-+		ret = -EOPNOTSUPP;
- 		goto err_exit;
-+	}
- 
- 	/* make tunneled filter HW entries if possible */
- 	memcpy(&tun_seg[1], seg, sizeof(*seg));
-@@ -1305,18 +1314,13 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
- 		devm_kfree(dev, tun_seg);
- 	}
- 
--	if (perfect_filter)
--		set_bit(fltr_idx, hw->fdir_perfect_fltr);
--	else
--		clear_bit(fltr_idx, hw->fdir_perfect_fltr);
--
- 	return ret;
- 
- err_exit:
- 	devm_kfree(dev, tun_seg);
- 	devm_kfree(dev, seg);
- 
--	return -EOPNOTSUPP;
-+	return ret;
- }
- 
- /**
-@@ -1914,7 +1918,9 @@ int ice_add_fdir_ethtool(struct ice_vsi *vsi, struct ethtool_rxnfc *cmd)
- 	input->comp_report = ICE_FXD_FLTR_QW0_COMP_REPORT_SW_FAIL;
- 
- 	/* input struct is added to the HW filter list */
--	ice_fdir_update_list_entry(pf, input, fsp->location);
-+	ret = ice_fdir_update_list_entry(pf, input, fsp->location);
-+	if (ret)
-+		goto release_lock;
- 
- 	ret = ice_fdir_write_all_fltr(pf, input, true);
- 	if (ret)
--- 
-2.31.1
+FWIW, I agree that in kernel user would help DCCP "de-deprecation"
+
+> then are you suggesting that we investigate this license concern to
+> allow for MP-DCCP to move upstream, or did you have a patch in mind?
+
+IMHO solving the license concerns and move MP-DCCP upstream (in this
+order) would be the better solution. That would allow creating the
+contributions record mentioned above.
+
+FTR MPTCP is already there, perhaps there is some possible convergence
+between the 2 protocols.
+
+Cheers,
+
+Paolo
 
 
