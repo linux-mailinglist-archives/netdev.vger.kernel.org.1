@@ -1,157 +1,146 @@
-Return-Path: <netdev+bounces-16878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBF774F371
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:30:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6628074F39A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF722816B5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1951D2816E3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1ED19BB7;
-	Tue, 11 Jul 2023 15:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E79A19BBA;
+	Tue, 11 Jul 2023 15:35:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A9819BAB
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 15:30:25 +0000 (UTC)
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54E0D136;
-	Tue, 11 Jul 2023 08:30:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689089424; x=1720625424;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WtKHEzd9TLb1fy9g0AvI3P/4wH5wHUCXn6+ARbR9U1s=;
-  b=hBr5izgDJD/+xQBRT3DHHo56zIVWGr+PwRKeYslY6byoAX8dVJKP/IlP
-   XY2wrXphIylhXd4071LpUGpDRQMvcVoheqR2xYz/VGZeg1ocw+At12Ode
-   PTC74t9K5YYezReTYPdi0oDkc/r4Djo/4nZ5gRCaOUN1m4d3t/zLJe6Xq
-   ptVaXtDqdCnfmUoyRk80WfAin8VYCXMblITX/1QZeF3sZhL4mF4qsSzh9
-   LDYiFacjAfODc99/FRomUQEFDlayLL1LDWMqsytLRRHjVZhB0ff9c6TOl
-   QyJW3PUvicDt5m4ta+3WiJMbTZ535Wn09jYYEWE781W+LtuVQ9dAC9WKE
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="428346794"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="428346794"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 08:30:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="698462660"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="698462660"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga006.jf.intel.com with ESMTP; 11 Jul 2023 08:30:10 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qJFJX-001swf-0G;
-	Tue, 11 Jul 2023 18:30:07 +0300
-Date: Tue, 11 Jul 2023 18:30:06 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 04/15] spi: Replace open coded
- spi_controller_xfer_timeout()
-Message-ID: <ZK11flZf/1grJ1Bd@smile.fi.intel.com>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-5-andriy.shevchenko@linux.intel.com>
- <cfaffa00-4b61-4d81-8675-70295844513b@sirena.org.uk>
- <ZK02efTYxV3czigr@smile.fi.intel.com>
- <5959b123-09e3-474b-9ab0-68d71cfdd9a2@sirena.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE1A19BAB
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 15:35:55 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0CB10EB;
+	Tue, 11 Jul 2023 08:35:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=wp3Gf78q27oropR3P7+eQq1HKA6J74ZGkab9Ggf11MA=; b=Lg
+	9kbFWJWVcnDtumqg6cH7lFcSrdExgg0dnO5XNJ4II1wJYjSXncNoZuySqiXXhK6EY/TDYiQW76ysj
+	RIC7gwd/V5UlVa/wDFAXVeNzx7Nicm7w1Ldc+Yx+6XBsliMzAgd1Y6NTmDE8Lg+DEDHYll1jTFcx9
+	qFn/HvgidsZW6Gs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qJFOm-00135w-Rw; Tue, 11 Jul 2023 17:35:32 +0200
+Date: Tue, 11 Jul 2023 17:35:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vesa =?iso-8859-1?B?SuTkc2tlbORpbmVu?= <vesa.jaaskelainen@vaisala.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Andrew Davis <afd@ti.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] net: phy: dp83822: Add support for line class driver
+ configuration
+Message-ID: <0ef64a05-64a0-4119-9dcc-83e65434cd24@lunn.ch>
+References: <20230710175621.8612-1-vesa.jaaskelainen@vaisala.com>
+ <261cb91c-eb3a-4612-93ad-25e2bc1a7c23@lunn.ch>
+ <87fac0dd-9a97-b188-4887-8c4bb21196d5@vaisala.com>
+ <6cf76d72-4747-46d2-a1f7-d2f1131491f7@lunn.ch>
+ <85e9dfbd-baea-1d73-aaf0-d6c14a1305eb@vaisala.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <5959b123-09e3-474b-9ab0-68d71cfdd9a2@sirena.org.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <85e9dfbd-baea-1d73-aaf0-d6c14a1305eb@vaisala.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 03:14:54PM +0100, Mark Brown wrote:
-> On Tue, Jul 11, 2023 at 02:01:13PM +0300, Andy Shevchenko wrote:
-> > On Mon, Jul 10, 2023 at 06:30:32PM +0100, Mark Brown wrote:
-> > > On Mon, Jul 10, 2023 at 06:49:21PM +0300, Andy Shevchenko wrote:
+On Tue, Jul 11, 2023 at 10:51:22AM +0300, Vesa Jääskeläinen wrote:
+> Hi Andrew,
 > 
-> > > > + * Assume speed to be 100 kHz if it's not defined at the time of invocation.
+> On 10.7.2023 22.38, Andrew Lunn wrote:
+> > > Hi Andrew,
+> > > 
+> > > This is needed for configuration in link between DP83822 and Ethernet Switch
+> > > chip.
+> > What switch chip is it?
 > 
-> > > You didn't mention this bit in the changelog, and I'm not 100% convinced
-> > > it was the best idea in the first place.  It's going to result in some
-> > > very big timeouts if it goes off, and we really should be doing
-> > > validation much earlier in the process.
+> Microchip's KSZ9897.
+
+O.K, so nothing special or oddball.
+
+> > Most boards just connect the MACs together and don't have PHYs in the
+> > middle. There are some boards which do have PHYs, but they don't need
+> > any special mode.
 > 
-> > Okay, let's drop this change.
+> In here there is PHY<->PHY line link. My understanding is that in this
+> particular case PHY link works better than *MII links.
+
+I've seen PHY<->PHY done when the switch was on a daughter board, and
+there was worries about getting RGMII over the connector etc.
+
+> > So before accepting any patches, we need a better understanding of
+> > that reduced MLT-3 is and why you would want to use it.
 > 
-> Like I say we *should* be fine with the refactoring without this, or at
-> least if it's an issue we should improve the validation.
+> OK.
+> 
+> My understanding is that as we have PHY<->PHY link it needs to handle itself
+> in standard way. Thus the MLT-3 full mode is required for communicating with
+> Ethernet switch.
+> 
+> It seems that Texas Instruments has figured out additional power saving
+> mechanism by carefully selecting used magnetics (they have guidelines for
+> that and list of supported ones). Now the thinking might have continued that
+> let's make the power saving mode the default for all.
 
-For the speeds < 1000 Hz, this change will lead to the div by 0 crash.
-It seems that the current code which this one removes is better than
-the spi_controller_xfer_timeout() provides.
+Do there guidelines for magnetic says anything about what to do when
+using unsupported ones. Like turn reduced MLT-3 off?
 
-If anything, the spi_controller_xfer_timeout() should be improved first.
-So, for now I drop this for sure. Maybe in the future we can come back
-to it.
+> With carefully selected magnetics one most likely gets correct looking
+> signal when measured from the cable and thus the other party then gets
 
--- 
-With Best Regards,
-Andy Shevchenko
+> I tried to look up what does this class A and class B mean but I am unable
+> to find the reasoning for that.
 
+If you look at the oscilloscope screenshots in the support forum, it
+looks like in reduced MLT-3 mode, The TX- and TX+ pins only have two
+states, not three. It relies on the magnetics to combine the two
+signals to produce a three state signal, and handle the bias in each
+signal.
 
+When in MLT-3 mode, i expect the TX- and TX+ pins do real MLT-3.
+
+With real MLT-3, you can then do capacitor coupling to other devices
+which conform to 802.3.
+
+> Do we have people from Texas Instruments that could share more insights?
+
+Maybe, but don't hold your breath. Since Dan Murphy left TI, TI does
+not really support its own PHYs in mainline.
+
+> In a way this could even be:
+> 
+>   ti,force-standard-mlt-3-signaling;
+
+Maybe. Or ti,disable-proprietary-line-coding
+
+Lets give TI a couple of days to comment.
+
+     Andrew
 
