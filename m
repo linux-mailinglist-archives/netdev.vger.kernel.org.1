@@ -1,24 +1,24 @@
-Return-Path: <netdev+bounces-16774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A522D74EAD2
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:39:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2013174EACF
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5B261C20D65
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:39:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA133281720
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F5419BC1;
-	Tue, 11 Jul 2023 09:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616E11DDC5;
+	Tue, 11 Jul 2023 09:30:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7DB1DDC1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C6119BC1
 	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 09:30:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D36C433D9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79849C433B8;
 	Tue, 11 Jul 2023 09:30:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689067805;
