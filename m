@@ -1,153 +1,121 @@
-Return-Path: <netdev+bounces-16868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719DB74F16F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:15:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62B474F1BD
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E433F281865
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:15:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22AAE1C20F10
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F301C19BAD;
-	Tue, 11 Jul 2023 14:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEB219BB2;
+	Tue, 11 Jul 2023 14:21:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF9814AB5
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:15:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 209CBC433C9;
-	Tue, 11 Jul 2023 14:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689084907;
-	bh=A+lgFSqWg8vRgir1XqFzY9nIE1Cw0dwqFBu8P2BdZBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KwXQpO0JwJwS2tync5AfGpO9HXb9u4mgZfpWRxyxjmWV7o23oHa66oSgLBUqWen2D
-	 ZlOHsSEyXpzrsEeWWEmLhLLitAzI15911I18ub63ARZldiwGDK6EeLi3B34Qy+IEG4
-	 waxyA6VmnpE80hBohYtayTpWfyRhiz5yBCu2xfPCie7wDB1OJGO5pfFeIe7TmhLaf6
-	 2F7TtEpspxDmIAOKWfQt4n5/QaTo60Dymh5zBKNq1hnkXPOMFNsHXFu721qfrAekf9
-	 KAql0ORVXuf2YxOmwhPq6tE1iNaCTZM61qgKsPoZvWs0hppRNFtMcBrTT4RcCr66z6
-	 VpMXSzxRgleHw==
-Date: Tue, 11 Jul 2023 15:14:54 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 04/15] spi: Replace open coded
- spi_controller_xfer_timeout()
-Message-ID: <5959b123-09e3-474b-9ab0-68d71cfdd9a2@sirena.org.uk>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-5-andriy.shevchenko@linux.intel.com>
- <cfaffa00-4b61-4d81-8675-70295844513b@sirena.org.uk>
- <ZK02efTYxV3czigr@smile.fi.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105F318C1F
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:21:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7301987
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:20:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689085223;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NY9zvWPkMIRBdIzQwvp51bTldJwjnkTeVv0DGYO1saU=;
+	b=EEZFmlF+yieTl6IKylqEc/8VXSb+4gW6rUG3hZGOiAwHlnXYrKX9YyTxGeVbQxzRwcX2Bk
+	j8pMRS4HBRVNloECLsYVyc/fZ5OMegaQ+FjbvhZjS++tNpAmlrye2XTftAbMte/LzahpcD
+	S2CG+/DeSCSluCDddv5ntgutNFeCDhY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-190-owKJyGXMPSOsyC8L1C253A-1; Tue, 11 Jul 2023 10:20:22 -0400
+X-MC-Unique: owKJyGXMPSOsyC8L1C253A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52C1B28040B2;
+	Tue, 11 Jul 2023 14:16:56 +0000 (UTC)
+Received: from [10.39.208.24] (unknown [10.39.208.24])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6434B40C2070;
+	Tue, 11 Jul 2023 14:16:54 +0000 (UTC)
+Message-ID: <3a8073d5-dab4-ed13-2c53-84ed5093bacb@redhat.com>
+Date: Tue, 11 Jul 2023 16:16:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="MZrPSMfLUzZVYlnE"
-Content-Disposition: inline
-In-Reply-To: <ZK02efTYxV3czigr@smile.fi.intel.com>
-X-Cookie: marriage, n.:
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Content-Language: en-US
+To: Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
+ xieyongji@bytedance.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20230628065919.54042-1-lulu@redhat.com>
+ <20230628065919.54042-2-lulu@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Subject: Re: [RFC 1/4] vduse: Add the struct to save the vq reconnect info
+In-Reply-To: <20230628065919.54042-2-lulu@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Hello Cindy,
 
---MZrPSMfLUzZVYlnE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 6/28/23 08:59, Cindy Lu wrote:
+> From: Your Name <you@example.com>
+> 
+> this struct is to save the reconnect info struct, in this
+> struct saved the page info that alloc to save the
+> reconnect info
+> 
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>   drivers/vdpa/vdpa_user/vduse_dev.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
+> index 26b7e29cb900..f845dc46b1db 100644
+> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> @@ -72,6 +72,12 @@ struct vduse_umem {
+>   	struct page **pages;
+>   	struct mm_struct *mm;
+>   };
+> +struct vdpa_reconnect_info {
+> +	u32 index;
+> +	phys_addr_t addr;
+> +	unsigned long vaddr;
+> +	phys_addr_t size;
+> +};
+>   
+>   struct vduse_dev {
+>   	struct vduse_vdpa *vdev;
+> @@ -106,6 +112,7 @@ struct vduse_dev {
+>   	u32 vq_align;
+>   	struct vduse_umem *umem;
+>   	struct mutex mem_lock;
+> +	struct vdpa_reconnect_info reconnect_info[64];
 
-On Tue, Jul 11, 2023 at 02:01:13PM +0300, Andy Shevchenko wrote:
-> On Mon, Jul 10, 2023 at 06:30:32PM +0100, Mark Brown wrote:
-> > On Mon, Jul 10, 2023 at 06:49:21PM +0300, Andy Shevchenko wrote:
+Why 64?
+Shouldn't it be part of struct vduse_virtqueue instead?
 
-> > > + * Assume speed to be 100 kHz if it's not defined at the time of invocation.
+>   };
+>   
+>   struct vduse_dev_msg {
 
-> > You didn't mention this bit in the changelog, and I'm not 100% convinced
-> > it was the best idea in the first place.  It's going to result in some
-> > very big timeouts if it goes off, and we really should be doing
-> > validation much earlier in the process.
-
-> Okay, let's drop this change.
-
-Like I say we *should* be fine with the refactoring without this, or at
-least if it's an issue we should improve the validation.
-
-> > > +	u32 speed_hz = xfer->speed_hz ?: 100000;
-
-> > Not only the ternery operator, but the version without the second
-> > argument for extra clarity!
-
-> Elvis can be interpreted as "A _or_ B (if A is false/0)".
-> Some pieces related to SPI use Elvis already IIRC.
-
-I understand what it means, I just don't find it's adding clarity most
-of the times it's used (there's a few places where it is useful like
-pasting in strings in formats).  There are some examples that I'd
-complain about in the code, most of them predating me working on SPI too
-much, but I'm not a fan.
-
---MZrPSMfLUzZVYlnE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmStY90ACgkQJNaLcl1U
-h9DeQQf+MxpgOv6egcsQtreuAtaq7Ev7HPCaH6MbusHDNH2hElvH+GmEYjovkV6m
-h3LadU5OvktJBaXfjDQRjU71Cbf70/Nlo8I3WN5V4iRKzqWtfMV16ZStvy2+1Rx/
-jHek+Aib8L8SiwlzvD6WB163yHCsSn5KBv2Pqp95DjGWamTl918onxXzSS6g2j5A
-ib1Mz8aOXWBsiIdaFTQ3NoK7Uvnykzp1X2uGcfrRZuPWQNVvpJs/wt5iOuTpuEws
-6O2PEgJext+6CeKBCv8pCvpex2QsVtDKLnDVvmDX4Oa2impxsxSIjLyVbZfbJ480
-4XviYIQ2LNlTFidlbAAqqEafOQrvRg==
-=WM20
------END PGP SIGNATURE-----
-
---MZrPSMfLUzZVYlnE--
 
