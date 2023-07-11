@@ -1,51 +1,88 @@
-Return-Path: <netdev+bounces-16951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A5074F8CD
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 22:12:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB2774F8DA
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 22:14:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62641C20DFC
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:12:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 093FF281951
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646A91EA7E;
-	Tue, 11 Jul 2023 20:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB4D1EA87;
+	Tue, 11 Jul 2023 20:14:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0698E1DDCB
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 20:12:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B42DC433C7;
-	Tue, 11 Jul 2023 20:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8222F182CD
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 20:14:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79250C433C9;
+	Tue, 11 Jul 2023 20:14:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689106326;
-	bh=MdUZCeeACrV8lco8xyZoWWdINdlukQxVGZTpoYXp6p8=;
+	s=k20201202; t=1689106486;
+	bh=QQ99VSEJ6m4sXmbmothGlilr6UcEysLFPY7XMiYqWYE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m9M7R6kX71CNU0VZH2rXNxmpcxlYVKMeYYYJLFYVO0Mw+J7PJ3GHvC7nMZW9lpjW2
-	 ELz43uOuJVVsC3Zoa8MsCUyNY+FclFXEpmGldE3RkIPOnDYZHYM5sAWDktQjhsPdNh
-	 T79DdgZgK5kOiivDsRLh7Wsv/dKha6xjrSQLP294bgSJKnn/8dFATGNdc617BODjNB
-	 Lpnx0p2VQlbU6JBkv8yWDGF4dLRaPKi/FxIaR7HDla3bSx/P2rZy06Ibl9fMF9RMW+
-	 UKGRIMjjoV6HSr5r2/iRiSfU+7l4V094NWif5n4TWSeH6SEGY8T4yCuSObKjj/9f9E
-	 cVD5LTMDXWnvA==
-Date: Tue, 11 Jul 2023 13:12:05 -0700
+	b=F31+5G5q1kfmzpJ15gBHIwtHxL9nwCFFLcEOKirbusA2Twqp9jcnzJRCtb14dlq94
+	 PjV0eAAjnd7Cd9joG25dBCL1xkx1chsR2rvqFGyerUkjJOXzEyr0nmjXAV93oeYoHr
+	 m29+ZJu0dCzQLyaD+3cJI3ZPQ+s1BCFfnRyEIvacR8gaO/H4QBppX/wxTIlxkx38V8
+	 7HPEQ/ThdwClPfg+enYIkIq7DobUatOn0MLuTyhWiICws1x6v/0LET2YeIEmf+qq8U
+	 pRmOm3JmcsrKQ+leYH5bieK1ykedF2/GHCsOf/3Q+EawbagWjlfefvtjzi+sYdYbtY
+	 jpvvU8v026JvA==
+Date: Tue, 11 Jul 2023 13:14:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: "David S. Miller" <davem@davemloft.net>, Oliver Neukum
- <oneukum@suse.com>, netdev@vger.kernel.org, USB mailing list
- <linux-usb@vger.kernel.org>
-Subject: Re: [PATCH] net: usbnet: Fix WARNING in
- usbnet_start_xmit/usb_submit_urb
-Message-ID: <20230711131205.53b3e5e4@kernel.org>
-In-Reply-To: <38ff51d4-2734-4dd7-8638-ae2fc8572c0d@rowland.harvard.edu>
-References: <000000000000a56e9105d0cec021@google.com>
-	<000000000000e298cd05fecc07d4@google.com>
-	<0f685f2f-06df-4cf2-9387-34f5e3c8b7b7@rowland.harvard.edu>
-	<7330e6c0-eb73-499e-8699-dc1754d90cad@rowland.harvard.edu>
-	<413fb529-477c-7ac9-881e-550b4613d38c@suse.com>
-	<38ff51d4-2734-4dd7-8638-ae2fc8572c0d@rowland.harvard.edu>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "vadfed@meta.com" <vadfed@meta.com>,
+ "jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "vadfed@fb.com" <vadfed@fb.com>, "Brandeburg, Jesse"
+ <jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+ <anthony.l.nguyen@intel.com>, "M, Saeed" <saeedm@nvidia.com>,
+ "leon@kernel.org" <leon@kernel.org>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "sj@kernel.org" <sj@kernel.org>,
+ "javierm@redhat.com" <javierm@redhat.com>, "ricardo.canuelo@collabora.com"
+ <ricardo.canuelo@collabora.com>, "mst@redhat.com" <mst@redhat.com>,
+ "tzimmermann@suse.de" <tzimmermann@suse.de>, "Michalik, Michal"
+ <michal.michalik@intel.com>, "gregkh@linuxfoundation.org"
+ <gregkh@linuxfoundation.org>, "jacek.lawrynowicz@linux.intel.com"
+ <jacek.lawrynowicz@linux.intel.com>, "airlied@redhat.com"
+ <airlied@redhat.com>, "ogabbay@kernel.org" <ogabbay@kernel.org>,
+ "arnd@arndb.de" <arnd@arndb.de>, "nipun.gupta@amd.com"
+ <nipun.gupta@amd.com>, "axboe@kernel.dk" <axboe@kernel.dk>, "linux@zary.sk"
+ <linux@zary.sk>, "masahiroy@kernel.org" <masahiroy@kernel.org>,
+ "benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+ "geert+renesas@glider.be" <geert+renesas@glider.be>, "Olech, Milena"
+ <milena.olech@intel.com>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
+ "liuhangbin@gmail.com" <liuhangbin@gmail.com>, "hkallweit1@gmail.com"
+ <hkallweit1@gmail.com>, "andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+ "razor@blackwall.org" <razor@blackwall.org>, "idosch@nvidia.com"
+ <idosch@nvidia.com>, "lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+ "nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>, "phil@nwl.cc"
+ <phil@nwl.cc>, "claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
+ <mschmidt@redhat.com>, "linux-clk@vger.kernel.org"
+ <linux-clk@vger.kernel.org>, "vadim.fedorenko@linux.dev"
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
+Message-ID: <20230711131443.2a4af476@kernel.org>
+In-Reply-To: <DM6PR11MB4657067EE043F4DBB9D8B03B9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
+	<ZJq3a6rl6dnPMV17@nanopsycho>
+	<DM6PR11MB4657084DDD7554663F86C1C19B24A@DM6PR11MB4657.namprd11.prod.outlook.com>
+	<ZJwWXZmZe4lQ04iK@nanopsycho>
+	<DM6PR11MB4657751607C36FC711271D639B30A@DM6PR11MB4657.namprd11.prod.outlook.com>
+	<ZKv1FRTXWLnLGRRS@nanopsycho>
+	<DM6PR11MB46575D14FFE115546FDC9DEB9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
+	<ZK1CizcqjqO1L/RQ@nanopsycho>
+	<DM6PR11MB4657067EE043F4DBB9D8B03B9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,17 +92,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Jul 2023 13:38:00 -0400 Alan Stern wrote:
-> +		u8		ep_addrs[3] = {
-> +			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0};
+On Tue, 11 Jul 2023 17:17:51 +0000 Kubalewski, Arkadiusz wrote:
+> >I think better to add the check to pin-register so future synce pin
+> >users don't have similar weird ideas. Could you please add this check?
+> 
+> Don't think it is way to go, and I don't think there is anything good
+> with preventing device drivers from labeling their pins the way they want.
 
-With the two-tab indentation and the continuation line starting
-half way thru.. this looks highly unusual. Can we use a more
-standard kernel formatting in this case?
-
-		u8 ep_addrs[3] = {
-			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0
-		};
--- 
-pw-bot: cr
+We had a long argument about how label should have a clearly defined
+meaning. We're not going to rehash it on every revision. What did 
+I miss :|
 
