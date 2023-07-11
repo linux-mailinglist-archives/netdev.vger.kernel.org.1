@@ -1,243 +1,306 @@
-Return-Path: <netdev+bounces-16659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B481374E2C1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB9674E2E7
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5A8C28145F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:45:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 940BE1C20C66
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CF6363;
-	Tue, 11 Jul 2023 00:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C129382;
+	Tue, 11 Jul 2023 01:00:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A045B196
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 00:45:22 +0000 (UTC)
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4C28E49
-	for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:45:17 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-7654e1d83e8so397897885a.1
-        for <netdev@vger.kernel.org>; Mon, 10 Jul 2023 17:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689036317; x=1691628317;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/vDAChdCtpEMWX7FZp6dXco/84l2XQjYx3GS9hbCrEs=;
-        b=QU2Ce+Q/ZLzGFSnA9bFQqtmexLsOQFptVRza5ba0p/yMIJRe853P6Oc1Xy0T/wfFuV
-         TE7dFaHuDFn4rrGoClHA+PAw846CTYpq9xggmi4twNpCm4cKooJWzwzl/zlUX9lYodp2
-         /mja+hg+XEfXqQkQ0ogC1AAFmEL103NKW4AGfSTSd1XNUrenllWXdMDgV7Jn2S494y7d
-         J2PgBmj9qbp71tZlsBOl4fn1/AqVSJy+v2rIfLLZGDqc8XFJ3pmz5LtobHFXyUMgaQqR
-         UwuZCwObiF0uviEdvoWP7cgk6GNDmqj0wOPr58FXp/fHMnZjX82xgFEgSg5fwVdhZlo9
-         4j3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689036317; x=1691628317;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/vDAChdCtpEMWX7FZp6dXco/84l2XQjYx3GS9hbCrEs=;
-        b=CPbjM6kV3t6lDa6YxFVwnZ2hQ7YBMw+ve8XBmVISIV8RoF27zccpzKgvT3OszHND4S
-         emai9dJw5Dp1UHzVyjuo/b67eIa5MshSO70dPcagO9EKaEq+kJwrYt1aRdCNdQVLuVhv
-         im1c6NviLm4hSPKEIO1bSaPr7m64rzLcXZKyzd74HCMxt4nFaGR9ThiHDZU3hf2VyVYC
-         ZjoW+XPNC1qsSlNuiqSqTEgsAHDsjjtGDd//Q3yW7zEHLowtpNOGge8Xd1yU/RKEfaKO
-         dZdi8idOYaa3wpkBIhs6N50pJzjkG0wvF1PFg7PXuTFtlRzhW1Ch3s2iiWQy71W6Fw/Y
-         kO+w==
-X-Gm-Message-State: ABy/qLbCP0wFusaXK937zG23f8sH9mIqVmLUYrzx2tFbH6SY/ATKoeJJ
-	56Wc5m83HqHMolaTjgNE5FqSmZAlFmTDdV6qz/4hH8iTCfzex/5GssQwLlZJ
-X-Google-Smtp-Source: APBJJlGmMfPz0wI92CuityRQyRUT7Kh0+wLgEI4lVG/0GSswhkihLDqBBo+i2OAo23yAEXn+5c2cnEOyo2p340ynQzo=
-X-Received: by 2002:a05:620a:468e:b0:767:405b:650f with SMTP id
- bq14-20020a05620a468e00b00767405b650fmr15044320qkb.45.1689036316710; Mon, 10
- Jul 2023 17:45:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4DA196
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 01:00:46 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E745C0;
+	Mon, 10 Jul 2023 18:00:44 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R0Mw33VjMzTmNY;
+	Tue, 11 Jul 2023 08:59:31 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 11 Jul 2023 09:00:41 +0800
+Subject: Re: [PATCH net v2] can: raw: fix receiver memory leak
+To: Oliver Hartkopp <socketcan@hartkopp.net>, <mkl@pengutronix.de>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<penguin-kernel@I-love.SAKURA.ne.jp>
+References: <20230707075342.2463015-1-william.xuanziyang@huawei.com>
+ <5c396de6-afab-6af9-f9d9-a698b9367873@hartkopp.net>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <242454ca-8b67-8169-fa30-5d605538ea63@huawei.com>
+Date: Tue, 11 Jul 2023 09:00:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230616122140.6e889357@kernel.org> <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com>
- <20230619110705.106ec599@kernel.org> <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
- <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org> <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
- <ZKNA9Pkg2vMJjHds@ziepe.ca> <CAHS8izNB0qNaU8OTcwDYmeVPtCrEjTTOhwCHtVsLiyhXmPLsXQ@mail.gmail.com>
- <ZKxDZfVAbVHgNgIM@ziepe.ca> <CAHS8izO3h3yh=CLJgzhLwCVM4SLgf64nnmBtGrXs=vxuJQHnMQ@mail.gmail.com>
- <ZKyZBbKEpmkFkpWV@ziepe.ca>
-In-Reply-To: <ZKyZBbKEpmkFkpWV@ziepe.ca>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 10 Jul 2023 17:45:05 -0700
-Message-ID: <CAHS8izOTiSO5PkM+x-CASjwew=U2j=JRNpbz_6NC6AsDTQ17Ug@mail.gmail.com>
-Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
- page_pool: remove PP_FLAG_PAGE_FRAG flag)
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>, John Hubbard <jhubbard@nvidia.com>, 
-	Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com, 
-	Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
-	Salil Mehta <salil.mehta@huawei.com>, Eric Dumazet <edumazet@google.com>, 
-	Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	Jonathan Lemon <jonathan.lemon@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <5c396de6-afab-6af9-f9d9-a698b9367873@hartkopp.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 4:49=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrot=
-e:
->
-> On Mon, Jul 10, 2023 at 04:02:59PM -0700, Mina Almasry wrote:
-> > On Mon, Jul 10, 2023 at 10:44=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca>=
- wrote:
-> > >
-> > > On Wed, Jul 05, 2023 at 06:17:39PM -0700, Mina Almasry wrote:
-> > >
-> > > > Another issue is that in networks with low MTU, we could be DMAing
-> > > > 1400/1500 bytes into each allocation, which is problematic if the
-> > > > allocation is 8K+. I would need to investigate a bit to see if/how =
-to
-> > > > solve that, and we may end up having to split the page and again ru=
-n
-> > > > into the 'not enough room in struct page' problem.
-> > >
-> > > You don't have an intree driver to use this with, so who knows, but
-> > > the out of tree GPU drivers tend to use a 64k memory management page
-> > > size, and I don't expect you'd make progress with a design where a 64=
-K
-> > > naturaly sized allocator is producing 4k/8k non-compound pages just
-> > > for netdev. We are still struggling with pagemap support for variable
-> > > page size folios, so there is a bunch of technical blockers before
-> > > drivers could do this.
-> > >
-> > > This is why it is so important to come with a complete in-tree
-> > > solution, as we cannot review this design if your work is done with
-> > > hacked up out of tree drivers.
-> > >
-> >
-> > I think you're assuming the proposal requires dma-buf exporter driver
-> > changes, and I have a 'hacked up out of tree driver' not visible to
-> > you.
->
-> Oh, I thought it was obvious what you did in patch 1 was a total
-> non-starter when I said you can't abuse the ZONE_DEVICE pages like
-> this.
->
-> You must create ZONE_DEVICE P2P pages, not MEMORY_DEVICE_PRIVATE to
-> represent P2P memory,
+> Hello William,
+> 
+> On 07.07.23 09:53, Ziyang Xuan wrote:
+>> Got kmemleak errors with the following ltp can_filter testcase:
+>>
+>> for ((i=1; i<=100; i++))
+>> do
+>>          ./can_filter &
+>>          sleep 0.1
+>> done
+>>
+>> ==============================================================
+>> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
+>> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
+>> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
+>> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
+>> [<00000000fd468496>] do_syscall_64+0x33/0x40
+>> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+>>
+>> It's a bug in the concurrent scenario of unregister_netdevice_many()
+>> and raw_release() as following:
+>>
+>>               cpu0                                        cpu1
+>> unregister_netdevice_many(can_dev)
+>>    unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
+>>    net_set_todo(can_dev)
+>>                         raw_release(can_socket)
+>>                           dev = dev_get_by_index(, ro->ifindex); // dev == NULL
+>>                           if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
+>>                             raw_disable_allfilters(, dev, );
+>>                             dev_put(dev);
+>>                           }
+>>                         ...
+>>                         ro->bound = 0;
+>>                         ...
+>>
+>> call_netdevice_notifiers(NETDEV_UNREGISTER, )
+>>    raw_notify(, NETDEV_UNREGISTER, )
+>>      if (ro->bound) // invalid because ro->bound has been set 0
+>>        raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
+>>
+>> Add a net_device pointer member in struct raw_sock to record bound can_dev,
+>> and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
+>> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
+>> dev_rcv_lists.
+>>
+>> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
+>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+>> ---
+>> v2:
+>>    - Fix the case for a bound socket for "all" CAN interfaces (ifindex == 0) in raw_bind().
+>> ---
+>>   net/can/raw.c | 61 ++++++++++++++++++++++-----------------------------
+>>   1 file changed, 26 insertions(+), 35 deletions(-)
+>>
+>> diff --git a/net/can/raw.c b/net/can/raw.c
+>> index 15c79b079184..7078821f35e0 100644
+>> --- a/net/can/raw.c
+>> +++ b/net/can/raw.c
+>> @@ -84,6 +84,7 @@ struct raw_sock {
+>>       struct sock sk;
+>>       int bound;
+>>       int ifindex;
+>> +    struct net_device *dev;
+>>       struct list_head notifier;
+>>       int loopback;
+>>       int recv_own_msgs;
+>> @@ -277,7 +278,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
+>>       if (!net_eq(dev_net(dev), sock_net(sk)))
+>>           return;
+>>   -    if (ro->ifindex != dev->ifindex)
+>> +    if (ro->dev != dev)
+>>           return;
+>>         switch (msg) {
+>> @@ -292,6 +293,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
+>>             ro->ifindex = 0;
+>>           ro->bound = 0;
+>> +        ro->dev = NULL;
+>>           ro->count = 0;
+>>           release_sock(sk);
+>>   @@ -337,6 +339,7 @@ static int raw_init(struct sock *sk)
+>>         ro->bound            = 0;
+>>       ro->ifindex          = 0;
+>> +    ro->dev              = NULL;
+>>         /* set default filter to single entry dfilter */
+>>       ro->dfilter.can_id   = 0;
+>> @@ -385,19 +388,13 @@ static int raw_release(struct socket *sock)
+>>         lock_sock(sk);
+>>   +    rtnl_lock();
+>>       /* remove current filters & unregister */
+>>       if (ro->bound) {
+>> -        if (ro->ifindex) {
+>> -            struct net_device *dev;
+>> -
+>> -            dev = dev_get_by_index(sock_net(sk), ro->ifindex);
+>> -            if (dev) {
+>> -                raw_disable_allfilters(dev_net(dev), dev, sk);
+>> -                dev_put(dev);
+>> -            }
+>> -        } else {
+>> +        if (ro->dev)
+>> +            raw_disable_allfilters(dev_net(ro->dev), ro->dev, sk);
+>> +        else
+>>               raw_disable_allfilters(sock_net(sk), NULL, sk);
+>> -        }
+>>       }
+>>         if (ro->count > 1)
+>> @@ -405,8 +402,10 @@ static int raw_release(struct socket *sock)
+>>         ro->ifindex = 0;
+>>       ro->bound = 0;
+>> +    ro->dev = NULL;
+>>       ro->count = 0;
+>>       free_percpu(ro->uniq);
+>> +    rtnl_unlock();
+>>         sock_orphan(sk);
+>>       sock->sk = NULL;
+>> @@ -422,6 +421,7 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+>>       struct sockaddr_can *addr = (struct sockaddr_can *)uaddr;
+>>       struct sock *sk = sock->sk;
+>>       struct raw_sock *ro = raw_sk(sk);
+>> +    struct net_device *dev = NULL;
+>>       int ifindex;
+>>       int err = 0;
+>>       int notify_enetdown = 0;
+>> @@ -431,14 +431,13 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+>>       if (addr->can_family != AF_CAN)
+>>           return -EINVAL;
+>>   +    rtnl_lock();
+>>       lock_sock(sk);
+>>         if (ro->bound && addr->can_ifindex == ro->ifindex)
+>>           goto out;
+>>         if (addr->can_ifindex) {
+>> -        struct net_device *dev;
+>> -
+>>           dev = dev_get_by_index(sock_net(sk), addr->can_ifindex);
+>>           if (!dev) {
+>>               err = -ENODEV;
+>> @@ -465,28 +464,23 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+>>       }
+>>         if (!err) {
+>> +        /* unregister old filters */
+>>           if (ro->bound) {
+>> -            /* unregister old filters */
+> 
+> Please move this comment back as we only unregister old filters when the socket is bound.
+> 
+>> -            if (ro->ifindex) {
+>> -                struct net_device *dev;
+>> -
+>> -                dev = dev_get_by_index(sock_net(sk),
+>> -                               ro->ifindex);
+>> -                if (dev) {
+>> -                    raw_disable_allfilters(dev_net(dev),
+>> -                                   dev, sk);
+>> -                    dev_put(dev);
+>> -                }
+>> -            } else {
+>> +            if (ro->dev)
+>> +                raw_disable_allfilters(dev_net(ro->dev),
+>> +                               ro->dev, sk);
+>> +            else
+>>                   raw_disable_allfilters(sock_net(sk), NULL, sk);
+>> -            }
+>>           }
+>>           ro->ifindex = ifindex;
+>> +
+> 
+> Why did you add an additional empty line here?
+> Please remove.
+> 
+>>           ro->bound = 1;
+>> +        ro->dev = dev;
+>>       }
+>>      out:
+>>       release_sock(sk);
+>> +    rtnl_unlock();
+>>         if (notify_enetdown) {
+>>           sk->sk_err = ENETDOWN;
+>> @@ -553,9 +547,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+>>           rtnl_lock();
+>>           lock_sock(sk);
+>>   -        if (ro->bound && ro->ifindex) {
+>> -            dev = dev_get_by_index(sock_net(sk), ro->ifindex);
+>> -            if (!dev) {
+>> +        dev = ro->dev;
+>> +        if (ro->bound && dev) {
+>> +            if (dev->reg_state != NETREG_REGISTERED) {
+>>                   if (count > 1)
+>>                       kfree(filter);
+>>                   err = -ENODEV;
+>> @@ -596,7 +590,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+>>           ro->count  = count;
+>>      out_fil:
+>> -        dev_put(dev);
+>>           release_sock(sk);
+>>           rtnl_unlock();
+>>   @@ -614,9 +607,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+>>           rtnl_lock();
+>>           lock_sock(sk);
+>>   -        if (ro->bound && ro->ifindex) {
+>> -            dev = dev_get_by_index(sock_net(sk), ro->ifindex);
+>> -            if (!dev) {
+>> +        dev = ro->dev;
+>> +        if (ro->bound && dev) {
+>> +            if (dev->reg_state != NETREG_REGISTERED) {
+>>                   err = -ENODEV;
+>>                   goto out_err;
+>>               }
+>> @@ -627,7 +620,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+>>               /* (try to) register the new err_mask */
+>>               err = raw_enable_errfilter(sock_net(sk), dev, sk,
+>>                              err_mask);
+>> -
+> 
+> And here you removed an empty line?
+> 
+> Please omit such mix of fixing a bug and change the coding style.
+> 
+>>               if (err)
+>>                   goto out_err;
+>>   @@ -640,7 +632,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+>>           ro->err_mask = err_mask;
+>>      out_err:
+>> -        dev_put(dev);
+>>           release_sock(sk);
+>>           rtnl_unlock();
+>>   
+> 
+> The rest looks fine now, many thanks!
+> It also reduces the code size.
+> 
+> When you send the v3 you can add these tags:
+> 
+> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> 
+OK, Thank you for your comments.
 
-We can extend the memory_type enum, with something like MEMORY_DEVICE_DMABU=
-F?
-
-> and you can't do that automatically from the
-> dmabuf core code.
->
-
-Sorry, why not?
-
-> Without doing this the DMA API doesn't actually work properly because
-> it doesn't have enough information to know about what the underlying
-> exporter is.
->
-
-I didn't think it would matter that the DMA API doesn't work with
-these pages, because the mapping already exists courtesy of
-dma_buf_map_attachment(), and these dma-buf pages don't need to be
-mapped (the dma_addr is already available). I'm providing
-dma_buf_map_sg() in that patch to use instead of the DMA API. Would be
-nice to help me understand why we would care why the DMA API doesn't
-work with these pages when we're asking code using these pages to use
-the provided API instead?
-
-> The entire point of DEVICE_PRIVATE is that the page content, and
-> access to the page's physical location, is *explicitly* unavailable to
-> anyone but the pgmap owner.
->
-
-This seems to be a semantics issue. Would setting the pages as
-MEMORY_DEVICE_DMABUF address this?
-
-> > > Fully and properly adding P2P ZONE_DEVICE to a real world driver is a
-> > > pretty big ask still.
-> >
-> > There is no such ask.
->
-> Well, there is from me if you want to use stuct pages as handles for
-> P2P memory. That is what we have defined in the pgmap area.
->
-> Also I should warn you that your 'option 2' is being NAK'd by
-> Christoph for now, we are not adding any new code around DMABUF's
-> hacky use of NULL sg_page scatterlist for P2P memory either. I've been
-> working on solutions here but it is slow going.
->
-
-Option 2, I think, doesn't care about the sg_page NULL. But it may be
-pointless to discuss, I don't see how we could modify the page pool,
-networking stack, and all the networking drivers to do anything other
-than struct page (someone feel free to correct).
-
-> > On dma-buf changes required. I do need approval from the dma-buf
-> > maintainers,
->
-> It is a neat hack, of sorts, to abuse DEVICE_PRIVATE to create struct
-> pages for the exclusive use of pagepool - but you need more approval
-> than just dmabuf maintainers to abuse the pgmap framework like
-> this.
->
-
-Who? I'd love to add them on subsequent proposals.
-
-> At least from my position I want to see MEMORY_DEVICE_PCI_P2PDMA used
-> to represent P2P memory.
-
-Would using p2pdma API instead of dmabuf be an acceptable direction?
-
-The nice thing about what I'm doing is that any existing dmabuf
-exported would be supported, AFAICT. To use p2pdma I think I would
-need to modify the drivers providing the device memory to do a
-pci_p2pdma_add_resource(), and use the pci_p2pdma_map_sg() on the
-importer driver (NIC), but that may work, with driver changes.
-
-Would that be an acceptable direction to you? Or are you against the
-approach in the RFC and don't have any alternative path forward for
-this? Is this not a use case we want to support in some way in the
-kernel?
-
-> You haven't CC'd anyone from the mm community
-> so I've added some people here to see if there are other opinions.
->
-
-I CC'd get_maintainers.pl output and you because you showed interest
-and get_maintainers did not add you automatically.
-
-> To be clear, you need an explicit ack from mm people on the abusive
-> use of pgmap in patch 1.
->
-
-Who? I would love to add them on subsequent proposals.
-
-> I know it is not what you want to hear, but there are actual reasons
-> why the P2P DMA problem has been festering for so long, and hacky
-> quick fixes like this are not going to be enough..
->
-
---
-Thanks,
-Mina
+> Best regards,
+> Oliver
+> 
+> .
 
