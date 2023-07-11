@@ -1,110 +1,162 @@
-Return-Path: <netdev+bounces-16913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2102A74F69E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:11:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5ABA74F6AD
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:17:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 517071C20D1D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F8C028126D
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422A61DDE9;
-	Tue, 11 Jul 2023 17:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52DB1DDEB;
+	Tue, 11 Jul 2023 17:17:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD82168CE
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:11:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03EECC433C8;
-	Tue, 11 Jul 2023 17:11:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689095462;
-	bh=InfyI8SICKvF4zmJpauBWDNo/zPPdtTLtpODWeNYZJ4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S32dMWGzpZI0vlWdhqWHPysllb8jt18+0TZ9/J6/kdL5p8gbnh9eiPh2pkxP+RwDr
-	 d0EN67ZYCRaVoqoGTdUn7tSaPbpFLOvIKB9W3RfO7Khnv/gc5uueJyhHejEN0QUEtp
-	 pIyQddscMT7tKiSD9x3pG9DciqYaTJHBdkJJC3KpKwgrjuvUf6W/QY5q9XxkZ/Pi6L
-	 1gBsJQrRHm4KyQfkOzRIQfxTcHDyonHFTlhpw5HM9BDRs6j2HX+m+JAAOzoLO50WgT
-	 kTSiEJqjA5aP5GKAdjVoyApZESK4B7ir78UtN6hH91vgx3PoLSGiIsfyDB0tfShxUw
-	 r4Qhhl88+yrXQ==
-Date: Tue, 11 Jul 2023 20:10:58 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next][resend v1 1/1] netlink: Don't use int as bool
- in netlink_update_socket_mc()
-Message-ID: <20230711171058.GT41919@unreal>
-References: <20230710100624.87836-1-andriy.shevchenko@linux.intel.com>
- <20230711063348.GB41919@unreal>
- <2a2d55f167a06782eb9dfa6988ec96c2eedb7fba.camel@redhat.com>
- <ZK002l0AojjdJptC@smile.fi.intel.com>
- <20230711122012.GR41919@unreal>
- <ZK1O7lBF1vH7/7UM@smile.fi.intel.com>
- <20230711133259.GS41919@unreal>
- <ZK1csjLgGM+ezG/J@smile.fi.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32C218C31
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:17:25 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2123.outbound.protection.outlook.com [40.107.100.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A27F910EF;
+	Tue, 11 Jul 2023 10:17:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MjN1bUpy4yUjHspqLH8F0fDXWOqHuMAZUpOHvybg+XMYLMUjEXeHgEih1odP6q0Ks6pdBMcKT9GbSKuCSJV8KCL16r5kRNVo89R0iLxIx8xcOv3UV5twf4pjY71+D2H2WuXVbNHP8vSdHZn6BiAz1h0oWdnripSWEVydaaPOh+FVN2fYJyeAcVDxUtVHN0YtxwXvxcXl1QHo8iNbVAJivrjQzONf3hZpZs2hOfr6vHlhDi/kEYS3LPtqqEgYRRUFV6OFef5qEY4+OJu2rLsM2uGA5JxMQszTMWjizZGNh4GEBAVJPn85Bzj5iItxXCjyoFpgoPBlFMqb6d/2wYO8Dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q+70ZNlJW1FV/L5yTPGtSSLvKyeUIFfwwdNNEar8X30=;
+ b=gcFCJo8kTNGKUQakplqWGEzxYG08eMWt1F2iKik410m+qsQTKeODnLPD6YJMllWTpq0AOy2GVqrC5lDPKATXGWQ11pDNXU8P7ae9hX/oAkdAICN9V2vMLUqpjFTU9B5uZ+6Vgptc5sPPU7CY3qq/5e6hXHfBdrjI07aW4aVq00sRaZPRCS4cRfK6EYhFsm1stRVqbj9LuT9D+/ulPAGnk5ptRvHdnUAhioHPrsJJQScSstftPzY/GsaIRdTt2PTGeaOHz4bZj/5s8uB1o8RHmPBCwifIcBMd4hrtlNBMmIoFs22GKC4xcsyaFvAWXlg5pzjheuIXYQnYSXXaTFT1vA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q+70ZNlJW1FV/L5yTPGtSSLvKyeUIFfwwdNNEar8X30=;
+ b=KraXtJRiJE2ZLBirbLHg6tXAqYz7OcDgF/1xHPT1uXeFVYl1xqa8/9jQD8kQOV8ASSICK7Bjnae+7DdRpU23g8AsiotN6Kvat/A9PbB0uIXBgX7U3RtsRnj7lHxoax+WD6cYE9W5r1z1FcvMl3Kk79609EMPvTeLcD5maZMFQqk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH7PR13MB5594.namprd13.prod.outlook.com (2603:10b6:510:130::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Tue, 11 Jul
+ 2023 17:17:17 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.017; Tue, 11 Jul 2023
+ 17:17:17 +0000
+Date: Tue, 11 Jul 2023 18:17:07 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Baoquan He <bhe@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+	linux-mm@kvack.org, schnelle@linux.ibm.com, vkoul@kernel.org,
+	eli.billauer@gmail.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+	derek.kiernan@amd.com, dragan.cvetic@amd.com,
+	linux@dominikbrodowski.net, Jonathan.Cameron@huawei.com,
+	linus.walleij@linaro.org, tsbogend@alpha.franken.de,
+	joyce.ooi@intel.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, tglx@linutronix.de,
+	maz@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+	robh+dt@kernel.org, frowand.list@gmail.com,
+	kernel test robot <lkp@intel.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 5/8] net: altera-tse: make ALTERA_TSE depend on HAS_IOMEM
+Message-ID: <ZK2Ok5i2m7zS6Uq0@corigine.com>
+References: <20230707135852.24292-1-bhe@redhat.com>
+ <20230707135852.24292-6-bhe@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230707135852.24292-6-bhe@redhat.com>
+X-ClientProxiedBy: LO6P265CA0023.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2ff::9) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZK1csjLgGM+ezG/J@smile.fi.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB5594:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66873dbd-2086-4a91-cae6-08db8232ad7a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	9HvtGbTTyeBHvZjH1P+rb18xwVsa2L+0BLmd1dAAoij8VEc5QOU6/3kSwjlmMeOTt8AzqLjsjaXsOAD5n3BSWukevo/VwIRowbFNVjL3y9d/BLSrC+QEN0e51SGRqH9s75gkgQ3jEgPNDnNe35Qs3TwH7/2ZREg1X0hNB7ekQio/yOCXrZJLELAE51dYEGWiwgfxZLklDKtz6Z0AgM/ugheVcLZRit6KDIDeDfpjp+7gtP6eoaxUxaotOKiVZmsT7Rl3ZqyRZvwY1ajlIMcvDi0B4pjT1g04GExaPC2On80iBNG30qbUjAb/hpHQo3nh8W/6gpTHvtLxaYieeBj7TxTEp8vk/XB1CERZor7Cvv8JlmrqTqabojOr4lWOjUs1R963kNVgTU4ckRSidh02NvWA55S/14DLn4pKKFmK+wNS4V0r67JemepyTjuM4Tu4R60Hq80azoO8qfD9ABbpjV4uCHLdleuqA75QfZWrvv/+R93VK4KmF7daSBYIT1XOvykQ/lFUOMYRWVLqm4W526ofdz9Mvp25JNaUwn46l53zkSL5oCMET/9R907OyjSqI0S/g2BVTtMcLe48bYqz0gMWFRnziszvsyl7HyRwJ0k=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(366004)(136003)(39840400004)(346002)(451199021)(66946007)(66556008)(44832011)(86362001)(7416002)(4326008)(316002)(2906002)(6916009)(41300700001)(66476007)(478600001)(5660300002)(8676002)(8936002)(38100700002)(2616005)(6666004)(6486002)(6512007)(83380400001)(26005)(6506007)(36756003)(186003)(966005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?FyMOOjTMyF56Pc4KZ/E/2IYwWosT50YsCN/SO73ls4XWDVv6wCKk4yjR+1I4?=
+ =?us-ascii?Q?4e9tm5IQj23Csn8NpDyJ63ie1zJBbK7Lwf3rwKUkg7KRRhRDcZO3hgXxAHPl?=
+ =?us-ascii?Q?yiVva8Bk2G+cmbRi58/TvhH63yWC2v5E4Ey58Vr24umpNOmF6pIyiwII2VLs?=
+ =?us-ascii?Q?CGy0IdqDhyDCGnIuYmSTplAxjuuZJsbknwzJUEVgIJIt+LMQljl4oWzoY+6I?=
+ =?us-ascii?Q?FiE81qim8O+M/qKMA8bS4vvEZ9P6E9qPUpvSCA1zYLNNxWe3DyCNYSxvO9Q4?=
+ =?us-ascii?Q?YumngkkhZiOJMUVDinF4PHRPP/rryF+Mjf5woammUPbS1TsiiiC5FxO9HKvk?=
+ =?us-ascii?Q?XYWw1jqMFnYl+MgnP0bs4ilYz7HXNE4Si/CKEt+ybn+PIYBe7hBeKeGEA0rt?=
+ =?us-ascii?Q?iU0Ar3pQxJA2/2uYKh4TiriyvLNEJGzBKxCV+NXy1xp51vvaFCtFBAYrdqsN?=
+ =?us-ascii?Q?SD9rv+GpT/2TXLeNc0aUsHHQlLKdJaZ4bKIceRphLbf3hEUJ4o3hdtKFLX4N?=
+ =?us-ascii?Q?IeC0ByKzOYSg+m2uGQ5aTtaz3x2uIETkdpJS7BPGABkIRlTXv4owtnxAWA1C?=
+ =?us-ascii?Q?LpAnyuf5j8UMgLNsS1KTs2iVHrEWrI3j6Tqw3cFdq1hZ6KMzwh+91G7P824+?=
+ =?us-ascii?Q?K/+tKbnAqy87ph7dPzX8lUqBPnh9aiPGjVfvjwHjpDj791OXmX0NuPZ1NBfm?=
+ =?us-ascii?Q?7SmiE30p6tPuz4aTFz2+HztH2uhdV4S2RImIv5o7Mlcdf1SzzfF06pZxdA5z?=
+ =?us-ascii?Q?2q2niQtLFpo3S8pHdp73M5PbI+Navj/0qfy7QBibczCagFGItGN0fD0aOJqb?=
+ =?us-ascii?Q?4uWmFvNif4JGvYMsp0LUvivAgxoTSqVJeZm9aoZn6nKlGFaOFQtohHm1t/3O?=
+ =?us-ascii?Q?CZWPFU/wCrsmAYj7Nw0YlrcXCcBqCVEMP8xK/QnzZOdg4R7XQSqEEkxpKMYa?=
+ =?us-ascii?Q?M8N1/KqeAxLgomrxmyWADEbJxpygfe0tyl6hwxFHTkXtudGvBjoGZ6FxnUvU?=
+ =?us-ascii?Q?/gY4FbHlaiMVxfMVCGZC3WPYUXb7IE4fXqeFKoDS/0uNeP1tGvNrifKUyrZr?=
+ =?us-ascii?Q?J/cGvs/jNn2Pb3LhAh4WzMIobHw6kY7dBmsSUK0DL8fhZw8eLo7e2oiAnD5R?=
+ =?us-ascii?Q?lu7o79tav5WT7W9/T42e99cK40C31E7CsoOIzeNmTgL4hac1NX49eujQ8SEr?=
+ =?us-ascii?Q?FQco71tSeJWR4gmMBJxVE8ppz3a/kgToXWRLj+wqFyaAKUstj2TXJ0jVTPNl?=
+ =?us-ascii?Q?ruIcjVw1HX3hPF5zA3J4a3j8x8UWXMu98jW36mSkKUJ1y4V7ggMMCytifmG4?=
+ =?us-ascii?Q?+Fk/tQqhdeAf4hkj9G/aKeBQZx9y2hgUILDKB7wZjYsBoaV/dLf8LYdu3yWS?=
+ =?us-ascii?Q?djjChoaxO326Udc79O0VEENbu8hJ1oh2XW4vTVyid4kE54RvNMYzQAgGmXAM?=
+ =?us-ascii?Q?NMSOtiNbM/2+eHbAgNPM4WaZejS8Z7SLLf8qLy3g/WTJytNLhhEkv8KH4FGo?=
+ =?us-ascii?Q?Y1W5XK9REa6FMy1XsyjLgtWyCiGZ27B0jRm5Ry6u/9N5GP8TS4jqwb4yaTy0?=
+ =?us-ascii?Q?a0TCrPGSm+ymwMBTOrBTFlu/qb5qsjh+PbaZm56yNku4xEFEEM0wfendcKES?=
+ =?us-ascii?Q?Qw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66873dbd-2086-4a91-cae6-08db8232ad7a
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 17:17:17.5200
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fvOI87SIPaSqhfle6VJqV1sty6nDP4dI2qc+BaMZ7FyPfozjs/FMaNsB6nXu18psGQgXzrOhYGDXJh9adipvjLfUOkVGienUcH2u5YXOX3I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB5594
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 04:44:18PM +0300, Andy Shevchenko wrote:
-> On Tue, Jul 11, 2023 at 04:32:59PM +0300, Leon Romanovsky wrote:
-> > On Tue, Jul 11, 2023 at 03:45:34PM +0300, Andy Shevchenko wrote:
-> > > On Tue, Jul 11, 2023 at 03:20:12PM +0300, Leon Romanovsky wrote:
-> > > > On Tue, Jul 11, 2023 at 01:54:18PM +0300, Andy Shevchenko wrote:
-> > > > > On Tue, Jul 11, 2023 at 12:21:12PM +0200, Paolo Abeni wrote:
-> > > > > > On Tue, 2023-07-11 at 09:33 +0300, Leon Romanovsky wrote:
-> > > > > > > On Mon, Jul 10, 2023 at 01:06:24PM +0300, Andy Shevchenko wrote:
+On Fri, Jul 07, 2023 at 09:58:49PM +0800, Baoquan He wrote:
+> On s390 systems (aka mainframes), it has classic channel devices for
+> networking and permanent storage that are currently even more common
+> than PCI devices. Hence it could have a fully functional s390 kernel
+> with CONFIG_PCI=n, then the relevant iomem mapping functions
+> [including ioremap(), devm_ioremap(), etc.] are not available.
 > 
-> ...
+> Here let ALTERA_TSE depend on HAS_IOMEM so that it won't be built
+> to cause below compiling error if PCI is unset:
 > 
-> > > > > > > So what is the outcome of "int - bool + bool" in the line above?
-> > > > > 
-> > > > > The same as with int - int [0 .. 1] + int [0 .. 1].
-> > > > 
-> > > > No, it is not. bool is defined as _Bool C99 type, so strictly speaking
-> > > > you are mixing types int - _Bool + _Bool.
-> > > 
-> > > 1. The original code already does that. You still haven't reacted on that.
-> > 
-> > The original code was int - int + int.
+> ------
+> ERROR: modpost: "devm_ioremap" [drivers/net/ethernet/altera/altera_tse.ko] undefined!
+> ------
 > 
-> No. You missed the callers part. They are using boolean.
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202306211329.ticOJCSv-lkp@intel.com/
+> Signed-off-by: Baoquan He <bhe@redhat.com>
 
-I didn't miss and pointed you to the exact line which was implicitly
-changed with your patch.
 
-> 
-> > > 2. Is what you are telling a problema?
-> > 
-> > No, I'm saying that you took perfectly correct code which had all types
-> > aligned and changed it to have mixed type arithmetic.
-> 
-> And after this change it's perfectly correct code with less letters and hidden
-> promotions (as a parameter to the function) and hence requires less cognitive
-> energy to parse.
-> 
-> So, the bottom line is the commit message you don't like, is it so?
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Tested-by: Simon Horman <simon.horman@corigine.com> # build-tested
 
-Please reread my and Paolo replies.
+I wonder if this should also have:
 
-Thanks
-
-> 
-> -- 
-> With Best Regards,
-> Andy Shevchenko
-> 
-> 
+  Fixes: ed33ef648964 ("Altera TSE: Add Altera Ethernet Driver Makefile and Kconfig")
 
