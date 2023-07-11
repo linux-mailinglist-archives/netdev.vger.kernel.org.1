@@ -1,283 +1,213 @@
-Return-Path: <netdev+bounces-16828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA6A74ED59
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:52:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF01074ED73
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 755B51C20E68
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:52:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9309F2817EB
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C9F18B13;
-	Tue, 11 Jul 2023 11:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89A518B19;
+	Tue, 11 Jul 2023 11:58:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610E11774C
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 11:52:55 +0000 (UTC)
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B826210E3
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 04:52:47 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-51e56749750so3088754a12.0
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 04:52:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689076366; x=1691668366;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMmzAbnQPb+hff08oGBX7AMmQrEjQkPWbeWYbWnEb2s=;
-        b=R6I4rQhZNuJhcRNVBlXhhbzoUBbtJugUPtDeDqspmlhc0LV6PhoXCtdxQT2Fj0bM/Z
-         D3kIChr40ply4orCGt+9ajW59qGsXI0q8dwmTjUCDnDH0ulp9uyX3O+SsEKbO2t7vinl
-         8gTJudbGuaMlUr/F2U1aCITw8lqIDA7UGsx63ZT1ftAReQn3Gp7VbkcsmETP/cRAyQai
-         lkIOqNqDJFzyv3RRj/Q+MFuMldUziVBZazHL8K6x6ggiatiMyxzswv65kZTUd+/j30i/
-         ceCU0hZSdHB7C1BCm/DJGmgVIEJr/TryA/39HtCJ72a1xnXsajO8AG8nwixG6ViSclLN
-         u3GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689076366; x=1691668366;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VMmzAbnQPb+hff08oGBX7AMmQrEjQkPWbeWYbWnEb2s=;
-        b=DMWSNq+3nD5suchXqmBHFRlxsAWNjbJMZIpZDLJ8RKhTqcdzA34hr8cvNEX+E5N95P
-         tu7ryXFSGrzwKK6MmGepAiypXVu6YAWQal3ybT+23+NuEXtsyKDQcIGW29ORcxn+zFor
-         D69125AATygTyf3ogIpM2phTK1HVBMB7cGjVn3uj1wcxO6JxqsUvIzf3um6RQTIPOxUY
-         7Ax5et49PkY1lowvdJp9DlNT4At0+h5B13GwnbKztu2YLslvj2/nYr3Y9RE3uqMl+j7j
-         pYvNJx8c4Xg/J8GYDwaJ5lusukBAkXbHQeCfmTf4udB+Z/JQ2lyES1cXxf2DI7wK8okt
-         etsw==
-X-Gm-Message-State: ABy/qLa3fFSn1UPxKghtoVNCgbQlC4zP/tFLBEAPiIRKbVWeIQobEkre
-	M6bPxx3zUrBDtu818laQAwBmEw==
-X-Google-Smtp-Source: APBJJlFxRCgoFvFTryd/EnnLREOPOgp5+SxcfOYu5/wDWMNeLe4NvM0dWgV+6D/1iKEYw/AVIF+zFw==
-X-Received: by 2002:a05:6402:506:b0:51e:26c8:25f7 with SMTP id m6-20020a056402050600b0051e26c825f7mr14275781edv.42.1689076365929;
-        Tue, 11 Jul 2023 04:52:45 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id u8-20020aa7d888000000b0051e0f21c43fsm1148663edq.31.2023.07.11.04.52.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 04:52:45 -0700 (PDT)
-Date: Tue, 11 Jul 2023 13:52:43 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>,
-	"vadfed@meta.com" <vadfed@meta.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"vadfed@fb.com" <vadfed@fb.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"sj@kernel.org" <sj@kernel.org>,
-	"javierm@redhat.com" <javierm@redhat.com>,
-	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
-	"airlied@redhat.com" <airlied@redhat.com>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux@zary.sk" <linux@zary.sk>,
-	"masahiroy@kernel.org" <masahiroy@kernel.org>,
-	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
-	"geert+renesas@glider.be" <geert+renesas@glider.be>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"idosch@nvidia.com" <idosch@nvidia.com>,
-	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
-	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
-	"phil@nwl.cc" <phil@nwl.cc>,
-	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
-Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
-Message-ID: <ZK1CizcqjqO1L/RQ@nanopsycho>
-References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
- <ZJq3a6rl6dnPMV17@nanopsycho>
- <DM6PR11MB4657084DDD7554663F86C1C19B24A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZJwWXZmZe4lQ04iK@nanopsycho>
- <DM6PR11MB4657751607C36FC711271D639B30A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZKv1FRTXWLnLGRRS@nanopsycho>
- <DM6PR11MB46575D14FFE115546FDC9DEB9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9657718B10;
+	Tue, 11 Jul 2023 11:58:59 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662B410C4;
+	Tue, 11 Jul 2023 04:58:57 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4R0fXr087Mz4f41Rq;
+	Tue, 11 Jul 2023 19:58:52 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.67.175.61])
+	by APP1 (Coremail) with SMTP id cCh0CgBX6DL7Q61kp17yMw--.23183S2;
+	Tue, 11 Jul 2023 19:58:52 +0800 (CST)
+From: Pu Lehui <pulehui@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Xu Kuohai <xukuohai@huawei.com>,
+	Pu Lehui <pulehui@huawei.com>,
+	Pu Lehui <pulehui@huaweicloud.com>
+Subject: [PATCH bpf] bpf: cpumap: Fix memory leak in cpu_map_update_elem
+Date: Tue, 11 Jul 2023 19:58:48 +0800
+Message-Id: <20230711115848.2701559-1-pulehui@huaweicloud.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB46575D14FFE115546FDC9DEB9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBX6DL7Q61kp17yMw--.23183S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw4fuF43Cw1kWw43Gr18Grg_yoW7Jw1UpF
+	WrJr1UGr40qw4Du3y8t3WrJr10vr1kua4UJ34fG3yFyF1DG3WDXFy8GFWxJrZxurs5ury7
+	Xwsrt3yqg3ykJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+	fUOmhFUUUUU
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Jul 11, 2023 at 12:34:11PM CEST, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Monday, July 10, 2023 2:10 PM
->>
->>Mon, Jul 10, 2023 at 12:07:30PM CEST, arkadiusz.kubalewski@intel.com wrote:
->>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>Sent: Wednesday, June 28, 2023 1:16 PM
->>>>Wed, Jun 28, 2023 at 11:15:11AM CEST, arkadiusz.kubalewski@intel.com
->>wrote:
->>>>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>>>Sent: Tuesday, June 27, 2023 12:18 PM
->>>>>>
->>>>>>Fri, Jun 23, 2023 at 02:38:10PM CEST, arkadiusz.kubalewski@intel.com
->>>>>>wrote:
->>>>>>
->>>>>>>v8 -> v9:
->>>>>>
->>>>>>Could you please address all the unresolved issues from v8 and send v10?
->>>>>>I'm not reviewing this one.
->>>>>>
->>>>>>Thanks!
->>>>>
->>>>>Sure, will do, but first missing to-do/discuss list:
->>>>>1) remove mode_set as not used by any driver
->>>
->>>I have implemented in ice (also added back the DPLL_MODE_FREERUN).
->>
->>Uh :/ Why exactly is it needed in this initial submission?
->>
->
->Without mode-set there is no need for device-set at all, right?
->So it is better to implement at least one set command, so we don't
->need remove device-set command entirely.
+From: Pu Lehui <pulehui@huawei.com>
 
-The enum cmd valu could stay as a placeholder, the rest can go.
+Syzkaller reported a memory leak as follows:
 
+BUG: memory leak
+unreferenced object 0xff110001198ef748 (size 192):
+  comm "syz-executor.3", pid 17672, jiffies 4298118891 (age 9.906s)
+  hex dump (first 32 bytes):
+    00 00 00 00 4a 19 00 00 80 ad e3 e4 fe ff c0 00  ....J...........
+    00 b2 d3 0c 01 00 11 ff 28 f5 8e 19 01 00 11 ff  ........(.......
+  backtrace:
+    [<ffffffffadd28087>] __cpu_map_entry_alloc+0xf7/0xb00
+    [<ffffffffadd28d8e>] cpu_map_update_elem+0x2fe/0x3d0
+    [<ffffffffadc6d0fd>] bpf_map_update_value.isra.0+0x2bd/0x520
+    [<ffffffffadc7349b>] map_update_elem+0x4cb/0x720
+    [<ffffffffadc7d983>] __se_sys_bpf+0x8c3/0xb90
+    [<ffffffffb029cc80>] do_syscall_64+0x30/0x40
+    [<ffffffffb0400099>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
 
->
->>
->>>
->>>>>2) remove "no-added-value" static functions descriptions in
->>>>>   dpll_core/dpll_netlink
->>>
->>>Removed.
->>>
->>>>>3) merge patches [ 03/10, 04/10, 05/10 ] into patches that are compiling
->>>>>   after each patch apply
->>>
->>>Hope Vadim will decide on this, the thing is merging in two patches
->>>doesn't make much sense as there won't be any linking until both patches
->>>are there, so most sense it would be if 3 are merged into one, but
->>>then we will be back to one big blob patch issue.
->>>
->>>>>4) remove function return values descriptions/lists
->>>
->>>Fixed.
->>>
->>>>>5) Fix patch [05/10]:
->>>>>   - status Supported
->>>>>   - additional maintainers
->>>>>   - remove callback:
->>>>>     int (*source_pin_idx_get)(...) from `struct dpll_device_ops`
->>>>>6) Fix patch [08/10]: rethink ice mutex locking scheme
->>>
->>>Fixed.
->>>
->>>>>7) Fix patch [09/10]: multiple comments on
->>>>>https://lore.kernel.org/netdev/ZIQu+%2Fo4J0ZBspVg@nanopsycho/#t
->>>>>8) add PPS DPLL phase offset to the netlink get-device API
->>>>>
->>>
->>>Added few things on this matter
->>>- 1 dpll level attribute:
->>>  - phase-shift - measuring the phase difference between dpll input
->>>    and it's output
->>>- 1 dpll-pin tuple level attribute:
->>>  - pin-phase-adjust - set/get phase adjust of a pin on a dpll
->>>- 2 pin level attributes:
->>>  - pin-phase-adjust-min - provide user with min value that can be set
->>>  - pin-phase-adjust-max - provide user with max value that can be set
->>>- a constant:
->>>  - DPLL_PHASE_SHIFT_DIVIDER similar to DPLL_TEMP_DIVIDER for producing
->>>    fraction value of measured DPLL_A_PHASE_SHIFT
->>
->>Again, why do we need this in this initial submission? Why it can't be a
->>follow-up patchset to extend this? This way we never converge :/
->>Please focus on what we have now and bring it in. Let the extensions to
->>be addressed later on, please.
->>
->
->Well AFAIK, RHEL is doing some monitoring software, so the end-users need this.
+BUG: memory leak
+unreferenced object 0xff110001198ef528 (size 192):
+  comm "syz-executor.3", pid 17672, jiffies 4298118891 (age 9.906s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffffadd281f0>] __cpu_map_entry_alloc+0x260/0xb00
+    [<ffffffffadd28d8e>] cpu_map_update_elem+0x2fe/0x3d0
+    [<ffffffffadc6d0fd>] bpf_map_update_value.isra.0+0x2bd/0x520
+    [<ffffffffadc7349b>] map_update_elem+0x4cb/0x720
+    [<ffffffffadc7d983>] __se_sys_bpf+0x8c3/0xb90
+    [<ffffffffb029cc80>] do_syscall_64+0x30/0x40
+    [<ffffffffb0400099>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
 
-They need it for the initial submission? Why? Why can't they wait 1 week
-for follow-up patchset?
+BUG: memory leak
+unreferenced object 0xff1100010fd93d68 (size 8):
+  comm "syz-executor.3", pid 17672, jiffies 4298118891 (age 9.906s)
+  hex dump (first 8 bytes):
+    00 00 00 00 00 00 00 00                          ........
+  backtrace:
+    [<ffffffffade5db3e>] kvmalloc_node+0x11e/0x170
+    [<ffffffffadd28280>] __cpu_map_entry_alloc+0x2f0/0xb00
+    [<ffffffffadd28d8e>] cpu_map_update_elem+0x2fe/0x3d0
+    [<ffffffffadc6d0fd>] bpf_map_update_value.isra.0+0x2bd/0x520
+    [<ffffffffadc7349b>] map_update_elem+0x4cb/0x720
+    [<ffffffffadc7d983>] __se_sys_bpf+0x8c3/0xb90
+    [<ffffffffb029cc80>] do_syscall_64+0x30/0x40
+    [<ffffffffb0400099>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
 
+In the cpu_map_update_elem flow, when kthread_stop is called before
+calling the threadfn of rcpu->kthread, since the KTHREAD_SHOULD_STOP bit
+of kthread has been set by kthread_stop, the threadfn of rcpu->kthread
+will never be executed, and rcpu->refcnt will never be 0, which will
+lead to the allocated rcpu, rcpu->queue and rcpu->queue->queue cannot be
+released.
 
->
->>
->>
->>>- implemented in dpll netlink and in ice
->>>
->>>>
->>>>You are missing removal of pin->prop.package_label = dev_name(dev); in
->>>>ice.
->>>>
->>>
->>>I didn't touch it, as we still need to discuss it, Jakub didn't respond
->>>on v8 thread.
->>>I don't see why we shall not name it the way. This is most meaningful
->>>label for those pins for the user right now.
->>
->>This is not meaningful, at all. dev_name() changes upon which pci slot
->>you plug the card into. package_label should be an actual label on a
->>silicon package. Why you think this two are related in aby way, makes me
->>really wonder. Could you elaborate the meaningfulness of this?
->>
->
->Without this, from end-user perspective, it would be very confusing.
->As in ice without any label there would 4 pins which differs only with id.
+Calling kthread_stop before executing kthread's threadfn will return
+-EINTR. We can complete the release of memory resources in this state.
 
-There you go, it does not have any label, yet you are trying hard to
-make up some. Does not make sense.
+Fixes: 6710e1126934 ("bpf: introduce new bpf cpu map type BPF_MAP_TYPE_CPUMAP")
+Signed-off-by: Pu Lehui <pulehui@huawei.com>
+---
+ kernel/bpf/cpumap.c | 40 ++++++++++++++++++++++++----------------
+ 1 file changed, 24 insertions(+), 16 deletions(-)
 
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index 8a33e8747a0e..6ae02be7a48e 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -122,22 +122,6 @@ static void get_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
+ 	atomic_inc(&rcpu->refcnt);
+ }
+ 
+-/* called from workqueue, to workaround syscall using preempt_disable */
+-static void cpu_map_kthread_stop(struct work_struct *work)
+-{
+-	struct bpf_cpu_map_entry *rcpu;
+-
+-	rcpu = container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
+-
+-	/* Wait for flush in __cpu_map_entry_free(), via full RCU barrier,
+-	 * as it waits until all in-flight call_rcu() callbacks complete.
+-	 */
+-	rcu_barrier();
+-
+-	/* kthread_stop will wake_up_process and wait for it to complete */
+-	kthread_stop(rcpu->kthread);
+-}
+-
+ static void __cpu_map_ring_cleanup(struct ptr_ring *ring)
+ {
+ 	/* The tear-down procedure should have made sure that queue is
+@@ -165,6 +149,30 @@ static void put_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
+ 	}
+ }
+ 
++/* called from workqueue, to workaround syscall using preempt_disable */
++static void cpu_map_kthread_stop(struct work_struct *work)
++{
++	struct bpf_cpu_map_entry *rcpu;
++	int err;
++
++	rcpu = container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
++
++	/* Wait for flush in __cpu_map_entry_free(), via full RCU barrier,
++	 * as it waits until all in-flight call_rcu() callbacks complete.
++	 */
++	rcu_barrier();
++
++	/* kthread_stop will wake_up_process and wait for it to complete */
++	err = kthread_stop(rcpu->kthread);
++	if (err) {
++		/* kthread_stop may be called before cpu_map_kthread_run
++		 * is executed, so we need to release the memory related
++		 * to rcpu.
++		 */
++		put_cpu_map_entry(rcpu);
++	}
++}
++
+ static void cpu_map_bpf_prog_run_skb(struct bpf_cpu_map_entry *rcpu,
+ 				     struct list_head *listp,
+ 				     struct xdp_cpumap_stats *stats)
+-- 
+2.25.1
 
->What names would you suggest?
-
-That is the point I made previously. For synce usecase, the label does
-not make sense. There should be no label. You reference the pin by ID
-from netdev, that is enough.
-
-I think better to add the check to pin-register so future synce pin
-users don't have similar weird ideas. Could you please add this check?
-
-Thanks!
-
-
-
->
->Thank you!
->Arkadiusz
->
->>
->>>
->>>Thank you!
->>>Arkadiusz
->>>
->>>>
->>>>>Thank you!
->>>>>Arkadiusz
 
