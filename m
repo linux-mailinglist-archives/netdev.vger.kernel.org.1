@@ -1,177 +1,160 @@
-Return-Path: <netdev+bounces-16813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E3FB74EC40
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:06:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0729674EC48
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:07:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F6F31C20A3A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:06:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37B481C20E59
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005B918AE0;
-	Tue, 11 Jul 2023 11:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0016918AEE;
+	Tue, 11 Jul 2023 11:07:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CA8171AF
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 11:06:39 +0000 (UTC)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8829B;
-	Tue, 11 Jul 2023 04:06:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689073598; x=1720609598;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RVFLgj8cxsWZyvySjgaprTvsCfpSOgqQ4kC3+s/s1Fk=;
-  b=Fgb/nzHdhACg9g5her1kIIHPWeJMCqDylq1nS+bRcMWjiKxpA76/iRcO
-   sTaAJTdEfkONty+4pL+OBY1upct2eZJaa4dveqrXbk3kmo5ZJOI1SR7RY
-   0j2QKeopsLJL046lR2p7P5OwtCgGchysPywz5Pn5OutUssKFMvY8YFclT
-   n0hIv9eG7KDpQx3c8NmnCtn0Jb2aXBQQkjgMQ5RrDtFwWeKmlp8DCUnyI
-   hRoX/Qni1jMapu+3UrmVLm17GxCFKi5L9dQLNfHca7upEJ/XelTOsOMvw
-   Ah8UDbx6EyH4MprfWwiu8ZjGKMq5NdlSF/dewGDPmVUaN+1dmwFmU0erh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="450950699"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="450950699"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 04:06:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="721057401"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="721057401"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga002.jf.intel.com with ESMTP; 11 Jul 2023 04:06:24 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qJBCG-001pDs-2n;
-	Tue, 11 Jul 2023 14:06:20 +0300
-Date: Tue, 11 Jul 2023 14:06:20 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>,
-	Sebastian Reichel <sebastian.reichel@collabora.com>
-Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 05/15] spi: Remove code duplication in
- spi_add_device_locked()
-Message-ID: <ZK03rBqoQ0IZz617@smile.fi.intel.com>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-6-andriy.shevchenko@linux.intel.com>
- <7557bada-3076-4d6e-a5c5-d368433706e2@sirena.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E884218AE0
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 11:07:54 +0000 (UTC)
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB5F18D;
+	Tue, 11 Jul 2023 04:07:53 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id d9443c01a7336-1b9ecf0cb4cso5145005ad.2;
+        Tue, 11 Jul 2023 04:07:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689073673; x=1691665673;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VAbigd4Jr2Fpxzw4zXpvjjl6jteztN/7xaUcM4mF8yg=;
+        b=Z9p3jVWhMV/c2wpyEfRmAYwSlrJqkpeLAcNG6rK4qh7mDOCQgMya8F2pVS0JWyF3Ry
+         s26ZCLIySjYoiMhRNjHDmPmm4+wcWc9ctTcufWyqB1c3gO7IDQ5+cQdcpWOgQJFu0hRu
+         1JYevGGs6ghwb9nBsr3ju6qlWPf1EIR2wQ1Kz8EWpGTySToBpAVTa5tNMxhfUNlVEklA
+         C7HZUYdN3X6m4Y3sWkQD2PQGTc5IcPkti7Rs30CoBT6fwS7Gc8f132ewjSkA7U0gMxh1
+         w22cShaVFIq6k2G+C2Y3ekgkXAviVkzMCqJVVHljXv17rmI+A54Ty13erxsCmAFVIJiz
+         m/aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689073673; x=1691665673;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VAbigd4Jr2Fpxzw4zXpvjjl6jteztN/7xaUcM4mF8yg=;
+        b=QfThBWqs64P6+NXwGQMjdBA27Tu5KMG/AjtAVME1a7BJUhWeQV2QUIhTbJD+4hrz+B
+         gWCc9Xm7kzeDk8c3sLIGKEeMq1dZ3lhQeSjPqIncJ0RjAiXMwvvWszgzNDqg+MlkLdZ+
+         Ru7ucgWgoCKtDHkypP4RJ13VSdkUGQUwZwWKppfSy/a2XNEbm6/OTF2cykQ5VT8SRVRY
+         yLLL8Ecmpq9d6ejsl57DGczRmLJPJzgrIRFFAqwRn+NtetKp+pW745VvrWYY2QgBgYVJ
+         ORGeBJjvR92aztcBvS8XM9xTP6at5H9QuA51fth3K85GtvMjTzHeKYoOcpWxZq42r55m
+         9vEQ==
+X-Gm-Message-State: ABy/qLYLgcMipoIjAa72er11gdYdQ1c8gPxFuaGyCNCrIwTafyhY1zCP
+	F8oDpNNk2s1cKDAzuP8nd2qocCbPZeKFTCCU
+X-Google-Smtp-Source: APBJJlEkBptODe2A0mVXfRnbLcZtVjmpzHzGpx2ENBDHNvRvTI9qIBydJG2CofJ2lXW8bPiRqBPF2Q==
+X-Received: by 2002:a17:903:2351:b0:1b8:86a1:9cf with SMTP id c17-20020a170903235100b001b886a109cfmr15113690plh.32.1689073672740;
+        Tue, 11 Jul 2023 04:07:52 -0700 (PDT)
+Received: from localhost.localdomain ([81.70.217.19])
+        by smtp.gmail.com with ESMTPSA id l21-20020a170902d35500b001b9dab0397bsm1628764plk.29.2023.07.11.04.07.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 04:07:51 -0700 (PDT)
+From: menglong8.dong@gmail.com
+X-Google-Original-From: imagedong@tencent.com
+To: michael.chan@broadcom.com,
+	leon@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Menglong Dong <imagedong@tencent.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [PATCH net-next v2] bnxt_en: use dev_consume_skb_any() in bnxt_tx_int
+Date: Tue, 11 Jul 2023 19:07:43 +0800
+Message-Id: <20230711110743.39067-1-imagedong@tencent.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7557bada-3076-4d6e-a5c5-d368433706e2@sirena.org.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 06:16:22PM +0100, Mark Brown wrote:
-> On Mon, Jul 10, 2023 at 06:49:22PM +0300, Andy Shevchenko wrote:
-> > Seems by unknown reason, probably some kind of mis-rebase,
-> > the commit 0c79378c0199 ("spi: add ancillary device support")
-> > adds a dozen of duplicating lines of code. Drop them.
-> > 
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > ---
-> >  drivers/spi/spi.c | 11 -----------
-> >  1 file changed, 11 deletions(-)
-> > 
-> > diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-> > index c99ee4164f11..46cbda383228 100644
-> > --- a/drivers/spi/spi.c
-> > +++ b/drivers/spi/spi.c
-> > @@ -712,17 +712,6 @@ EXPORT_SYMBOL_GPL(spi_add_device);
-> >  static int spi_add_device_locked(struct spi_device *spi)
-> >  {
-> >  	struct spi_controller *ctlr = spi->controller;
-> > -	struct device *dev = ctlr->dev.parent;
-> > -
-> > -	/* Chipselects are numbered 0..max; validate. */
-> > -	if (spi_get_chipselect(spi, 0) >= ctlr->num_chipselect) {
-> > -		dev_err(dev, "cs%d >= max %d\n", spi_get_chipselect(spi, 0),
-> > -			ctlr->num_chipselect);
-> > -		return -EINVAL;
-> > -	}
-> > -
-> > -	/* Set the bus ID string */
-> > -	spi_dev_set_name(spi);
-> 
-> I see that this is duplicating spi_add_device() (and we really could do
-> better with code sharing there I think) but I can't immediately see
-> where the duplication that's intended to be elimiated is here - where
-> else in the one call path that spi_add_device_locked() has would we do
-> the above?  Based on the changelog I was expecting to see some
-> duplicated code in the function itself.
+From: Menglong Dong <imagedong@tencent.com>
 
-Oh, by some reason Sebastian wasn't in this rather long Cc list.
-Added him.
+In bnxt_tx_int(), the skb in the tx ring buffer will be freed after the
+transmission completes with dev_kfree_skb_any(), which will produce
+the noise on the tracepoint "skb:kfree_skb":
 
-Reading again I don't see any useful explanation why that piece of code has to
-be duplicated among these two functions. It's 100% a copy.
+$ perf script record -e skb:kfree_skb -a
+$ perf script
+  swapper     0 [014] 12814.337522: skb:kfree_skb: skbaddr=0xffff88818f145ce0 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [003] 12814.338318: skb:kfree_skb: skbaddr=0xffff888108380600 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12814.375258: skb:kfree_skb: skbaddr=0xffff88818f147ce0 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12814.451960: skb:kfree_skb: skbaddr=0xffff88818f145ce0 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [008] 12814.562166: skb:kfree_skb: skbaddr=0xffff888112664600 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12814.732517: skb:kfree_skb: skbaddr=0xffff88818f145ce0 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12814.800608: skb:kfree_skb: skbaddr=0xffff88810025d100 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12814.861501: skb:kfree_skb: skbaddr=0xffff888108295a00 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12815.377038: skb:kfree_skb: skbaddr=0xffff88818f147ce0 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+  swapper     0 [014] 12815.395530: skb:kfree_skb: skbaddr=0xffff88818f145ee0 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
 
-Sebastian, can you shed some light here?
+And the call stack is like this:
 
+$ perf script record -e skb:kfree_skb -a --call-graph fp
+$ perf script
+swapper     0 [015] 12915.386236: skb:kfree_skb: skbaddr=0xffff88b0473cd000 protocol=2048 location=dev_kfree_skb_any_reason+0x2e reason: NOT_SPECIFIED
+        ffffffff81e5b0a7 kfree_skb_reason+0x117 (vmlinux)
+        ffffffff81e5b0a7 kfree_skb_reason+0x117 (vmlinux)
+        ffffffff81e6dd1e dev_kfree_skb_any_reason+0x2e (vmlinux)
+        ffffffffa04510d5 bnxt_tx_int+0x95 ([bnxt_en])
+        ffffffffa0454ee5 __bnxt_poll_work_done+0x25 ([bnxt_en])
+        ffffffffa045b9d2 bnxt_poll+0x72 ([bnxt_en])
+        ffffffff81e7b47e __napi_poll+0x2e (vmlinux)
+        ffffffff81e7bb34 net_rx_action+0x294 (vmlinux)
+        ffffffff8218ff5e __do_softirq+0xfe (vmlinux)
+        ffffffff810ad51e irq_exit_rcu+0x7e (vmlinux)
+        ffffffff82175bb5 common_interrupt+0xc5 (vmlinux)
+        ffffffff82200d27 asm_common_interrupt+0x27 (vmlinux)
+        ffffffff8217ae54 intel_idle_irq+0x64 (vmlinux)
+        ffffffff81dea7ae cpuidle_enter+0x2e (vmlinux)
+        ffffffff811057e3 call_cpuidle+0x23 (vmlinux)
+        ffffffff8110b16a do_idle+0x1ea (vmlinux)
+        ffffffff8110b3cd cpu_startup_entry+0x1d (vmlinux)
+        ffffffff8106dc08 start_secondary+0x118 (vmlinux)
+        ffffffff81000263 secondary_startup_64_no_verify+0x17e (vmlinux)
+
+Replace dev_kfree_skb_any() with dev_consume_skb_any() in bnxt_tx_int()
+to reduce the noise.
+
+Signed-off-by: Menglong Dong <imagedong@tencent.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+---
+v2:
+- be more specific in the commit message
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index e5b54e6025be..d84ded8db93d 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -685,7 +685,7 @@ static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
+ next_tx_int:
+ 		cons = NEXT_TX(cons);
+ 
+-		dev_kfree_skb_any(skb);
++		dev_consume_skb_any(skb);
+ 	}
+ 
+ 	WRITE_ONCE(txr->tx_cons, cons);
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.40.1
 
 
