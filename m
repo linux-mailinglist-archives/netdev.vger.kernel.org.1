@@ -1,202 +1,119 @@
-Return-Path: <netdev+bounces-16729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72F0774E91A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:29:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A0674E925
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BF91C20C3E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:29:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C5971C20C49
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A48B174F3;
-	Tue, 11 Jul 2023 08:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F69111C8F;
+	Tue, 11 Jul 2023 08:31:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F77174CC
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 08:28:58 +0000 (UTC)
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80336E77;
-	Tue, 11 Jul 2023 01:28:27 -0700 (PDT)
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id 2532E660700A;
-	Tue, 11 Jul 2023 09:28:16 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1689064098;
-	bh=spdNLway67POM3vmFaXNGhDhQmXxhVIedWvVLp0PkEI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XSCTbFXk9e6Ms6w3dUD0gTaJbCLMJPnp6Us3KW28VZQ9hoaNYRdeO51FSibZH/fzR
-	 JKiOts4MP0vpXd7Sm62WRMiy18wm8cew197TIrGkrMstBRkn8EotGVMfdYCXfIPJSe
-	 daxKC2B2n9x1az4GZ5GnR8rcX8dTYTsyY730jAhseXuJoFP2RlZZLPbPOwRRmcg2DA
-	 AuU+HmpPB29i7vONs5CAXPnuO8/39XXDXiNgdv1iHqfSMOywBsFHXC35USEsn3iVGM
-	 sm/VWNEaupu1VVdE1Na6ph1PWVqdQwL0sL6NNEZHb+h9luZhHTnlJNLnVZ7IUaGKbA
-	 HdIZq6knmkqdQ==
-Message-ID: <83c4b75a-06d7-9fca-ffa0-f2e6a6ae7aed@collabora.com>
-Date: Tue, 11 Jul 2023 10:28:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B8A17730
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 08:31:41 +0000 (UTC)
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD2191;
+	Tue, 11 Jul 2023 01:31:39 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-c49777d6e7aso6615218276.1;
+        Tue, 11 Jul 2023 01:31:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689064298; x=1691656298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YXQHwA7H4BKxYYTb2kjEWqMmKPsPln0gjwSHgBiVGpM=;
+        b=pwtCI+eA3pc8/M5Q+ZS9tZKwsbnA1P0CDApbwuntcWVRHjARj+uoJXkPoX4oFhyiHn
+         TUIzHvznIT+rTZEZijG/xFlaJrcfaoEzMax+ds+q3o3FXBwSSCcMeUbatAkaNOQ2Q4Mf
+         ylw3duVDFPu6Kq52ro6W9FYeArJ6ZseErLjvHZ5XRn+AFd3ycId9a8vTCBycGZb/GeTO
+         3oCYOk/WKc1C3bmV1R9Debu416gENyTEbfJZm5ewHrX5UOAxf3qWpKIAzraSBGFXdlrM
+         3/LWvD8WlFk/ohEl2M49IKqSYCS5FyEnecH2DLwDdd2U+B0crfPkVtcRzd4zcGMGO8iD
+         SQQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689064298; x=1691656298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YXQHwA7H4BKxYYTb2kjEWqMmKPsPln0gjwSHgBiVGpM=;
+        b=L6DEXOGXlABR50wufjysrSEk35xbXDGFWS7DvBOw2dOe9edESd6IF5Iaq3vxdC2pHI
+         xlNVo3TfLsWEzmWf65+xDxKkCrxootje+jKyGk6b2356wdvU7s2nUbUfvKEagkG+xv/6
+         AZ0P8HDs+qcDlismhOURTB0bKp6JxQSfJkOCFN6GX7u9IIy2f57Dh5GIT64XTxA5/N6e
+         /ravkZbwAEEzDq+hGpZIULoDKDlWVfHIyxVmrDhF0gb86yjYU29kW9kc7fG4Dtjupz5K
+         Won9/pLFjF0uvCw8QWFAoEGnqj7Xjy7+LMilJ4WpiBexGfOwWB3xoZqP71+tL8XhnFOZ
+         FZtw==
+X-Gm-Message-State: ABy/qLZugImKImb/RMUnsSQedD/BY1bSu+Z9ZeOAGgICyrGJDfYehjqN
+	gb2uyiBrYnJWofTWY3BmlwxsGqUWYSTzmwu8AAE=
+X-Google-Smtp-Source: APBJJlFV9kBJSYVRF9EQGBKu1C+CXMwjV8RCu7fEsP63WQp2AzTYHA2QQpGgUQM8ahKiOs6f6MOd6DVqYRpCYNi9MtA=
+X-Received: by 2002:a25:2e45:0:b0:c6b:aef4:db27 with SMTP id
+ b5-20020a252e45000000b00c6baef4db27mr12058548ybn.17.1689064298622; Tue, 11
+ Jul 2023 01:31:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 04/15] spi: Replace open coded
- spi_controller_xfer_timeout()
-Content-Language: en-US
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Mark Brown <broonie@kernel.org>,
- Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
- Yang Yingliang <yangyingliang@huawei.com>,
- Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
- Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
- =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
- linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Sanjay R Mehta <sanju.mehta@amd.com>,
- Radu Pirea <radu_nicolae.pirea@upb.ro>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>,
- Tudor Ambarus <tudor.ambarus@linaro.org>,
- Serge Semin <fancer.lancer@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>, Andy Gross <agross@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Heiko Stuebner <heiko@sntech.de>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Orson Zhai <orsonzhai@gmail.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>,
- Chunyan Zhang <zhang.lyra@gmail.com>, Alain Volmat
- <alain.volmat@foss.st.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-5-andriy.shevchenko@linux.intel.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20230710154932.68377-5-andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <1585899.1688486184@warthog.procyon.org.uk>
+In-Reply-To: <1585899.1688486184@warthog.procyon.org.uk>
+From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date: Tue, 11 Jul 2023 10:31:27 +0200
+Message-ID: <CAAUqJDv26FBuG+UYDc+xBYz0b8V-+eDzzLXjianmWAAo_JwvLg@mail.gmail.com>
+Subject: Re: [PATCH net] crypto: af_alg: Fix merging of written data into
+ spliced pages
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Il 10/07/23 17:49, Andy Shevchenko ha scritto:
-> Since the new spi_controller_xfer_timeout() helper appeared,
-> we may replace open coded variant in spi_transfer_wait().
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+On Tue, Jul 4, 2023 at 5:56=E2=80=AFPM David Howells <dhowells@redhat.com> =
+wrote:
+> af_alg_sendmsg() takes data-to-be-copied that's provided by write(),
+> send(), sendmsg() and similar into pages that it allocates and will merge
+> new data into the last page in the list, based on the value of ctx->merge=
+.
+>
+> Now that af_alg_sendmsg() accepts MSG_SPLICE_PAGES, it adds spliced pages
+> directly into the list and then incorrectly appends data to them if there=
+'s
+> space left because ctx->merge says that it can.  This was cleared by
+> af_alg_sendpage(), but that got lost.
+>
+> Fix this by skipping the merge if MSG_SPLICE_PAGES is specified and
+> clearing ctx->merge after MSG_SPLICE_PAGES has added stuff to the list.
+>
+> Fixes: bf63e250c4b1 ("crypto: af_alg: Support MSG_SPLICE_PAGES")
+> Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+> Link: https://lore.kernel.org/r/CAAUqJDvFuvms55Td1c=3DXKv6epfRnnP78438nZQ=
+-JKyuCptGBiQ@mail.gmail.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: linux-crypto@vger.kernel.org
+> cc: netdev@vger.kernel.org
 > ---
->   drivers/spi/spi.c       | 25 ++-----------------------
->   include/linux/spi/spi.h |  6 +++++-
->   2 files changed, 7 insertions(+), 24 deletions(-)
-> 
-> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-> index 125dea8fae00..c99ee4164f11 100644
-> --- a/drivers/spi/spi.c
-> +++ b/drivers/spi/spi.c
-> @@ -1342,8 +1342,7 @@ static int spi_transfer_wait(struct spi_controller *ctlr,
->   {
->   	struct spi_statistics __percpu *statm = ctlr->pcpu_statistics;
->   	struct spi_statistics __percpu *stats = msg->spi->pcpu_statistics;
-> -	u32 speed_hz = xfer->speed_hz;
-> -	unsigned long long ms;
-> +	unsigned long ms;
->   
->   	if (spi_controller_is_slave(ctlr)) {
->   		if (wait_for_completion_interruptible(&ctlr->xfer_completion)) {
-> @@ -1351,29 +1350,9 @@ static int spi_transfer_wait(struct spi_controller *ctlr,
->   			return -EINTR;
->   		}
->   	} else {
-> -		if (!speed_hz)
-> -			speed_hz = 100000;
-> -
-> -		/*
-> -		 * For each byte we wait for 8 cycles of the SPI clock.
-> -		 * Since speed is defined in Hz and we want milliseconds,
-> -		 * use respective multiplier, but before the division,
-> -		 * otherwise we may get 0 for short transfers.
-> -		 */
-> -		ms = 8LL * MSEC_PER_SEC * xfer->len;
-> -		do_div(ms, speed_hz);
-> -
-> -		/*
-> -		 * Increase it twice and add 200 ms tolerance, use
-> -		 * predefined maximum in case of overflow.
-> -		 */
-> -		ms += ms + 200;
-> -		if (ms > UINT_MAX)
-> -			ms = UINT_MAX;
-> -
-> +		ms = spi_controller_xfer_timeout(ctlr, xfer);
+>  crypto/af_alg.c |    7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-I agree on using helpers, but the logic is slightly changing here: yes it is
-unlikely (and also probably useless) to get ms == UINT_MAX, but the helper is
-limiting the maximum timeout value to 500mS, which may not work for some slow
-controllers/devices.
-
-This should get validated on more than a few platforms, and I'm not sure that
-this kind of validation would be "fast" to get... so, probably the best thing
-to do here is to add a warning in case the timeout exceeds 500mS, print the
-actual value, keep it like this for a kernel version or two and check reports:
-that would allow to understand what a safe maximum timeout value could be.
-
-Aside from that, I wouldn't drop those nice comments explaining how/why the
-timeout is calculated: I know how, but not everyone knows in advance.
-
-Regards,
-Angelo
-
->   		ms = wait_for_completion_timeout(&ctlr->xfer_completion,
->   						 msecs_to_jiffies(ms));
-> -
->   		if (ms == 0) {
->   			SPI_STATISTICS_INCREMENT_FIELD(statm, timedout);
->   			SPI_STATISTICS_INCREMENT_FIELD(stats, timedout);
-> diff --git a/include/linux/spi/spi.h b/include/linux/spi/spi.h
-> index 32c94eae8926..0ce1cb18a076 100644
-> --- a/include/linux/spi/spi.h
-> +++ b/include/linux/spi/spi.h
-> @@ -1270,12 +1270,16 @@ static inline bool spi_is_bpw_supported(struct spi_device *spi, u32 bpw)
->    * that it would take on a single data line and take twice this amount of time
->    * with a minimum of 500ms to avoid false positives on loaded systems.
->    *
-> + * Assume speed to be 100 kHz if it's not defined at the time of invocation.
-> + *
->    * Returns: Transfer timeout value in milliseconds.
->    */
->   static inline unsigned int spi_controller_xfer_timeout(struct spi_controller *ctlr,
->   						       struct spi_transfer *xfer)
->   {
-> -	return max(xfer->len * 8 * 2 / (xfer->speed_hz / 1000), 500U);
-> +	u32 speed_hz = xfer->speed_hz ?: 100000;
-> +
-> +	return max(xfer->len * 8 * 2 / (speed_hz / 1000), 500U);
->   }
->   
->   /*---------------------------------------------------------------------------*/
-
+Thanks for the fix! I can confirm that it fixes the reported issue.
+There remains some kernel panic on s390x that I hadn't noticed in the
+results earlier, but that's probably a different issue. I'll
+investigate and send a report/patch when I have more information.
 
