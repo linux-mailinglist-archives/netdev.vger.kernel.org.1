@@ -1,259 +1,143 @@
-Return-Path: <netdev+bounces-16862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C761D74F106
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:03:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D8074F10E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:04:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D979281865
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:03:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9D511C20F67
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB9A18C3E;
-	Tue, 11 Jul 2023 14:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5007818C3E;
+	Tue, 11 Jul 2023 14:04:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A9514AB5;
-	Tue, 11 Jul 2023 14:03:51 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0114F127;
-	Tue, 11 Jul 2023 07:03:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=NCe20DJxaBTemI8S1kSVzZUvr73+rwHUToovZ2WdzP4=; b=ncCNbccrzrIFicDTnSEtOL7fbr
-	0ML24MM0HScWxcxeOazUxPWt8cEcHtGsSa7ZlzjqQUKYy4BO+Hzq/DXzMWYImgzqIFrnzj/16VnkR
-	zh2Zq9rmITbycVSSVkJFyJgTXbZ1qjS4XcnLdCBh7ERqjEgWw2ymzQFCiblvPnvHkP9q7S+h3/daW
-	WZv/I8slbAPAGAj2wfO06Velvr7bN6FBcjSPF//Qm/vyOpogesSo+sOtc5di6dM6EvL8OdkpiMS7b
-	s7GGAob+TbsDJ4sOvYWn9950l07qjb8R0nyT8+Wh4vGNdGh2H2nbJJXSErO45aGwJh6stdX88j/JK
-	sRyqmCIQ==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qJDxr-000OUm-Ch; Tue, 11 Jul 2023 16:03:39 +0200
-Received: from [81.6.34.132] (helo=localhost.localdomain)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qJDxq-000CVL-SD; Tue, 11 Jul 2023 16:03:38 +0200
-Subject: Re: [PATCH bpf-next v4 3/8] libbpf: Add opts-based
- attach/detach/query API for tcx
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
- kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
- davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20230710201218.19460-1-daniel@iogearbox.net>
- <20230710201218.19460-4-daniel@iogearbox.net>
- <CAEf4BzaGbVe3ip_cDxV0u8bBUEVExdqHXOFBorHWZ0tpDBLLnw@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <dd7aaf1e-9abf-0b9c-bfba-ee3bc4cfa852@iogearbox.net>
-Date: Tue, 11 Jul 2023 16:03:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386F118C21
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:04:11 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on20613.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eab::613])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83599E;
+	Tue, 11 Jul 2023 07:04:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QvW6YyEToRwioS7gzXwgEx67G6pT7uRiMXFMP6vrGhk67AZAvAV48elfzLexiS4TQ65oPflGMG7yoyVRZlZuAhYj72XI/6YblmERmRdg+l/qZeyDcKxM/T/gmS736H4bTUkYrROCvydBDl9n3QqXaVK05QM7V4aetGdaWsaYKKRacGMcE1kjffGj0I5+wEQMydSlOHIsasl3eeTDLQafJGRij4tlQfZEuiZSsV7nZh++ZL2HZKT4I5O5ScBNgLpA2xsVxTRXhSHYQ9elc0TJhIEQrCJguGA0hka2dcn0gSILteiTIpmy54ClY2Rh7pTkv6Q7KmAK8oVIZwg9jQ5+3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=P3LhRzvJcOEI8vmRt7Xpld9wRzlXodS7WT8YmwdNHrc=;
+ b=PjphlJMBixH6QOjz/DxyEt9zfRwDfvNTY+uPslZHlAcJjKH2KPtQ8ypcs9vU6blp4JmpS9t1ONNhdCh65zcHyoP49jtg5IYncsrYnGQtwXQe0NOmNSER1c/c8epAZ2PNjURTji7qI3r7h43c+sWi3NLDzpVQdIBuCI1ndohLKt2AK3rgKl+PsE6n/ev98lMk0NLvNYyVBRHRbpeb35sHeo8D7i55DTI21oRDXcnxBGg4ZbO15sIPs/a1+4lZqdCcuA8rlbbz4qP7efI2Ksced2GkkA++mysjoHkSm838NIjeLzeXHmo5RkQR1NVcKoKaM8McjwKpKCzTNyYlWo6SxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P3LhRzvJcOEI8vmRt7Xpld9wRzlXodS7WT8YmwdNHrc=;
+ b=ZgS6N7TOaJJIgZTBgVdqLscPYza8kQzFsbQCFjqz6KTdlpHbtb55wkILhcw19LUyXU2A/hnJBh1OVeqWVPtnU40rp2AIgcVt90pKkoPZiWkcRYp3bE0CETvn7vwmJ44Hk3LwmeVxX3HX45Vt5fNc8xT33bZ4T7EBlCSVY9C/g6o=
+Received: from BN8PR12CA0006.namprd12.prod.outlook.com (2603:10b6:408:60::19)
+ by DS0PR12MB7778.namprd12.prod.outlook.com (2603:10b6:8:151::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Tue, 11 Jul
+ 2023 14:04:04 +0000
+Received: from BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:60:cafe::f8) by BN8PR12CA0006.outlook.office365.com
+ (2603:10b6:408:60::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30 via Frontend
+ Transport; Tue, 11 Jul 2023 14:04:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT062.mail.protection.outlook.com (10.13.177.34) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6588.20 via Frontend Transport; Tue, 11 Jul 2023 14:04:03 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 11 Jul
+ 2023 09:04:02 -0500
+From: Michal Simek <michal.simek@amd.com>
+To: <linux-kernel@vger.kernel.org>, <monstr@monstr.eu>,
+	<michal.simek@xilinx.com>, <git@xilinx.com>
+CC: Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>, Conor Dooley
+	<conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Marc Kleine-Budde <mkl@pengutronix.de>,
+	Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>, Paolo Abeni
+	<pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring
+	<robh+dt@kernel.org>, Wolfgang Grandegger <wg@grandegger.com>,
+	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/2] can: xilinx_can: Add support for reset
+Date: Tue, 11 Jul 2023 16:03:53 +0200
+Message-ID: <cover.1689084227.git.michal.simek@amd.com>
+X-Mailer: git-send-email 2.36.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEf4BzaGbVe3ip_cDxV0u8bBUEVExdqHXOFBorHWZ0tpDBLLnw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-Developer-Signature: v=1; a=openpgp-sha256; l=473; i=michal.simek@amd.com; h=from:subject:message-id; bh=UpGZAvGk7X5kDR+J9E5G4WYCox6QV/3iaH6VAi86SU8=; b=owGbwMvMwCR4yjP1tKYXjyLjabUkhpS1iS4x9bfClAVmqTHIL73edWL3X1v5rhVsoSpGG1f3X gk/1VTSEcvCIMjEICumyCJtc+XM3soZU4QvHpaDmcPKBDKEgYtTACbyewLDguZDdivmSXVIfHdx Mztv2cj8fc6pSwzzEy5NP88iJ8dz/tPU4NklRoWG76VXAgA=
+X-Developer-Key: i=michal.simek@amd.com; a=openpgp; fpr=67350C9BF5CCEE9B5364356A377C7F21FE3D1F91
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26966/Tue Jul 11 09:28:31 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT062:EE_|DS0PR12MB7778:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7426da94-7394-40f4-9020-08db8217af5d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	OX86xHo9DmF7pYaA2DIE7VjY1FLYyjsvNiMFwGNMpD9nHVVaLnIPVHdBB4cVq4Yv/JcWX+W/BBEybb0Cnjo2WZ3PeOP0VqgSDOxsbuqTRKPRMTNuvd4olNNZ9956RicUitoy9Stux/haAuQ5ZucXywwYueyFSp9GPlPDfPVKn2d55UA4fbA3qI9enzjg3gjJFvDxdC6mCgviurSSzEO+rV0lUlVIhf0mbIcb4CVp16F6gqChuFbt487dvpZD5jfR8NvYBNzOasI8B7I5uwJyJILD1wCaHA2Bcz8uDUXk4zrBI58UmU1Z+eo2e8WpGjj45xK+4pAftU/qioy1wneiEZ3nuzFlVJ9yR3L84GY0E12gXU/5NOOyz2kba4MeJsu/botRSM/YuGQrdtqirOD35Ub3yrKfJ1ti8vM+pMNcbU/X1KgO3KrsVDsIMtp4n2AkfFpcHLbUgqCXB5bjFwAvr551lTtKCkhDBhaoa2WrNIBOff7VT2cYoQjRb/4SysOdYURVdki+MWHcW1NOE2oRFUaKcyevBzb34r6PujizqrO0xDFzGhfFURhWInvm1GJ/769ydF2eOb4Y8m4TcMefSpuglT5er4JOxhtpZBlknRNddS3ncemqPPzAwASlQ8dWdeNqBIQ65xBbiHU8i68yKOEd/yKvj/j+Xme/1oohtCGDqpfdDcMSB2D7tPfUQ6BC6kcjw8p5GvAQOYSf/ULb3fz1fqX1VIuFtUdJwoaacrcKI5CXOdceGH9hNbRgp2eVUX5/G+W3VbU7u0QxdWsmSy9yH1cY7+IDa8UDAvkC1wk=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(376002)(39860400002)(396003)(451199021)(46966006)(36840700001)(40470700004)(110136005)(478600001)(6666004)(54906003)(36860700001)(26005)(16526019)(336012)(186003)(70586007)(4744005)(2906002)(70206006)(82310400005)(41300700001)(316002)(5660300002)(44832011)(7416002)(4326008)(8676002)(81166007)(82740400003)(8936002)(356005)(40460700003)(86362001)(36756003)(2616005)(47076005)(83380400001)(426003)(40480700001)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 14:04:03.9654
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7426da94-7394-40f4-9020-08db8217af5d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7778
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/11/23 6:00 AM, Andrii Nakryiko wrote:
-> On Mon, Jul 10, 2023 at 1:12 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>
->> Extend libbpf attach opts and add a new detach opts API so this can be used
->> to add/remove fd-based tcx BPF programs. The old-style bpf_prog_detach() and
->> bpf_prog_detach2() APIs are refactored to reuse the new bpf_prog_detach_opts()
->> internally.
->>
->> The bpf_prog_query_opts() API got extended to be able to handle the new
->> link_ids, link_attach_flags and revision fields.
->>
->> For concrete usage examples, see the extensive selftests that have been
->> developed as part of this series.
->>
->> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->> ---
->>   tools/lib/bpf/bpf.c      | 105 +++++++++++++++++++++++++--------------
->>   tools/lib/bpf/bpf.h      |  92 ++++++++++++++++++++++++++++------
->>   tools/lib/bpf/libbpf.c   |  12 +++--
->>   tools/lib/bpf/libbpf.map |   1 +
->>   4 files changed, 157 insertions(+), 53 deletions(-)
->>
-> 
-> Thanks for doc comments! Looks good, left a few nits with suggestions
-> for simplifying code, but it's minor.
-> 
-> Acked-by: Andrii Nakryiko <andrii@kernel.org>
-> 
->> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
->> index 3b0da19715e1..3dfc43b477c3 100644
->> --- a/tools/lib/bpf/bpf.c
->> +++ b/tools/lib/bpf/bpf.c
->> @@ -629,55 +629,87 @@ int bpf_prog_attach(int prog_fd, int target_fd, enum bpf_attach_type type,
->>          return bpf_prog_attach_opts(prog_fd, target_fd, type, &opts);
->>   }
->>
->> -int bpf_prog_attach_opts(int prog_fd, int target_fd,
->> -                         enum bpf_attach_type type,
->> -                         const struct bpf_prog_attach_opts *opts)
->> +int bpf_prog_attach_opts(int prog_fd, int target,
->> +                        enum bpf_attach_type type,
->> +                        const struct bpf_prog_attach_opts *opts)
->>   {
->> -       const size_t attr_sz = offsetofend(union bpf_attr, replace_bpf_fd);
->> +       const size_t attr_sz = offsetofend(union bpf_attr, expected_revision);
->> +       __u32 relative_id, flags;
->>          union bpf_attr attr;
->> -       int ret;
->> +       int ret, relative;
->>
->>          if (!OPTS_VALID(opts, bpf_prog_attach_opts))
->>                  return libbpf_err(-EINVAL);
->>
->> +       relative_id = OPTS_GET(opts, relative_id, 0);
->> +       relative = OPTS_GET(opts, relative_fd, 0);
->> +       flags = OPTS_GET(opts, flags, 0);
->> +
->> +       /* validate we don't have unexpected combinations of non-zero fields */
->> +       if (relative > 0 && relative_id)
->> +               return libbpf_err(-EINVAL);
-> 
-> I left a comment in the next patch about this, I think it should be
-> simple `if (relative_fd && relative_id) { /* bad */ }`. But see the
-> next patch for why.
-> 
->> +       if (relative_id) {
->> +               relative = relative_id;
->> +               flags |= BPF_F_ID;
->> +       }
-> 
-> it's a bit hard to follow as written (to me at least). How about a
-> slight variation that has less in-place state update
-> 
-> 
-> int relative_fd, relative_id;
-> 
-> relative_fd = OPTS_GET(opts, relative_fd, 0);
-> relative_id = OPTS_GET(opts, relative_id, 0);
-> 
-> /* only one of fd or id can be specified */
-> if (relative_fd && relative_id > 0)
->      return libbpf_err(-EINVAL);
-> 
-> ... then see further below
-> 
->> +
->>          memset(&attr, 0, attr_sz);
->> -       attr.target_fd     = target_fd;
->> -       attr.attach_bpf_fd = prog_fd;
->> -       attr.attach_type   = type;
->> -       attr.attach_flags  = OPTS_GET(opts, flags, 0);
->> -       attr.replace_bpf_fd = OPTS_GET(opts, replace_prog_fd, 0);
->> +       attr.target_fd          = target;
->> +       attr.attach_bpf_fd      = prog_fd;
->> +       attr.attach_type        = type;
->> +       attr.attach_flags       = flags;
->> +       attr.relative_fd        = relative;
-> 
-> instead of two lines above, have simple if/else
-> 
-> if (relative_if) {
->      attr.relative_id = relative_id;
->      attr.attach_flags = flags | BPF_F_ID;
-> } else {
->      attr.relative_fd = relative_fd;
->      attr.attach_flags = flags;
-> }
-> 
-> This combined with the piece above seems very straightforward in terms
-> of what is checked and what's passed into attr. WDYT?
+Hi,
 
-All sgtm, I've implemented the suggestions locally for v5.
+IP core has option reset line which can be wired that's why add support
+for optional reset.
 
->> +       attr.replace_bpf_fd     = OPTS_GET(opts, replace_fd, 0);
->> +       attr.expected_revision  = OPTS_GET(opts, expected_revision, 0);
->>
->>          ret = sys_bpf(BPF_PROG_ATTACH, &attr, attr_sz);
->>          return libbpf_err_errno(ret);
->>   }
->>
->> -int bpf_prog_detach(int target_fd, enum bpf_attach_type type)
->> +int bpf_prog_detach_opts(int prog_fd, int target,
->> +                        enum bpf_attach_type type,
->> +                        const struct bpf_prog_detach_opts *opts)
->>   {
->> -       const size_t attr_sz = offsetofend(union bpf_attr, replace_bpf_fd);
->> +       const size_t attr_sz = offsetofend(union bpf_attr, expected_revision);
->> +       __u32 relative_id, flags;
->>          union bpf_attr attr;
->> -       int ret;
->> +       int ret, relative;
->> +
->> +       if (!OPTS_VALID(opts, bpf_prog_detach_opts))
->> +               return libbpf_err(-EINVAL);
->> +
->> +       relative_id = OPTS_GET(opts, relative_id, 0);
->> +       relative = OPTS_GET(opts, relative_fd, 0);
->> +       flags = OPTS_GET(opts, flags, 0);
->> +
->> +       /* validate we don't have unexpected combinations of non-zero fields */
->> +       if (relative > 0 && relative_id)
->> +               return libbpf_err(-EINVAL);
->> +       if (relative_id) {
->> +               relative = relative_id;
->> +               flags |= BPF_F_ID;
->> +       }
-> 
-> see above, I think the same data flow simplification can be done
-> 
->>
->>          memset(&attr, 0, attr_sz);
->> -       attr.target_fd   = target_fd;
->> -       attr.attach_type = type;
->> +       attr.target_fd          = target;
->> +       attr.attach_bpf_fd      = prog_fd;
->> +       attr.attach_type        = type;
->> +       attr.attach_flags       = flags;
->> +       attr.relative_fd        = relative;
->> +       attr.expected_revision  = OPTS_GET(opts, expected_revision, 0);
->>
->>          ret = sys_bpf(BPF_PROG_DETACH, &attr, attr_sz);
->>          return libbpf_err_errno(ret);
->>   }
->>
-> 
-> [...]
-> 
->> diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
->> index d9ec4407befa..a95d39bbef90 100644
->> --- a/tools/lib/bpf/libbpf.map
->> +++ b/tools/lib/bpf/libbpf.map
->> @@ -396,4 +396,5 @@ LIBBPF_1.3.0 {
->>          global:
->>                  bpf_obj_pin_opts;
->>                  bpf_program__attach_netfilter;
->> +               bpf_prog_detach_opts;
-> 
-> I think it sorts before bpf_program__attach_netfilter?
+Thanks,
+Michal
 
-Yeap, also fixed.
+
+Michal Simek (1):
+  dt-bindings: can: xilinx_can: Add reset description
+
+Srinivas Neeli (1):
+  can: xilinx_can: Add support for controller reset
+
+ .../bindings/net/can/xilinx,can.yaml          |  3 +++
+ drivers/net/can/xilinx_can.c                  | 25 ++++++++++++++++---
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+-- 
+2.36.1
+
 
