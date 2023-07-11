@@ -1,200 +1,99 @@
-Return-Path: <netdev+bounces-16890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC13374F58D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:33:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA1C74F5A2
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBECE1C20FD1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:33:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64F351C20DE5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C631218C1B;
-	Tue, 11 Jul 2023 16:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F275319BB6;
+	Tue, 11 Jul 2023 16:37:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93EFA5C
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:33:38 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCED01BE8
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 09:33:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AB/3H9Y8DNw4CC/Uc3OUtrLVzkaX72MBD6okrjFOllMp2Z/JKtze3L7L2mNL2+jwe4SGIliBcqVLY7JQkbPsta5yDxoYjfMRLPXEUtws1muQMOl5PhuMNu8lkkQZSJ84M23QdASCz1m+peroCmQdP8EHyV3W9STx2P29vwLVX62rTUsbbmZ6Ne9BzlWHsHfW9Etl+DqN4PFM9ZxfAZ2RMH04LLQhw9w82FwURtsQdsLreI9Uq/v6wxVKgZWraR/3HDvu4AGaFb7SMa2YKRQJa920zdKetf0cbTh7ysOAfG8ladcZraIgPEeG5Y1r91xewnd9sP9ahaK6BIhnNjtunQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cfIegLM/b9d0c4gCjsheGSBunvBdy7M9ygjGPKRwyEw=;
- b=Bip8kUQMojiKh+GrNErpC4h0oXzto6aw6imy99QPFhMW9yESDzub1IHBu6QzT+Uo9FprrjpC1VGm7vYTzUtA3hDaEXdiBRayyKj/Q2XHo4jTov1K7wa+f+dEPE1d4uu9JzvsgnLYy674JkFKQLA0Q5mMl3VpAcyFmUyeik/cYZQ4yoLVFHf5ymWrhLsKso6Z0Tw33SXxUB6uODQayCIFOaXYRFQ8FV6O3HzAGZZVXBWbULcQakvLEdTsxY7AFOnjRYm3jZE4R0nOqfKi+r4A3gslvRuOMMs/iBeFN4KVFmqKPQFxxdPUHfWbWC2PY9gN7QId7yJ3eyYN0/EE0kIUPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cfIegLM/b9d0c4gCjsheGSBunvBdy7M9ygjGPKRwyEw=;
- b=Ew0E+yziSdSLxgoQ55VUZI6w9GubsVFsSgbImCzWVPKLt6Z7KEomh0RvlnLS8m2AYRBPCIj5Q8yk6kvLEXx26Mw+lzSqTH4zI+zFZADScc+uI7zzRjZ4qYUYNzESjRH+cGb9h2jUj81ys+TnHreiPihbSffyhykknREKxe5iuUI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SJ0PR13MB5546.namprd13.prod.outlook.com (2603:10b6:a03:420::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.25; Tue, 11 Jul
- 2023 16:33:20 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.017; Tue, 11 Jul 2023
- 16:33:20 +0000
-Date: Tue, 11 Jul 2023 17:33:13 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	piotr.raczynski@intel.com, aleksander.lobakin@intel.com,
-	pmenzel@molgen.mpg.de,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-net v3] ice: prevent NULL pointer deref during reload
-Message-ID: <ZK2ESQIcppzGDa80@corigine.com>
-References: <20230706062551.2261312-1-michal.swiatkowski@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230706062551.2261312-1-michal.swiatkowski@linux.intel.com>
-X-ClientProxiedBy: LO2P265CA0306.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a5::30) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8530FA5C
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:37:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5455DC433C7;
+	Tue, 11 Jul 2023 16:37:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689093427;
+	bh=aHT875jqb7GCXnWc2Ry1gRBSKWwPBNo+nPkkwZHSA7o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XZcDX6MuV+y8LxjpADtuxJN9kkfLBsqNkhqyXEa3psF4oOdOqc7RnUlVqRXrzujQx
+	 U7z6hXEp3i1p7PnWWUws8u7XMruc5KZg+optBKJZs4J5sNj8goDRJpdSN+Z8iuVOOJ
+	 QniYqPd7vbqZMUv4lnKK4zCM5yIDha1JSBvNLBWiwT2fZCTFpAW67TyYK8KWH5iF5H
+	 qI6F9kT+t5g2omPrQcCHlRiBXiGKNucyuEDNHjmprkwPf13Zi+RUiU2PE1jLMRUVDd
+	 Srz3L511P+Go6bRM1JShlUd6lZ9ESMqe3iOvNXbIP7bnTf3acQ4E5x+yUxgasMGKva
+	 gfOsNkBSXpwbw==
+Date: Tue, 11 Jul 2023 09:37:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Yunsheng Lin <yunshenglin0825@gmail.com>, Yunsheng Lin
+ <linyunsheng@huawei.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang
+ Chen <liangchen.linux@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH v5 RFC 1/6] page_pool: frag API support for 32-bit arch
+ with 64-bit DMA
+Message-ID: <20230711093705.45454e41@kernel.org>
+In-Reply-To: <8639b838-8284-05a2-dbc3-7e4cb45f163a@intel.com>
+References: <20230629120226.14854-1-linyunsheng@huawei.com>
+	<20230629120226.14854-2-linyunsheng@huawei.com>
+	<20230707170157.12727e44@kernel.org>
+	<3d973088-4881-0863-0207-36d61b4505ec@gmail.com>
+	<20230710113841.482cbeac@kernel.org>
+	<8639b838-8284-05a2-dbc3-7e4cb45f163a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5546:EE_
-X-MS-Office365-Filtering-Correlation-Id: d8b3edad-a810-46a6-221b-08db822c8955
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VdqvJlf9pcOqCg9fytlyZyTNvRLOtwjX2izgABQviSq1W7W1aPuYiVmKxJ1kvgI7pIxhS0LKYeS9W+S+z9YVYoa2AhfJLr/aiJ/nb6/8eBpRtLzIdgKm3tJoR/Dpw19JlOmjyDN2eZR8cjz7HVnGWT8rav7X6/1sKmTZMI3sRfKwRI7pqnnR6ixioHhWJs9tZ4EbmZH6J4tZK7lxv82HHgO8G28OHGg51Mkw/+klmIswbglzWEendElUtPwlUW2NsrA/wb6GguyWRrckJMkskgNsyXcRyk6flSj6bhPzMdNOgtxKbsomC2ohNE20Eze+AUHBSdq1l7Po6e4smyx8Bafi7TuJDA+HrFqhfGPl6g+KuidFGKJZ6Ihmf3yq01qNf4pgM/sFd+fhN6Tzzjk/Qd5lAIKfF3NmAwCamuXYI4GLJ8m1IanXAg+NJVxAEax2YU8k7z2xbcHA9Dms9/GaEnSXTzx+uY0QHBUOg3k4myTrCjPy20K0fpp3MjdO7DBIO/8SsAuFP1qq1x1GUxbCKA4+PSTQ1Tpbzy4KEEhvt1VAqGijmTpQSN2E1lom46wkjfpE1Kkf7WSNQhbe6yDF80kItlngmv26UxAVmFZgyyo=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(376002)(366004)(396003)(39840400004)(451199021)(316002)(8676002)(83380400001)(2616005)(2906002)(66476007)(66556008)(26005)(66946007)(6916009)(4326008)(6486002)(478600001)(5660300002)(186003)(44832011)(41300700001)(6512007)(8936002)(6506007)(6666004)(86362001)(36756003)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+QaxUOVYAWaT2ZR8Nm3odJuEA4hdrCsYz3PM3hyS4p96s+1XdryQm5yraeBh?=
- =?us-ascii?Q?AKbfhlsQWK9wr9f64+N7AjrRieGyDS/DZ9xB146l/h9Bhr0xoWpvcLGPIri5?=
- =?us-ascii?Q?1UbnV6mxmkogD8hF+iM7l2MVl3F9ZSwEvUCv/yDl8T7fkgqpHd9gcI7ghJXb?=
- =?us-ascii?Q?hsk7JoIPV9cA9yf8iTjD1RuuZRntjh2a/1ovc+vIOaHO5as5XXdqp1TjBeDN?=
- =?us-ascii?Q?mXstZz9JnQpYcwv8xzhHXnCZT1OjoeSe3d0jGIZLePHsoOx1F7YiTPra9E3n?=
- =?us-ascii?Q?WgstMw6RVRl2Mde5EWy4IzEHxeIzls+xU3Sx6SRPRh+XmMVIHO5m6OsQNOeU?=
- =?us-ascii?Q?zIrjTajehTplXoGXg6ltej4RQC8nenKXt6kvQvoPFjIEabTSGNcBppQWafDl?=
- =?us-ascii?Q?eN8FetWFrtW6bLgn8wg1iv9+JD8pfyHeM8O0wFtigugTpLt1eg2USmZm8Zxi?=
- =?us-ascii?Q?vNbnGijKpkzr5FRtjV+Fkh/KbwrdeDHvaEwGGrnYm9ltsO3r27911wbHYhzz?=
- =?us-ascii?Q?bhtKEMj6dUTjjs6qiVpcircT0HQYUqhsveHr3nKv5AeD1xcGOY3b2313OXik?=
- =?us-ascii?Q?f8KoggWRdFi7yKIxN2XPKRP7VSAIhRvQdLOW/XB+J/t2gTrIIvs/dG6NgA/a?=
- =?us-ascii?Q?utkFKkhPJp7yE+DZ+lCTzxVzZCJRUheQo3TfmUojQDO2OcTLwBd/05Sqc+kK?=
- =?us-ascii?Q?tMAI0RQUGOMYbiUfi227/MKeztxFqb9YdvLz80oZhYIYJ+0HfYn6qkP8oUcT?=
- =?us-ascii?Q?g+BC5at9sDZFRyBVOvYV1oqwfyvM3zmWPXf6U9GZa+wwem9C+KvTIpDvTpaP?=
- =?us-ascii?Q?fg5SDuOLf0nOhxaFPYxJhQnwRwT4fYpe9SwukttgH3fTEyFsFneGb4uVLLOy?=
- =?us-ascii?Q?hmkKOU+pDhooO/gVhF4UALj1XVzKlYj4/jHcsO0dajiL0ttJZvWbW4ukrMXA?=
- =?us-ascii?Q?uJCLRE9IKS0zetz72TaJUpjMjwV1VgzwqQ7MP7K7NiEsuH1A6WprI5Pc0DUA?=
- =?us-ascii?Q?7q+IZ4j7QSE2+4kSA2RHRxxrUpN4ONt5relxtJvvhqCLU9nvrLWwp3iN3LWV?=
- =?us-ascii?Q?EhGUmD8erhU3FIyLnrOUdSn02JR11AtZidIs4+9+tuZVyWs3M38H5DU2OUi9?=
- =?us-ascii?Q?mVsKFr+Jq+sfCdEITUWonJLmfUt2sKoRHoNO4AwCnPIUmqeATIclmaXn6wTj?=
- =?us-ascii?Q?de2lIAb78EmPiTKo/mKCQ2wai5945fszZlcU6C0r894v+aUNoOnOfB8yOus/?=
- =?us-ascii?Q?dfGsBOck+g02+bw8JoCPfauhUh6WBDZ1zpoBsch96KgITZPWgO4SgQmXblN0?=
- =?us-ascii?Q?8EDMBsgyL3oVgkbyQnXsYWO1NIbkZQocEEQlM5qtuyIm233dpRbWEZZWP0GB?=
- =?us-ascii?Q?9WmTgO8Q0zR9tHSa6GPl5ZVDty3raLbg5SuEMCEU5PmzXOBnI7ZZO8jEqTX3?=
- =?us-ascii?Q?DEbzbq1e4hT0DaLFnrjiUmOx0gzmZvPIGlYxz7h1CCR/x1erUpQX4lQw5g13?=
- =?us-ascii?Q?oCMZKxYSY5xI2Og/xunMrnLqhvLvFwARvZ6E+wc5+cxSZHCHJHgTO0EWkBwH?=
- =?us-ascii?Q?s8e6haCKJIpLeiUK7OpaZzN745V55gonxS6wEkiQrxD0hE77+g02WYTHxfL9?=
- =?us-ascii?Q?Vg=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8b3edad-a810-46a6-221b-08db822c8955
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 16:33:20.4389
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9icQ1D2lvhwQ78kASmV8IQPIZ224rfwNnvuu6BndoNX8BpMe/XqPh72t/GTudef0dQYCR6FyHrs1f0KCS1Ah5wAEJvT6nBXjTe01CoacK5c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5546
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 06, 2023 at 08:25:51AM +0200, Michal Swiatkowski wrote:
-> Calling ethtool during reload can lead to call trace, because VSI isn't
-> configured for some time, but netdev is alive.
-> 
-> To fix it add rtnl lock for VSI deconfig and config. Set ::num_q_vectors
-> to 0 after freeing and add a check for ::tx/rx_rings in ring related
-> ethtool ops.
-> 
-> Add proper unroll of filters in ice_start_eth().
-> 
-> Reproduction:
-> $watch -n 0.1 -d 'ethtool -g enp24s0f0np0'
-> $devlink dev reload pci/0000:18:00.0 action driver_reinit
-> 
-> Call trace before fix:
-> [66303.926205] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [66303.926259] #PF: supervisor read access in kernel mode
-> [66303.926286] #PF: error_code(0x0000) - not-present page
-> [66303.926311] PGD 0 P4D 0
-> [66303.926332] Oops: 0000 [#1] PREEMPT SMP PTI
-> [66303.926358] CPU: 4 PID: 933821 Comm: ethtool Kdump: loaded Tainted: G           OE      6.4.0-rc5+ #1
-> [66303.926400] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.00.01.0014.070920180847 07/09/2018
-> [66303.926446] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
-> [66303.926649] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
-> [66303.926722] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
-> [66303.926749] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
-> [66303.926781] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
-> [66303.926811] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
-> [66303.926843] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
-> [66303.926874] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
-> [66303.926906] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
-> [66303.926941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [66303.926967] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
-> [66303.926999] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [66303.927029] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [66303.927060] PKRU: 55555554
-> [66303.927075] Call Trace:
-> [66303.927094]  <TASK>
-> [66303.927111]  ? __die+0x23/0x70
-> [66303.927140]  ? page_fault_oops+0x171/0x4e0
-> [66303.927176]  ? exc_page_fault+0x7f/0x180
-> [66303.927209]  ? asm_exc_page_fault+0x26/0x30
-> [66303.927244]  ? ice_get_ringparam+0x22/0x50 [ice]
-> [66303.927433]  rings_prepare_data+0x62/0x80
-> [66303.927469]  ethnl_default_doit+0xe2/0x350
-> [66303.927501]  genl_family_rcv_msg_doit.isra.0+0xe3/0x140
-> [66303.927538]  genl_rcv_msg+0x1b1/0x2c0
-> [66303.927561]  ? __pfx_ethnl_default_doit+0x10/0x10
-> [66303.927590]  ? __pfx_genl_rcv_msg+0x10/0x10
-> [66303.927615]  netlink_rcv_skb+0x58/0x110
-> [66303.927644]  genl_rcv+0x28/0x40
-> [66303.927665]  netlink_unicast+0x19e/0x290
-> [66303.927691]  netlink_sendmsg+0x254/0x4d0
-> [66303.927717]  sock_sendmsg+0x93/0xa0
-> [66303.927743]  __sys_sendto+0x126/0x170
-> [66303.927780]  __x64_sys_sendto+0x24/0x30
-> [66303.928593]  do_syscall_64+0x5d/0x90
-> [66303.929370]  ? __count_memcg_events+0x60/0xa0
-> [66303.930146]  ? count_memcg_events.constprop.0+0x1a/0x30
-> [66303.930920]  ? handle_mm_fault+0x9e/0x350
-> [66303.931688]  ? do_user_addr_fault+0x258/0x740
-> [66303.932452]  ? exc_page_fault+0x7f/0x180
-> [66303.933193]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> 
-> Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On Tue, 11 Jul 2023 12:59:00 +0200 Alexander Lobakin wrote:
+> I'm fine with that, although ain't really able to work on this myself
+> now :s (BTW I almost finished Netlink bigints, just some more libie/IAVF
+> crap).
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+FWIW I was thinking about the bigints recently, and from ynl
+perspective I think we may want two flavors :( One which is at
+most the length of platform's long long, and another which is
+always a bigint. The latter will be more work for user space
+to handle, so given 99% of use cases don't need more than 64b
+we should make its life easier?
 
+> It just needs to be carefully designed, because if we want move ALL the
+> inlines to a new header, we may end up including 2 PP's headers in each
+> file. That's why I'd prefer "core/driver" separation. Let's say skbuff.c
+> doesn't need page_pool_create(), page_pool_alloc(), and so on, while
+> drivers don't need some of its internal functions.
+> OTOH after my patch it's included in only around 20-30 files on
+> allmodconfig. That is literally nothing comparing to e.g. kernel.h
+> (w/includes) :D
+
+Well, once you have to rebuilding 100+ files it gets pretty hard to
+clean things up ;) 
+
+I think I described the preferred setup, previously:
+
+$path/page_pool.h:
+
+#include <$path/page_pool/types.h>
+#include <$path/page_pool/helpers.h>
+
+$path/page_pool/types.h - has types
+$path/page_pool/helpers.h - has all the inlines
+
+C sources can include $path/page_pool.h, headers should generally only
+include $path/page_pool/types.h.
 
