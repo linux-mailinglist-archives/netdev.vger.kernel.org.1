@@ -1,113 +1,165 @@
-Return-Path: <netdev+bounces-16970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1631474F9A4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:20:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F20CE74F9E6
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:39:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3182A28144D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 21:20:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C098281646
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 21:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6321ED26;
-	Tue, 11 Jul 2023 21:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55ED1ED2F;
+	Tue, 11 Jul 2023 21:39:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E651EA7B
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 21:20:26 +0000 (UTC)
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401C8133;
-	Tue, 11 Jul 2023 14:20:22 -0700 (PDT)
-Received: from [192.168.1.103] (178.176.78.121) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 12 Jul
- 2023 00:20:13 +0300
-Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
-To: Jakub Kicinski <kuba@kernel.org>, Lee Jones <lee@kernel.org>
-CC: Zheng Wang <zyytlz.wz@163.com>, <davem@davemloft.net>,
-	<linyunsheng@huawei.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<hackerzheng666@gmail.com>, <1395428693sheep@gmail.com>,
-	<alex000young@gmail.com>
-References: <20230311180630.4011201-1-zyytlz.wz@163.com>
- <20230710114253.GA132195@google.com> <20230710091545.5df553fc@kernel.org>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <743cda21-58b7-35db-8c62-35e2b834645c@omp.ru>
-Date: Wed, 12 Jul 2023 00:20:11 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51A51EA8D
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 21:39:21 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A9DC127;
+	Tue, 11 Jul 2023 14:39:20 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b89d47ffb6so32097155ad.2;
+        Tue, 11 Jul 2023 14:39:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689111560; x=1691703560;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KtT4gFz6TTEFRseSk+gcMtJFveuGAwBprTn2TmvM3QM=;
+        b=qVGDef4XTDiy2pQQAH3Cwnbtqh8ZKWeDR0YpW5oBVmIf8Ft1FfiQFB9j/nigTkpw8I
+         82vXU59i3SdogLeNz/ABKCqINgA4PTDr9/ZdUPp6ZUB83Z6MdD4YHZx6qWrTB/+YO5SG
+         xt3gCozG7WIu1lWUXRr3EpK+TzZRAcw2ll3vth9VDJ1GAaRvrA2V8kIgGX9kdM2Wgg3l
+         stzdpWOedBvZ0uhTUpLtvsrBCTVN9HRCFZfzCFKFQAEkzZQTdhvlZETvKEQOgCpBxb1y
+         lgv7BtP9O20Qjyp/f7+CQeQ3LbV13czXSXJgwRbcUJP+TfmtuZqC2GkNl1o/MlSqRGEW
+         v5GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689111560; x=1691703560;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KtT4gFz6TTEFRseSk+gcMtJFveuGAwBprTn2TmvM3QM=;
+        b=hm8E4CWDWpbVZZ/+chXcJ7tdA4AR/wwkc6zVZU92wh0wHs5qBdenkc+UEB6mFSZ4XZ
+         8SJ5UAwVhW5mwC6+OrNEvwivGpCBvhuDzKI4tId4ng9Yf8BzmutY01tDT7m0gnqOu+yg
+         m4gMsrzsZj+OnXjDY/tAi1tuwoo2Vo420xOaPzZTe6yyrrR4a6eV/vF2zr0h0q6aB3pw
+         xF6n9AtDZhrtv7gkZteIzebInWjRv6qvq8LQ5D3Yemyds4oLFwI3y9BBiiJ9H8tu51Ij
+         OIsAk5FHDmvvpEKkrbWZET54CKfnJQisQEuxfcY0+Za2rbh1vSW1QW0WFRHkoO4+rLHG
+         cQbw==
+X-Gm-Message-State: ABy/qLY2MGoYPaQXvDgloKfTQQOhhNGNIDy5sCwAO/D0tbP/5sjIELhQ
+	4P4dsfoJXbL45Ui7piOqFVc=
+X-Google-Smtp-Source: APBJJlHvfrCF++DlafNT3B6O6EffAGKpXCrh8newwF9nz4kDCviiDR8GuVNpvkxYKklGu+rZ5VQk5Q==
+X-Received: by 2002:a17:903:24e:b0:1b6:80f0:d969 with SMTP id j14-20020a170903024e00b001b680f0d969mr15429164plh.11.1689111559501;
+        Tue, 11 Jul 2023 14:39:19 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:9374])
+        by smtp.gmail.com with ESMTPSA id bd5-20020a170902830500b001b8761c739csm2362090plb.271.2023.07.11.14.39.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 14:39:19 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 11 Jul 2023 11:39:17 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
+	DRI Development <dri-devel@lists.freedesktop.org>,
+	linux-rtc@vger.kernel.org,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	netdev <netdev@vger.kernel.org>,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+	Linux MMC List <linux-mmc@vger.kernel.org>,
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
+ 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
+ mechanism)
+Message-ID: <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
+References: <20230511181931.869812-1-tj@kernel.org>
+ <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
+ <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+ <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230710091545.5df553fc@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.78.121]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 07/11/2023 20:35:12
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 178558 [Jul 11 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 521 521 0c3391dd6036774f2e1052158c81e48587b96e95
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_arrow_text}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.121 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.121 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;178.176.78.121:7.7.3,7.4.1,7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {iprep_blacklist}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.121
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/11/2023 20:41:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/11/2023 2:37:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/10/23 7:15 PM, Jakub Kicinski wrote:
-[...]
+Hello,
 
->> For better or worse, it looks like this issue was assigned a CVE.
+On Tue, Jul 11, 2023 at 04:06:22PM +0200, Geert Uytterhoeven wrote:
+> On Tue, Jul 11, 2023 at 3:55 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> >
+> > Hi Tejun,
+> >
+> > On Fri, May 12, 2023 at 9:54 PM Tejun Heo <tj@kernel.org> wrote:
+> > > Workqueue now automatically marks per-cpu work items that hog CPU for too
+> > > long as CPU_INTENSIVE, which excludes them from concurrency management and
+> > > prevents stalling other concurrency-managed work items. If a work function
+> > > keeps running over the thershold, it likely needs to be switched to use an
+> > > unbound workqueue.
+> > >
+> > > This patch adds a debug mechanism which tracks the work functions which
+> > > trigger the automatic CPU_INTENSIVE mechanism and report them using
+> > > pr_warn() with exponential backoff.
+> > >
+> > > v2: Drop bouncing through kthread_worker for printing messages. It was to
+> > >     avoid introducing circular locking dependency but wasn't effective as it
+> > >     still had pool lock -> wci_lock -> printk -> pool lock loop. Let's just
+> > >     print directly using printk_deferred().
+> > >
+> > > Signed-off-by: Tejun Heo <tj@kernel.org>
+> > > Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> >
+> > Thanks for your patch, which is now commit 6363845005202148
+> > ("workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
+> > mechanism") in v6.5-rc1.
+> >
+> > I guess you are interested to know where this triggers.
+> > I enabled CONFIG_WQ_CPU_INTENSIVE_REPORT=y, and tested
+> > the result on various machines...
 > 
-> Ugh, what a joke. 
+> > OrangeCrab/Linux-on-LiteX-VexRiscV with ht16k33 14-seg display and ssd130xdrmfb:
+> >
+> >   workqueue: check_lifetime hogged CPU for >10000us 4 times, consider
+> > switching to WQ_UNBOUND
+> >   workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 1024
+> > times, consider switching to WQ_UNBOUND
+> >   workqueue: fb_flashcursor hogged CPU for >10000us 128 times,
+> > consider switching to WQ_UNBOUND
+> >   workqueue: ht16k33_seg14_update hogged CPU for >10000us 128 times,
+> > consider switching to WQ_UNBOUND
+> >   workqueue: mmc_rescan hogged CPU for >10000us 128 times, consider
+> > switching to WQ_UNBOUND
 > 
-> Sergey, could you take a look at fixing this properly?
+> Got one more after a while:
+> 
+> workqueue: neigh_managed_work hogged CPU for >10000us 4 times,
+> consider switching to WQ_UNBOUND
 
-   OK, started looking at it again...
-   I have no h/w anymore but I'm hoping to find a tester on #renesas-soc...
+I wonder whether the right thing to do here is somehow scaling the threshold
+according to the relative processing power. It's difficult to come up with a
+threshold which works well across the latest & fastest and really tiny CPUs.
+I'll think about it some more but if you have some ideas, please feel free
+to suggest.
 
-MBR, Sergey
+Thanks.
+
+-- 
+tejun
 
