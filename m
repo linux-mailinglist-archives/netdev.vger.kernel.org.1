@@ -1,144 +1,102 @@
-Return-Path: <netdev+bounces-16858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A23374F099
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:46:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6CED74F0B0
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBED72817FD
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:46:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7EF51C20F33
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536F918C29;
-	Tue, 11 Jul 2023 13:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF8618C35;
+	Tue, 11 Jul 2023 13:52:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426AD17755
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:46:15 +0000 (UTC)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612B71720;
-	Tue, 11 Jul 2023 06:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689083143; x=1720619143;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9H4lxY6vAKcrrWzIJhW2JQY4hyPVgKM+IPDOVEDyRyc=;
-  b=ee4BMRtq6BJ72IA1ENNSRnid0uOHuASD/FUb7DmwaopQVJmGjRDd/Fqu
-   FfrZAmp4haUZjCn8Jw+1OResaQwZL3yTVg8wz1wElELYgacz9CohVKhxK
-   SqZbFlwGceX3bCNxHwvbM8U2JgBi/LU7331auWofbpEj//Y94yZNN2ChN
-   EIgmR4b2Mq/3jrjXqh/ZijBXdVIpLdZdO0j+GOxTrnBstcaDqkcamp+2b
-   UeJXnlpuigHgY0cWo1RjoHBcA64LXlF+Ixd/oy9tYmP7AyL0ON7c4Kw6j
-   k3su8LMvxykbKWS18DVDnfsNS9C5M0iwwYpkKkRH3O0IHZRNHHZtGmcp5
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="354484232"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="354484232"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 06:45:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="750766718"
-X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
-   d="scan'208";a="750766718"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga008.jf.intel.com with ESMTP; 11 Jul 2023 06:45:29 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qJDgE-001rb5-12;
-	Tue, 11 Jul 2023 16:45:26 +0300
-Date: Tue, 11 Jul 2023 16:45:25 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 00/15] spi: Header and core clean up and refactoring
-Message-ID: <ZK1c9RIHZ+gSkFVw@smile.fi.intel.com>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <58c6f76a-8028-4ce8-a101-d5feb3b40897@sirena.org.uk>
- <ZK04/8UQEaNinLoK@smile.fi.intel.com>
- <af598782-6998-4d60-b7fc-3d9aaeb0fe8f@sirena.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF00D18C2C
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:52:36 +0000 (UTC)
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADDDBC
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:52:35 -0700 (PDT)
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3a4074304faso2287617b6e.0
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:52:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689083555; x=1691675555;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=try7kLiqOvWBbDWNv3AsjzJNZ1pHNvllo2yNmM+PfCo=;
+        b=Dx/6W19Cw5qsJgVNmczFgUrg1Dzk8T5fB2uC2iGDDwoABS+VfoIpHklsn8rXaLZSfu
+         a9gSC+L9PuYt/gXY3oGBnPLey2pet42tI8iefKSRWMn1zVgZZbccr+uQQ1LyptCr8YzX
+         /xCABaLYXVsLjtgcylDIukPtnDDnPKRQPfsMgyS+mMvD4TkexktEP9jBbkVfPWQ2BP9t
+         yNADfOUCNgS4QMzxJnIcD+yu/UbcWBMoEteYlFpjuBqPh5pLErvFp+Up4V6FAh9d1kcu
+         AxuAL9AvNXVIsVucXsjyp7gofRWdRYfa7LjltT+e4OHqH6Lu7THlzh8v1MHTXHac1ETV
+         C3Nw==
+X-Gm-Message-State: ABy/qLZJbxym8Tgo+8W4zReXoY7Qs8rlSu86QS37tAszXy4kFQh2aVsC
+	fBfSn2MufVziSw+xSKNu2smJ1C4NuhXablEAryGyAWBgYNa9
+X-Google-Smtp-Source: APBJJlGDsG+nOMkSJbLXJKRNGNJfHOn13Ov445zenjdwf+cSdHKoP10U8UttX2mqO6muw59vtWRMSKpRyJ6QOj+P2/CyrzrHnT/T
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af598782-6998-4d60-b7fc-3d9aaeb0fe8f@sirena.org.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:aca:bd03:0:b0:3a3:a8d1:1aa1 with SMTP id
+ n3-20020acabd03000000b003a3a8d11aa1mr1493645oif.2.1689083554789; Tue, 11 Jul
+ 2023 06:52:34 -0700 (PDT)
+Date: Tue, 11 Jul 2023 06:52:34 -0700
+In-Reply-To: <0000000000009393ba059691c6a3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000477efc0600366975@google.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in j1939_session_get_by_addr
+From: syzbot <syzbot+d9536adc269404a984f8@syzkaller.appspotmail.com>
+To: Jose.Abreu@synopsys.com, arvid.brodin@alten.se, davem@davemloft.net, 
+	dvyukov@google.com, ilias.apalodimas@linaro.org, joabreu@synopsys.com, 
+	jose.abreu@synopsys.com, kernel@pengutronix.de, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux@rempel-privat.de, mkl@pengutronix.de, 
+	netdev@vger.kernel.org, nogikh@google.com, robin@protonic.nl, 
+	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com, 
+	tonymarislogistics@yandex.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 02:38:37PM +0100, Mark Brown wrote:
-> On Tue, Jul 11, 2023 at 02:11:59PM +0300, Andy Shevchenko wrote:
-> 
-> > Do you think patch 9 deserves to be proceeded?
-> 
-> That one I need to think about, may as well resend it and I can think
-> about the resend.
+This bug is marked as fixed by commit:
+can: j1939: transport: make sure the aborted session will be
 
-Got it.
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
 
-Probably I have to amend commit message in the patch 9 to point out why
-struct_size() is better.
+#syz fix: exact-commit-title
 
--- 
-With Best Regards,
-Andy Shevchenko
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
 
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=d9536adc269404a984f8
 
+---
+[1] I expect the commit to be present in:
+
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+The full list of 9 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
