@@ -1,143 +1,148 @@
-Return-Path: <netdev+bounces-16908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79FB74F647
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:00:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BE8A74F66F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 19:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E09D91C20DE5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:00:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78A051C20D91
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 17:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05AA1DDD4;
-	Tue, 11 Jul 2023 17:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A101DDDA;
+	Tue, 11 Jul 2023 17:05:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9260918C1C
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:00:55 +0000 (UTC)
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F9810C7
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:00:53 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso4355677a12.3
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:00:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689094853; x=1691686853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NjdBm9r4v+Ai8dx8XOLGpj/M16ExfA2ti1QWcSGJBEM=;
-        b=D3eHX6mW8sRVZwL/LbZFwwUi4C6QNMl0EkyDqnWGMqIQVkll2TcyX3LLXdCUqLR1vp
-         doNX6SB3xadoUNV7DvpW09dMeTFuWs8nzjCDf24V5DD5OTqOpkYLtGGy3fJt/YJhSTsE
-         +P6I85DPmZGbZCnYUGXILkK7kaK6CTmYJDbag8jyPHWLkJst8NXJGZQmFBJ6NvfVy1wX
-         Kqx5A/7Ts7vaWP93YOYfHxEBPTpWt8H9iUy0hvuzw8v35PuLie6mEYPsVgXE9saFUb16
-         b9L+octD/weCgoaGamRF/oW28PCuLBTjHTMCYt8jUmoyg+hxIZAiI8Pd2DldLX4eY8/+
-         CkXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689094853; x=1691686853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NjdBm9r4v+Ai8dx8XOLGpj/M16ExfA2ti1QWcSGJBEM=;
-        b=CAfPi/dBOoadxI3eeKvQQfVgASIcuVQIhFfAD4+xW1MWK5sN331aad88tpMJsQ6rJi
-         ErkCU96yLvf6AW5/eF4G4h0Y1WIpnbSnYANJm4FCg1ymkLogdWTZFiPD63Q/3AEswHjP
-         m33MeFSowvLVyrld7xm4XV99mKvSQPxRsBvyigDF7d7tkHqQkVYFpxdK4b9IuIdSyK6G
-         +aHZN1s4fxN8S/ppwU5+8GibRjPvgXzA9WpXpwPRNxmbLLSVgUbf9G0FWVlsH3f/+3Id
-         pM/Yi0h0ubDL8SfhqXfcEIVt8W8aHm7AeSci+3k/tV8vLF/a/K/pAfXdjGq22BuH1H9P
-         8bcw==
-X-Gm-Message-State: ABy/qLaOXAzcGXbQoQlFk5lACJ3HwBnSi3TDm2KyatXIt2UYVTBHUHP6
-	YCDBVY5z9ilQFJA3Zu8Yr9P8ZiUy58sgfy27TgK+dw==
-X-Google-Smtp-Source: APBJJlElzBUqt9brN3WkdBYspoLN+ugvRwtHICbp2dyC6rSR+4Ol09QVGlmB5Ih44ZkXB+um4Wsu8SVymGBguo4iDvg=
-X-Received: by 2002:a17:90a:d586:b0:263:4815:cb9a with SMTP id
- v6-20020a17090ad58600b002634815cb9amr15695007pju.41.1689094852746; Tue, 11
- Jul 2023 10:00:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BE1168CE
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:05:51 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01CD1E75
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:05:49 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qJGni-0003hd-JI; Tue, 11 Jul 2023 19:05:22 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 822D71EDE3F;
+	Tue, 11 Jul 2023 17:05:20 +0000 (UTC)
+Date: Tue, 11 Jul 2023 19:05:19 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Mike Looijmans <mike.looijmans@topic.nl>
+Cc: linux-can@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Kopp <thomas.kopp@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] can: mcp251xfd: Always stop on BUS_OFF and call
+ netif_stop_queue
+Message-ID: <20230711-refusing-derby-9a9d4d255d30-mkl@pengutronix.de>
+References: <1b153bce-a66a-45ee-a5c6-963ea6fb1c82.949ef384-8293-46b8-903f-40a477c056ae.c7fafffb-93a7-4f4c-9c1e-df959c3ed3bb@emailsignatures365.codetwo.com>
+ <20230711152647.28673-1-mike.looijmans@topic.nl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230711105930.29170-1-larysa.zaremba@intel.com> <a05a4ac2-40c8-da67-6727-b9844930386e@redhat.com>
-In-Reply-To: <a05a4ac2-40c8-da67-6727-b9844930386e@redhat.com>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Tue, 11 Jul 2023 10:00:42 -0700
-Message-ID: <CAKH8qBtBHD=1bXQyPUczLRUSNagNTKC6DNhO1rqHmrGE5kLHWQ@mail.gmail.com>
-Subject: Re: [PATCH bpf] xdp: use trusted arguments in XDP hints kfuncs
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>, bpf@vger.kernel.org, brouer@redhat.com, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xjdidpnmyunubgfu"
+Content-Disposition: inline
+In-Reply-To: <20230711152647.28673-1-mike.looijmans@topic.nl>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 7:21=E2=80=AFAM Jesper Dangaard Brouer
-<jbrouer@redhat.com> wrote:
->
->
-> On 11/07/2023 12.59, Larysa Zaremba wrote:
-> > Currently, verifier does not reject XDP programs that pass NULL pointer=
- to
-> > hints functions. At the same time, this case is not handled in any driv=
-er
-> > implementation (including veth). For example, changing
-> >
-> > bpf_xdp_metadata_rx_timestamp(ctx, &timestamp);
-> >
-> > to
-> >
-> > bpf_xdp_metadata_rx_timestamp(ctx, NULL);
-> >
-> > in xdp_metadata test successfully crashes the system.
-> >
-> > Add KF_TRUSTED_ARGS flag to hints kfunc definitions, so driver code
-> > does not have to worry about getting invalid pointers.
-> >
->
-> Looks good to me, assuming this means verifier will reject BPF-prog's
-> supplying NULL.
->
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
->
-> > Fixes: 3d76a4d3d4e5 ("bpf: XDP metadata RX kfuncs")
-> > Reported-by: Stanislav Fomichev <sdf@google.com>
-> > Closes: https://lore.kernel.org/bpf/ZKWo0BbpLfkZHbyE@google.com/
-> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 
-Acked-by: Stanislav Fomichev <sdf@google.com>
+--xjdidpnmyunubgfu
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for the fix!
+On 11.07.2023 17:26:47, Mike Looijmans wrote:
+> When there's an error attempting to store the BER counter, don't abort
+> but continue shutting down the chip as required.
 
-> > ---
-> >   net/core/xdp.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/core/xdp.c b/net/core/xdp.c
-> > index 41e5ca8643ec..8362130bf085 100644
-> > --- a/net/core/xdp.c
-> > +++ b/net/core/xdp.c
-> > @@ -741,7 +741,7 @@ __bpf_kfunc int bpf_xdp_metadata_rx_hash(const stru=
-ct xdp_md *ctx, u32 *hash,
-> >   __diag_pop();
-> >
-> >   BTF_SET8_START(xdp_metadata_kfunc_ids)
-> > -#define XDP_METADATA_KFUNC(_, name) BTF_ID_FLAGS(func, name, 0)
-> > +#define XDP_METADATA_KFUNC(_, name) BTF_ID_FLAGS(func, name, KF_TRUSTE=
-D_ARGS)
-> >   XDP_METADATA_KFUNC_xxx
-> >   #undef XDP_METADATA_KFUNC
-> >   BTF_SET8_END(xdp_metadata_kfunc_ids)
->
+If you refer to an error by __mcp251xfd_get_berr_counter(), it's not a
+store error, but a failure of regmap_read(priv->map_reg,
+MCP251XFD_REG_TREC, &trec). By default the SPI transfers are CRC enabled
+and no/wrong data from the chip will be detected and return an error
+here (after 3 retires). In out of memory conditions or other kernel
+errors might be possible here, too.
+
+Have you seen a problem here? But as we shut down the chip here anyways,
+we can ignore the error here.
+
+> After disabling communications, also stop the TX queue with a call to
+> netif_stop_queue.
+
+can_bus_off() will call netif_carrier_off(), isn't this sufficient? Have
+you enabled automatic restart in case of bus off? I think the netdev
+watchdog will kick you, if the interface has a stooped queue for too
+long (IIRC 5 seconds).
+
+> When the interface restarts, mcp251xfd_set_mode will
+> call netif_wake_queue and resume.
+>=20
+> This fixes a hangup in either send() or poll() from userspace. To
+> reproduce: I ran "cansequence can0 -p" to flood the system with packets.
+> While running that, I shorted the CAN signals, causing a bus error.
+> Usually communications would resume after the CAN bus restarted, but
+> sometimes the system got stuck and refused to send any more packets.
+> The sending process would be in either poll() or send(), waiting for
+> the queue to resume. To "unstuck" the process from send() it was
+> sufficient to send any packet on the can interface from another
+> process. To get it out of the poll() hang, only bringing the can
+> interface down (and up) would work.
+>=20
+> After adding the netif_stop_queue call, I was unable to reproduce the
+> problem.
+
+The newly added netif_stop_queue() will cause the netif_wake_queue() in
+the mcp251xfd_set_mode() to actually wake the queue. If you observe a
+problem, I think it's a general problem, so all drivers would be
+effected.
+
+> Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--xjdidpnmyunubgfu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmSti8sACgkQvlAcSiqK
+BOhbsgf/ZDCk6kV2bkTAL5hEAJ20qEpn5KsjPtSV3Hg4n07RaxlTSKFbjesUBJYZ
+lGLGnIBxPQZE2g4z4pMKkBaG1E3xq1GJ04gEAefbg6u2Q7h5xvsZ8RLtnuT0ODsE
+WB7UJd9yAFKC+nlyRwErZdacem0Zni18rm482p5WPQbxItgO+VM9InLOxZxBaEjG
+HP7l2VKIxy/7QHm/UNrMZshFZjLAgH1uKnYkhpczxD2AI22XrM69SJZvODGsTqiz
+u0/mWRfTpHA7jbH3RrgX1nz5Ne7vxnx9HAey9QMpV4knF3osLFHGnk5AG0mnw8cu
+3at2k9pIKa9H/qE5hEF2liMqw+x7LQ==
+=e62K
+-----END PGP SIGNATURE-----
+
+--xjdidpnmyunubgfu--
 
