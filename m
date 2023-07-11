@@ -1,219 +1,155 @@
-Return-Path: <netdev+bounces-16906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F83C74F611
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1776974F636
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF79B281230
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:49:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 844DD281721
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BA11DDDA;
-	Tue, 11 Jul 2023 16:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61CA71DDCE;
+	Tue, 11 Jul 2023 16:56:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F041D443D;
-	Tue, 11 Jul 2023 16:47:27 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BC1270E;
-	Tue, 11 Jul 2023 09:47:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=cxdP5k1Wf4ucsxHqN/1D2ttZdsn5N5+5P8fLYTup9VE=; b=GWgTwaw6zlUGFD3vYGAdeNqxX9
-	uqwIzSuoRghrMOnQCdGIxltuQJX8CcwXfwfY7AjE+OLOzLnOnAkYo8s4g8nSJUNKDH936kQ6+F4K4
-	cOeL3k4HQM7e8y0+GuMuTdgN+i6D0n24S6YloxqltqcNyBROz2dCrPowde3H/kPxfSL96VyOdsbVD
-	h6+Jm6wY2OkYMwkqARswxmdrPwIdbxrFf/48oUArFM8lTCvdPHn5fhU3Ycpb4UEhvpUg5QJXzQkKb
-	/8Wg9PSmK/PH2CqNLBNhfhGo5hivfyNMu1GU1yIxIi4QGqPEigCyxDSnPibrI0/WxhGhqmTrS+kHL
-	XjXJ8VzA==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qJGVS-0007sR-Kl; Tue, 11 Jul 2023 18:46:30 +0200
-Received: from [81.6.34.132] (helo=localhost.localdomain)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qJGVS-00029L-2t; Tue, 11 Jul 2023 18:46:30 +0200
-Subject: Re: [PATCH bpf-next v4 6/8] bpftool: Extend net dump with tcx progs
-To: Quentin Monnet <quentin@isovalent.com>, ast@kernel.org
-Cc: andrii@kernel.org, martin.lau@linux.dev, razor@blackwall.org,
- sdf@google.com, john.fastabend@gmail.com, kuba@kernel.org, dxu@dxuuu.xyz,
- joe@cilium.io, toke@kernel.org, davem@davemloft.net, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20230710201218.19460-1-daniel@iogearbox.net>
- <20230710201218.19460-7-daniel@iogearbox.net>
- <f7dd8bef-87c0-123b-c14e-d278fbc7dbe3@isovalent.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <85c76195-0a77-a2bb-f4d2-d3ce6ee56530@iogearbox.net>
-Date: Tue, 11 Jul 2023 18:46:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC96443D
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:56:54 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2101.outbound.protection.outlook.com [40.107.94.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BE010C0;
+	Tue, 11 Jul 2023 09:56:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dU4RIsZv7VIUYbpH+V9iy1sSZ9nxvQrxg3a4wuihh480iMfd/VrnE7gdfrrvxrjon+sR7l0TzkV3A562/cM46CYed7gtgPDJCEuM6jgUbQgh6VWApauA2Yw1lAwy1GF7DJvXaYiJpS4t9EvhXnunKmF1J7/k9c7A1jzcB0zH7zJAKXZ3IOBHrxPv1R+f5J7hs9Rtxf4S+2UZqgK4HdjC++pGiNBpfF5t5gY6URwqx5qSIOhtTsIoXxl6QRordO4uMmw8M2fUMJRRfOXp/TWGcHW3SUv83yQGw5uFvCyudoUYeRObGUCgKvlYQJt1QZ1hk/TXomx+2lZ8U2WXhzvqug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/R8sfYCi7huBlqXfJBAcQeV9EgoY5tiUNSDj324RfHs=;
+ b=OwLArhj6EL1CvSWrzRGodN2nhJZzaB73nBNL/8K8mOsl2B4v1NhFDcjC0cGkN9LMUB8eDjn7XZonQmpPwE3UGpMBhThER3vkzoaYC9xRoZBwYSXZkgBhDV/doIo6nTgUhZZZ3h/VjeYlhwZVUOoqXt6OcHQAg334HTMJMbIDRPly2WmG8RxUvduCzqsseJq6QrgUEO/U9xnH+kfqTlBXK3EGW6z7/+1WSiadQKXQ1WRxCsuvG2Bc8T8xiZLjN0aJ4zl6ORIz8EJrYE+UIY7VsLQrxdE0u4mHXcj8H+sbd1yns8v9P2fciJCKGNgGsQE2dl3NkUeaqvpRMteZC7xAOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/R8sfYCi7huBlqXfJBAcQeV9EgoY5tiUNSDj324RfHs=;
+ b=Tljq6hS89Pt/Ijw3lkU2VlKtj6qvtrfTMXq3CowV0osYHrfmmwEpURONNUP7lkw+qk3rTy5iZe5/WwqC8/H4m/VnsAmuZoCYyOuAvia4RGU9NXLQAUbEsCEcQYoHh1zWNP+T7vIhtNUs38FKcoQZCe4nHgTxyMdsjmknfk0GSlg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY3PR13MB4961.namprd13.prod.outlook.com (2603:10b6:a03:36d::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Tue, 11 Jul
+ 2023 16:56:45 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.017; Tue, 11 Jul 2023
+ 16:56:45 +0000
+Date: Tue, 11 Jul 2023 17:56:37 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/3] net: mscc: ocelot: extend
+ ocelot->fwd_domain_lock to cover ocelot->tas_lock
+Message-ID: <ZK2JxXusoKjkZq2m@corigine.com>
+References: <20230705104422.49025-1-vladimir.oltean@nxp.com>
+ <20230705104422.49025-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230705104422.49025-2-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: LO4P123CA0132.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:193::11) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f7dd8bef-87c0-123b-c14e-d278fbc7dbe3@isovalent.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26966/Tue Jul 11 09:28:31 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB4961:EE_
+X-MS-Office365-Filtering-Correlation-Id: 00e82d80-bea9-495d-1342-08db822fcef2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	6MQiqGD/Y4p+4hC9BIL3OXTCqTLe64FvlQQqAy1Z5tTeRv+Bq1ASzjHFnHVy6OYOdyAX14cMrWmlYfe5L57yi0dNudL/WLYBVz8YzP855N7nlUfZWGwqiEFOpZAc4PdwpVxARmxJZF1TVUPjQew2ejFW8G/NpurBWlQT1mpnrzTVMo/vP8FqjRFhDkK6obwT6aNCAY3ASdJmm16onwXr2ccCIKcUK9XmsfLPmwYAP2ZVCZJ2fv6/pfUK8lRHL4BarW6+cQXeFg6Q8O3hbVBQ2o7f8xT3IcG5zwZf31O+n0TV+nrbka1mSif8sK8wiUqPt72xMLor3mB03K18zrLKWO8ryyDRO8RUPD6BRX/jMFcaFLQ0iu1TJ1+yjGU/+fjB9Oct5F/cfkt73qjJ8yAdPIpNRYrVSnU+58+xYK//eQ5m0ioCsk/88UPsvL5xXjBCW/BI4Iw0S87YkRgkaurTa+4LuQqacAj73pA1R9bfxYMekJaccR//4Q02MvR1iGJs7qFMVqIzPoFtf7csLUaCpixqIHBXWphF/a710yMPHEjd2Wp/CAu8vwfhe7AhubYCTkHI+8XBjelxBZtK9IeT63PjDTQUPoWcE7vV6GlmdXs=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39840400004)(136003)(366004)(396003)(451199021)(38100700002)(54906003)(6486002)(86362001)(6512007)(6506007)(6666004)(36756003)(186003)(26005)(478600001)(2906002)(4744005)(41300700001)(83380400001)(316002)(8676002)(7416002)(5660300002)(8936002)(44832011)(66946007)(2616005)(66556008)(66476007)(6916009)(4326008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?U+tdYnjCKJsnn+89p9AKWvSuuSGSEaEztYFx/OQhar7E0XVrdWvBK6s/6MUF?=
+ =?us-ascii?Q?yPa7fvrfL0fgqkv9ZxChzfZf0+JI6u0BnWqI2GiDSFQPjodtQDvIFWT83FXQ?=
+ =?us-ascii?Q?eTqfahoJkHJTU05imo73skecfOITwxlOXB890CU9xB12lfqpwOXwd3bRuf/1?=
+ =?us-ascii?Q?WDWknMn6m9IBZQZgD5wikUfatRYWrEsMafNrMrXNA+f1ZaxMmxckSIczqoVZ?=
+ =?us-ascii?Q?GaayzFf4LY7vCkEVPkLqGmOOYFuN5oGTIrui2HBgQ3+o2bP3G0ADhLe/rPis?=
+ =?us-ascii?Q?k05JF9YIHl73X1rtPO1x4pNLTBrhdSbAuAjTDHYp6oBkrkXRWbMfk3U0X2Ww?=
+ =?us-ascii?Q?cNOrNh2X2JCcmhAk+9aZo73NmJNonCOzss9Ij3U7urBuRyTGbEz4ZfLNm8vz?=
+ =?us-ascii?Q?lHYFdGERt4cQYpe6gfiIuICTqKNe2/3N8c8zikA/QULVr/XBQbLUdAIAPdQG?=
+ =?us-ascii?Q?SxnqJusxOnW2V/4g4sAF0Kut2B807pHDv1VyKaADJui6Up3sQ4fk5gtzh0C7?=
+ =?us-ascii?Q?h3QrI69F1L+GSR94EulOdy7vYdE7evCbja85Eukzn7cZauYPRgFPMWPjIPtl?=
+ =?us-ascii?Q?yuKEyeSim575zoOB206O+IZSnsRwBwBPVv6MSdWrg9ifJHW6z1dDTbfqbfr3?=
+ =?us-ascii?Q?fncihI1fg4tmVFy12xNyXySlHruu8rd1x+wGJsC/sdvIxOly+CuBDqcKzekD?=
+ =?us-ascii?Q?yzTNRoYOeneL4VuoKcnnEMuWD9/i9Y/Vj9TG/6ersqtwht/CyRrZhKvfmGzN?=
+ =?us-ascii?Q?GTCMJflfWG4ZDQEcCw030+HA2uGl9Grsl8RFjk6Q1N32f61dLbl171Xd8GnO?=
+ =?us-ascii?Q?qikpaJEcPpBZwgy+WQc12lOlDZQAmll3gopdbh2tv303vUKDGPEwSvIxJdF9?=
+ =?us-ascii?Q?nEztiYDTWz+2SlCKELcWvw8htog9hJvEQQmuMQadsYLofnBPG5uD4D2+KfXc?=
+ =?us-ascii?Q?a68uO3+sEJhVtW6xNOJbbQhsSwhaiQnorpE038hIMHkAKkog+8e3Y5oxMTMb?=
+ =?us-ascii?Q?ulJ7ro2orvzgTQbXtzxRRw/eErXgsTCP5/Y0WmVhTaSIXs5wtpbo9PAQKByN?=
+ =?us-ascii?Q?2YqhRrKZ1pesdj4N+z1RtNNZ/uVmD9yPo1JN/nEe4Kccn1ZvM+evcco25m6h?=
+ =?us-ascii?Q?Dy0TPKQ2cgWgdL3MVBdZVvKalxD+g5NMQBmqrKaebNXS6j40k873vxbK3T1y?=
+ =?us-ascii?Q?in0M2V5H1d7XrK9HaCope8TI544c8WcKL7zHrO7pwAcnyLNXzrCuGY0IHlgy?=
+ =?us-ascii?Q?6YxeOd0t65i/oO8DkaRD0Pa/e8ewkCt0y5XOudYhSJSmiwQsUSWHmgftNQoj?=
+ =?us-ascii?Q?SNvSLa0v/sJY69Di2oMYLc1gRRbHqH7gTFAq7ZO07cxZ+qlBQkXwj+5cRERV?=
+ =?us-ascii?Q?lMVAbJUgoKGeSXOAFkAlYunJ2vsr7qhU714LEqXD+CHeWh0aQe7x36P8JZzI?=
+ =?us-ascii?Q?ho8dnq8QaA6RfSJ07v9k9lHXCRcej22WvD0vlkH56slQmUfsKcwB2BI+CItE?=
+ =?us-ascii?Q?d5B24VD+nFME5nnlqaVcBtsXdQhrPm+nBA/CjGKk/16Rkcez/tR0MsyVaLdo?=
+ =?us-ascii?Q?pu5mJLe/SBssFzOTj45NurNCpCFsZD+hznsXe/L2By/QGEmaF+HHPaMEYVYy?=
+ =?us-ascii?Q?3w=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00e82d80-bea9-495d-1342-08db822fcef2
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 16:56:45.1790
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qsQadsNk74+b8v9uRXhie7IFNNCdsTqfQY5xDeJ+o0dLXHtFqo8f4lBvm9TEAEfQFCgaFAWwBCqFUT8looeoryADBV9bTwVvqVnLfqGVTBg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB4961
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/11/23 4:19 PM, Quentin Monnet wrote:
-> 2023-07-10 22:12 UTC+0200 ~ Daniel Borkmann <daniel@iogearbox.net>
->> Add support to dump fd-based attach types via bpftool. This includes both
->> the tc BPF link and attach ops programs. Dumped information contain the
->> attach location, function entry name, program ID and link ID when applicable.
->>
->> Example with tc BPF link:
->>
->>    # ./bpftool net
->>    xdp:
->>
->>    tc:
->>    bond0(4) tcx/ingress cil_from_netdev prog id 784 link id 10
->>    bond0(4) tcx/egress cil_to_netdev prog id 804 link id 11
->>
->>    flow_dissector:
->>
->>    netfilter:
->>
->> Example with tc BPF attach ops:
->>
->>    # ./bpftool net
->>    xdp:
->>
->>    tc:
->>    bond0(4) tcx/ingress cil_from_netdev prog id 654
->>    bond0(4) tcx/egress cil_to_netdev prog id 672
->>
->>    flow_dissector:
->>
->>    netfilter:
->>
->> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+On Wed, Jul 05, 2023 at 01:44:20PM +0300, Vladimir Oltean wrote:
+> In a future commit we will have to call vsc9959_tas_guard_bands_update()
+> from ocelot_port_update_active_preemptible_tcs(), and that will be
+> impossible due to the AB/BA locking dependencies between
+> ocelot->tas_lock and ocelot->fwd_domain_lock.
 > 
-> Reviewed-by: Quentin Monnet <quentin@isovalent.com>
+> Just like we did in commit 3ff468ef987e ("net: mscc: ocelot: remove
+> struct ocelot_mm_state :: lock"), the only solution is to expand the
+> scope of ocelot->fwd_domain_lock for it to also serialize changes made
+> to the Time-Aware Shaper, because those will have to result in a
+> recalculation of cut-through TCs, which is something that depends on the
+> forwarding domain.
 > 
-> Thank you!
-> 
-> If you respin, would you mind updating the docs please
-> (Documentation/bpftool-net.rst), I realise it says that "bpftool net"
-> only dumps for tc and XDP, but that's not true any more since we have
-> the flow dissector, netfilter programs, and now tcx. The examples are
-> out-of-date too, but updating them doesn't have to be part of this PR.
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Good point, I updated the docs and help usage to reflect that.
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
->>   tools/bpf/bpftool/net.c | 86 +++++++++++++++++++++++++++++++++++++++--
->>   1 file changed, 82 insertions(+), 4 deletions(-)
->>
->> diff --git a/tools/bpf/bpftool/net.c b/tools/bpf/bpftool/net.c
->> index 26a49965bf71..22af0a81458c 100644
->> --- a/tools/bpf/bpftool/net.c
->> +++ b/tools/bpf/bpftool/net.c
->> @@ -76,6 +76,11 @@ static const char * const attach_type_strings[] = {
->>   	[NET_ATTACH_TYPE_XDP_OFFLOAD]	= "xdpoffload",
->>   };
->>   
->> +static const char * const attach_loc_strings[] = {
->> +	[BPF_TCX_INGRESS]		= "tcx/ingress",
->> +	[BPF_TCX_EGRESS]		= "tcx/egress",
->> +};
->> +
->>   const size_t net_attach_type_size = ARRAY_SIZE(attach_type_strings);
->>   
->>   static enum net_attach_type parse_attach_type(const char *str)
->> @@ -422,8 +427,80 @@ static int dump_filter_nlmsg(void *cookie, void *msg, struct nlattr **tb)
->>   			      filter_info->devname, filter_info->ifindex);
->>   }
->>   
->> -static int show_dev_tc_bpf(int sock, unsigned int nl_pid,
->> -			   struct ip_devname_ifindex *dev)
->> +static const char *flags_strings(__u32 flags)
->> +{
->> +	return json_output ? "none" : "";
->> +}
->> +
->> +static int __show_dev_tc_bpf_name(__u32 id, char *name, size_t len)
->> +{
->> +	struct bpf_prog_info info = {};
->> +	__u32 ilen = sizeof(info);
->> +	int fd, ret;
->> +
->> +	fd = bpf_prog_get_fd_by_id(id);
->> +	if (fd < 0)
->> +		return fd;
->> +	ret = bpf_obj_get_info_by_fd(fd, &info, &ilen);
->> +	if (ret < 0)
->> +		goto out;
->> +	ret = -ENOENT;
->> +	if (info.name[0]) {
->> +		get_prog_full_name(&info, fd, name, len);
->> +		ret = 0;
->> +	}
->> +out:
->> +	close(fd);
->> +	return ret;
->> +}
->> +
->> +static void __show_dev_tc_bpf(const struct ip_devname_ifindex *dev,
->> +			      const enum bpf_attach_type loc)
->> +{
->> +	__u32 prog_flags[64] = {}, link_flags[64] = {}, i;
->> +	__u32 prog_ids[64] = {}, link_ids[64] = {};
->> +	LIBBPF_OPTS(bpf_prog_query_opts, optq);
->> +	char prog_name[MAX_PROG_FULL_NAME];
->> +	int ret;
->> +
->> +	optq.prog_ids = prog_ids;
->> +	optq.prog_attach_flags = prog_flags;
->> +	optq.link_ids = link_ids;
->> +	optq.link_attach_flags = link_flags;
->> +	optq.count = ARRAY_SIZE(prog_ids);
->> +
->> +	ret = bpf_prog_query_opts(dev->ifindex, loc, &optq);
->> +	if (ret)
->> +		return;
->> +	for (i = 0; i < optq.count; i++) {
->> +		NET_START_OBJECT;
->> +		NET_DUMP_STR("devname", "%s", dev->devname);
->> +		NET_DUMP_UINT("ifindex", "(%u)", dev->ifindex);
->> +		NET_DUMP_STR("kind", " %s", attach_loc_strings[loc]);
->> +		ret = __show_dev_tc_bpf_name(prog_ids[i], prog_name,
->> +					     sizeof(prog_name));
->> +		if (!ret)
->> +			NET_DUMP_STR("name", " %s", prog_name);
->> +		NET_DUMP_UINT("prog_id", " prog id %u", prog_ids[i]);
-> 
-> I was unsure at first about having two words for "prog id", or "link id"
-> below (we use "prog_id" for netfilter, for example), but I see it leaves
-> you the opportunity to append the flags, if any, without additional
-> keywords so... why not.
-
-Ok, I'll change it into prog_id, link_id for consistency for the human readable output.
-
-And some like flow dissector just dump 'id'. After sync with Quentin, I tracked this
-in [0] to more streamline the net dump output for other types.
-
-   [0] https://github.com/libbpf/bpftool/issues/106
-
-Thanks,
-Daniel
 
