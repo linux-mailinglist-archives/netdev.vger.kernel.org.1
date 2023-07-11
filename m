@@ -1,153 +1,132 @@
-Return-Path: <netdev+bounces-16967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBC4274F98F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:02:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ABCE74F991
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 773E1281423
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 21:02:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA9F9281461
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 21:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DEC41EA9E;
-	Tue, 11 Jul 2023 21:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3478A1ED21;
+	Tue, 11 Jul 2023 21:08:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721DA1ED20
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 21:01:33 +0000 (UTC)
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD5110DD
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:01:32 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-565f8e359b8so4287398eaf.2
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 14:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689109291; x=1691701291;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y+wNL7uX7hr5BtVhWKeG8QW6Iwt6qL0jrJtflU9Rw0g=;
-        b=F4mb2Bm/nJEI8G1VXSHURHaJoxZSolT4mdMNufTM4a3dWrX5sPgvjcj9sKbWlbuNyk
-         zsxKRv2yldnAnvsjOjQNTHJaUneJFjRy0kR2vb6ILsfW3n8xlRONKcalZEykFNUhj6+Y
-         wZLAJtzCWbWhxq3b2J/SlcCVATJ+NMdPcOFL6NPZQJk/P2MyeZXaUuo1jcBcQDa/yXWo
-         4Xyxgnu2Yzy3oS4K15wVtCSGI1osh8i9UObSxs8PytxoDJoniQh3hoccUhPcFggXcBP+
-         72mgRboMdDBXqzGWUTyNL3Q86UYSXVMD4/a/WEkLLz96p4wU5zdpEzqc9m9TKkDEZwx4
-         8hjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689109291; x=1691701291;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y+wNL7uX7hr5BtVhWKeG8QW6Iwt6qL0jrJtflU9Rw0g=;
-        b=FJdbL23jVJdrq8DuTC6jZwR8YWNq4aRZd1582Cu5XXUm4JrRAg2qjYzDgD6p+0eJU+
-         Yf5J+FJBP/oy5G1YG8wt1Kb1nZBr+LJy0bshjq8nPjWyQ7lrYvPSWLURKqHikKG03d+a
-         BAq7BZCBrK6+Rqh61t38fWDezJLG9Od6ryg4dZRKpDM/m0v1zRkkW1ni0gfgT801ashN
-         yAQbkvF4BRZ0jBrVDJngxfwQH5mp4tHxVf+Mcy3pgvZIonpavCZ+SyjrW8lNiiE4W/U0
-         kN8A/20HYyjc5gCP154f0Suartn2FTjFiI9Jp/NwOavv9FoMN9eODS//WScFLR3lkeFy
-         Vbzg==
-X-Gm-Message-State: ABy/qLY+X2dDCR5nyJ2ilToXMF8wuuxgJhmirFmCsMmAvbWHCF+SUHxW
-	O9OAXgmS11GrJ5T0tPxUG8HJXxrGjL+/iORUs4s=
-X-Google-Smtp-Source: APBJJlGuc0vkNQFpBfr5S8ohkx89OKez5xdQwLvy0dCFMNpbd2aeeWhOV5OqZjE+XeOvDC6XBay7EQ==
-X-Received: by 2002:a05:6808:10d2:b0:3a1:e3ee:742a with SMTP id s18-20020a05680810d200b003a1e3ee742amr20748917ois.8.1689109291443;
-        Tue, 11 Jul 2023 14:01:31 -0700 (PDT)
-Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:d1e8:1b90:7e91:3217])
-        by smtp.gmail.com with ESMTPSA id d5-20020a05680808e500b003a1e965bf39sm1290575oic.2.2023.07.11.14.01.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 14:01:31 -0700 (PDT)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	shaozhengchao@huawei.com,
-	victor@mojatatu.com,
-	simon.horman@corigine.com,
-	paolo.valente@unimore.it,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net v3 4/4] selftests: tc-testing: add test for qfq with stab overhead
-Date: Tue, 11 Jul 2023 18:01:03 -0300
-Message-Id: <20230711210103.597831-5-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230711210103.597831-1-pctammela@mojatatu.com>
-References: <20230711210103.597831-1-pctammela@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295211EA7B
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 21:08:02 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06ADE10F2;
+	Tue, 11 Jul 2023 14:08:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=bXiTiMUgJ5wgNi4O9q39ceTcIre3EBRHft3p8v4q4jU=; b=sAbOMecYFOIvVqR8a31WimFxvT
+	Upa8xMlkw3aFApRVvOnH3gdglXr09cqPX+5Z3X37W7PAd6zdyDGKPOqXpeO7U72cOwVnbRNlgzu2L
+	YHIFNC1hsC4RhRRrqIsmlsqOlhiixCi9UmY2bkLliolKHjr0IS0TfGsdlLimUfver/DPtntzM4hRf
+	JEtKtUwk+U8N0jEpCBuHhxsYSst5buW8A7HptyrjnM4mGpwRF8KpCul/47vLMNiH1aINHoHAZtpiQ
+	aDqQpLE0Nx5UQbhyXHVDQjdMgu6YKie7A2Fu6Z8owXk9+lvjSj6bnK4yL7yO6bjfcRSFH9Fj1FRIe
+	Yz8N2EiQ==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qJKaU-00FtYb-0Y;
+	Tue, 11 Jul 2023 21:07:58 +0000
+Message-ID: <fc25d296-b245-9a5d-302f-c313f239569e@infradead.org>
+Date: Tue, 11 Jul 2023 14:07:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net] wifi: airo: avoid uninitialized warning in
+ airo_get_rate()
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>
+Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Kalle Valo <kvalo@kernel.org>, linux-wireless@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20230709133154.26206-1-rdunlap@infradead.org>
+ <ZK2QeBZKWi0Q6vuW@corigine.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <ZK2QeBZKWi0Q6vuW@corigine.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-A packet with stab overhead greater than QFQ_MAX_LMAX should be dropped
-by the QFQ qdisc as it can't handle such lengths.
+Hi Simon,
 
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- .../tc-testing/tc-tests/qdiscs/qfq.json       | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On 7/11/23 10:25, Simon Horman wrote:
+> On Sun, Jul 09, 2023 at 06:31:54AM -0700, Randy Dunlap wrote:
+>> Quieten a gcc (11.3.0) build error or warning by checking the function
+>> call status and returning -EBUSY if the function call failed.
+>> This is similar to what several other wireless drivers do for the
+>> SIOCGIWRATE ioctl call when there is a locking problem.
+>>
+>> drivers/net/wireless/cisco/airo.c: error: 'status_rid.currentXmitRate' is used uninitialized [-Werror=uninitialized]
+> 
+> Hi Randy,
+> 
+> There seem to be other calls to readStatusRid() in the same file
+> with similar properties. Perhaps it would be best to fix them too?
+> 
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json
-index 965da7622dac..976dffda4654 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json
-@@ -261,5 +261,43 @@
-         "teardown": [
-             "$IP link del dev $DUMMY type dummy"
-         ]
-+    },
-+    {
-+        "id": "5993",
-+        "name": "QFQ with stab overhead greater than max packet len",
-+        "category": [
-+            "qdisc",
-+            "qfq",
-+            "scapy"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$IP link add dev $DUMMY type dummy || /bin/true",
-+            "$IP link set dev $DUMMY up || /bin/true",
-+            "$TC qdisc add dev $DUMMY handle 1: stab mtu 2048 tsize 512 mpu 0 overhead 999999999 linklayer ethernet root qfq",
-+            "$TC class add dev $DUMMY parent 1: classid 1:1 qfq weight 100",
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip flower dst_ip 1.3.3.7/32 action mirred egress mirror dev $DUMMY"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY parent 1: matchall classid 1:1",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 22,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='1.3.3.7')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -s qdisc ls dev $DUMMY",
-+        "matchPattern": "dropped 22",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY handle 1: root qfq"
-+        ]
-     }
- ]
+Yes, there are 40+ calls that could have problems.
+Please see this thread:
+  https://lore.kernel.org/all/2f6ffd1c-a756-b7b8-bba4-77c2308f26b9@infradead.org/
+
+This is an attempt to shut up the build error/warning, which only occurs after
+this one function call.
+
+For such an old driver/hardware, I don't plan to do massive surgery
+to it.
+
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>> Link: lore.kernel.org/r/39abf2c7-24a-f167-91da-ed4c5435d1c4@linux-m68k.org
+>> Cc: Kalle Valo <kvalo@kernel.org>
+>> Cc: linux-wireless@vger.kernel.org
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: netdev@vger.kernel.org
+>> ---
+>>  drivers/net/wireless/cisco/airo.c |    5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff -- a/drivers/net/wireless/cisco/airo.c b/drivers/net/wireless/cisco/airo.c
+>> --- a/drivers/net/wireless/cisco/airo.c
+>> +++ b/drivers/net/wireless/cisco/airo.c
+>> @@ -6157,8 +6157,11 @@ static int airo_get_rate(struct net_devi
+>>  	struct iw_param *vwrq = &wrqu->bitrate;
+>>  	struct airo_info *local = dev->ml_priv;
+>>  	StatusRid status_rid;		/* Card status info */
+>> +	int ret;
+>>  
+>> -	readStatusRid(local, &status_rid, 1);
+>> +	ret = readStatusRid(local, &status_rid, 1);
+>> +	if (ret)
+>> +		return -EBUSY;
+>>  
+>>  	vwrq->value = le16_to_cpu(status_rid.currentXmitRate) * 500000;
+>>  	/* If more than one rate, set auto */
+>>
+
 -- 
-2.39.2
-
+~Randy
 
