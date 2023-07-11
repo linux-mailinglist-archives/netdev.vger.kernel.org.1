@@ -1,348 +1,289 @@
-Return-Path: <netdev+bounces-16706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1489F74E782
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:45:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09D4C74E791
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 08:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D17851C20BC1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 06:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C7C91C20B80
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 06:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E931640C;
-	Tue, 11 Jul 2023 06:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C67168CE;
+	Tue, 11 Jul 2023 06:52:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954FE211F
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:45:19 +0000 (UTC)
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81AF5A6;
-	Mon, 10 Jul 2023 23:45:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1689057906; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=XBAcZPztmhOEYaBKdtYyeLKfZS30KX59yoB3tQ7Bgrl/i/qZjkUoeg4csp/zxk9nok
-    3yg2QjFplKdOy10S+d9mAyOhcC9OcWwhZx5T+eSG2XXm1gShH8g2MTLfN/NMl8FpsC7V
-    gzO5ycM20K5T0LTmd//2/1nGI9DK/BkZ2vRPWibRiKpxmvnTMMAyqSO9tcNuDwryOFMw
-    ZeqsGI6XqtANmp0Z7IzOQOGHuzIdwJJzwJS4TB85HbWqlQWsafkSJRSPplQFPKwY/09g
-    nTgufro1j7R6hEhAA6HBbpPvDP7VZWDJG77E8gpUKD88YzZfCojmrgK4mqYeeFaPKrz4
-    tj2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1689057906;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
-    Subject:Sender;
-    bh=57LMO8ckkTQv4DmzUmy9Q+FQE1vJH57Qq72MsEf84oc=;
-    b=FJUfUXSUm6j4d+Vsitrjwqr08M5Y2FQ1pRyVLvCiMsVdZq6+BxHHXDvT+UILBV4rFQ
-    nRY6f7XoVvXIpE0tEGUTJlB+FUbbfkzihAuYN+uC4J8eqvNUzo8KzdiaA3kBYPCuUs9F
-    HaD/cQI1cl+1VqLCn1KkUc0KUFRFIR7CGGYZ4b9aQETGN9u+7FM22sY9nzv/qG/Ntfts
-    QC8q8G19uzac+rckBbsppg72l0x3ayLiMj3EdcXh01X3Hx/m5PBMMsiWIiKg4U7TvlDM
-    OJQJPNhuXwCQJhWiER/1qg08M78V9lwHCbvxFSfQ1wRpcA/WBkL6CsE+IfThvuXYWthE
-    yPXw==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1689057906;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
-    Subject:Sender;
-    bh=57LMO8ckkTQv4DmzUmy9Q+FQE1vJH57Qq72MsEf84oc=;
-    b=KLzUlQ28xIKsH4nHpsfUsZDvo5TLRiSFwERBsuzRqOS6gbOsb9lHLnGMRbid+82MjQ
-    q/NkOxKE5rm413V8vdCnyO6Owk+wIy4hssuMnZZvsMQtalXUkESr+WYN/uevVPWiDP5d
-    qt5NdDWCqZvfIh5irERIO7XUteh7TYaSqwGh8k+rkniqDhCrQPncIJaPOt7ZCcN0OKC6
-    9IYqGtwJwcSEaEK26/dpVcXeYIkL88seqfvBiJbFEv9gE8+5rH5ryNs9eMO5wCq7+eRT
-    UE1Kqm011oTLtYXGkJHRSa0jCiJpZYmQsO+pEkhtqa84W1ChOPHxcsRB9lawmVqST51J
-    mRnw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1689057906;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
-    Subject:Sender;
-    bh=57LMO8ckkTQv4DmzUmy9Q+FQE1vJH57Qq72MsEf84oc=;
-    b=JyvqHfESbsRn3p+h5ZrmYkRhDrli/gY4+05lt7rSwVPEs54DF/TOCbIjZDMDLIYEtR
-    szLtmRJeVKzmcPYZ+vCA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDUQnQ=="
-Received: from [IPV6:2a00:6020:4a8e:5000::923]
-    by smtp.strato.de (RZmta 49.6.0 AUTH)
-    with ESMTPSA id J16f43z6B6j5MxQ
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Tue, 11 Jul 2023 08:45:05 +0200 (CEST)
-Message-ID: <d7c2f3fa-2edc-c32d-d404-c68b5bd5b5bb@hartkopp.net>
-Date: Tue, 11 Jul 2023 08:45:00 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A9D1840
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:52:25 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5940F188;
+	Mon, 10 Jul 2023 23:52:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689058343; x=1720594343;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=xmfyUKctCz038dw1lR/RnkSSZj+tRTiIoFCVnQGhR4c=;
+  b=SRY0FOdG/ycWK6LOa28bQY2osHtahl2MksQBN65u9HRnkZRNDs5cwSdY
+   qdP9Qz7K+xK+p7f/NL6HuRizadDYOR6WzdBJZSoAqBFZAXRnwwdJ0oTRD
+   tMK7EESFonwk2m0+4vWY6eZHNA77AuUfz2V1ej+wVq3+0JiHdLGkrg0X3
+   LMxSBtgM867cMIDCOazIgrKbpkauy8DiEeKwpOXWBWBSNJOZ4dcUdE2A6
+   nhlQyhtB+l1bSWPiX2M4fKl6KsCZA/CfrnnfH0cfemWz3+ggcNa1WycXi
+   JpzbOEFPlToVvdf9rNzB7guGv7MXvDgxiW08qQ3MNMfi8y2STYdMkfev8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="430628326"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="430628326"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 23:52:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="698331084"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="698331084"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga006.jf.intel.com with ESMTP; 10 Jul 2023 23:52:22 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 10 Jul 2023 23:52:21 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 23:52:21 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.43) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 10 Jul 2023 23:52:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Iq5G5XQduhzgxDV6EPtqBOLnhSG6/k/5lG3btVdnjwr+PrSQTAe52p2RZZWDwG8KygTp1HyP03oK3mjpBaVR0BeR9OjTI6X44vXagUsXuWkUagNS5GzG+P5qQ5r8ntvx1nVVYLdp0RMYp0l+XVx06d07KHllU+tW83IiU6JBqFzNFqmnaChNXXrpXxgooyEbSBDk9baHVUAkBC1T/n0dC7iDU9gVGONhZtyB11HBMmSa8xhXwDwdiVe5fpQa70eg00AG8VrBJYrk3pzy54eA9jx3WJZY1AXc/e1dg4KVQc5yc9bldvWUEuR8SgrhHwtvYDM4lS0JwgBvF7YcouwlIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BvTT4j1o6+uQ+KN5RKHhuZPQKNry6jQllwG61INyw4M=;
+ b=GlKAcY9p+qacbh8MGe5GO1vz6hr8hT1yG+9QaY2IVOE/d8TtpMUtXzsF2VkQ5TNIxWOSnxHtbBXkyJKvc3Le3heHOaQdIzZav/+SStbSty3ux0q3N4KtrxmALJN6cqH4VUdXDW4QWImJeBVSuHx94dfJDqxVg8Qze/lTfL+QKWBkZoNk/VD3tYB77x3co0NcvwKRDG3S4yIGX2xxgjS6bOWzM7ueU7X9wRt1fNcfKQXuPhLU7H03Sq1ltnEXkRQcHnGZ2z+tIMrJ5rIA2HjO5M9BFwO/2RglHB13xyIA8KJdxyitwnax/kr11p6piqpOVfWDHnKE1oe2AJ0tj0xjgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by PH0PR11MB4952.namprd11.prod.outlook.com (2603:10b6:510:40::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Tue, 11 Jul
+ 2023 06:52:19 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::aeb:12b5:6ac9:fab0]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::aeb:12b5:6ac9:fab0%7]) with mapi id 15.20.6500.029; Tue, 11 Jul 2023
+ 06:52:19 +0000
+Date: Mon, 10 Jul 2023 23:52:14 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@lst.de>, John Hubbard <jhubbard@nvidia.com>, "Dan
+ Williams" <dan.j.williams@intel.com>
+CC: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	"Jesper Dangaard Brouer" <jbrouer@redhat.com>, <brouer@redhat.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+	<davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>, "Yisen
+ Zhuang" <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+	"Eric Dumazet" <edumazet@google.com>, Sunil Goutham <sgoutham@marvell.com>,
+	"Geetha sowjanya" <gakula@marvell.com>, Subbaraya Sundeep
+	<sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Felix Fietkau
+	<nbd@nbd.name>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
+	<shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle Valo
+	<kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>,
+	<linux-wireless@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, Jonathan Lemon
+	<jonathan.lemon@gmail.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Message-ID: <64acfc1e46a80_8e17829462@dwillia2-xfh.jf.intel.com.notmuch>
+References: <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com>
+ <20230619110705.106ec599@kernel.org>
+ <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
+ <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
+ <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
+ <ZKNA9Pkg2vMJjHds@ziepe.ca>
+ <CAHS8izNB0qNaU8OTcwDYmeVPtCrEjTTOhwCHtVsLiyhXmPLsXQ@mail.gmail.com>
+ <ZKxDZfVAbVHgNgIM@ziepe.ca>
+ <CAHS8izO3h3yh=CLJgzhLwCVM4SLgf64nnmBtGrXs=vxuJQHnMQ@mail.gmail.com>
+ <ZKyZBbKEpmkFkpWV@ziepe.ca>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZKyZBbKEpmkFkpWV@ziepe.ca>
+X-ClientProxiedBy: MW3PR06CA0029.namprd06.prod.outlook.com
+ (2603:10b6:303:2a::34) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net v3] can: raw: fix receiver memory leak
-To: Ziyang Xuan <william.xuanziyang@huawei.com>, mkl@pengutronix.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-can@vger.kernel.org, netdev@vger.kernel.org,
- penguin-kernel@I-love.SAKURA.ne.jp
-References: <20230711011737.1969582-1-william.xuanziyang@huawei.com>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20230711011737.1969582-1-william.xuanziyang@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|PH0PR11MB4952:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3e2411a9-95bc-4816-93b1-08db81db5e73
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5lOmx+jWgR4SuCCKZRKsCI1/HZsm+u3676QyWGpb2SsIbAe0C4DmhYpTolb6sdSmucSQLLP38EUhUHlrfA2BUXuQz7sYTmNTMu8RS2EctYZZzLYpvN+DEcmY1zHGxuxJo+pebJ9CGhZD6VupTfrOo4k9papVeGODJD71XkxHgWUM46wQTIdzNH0QLMTbd5m8l17LYTg0C56v5bpgwsVWUyNWpsQfUd6TguU6o3foaE6Fmjnf+yZEYnmLXO++2wXiftHOjwwnJHWpz7I7SF75jAUHWF0bM76NU9/ZOZOhaMc5BNUyGq5mP667mvD4HoRhk8FZ9GqYd7RRxVx0Ls+LFpln6S6/bVbaZxnJqzVa1UyFK3Mh7ai3eisWTsDUc7EJEwOGqXzYpincAV3SPoalSJRkNAYYvRQwzOM8xuctjuT7uZjdKTiRoGtpQO6jFjfxgGj5I8phssADD6qqFufXm21vgr4uayH+F5BStuY5iZcOLIL22fxwPtpMmTpO1e5n7AfyzuKr0cHguM7JTek1AqUPPCMT4yYPJbEP9jaDp1o=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(136003)(39860400002)(396003)(366004)(376002)(451199021)(38100700002)(86362001)(7406005)(6666004)(6486002)(54906003)(110136005)(82960400001)(26005)(6506007)(53546011)(186003)(9686003)(6512007)(966005)(66556008)(7416002)(2906002)(5660300002)(316002)(66476007)(478600001)(66946007)(8936002)(8676002)(83380400001)(4326008)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QmJOQ2tUWG8xK09OaTE3YmNINGZDcVBqY040SXdjc0hLZ0E4b25vdTFGS1Nr?=
+ =?utf-8?B?RUJtMWJkclFHZHRta1JqM3ZVbm5qcXY2TTdHVUZwb1I2VmlVWm9nd3hzMHhC?=
+ =?utf-8?B?VWpaaCtETUE5QytDV2o2Ky9ndGZ1bUZSN25vUTMyRnhRalBvQytVazN6THBi?=
+ =?utf-8?B?M0pxd0JMS3lGK0VrajBUTFN2N1ZTdytIWFNRRFlGeTVwNm1IeXZmQ2tKWHZF?=
+ =?utf-8?B?VCtiUVk0bUxYVFZ5KzVEMFU3dkM2NEErRWc4RFdiNTUydW5DdW5URmY1ekZ2?=
+ =?utf-8?B?Rmt4andsVjJwT21QbmJRaWkrZjIrcmp0NWFKdTF0ZDk0MGw5ZGRnRW9BZnd6?=
+ =?utf-8?B?YnZoWm9CR1puT3FBVzZVU3FhL0J4Wlg4RVNiZTNlQkVybWpFcFVnT01iOXgx?=
+ =?utf-8?B?UEVtTk9DWjdFRXphdis4a1BCazYxbkFuWUFUMXVZbjVHZnhsak12WlAzV0RB?=
+ =?utf-8?B?NUJaWEZmZW9acGxMWjhjODUzVkp3UjlSUUFUUjBSVXdNVGw1SFZBRXFzRFBI?=
+ =?utf-8?B?ZVFjRlc3ZnlTeDdYejNvbG54aWt2T1RpZmhQVnIxL2E1WnBmSjBxSzcxWk5E?=
+ =?utf-8?B?enY4Smx5Wkw4S0RmRXhrUld5aWpUNmdZb3NERkVkMExOakU4OXVxc1R6bXVO?=
+ =?utf-8?B?YWdML29FdUFYOXpOS1VEd3dHalVGZm1uR0VWalFBckRQTno1TXFOSXA4RmRn?=
+ =?utf-8?B?cGt2UTVqMjQycE80aDk0SFRnV3FYV2NiYmJFOExLYkVOdDMwdEt1bU1QZjBs?=
+ =?utf-8?B?R2crQjZhUzZkOU5hQXh2b3Z1R2JwUzJwRFg2TkM5SytoK1krZjBXT2ZDait6?=
+ =?utf-8?B?NG80Rnc3NTcyTGc0Q2IvdXJVeGZ5SzBPR1VOUmRUTE9TQ0FpWGF2VDc2TGdN?=
+ =?utf-8?B?eTRERFRKMWFGNkdrdFhaZ2l0c1lpL0d1L0hTWGR3c1UwMFRsNHR1QXY2OW5l?=
+ =?utf-8?B?T0N4T2tTRFNuNWFVZy83K05mS0o5aVVZa043RFloU0l0dlVaS2Q5RWUwcTBR?=
+ =?utf-8?B?bGdhanQxUFhIQXBWTS9sKytQc1ZjSHF4VFpmTExVaytWa3FWNEdDbEJyM0xv?=
+ =?utf-8?B?VEFDN3dQd2NBdVU2QkVhSERvYXQzdU1pd2NaNkZtSzdLenFSaWZvaDhmSzAv?=
+ =?utf-8?B?a1RHR3M0ZkZlUzcyaXhtaXFBbXFwRS9lOEdZellBYWNvdXRlZEJFSjA3UjFY?=
+ =?utf-8?B?bUFWSndwcFpheVF0TjkwRjh4N0RuaDZ0OGc5MGptYVlBeXNWVGNYbFdRMnpI?=
+ =?utf-8?B?Y0g5RVF6V0xaSlIrNnBjLzVnZ3hYRFdtZUdnMmJIWGZSTVdQYUVwaU9rMTlZ?=
+ =?utf-8?B?eUpUaXB6cUE4bk43c3NvaDBwbmZvOWVJUzBMdHBmdDNKRDJWU2FkRC9EVTUx?=
+ =?utf-8?B?M080amVxTGdRMG5GYWhHT1V6OCtaNDA4ZkRrTGE3a1JDSkJQUVY2dmlzWmdt?=
+ =?utf-8?B?ampCOHlTZzNORTlnbmt2cDBWcU5ZZUdoM3lvNmVLVzZEUXNOV2YwVjAwc0RU?=
+ =?utf-8?B?VUFwaERvUW5RaHJVaXFNdFZYMmtmSC8raysyZGg4MmxSRHBGQ29sY2pXVUxF?=
+ =?utf-8?B?cWxrWDJvdXdNbmhMMURzSWpGcThDYTBmbmRzRXF2MWtOS29QUEU0dGg3b0xx?=
+ =?utf-8?B?QjRDanovaWlSVDlHbUJvL3ExRjZJRFpDL2tLdFI3aFBwVTRjL1pvRkFLejQ3?=
+ =?utf-8?B?b0Q5clNFVzRqcXc3TVAveS8xWm9rbURtelRNQlkyaWR3aTU0MlFheGlTU1pJ?=
+ =?utf-8?B?UzdIMjZPVXNXeVU5eVFnY2gzMTNveUozc2dsQUZGZmVpUXErc1J1SnU2QnFp?=
+ =?utf-8?B?bi9qMnBQL1NhYUx2Ui9Vb1A3K1o0ZXJ5bkhESTV4cG1CRWUyV0w0NkU3SGZW?=
+ =?utf-8?B?cDk1NEZhQUU3OURwd0RtSDB3enZQeXBzeWNyRTJJdVBPSHdmOWY1elM5bnRY?=
+ =?utf-8?B?cHZZajJJd0NodUJQOVdaSjNBREEwSzZlZEYxWmkrL0J4YUF6cC9ZUVdaMkdN?=
+ =?utf-8?B?Ui9Mbkg1dmZkRk9nTVQvMmYxeFY3YVVBYlQxUEdBVmJsVUY2ZmlTRnJseGVM?=
+ =?utf-8?B?MWhNMWNaV2JkRjl6YU5aRTZKWlJ6Q0pRYUUyM3JiLy8xcUIxUlNPMUxMZkR5?=
+ =?utf-8?B?MGMvTW5LdER1clo5S2VpbC9LYVJCeUZSRU5uMkZrTkZKd2ZsNjdDZm16N0x6?=
+ =?utf-8?B?S1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e2411a9-95bc-4816-93b1-08db81db5e73
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 06:52:18.9871
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0V9IMFrrRj9ZpKfKDJfLXw42iG7KptrCLlcWI5e0oh44wSCI+gNDsczQvcrTP6UedoQISLU5XS0BnR0qrP+0FqCV8W8bzYh609vSIaR0dE4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4952
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 11.07.23 03:17, Ziyang Xuan wrote:
-> Got kmemleak errors with the following ltp can_filter testcase:
+Jason Gunthorpe wrote:
+> On Mon, Jul 10, 2023 at 04:02:59PM -0700, Mina Almasry wrote:
+> > On Mon, Jul 10, 2023 at 10:44 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Wed, Jul 05, 2023 at 06:17:39PM -0700, Mina Almasry wrote:
+> > >
+> > > > Another issue is that in networks with low MTU, we could be DMAing
+> > > > 1400/1500 bytes into each allocation, which is problematic if the
+> > > > allocation is 8K+. I would need to investigate a bit to see if/how to
+> > > > solve that, and we may end up having to split the page and again run
+> > > > into the 'not enough room in struct page' problem.
+> > >
+> > > You don't have an intree driver to use this with, so who knows, but
+> > > the out of tree GPU drivers tend to use a 64k memory management page
+> > > size, and I don't expect you'd make progress with a design where a 64K
+> > > naturaly sized allocator is producing 4k/8k non-compound pages just
+> > > for netdev. We are still struggling with pagemap support for variable
+> > > page size folios, so there is a bunch of technical blockers before
+> > > drivers could do this.
+> > >
+> > > This is why it is so important to come with a complete in-tree
+> > > solution, as we cannot review this design if your work is done with
+> > > hacked up out of tree drivers.
+> > >
+> > 
+> > I think you're assuming the proposal requires dma-buf exporter driver
+> > changes, and I have a 'hacked up out of tree driver' not visible to
+> > you.
 > 
-> for ((i=1; i<=100; i++))
-> do
->          ./can_filter &
->          sleep 0.1
-> done
+> Oh, I thought it was obvious what you did in patch 1 was a total
+> non-starter when I said you can't abuse the ZONE_DEVICE pages like
+> this.
 > 
-> ==============================================================
-> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
-> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
-> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
-> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
-> [<00000000fd468496>] do_syscall_64+0x33/0x40
-> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+> You must create ZONE_DEVICE P2P pages, not MEMORY_DEVICE_PRIVATE to
+> represent P2P memory, and you can't do that automatically from the
+> dmabuf core code.
 > 
-> It's a bug in the concurrent scenario of unregister_netdevice_many()
-> and raw_release() as following:
+> Without doing this the DMA API doesn't actually work properly because
+> it doesn't have enough information to know about what the underlying
+> exporter is.
 > 
->               cpu0                                        cpu1
-> unregister_netdevice_many(can_dev)
->    unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
->    net_set_todo(can_dev)
-> 						raw_release(can_socket)
-> 						  dev = dev_get_by_index(, ro->ifindex); // dev == NULL
-> 						  if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
-> 						    raw_disable_allfilters(, dev, );
-> 						    dev_put(dev);
-> 						  }
-> 						  ...
-> 						  ro->bound = 0;
-> 						  ...
+> The entire point of DEVICE_PRIVATE is that the page content, and
+> access to the page's physical location, is *explicitly* unavailable to
+> anyone but the pgmap owner.
 > 
-> call_netdevice_notifiers(NETDEV_UNREGISTER, )
->    raw_notify(, NETDEV_UNREGISTER, )
->      if (ro->bound) // invalid because ro->bound has been set 0
->        raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
+> > > Fully and properly adding P2P ZONE_DEVICE to a real world driver is a
+> > > pretty big ask still.
+> > 
+> > There is no such ask.
 > 
-> Add a net_device pointer member in struct raw_sock to record bound can_dev,
-> and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
-> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
-> dev_rcv_lists.
+> Well, there is from me if you want to use stuct pages as handles for
+> P2P memory. That is what we have defined in the pgmap area.
 > 
-> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
-> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> ---
-> v3:
->    - Remove unnecessary coding style changes.
->    - Add Reviewed-by and Acked-by tags.
-> v2:
->    - Do not hold idev anyway firstly.
-
-Just a nitpick:
-
-The change for v2 was:
-
-- Fix the case for a bound socket for "all" CAN interfaces (ifindex == 
-0) in raw_bind().
-
-The rest is ok now, thanks!
-
-@Marc Kleine-Budde: Please remove the patch history or change the v2 
-description - as you like. Thx!
-
-Best regards,
-Oliver
-
-> ---
->   net/can/raw.c | 57 ++++++++++++++++++++++-----------------------------
->   1 file changed, 24 insertions(+), 33 deletions(-)
+> Also I should warn you that your 'option 2' is being NAK'd by
+> Christoph for now, we are not adding any new code around DMABUF's
+> hacky use of NULL sg_page scatterlist for P2P memory either. I've been
+> working on solutions here but it is slow going.
 > 
-> diff --git a/net/can/raw.c b/net/can/raw.c
-> index 15c79b079184..2302e4882967 100644
-> --- a/net/can/raw.c
-> +++ b/net/can/raw.c
-> @@ -84,6 +84,7 @@ struct raw_sock {
->   	struct sock sk;
->   	int bound;
->   	int ifindex;
-> +	struct net_device *dev;
->   	struct list_head notifier;
->   	int loopback;
->   	int recv_own_msgs;
-> @@ -277,7 +278,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
->   	if (!net_eq(dev_net(dev), sock_net(sk)))
->   		return;
->   
-> -	if (ro->ifindex != dev->ifindex)
-> +	if (ro->dev != dev)
->   		return;
->   
->   	switch (msg) {
-> @@ -292,6 +293,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
->   
->   		ro->ifindex = 0;
->   		ro->bound = 0;
-> +		ro->dev = NULL;
->   		ro->count = 0;
->   		release_sock(sk);
->   
-> @@ -337,6 +339,7 @@ static int raw_init(struct sock *sk)
->   
->   	ro->bound            = 0;
->   	ro->ifindex          = 0;
-> +	ro->dev              = NULL;
->   
->   	/* set default filter to single entry dfilter */
->   	ro->dfilter.can_id   = 0;
-> @@ -385,19 +388,13 @@ static int raw_release(struct socket *sock)
->   
->   	lock_sock(sk);
->   
-> +	rtnl_lock();
->   	/* remove current filters & unregister */
->   	if (ro->bound) {
-> -		if (ro->ifindex) {
-> -			struct net_device *dev;
-> -
-> -			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
-> -			if (dev) {
-> -				raw_disable_allfilters(dev_net(dev), dev, sk);
-> -				dev_put(dev);
-> -			}
-> -		} else {
-> +		if (ro->dev)
-> +			raw_disable_allfilters(dev_net(ro->dev), ro->dev, sk);
-> +		else
->   			raw_disable_allfilters(sock_net(sk), NULL, sk);
-> -		}
->   	}
->   
->   	if (ro->count > 1)
-> @@ -405,8 +402,10 @@ static int raw_release(struct socket *sock)
->   
->   	ro->ifindex = 0;
->   	ro->bound = 0;
-> +	ro->dev = NULL;
->   	ro->count = 0;
->   	free_percpu(ro->uniq);
-> +	rtnl_unlock();
->   
->   	sock_orphan(sk);
->   	sock->sk = NULL;
-> @@ -422,6 +421,7 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->   	struct sockaddr_can *addr = (struct sockaddr_can *)uaddr;
->   	struct sock *sk = sock->sk;
->   	struct raw_sock *ro = raw_sk(sk);
-> +	struct net_device *dev = NULL;
->   	int ifindex;
->   	int err = 0;
->   	int notify_enetdown = 0;
-> @@ -431,14 +431,13 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->   	if (addr->can_family != AF_CAN)
->   		return -EINVAL;
->   
-> +	rtnl_lock();
->   	lock_sock(sk);
->   
->   	if (ro->bound && addr->can_ifindex == ro->ifindex)
->   		goto out;
->   
->   	if (addr->can_ifindex) {
-> -		struct net_device *dev;
-> -
->   		dev = dev_get_by_index(sock_net(sk), addr->can_ifindex);
->   		if (!dev) {
->   			err = -ENODEV;
-> @@ -467,26 +466,20 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->   	if (!err) {
->   		if (ro->bound) {
->   			/* unregister old filters */
-> -			if (ro->ifindex) {
-> -				struct net_device *dev;
-> -
-> -				dev = dev_get_by_index(sock_net(sk),
-> -						       ro->ifindex);
-> -				if (dev) {
-> -					raw_disable_allfilters(dev_net(dev),
-> -							       dev, sk);
-> -					dev_put(dev);
-> -				}
-> -			} else {
-> +			if (ro->dev)
-> +				raw_disable_allfilters(dev_net(ro->dev),
-> +						       ro->dev, sk);
-> +			else
->   				raw_disable_allfilters(sock_net(sk), NULL, sk);
-> -			}
->   		}
->   		ro->ifindex = ifindex;
->   		ro->bound = 1;
-> +		ro->dev = dev;
->   	}
->   
->    out:
->   	release_sock(sk);
-> +	rtnl_unlock();
->   
->   	if (notify_enetdown) {
->   		sk->sk_err = ENETDOWN;
-> @@ -553,9 +546,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->   		rtnl_lock();
->   		lock_sock(sk);
->   
-> -		if (ro->bound && ro->ifindex) {
-> -			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
-> -			if (!dev) {
-> +		dev = ro->dev;
-> +		if (ro->bound && dev) {
-> +			if (dev->reg_state != NETREG_REGISTERED) {
->   				if (count > 1)
->   					kfree(filter);
->   				err = -ENODEV;
-> @@ -596,7 +589,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->   		ro->count  = count;
->   
->    out_fil:
-> -		dev_put(dev);
->   		release_sock(sk);
->   		rtnl_unlock();
->   
-> @@ -614,9 +606,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->   		rtnl_lock();
->   		lock_sock(sk);
->   
-> -		if (ro->bound && ro->ifindex) {
-> -			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
-> -			if (!dev) {
-> +		dev = ro->dev;
-> +		if (ro->bound && dev) {
-> +			if (dev->reg_state != NETREG_REGISTERED) {
->   				err = -ENODEV;
->   				goto out_err;
->   			}
-> @@ -640,7 +632,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->   		ro->err_mask = err_mask;
->   
->    out_err:
-> -		dev_put(dev);
->   		release_sock(sk);
->   		rtnl_unlock();
->   
+> > On dma-buf changes required. I do need approval from the dma-buf
+> > maintainers,
+> 
+> It is a neat hack, of sorts, to abuse DEVICE_PRIVATE to create struct
+> pages for the exclusive use of pagepool - but you need more approval
+> than just dmabuf maintainers to abuse the pgmap framework like
+> this.
+> 
+> At least from my position I want to see MEMORY_DEVICE_PCI_P2PDMA used
+> to represent P2P memory. You haven't CC'd anyone from the mm community
+> so I've added some people here to see if there are other opinions.
+> 
+> To be clear, you need an explicit ack from mm people on the abusive
+> use of pgmap in patch 1.
+
+This thread is long so I am only reacting to this first message I am
+copied on, but yes agree with Jason anything peer-to-peer DMA needs to
+reuse p2pdma and it definitely needs in-tree producers and consumers for
+all infrastructure.
+
+One piece of technical debt standing in the way of any proposed
+expansion of pgmap usage is the final resolution of this topic:
+
+https://lore.kernel.org/all/166579181584.2236710.17813547487183983273.stgit@dwillia2-xfh.jf.intel.com/
+
+I am also generally reticent to entertain taking on new pgmap
+maintenance. I.e. now that accelerator memory attached over a coherent
+link is an open hardware standard (CXL) that addresses what pgmap
+infrastructure enabled in software.
+
+> I know it is not what you want to hear, but there are actual reasons
+> why the P2P DMA problem has been festering for so long, and hacky
+> quick fixes like this are not going to be enough..
+> 
+> Jason
 
