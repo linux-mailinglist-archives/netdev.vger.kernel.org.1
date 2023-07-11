@@ -1,225 +1,90 @@
-Return-Path: <netdev+bounces-16718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0E374E7FF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:31:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAC8874E800
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FFB31C20A72
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 07:31:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16DCB1C20A63
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 07:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5275A171D9;
-	Tue, 11 Jul 2023 07:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437AA174C8;
+	Tue, 11 Jul 2023 07:32:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB1B5CBC
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:31:36 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887DB195
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 00:31:34 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-666e5f0d60bso2955577b3a.3
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 00:31:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689060693; x=1691652693;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mU7adQxergy0+EODg7ZGlSf1AjfLmSwIzNA8dsXtYw=;
-        b=gtysNIRX3U6hTOJBac7SvT3Z4d0hasjxDd9qUCQ2VrXofYumAJypIJZCNsOHls3rur
-         QeY5+Y9/DuGAEGNd4OB8lVuYbxEyuDoT/14UPMkTCGeHil5/HLMd4EMB3UlNhu5ueOJW
-         9fptDDKGK9wVpv9TBP4yWYpRJMzF5yJGLFohSqKxwPeqIVFTO7tG+nY6Oj1mbmA02G4j
-         eaaowE4a+mhho1WV7wgh7by8FtT2jkM742pprfahfVgVCZMFxxumiwJF5mTjiDEmW+6N
-         dwqr8akMckGqxR2sPGXYNnZUBPMjRb4/4Zs3UA2oSOHPmdV9KUHe1BYVa+IqI21AZdTV
-         OdDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689060693; x=1691652693;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+mU7adQxergy0+EODg7ZGlSf1AjfLmSwIzNA8dsXtYw=;
-        b=EusZmWQkAxsPN1bw4qPVpA1ujoxWWueDMBHXQKsjRgvOwYtUZo4Y2Rc7w/dXLdfF90
-         CZCXOG08p71J5VDDiZjp42RiQVJShbUPzL7pLZy5HnGKourNQf0INdhkzltIQNSAcXDZ
-         zSu7v9F6hkfmosdFxbn/x3zCGIfE6oaqS8JbhgeQXAERtF3/L07fCI1zHX4RPuqYCPcd
-         Rk/yJBvYzcs0hndPU/WeLFKE+Iwv3mGSeSFIlWqnHo7KWO/HRmSS+7/AEZmXgw9MCG/Q
-         bYYQeIgDeVeNuCmqIUnT8D81jU7jRcRfZU1akekL49eglgccLbpbBtdLO8Nv1xVT8opn
-         2luw==
-X-Gm-Message-State: ABy/qLZ6gIivysj7r/Kz0g3rVzRofk2QKK5DYptNVX8zpnWpq4Lnq0ep
-	+YilllmcL564Br6sgXyd8PwEzjrvvurWaQ==
-X-Google-Smtp-Source: APBJJlEF8jjXXgnNQD/QVp7zAJWL6KyDs7S+n4BUfHHKmuEK5A0xvRaZYSJFPJQoifvd3AGymAuQGA==
-X-Received: by 2002:a05:6a20:7489:b0:126:78b0:993a with SMTP id p9-20020a056a20748900b0012678b0993amr13810426pzd.29.1689060692562;
-        Tue, 11 Jul 2023 00:31:32 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([2409:8a02:7829:4ce0:2824:2fe6:d3e1:6539])
-        by smtp.gmail.com with ESMTPSA id c19-20020aa78e13000000b0062bc045bf4fsm1076138pfr.19.2023.07.11.00.31.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 00:31:28 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Andrea Claudi <aclaudi@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Ying Xu <yinxu@redhat.com>
-Subject: [PATCH iproute2] lib: move rtnl_echo_talk from libnetlink to utils
-Date: Tue, 11 Jul 2023 15:31:17 +0800
-Message-Id: <20230711073117.1105575-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C48171DC
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:32:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F79C433C8;
+	Tue, 11 Jul 2023 07:32:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689060726;
+	bh=J+7qpMah7tjR/wIuDuI3+LbXguCQY9CEVJ+oqH4ORXs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=et51hedx+QMT1zTAX2xWz7YG/MbECAcudnhr3gW4lOHaskIdJ6FWWSUQ3WkbTQN8t
+	 x0yP7t3xzO1o4VyzQlaqZSZltwQytTwWpwGfSjfJz4Sniy+9m7D3CnOg3zJJA7c9zx
+	 Wk7DaYzRrmmjessjs10OZ9STeJwFL9c3bNLqK0kBW1PEub53KLAcaAjuSwBcX8MJH8
+	 KDgLULVHjf0/M8uHhSlea+MNTEHpNugHEHCvJOIGFPgWko1GgXhbnx5UjePa7SsByz
+	 rUxsfOdbkgQSHyPFqXVvTNH5hNnk31gziuZF5ZblEat1VxK028qM4NwGuVC3+r+EKo
+	 RMhn8LsL8PUWQ==
+Date: Tue, 11 Jul 2023 10:32:01 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Florian Kauer <florian.kauer@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	netdev@vger.kernel.org, kurt@linutronix.de,
+	vinicius.gomes@intel.com, muhammad.husaini.zulkifli@intel.com,
+	tee.min.tan@linux.intel.com, aravindhan.gunasekaran@intel.com,
+	sasha.neftin@intel.com, Naama Meir <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH net 1/6] igc: Rename qbv_enable to taprio_offload_enable
+Message-ID: <20230711073201.GJ41919@unreal>
+References: <20230710163503.2821068-1-anthony.l.nguyen@intel.com>
+ <20230710163503.2821068-2-anthony.l.nguyen@intel.com>
+ <20230711070130.GC41919@unreal>
+ <51f59838-8972-73c8-e6d2-83ad56bfeab4@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51f59838-8972-73c8-e6d2-83ad56bfeab4@linutronix.de>
 
-In commit 6c09257f1bf6 ("rtnetlink: add new function rtnl_echo_talk()"),
-some json obj functions were exported in libnetlink. Which cause build
-error like:
-    /usr/bin/ld: /tmp/cc6YaGBM.o: in function `rtnl_echo_talk':
-    libnetlink.c:(.text+0x25bd): undefined reference to `new_json_obj'
-    /usr/bin/ld: libnetlink.c:(.text+0x25c7): undefined reference to `open_json_object'
-    /usr/bin/ld: libnetlink.c:(.text+0x25e3): undefined reference to `close_json_object'
-    /usr/bin/ld: libnetlink.c:(.text+0x25e8): undefined reference to `delete_json_obj'
-    collect2: error: ld returned 1 exit status
+On Tue, Jul 11, 2023 at 09:18:31AM +0200, Florian Kauer wrote:
+> Hi Leon,
+> 
+> On 11.07.23 09:01, Leon Romanovsky wrote:
+> > On Mon, Jul 10, 2023 at 09:34:58AM -0700, Tony Nguyen wrote:
+> >> From: Florian Kauer <florian.kauer@linutronix.de>
+> >>
+> >> In the current implementation the flags adapter->qbv_enable
+> >> and IGC_FLAG_TSN_QBV_ENABLED have a similar name, but do not
+> >> have the same meaning. The first one is used only to indicate
+> >> taprio offload (i.e. when igc_save_qbv_schedule was called),
+> >> while the second one corresponds to the Qbv mode of the hardware.
+> >> However, the second one is also used to support the TX launchtime
+> >> feature, i.e. ETF qdisc offload. This leads to situations where
+> >> adapter->qbv_enable is false, but the flag IGC_FLAG_TSN_QBV_ENABLED
+> >> is set. This is prone to confusion.
+> >>
+> >> The rename should reduce this confusion. Since it is a pure
+> >> rename, it has no impact on functionality.
+> > 
+> > And shouldn't be sent to net, but to net-next.> 
+> > Thanks
+> 
+> In principle I fully agree that sole renames are not intended for net.
+> But in this case the rename is tightly coupled with the other patches
+> of the series, not only due to overlapping code changes, but in particular
+> because the naming might very likely be one root cause of the regressions.
 
-Commit 6d68d7f85d8a ("testsuite: fix build failure") only fixed this issue
-for iproute building. But if other applications include the libnetlink.a,
-they still have this problem, because libutil.a is not exported to the
-LDLIBS. So let's move the rtnl_echo_talk() from libnetlink.c to utils.c
-to avoid this issue.
+I understand the intention, but your second patch showed that rename was
+premature.
 
-After the fix, we can also remove the update by c0a06885b944 ("testsuite: fix
-testsuite build failure when iproute build without libcap-devel").
-
-Reported-by: Ying Xu <yinxu@redhat.com>
-Fixes: 6c09257f1bf6 ("rtnetlink: add new function rtnl_echo_talk()")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- include/libnetlink.h     |  3 ---
- include/utils.h          |  3 +++
- lib/libnetlink.c         | 22 ----------------------
- lib/utils.c              | 22 ++++++++++++++++++++++
- testsuite/tools/Makefile |  8 ++------
- 5 files changed, 27 insertions(+), 31 deletions(-)
-
-diff --git a/include/libnetlink.h b/include/libnetlink.h
-index 39ed87a7..1c4557e8 100644
---- a/include/libnetlink.h
-+++ b/include/libnetlink.h
-@@ -171,9 +171,6 @@ int rtnl_dump_filter_errhndlr_nc(struct rtnl_handle *rth,
- #define rtnl_dump_filter_errhndlr(rth, filter, farg, errhndlr, earg) \
- 	rtnl_dump_filter_errhndlr_nc(rth, filter, farg, errhndlr, earg, 0)
- 
--int rtnl_echo_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n, int json,
--		   int (*print_info)(struct nlmsghdr *n, void *arg))
--	__attribute__((warn_unused_result));
- int rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
- 	      struct nlmsghdr **answer)
- 	__attribute__((warn_unused_result));
-diff --git a/include/utils.h b/include/utils.h
-index 0b5d86a2..841c2547 100644
---- a/include/utils.h
-+++ b/include/utils.h
-@@ -385,4 +385,7 @@ int proto_a2n(unsigned short *id, const char *buf,
- const char *proto_n2a(unsigned short id, char *buf, int len,
- 		      const struct proto *proto_tb, size_t tb_len);
- 
-+int rtnl_echo_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n, int json,
-+		   int (*print_info)(struct nlmsghdr *n, void *arg))
-+	__attribute__((warn_unused_result));
- #endif /* __UTILS_H__ */
-diff --git a/lib/libnetlink.c b/lib/libnetlink.c
-index 7edcd285..55a8e135 100644
---- a/lib/libnetlink.c
-+++ b/lib/libnetlink.c
-@@ -1140,28 +1140,6 @@ static int __rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
- 	return __rtnl_talk_iov(rtnl, &iov, 1, answer, show_rtnl_err, errfn);
- }
- 
--int rtnl_echo_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n, int json,
--		   int (*print_info)(struct nlmsghdr *n, void *arg))
--{
--	struct nlmsghdr *answer;
--	int ret;
--
--	n->nlmsg_flags |= NLM_F_ECHO | NLM_F_ACK;
--
--	ret = rtnl_talk(rtnl, n, &answer);
--	if (ret)
--		return ret;
--
--	new_json_obj(json);
--	open_json_object(NULL);
--	print_info(answer, stdout);
--	close_json_object();
--	delete_json_obj();
--	free(answer);
--
--	return 0;
--}
--
- int rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
- 	      struct nlmsghdr **answer)
- {
-diff --git a/lib/utils.c b/lib/utils.c
-index b1f27305..8b89052c 100644
---- a/lib/utils.c
-+++ b/lib/utils.c
-@@ -1952,3 +1952,25 @@ int proto_a2n(unsigned short *id, const char *buf,
- 
- 	return 0;
- }
-+
-+int rtnl_echo_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n, int json,
-+		   int (*print_info)(struct nlmsghdr *n, void *arg))
-+{
-+	struct nlmsghdr *answer;
-+	int ret;
-+
-+	n->nlmsg_flags |= NLM_F_ECHO | NLM_F_ACK;
-+
-+	ret = rtnl_talk(rtnl, n, &answer);
-+	if (ret)
-+		return ret;
-+
-+	new_json_obj(json);
-+	open_json_object(NULL);
-+	print_info(answer, stdout);
-+	close_json_object();
-+	delete_json_obj();
-+	free(answer);
-+
-+	return 0;
-+}
-diff --git a/testsuite/tools/Makefile b/testsuite/tools/Makefile
-index 0356ddae..56d7a71c 100644
---- a/testsuite/tools/Makefile
-+++ b/testsuite/tools/Makefile
-@@ -1,13 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0
- CFLAGS=
--LDLIBS=
- include ../../config.mk
--ifeq ($(HAVE_CAP),y)
--LDLIBS+= -lcap
--endif
- 
--generate_nlmsg: generate_nlmsg.c ../../lib/libnetlink.a ../../lib/libutil.a
--	$(QUIET_CC)$(CC) $(CPPFLAGS) $(CFLAGS) $(EXTRA_CFLAGS) -I../../include -I../../include/uapi -include../../include/uapi/linux/netlink.h -o $@ $^ -lmnl $(LDLIBS)
-+generate_nlmsg: generate_nlmsg.c ../../lib/libnetlink.a
-+	$(QUIET_CC)$(CC) $(CPPFLAGS) $(CFLAGS) $(EXTRA_CFLAGS) -I../../include -I../../include/uapi -include../../include/uapi/linux/netlink.h -o $@ $^ -lmnl
- 
- clean:
- 	rm -f generate_nlmsg
--- 
-2.38.1
-
+Thanks
 
