@@ -1,140 +1,123 @@
-Return-Path: <netdev+bounces-16797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4645C74EB8A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:12:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E74A174EB9B
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 12:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C012812C3
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:12:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A2F281450
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 10:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFB7182B9;
-	Tue, 11 Jul 2023 10:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8860182BB;
+	Tue, 11 Jul 2023 10:17:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69CB182AA
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:12:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FBDBC433C8;
-	Tue, 11 Jul 2023 10:12:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689070358;
-	bh=1jPTmcG+D3o2OHcQGCOEXQA/egR+CjiCTfrDIYEPW0U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=efOX9wsuSGxcDAiJ52nPs2hqe3ibmghDTM5/r0t8kgKZvJqyryRf+ItOg9C1YysJE
-	 iJMD/mWpBHCZTmpbwaSimCgQfl81GUGa/cnrp0IvmjUU9v1DzZ6AEouhDUyg0VMLyH
-	 U/9gXeE3owG8YWEwfzsqlDZYWvquXq9xQmQptd6UlH1AOFh0WP8kjwzdf+SsFlmVU4
-	 jUmPGZYAsKQ6fKo+AxPGO3Tf03Il6JmGR2Bnkks0azkrGDjKRlPVsv8Crt6WwTxaq4
-	 b5mwEPDo6PRTS3I6tSOW+JJ2s6BlTUj06N6CxpeDadeAFt0ocqs6xhDQ4+1BqhpmUt
-	 1FJNsIj/0VRhQ==
-Date: Tue, 11 Jul 2023 13:12:33 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Florian Kauer <florian.kauer@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	netdev@vger.kernel.org, kurt@linutronix.de,
-	vinicius.gomes@intel.com, muhammad.husaini.zulkifli@intel.com,
-	tee.min.tan@linux.intel.com, aravindhan.gunasekaran@intel.com,
-	sasha.neftin@intel.com, Naama Meir <naamax.meir@linux.intel.com>
-Subject: Re: [PATCH net 5/6] igc: Fix launchtime before start of cycle
-Message-ID: <20230711101233.GM41919@unreal>
-References: <20230710163503.2821068-1-anthony.l.nguyen@intel.com>
- <20230710163503.2821068-6-anthony.l.nguyen@intel.com>
- <20230711070902.GF41919@unreal>
- <7005af42-e546-6a7c-015f-037a5f0e08a9@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1F817AD4
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 10:17:28 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D949DB;
+	Tue, 11 Jul 2023 03:17:27 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-66872dbc2efso1475519b3a.0;
+        Tue, 11 Jul 2023 03:17:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689070647; x=1689675447;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y/TPc4qbXoB0pbK4FsXQVUtP8mim8aigvIY0Kfk3sRk=;
+        b=Jh71dhKLGrLPX3MkPXdJbmsvmHb9ymTPuDY8ke7IDUXKpr7l4Tm6bZmfVRWOhqGQ10
+         m8m/i1wHtzeqzAIIL9XdE+AsImapn4C1EV6KYRVF3B57VNwlC1NzEq99WV1aX11hT+9V
+         yZtx2HE+YzdrayNFFnCrPEg8sq7zYtHCcHCuQ8qWBkRYYO6Geez16nsqH1PSp1uGmNNW
+         KKN2CplVMpbTxGmj/eEUqtcZ6XOAnlxgvl126pHuUA3leLO7IV/wqggdVPo5BTMI0YXw
+         HTKR5CEOXWE4JZRuxeQC4Xvbod7jqVjA85hi3D0AWQquPtSa2xeJAsMHDadpzIdHBpn+
+         RiOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689070647; x=1689675447;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=y/TPc4qbXoB0pbK4FsXQVUtP8mim8aigvIY0Kfk3sRk=;
+        b=BHtXyrbFCldSG68KXC2/jQSuRk1SQ3NsOxn6KlxiEwzzAXjP1VnwerMuf+FvVmGyjB
+         cnMYsZEfKyfgPI58GFZCeIdjz3gMzSiDWD/awb0hA1jjbvHt0c2YVR23DUn3My/T1xFL
+         VFn3Yk1m/VnmJPg2yvx5IP3PddcLb7rleE0QmS05kb26mHxhqPwAJ7W1GCW62+hxq8xW
+         qKfelPBSah7itrpotFYnUsoK9xK9H5P4yB9Ib1dFegdm8ItAIqQ94jZaQWcBItYehk+L
+         JOFlXRznu9TBqS2j1pnTz0k3WqTzJC2hR7Vh0FJDL7/5gbj5Wmz/U7kl8CIqtegCUjHX
+         JfxQ==
+X-Gm-Message-State: ABy/qLZ4/cuxJ0ImeNfPhY/8mLXQ06wKtzMY9FAre/WNnJIeTjuJ29MG
+	CUbZ9XOZ0FhBINvNSbZtSRc=
+X-Google-Smtp-Source: APBJJlHATYduvyltjqPfPT6M+JtWfFyLAxbGikQ/7C7x9+RUVP99xTnAAFTvkxgoEv4j4Fc6RuYi9w==
+X-Received: by 2002:a05:6a20:3cab:b0:121:84ce:c629 with SMTP id b43-20020a056a203cab00b0012184cec629mr19847457pzj.0.1689070646790;
+        Tue, 11 Jul 2023 03:17:26 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id 11-20020aa7924b000000b00668738796b6sm1357328pfp.52.2023.07.11.03.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 03:17:25 -0700 (PDT)
+Date: Tue, 11 Jul 2023 19:16:50 +0900 (JST)
+Message-Id: <20230711.191650.2195478119125867730.ubuntu@gmail.com>
+To: kuba@kernel.org
+Cc: fujita.tomonori@gmail.com, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, aliceryhl@google.com,
+ miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me
+Subject: Re: [PATCH v2 0/5] Rust abstractions for network device drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20230710112952.6f3c45dd@kernel.org>
+References: <20230710073703.147351-1-fujita.tomonori@gmail.com>
+	<20230710112952.6f3c45dd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7005af42-e546-6a7c-015f-037a5f0e08a9@linutronix.de>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 10:37:48AM +0200, Florian Kauer wrote:
-> On 11.07.23 09:09, Leon Romanovsky wrote:
-> > On Mon, Jul 10, 2023 at 09:35:02AM -0700, Tony Nguyen wrote:
-> >> From: Florian Kauer <florian.kauer@linutronix.de>
-> >>
-> >> It is possible (verified on a running system) that frames are processed
-> >> by igc_tx_launchtime with a txtime before the start of the cycle
-> >> (baset_est).
-> >>
-> >> However, the result of txtime - baset_est is written into a u32,
-> >> leading to a wrap around to a positive number. The following
-> >> launchtime > 0 check will only branch to executing launchtime = 0
-> >> if launchtime is already 0.
-> >>
-> >> Fix it by using a s32 before checking launchtime > 0.
-> >>
-> >> Fixes: db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
-> >> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> >> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> >> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-> >> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> >> ---
-> >>  drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> >> index 5d24930fed8f..4855caa3bae4 100644
-> >> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> >> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> >> @@ -1016,7 +1016,7 @@ static __le32 igc_tx_launchtime(struct igc_ring *ring, ktime_t txtime,
-> >>  	ktime_t base_time = adapter->base_time;
-> >>  	ktime_t now = ktime_get_clocktai();
-> >>  	ktime_t baset_est, end_of_cycle;
-> >> -	u32 launchtime;
-> >> +	s32 launchtime;
-> > 
-> > The rest of igc_tx_launchtime() function is very questionable,
-> > as ktime_sub_ns() returns ktime_t which is s64.
-> > 
-> >   1049         launchtime = ktime_sub_ns(txtime, baset_est);
-> >   1050         if (launchtime > 0)
-> >   1051                 div_s64_rem(launchtime, cycle_time, &launchtime);
-> >   1052         else
-> >   1053                 launchtime = 0;
-> >   1054
-> >   1055         return cpu_to_le32(launchtime);
-> > 
-> 
-> If I understand correctly, ktime_sub_ns(txtime, baset_est) will only return
-> something larger than s32 max if cycle_time is larger than s32 max and if that
-> is the case everything will be broken anyway since the corresponding hardware
-> register only holds 30 bits.
+Hi,
 
-I suggest you to use proper variable types, what about the following
-snippet?
+On Mon, 10 Jul 2023 11:29:52 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-ktime_t launchtime;
+> On Mon, 10 Jul 2023 16:36:58 +0900 FUJITA Tomonori wrote:
+>> This patchset adds minimum Rust abstractions for network device
+>> drivers and an example of a Rust network device driver, a simpler
+>> version of drivers/net/dummy.c.
+>> 
+>> The major change is a way to drop an skb (1/5 patch); a driver needs
+>> to explicitly call a function to drop a skb. The code to let a skb
+>> go out of scope can't be compiled.
+>> 
+>> I dropped get_stats64 support patch that the current sample driver
+>> doesn't use. Instead I added a patch to update the NETWORKING DRIVERS
+>> entry in MAINTAINERS.
+> 
+> I'd like to double down on my suggestion to try to implement a real
+> PHY driver. Most of the bindings in patch 3 will never be used by
+> drivers. (Re)implementing a real driver will guide you towards useful
+> stuff and real problems.
 
-launchtime = ktime_sub_ns(txtime, baset_est);
-WARN_ON(upper_32_bits(launchtime));
-div_s64_rem(launchtime, cycle_time, &launchtime);
+You meant reimplementing one of drivers in drivers/net/phy in Rust
+(with Rust abstractions for PHY drivers)?
 
-return cpu_to_le32(lower_32_bits(launchtime));
+Even the approach, we would get hit the same problem? Replacing an
+existing working driver in C doesn't make sense much thus the
+abstractions cannot be merged until someone want to implement a driver
+in Rust for new PHY hardware.
 
-> 
-> However, I do not see on first inspection where that case is properly handled
-> (probably just by rejecting the TAPRIO schedule).
-> 
-> Can someone with more experience in that area please jump in?
-> 
-> Thanks,
-> Florian
-> 
-> > 
-> >>  	s64 n;
-> >>  
-> >>  	n = div64_s64(ktime_sub_ns(now, base_time), cycle_time);
-> >> -- 
-> >> 2.38.1
-> >>
-> >>
-> 
+Or you think that PHY drivers (and probably the abstractions) are
+relatively simple so merging the abstractions for them is acceptable
+without a real driver (we could put a real drivers under
+samples/rust/)?
+
+thanks,
+
 
