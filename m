@@ -1,151 +1,79 @@
-Return-Path: <netdev+bounces-16656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460EA74E284
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:23:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2187674E29E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:39:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76BA11C20C36
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:23:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55FA22813A0
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C5F194;
-	Tue, 11 Jul 2023 00:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7C237E;
+	Tue, 11 Jul 2023 00:39:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AC6191;
-	Tue, 11 Jul 2023 00:23:26 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA241A8;
-	Mon, 10 Jul 2023 17:23:24 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso2798770b3a.2;
-        Mon, 10 Jul 2023 17:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689035004; x=1691627004;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJexsnAviZKaD4R6So1yQqblAXVnUemiWagepXo9BkY=;
-        b=G+20GWBl6qoZiT4bB/05q04cx5SsOD/cpfs8ZXD8OR+EMY8A0OO8dgm58bbnlah13b
-         N+MpPTnPq056IRIzneTrxqvnrbX0kuq5+yjEvp0RZwvOKHRFDQD8WylXZw3BfgE4BsV6
-         AZPeYmx79erNvUCCivmyFqabf2lpNALPQ5uiMlVQA5z5v4bhmGPbFTGUsOyq1t6zsf7M
-         RFShTeuEO/zgGvnP+5/3DMDBeE3ytrI9S73GP9dfr3H9D5rLGojee3k3Bd3OjRg8WxAk
-         tFSz2e8LhGEPsXjh3CufUBdHIeQ311vJ8QLXYYjAJTqeYD9gzRMmeK+YszvS7cZAnNkx
-         0mMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689035004; x=1691627004;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QJexsnAviZKaD4R6So1yQqblAXVnUemiWagepXo9BkY=;
-        b=asAFCDglNexlRouqbnHtGNl53ml6b/4K9Z/TvQ32EmyelGozOGe4VntKXZpdCzVW0w
-         jmQlH4Yqx34BPQGz5EwDe48vBSuh+WfpeTfmUGNYzDubvYd7cLrDgmI0gXcBzGXAQ81K
-         x17gVILBdH9bSrC4bTurRpK2mzntz9XMdwIfsTcE/8Ya3UCmxsxIscHD0cYpbch2nDv0
-         P1zNwJEM4vGlGWqiyH4yohLbqYnzFJGCtVyRSsdCHD9+cWvXNMKyQ9b/7rAqCcUxPXkt
-         VbKJvkLPLQO7vn98XcHM6OFBtPpb8cmWmoWdFBAdR3336dGlckmItvYuxQDOLapyyZnc
-         l9KA==
-X-Gm-Message-State: ABy/qLbNacnuVH1Dm0hCB0z0Bhi8qAb8/5/uzDilg7AS/l6KFXXBHD0J
-	Sfhz9uxqEUjls35TKExZoGM=
-X-Google-Smtp-Source: APBJJlFtjQhrmd78YmfBm4R20CNBQ7EcN5C+FxkjjCwpmTvqaFkAudVmPEaMvDxWG4uOrjlVfRK6Ig==
-X-Received: by 2002:a05:6a00:1593:b0:65e:ec60:b019 with SMTP id u19-20020a056a00159300b0065eec60b019mr13513481pfk.25.1689035003994;
-        Mon, 10 Jul 2023 17:23:23 -0700 (PDT)
-Received: from MacBook-Pro-8.local ([2620:10d:c090:400::5:9b44])
-        by smtp.gmail.com with ESMTPSA id j15-20020aa7800f000000b00666e883757fsm364497pfi.123.2023.07.10.17.23.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 17:23:23 -0700 (PDT)
-Date: Mon, 10 Jul 2023 17:23:20 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
-	razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
-	kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
-	davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 1/8] bpf: Add generic attach/detach/query API
- for multi-progs
-Message-ID: <20230711002320.bp4mlb4at45vkrqt@MacBook-Pro-8.local>
-References: <20230710201218.19460-1-daniel@iogearbox.net>
- <20230710201218.19460-2-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381E2191
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 00:38:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B1B0C433C8;
+	Tue, 11 Jul 2023 00:38:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689035939;
+	bh=2Us+2Gjr0gIOj1mGTkYo2JYzunlMRBtsOjC254M84+w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lJwNlETulPGHNBEp/gFTISgJdr1I+W/mVUx63icsBGF9m4lO+kNGo76kCEGxGt+bK
+	 VSYa24riJcFXQjuekCsO428wUPbD/1XmLa/x3zzAm+J8fqfzg42wdHwTF2W4f/bRiB
+	 i3AthakBeUe4eWyEpTK74lGnG/wVmkcVRlnTRX5oSqx8LqjauKg4I8OBoC+aJvtFNp
+	 TcsIgV43bEOfmdoB41V0LQfjuA5q5kvtnnk/uEZdxkeMgsTyoqf7jN0ldKUqJjv+/n
+	 kUz2F78bUOI2JCNWeL2iwGOqcxBHXJ4/joOfCTtLCYxCVto84xnhmw72IBYTU8Ar29
+	 zbvaEVBnKVHGQ==
+Date: Mon, 10 Jul 2023 17:38:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next 0/3] eth: bnxt: handle invalid Tx completions
+ more gracefully
+Message-ID: <20230710173858.75bc590e@kernel.org>
+In-Reply-To: <CACKFLikt=1U5fB2Xe=KfsvjfrXmgQuR2PH4iWCESWcpZBf-8Qg@mail.gmail.com>
+References: <20230710205611.1198878-1-kuba@kernel.org>
+	<CACKFLikt=1U5fB2Xe=KfsvjfrXmgQuR2PH4iWCESWcpZBf-8Qg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710201218.19460-2-daniel@iogearbox.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 10, 2023 at 10:12:11PM +0200, Daniel Borkmann wrote:
-> + *
-> + *   struct bpf_mprog_entry *entry, *peer;
-> + *   int ret;
-> + *
-> + *   // bpf_mprog user-side lock
-> + *   // fetch active @entry from attach location
-> + *   [...]
-> + *   ret = bpf_mprog_attach(entry, [...]);
-> + *   if (ret >= 0) {
-> + *       peer = bpf_mprog_peer(entry);
-> + *       if (bpf_mprog_swap_entries(ret))
-> + *           // swap @entry to @peer at attach location
-> + *       bpf_mprog_commit(entry);
-> + *       ret = 0;
-> + *   } else {
-> + *       // error path, bail out, propagate @ret
-> + *   }
-> + *   // bpf_mprog user-side unlock
-> + *
-> + *  Detach case:
-> + *
-> + *   struct bpf_mprog_entry *entry, *peer;
-> + *   bool release;
-> + *   int ret;
-> + *
-> + *   // bpf_mprog user-side lock
-> + *   // fetch active @entry from attach location
-> + *   [...]
-> + *   ret = bpf_mprog_detach(entry, [...]);
-> + *   if (ret >= 0) {
-> + *       release = ret == BPF_MPROG_FREE;
-> + *       peer = release ? NULL : bpf_mprog_peer(entry);
-> + *       if (bpf_mprog_swap_entries(ret))
-> + *           // swap @entry to @peer at attach location
-> + *       bpf_mprog_commit(entry);
-> + *       if (release)
-> + *           // free bpf_mprog_bundle
-> + *       ret = 0;
-> + *   } else {
-> + *       // error path, bail out, propagate @ret
-> + *   }
-> + *   // bpf_mprog user-side unlock
+On Mon, 10 Jul 2023 14:44:31 -0700 Michael Chan wrote:
+> > bnxt trusts the events generated by the device which may lead to kernel
+> > crashes. These are extremely rare but they do happen. For a while
+> > I thought crashing may be intentional, because device reporting invalid
+> > completions should never happen, and having a core dump could be useful
+> > if it does. But in practice I haven't found any clues in the core dumps,
+> > and panic_on_warn exists.  
+> 
+> Indeed, it was intentional to crash the kernel so that we could
+> analyze the rings in the core dump.  Typically, we would find a bad
+> completion in one of the rings and we would debug it with the hardware
+> team during early chip testing.  Either the bug is fixed or some
+> suitable workaround is implemented.  Ideally, this should never happen
+> once the chip goes into production.
 
-Thanks for the doc. It helped a lot.
-And when it's contained like this it's easier to discuss api.
-It seems bpf_mprog_swap_entries() is trying to abstract the error code
-away, but BPF_MPROG_FREE leaks out and tcx_entry_needs_release()
-captures it with extra miniq_active twist, which I don't understand yet.
-bpf_mprog_peer() is also leaking a bit of implementation detail.
-Can we abstract it further, like:
+I was suspecting bad HW, but some new platforms seems to be hitting it,
+too. Which now makes me suspect PXE -> Linux hand off problem? 
+Or multi-host?  Hard to tell..
+Hopefully once it's not crashing it will be easier to do more analysis -
+crashes within softirq during boot don't propagate too well into
+monitoring systems :(
 
-ret = bpf_mprog_detach(entry, [...], &new_entry);
-if (ret >= 0) {
-   if (entry != new_entry)
-     // swap @entry to @new_entry at attach location
-   bpf_mprog_commit(entry);
-   if (!new_entry)
-     // free bpf_mprog_bundle
-}
-and make bpf_mprog_peer internal to mprog. It will also allow removing
-BPF_MPROG_FREE vs SWAP distinction. peer is hidden.
-   if (entry != new_entry)
-      // update
-also will be easier to read inside tcx code without looking into mprog details.
+> I suppose in a large enough deployment, this NULL SKB crash can
+> happen.  I will review your patchset later today.  Thanks.
+
+Thanks!
 
