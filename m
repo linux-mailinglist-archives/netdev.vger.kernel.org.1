@@ -1,306 +1,161 @@
-Return-Path: <netdev+bounces-16660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB9674E2E7
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:00:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C8774E2E9
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 03:01:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 940BE1C20C66
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:00:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686661C20C7B
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 01:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C129382;
-	Tue, 11 Jul 2023 01:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56BDB382;
+	Tue, 11 Jul 2023 01:01:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4DA196
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 01:00:46 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E745C0;
-	Mon, 10 Jul 2023 18:00:44 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R0Mw33VjMzTmNY;
-	Tue, 11 Jul 2023 08:59:31 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 11 Jul 2023 09:00:41 +0800
-Subject: Re: [PATCH net v2] can: raw: fix receiver memory leak
-To: Oliver Hartkopp <socketcan@hartkopp.net>, <mkl@pengutronix.de>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20230707075342.2463015-1-william.xuanziyang@huawei.com>
- <5c396de6-afab-6af9-f9d9-a698b9367873@hartkopp.net>
-From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <242454ca-8b67-8169-fa30-5d605538ea63@huawei.com>
-Date: Tue, 11 Jul 2023 09:00:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A522196
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 01:01:11 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E53CE;
+	Mon, 10 Jul 2023 18:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1689037267;
+	bh=B4DwB8zOKuSyVO8uxq9Dy+tWno5pkUGZDOX2npkrOD0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FqgRuQwsI8m5TJWRKxGQU19rmC2knnq0gj7qmZEsQwbK+Fje37fEzCqEcAyjKJDji
+	 rKninmF78dATO6nX5GwjJJI6iimcmp0EXe808LB/JOt3Krcle4+1MWAhxHVth0VDeW
+	 BTPBecpJkPr5av6LNy8D32qp8NtDzjr0T9ojG6JaBXfvUWELqRyM8xBxBL2N812/YI
+	 SNOZKn2SMKF+Xpa7iSXee9xKHt2QMOjRGMrKDM8iM+lc0UykkWst6RZdL9RDzUgZPC
+	 dkBi501Qvi4pU4KW3b89L0oILpMbL6F/jTg22kpPIoMJJwM2EFuvPyqNcIQjQ8wQSR
+	 h3AwpOEL5wm7g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4R0Mxt43rfz4whq;
+	Tue, 11 Jul 2023 11:01:06 +1000 (AEST)
+Date: Tue, 11 Jul 2023 11:01:05 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>, David Miller
+ <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>
+Subject: Re: linux-next: manual merge of the vhost tree with the net-next
+ tree
+Message-ID: <20230711110105.467f896d@canb.auug.org.au>
+In-Reply-To: <20230623130443.6c9a481e@canb.auug.org.au>
+References: <20230623130443.6c9a481e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5c396de6-afab-6af9-f9d9-a698b9367873@hartkopp.net>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/vYM/I6ZyNfC9j0yYpl4QqtM";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Hello William,
-> 
-> On 07.07.23 09:53, Ziyang Xuan wrote:
->> Got kmemleak errors with the following ltp can_filter testcase:
->>
->> for ((i=1; i<=100; i++))
->> do
->>          ./can_filter &
->>          sleep 0.1
->> done
->>
->> ==============================================================
->> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
->> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
->> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
->> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
->> [<00000000fd468496>] do_syscall_64+0x33/0x40
->> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
->>
->> It's a bug in the concurrent scenario of unregister_netdevice_many()
->> and raw_release() as following:
->>
->>               cpu0                                        cpu1
->> unregister_netdevice_many(can_dev)
->>    unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
->>    net_set_todo(can_dev)
->>                         raw_release(can_socket)
->>                           dev = dev_get_by_index(, ro->ifindex); // dev == NULL
->>                           if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
->>                             raw_disable_allfilters(, dev, );
->>                             dev_put(dev);
->>                           }
->>                         ...
->>                         ro->bound = 0;
->>                         ...
->>
->> call_netdevice_notifiers(NETDEV_UNREGISTER, )
->>    raw_notify(, NETDEV_UNREGISTER, )
->>      if (ro->bound) // invalid because ro->bound has been set 0
->>        raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
->>
->> Add a net_device pointer member in struct raw_sock to record bound can_dev,
->> and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
->> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
->> dev_rcv_lists.
->>
->> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
->> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
->> ---
->> v2:
->>    - Fix the case for a bound socket for "all" CAN interfaces (ifindex == 0) in raw_bind().
->> ---
->>   net/can/raw.c | 61 ++++++++++++++++++++++-----------------------------
->>   1 file changed, 26 insertions(+), 35 deletions(-)
->>
->> diff --git a/net/can/raw.c b/net/can/raw.c
->> index 15c79b079184..7078821f35e0 100644
->> --- a/net/can/raw.c
->> +++ b/net/can/raw.c
->> @@ -84,6 +84,7 @@ struct raw_sock {
->>       struct sock sk;
->>       int bound;
->>       int ifindex;
->> +    struct net_device *dev;
->>       struct list_head notifier;
->>       int loopback;
->>       int recv_own_msgs;
->> @@ -277,7 +278,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
->>       if (!net_eq(dev_net(dev), sock_net(sk)))
->>           return;
->>   -    if (ro->ifindex != dev->ifindex)
->> +    if (ro->dev != dev)
->>           return;
->>         switch (msg) {
->> @@ -292,6 +293,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
->>             ro->ifindex = 0;
->>           ro->bound = 0;
->> +        ro->dev = NULL;
->>           ro->count = 0;
->>           release_sock(sk);
->>   @@ -337,6 +339,7 @@ static int raw_init(struct sock *sk)
->>         ro->bound            = 0;
->>       ro->ifindex          = 0;
->> +    ro->dev              = NULL;
->>         /* set default filter to single entry dfilter */
->>       ro->dfilter.can_id   = 0;
->> @@ -385,19 +388,13 @@ static int raw_release(struct socket *sock)
->>         lock_sock(sk);
->>   +    rtnl_lock();
->>       /* remove current filters & unregister */
->>       if (ro->bound) {
->> -        if (ro->ifindex) {
->> -            struct net_device *dev;
->> -
->> -            dev = dev_get_by_index(sock_net(sk), ro->ifindex);
->> -            if (dev) {
->> -                raw_disable_allfilters(dev_net(dev), dev, sk);
->> -                dev_put(dev);
->> -            }
->> -        } else {
->> +        if (ro->dev)
->> +            raw_disable_allfilters(dev_net(ro->dev), ro->dev, sk);
->> +        else
->>               raw_disable_allfilters(sock_net(sk), NULL, sk);
->> -        }
->>       }
->>         if (ro->count > 1)
->> @@ -405,8 +402,10 @@ static int raw_release(struct socket *sock)
->>         ro->ifindex = 0;
->>       ro->bound = 0;
->> +    ro->dev = NULL;
->>       ro->count = 0;
->>       free_percpu(ro->uniq);
->> +    rtnl_unlock();
->>         sock_orphan(sk);
->>       sock->sk = NULL;
->> @@ -422,6 +421,7 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->>       struct sockaddr_can *addr = (struct sockaddr_can *)uaddr;
->>       struct sock *sk = sock->sk;
->>       struct raw_sock *ro = raw_sk(sk);
->> +    struct net_device *dev = NULL;
->>       int ifindex;
->>       int err = 0;
->>       int notify_enetdown = 0;
->> @@ -431,14 +431,13 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->>       if (addr->can_family != AF_CAN)
->>           return -EINVAL;
->>   +    rtnl_lock();
->>       lock_sock(sk);
->>         if (ro->bound && addr->can_ifindex == ro->ifindex)
->>           goto out;
->>         if (addr->can_ifindex) {
->> -        struct net_device *dev;
->> -
->>           dev = dev_get_by_index(sock_net(sk), addr->can_ifindex);
->>           if (!dev) {
->>               err = -ENODEV;
->> @@ -465,28 +464,23 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->>       }
->>         if (!err) {
->> +        /* unregister old filters */
->>           if (ro->bound) {
->> -            /* unregister old filters */
-> 
-> Please move this comment back as we only unregister old filters when the socket is bound.
-> 
->> -            if (ro->ifindex) {
->> -                struct net_device *dev;
->> -
->> -                dev = dev_get_by_index(sock_net(sk),
->> -                               ro->ifindex);
->> -                if (dev) {
->> -                    raw_disable_allfilters(dev_net(dev),
->> -                                   dev, sk);
->> -                    dev_put(dev);
->> -                }
->> -            } else {
->> +            if (ro->dev)
->> +                raw_disable_allfilters(dev_net(ro->dev),
->> +                               ro->dev, sk);
->> +            else
->>                   raw_disable_allfilters(sock_net(sk), NULL, sk);
->> -            }
->>           }
->>           ro->ifindex = ifindex;
->> +
-> 
-> Why did you add an additional empty line here?
-> Please remove.
-> 
->>           ro->bound = 1;
->> +        ro->dev = dev;
->>       }
->>      out:
->>       release_sock(sk);
->> +    rtnl_unlock();
->>         if (notify_enetdown) {
->>           sk->sk_err = ENETDOWN;
->> @@ -553,9 +547,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->>           rtnl_lock();
->>           lock_sock(sk);
->>   -        if (ro->bound && ro->ifindex) {
->> -            dev = dev_get_by_index(sock_net(sk), ro->ifindex);
->> -            if (!dev) {
->> +        dev = ro->dev;
->> +        if (ro->bound && dev) {
->> +            if (dev->reg_state != NETREG_REGISTERED) {
->>                   if (count > 1)
->>                       kfree(filter);
->>                   err = -ENODEV;
->> @@ -596,7 +590,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->>           ro->count  = count;
->>      out_fil:
->> -        dev_put(dev);
->>           release_sock(sk);
->>           rtnl_unlock();
->>   @@ -614,9 +607,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->>           rtnl_lock();
->>           lock_sock(sk);
->>   -        if (ro->bound && ro->ifindex) {
->> -            dev = dev_get_by_index(sock_net(sk), ro->ifindex);
->> -            if (!dev) {
->> +        dev = ro->dev;
->> +        if (ro->bound && dev) {
->> +            if (dev->reg_state != NETREG_REGISTERED) {
->>                   err = -ENODEV;
->>                   goto out_err;
->>               }
->> @@ -627,7 +620,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->>               /* (try to) register the new err_mask */
->>               err = raw_enable_errfilter(sock_net(sk), dev, sk,
->>                              err_mask);
->> -
-> 
-> And here you removed an empty line?
-> 
-> Please omit such mix of fixing a bug and change the coding style.
-> 
->>               if (err)
->>                   goto out_err;
->>   @@ -640,7 +632,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
->>           ro->err_mask = err_mask;
->>      out_err:
->> -        dev_put(dev);
->>           release_sock(sk);
->>           rtnl_unlock();
->>   
-> 
-> The rest looks fine now, many thanks!
-> It also reduces the code size.
-> 
-> When you send the v3 you can add these tags:
-> 
-> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> 
-OK, Thank you for your comments.
+--Sig_/vYM/I6ZyNfC9j0yYpl4QqtM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> Best regards,
-> Oliver
-> 
-> .
+Hi all,
+
+On Fri, 23 Jun 2023 13:04:43 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> Today's linux-next merge of the vhost tree got a conflict in:
+>=20
+>   drivers/net/virtio_net.c
+>=20
+> between commit:
+>=20
+>   80f50f918c6e ("virtio_net: separate the logic of freeing the rest merge=
+able buf")
+>=20
+> from the net-next tree and commit:
+>=20
+>   21081476b808 ("virtio_net: support dma premapped")
+
+This is now commit
+
+  c8dc5b9adff9 ("virtio_net: support dma premapped")
+
+> from the vhost tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> diff --cc drivers/net/virtio_net.c
+> index 0db14f6b87d3,d67b36fdba0d..000000000000
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@@ -1128,28 -1136,6 +1233,28 @@@ err
+>   	return NULL;
+>   }
+>  =20
+>  +static void mergeable_buf_free(struct receive_queue *rq, int num_buf,
+>  +			       struct net_device *dev,
+>  +			       struct virtnet_rq_stats *stats)
+>  +{
+>  +	struct page *page;
+>  +	void *buf;
+>  +	int len;
+>  +
+>  +	while (num_buf-- > 1) {
+> - 		buf =3D virtqueue_get_buf(rq->vq, &len);
+> ++		buf =3D virtnet_rq_get_buf(rq, &len, NULL);
+>  +		if (unlikely(!buf)) {
+>  +			pr_debug("%s: rx error: %d buffers missing\n",
+>  +				 dev->name, num_buf);
+>  +			dev->stats.rx_length_errors++;
+>  +			break;
+>  +		}
+>  +		stats->bytes +=3D len;
+>  +		page =3D virt_to_head_page(buf);
+>  +		put_page(page);
+>  +	}
+>  +}
+>  +
+>   /* Why not use xdp_build_skb_from_frame() ?
+>    * XDP core assumes that xdp frags are PAGE_SIZE in length, while in
+>    * virtio-net there are 2 points that do not match its requirements:
+
+This is now a conflict between the vhost tree and Linus' tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/vYM/I6ZyNfC9j0yYpl4QqtM
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSsqdEACgkQAVBC80lX
+0GyZPwf/cFvPmsfrNh9BzsRVjwY6977gPEoHeWXeTWzEamrXxH9+UOS3MTsf1NN5
+uBJb1Rm0aRlrsfShLxBK4T5R72fjuRIGlr1W5xesLn69O4uRnMcPpCB4FfZRFU8A
+5rywlnAQVJjt/AgQkjOKhaxzC52h9msxHAvNNwqtYRp6o3ysLumE2WcPoIX8AtCZ
+I50pnZ94DJIwS+APgaNL7q/yNZl7UezYcXbhmHQqg02Tgp4sYfoE0lkFo6jGXkjW
+u9whwIXx+uctvAUzQUFpxijZmUrD9U19X9h245jZJRu+T/oh7jJDDPEVyoZd8ihE
+R5SgjBc7rFEFuIJHnlLVcOkovYZFaA==
+=uY7L
+-----END PGP SIGNATURE-----
+
+--Sig_/vYM/I6ZyNfC9j0yYpl4QqtM--
 
