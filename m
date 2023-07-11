@@ -1,79 +1,149 @@
-Return-Path: <netdev+bounces-16657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2187674E29E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:39:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131F974E2AB
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 02:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55FA22813A0
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:39:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11B028148B
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 00:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7C237E;
-	Tue, 11 Jul 2023 00:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D12381;
+	Tue, 11 Jul 2023 00:41:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381E2191
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 00:38:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B1B0C433C8;
-	Tue, 11 Jul 2023 00:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689035939;
-	bh=2Us+2Gjr0gIOj1mGTkYo2JYzunlMRBtsOjC254M84+w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lJwNlETulPGHNBEp/gFTISgJdr1I+W/mVUx63icsBGF9m4lO+kNGo76kCEGxGt+bK
-	 VSYa24riJcFXQjuekCsO428wUPbD/1XmLa/x3zzAm+J8fqfzg42wdHwTF2W4f/bRiB
-	 i3AthakBeUe4eWyEpTK74lGnG/wVmkcVRlnTRX5oSqx8LqjauKg4I8OBoC+aJvtFNp
-	 TcsIgV43bEOfmdoB41V0LQfjuA5q5kvtnnk/uEZdxkeMgsTyoqf7jN0ldKUqJjv+/n
-	 kUz2F78bUOI2JCNWeL2iwGOqcxBHXJ4/joOfCTtLCYxCVto84xnhmw72IBYTU8Ar29
-	 zbvaEVBnKVHGQ==
-Date: Mon, 10 Jul 2023 17:38:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
-Subject: Re: [PATCH net-next 0/3] eth: bnxt: handle invalid Tx completions
- more gracefully
-Message-ID: <20230710173858.75bc590e@kernel.org>
-In-Reply-To: <CACKFLikt=1U5fB2Xe=KfsvjfrXmgQuR2PH4iWCESWcpZBf-8Qg@mail.gmail.com>
-References: <20230710205611.1198878-1-kuba@kernel.org>
-	<CACKFLikt=1U5fB2Xe=KfsvjfrXmgQuR2PH4iWCESWcpZBf-8Qg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE1137E;
+	Tue, 11 Jul 2023 00:41:24 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47F71AC;
+	Mon, 10 Jul 2023 17:41:22 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b6ff1ada5dso80498691fa.2;
+        Mon, 10 Jul 2023 17:41:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689036081; x=1691628081;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=efOAgxEmmwfXTjqPB7I0Z2dgqV2TvYCNGg5OCjQJVI4=;
+        b=B+3OS09MuotFOVY1dDveToEz2WoT5xkcB3LzHb6Z+2tOWZQ84ha0XpAoqRFu8tNIgl
+         7Uj90GnG4Yml9Bj40WCMsC01xMMal/sHbREfSoKFrIXtt7X241sCWPXGb+M9WdE/BGz/
+         4Joe6k93ob75Inpyix+DVPJ/OHbqPjLg3kLRTbZt3d4dxR0m+C1tUqMfl3kQ+Ouoitgi
+         5sC0r3tQL8mS4qQqOBlSPt1QNPL/6Whceai7ALHec3LXf0+HW5N/01JZ0Kr5PfFoTVcR
+         wqT5pvQ+Adwa0szw82oz1/mBXkHeDak7VxrAHoWqQ6Cvppb7ibPCzHuYpNKUSvxvTZ5c
+         fjqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689036081; x=1691628081;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=efOAgxEmmwfXTjqPB7I0Z2dgqV2TvYCNGg5OCjQJVI4=;
+        b=frVijC4tNI+4JD7u6aV1/HByf163CJw2gBrECSg16/BScF/106EEYTNKplr1yU0Mq1
+         cr9Mrx/OmgoM70+mPszAcB9s0wXjb3zW9UlhnBuzsnCwZHwII3M2WkNPDw2aqvYfIMti
+         bLai9OLzbphEVkKRjCdPWDRmEnOqQu9K1s9Pmj+MRZbr6G3o3TXaElVRJixaaiwE19F/
+         Ne/dD8oQi35sS3R4C1YexQLuchuNbVoGxwFHfhyqfe+UUaDi/RwcpCLiGQbzJ+SE3yCR
+         H8gPPTf7YTNsDzkdfYhQrf/3atODAABub/HfrTldpuiFCBIRKwrGuEsbvbu88ChiuxqS
+         8a3Q==
+X-Gm-Message-State: ABy/qLbI159XA/s3wXOC2FlOLBpopGwdUWnNnPomFcF8sq8Kl+JKJv4y
+	9+Vt4kcmNw1760akZH8PJFAycfAXSg9cVzyfGpM=
+X-Google-Smtp-Source: APBJJlE0xkzS08RMt8yd7eqeNOa+sfpj/or0uIsa7m/WeT7ybK4WWGVR/nd2iSYTODdqjMCKQeeVPXXhFVq9VpATKiI=
+X-Received: by 2002:a2e:8883:0:b0:2b6:e2c2:d234 with SMTP id
+ k3-20020a2e8883000000b002b6e2c2d234mr11356614lji.33.1689036080823; Mon, 10
+ Jul 2023 17:41:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <CAN+4W8iRH6kpDmmY8i5r1nKbckaYghmOCqRXe+4bDHE7vzVMMA@mail.gmail.com>
+ <20230706153327.99298-1-kuniyu@amazon.com>
+In-Reply-To: <20230706153327.99298-1-kuniyu@amazon.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 10 Jul 2023 17:41:09 -0700
+Message-ID: <CAADnVQK5gorOuM+GTANJjrwTNSfVcEO-cL_ESqXOjUBdpJLvGQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 6/7] bpf, net: Support SO_REUSEPORT sockets
+ with bpf_sk_assign
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Lorenz Bauer <lmb@isovalent.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, 
+	Hemanth Malla <hemanthmalla@gmail.com>, Joe Stringer <joe@cilium.io>, Joe Stringer <joe@wand.net.nz>, 
+	John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>, 
+	KP Singh <kpsingh@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Mykola Lysenko <mykolal@fb.com>, Network Development <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Stanislav Fomichev <sdf@google.com>, Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Yonghong Song <yhs@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 10 Jul 2023 14:44:31 -0700 Michael Chan wrote:
-> > bnxt trusts the events generated by the device which may lead to kernel
-> > crashes. These are extremely rare but they do happen. For a while
-> > I thought crashing may be intentional, because device reporting invalid
-> > completions should never happen, and having a core dump could be useful
-> > if it does. But in practice I haven't found any clues in the core dumps,
-> > and panic_on_warn exists.  
-> 
-> Indeed, it was intentional to crash the kernel so that we could
-> analyze the rings in the core dump.  Typically, we would find a bad
-> completion in one of the rings and we would debug it with the hardware
-> team during early chip testing.  Either the bug is fixed or some
-> suitable workaround is implemented.  Ideally, this should never happen
-> once the chip goes into production.
+On Thu, Jul 6, 2023 at 8:33=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Lorenz Bauer <lmb@isovalent.com>
+> Date: Thu, 6 Jul 2023 09:11:15 +0100
+> > On Thu, Jul 6, 2023 at 1:41=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > >
+> > > Sorry for late reply.
+> > >
+> > > What we know about sk before inet6?_lookup_reuseport() are
+> > >
+> > >   (1) sk was full socket in bpf_sk_assign()
+> > >   (2) sk had SOCK_RCU_FREE in bpf_sk_assign()
+> > >   (3) sk was TCP_LISTEN here if TCP
+> >
+> > Are we looking at the same bpf_sk_assign? Confusingly there are two
+> > very similarly named functions. The one we care about is:
+> >
+> > BPF_CALL_3(bpf_sk_assign, struct sk_buff *, skb, struct sock *, sk, u64=
+, flags)
+> > {
+> >     if (!sk || flags !=3D 0)
+> >         return -EINVAL;
+> >     if (!skb_at_tc_ingress(skb))
+> >         return -EOPNOTSUPP;
+> >     if (unlikely(dev_net(skb->dev) !=3D sock_net(sk)))
+> >         return -ENETUNREACH;
+> >     if (sk_is_refcounted(sk) &&
+> >         unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
+> >         return -ENOENT;
+> >
+> >     skb_orphan(skb);
+> >     skb->sk =3D sk;
+> >     skb->destructor =3D sock_pfree;
+> >
+> >     return 0;
+> > }
+> >
+> > From this we can't tell what state the socket is in or whether it is
+> > RCU freed or not.
+>
+> But we can in inet6?_steal_sock() by calling sk_is_refcounted() again
+> via skb_steal_sock().
+>
+> In inet6?_steal_sock(), we call inet6?_lookup_reuseport() only for
+> sk that was a TCP listener or UDP non-connected socket until just before
+> the sk_state checks.  Then, we know *refcounted should be false for such
+> sockets even before inet6?_lookup_reuseport().
+>
+> After the checks, sk might be poped out of the reuseport group before
+> inet6?_lookup_reuseport() and reuse_sk might be NULL, but it's not
+> related because *refcounted is a value for sk, not for reuse_sk.
 
-I was suspecting bad HW, but some new platforms seems to be hitting it,
-too. Which now makes me suspect PXE -> Linux hand off problem? 
-Or multi-host?  Hard to tell..
-Hopefully once it's not crashing it will be easier to do more analysis -
-crashes within softirq during boot don't propagate too well into
-monitoring systems :(
-
-> I suppose in a large enough deployment, this NULL SKB crash can
-> happen.  I will review your patchset later today.  Thanks.
-
-Thanks!
+I was about to apply v5 before I noticed this discussion on v4.
+Sounds like v6 will be needed.
+Next time please continue discussion in the latest version.
 
