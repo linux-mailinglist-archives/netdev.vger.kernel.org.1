@@ -1,137 +1,117 @@
-Return-Path: <netdev+bounces-16844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B21374EFCE
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BCB074EFD4
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:06:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69A281C20EDF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:05:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C1C91C20DF5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE4718B19;
-	Tue, 11 Jul 2023 13:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6688D18B19;
+	Tue, 11 Jul 2023 13:06:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8A12598
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:05:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE23AC433C8;
-	Tue, 11 Jul 2023 13:05:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689080732;
-	bh=HnVEva2jdOLXu3EN/cKYarAoyETVmcXrgG0CY9KCvZQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BO5Sf+xL4FaASSNsNdM5EGXByrv4WeTUxRBoPW2QNejIwlELvXTu5gKKqv4hkKhGg
-	 oi3ZfR9Shzo5QwnSHTFndf8ZIVkqpTClpssosTOBH6/4HIjVrlXO3KdynsW5+Pg7kp
-	 pbkKvKQx6ir3yg7CLJDoLHQzo0ewO66SzIeDifz9SCJzdBAZAn9RpEQzQEGNZHOmt+
-	 6tOI/PPlmxZBFom+gGGjOjy+qrSc5cI26iueLs1Gv6DR2sYD26rubxcFZS48+8Dw/G
-	 5SSyFU8wEM4MuZLWsQU4tXLcKI+0ehoZc3/OitBA10N/7/7vB38b2KMdMwG1AhcrlN
-	 +CUurb7ZrrwoQ==
-Date: Tue, 11 Jul 2023 14:05:18 +0100
-From: Mark Brown <broonie@kernel.org>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>,
-	Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Sanjay R Mehta <sanju.mehta@amd.com>,
-	Radu Pirea <radu_nicolae.pirea@upb.ro>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Alain Volmat <alain.volmat@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2 04/15] spi: Replace open coded
- spi_controller_xfer_timeout()
-Message-ID: <e3688ce5-616a-4399-a4e3-c410a09f6a45@sirena.org.uk>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
- <20230710154932.68377-5-andriy.shevchenko@linux.intel.com>
- <83c4b75a-06d7-9fca-ffa0-f2e6a6ae7aed@collabora.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5604418C02
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:06:19 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 879A5195
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689080774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=621jpeg8rXw1HoMqyF3Cr2cXzc4xRe3exawPPb/GBlI=;
+	b=CO9VPmomMST9WOSn1yeg3KIJQf/GtfLzu360nk4k6Vk/4C8M14s0ppbH50Ih0fbXau2CMY
+	NrlZJ6jBGpk214eS63IXf5jJm87WexH/lKOa8Dt5krRoxWjbhqgeE9t0r4bOaiozCQw66g
+	Tl1TIux7VesmkSgUWVkgO7qrai7F9yE=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-398-9dkDs-WjM_aM3POxk13ZOA-1; Tue, 11 Jul 2023 09:06:10 -0400
+X-MC-Unique: 9dkDs-WjM_aM3POxk13ZOA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-765a44ce88aso388646885a.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 06:06:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689080769; x=1691672769;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=621jpeg8rXw1HoMqyF3Cr2cXzc4xRe3exawPPb/GBlI=;
+        b=M+Uv1E52X3tRJRrutgiIyQqCn2Qhr17uq+xC+EWZ4765gbczdCo9batcPhz4vkitt/
+         f/FL1frOpHbQyoNkvLRyadYRFelHoeSxu25bRSs6QmBpBJcDQ/Rsr/Ie/IOBB7Mdp3ot
+         Irwa3bOmw86NSJeVflssgloNulB2OebHTt7aoCi/h1M7rwqPUVaM9lY+uuG9Gu5VdCsa
+         rXOihWkeeYiP2KPpJhBkzWnYtdThpwGfuYn43/9twUevRlzbvZlIsuPEwroG1DDG46Tw
+         lG+0LegpfTo/Py5zUnvbEdLpZR55LG4E/VfN3Vl+S2QWsBrbeSTQgZEkY7roAFtVUaVK
+         SEbA==
+X-Gm-Message-State: ABy/qLaxgMNsGxA8iXAmy/vck0Mk0PKLb8LWUB8oHCcP0AXCRQY6tP2J
+	h3dMfA26N3XH7K33a/239wHLqpr4/fG3YJ5b6ZbqL3HU1tk2KF8aw223HEClEaNayAqJHCse8tS
+	mJp84ylCkFEXWNDtb
+X-Received: by 2002:a05:620a:2a08:b0:765:734b:1792 with SMTP id o8-20020a05620a2a0800b00765734b1792mr23405413qkp.23.1689080768678;
+        Tue, 11 Jul 2023 06:06:08 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGKsAEoYjCuBe/RLC+s8vVfCSnBTIjmYs9lUXherbrMHdd/xt8k/DuInjKGuiKn/ST+FGm8LA==
+X-Received: by 2002:a05:620a:2a08:b0:765:734b:1792 with SMTP id o8-20020a05620a2a0800b00765734b1792mr23405385qkp.23.1689080768414;
+        Tue, 11 Jul 2023 06:06:08 -0700 (PDT)
+Received: from debian ([92.62.32.42])
+        by smtp.gmail.com with ESMTPSA id g6-20020ae9e106000000b00767dc4c539bsm970048qkm.44.2023.07.11.06.06.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 06:06:07 -0700 (PDT)
+Date: Tue, 11 Jul 2023 15:06:00 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Paul Moore <paul@paul-moore.com>,
+	Eric Paris <eparis@parisplace.org>,
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+	David Ahern <dsahern@kernel.org>, Dmitry Kozlov <xeb@mail.ru>
+Subject: [PATCH net-next 0/4] net: Mark the sk parameter of routing functions
+ as 'const'.
+Message-ID: <cover.1689077819.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="925w7TTgRoHZtFsT"
-Content-Disposition: inline
-In-Reply-To: <83c4b75a-06d7-9fca-ffa0-f2e6a6ae7aed@collabora.com>
-X-Cookie: marriage, n.:
-
-
---925w7TTgRoHZtFsT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 10:28:13AM +0200, AngeloGioacchino Del Regno wrote:
-> Il 10/07/23 17:49, Andy Shevchenko ha scritto:
+The sk_getsecid security hook prevents the use of a const sk pointer in
+several routing functions. Since this hook should only read sk data,
+make its sk argument const (patch 1), then constify the sk parameter of
+various routing functions (patches 2-4).
 
-> > +		ms = spi_controller_xfer_timeout(ctlr, xfer);
+Build-tested with make allmodconfig.
 
-> I agree on using helpers, but the logic is slightly changing here: yes it is
-> unlikely (and also probably useless) to get ms == UINT_MAX, but the helper is
-> limiting the maximum timeout value to 500mS, which may not work for some slow
-> controllers/devices.
+Guillaume Nault (4):
+  security: Constify sk in the sk_getsecid hook.
+  ipv4: Constify the sk parameter of ip_route_output_*().
+  ipv6: Constify the sk parameter of several helper functions.
+  pptp: Constify the po parameter of pptp_route_output().
 
-The helper is limiting the *minimum* timeout value to 500ms - it's using
-max() not min().  The idea is the other way around, that for a very fast
-transfer we don't want to end up with such a short timeout that it false
-triggers due to scheduling issues.
+ drivers/net/ppp/pptp.c        |  4 ++--
+ include/linux/icmpv6.h        | 10 ++++------
+ include/linux/lsm_hook_defs.h |  2 +-
+ include/linux/security.h      |  5 +++--
+ include/net/route.h           |  6 +++---
+ net/ipv6/datagram.c           |  7 ++++---
+ net/ipv6/icmp.c               |  6 ++----
+ net/ipv6/mcast.c              |  8 +++-----
+ security/security.c           |  2 +-
+ security/selinux/hooks.c      |  4 ++--
+ 10 files changed, 25 insertions(+), 29 deletions(-)
 
---925w7TTgRoHZtFsT
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+2.39.2
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmStU40ACgkQJNaLcl1U
-h9B+yQf+KBYXJ7506wC0Am0zY2LnPrpwi7/uhVWQsN9GzhBVU0RGwam2xuqmpCeo
-A3o92lqKSQPkQGllTlnuM3r4jp2qDy1/U/QJJxak+i/i8NjuVxIQQIKtnM/nRQxh
-yRpIp6WbVt+HJsdFgPS6j6r/3m1qS4eTbso7/ciwLzdRc2Yxk9SLXFteOErlAEoq
-hhR7VxhID4BE72a+1NbyuALEVGjSMYBdpddD//Qa1UsJVw1yK5HuM51CaQd9bTlo
-EtrmXMgaG9FB+lQeu2zedT6HTQQH/hOB77luYq4zGm849tw2sfBPIhqVgQtkkutv
-4hpXSMiuD+iL32PThXfathhu4xvFiQ==
-=l6sR
------END PGP SIGNATURE-----
-
---925w7TTgRoHZtFsT--
 
