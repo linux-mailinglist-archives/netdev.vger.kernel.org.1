@@ -1,105 +1,283 @@
-Return-Path: <netdev+bounces-16822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8837C74ED29
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:47:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA6A74ED59
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713DA1C20E4F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:47:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 755B51C20E68
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 11:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0884918B08;
-	Tue, 11 Jul 2023 11:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C9F18B13;
+	Tue, 11 Jul 2023 11:52:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F1918AEE
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 11:47:52 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71AD136;
-	Tue, 11 Jul 2023 04:47:51 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R0fDf5Rx4ztR7x;
-	Tue, 11 Jul 2023 19:44:50 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 11 Jul
- 2023 19:47:48 +0800
-Subject: Re: [PATCH v5 RFC 2/6] page_pool: unify frag_count handling in
- page_pool_is_last_frag()
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>
-References: <20230629120226.14854-1-linyunsheng@huawei.com>
- <20230629120226.14854-3-linyunsheng@huawei.com>
- <e201644d-c9bd-52d9-9d26-a18bc4def21f@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <c9be2d69-450e-5e01-5884-0516a56f4c7c@huawei.com>
-Date: Tue, 11 Jul 2023 19:47:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610E11774C
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 11:52:55 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B826210E3
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 04:52:47 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-51e56749750so3088754a12.0
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 04:52:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689076366; x=1691668366;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VMmzAbnQPb+hff08oGBX7AMmQrEjQkPWbeWYbWnEb2s=;
+        b=R6I4rQhZNuJhcRNVBlXhhbzoUBbtJugUPtDeDqspmlhc0LV6PhoXCtdxQT2Fj0bM/Z
+         D3kIChr40ply4orCGt+9ajW59qGsXI0q8dwmTjUCDnDH0ulp9uyX3O+SsEKbO2t7vinl
+         8gTJudbGuaMlUr/F2U1aCITw8lqIDA7UGsx63ZT1ftAReQn3Gp7VbkcsmETP/cRAyQai
+         lkIOqNqDJFzyv3RRj/Q+MFuMldUziVBZazHL8K6x6ggiatiMyxzswv65kZTUd+/j30i/
+         ceCU0hZSdHB7C1BCm/DJGmgVIEJr/TryA/39HtCJ72a1xnXsajO8AG8nwixG6ViSclLN
+         u3GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689076366; x=1691668366;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VMmzAbnQPb+hff08oGBX7AMmQrEjQkPWbeWYbWnEb2s=;
+        b=DMWSNq+3nD5suchXqmBHFRlxsAWNjbJMZIpZDLJ8RKhTqcdzA34hr8cvNEX+E5N95P
+         tu7ryXFSGrzwKK6MmGepAiypXVu6YAWQal3ybT+23+NuEXtsyKDQcIGW29ORcxn+zFor
+         D69125AATygTyf3ogIpM2phTK1HVBMB7cGjVn3uj1wcxO6JxqsUvIzf3um6RQTIPOxUY
+         7Ax5et49PkY1lowvdJp9DlNT4At0+h5B13GwnbKztu2YLslvj2/nYr3Y9RE3uqMl+j7j
+         pYvNJx8c4Xg/J8GYDwaJ5lusukBAkXbHQeCfmTf4udB+Z/JQ2lyES1cXxf2DI7wK8okt
+         etsw==
+X-Gm-Message-State: ABy/qLa3fFSn1UPxKghtoVNCgbQlC4zP/tFLBEAPiIRKbVWeIQobEkre
+	M6bPxx3zUrBDtu818laQAwBmEw==
+X-Google-Smtp-Source: APBJJlFxRCgoFvFTryd/EnnLREOPOgp5+SxcfOYu5/wDWMNeLe4NvM0dWgV+6D/1iKEYw/AVIF+zFw==
+X-Received: by 2002:a05:6402:506:b0:51e:26c8:25f7 with SMTP id m6-20020a056402050600b0051e26c825f7mr14275781edv.42.1689076365929;
+        Tue, 11 Jul 2023 04:52:45 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id u8-20020aa7d888000000b0051e0f21c43fsm1148663edq.31.2023.07.11.04.52.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 04:52:45 -0700 (PDT)
+Date: Tue, 11 Jul 2023 13:52:43 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>,
+	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
+	"airlied@redhat.com" <airlied@redhat.com>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"idosch@nvidia.com" <idosch@nvidia.com>,
+	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
+	"phil@nwl.cc" <phil@nwl.cc>,
+	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
+Message-ID: <ZK1CizcqjqO1L/RQ@nanopsycho>
+References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
+ <ZJq3a6rl6dnPMV17@nanopsycho>
+ <DM6PR11MB4657084DDD7554663F86C1C19B24A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZJwWXZmZe4lQ04iK@nanopsycho>
+ <DM6PR11MB4657751607C36FC711271D639B30A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZKv1FRTXWLnLGRRS@nanopsycho>
+ <DM6PR11MB46575D14FFE115546FDC9DEB9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e201644d-c9bd-52d9-9d26-a18bc4def21f@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB46575D14FFE115546FDC9DEB9B31A@DM6PR11MB4657.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/10 22:39, Alexander Lobakin wrote:
-> From: Yunsheng Lin <linyunsheng@huawei.com>
-> Date: Thu, 29 Jun 2023 20:02:22 +0800
-> 
->> Currently when page_pool_create() is called with
->> PP_FLAG_PAGE_FRAG flag, page_pool_alloc_pages() is only
->> allowed to be called under the below constraints:
->> 1. page_pool_fragment_page() need to be called to setup
->>    page->pp_frag_count immediately.
->> 2. page_pool_defrag_page() often need to be called to drain
->>    the page->pp_frag_count when there is no more user will
->>    be holding on to that page.
-> 
-> [...]
-> 
->> @@ -352,12 +377,10 @@ static inline bool page_pool_is_last_frag(struct page_pool *pool,
->>  {
->>  	/* We assume we are the last frag user that is still holding
->>  	 * on to the page if:
->> -	 * 1. Fragments aren't enabled.
->> -	 * 2. We are running in 32-bit arch with 64-bit DMA.
->> -	 * 3. page_pool_defrag_page() indicate we are the last user.
->> +	 * 1. We are running in 32-bit arch with 64-bit DMA.
->> +	 * 2. page_pool_defrag_page() indicate we are the last user.
->>  	 */
->> -	return !(pool->p.flags & PP_FLAG_PAGE_FRAG) ||
->> -	       PAGE_POOL_DMA_USE_PP_FRAG_COUNT ||
->> +	return PAGE_POOL_DMA_USE_PP_FRAG_COUNT ||
->>  	       (page_pool_defrag_page(page, 1) == 0);
-> 
-> Just noticed while developing: after this change, the first function
-> argument, i.e. @pool, is not needed anymore and can be removed.
+Tue, Jul 11, 2023 at 12:34:11PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Monday, July 10, 2023 2:10 PM
+>>
+>>Mon, Jul 10, 2023 at 12:07:30PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>Sent: Wednesday, June 28, 2023 1:16 PM
+>>>>Wed, Jun 28, 2023 at 11:15:11AM CEST, arkadiusz.kubalewski@intel.com
+>>wrote:
+>>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>>Sent: Tuesday, June 27, 2023 12:18 PM
+>>>>>>
+>>>>>>Fri, Jun 23, 2023 at 02:38:10PM CEST, arkadiusz.kubalewski@intel.com
+>>>>>>wrote:
+>>>>>>
+>>>>>>>v8 -> v9:
+>>>>>>
+>>>>>>Could you please address all the unresolved issues from v8 and send v10?
+>>>>>>I'm not reviewing this one.
+>>>>>>
+>>>>>>Thanks!
+>>>>>
+>>>>>Sure, will do, but first missing to-do/discuss list:
+>>>>>1) remove mode_set as not used by any driver
+>>>
+>>>I have implemented in ice (also added back the DPLL_MODE_FREERUN).
+>>
+>>Uh :/ Why exactly is it needed in this initial submission?
+>>
+>
+>Without mode-set there is no need for device-set at all, right?
+>So it is better to implement at least one set command, so we don't
+>need remove device-set command entirely.
 
-Yes, thanks.
+The enum cmd valu could stay as a placeholder, the rest can go.
 
-> 
 
+>
+>>
+>>>
+>>>>>2) remove "no-added-value" static functions descriptions in
+>>>>>   dpll_core/dpll_netlink
+>>>
+>>>Removed.
+>>>
+>>>>>3) merge patches [ 03/10, 04/10, 05/10 ] into patches that are compiling
+>>>>>   after each patch apply
+>>>
+>>>Hope Vadim will decide on this, the thing is merging in two patches
+>>>doesn't make much sense as there won't be any linking until both patches
+>>>are there, so most sense it would be if 3 are merged into one, but
+>>>then we will be back to one big blob patch issue.
+>>>
+>>>>>4) remove function return values descriptions/lists
+>>>
+>>>Fixed.
+>>>
+>>>>>5) Fix patch [05/10]:
+>>>>>   - status Supported
+>>>>>   - additional maintainers
+>>>>>   - remove callback:
+>>>>>     int (*source_pin_idx_get)(...) from `struct dpll_device_ops`
+>>>>>6) Fix patch [08/10]: rethink ice mutex locking scheme
+>>>
+>>>Fixed.
+>>>
+>>>>>7) Fix patch [09/10]: multiple comments on
+>>>>>https://lore.kernel.org/netdev/ZIQu+%2Fo4J0ZBspVg@nanopsycho/#t
+>>>>>8) add PPS DPLL phase offset to the netlink get-device API
+>>>>>
+>>>
+>>>Added few things on this matter
+>>>- 1 dpll level attribute:
+>>>  - phase-shift - measuring the phase difference between dpll input
+>>>    and it's output
+>>>- 1 dpll-pin tuple level attribute:
+>>>  - pin-phase-adjust - set/get phase adjust of a pin on a dpll
+>>>- 2 pin level attributes:
+>>>  - pin-phase-adjust-min - provide user with min value that can be set
+>>>  - pin-phase-adjust-max - provide user with max value that can be set
+>>>- a constant:
+>>>  - DPLL_PHASE_SHIFT_DIVIDER similar to DPLL_TEMP_DIVIDER for producing
+>>>    fraction value of measured DPLL_A_PHASE_SHIFT
+>>
+>>Again, why do we need this in this initial submission? Why it can't be a
+>>follow-up patchset to extend this? This way we never converge :/
+>>Please focus on what we have now and bring it in. Let the extensions to
+>>be addressed later on, please.
+>>
+>
+>Well AFAIK, RHEL is doing some monitoring software, so the end-users need this.
+
+They need it for the initial submission? Why? Why can't they wait 1 week
+for follow-up patchset?
+
+
+>
+>>
+>>
+>>>- implemented in dpll netlink and in ice
+>>>
+>>>>
+>>>>You are missing removal of pin->prop.package_label = dev_name(dev); in
+>>>>ice.
+>>>>
+>>>
+>>>I didn't touch it, as we still need to discuss it, Jakub didn't respond
+>>>on v8 thread.
+>>>I don't see why we shall not name it the way. This is most meaningful
+>>>label for those pins for the user right now.
+>>
+>>This is not meaningful, at all. dev_name() changes upon which pci slot
+>>you plug the card into. package_label should be an actual label on a
+>>silicon package. Why you think this two are related in aby way, makes me
+>>really wonder. Could you elaborate the meaningfulness of this?
+>>
+>
+>Without this, from end-user perspective, it would be very confusing.
+>As in ice without any label there would 4 pins which differs only with id.
+
+There you go, it does not have any label, yet you are trying hard to
+make up some. Does not make sense.
+
+
+>What names would you suggest?
+
+That is the point I made previously. For synce usecase, the label does
+not make sense. There should be no label. You reference the pin by ID
+from netdev, that is enough.
+
+I think better to add the check to pin-register so future synce pin
+users don't have similar weird ideas. Could you please add this check?
+
+Thanks!
+
+
+
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>>
+>>>Thank you!
+>>>Arkadiusz
+>>>
+>>>>
+>>>>>Thank you!
+>>>>>Arkadiusz
 
