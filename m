@@ -1,181 +1,259 @@
-Return-Path: <netdev+bounces-16861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C36BF74F0CA
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 15:55:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C761D74F106
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 16:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3036E2817D6
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 13:55:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D979281865
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 14:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAE718C39;
-	Tue, 11 Jul 2023 13:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB9A18C3E;
+	Tue, 11 Jul 2023 14:03:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E38618C36
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 13:55:42 +0000 (UTC)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8E594;
-	Tue, 11 Jul 2023 06:55:40 -0700 (PDT)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-579ed2829a8so61177867b3.1;
-        Tue, 11 Jul 2023 06:55:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689083740; x=1691675740;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZXQMJc+mkFZtu2vLefW5Re8NpovkJxJKped5EUiUKOE=;
-        b=BtAaeM1r57mlTwANqrQdgSLT/BQzCsFQlocFdyHWa89EhRx/Tske8E/0U75RZXV/s1
-         vMyOFmR/2tI6KuRUXLHUKv4udaytrpPO6K3Fxy7kVfvnnBEFQMP1Ae5MfZuJKVuanSAl
-         0WygyPjzqFgohifL9lHygDSKSTwS6dX8GALt0KV1Jyqo+hEGDwHMIQcAbMEyiApjeDzZ
-         Q+mPxd6jF1+rjlyYvx06uYH7W3okrwsmfAtX0LGSuc/JGrlCBa7B4F2D8QXAgmHfKZz7
-         DC5P65Erc4VsIyW0Zy0MZTg0+mK6947XvoiBOxjgASDtC0xBppxfVYAcDFpeFnr90Z1w
-         Serw==
-X-Gm-Message-State: ABy/qLaFdqm9/3UmzRWN9Mp+o8X9X/Eg2BvChVvN3stetv8wyVdYUq8z
-	dp5K2aHCf1XZkRiXwGUur7aGl961CU8XjA==
-X-Google-Smtp-Source: APBJJlG2SP6QbX+lb4Zp1K7VfQDqff8Wq2bAVPCyWAjRlgmsdN76O/U7mI3WXYO0nzlsMPEK4vnd5w==
-X-Received: by 2002:a0d:d383:0:b0:561:b8a1:e7ef with SMTP id v125-20020a0dd383000000b00561b8a1e7efmr17947283ywd.41.1689083739787;
-        Tue, 11 Jul 2023 06:55:39 -0700 (PDT)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
-        by smtp.gmail.com with ESMTPSA id l10-20020a81d54a000000b0056ffdec590csm569466ywj.41.2023.07.11.06.55.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 06:55:39 -0700 (PDT)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-577497ec6c6so61279067b3.2;
-        Tue, 11 Jul 2023 06:55:39 -0700 (PDT)
-X-Received: by 2002:a81:6e8b:0:b0:570:85b2:e6dd with SMTP id
- j133-20020a816e8b000000b0057085b2e6ddmr17111816ywc.17.1689083738977; Tue, 11
- Jul 2023 06:55:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A9514AB5;
+	Tue, 11 Jul 2023 14:03:51 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0114F127;
+	Tue, 11 Jul 2023 07:03:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=NCe20DJxaBTemI8S1kSVzZUvr73+rwHUToovZ2WdzP4=; b=ncCNbccrzrIFicDTnSEtOL7fbr
+	0ML24MM0HScWxcxeOazUxPWt8cEcHtGsSa7ZlzjqQUKYy4BO+Hzq/DXzMWYImgzqIFrnzj/16VnkR
+	zh2Zq9rmITbycVSSVkJFyJgTXbZ1qjS4XcnLdCBh7ERqjEgWw2ymzQFCiblvPnvHkP9q7S+h3/daW
+	WZv/I8slbAPAGAj2wfO06Velvr7bN6FBcjSPF//Qm/vyOpogesSo+sOtc5di6dM6EvL8OdkpiMS7b
+	s7GGAob+TbsDJ4sOvYWn9950l07qjb8R0nyT8+Wh4vGNdGh2H2nbJJXSErO45aGwJh6stdX88j/JK
+	sRyqmCIQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qJDxr-000OUm-Ch; Tue, 11 Jul 2023 16:03:39 +0200
+Received: from [81.6.34.132] (helo=localhost.localdomain)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qJDxq-000CVL-SD; Tue, 11 Jul 2023 16:03:38 +0200
+Subject: Re: [PATCH bpf-next v4 3/8] libbpf: Add opts-based
+ attach/detach/query API for tcx
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+ kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
+ davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20230710201218.19460-1-daniel@iogearbox.net>
+ <20230710201218.19460-4-daniel@iogearbox.net>
+ <CAEf4BzaGbVe3ip_cDxV0u8bBUEVExdqHXOFBorHWZ0tpDBLLnw@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <dd7aaf1e-9abf-0b9c-bfba-ee3bc4cfa852@iogearbox.net>
+Date: Tue, 11 Jul 2023 16:03:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
-In-Reply-To: <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 11 Jul 2023 15:55:26 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
-Message-ID: <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
-Subject: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2 6/7]
- workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
-To: Tejun Heo <tj@kernel.org>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
-	Linux PM list <linux-pm@vger.kernel.org>, 
-	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <CAEf4BzaGbVe3ip_cDxV0u8bBUEVExdqHXOFBorHWZ0tpDBLLnw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26966/Tue Jul 11 09:28:31 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Tejun,
+On 7/11/23 6:00 AM, Andrii Nakryiko wrote:
+> On Mon, Jul 10, 2023 at 1:12 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> Extend libbpf attach opts and add a new detach opts API so this can be used
+>> to add/remove fd-based tcx BPF programs. The old-style bpf_prog_detach() and
+>> bpf_prog_detach2() APIs are refactored to reuse the new bpf_prog_detach_opts()
+>> internally.
+>>
+>> The bpf_prog_query_opts() API got extended to be able to handle the new
+>> link_ids, link_attach_flags and revision fields.
+>>
+>> For concrete usage examples, see the extensive selftests that have been
+>> developed as part of this series.
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> ---
+>>   tools/lib/bpf/bpf.c      | 105 +++++++++++++++++++++++++--------------
+>>   tools/lib/bpf/bpf.h      |  92 ++++++++++++++++++++++++++++------
+>>   tools/lib/bpf/libbpf.c   |  12 +++--
+>>   tools/lib/bpf/libbpf.map |   1 +
+>>   4 files changed, 157 insertions(+), 53 deletions(-)
+>>
+> 
+> Thanks for doc comments! Looks good, left a few nits with suggestions
+> for simplifying code, but it's minor.
+> 
+> Acked-by: Andrii Nakryiko <andrii@kernel.org>
+> 
+>> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+>> index 3b0da19715e1..3dfc43b477c3 100644
+>> --- a/tools/lib/bpf/bpf.c
+>> +++ b/tools/lib/bpf/bpf.c
+>> @@ -629,55 +629,87 @@ int bpf_prog_attach(int prog_fd, int target_fd, enum bpf_attach_type type,
+>>          return bpf_prog_attach_opts(prog_fd, target_fd, type, &opts);
+>>   }
+>>
+>> -int bpf_prog_attach_opts(int prog_fd, int target_fd,
+>> -                         enum bpf_attach_type type,
+>> -                         const struct bpf_prog_attach_opts *opts)
+>> +int bpf_prog_attach_opts(int prog_fd, int target,
+>> +                        enum bpf_attach_type type,
+>> +                        const struct bpf_prog_attach_opts *opts)
+>>   {
+>> -       const size_t attr_sz = offsetofend(union bpf_attr, replace_bpf_fd);
+>> +       const size_t attr_sz = offsetofend(union bpf_attr, expected_revision);
+>> +       __u32 relative_id, flags;
+>>          union bpf_attr attr;
+>> -       int ret;
+>> +       int ret, relative;
+>>
+>>          if (!OPTS_VALID(opts, bpf_prog_attach_opts))
+>>                  return libbpf_err(-EINVAL);
+>>
+>> +       relative_id = OPTS_GET(opts, relative_id, 0);
+>> +       relative = OPTS_GET(opts, relative_fd, 0);
+>> +       flags = OPTS_GET(opts, flags, 0);
+>> +
+>> +       /* validate we don't have unexpected combinations of non-zero fields */
+>> +       if (relative > 0 && relative_id)
+>> +               return libbpf_err(-EINVAL);
+> 
+> I left a comment in the next patch about this, I think it should be
+> simple `if (relative_fd && relative_id) { /* bad */ }`. But see the
+> next patch for why.
+> 
+>> +       if (relative_id) {
+>> +               relative = relative_id;
+>> +               flags |= BPF_F_ID;
+>> +       }
+> 
+> it's a bit hard to follow as written (to me at least). How about a
+> slight variation that has less in-place state update
+> 
+> 
+> int relative_fd, relative_id;
+> 
+> relative_fd = OPTS_GET(opts, relative_fd, 0);
+> relative_id = OPTS_GET(opts, relative_id, 0);
+> 
+> /* only one of fd or id can be specified */
+> if (relative_fd && relative_id > 0)
+>      return libbpf_err(-EINVAL);
+> 
+> ... then see further below
+> 
+>> +
+>>          memset(&attr, 0, attr_sz);
+>> -       attr.target_fd     = target_fd;
+>> -       attr.attach_bpf_fd = prog_fd;
+>> -       attr.attach_type   = type;
+>> -       attr.attach_flags  = OPTS_GET(opts, flags, 0);
+>> -       attr.replace_bpf_fd = OPTS_GET(opts, replace_prog_fd, 0);
+>> +       attr.target_fd          = target;
+>> +       attr.attach_bpf_fd      = prog_fd;
+>> +       attr.attach_type        = type;
+>> +       attr.attach_flags       = flags;
+>> +       attr.relative_fd        = relative;
+> 
+> instead of two lines above, have simple if/else
+> 
+> if (relative_if) {
+>      attr.relative_id = relative_id;
+>      attr.attach_flags = flags | BPF_F_ID;
+> } else {
+>      attr.relative_fd = relative_fd;
+>      attr.attach_flags = flags;
+> }
+> 
+> This combined with the piece above seems very straightforward in terms
+> of what is checked and what's passed into attr. WDYT?
 
-On Fri, May 12, 2023 at 9:54=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
-> Workqueue now automatically marks per-cpu work items that hog CPU for too
-> long as CPU_INTENSIVE, which excludes them from concurrency management an=
-d
-> prevents stalling other concurrency-managed work items. If a work functio=
-n
-> keeps running over the thershold, it likely needs to be switched to use a=
-n
-> unbound workqueue.
->
-> This patch adds a debug mechanism which tracks the work functions which
-> trigger the automatic CPU_INTENSIVE mechanism and report them using
-> pr_warn() with exponential backoff.
->
-> v2: Drop bouncing through kthread_worker for printing messages. It was to
->     avoid introducing circular locking dependency but wasn't effective as=
- it
->     still had pool lock -> wci_lock -> printk -> pool lock loop. Let's ju=
-st
->     print directly using printk_deferred().
->
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Suggested-by: Peter Zijlstra <peterz@infradead.org>
+All sgtm, I've implemented the suggestions locally for v5.
 
-Thanks for your patch, which is now commit 6363845005202148
-("workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
-mechanism") in v6.5-rc1.
+>> +       attr.replace_bpf_fd     = OPTS_GET(opts, replace_fd, 0);
+>> +       attr.expected_revision  = OPTS_GET(opts, expected_revision, 0);
+>>
+>>          ret = sys_bpf(BPF_PROG_ATTACH, &attr, attr_sz);
+>>          return libbpf_err_errno(ret);
+>>   }
+>>
+>> -int bpf_prog_detach(int target_fd, enum bpf_attach_type type)
+>> +int bpf_prog_detach_opts(int prog_fd, int target,
+>> +                        enum bpf_attach_type type,
+>> +                        const struct bpf_prog_detach_opts *opts)
+>>   {
+>> -       const size_t attr_sz = offsetofend(union bpf_attr, replace_bpf_fd);
+>> +       const size_t attr_sz = offsetofend(union bpf_attr, expected_revision);
+>> +       __u32 relative_id, flags;
+>>          union bpf_attr attr;
+>> -       int ret;
+>> +       int ret, relative;
+>> +
+>> +       if (!OPTS_VALID(opts, bpf_prog_detach_opts))
+>> +               return libbpf_err(-EINVAL);
+>> +
+>> +       relative_id = OPTS_GET(opts, relative_id, 0);
+>> +       relative = OPTS_GET(opts, relative_fd, 0);
+>> +       flags = OPTS_GET(opts, flags, 0);
+>> +
+>> +       /* validate we don't have unexpected combinations of non-zero fields */
+>> +       if (relative > 0 && relative_id)
+>> +               return libbpf_err(-EINVAL);
+>> +       if (relative_id) {
+>> +               relative = relative_id;
+>> +               flags |= BPF_F_ID;
+>> +       }
+> 
+> see above, I think the same data flow simplification can be done
+> 
+>>
+>>          memset(&attr, 0, attr_sz);
+>> -       attr.target_fd   = target_fd;
+>> -       attr.attach_type = type;
+>> +       attr.target_fd          = target;
+>> +       attr.attach_bpf_fd      = prog_fd;
+>> +       attr.attach_type        = type;
+>> +       attr.attach_flags       = flags;
+>> +       attr.relative_fd        = relative;
+>> +       attr.expected_revision  = OPTS_GET(opts, expected_revision, 0);
+>>
+>>          ret = sys_bpf(BPF_PROG_DETACH, &attr, attr_sz);
+>>          return libbpf_err_errno(ret);
+>>   }
+>>
+> 
+> [...]
+> 
+>> diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
+>> index d9ec4407befa..a95d39bbef90 100644
+>> --- a/tools/lib/bpf/libbpf.map
+>> +++ b/tools/lib/bpf/libbpf.map
+>> @@ -396,4 +396,5 @@ LIBBPF_1.3.0 {
+>>          global:
+>>                  bpf_obj_pin_opts;
+>>                  bpf_program__attach_netfilter;
+>> +               bpf_prog_detach_opts;
+> 
+> I think it sorts before bpf_program__attach_netfilter?
 
-I guess you are interested to know where this triggers.
-I enabled CONFIG_WQ_CPU_INTENSIVE_REPORT=3Dy, and tested
-the result on various machines...
-
-SH/R-Mobile:
-
-  workqueue: genpd_power_off_work_fn hogged CPU for >10000us 4 times,
-consider switching to WQ_UNBOUND
-
-Atmark Techno Armadillo800-EVA with shmob_drm:
-
-  workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 16
-times, consider switching to WQ_UNBOUND
-
-R-Car Gen2:
-
-  workqueue: rtc_timer_do_work hogged CPU for >10000us 4 times,
-consider switching to WQ_UNBOUND
-
-R-Car Gen2/Gen3:
-
-  workqueue: pm_runtime_work hogged CPU for >10000us 4 times, consider
-switching to WQ_UNBOUND
-
-R-Car Gen3:
-
-  workqueue: kfree_rcu_work hogged CPU for >10000us 4 times, consider
-switching to WQ_UNBOUND
-
-OrangeCrab/Linux-on-LiteX-VexRiscV with ht16k33 14-seg display and ssd130xd=
-rmfb:
-
-  workqueue: check_lifetime hogged CPU for >10000us 4 times, consider
-switching to WQ_UNBOUND
-  workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 1024
-times, consider switching to WQ_UNBOUND
-  workqueue: fb_flashcursor hogged CPU for >10000us 128 times,
-consider switching to WQ_UNBOUND
-  workqueue: ht16k33_seg14_update hogged CPU for >10000us 128 times,
-consider switching to WQ_UNBOUND
-  workqueue: mmc_rescan hogged CPU for >10000us 128 times, consider
-switching to WQ_UNBOUND
-
-Atari (ARAnyM):
-
-  workqueue: ata_sff_pio_task hogged CPU for >10000us 64 times,
-consider switching to WQ_UNBOUND
-
-The OrangeCrab is a slow machine, so it's not that surprising to see these
-messages...
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Yeap, also fixed.
 
