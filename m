@@ -1,49 +1,66 @@
-Return-Path: <netdev+bounces-16721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1170974E837
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:40:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C9E74E85E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 09:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E9E81C20C2F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 07:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B87812815DE
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 07:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D49174CC;
-	Tue, 11 Jul 2023 07:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82219174D2;
+	Tue, 11 Jul 2023 07:50:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D227C5CBC
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:40:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 254ABC433C8;
-	Tue, 11 Jul 2023 07:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689061229;
-	bh=mir9lMosxsKMhRVUiJnRWnuPkqQkT24ItkUJNuKUGqY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bK1ndyY9I2b4mhR0o4T3l/9VjE7JG1KzF9bFos3OF2I61Wu3daHV1EJSKmkI5emmu
-	 ip5mIrYXuvklerAmWZP5chAYRtu+nEdKIzLWcJOwCZNDcdGdmL8ZqFwlzHkMIn5SOj
-	 3YmXqe93RMwLiHsZKV8jnl8FJDwJDD8qNNa+pcg888XbIH8G1lqKVL1Wnmt5cht1Ug
-	 R7CQRhNxRdPLBTIYTyYIsIhKm+29yvNPNxjiJxxW/2NgEWYZcGsUsVOzj4llw4y8ne
-	 PvIlP9abEb1p9PHhE6T6/9DJgsm8xJbZBGxdaeGqLPP+NEN9HXaPewYuXRwsL9sdxV
-	 m/sNgmlraD8QA==
-Date: Tue, 11 Jul 2023 10:40:25 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	sharmaajay@microsoft.com, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, schakrabarti@microsoft.com
-Subject: Re: [PATCH V3 net] net: mana: Configure hwc timeout from hardware
-Message-ID: <20230711074025.GK41919@unreal>
-References: <1689060957-1475-1-git-send-email-schakrabarti@linux.microsoft.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766DE63E
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 07:50:54 +0000 (UTC)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F10A100;
+	Tue, 11 Jul 2023 00:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689061852; x=1720597852;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FdsteEPVoKhljkYScsI1bW/zn+WpJ+G1WJFTIr7P2+I=;
+  b=Q3aHBPlIffVDHxcKfeuwVdkG9ysTmOzJlSYsJ7lIoK8+evtwy2DfmshP
+   Zf5cilbOUqBMxzRHORJxDi2q0NIbu+1xt8FRPIycKzqZ3BX+TgHpnt8aw
+   x5GfGf5c7/5VoEKsRIoz9lGqCulKEyWXX8tl/M1+UV0Z8nCLPinGHrihK
+   1CQuXImvZs1llsmf1EFxyoBPRpgi/8NOiW1/wd/bCYj4iDjKBNuBay+9q
+   Qm7Z0nXLwf5JPFjeebePGVriNro6eXXKftSnZSLmq023j3owef6kb9RtR
+   FpDtZOUGjEcAkSVl0I92OvzgcPZ23D6sz+SYuGjDGtVkoSHwD5XnR1EnA
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="363419830"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="363419830"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 00:50:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="895088411"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="895088411"
+Received: from lkp-server01.sh.intel.com (HELO c544d7fc5005) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 11 Jul 2023 00:50:48 -0700
+Received: from kbuild by c544d7fc5005 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qJ891-0004Sx-1N;
+	Tue, 11 Jul 2023 07:50:47 +0000
+Date: Tue, 11 Jul 2023 15:50:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vivek Pernamitta <quic_vpernami@quicinc.com>, mhi@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, mrana@quicinc.com,
+	quic_qianyu@quicinc.com, manivannan.sadhasivam@linaro.org,
+	Vivek Pernamitta <quic_vpernami@quicinc.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V1] net: mhi : Add support to enable ethernet interface
+Message-ID: <202307111559.xDdV7vHr-lkp@intel.com>
+References: <1688118281-13032-1-git-send-email-quic_vpernami@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,238 +69,192 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1689060957-1475-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <1688118281-13032-1-git-send-email-quic_vpernami@quicinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 12:35:57AM -0700, Souradeep Chakrabarti wrote:
-> At present hwc timeout value is a fixed value.
-> This patch sets the hwc timeout from the hardware.
-> It now uses a new hardware capability
+Hi Vivek,
 
-This is new functionality which means that patch should be sent to net-next.
+kernel test robot noticed the following build errors:
 
-> GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG to query
-> and set the value in hwc_timeout.
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v6.5-rc1 next-20230711]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Please try to avoid breaking your commit messages after 50 chars and use whole available
-line space.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vivek-Pernamitta/net-mhi-Add-support-to-enable-ethernet-interface/20230630-174659
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1688118281-13032-1-git-send-email-quic_vpernami%40quicinc.com
+patch subject: [PATCH V1] net: mhi : Add support to enable ethernet interface
+config: riscv-randconfig-r042-20230710 (https://download.01.org/0day-ci/archive/20230711/202307111559.xDdV7vHr-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230711/202307111559.xDdV7vHr-lkp@intel.com/reproduce)
 
-Thanks
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307111559.xDdV7vHr-lkp@intel.com/
 
-> 
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> ---
-> V2 -> V3:
-> * Removed the stable release from cc
-> * Formatted the variable position to follow reverse xmas tree
-> * Removed the log from mana_gd_query_hwc_timeout on success scenario
-> ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 30 ++++++++++++++++++-
->  .../net/ethernet/microsoft/mana/hw_channel.c  | 25 +++++++++++++++-
->  include/net/mana/gdma.h                       | 20 ++++++++++++-
->  include/net/mana/hw_channel.h                 |  5 ++++
->  4 files changed, 77 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 8f3f78b68592..4537a70e30d4 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -106,6 +106,25 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
->  	return 0;
->  }
->  
-> +static int mana_gd_query_hwc_timeout(struct pci_dev *pdev, u32 *timeout_val)
-> +{
-> +	struct gdma_context *gc = pci_get_drvdata(pdev);
-> +	struct gdma_query_hwc_timeout_resp resp = {};
-> +	struct gdma_query_hwc_timeout_req req = {};
-> +	int err;
-> +
-> +	mana_gd_init_req_hdr(&req.hdr, GDMA_QUERY_HWC_TIMEOUT,
-> +			     sizeof(req), sizeof(resp));
-> +	req.timeout_ms = *timeout_val;
-> +	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
-> +	if (err || resp.hdr.status)
-> +		return err ? err : -EPROTO;
-> +
-> +	*timeout_val = resp.timeout_ms;
-> +
-> +	return 0;
-> +}
-> +
->  static int mana_gd_detect_devices(struct pci_dev *pdev)
->  {
->  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> @@ -879,8 +898,11 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
->  	struct gdma_context *gc = pci_get_drvdata(pdev);
->  	struct gdma_verify_ver_resp resp = {};
->  	struct gdma_verify_ver_req req = {};
-> +	struct hw_channel_context *hwc;
->  	int err;
->  
-> +	hwc = gc->hwc.driver_data;
-> +
->  	mana_gd_init_req_hdr(&req.hdr, GDMA_VERIFY_VF_DRIVER_VERSION,
->  			     sizeof(req), sizeof(resp));
->  
-> @@ -907,7 +929,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
->  			err, resp.hdr.status);
->  		return err ? err : -EPROTO;
->  	}
-> -
-> +	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
-> +		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
-> +		if (err) {
-> +			dev_err(gc->dev, "Failed to set the hwc timeout %d\n", err);
-> +			return err;
-> +		}
-> +	}
->  	return 0;
->  }
->  
-> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> index 2bd1d74021f7..db433501e5e6 100644
-> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> @@ -174,7 +174,25 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
->  		complete(&hwc->hwc_init_eqe_comp);
->  		break;
->  
-> +	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
-> +		type_data.as_uint32 = event->details[0];
-> +		type = type_data.type;
-> +		val = type_data.value;
-> +
-> +		switch (type) {
-> +		case HWC_DATA_CFG_HWC_TIMEOUT:
-> +			hwc->hwc_timeout = val;
-> +			break;
-> +
-> +		default:
-> +			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
-> +			break;
-> +		}
-> +
-> +		break;
-> +
->  	default:
-> +		dev_warn(hwc->dev, "Received unknown gdma event %u\n", event->type);
->  		/* Ignore unknown events, which should never happen. */
->  		break;
->  	}
-> @@ -704,6 +722,7 @@ int mana_hwc_create_channel(struct gdma_context *gc)
->  	gd->pdid = INVALID_PDID;
->  	gd->doorbell = INVALID_DOORBELL;
->  
-> +	hwc->hwc_timeout = HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS;
->  	/* mana_hwc_init_queues() only creates the required data structures,
->  	 * and doesn't touch the HWC device.
->  	 */
-> @@ -770,6 +789,8 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
->  	hwc->gdma_dev->doorbell = INVALID_DOORBELL;
->  	hwc->gdma_dev->pdid = INVALID_PDID;
->  
-> +	hwc->hwc_timeout = 0;
-> +
->  	kfree(hwc);
->  	gc->hwc.driver_data = NULL;
->  	gc->hwc.gdma_context = NULL;
-> @@ -818,6 +839,7 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  		dest_vrq = hwc->pf_dest_vrq_id;
->  		dest_vrcq = hwc->pf_dest_vrcq_id;
->  	}
-> +	dev_err(hwc->dev, "HWC: timeout %u ms\n", hwc->hwc_timeout);
->  
->  	err = mana_hwc_post_tx_wqe(txq, tx_wr, dest_vrq, dest_vrcq, false);
->  	if (err) {
-> @@ -825,7 +847,8 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  		goto out;
->  	}
->  
-> -	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
-> +	if (!wait_for_completion_timeout(&ctx->comp_event,
-> +					 (hwc->hwc_timeout / 1000) * HZ)) {
->  		dev_err(hwc->dev, "HWC: Request timed out!\n");
->  		err = -ETIMEDOUT;
->  		goto out;
-> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-> index 96c120160f15..88b6ef7ce1a6 100644
-> --- a/include/net/mana/gdma.h
-> +++ b/include/net/mana/gdma.h
-> @@ -33,6 +33,7 @@ enum gdma_request_type {
->  	GDMA_DESTROY_PD			= 30,
->  	GDMA_CREATE_MR			= 31,
->  	GDMA_DESTROY_MR			= 32,
-> +	GDMA_QUERY_HWC_TIMEOUT		= 84, /* 0x54 */
->  };
->  
->  #define GDMA_RESOURCE_DOORBELL_PAGE	27
-> @@ -57,6 +58,8 @@ enum gdma_eqe_type {
->  	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
->  	GDMA_EQE_HWC_INIT_DATA		= 130,
->  	GDMA_EQE_HWC_INIT_DONE		= 131,
-> +	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
-> +	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
->  };
->  
->  enum {
-> @@ -531,10 +534,12 @@ enum {
->   * so the driver is able to reliably support features like busy_poll.
->   */
->  #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
-> +#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
->  
->  #define GDMA_DRV_CAP_FLAGS1 \
->  	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
-> -	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX)
-> +	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-> +	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG)
->  
->  #define GDMA_DRV_CAP_FLAGS2 0
->  
-> @@ -664,6 +669,19 @@ struct gdma_disable_queue_req {
->  	u32 alloc_res_id_on_creation;
->  }; /* HW DATA */
->  
-> +/* GDMA_QUERY_HWC_TIMEOUT */
-> +struct gdma_query_hwc_timeout_req {
-> +	struct gdma_req_hdr hdr;
-> +	u32 timeout_ms;
-> +	u32 reserved;
-> +};
-> +
-> +struct gdma_query_hwc_timeout_resp {
-> +	struct gdma_resp_hdr hdr;
-> +	u32 timeout_ms;
-> +	u32 reserved;
-> +};
-> +
->  enum atb_page_size {
->  	ATB_PAGE_SIZE_4K,
->  	ATB_PAGE_SIZE_8K,
-> diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
-> index 6a757a6e2732..3d3b5c881bc1 100644
-> --- a/include/net/mana/hw_channel.h
-> +++ b/include/net/mana/hw_channel.h
-> @@ -23,6 +23,10 @@
->  #define HWC_INIT_DATA_PF_DEST_RQ_ID	10
->  #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
->  
-> +#define HWC_DATA_CFG_HWC_TIMEOUT 1
-> +
-> +#define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
-> +
->  /* Structures labeled with "HW DATA" are exchanged with the hardware. All of
->   * them are naturally aligned and hence don't need __packed.
->   */
-> @@ -182,6 +186,7 @@ struct hw_channel_context {
->  
->  	u32 pf_dest_vrq_id;
->  	u32 pf_dest_vrcq_id;
-> +	u32 hwc_timeout;
->  
->  	struct hwc_caller_ctx *caller_ctx;
->  };
-> -- 
-> 2.34.1
-> 
+All errors (new ones prefixed by >>):
+
+         |                                          ~~~~~~~~~~ ^
+   In file included from drivers/net/mhi_net.c:7:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/riscv/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/riscv/include/asm/io.h:136:
+   include/asm-generic/io.h:751:2: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     751 |         insw(addr, buffer, count);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/riscv/include/asm/io.h:105:53: note: expanded from macro 'insw'
+     105 | #define insw(addr, buffer, count) __insw(PCI_IOBASE + (addr), buffer, count)
+         |                                          ~~~~~~~~~~ ^
+   In file included from drivers/net/mhi_net.c:7:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/riscv/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/riscv/include/asm/io.h:136:
+   include/asm-generic/io.h:759:2: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     759 |         insl(addr, buffer, count);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/riscv/include/asm/io.h:106:53: note: expanded from macro 'insl'
+     106 | #define insl(addr, buffer, count) __insl(PCI_IOBASE + (addr), buffer, count)
+         |                                          ~~~~~~~~~~ ^
+   In file included from drivers/net/mhi_net.c:7:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/riscv/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/riscv/include/asm/io.h:136:
+   include/asm-generic/io.h:768:2: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     768 |         outsb(addr, buffer, count);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/riscv/include/asm/io.h:118:55: note: expanded from macro 'outsb'
+     118 | #define outsb(addr, buffer, count) __outsb(PCI_IOBASE + (addr), buffer, count)
+         |                                            ~~~~~~~~~~ ^
+   In file included from drivers/net/mhi_net.c:7:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/riscv/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/riscv/include/asm/io.h:136:
+   include/asm-generic/io.h:777:2: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     777 |         outsw(addr, buffer, count);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/riscv/include/asm/io.h:119:55: note: expanded from macro 'outsw'
+     119 | #define outsw(addr, buffer, count) __outsw(PCI_IOBASE + (addr), buffer, count)
+         |                                            ~~~~~~~~~~ ^
+   In file included from drivers/net/mhi_net.c:7:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/riscv/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/riscv/include/asm/io.h:136:
+   include/asm-generic/io.h:786:2: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     786 |         outsl(addr, buffer, count);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/riscv/include/asm/io.h:120:55: note: expanded from macro 'outsl'
+     120 | #define outsl(addr, buffer, count) __outsl(PCI_IOBASE + (addr), buffer, count)
+         |                                            ~~~~~~~~~~ ^
+   In file included from drivers/net/mhi_net.c:7:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/riscv/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/riscv/include/asm/io.h:136:
+   include/asm-generic/io.h:1134:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+    1134 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
+         |                                                   ~~~~~~~~~~ ^
+>> drivers/net/mhi_net.c:327:19: error: passing 'const unsigned char *' to parameter of type 'u8 *' (aka 'unsigned char *') discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+     327 |                 eth_random_addr(ndev->dev_addr);
+         |                                 ^~~~~~~~~~~~~~
+   include/linux/etherdevice.h:230:40: note: passing argument to parameter 'addr' here
+     230 | static inline void eth_random_addr(u8 *addr)
+         |                                        ^
+   13 warnings and 1 error generated.
+
+
+vim +327 drivers/net/mhi_net.c
+
+   320	
+   321	static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev, bool eth_dev)
+   322	{
+   323		struct mhi_net_dev *mhi_netdev;
+   324		int err;
+   325	
+   326		if (eth_dev) {
+ > 327			eth_random_addr(ndev->dev_addr);
+   328			if (!is_valid_ether_addr(ndev->dev_addr))
+   329				return -EADDRNOTAVAIL;
+   330		}
+   331	
+   332		mhi_netdev = netdev_priv(ndev);
+   333	
+   334		dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+   335		mhi_netdev->ndev = ndev;
+   336		mhi_netdev->mdev = mhi_dev;
+   337		mhi_netdev->skbagg_head = NULL;
+   338		mhi_netdev->mru = mhi_dev->mhi_cntrl->mru;
+   339		mhi_netdev->ethernet_if = eth_dev;
+   340	
+   341		INIT_DELAYED_WORK(&mhi_netdev->rx_refill, mhi_net_rx_refill_work);
+   342		u64_stats_init(&mhi_netdev->stats.rx_syncp);
+   343		u64_stats_init(&mhi_netdev->stats.tx_syncp);
+   344	
+   345		/* Start MHI channels */
+   346		err = mhi_prepare_for_transfer(mhi_dev);
+   347		if (err)
+   348			return err;
+   349	
+   350		/* Number of transfer descriptors determines size of the queue */
+   351		mhi_netdev->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
+   352	
+   353		err = register_netdev(ndev);
+   354		if (err)
+   355			return err;
+   356	
+   357		return 0;
+   358	}
+   359	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
