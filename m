@@ -1,118 +1,179 @@
-Return-Path: <netdev+bounces-16942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB2774F7CD
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:10:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE66574F7E7
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 20:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5631B2818E4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:10:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92C851C210AD
+	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 18:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D871E52D;
-	Tue, 11 Jul 2023 18:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADC41E538;
+	Tue, 11 Jul 2023 18:17:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80D31E508
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 18:10:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77234C433C8;
-	Tue, 11 Jul 2023 18:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689099018;
-	bh=fgsSU4RTwG4VGCYX1r2gOtI9K5ILxtnDHYmNK6g0Mkg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sc+m/bTBE4mmECtCDGZJiMQjX7s83U1TwrfjoYrot9ksHXoaYC0wEQd0ySZSa43Si
-	 Xf53ueLL+QXtBWoxmxBxcTMwonY27GfRa0LU+rEcjrh1AV/NR1Xcp0XSsjJBmh5e4I
-	 qF++OOo0UlxZUg95+pPSEle6XLficCeo38fGGIKXpMvWcwq6sZcq7LiUz4+28mC2Z0
-	 3TJn0byHHeNPf8oEt6/XIzkcI1RPotW1TuG2G2us1+sfbgnWBpTA2z7dbDrGVEFmZ+
-	 vfDpTvP85IxQ5PEsfdXAhiIo7wxIHBrxT8Wrvmtks2QdQMpQt5gIqDkcG8+Y9udOiN
-	 WXFt5ncsTu0hQ==
-Date: Tue, 11 Jul 2023 19:10:12 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Michal Simek <michal.simek@amd.com>
-Cc: linux-kernel@vger.kernel.org, monstr@monstr.eu, michal.simek@xilinx.com,
-	git@xilinx.com,
-	Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] dt-bindings: can: xilinx_can: Add reset description
-Message-ID: <20230711-parted-rasping-82b911b90e1e@spud>
-References: <cover.1689084227.git.michal.simek@amd.com>
- <c8e7f86d60b56a9ca2592d9ee30a3a64e535f429.1689084227.git.michal.simek@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437711E508;
+	Tue, 11 Jul 2023 18:17:14 +0000 (UTC)
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0779C;
+	Tue, 11 Jul 2023 11:17:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689099433; x=1720635433;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ejSRqyLc1keD4J84EQBZZKFA9D4wAPd5a7wHIeEh9lk=;
+  b=lJagRR05LfgvbN+CSWEOnAGSk8pNI9WmVTrfDH2JBjGCU3DglCK+d10s
+   oZZqn9quKgNEzo9FdcykHLTuiyGtoK/iar9JWY0GDhrgp6Npee9aL2PYe
+   3ezezIEsJIZlCgE0zF8m9y2s42n3V9MMS9beRr3qaYedK3G6oQCzXMqcF
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.01,197,1684800000"; 
+   d="scan'208";a="592379661"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 18:17:09 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id 5AE7C805D4;
+	Tue, 11 Jul 2023 18:17:03 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 11 Jul 2023 18:16:49 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.170.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Tue, 11 Jul 2023 18:16:44 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <lmb@isovalent.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <haoluo@google.com>, <hemanthmalla@gmail.com>,
+	<joe@cilium.io>, <joe@wand.net.nz>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <martin.lau@linux.dev>, <mykolal@fb.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
+	<shuah@kernel.org>, <song@kernel.org>, <willemdebruijn.kernel@gmail.com>,
+	<yhs@fb.com>
+Subject: Re: [PATCH bpf-next v5 6/7] bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign
+Date: Tue, 11 Jul 2023 11:16:34 -0700
+Message-ID: <20230711181634.52860-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAN+4W8gs84r+PVWgMbic29Opj2EviNMh7AzcP=BR3CLvYHiQWg@mail.gmail.com>
+References: <CAN+4W8gs84r+PVWgMbic29Opj2EviNMh7AzcP=BR3CLvYHiQWg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="goRIxT+tsSQKD88J"
-Content-Disposition: inline
-In-Reply-To: <c8e7f86d60b56a9ca2592d9ee30a3a64e535f429.1689084227.git.michal.simek@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.187.170.35]
+X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+
+From: Lorenz Bauer <lmb@isovalent.com>
+Date: Tue, 11 Jul 2023 17:15:06 +0100
+> On Tue, Jul 4, 2023 at 2:46 PM Lorenz Bauer <lmb@isovalent.com> wrote:
+> >
+> > +static inline
+> > +struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
+> > +                             const struct in6_addr *saddr, const __be16 sport,
+> > +                             const struct in6_addr *daddr, const __be16 dport,
+> > +                             bool *refcounted, inet6_ehashfn_t *ehashfn)
+> > +{
+> > +       struct sock *sk, *reuse_sk;
+> > +       bool prefetched;
+> > +
+> > +       sk = skb_steal_sock(skb, refcounted, &prefetched);
+> > +       if (!sk)
+> > +               return NULL;
+> > +
+> > +       if (!prefetched)
+> > +               return sk;
+> > +
+> > +       if (sk->sk_protocol == IPPROTO_TCP) {
+> > +               if (sk->sk_state != TCP_LISTEN)
+> > +                       return sk;
+> > +       } else if (sk->sk_protocol == IPPROTO_UDP) {
+> > +               if (sk->sk_state != TCP_CLOSE)
+> > +                       return sk;
+> > +       } else {
+> > +               return sk;
+> > +       }
+> > +
+> > +       reuse_sk = inet6_lookup_reuseport(net, sk, skb, doff,
+> > +                                         saddr, sport, daddr, ntohs(dport),
+> > +                                         ehashfn);
+> > +       if (!reuse_sk)
+> > +               return sk;
+> > +
+> > +       /* We've chosen a new reuseport sock which is never refcounted. This
+> > +        * implies that sk also isn't refcounted.
+> > +        */
+> > +       WARN_ON_ONCE(*refcounted);
+> > +
+> > +       return reuse_sk;
+> > +}
+> 
+> Hi Kuniyuki,
+> 
+> Continuing the conversation from v5 of the patch set, you wrote:
+> 
+> In inet6?_steal_sock(), we call inet6?_lookup_reuseport() only for
+> sk that was a TCP listener or UDP non-connected socket until just before
+> the sk_state checks.  Then, we know *refcounted should be false for such
+> sockets even before inet6?_lookup_reuseport().
+> 
+> This makes sense for me in the TCP listener case. I understand UDP
+> less, so I'll have to rely on your input. I tried to convince myself
+> that all UDP sockets in TCP_CLOSE have SOCK_RCU_FREE set. However, the
+> only place I see sock_set_flag(sk, SOCK_RCU_FREE) in the UDP case is
+> in udp_lib_get_port(). That in turn seems to be called during bind.
+> So, what if BPF does bpf_sk_assign() of an unbound and unconnected
+> socket?  Wouldn't that trigger the warning?
+
+Ah sorry, I assumed it would not happen, but if we can put unbound
+TCP/UDP socket into a map and select it, then yes, it hits the warning.
+
+Let's say we can select a non-RCU sk in bpf_sk_assign() and then the
+socket is converted to RCU by bind(udp_sk) or listen(tcp_sk).
+
+The sk_is_refcounted() in bpf_sk_assign() returns true and sk_refcnt
+is incremented.  Then, I think of two scenarios:
+
+  1) RCU conversion is done before sk_is_refcounted() in skb_steal_sock().
+     -> *refcounted is false
+
+  2) RCU conversion is done after skb_steal_sock().
+     -> *refcounted is true
+
+In both cases, we need to decrement the refcnt that is bumped up
+by bpf_sk_assign().  The sock_put() in the v1 series does not catch
+the former case.
+
+How should we track it ?
 
 
---goRIxT+tsSQKD88J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> 
+> To maybe sidestep this question: do you think the location of the
+> WARN_ON_ONCE has to prevent this patch set from going in? I've been
+> noodling at it for quite a while already and it would be good to see
+> it land.
 
-On Tue, Jul 11, 2023 at 04:03:54PM +0200, Michal Simek wrote:
-> IP core has input for reset signal which can be connected that's why
-> describe optional reset property.
->=20
-> Signed-off-by: Michal Simek <michal.simek@amd.com>
+If the issue above happened, I think it could be a blocker.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
-> ---
->=20
->  Documentation/devicetree/bindings/net/can/xilinx,can.yaml | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/can/xilinx,can.yaml b/=
-Documentation/devicetree/bindings/net/can/xilinx,can.yaml
-> index 897d2cbda45b..64d57c343e6f 100644
-> --- a/Documentation/devicetree/bindings/net/can/xilinx,can.yaml
-> +++ b/Documentation/devicetree/bindings/net/can/xilinx,can.yaml
-> @@ -46,6 +46,9 @@ properties:
->      $ref: /schemas/types.yaml#/definitions/uint32
->      description: CAN Tx mailbox buffer count (CAN FD)
-> =20
-> +  resets:
-> +    maxItems: 1
-> +
->  required:
->    - compatible
->    - reg
-> --=20
-> 2.36.1
->=20
-
---goRIxT+tsSQKD88J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZK2bBAAKCRB4tDGHoIJi
-0pTmAP0RcjbnxLer61UPJAZOWQdhrzOor0yr7ddQcKI9iGX9RAEAshUh7JvDWhDV
-fnrS8qIgliqgcBJXI/9ewYwCU5qfTQ8=
-=QG6Q
------END PGP SIGNATURE-----
-
---goRIxT+tsSQKD88J--
+Thanks!
 
