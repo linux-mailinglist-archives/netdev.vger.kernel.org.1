@@ -1,175 +1,199 @@
-Return-Path: <netdev+bounces-16983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907D374FBF7
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:57:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27E974FBFB
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 02:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 452012809E3
-	for <lists+netdev@lfdr.de>; Tue, 11 Jul 2023 23:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 953312817E7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 00:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7211ED45;
-	Tue, 11 Jul 2023 23:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0C4610A;
+	Wed, 12 Jul 2023 00:01:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A98D1DDE5
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:57:02 +0000 (UTC)
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F3B170F
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:57:00 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3a337ddff16so4844756b6e.0
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 16:57:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8566E17C3
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 00:01:24 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E29EF1712
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:01:22 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-51e429e1eabso6134369a12.2
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:01:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689119819; x=1691711819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=leJKi4u06YRTzo0lBrUW1GjV6mczJ561dFwtREQL+Dg=;
-        b=DXK8WidcvmvzjeVYH/6WijviZ73toBOmyVp9mIOd03ZD+R3rHWdoxQSvE5e9wD1KCJ
-         9mK/DDwssbLXSnouE8MAwnVDe+VkRcpQSrinJNmyu0FnYmd+CKVNA1F34dvSGu5lfZwy
-         cyr25JKjczwfRObdI7oARPE9gHghtmOAegQpocDq/APkFl+1PNSXGJo1xP2SNdGpJGtv
-         /nEQL7vqxVxYsTwIY7luylFSj8xoTEsYM9t5cm2HxYfPwTnzx8rs4qClhieKHRjwL54Q
-         8sya8gM8UB4rmOcx/i0v01+HlH4cbtNGlO2x9kzZaZUcFmUL9dtfGxX7fDRkv+FMzf1u
-         InjQ==
+        d=broadcom.com; s=google; t=1689120081; x=1691712081;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jBLFXwt7wgJkIOCzrV7wSea7z6lVpY5EkQGQ4IUNtOE=;
+        b=Pa6KIcoaqP83cm4TWMwM9o18WZSGzaWvJeBxNVI/1SmeyHhRp2tpJsrgU/NOmCqI4c
+         zvjM9ON/tFkVfR0C0BROriaovN6L7GWTmcr9p8kiz/aF3yTPDQpRYbszihXNqK6qyqeu
+         BGXUAGyTJ4drL7TaumauN113zSBMsfqh7qkoc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689119819; x=1691711819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=leJKi4u06YRTzo0lBrUW1GjV6mczJ561dFwtREQL+Dg=;
-        b=mDH/3gXGNRZUk/fYLOHPIWknnBDvfVzSBD/GnwOTU0s2ejdPdpYhbSlX4LqFDWRgUh
-         yGHYb1KISZwRuBkVMMYHHS7Nmc7LtFTQ1zPQQOSKYPSV2BQH7tz4z+JTI6la8SQjSKrT
-         h2bKzMQIs2PRSt9DQ9FDN3tt6nj/CXGPIm+yXV+cp1olcagKYA8UYChCCxbQGTUyTvHo
-         atRrF3vLXLZn2FhkPszP/KyLM0vi6YS1vaEDtfvYvMs9Gu+GKTC+QVr1KaAeouaYU/F9
-         QB2BlEMa40TPNFAqthGcAClnFIdUD+B1rUGojhEISXMAktLmEEb8D7gmrTHK4uMjIyWA
-         jfNw==
-X-Gm-Message-State: ABy/qLYk73ucL/FZOle609AI11T64Ffy9tTq8YX26NEwlzk33imZtrpQ
-	GmESn0hsS7YhNWk5ukSgEPyRBg==
-X-Google-Smtp-Source: APBJJlHPVDwycmPbbNO1kwHaGDMrzsNQAmVLFppzVomF/d82yUMQJxrek5vJqs3gAPlID0cxcW6lxg==
-X-Received: by 2002:a05:6808:11cf:b0:3a3:fa64:b543 with SMTP id p15-20020a05680811cf00b003a3fa64b543mr9841890oiv.12.1689119819344;
-        Tue, 11 Jul 2023 16:56:59 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id x11-20020a63b34b000000b005533c53f550sm1952223pgt.45.2023.07.11.16.56.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 16:56:58 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1qJNE0-000KOY-Hj;
-	Tue, 11 Jul 2023 20:56:56 -0300
-Date: Tue, 11 Jul 2023 20:56:56 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Mina Almasry <almasrymina@google.com>,
-	John Hubbard <jhubbard@nvidia.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Shayne Chen <shayne.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Jonathan Lemon <jonathan.lemon@gmail.com>
-Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
- page_pool: remove PP_FLAG_PAGE_FRAG flag)
-Message-ID: <ZK3sSMSVWM5EbHLG@ziepe.ca>
-References: <ZKyZBbKEpmkFkpWV@ziepe.ca>
- <20230711042708.GA18658@lst.de>
- <20230710215906.49514550@kernel.org>
- <20230711050445.GA19323@lst.de>
- <ZK1FbjG+VP/zxfO1@ziepe.ca>
- <20230711090047.37d7fe06@kernel.org>
- <ZK2Gh2qGxlpZexCM@ziepe.ca>
- <20230711100636.63b0a88a@kernel.org>
- <ZK2k9YQiXTtcGhp0@ziepe.ca>
- <20230711133420.5df88f02@kernel.org>
+        d=1e100.net; s=20221208; t=1689120081; x=1691712081;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jBLFXwt7wgJkIOCzrV7wSea7z6lVpY5EkQGQ4IUNtOE=;
+        b=Ixm3yWspUrXzfvZTlwrIumdcBrR7Vh+4MHHJ2qp5k6AnuEinwngRN+H/540OHunXTW
+         0JnPPw8I8yQHbJgMXNe3C9ZdtUyTKBDl5wMqZCsJrEZrOkBfja4Ge0Mmrms9dORgsuNC
+         PZJdefvi3I5OKOMej+fF/EEMSNSPalcqXHoV71lTTTz+yX12lj8Ljdi0/6PBBJiZbgbZ
+         vAHNq7syNauz+cxgXhAe219Az9E7kbTufI+rp8Kcdbvax35VbszKfmAeazjfuGQJ3qhS
+         n8Az7tAqL+3YS8cNAWbjGZp7ugeUbu93xlrhLOA8lf/+jhuZY8FFmZ3fSZxuyd8DiWa7
+         inkw==
+X-Gm-Message-State: ABy/qLYnhAVNHOHx8cV01fJDFNIzLJxm/fMhBipwfpd+x6Cq3UJ5axAu
+	Eug54yTRK/wDe9H7knKuWhueUExhzYUslBv6lnW/gw==
+X-Google-Smtp-Source: APBJJlFkVNdCws/XchXUtpaLfyvG4jk7cJhus3Rk2nELkRfMLkE/FTELGSzmq2v2PK6D58GhRFg7bN9/lJNURiAgtdc=
+X-Received: by 2002:a50:fe93:0:b0:51a:5a25:6631 with SMTP id
+ d19-20020a50fe93000000b0051a5a256631mr15168363edt.3.1689120081200; Tue, 11
+ Jul 2023 17:01:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711133420.5df88f02@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230710205611.1198878-1-kuba@kernel.org> <20230710205611.1198878-4-kuba@kernel.org>
+ <CACKFLikGR5qa8+ReLi2krEH9En=5QRv0txEVcM2FE-W6Lc6UuA@mail.gmail.com>
+In-Reply-To: <CACKFLikGR5qa8+ReLi2krEH9En=5QRv0txEVcM2FE-W6Lc6UuA@mail.gmail.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 11 Jul 2023 17:01:08 -0700
+Message-ID: <CACKFLimD-bKmJ1tGZOLYRjWzEwxkri-Mw7iFme1x2Dr0twdCeg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] eth: bnxt: handle invalid Tx completions
+ more gracefully
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000073e93f06003eead4"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 01:34:20PM -0700, Jakub Kicinski wrote:
+--00000000000073e93f06003eead4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > Yep. At the high end open standards based ethernet has also notably
-> > "failed" as well. Every switch vendor now offers their own proprietary
-> > ecosystem on a whole bunch of different axis. They all present
-> > "ethernet" toward the host but the host often needs to work in a
-> > special way to really take full advantage of the proprietary fabric
-> > behaviors.
-> 
-> I'm not familiar with "high end open standards based on ethernet", would
-> those be some RDMA / storage things? For TCP/IP networks pretty much
-> the only things that matter in a switch are bandwidth, size of buffers,
-> power... Implementation stuff.
+On Tue, Jul 11, 2023 at 1:00=E2=80=AFAM Michael Chan <michael.chan@broadcom=
+.com> wrote:
+>
+> On Mon, Jul 10, 2023 at 1:56=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > Invalid Tx completions should never happen (tm) but when they do
+> > they crash the host, because driver blindly trusts that there is
+> > a valid skb pointer on the ring.
+> >
+> > The completions I've seen appear to be some form of FW / HW
+> > miscalculation or staleness, they have typical (small) values
+> > (<100), but they are most often higher than number of queued
+> > descriptors. They usually happen after boot.
+> >
+> > Instead of crashing print a warning and schedule a reset.
+>
+> It generally looks good to me.  I have a few comments below.
+>
+> The logic is very similar to the bnapi->in_reset logic to reset due to
+> RX errors.  We have a counter for the number of times we do the RX
+> reset so I think it might be good to add a similar TX reset counter.
 
-I would say when you are getting into ethernet deployments with 25 or
-51 Tbps switches directly connected to hosts running at >100G you are
-getting into the high end side of things.
+Never mind about the counter.  Since we are doing a complete reset,
+the cpr structure will be freed anyway and the counter won't persist.
 
-These are very expensive networks. They run complex congestion
-provoking workloads. They have sophisticated multi-pathing. They often
-use use a non-blocking topology. Congestion management is important.
+Later when we add support for per TX ring reset, we can add the
+counter at that time.
 
-Making this work with good utilization, and low tail latency is a
-really hard problem. Many of the solutions come with switch features
-supporting it.
+>
+> The XDP code path can potentially crash in a similar way if we get a
+> bad completion from hardware.  I'm not sure if we should add similar
+> logic to the XDP code path.
+>
+> Thanks.
 
-You'd proably say these are not TCP focused networks, even though they
-are based on ethernet and IP.
+--00000000000073e93f06003eead4
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-So I think of them as high end "standards based" ethernet and IP
-looking networks that have proprietary elements mixed in throughout.
-
-Right now there is a bit of a press war between vendors on 'ethernet
-for AI'. Both Broadcom and NVIDIA are taking techonlogies that were
-originally built for TCP ethernet networks and remixing/speeding them
-up to run roce workloads effectively. There is alot more information
-available now without NDA that shows some detail on this space.
-
-AWS's SRD multipathing, Broadcom "AI Ethernet" and NVIDIA's Spectrum-X
-spring to mind as topical to what these sorts of ethernet networks
-are.
-
-> A lot of "standardization" efforts are just attempts to prove to 
-> a buyers that an ecosystem exists.
-
-Heh, that was probably more true years ago. These days it seems like
-some standardization is also being done so the large hyperscalers can
-improve their Approved Vendors List.
-
-I suppose as long as the result is something we can implement openly
-in Linux the motivation for standardization is less important.
-
-Jason
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBh6PezZUqqwg87EmnTAq2piHBiF9TsR
+L2RJLAKw5H3OMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcx
+MjAwMDEyMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAsP/aw6xm6Rixk80E4wPiUT4Yrip2hi+ktzi4zJ++vApN5KcD7
+ic7hWuMdFdes/ES9ImHqjvNvaDHLVMzdl8h+wmojkxUJYE7FYhsyJbjRYc2ATykNIVBeqQCJulQj
+qHeMQeL5N7H+YmFcvupSd/bAEd6pI0GQ/DAU2frAp/u3h6yziMOnwIAjNMiU+vlGZ1e9CwmS2nNE
+X3dYdBNnM+TXwJPdUe3CUWLrbDy9JobHSTXdEJGP1N5rmloIb4Ka8R6okW1RQnsdl+W+nvGn4BX1
+d/DPQW+cl6kIhfkfb4EAofPhH6YqcNMPbkFirhjuB881LMlDkxyGCCLPtObhrv1o
+--00000000000073e93f06003eead4--
 
