@@ -1,179 +1,163 @@
-Return-Path: <netdev+bounces-17268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22EE7750F55
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 19:12:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23060750F7D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 19:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF0391C21027
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:12:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 580881C2117B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFE320F8C;
-	Wed, 12 Jul 2023 17:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBDA20F8F;
+	Wed, 12 Jul 2023 17:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ECD14F74
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 17:12:30 +0000 (UTC)
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFCE210B
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 10:12:28 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id 006d021491bc7-55e1a9ff9d4so607420eaf.1
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 10:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689181948; x=1691773948;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jKOQnEOLMmerIKlixWlGKMrdiR4Q+oOwWNf5K9+7qOc=;
-        b=1q4NrfwgmqGvVN17EK0lf8H66ysk/x4AlfaOKc1hxHOzeQ6/oOU6HkZNYKTJDYtI4k
-         T+cSm8QRUFICzn3s3ZWalDyAhmBCoY9y0pEbHOZ0pKeNGXEzZ/f/hJsqrjh6TH8ebDh4
-         xT/qIRGdF3LkAwwQuOuuwzvjgw2cDrnwLXkwHnQkPkBkEThqnZWvmVnd7NzF+y+qQZ8K
-         bmUtP1zBblrYQGxNiqDQb+y7L07I2JiCcNUH2frfl4uDHU3SnW1w19f+0E/YlxMr4v6e
-         KcW0FEzEozNFG/7WQSAsRKKQeIeZZ4WrBtpPhReXM1hGkxACoC9qBJkDJ2aSxtEWASzI
-         KZrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689181948; x=1691773948;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jKOQnEOLMmerIKlixWlGKMrdiR4Q+oOwWNf5K9+7qOc=;
-        b=V0uq2Mk1O9Ed8C2Raq72fvwqt8yddG32KnRCK2S8NnukHtEsqg2Xvfh37W7/XPFmAe
-         Ig8Sa0KwjxI9TJawTTm22i36NFcTOKNRQFW/MY6zqixYdO2Hd5IyhM1NfJqlYuZTNK7s
-         zFRIhWhZg3e2/gi6+vpcWsK8MJDGmHACgNe9ALTmTjjNXU1GV1iAwkImwwdMfVapQcbD
-         XE97ioTVd+stsMYLaXeTeeOiueWtsWbq+qfvGCynIt8cYqizdw8CSrvMpdHqQv0uw26p
-         ThbpCsX39odY3c8Jn+E5OBm4SnIhhtV/zj5qmR9Qko5RuRLjlnPoMuLqLDlHK6UYUG/t
-         hHbA==
-X-Gm-Message-State: ABy/qLbMOBndYd+1n8fZ8uVfm1lMXN35FDrXNfJFnJnpX/ul8SBV1AAR
-	g0wAlZxgDgIASN4XRE+QQiNqIg==
-X-Google-Smtp-Source: APBJJlEsbMlBBgnMUHUTcxyrMm93ybSGvvJcK7fpkW3NqssCjI0XlPa/OPQ9xojqv7bCd9x9ElFlow==
-X-Received: by 2002:a4a:d0aa:0:b0:560:c558:b6f9 with SMTP id t10-20020a4ad0aa000000b00560c558b6f9mr1936185oor.2.1689181947934;
-        Wed, 12 Jul 2023 10:12:27 -0700 (PDT)
-Received: from ?IPV6:2804:14d:5c5e:44fb:f14e:a0e2:ad5:7847? ([2804:14d:5c5e:44fb:f14e:a0e2:ad5:7847])
-        by smtp.gmail.com with ESMTPSA id 66-20020a4a0945000000b0056082ad01desm2039706ooa.14.2023.07.12.10.12.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jul 2023 10:12:27 -0700 (PDT)
-Message-ID: <0f762e7b-f392-9311-6afc-ed54bf73a980@mojatatu.com>
-Date: Wed, 12 Jul 2023 14:12:23 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498BF14F74
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 17:19:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D484C433C8;
+	Wed, 12 Jul 2023 17:19:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689182367;
+	bh=B1zrVw53HP9fl1Bt8nVhkDzVX3NwiuI8wtKtFcXLGAQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FFqnCr+apZn/AdPHC7wYAfPXDMGTaESeG2TpTKs4LcmmUGghfe4XEJ3cPVlVgMTKB
+	 ssizHfjmi3/8Rqrppm6kuEixPP/DuF/03VIZirEUwV0EMhFl1PckUsAU9Zb6o/bRoT
+	 t5p14w1j2NAzfLyPqUuIr2bEIFbqOWbTsIFdnP5n4fLuLpgts4eIUhNOcEc22d1Fl1
+	 AjHN9HEbTWzgOshRdoJ22Em3sWgPR4IFuyc+JfJ+eIiqlXxf6iULQtEXo5tq7bNKQs
+	 DoMIfBA6LHCKM7Z39x2ESbuFQV3+jPbKgZHiZMcaRUiUJ9i1D5fDf9EhV7ViLWI4rm
+	 3Qo+Pf1KJ2U3A==
+Date: Wed, 12 Jul 2023 10:19:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: brouer@redhat.com, netdev@vger.kernel.org, almasrymina@google.com,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, edumazet@google.com,
+ dsahern@gmail.com, michael.chan@broadcom.com, willemb@google.com, Ulrich
+ Drepper <drepper@redhat.com>
+Subject: Re: [RFC 00/12] net: huge page backed page_pool
+Message-ID: <20230712101926.6444c1cc@kernel.org>
+In-Reply-To: <28bde9e2-7d9c-50d9-d26c-a3a9d37e9e50@redhat.com>
+References: <20230707183935.997267-1-kuba@kernel.org>
+	<1721282f-7ec8-68bd-6d52-b4ef209f047b@redhat.com>
+	<20230711170838.08adef4c@kernel.org>
+	<28bde9e2-7d9c-50d9-d26c-a3a9d37e9e50@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: TC: selftests: current timeout (45s) is too low
-Content-Language: en-US
-To: Matthieu Baerts <matthieu.baerts@tessares.net>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell
- <anders.roxell@linaro.org>, Davide Caratti <dcaratti@redhat.com>
-References: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
- <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
- <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 12/07/2023 11:43, Matthieu Baerts wrote:
-> Hi Pedro,
-> 
-> On 12/07/2023 15:43, Pedro Tammela wrote:
->> I have been involved in tdc for a while now, here are my comments.
-> 
-> Thank you for your reply!
-> 
->> On 12/07/2023 06:47, Matthieu Baerts wrote:
->>> Hi Jamal, Cong, Jiri,
->>>
->>> When looking for something else [1] in LKFT reports [2], I noticed that
->>> the TC selftest ended with a timeout error:
->>>
->>>     not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
->>>
->>> The timeout has been introduced 3 years ago:
->>>
->>>     852c8cbf34d3 ("selftests/kselftest/runner.sh: Add 45 second timeout
->>> per test")
->>>
->>> Recently, a new option has been introduced to override the value when
->>> executing the code:
->>>
->>>     f6a01213e3f8 ("selftests: allow runners to override the timeout")
->>>
->>> But I guess it is still better to set a higher default value for TC
->>> tests. This is easy to fix by simply adding "timeout=<seconds>" in a
->>> "settings" file in 'tc-testing' directory, e.g.
->>>
->>>     echo timeout=1200 > tools/testing/selftests/tc-testing/settings
->>>
->>> I'm sending this email instead of a patch because I don't know which
->>> value makes sense. I guess you know how long the tests can take in a
->>> (very) slow environment and you might want to avoid this timeout error.
->>
->> I believe a timeout between 5-10 to minutes should cover the entire suite
-> 
-> Thank you for your feedback.
-> If we want to be on the safe side, I guess it is better to put 10
-> minutes or even 15, no?
+On Wed, 12 Jul 2023 16:00:46 +0200 Jesper Dangaard Brouer wrote:
+> On 12/07/2023 02.08, Jakub Kicinski wrote:
+> >> Generally the pp_provider's will have to use the refcnt schemes
+> >> supported by page_pool.  (Which is why I'm not 100% sure this fits
+> >> Mina's use-case).
+> >>
+> >> [IOTLB details]:
+> >>
+> >> As mentioned on [RFC 08/12] there are other techniques for reducing
+> >> IOTLB misses, described in:
+> >>    IOMMU: Strategies for Mitigating the IOTLB Bottleneck
+> >>     - https://inria.hal.science/inria-00493752/document
+> >>
+> >> I took a deeper look at also discovered Intel's documentation:
+> >>    - Intel virtualization technology for directed I/O, arch spec
+> >>    -
+> >> https://www.intel.com/content/www/us/en/content-details/774206/intel-v=
+irtualization-technology-for-directed-i-o-architecture-specification.html
+> >>
+> >> One problem that is interesting to notice is how NICs access the packe=
+ts
+> >> via ring-queue, which is likely larger that number of IOTLB entries.
+> >> Thus, a high change of IOTLB misses.  They suggest marking pages with
+> >> Eviction Hints (EH) that cause pages to be marked as Transient Mappings
+> >> (TM) which allows IOMMU to evict these faster (making room for others).
+> >> And then combine this with prefetching. =20
+> >=20
+> > Interesting, didn't know about EH.
+>=20
+> I was looking for a way to set this Eviction Hint (EH) the article
+> talked about, but I'm at a loss.
 
-Sure, makes sense.
-If someone complains we can lower it.
+Could possibly be something that the NIC has to set inside the PCIe
+transaction headers? Like the old cache hints that predated DDIO?
 
-> 
->>> I also noticed most of the tests were skipped [2], probably because
->>> something is missing in the test environment? Do not hesitate to contact
->>> the lkft team [3], that's certainly easy to fix and it would increase
->>> the TC test coverage when they are validating all the different kernel
->>> versions :)
->>
->>  From the logs it seems like the kernel image is missing the 'ct' action.
->> Possibly also missing other actions/tc components, so it seems like a
->> kernel config issue.
-> 
-> According to [1], the kconfig is generated by merging these files:
-> 
->    defconfig, systemd.config [2], tools/testing/selftests/kexec/config,
-> tools/testing/selftests/net/config,
-> tools/testing/selftests/net/mptcp/config,
-> tools/testing/selftests/net/hsr/config,
-> tools/testing/selftests/net/forwarding/config,
-> tools/testing/selftests/tc-testing/config
-> 
-> You can see the final .config file in [3].
-> 
-> I can see "CONFIG_NET_ACT_CTINFO(=m)" but not "CONFIG_NET_ACT_CT" while
-> they are both in tc-testing/config file. Maybe a conflict with another
-> selftest config?
-> 
-> I don't see any mention of "NET_ACT_CT" in the build logs [4].
+> >> In this context of how fast a page is reused by NIC and spatial
+> >> locality, it is worth remembering that PP have two schemes, (1) the fa=
+st
+> >> alloc cache that in certain cases can recycle pages (and it based on a
+> >> stack approach), (2) normal recycling via the ptr_ring that will have a
+> >> longer time before page gets reused. =20
+> >=20
+> > I read somewhere that Intel IOTLB can be as small as 256 entries. =20
+>=20
+> Are IOTLB hardware different from the TLB hardware block?
+>=20
+> I can find data on TLB sizes, which says there are two levels on Intel,
+> quote from "248966-Software-Optimization-Manual-R047.pdf":
+>=20
+>   Nehalem microarchitecture implements two levels of translation=20
+> lookaside buffer (TLB). The first level consists of separate TLBs for=20
+> data and code. DTLB0 handles address translation for data accesses, it=20
+> provides 64 entries to support 4KB pages and 32 entries for large pages.
+> The ITLB provides 64 entries (per thread) for 4KB pages and 7 entries=20
+> (per thread) for large pages.
+>=20
+>   The second level TLB (STLB) handles both code and data accesses for=20
+> 4KB pages. It support 4KB page translation operation that missed DTLB0=20
+> or ITLB. All entries are 4-way associative. Here is a list of entries
+> in each DTLB:
+>=20
+>   =E2=80=A2 STLB for 4-KByte pages: 512 entries (services both data and=20
+> instruction look-ups).
+>   =E2=80=A2 DTLB0 for large pages: 32 entries.
+>   =E2=80=A2 DTLB0 for 4-KByte pages: 64 entries.
+>=20
+>   An DTLB0 miss and STLB hit causes a penalty of 7cycles. Software only=20
+> pays this penalty if the DTLB0 is used in some dispatch cases. The=20
+> delays associated with a miss to the STLB and PMH are largely nonblocking.
 
-There's a requirement for NET_ACT_CT which is not set in the final 
-config (CONFIG_NF_FLOW_TABLE).
+No idea :( This is an old paper from Rolf in his Netronome days which
+says ~Sandy Bridge had only IOTLB 64 entries:
 
-Perhaps this could fix?
-diff --git a/tools/testing/selftests/tc-testing/config 
-b/tools/testing/selftests/tc-testing/config
-index 6e73b09c20c8..d1ad29040c02 100644
---- a/tools/testing/selftests/tc-testing/config
-+++ b/tools/testing/selftests/tc-testing/config
-@@ -5,6 +5,7 @@ CONFIG_NF_CONNTRACK=m
-  CONFIG_NF_CONNTRACK_MARK=y
-  CONFIG_NF_CONNTRACK_ZONES=y
-  CONFIG_NF_CONNTRACK_LABELS=y
-+CONFIG_NF_FLOW_TABLE=m
-  CONFIG_NF_NAT=m
-  CONFIG_NETFILTER_XT_TARGET_LOG=m
+https://dl.acm.org/doi/pdf/10.1145/3230543.3230560
+
+But it's a pretty old paper.
+
+> > So it seems pretty much impossible for it to cache accesses to 4k
+> > pages thru recycling. I thought that even 2M pages will start to
+> > be problematic for multi queue devices (1k entries on each ring x
+> > 32 rings =3D=3D 128MB just sitting on the ring, let alone circulation).
+> >  =20
+>=20
+> Yes, I'm also worried about how badly these NIC rings and PP ptr_ring
+> affects the IOTLB's ability to cache entries.  Why I suggested testing
+> out the Eviction Hint (EH), but I have not found a way to use/enable
+> these as a quick test in your environment.
+
+FWIW the first version of the code I wrote actually had the coherent
+ring memory also use the huge pages - the MEP allocator underlying the
+page pool can be used by the driver directly to allocate memory for
+other uses than the page pool.
+
+But I figured that's going to be a nightmare to upstream, and Alex said
+that even on x86 coherent DMA memory is just write combining not cached
+(which frankly IDK why, possibly yet another thing we could consider
+optimizing?!)
+
+So I created two allocators, one for coherent (backed by 2M pages) and
+one for non-coherent (backed by 1G pages).
+
+For the ptr_ring I was considering bumping the refcount of pages
+allocated from outside the 1G pool, so that they do not get recycled.
+I deferred optimizing that until I can get some production results.
+The extra CPU cost of loss of recycling could outweigh the IOTLB win.
+
+All very exciting stuff, I wish the days were slightly longer :)
 
