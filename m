@@ -1,166 +1,151 @@
-Return-Path: <netdev+bounces-17146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F8F750940
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:09:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB44750931
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:04:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 785EE1C20DA9
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:09:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ADF2280D33
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF302AB3B;
-	Wed, 12 Jul 2023 13:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A346B2AB27;
+	Wed, 12 Jul 2023 13:04:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6205A2AB38
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 13:09:00 +0000 (UTC)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3B012F
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:08:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689167338; x=1720703338;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hXQMCcFin/UYaNu3Fk8IAoCNHk3fcBHqYNPenPuzrw4=;
-  b=lspl2bWkJSu2nBRl6aZ/Lvv1zt1SJ6iXrrQoj29XM04/z/dvaKLyNKXe
-   qQRl7zocs8HBlA8VBrtTRAMZ1TAa8AOa2Ox3tPTnPdrdm3WPtcKRVet2c
-   x83rtNbwtgHFRrB2c2K6xEeSEaF9Oirle+iAPiprl4TZpglq8TmaiFdeS
-   aoYrnoMVXUbMPaL5PTSFSInKRSevWP1gl7GPsDLxfVynZZOy9/hkpeRCM
-   rWCl0HBqwyvoxg9k70L65OjOWRkCGexYhMM5R/4onZMMSQx1dvEF8cx5w
-   F6JWnx/Tuplcqh7fhoS96Zt/l/nE3SMrbIGe6tACkBxta0dUiQJGLDlpf
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="368418357"
-X-IronPort-AV: E=Sophos;i="6.01,199,1684825200"; 
-   d="scan'208";a="368418357"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 06:08:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="715576686"
-X-IronPort-AV: E=Sophos;i="6.01,199,1684825200"; 
-   d="scan'208";a="715576686"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by orsmga007.jf.intel.com with ESMTP; 12 Jul 2023 06:08:56 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v5] ice: Fix memory management in ice_ethtool_fdir.c
-Date: Wed, 12 Jul 2023 15:02:10 +0200
-Message-Id: <20230712130210.33864-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4743FFE
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 13:04:39 +0000 (UTC)
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B6D72684
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:04:20 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-76754b9eac0so674820785a.0
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:04:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1689167054; x=1691759054;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mdLQFPNPGe/xfjjMPC9CiT+YRxrl3hMH3BrdIE5YjaY=;
+        b=YI0f6+XglZeneofRioxe+G+n6wemfm3EawZ7D+K5a8tal5n6sf4v0Bhn9PvLpkjxIK
+         ZNk+i1n01TVGNdnCUQNAW6cvhz9r4c7zCJNrFd0LMb58e7DRNkqqJ8aPQoz67dGUrFHs
+         K808ROVLQXnwZaSdM02syiSLWGvj7C+CKL+eL1mL3EiBhmMcAE2WIWrGzJM0kbAuBUNQ
+         xNcv05BkVV8M1LVXNFaNx+C0BHx+DbgBBGkf/4E33OnR0mdkWoeztyw5xr7gXlj1fof+
+         7G1XWjNZvn1VhZXeOgIB6lKM6WsJ9nuZdu8lCLjq70wAtKYiFyc2rtStYfhaLlVvT0wg
+         T7Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689167054; x=1691759054;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mdLQFPNPGe/xfjjMPC9CiT+YRxrl3hMH3BrdIE5YjaY=;
+        b=a/KRTxUb+xGlLvKwSIXLP4HY+cSoZWNUEwboqFil1nK1Ji+8pOJqYjw7gN9ejnpynE
+         2FK57lSO8OaRcMWq77YZ45otdTYq/+6jU7RlnCwuQ6taTz4+c2d2pX4CFfEEyq9EVbRx
+         5UFAEoDz/T+K0q1J3r3DuxfaKNPmX4XclS/7gBhEOlm4gg0APj4SWur5UdgT/YHWEKTe
+         z4b3W1XF8pcrVmaERsVjuDUGUsxF3e1qHJdDuuZObvxce7/L0egKJtEZOGjFvaDGnZLe
+         A/zKq7lkqaEDgzJprojkbsMb8qo/y88H8t2V9cKFV+GjKLyRYlrdbhBMK+2FhzaKKPiS
+         ukDw==
+X-Gm-Message-State: ABy/qLYQoSzd8mSZ/joX8bKeMDTIDBgu7Q9w3S2zaKD46Telm/uuPL1r
+	5LmYjSeF2SRJfO+wJTamT0DCgw==
+X-Google-Smtp-Source: APBJJlEdeYkVDmlqAfKbS3vhgLsKS/cdCg6j6IrkhW2imk9UWrcFiHdY0Nrk6nRyhVKg/ih/MRHN1Q==
+X-Received: by 2002:a05:620a:4105:b0:75b:23a0:e7a1 with SMTP id j5-20020a05620a410500b0075b23a0e7a1mr21820466qko.2.1689167054115;
+        Wed, 12 Jul 2023 06:04:14 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id pi21-20020a05620a379500b00767c9915e32sm2126812qkn.70.2023.07.12.06.03.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 06:04:04 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qJZVW-000OK0-71;
+	Wed, 12 Jul 2023 10:03:50 -0300
+Date: Wed, 12 Jul 2023 10:03:50 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Mina Almasry <almasrymina@google.com>, David Ahern <dsahern@kernel.org>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jonathan Lemon <jonathan.lemon@gmail.com>, logang@deltatee.com,
+	Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Message-ID: <ZK6ktnwIjXIobFIM@ziepe.ca>
+References: <20230711050445.GA19323@lst.de>
+ <ZK1FbjG+VP/zxfO1@ziepe.ca>
+ <20230711090047.37d7fe06@kernel.org>
+ <04187826-8dad-d17b-2469-2837bafd3cd5@kernel.org>
+ <20230711093224.1bf30ed5@kernel.org>
+ <CAHS8izNHkLF0OowU=p=mSNZss700HKAzv1Oxqu2bvvfX_HxttA@mail.gmail.com>
+ <20230711133915.03482fdc@kernel.org>
+ <2263ae79-690e-8a4d-fca2-31aacc5c9bc6@kernel.org>
+ <CAHS8izP=k8CqUZk7bGUx4ctm4m2kRC2MyEJv+N4+b0cHVkTQmA@mail.gmail.com>
+ <20f6cbda-e361-9a81-de51-b395ec13841a@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20f6cbda-e361-9a81-de51-b395ec13841a@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix ethtool FDIR logic to not use memory after its release.
-In the ice_ethtool_fdir.c file there are 2 spots where code can
-refer to pointers which may be missing.
+On Wed, Jul 12, 2023 at 09:55:51AM +0200, Christian König wrote:
 
-In the ice_cfg_fdir_xtrct_seq() function seg may be freed but
-even then may be still used by memcpy(&tun_seg[1], seg, sizeof(*seg)).
+> > Anyone see any glaring issues with this approach? I plan on trying to
+> > implement a PoC and sending an RFC v2.
+> 
+> Well we already have DMA-buf as user API for this use case, which is
+> perfectly supported by RDMA if I'm not completely mistaken.
+> 
+> So what problem do you try to solve here actually?
 
-In the ice_add_fdir_ethtool() function struct ice_fdir_fltr *input
-may first fail to be added via ice_fdir_update_list_entry() but then
-may be deleted by ice_fdir_update_list_entry.
+In a nutshell, netdev's design currently needs struct pages to do DMA
+to it's packet buffers.
 
-Terminate in both cases when the returned value of the previous
-operation is other than 0, free memory and don't use it anymore.
+So it cannot consume the scatterlist that dmabuf puts out
 
-Reported-by: Michal Schmidt <mschmidt@redhat.com>
-Link: https://bugzilla.redhat.com/show_bug.cgi?id=2208423
-Fixes: cac2a27cd9ab ("ice: Support IPv4 Flow Director filters")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
-v2: extend CC list, fix freeing memory before return
-v3: correct typos in the commit msg
-v4: restore devm() approach
-v5: minor changes
----
- .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 26 ++++++++++---------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+RDMA doesn't need struct pages at all, so it is fine.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index ead6d50fc0ad..8c6e13f87b7d 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -1281,16 +1281,21 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
- 				     ICE_FLOW_FLD_OFF_INVAL);
- 	}
- 
--	/* add filter for outer headers */
- 	fltr_idx = ice_ethtool_flow_to_fltr(fsp->flow_type & ~FLOW_EXT);
-+
-+	assign_bit(fltr_idx, hw->fdir_perfect_fltr, perfect_filter);
-+
-+	/* add filter for outer headers */
- 	ret = ice_fdir_set_hw_fltr_rule(pf, seg, fltr_idx,
- 					ICE_FD_HW_SEG_NON_TUN);
--	if (ret == -EEXIST)
--		/* Rule already exists, free memory and continue */
--		devm_kfree(dev, seg);
--	else if (ret)
-+	if (ret == -EEXIST) {
-+		/* Rule already exists, free memory and count as success */
-+		ret = 0;
-+		goto err_exit;
-+	} else if (ret) {
- 		/* could not write filter, free memory */
- 		goto err_exit;
-+	}
- 
- 	/* make tunneled filter HW entries if possible */
- 	memcpy(&tun_seg[1], seg, sizeof(*seg));
-@@ -1305,18 +1310,13 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
- 		devm_kfree(dev, tun_seg);
- 	}
- 
--	if (perfect_filter)
--		set_bit(fltr_idx, hw->fdir_perfect_fltr);
--	else
--		clear_bit(fltr_idx, hw->fdir_perfect_fltr);
--
- 	return ret;
- 
- err_exit:
- 	devm_kfree(dev, tun_seg);
- 	devm_kfree(dev, seg);
- 
--	return -EOPNOTSUPP;
-+	return ret;
- }
- 
- /**
-@@ -1914,7 +1914,9 @@ int ice_add_fdir_ethtool(struct ice_vsi *vsi, struct ethtool_rxnfc *cmd)
- 	input->comp_report = ICE_FXD_FLTR_QW0_COMP_REPORT_SW_FAIL;
- 
- 	/* input struct is added to the HW filter list */
--	ice_fdir_update_list_entry(pf, input, fsp->location);
-+	ret = ice_fdir_update_list_entry(pf, input, fsp->location);
-+	if (ret)
-+		goto release_lock;
- 
- 	ret = ice_fdir_write_all_fltr(pf, input, true);
- 	if (ret)
--- 
-2.31.1
+If Mina can go down the path of changing netdev to avoid needing
+struct pages then no changes to DRM side things.
 
+Otherwise a P2P struct page and a co-existance with netmem on a
+ZONE_DEVICE page would be required. :\
+
+Jason
 
