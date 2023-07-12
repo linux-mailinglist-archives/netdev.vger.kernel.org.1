@@ -1,123 +1,102 @@
-Return-Path: <netdev+bounces-16993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4432574FC1A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 02:30:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4464C74FC21
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 02:32:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1A04281737
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 00:30:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A91C2818AF
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 00:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4719F391;
-	Wed, 12 Jul 2023 00:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81952376;
+	Wed, 12 Jul 2023 00:32:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AAB394
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 00:30:06 +0000 (UTC)
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0108FDC;
-	Tue, 11 Jul 2023 17:30:04 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a425ef874dso44082b6e.0;
-        Tue, 11 Jul 2023 17:30:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689121804; x=1691713804;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AywlaY7x3Z/gX6am2crBJ9gOzJzowq37abxtBtmocQo=;
-        b=ghdEvDcr1IFDaQljt1dRUmu0HvE8cBRXow9dvmJIaaoVnpliy0H6io9/6jVjgOiCvp
-         W8ARD6eHNeqfJ+cDPA0NJgPJBqbJKcZVgnHyOUyjNKE8bjkztkk4ySHLSiUBAuECvNvG
-         mb/2DywJzkaoQruchWfaALw0QTZyIhkyMl6GdGEbXU96lEG1IIKslGtkOxNFHbPJlukV
-         cU3AAipN+IhHQaj7foFoecZ/dEzkn+h7hzibqavkPSnM3iQjwT1oNRd+xdvy8XXbjmLV
-         /C6WF+gR5Z+E29WVX3/x1rDq3OotadtwPkAl2sIQPRWVXcg0mMjVQCSxr6vu04KG1I6/
-         7Mcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689121804; x=1691713804;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AywlaY7x3Z/gX6am2crBJ9gOzJzowq37abxtBtmocQo=;
-        b=bUKZe5EHmmMkMZQH/LEM14fmxXoevruRIHWM9SWwGZfoGW2awpqz8dq/NYVPX88Zcc
-         AONvZ+G7txxkEwamT8jvKUUhHnUrRIKRYC29KXCvQaC4UIs/kf0Tx0kz46J8RqbtMnTB
-         uv6hY2EsAS6sNPGZ7jamO8t5itytV0P+7yu4Sq6GDPvGAuivpxk1QtsisnDF/oDYLHld
-         hfGJ8WNlfEgBoS9ZbR5KKvtwI1yiRclBkseOV5s15pwphBLo9cEy5NzYuSGC0p6nLlEH
-         ve2y/35zk43I5r0GbrnpH58yBUFa93Nr4vlJoiow6AaAoMKI5fjr1JFo8OM8q7j4NPPv
-         Z/Sw==
-X-Gm-Message-State: ABy/qLYV8V/OOKnqnT0dEjpmCMSThclIX5eJ0HrbE2GxRert584F4GKD
-	Yh9QKPN7L9VnbvdrYyB6aBs=
-X-Google-Smtp-Source: APBJJlERzXloivjI5bk3/nTAyrXULoGFQYQ9HeldnM+GEDq5PgIauvtfIOYiM1H16bglc4CH0JAn3w==
-X-Received: by 2002:a05:6808:1aa6:b0:3a3:78dc:8c4c with SMTP id bm38-20020a0568081aa600b003a378dc8c4cmr15877789oib.46.1689121804077;
-        Tue, 11 Jul 2023 17:30:04 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:9374])
-        by smtp.gmail.com with ESMTPSA id s10-20020a62e70a000000b006687b41c4dasm2285401pfh.110.2023.07.11.17.30.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 17:30:03 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 11 Jul 2023 14:30:01 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
-	DRI Development <dri-devel@lists.freedesktop.org>,
-	linux-rtc@vger.kernel.org,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	netdev <netdev@vger.kernel.org>,
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-	Linux MMC List <linux-mmc@vger.kernel.org>,
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
- mechanism)
-Message-ID: <ZK30CR196rs-OWLq@slm.duckdns.org>
-References: <20230511181931.869812-1-tj@kernel.org>
- <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
- <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
- <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
- <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DBD362;
+	Wed, 12 Jul 2023 00:32:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65862C433C7;
+	Wed, 12 Jul 2023 00:32:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689121948;
+	bh=PTOTcpcxaw8WH84nNL7V6AheHGo/Ep2KZo1K6pljj0g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bJCHI/nEmegoQi3lZtuJO8xmipR7Sq5ohXo+8/EEv3dBX4OEtMAjgwM4ZT1xe/hWq
+	 XkaFK8qbis4J4tuO+IB0Lri7g0lMuIac+AM7MHH+vYPzbAaov4RF6LhnXbiIr+UWCf
+	 mskmKeLInQdXt6e/i0tPpZ5duSE6dNkoQtI9vfCmWV9pfg+L88awR7PhMcOTaEQWZG
+	 vQef/tQeC/CldkjcTi2RBEihWBR+5HBHpzd8UVRZCNOj6gEbzWAg3odS3HGXttPkrA
+	 1ZUrsighM82qTD0+7YTZ3GMcxDM1zBPkXrFGuVMShSyWr84wDhGxKhnaC7sKzxC15R
+	 jJTrfjj0jSpHg==
+Date: Tue, 11 Jul 2023 17:32:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org,
+ magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com,
+ hawk@kernel.org, netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Subject: Re: [RFC bpf-next v3 09/14] net/mlx5e: Implement devtx kfuncs
+Message-ID: <20230711173226.7e9cca4a@kernel.org>
+In-Reply-To: <20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local>
+References: <20230707193006.1309662-1-sdf@google.com>
+	<20230707193006.1309662-10-sdf@google.com>
+	<20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
-> On Tue, Jul 11, 2023 at 04:06:22PM +0200, Geert Uytterhoeven wrote:
-> > On Tue, Jul 11, 2023 at 3:55 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-...
-> > workqueue: neigh_managed_work hogged CPU for >10000us 4 times,
-> > consider switching to WQ_UNBOUND
+On Tue, 11 Jul 2023 15:56:57 -0700 Alexei Starovoitov wrote:
+> I think this proves my point: csum is not generalizable even across veth and mlx5.
+> Above is a square peg that tries to fit csum_start/offset api (that makes sense from SW pov)
+> into HW that has different ideas about csum-ing.
 > 
-> I wonder whether the right thing to do here is somehow scaling the threshold
-> according to the relative processing power. It's difficult to come up with a
-> threshold which works well across the latest & fastest and really tiny CPUs.
-> I'll think about it some more but if you have some ideas, please feel free
-> to suggest.
+> Here is what mlx5 does:
+> mlx5e_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+>                             struct mlx5e_accel_tx_state *accel,
+>                             struct mlx5_wqe_eth_seg *eseg)
+> {
+>         if (unlikely(mlx5e_ipsec_txwqe_build_eseg_csum(sq, skb, eseg)))
+>                 return;
+> 
+>         if (likely(skb->ip_summed == CHECKSUM_PARTIAL)) {
+>                 eseg->cs_flags = MLX5_ETH_WQE_L3_CSUM;
+>                 if (skb->encapsulation) {
 
-Geert, do you mind posting the full kernel logs for the affected machines?
+This should be irrelevant today, as LCO exists?
 
-Thanks.
+>                         eseg->cs_flags |= MLX5_ETH_WQE_L3_INNER_CSUM |
+>                                           MLX5_ETH_WQE_L4_INNER_CSUM;
+>                         sq->stats->csum_partial_inner++;
+>                 } else {
+>                         eseg->cs_flags |= MLX5_ETH_WQE_L4_CSUM;
+>                         sq->stats->csum_partial++;
+>                 }
+> 
+> How would you generalize that into csum api that will work across NICs ?
+> 
+> My answer stands: you cannot.
+> 
+> My proposal again:
+> add driver specifc kfuncs and hooks for things like csum.
+> 
+> Kuba,
+> since you nacked driver specific stuff please suggest a way to unblock this stalemate.
 
--- 
-tejun
+I hope I'm not misremembering but I think I suggested at the beginning
+to create a structure describing packet geometry and requested offloads,
+and for the prog fill that in.
+
+All operating systems I know end up doing that, we'll end up doing
+that as well. The question is whether we're willing to learn from
+experience or prefer to go on a wild ride first...
 
