@@ -1,85 +1,80 @@
-Return-Path: <netdev+bounces-17003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171E574FC73
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 02:58:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5E874FC81
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:09:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 448E61C20E64
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 00:58:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96C65281577
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC3E376;
-	Wed, 12 Jul 2023 00:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACA3378;
+	Wed, 12 Jul 2023 01:09:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01265362
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 00:58:46 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C4710C2
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 17:58:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=u63cQ9KJgFZk0WRTc/D8CnfvJCtpLoT7pCLvVg5QEIg=; b=K5Z9pafVgL3h8v9oVD4MMbaxhL
-	RBAEtAUzV26ECVMQGfrwPo2mJrCfxaeIw/Oqjqp6A3JMxwRpm2BNoV5bLe+x51mdCvVd6iWTlZiO/
-	YdCaBp1Zld8yXya2jKVf6REGIUS3zcduXAp6x7193P/2hXeJhKdtys4l1I0SaNcVDC9o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qJOBn-0015VV-Qy; Wed, 12 Jul 2023 02:58:43 +0200
-Date: Wed, 12 Jul 2023 02:58:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Sergei Antonov <saproj@gmail.com>, netdev@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk
-Subject: Re: Regression: supported_interfaces filling enforcement
-Message-ID: <f1fec161-1eb5-4b3f-b621-9bb9b4bfd634@lunn.ch>
-References: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
- <20230710123556.gufuowtkre652fdp@skbuf>
- <CABikg9zfGVEJsWf7eq=K5oKQozt86LLn-rzMaVmycekXkQEa8Q@mail.gmail.com>
- <20230710153827.jhdbl5xh3stslz3u@skbuf>
- <CABikg9xc5PryyT+b=3JsJoHppe+tfOs+BWrq+kETQK99A-DG=g@mail.gmail.com>
- <20230711215848.lhflxqbpyjkmkslj@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB91362
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:09:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C2BFC433C8;
+	Wed, 12 Jul 2023 01:09:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689124178;
+	bh=ltHNWLVPb2iZrrx11QvvdCUrxBBk4wMx2HLKSZtmABs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SggduFVRY4zF963GrWMTGQY0r6EANRo61woi92V6Hho/4t07pfycVl2feYoc7agZc
+	 EVbMzpL+xkuamzpeOyiuei3xwcZGkg8gPxVfxDo2vqF/p6gLzgbfttxvEZB7ahts4c
+	 MuB+L22Lb8+LCyw30YY0FNq/P9+2iXRwWJrk5oqxbVya8X8swA+XQxBcBfGzXrN2gC
+	 lDB3WPQD6pHgOC3zkbtbbsjWvLubRl3w78nGJNqNwBIWIyRpQusqIzFmegRhqAOw/C
+	 PfXzKzIGHRBvIigvdJ4y/RDIENW2uC63gUIMpQ4pOfop7apkSa8B4vomufwO458oqS
+	 EWgbnjjID28yQ==
+Date: Tue, 11 Jul 2023 18:09:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next 3/3] eth: bnxt: handle invalid Tx completions
+ more gracefully
+Message-ID: <20230711180937.3c0262a9@kernel.org>
+In-Reply-To: <CACKFLimD-bKmJ1tGZOLYRjWzEwxkri-Mw7iFme1x2Dr0twdCeg@mail.gmail.com>
+References: <20230710205611.1198878-1-kuba@kernel.org>
+	<20230710205611.1198878-4-kuba@kernel.org>
+	<CACKFLikGR5qa8+ReLi2krEH9En=5QRv0txEVcM2FE-W6Lc6UuA@mail.gmail.com>
+	<CACKFLimD-bKmJ1tGZOLYRjWzEwxkri-Mw7iFme1x2Dr0twdCeg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711215848.lhflxqbpyjkmkslj@skbuf>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 12, 2023 at 12:58:48AM +0300, Vladimir Oltean wrote:
-> On Mon, Jul 10, 2023 at 09:09:48PM +0300, Sergei Antonov wrote:
-> > On Mon, 10 Jul 2023 at 18:38, Vladimir Oltean <olteanv@gmail.com> wrote:
-> > 
-> > > That being said, given the kind of bugs I've seen uncovered in this
-> > > driver recently, I'd say it would be ridiculous to play pretend - you're
-> > > probably one of its only users. You can probably be a bit aggressive,
-> > > remove support for incomplete device trees, see if anyone complains, and
-> > > they do, revert the removal.
-> > 
-> > Can mv88e6060 functionality be transferred to mv88e6xxx?
+On Tue, 11 Jul 2023 17:01:08 -0700 Michael Chan wrote:
+> > It generally looks good to me.  I have a few comments below.
+> >
+> > The logic is very similar to the bnapi->in_reset logic to reset due to
+> > RX errors.  We have a counter for the number of times we do the RX
+> > reset so I think it might be good to add a similar TX reset counter.  
 > 
-> Honestly, I don't know.
+> Never mind about the counter.  Since we are doing a complete reset,
+> the cpr structure will be freed anyway and the counter won't persist.
+> 
+> Later when we add support for per TX ring reset, we can add the
+> counter at that time.
 
-I think Vivien looked at that once, but decided against it. I don't
-remember why. Maybe because of lack of hardware, or anybody to test
-it?
+Oh, if all the cpr stats get lost during reset or re-config, that's
+quite unfortunate. We should get that fixed without waiting for per
+ring resets of any sort, just in case that takes long. 
 
-	Andrew
+Can we stash the old sum somewhere and report in ethtool as "non-ring"
+or "old" or ..?
 
+> > The XDP code path can potentially crash in a similar way if we get a
+> > bad completion from hardware.  I'm not sure if we should add similar
+> > logic to the XDP code path.
 
+Ack, will fix.
 
