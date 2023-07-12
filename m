@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-17113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA2AA7505CB
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:17:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 428F47505CE
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EC5528112D
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:17:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7228C1C210AA
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2182F2770A;
-	Wed, 12 Jul 2023 11:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BF12772B;
+	Wed, 12 Jul 2023 11:16:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F8227701
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 11:16:33 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9C9D199E;
-	Wed, 12 Jul 2023 04:16:29 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36C7I0u2028087;
-	Wed, 12 Jul 2023 04:16:23 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C3027701
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 11:16:37 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2861BD4;
+	Wed, 12 Jul 2023 04:16:34 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36C7dgeW018088;
+	Wed, 12 Jul 2023 04:16:28 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=pfpt0220;
- bh=kLS/in3vWtvzyYJIZGqwovZ/d0FpVKPXoxAGuc8n16U=;
- b=PcUs0O8Ggt6B8vLzYcFWKvC4b+ncYgrfGBWGkEa3BQnw9t38xCidTzp9nrBBPSquJtgb
- uldbdf6/oPc7KjLwPJ00bWuMwWxwkKk1wNjS2xRPOaC1OdRqQTplN1mAswiBuKVaonoR
- 4sUq4mVsUXymvQLULZnb/kgf+pUi4PkA8u//UKwHOOuCUJ1VA1e+AJkgK+xL+Oh4Yvrw
- bPmYtP6/jZ2mZzPAdaJlO5XIOwkfI0M5F8UNk8MuWeQCaj8ZPAeKvhKW8DQyr4lxHumo
- rMjy6AV7KzFp1PufONQt14BbhItgp1cm37i6biPOghpLf542YBF+laB9MCLwq9QTaeZ1 lg== 
+ bh=xUKnx6fN161jpLFot1e+fBvz0wDK4Bch2yaHPEnIcBg=;
+ b=AIAMG8r5B2a6nbsirut8vhpYkkL6IqE/jI9sDKlz+HhSZGHSQgYbC4SyMOpNQP77oUXl
+ kJiPq4XQ3y/tq8k62RmvLls02CaWcdFc8HGxhCS7Q8SuUnYYASwNkZz7k8jmlAtCu7bR
+ fxkZ2w+ExZB1aK3SWod56w9XFxTb8fuYLwO+oIWHv1No5AFciaNEbrD13/+9PIJkPC9/
+ tohpfRvzvDbUSxQ3lhagLDqJHvC4Pc/5qQZzZR+tjEEKYt5mUK1qsAWMKnyxOPYdujgg
+ vpUl8ik8MOVoev1unzabSEHFdlh8DGvg3kZIPv48kKvjaz6LZDL2lz0VZtES8R+86uLz UQ== 
 Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rsb7rbdj5-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rsb9ajs3q-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 12 Jul 2023 04:16:22 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+	Wed, 12 Jul 2023 04:16:28 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
  (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 12 Jul
- 2023 04:16:21 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 12 Jul 2023 04:16:21 -0700
+ 2023 04:16:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 12 Jul 2023 04:16:26 -0700
 Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id E7CF83F7064;
-	Wed, 12 Jul 2023 04:16:17 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 6D3C33F7048;
+	Wed, 12 Jul 2023 04:16:23 -0700 (PDT)
 From: Suman Ghosh <sumang@marvell.com>
 To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH 2/3] octeontx2-af: Fix hash extraction enable configuration
-Date: Wed, 12 Jul 2023 16:46:03 +0530
-Message-ID: <20230712111604.2290974-3-sumang@marvell.com>
+Subject: [net PATCH 3/3] octeontx2-af: Fix hash configuration for both source and destination IPv6
+Date: Wed, 12 Jul 2023 16:46:04 +0530
+Message-ID: <20230712111604.2290974-4-sumang@marvell.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230712111604.2290974-1-sumang@marvell.com>
 References: <20230712111604.2290974-1-sumang@marvell.com>
@@ -66,8 +66,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: Ddfdr3Coj_pYXyyfvBp7nriHMxpKeFPe
-X-Proofpoint-ORIG-GUID: Ddfdr3Coj_pYXyyfvBp7nriHMxpKeFPe
+X-Proofpoint-GUID: MB3GgW_nao3SPoxUZ2CUwREYB9pnWm0F
+X-Proofpoint-ORIG-GUID: MB3GgW_nao3SPoxUZ2CUwREYB9pnWm0F
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-12_06,2023-07-11_01,2023-05-22_02
@@ -78,167 +78,101 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As of today, hash extraction was enabled by default for the default
-MKEX profile. This patch fixes that and enable the support based on
-customer specific MKEX profile.
+As of today, hash reduction was supported only for source IPv6 address.
+This patch fixes that and adds supports for both source and
+destination IPv6 address.
 
 Fixes: a95ab93550d3 ("octeontx2-af: Use hashed field in MCAM key")
 Signed-off-by: Suman Ghosh <sumang@marvell.com>
 ---
- .../marvell/octeontx2/af/rvu_npc_fs.c         | 22 +++++++---
- .../marvell/octeontx2/af/rvu_npc_fs.h         |  4 ++
- .../marvell/octeontx2/af/rvu_npc_hash.c       | 43 ++++++++++++++++++-
- .../marvell/octeontx2/af/rvu_npc_hash.h       |  8 ++--
- 4 files changed, 65 insertions(+), 12 deletions(-)
+ .../marvell/octeontx2/af/rvu_npc_hash.c       | 37 +++++++++----------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index 006beb5cf98d..acb6f34b3cae 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -13,11 +13,6 @@
- #include "rvu_npc_fs.h"
- #include "rvu_npc_hash.h"
- 
--#define NPC_BYTESM		GENMASK_ULL(19, 16)
--#define NPC_HDR_OFFSET		GENMASK_ULL(15, 8)
--#define NPC_KEY_OFFSET		GENMASK_ULL(5, 0)
--#define NPC_LDATA_EN		BIT_ULL(7)
--
- static const char * const npc_flow_names[] = {
- 	[NPC_DMAC]	= "dmac",
- 	[NPC_SMAC]	= "smac",
-@@ -442,6 +437,7 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
- static void npc_scan_ldata(struct rvu *rvu, int blkaddr, u8 lid,
- 			   u8 lt, u64 cfg, u8 intf)
- {
-+	struct npc_mcam_kex_hash *mkex_hash = rvu->kpu.mkex_hash;
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
- 	u8 hdr, key, nr_bytes, bit_offset;
- 	u8 la_ltype, la_start;
-@@ -490,8 +486,20 @@ do {									       \
- 	NPC_SCAN_HDR(NPC_SIP_IPV4, NPC_LID_LC, NPC_LT_LC_IP, 12, 4);
- 	NPC_SCAN_HDR(NPC_DIP_IPV4, NPC_LID_LC, NPC_LT_LC_IP, 16, 4);
- 	NPC_SCAN_HDR(NPC_IPFRAG_IPV6, NPC_LID_LC, NPC_LT_LC_IP6_EXT, 6, 1);
--	NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 16);
--	NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 16);
-+	if (rvu->hw->cap.npc_hash_extract) {
-+		if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][0])
-+			NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 4);
-+		else
-+			NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 16);
-+
-+		if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][1])
-+			NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 4);
-+		else
-+			NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 16);
-+	} else {
-+		NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 16);
-+		NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 16);
-+	}
- 	NPC_SCAN_HDR(NPC_SPORT_UDP, NPC_LID_LD, NPC_LT_LD_UDP, 0, 2);
- 	NPC_SCAN_HDR(NPC_DPORT_UDP, NPC_LID_LD, NPC_LT_LD_UDP, 2, 2);
- 	NPC_SCAN_HDR(NPC_SPORT_TCP, NPC_LID_LD, NPC_LT_LD_TCP, 0, 2);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h
-index bdd65ce56a32..3f5c9042d10e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h
-@@ -9,6 +9,10 @@
- #define __RVU_NPC_FS_H
- 
- #define IPV6_WORDS	4
-+#define NPC_BYTESM	GENMASK_ULL(19, 16)
-+#define NPC_HDR_OFFSET	GENMASK_ULL(15, 8)
-+#define NPC_KEY_OFFSET	GENMASK_ULL(5, 0)
-+#define NPC_LDATA_EN	BIT_ULL(7)
- 
- void npc_update_entry(struct rvu *rvu, enum key_fields type,
- 		      struct mcam_entry *entry, u64 val_lo,
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-index 79e649917ffa..76553e0c216f 100644
+index 76553e0c216f..e7b71f2f3ad3 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-@@ -215,13 +215,54 @@ void npc_config_secret_key(struct rvu *rvu, int blkaddr)
+@@ -100,20 +100,20 @@ u32 npc_field_hash_calc(u64 *ldata, struct npc_get_field_hash_info_rsp rsp,
+ 	return field_hash;
+ }
  
- void npc_program_mkex_hash(struct rvu *rvu, int blkaddr)
+-static u64 npc_update_use_hash(int lt, int ld)
++static u64 npc_update_use_hash(struct rvu *rvu, int blkaddr,
++			       u8 intf, int lid, int lt, int ld)
  {
-+	struct npc_mcam_kex_hash *mh = rvu->kpu.mkex_hash;
- 	struct hw_cap *hwcap = &rvu->hw->cap;
-+	u8 intf, ld, hdr_offset, byte_len;
- 	struct rvu_hwinfo *hw = rvu->hw;
--	u8 intf;
+-	u64 cfg = 0;
+-
+-	switch (lt) {
+-	case NPC_LT_LC_IP6:
+-		/* Update use_hash(bit-20) and bytesm1 (bit-16:19)
+-		 * in KEX_LD_CFG
+-		 */
+-		cfg = KEX_LD_CFG_USE_HASH(0x1, 0x03,
+-					  ld ? 0x8 : 0x18,
+-					  0x1, 0x0, 0x10);
+-		break;
+-	}
++	u8 hdr, key;
 +	u64 cfg;
- 
-+	/* Check if hardware supports hash extraction */
- 	if (!hwcap->npc_hash_extract)
- 		return;
- 
-+	/* Check if IPv6 source/destination address
-+	 * should be hash enabled.
-+	 * Hashing reduces 128bit SIP/DIP fields to 32bit
-+	 * so that 224 bit X2 key can be used for IPv6 based filters as well,
-+	 * which in turn results in more number of MCAM entries available for
-+	 * use.
-+	 *
-+	 * Hashing of IPV6 SIP/DIP is enabled in below scenarios
-+	 * 1. If the silicon variant supports hashing feature
-+	 * 2. If the number of bytes of IP addr being extracted is 4 bytes ie
-+	 *    32bit. The assumption here is that if user wants 8bytes of LSB of
-+	 *    IP addr or full 16 bytes then his intention is not to use 32bit
-+	 *    hash.
-+	 */
-+	for (intf = 0; intf < hw->npc_intfs; intf++) {
-+		for (ld = 0; ld < NPC_MAX_LD; ld++) {
-+			cfg = rvu_read64(rvu, blkaddr,
-+					 NPC_AF_INTFX_LIDX_LTX_LDX_CFG(intf,
-+								       NPC_LID_LC,
-+								       NPC_LT_LC_IP6,
-+								       ld));
-+			hdr_offset = FIELD_GET(NPC_HDR_OFFSET, cfg);
-+			byte_len = FIELD_GET(NPC_BYTESM, cfg);
-+			/* Hashing of IPv6 source/destination address should be
-+			 * enabled if,
-+			 * hdr_offset == 8 (offset of source IPv6 address) or
-+			 * hdr_offset == 24 (offset of destination IPv6)
-+			 * address) and the number of byte to be
-+			 * extracted is 4. As per hardware configuration
-+			 * byte_len should be == actual byte_len - 1.
-+			 * Hence byte_len is checked against 3 but nor 4.
-+			 */
-+			if ((hdr_offset == 8 || hdr_offset == 24) && byte_len == 3)
-+				mh->lid_lt_ld_hash_en[intf][NPC_LID_LC][NPC_LT_LC_IP6][ld] = true;
-+		}
-+	}
 +
-+	/* Update hash configuration if the field is hash enabled */
- 	for (intf = 0; intf < hw->npc_intfs; intf++) {
- 		npc_program_mkex_hash_rx(rvu, blkaddr, intf);
- 		npc_program_mkex_hash_tx(rvu, blkaddr, intf);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
-index bbc7a0e95e48..52d4234897c6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
-@@ -67,8 +67,8 @@ static struct npc_mcam_kex_hash npc_mkex_hash_default __maybe_unused = {
- 	[NIX_INTF_RX] = {
- 		[NPC_LID_LC] = {
- 			[NPC_LT_LC_IP6] = {
--				true,
--				true,
-+				false,
-+				false,
- 			},
- 		},
- 	},
-@@ -76,8 +76,8 @@ static struct npc_mcam_kex_hash npc_mkex_hash_default __maybe_unused = {
- 	[NIX_INTF_TX] = {
- 		[NPC_LID_LC] = {
- 			[NPC_LT_LC_IP6] = {
--				true,
--				true,
-+				false,
-+				false,
- 			},
- 		},
- 	},
++	cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_LIDX_LTX_LDX_CFG(intf, lid, lt, ld));
++	hdr = FIELD_GET(NPC_HDR_OFFSET, cfg);
++	key = FIELD_GET(NPC_KEY_OFFSET, cfg);
++
++	/* Update use_hash(bit-20) to 'true' and
++	 * bytesm1(bit-16:19) to '0x3' in KEX_LD_CFG
++	 */
++	cfg = KEX_LD_CFG_USE_HASH(0x1, 0x03, hdr, 0x1, 0x0, key);
+ 
+ 	return cfg;
+ }
+@@ -132,12 +132,12 @@ static void npc_program_mkex_hash_rx(struct rvu *rvu, int blkaddr,
+ 		for (lt = 0; lt < NPC_MAX_LT; lt++) {
+ 			for (ld = 0; ld < NPC_MAX_LD; ld++) {
+ 				if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][ld]) {
+-					u64 cfg = npc_update_use_hash(lt, ld);
++					u64 cfg;
+ 
+-					hash_cnt++;
+ 					if (hash_cnt == NPC_MAX_HASH)
+ 						return;
+ 
++					cfg = npc_update_use_hash(rvu, blkaddr, intf, lid, lt, ld);
+ 					/* Set updated KEX configuration */
+ 					SET_KEX_LD(intf, lid, lt, ld, cfg);
+ 					/* Set HASH configuration */
+@@ -149,6 +149,7 @@ static void npc_program_mkex_hash_rx(struct rvu *rvu, int blkaddr,
+ 							     mkex_hash->hash_mask[intf][ld][1]);
+ 					SET_KEX_LD_HASH_CTRL(intf, ld,
+ 							     mkex_hash->hash_ctrl[intf][ld]);
++					hash_cnt++;
+ 				}
+ 			}
+ 		}
+@@ -169,12 +170,12 @@ static void npc_program_mkex_hash_tx(struct rvu *rvu, int blkaddr,
+ 		for (lt = 0; lt < NPC_MAX_LT; lt++) {
+ 			for (ld = 0; ld < NPC_MAX_LD; ld++)
+ 				if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][ld]) {
+-					u64 cfg = npc_update_use_hash(lt, ld);
++					u64 cfg;
+ 
+-					hash_cnt++;
+ 					if (hash_cnt == NPC_MAX_HASH)
+ 						return;
+ 
++					cfg = npc_update_use_hash(rvu, blkaddr, intf, lid, lt, ld);
+ 					/* Set updated KEX configuration */
+ 					SET_KEX_LD(intf, lid, lt, ld, cfg);
+ 					/* Set HASH configuration */
+@@ -187,8 +188,6 @@ static void npc_program_mkex_hash_tx(struct rvu *rvu, int blkaddr,
+ 					SET_KEX_LD_HASH_CTRL(intf, ld,
+ 							     mkex_hash->hash_ctrl[intf][ld]);
+ 					hash_cnt++;
+-					if (hash_cnt == NPC_MAX_HASH)
+-						return;
+ 				}
+ 		}
+ 	}
 -- 
 2.25.1
 
