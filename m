@@ -1,71 +1,127 @@
-Return-Path: <netdev+bounces-17303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AE66751202
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 22:50:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C769751205
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 22:53:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F789280CCE
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 20:50:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12FCB1C2105B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 20:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD16DF56;
-	Wed, 12 Jul 2023 20:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BBEDF6E;
+	Wed, 12 Jul 2023 20:53:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2885DDC8
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 20:50:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A562FC433C7;
-	Wed, 12 Jul 2023 20:50:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689195033;
-	bh=3cGyB8/OccxEE6UIAgzhlRswaN6zKAPX36mGUHOu9PQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=atwJnFTkkPJkAblh0d6Tjsqz2cmdpGCVQpxTg1ZV9W/dRYqQjlJ4X27sOw5UIPolr
-	 p051Yy0SYmpkxwOw9GhO4BhSZM1dZ2qiPYv2NSTIP/6/pr3RJTjHStW73gh+Dbrlj9
-	 t2cwJlgjhr75czuB5XRjZd4i5pCsx5zBZTQfRkNT+9jgengHw2ne1qYRiQPOUkPTha
-	 YhxXK9ro64MzuBuZIik4gDcdfFaXIhh4B9AhmYFMQ2XIfHz9dUafi1u4s7peiNXYu6
-	 cFvpyDqqGVIFqyIB/Qs/qixkLZlDDfhJBEVlZLLP4xAdfqrgSPwnzXxielUAheevMk
-	 Z9VTMRanpeSWA==
-Date: Wed, 12 Jul 2023 13:50:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- michael.chan@broadcom.com
-Subject: Re: [PATCH net-next 3/3] eth: bnxt: handle invalid Tx completions
- more gracefully
-Message-ID: <20230712135032.28011bc4@kernel.org>
-In-Reply-To: <c3ad12394627fffc5a0d8e48e019e6ef61814597.camel@redhat.com>
-References: <20230710205611.1198878-1-kuba@kernel.org>
-	<20230710205611.1198878-4-kuba@kernel.org>
-	<774e2719376723595425067ab3a6f59b72c50bc2.camel@redhat.com>
-	<20230711181919.50f27180@kernel.org>
-	<5b722084c6031009f845e6af8b438d49b9ea7dc1.camel@redhat.com>
-	<20230712093418.5578c227@kernel.org>
-	<c3ad12394627fffc5a0d8e48e019e6ef61814597.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC1CDDCF
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 20:53:13 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C181199D
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 13:53:11 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-57704a25be9so18833167b3.1
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 13:53:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689195190; x=1691787190;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p9QPsCD/Sct5C3jY+g/VQEaVoM3H/JWnzXtkru8S9wA=;
+        b=5wm0H1/TT8NM8HFmoANfbtFmPlmgiCOZMW7Zcj/bIpqeAKM0V4u9Vv2Xl91RzQY+Xp
+         ZM0+SzECWdFuGZOXUQrzSbGYvtM5yJ60Nq5aXPZG5//K6b2EN+AF/H5iLcrbVmvYlmqn
+         LXw7orLcivUBCmqH2ELAx5WLTw5Y1OIXcUZdaQ0g2n6iI4cXT7GH7Dwt3hWN0BZ0mZ+R
+         G+8NySZPvuCK+2vwUQUJItaJIDPlbBQd7a1yypv0F2J5qnQOeG4z4YBsEdmuFi9NspCO
+         RG2d9oA9zi8/Jjon/mPBrgHRdycPmMwqyTmgiM2sFSoRWgJx1yOmcLzqgEdq9PSRiyEU
+         QRew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689195190; x=1691787190;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=p9QPsCD/Sct5C3jY+g/VQEaVoM3H/JWnzXtkru8S9wA=;
+        b=WRgLyqrbA4CYRYFMdd1xfUwwIlxX/61SHvuPLDhoPhzYCP2F2uUHQcl4WC8PamG1kA
+         j7DSjtG6S5gztGL9e47+C0sGC8GyHRtQTQhKLpRotgpY9k+ui0wKMAtafbeAF97j3d4D
+         y0k513QBiUETIYJwrg16+jUB66AJ92FEmxNJxjnXrr5vkj8JPo89r0XbWwhxLUMXjeWl
+         h+3py3UOY7CCd90RVq8q4ZLggis2rubuIkWR1WXEQNOJUhzttvxMLPZV4G85tkEX5dzu
+         q973Dol1cXhcKXZ/SjFgIJIDpfm/Pwkzeuj5Rt3ec30bGIUmVoymViookdhiTBAFVrnK
+         XGkQ==
+X-Gm-Message-State: ABy/qLZpV7ZXGF3iPRobI4WIz5X4nfeX8chlmemIwZkSDI24IUYBDCB3
+	6QtDYFcVn9AYgwMKZWZRF3ucLrg=
+X-Google-Smtp-Source: APBJJlGQhaseuP/DPTMeml4TZQGe8eKZparx5CG699nxDyYD1BJ5584Q8bIHIoYCOo7NUjbN7mlFNBM=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a81:af18:0:b0:576:e268:903d with SMTP id
+ n24-20020a81af18000000b00576e268903dmr39126ywh.2.1689195190559; Wed, 12 Jul
+ 2023 13:53:10 -0700 (PDT)
+Date: Wed, 12 Jul 2023 13:53:09 -0700
+In-Reply-To: <20230712130954.7c8dc5ef@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <CAKH8qBvnMd2JgobQf1bvc=x7uEn1RPVHcuu3F7gB6vS627g-Xg@mail.gmail.com>
+ <CAADnVQLCRrPtQMPBuYiKv44SLDiYwz69KZ=0e0HxJdPQz4x2HQ@mail.gmail.com>
+ <ZK4eFox0DwbpyIJv@google.com> <CAADnVQJnf=KJ17MJWujkj+oSxp7kNNK1k08PvH+Wx617yAtZ8Q@mail.gmail.com>
+ <CAKH8qBvGbJhAeNQ0zZxFFf_V_Oq=85xwx7KgsL1xA7GK+qcFnw@mail.gmail.com>
+ <CAF=yD-LO=LDWhKM--r9F119-J_9v-Znm4saxFrhhxhMV6nnmJQ@mail.gmail.com>
+ <20230712190342.dlgwh6uka5bcjfkl@macbook-pro-8.dhcp.thefacebook.com>
+ <CAF=yD-Kf6wSc1JkgpNHEBVbyRiJ1pHqbw7SkkuHGAHatyS+eVg@mail.gmail.com>
+ <CAADnVQ+QGgjmqiV_uRzcrPOrH=GeDTtkAVs6t2n15WA9x3o3sw@mail.gmail.com> <20230712130954.7c8dc5ef@kernel.org>
+Message-ID: <ZK8SqGZOYK5THiQL@google.com>
+Subject: Re: [RFC bpf-next v3 09/14] net/mlx5e: Implement devtx kfuncs
+From: Stanislav Fomichev <sdf@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	"Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?=" <toke@kernel.org>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	magnus.karlsson@intel.com, 
+	"=?utf-8?B?QmrDtnJuIFTDtnBlbA==?=" <bjorn@kernel.org>, maciej.fijalkowski@intel.com, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Network Development <netdev@vger.kernel.org>, xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 12 Jul 2023 22:31:45 +0200 Paolo Abeni wrote:
-> > Is there really any difference whether one changes a byte or ors
-> > in a bit? Either way it's a partial update of a word.  
-> 
-> Really not a big deal, but 'or' fetches memory and then store it, while
-> move [immediate] is a single store. In case of a cache miss, 'or'
-> should stall, while 'mov' should not. In general with 'mov' there
-> should be less pressure on the cache and/or bus.
+On 07/12, Jakub Kicinski wrote:
+> On Wed, 12 Jul 2023 12:42:35 -0700 Alexei Starovoitov wrote:
+> > > Basically, add to AF_XDP what we already have for its predecessor
+> > > AF_PACKET: setsockopt PACKET_VNET_HDR?
+> > >
+> > > Possibly with a separate new struct, rather than virtio_net_hdr. As
+> > > that has dependencies on other drivers, notably virtio and its
+> > > specification process. =20
+> >=20
+> > yeah. Forgot about this one.
+> > That's a perfect fit. I would reuse virtio_net_hdr as-is.
+> > Why reinvent the wheel?
+> > It would force uapi, but some might argue it's a good thing.
+>=20
+> I was gonna reply on the other leg of the thread but it sounds like
+> we're in agreement now? =F0=9F=91=8F=EF=B8=8F  virtio_net_hdr is the kind=
+ of generic
+> descriptor I had in mind.
+>=20
+> I'd suggest breaking hdr_len into L2len, L3len and L4len, tho. How does
+> virtio do IP length updates during TSO if it doesn't know where L3
+> starts? HW will want to know, and it's easy to add them together in
+> cases where it doesn't. Which is why I kept saying "packet geometry"
+> rather than pointing at virtio_net_hdr.
 
-You're right, if the store buffer can buffer 1B stores then we won't
-stall the instruction pile line. But we most likely will for the bit
-op. The setting is an extremely rare path, tho, so given your
-"not a big deal" disclaimer I'm intending to keep the bitfield :)
+Perfect, I'll drop the kfuncs and will switch to a more static way
+of passing this info. We can discuss the particular layout once I have
+something concrete to show :-)
+
+Thanks, again, everyone for the comments!
 
