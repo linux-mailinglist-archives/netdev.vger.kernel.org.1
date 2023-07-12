@@ -1,216 +1,148 @@
-Return-Path: <netdev+bounces-17074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E9B7501B3
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:36:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 494F87501B1
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F50A1C2114B
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:36:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04703281908
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CFE20EE;
-	Wed, 12 Jul 2023 08:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F6E1116;
+	Wed, 12 Jul 2023 08:36:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25927100A1;
-	Wed, 12 Jul 2023 08:36:22 +0000 (UTC)
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D69B01FD4;
-	Wed, 12 Jul 2023 01:36:19 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VnCF4AR_1689150975;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VnCF4AR_1689150975)
-          by smtp.aliyun-inc.com;
-          Wed, 12 Jul 2023 16:36:16 +0800
-Message-ID: <1689150956.767141-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v11 03/10] virtio_ring: introduce virtqueue_set_premapped()
-Date: Wed, 12 Jul 2023 16:35:56 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-4-xuanzhuo@linux.alibaba.com>
- <CACGkMEumF73qbByV3K1+fdgnXBXqu-YS2yas+Vy_=Dn+yjy-cw@mail.gmail.com>
-In-Reply-To: <CACGkMEumF73qbByV3K1+fdgnXBXqu-YS2yas+Vy_=Dn+yjy-cw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AA3362
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:36:09 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2067.outbound.protection.outlook.com [40.107.243.67])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF325EA;
+	Wed, 12 Jul 2023 01:36:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vc2KGuOCsdZK2s5Tf5RkhfK7zDlvIy7V/T0qFbF0u7QRHd6UdxF0e/ztsTZl5J1e6Eay0zUbaOm5C/dHFiuhn4/yT9/iKJ4yXk2n1HBgDY8w29sJ2QsxdRrNT9eJcLWBsxNY3DK7v//npxb4y4EltLphgcYpse+aiVXHV3t1B+GHVF8qQfoYoW2tdXeC09vDFtk1+BagYVhBT7Vse/bbIw1wAsAVa41O5ViTIaB3hZ1sZalVvBUG4SFS0qdtz2tdqFB86/IbYDOv156Uj/fxRiU2It/t/8HsrYd03kK2HVLWd7CEmHrfoc3AZlt+8TdgNrddiFGSwjcPn5IFEEqKuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k5s3lQKf8pS/4y3BJgNuzGDQPhHafaC8GA0b4/5Y+6c=;
+ b=ViMjQ5sHDGhvnVfDs07Qh7V28RNnVRDI6HAvhQTp05l4WEse5sI7JR04yXCbfSN1kN66IlfpCVC1mkgGDHDRwOWYfbLPm18Lyjh6n/SnIv2XBmv6SLS9DZ5YPrZOEynlc2C2aXAMRA342FLVf6vwkKkZ2x3ploOu0gQ/+hXFBSKdZrtvOEfXoV6MTN/eDK2vyXUzNBksZ1RB+TMblFHELElYVQk7S6o1nqE6IrFS2mTy34ebWevOk2R0/OYjQn00mAS97wpGHp90CWllZDwyQEe37233wca9ZmcCLMXYDu/qKVUm3NAOXrNO4D7DcteaWPP9pYwT1LnP4efPJ/wF6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k5s3lQKf8pS/4y3BJgNuzGDQPhHafaC8GA0b4/5Y+6c=;
+ b=YwxsNXnl5H6xy/0NIl+FJmjPQ3RLCAON3wRvW43IUPnioMqXJ8nOL6FVHFexbsc4BtLioayX695GmbbWhMBRgICcUNptmH1037hGz+iFiUwyRQM/zibhNgIaFmVi1gmNrRIySR8JA9Iary3g0U6iKVY4fsKBEwuo8o8/G50NFCYFQGokVnnkQ4agoqhEZDOOWlhjPSzr1chFeRhRXRs/e71qJILDken65R3VLPqcFBxs+2tMTJvqrNjC4fwciO2Hu/+nK1tKFv3igzZJKZLWD9JWRbkLvUNtTrptwYKLw4zsQw90IW7g8wGO4ZGDbqD2tR+iMqM6ln8cywmhD3D3Gg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by PH8PR12MB6745.namprd12.prod.outlook.com (2603:10b6:510:1c0::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.32; Wed, 12 Jul
+ 2023 08:36:06 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::3aad:bfe2:42fb:705f]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::3aad:bfe2:42fb:705f%4]) with mapi id 15.20.6565.028; Wed, 12 Jul 2023
+ 08:36:06 +0000
+Date: Wed, 12 Jul 2023 11:36:00 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@mellanox.com>, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] devlink: uninitialized data in
+ nsim_dev_trap_fa_cookie_write()
+Message-ID: <ZK5l8HdIbF7qRwyp@shredder>
+References: <7c1f950b-3a7d-4252-82a6-876e53078ef7@moroto.mountain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c1f950b-3a7d-4252-82a6-876e53078ef7@moroto.mountain>
+X-ClientProxiedBy: VI1PR0202CA0016.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::29) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|PH8PR12MB6745:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77efaa7d-f7b4-4b5a-d410-08db82b308a9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	8hCionob1SWvNC+CAxf8AlJ5dxi0zVrpAfYbtb2Qa3e5min2U/j9KBhI+lBUopKVfxd+JWwY3mbssv6ymGpKTCRhhvwd4gJAXO3S9mo8Mv/HpEYlB0qIwq8sQmXe9kh3p3EnCsZ9LVwdURI5X48j/H3CUgOL2TPcYuGFELVjNJiPR/UdJJyAoBikC3bhEQNTrgya7tMiPN2j6agvtC3nb6YOVG4aG7JIhAmHJnoO5SAWYy2Ut5PidltA8hNLRA18ie9jphVwmuCKvACOb0w4356sK116RR5BiEQLB9Rk/QJlJdCa452Wchj7+zmJAePk378Q28JvX0dYOavqwEAbD9x9WGwHJA1e2zSZWoiGszE5wIgu1NDqN8x/+FqgEeH0IEmJ5B2dI7JgOB8rkjRBH3ZKaqzx174O6geiPpPSJreyM2Kjp4C0BBvE0U1YxKbOsNZJZgc9EQUt4HLC/1zjOM39oWmTmPbOzjYcG+VboUT/K3Eq4qU4XDyvxeYT6fdEfVNVbmX1w4Urn0SzV2w666W/V74jr7Mu86Fiq36JVCwQhXu8s8NmFLtT2oyetG0A
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(376002)(39860400002)(396003)(366004)(136003)(346002)(451199021)(86362001)(8936002)(8676002)(186003)(2906002)(4744005)(5660300002)(26005)(9686003)(6506007)(6666004)(33716001)(54906003)(38100700002)(66946007)(66556008)(6486002)(6916009)(4326008)(66476007)(478600001)(41300700001)(316002)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/Zz4l06VlHkzzg0ei1HPioo8w8YHNo3mWzLy/rf+aTqpH9nJH7/xEhUe/dPd?=
+ =?us-ascii?Q?od/NTBT/i2u3/qs5ow5kAuGuz0onh7TjoHub+QAxn1uQvumzZBUxL+fSLjOG?=
+ =?us-ascii?Q?VnB5+8vtxwMNmmav1cJINrJ/BOeGxmC5j8HcKtlm3ZnbE/LTFiEtz6Hdkff0?=
+ =?us-ascii?Q?4C4CejXpwHktpRQ/rg6NYVfMC4/6LiSDJxMwT/uZyhgItrJ+iokBW+skZE2d?=
+ =?us-ascii?Q?sGaneMwV2UIvirmEMm6DlMuZ2AR1WXJA3hBXKf7nlaplik6LTBQPaSZWYzVY?=
+ =?us-ascii?Q?5O0ojxPyui+RD4gxyy3G96OMdo+owl3GaEbsRvYC+vHSCAV8gHRwCcdLKcas?=
+ =?us-ascii?Q?eW2jwXpazPl4j/RMY24ndTFIYOo1pqejhplSPNAblqpcxOAfJ5utgLoppZry?=
+ =?us-ascii?Q?MvLpDe6bhFm7en2G1EYIkBMjPix/CRnYgCBywWxKvLkwMZaDn5yfspvocNwX?=
+ =?us-ascii?Q?Zqo8g4xcPyivQDvpiYQBrpjIVplWkNDZG/PrazKSoIg9E2DjFLpmvPWfbhUF?=
+ =?us-ascii?Q?1lg6Nb1gcxV28ynK+xCQGjSzJOxflPByZHtLUvcHToYhuVD6OyA4IMuNXtGq?=
+ =?us-ascii?Q?ok9/9Xz/2hMiYLhswlOZ60jrwIAjpuVHXmZDRqixsJdGHA9HhjqScvLw2ozB?=
+ =?us-ascii?Q?6hWKutOOKBZvtyRJeE6IIQjFVwBHpHAirg0BeSyDon4VUWBR/1UAPvEJ+WnG?=
+ =?us-ascii?Q?hT/6PAW9S0YCwClmCBkV4O7frpcyFKmkIJDMSBsa2yZKIYMLIB7oir99RMM9?=
+ =?us-ascii?Q?gIPZbcIeF2lQIUeuAN+uVd/xCds2QksirtaBwRkkHyMO+o9l/zpwm3G3YZnz?=
+ =?us-ascii?Q?JNxdyX0uhggnKgqM+R8BiNHLIo2dZxqVjVLOycHtS/TTqgUw8ghacKJzaQDI?=
+ =?us-ascii?Q?IOXj4rr94ui3XdP8Qlo5ZStoDoQTyPIqZq8I7TluYg7zB5mezlG/HTC7X3sP?=
+ =?us-ascii?Q?AvWPqz9FWmK8CQhcp2GCYX62MYm++cjLsX04rb17S6/Vb2PfVBvCTCWR9DtY?=
+ =?us-ascii?Q?2ydCTZzeCK7gw81FwGzxXbp1Ji3BGo6d6u0/5pr8OoK8+CfVdg5C6juRHX0o?=
+ =?us-ascii?Q?c2Gwlm6X02aK4weNaPfG1YYjOP/P6XRfVDwIH42KQ7NfTPUA9FMDKrT0exEy?=
+ =?us-ascii?Q?Lb3nRxE3mQTPUXpghVF0tbc693h9YCXLzGVXxWQy0WgEy4JclU2dgteLmp52?=
+ =?us-ascii?Q?OoIkR60LDkVZ0xlHgY1IzWgl01XY0VydAQZfOw7cMUtbF4njLiGrEcAGJBLQ?=
+ =?us-ascii?Q?UyY+dxSpK3E3f8qbq6pnf1tSela+Q6M03KJb7/VViQyLpT5Im5pTHR7hB4f9?=
+ =?us-ascii?Q?Lmr8M5KX/BAGDUFEKoBdQKg33s4cMzLxy8Pdo42ed5wE6tcdkfCg5kGm6/ul?=
+ =?us-ascii?Q?OJ3mzdHYAOhbHE2GfAGvsRfO8FShefDZ4Uv8ar9omceOXcn7yPqcJyUljTLN?=
+ =?us-ascii?Q?sSxiCAdX2L9em8aiGa0svWz1diJC9ERTVB8WObss6CtQOyCVbnsFJ/9Z07sH?=
+ =?us-ascii?Q?F9APvVW0v+mR4JEDJFHQ/fopOHFWhGid3+24sYpGCpktOndhUQ46I9kl0wgK?=
+ =?us-ascii?Q?0rC/LghAmf4f2fIuPCyKBvxRg3dW9+F5aw0xgads?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77efaa7d-f7b4-4b5a-d410-08db82b308a9
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 08:36:06.0701
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YKuaArOixuNbOSiOhKeKSsyamWd0MUvPg9pDljLBIF32FSYBDbuigDazT/6xTuJPRBe/47YA59orGK7eRGbw9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6745
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 12 Jul 2023 16:24:18 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
-a.com>
-> wrote:
->
-> > This helper allows the driver change the dma mode to premapped mode.
-> > Under the premapped mode, the virtio core do not do dma mapping
-> > internally.
-> >
-> > This just work when the use_dma_api is true. If the use_dma_api is fals=
-e,
-> > the dma options is not through the DMA APIs, that is not the standard
-> > way of the linux kernel.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/virtio/virtio_ring.c | 45 ++++++++++++++++++++++++++++++++++++
-> >  include/linux/virtio.h       |  2 ++
-> >  2 files changed, 47 insertions(+)
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 87d7ceeecdbd..5ace4539344c 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -172,6 +172,9 @@ struct vring_virtqueue {
-> >         /* Host publishes avail event idx */
-> >         bool event;
-> >
-> > +       /* Do DMA mapping by driver */
-> > +       bool premapped;
-> > +
-> >         /* Head of free buffer list. */
-> >         unsigned int free_head;
-> >         /* Number we've added since last sync. */
-> > @@ -2061,6 +2064,7 @@ static struct virtqueue
-> > *vring_create_virtqueue_packed(
-> >         vq->packed_ring =3D true;
-> >         vq->dma_dev =3D dma_dev;
-> >         vq->use_dma_api =3D vring_use_dma_api(vdev);
-> > +       vq->premapped =3D false;
-> >
-> >         vq->indirect =3D virtio_has_feature(vdev,
-> > VIRTIO_RING_F_INDIRECT_DESC) &&
-> >                 !context;
-> > @@ -2550,6 +2554,7 @@ static struct virtqueue
-> > *__vring_new_virtqueue(unsigned int index,
-> >  #endif
-> >         vq->dma_dev =3D dma_dev;
-> >         vq->use_dma_api =3D vring_use_dma_api(vdev);
-> > +       vq->premapped =3D false;
-> >
-> >         vq->indirect =3D virtio_has_feature(vdev,
-> > VIRTIO_RING_F_INDIRECT_DESC) &&
-> >                 !context;
-> > @@ -2693,6 +2698,46 @@ int virtqueue_resize(struct virtqueue *_vq, u32 =
-num,
-> >  }
-> >  EXPORT_SYMBOL_GPL(virtqueue_resize);
-> >
-> > +/**
-> > + * virtqueue_set_premapped - set the vring premapped mode
-> > + * @_vq: the struct virtqueue we're talking about.
-> > + *
-> > + * Enable the premapped mode of the vq.
-> > + *
-> > + * The vring in premapped mode does not do dma internally, so the driv=
-er
-> > must
-> > + * do dma mapping in advance. The driver must pass the dma_address thr=
-ough
-> > + * dma_address of scatterlist. When the driver got a used buffer from
-> > + * the vring, it has to unmap the dma address.
-> > + *
-> > + * This function must be called immediately after creating the vq, or
-> > after vq
-> > + * reset, and before adding any buffers to it.
-> > + *
-> > + * Caller must ensure we don't call this with other virtqueue operatio=
-ns
-> > + * at the same time (except where noted).
-> > + *
-> > + * Returns zero or a negative error.
-> > + * 0: success.
-> > + * -EINVAL: vring does not use the dma api, so we can not enable
-> > premapped mode.
-> > + */
-> > +int virtqueue_set_premapped(struct virtqueue *_vq)
-> > +{
-> > +       struct vring_virtqueue *vq =3D to_vvq(_vq);
-> > +       u32 num;
-> > +
-> > +       num =3D vq->packed_ring ? vq->packed.vring.num : vq->split.vrin=
-g.num;
-> > +
-> > +       if (num !=3D vq->vq.num_free)
-> > +               return -EINVAL;
-> >
->
-> If we check this, I think we need to protect this with
-> START_USE()/END_USE().
+On Tue, Jul 11, 2023 at 11:52:26AM +0300, Dan Carpenter wrote:
+> The simple_write_to_buffer() function is designed to handle partial
+> writes.  It returns negatives on error, otherwise it returns the number
+> of bytes that were able to be copied.  This code doesn't check the
+> return properly.  We only know that the first byte is written, the rest
+> of the buffer might be uninitialized.
+> 
+> There is no need to use the simple_write_to_buffer() function.
+> Partial writes are prohibited by the "if (*ppos != 0)" check at the
+> start of the function.  Just use memdup_user() and copy the whole
+> buffer.
+> 
+> Fixes: d3cbb907ae57 ("netdevsim: add ACL trap reporting cookie as a metadata")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-YES.
-
-
->
->
-> > +
-> > +       if (!vq->use_dma_api)
-> > +               return -EINVAL;
-> >
->
-> Not a native spreak, but I think "dma_premapped" is better than "premappe=
-d"
-> as "dma_premapped" implies "use_dma_api".
-
-I am ok to fix this.
-
-Thanks.
-
-
->
-> Thanks
->
->
-> > +
-> > +       vq->premapped =3D true;
-> > +
-> > +       return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(virtqueue_set_premapped);
-> > +
-> >  /* Only available for split ring */
-> >  struct virtqueue *vring_new_virtqueue(unsigned int index,
-> >                                       unsigned int num,
-> > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > index de6041deee37..2efd07b79ecf 100644
-> > --- a/include/linux/virtio.h
-> > +++ b/include/linux/virtio.h
-> > @@ -78,6 +78,8 @@ bool virtqueue_enable_cb(struct virtqueue *vq);
-> >
-> >  unsigned virtqueue_enable_cb_prepare(struct virtqueue *vq);
-> >
-> > +int virtqueue_set_premapped(struct virtqueue *_vq);
-> > +
-> >  bool virtqueue_poll(struct virtqueue *vq, unsigned);
-> >
-> >  bool virtqueue_enable_cb_delayed(struct virtqueue *vq);
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
-> >
->
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
