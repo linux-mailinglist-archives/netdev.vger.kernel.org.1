@@ -1,160 +1,115 @@
-Return-Path: <netdev+bounces-17020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58BB174FD6B
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 05:07:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C60274FD6C
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 05:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8998E1C20EF1
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:07:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB0B6280E3D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1D9393;
-	Wed, 12 Jul 2023 03:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E3E802;
+	Wed, 12 Jul 2023 03:07:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A276819
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 03:06:56 +0000 (UTC)
-Received: from mail2-1.quietfountain.com (mail2-1.quietfountain.com [64.111.48.224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A4BD171F
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 20:06:55 -0700 (PDT)
-Received: from mail2-1.quietfountain.com (localhost [127.0.0.1])
-	by mail2-1.quietfountain.com (Postfix) with ESMTP id 4R12hZ2XKzzshQm
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 22:06:54 -0500 (CDT)
-Authentication-Results: mail2-1.quietfountain.com (amavisd-new);
-	dkim=pass (4096-bit key) reason="pass (just generated, assumed good)"
-	header.d=quietfountain.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-	quietfountain.com; h=content-transfer-encoding:content-type
-	:in-reply-to:organization:content-language:references:to:subject
-	:from:user-agent:mime-version:date:message-id; s=dkim; t=
-	1689131207; x=1691723208; bh=7+nTT8Nu27id2b+7loXoVaxJI+AUEv242+w
-	/aMMjcKc=; b=WPVZpjfrw4xWq2w/lm1wsOJugTxZ7obLLKtSAOkgiovAk1MAbnv
-	kgVMpmJ/s6aOs8LR+kWWl5teO3tx/c/aKaZVkN3Pt6suOccZ/DZGHFRrw0JLJmoO
-	or2aziFcIPzJ4qCeBCKAV157LFLODzbjhaVaVpuVFpPLN71YImVS0ev4QPmXEwmo
-	lumd/cgftL3kFA1CB5F+Kb5939+8KvEi4wFvGlv9Wt9Aplv5b41HUylphBhvXGTm
-	sucUbWn5+57xmR64rDotQO3wV6kxyUTlY2ALaTQpHAVHVGpVh+Bj4l+KXHadHQKo
-	4y2uCFgLKLfN+K3F7NpXmK+Z2geWeqyQaKjoqeL/5md9Ut0Xef1z0mmXvNrchnaz
-	OXWiZLRsdX4c1nQPuvYu7u1RgwRC8yciKKKfK3KK2C4jKNLHRXwvuFKIqES7jkSV
-	/WahcEeCzKj9R+ZN+HMb8io1TEu/3HeG/83N9iCBknfZxVZ+pTgpUGXd4nWC7gwu
-	KovW3wjVlxifkp3dOO5/14799Pf1oSP3PusuTbqP1iAIie86ihsSYBVTyoOhbb/f
-	4HSusD184MbYoXAMpzPTsMmVuwSkw1kK6cuRUq+u+na3T8FAz51LXB+te7CXnHpV
-	HMkfcrNjMJbA4yrYKA70gShy4WDVjtUKojDf0dqJZ2C3/9gb0rfr8gqU=
-X-Virus-Scanned: Debian amavisd-new at email2.1.quietfountain.com
-Received: from mail2-1.quietfountain.com ([127.0.0.1])
-	by mail2-1.quietfountain.com (mail2-1.quietfountain.com [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id FmyN5PL8LtY8 for <netdev@vger.kernel.org>;
-	Tue, 11 Jul 2023 22:06:47 -0500 (CDT)
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-Received: from [10.12.114.193] (unknown [10.12.114.193])
-	by mail2-1.quietfountain.com (Postfix) with ESMTPSA id 4R12hQ6DsVzsfvj;
-	Tue, 11 Jul 2023 22:06:46 -0500 (CDT)
-Message-ID: <83efdb0a-559e-edbd-a833-3891f04638ac@quietfountain.com>
-Date: Tue, 11 Jul 2023 22:06:45 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F0138F;
+	Wed, 12 Jul 2023 03:07:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E4C6C433C8;
+	Wed, 12 Jul 2023 03:07:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689131261;
+	bh=uOoIoKaMaiPjbxEKLwffsfSd7isUyv91luMjnMlx8iI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=alvo3LKZuPmcu5955E9J9ZB+IPN6beiUyQ2ECUv0JGwmn+MPM8kRwx5Sg5P1tOENb
+	 UZCnueAWtbS0qnwmUqP+cnCS9UYuVK4KYRs2maGz47TdpKQr1/l92g86hGUbeNXfdW
+	 BvhNrSgaCvYzSmNEIggaJoa5KLbzDLEAYdffC9VA7HH9S3fnHDPkYB5NoZW1WPjPKy
+	 Yg7Mj+NQg/zv61cHjaBVUk7EuReKdP1DmN7BHBOMoedN7vLXeJ9ri5+bX2yOEoAi9O
+	 vVqVkc7Cqinsgf52YGE+5J8NPuodahImjXBfaZhQhXbFi3JLbG1MMKu6ZhwleZt7IS
+	 CA+ieJG9u3Iig==
+Date: Tue, 11 Jul 2023 20:07:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stanislav Fomichev <sdf@google.com>, bpf <bpf@vger.kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@kernel.org>, Willem de Bruijn <willemb@google.com>, David Ahern
+ <dsahern@kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, "Fijalkowski, Maciej"
+ <maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Network Development <netdev@vger.kernel.org>, xdp-hints@xdp-project.net
+Subject: Re: [RFC bpf-next v3 09/14] net/mlx5e: Implement devtx kfuncs
+Message-ID: <20230711200740.236b0142@kernel.org>
+In-Reply-To: <CAADnVQJ3iyoZaxaALWd4zTsDT3Z=czU4g7qpmBFWPUs5ucqCMg@mail.gmail.com>
+References: <20230707193006.1309662-1-sdf@google.com>
+	<20230707193006.1309662-10-sdf@google.com>
+	<20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local>
+	<20230711173226.7e9cca4a@kernel.org>
+	<CAADnVQJ3iyoZaxaALWd4zTsDT3Z=czU4g7qpmBFWPUs5ucqCMg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-From: Harry Coin <hcoin@quietfountain.com>
-Subject: Re: llc needs namespace awareness asap, was Re: Patch fixing STP if
- bridge in non-default namespace.
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org
-References: <9190b2ac-a3f7-d4f5-211a-ea860f09687a@quietfountain.com>
- <20230711215132.77594-1-kuniyu@amazon.com>
- <b01e5af6-e397-486d-3428-6fa30a919042@quietfountain.com>
- <de5a9b44-fd6d-466a-822b-334343713b9b@lunn.ch>
-Content-Language: en-US
-Organization: Quiet Fountain LLC / Rock Stable Systems
-In-Reply-To: <de5a9b44-fd6d-466a-822b-334343713b9b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Tue, 11 Jul 2023 19:37:23 -0700 Alexei Starovoitov wrote:
+> > I hope I'm not misremembering but I think I suggested at the beginning
+> > to create a structure describing packet geometry and requested offloads,
+> > and for the prog fill that in.  
+> 
+> hmm. but that's what skb is for. skb == packet geometry ==
+> layout of headers, payload, inner vs outer, csum partial, gso params.
+> 
+> bpf at tc layer supposed to interact with that correctly.
+> If the packet is modified skb geometry should be adjusted accordingly.
+> Like BPF_F_RECOMPUTE_CSUM flag in bpf_skb_store_bytes().
+> 
+> > All operating systems I know end up doing that, we'll end up doing
+> > that as well. The question is whether we're willing to learn from
+> > experience or prefer to go on a wild ride first...  
+> 
+> I don't follow. This thread was aimed to add xdp layer knobs.
+> To me XDP is a driver level.
 
-On 7/11/23 19:55, Andrew Lunn wrote:
->> Something like that, but to your point about regression -- It a
->> statistically good bet there are many bridges with STP enabled in
->> non-default name spaces that simply have no loops in L2 BUT these are
->> 'buried'=C2=A0 inside docker images or prepackaged setups that work 'j=
-ust fine
->> standalone' and also 'in lab namespaces (that just don't have L2 loops=
-...)
->> and so that don't hit the bug.=C2=A0 These users are one "cable click =
-to an open
->> port already connected somewhere they can't see" away from bringing do=
-wn
->> every computer on their entire link (like me, been there, it's not a h=
-appy
->> week for anyone...), they just don't know it.=C2=A0 And their vendors =
-'trust STP,
->> so that can't be it' --- but it is.
->>
->> If the patch above gets installed-- then packagers downstream will hav=
-e to
->> respond with effort to add code to turn off STP if finding themselves =
-in a
->> namespace, and not if not.=C2=A0=C2=A0 They will be displeased at havi=
-ng to
->> accommodate then de-accommodate when the fix lands.=C2=A0=C2=A0 As a '=
-usually
->> downstream of the kernel' developer, I'd rather be warned than blocked=
-.
-> I don't know this code at all, so maybe a dumb question. What about
-> user space STP and RSTP? Do they get to see BPDUs? If that works, we
-> need to ensure any checking you add does not break that use case.
->
-> 	Andrew
+Driver is not a layer of the networking stack, I don't think it's 
+a useful or meaningful anchor point for the mental model. 
 
-Andrew, the only RTSP / STP provider I know of is open-vswitch and their=20
-docs (last I read them) provide the caution to use veth pairs to=20
-namespaces, but not run their daemon there--- and fair enough as no=20
-multicast llc would make it to that code in a namespace as currently=20
-kernel implemented.
+We're talking about a set of functionality, we can look at how that
+functionality was exposed in existing code.
 
-Like STP and namespaces in bridge code quite happily accepting commands=20
-it fails to deliver (though it's properly a subject for another related=20
-thread, you really have to read lots of fine print to notice the kernel=20
-bridge code has both STP and vlan capability, but they do *not* play=20
-well robustly though the system happily accepts configs like they do=20
-(STP BPDUs appropriate to one vlan can go out untagged..)
+> 'struct xdp_md' along with
+> BPF_F_XDP_HAS_FRAGS is the best abstraction we could do generalizing
+> dma-buffers (page and multi-page) that drivers operate on.
 
-Anyhow, to your point:=C2=A0 As zero multicast L2 packets make it to the=20
-kernel protocols stacks, much less user space if they aren't in the=20
-default net name space, this fix at most would allow packets they=20
-presently expect, are documented to get, but somehow magically never=20
-arrive -- to arrive.
+I think you're working against your own claim.
+xdp frags explicitly reuse struct skb_shared_info.
 
-Put more 'mathematically':=C2=A0 Neither the bug nor its fix will change=20
-anything in the primary namespace, neither the bug nor its fix will=20
-change packets that presently arrive in the non-default namespace to=20
-behave other than as now they do.=C2=A0 The only change should be to caus=
-e=20
-multicast packets that ought to be delivered to listeners in the=20
-non-default namespace to get them.
+> Everything else at driver level is too unique to generalize.
+> skb layer is already doing its job.
 
-HTH
+How can you say that drivers are impossible to generalize and than
+that the skb layer "is doing its job" ie. generalizes them?
 
-Harry Coin
+> In that sense "generic XDP" is a feature for testing only.
+> Trying to make "generic XDP" fast is missing the point of XDP.
 
-Bettendorf, Iowa
+That's a topic on its own.
 
+> AF_XDP is a different concept. Exposing timestamp,
+> csum, TSO to AF_XDP users is a different design challenge.
+> I'm all for doing that, but trying to combine "timestamp in xdp tx"
+> and "timestamp in AF_XDP" will lead to bad trade-off-s for both.
+> Which I think this patchset demonstrates.
 
-
-
---=20
+Too vague to agree or disagree with.
 
