@@ -1,119 +1,186 @@
-Return-Path: <netdev+bounces-17176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4100750B77
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:56:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2442750B87
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E55CC1C20F4D
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:55:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C624281771
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B361C2AB5F;
-	Wed, 12 Jul 2023 14:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535F634CE9;
+	Wed, 12 Jul 2023 14:58:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BE0A42
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:55:57 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2A7BB;
-	Wed, 12 Jul 2023 07:55:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BINkZ1i4PKbO0+fsSVwUWsXVzisxjT4/2QKSssOySGM=; b=QFjAs1WzTxEUF8chDYKA9DlGDT
-	sJN8HV/wvVUFJ/zD7PJtGdfq1i92ZgHRlm5fg55/irDCuSja/uKzralkXH7VLBsgLEZmnQe4zgYlU
-	lN19WBy4XwBfRdY19J53pq29mtBpk2kvNWYzpny1Epr9p1/GdmI8IsU8isimR/DqV40A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qJbFo-0019Hu-Gx; Wed, 12 Jul 2023 16:55:44 +0200
-Date: Wed, 12 Jul 2023 16:55:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Colin Foster <colin.foster@in-advantage.com>,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	Linus Walleij <linus.walleij@linaro.org>,
-	UNGLinuxDriver@microchip.com,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [RFC RESEND v1 pinctrl-next 0/1] add blink and activity
- functions to SGPIO
-Message-ID: <39b297b0-5266-4f4b-ade6-8ccb95e90411@lunn.ch>
-References: <20230712022250.2319557-1-colin.foster@in-advantage.com>
- <64ae73ce.050a0220.fe1a6.4b8a@mx.google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475BA34CC8
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:58:20 +0000 (UTC)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81F71BD6
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:58:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689173896; x=1720709896;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zcW5kz8PrZMlxYxJAbQQUtUE+T2XGM7/jXVNUV8g9aM=;
+  b=elnwPhnJsBoCvG4+uUI1zozAOGSuZBEEbjnjg2GbB45US2taD0Tkgkhy
+   4sahtDzL3IsssS5o5xZccxgDHMSMDTQyAbXF1Hz/itzwZdveor1b6nKtn
+   v+cEctY3nkKSPp9EvQX/9dTCGlBPLszGB8hkFhFWK5Sg223PSszsCzlFF
+   s=;
+X-IronPort-AV: E=Sophos;i="6.01,199,1684800000"; 
+   d="scan'208";a="15918877"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 14:58:14 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id 19BB040DAA;
+	Wed, 12 Jul 2023 14:58:14 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 12 Jul 2023 14:58:13 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.181.74) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Wed, 12 Jul 2023 14:58:10 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <idosch@idosch.org>
+CC: <bridge@lists.linux-foundation.org>, <davem@davemloft.net>,
+	<ebiederm@xmission.com>, <edumazet@google.com>, <hcoin@quietfountain.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <razor@blackwall.org>,
+	<roopa@nvidia.com>
+Subject: Re: [PATCH v1 net] bridge: Return an error when enabling STP in netns.
+Date: Wed, 12 Jul 2023 07:58:02 -0700
+Message-ID: <20230712145802.726-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <ZK69NDM60+N0TTFh@shredder>
+References: <ZK69NDM60+N0TTFh@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64ae73ce.050a0220.fe1a6.4b8a@mx.google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.119.181.74]
+X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 03:59:10AM +0200, Christian Marangi wrote:
-> On Tue, Jul 11, 2023 at 07:22:49PM -0700, Colin Foster wrote:
-> > Preface (new for resend):
+From: Ido Schimmel <idosch@idosch.org>
+Date: Wed, 12 Jul 2023 17:48:20 +0300
+> On Tue, Jul 11, 2023 at 04:54:15PM -0700, Kuniyuki Iwashima wrote:
+> > When we create an L2 loop on a bridge in netns, we will see packets storm
+> > even if STP is enabled.
 > > 
-> > This is a resend of a patch I'd sent a couple years back. At that time,
-> > I was told to wait for hardware-offloaded LEDS. It looks like that time
-> > has finally come, so I've changed this from PATCH down to an RFC to make
-> > sure this is the right approach for the framework.
+> >   # unshare -n
+> >   # ip link add br0 type bridge
+> >   # ip link add veth0 type veth peer name veth1
+> >   # ip link set veth0 master br0 up
+> >   # ip link set veth1 master br0 up
+> >   # ip link set br0 type bridge stp_state 1
+> >   # ip link set br0 up
+> >   # sleep 30
+> >   # ip -s link show br0
+> >   2: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+> >       link/ether b6:61:98:1c:1c:b5 brd ff:ff:ff:ff:ff:ff
+> >       RX: bytes  packets  errors  dropped missed  mcast
+> >       956553768  12861249 0       0       0       12861249  <-. Keep
+> >       TX: bytes  packets  errors  dropped carrier collsns     |  increasing
+> >       1027834    11951    0       0       0       0         <-'   rapidly
 > > 
-> > Ocelot chips (VSC7511, VSC7512, VSC7513, VSC7514) have support for
-> > hardware-offloaded LEDs based on network activity. This is currenty
-> > managed by way of pinctrl-microchip-sgpio (and this current patch).
+> > This is because llc_rcv() drops all packets in non-root netns and BPDU
+> > is dropped.
 > > 
-> > The purpose of this resend is two-fold. First, to come up with an idea
-> > of how this pinctrl-microchip-sgpio module can fit in with the new
-> > hardware-offloaded netdev triggers Christian Marangi recently added. Is
-> > this something that should be in the pinctrl module itself? Or should
-> > there be a drivers/net/ethernet/mscc/ocelot_leds.c module that I should
-> > add?
-> >
+> > Let's show an error when enabling STP in netns.
+> > 
+> >   # unshare -n
+> >   # ip link add br0 type bridge
+> >   # ip link set br0 type bridge stp_state 1
+> >   Error: bridge: STP can't be enabled in non-root netns.
+> > 
+> > Note this commit will be reverted later when we namespacify the whole LLC
+> > infra.
+> > 
+> > Fixes: e730c15519d0 ("[NET]: Make packet reception network namespace safe")
+> > Suggested-by: Harry Coin <hcoin@quietfountain.com>
 > 
-> I'm a bit out of the loop on what magic OEM did to make LED work on
-> ocelot but I feel an ocelot_leds submodule is needed.
+> I'm not sure that's accurate. I read his response in the link below and
+> he says "I'd rather be warned than blocked" and "But better warned and
+> awaiting a fix than blocked", which I agree with. The patch has the
+> potential to cause a lot of regressions, but without actually fixing the
+> problem.
 > 
-> To correctly supports the hw many API needs to be defined and for switch
-> I would stick with how things are done with qca8k, codewise and DT wise
-> (with how LEDs are defined in DT)
+> How about simply removing the error [1]? Since iproute2 commit
+> 844c37b42373 ("libnetlink: Handle extack messages for non-error case"),
+> it can print extack warnings and not only errors. With the diff below:
+
+This is good to know and I also prefer this approach!
+I'll post v2.
+
+Thanks!
+
+
 > 
-> Ideally the feature for MAC will be generilized and added to the DSA ops
-> struct, so having things in the DSA driver would make the migration
-> easier.
-
-`ocelot` is a bit of an odd device, since it is both a DSA device for
-felix and seville and a pure switchdev device for ocelot.
-
-You need some integration with the switch driver, because i expect
-only the switch driver has the knowledge of how LEDs are mapped to
-struct netdev and ports. And in order to offload blinking you need
-that mapping.
-
-I have some WIP patches to add a generalized DSA interface for LEDs,
-and support for mv88e6xxx. I would also like to move qca8k over to
-that. So it could be that felix and seville would use that. Ocelot
-would need to do it slightly different, but i expect it is just a
-layer on top of some shared code, much like the rest of ocelot.
-
-Having pinmux in the middle is interesting. I've no idea how that will
-work, but i've not looked at it.
-
-      Andrew
+>  # unshare -n 
+>  # ip link add name br0 type bridge
+>  # ip link set dev br0 type bridge stp_state 1
+>  Warning: bridge: STP can't be enabled in non-root netns.
+>  # echo $?
+>  0
+> 
+> [1]
+> diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
+> index a807996ac56b..b5143de37938 100644
+> --- a/net/bridge/br_stp_if.c
+> +++ b/net/bridge/br_stp_if.c
+> @@ -201,10 +201,8 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
+>  {
+>         ASSERT_RTNL();
+>  
+> -       if (!net_eq(dev_net(br->dev), &init_net)) {
+> +       if (!net_eq(dev_net(br->dev), &init_net))
+>                 NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in non-root netns");
+> -               return -EINVAL;
+> -       }
+>  
+>         if (br_mrp_enabled(br)) {
+>                 NL_SET_ERR_MSG_MOD(extack,
+> 
+> > Link: https://lore.kernel.org/netdev/0f531295-e289-022d-5add-5ceffa0df9bc@quietfountain.com/
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  net/bridge/br_stp_if.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
+> > index 75204d36d7f9..a807996ac56b 100644
+> > --- a/net/bridge/br_stp_if.c
+> > +++ b/net/bridge/br_stp_if.c
+> > @@ -201,6 +201,11 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
+> >  {
+> >  	ASSERT_RTNL();
+> >  
+> > +	if (!net_eq(dev_net(br->dev), &init_net)) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in non-root netns");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> >  	if (br_mrp_enabled(br)) {
+> >  		NL_SET_ERR_MSG_MOD(extack,
+> >  				   "STP can't be enabled if MRP is already enabled");
+> > -- 
+> > 2.30.2
 
