@@ -1,103 +1,81 @@
-Return-Path: <netdev+bounces-17326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0E1751459
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 01:17:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7781751463
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 01:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29BE228191D
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:17:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 147DF281A0D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D88B1D2F5;
-	Wed, 12 Jul 2023 23:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCB11D2F8;
+	Wed, 12 Jul 2023 23:20:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD0C1D2F3
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 23:17:29 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B84173F
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 16:17:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NObsMCZolPr8URNs7WzZ66Itj7bHIsYle0ui7AsSv3c=; b=zuiJtZWTkmW+XzqcjEQ9ZS0Scr
-	QA6LsDYgzVH7kCF6+WF6x1H3E2+LevAZAbt344RVcKEBBxfAyoJTdkQ9IUcxMLN/1u39hcGQZrJU2
-	sCBZ682JPoYYTk0H/OlNLcz+B1aQDwvCcJSY0lmKocdR3W+uJ4kP7n+fFZf93WnSFk7M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qJj5H-001BR2-RM; Thu, 13 Jul 2023 01:17:23 +0200
-Date: Thu, 13 Jul 2023 01:17:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vivien Didelot <vivien.didelot@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Tobias Waldekranz <tobias@waldekranz.com>
-Subject: Re: [PATCH net v2] dsa: mv88e6xxx: Do a final check before timing out
-Message-ID: <06035fce-c1e5-434b-9448-77b7f6abd110@lunn.ch>
-References: <20230712223405.861899-1-linus.walleij@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273DC1D2F6
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 23:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 80C0DC433C9;
+	Wed, 12 Jul 2023 23:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689204021;
+	bh=zkasVwqLRc7W1UseZaCkfYhoC92bPsjC+N8B9QXHh84=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cDgL6nimw8l95lO/4ncH7p3RITSpEyYt4VGF4l8nkeTtPpKS39MyHb1TDH9WObXgL
+	 rup931vGlIIodd0VmSsQZtLFeOUbN6qlL6X+vJOfhOEvpxhOKsR5M+p/2EFc7EBabs
+	 zb2GWq03PD3MopbARDWyprZ341u6AbjjNK5DnmhwQohV0iri86CshscjvZKtmUM1y9
+	 k2o2FXg1/CQMu2YRLurNjkZalnvKd3eONOTT5CAeyhft9bn+GtvEIFTgrog+jjEovy
+	 qqUrv0+UfgzIY+J0U9YuAv5JlZqhEQtBnw8hWPNpEiYsjzEzqD2jjDWPDgW5PQQqUh
+	 Lknhk/iRffmiw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 63375C04E32;
+	Wed, 12 Jul 2023 23:20:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230712223405.861899-1-linus.walleij@linaro.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] net/sched: make psched_mtu() RTNL-less safe
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168920402140.16706.12261213766456286160.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Jul 2023 23:20:21 +0000
+References: <20230711021634.561598-1-pctammela@mojatatu.com>
+In-Reply-To: <20230711021634.561598-1-pctammela@mojatatu.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com
 
-On Thu, Jul 13, 2023 at 12:34:05AM +0200, Linus Walleij wrote:
-> I get sporadic timeouts from the driver when using the
-> MV88E6352. Reading the status again after the loop fixes the
-> problem: the operation is successful but goes undetected.
-> 
-> Some added prints show things like this:
-> 
-> [   58.356209] mv88e6085 mdio_mux-0.1:00: Timeout while waiting
->     for switch, addr 1b reg 0b, mask 8000, val 0000, data c000
-> [   58.367487] mv88e6085 mdio_mux-0.1:00: Timeout waiting for
->     ATU op 4000, fid 0001
-> (...)
-> [   61.826293] mv88e6085 mdio_mux-0.1:00: Timeout while waiting
->     for switch, addr 1c reg 18, mask 8000, val 0000, data 9860
-> [   61.837560] mv88e6085 mdio_mux-0.1:00: Timeout waiting
->     for PHY command 1860 to complete
-> 
-> The reason is probably not the commands: I think those are
-> mostly fine with the 50+50ms timeout, but the problem
-> appears when OpenWrt brings up several interfaces in
-> parallel on a system with 7 populated ports: if one of
-> them take more than 50 ms and waits one or more of the
-> others can get stuck on the mutex for the switch and then
-> this can easily multiply.
-> 
-> As we sleep and wait, the function loop needs a final
-> check after exiting the loop if we were successful.
-> 
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
-> Cc: Tobias Waldekranz <tobias@waldekranz.com>
-> Fixes: 35da1dfd9484 ("net: dsa: mv88e6xxx: Improve performance of busy bit polling")
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Hello:
 
-Hi Linus
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks for the new version.
+On Mon, 10 Jul 2023 23:16:34 -0300 you wrote:
+> Eric Dumazet says[1]:
+> -------
+> Speaking of psched_mtu(), I see that net/sched/sch_pie.c is using it
+> without holding RTNL, so dev->mtu can be changed underneath.
+> KCSAN could issue a warning.
+> -------
+> 
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Here is the summary with links:
+  - [v2,net] net/sched: make psched_mtu() RTNL-less safe
+    https://git.kernel.org/netdev/net/c/150e33e62c1f
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
