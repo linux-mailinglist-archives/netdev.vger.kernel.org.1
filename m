@@ -1,81 +1,119 @@
-Return-Path: <netdev+bounces-17175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F8A750B73
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:55:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4100750B77
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADD1A28175D
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:55:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E55CC1C20F4D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7756C34CE8;
-	Wed, 12 Jul 2023 14:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B361C2AB5F;
+	Wed, 12 Jul 2023 14:55:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316AC27726
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:55:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58EA3C433D9;
-	Wed, 12 Jul 2023 14:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689173700;
-	bh=aWXZ168MF3/GE/VIa8RqS5mzwhZWllmcBrl2Dw1kmJY=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=F3o5hbNBHjzOyKI2Zb+VAnfjStTlMBd8I9tl2otWFJJrT8M3yvSngnBQU4DMprCty
-	 wuvJRxia2uZXeLBEB9Dy7ATFrAP9pozpYNgIzc8tqeKGbUK2Fv7EG5icPwV5KpOU9U
-	 /YJBgVX8/jtWmDca/EwHndYKJgAqvDZVvZGAeqVEr5r1/xnviYUUGUwjqGg8EJKuJz
-	 tD3wj2SdG1zgyMqpodrTQgZ/isVk0pcWouaWsar1wShUZaqDBXcVRDFVkBk9XzeuAH
-	 ZeBzQpHwBrq/1KRmdFZviGF+UA1u3ls2hS0jN+Nx+pnYlEsrDAbHGzjUsQXC04/loq
-	 clC9NyBXo0VxQ==
-Message-ID: <0db45681-dd13-21e9-1be6-861fd9588ca9@kernel.org>
-Date: Wed, 12 Jul 2023 08:54:59 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BE0A42
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:55:57 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2A7BB;
+	Wed, 12 Jul 2023 07:55:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BINkZ1i4PKbO0+fsSVwUWsXVzisxjT4/2QKSssOySGM=; b=QFjAs1WzTxEUF8chDYKA9DlGDT
+	sJN8HV/wvVUFJ/zD7PJtGdfq1i92ZgHRlm5fg55/irDCuSja/uKzralkXH7VLBsgLEZmnQe4zgYlU
+	lN19WBy4XwBfRdY19J53pq29mtBpk2kvNWYzpny1Epr9p1/GdmI8IsU8isimR/DqV40A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qJbFo-0019Hu-Gx; Wed, 12 Jul 2023 16:55:44 +0200
+Date: Wed, 12 Jul 2023 16:55:44 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Colin Foster <colin.foster@in-advantage.com>,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>,
+	UNGLinuxDriver@microchip.com,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [RFC RESEND v1 pinctrl-next 0/1] add blink and activity
+ functions to SGPIO
+Message-ID: <39b297b0-5266-4f4b-ade6-8ccb95e90411@lunn.ch>
+References: <20230712022250.2319557-1-colin.foster@in-advantage.com>
+ <64ae73ce.050a0220.fe1a6.4b8a@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v1 net-next] ipv6: rpl: Remove redundant skb_dst_drop().
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-To: Simon Horman <simon.horman@corigine.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20230710213511.5364-1-kuniyu@amazon.com>
- <ZK6Q5bp7cYhfl6iN@corigine.com>
- <2fda9e96-cefc-fcee-063c-cdf652a64992@kernel.org>
-In-Reply-To: <2fda9e96-cefc-fcee-063c-cdf652a64992@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64ae73ce.050a0220.fe1a6.4b8a@mx.google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/12/23 8:42 AM, David Ahern wrote:
-> On 7/12/23 5:39 AM, Simon Horman wrote:
->> On Mon, Jul 10, 2023 at 02:35:11PM -0700, Kuniyuki Iwashima wrote:
->>> RPL code has a pattern where skb_dst_drop() is called before
->>> ip6_route_input().
->>>
->>> However, ip6_route_input() calls skb_dst_drop() internally,
->>> so we need not call skb_dst_drop() before ip6_route_input().
->>>
->>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->>
->> Reviewed-by: Simon Horman <simon.horman@corigine.com>
->>
+On Wed, Jul 12, 2023 at 03:59:10AM +0200, Christian Marangi wrote:
+> On Tue, Jul 11, 2023 at 07:22:49PM -0700, Colin Foster wrote:
+> > Preface (new for resend):
+> > 
+> > This is a resend of a patch I'd sent a couple years back. At that time,
+> > I was told to wait for hardware-offloaded LEDS. It looks like that time
+> > has finally come, so I've changed this from PATCH down to an RFC to make
+> > sure this is the right approach for the framework.
+> > 
+> > Ocelot chips (VSC7511, VSC7512, VSC7513, VSC7514) have support for
+> > hardware-offloaded LEDs based on network activity. This is currenty
+> > managed by way of pinctrl-microchip-sgpio (and this current patch).
+> > 
+> > The purpose of this resend is two-fold. First, to come up with an idea
+> > of how this pinctrl-microchip-sgpio module can fit in with the new
+> > hardware-offloaded netdev triggers Christian Marangi recently added. Is
+> > this something that should be in the pinctrl module itself? Or should
+> > there be a drivers/net/ethernet/mscc/ocelot_leds.c module that I should
+> > add?
+> >
 > 
-> I have been ignoring net-next patches since net-next status still shows
-> as closed.
+> I'm a bit out of the loop on what magic OEM did to make LED work on
+> ocelot but I feel an ocelot_leds submodule is needed.
+> 
+> To correctly supports the hw many API needs to be defined and for switch
+> I would stick with how things are done with qca8k, codewise and DT wise
+> (with how LEDs are defined in DT)
+> 
+> Ideally the feature for MAC will be generilized and added to the DSA ops
+> struct, so having things in the DSA driver would make the migration
+> easier.
 
-I was shown the error of my ways (i.e., pointed to the new URL for
-net-next status)
+`ocelot` is a bit of an odd device, since it is both a DSA device for
+felix and seville and a pure switchdev device for ocelot.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+You need some integration with the switch driver, because i expect
+only the switch driver has the knowledge of how LEDs are mapped to
+struct netdev and ports. And in order to offload blinking you need
+that mapping.
 
+I have some WIP patches to add a generalized DSA interface for LEDs,
+and support for mv88e6xxx. I would also like to move qca8k over to
+that. So it could be that felix and seville would use that. Ocelot
+would need to do it slightly different, but i expect it is just a
+layer on top of some shared code, much like the rest of ocelot.
+
+Having pinmux in the middle is interesting. I've no idea how that will
+work, but i've not looked at it.
+
+      Andrew
 
