@@ -1,127 +1,245 @@
-Return-Path: <netdev+bounces-17090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B379E750385
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:47:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 776FE7503BA
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E09B51C20F49
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:47:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A86901C20F49
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC0E1F958;
-	Wed, 12 Jul 2023 09:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EF41F95A;
+	Wed, 12 Jul 2023 09:48:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17294433
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:47:14 +0000 (UTC)
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4764AB0
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 02:47:12 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-51de9c2bc77so8284641a12.3
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 02:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689155231; x=1691747231;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D9xoV9OSsDzeAGBHAsjc/WkWlPTtUKCm7g6vupM4Sfk=;
-        b=dbvSSV79144Xj4t/Ev6ulB2208F/WG5SbNt8TVEV8JuyW5jPmuG+hX+cwEOLgkyweX
-         i5DwqIXMkRAtQBXiSujj2YTdrxKuuHC/ndfd8EXh+8oqA3Z2qKyZ/+aZ+K7UlyZn7TdM
-         OD7vwq2DuC8MNThqh/HImUc+mXUa1EMKAlBWOjiHogsp/2Cl2IOBYcKZ3joJ1R327EfS
-         FlNAqRCCXM0LVmE/V1Ab7lrPE/mPkhJL22VFLZFbti+QudYSKIVdfSuTwc6/00mk92me
-         RMZE3g+wonZvVbDgUgZhK1diVO1NMfkwNIhQWKtT8+U6knEKKmm0sojfKmNCalVW+PGp
-         qaeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689155231; x=1691747231;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=D9xoV9OSsDzeAGBHAsjc/WkWlPTtUKCm7g6vupM4Sfk=;
-        b=RX4GrWtbvfFRd5heL7FSTR8oiiFnIHBYX+NsQKMB3vOqM/IZ9dCfynYCJOYvx7IDIJ
-         gMknpFvQEgnlAfm2/nr2SjZ0caNZBTbUsyucMNG47vrPevaDuWume3DOkVlXpj676I97
-         araLII/TTuhPYBKknVZwNjyDks3J9BwyGspoXyWLhVXTFw0buT5m52E6eSCBV4AUDpZk
-         PqwfgbwMDySf/wG8RgI8n0WytufEW4p1QyQiBCGyb4/VWyWKnXDeQ4c3E8xR1k8cNtMB
-         A1CFs3QeQRqC51MSZeBl460/iA+puyHZ52ZPj42XJ283socIywNjliwT027FL1RoN5DF
-         Am1w==
-X-Gm-Message-State: ABy/qLb2dt3b0o9LqNkIhARxt9wWm1A1CUrEOUgQ16KVIhnVKSQ8zFpl
-	E1CciYqPnkGdJKM6xEaNWrHzaDCiODloxPKL9pYfVQ==
-X-Google-Smtp-Source: APBJJlHynQouQei8wAh6Z81oCVycM4afm0fiJvGuTeNiTTesD4RpwSfcG9YwiibW0PnOqYh8kixCzw==
-X-Received: by 2002:a05:6402:350:b0:51a:265a:8fca with SMTP id r16-20020a056402035000b0051a265a8fcamr20076101edw.27.1689155230657;
-        Wed, 12 Jul 2023 02:47:10 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:e63d:32df:2bec:83e9? ([2a02:578:8593:1200:e63d:32df:2bec:83e9])
-        by smtp.gmail.com with ESMTPSA id bm24-20020a0564020b1800b0051e069ebee3sm2475137edb.14.2023.07.12.02.47.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jul 2023 02:47:10 -0700 (PDT)
-Message-ID: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
-Date: Wed, 12 Jul 2023 11:47:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDB84433
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:48:08 +0000 (UTC)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3DC1736;
+	Wed, 12 Jul 2023 02:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689155284; x=1720691284;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2WHclcV0q6My+F68DlQVIVuheRjpPEOSlso5nB/K6I8=;
+  b=cuRjzIsRL4bymfqbu/8DZhuKTo3gctuuAHNTopXhA1y18qGMzUXF2ZOl
+   cGX3LH0hXcjWzKTjYPhH9qXB7BVihV2ZTQmRwZ4NF5sD/waBlp8T2i2kC
+   aSlGUcNJXvrv2NJCjailhOol0oUO91vmlAFi120cBo0l8s64NS0+83y3O
+   Doof0NxDDEO6nyygDz5UMmpXgp4DN14L1FaR/w17Kysd77kz0K5kzASHk
+   stqYHsQ783H+gV91QD6PrgLj4qfNsmq/66GpEs9Ad/i/ZTvK5RHKrYz3n
+   bf87eswhir6Qy1KR4vIql/V/MAKxvO3NcAh8/YVIkkJYdWROLuahuNWX4
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="395646257"
+X-IronPort-AV: E=Sophos;i="6.01,199,1684825200"; 
+   d="scan'208";a="395646257"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 02:47:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="724818515"
+X-IronPort-AV: E=Sophos;i="6.01,199,1684825200"; 
+   d="scan'208";a="724818515"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga007.fm.intel.com with ESMTP; 12 Jul 2023 02:47:57 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 12 Jul 2023 02:47:57 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 12 Jul 2023 02:47:56 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 12 Jul 2023 02:47:56 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 12 Jul 2023 02:47:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EBqlVXDEO6EB6UCbEBp8pHZRE+7iHcVCHAWS4OsMK8s5/9JjzV3cVF4zkDXxYux7RIjwGEI4b5zswf+bvEvh79n57vxRV64J3SrdqVEUlBppivVOv1u0margGwHRVPz4LiZDIS/OKZ/Px0BvzMxLMePqIgtJiiHjpP7nNypjrYHtnecs+3jWBM5qFatZ7loF2vzOo4LUEndZKs2JiPe+kUM1RbLUOQdh5vpDNrCehuvtolg+V5+NwTWOv8yI7xgQhIhwXmFyDGKr3cM8CPFFGueHd4Vq6GpI/vmXC4M03a4fNw1JM4Iqbd8vFrGJeGu5pp/u69r78dMzz0i2VK8FRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4hOsGlOhYqgsgwA1CNaoZ6ohvioE5O8XCsZx7nthmZg=;
+ b=H0NwZkhjJY44JYlvNtp40Bl5Kcxgh9j2reqop2RwfFYbzgu/YLWcsK/Sexws/kcSiPbHeiX4b4Up7Vw5X0SlXcv7shvAe7WTpspDxhjPwe61BjR8qUmpieSEIXJb6iSJfGAiAP2GXs/z9jf9FCj3oUbF0hjKnxvC8scHPmFfhLL3yq+MA8WPZKVRbhI/h8og+axcpQuyhzbUohxTEl/KjY40nC0yrKCxQBPrxq57zE/7Ki/F4LTvHNEcSxMwzwn2+O4W8Ie+ggRPidWcClhFnommSeSuDMdw3DgldQl6JtDCSLBapLZQ3EAMOmtskZYZmYcoYI3Px06rlV5z0z11cQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ PH0PR11MB4999.namprd11.prod.outlook.com (2603:10b6:510:37::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6565.30; Wed, 12 Jul 2023 09:47:44 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::24bd:974b:5c01:83d6]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::24bd:974b:5c01:83d6%3]) with mapi id 15.20.6565.028; Wed, 12 Jul 2023
+ 09:47:43 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>,
+	"chuck.lever@oracle.com" <chuck.lever@oracle.com>
+Subject: RE: [PATCH net-next] tools: ynl-gen: fix parse multi-attr enum
+ attribute
+Thread-Topic: [PATCH net-next] tools: ynl-gen: fix parse multi-attr enum
+ attribute
+Thread-Index: AQHZs93dRsBnvsQ2oE6qwQQo1+9ekK+1guSAgABffbA=
+Date: Wed, 12 Jul 2023 09:47:43 +0000
+Message-ID: <DM6PR11MB465780867DE4C45F977A06D39B36A@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230711095323.121131-1-arkadiusz.kubalewski@intel.com>
+ <20230711205953.346e883b@kernel.org>
+In-Reply-To: <20230711205953.346e883b@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|PH0PR11MB4999:EE_
+x-ms-office365-filtering-correlation-id: 2c769c60-a9c5-4193-cc6c-08db82bd0a6a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pgKP8jOKWhUQO+txjyfo9XtMY9mpRQz8w6Mk6VLsSGJqQlCD1D6FBMZR1mLmxXyEZI1KrNgRmaX12yChvptLdS0aeeo2I3nnb40mKxqec4g4gcrDBnVtx0yrHBHEkqZwU0sqH0woL1BZUhbGq+mX/ILy2+6rf3d/OmM7vvbu/IVDFf2JsneyAtFHrVC9srettfBJH0hRVkZXzHxdYpRBDB8MABaGFCq0159s7P/xApKtAqJ4UqdkweSWmlWDpQULWfFz1f/PWnvUnPHptN8kggMvFT1OM+3Z+NnmhTxdNyF2uU6HYIYcVdVLAeyIbtEtDnDmTULkH1OBNke5EDtLbUNWG3Vc7cnmdXIc8bxAeCsvrBEw41NRtYvqA1UWbKvBskeONl/xkJZJF+ASBDmoLcfCATZ6djPJ8zMkLSq04WfHE0YgwiU3VaQ3fg53XqHVAo9BM/CmBlYsbA0FIEfAYY9LuA3ltRcoeQ38pRQ/DQLNMvqipuqNUH5aM2JLKUpzhoIIcNJAF+mb1zrj+bFeNVP675gCt+rCAecKoCHOXkbO08VLTBHuRqDuen7lZx9uTFWlrujCzsgwc6wcoPipZebnArBb4rJqQ9KYyZQMfg9oQnvegee1oVzHp+wBN4kY
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(39860400002)(366004)(136003)(376002)(451199021)(54906003)(478600001)(76116006)(7696005)(71200400001)(6506007)(26005)(9686003)(186003)(66946007)(2906002)(316002)(41300700001)(6916009)(66556008)(82960400001)(4326008)(66446008)(66476007)(52536014)(8676002)(64756008)(8936002)(5660300002)(38100700002)(86362001)(33656002)(38070700005)(83380400001)(55016003)(122000001)(66899021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IjqvDaaeKIvF8j5rPjFnw5ks8pMDbnHPDt6wl7EYr4o+ONftm+8pbSM50oFS?=
+ =?us-ascii?Q?tlJ04luNlE1DoCcatGNs6QIfqiu+bR17Lgie0i32eqoRHjRxF0b2vknz3iCW?=
+ =?us-ascii?Q?xWFuqUgoeWAcc4iacTSJQRl+7l05lttEUNSa7+Tz+4zbbjn6xuCBCvGHS+ip?=
+ =?us-ascii?Q?Zaa/yF3hNbRjbt3OYkmiUc/Ni6b9mucjONaVGCG4ORTmA025sYOOd5QJJ646?=
+ =?us-ascii?Q?BZw2XYNRZFR2afO7kAEDGil9Ro6b7ZzCjvqpD/f8u3/CaeIgUvSvvJNyulEQ?=
+ =?us-ascii?Q?7Ik0tbwQgS/U5kZ/16GrAx83yS///H+MWLfY4QYlLThVoRE2nRS8URZ4Vte9?=
+ =?us-ascii?Q?xHo7a3wIT6Y4adzj40s6YqqxlACC1hdpLt7V2F3wUEjkC4mK1fW8TboHmMxu?=
+ =?us-ascii?Q?xv9EReEzZ/LzRm8rV4f6I0lBNXlJVj1tdPUFve6HhWHiPxxRL4uVofno3Zap?=
+ =?us-ascii?Q?yuj5uuyArKJLIjUPwqgYAGjxiEdF0TyNCPbKHMYs8LF8W2fhzKLoqpAq/GS9?=
+ =?us-ascii?Q?x2UQXx9CCXQClgPw4tWQGCPh/9GnJcH1BL3+CK5xLXNjAmjzFkKCxS7y1+cq?=
+ =?us-ascii?Q?RMfJxeh4pNO9njVX5oGP4IlVgCa6WFJx1mnKukUrw4HEWAuE/cZQENjf5Q0M?=
+ =?us-ascii?Q?HMtYB3mwIgiJ8RJ6TDUNEmVzsBxL/6G+Me9qiQKCSaGm9+CHGWGW4gTggE4m?=
+ =?us-ascii?Q?stbNzOmIiH0Fdr5NdAxaW9hD3K1OyKesRRev4vB1YHU/geeiDerawdBLdhYl?=
+ =?us-ascii?Q?kHeLTg1Ez89Z9cOSJBvyHN5cAEEuziSQkruMLcT7Ed47jSOGadDIFrz70jVC?=
+ =?us-ascii?Q?/SVX1ei7nZeskRRDkdo2/a51D/5DtluD6VD36bcxcaRq34MzOuGwYEm89Vkj?=
+ =?us-ascii?Q?zjmQPbd67NQbfSKaPLuGD2/co+Y+EQQs1z342It4ZfdZzVjF3GglUS97qfez?=
+ =?us-ascii?Q?i3jhVfG1GIiOBRtZHyIhGiO8uz6x6RAxR4O7Icw/bj7g0qleQ9jo03jYzrhj?=
+ =?us-ascii?Q?oLhKpPtVN+wDo/rdOIPr6vlVf6fayFzy0KalR2bblCtvdNxlLL7jujeltLwq?=
+ =?us-ascii?Q?T0nly8nBV+m1JT8taD/0s/Y3tLS2MzpEEToJZPbfWG7eP4ly/oLRo1GlEKDW?=
+ =?us-ascii?Q?DzmaPB2XTJqhfN8WG0vbMJUgNzIpeVQ5sa3OWhGMsLOGhLod19exTtitQCU8?=
+ =?us-ascii?Q?RfdgFmhsyHJRfRp/w+cSbmiIqHn+/mqExRoYksWcKYJ/nE610LjlcIVvpG7V?=
+ =?us-ascii?Q?wg3FrhHp9dlgFGM+auUTZTZwOJGuSdLtiwtuA2DYXR7jd1oerOssvM2m2pO9?=
+ =?us-ascii?Q?6c6uOFfXBwgcuXk/MgLlOI9WmSo/+iQP/1P+u0EdRmpKAXx0WwdXEke12xv3?=
+ =?us-ascii?Q?U7TC0RpKeJr4wZzHg49WRZZfcXNm9fI/NLtf+wHGnGU+uU1BlxOTIw789Sfk?=
+ =?us-ascii?Q?29YnCvQNJA8rVHHzhk3OsaYuwLxBh3JO/0evctbLCQZ86/j4WFnqdDoHBFTK?=
+ =?us-ascii?Q?WLHCqeM2zQb/XjC6Gtf8GdFo7iLo0gvm50ZBuCyz4QA4DmGnRmU2Er/Ubfv9?=
+ =?us-ascii?Q?WorBqjNkaqTkU1qmo3zNL1r0eBqQvDjkoUfGw1hf9D5T4hW/A9obj/7INHUe?=
+ =?us-ascii?Q?Kw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-GB
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell <anders.roxell@linaro.org>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Subject: TC: selftests: current timeout (45s) is too low
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c769c60-a9c5-4193-cc6c-08db82bd0a6a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2023 09:47:43.7675
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9tu2Sp7E1boQIhxa6GHrmw5X9cF0GYws7yayKY0F2RaL7kSm3kpOXadvCAKTME9mt5hcJ2rk8rTHg24ZYWn1yR1b+DwWeEmoStVU0TkN9yI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4999
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jamal, Cong, Jiri,
+>From: Jakub Kicinski <kuba@kernel.org>
+>Sent: Wednesday, July 12, 2023 6:00 AM
+>
+>On Tue, 11 Jul 2023 11:53:23 +0200 Arkadiusz Kubalewski wrote:
+>> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py index
+>> 3b343d6cbbc0..553d82dd6382 100644
+>> --- a/tools/net/ynl/lib/ynl.py
+>> +++ b/tools/net/ynl/lib/ynl.py
+>> @@ -407,7 +407,14 @@ class YnlFamily(SpecFamily):
+>>                  raw >>=3D 1
+>>                  i +=3D 1
+>>          else:
+>> -            value =3D enum.entries_by_val[raw - i].name
+>> +            if attr_spec.is_multi:
+>> +                for index in range(len(raw)):
+>> +                    if (type(raw[index]) =3D=3D int):
+>> +                        enum_name =3D enum.entries_by_val[raw[index] -
+>>i].name
+>> +                        rsp[attr_spec['name']][index] =3D enum_name
+>> +                return
+>> +            else:
+>> +                value =3D enum.entries_by_val[raw - i].name
+>>          rsp[attr_spec['name']] =3D value
+>
+>Two asks:
+>
+>First this function stupidly looks at value-start. Best I can tell this is
+>a leftover from when enum set was an array, but potentially "indexed with
+>an offset" (ie. if value start =3D 10, first elem would have value 11, sec=
+ond
+>12 etc.). When we added support for sparse enums this was carried forward,
+>but it's actually incorrect. entries_by_val is indexed with the real value=
+,
+>we should not subtract the start-value. So please send a patch to set i to
+>0 at the start and ignore start-value here (or LMK if I should send one).
+>
+>Second, instead of fixing the value up here, after already putting it in
+>the rsp - can we call this function to decode the enum before?
+>A bit hard to explain, let me show you the diff of what I have in mind for
+>the call site:
+>
+>diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py index
+>1b3a36fbb1c3..e2e8a8c5fb6b 100644
+>--- a/tools/net/ynl/lib/ynl.py
+>+++ b/tools/net/ynl/lib/ynl.py
+>@@ -466,15 +466,15 @@ genl_family_name_to_id =3D None
+>             else:
+>                 raise Exception(f'Unknown {attr_spec["type"]} with name
+>{attr_spec["name"]}')
+>
+>+            if 'enum' in attr_spec:
+>+                decoded =3D self._decode_enum(rsp, attr_spec)
+>+
+>             if not attr_spec.is_multi:
+>                 rsp[attr_spec['name']] =3D decoded
+>             elif attr_spec.name in rsp:
+>                 rsp[attr_spec.name].append(decoded)
+>             else:
+>                 rsp[attr_spec.name] =3D [decoded]
+>-
+>-            if 'enum' in attr_spec:
+>-                self._decode_enum(rsp, attr_spec)
+>         return rsp
+>
+>     def _decode_extack_path(self, attrs, attr_set, offset, target):
+>
+>Then _decode_enum() only has to ever deal with single values, and the
+>caller will take care of mutli_attr like it would for any other type?
 
-When looking for something else [1] in LKFT reports [2], I noticed that
-the TC selftest ended with a timeout error:
+Sure, I will try to implement your proposal and send update here.
 
-  not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
+Thank you!
+Arkadiusz
 
-The timeout has been introduced 3 years ago:
-
-  852c8cbf34d3 ("selftests/kselftest/runner.sh: Add 45 second timeout
-per test")
-
-Recently, a new option has been introduced to override the value when
-executing the code:
-
-  f6a01213e3f8 ("selftests: allow runners to override the timeout")
-
-But I guess it is still better to set a higher default value for TC
-tests. This is easy to fix by simply adding "timeout=<seconds>" in a
-"settings" file in 'tc-testing' directory, e.g.
-
-  echo timeout=1200 > tools/testing/selftests/tc-testing/settings
-
-I'm sending this email instead of a patch because I don't know which
-value makes sense. I guess you know how long the tests can take in a
-(very) slow environment and you might want to avoid this timeout error.
-
-I also noticed most of the tests were skipped [2], probably because
-something is missing in the test environment? Do not hesitate to contact
-the lkft team [3], that's certainly easy to fix and it would increase
-the TC test coverage when they are validating all the different kernel
-versions :)
-
-Cheers,
-Matt
-
-[1] The impact of https://github.com/Linaro/test-definitions/pull/446
-[2]
-https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230711/testrun/18267241/suite/kselftest-tc-testing/test/tc-testing_tdc_sh/log
-[3] lkft@linaro.org
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+>--
+>pw-bot: cr
 
