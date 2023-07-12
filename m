@@ -1,82 +1,87 @@
-Return-Path: <netdev+bounces-17318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965A075138C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 00:30:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF7DE751393
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 00:31:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 729041C210D2
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 22:30:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C0061C211B7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 22:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7C0F9DB;
-	Wed, 12 Jul 2023 22:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C141E1D2E2;
+	Wed, 12 Jul 2023 22:31:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D6314F8C;
-	Wed, 12 Jul 2023 22:30:51 +0000 (UTC)
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8641BF9;
-	Wed, 12 Jul 2023 15:30:50 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6b5d7e60015so26910a34.0;
-        Wed, 12 Jul 2023 15:30:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5ED4384
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 22:31:37 +0000 (UTC)
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26BBB1FDB;
+	Wed, 12 Jul 2023 15:31:36 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-55adfa61199so131285a12.2;
+        Wed, 12 Jul 2023 15:31:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689201049; x=1691793049;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kiCtA/22/EFm5piD1C3kb16M+b7jXxq1GCQ/ove9Xq0=;
-        b=E6Wp19MqbiLa2w7w8XBEoyRhEcfcSxvTvj2OkSTX3vp6LRYcYoZiMzggqAGNwlx5Iz
-         QX0n4wA+Ke0Jt6PAMil195jlchqfWxTW/CZGRXZ3iHGaNjrJG1lfmEOSiQMujagfN8ft
-         dkpA8+tObItaUlZAUFA/k35Cu5CRMRGIKFSrckM89xjNXopjLGMe836Bqu1ONCbcOD7Y
-         Jyb0HD8IQ5xOixDntnw+21DCZaJrNjA32NyeKBQK4eP2dooEu1IHi9Home9BiWH1IOrx
-         KWumjonVVr8FvJebrZ3EopygegOb5rMNJtTUXeHqf82x2djD0ZGhnqaMSqcmWB+zwp/M
-         xyZw==
+        d=gmail.com; s=20221208; t=1689201095; x=1691793095;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qCpvGyW7ZNtzKpBm2Ry0x2qGxhjvzST5Bf86BqgznXA=;
+        b=KHsoBgFNhngzZ+1XI0HfDDPczhjyvQZMxkyeCW532jV+dpvmTISH8pxMzBXTzY2VMv
+         0GOFXFF3czKZl7IYWVBjWCsmAG31URAjWou4msKKQgdAPo3MuaUtZDGyz3iQmaA6LKF7
+         m8MIl1dtM9VRCrsi0OnumUM1v+hTPFLHeKySR8Fdwpp/qymtg+J16kTeNwUsSUagsxKM
+         yCQ2h7AM1uZm7LP8hp4vEqoKNvw0Pi1/8Sj4Gg9yCRDHTnjX6t2vIdYNjruqbHEcQfWu
+         ykBxbabQv1Gp7zg4Btj5zQc6uFIDnifVZEULqgCa72IRqH0dJOFcf9FYq3UCM/NbXBP8
+         j33A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689201049; x=1691793049;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kiCtA/22/EFm5piD1C3kb16M+b7jXxq1GCQ/ove9Xq0=;
-        b=ClZW0kAbrJ0SI37QjUrhhqqmvXVY4LgBXPdh1vdyYZDJsROOQhjCZjP7zdIRA7W1Wd
-         JdHKaBDJLYl37HV39grgVDh/pCLCO6vCPqRLgm+y9Hj2I0aKfCf6QMdEIIyHtKjJ2N9t
-         KrZdhvn9B4x1IqRUCx5TFiU7c1HSmd1zRXpKkTBTWzq263PjTpaiVL32e98UQpFEpk/2
-         lIy266CwfXBflID7AkXeVCayAgdkPdOcZakhJQAtoR23vhjIk5QOEch+8Xt/n09jfPfp
-         X9LLVAZ48b1X/63dwF8KR+I//0I+HLn8EQDfm+0I5D2YRqsHoYaK62SHHcm8uwQvhn+r
-         cMPA==
-X-Gm-Message-State: ABy/qLYTfE5h9/Mlgw/yECz78TdfwwtTxEz/wSx/fXr0MsIBwkl5tfci
-	jHuMFk3wWJVMwtELxvhsJHw=
-X-Google-Smtp-Source: APBJJlE/TrK+/bVBSaKKfwmTCH2roaa04EPD0bWHMKadQ45qsGluYb662stQWtWVrmHVvWnKupUpzw==
-X-Received: by 2002:a05:6830:e05:b0:6b8:9705:5035 with SMTP id do5-20020a0568300e0500b006b897055035mr18929269otb.33.1689201049336;
-        Wed, 12 Jul 2023 15:30:49 -0700 (PDT)
-Received: from localhost.localdomain ([2620:10d:c090:400::5:3399])
-        by smtp.gmail.com with ESMTPSA id i11-20020a17090a2acb00b00265b0268382sm4431105pjg.37.2023.07.12.15.30.47
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 12 Jul 2023 15:30:48 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	kernel-team@fb.com
-Subject: pull-request: bpf 2023-07-12
-Date: Wed, 12 Jul 2023 15:30:45 -0700
-Message-Id: <20230712223045.40182-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
+        d=1e100.net; s=20221208; t=1689201095; x=1691793095;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qCpvGyW7ZNtzKpBm2Ry0x2qGxhjvzST5Bf86BqgznXA=;
+        b=GML2O/ByfTI5GxWV9Ufkzk/N68/Azx09nYGd/n7sqBn0dJoqxAPq/i9i9CmJ8mRNKq
+         UFwC5dnl5uwIl4PDbVbcsJt9jNqFWdSYDFs2q7St5kp4FZvgu96CUtYj/1nuOIJzZIAb
+         6trouAlimmgFHvjTD2AWk5sDdKyiKBvzDtxIFOjT/SXfGROXaWFcBWgdykcoQVcN7fPH
+         aZtVm66BwXPmr0nex4y7vL9UOKDDRfYbhE5VxHLE3IPYRqbm+vfDzYgsUmuMc1DLcEre
+         CunmiyynpYhS3MCtZ1MND5FWfRkDC4qtod1UIbB4gD735R+PW1+RN2mXsIrlog32YInr
+         VT6w==
+X-Gm-Message-State: ABy/qLaGKOAXrK5FpH6YKn/IeEdC/lFRJ0e+oyB4P9IhWmUkNbuIwoOT
+	DdDpLcDyldiSmn6RkKU7hKQ=
+X-Google-Smtp-Source: APBJJlF6okL7Dglm5S6RpST3VlKIYHaPb/KgL/WI8M8bciN3EtB5A+GR1rnB0ASkVIGOKLFR21m7fw==
+X-Received: by 2002:a17:902:d4d1:b0:1b8:a234:7617 with SMTP id o17-20020a170902d4d100b001b8a2347617mr23278580plg.5.1689201095479;
+        Wed, 12 Jul 2023 15:31:35 -0700 (PDT)
+Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170902b18a00b001b9dfa8d884sm4466924plr.226.2023.07.12.15.31.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 15:31:35 -0700 (PDT)
+Date: Wed, 12 Jul 2023 22:31:34 +0000
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v5 13/17] vsock: enable setting SO_ZEROCOPY
+Message-ID: <ZK8pxrbkrH2bEgw7@bullseye>
+References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
+ <20230701063947.3422088-14-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230701063947.3422088-14-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -84,75 +89,121 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Sat, Jul 01, 2023 at 09:39:43AM +0300, Arseniy Krasnov wrote:
+> For AF_VSOCK, zerocopy tx mode depends on transport, so this option must
+> be set in AF_VSOCK implementation where transport is accessible (if
+> transport is not set during setting SO_ZEROCOPY: for example socket is
+> not connected, then SO_ZEROCOPY will be enabled, but once transport will
+> be assigned, support of this type of transmission will be checked).
+> 
+> To handle SO_ZEROCOPY, AF_VSOCK implementation uses SOCK_CUSTOM_SOCKOPT
+> bit, thus handling SOL_SOCKET option operations, but all of them except
+> SO_ZEROCOPY will be forwarded to the generic handler by calling
+> 'sock_setsockopt()'.
+> 
+> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> ---
+>  Changelog:
+>  v4 -> v5:
+>   * This patch is totally reworked. Previous version added check for
+>     PF_VSOCK directly to 'net/core/sock.c', thus allowing to set
+>     SO_ZEROCOPY for AF_VSOCK type of socket. This new version catches
+>     attempt to set SO_ZEROCOPY in 'af_vsock.c'. All other options
+>     except SO_ZEROCOPY are forwarded to generic handler. Only this
+>     option is processed in 'af_vsock.c'. Handling this option includes
+>     access to transport to check that MSG_ZEROCOPY transmission is
+>     supported by the current transport (if it is set, if not - transport
+>     will be checked during 'connect()').
+> 
+>  net/vmw_vsock/af_vsock.c | 44 ++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 42 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> index da22ae0ef477..8acc77981d01 100644
+> --- a/net/vmw_vsock/af_vsock.c
+> +++ b/net/vmw_vsock/af_vsock.c
+> @@ -1406,8 +1406,18 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>  			goto out;
+>  		}
+>  
+> -		if (vsock_msgzerocopy_allow(transport))
+> +		if (!vsock_msgzerocopy_allow(transport)) {
+> +			/* If this option was set before 'connect()',
+> +			 * when transport was unknown, check that this
+> +			 * feature is supported here.
+> +			 */
+> +			if (sock_flag(sk, SOCK_ZEROCOPY)) {
+> +				err = -EOPNOTSUPP;
+> +				goto out;
+> +			}
+> +		} else {
+>  			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
+> +		}
+>  
+>  		err = vsock_auto_bind(vsk);
+>  		if (err)
+> @@ -1643,7 +1653,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>  	const struct vsock_transport *transport;
+>  	u64 val;
+>  
+> -	if (level != AF_VSOCK)
+> +	if (level != AF_VSOCK && level != SOL_SOCKET)
+>  		return -ENOPROTOOPT;
+>  
+>  #define COPY_IN(_v)                                       \
+> @@ -1666,6 +1676,34 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>  
+>  	transport = vsk->transport;
+>  
+> +	if (level == SOL_SOCKET) {
+> +		if (optname == SO_ZEROCOPY) {
+> +			int zc_val;
+> +
+> +			/* Use 'int' type here, because variable to
+> +			 * set this option usually has this type.
+> +			 */
+> +			COPY_IN(zc_val);
+> +
+> +			if (zc_val < 0 || zc_val > 1) {
+> +				err = -EINVAL;
+> +				goto exit;
+> +			}
+> +
+> +			if (transport && !vsock_msgzerocopy_allow(transport)) {
+> +				err = -EOPNOTSUPP;
+> +				goto exit;
+> +			}
+> +
+> +			sock_valbool_flag(sk, SOCK_ZEROCOPY,
+> +					  zc_val ? true : false);
+> +			goto exit;
+> +		}
+> +
+> +		release_sock(sk);
+> +		return sock_setsockopt(sock, level, optname, optval, optlen);
+> +	}
+> +
+>  	switch (optname) {
+>  	case SO_VM_SOCKETS_BUFFER_SIZE:
+>  		COPY_IN(val);
+> @@ -2321,6 +2359,8 @@ static int vsock_create(struct net *net, struct socket *sock,
+>  		}
+>  	}
+>  
+> +	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
+> +
 
-The following pull-request contains BPF updates for your *net* tree.
+I found that because datagrams have !ops->setsockopt this bit causes
+setsockopt() to fail (the related logic can be found in
+__sys_setsockopt). Maybe we should only set this for connectibles?
 
-We've added 5 non-merge commits during the last 7 day(s) which contain
-a total of 7 files changed, 93 insertions(+), 28 deletions(-).
+Best,
+Bobby
 
-The main changes are:
-
-1) Fix max stack depth check for async callbacks, from Kumar.
-
-2) Fix inconsistent JIT image generation, from Björn.
-
-3) Use trusted arguments in XDP hints kfuncs, from Larysa.
-
-4) Fix memory leak in cpu_map_update_elem, from Pu.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Hou Tao, Jesper Dangaard Brouer, Stanislav Fomichev
-
-----------------------------------------------------------------
-
-The following changes since commit 6843306689aff3aea608e4d2630b2a5a0137f827:
-
-  Merge tag 'net-6.5-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-07-05 15:44:45 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to 2e06c57d66d3f6c26faa5f5b479fb3add34ce85a:
-
-  xdp: use trusted arguments in XDP hints kfuncs (2023-07-11 20:04:50 -0700)
-
-----------------------------------------------------------------
-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'Fix for check_max_stack_depth'
-
-Björn Töpel (1):
-      riscv, bpf: Fix inconsistent JIT image generation
-
-Kumar Kartikeya Dwivedi (2):
-      bpf: Fix max stack depth check for async callbacks
-      selftests/bpf: Add selftest for check_stack_max_depth bug
-
-Larysa Zaremba (1):
-      xdp: use trusted arguments in XDP hints kfuncs
-
-Pu Lehui (1):
-      bpf: cpumap: Fix memory leak in cpu_map_update_elem
-
- arch/riscv/net/bpf_jit.h                           |  6 ++--
- arch/riscv/net/bpf_jit_core.c                      | 19 ++++++----
- kernel/bpf/cpumap.c                                | 40 +++++++++++++---------
- kernel/bpf/verifier.c                              |  5 +--
- net/core/xdp.c                                     |  2 +-
- .../selftests/bpf/prog_tests/async_stack_depth.c   |  9 +++++
- .../selftests/bpf/progs/async_stack_depth.c        | 40 ++++++++++++++++++++++
- 7 files changed, 93 insertions(+), 28 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/async_stack_depth.c
- create mode 100644 tools/testing/selftests/bpf/progs/async_stack_depth.c
+>  	vsock_insert_unbound(vsk);
+>  
+>  	return 0;
+> -- 
+> 2.25.1
+> 
 
