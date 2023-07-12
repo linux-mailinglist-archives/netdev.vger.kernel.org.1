@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-17024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B84B74FD8E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 05:15:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF4B774FDA5
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 05:21:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C6BD2813F7
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:15:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E91811C20EEC
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6865810;
-	Wed, 12 Jul 2023 03:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C121EA34;
+	Wed, 12 Jul 2023 03:21:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389F280D;
-	Wed, 12 Jul 2023 03:15:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A955CC433C8;
-	Wed, 12 Jul 2023 03:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B387F9;
+	Wed, 12 Jul 2023 03:21:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01898C433C7;
+	Wed, 12 Jul 2023 03:21:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689131708;
-	bh=cXX15OpDYjd3XmJnLey2o0GhrG8lr8HHYH3YCewR61c=;
+	s=k20201202; t=1689132075;
+	bh=/NuFIWfEtVjk5MvroN0JIwWzQv+7JB4TBDHgC9DyCxM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Oh5folkV0QWUsh7tNheg8KRnfXa0fKakeE16XvIvmqlYaMJRyD9CBNRrkq4U/V/1J
-	 iEnieM2WLLe5YUzewFiSKu29jA5/dyr+vHxs+cYAcIMbA9FwjaLL5W4Z94BU+Ke8KU
-	 twzQKO8U+IdTts5daESaE6NQGCBSiIIJGgQTMuFB/1Zpb8bmQBuYI9WGhXbyHVZxMf
-	 BgtDhwMPnv8ZeRjsJyY9j5typoP7A40vC4bNs25Qwh8FeY1K4hurqgCEsSoFwWUPyd
-	 UWw4GINdfzi+dxzMNZqtWIwds9wBEnwt+pNjjFBCzHd4IkD1NC0uJvq4gqOBzICJDE
-	 CoLErVpRODaow==
-Date: Tue, 11 Jul 2023 20:15:06 -0700
+	b=nsHuyOFlOfGP8W5cNrlZS+JZtz4WNfbJ3xNhO/Diz6kJf1YahQVGjiWGISpV7KKkO
+	 SirSzT6+Iey/kn0zRhDR5DEKmJRQRDUDYaIOJXh+ahNGgXUyRs/qMWi9Glh+7rhHx3
+	 XTcq9L/IpBB/hq6c+CgQ4A+aTeOrE3SGjsDTzhzPuJDCEBVcOEdkrR0xBM0ns9TtBs
+	 tQKqpy6SrlL5py4Ykit+ZGJ/2RIwTeaZHeIPEyg3vqiug1bzHGvpQ8LvFiTbXieuwv
+	 xAnG92vdQu8FVifLfMdDuJjN3sBdbWU0WzPk+1Wi0aVV4FFcLtH7kVGdpvpv+0dXFJ
+	 lQF0uJuPrGRSA==
+Date: Tue, 11 Jul 2023 20:21:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
- patches@lists.linux.dev, linux-kernel@vger.kernel.org,
- torvalds@linux-foundation.org, akpm@linux-foundation.org,
- linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
- lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
- f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, srw@sladewatkins.net,
- rwarsow@gmx.de, conor@kernel.org, Qingfang DENG
- <qingfang.deng@siflower.com.cn>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>, Masahide NAKAMURA
- <nakam@linux-ipv6.org>, Ville Nuorvala <vnuorval@tcs.hut.fi>, Netdev
- <netdev@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, "open list:KERNEL
- SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH 6.4 0/6] 6.4.3-rc2 review
-Message-ID: <20230711201506.25cc464d@kernel.org>
-In-Reply-To: <CA+G9fYtEr-=GbcXNDYo3XOkwR+uYgehVoDjsP0pFLUpZ_AZcyg@mail.gmail.com>
-References: <20230709203826.141774942@linuxfoundation.org>
-	<CA+G9fYtEr-=GbcXNDYo3XOkwR+uYgehVoDjsP0pFLUpZ_AZcyg@mail.gmail.com>
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>, Thierry Reding
+ <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, Richard
+ Cochran <richardcochran@gmail.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v3 00/12] net: stmmac: replace boolean fields
+ in plat_stmmacenet_data with flags
+Message-ID: <20230711202114.5e4f1dcd@kernel.org>
+In-Reply-To: <20230710090001.303225-1-brgl@bgdev.pl>
+References: <20230710090001.303225-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,10 +63,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 10 Jul 2023 17:11:18 +0530 Naresh Kamboju wrote:
->   git_repo: https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc
->   git_sha: 3e37df3ffd9a648c9f88f6bbca158e43d5077bef
+On Mon, 10 Jul 2023 10:59:49 +0200 Bartosz Golaszewski wrote:
+> As suggested by Jose Abreu: let's drop all 12 boolean fields in
+> plat_stmmacenet_data and replace them with a common bitfield.
 
-I can't find this sha :( Please report back if you can still repro this
-and how we get get the relevant code
+Peppe, please take a look.
 
