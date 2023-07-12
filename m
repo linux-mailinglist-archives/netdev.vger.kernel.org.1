@@ -1,131 +1,164 @@
-Return-Path: <netdev+bounces-17058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD0074FF9E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:45:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D0074FFB7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C82CC1C20FDF
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 06:45:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0528728160E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 06:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B725B1FD2;
-	Wed, 12 Jul 2023 06:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB791FD2;
+	Wed, 12 Jul 2023 06:50:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6031C29
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:45:40 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9AD719B
-	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:45:38 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6687096c6ddso3885147b3a.0
-        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1689144338; x=1691736338;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y8WhpdF8/RW8zGFH/BZgsqEuwmUxTSnkz6bmGMUpKLg=;
-        b=W/GvKFglSlPxZ7GDe3SBJk00S68EMh1nVTwsJAwhPkQ3MT365bsUjoqdqE+/sA7CSN
-         NRbg4zl/wx1Ls0jXTms3+eFHtQJyUHaiDmc3++U9grS799Xvv+6VfZ7rUTRs7OMQTQAB
-         FWp2o073tH2I2V2BGGYkcvq9X9akSwkleCwtv4Cgn9Gl0v/0cXvmNCmhRYQdPENheFEs
-         xGjTHkxJaBaShbI/QBVm5k2nSoBimFca0JrTPTEOBCnwYyet961sXcDsDzRAZpzsM6Db
-         MLVmvFZEDnKOJT+7M+5szD2mCWMufCAeW02SnLCg9kpv0jB3gHFFeTNQKSCl0J7aqjAE
-         5n8Q==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C90620F2
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:50:16 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D13DC
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689144612;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t/l4l2llIvkeYOOhz2I58lxas5zvAcDYWXpunKWC/44=;
+	b=bjoNGogaWaAqMHliuWfoW8fbJd9PIqdR9b0Ov4kzspbBTPS2foc1nD7TwfffF8w1hwN8ju
+	JbQtV6QEaQI3rxv3MxWvSPu30drKFue3PE5d9UdAZQVz3CVwpjVbXn7d98lNp/boGeVQEN
+	YKEHM0yLRgQ7lMe5rR2pIg/STen+MGw=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-571-SRxuqeSYObCCNJxDU4w1Bg-1; Wed, 12 Jul 2023 02:50:10 -0400
+X-MC-Unique: SRxuqeSYObCCNJxDU4w1Bg-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-767b80384a3so98831785a.0
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 23:50:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689144338; x=1691736338;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8WhpdF8/RW8zGFH/BZgsqEuwmUxTSnkz6bmGMUpKLg=;
-        b=LRWHaVtvYYrfrgX9+PHXWyxnAxb1N0X6Utd28Y12rCp4J7wPzux25FzjQeWSabZasU
-         6o6Ou2PLNxsWDwdawX+2vFZRavTnlA+4RCEErZ+x3Ao3WO++Ys0O4sPbnvz8E/dYuhMw
-         K3cBoZuKVah+ubd5efHjH1D70uc15YigpsoWEzVUvyt8GrA9q7IpyPRjI40cdwLNnxZe
-         NUf4txf5VCV9TbopRWYoJDNrXfnakZo+pThhZu9Q8JhBFZLgQIW95oc9C1XnaNAF/o9K
-         dyXe9SgVl72OiYacv9WBtuQDiY+vVPhRu25JH3EcftgAmfkBBTS8UwNqftsPJF0jq/Re
-         2TWg==
-X-Gm-Message-State: ABy/qLYwrm/khfVH6EigP5seS9J+DZPHDBpfG9iaYBJ2jOkqChNv+yuu
-	pCHFHikaxyuzf7x6R4CPJxSmNw==
-X-Google-Smtp-Source: APBJJlF4k1pkoB3GqDRrCOhh7latAjS6/d0b535BaPunB3YtROa/Y2UxTSwoSRKXrxX78yz7cfx0Xg==
-X-Received: by 2002:a05:6a20:7f94:b0:12f:dc60:2b9e with SMTP id d20-20020a056a207f9400b0012fdc602b9emr17247332pzj.48.1689144338323;
-        Tue, 11 Jul 2023 23:45:38 -0700 (PDT)
-Received: from [10.94.58.170] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id c11-20020a170902cb0b00b001aaf2e8b1eesm3085131ply.248.2023.07.11.23.45.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 23:45:36 -0700 (PDT)
-Message-ID: <987f7855-8b1e-ad1a-29d3-8511ccaa00b2@bytedance.com>
-Date: Wed, 12 Jul 2023 14:45:26 +0800
+        d=1e100.net; s=20221208; t=1689144610; x=1691736610;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t/l4l2llIvkeYOOhz2I58lxas5zvAcDYWXpunKWC/44=;
+        b=IlVCzYSc1MDBrloxDqoYfjBmfm3WfshP3WT2ZTjXi2mDtX2NbTPwWUCtmlxTnC5oPk
+         BWfl8gjiPw3bpsg/wWXAHivRpRFElyxmvDTcoi/ZZbyJEo+RYOQRbi62kcEGo7zwEMeb
+         ZAEx24iK1sHtLIj7LXAPxmvJ9VF6clawTZsHjRQ2Co8BgH+RJCJAhhBO9Zx3VKrhcHHN
+         ziCNt7/aDbw8LMl2RANWQgzTDOq02ywU+TuM1zGulPZNRwin7e+GR/pi5ZUZ/6k7Bl/N
+         ARlE6cHxyoDZqBVpGo1SyAIf2dAQAE7vR96fLjD25zKCGCm7tj3Rhpx4wwvG8sfbQBSC
+         WPWQ==
+X-Gm-Message-State: ABy/qLaA/OTx1ae075Le/HHl1d2bq1+vGhw2jyQJaaMZZzWQNSH5KGU3
+	dAUDP2JP5RiFRfnVeRcnJOg1pYnAGIxLFvm398rXVFy0opKP7Cc9H4gPq40Tx3vqsuXrZanOW72
+	r9eoZt9AAdtH7xswHr1s2cTvP
+X-Received: by 2002:a05:620a:4510:b0:762:41d6:c3dc with SMTP id t16-20020a05620a451000b0076241d6c3dcmr21932370qkp.0.1689144610208;
+        Tue, 11 Jul 2023 23:50:10 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGOwGJRGW4tR3jEXjuiKzegFioU+QlfxiBtzlBJi1QOktBF3HTz1ELy8hA8fGQvke12IkrxCQ==
+X-Received: by 2002:a05:620a:4510:b0:762:41d6:c3dc with SMTP id t16-20020a05620a451000b0076241d6c3dcmr21932348qkp.0.1689144609885;
+        Tue, 11 Jul 2023 23:50:09 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-235-188.dyn.eolo.it. [146.241.235.188])
+        by smtp.gmail.com with ESMTPSA id i28-20020a05620a151c00b00767d5b81920sm1893287qkk.85.2023.07.11.23.50.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 23:50:09 -0700 (PDT)
+Message-ID: <5b722084c6031009f845e6af8b438d49b9ea7dc1.camel@redhat.com>
+Subject: Re: [PATCH net-next 3/3] eth: bnxt: handle invalid Tx completions
+ more gracefully
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	michael.chan@broadcom.com
+Date: Wed, 12 Jul 2023 08:50:06 +0200
+In-Reply-To: <20230711181919.50f27180@kernel.org>
+References: <20230710205611.1198878-1-kuba@kernel.org>
+	 <20230710205611.1198878-4-kuba@kernel.org>
+	 <774e2719376723595425067ab3a6f59b72c50bc2.camel@redhat.com>
+	 <20230711181919.50f27180@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: Re: [PATCH RESEND net-next 1/2] net-memcg: Scopify the indicators
- of sockmem pressure
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt
- <shakeelb@google.com>, Muchun Song <muchun.song@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, David Ahern <dsahern@kernel.org>,
- Yosry Ahmed <yosryahmed@google.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Yu Zhao
- <yuzhao@google.com>, Kefeng Wang <wangkefeng.wang@huawei.com>,
- Yafang Shao <laoar.shao@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Breno Leitao <leitao@debian.org>, David Howells <dhowells@redhat.com>,
- Jason Xing <kernelxing@tencent.com>, Xin Long <lucien.xin@gmail.com>,
- Michal Hocko <mhocko@suse.com>, Alexei Starovoitov <ast@kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)"
- <cgroups@vger.kernel.org>,
- "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)"
- <linux-mm@kvack.org>
-References: <20230711124157.97169-1-wuyun.abel@bytedance.com>
- <20230711204537.04cb1124@kernel.org>
-Content-Language: en-US
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <20230711204537.04cb1124@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub,
+On Tue, 2023-07-11 at 18:19 -0700, Jakub Kicinski wrote:
+> On Tue, 11 Jul 2023 12:10:28 +0200 Paolo Abeni wrote:
+> > On Mon, 2023-07-10 at 13:56 -0700, Jakub Kicinski wrote:
+> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/=
+ethernet/broadcom/bnxt/bnxt.h
+> > > index 080e73496066..08ce9046bfd2 100644
+> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > > @@ -1008,6 +1008,7 @@ struct bnxt_napi {
+> > >  					  int);
+> > >  	int			tx_pkts;
+> > >  	u8			events;
+> > > +	u8			tx_fault:1; =20
+> >=20
+> > Since there are still a few holes avail, I would use a plain u8 (or
+> > bool) to help the compiler emit better code.
+>=20
+> Is that still true or was it only true for old compilers?
+> With gcc version 13.1.1 20230614 :
+>=20
+> $ cat /tmp/t.c=20
+> #include <strings.h>
+>=20
+> struct some {
+>     void (*f)(void);
+>     unsigned char b;
+> #ifdef BLA
+>     _Bool a;
+> #else
+>     unsigned char a:1;
+> #endif
+> };
+>=20
+> int bla(struct some *s)
+> {
+>     if (s->a)
+>         s->f();
+>     return 0;
+> }
+>=20
+> $ gcc -W -Wall -O2  /tmp/t.c -o /tmp/t -c
+> $ objdump -S /tmp/t > /tmp/a
+> $ gcc -DBLA -W -Wall -O2  /tmp/t.c -o /tmp/t -c
+> $ objdump -S /tmp/t > /tmp/b
+> $ diff /tmp/a /tmp/b
+> 8c8
+> <    0:	f6 47 09 01          	testb  $0x1,0x9(%rdi)
+> ---
+> >    0:	80 7f 09 00          	cmpb   $0x0,0x9(%rdi)
+>=20
+> $ gcc -V
+>=20
+> Shouldn't matter, right?
 
-On 7/12/23 11:45 AM, Jakub Kicinski wrote:
-> On Tue, 11 Jul 2023 20:41:43 +0800 Abel Wu wrote:
->> Now there are two indicators of socket memory pressure sit inside
->> struct mem_cgroup, socket_pressure and tcpmem_pressure.
->>
->> When in legacy mode aka. cgroupv1, the socket memory is charged
->> into a separate counter memcg->tcpmem rather than ->memory, so
->> the reclaim pressure of the memcg has nothing to do with socket's
->> pressure at all. While for default mode, the ->tcpmem is simply
->> not used.
->>
->> So {socket,tcpmem}_pressure are only used in default/legacy mode
->> respectively. This patch fixes the pieces of code that make mixed
->> use of both.
-> 
-> Eric Dumazet is currently AFK, can we wait for him to return
-> (in about a week) before merging?
+Surely not a big deal. But some users (possibly most of them!) have
+older compiler. Including an assignment in the test code, I get this
+additional difference:
 
-Sure, thanks for providing this information!
+-   c:	80 4b 09 01          	orb    $0x1,0x9(%rbx)
++   c:	c6 43 09 01          	movb   $0x1,0x9(%rbx)
 
-Best Regards,
-	Abel
+with the bitfield using the 'or' operation. Not a big deal, but the
+other option is slightly better ;)
+
+Cheers,
+
+Paolo
+
+
 
