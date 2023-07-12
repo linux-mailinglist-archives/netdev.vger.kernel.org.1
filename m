@@ -1,155 +1,102 @@
-Return-Path: <netdev+bounces-17125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BDA7506A1
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:48:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9E57506D0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8D5D28163C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:47:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676771C20F34
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE402771D;
-	Wed, 12 Jul 2023 11:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635C02771F;
+	Wed, 12 Jul 2023 11:48:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8006D200D6
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 11:47:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6827AC433C9;
-	Wed, 12 Jul 2023 11:47:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689162475;
-	bh=BL+8Fo9QG0zNtj0y7Lgb/m7HMTTimtNx9krlJ8PROKk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=MBDgsatfZpWqdAMwV6qveeIfLQ6N7jrowK9LjuavtymGZJ2RZ2Oc1MpqiENhz3quE
-	 3C52w4yN+XHh2R9JtS9d5C82wdCYmJLOyIegf8gaLO9fnbUYfmxOmBAQgyocJctiAI
-	 6E59ipQJyxOm+qSbYi3HkSZBX2tCKWY1iP+GjHTkOSnvKhvbhkax3ZarfbH5wu0wKK
-	 qx68/+nBANjiNw+aQoV6C1vLW4EDygmSD4fpo+BTkFwtXsm5w2b39Kd49evlvRZIW7
-	 KcdjwPLLtdt+TqxuNclA8arYxR3eJ8wd/C5/2IO8CCIn4CiFbVXi916UJQXvZWbBYq
-	 HcHdiJ1RRWg+A==
-From: Mark Brown <broonie@kernel.org>
-To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, 
- Yang Yingliang <yangyingliang@huawei.com>, 
- Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>, 
- Neil Armstrong <neil.armstrong@linaro.org>, 
- Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>, 
- Vijaya Krishna Nivarthi <quic_vnivarth@quicinc.com>, 
- =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
- linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
- linux-rockchip@lists.infradead.org, linux-riscv@lists.infradead.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Sanjay R Mehta <sanju.mehta@amd.com>, 
- Radu Pirea <radu_nicolae.pirea@upb.ro>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, 
- Claudiu Beznea <claudiu.beznea@microchip.com>, 
- Tudor Ambarus <tudor.ambarus@linaro.org>, 
- Serge Semin <fancer.lancer@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
- Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>, Heiko Stuebner <heiko@sntech.de>, 
- Palmer Dabbelt <palmer@dabbelt.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, Orson Zhai <orsonzhai@gmail.com>, 
- Baolin Wang <baolin.wang@linux.alibaba.com>, 
- Chunyan Zhang <zhang.lyra@gmail.com>, 
- Alain Volmat <alain.volmat@foss.st.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Max Filippov <jcmvbkbc@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Richard Cochran <richardcochran@gmail.com>
-In-Reply-To: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
-References: <20230710154932.68377-1-andriy.shevchenko@linux.intel.com>
-Subject: Re: (subset) [PATCH v2 00/15] spi: Header and core clean up and
- refactoring
-Message-Id: <168916246513.47003.10097115249886306259.b4-ty@kernel.org>
-Date: Wed, 12 Jul 2023 12:47:45 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559AE2771D
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 11:48:38 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96BDC1BFF
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 04:48:10 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4R1GC52s1HzPkCQ;
+	Wed, 12 Jul 2023 19:45:37 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 12 Jul
+ 2023 19:47:57 +0800
+Subject: Re: [RFC 00/12] net: huge page backed page_pool
+To: Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer
+	<jbrouer@redhat.com>
+CC: <netdev@vger.kernel.org>, <brouer@redhat.com>, <almasrymina@google.com>,
+	<hawk@kernel.org>, <ilias.apalodimas@linaro.org>, <edumazet@google.com>,
+	<dsahern@gmail.com>, <michael.chan@broadcom.com>, <willemb@google.com>
+References: <20230707183935.997267-1-kuba@kernel.org>
+ <1721282f-7ec8-68bd-6d52-b4ef209f047b@redhat.com>
+ <20230711170838.08adef4c@kernel.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <edf4f724-0c0e-c6ae-ffcb-ec1336448e59@huawei.com>
+Date: Wed, 12 Jul 2023 19:47:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20230711170838.08adef4c@kernel.org>
 Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 10 Jul 2023 18:49:17 +0300, Andy Shevchenko wrote:
-> Various cleanups and refactorings of the SPI header and core parts
-> united in a single series. It also touches drivers under SPI subsystem
-> folder on the pure renaming purposes of some constants.
+On 2023/7/12 8:08, Jakub Kicinski wrote:
+> On Tue, 11 Jul 2023 17:49:19 +0200 Jesper Dangaard Brouer wrote:
+>> I see you have discovered that the next bottleneck are the IOTLB misses.
+>> One of the techniques for reducing IOTLB misses is using huge pages.
+>> Called "super-pages" in article (below), and they report that this trick
+>> doesn't work on AMD (Pacifica arch).
+>>
+>> I think you have convinced me that the pp_provider idea makes sense for
+>> *this* use-case, because it feels like natural to extend PP with
+>> mitigations for IOTLB misses. (But I'm not 100% sure it fits Mina's
+>> use-case).
 > 
-> No functional change intended.
+> We're on the same page then (no pun intended).
 > 
-> Changelog v2:
-> - added new patches 3,4,5,10,13,14
-> - massaged comment and kernel doc in patch 9
-> - split used to be patch 4 to patches 11,12
-> - covered a few things in SPI core in patch 15
-> - amended commit message for above (Mark)
-> - reshuffled patches in the series for better logical grouping
+>> What is your page refcnt strategy for these huge-pages. I assume this
+>> rely on PP frags-scheme, e.g. using page->pp_frag_count.
+>> Is this correctly understood?
 > 
-> [...]
+> Oh, I split the page into individual 4k pages after DMA mapping.
+> There's no need for the host memory to be a huge page. I mean, 
+> the actual kernel identity mapping is a huge page AFAIU, and the 
+> struct pages are allocated, anyway. We just need it to be a huge 
+> page at DMA mapping time.
+> 
+> So the pages from the huge page provider only differ from normal
+> alloc_page() pages by the fact that they are a part of a 1G DMA
+> mapping.
 
-Applied to
+If it is about DMA mapping, is it possible to use dma_map_sg()
+to enable a big continuous dma map for a lot of discontinuous
+4k pages to avoid allocating big huge page?
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+As the comment:
+"The scatter gather list elements are merged together (if possible)
+and tagged with the appropriate dma address and length."
 
-Thanks!
-
-[01/15] spi: Remove unneeded OF node NULL checks
-        commit: fbab5b2c09060e8034fee6ec2df69a62594fb7db
-[02/15] spi: Drop duplicate IDR allocation code in spi_register_controller()
-        commit: 440c47331bdb889e24128c75387c695ca81d9b9b
-[03/15] spi: Replace if-else-if by bitops and multiplications
-        commit: 2b308e7176e366a52a07a49868e3b1a295e56785
-[06/15] spi: Use sysfs_emit() to instead of s*printf()
-        commit: f2daa4667fda1aa951b91da0ae9675a5da9d7716
-[07/15] spi: Sort headers alphabetically
-        commit: edf6a864c996f9a9f5299a3b3e574a37e64000c5
-[08/15] spi: Clean up headers
-        (no commit info)
-[11/15] spi: Get rid of old SPI_MASTER_NO_TX & SPI_MASTER_NO_RX
-        commit: c397f09e5498994790503a64486213ef85e58db9
-[12/15] spi: Get rid of old SPI_MASTER_MUST_TX & SPI_MASTER_MUST_RX
-        commit: 90366cd60133a9f5b6a2f31360367c658585e125
-[13/15] spi: Rename SPI_MASTER_GPIO_SS to SPI_CONTROLLER_GPIO_SS
-        commit: 82238d2cbd99ebd09dda48fb7c1c8802097da6a2
-[14/15] spi: Convert to SPI_CONTROLLER_HALF_DUPLEX
-        commit: 7a2b552c8e0e5bb280558f6c120140f5f06323bc
-[15/15] spi: Fix spelling typos and acronyms capitalization
-        commit: 702ca0269ed56e2d8dae7874a4d8af268e2a382e
-
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+https://elixir.free-electrons.com/linux/v4.16.18/source/arch/arm/mm/dma-mapping.c#L1805
 
