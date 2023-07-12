@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-17170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA18750B35
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:43:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CDA9750B45
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:46:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181252819EF
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:43:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8C461C21147
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6197F27726;
-	Wed, 12 Jul 2023 14:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B760727736;
+	Wed, 12 Jul 2023 14:45:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B0CEACB
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:43:14 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E64DBB
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:43:12 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-51e5672d580so5231425a12.2
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:43:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69931F199
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:45:57 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF762BB
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:45:55 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9741caaf9d4so815091966b.0
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:45:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689172991; x=1691764991;
+        d=tessares.net; s=google; t=1689173154; x=1691765154;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zwe4PWRdwr29yhu3VQjogGVWqtrG3b8mEa1jwO9nY5A=;
-        b=n0l/80mjSnGHxbwmKO43YWE7KndGYzg7mE0S7dpKyXlWtbM/X6ysE0kmVTITcovV3D
-         2aekAgrGD+8jFQsmgZ5dkHvWOMGJgBS7SQQu4q/idt2YpCg6CeeUSbYA2mSjBbDn+++w
-         Gjb6IBbcxsRP6lmvDUYOSqKKBvSaNzh0CaJZXgPM0EC/gF1Nyo7m9aqfxD9GyMPLny+E
-         mt0L8fWlLkxaNziAIGMW71cpKI8auv1h0kv/a4ai9gKgNeBc56H2x4JI47RFGU7rS5Eo
-         RSSY8yFu/9VS1Ky4wB1azdfCUYd79Vps8FqCv3fyL40uoCY7/8unefHASN87nTL6TL9a
-         kD4w==
+        bh=DRDieu641p4IUf1stMnNllECM0gfcLeHmhaeQbMBntI=;
+        b=LeXFm5ukWyg0ZzTCTRzsDeO/5x6A+3t0P5zjFv0cxo5yqRRufpEbhf0de5YDKv/gcz
+         m8Lo++p3yeIdkPs+AxFmPp9Ln6KzbvbjYTVjup5xBDfJh15H1scaVqI1lhxrDXKxx7bp
+         NZWot+lHV+w6QjYCkhYgXCEoEQ1Pab9ciZlxhRUqRq2wqRwPvCGGjpIJaNHLq46yMajV
+         r0MKd3ql7gZPYKQ/aAGVjD225krD5FjElER/E17ytvZBJjn2g3x3fIaj8Mdr+piEZLiX
+         aHDiwO78ZHc9h+Q1K51Dp3PFOdIyjexM8AZlXB7lESBjYBL6GvE5LoA0dd59H9/m59U1
+         zBdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689172991; x=1691764991;
+        d=1e100.net; s=20221208; t=1689173154; x=1691765154;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zwe4PWRdwr29yhu3VQjogGVWqtrG3b8mEa1jwO9nY5A=;
-        b=UWQKfegABiSXvE+GDIsYwCG/wz+RX34ijKt+m1hJoqasb+dUNK+xiVaAybR8NXe77S
-         BusUE7IRqjyI4ojz4SgUOU4NxEMlrZI9/IfoJx+/CwOnAJ/zI3zqdBTE68ULSf7luTDX
-         j9Zcbue4I+nRT2SO6ZmRYM692fTrfyVUGVlrBJ/TDILG/W09EMbess7Jn5aWqZRnyGQ1
-         q93KqTzU3+enYc7M5yn4yaESjmiGqMb1JJeV7HE57zANekCh7uxGbFoBvkun4FSdSsAw
-         p9QBHo94gkcL2oe2qN/Qdz+//QBYCZZw9LQK5zXfztE/XUc7RD3IZ9UuCQiKFiq/VkjS
-         OSJQ==
-X-Gm-Message-State: ABy/qLZVOS+P12VaQ+ntvUnXEhqMqUmTwIaxZlBvh+ObTOp5tC24d32r
-	toPmA75YurluveQZug2O6cLBDQ==
-X-Google-Smtp-Source: APBJJlH9PeWSqDuRqpviG69SgVnfutdCUs82uCojfS+uCK4nlwq7ugo0PnqEQz6XG+mZeiZBjB87oA==
-X-Received: by 2002:aa7:d6ce:0:b0:51e:1a47:3e3a with SMTP id x14-20020aa7d6ce000000b0051e1a473e3amr18414436edr.18.1689172990833;
-        Wed, 12 Jul 2023 07:43:10 -0700 (PDT)
+        bh=DRDieu641p4IUf1stMnNllECM0gfcLeHmhaeQbMBntI=;
+        b=XwNdRX8WlYfrcx8nFLSyZF44y7FwAA5Tig1gKsPaSxFyW0MAIl59rPPvyonYGykXtz
+         0KPtLCg+STi4of/52Zh/NwpofdBhVEVuaGqSh2IXZEdSRzjYMAR2q+F14PesMDRTusuK
+         EDyTFim3DvDEiIUxJiJodkyBXkNhlJU4RqUvmt+t7OPa7R3XqnAozGgYxjBddqFaiQq+
+         y1gxWG33Mc3VH3336nSORg9OhwxgBY6+b4XYlx+iw6jHyqAI7zCezgEy1GK9Ot+wPAlc
+         +F+NIY5yKMASVESGdwxPJTw9cYl3X+AKyWG8lWOQg7j0fOHXn9bcu/F7tPa1WwFCFT5F
+         8k7A==
+X-Gm-Message-State: ABy/qLbL5h7Zkx95f5PGr7CHk5gVBGbcB5k9pYFo7rqSVZ7A1UgaXBYt
+	+n7jwdYrsplnF/g01t29kZgxlw==
+X-Google-Smtp-Source: APBJJlG9rA7+fficfCzsrkAwo1ShjlWEUrCBU8P80VR8iEokwRt76ueQdJULZtyt996CBbksUqoR1w==
+X-Received: by 2002:a17:906:73d8:b0:993:d117:e3b9 with SMTP id n24-20020a17090673d800b00993d117e3b9mr18336546ejl.20.1689173154161;
+        Wed, 12 Jul 2023 07:45:54 -0700 (PDT)
 Received: from ?IPV6:2a02:578:8593:1200:ef4b:f9b8:e94a:ea27? ([2a02:578:8593:1200:ef4b:f9b8:e94a:ea27])
-        by smtp.gmail.com with ESMTPSA id a19-20020a50ff13000000b0051bed498851sm2865439edu.54.2023.07.12.07.43.10
+        by smtp.gmail.com with ESMTPSA id um10-20020a170906cf8a00b0098e78ff1a87sm2646582ejb.120.2023.07.12.07.45.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jul 2023 07:43:10 -0700 (PDT)
-Message-ID: <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
-Date: Wed, 12 Jul 2023 16:43:09 +0200
+        Wed, 12 Jul 2023 07:45:53 -0700 (PDT)
+Message-ID: <d369fe0f-d632-270d-7036-6021d9ae787a@tessares.net>
+Date: Wed, 12 Jul 2023 16:45:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,15 +68,16 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
 Subject: Re: TC: selftests: current timeout (45s) is too low
 Content-Language: en-GB
-To: Pedro Tammela <pctammela@mojatatu.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell
- <anders.roxell@linaro.org>, Davide Caratti <dcaratti@redhat.com>
+To: Davide Caratti <dcaratti@redhat.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev <netdev@vger.kernel.org>, Anders Roxell <anders.roxell@linaro.org>
 References: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
  <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
+ <CAKa-r6sg3QRm3btoWTj7SzBSi29WUpT0et7dgdTmvbNE=74J3Q@mail.gmail.com>
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
+In-Reply-To: <CAKa-r6sg3QRm3btoWTj7SzBSi29WUpT0et7dgdTmvbNE=74J3Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -86,85 +87,89 @@ X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Pedro,
+Hi Davide,
 
-On 12/07/2023 15:43, Pedro Tammela wrote:
-> I have been involved in tdc for a while now, here are my comments.
-
-Thank you for your reply!
-
-> On 12/07/2023 06:47, Matthieu Baerts wrote:
->> Hi Jamal, Cong, Jiri,
->>
->> When looking for something else [1] in LKFT reports [2], I noticed that
->> the TC selftest ended with a timeout error:
->>
->>    not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
->>
->> The timeout has been introduced 3 years ago:
->>
->>    852c8cbf34d3 ("selftests/kselftest/runner.sh: Add 45 second timeout
->> per test")
->>
->> Recently, a new option has been introduced to override the value when
->> executing the code:
->>
->>    f6a01213e3f8 ("selftests: allow runners to override the timeout")
->>
->> But I guess it is still better to set a higher default value for TC
->> tests. This is easy to fix by simply adding "timeout=<seconds>" in a
->> "settings" file in 'tc-testing' directory, e.g.
->>
->>    echo timeout=1200 > tools/testing/selftests/tc-testing/settings
->>
->> I'm sending this email instead of a patch because I don't know which
->> value makes sense. I guess you know how long the tests can take in a
->> (very) slow environment and you might want to avoid this timeout error.
+On 12/07/2023 16:02, Davide Caratti wrote:
+> hello!
 > 
-> I believe a timeout between 5-10 to minutes should cover the entire suite
-
-Thank you for your feedback.
-If we want to be on the safe side, I guess it is better to put 10
-minutes or even 15, no?
-
->> I also noticed most of the tests were skipped [2], probably because
->> something is missing in the test environment? Do not hesitate to contact
->> the lkft team [3], that's certainly easy to fix and it would increase
->> the TC test coverage when they are validating all the different kernel
->> versions :)
+> On Wed, Jul 12, 2023 at 3:43 PM Pedro Tammela <pctammela@mojatatu.com> wrote:
+>>
+>> Hi Matthieu,
+>>
+>> I have been involved in tdc for a while now, here are my comments.
+>>
+>> On 12/07/2023 06:47, Matthieu Baerts wrote:
+>>> Hi Jamal, Cong, Jiri,
+>>>
+>>> When looking for something else [1] in LKFT reports [2], I noticed that
+>>> the TC selftest ended with a timeout error:
+>>>
+>>>    not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
+>>>
+>>> The timeout has been introduced 3 years ago:
+>>>
+>>>    852c8cbf34d3 ("selftests/kselftest/runner.sh: Add 45 second timeout
+>>> per test")
+>>>
+>>> Recently, a new option has been introduced to override the value when
+>>> executing the code:
+>>>
+>>>    f6a01213e3f8 ("selftests: allow runners to override the timeout")
+>>>
+>>> But I guess it is still better to set a higher default value for TC
+>>> tests. This is easy to fix by simply adding "timeout=<seconds>" in a
+>>> "settings" file in 'tc-testing' directory, e.g.
+>>>
+>>>    echo timeout=1200 > tools/testing/selftests/tc-testing/settings
 > 
-> From the logs it seems like the kernel image is missing the 'ct' action.
-> Possibly also missing other actions/tc components, so it seems like a
-> kernel config issue.
+> finding a good default is not easy, because some kernel (e.g. those
+> built with debug options) are very slow .
+Thank you for your feedback!
 
-According to [1], the kconfig is generated by merging these files:
+I agree it is not be easy. From what I see, lkft doesn't run the
+selftests with a debug kconfig. I guess we can assume these tests are
+either ran in a slow environment or with a debug kconfig but not both,
+otherwise the timeout would be too high -- at least that's what we did
+with MPTCP :)
 
-  defconfig, systemd.config [2], tools/testing/selftests/kexec/config,
-tools/testing/selftests/net/config,
-tools/testing/selftests/net/mptcp/config,
-tools/testing/selftests/net/hsr/config,
-tools/testing/selftests/net/forwarding/config,
-tools/testing/selftests/tc-testing/config
+Is 15 minute a good value to start with?
 
-You can see the final .config file in [3].
+> Maybe we can leverage also on the other value in tdc_config.py [1] -
+> or at least ensure that the setting in 'setting' is consistent.
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d37e56df23f9e
+I don't know the TC test env but it looks like it is a timeout that is
+used in case of issues. I guess this timeout should in theory never be
+fired except in case of big problem, no?
+If we use it and if there are 543 tests -- according to the logs -- the
+global timeout would be just under 1h50 :)
+This timeout in the worst case scenario when nothing is working, I guess
+it makes sense to have this kselftest timeout below that.
 
-I can see "CONFIG_NET_ACT_CTINFO(=m)" but not "CONFIG_NET_ACT_CT" while
-they are both in tc-testing/config file. Maybe a conflict with another
-selftest config?
+> 
+> [...]
+> 
+>>> I also noticed most of the tests were skipped [2], probably because
+>>> something is missing in the test environment? Do not hesitate to contact
+>>> the lkft team [3], that's certainly easy to fix and it would increase
+>>> the TC test coverage when they are validating all the different kernel
+>>> versions :)
+>>
+>>  From the logs it seems like the kernel image is missing the 'ct'
+>> action. Possibly also missing other actions/tc components, so it seems
+>> like a kernel config issue.
+> 
+> when I run tdc I use to do:
+> 
+> #  yes | make kselftest-merge
+> 
+> so that the kconfigs are not forgot :)
 
-I don't see any mention of "NET_ACT_CT" in the build logs [4].
+It looks like it is more than what lkft is using (see my reply to
+Pedro). Maybe a conflict with just the ones lkft is using then?
 
 Cheers,
 Matt
-
-[1]
-https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/builds/2SPJN70f1LBiWmZIxl0WNcOmjwN
-[2]
-https://raw.githubusercontent.com/Linaro/meta-lkft/kirkstone/meta/recipes-kernel/linux/files/systemd.config
-[3]
-https://storage.tuxsuite.com/public/linaro/lkft/builds/2SPJN70f1LBiWmZIxl0WNcOmjwN/config
-[4]
-https://storage.tuxsuite.com/public/linaro/lkft/builds/2SPJN70f1LBiWmZIxl0WNcOmjwN/build-debug.log
 -- 
 Tessares | Belgium | Hybrid Access Solutions
 www.tessares.net
