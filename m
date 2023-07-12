@@ -1,264 +1,191 @@
-Return-Path: <netdev+bounces-17328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AFE1751471
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 01:28:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259267514A0
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 01:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5831C210AF
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:28:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D670D2817A2
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5661D2FB;
-	Wed, 12 Jul 2023 23:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C521D2FF;
+	Wed, 12 Jul 2023 23:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA941D2E9
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 23:28:54 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8E31FD8;
-	Wed, 12 Jul 2023 16:28:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DazW8UB56x6wOJQKMGo2nWrl8pFvf5GtnX3WpfqWgfWKx3Z+E4LJRSKqHsxnA+gcfguBGeCWddqeFq/qUGY+ogYlfE2jPQs1Cb6+/3xks+/Eb9tvtweiJdEkSjUqRfe4ttSwIJ52vXs2vgU1Non1Cs30fpIkc3hKtzVrok4otQjrQ3ipbM0py85m5AR78gTCezShJ0zdkXgkAxTI61NKxluMQEfq0lcTNCfY2lxcEHbMei4AftIoOXzKS5ijY6e6WP1qVY3tVUfa/IGrno9RgW/hw0qtcGURtNVPKa5dD/OggVgbjUi6Kw2wO1L/2/QI14CY3CgPnpR4vWcQ//fePg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BianAceytRTBFIZC6KDEm3WMNH6gDT8ZIyA+GSZgKeQ=;
- b=dVwxYQWxAhHfXYLVP2CsHjdcfjY0q1yLvoYh+dsEGGggrnJaD/T1Tdq0M+ofwJ/wjZI0mUABDQ6/e2FQ0x4nIUy3sxX2QqtGNJDuc8vpfwdt+mjWIagk1OBN7vyL8cQhDBIahlPXQLbQVW/jTjlM59leEVcszFMn7GFStD0EJm7Mp5Brl8/Gel525EhwnloqHTgDVv4R9uYJYsvEdXuClNWGACGWkKxKyrDxkXYrtnAdM9eSFOP2j7qfRaxrMzaomDRyvHaA2Chh9RlYWf8hEEV+9QmmZLuBUwjAJoBDzPo58ESgD800hIVJ46VdPWKJ/JqLptCBrzCEX5GihwOrZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BianAceytRTBFIZC6KDEm3WMNH6gDT8ZIyA+GSZgKeQ=;
- b=zxO+3Kdc0+zZ3mc6C2MTPjgDNlUdzT9oFkaby3iSHdYeI1QbTBYMc1aG07HeKg4zvVvSHYo/vz5jXkDqqCvyhaoZIeGBGnNE+3ClzB8YvN6+dIxv4jQ/Lljz1sgiGlVfUrrs5m6eELlHJVS30uA9i/A2a5+2YKGCSMs/HcGrHlg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
- by SJ2PR12MB7797.namprd12.prod.outlook.com (2603:10b6:a03:4c5::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22; Wed, 12 Jul
- 2023 23:28:46 +0000
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::bce4:716a:8303:efcf]) by MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::bce4:716a:8303:efcf%4]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
- 23:28:45 +0000
-Message-ID: <d4047df7-6e55-1fd5-a61b-9aea3b4da3c5@amd.com>
-Date: Wed, 12 Jul 2023 18:28:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH V6 1/9] drivers core: Add support for Wifi band RF
- mitigations
-To: Andrew Lunn <andrew@lunn.ch>, Evan Quan <evan.quan@amd.com>
-Cc: rafael@kernel.org, lenb@kernel.org, Alexander.Deucher@amd.com,
- Christian.Koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
- daniel@ffwll.ch, johannes@sipsolutions.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com, tzimmermann@suse.de,
- hdegoede@redhat.com, jingyuwang_vip@163.com, Lijo.Lazar@amd.com,
- jim.cromie@gmail.com, bellosilicio@gmail.com, andrealmeid@igalia.com,
- trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de, linux-kernel@vger.kernel.org,
- linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20230710083641.2132264-1-evan.quan@amd.com>
- <20230710083641.2132264-2-evan.quan@amd.com>
- <5439dd61-7b5f-4fc9-8ccd-f7df43a791dd@lunn.ch>
-Content-Language: en-US
-From: Mario Limonciello <mario.limonciello@amd.com>
-In-Reply-To: <5439dd61-7b5f-4fc9-8ccd-f7df43a791dd@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1PR04CA0017.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::22) To MN0PR12MB6101.namprd12.prod.outlook.com
- (2603:10b6:208:3cb::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3D81D2E9;
+	Wed, 12 Jul 2023 23:44:28 +0000 (UTC)
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE11EA;
+	Wed, 12 Jul 2023 16:44:24 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.west.internal (Postfix) with ESMTP id 7191F3200951;
+	Wed, 12 Jul 2023 19:44:23 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Wed, 12 Jul 2023 19:44:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm1; t=1689205462; x=1689291862; bh=32DhVpjlB5
+	qv2RGsaSG2S3DxCzE7pSAz5Ol3v4ZOloA=; b=Q+6YFmiE/uWOUcwnG5JjGTGP9a
+	DfZaL1JEplHBINYyebNSzg4lgY7AW9vHXwo1ZdL+NnfcO2S6wWoqMw0pMXG0brRV
+	nd0UIYW3nFTcLOqR3QFD/T8gfsZ4BjnWCEEyR0TDDKTTM1OZNs4qCIM0OIdtfPBN
+	oMVgJ8L4ZJoqa8lZ8L6tfmOXxXXJI6GASPJ6xwLHInTRE8GSLmwU1n4BjbmXU58x
+	oxpXoU5RYsXXOU3BeNudpYtAI4jAnAiBoN6cxcNeTqPkn8ZFJjy+NMNeJ6hDlYZr
+	N5BfwsKKOWQFPzE7GJOpsbLo5Pu9CPkwg+L0WjcvF8Day37kpx83w9Iqbkug==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1689205462; x=1689291862; bh=32DhVpjlB5qv2
+	RGsaSG2S3DxCzE7pSAz5Ol3v4ZOloA=; b=Lx/iwIed1H8kiK2S5PTiWd7pYxiKo
+	6yzN4bomecJ8insQJaL/uCXVH3aehCCXmDnMxA+xs0RCtQsGZ8yxBtTr3kex8Uj8
+	7AUtDOhJ2Pe3UTF5wc/12Hk9AF3pnjjKhRpHd1I6rFM95gx0O0S/lvM/mP/n8GNS
+	0eLJeOxlRXQ2T5boTwFXnkOuXd7Ho5qTGg2SxXVAPgxY9iu2Eb6hzg6WK0lBISzo
+	2E47KIHo8uZnUMdvLFYfAtZBb5CB+1bAJAm0rlUOWztaiupBxE1TelQFJ5qpuy0s
+	zF1uDIMsKZCsN0nv4m7eoYQ/mUdYckC9BdPTm+9Gb9kVVIrxyNiTwhKaA==
+X-ME-Sender: <xms:1jqvZOozHou81WdtgXLUfY9lJ52l4zIe2vRTza4mA9Pme5H9xm4_gQ>
+    <xme:1jqvZMpyLm4IghaNnFnqSeul6Zv9TfaLbGx7IbOPEo__u5yPjr_h3sI7JkKBLpaxa
+    hBKMkomF394Ca86vQ>
+X-ME-Received: <xmr:1jqvZDO0gJrilWd9YDPAb0LGjjqBq4hhQYXgzsNGj6PsBw36uLif5gdPxNIzPhGKbjtl_9woyJQ8_HzXIFepUt2iYdJHfgmTdPFGKYVlbmk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrfeefgddvgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhedmnecujfgurhephffvve
+    fufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihu
+    segugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeetgefhhfeigfejtddvteefff
+    fgteekteduiedtkeevleduvdejueeggfdtfeegfeenucffohhmrghinhepihgvthhfrdho
+    rhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepug
+    iguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:1jqvZN73mQjvozEWfF4-BHrk0AA8nQxhoy8vkl_-6aFiHQdMGH86Og>
+    <xmx:1jqvZN7BKz_LGhpqVcWj8hZFuiwJeXlyzP80eAwsTLw_ZXuOwE79tg>
+    <xmx:1jqvZNibXfOKLiBPs7yKP35wI3A9TvqJayLiNsF2jaZELMj06tUojw>
+    <xmx:1jqvZHsP4Trw8WbzxrHouJNbZHsc4panCNpegQJhMOofCIy3OsXMug>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 12 Jul 2023 19:44:21 -0400 (EDT)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	coreteam@netfilter.org,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	fw@strlen.de,
+	daniel@iogearbox.net
+Cc: dsahern@kernel.org
+Subject: [PATCH bpf-next v4 0/6] Support defragmenting IPv(4|6) packets in BPF
+Date: Wed, 12 Jul 2023 17:43:55 -0600
+Message-ID: <cover.1689203090.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|SJ2PR12MB7797:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2516036d-7040-40e6-2503-08db832fbcb9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	kf0eDkYTRJL0ndD0qdii5mS8Kjfemz4RuwMlp0xkfFm3aItOH+ZEgjA2E1SO+C2q3d3ZLVat744U/zXqH/OeUJLthkaRxXfSpQ8DNDjvb1aInuSCO03fEKE9cEGe/6diPQ6bBXlst8ykvFHf8HgWZegTdzfKLv+HMwrU29mZPnDy3/TEFR//TcXjrnSNtQGGuSaCuSt3o5uyF89/DwMQnj4kwGXUlIxgOJFhsB6X1X79U+wBCtKNEic6bTv/Y3a3MmdsIa/gQv72NR5NI4kfOACr0KQLJ8Hr+hjngxEwnvtNNjCFvB7VH+Nhv1YGTjh+ow/KsurXRzDMeIL4RCV8zJVys6uf0HkJQPh0+/gvvYfQXaLtzWC/4hY0uQ+H+5tUTFTQpKTZaQXr2SkzrJMUKXSEG2B2R2xCs9K9mA4YMryDxhQ6F9B5VcHxNPGAV/IZT4xrieW7hfbuLo0wSL+nSpfIbPjk+BxqUjSH3xPu6NS0vCXs1I4GKLPPLOvhryjMMjC/8HBpfaIsGBRJkzHJsYP8RtQDfRcxEj/AQM+Ftm6wiyRWnFPiZs+LPOw1pOv/EfMcxfExjhIYCb9JQaK7Z/oX75rGlt79QuPFJV+GQMtEDUeLxESni7L+FoMaANu4tf1nGz5lkloMbAMe5Ntlhg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(376002)(396003)(366004)(451199021)(41300700001)(8936002)(8676002)(6486002)(6666004)(110136005)(66899021)(31686004)(5660300002)(2906002)(44832011)(7416002)(316002)(4326008)(6636002)(66556008)(66476007)(66946007)(6512007)(36756003)(478600001)(31696002)(186003)(86362001)(38100700002)(83380400001)(6506007)(53546011)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aC9wRmliYVZYbjJhRDJrZHNaY3NRSzNNMDBLek5NdEFIL3ptZEN1bjdtdXIz?=
- =?utf-8?B?dklHV0VZT2d0TzlSZ2JlWDdhcjBCVk5mSTIwWENEdnZWd25HSC9lSmVQdWFJ?=
- =?utf-8?B?M0ZPYVJ2enJ6dVFrbGZoQk9wSjI5ZDV0TWVOeDRXR0lxZm8xSXRoTGZsa25q?=
- =?utf-8?B?c2V5cmUvNGl2UDF0V1dNSDJIdEg3ZjBEZk81eU96R1M4MWJYUE50RjBsMHVX?=
- =?utf-8?B?QjdIQ1B0UDc5RXlzYmFpekJlK0lFdURCbGhNK1BBejNzc0hlUEJyZ3hmTEg4?=
- =?utf-8?B?d050by9UZm91RFk2WEJXbWQ2T0ZsVkZIbVU1aGVtdFViWk9TRGhFNzlKaUNL?=
- =?utf-8?B?aitVMmJFN0Z0dExKZ1ZDOFZ2S2Nkb1JtazlzSXRLVU1jK3grMnI0Nk9xV0d1?=
- =?utf-8?B?R2hheWNEeTQ4cnFXTXRGeTQvMmlHeEtJWGRBOUppS1U2KzhRc3JEckhFeFNE?=
- =?utf-8?B?SSs2N0JQbGhhQ3FzS3hFdWkydEpoRThEbStkUWJCakNoV01MNkNzcGowcFZC?=
- =?utf-8?B?M1JXeEgrNlBXdlgvNU9yU0Mxa0VzRmVBWU5TaHFmSEcvS0pqbnQwWHJLTit2?=
- =?utf-8?B?bi9WMWhPL1gwaURuaEwvSmNITFZ1RjBXRGZzeVpIbm1wWU1Mb2JSODBydkEy?=
- =?utf-8?B?KzlHaUhRL0xaUG1iaFhKeXA1UVBlV2l2UC9xWEJDTSthY3dRTDZTZlJIYzZl?=
- =?utf-8?B?aWkxdnpVeFFLOFdNZGFWOXVYRU9MUWZseXEvT0I4WDczSGpaMCtwNlR3SnZL?=
- =?utf-8?B?Z0hCZC9nQ3ZBRjZDb1RLazdtTUdqc2hmUlFJZWtuSGdrVzFUQ2FGY0ZqQTRV?=
- =?utf-8?B?OXo2VVY3OG9MOUkzdEw1ZHdwS2I5OVhXVk5ncTl5UmpwNWgvbTZIYkVFMGgr?=
- =?utf-8?B?ZjNla1N3Y2xvanEvQk1QWU8wWlQxNW55QStscWtmWnhjVFNDOERWWENQVElN?=
- =?utf-8?B?N2pDU3cxWTB2QmptTjE5SFBtNWFPNmtqVjF3aEFTbllVVkRTaVcyU2RKeUZS?=
- =?utf-8?B?bGFCUUtuMUNXdFFKc0JwVjJqZkdOYTZNTlI2RHNhaUg2UlR5Yy9GWUpoMHla?=
- =?utf-8?B?QjI2TlRvVFpSRHJ1M0hZS3RGTlJVTDBZZi9VVTN1N2l4ZEQvbFdvcDZaU0Jm?=
- =?utf-8?B?T2Z4WGhOR1Jva1o2emVRblIyTTdualdDQ21XcFRST1VQK0lVeU45VEVmTW95?=
- =?utf-8?B?eHIyZGJrTnowbUY3MHAxQlRXbmxBNS91RHNyNk8xVnBMSHV3S0lkTDNtQ1Zi?=
- =?utf-8?B?U3d6NWRuN0VDcTVxNEJIQzdWdnA2K2VWZW9ITUVpQnhobG5ac09HUWpza1JR?=
- =?utf-8?B?czFTcXZ0bE5TRzl2MHFkZlhTVldvdnJzWHFtbGs4aTMvWUx1RUdwYUtySnBq?=
- =?utf-8?B?bS8vcTRsV3duMC9UN281YzBjclRqUzFqVUlqRXRuZHVOSGtqclFWQm9sR2Nk?=
- =?utf-8?B?MGV1RUlTeTJ0TXhMdlNSRWprK1pxelBpS0t6a2EySFI0NlYvdlFMeXk4WnFB?=
- =?utf-8?B?Nm90dy9MR3o4NU1IcnVlTGI1ZFMxOHNxNHZZbEFxekowUjFBUTlsUmgyNnI3?=
- =?utf-8?B?ZjdLSXI2Rzh4SzMrVWdNcklwT0FNaldSRGptenZLcWFuUWpxSDJaK2E3OXp6?=
- =?utf-8?B?dW5rbHVYaVI3ckllc1M1QWlUd1VySFlRd3J5eGt0YlBhQmluZ2FaLzVTenA4?=
- =?utf-8?B?TkFya1cyU3Fxb3JiTjhaYjA4YmNROUZlZGFvdnp5aFg3SHIyL1NnUS9EK09Y?=
- =?utf-8?B?Vmc0c1d1UGwyK0daUmRZdno1SDRSYXJBL0ljaS9yUmZoc1g1YVBiNmFadHA5?=
- =?utf-8?B?dTNoejFoYjMvQ21kdHNPeVQ3VUJLWm1Uam5QV2UrZkg1bkVLWFJxVEdHZStG?=
- =?utf-8?B?VlJnemx4ZlA1QkJyVnRNZVJROTQ1ZERqeS9PeTEyYUJXYStZdE44bjNFcTg1?=
- =?utf-8?B?ZjZTQld2aks2T2lJb3BsaHlORFQ3Wkpmd25SSXliSGIrOTJtdTlGUlVaVm12?=
- =?utf-8?B?cXZaRk51TS9CM1FvamRJeTlQVDhkS09EOHB0emxCeElFYTZNakwwckladWFv?=
- =?utf-8?B?eTJyU2Y5VWhkNXhGaE96emUydWE5QmxMeG1UaDZqZmNUQklhRG9RSWdMQUZi?=
- =?utf-8?B?a2VHeUtaRjJTQU0yVklGMDE0Z1IxeUVOUUkyTW5tdU9uVzQ5a0NDYUJUN0Vu?=
- =?utf-8?B?UHc9PQ==?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2516036d-7040-40e6-2503-08db832fbcb9
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 23:28:45.7824
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vv+JZR7xb8ua8xXleDJLd3jMQqQy1O6VTMh8S36lVxh6yI6l0VxptJk+0dj155w3+fpzrLKdh3MCtq1l8wHlZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7797
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/12/23 18:12, Andrew Lunn wrote:
->> +/**
->> + * wbrf_supported_producer - Determine if the device can report frequencies
->> + *
->> + * @dev: device pointer
->> + *
->> + * WBRF is used to mitigate devices that cause harmonic interference.
->> + * This function will determine if this device needs to report such frequencies.
-> 
-> How is the WBRF core supposed to answer this question? That it knows
-> there is at least one device which has registered with WBRF saying it
-> can change its behaviour to avoid causing interference?
-> 
-Potential producers are supposed to be the ones asking the question.
-> Rather than "Determine if the device can report frequencies" should it be
-> "Determine if the device should report frequencies"
-Agree.
-> 
-> A WiFi device can always report frequencies, since it knows what
-> frequency is it currently using. However, it is pointless making such
-> reports if there is no device which can actually make use of the
-> information.
+=== Context ===
 
-Which is why this function exists.
+In the context of a middlebox, fragmented packets are tricky to handle.
+The full 5-tuple of a packet is often only available in the first
+fragment which makes enforcing consistent policy difficult. There are
+really only two stateless options, neither of which are very nice:
 
-With the AMD ACPI implementation the platform will dictate this information.
+1. Enforce policy on first fragment and accept all subsequent fragments.
+   This works but may let in certain attacks or allow data exfiltration.
 
-If a future device tree implementation is added it would work similarly.
+2. Enforce policy on first fragment and drop all subsequent fragments.
+   This does not really work b/c some protocols may rely on
+   fragmentation. For example, DNS may rely on oversized UDP packets for
+   large responses.
 
-> 
->> +bool wbrf_supported_producer(struct device *dev)
->> +{
->> +	return true;
->> +}
-> 
-> I found the default implementation of true being odd. It makes me
-> wounder, what is the point of this call. I would expect this to see if
-> a linked list is empty or not.
+So stateful tracking is the only sane option. RFC 8900 [0] calls this
+out as well in section 6.3:
 
-The point is a lot clearer when you look at the description for the 
-Kconfig included in patch 2.
+    Middleboxes [...] should process IP fragments in a manner that is
+    consistent with [RFC0791] and [RFC8200]. In many cases, middleboxes
+    must maintain state in order to achieve this goal.
 
-+	  Ideally it is the hardware designer/provider who should provide a
-+	  solution for the possible RF interference issue. Since they know
-+	  well whether there could be RF interference issue with their
-+	  platforms.
-+
-+	  Say Y to enable this generic WBRF solution for diagnosing potential
-+	  interference issues on systems without the ACPI mechanism and
-+	  developing solutions.
+=== BPF related bits ===
 
-WBRF_AMD_ACPI and WBRF_GENERIC are mutually exclusive.  I don't expect 
-the average user to enable WBRF_GENERIC, but there isn't anything to 
-stop them from doing so.
+Policy has traditionally been enforced from XDP/TC hooks. Both hooks
+run before kernel reassembly facilities. However, with the new
+BPF_PROG_TYPE_NETFILTER, we can rather easily hook into existing
+netfilter reassembly infra.
 
-It may also aide in developing a WBRF_DEVICE_TREE or similar.
+The basic idea is we bump a refcnt on the netfilter defrag module and
+then run the bpf prog after the defrag module runs. This allows bpf
+progs to transparently see full, reassembled packets. The nice thing
+about this is that progs don't have to carry around logic to detect
+fragments.
 
-> 
->> +/**
->> + * wbrf_supported_consumer - Determine if the device can react to frequencies
-> 
-> This again seems odd. A device should know if it can react to
-> frequencies or not. WBRF core should not need to tell it. What makes
-> more sense to me is that this call is about a device telling the WBRF
-> core it is able to react to frequencies. The WBRF core then can give a
-> good answer to wbrf_supported_producer(), yes, i know of some other
-> device who might be able to do something to avoid causing interference
-> to you, so please do tell me about frequencies you want to use.
-> 
-> What is missing here in this API is policy information. The WBRF core
-> knows it has zero or more devices which can report what frequencies
-> they are using, and it has zero or more devices which maybe can do
-> something. But then you need policy to say this particular board needs
-> any registered devices to actually do something because of poor
-> shielding. Should this policy be as simple as a bool, or should it
-> actually say the board has shielding issues for a list of frequencies?
-> I think the answer to what will depend on the cost of taking action
-> when no action is actually required.
+=== Changelog ===
 
-Again, look at patch 2 and the purpose of WBRF_GENERIC.  I suppose an 
-argument can be made to bring WBRF_GENERIC into patch 1.
+Changes from v3:
+* Correctly initialize `addrlen` stack var for recvmsg()
 
-> 
->> + * wbrf_register_notifier - Register for notifications of frequency changes
->> + *
->> + * @nb: driver notifier block
->> + *
->> + * WBRF is used to mitigate devices that cause harmonic interference.
->> + * This function will allow consumers to register for frequency notifications.
->> + */
->> +int wbrf_register_notifier(struct notifier_block *nb)
->> +{
->> +	return blocking_notifier_chain_register(&wbrf_chain_head, nb);
->> +}
-> 
-> What are the timing requirements for the handler? Should the handler
-> block until the device has finished doing what it needs to do and the
-> frequency response has settled? We don't want the WiFi device doing a
-> SNR measurement until we know local noise is at a minimum. I think it
-> would be good to document things like this here.
-> 
->> +struct wbrf_ranges_out {
->> +	u32			num_of_ranges;
->> +	struct exclusion_range	band_list[MAX_NUM_OF_WBRF_RANGES];
->> +} __packed;
-> 
-> Seems odd using packed here. It is the only structure which is
-> packed. I would also move the u32 after the struct so it is naturally
-> aligned on 64 bit systems.
-> 
-> 	Andrew
+Changes from v2:
+
+* module_put() if ->enable() fails
+* Fix CI build errors
+
+Changes from v1:
+
+* Drop bpf_program__attach_netfilter() patches
+* static -> static const where appropriate
+* Fix callback assignment order during registration
+* Only request_module() if callbacks are missing
+* Fix retval when modprobe fails in userspace
+* Fix v6 defrag module name (nf_defrag_ipv6_hooks -> nf_defrag_ipv6)
+* Simplify priority checking code
+* Add warning if module doesn't assign callbacks in the future
+* Take refcnt on module while defrag link is active
+
+
+[0]: https://datatracker.ietf.org/doc/html/rfc8900
+
+
+Daniel Xu (6):
+  netfilter: defrag: Add glue hooks for enabling/disabling defrag
+  netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link
+  netfilter: bpf: Prevent defrag module unload while link active
+  bpf: selftests: Support not connecting client socket
+  bpf: selftests: Support custom type and proto for client sockets
+  bpf: selftests: Add defrag selftests
+
+ include/linux/netfilter.h                     |  15 +
+ include/uapi/linux/bpf.h                      |   5 +
+ net/ipv4/netfilter/nf_defrag_ipv4.c           |  17 +-
+ net/ipv6/netfilter/nf_defrag_ipv6_hooks.c     |  11 +
+ net/netfilter/core.c                          |   6 +
+ net/netfilter/nf_bpf_link.c                   | 150 +++++++++-
+ tools/include/uapi/linux/bpf.h                |   5 +
+ tools/testing/selftests/bpf/Makefile          |   4 +-
+ .../selftests/bpf/generate_udp_fragments.py   |  90 ++++++
+ .../selftests/bpf/ip_check_defrag_frags.h     |  57 ++++
+ tools/testing/selftests/bpf/network_helpers.c |  26 +-
+ tools/testing/selftests/bpf/network_helpers.h |   3 +
+ .../bpf/prog_tests/ip_check_defrag.c          | 283 ++++++++++++++++++
+ .../selftests/bpf/progs/ip_check_defrag.c     | 104 +++++++
+ 14 files changed, 754 insertions(+), 22 deletions(-)
+ create mode 100755 tools/testing/selftests/bpf/generate_udp_fragments.py
+ create mode 100644 tools/testing/selftests/bpf/ip_check_defrag_frags.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/ip_check_defrag.c
+ create mode 100644 tools/testing/selftests/bpf/progs/ip_check_defrag.c
+
+-- 
+2.41.0
 
 
