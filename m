@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-17232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1FB9750E2A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 18:17:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15925750E2D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 18:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31561C211EC
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:17:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEDDF2810BE
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8C521512;
-	Wed, 12 Jul 2023 16:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D6314F7E;
+	Wed, 12 Jul 2023 16:16:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC2221510
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 16:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7201721500
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 16:16:52 +0000 (UTC)
 Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2068.outbound.protection.outlook.com [40.107.95.68])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA2B1BFC
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:16:43 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EFB12101
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:16:49 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kc3u624bjkg+8EX1myDaZ/7/bUqTBbErYHqji/Tob/OKlX8paoM/6pyn0rzd7MtGJ/2dwq/LhiQQD4KphyQg/o+aIHgg/8yxBE0iLmnBCfZZrwEjL1vXJwU0nXKXAfFoLEAg4tvGaZr2F2AYW2En7S/19V9zdhLgn+XxXBmEFhtMMrqIPm7hyJLHe4g8Ds2IVwTsbI0K4HbD1QYNAiL7iVKi1ZujWNVkYE+8VulVUzY0l0tuMuauaVMPn6Zj/xDbBzu4/aFtDm+NhSNM+SDn7tTh0y9NFG2j8axFi8MAlPsmOjbqvJsnxywXqD1ColfuP2pJNkPnjXrlIwxUTv4DHg==
+ b=b1pQ74zEDCjO1dVm46I9yjIB62B34CwlVmQs5M5leKJAg5YHlcL5cagsnYRvEOkY+PORUHdL3WrIAKPnHM1BaDBhs9PO5VV2EgVoFufofkhjLlOM8lX+M6GnTt6y5+rE6+RjvOueVadpi0PL9SHVhGc/L6VZ/bWhE3I+HWO5StFWiHB0EvrjE1jdDop1jRtA4ziTdxH9LMtdmAs71bonuC3DUzXDtDpwrFHd2THvCWL1StEf1/DoZor5Lil1nS4UCQFrQhkVwVB1IdVCphi/YnEPT/A9TfgYv2xyKwctpLnolLMM0uDfck6Efv/wqMHXWcbVa5TYk8bDTur8+Lcydw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ly3lFtXI9NdSZNmIFJb/xY/L5foycorQr3fO0VpWxAE=;
- b=Bph5L81U0vowhrwtlMfomhztHtS7g08Mq2VuXULKzKeViMW1pkUQO52bEwqqZluMOo/1cs2cSi0ocJ6vTcCatsAf3xCRm8EYjMJ2NygOcnjDsLOz7ArcfDC9BGPC4jqwWDtPxx8cYInp25oklPV6sOnNGq/4KK8mEJj5n/RxHrpdY2shMuGdFQ0JQM/AS9odA4dWsFRy7P66p5J16xHm1VkdT+mtNjogySZdLjYzanbqOs7PKUhCvlu3Y1S3wHNiZJr77QgyjV3qrYWcYphDu5CXjp+8a5/w+HXdPS4arSme14O8WyusmqWP/X99R8y6AkLFQalwe5wr0QJ7vDsJ7A==
+ bh=tY2LHmXVjq6Iqi2cmYI7gvya1ZoMhI31x7920936aA0=;
+ b=LYaZ7KPrSN1MgqcTPdI7lrKpr2CUK4xUM8k8rMmxWTggXz3j+caZF7o0ERi6wwkHl56a2UzyZGAK//1bXdToLGjHw9bM73fyLkpE2887e7Ie7UgLT38xts/RvMKGoY89K66ErTp9mc09HufouL9EGleaZzQ33BHJ695J0LIIcpj1NYoe6lbuhmRDSRIKKa/oLW9PwzSzYblTt1D1dBpa6qJDdHMbE2TdmKaMCbbAfwVMWnaaYbPveTErKj9sW0cnCeXNcJNkP5EOmXX2l5OcuCTAY3LXZ0ENe83VFtRzcf3f8zTgJpDMJ9gJQiTYR4F7AhZaZmMF0jSbw/VVbvR8jg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ly3lFtXI9NdSZNmIFJb/xY/L5foycorQr3fO0VpWxAE=;
- b=Cp4uMwz8JLanKVDdE97k6Wd90bQf2YpbJuaft3SObL+I0NwQ0nSQy3me/pAG2NBge8nBAUB+p8lQF6d7yzfviw4+Hgu5d7cn+dniU2UqmQdhggGnAbq+kAl6ea+eyv/MfQiAZXbSbE4bS5uphpznor4u0Ui+fKDlEJyndqOeepbOzNJlJ+KUhbriM4ViAVPK5pEAwSA4Yv6dQeAqxHNstLYdQ1AxWaw1kF0Vba5I8a3QUO9lzuwslKtnaVpk24yRGmpQpyq8lS5AtzQRm9iovTIH7cjm11+b3vIzpvDBVoroUNwQfbepcT5QoaCDSeStzb9dF1r0mLmj6Di9VexFDQ==
+ bh=tY2LHmXVjq6Iqi2cmYI7gvya1ZoMhI31x7920936aA0=;
+ b=VExm5olKt2JjFPpMseh3J3hlagJLS6Fb0thWvzgyeF+d2ahMUNF1pUcT7rbbvBQ0jwc/ibkSIwfKf7c6jzScwrvVPcEG/cZL0JhIGNhvr56NZ7OFdLPDf0BFhyxGwDLDYAW+aGrQUtVemI10tMrkOvWZHKM0VE5KBumq72eDjJYpAVETMTPJxschuc/tY39X5/NIadz/HGG7rHPg93LhaICvwIdkZCKFhdveyLEXJTW7AY/HZWiulaMTLFOIlpNxzrkNLO4+mWTNb6+1fs8IYgVjd89ylJhMcBXNQWL8Z8sCGz/sI5kvJm6cIKQfZ/pvYSA5vkUs0udT+VFhXrmTrg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
  by PH7PR12MB7212.namprd12.prod.outlook.com (2603:10b6:510:207::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Wed, 12 Jul
- 2023 16:16:40 +0000
+ 2023 16:16:47 +0000
 Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
  ([fe80::3f6a:7977:dcd4:9ad1]) by SJ1PR12MB6075.namprd12.prod.outlook.com
  ([fe80::3f6a:7977:dcd4:9ad1%4]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
- 16:16:40 +0000
+ 16:16:47 +0000
 From: Aurelien Aptel <aaptel@nvidia.com>
 To: linux-nvme@lists.infradead.org,
 	netdev@vger.kernel.org,
@@ -66,16 +66,16 @@ Cc: Aurelien Aptel <aaptel@nvidia.com>,
 	borisp@nvidia.com,
 	galshalom@nvidia.com,
 	mgurtovoy@nvidia.com
-Subject: [PATCH v12 03/26] net/ethtool: add ULP_DDP_{GET,SET} operations for caps and stats
-Date: Wed, 12 Jul 2023 16:14:50 +0000
-Message-Id: <20230712161513.134860-4-aaptel@nvidia.com>
+Subject: [PATCH v12 04/26] Documentation: document netlink ULP_DDP_GET/SET messages
+Date: Wed, 12 Jul 2023 16:14:51 +0000
+Message-Id: <20230712161513.134860-5-aaptel@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712161513.134860-1-aaptel@nvidia.com>
 References: <20230712161513.134860-1-aaptel@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0122.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:97::12) To SJ1PR12MB6075.namprd12.prod.outlook.com
+X-ClientProxiedBy: FR0P281CA0090.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1e::15) To SJ1PR12MB6075.namprd12.prod.outlook.com
  (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,53 +85,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|PH7PR12MB7212:EE_
-X-MS-Office365-Filtering-Correlation-Id: e8cbf1c4-9804-4b9b-24c4-08db82f36025
+X-MS-Office365-Filtering-Correlation-Id: 9bbbeb68-3985-475d-ae08-08db82f3642f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	6jm87B4/CCmkS1jOZVmT0CVq19hScft4sFAXnjVvZBtlTUnA8FPTLIS5FHhALOSMOSOtGJwrd7RMLOQPYLUETcf+oHxm3w/Xr2wnrSiQj/RkLRw45O1ozuyFDxou2ZNO4+iQ8krM4UmVKT6EijMj+hrD4gnLvcl1b4CG4kdqWrP3GTc+FYsg6rxpUIeJ9xsDQ7ZyJDjyz2wdtq2O99DiarvLyHj/6DT/CguZqtNu7zNu1HVzOuDb1+kJMn/ibqspwcWs/JRi+1UwXBUtDm7kw1U+EedbviYYEv7nu86TWUwnZ6SMIrPV+j11juto+xDeCcf7+nNNdX6dKKxSgjEp7mgXOy619HJkCC3DoBr1/4cyBlIYmfeBeJgZwUeO8j6PDWTztUNRZBI3MuEMcKWKz3LKQaUxSRvNasu22+rIMe/tHgpMPtl2MQehgdVzzHtF/KhMkGkUAehwYWxsUUgOcqwb/AGI9iTLSN6B9HXu+SREv6HtVv1dRqJ+VIMHRfc8slzjkSxijuvI+t3GJwknVcv7LXWMQjZjOrug0zKVuOeBT8HQjg4CcyH4XEYqtb0W
+	Be55JZyE/0qr5NcK1YrY1maItSM2ZAylt8L26mJ2NY9PXyT1tXkywnCsADaNdTYjg6wMU5MbuxB9r2S+aaYBEZ2Woclg78EJbd1NXYFIbf3FxSYuc1UT1OOVmhkKZ6/fgPcNZS3VcLBUaA1DB+j9+sQn6pHYKspR+ZdObtsq81AW081SnKJlWFK6cl8c4SOSu5+dupOMtjC0kZuN0ZZIPywi0kK/x1IEnqYPdxPBw/7flZvgc69xvkLAZchT2Z7FPUF2zBLlGeins0GHI73hLNcBSwOwIJtjCk9SsBnUQRdk3qYdvGV04W971bkN7Ry1LS5EU2UuiyGBm26gAyxMpemd7aaRJ/tb5lu62rZcj2xU24wRMdAgsOGoP4ZHFRB16JgzBwDYGR76eXSjstzGwwqozvXintxUPi1dbFSg3L6PzUqkjAeIzpyqzfgbJjfJjHzsiV4sqGpH6Ypcr7Rvyq1q1wlw2Ac8JbTz31pzmFU/6fgc1UveMdcP/kPDNFkkkifE2tTzmbRUtgYCYWDR2+X29QRm+nuIi5E+upMjl9bNLO3/7YyReQuTo/elV4N3
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(136003)(346002)(376002)(396003)(451199021)(186003)(2616005)(86362001)(66476007)(66946007)(66556008)(316002)(83380400001)(107886003)(4326008)(6512007)(1076003)(26005)(6506007)(478600001)(2906002)(6486002)(36756003)(30864003)(6666004)(38100700002)(41300700001)(7416002)(8676002)(8936002)(5660300002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(136003)(346002)(376002)(396003)(451199021)(186003)(2616005)(86362001)(66476007)(66946007)(66556008)(316002)(83380400001)(107886003)(4326008)(6512007)(1076003)(26005)(6506007)(478600001)(2906002)(6486002)(36756003)(15650500001)(6666004)(38100700002)(41300700001)(7416002)(8676002)(8936002)(5660300002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VVuTqBVDx2KTdT9wmPJXMn5r0e1oENrhjGrJt5by4NFMbuHDo7E7AHUiEw8M?=
- =?us-ascii?Q?NpEfS5+RYi802G+VokpYaVbTnu3xzUWn+eLp+QZK3Ua6V8gllXZyaS1Cmbkn?=
- =?us-ascii?Q?2lHhZYzyTIioMEosoGKm12g+iTwfDmPyPBE6BjMMwJ2OUwIoOMRcBgbF315/?=
- =?us-ascii?Q?eONcmPZWTtjiBLw25iAmHimh0eNXzCpYdoqPAh5cPDbfHldxZ6+YPJgK7cv5?=
- =?us-ascii?Q?JOEUT7CDhBz3DxdhV7mpaudqP+aKR7Yb6qnoXCKhFC/9qT1CRImvbCa7+/LU?=
- =?us-ascii?Q?mTA0T/1YuFT92cqwd1/g4FFm1VSl7N2wNHEIDDTkOub7cTk/neYhBr+5Evcw?=
- =?us-ascii?Q?sSQcG+0teD1rMUYdGtpsGDVPIo24CMiWwLOszEqYmkla+qwZKt7b6SiXAyq3?=
- =?us-ascii?Q?jrG78h4AfNBiiVNdHp1zxSqOlC+rb6/APJokjKtnpG/0aHoimBpsA8yScM4s?=
- =?us-ascii?Q?dMAaia2UrFntPzeesDrwb6qOFBHqXB9aP1QjKQ118HtAgVj7Y7+wOa2hQciH?=
- =?us-ascii?Q?bEVNn03j0OVpHQRk86bnwRl/93rXx3Pm011KY8j+gemKGqFKXjd8Lk79MMFV?=
- =?us-ascii?Q?koKq+Ccz601ukiKKhEjexYrGvf5H1jnaW56txjHPm9yDRTTg0snaKSd/HHzE?=
- =?us-ascii?Q?C2Q2zFioxW206FStwtQFdLBakVO4Cx+FrttA3agVIOiyM2Nd3qZBW4ia+/3z?=
- =?us-ascii?Q?kRPtxt+bZHCNVsRirD9ngEOUBMgVPWLR3G9YYDT/gKovmKAQlgUiuWRfMYRK?=
- =?us-ascii?Q?Wr0tIH7MfhEfY8B7YVF9rljfsWCgiQIhRdYXZFfau+RlGEECIkNiJdfaekFR?=
- =?us-ascii?Q?2sQmeKp3A+g8Xzh2x/hslP+v9A549crj4t6Hh3S5GPNX830TSVDinTTxemZ/?=
- =?us-ascii?Q?7r4R/h2ze9aRv8r3jMY2PzQKuP4RZtOArhX4pC9BpEPcRAKdO0z5LDIvNKLL?=
- =?us-ascii?Q?78HxNyRNMroLKd8ywIL5Omr1n6nyAC/WQYXokU2LUjRkRwMTf4uKru/Gymqs?=
- =?us-ascii?Q?Ycgq5ZA8Yze/uzejJFeJozGWpBdHICrskjJX/N7ebmUbwTH5+mozEkNs+vA3?=
- =?us-ascii?Q?nGIy8DKpb3Crmb1X9Fw0o2LOp5VYkOKEaFpHlgBDmiZ37cQ5MvEtO3aYKHjO?=
- =?us-ascii?Q?Wsow3T3RNSOHCvmeTMxDbwaDB+hEgYxfZezKHoMcJaWWafCz4iesptCjM5Ln?=
- =?us-ascii?Q?je1+/oeVqXJl2E9PvcnZN0bFmPSEHviCpPXnzAvrEy1yNFeHC6G+tT/ep8EH?=
- =?us-ascii?Q?0TbwzNAX4WrxGk9p35y6SzU12SabJyjaeLh6ewEk+R5WOh1eBxjlQuLiqGBP?=
- =?us-ascii?Q?kB+mUlKkMzwuhgFDdg81knXsdtq4gLLxTU28bmKnn8sNdirR3l/HuPogWwh4?=
- =?us-ascii?Q?2OqA0zdk05/ujKn++BKrJCDeVyCXO2sIoCdE4/tBVEtsY3pDMw52S/cqLnrQ?=
- =?us-ascii?Q?/328aAXOeTHLmXMe8vFbYyczUE/lQaLQZXzwcVtM2BxzPKIiuKsGupO8nJ7i?=
- =?us-ascii?Q?YcnFnmVs80nZ020JUzXvYtz2oQaNjWffbEJsldc9aPWXIe6PtDnbLz2rxp2C?=
- =?us-ascii?Q?OzveGu/P/h5SPml05fhgWd+Ca+7I7SaTvZF7ITxF?=
+	=?us-ascii?Q?ZBvQ49Ht9AH3LNsFTeIj7QPVofjMsqEv6YoK3wd7MruJCB63lKu7dwJ40P0f?=
+ =?us-ascii?Q?8KHL//alDFvw3/C2UBAdg2kLVJ7SReC7ui/N434MJJuHq3k+QXVNgevLnOmn?=
+ =?us-ascii?Q?42GJkvKwNyafd3ZhOnOhEiDpWvC7JJDdQUqNZgLjtG59y1M/ygUujlFndNTf?=
+ =?us-ascii?Q?y/JmoQGdMajbenfdWLwd4udDLH7/ocdHwlAGUu6bJ+p5aEfGJDB17RMF5bRV?=
+ =?us-ascii?Q?14o7sMSk9w7/suP4PyWfpWW5xmexPMTtR5jI+XuzlXEpBdRmeNMpQGwVpL+5?=
+ =?us-ascii?Q?PpdiZqnenv2OhH0A00RhOTHPBxry3UoGgXJmFtQeRk/1HXWrPAVY+rtEnaEY?=
+ =?us-ascii?Q?5cKvuRu4yjitZfZMvitHGuZOhUYRBrQQT5uQtotFSrLxzCXJvaB8VSqXrHBk?=
+ =?us-ascii?Q?csNmvbXXkRxi9oEaZp5+E/2IWyD1teNVKYzN42jIxulpbesnJkNpG7e8LFto?=
+ =?us-ascii?Q?bSaAtU+kJazFLNqup0uhKEO5dB7vzgr5pFw63YgIa9HUibel5iapsG5GemT3?=
+ =?us-ascii?Q?+VRTO/vh7Hm2riMh2cN3+ILSYSIohN7EyXcdvk9A3+u1ePYO6IJ6FO9nsJHY?=
+ =?us-ascii?Q?eU3jn8Ow6nlmLPND5fhRoxM53GYr9vTBhJwmkf4krZc8zVutpDHp702+AGML?=
+ =?us-ascii?Q?oaDc9u71D8F6TeKA6rMibEELTMQs7MN6jKmhOumtHTjL9hYg6xcyN5HGgSwj?=
+ =?us-ascii?Q?pHfTX+/HUU8Syr2o0tf9tNmFNXTeEZs1h+2rEByWhHXojiNd49q1QIhKuATU?=
+ =?us-ascii?Q?MKmY6qDtTYOsQLPzqsSUbvmX6uWpnNGhFCXB+gby5PMkiCelbLdFDC3I8syl?=
+ =?us-ascii?Q?rQy6qoiHfWMUNRTt1O/EuWLVMNC6VUHnMhQB17gP280eMl3echY9e6O6/VTL?=
+ =?us-ascii?Q?BaDNdZ5tYjoFtEVq1g9hhGrAhJY3iIRV6K1sauKkgAZT4xgB8cRHKkmtlJzL?=
+ =?us-ascii?Q?W8EYq7cCv9H3/OBcJYL3YAsxi+rQagYxM3PLZnU+C2Hqnzw7Qy8eVa33htF9?=
+ =?us-ascii?Q?TbKp0q4T1+RVl0z3ZykiHYgMagGDoziqEKq9bcxnW28mX6xSrbP5LwEwyGMp?=
+ =?us-ascii?Q?n74ggOvFtV27qdXy2SIllJ7Zh4qZtt9wSO8Yan5Vx2mLUqzMGjrZj51yNNy8?=
+ =?us-ascii?Q?Ee4yGR8FUx+YZh2N4TsEDHumQ+pDoC6wo/CO8G6KR1eFbvPzGDKIU94te6ei?=
+ =?us-ascii?Q?Uj5FKnegYk/O5t8b2VpmfpcgloXqJtnf5FBXAcKz9UdZxq0FyU56vsYzM7ep?=
+ =?us-ascii?Q?t6P94hgNRpQSGjkblx+t9rmoRGDZFOZa0Oo9zNP8LrD+HDHfHI+JDGRxCpY5?=
+ =?us-ascii?Q?NzWZyWGcLSg6MXYshVYws/PAuYvYA2VHdD1mBan2tIdOj2dV+eDjF6e6k6dC?=
+ =?us-ascii?Q?630FxY2YlZ+eTf+dyhj55cD3VWCEbAdxS9nEDsjFxKxdj2NF9M/9FSDhIwJ7?=
+ =?us-ascii?Q?LBtzT63qACi4oSKBZDk0AQlHtLLKUoWvXczu7aSJo6Zxl7enU3R1Q2oC5L/4?=
+ =?us-ascii?Q?onGPzgNm88/7dp1MV7FYPUehvW870JsG56/JpgjlXUoDiD/UzH2ZAx/O1p20?=
+ =?us-ascii?Q?ZgBsnAGC/O4MERoccDsVlpvZsJffccR7QhcxXYPR?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8cbf1c4-9804-4b9b-24c4-08db82f36025
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9bbbeb68-3985-475d-ae08-08db82f3642f
 X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 16:16:40.7635
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 16:16:47.7156
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3gpYUP+A6MDKU+VQam27thNhwfl91zMVfFC9j0NUgs2sQ90o0WN9wHN8mttLEonDQANkVjwPzRSHDUZvj0AMmQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0WXIqfCT2OQ+dX2y4BSp0ecz4f1IqFXR1KeleRsoR9MYrQRfXDVCJpIbzZ6rgvNJ2QqzoOMKsBVLSRNP5egj/Q==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7212
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
@@ -141,569 +141,271 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This commit adds:
+Add detailed documentation about:
+- ETHTOOL_MSG_ULP_DDP_GET and ETHTOOL_MSG_ULP_DDP_SET netlink messages
+- ETH_SS_ULP_DDP_CAPS and ETH_SS_ULP_DDP_STATS stringsets
 
-- 3 new netlink messages:
-  * ULP_DDP_GET: returns a bitset of supported and active capabilities
-  * ULP_DDP_SET: tries to activate requested bitset and returns results
-  * ULP_DDP_NTF: notification for capabilities change
+ETHTOOL_MSG_ULP_DDP_GET/SET messages are used to configure ULP DDP
+capabilities and retrieve ULP DDP statistics.
 
-Rename and export bitset_policy for use in ulp_ddp.c.
-
-ULP DDP capabilities handling is similar to netdev features
-handling.
-
-If a ULP_DDP_GET message has requested statistics via the
-ETHTOOL_FLAG_STATS header flag, then statistics are returned to
-userspace.
-
-  ULP_DDP_GET request: (header only)
-  ULP_DDP_GET reply:
-
-      HW             (bitset)
-      ACTIVE         (bitset)
-      STATS          (nest, optional)
-          STATS_xxxx (u64)
-          ....
-
-  ULP_DDP_SET request:
-      WANTED         (bitset)
-  ULP_DDP_SET reply:
-      WANTED         (bitset)
-      ACTIVE         (bitset)
+Both statistics and capabilities names can be retrieved dynamically
+from the kernel via string sets (no need to hardcode them and keep
+them in sync in ethtool).
 
 Signed-off-by: Shai Malin <smalin@nvidia.com>
 Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
 ---
- include/uapi/linux/ethtool_netlink.h |  18 ++
- net/ethtool/Makefile                 |   2 +-
- net/ethtool/bitset.c                 |  20 +-
- net/ethtool/netlink.c                |  20 ++
- net/ethtool/netlink.h                |   4 +
- net/ethtool/ulp_ddp.c                | 316 +++++++++++++++++++++++++++
- 6 files changed, 369 insertions(+), 11 deletions(-)
- create mode 100644 net/ethtool/ulp_ddp.c
+ Documentation/netlink/specs/ethtool.yaml     | 102 +++++++++++++++++++
+ Documentation/networking/ethtool-netlink.rst |  92 +++++++++++++++++
+ Documentation/networking/statistics.rst      |   1 +
+ 3 files changed, 195 insertions(+)
 
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index a9aebbe420c8..93bd5ca9bac3 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
-@@ -57,6 +57,8 @@ enum {
- 	ETHTOOL_MSG_PLCA_GET_STATUS,
- 	ETHTOOL_MSG_MM_GET,
- 	ETHTOOL_MSG_MM_SET,
-+	ETHTOOL_MSG_ULP_DDP_GET,
-+	ETHTOOL_MSG_ULP_DDP_SET,
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 837b565577ca..65114e28a4ad 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -377,6 +377,67 @@ attribute-sets:
+         name: nochange
+         type: nest
+         nested-attributes: bitset
++  -
++    name: ulp-ddp-stat
++    attributes:
++      -
++        name: pad
++        value: 1
++        type: pad
++      -
++        name: rx-nvmeotcp-sk-add
++        type: u64
++      -
++        name: rx-nvmeotcp-sk-add-fail
++        type: u64
++      -
++        name: rx-nvmeotcp-sk-del
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-setup
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-setup-fail
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-teardown
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-drop
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-resync
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-packets
++        type: u64
++      -
++        name: rx-nvmeotcp-ddp-bytes
++        type: u64
++  -
++    name: ulp-ddp
++    attributes:
++      -
++        name: header
++        value: 1
++        type: nest
++        nested-attributes: header
++      -
++        name: hw
++        type: nest
++        nested-attributes: bitset
++      -
++        name: active
++        type: nest
++        nested-attributes: bitset
++      -
++        name: wanted
++        type: nest
++        nested-attributes: bitset
++      -
++        name: stats
++        type: nest
++        nested-attributes: ulp-ddp-stat
+   -
+     name: channels
+     attributes:
+@@ -1692,3 +1753,44 @@ operations:
+       name: mm-ntf
+       doc: Notification for change in MAC Merge configuration.
+       notify: mm-get
++    -
++      name: ulp-ddp-get
++      doc: Get ULP DDP capabilities and stats.
++
++      attribute-set: ulp-ddp
++
++      do: &ulp-ddp-get-op
++        request:
++          value: 44
++          attributes:
++            - header
++        reply:
++          value: 44
++          attributes:
++            - header
++            - hw
++            - active
++            - stats
++      dump: *ulp-ddp-get-op
++    -
++      name: ulp-ddp-set
++      doc: Set ULP DDP capabilities.
++
++      attribute-set: ulp-ddp
++
++      do:
++        request:
++          value: 45
++          attributes:
++            - header
++            - wanted
++        reply:
++          value: 45
++          attributes:
++            - header
++            - hw
++            - active
++    -
++      name: ulp-ddp-ntf
++      doc: Notification for change in ULP DDP capabilities.
++      notify: ulp-ddp-get
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index 2540c70952ff..8ffca8ae9bbd 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -225,6 +225,8 @@ Userspace to kernel:
+   ``ETHTOOL_MSG_RSS_GET``               get RSS settings
+   ``ETHTOOL_MSG_MM_GET``                get MAC merge layer state
+   ``ETHTOOL_MSG_MM_SET``                set MAC merge layer parameters
++  ``ETHTOOL_MSG_ULP_DDP_GET``           get ULP DDP capabilities and stats
++  ``ETHTOOL_MSG_ULP_DDP_SET``           set ULP DDP capabilities
+   ===================================== =================================
  
- 	/* add new constants above here */
- 	__ETHTOOL_MSG_USER_CNT,
-@@ -109,6 +111,9 @@ enum {
- 	ETHTOOL_MSG_PLCA_NTF,
- 	ETHTOOL_MSG_MM_GET_REPLY,
- 	ETHTOOL_MSG_MM_NTF,
-+	ETHTOOL_MSG_ULP_DDP_GET_REPLY,
-+	ETHTOOL_MSG_ULP_DDP_SET_REPLY,
-+	ETHTOOL_MSG_ULP_DDP_NTF,
+ Kernel to userspace:
+@@ -268,6 +270,9 @@ Kernel to userspace:
+   ``ETHTOOL_MSG_PSE_GET_REPLY``            PSE parameters
+   ``ETHTOOL_MSG_RSS_GET_REPLY``            RSS settings
+   ``ETHTOOL_MSG_MM_GET_REPLY``             MAC merge layer status
++  ``ETHTOOL_MSG_ULP_DDP_GET_REPLY``        ULP DDP capabilities and stats
++  ``ETHTOOL_MSG_ULP_DDP_SET_REPLY``        optional reply to ULP_DDP_SET
++  ``ETHTOOL_MSG_ULP_DDP_NTF``              ULP DDP capabilities notification
+   ======================================== =================================
  
- 	/* add new constants above here */
- 	__ETHTOOL_MSG_KERNEL_CNT,
-@@ -977,6 +982,19 @@ enum {
+ ``GET`` requests are sent by userspace applications to retrieve device
+@@ -1994,6 +1999,93 @@ The attributes are propagated to the driver through the following structure:
+ .. kernel-doc:: include/linux/ethtool.h
+     :identifiers: ethtool_mm_cfg
  
- /* ULP DDP */
++ULP_DDP_GET
++===========
++
++Get ULP DDP capabilities for the interface and optional driver-defined stats.
++
++Request contents:
++
++  ====================================  ======  ==========================
++  ``ETHTOOL_A_ULP_DDP_HEADER``          nested  request header
++  ====================================  ======  ==========================
++
++Kernel response contents:
++
++  ====================================  ======  ==========================
++  ``ETHTOOL_A_ULP_DDP_HEADER``          nested  reply header
++  ``ETHTOOL_A_ULP_DDP_HW``              bitset  dev->ulp_ddp_caps.hw
++  ``ETHTOOL_A_ULP_DDP_ACTIVE``          bitset  dev->ulp_ddp_caps.active
++  ``ETHTOOL_A_ULP_DDP_STATS``           nested  ULP DDP statistics
++  ====================================  ======  ==========================
++
++
++* If ``ETHTOOL_FLAG_COMPACT_BITSETS`` was set in
++  ``ETHTOOL_A_HEADER_FLAG``, the bitsets of the reply are in compact
++  form. In that form, the names for the individual bits can be retrieved
++  via the ``ETH_SS_ULP_DDP_CAPS`` string set.
++* ``ETHTOOL_A_ULP_DDP_STATS`` contains statistics which
++  are only reported if ``ETHTOOL_FLAG_STATS`` was set in
++  ``ETHTOOL_A_HEADER_FLAGS``.
++
++ULP DDP statistics content:
++
++  =====================================================  ===  ===============
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_SK_ADD``         u64  sockets successfully prepared for offloading
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_SK_ADD_FAIL``    u64  sockets that failed to be prepared for offloading
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_SK_DEL``         u64  sockets where offloading has been removed
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_DDP_SETUP``      u64  PDUs successfully prepared for Direct Data Placement
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_DDP_SETUP_FAIL`` u64  PDUs that failed DDP preparation
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_DDP_TEARDOWN``   u64  PDUs done with DDP
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_DROP``           u64  PDUs dropped
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_RESYNC``         u64  resync
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_PACKETS``        u64  offloaded PDUs
++  ``ETHTOOL_A_ULP_DDP_STATS_RX_NVMEOTCP_BYTES``          u64  offloaded bytes
++  =====================================================  ===  ===============
++
++The names of each statistics are global. They can be retrieved via the
++``ETH_SS_ULP_DDP_STATS`` string set.
++
++ULP_DDP_SET
++===========
++
++Request to set ULP DDP capabilities for the interface.
++
++Request contents:
++
++  ====================================  ======  ==========================
++  ``ETHTOOL_A_ULP_DDP_HEADER``          nested  request header
++  ``ETHTOOL_A_ULP_DDP_WANTED``          bitset  requested capabilities
++  ====================================  ======  ==========================
++
++Kernel response contents:
++
++  ====================================  ======  ==========================
++  ``ETHTOOL_A_ULP_DDP_HEADER``          nested  reply header
++  ``ETHTOOL_A_ULP_DDP_WANTED``          bitset  diff wanted vs. results
++  ``ETHTOOL_A_ULP_DDP_ACTIVE``          bitset  diff old vs. new active
++  ====================================  ======  ==========================
++
++Request contains only one bitset which can be either value/mask pair
++(request to change specific capabilities and leave the rest) or only a
++value (request to set the complete capabilities provided literally).
++
++Requests are subject to sanity checks by drivers so an optional kernel
++reply (can be suppressed by ``ETHTOOL_FLAG_OMIT_REPLY`` flag in
++request header) informs client about the actual
++results.
++
++* ``ETHTOOL_A_ULP_DDP_WANTED`` reports the difference between client
++  request and actual result: mask consists of bits which differ between
++  requested capability and result (dev->ulp_ddp_caps.active after the
++  operation), value consists of values of these bits in the request
++  (i.e. negated values from resulting capabilities).
++* ``ETHTOOL_A_ULP_DDP_ACTIVE`` reports the difference between old and
++  new dev->ulp_ddp_caps.active: mask consists of bits which have
++  changed, values are their values in new dev->ulp_ddp_caps.active
++  (after the operation).
++
++
+ Request translation
+ ===================
  
-+enum {
-+	ETHTOOL_A_ULP_DDP_UNSPEC,
-+	ETHTOOL_A_ULP_DDP_HEADER,			/* nest - _A_HEADER_* */
-+	ETHTOOL_A_ULP_DDP_HW,				/* bitset */
-+	ETHTOOL_A_ULP_DDP_ACTIVE,			/* bitset */
-+	ETHTOOL_A_ULP_DDP_WANTED,			/* bitset */
-+	ETHTOOL_A_ULP_DDP_STATS,			/* nest - _A_ULP_DDP_STATS_* */
-+
-+	/* add new constants above here */
-+	__ETHTOOL_A_ULP_DDP_CNT,
-+	ETHTOOL_A_ULP_DDP_MAX = __ETHTOOL_A_ULP_DDP_CNT - 1
-+};
-+
- enum {
- 	ETHTOOL_A_ULP_DDP_STATS_UNSPEC,
- 	ETHTOOL_A_ULP_DDP_STATS_PAD,
-diff --git a/net/ethtool/Makefile b/net/ethtool/Makefile
-index 504f954a1b28..a2fdc5ed7655 100644
---- a/net/ethtool/Makefile
-+++ b/net/ethtool/Makefile
-@@ -8,4 +8,4 @@ ethtool_nl-y	:= netlink.o bitset.o strset.o linkinfo.o linkmodes.o rss.o \
- 		   linkstate.o debug.o wol.o features.o privflags.o rings.o \
- 		   channels.o coalesce.o pause.o eee.o tsinfo.o cabletest.o \
- 		   tunnels.o fec.o eeprom.o stats.o phc_vclocks.o mm.o \
--		   module.o pse-pd.o plca.o mm.o
-+		   module.o pse-pd.o plca.o ulp_ddp.o
-diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
-index 0515d6604b3b..1bef91fcce4b 100644
---- a/net/ethtool/bitset.c
-+++ b/net/ethtool/bitset.c
-@@ -302,7 +302,7 @@ int ethnl_put_bitset32(struct sk_buff *skb, int attrtype, const u32 *val,
- 	return -EMSGSIZE;
- }
+diff --git a/Documentation/networking/statistics.rst b/Documentation/networking/statistics.rst
+index 551b3cc29a41..9997c5e8d34e 100644
+--- a/Documentation/networking/statistics.rst
++++ b/Documentation/networking/statistics.rst
+@@ -172,6 +172,7 @@ statistics are supported in the following commands:
+   - `ETHTOOL_MSG_PAUSE_GET`
+   - `ETHTOOL_MSG_FEC_GET`
+   - `ETHTOOL_MSG_MM_GET`
++  - `ETHTOOL_MSG_ULP_DDP_GET`
  
--static const struct nla_policy bitset_policy[] = {
-+const struct nla_policy ethnl_bitset_policy[] = {
- 	[ETHTOOL_A_BITSET_NOMASK]	= { .type = NLA_FLAG },
- 	[ETHTOOL_A_BITSET_SIZE]		= NLA_POLICY_MAX(NLA_U32,
- 							 ETHNL_MAX_BITSET_SIZE),
-@@ -327,11 +327,11 @@ static const struct nla_policy bit_policy[] = {
-  */
- int ethnl_bitset_is_compact(const struct nlattr *bitset, bool *compact)
- {
--	struct nlattr *tb[ARRAY_SIZE(bitset_policy)];
-+	struct nlattr *tb[ARRAY_SIZE(ethnl_bitset_policy)];
- 	int ret;
- 
--	ret = nla_parse_nested(tb, ARRAY_SIZE(bitset_policy) - 1, bitset,
--			       bitset_policy, NULL);
-+	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_bitset_policy) - 1, bitset,
-+			       ethnl_bitset_policy, NULL);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -553,15 +553,15 @@ int ethnl_update_bitset32(u32 *bitmap, unsigned int nbits,
- 			  const struct nlattr *attr, ethnl_string_array_t names,
- 			  struct netlink_ext_ack *extack, bool *mod)
- {
--	struct nlattr *tb[ARRAY_SIZE(bitset_policy)];
-+	struct nlattr *tb[ARRAY_SIZE(ethnl_bitset_policy)];
- 	unsigned int change_bits;
- 	bool no_mask;
- 	int ret;
- 
- 	if (!attr)
- 		return 0;
--	ret = nla_parse_nested(tb, ARRAY_SIZE(bitset_policy) - 1, attr,
--			       bitset_policy, extack);
-+	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_bitset_policy) - 1, attr,
-+			       ethnl_bitset_policy, extack);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -606,7 +606,7 @@ int ethnl_parse_bitset(unsigned long *val, unsigned long *mask,
- 		       ethnl_string_array_t names,
- 		       struct netlink_ext_ack *extack)
- {
--	struct nlattr *tb[ARRAY_SIZE(bitset_policy)];
-+	struct nlattr *tb[ARRAY_SIZE(ethnl_bitset_policy)];
- 	const struct nlattr *bit_attr;
- 	bool no_mask;
- 	int rem;
-@@ -614,8 +614,8 @@ int ethnl_parse_bitset(unsigned long *val, unsigned long *mask,
- 
- 	if (!attr)
- 		return 0;
--	ret = nla_parse_nested(tb, ARRAY_SIZE(bitset_policy) - 1, attr,
--			       bitset_policy, extack);
-+	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_bitset_policy) - 1, attr,
-+			       ethnl_bitset_policy, extack);
- 	if (ret < 0)
- 		return ret;
- 	no_mask = tb[ETHTOOL_A_BITSET_NOMASK];
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index 39a459b0111b..11c680b4e9f7 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -308,6 +308,8 @@ ethnl_default_requests[__ETHTOOL_MSG_USER_CNT] = {
- 	[ETHTOOL_MSG_PLCA_GET_STATUS]	= &ethnl_plca_status_request_ops,
- 	[ETHTOOL_MSG_MM_GET]		= &ethnl_mm_request_ops,
- 	[ETHTOOL_MSG_MM_SET]		= &ethnl_mm_request_ops,
-+	[ETHTOOL_MSG_ULP_DDP_GET]	= &ethnl_ulp_ddp_request_ops,
-+	[ETHTOOL_MSG_ULP_DDP_SET]	= &ethnl_ulp_ddp_request_ops,
- };
- 
- static struct ethnl_dump_ctx *ethnl_dump_context(struct netlink_callback *cb)
-@@ -671,6 +673,7 @@ ethnl_default_notify_ops[ETHTOOL_MSG_KERNEL_MAX + 1] = {
- 	[ETHTOOL_MSG_MODULE_NTF]	= &ethnl_module_request_ops,
- 	[ETHTOOL_MSG_PLCA_NTF]		= &ethnl_plca_cfg_request_ops,
- 	[ETHTOOL_MSG_MM_NTF]		= &ethnl_mm_request_ops,
-+	[ETHTOOL_MSG_ULP_DDP_NTF]	= &ethnl_ulp_ddp_request_ops,
- };
- 
- /* default notification handler */
-@@ -766,6 +769,7 @@ static const ethnl_notify_handler_t ethnl_notify_handlers[] = {
- 	[ETHTOOL_MSG_MODULE_NTF]	= ethnl_default_notify,
- 	[ETHTOOL_MSG_PLCA_NTF]		= ethnl_default_notify,
- 	[ETHTOOL_MSG_MM_NTF]		= ethnl_default_notify,
-+	[ETHTOOL_MSG_ULP_DDP_NTF]	= ethnl_default_notify,
- };
- 
- void ethtool_notify(struct net_device *dev, unsigned int cmd, const void *data)
-@@ -1158,6 +1162,22 @@ static const struct genl_ops ethtool_genl_ops[] = {
- 		.policy = ethnl_mm_set_policy,
- 		.maxattr = ARRAY_SIZE(ethnl_mm_set_policy) - 1,
- 	},
-+	{
-+		.cmd    = ETHTOOL_MSG_ULP_DDP_GET,
-+		.doit   = ethnl_default_doit,
-+		.start  = ethnl_default_start,
-+		.dumpit = ethnl_default_dumpit,
-+		.done   = ethnl_default_done,
-+		.policy = ethnl_ulp_ddp_get_policy,
-+		.maxattr = ARRAY_SIZE(ethnl_ulp_ddp_get_policy) - 1,
-+	},
-+	{
-+		.cmd	= ETHTOOL_MSG_ULP_DDP_SET,
-+		.flags	= GENL_UNS_ADMIN_PERM,
-+		.doit	= ethnl_default_set_doit,
-+		.policy = ethnl_ulp_ddp_set_policy,
-+		.maxattr = ARRAY_SIZE(ethnl_ulp_ddp_set_policy) - 1,
-+	},
- };
- 
- static const struct genl_multicast_group ethtool_nl_mcgrps[] = {
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 79424b34b553..2e8c4090d91b 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -395,10 +395,12 @@ extern const struct ethnl_request_ops ethnl_rss_request_ops;
- extern const struct ethnl_request_ops ethnl_plca_cfg_request_ops;
- extern const struct ethnl_request_ops ethnl_plca_status_request_ops;
- extern const struct ethnl_request_ops ethnl_mm_request_ops;
-+extern const struct ethnl_request_ops ethnl_ulp_ddp_request_ops;
- 
- extern const struct nla_policy ethnl_header_policy[ETHTOOL_A_HEADER_FLAGS + 1];
- extern const struct nla_policy ethnl_header_policy_stats[ETHTOOL_A_HEADER_FLAGS + 1];
- extern const struct nla_policy ethnl_strset_get_policy[ETHTOOL_A_STRSET_COUNTS_ONLY + 1];
-+extern const struct nla_policy ethnl_bitset_policy[ETHTOOL_A_BITSET_MASK + 1];
- extern const struct nla_policy ethnl_linkinfo_get_policy[ETHTOOL_A_LINKINFO_HEADER + 1];
- extern const struct nla_policy ethnl_linkinfo_set_policy[ETHTOOL_A_LINKINFO_TP_MDIX_CTRL + 1];
- extern const struct nla_policy ethnl_linkmodes_get_policy[ETHTOOL_A_LINKMODES_HEADER + 1];
-@@ -441,6 +443,8 @@ extern const struct nla_policy ethnl_plca_set_cfg_policy[ETHTOOL_A_PLCA_MAX + 1]
- extern const struct nla_policy ethnl_plca_get_status_policy[ETHTOOL_A_PLCA_HEADER + 1];
- extern const struct nla_policy ethnl_mm_get_policy[ETHTOOL_A_MM_HEADER + 1];
- extern const struct nla_policy ethnl_mm_set_policy[ETHTOOL_A_MM_MAX + 1];
-+extern const struct nla_policy ethnl_ulp_ddp_get_policy[ETHTOOL_A_ULP_DDP_HEADER + 1];
-+extern const struct nla_policy ethnl_ulp_ddp_set_policy[ETHTOOL_A_ULP_DDP_WANTED + 1];
- 
- int ethnl_set_features(struct sk_buff *skb, struct genl_info *info);
- int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info);
-diff --git a/net/ethtool/ulp_ddp.c b/net/ethtool/ulp_ddp.c
-new file mode 100644
-index 000000000000..e5451689fef9
---- /dev/null
-+++ b/net/ethtool/ulp_ddp.c
-@@ -0,0 +1,316 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ *
-+ * ulp_ddp.c
-+ *     Author: Aurelien Aptel <aaptel@nvidia.com>
-+ *     Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
-+ */
-+
-+#include "netlink.h"
-+#include "common.h"
-+#include "bitset.h"
-+#include <net/ulp_ddp.h>
-+
-+#define ETHTOOL_ULP_DDP_STATS_CNT \
-+	(__ETHTOOL_A_ULP_DDP_STATS_CNT - (ETHTOOL_A_ULP_DDP_STATS_PAD + 1))
-+
-+static struct ulp_ddp_netdev_caps *netdev_ulp_ddp_caps(struct net_device *dev)
-+{
-+#ifdef CONFIG_ULP_DDP
-+	return &dev->ulp_ddp_caps;
-+#else
-+	return NULL;
-+#endif
-+}
-+
-+static const struct ulp_ddp_dev_ops *netdev_ulp_ddp_ops(struct net_device *dev)
-+{
-+#ifdef CONFIG_ULP_DDP
-+	return dev->netdev_ops->ulp_ddp_ops;
-+#else
-+	return NULL;
-+#endif
-+}
-+
-+/* ULP_DDP_GET */
-+
-+struct ulp_ddp_req_info {
-+	struct ethnl_req_info	base;
-+};
-+
-+struct ulp_ddp_reply_data {
-+	struct ethnl_reply_data	base;
-+	DECLARE_BITMAP(hw, ULP_DDP_C_COUNT);
-+	DECLARE_BITMAP(active, ULP_DDP_C_COUNT);
-+	struct ethtool_ulp_ddp_stats stats;
-+};
-+
-+#define ULP_DDP_REPDATA(__reply_base) \
-+	container_of(__reply_base, struct ulp_ddp_reply_data, base)
-+
-+const struct nla_policy ethnl_ulp_ddp_get_policy[] = {
-+	[ETHTOOL_A_ULP_DDP_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy_stats),
-+};
-+
-+static int ulp_ddp_put_stats64(struct sk_buff *skb, int attrtype, const u64 *val,
-+			       unsigned int count)
-+{
-+	struct nlattr *nest;
-+	unsigned int i, attr;
-+
-+	nest = nla_nest_start(skb, attrtype);
-+	if (!nest)
-+		return -EMSGSIZE;
-+
-+	/* skip attributes unspec & pad */
-+	attr = ETHTOOL_A_ULP_DDP_STATS_PAD + 1;
-+	for (i = 0 ; i < count; i++, attr++)
-+		if (nla_put_u64_64bit(skb, attr, val[i], ETHTOOL_A_ULP_DDP_STATS_PAD))
-+			goto nla_put_failure;
-+
-+	nla_nest_end(skb, nest);
-+	return 0;
-+
-+nla_put_failure:
-+	nla_nest_cancel(skb, nest);
-+	return -EMSGSIZE;
-+}
-+
-+static int ulp_ddp_prepare_data(const struct ethnl_req_info *req_base,
-+				struct ethnl_reply_data *reply_base,
-+				struct genl_info *info)
-+{
-+	const struct ulp_ddp_dev_ops *ops = netdev_ulp_ddp_ops(reply_base->dev);
-+	struct ulp_ddp_netdev_caps *caps = netdev_ulp_ddp_caps(reply_base->dev);
-+	struct ulp_ddp_reply_data *data = ULP_DDP_REPDATA(reply_base);
-+
-+	if (!caps || !ops)
-+		return -EOPNOTSUPP;
-+
-+	bitmap_copy(data->hw, caps->hw, ULP_DDP_C_COUNT);
-+	bitmap_copy(data->active, caps->active, ULP_DDP_C_COUNT);
-+
-+	if (req_base->flags & ETHTOOL_FLAG_STATS) {
-+		if (!ops->get_stats)
-+			return -EOPNOTSUPP;
-+		ops->get_stats(reply_base->dev, &data->stats);
-+	}
-+	return 0;
-+}
-+
-+static int ulp_ddp_reply_size(const struct ethnl_req_info *req_base,
-+			      const struct ethnl_reply_data *reply_base)
-+{
-+	const struct ulp_ddp_reply_data *data = ULP_DDP_REPDATA(reply_base);
-+	bool compact = req_base->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
-+	unsigned int len = 0;
-+	int ret;
-+
-+	ret = ethnl_bitset_size(data->hw, NULL, ULP_DDP_C_COUNT,
-+				ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		return ret;
-+	len += ret;
-+	ret = ethnl_bitset_size(data->active, NULL, ULP_DDP_C_COUNT,
-+				ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		return ret;
-+	len += ret;
-+
-+	if (req_base->flags & ETHTOOL_FLAG_STATS) {
-+		len += nla_total_size_64bit(sizeof(u64)) * ETHTOOL_ULP_DDP_STATS_CNT;
-+		len += nla_total_size(0); /* nest */
-+	}
-+	return len;
-+}
-+
-+static int ulp_ddp_fill_reply(struct sk_buff *skb,
-+			      const struct ethnl_req_info *req_base,
-+			      const struct ethnl_reply_data *reply_base)
-+{
-+	const struct ulp_ddp_reply_data *data = ULP_DDP_REPDATA(reply_base);
-+	bool compact = req_base->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
-+	int ret;
-+
-+	ret = ethnl_put_bitset(skb, ETHTOOL_A_ULP_DDP_HW, data->hw,
-+			       NULL, ULP_DDP_C_COUNT,
-+			       ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = ethnl_put_bitset(skb, ETHTOOL_A_ULP_DDP_ACTIVE, data->active,
-+			       NULL, ULP_DDP_C_COUNT,
-+			       ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (req_base->flags & ETHTOOL_FLAG_STATS) {
-+		ret = ulp_ddp_put_stats64(skb, ETHTOOL_A_ULP_DDP_STATS,
-+					  (u64 *)&data->stats,
-+					  ETHTOOL_ULP_DDP_STATS_CNT);
-+		if (ret < 0)
-+			return ret;
-+	}
-+	return ret;
-+}
-+
-+/* ULP_DDP_SET */
-+
-+const struct nla_policy ethnl_ulp_ddp_set_policy[] = {
-+	[ETHTOOL_A_ULP_DDP_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
-+	[ETHTOOL_A_ULP_DDP_WANTED] = NLA_POLICY_NESTED(ethnl_bitset_policy),
-+};
-+
-+static int ulp_ddp_send_reply(struct net_device *dev, struct genl_info *info,
-+			      const unsigned long *wanted,
-+			      const unsigned long *wanted_mask,
-+			      const unsigned long *active,
-+			      const unsigned long *active_mask, bool compact)
-+{
-+	struct sk_buff *rskb;
-+	void *reply_payload;
-+	int reply_len = 0;
-+	int ret;
-+
-+	reply_len = ethnl_reply_header_size();
-+	ret = ethnl_bitset_size(wanted, wanted_mask, ULP_DDP_C_COUNT,
-+				ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		goto err;
-+	reply_len += ret;
-+	ret = ethnl_bitset_size(active, active_mask, ULP_DDP_C_COUNT,
-+				ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		goto err;
-+	reply_len += ret;
-+
-+	rskb = ethnl_reply_init(reply_len, dev, ETHTOOL_MSG_ULP_DDP_SET_REPLY,
-+				ETHTOOL_A_ULP_DDP_HEADER, info,
-+				&reply_payload);
-+	if (!rskb) {
-+		ret = -ENOMEM;
-+		goto err;
-+	}
-+
-+	ret = ethnl_put_bitset(rskb, ETHTOOL_A_ULP_DDP_WANTED, wanted,
-+			       wanted_mask, ULP_DDP_C_COUNT,
-+			       ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		goto nla_put_failure;
-+	ret = ethnl_put_bitset(rskb, ETHTOOL_A_ULP_DDP_ACTIVE, active,
-+			       active_mask, ULP_DDP_C_COUNT,
-+			       ulp_ddp_caps_names, compact);
-+	if (ret < 0)
-+		goto nla_put_failure;
-+
-+	genlmsg_end(rskb, reply_payload);
-+	ret = genlmsg_reply(rskb, info);
-+	return ret;
-+
-+nla_put_failure:
-+	nlmsg_free(rskb);
-+	WARN_ONCE(1, "calculated message payload length (%d) not sufficient\n",
-+		  reply_len);
-+err:
-+	GENL_SET_ERR_MSG(info, "failed to send reply message");
-+	return ret;
-+}
-+
-+static int ulp_ddp_set_validate(struct ethnl_req_info *req_info, struct genl_info *info)
-+{
-+	const struct ulp_ddp_dev_ops *ops;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, ETHTOOL_A_ULP_DDP_WANTED))
-+		return -EINVAL;
-+
-+	ops = netdev_ulp_ddp_ops(req_info->dev);
-+	if (!ops || !ops->set_caps || !netdev_ulp_ddp_caps(req_info->dev))
-+		return -EOPNOTSUPP;
-+
-+	return 1;
-+}
-+
-+static int ulp_ddp_set(struct ethnl_req_info *req_info, struct genl_info *info)
-+{
-+	DECLARE_BITMAP(old_active, ULP_DDP_C_COUNT);
-+	DECLARE_BITMAP(new_active, ULP_DDP_C_COUNT);
-+	DECLARE_BITMAP(req_wanted, ULP_DDP_C_COUNT);
-+	DECLARE_BITMAP(req_mask, ULP_DDP_C_COUNT);
-+	DECLARE_BITMAP(all_bits, ULP_DDP_C_COUNT);
-+	DECLARE_BITMAP(tmp, ULP_DDP_C_COUNT);
-+	const struct ulp_ddp_dev_ops *ops;
-+	struct ulp_ddp_netdev_caps *caps;
-+	int ret;
-+
-+	caps = netdev_ulp_ddp_caps(req_info->dev);
-+	ops = netdev_ulp_ddp_ops(req_info->dev);
-+	ret = ethnl_parse_bitset(req_wanted, req_mask, ULP_DDP_C_COUNT,
-+				 info->attrs[ETHTOOL_A_ULP_DDP_WANTED],
-+				 ulp_ddp_caps_names, info->extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* if (req_mask & ~all_bits) */
-+	bitmap_fill(all_bits, ULP_DDP_C_COUNT);
-+	bitmap_andnot(tmp, req_mask, all_bits, ULP_DDP_C_COUNT);
-+	if (!bitmap_empty(tmp, ULP_DDP_C_COUNT))
-+		return -EINVAL;
-+
-+	/* new_active = (old_active & ~req_mask) | (wanted & req_mask)
-+	 * new_active &= caps_hw
-+	 */
-+	bitmap_copy(old_active, caps->active, ULP_DDP_C_COUNT);
-+	bitmap_and(req_wanted, req_wanted, req_mask, ULP_DDP_C_COUNT);
-+	bitmap_andnot(new_active, old_active, req_mask, ULP_DDP_C_COUNT);
-+	bitmap_or(new_active, new_active, req_wanted, ULP_DDP_C_COUNT);
-+	bitmap_and(new_active, new_active, caps->hw, ULP_DDP_C_COUNT);
-+	if (!bitmap_equal(old_active, new_active, ULP_DDP_C_COUNT)) {
-+		ret = ops->set_caps(req_info->dev, new_active, info->extack);
-+		if (ret < 0)
-+			return ret;
-+		bitmap_copy(new_active, caps->active, ULP_DDP_C_COUNT);
-+	}
-+
-+	if (!(req_info->flags & ETHTOOL_FLAG_OMIT_REPLY)) {
-+		bool compact = req_info->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
-+		DECLARE_BITMAP(wanted_diff_mask, ULP_DDP_C_COUNT);
-+		DECLARE_BITMAP(active_diff_mask, ULP_DDP_C_COUNT);
-+
-+		/* wanted_diff_mask = req_wanted ^ new_active
-+		 * active_diff_mask = old_active ^ new_active -> mask of bits that have changed
-+		 * wanted_diff_mask &= req_mask    -> mask of bits that have diff value than wanted
-+		 * req_wanted &= wanted_diff_mask  -> bits that have diff value than wanted
-+		 * new_active &= active_diff_mask  -> bits that have changed
-+		 */
-+		bitmap_xor(wanted_diff_mask, req_wanted, new_active, ULP_DDP_C_COUNT);
-+		bitmap_xor(active_diff_mask, old_active, new_active, ULP_DDP_C_COUNT);
-+		bitmap_and(wanted_diff_mask, wanted_diff_mask, req_mask, ULP_DDP_C_COUNT);
-+		bitmap_and(req_wanted, req_wanted, wanted_diff_mask,  ULP_DDP_C_COUNT);
-+		bitmap_and(new_active, new_active, active_diff_mask,  ULP_DDP_C_COUNT);
-+		ret = ulp_ddp_send_reply(req_info->dev, info,
-+					 req_wanted, wanted_diff_mask,
-+					 new_active, active_diff_mask,
-+					 compact);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	/* return 1 to notify */
-+	return bitmap_equal(old_active, new_active, ULP_DDP_C_COUNT);
-+}
-+
-+const struct ethnl_request_ops ethnl_ulp_ddp_request_ops = {
-+	.request_cmd		= ETHTOOL_MSG_ULP_DDP_GET,
-+	.reply_cmd		= ETHTOOL_MSG_ULP_DDP_GET_REPLY,
-+	.hdr_attr		= ETHTOOL_A_ULP_DDP_HEADER,
-+	.req_info_size		= sizeof(struct ulp_ddp_req_info),
-+	.reply_data_size	= sizeof(struct ulp_ddp_reply_data),
-+
-+	.prepare_data		= ulp_ddp_prepare_data,
-+	.reply_size		= ulp_ddp_reply_size,
-+	.fill_reply		= ulp_ddp_fill_reply,
-+
-+	.set_validate		= ulp_ddp_set_validate,
-+	.set			= ulp_ddp_set,
-+	.set_ntf_cmd		= ETHTOOL_MSG_ULP_DDP_NTF,
-+};
+ debugfs
+ -------
 -- 
 2.34.1
 
