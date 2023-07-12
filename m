@@ -1,127 +1,185 @@
-Return-Path: <netdev+bounces-17147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DADF775094A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:12:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C8F575096A
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8F01C20D9E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:12:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F532280E19
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 13:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38EC2AB41;
-	Wed, 12 Jul 2023 13:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C71C2AB42;
+	Wed, 12 Jul 2023 13:17:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9629B200DA
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 13:12:01 +0000 (UTC)
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499211984
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:11:59 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-47e4d002e0bso2510039e0c.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 06:11:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4E71F95D
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 13:17:04 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2105.outbound.protection.outlook.com [40.107.93.105])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92D591984;
+	Wed, 12 Jul 2023 06:17:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SctPp1CGqD99NjYUH8ReJHGvatObRzO8b5K6T8hTNwcFoX+ESSUnCp0CakatFPBfqGR+K/w1UYJcjwUeC1i2ZvTeOxnzn/XOTkJLNgl28E+a4K6Q6n3FQExIOqkpwGV4ZmX9Nt0I+m/5O02IgyyS8HvXnl+UE/XcNX+5/LiC3IpE0/plp2sdYzMR8aZo4BGRODRD+ctkveuiXiyVa3+KVDi8I4+HThoSlzm8YSBAmvYxi347SWROj8H19TzYOVjpjK3PGCT32lm2JgfmyGQz/gTABgb1+jm2G4Ks0969UzMw1pWxbsvUgQBH+lxuv4FJp0RyeVxxy5PZjXdDvUAmHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lR38tOdTYJugkhlE84oqW2Xb/unr+1YjFwaMDA8TgGg=;
+ b=aIMzwVFlHUjQNmRDZEL2CwZ3EmcRWhtWjej5lYuRtVgSBu6TWH5OWvJuzUCqfDTwmglxjNB46jyd1BxXeVAX7+vA6gYJploMkGdU+RBsvOLsfG0NnkufCYfBwL97OuZCbN4RX0bpcU0YDkPCmEHCz86siqVmFd0fTTA5jFTQYnrg+WCfZjFzYcqnFzXoggB7dPv5d5tdMKBBI/ROHrV9pyhJuKdRzKARy0OvMahY+f8PXRe/uqwHEl6paDv1NIOqfsxATEVH8SehOSGgyUqWA6mX1lf2luqjzxmvYbouo6L9prWHf7X93qUxZQQFunZqFdl8zzdnPM9tK64pk43YKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689167518; x=1691759518;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMTX55rsuAtxs8eoTMF0zmRGfyj0Pb2SnfXciWnbDRk=;
-        b=oODGvdD932AIbLChg31AWvPktzZ4m7FTZ6aQ1gLyUuWlnI3wXkOvvrIbbIi8uCqd6K
-         2DqwWEDw/fQbtPRvLRedVPOOzTHHsf/4HRHxNFxP2Pk6AD3zGU495vP9iEFnx3zwtWlR
-         2U9wGjnFkQAVowaGRwGExOWZmczAT6UqND7v5XIqWbDiLIB4+pd1kEjNyEUPRXB2t+cd
-         KSbQccVpwUXW9MgFExadDhAfNc6PtxFhlmkd9Qf3Xr8zxwO/yEbyTLdJSY2y1F+sI6hw
-         OZ0Z6hSly9/ApfbBL7ai06kUQFpp3+K3Qd325h0IqPNZ3Q4h3cKxEYPBZU3Hr9g2pzfX
-         0XEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689167518; x=1691759518;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mMTX55rsuAtxs8eoTMF0zmRGfyj0Pb2SnfXciWnbDRk=;
-        b=QPWmlZ9onPN2b7oDmXH3mj6ibESf0ezZZbE5tR9inwld4dAO0p4N6A1gYEmaWYareP
-         0ApC1jgjB/22sYUY7Sel4WHlepiTaekD40/u9YnxbJgGCGMC5oTqotTVd/65iZVG4uBq
-         Pzx8Xzv2VRBuOdEUKF4tH6KEt36ZqsYusX8EWMqVfESZkz0FWziPPlznUoIXs12SG9CF
-         1W58uopGLhv9Uv0KJZuX+UcrZzyP0jprZMqnsjcOwgvXt+56ceZnYQM/1qVFo3MJvlbt
-         qYkyA1ORK7yIgtWoGKo+hL8d2zwgyqRSuCnGHojc8RHBOJunOuVi7eLYikN72xlULlcO
-         JxXA==
-X-Gm-Message-State: ABy/qLajPd19g6Sy39FoJtphHFw4QrcOtgI6wy+X/OwJh1brUQSJPB0j
-	vexEloVyqNFSaQ0QM3+YrEJmfTv6UpNjvl+sIEa4IQ==
-X-Google-Smtp-Source: APBJJlHszP/BzjPgRktgE9ZmebvyBVKr6pfvWwTZjRe8dSb5sh4qROzT6nYqpk/0QxLKUnz2CT1ElQ7dwOmGZ7kEQMc=
-X-Received: by 2002:a1f:3fd0:0:b0:481:2ff5:c9a9 with SMTP id
- m199-20020a1f3fd0000000b004812ff5c9a9mr938260vka.13.1689167518233; Wed, 12
- Jul 2023 06:11:58 -0700 (PDT)
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lR38tOdTYJugkhlE84oqW2Xb/unr+1YjFwaMDA8TgGg=;
+ b=c9PFLu974+n1Q3svFfXIlVPgVWYTrOgABA9ZDGBNIjk0zBuYgC4T+SCYfTHU5Podlg6sHtEWolsXowBKqq80whQmLiD+Fbt0X6HYU0WpMZRlUoArgQboBxMUx0lBJxdOM8BBUhwZKb2m9pY/R3FlkSut91Q5209Ardf/h5BrnQA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SN7PR13MB6254.namprd13.prod.outlook.com (2603:10b6:806:2ed::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Wed, 12 Jul
+ 2023 13:16:58 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
+ 13:16:57 +0000
+Date: Wed, 12 Jul 2023 14:16:50 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v1] netfilter: conntrack: validate cta_ip via parsing
+Message-ID: <ZK6nwn99T8NAP6pC@corigine.com>
+References: <20230711032257.3561166-1-linma@zju.edu.cn>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711032257.3561166-1-linma@zju.edu.cn>
+X-ClientProxiedBy: LO4P123CA0562.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:33b::12) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230709203826.141774942@linuxfoundation.org> <CA+G9fYtEr-=GbcXNDYo3XOkwR+uYgehVoDjsP0pFLUpZ_AZcyg@mail.gmail.com>
- <20230711201506.25cc464d@kernel.org> <ZK5k7YnVA39sSXOv@duo.ucw.cz>
-In-Reply-To: <ZK5k7YnVA39sSXOv@duo.ucw.cz>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 12 Jul 2023 18:41:46 +0530
-Message-ID: <CA+G9fYvEJgcNhvJk6pvdQOkaS_+x105ZgSM1BVvYy0RRW+1TvA@mail.gmail.com>
-Subject: Re: [PATCH 6.4 0/6] 6.4.3-rc2 review
-To: Jakub Kicinski <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, 
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	torvalds@linux-foundation.org, akpm@linux-foundation.org, linux@roeck-us.net, 
-	shuah@kernel.org, patches@kernelci.org, lkft-triage@lists.linaro.org, 
-	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, 
-	Qingfang DENG <qingfang.deng@siflower.com.cn>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>, Masahide NAKAMURA <nakam@linux-ipv6.org>, 
-	Ville Nuorvala <vnuorval@tcs.hut.fi>, Arnd Bergmann <arnd@arndb.de>, Pavel Machek <pavel@denx.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN7PR13MB6254:EE_
+X-MS-Office365-Filtering-Correlation-Id: da8ee4f5-a61d-45f7-0f1a-08db82da44eb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	V87Bh+g5Y2q2NriHJLg6b811USL12Ku79JgHlyYgcQCEeDeCGdFEiGVRNfWn7Z6V5VJWsa5jj/mDeQVJrt99bHGQhMLDOwua46qfj0RpvQOB7WxOWOGAuJhR3XmsOZDTfCrPTkQuy87CaLiIg94lMUwmaa4aUKP0xVsNftI/4TojOzlmizUnZdME1TsmIfQGai3Lt+Ou1rHscCvD2aKib3EnaOnUGUWElngX3OZSofCm0WoE4E/xLvHOLs1tS2IQGYY7lxMMB2xk8xV25eoAbp4egAJPzn+xG8+1hQPWG58CSdaWpmwjBxrLFWli0XNXN4jHNhJEhn0XpCBXxx0X+sMk21vCoMcHfg2E6okD/V+Xf63/0lHz7pjzOnJC9uLKcqV0UkxHuOoVrKMzux76sUy2OrH8ZFgzByLs1wTUBZSXsJsuthkzsdhDFBPFSWz9cTLVJX2HI7KbfxBbnCschAI2p2JGWVXmr0J4eqefB0ODE8wAxwp77RNwuhCbX9uBds2Nuf/5zy5JL1HDAUzqL6VkG1UGUGpvT0dD2l9UQcy+LirCLHIPFt1IvYMqof2YiIIt22k+lMgtZoztjiM0ApX+8CVqdsZroDPxu8xStaI=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(136003)(396003)(346002)(39840400004)(451199021)(186003)(26005)(6512007)(2616005)(6506007)(5660300002)(83380400001)(4326008)(44832011)(8936002)(478600001)(41300700001)(6916009)(2906002)(66556008)(316002)(66946007)(66476007)(8676002)(7416002)(15650500001)(36756003)(6666004)(6486002)(38100700002)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?mRFleSNx1RRipqrklR8vVn6kQAgVqGBe5zW1tgrhwGxvYuRd0OniHHCKQ7EI?=
+ =?us-ascii?Q?eqjjE16Ztn4540azI/FysTEbH0mPtGeA4WtiI1wPcs4Rwq0DJpqgmqHuG/h/?=
+ =?us-ascii?Q?ukyr5FhhRFvBABWunlJVGSEbH9hISfNxrh7vSN8B5d06HR9MgkpkzuPDyURP?=
+ =?us-ascii?Q?ODi9+NWxivxRY3HUHifFMViC0zUovbRRnZ/ISzyXo71ZOtqUkFqXT2/DyYsF?=
+ =?us-ascii?Q?A7RxtnVdxVX4m9h/ZOk/UMszKYn89csc6U1yDa6NoyHLIPoNuMObXxXtDBD4?=
+ =?us-ascii?Q?k8sPQZox6ZHTPVJIE4AGxKr0FR865dFRpGuxmyJuzlWycmrHvozwoeef3YHq?=
+ =?us-ascii?Q?RxP43p0khRBzkIeKiyquqFGqxYYcJyCfr+Z1zEFALxNwB8VuZc/huCs3D6xA?=
+ =?us-ascii?Q?ZSGnYVJLeqxn7FgUpYM2dvBE96+RE1pvUmsiMcXseEUeckxKtCbqWBTDl7RN?=
+ =?us-ascii?Q?2Wd9bc8nR6RKmP8M5zY4959dAy72sP0L/Lj4tSpgPX0XP0UUW1WfLe9F0mH5?=
+ =?us-ascii?Q?YdzEYipa0ck+3+DW1aRFL9umYeABC7G6vZoVdieX63FKiBcGKAOvVdyWOBgw?=
+ =?us-ascii?Q?Y5VQ5JM59s3uEHZFKe7lOUDiAovHutUkOGc2szdiBb4eE/2MdN/kwDBlIlAR?=
+ =?us-ascii?Q?1ltSu862GuEDd3TX+XPGqC0g4Fekb5/aK33e/Jx8+6Dt8N0Teye8A0/2Vw6U?=
+ =?us-ascii?Q?Sp7BbdzZQ++EQ9OKtg7Br1XLK/U63G33go1yBHvlfS1L7FjfIgxvnQnMPn2f?=
+ =?us-ascii?Q?XlHDPBBN8kF5SoAQPbfM9YNfMSkdlMOfNU/qox1iBE/4y3bgTrew+RGOK373?=
+ =?us-ascii?Q?BZLd+e8OtmfLqijJTSLlGG+oMUnuD8HQhnaLAJI90/FEpcBLv9CpzQpDrbUY?=
+ =?us-ascii?Q?5H1gZcgUaTTo2MD/LWPiTt90/uCPTZMgXePQRxdtGKju3rB4EAI6y/cShVYr?=
+ =?us-ascii?Q?GqnfVkb/xAOu1cVs1MTLgiW992BfZUHdm5vv21LOOjLDUTidDEWOBmXeyd7v?=
+ =?us-ascii?Q?Z+k+8WVh1YcguRd4LRLN0HN2WJUfKQDMWz1a2XldrfqS13dtLyz9I8xMKvmv?=
+ =?us-ascii?Q?5VXSZXVH6yW6fs6y9L5TGQe9jk6CTty3F9qtMJvMitXAhRBO+YZKoKFLtigU?=
+ =?us-ascii?Q?8eGvs1+iAkN8iKqOvf/D0IQYftgrZ80v8uRMHPKr+ElqlcarTQjkfx2VM7hq?=
+ =?us-ascii?Q?1AY7kjetHY+Q3T3G0yhrX0rISAYFGKdxBnJw4/rYk9In2iYJMzSj48T3ksXB?=
+ =?us-ascii?Q?db0mcNnUcDpAtiIhBLAC4iPLzlogoP8TgUc4pfMtwLmELYXsCrZnKfw8J2id?=
+ =?us-ascii?Q?h9Un3FkInuMkivFgbJFq3KlqRCOkiQtVYCmOhBibB4PdWviTRBEbMLBIbLCS?=
+ =?us-ascii?Q?wFFnlVnLa8OgKRSQvMv4YYHny8hqBMdJ3soyDTZLJ964c7zhu0OsrvAQIGzC?=
+ =?us-ascii?Q?yyGZ+HETWP05qnO0j1vVIi4UC2IhW3I9z5yVB0B+f2PfQg3/CCzgrtBdRtx3?=
+ =?us-ascii?Q?swu16OB4/+WN27mgGAswNNI4wW0QI/CXcYTK9VhGE8/raQPxjfNJgScfPW3b?=
+ =?us-ascii?Q?NfN1oonBjv0v+wyMFSdewFAUsHbgY/S9GK3hY+iw1JuDIK+1OjHOYkVzyZIq?=
+ =?us-ascii?Q?iA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da8ee4f5-a61d-45f7-0f1a-08db82da44eb
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 13:16:57.6847
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qsAPNpEJ215Lkkzh/8pxtfsKaqUTS3mtfnPD2OjROPzTjVHI9q3tUU3g+1ePyKkFTJtc1b7G8yWEJeM82d5bgyR9DhL2AwIHlGFuwy5JTiU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR13MB6254
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 12 Jul 2023 at 14:01, Pavel Machek <pavel@denx.de> wrote:
->
-> Hi!
->
-> > >   git_repo: https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc
-> > >   git_sha: 3e37df3ffd9a648c9f88f6bbca158e43d5077bef
-> >
-> > I can't find this sha :( Please report back if you can still repro this
-> > and how we get get the relevant code
->
-> That sha seems to be:
->
-> commit 3e37df3ffd9a648c9f88f6bbca158e43d5077bef
-> Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Date:   Sun Jul 9 22:38:22 2023 +0200
->
->     Linux 6.4.3-rc2
+On Tue, Jul 11, 2023 at 11:22:57AM +0800, Lin Ma wrote:
+> In current ctnetlink_parse_tuple_ip() function, nested parsing and
+> validation is splitting as two parts. This is unnecessary as the
+> nla_parse_nested_deprecated function supports validation in the fly.
+> These two finially reach same place __nla_validate_parse with same
+> validate flag.
+> 
+> nla_parse_nested_deprecated
+>   __nla_parse(.., NL_VALIDATE_LIBERAL, ..)
+>     __nla_validate_parse
+> 
+> nla_validate_nested_deprecated
+>   __nla_validate_nested(.., NL_VALIDATE_LIBERAL, ..)
+>     __nla_validate
+>       __nla_validate_parse
+> 
+> This commit removes the call to nla_validate_nested_deprecated and pass
+> cta_ip_nla_policy when do parsing.
+> 
+> Fixes: 8cb081746c03 ("netlink: make validation more configurable for future strictness")
 
-That is the commit id from stable-rc tree.
+I don't think this warrants a fixes tag, as it's not fixing any
+user-visible behaviour. Rather, it is a clean-up.
 
-I have re-tested the reported issues multiple times and
-it seems that it is intermittently reproducible.
-Following list of links shows kernel crashes while testing
-selftest net pmtu.sh
-
-1)
-Unable to handle kernel paging request at virtual address
-https://lkft.validation.linaro.org/scheduler/job/6579624#L4648
-
-
-2)
-include/net/neighbour.h:302 suspicious rcu_dereference_check() usage!
-
-https://lkft.validation.linaro.org/scheduler/job/6579625#L7500
-https://lkft.validation.linaro.org/scheduler/job/6579626#L7509
-https://lkft.validation.linaro.org/scheduler/job/6579622#L7537
-https://lkft.validation.linaro.org/scheduler/job/6579623#L7469
-
-- Naresh
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> ---
+>  net/netfilter/nf_conntrack_netlink.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+> index 69c8c8c7e9b8..334db22199c1 100644
+> --- a/net/netfilter/nf_conntrack_netlink.c
+> +++ b/net/netfilter/nf_conntrack_netlink.c
+> @@ -1321,15 +1321,11 @@ static int ctnetlink_parse_tuple_ip(struct nlattr *attr,
+>  	struct nlattr *tb[CTA_IP_MAX+1];
+>  	int ret = 0;
+>  
+> -	ret = nla_parse_nested_deprecated(tb, CTA_IP_MAX, attr, NULL, NULL);
+> +	ret = nla_parse_nested_deprecated(tb, CTA_IP_MAX, attr,
+> +					  cta_ip_nla_policy, NULL);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	ret = nla_validate_nested_deprecated(attr, CTA_IP_MAX,
+> -					     cta_ip_nla_policy, NULL);
+> -	if (ret)
+> -		return ret;
+> -
+>  	switch (tuple->src.l3num) {
+>  	case NFPROTO_IPV4:
+>  		ret = ipv4_nlattr_to_tuple(tb, tuple, flags);
+> -- 
+> 2.17.1
+> 
+> 
 
