@@ -1,240 +1,101 @@
-Return-Path: <netdev+bounces-17312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2105475127A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:15:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A69175127B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:15:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133CB1C2105B
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 21:15:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A5FA281894
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 21:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D4AEAF1;
-	Wed, 12 Jul 2023 21:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7B2E568;
+	Wed, 12 Jul 2023 21:14:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC44F9C7
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 21:14:18 +0000 (UTC)
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB2C2D66
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:13:50 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6b711c3ad1fso6158017a34.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689196423; x=1691788423;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=15knOmL3tWtvgoG9fedUyxn9UCvXhpGf0W+V6tVwy4A=;
-        b=W5p3CAZb1UFDzXi2Vrh+TID/3QPef7nlZiJ+0j2AkTQI/HKXWuukn3oSjwVp8C2poa
-         pACXTCYcdEpYxHHyHh+vNIYCIvtWZJZFKM0yh+pwuFOf3mCpEcRiXnYTJxgICjcFJTPK
-         F/WJakQai1uaxCiCub4/Q0sAzk278y0WsyVg6RdIJ6vhm5hglz58hc52e5TArlUwUgfq
-         XdkCaaMpRLCnfblw7QqSUnxHvWZ1LVG3vx379tUaboedRHNnhZRW/L8Akl4h8AUjWfqc
-         GXc6vQxHgyQJSvRrC9V50n4I4cJWOsbGR1pfBbgguZYKTBYUPIxS5qFQrZbsqNVMiP1/
-         yaLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689196423; x=1691788423;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=15knOmL3tWtvgoG9fedUyxn9UCvXhpGf0W+V6tVwy4A=;
-        b=Ic4rZEncYaEmXn5VpUQPn7QjSytPQZMFtbt/AZcOGEDEWGF3W6Yc6rozRUKDncL/db
-         O1wBYses0s4X2L0QdPl8hnHQRSirFswmPAm5wqp/1wIG/xlnYEBwHmH85x0I+4tFeUX/
-         k7tpAUqh7nfoMKaw5ZdzjWfciHfffV2Sf1qOkteOHOMCcVBUn/u89+N4jA1/Rem/Zdf3
-         8Xm6Qlv2aIDY0eV0QPCFT1j5UOT8LBxhTuxPAUmjEaMbvNNHFtQW3PYvVrpbV169GMKP
-         yK6gJQQnX1NYpT6gGVri96drgrBMiRghFeKOP4yJF19wAWCjrxbJomxfVC2YIREnBWhT
-         Tacg==
-X-Gm-Message-State: ABy/qLZRj0LTHaYl9zt4LL+PzSiMj60cZ474prk/Y0eSx5J/cFsOUowh
-	d1XiS8okkw2J8hOgFT3zrvuA9ZNebLTGcYyh8ZQ=
-X-Google-Smtp-Source: APBJJlGJNCicoIGy9PSgzdGA/F3nYeYKjrR69+gkWBKgJUL8hwySyuNI7GW6EOlFxvJZibLnaWp4mA==
-X-Received: by 2002:a05:6870:c086:b0:1b6:a4e2:a284 with SMTP id c6-20020a056870c08600b001b6a4e2a284mr12976564oad.49.1689196423691;
-        Wed, 12 Jul 2023 14:13:43 -0700 (PDT)
-Received: from localhost.localdomain ([2804:7f1:e2c1:1622:34af:d3bb:8e9a:95c5])
-        by smtp.gmail.com with ESMTPSA id zh27-20020a0568716b9b00b001a663e49523sm2387213oab.36.2023.07.12.14.13.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 14:13:43 -0700 (PDT)
-From: Victor Nogueira <victor@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pctammela@mojatatu.com,
-	simon.horman@corigine.com,
-	kernel@mojatatu.com
-Subject: [PATCH net-next v4 5/5] net: sched: cls_flower: Undo tcf_bind_filter in case of an error
-Date: Wed, 12 Jul 2023 18:13:13 -0300
-Message-Id: <20230712211313.545268-6-victor@mojatatu.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230712211313.545268-1-victor@mojatatu.com>
-References: <20230712211313.545268-1-victor@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E963FBFB
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 21:14:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63CB9C433C8;
+	Wed, 12 Jul 2023 21:14:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689196483;
+	bh=B1zA1eBMfXevQL/+/vT3YjAZ56x9OXlsjsE8c5KjQnk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JKTHx2ATwHkNpYCN+atTPpltex/6GGaHAKhbJEwnsS7FBMbRc7GxxCfPPQjRU2WHo
+	 s1YQmZ2zJDtgDcBSDQF1FpeqWEGuAmSbyQlD0N2MOkDgaLUUJ7gOagqqgwrOesANv5
+	 Yz+3gNm0NPVMQ+Xymj22+HPFPW9yQHSGpR7bzHKbcaK7/TNVgVUTzgmrzZLCpFG0qq
+	 lYX4s4g2OWWDhgNShBsaiWlWA7aLoVNihal2rOSBcX0lb+TMTeOeT85wbJYtvdJ4aJ
+	 zQEXqsQcm2Bf9A898ne6VMwBX1Vf0YqTrnCTwuDj0rOT9hKUzgATSIvU8WwRoZ+hAZ
+	 mRIjClyG8HzfA==
+Date: Wed, 12 Jul 2023 14:14:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Nambiar, Amritha" <amritha.nambiar@intel.com>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>,
+ <sridhar.samudrala@intel.com>
+Subject: Re: [net-next/RFC PATCH v1 1/4] net: Introduce new napi fields for
+ rx/tx queues
+Message-ID: <20230712141442.44989fa7@kernel.org>
+In-Reply-To: <717fbdd6-9ef7-3ad6-0c29-d0f3798ced8e@intel.com>
+References: <168564116688.7284.6877238631049679250.stgit@anambiarhost.jf.intel.com>
+	<168564134580.7284.16867711571036004706.stgit@anambiarhost.jf.intel.com>
+	<20230602230635.773b8f87@kernel.org>
+	<717fbdd6-9ef7-3ad6-0c29-d0f3798ced8e@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-If TCA_FLOWER_CLASSID is specified in the netlink message, the code will
-call tcf_bind_filter. However, if any error occurs after that, the code
-should undo this by calling tcf_unbind_filter.
+On Wed, 12 Jul 2023 13:09:35 -0700 Nambiar, Amritha wrote:
+> On 6/2/2023 11:06 PM, Jakub Kicinski wrote:
+> > On Thu, 01 Jun 2023 10:42:25 -0700 Amritha Nambiar wrote:  
+> >> Introduce new napi fields 'napi_rxq_list' and 'napi_txq_list'
+> >> for rx and tx queue set associated with the napi and
+> >> initialize them. Handle their removal as well.
+> >>
+> >> This enables a mapping of each napi instance with the
+> >> queue/queue-set on the corresponding irq line.  
+> > 
+> > Wouldn't it be easier to store the NAPI instance pointer in the queue?
+> > That way we don't have to allocate memory.
+> >   
+> 
+> Could you please elaborate on this so I have more clarity ? 
 
-Fixes: 77b9900ef53a ("tc: introduce Flower classifier")
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
----
- net/sched/cls_flower.c | 99 ++++++++++++++++++++----------------------
- 1 file changed, 47 insertions(+), 52 deletions(-)
+First off, let's acknowledge the fact you're asking me for
+clarifications ~40 days after I sent the feedback.
 
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index f2b0bc4142fe..8da9d039d964 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -2173,53 +2173,6 @@ static bool fl_needs_tc_skb_ext(const struct fl_flow_key *mask)
- 	return mask->meta.l2_miss;
- }
- 
--static int fl_set_parms(struct net *net, struct tcf_proto *tp,
--			struct cls_fl_filter *f, struct fl_flow_mask *mask,
--			unsigned long base, struct nlattr **tb,
--			struct nlattr *est,
--			struct fl_flow_tmplt *tmplt,
--			u32 flags, u32 fl_flags,
--			struct netlink_ext_ack *extack)
--{
--	int err;
--
--	err = tcf_exts_validate_ex(net, tp, tb, est, &f->exts, flags,
--				   fl_flags, extack);
--	if (err < 0)
--		return err;
--
--	if (tb[TCA_FLOWER_CLASSID]) {
--		f->res.classid = nla_get_u32(tb[TCA_FLOWER_CLASSID]);
--		if (flags & TCA_ACT_FLAGS_NO_RTNL)
--			rtnl_lock();
--		tcf_bind_filter(tp, &f->res, base);
--		if (flags & TCA_ACT_FLAGS_NO_RTNL)
--			rtnl_unlock();
--	}
--
--	err = fl_set_key(net, tb, &f->key, &mask->key, extack);
--	if (err)
--		return err;
--
--	fl_mask_update_range(mask);
--	fl_set_masked_key(&f->mkey, &f->key, mask);
--
--	if (!fl_mask_fits_tmplt(tmplt, mask)) {
--		NL_SET_ERR_MSG_MOD(extack, "Mask does not fit the template");
--		return -EINVAL;
--	}
--
--	/* Enable tc skb extension if filter matches on data extracted from
--	 * this extension.
--	 */
--	if (fl_needs_tc_skb_ext(&mask->key)) {
--		f->needs_tc_skb_ext = 1;
--		tc_skb_ext_tc_enable();
--	}
--
--	return 0;
--}
--
- static int fl_ht_insert_unique(struct cls_fl_filter *fnew,
- 			       struct cls_fl_filter *fold,
- 			       bool *in_ht)
-@@ -2251,6 +2204,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	struct cls_fl_head *head = fl_head_dereference(tp);
- 	bool rtnl_held = !(flags & TCA_ACT_FLAGS_NO_RTNL);
- 	struct cls_fl_filter *fold = *arg;
-+	bool bound_to_filter = false;
- 	struct cls_fl_filter *fnew;
- 	struct fl_flow_mask *mask;
- 	struct nlattr **tb;
-@@ -2335,15 +2289,46 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	if (err < 0)
- 		goto errout_idr;
- 
--	err = fl_set_parms(net, tp, fnew, mask, base, tb, tca[TCA_RATE],
--			   tp->chain->tmplt_priv, flags, fnew->flags,
--			   extack);
--	if (err)
-+	err = tcf_exts_validate_ex(net, tp, tb, tca[TCA_RATE],
-+				   &fnew->exts, flags, fnew->flags,
-+				   extack);
-+	if (err < 0)
- 		goto errout_idr;
- 
-+	if (tb[TCA_FLOWER_CLASSID]) {
-+		fnew->res.classid = nla_get_u32(tb[TCA_FLOWER_CLASSID]);
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_lock();
-+		tcf_bind_filter(tp, &fnew->res, base);
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_unlock();
-+		bound_to_filter = true;
-+	}
-+
-+	err = fl_set_key(net, tb, &fnew->key, &mask->key, extack);
-+	if (err)
-+		goto unbind_filter;
-+
-+	fl_mask_update_range(mask);
-+	fl_set_masked_key(&fnew->mkey, &fnew->key, mask);
-+
-+	if (!fl_mask_fits_tmplt(tp->chain->tmplt_priv, mask)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Mask does not fit the template");
-+		err = -EINVAL;
-+		goto unbind_filter;
-+	}
-+
-+	/* Enable tc skb extension if filter matches on data extracted from
-+	 * this extension.
-+	 */
-+	if (fl_needs_tc_skb_ext(&mask->key)) {
-+		fnew->needs_tc_skb_ext = 1;
-+		tc_skb_ext_tc_enable();
-+	}
-+
- 	err = fl_check_assign_mask(head, fnew, fold, mask);
- 	if (err)
--		goto errout_idr;
-+		goto unbind_filter;
- 
- 	err = fl_ht_insert_unique(fnew, fold, &in_ht);
- 	if (err)
-@@ -2434,6 +2419,16 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 				       fnew->mask->filter_ht_params);
- errout_mask:
- 	fl_mask_put(head, fnew->mask);
-+
-+unbind_filter:
-+	if (bound_to_filter) {
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_lock();
-+		tcf_unbind_filter(tp, &fnew->res);
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_unlock();
-+	}
-+
- errout_idr:
- 	if (!fold)
- 		idr_remove(&head->handle_idr, fnew->handle);
--- 
-2.25.1
+Pause for self-reflection.
 
+Okay.
+
+> Are you suggesting that there's a way to avoid maintaining the list
+> of queues in the napi struct?
+
+Yes, why not add the napi pointer to struct netdev_queue and
+netdev_rx_queue, specifically?
+
+> The idea was for netdev-genl to extract information out of 
+> netdev->napi_list->napi. For tracking queues, we build a linked list
+> of queues for the napi and store it in the napi_struct. This would
+> also enable updating the napi<->queue[s] association (later with the
+> 'set' command), i.e. remove the queue[s] from the existing napi
+> instance that it is currently associated with and map with the new
+> napi instance, by simply deleting from one list and adding to the new
+> list.
+
+Right, my point is that each queue can only be serviced by a single
+NAPI at a time, so we have a 1:N relationship. It's easier to store
+the state on the side that's the N, rather than 1.
+
+You can add list_head to the queue structs, if you prefer to be able 
+to walk queues of a NAPI more efficiently (that said the head for
+the list is in "control path only section" of napi_struct so...
+I think you don't?)
 
