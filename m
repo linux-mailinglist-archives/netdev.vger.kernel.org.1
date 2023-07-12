@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-17285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDBEB751114
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 21:21:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC4875114D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 21:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C7611C21176
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 19:21:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 018CC1C20FD6
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 19:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B142214F7;
-	Wed, 12 Jul 2023 19:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EC921507;
+	Wed, 12 Jul 2023 19:36:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6474920FBB
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 19:21:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DF6C433C8;
-	Wed, 12 Jul 2023 19:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F4920F8B
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 19:36:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E222C433C8;
+	Wed, 12 Jul 2023 19:36:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689189664;
-	bh=zFknxIUp58JbD9ix796NYgBWpRiWepb7NddG7MOPTDI=;
+	s=k20201202; t=1689190574;
+	bh=EogeTGIiuUFqzne3v5vm4Ifad7BZZ2pCtarM917N8FI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ESQQ0lon469eKMh9FscSqGLKQpIUW2tnp9ajGsx2piuIE8wLlQ8uckcKlB2J6W62J
-	 xtTMO8gUxYynXAbeujx307qrQfVPNJGCXxaqic9FdLomM0qE6uDNhnu++vpAs5O8V4
-	 dURYLwPIqHhImbUEg6LgmHV7V+vmb5SVZil89u2Z5PJJj7EBnkcWdLdKFkoPJv8Dld
-	 ESWAGmjQMgzSREK5yH7na1UNn/OBSz0QGWZlpPcrpm0E2nnYKGGKaWWFMNvqIes2cI
-	 +gXkA85ksyGhBWKxFxeZN8M7ZbM7gv3cTA/QyrKzhmOxXZEq8yGKH5qDhNh/aWBfh9
-	 XW/MX+A6zpDWw==
-Date: Wed, 12 Jul 2023 12:21:03 -0700
+	b=LpE3SJuNK4U7nmwc8P4oTt0ZKY7/t2LKkaEq8vEXLKYM8LnUOaJU0H7H0C+RhZ4mv
+	 ttm0IOyk6cIjvzPIMUxFThldGR4abW/8Aknzi53P2wErDaQpIoPiU5gAaWKIhHWY/2
+	 EtMI8/8C3jH0byvt5apBXNgnl9RERwkcMMqffHgnOpZH3eskXZXWBPo66ohtW4v88M
+	 2PwmkAW2cUDbgkk5A8EJt8OgxuC1PcQY7W8Lqio7OUlzAwtDlHIBOOTXOOCOrGO+8I
+	 2XW6vyo6jBcouoJXLjKa44KCxp5fRJDiXH8JHDYDCjwziNuOxnJLrYvZCrRG3IscTu
+	 DEhB8WwhRBQiA==
+Date: Wed, 12 Jul 2023 12:36:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
- moshe@nvidia.com
-Subject: Re: [patch net-next] devlink: remove reload failed checks in params
- get/set callbacks
-Message-ID: <20230712122103.4263c112@kernel.org>
-In-Reply-To: <ZK7EyBcE7sFVvYvh@nanopsycho>
-References: <20230712113710.2520129-1-jiri@resnulli.us>
-	<ZK6u8UFXjyD+a9R0@shredder>
-	<ZK7EyBcE7sFVvYvh@nanopsycho>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <simon.horman@corigine.com>, Rafal
+ Romanowski <rafal.romanowski@intel.com>, Leon Romanovsky <leon@kernel.org>,
+ Ma Yuying <yuma@redhat.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org (moderated list:INTEL
+ ETHERNET DRIVERS), linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH v2 1/2] i40e: Add helper for VF inited state check with
+ timeout
+Message-ID: <20230712123613.20a98732@kernel.org>
+In-Reply-To: <20230712133247.588636-1-ivecera@redhat.com>
+References: <20230712133247.588636-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,51 +54,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 12 Jul 2023 17:20:40 +0200 Jiri Pirko wrote:
-> >> Back then, it was a possible fix. Alternative way to fix this was to
-> >> make sure drivers register/unregister params in the code where it is
-> >> ensured that the data accessed by params callbacks are available.
-> >> But that was problematic as the list of params wes static durint  
-> >
-> >s/wes/was/
-> >s/durint/during/  
-> 
-> Maintainers, I will send v2 with these typos fixed tomorrow, if these
-> are not any other comments.
+On Wed, 12 Jul 2023 15:32:46 +0200 Ivan Vecera wrote:
+> +	for (i = 0; i < 15; i++)
+> +		if (!test_bit(I40E_VF_STATE_INIT, &vf->vf_states))
+> +			msleep(20);
+> +
+> +	if (!test_bit(I40E_VF_STATE_INIT, &vf->vf_states)) {
+> +		dev_err(&vf->pf->pdev->dev,
+> +			"VF %d still in reset. Try again.\n", vf->vf_id);
+> +		return false;
 
-Feel free to toss in
-
-pw-bot: changes-requested
-
-so we don't have to update the status manually.
-
-The commit message would benefit from a rewrite, TBH I don't understand
-half of it, specially:
-
-  Alternative way to fix this was to make sure drivers
-  register/unregister params in the code where it is ensured that 
-  the data accessed by params callbacks are available.
-
-Can't parse.
-
-  list of params [was] static [during] devlink instance being
-  registered.
-
-You mean that list of params can't change after the instance was
-registered?
-
-  register/unregister params alongside with the data it touches
-
-Meaning params for a sub-object are registered when the sub-object 
-is registered? An example could help clarify the meaning.
-
-> >> devlink instance being registered.
-> >> 
-> >> Eventually this limitation was lifted and also the alternative fix
-> >> (which also fixed another issue) was done for mlxsw by
-> >> commit 74cbc3c03c82 ("mlxsw: spectrum_acl_tcam: Move devlink param to TCAM code").
-> >> 
-> >> The checks are no longer relevant, each driver should make sure to
-> >> register/unregister params alongside with the data it touches. Remove
-> >> the checks.
+I like my loop more but if you want to have the msleep() indented just
+add an else { return true; } branch. Take advantage of the fact this is
+a function, now, and you can just return.
 
