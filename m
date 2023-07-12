@@ -1,154 +1,162 @@
-Return-Path: <netdev+bounces-17070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7427501A1
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:34:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A257501A7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA14228197E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:34:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2563A28196B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A8B100AA;
-	Wed, 12 Jul 2023 08:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C52E1116;
+	Wed, 12 Jul 2023 08:34:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A52100A1
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:33:37 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1740435A2
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:33:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689150812;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fvdacFEp0fHJZBwcSBoPdNOwi8cM02LSwjABkIHIvP4=;
-	b=I2azKyayccD/v5U3vKNBPKrg2Z9H1/kFiATuWDObTEBnF9CMxCZlDVTkau6gwPpvDHfPig
-	2skc8e3KjislrDbHehcz0L1af2pSYMMCtQ6jcRr/lTyrNLZqdD9tVb1uffCkfPByLboTlI
-	nFmiLIOsS2NvBaOgVI7rXcx4tSMt960=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-163-hr6eTmQeOM-0XSHtJWxyhg-1; Wed, 12 Jul 2023 04:33:30 -0400
-X-MC-Unique: hr6eTmQeOM-0XSHtJWxyhg-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b701c82e83so62779461fa.1
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:33:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689150809; x=1691742809;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fvdacFEp0fHJZBwcSBoPdNOwi8cM02LSwjABkIHIvP4=;
-        b=MJDGLocr4tkcHGo6XnG3LhJt+U3m6AeU0WA3OFqaWqIdeEUJgzaftWF4WA0ire0wNa
-         5OWbJtoBxEDgNqPd4fCVdt1/hInzEgnOzzYvKHbkan3b31gNVqgSoDx5lkdKMuF91lOC
-         IlEapahmiq3tzaBiVC2aF2TH9nXrgFHRmzl1RMN42K+dA3zBAHvAeJNVg8P15Wi9Q4Fm
-         z7/3ntaUeHbJodAKfUWWUS/yxiA7Vhu9HHQapHplu6MbtqkTEdkrYBqJwVLEBHHCX+C7
-         Gbiou5cfUY42aK9Gh0/vnQDHM80WQ3nPiN5Q4ZISdTmKlxZUZq7oO4T+osLk7hhLIHw7
-         vwtw==
-X-Gm-Message-State: ABy/qLbB0vqtdgp74DW+79Y9YbXfmknIPsaZBY+IOnrDf513Xa73oDuV
-	QoHHLMQ6+AxWdE3AERkX+GpKO+9XXHqqyH+PlE+TxTVKQ7mUJCOZL3YuUXArkEY9UUozzoDe1SD
-	EgPkv4RcXdyRzxdiilA20jJrcZUJ4O0lg
-X-Received: by 2002:a2e:b603:0:b0:2b4:737c:e316 with SMTP id r3-20020a2eb603000000b002b4737ce316mr16712861ljn.14.1689150809142;
-        Wed, 12 Jul 2023 01:33:29 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEmgozVOI0gKaZQ3hOgaTYXTianq80QHVDrFU4Y4jEsQxG9CbS08CkZMlDFE28l0iJfKv8GKqIhGpj8BU76nDU=
-X-Received: by 2002:a2e:b603:0:b0:2b4:737c:e316 with SMTP id
- r3-20020a2eb603000000b002b4737ce316mr16712841ljn.14.1689150808782; Wed, 12
- Jul 2023 01:33:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F707638;
+	Wed, 12 Jul 2023 08:34:52 +0000 (UTC)
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E9B1994;
+	Wed, 12 Jul 2023 01:34:50 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VnCCAGS_1689150885;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VnCCAGS_1689150885)
+          by smtp.aliyun-inc.com;
+          Wed, 12 Jul 2023 16:34:46 +0800
+Message-ID: <1689150822.0177438-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v11 04/10] virtio_ring: support add premapped buf
+Date: Wed, 12 Jul 2023 16:33:42 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux-foundation.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-5-xuanzhuo@linux.alibaba.com>
+ <CACGkMEu16kUX02L+zb=hcX_sMW-s6wBFtiCRC_3H4ky4iDdy4Q@mail.gmail.com>
+In-Reply-To: <CACGkMEu16kUX02L+zb=hcX_sMW-s6wBFtiCRC_3H4ky4iDdy4Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com> <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 12 Jul 2023 16:33:17 +0800
-Message-ID: <CACGkMEseicSpsCZEunV_GoPR2qYfnB-kp_DvJQUg1pyED9XBkA@mail.gmail.com>
-Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux-foundation.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
+On Wed, 12 Jul 2023 16:31:35 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
+> >
+> > If the vq is the premapped mode, use the sg_dma_address() directly.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 19 +++++++++++++++++--
+> >  1 file changed, 17 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index 5ace4539344c..d471dee3f4f7 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -361,6 +361,11 @@ static struct device *vring_dma_dev(const struct v=
+ring_virtqueue *vq)
+> >  static int vring_map_one_sg(const struct vring_virtqueue *vq, struct s=
+catterlist *sg,
+> >                             enum dma_data_direction direction, dma_addr=
+_t *addr)
+> >  {
+> > +       if (vq->premapped) {
+> > +               *addr =3D sg_dma_address(sg);
+> > +               return 0;
+> > +       }
+> > +
+> >         if (!vq->use_dma_api) {
+> >                 /*
+> >                  * If DMA is not used, KMSAN doesn't know that the scat=
+terlist
+> > @@ -639,8 +644,12 @@ static inline int virtqueue_add_split(struct virtq=
+ueue *_vq,
+> >                 dma_addr_t addr =3D vring_map_single(
+> >                         vq, desc, total_sg * sizeof(struct vring_desc),
+> >                         DMA_TO_DEVICE);
+> > -               if (vring_mapping_error(vq, addr))
+> > +               if (vring_mapping_error(vq, addr)) {
+> > +                       if (vq->premapped)
+> > +                               goto free_indirect;
 >
-> Added virtqueue_dma_dev() to get DMA device for virtio. Then the
-> caller can do dma operation in advance. The purpose is to keep memory
-> mapped across multiple add/get buf operations.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Under which case could we hit this? A bug of the driver?
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Here the map operate is for the indirect descs array.
 
-Thanks
+So this is done inside the virtio core.
 
-> ---
->  drivers/virtio/virtio_ring.c | 17 +++++++++++++++++
->  include/linux/virtio.h       |  2 ++
->  2 files changed, 19 insertions(+)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index d471dee3f4f7..1fb2c6dca9ea 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2265,6 +2265,23 @@ int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
->  }
->  EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
->
-> +/**
-> + * virtqueue_dma_dev - get the dma dev
-> + * @_vq: the struct virtqueue we're talking about.
-> + *
-> + * Returns the dma dev. That can been used for dma api.
-> + */
-> +struct device *virtqueue_dma_dev(struct virtqueue *_vq)
-> +{
-> +       struct vring_virtqueue *vq =3D to_vvq(_vq);
-> +
-> +       if (vq->use_dma_api)
-> +               return vring_dma_dev(vq);
-> +       else
-> +               return NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(virtqueue_dma_dev);
-> +
->  /**
->   * virtqueue_kick_prepare - first half of split virtqueue_kick call.
->   * @_vq: the struct virtqueue
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index 2efd07b79ecf..35d175121cc6 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -61,6 +61,8 @@ int virtqueue_add_sgs(struct virtqueue *vq,
->                       void *data,
->                       gfp_t gfp);
->
-> +struct device *virtqueue_dma_dev(struct virtqueue *vq);
-> +
->  bool virtqueue_kick(struct virtqueue *vq);
->
->  bool virtqueue_kick_prepare(struct virtqueue *vq);
-> --
-> 2.32.0.3.g01195cf9f
->
+Thanks.
 
+
+
+
+>
+> Thanks
+>
+> > +
+> >                         goto unmap_release;
+> > +               }
+> >
+> >                 virtqueue_add_desc_split(_vq, vq->split.vring.desc,
+> >                                          head, addr,
+> > @@ -706,6 +715,7 @@ static inline int virtqueue_add_split(struct virtqu=
+eue *_vq,
+> >                         i =3D vring_unmap_one_split(vq, i);
+> >         }
+> >
+> > +free_indirect:
+> >         if (indirect)
+> >                 kfree(desc);
+> >
+> > @@ -1307,8 +1317,12 @@ static int virtqueue_add_indirect_packed(struct =
+vring_virtqueue *vq,
+> >         addr =3D vring_map_single(vq, desc,
+> >                         total_sg * sizeof(struct vring_packed_desc),
+> >                         DMA_TO_DEVICE);
+> > -       if (vring_mapping_error(vq, addr))
+> > +       if (vring_mapping_error(vq, addr)) {
+> > +               if (vq->premapped)
+> > +                       goto free_desc;
+> > +
+> >                 goto unmap_release;
+> > +       }
+> >
+> >         vq->packed.vring.desc[head].addr =3D cpu_to_le64(addr);
+> >         vq->packed.vring.desc[head].len =3D cpu_to_le32(total_sg *
+> > @@ -1366,6 +1380,7 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >         for (i =3D 0; i < err_idx; i++)
+> >                 vring_unmap_desc_packed(vq, &desc[i]);
+> >
+> > +free_desc:
+> >         kfree(desc);
+> >
+> >         END_USE(vq);
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
