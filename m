@@ -1,175 +1,235 @@
-Return-Path: <netdev+bounces-17078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85B59750246
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:01:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8398F750266
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51F8D2816A4
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:01:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 981811C20F27
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6943C100B2;
-	Wed, 12 Jul 2023 09:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC9C100B6;
+	Wed, 12 Jul 2023 09:04:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4C81116
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:01:26 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0749310CF
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 02:01:24 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.nyi.internal (Postfix) with ESMTP id 451635C00BD;
-	Wed, 12 Jul 2023 05:01:24 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Wed, 12 Jul 2023 05:01:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1689152484; x=1689238884; bh=xmp0kiDiHuCYb
-	FACY9UK1mmkzYRL6jMu4jfjvJVgrY0=; b=FnaaxwQ0un1Djy+1JtlBJWorL+uGD
-	s9NTx1bzRrsXqM+a/cDd14V+xKZ8/+mZ5RXVYh4mxcniEQkXgY/Bc1Nmhc1hISaD
-	nobnHPnffsbQ6qzzFXDV/vLl9IQkjvWsaKPPGgOX+0/jA5RIF6ifDVM8BLzHKJ0E
-	J1/9AiSj1GLYQiujjpYk1rmYhHmHIXUZXXuSEyIaqZSb+hMZmLhEIHh6+MTGuiQB
-	Rz/hQAviLwXWQ2l2y1HrCjvmJh8RA50ieXb2LPcTNaNyE/pOuUfrWkJV5shSiIr5
-	qBbgoYv1rWOghpmKODnNJVi/YBHC1shjtOWek1q9RaEv1hgHuedH7RkMQ==
-X-ME-Sender: <xms:42uuZEfQL5-w1EIAvTuR1sxYt1hi8SoVmInhZpUMtiPJsD52SnaX_Q>
-    <xme:42uuZGOU5ZdNFf1KLSTfropbP6r9LODRzgj2rh5p-WDg6LVRb8IJfte6gg7hSViRR
-    wdA9xIyJ5UqBcY>
-X-ME-Received: <xmr:42uuZFh4tYwZIJYNF88KxmvcrnO4W8PjdXBSCF8fLPTWcDp5L2GpiZrxTjrhUdKQHCUpagLXmu6EKUk_rwY8EaY2LAI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrfedvgdduudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:42uuZJ-5ZnmhZ9xSUaSbuROXP4KbNBPEsAijKk3W5oI63mw8SFp29g>
-    <xmx:42uuZAunWTgPsjjligJ-dJtDR08ccYrXbGQkYCJqLkyZ-Akw8ih4qQ>
-    <xmx:42uuZAGeSpPidbKxM9gn8HT3CAvQIAplm9cOQKJ77SwP2ZbC4Hsu8A>
-    <xmx:5GuuZMJijq_Kc0gBEmy2581CX30_LX2cHXsVKy5fI6ENkBNtilWhsg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 12 Jul 2023 05:01:23 -0400 (EDT)
-Date: Wed, 12 Jul 2023 12:01:19 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	brett.creeley@amd.com, drivers@pensando.io
-Subject: Re: [PATCH net-next 5/5] ionic: add FLR recovery support
-Message-ID: <ZK5r307SRIBUfpgF@shredder>
-References: <20230712002025.24444-1-shannon.nelson@amd.com>
- <20230712002025.24444-6-shannon.nelson@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D915684
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:04:08 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF2A26BC
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 02:03:57 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qJVl1-0003ZK-Hv; Wed, 12 Jul 2023 11:03:35 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D6AF41EE5D7;
+	Wed, 12 Jul 2023 09:03:32 +0000 (UTC)
+Date: Wed, 12 Jul 2023 11:03:32 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Michal Simek <michal.simek@amd.com>
+Cc: linux-kernel@vger.kernel.org, monstr@monstr.eu, michal.simek@xilinx.com,
+	git@xilinx.com, Srinivas Neeli <srinivas.neeli@amd.com>,
+	Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	linux-arm-kernel@lists.infradead.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] can: xilinx_can: Add support for controller reset
+Message-ID: <20230712-recliner-subtly-196dece73001-mkl@pengutronix.de>
+References: <cover.1689084227.git.michal.simek@amd.com>
+ <a913de6c4099a1d3408a3973f637446b50c5dee4.1689084227.git.michal.simek@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="t5miqgvjtmuko355"
 Content-Disposition: inline
-In-Reply-To: <20230712002025.24444-6-shannon.nelson@amd.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <a913de6c4099a1d3408a3973f637446b50c5dee4.1689084227.git.michal.simek@amd.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 05:20:25PM -0700, Shannon Nelson wrote:
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-> index b141a29177df..8679d463e98a 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-> @@ -320,6 +320,8 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (err)
->  		goto err_out;
->  
-> +	pci_save_state(pdev);
 
-Can you please explain why this is needed? See more below.
+--t5miqgvjtmuko355
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 11.07.2023 16:03:55, Michal Simek wrote:
+> From: Srinivas Neeli <srinivas.neeli@amd.com>
+>=20
+> Add support for an optional reset for the CAN controller using the reset
+> driver. If the CAN node contains the "resets" property, then this logic
+> will perform CAN controller reset.
+>=20
+> Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
+> Signed-off-by: Michal Simek <michal.simek@amd.com>
+> ---
+>=20
+>  drivers/net/can/xilinx_can.c | 25 +++++++++++++++++++++----
+>  1 file changed, 21 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
+> index 4d3283db3a13..929e00061898 100644
+> --- a/drivers/net/can/xilinx_can.c
+> +++ b/drivers/net/can/xilinx_can.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/can/error.h>
+>  #include <linux/phy/phy.h>
+>  #include <linux/pm_runtime.h>
+> +#include <linux/reset.h>
+> =20
+>  #define DRIVER_NAME	"xilinx_can"
+> =20
+> @@ -200,6 +201,7 @@ struct xcan_devtype_data {
+>   * @can_clk:			Pointer to struct clk
+>   * @devtype:			Device type specific constants
+>   * @transceiver:		Optional pointer to associated CAN transceiver
+> + * @rstc:			Pointer to reset control
+>   */
+>  struct xcan_priv {
+>  	struct can_priv can;
+> @@ -218,6 +220,7 @@ struct xcan_priv {
+>  	struct clk *can_clk;
+>  	struct xcan_devtype_data devtype;
+>  	struct phy *transceiver;
+> +	struct reset_control *rstc;
+>  };
+> =20
+>  /* CAN Bittiming constants as per Xilinx CAN specs */
+> @@ -1799,6 +1802,16 @@ static int xcan_probe(struct platform_device *pdev)
+>  	priv->can.do_get_berr_counter =3D xcan_get_berr_counter;
+>  	priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK |
+>  					CAN_CTRLMODE_BERR_REPORTING;
+> +	priv->rstc =3D devm_reset_control_get_optional_exclusive(&pdev->dev, NU=
+LL);
+> +	if (IS_ERR(priv->rstc)) {
+> +		dev_err(&pdev->dev, "Cannot get CAN reset.\n");
+> +		ret =3D PTR_ERR(priv->rstc);
+> +		goto err_free;
+> +	}
 > +
->  	/* Allocate and init the LIF */
->  	err = ionic_lif_size(ionic);
->  	if (err) {
-> @@ -408,12 +410,68 @@ static void ionic_remove(struct pci_dev *pdev)
->  	ionic_devlink_free(ionic);
+> +	ret =3D reset_control_reset(priv->rstc);
+> +	if (ret)
+> +		goto err_free;
+> =20
+>  	if (devtype->cantype =3D=3D XAXI_CANFD) {
+>  		priv->can.data_bittiming_const =3D
+> @@ -1827,7 +1840,7 @@ static int xcan_probe(struct platform_device *pdev)
+>  	/* Get IRQ for the device */
+>  	ret =3D platform_get_irq(pdev, 0);
+>  	if (ret < 0)
+> -		goto err_free;
+> +		goto err_reset;
+> =20
+>  	ndev->irq =3D ret;
+> =20
+> @@ -1843,21 +1856,21 @@ static int xcan_probe(struct platform_device *pde=
+v)
+>  	if (IS_ERR(priv->can_clk)) {
+>  		ret =3D dev_err_probe(&pdev->dev, PTR_ERR(priv->can_clk),
+>  				    "device clock not found\n");
+> -		goto err_free;
+> +		goto err_reset;
+>  	}
+> =20
+>  	priv->bus_clk =3D devm_clk_get(&pdev->dev, devtype->bus_clk_name);
+>  	if (IS_ERR(priv->bus_clk)) {
+>  		ret =3D dev_err_probe(&pdev->dev, PTR_ERR(priv->bus_clk),
+>  				    "bus clock not found\n");
+> -		goto err_free;
+> +		goto err_reset;
+>  	}
+> =20
+>  	transceiver =3D devm_phy_optional_get(&pdev->dev, NULL);
+>  	if (IS_ERR(transceiver)) {
+>  		ret =3D PTR_ERR(transceiver);
+>  		dev_err_probe(&pdev->dev, ret, "failed to get phy\n");
+> -		goto err_free;
+> +		goto err_reset;
+>  	}
+>  	priv->transceiver =3D transceiver;
+> =20
+> @@ -1904,6 +1917,8 @@ static int xcan_probe(struct platform_device *pdev)
+>  err_disableclks:
+>  	pm_runtime_put(priv->dev);
+>  	pm_runtime_disable(&pdev->dev);
+> +err_reset:
+> +	reset_control_assert(priv->rstc);
+>  err_free:
+>  	free_candev(ndev);
+>  err:
+> @@ -1920,10 +1935,12 @@ static int xcan_probe(struct platform_device *pde=
+v)
+>  static void xcan_remove(struct platform_device *pdev)
+>  {
+>  	struct net_device *ndev =3D platform_get_drvdata(pdev);
+> +	struct xcan_priv *priv =3D netdev_priv(ndev);
+> =20
+>  	unregister_candev(ndev);
+>  	pm_runtime_disable(&pdev->dev);
+>  	free_candev(ndev);
+> +	reset_control_assert(priv->rstc);
+
+Nitpick: Can you make this symmetric with respect to the error handling
+in xcan_probe()?
+
+Oh - that's not a cosmetic issue, it's a use-after-free. free_candev()
+frees your priv.
+
 >  }
->  
-> +static void ionic_reset_prepare(struct pci_dev *pdev)
-> +{
-> +	struct ionic *ionic = pci_get_drvdata(pdev);
-> +	struct ionic_lif *lif = ionic->lif;
-> +
-> +	dev_dbg(ionic->dev, "%s: device stopping\n", __func__);
+> =20
+>  static struct platform_driver xcan_driver =3D {
+> --=20
+> 2.36.1
+>=20
+>
 
-Nit: You can use pci_dbg(pdev, ...);
+Marc
 
-> +
-> +	del_timer_sync(&ionic->watchdog_timer);
-> +	cancel_work_sync(&lif->deferred.work);
-> +
-> +	mutex_lock(&lif->queue_lock);
-> +	ionic_stop_queues_reconfig(lif);
-> +	ionic_txrx_free(lif);
-> +	ionic_lif_deinit(lif);
-> +	ionic_qcqs_free(lif);
-> +	mutex_unlock(&lif->queue_lock);
-> +
-> +	ionic_dev_teardown(ionic);
-> +	ionic_clear_pci(ionic);
-> +	ionic_debugfs_del_dev(ionic);
-> +}
-> +
-> +static void ionic_reset_done(struct pci_dev *pdev)
-> +{
-> +	struct ionic *ionic = pci_get_drvdata(pdev);
-> +	struct ionic_lif *lif = ionic->lif;
-> +	int err;
-> +
-> +	err = ionic_setup_one(ionic);
-> +	if (err)
-> +		goto err_out;
-> +
-> +	pci_restore_state(pdev);
-> +	pci_save_state(pdev);
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-It's not clear to me why this is needed. Before issuing the reset, PCI
-core calls pci_dev_save_and_disable() which saves the configuration
-space of the device. After the reset, but before invoking the
-reset_done() handler, PCI core restores the configuration space of the
-device by calling pci_restore_state(). IOW, these calls seem to be
-redundant.
+--t5miqgvjtmuko355
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I'm asking because I have patches that implement these handlers as well,
-but I'm not calling pci_save_state() / pci_restore_state() in this flow
-and it seems to work fine.
+-----BEGIN PGP SIGNATURE-----
 
-> +
-> +	ionic_debugfs_add_sizes(ionic);
-> +	ionic_debugfs_add_lif(ionic->lif);
-> +
-> +	err = ionic_restart_lif(lif);
-> +	if (err)
-> +		goto err_out;
-> +
-> +	mod_timer(&ionic->watchdog_timer, jiffies + 1);
-> +
-> +err_out:
-> +	dev_dbg(ionic->dev, "%s: device recovery %s\n",
-> +		__func__, err ? "failed" : "done");
-> +}
-> +
-> +static const struct pci_error_handlers ionic_err_handler = {
-> +	/* FLR handling */
-> +	.reset_prepare      = ionic_reset_prepare,
-> +	.reset_done         = ionic_reset_done,
-> +};
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmSubF8ACgkQvlAcSiqK
+BOhacAf+PxVDSySlZHv7eQtQBdt1l/9E2XzOP6qMS2eQpLWrbNO26uizX8nO1rPT
+fwAa0Gw7UoAO89GcLlh+kr4t24o6S6Cz4nY6X0eBi8EIpEyMcOyiVvi9zNt3mA/S
+RqnsymO5L+LieNQ2Bemo/yD+vxSFWnWOa2CYXFTR0ABzu2iceLKGe15SBobaoyEv
+138O+oyhWv6rYbgsx/K+a1woCXKiM9ByY0AV579xemEksdDBEAxq1DOKEd2gOjg3
+Az9/wTg68sFWfJoyh07+2kK/+i6WO42qsJRk4EKVKqBqD9dnKsNHF/MZmxHkDUSn
+X8zg50vZ2Zz5R7qAlcGjDeSuglyZ/w==
+=I9WH
+-----END PGP SIGNATURE-----
+
+--t5miqgvjtmuko355--
 
