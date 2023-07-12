@@ -1,66 +1,108 @@
-Return-Path: <netdev+bounces-17315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6077512A8
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9DD47512C2
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 23:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2CAF281823
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 21:31:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5573281965
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 21:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F5CEAF4;
-	Wed, 12 Jul 2023 21:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6297AF9D9;
+	Wed, 12 Jul 2023 21:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213EFE568
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 21:31:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 482DFC433C7;
-	Wed, 12 Jul 2023 21:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EF2F50D;
+	Wed, 12 Jul 2023 21:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 02D6BC433C7;
+	Wed, 12 Jul 2023 21:50:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689197491;
-	bh=g6kPIL4LCoQUHNeV9eXv2hIHMy3/xuBWDvTBuzux4CM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o4eUW5bDY674WXsroq750qA8F1XkxUKFeic+6TOj3uilDBhQ4UdOhzbcdbTw4m7Gu
-	 +v8rnRA5GeGqtBYXRIyOpeYzd0FNa3AgQZkUw08UGXuLZ5qSJwMqcfSY+mQ0oO/2XP
-	 mDyuGeftL2nuBAgyGPQ+eYMR5sgnfthGXSQIZa3f4T21BYb7c0FWhIxmX2rB4pn1AW
-	 Hb7BAlLzj7qSWgiHX6Bc94i2O/mvg4K7K/62TgCG3D8bgrGVxYaRC08gxEurkeoJXo
-	 5wx1QzXsOCErRMPiGKyE/HXlVxch3pgx6ENPPcRzHRJDjoa1Ntob21DUlRSFQu/GWs
-	 /A4aY6CM93jEw==
-Date: Wed, 12 Jul 2023 14:31:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sunil Kovvuri <sunil.kovvuri@gmail.com>
-Cc: Suman Ghosh <sumang@marvell.com>, sgoutham@marvell.com,
- gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] octeontx2-pf: Install TC filter rules in
- hardware based on priority
-Message-ID: <20230712143130.483d1449@kernel.org>
-In-Reply-To: <CA+sq2CdCw1OT_ChVg_95ALzPX-1LWyiHUSsThor7O3J7Jm3Nmw@mail.gmail.com>
-References: <20230712184011.2409691-1-sumang@marvell.com>
-	<CA+sq2CdCw1OT_ChVg_95ALzPX-1LWyiHUSsThor7O3J7Jm3Nmw@mail.gmail.com>
+	s=k20201202; t=1689198624;
+	bh=OuAbfPmSlVi4EZZR7sYV2K+yruQB4yKAZfVpBjW/U3c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kHU204c3rkaKDAcBWdrlSI67BN98MeVpHtaMTjYv4bybpXL6RmMA5cgQJz4E2pF2I
+	 QBPLZtY8zQDV3f6040cZII8gmyTqAEQQ69EycM51UFD8r4XbdrCCFDZzwiquSYCcO4
+	 Fo8cj4XF9wX2Lcb93MoSyeBF/CC1oEMinps9iLysvGslCsnR4YiNaSI/DX5AXStuNn
+	 XfSbHMF4WDjypYWrA4yllNJk3Jocg/3bNTrL/Ird1CKuvGz8+/eMpeEWZFRUb9zv94
+	 hB/kVgajjkIen7UhJ8nCRJ/EPFxQVWT5J4ckARJBrzaDwosFUCs8fpJySUY119c8JZ
+	 ow2+VNgjv9o3Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D7D6AE49BBF;
+	Wed, 12 Jul 2023 21:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 bpf-next 00/14] bpf: Introduce bpf_mem_cache_free_rcu().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168919862387.303.8813796941061436903.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Jul 2023 21:50:23 +0000
+References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
+In-Reply-To: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: daniel@iogearbox.net, andrii@kernel.org, void@manifault.com,
+ houtao@huaweicloud.com, paulmck@kernel.org, tj@kernel.org,
+ rcu@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ kernel-team@fb.com
 
-On Thu, 13 Jul 2023 00:46:49 +0530 Sunil Kovvuri wrote:
-> net-next is not yet open, please check the status here
-> http://vger.kernel.org/~davem/net-next.html
+Hello:
 
-A bit of a change in process, sorry for the confusion.
-The vger server was giving us grief so we switched the link to:
+This series was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-https://patchwork.hopto.org/net-next.html
+On Wed,  5 Jul 2023 20:34:33 -0700 you wrote:
+> From: Alexei Starovoitov <ast@kernel.org>
+> 
+> v3->v4:
+> - extra patch 14 from Hou to check for object leaks.
+> - fixed the race/leak in free_by_rcu_ttrace. Extra hunk in patch 8.
+> - added Acks and fixed typos.
+> 
+> [...]
 
-We updated the docs but it will probably take a couple more weeks
-before they are rendered online.
+Here is the summary with links:
+  - [v4,bpf-next,01/14] bpf: Rename few bpf_mem_alloc fields.
+    https://git.kernel.org/bpf/bpf-next/c/12c8d0f4c870
+  - [v4,bpf-next,02/14] bpf: Simplify code of destroy_mem_alloc() with kmemdup().
+    https://git.kernel.org/bpf/bpf-next/c/a80672d7e10e
+  - [v4,bpf-next,03/14] bpf: Let free_all() return the number of freed elements.
+    https://git.kernel.org/bpf/bpf-next/c/9de3e81521b4
+  - [v4,bpf-next,04/14] bpf: Refactor alloc_bulk().
+    https://git.kernel.org/bpf/bpf-next/c/05ae68656a8e
+  - [v4,bpf-next,05/14] bpf: Factor out inc/dec of active flag into helpers.
+    https://git.kernel.org/bpf/bpf-next/c/18e027b1c7c6
+  - [v4,bpf-next,06/14] bpf: Further refactor alloc_bulk().
+    https://git.kernel.org/bpf/bpf-next/c/7468048237b8
+  - [v4,bpf-next,07/14] bpf: Change bpf_mem_cache draining process.
+    https://git.kernel.org/bpf/bpf-next/c/d114dde245f9
+  - [v4,bpf-next,08/14] bpf: Add a hint to allocated objects.
+    https://git.kernel.org/bpf/bpf-next/c/822fb26bdb55
+  - [v4,bpf-next,09/14] bpf: Allow reuse from waiting_for_gp_ttrace list.
+    https://git.kernel.org/bpf/bpf-next/c/04fabf00b4d3
+  - [v4,bpf-next,10/14] rcu: Export rcu_request_urgent_qs_task()
+    https://git.kernel.org/bpf/bpf-next/c/43a89baecfe2
+  - [v4,bpf-next,11/14] selftests/bpf: Improve test coverage of bpf_mem_alloc.
+    https://git.kernel.org/bpf/bpf-next/c/f76faa65c971
+  - [v4,bpf-next,12/14] bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().
+    https://git.kernel.org/bpf/bpf-next/c/5af6807bdb10
+  - [v4,bpf-next,13/14] bpf: Convert bpf_cpumask to bpf_mem_cache_free_rcu.
+    https://git.kernel.org/bpf/bpf-next/c/8e07bb9ebcd9
+  - [v4,bpf-next,14/14] bpf: Add object leak check.
+    https://git.kernel.org/bpf/bpf-next/c/4ed8b5bcfada
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
