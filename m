@@ -1,97 +1,178 @@
-Return-Path: <netdev+bounces-17066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B1D7500B3
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:05:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C5F75018F
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89EB51C20F49
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:05:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D33C21C2113D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 08:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3ACDDBE;
-	Wed, 12 Jul 2023 08:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D1A4433;
+	Wed, 12 Jul 2023 08:31:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606481116
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:05:19 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B04FE42;
-	Wed, 12 Jul 2023 01:05:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5TWVCjFGRExPcN05bVzne/2B6BKN45D6agRtviLb2cw=; b=ifUBNQvneXGD6J7waajKoLIn5D
-	pG2U4BC29xw3bvWK+iSa+gOc5fps12nyXisO8GUjZ8wBkPcELGpNAi8PTuiQj86VL0sCdJPtz7/SJ
-	xDuH43rN8cRQBY3ejlqYEvDoSWs/I9KWpHX7l4ReCDlLbCJaKIVUiQ9cJY3maD4eCUpWtv19dQc9v
-	4jLvvZZcrFyGbrozGDxTtRXwc6xqFTZdD2LdxXi8stUAEqMLCPZuf/VMl13F1s0oHfVPzh5xGfpnq
-	2A2xfm09toEHq4IIK/6YuxkSg15wVtz4ZkfBoKGkw+JRBLJPojBFi0ryZN9ICESH+dDlfa0WzYGH0
-	ztv3GCvQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qJUqQ-00GTmW-3M; Wed, 12 Jul 2023 08:05:06 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BABA33001E7;
-	Wed, 12 Jul 2023 10:05:04 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A1024243A2F82; Wed, 12 Jul 2023 10:05:04 +0200 (CEST)
-Date: Wed, 12 Jul 2023 10:05:04 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Tejun Heo <tj@kernel.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
-	DRI Development <dri-devel@lists.freedesktop.org>,
-	linux-rtc@vger.kernel.org,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	netdev <netdev@vger.kernel.org>,
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-	Linux MMC List <linux-mmc@vger.kernel.org>,
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
- mechanism)
-Message-ID: <20230712080504.GA3100107@hirez.programming.kicks-ass.net>
-References: <20230511181931.869812-1-tj@kernel.org>
- <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
- <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
- <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
- <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F31393
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:31:54 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 526D926BB
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:31:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689150710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mMY8N4GgkrsaFITZViPaX/26omPvMDOYikNXpePFX8U=;
+	b=J9mTj7GQOTLJcGFvm1eoSLDTfJD8IX13x8vaUB4X/N66f3l9SOOVNJGPA0AO0xByuZujFo
+	9dwN1MpLM6b8E2stSptCGvXXFmY5SGtdmyzsK8BVjHR2W8CE90YUuCEYt7iMzG0UxlkOa2
+	/mGOvcUFGhjCmNujbD7ZBOovPMvTxxs=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-372-fEORgzYNN6yTuLo7Na02SA-1; Wed, 12 Jul 2023 04:31:49 -0400
+X-MC-Unique: fEORgzYNN6yTuLo7Na02SA-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b6ff15946fso64634551fa.2
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:31:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689150707; x=1691742707;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mMY8N4GgkrsaFITZViPaX/26omPvMDOYikNXpePFX8U=;
+        b=JudGd4j6Q3eteBI2mThUh++FVcLlXghOQ89/P/fy2BR0kpnvMEYrUDtM7+k1w4jsP+
+         Xzx5cydmaSc9xePu34fSy6SZcUxxL3sl2TgMBq+c7nUGokBofVlrD4rvFR0Tdh0NFUSX
+         HFbAEAUk5ZIQ2GgtJFUbcTTpfZt5BE1xWsa1yFPT2HEMtwCS5rHZrrPfDiBHhvzbJE8c
+         a6wCTeiehX1TSD/ent0Nl1C7o/KtjGefeM8Mf4u/6nGszVPrjzxkQVQo/2ebYkYPrvsp
+         RgK9IZqHjtqXQHtsN/idDRXAkz1pnp9N/A+iHQXUizLDCud69EvvrHOaeICVjvSYFNfI
+         u6Pg==
+X-Gm-Message-State: ABy/qLa3DoVAuWt2m+HJhwBhFqsBP6JXjnhr5UBYzLmcrVbAjS1sscbx
+	Y4/nmMIiJLwGefLAEAEbtYyWOk7mX7Xm6pzhpYO09l/1eBdfixSQkgVsED4P8VBrIf03eA5iKgf
+	5DMrbKkSQcJH/6EL5rrVeUdj7PPmtV9uy
+X-Received: by 2002:a2e:b0c7:0:b0:2b6:ec69:7c3b with SMTP id g7-20020a2eb0c7000000b002b6ec697c3bmr14248584ljl.46.1689150707782;
+        Wed, 12 Jul 2023 01:31:47 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH8VQdPippc4jzXJqOkjPYz7uzhQc4c9Zm733Etko9K6J3AzHieVFvn79o9Yal5pESop9imlfRDh3vOC46gGBc=
+X-Received: by 2002:a2e:b0c7:0:b0:2b6:ec69:7c3b with SMTP id
+ g7-20020a2eb0c7000000b002b6ec697c3bmr14248566ljl.46.1689150707490; Wed, 12
+ Jul 2023 01:31:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com> <20230710034237.12391-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20230710034237.12391-5-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 12 Jul 2023 16:31:35 +0800
+Message-ID: <CACGkMEu16kUX02L+zb=hcX_sMW-s6wBFtiCRC_3H4ky4iDdy4Q@mail.gmail.com>
+Subject: Re: [PATCH vhost v11 04/10] virtio_ring: support add premapped buf
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
+On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+>
+> If the vq is the premapped mode, use the sg_dma_address() directly.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 19 +++++++++++++++++--
+>  1 file changed, 17 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 5ace4539344c..d471dee3f4f7 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -361,6 +361,11 @@ static struct device *vring_dma_dev(const struct vri=
+ng_virtqueue *vq)
+>  static int vring_map_one_sg(const struct vring_virtqueue *vq, struct sca=
+tterlist *sg,
+>                             enum dma_data_direction direction, dma_addr_t=
+ *addr)
+>  {
+> +       if (vq->premapped) {
+> +               *addr =3D sg_dma_address(sg);
+> +               return 0;
+> +       }
+> +
+>         if (!vq->use_dma_api) {
+>                 /*
+>                  * If DMA is not used, KMSAN doesn't know that the scatte=
+rlist
+> @@ -639,8 +644,12 @@ static inline int virtqueue_add_split(struct virtque=
+ue *_vq,
+>                 dma_addr_t addr =3D vring_map_single(
+>                         vq, desc, total_sg * sizeof(struct vring_desc),
+>                         DMA_TO_DEVICE);
+> -               if (vring_mapping_error(vq, addr))
+> +               if (vring_mapping_error(vq, addr)) {
+> +                       if (vq->premapped)
+> +                               goto free_indirect;
 
-> I wonder whether the right thing to do here is somehow scaling the threshold
-> according to the relative processing power. It's difficult to come up with a
-> threshold which works well across the latest & fastest and really tiny CPUs.
-> I'll think about it some more but if you have some ideas, please feel free
-> to suggest.
+Under which case could we hit this? A bug of the driver?
 
-We could scale by BogoMIPS I suppose, it's a bogus measurement, as per
-the name, but it does have some relation to how fast the machine is.
+Thanks
+
+> +
+>                         goto unmap_release;
+> +               }
+>
+>                 virtqueue_add_desc_split(_vq, vq->split.vring.desc,
+>                                          head, addr,
+> @@ -706,6 +715,7 @@ static inline int virtqueue_add_split(struct virtqueu=
+e *_vq,
+>                         i =3D vring_unmap_one_split(vq, i);
+>         }
+>
+> +free_indirect:
+>         if (indirect)
+>                 kfree(desc);
+>
+> @@ -1307,8 +1317,12 @@ static int virtqueue_add_indirect_packed(struct vr=
+ing_virtqueue *vq,
+>         addr =3D vring_map_single(vq, desc,
+>                         total_sg * sizeof(struct vring_packed_desc),
+>                         DMA_TO_DEVICE);
+> -       if (vring_mapping_error(vq, addr))
+> +       if (vring_mapping_error(vq, addr)) {
+> +               if (vq->premapped)
+> +                       goto free_desc;
+> +
+>                 goto unmap_release;
+> +       }
+>
+>         vq->packed.vring.desc[head].addr =3D cpu_to_le64(addr);
+>         vq->packed.vring.desc[head].len =3D cpu_to_le32(total_sg *
+> @@ -1366,6 +1380,7 @@ static int virtqueue_add_indirect_packed(struct vri=
+ng_virtqueue *vq,
+>         for (i =3D 0; i < err_idx; i++)
+>                 vring_unmap_desc_packed(vq, &desc[i]);
+>
+> +free_desc:
+>         kfree(desc);
+>
+>         END_USE(vq);
+> --
+> 2.32.0.3.g01195cf9f
+>
+
 
