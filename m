@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-17217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF0B2750CF7
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:47:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FE8750CFA
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:47:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64ACC2813A9
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:47:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43119281420
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D00020F9D;
-	Wed, 12 Jul 2023 15:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC01520FB1;
+	Wed, 12 Jul 2023 15:40:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3578200B1
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:40:35 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 508BC10C4
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:32 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-635ee3baa14so39637226d6.3
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC77200B1
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:40:37 +0000 (UTC)
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2348A1BE8
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:34 -0700 (PDT)
+Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-794c5f60479so2019952241.3
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689176431; x=1691768431;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689176433; x=1691768433;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rGkm982TgVCXzimWHcMFf6ZF8hXchMXHwES+CKMpwqs=;
-        b=MlOfvYtFOIkaHxwNcXMh4BjvtzBsJ5AYEq6I5b6/LSuAuAdNogDDvCdF+ONFwZ6fYo
-         WOuIYLiTFOMpw6HCioPtHEhQt2VAGwnZ+WPP7O05LZSwjcBcZBi6IGsqA2GerBlodt4o
-         qw3tmG1uYLAjDAFpHf1rVlAvyQ9Y7ZDFiWhafs3IPel3rINKaowmF6/ARi4pC1zYAc7B
-         mV74bG4OVTgDsqU/QdcIh78LFEnu56ATz/0zY2tuebUdnxGxd4/DdcGOb1hOyVkmLKfe
-         43fmIccxTuyJ0o9Q75s6h9nLtkobBdl969hD+nOwA77jELz2nebS7NgYTZ8hNxsjUNMR
-         nnBQ==
+        bh=4IaRsnxTElzrmgzMPCUFnGA90AieYyDx7duea1us0nw=;
+        b=RDORQTbSQBDUK5BFkRi+GB5NVkqHk0JPLIf4oCG64mZV4X1JUviR+ZdqeHmXKTvC1k
+         oPFPyEi3KGWTJueX2TXkizUJWklSMDyQBtWXGKXEYTDifgBkhQmrmURLK1K/C/t1S5QV
+         I1dnHSqOnWfZJWkohtFa9982NZ37qsQ40Fb65aYiY77GC3np1sso1KrGkW5hGHbYyjBZ
+         Fh3M8Q6fpGZzSzkEcVC5jDO+VAOAFiXiwHwYP82QbDlqvs3M/FUF9t2UinGs09VnFRRl
+         /eSnQLldIQxQbwQK7cPmFJjRj9Ws6Et5urc+aUkNbtnTAMmyCKFx928yA5BvFk3s/NZ/
+         YngQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689176431; x=1691768431;
+        d=1e100.net; s=20221208; t=1689176433; x=1691768433;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rGkm982TgVCXzimWHcMFf6ZF8hXchMXHwES+CKMpwqs=;
-        b=B2HiI9nXmkOsLeuQo4HvfHWMHtMJ6QSkmrY7FAJnFixJJJ/oCcbdRKwa5m5fA4+ODp
-         J0faq73IKYMzhKJEHZ/+UAH/UA1AiR8ygBjsMqwnsKSOBX7QG3sQx2PQycSUywu8QL7n
-         SZJnCj4BtdVsiNYhjTr4pHlI6q/GsC07qHdCv5e0mvfHqod+BuLUvojYXiEE2AePsgrD
-         +3TZnKu3g1UjOR/rPqmUKCbkungXVAuE6qr2DayzmhPhhXJVbg7wzQHmrn4Tk97J5ImU
-         BqGFSdbLRt0nC5iruU5N7LoMFifKKgGjnmO5moX+KAIr7iinHVtprGxbkp2YzIqw1Abp
-         Qz3w==
-X-Gm-Message-State: ABy/qLZj//USKDqpsyvAiTTa3MBQoWfJ89v25yNZmbjlSQP4WedzqyaX
-	3gxv2HfpLOqQwkza1QTfECC4iV+E3JR9Y6MxJ87s2g==
-X-Google-Smtp-Source: APBJJlHkjh85toFojO7emksYRQ8Vp+8G2H/MQ8ZyJwZd0TaN98QweybOBNPi3kY5axthazYSbwdl+g==
-X-Received: by 2002:a0c:f5d4:0:b0:632:5fb:5642 with SMTP id q20-20020a0cf5d4000000b0063205fb5642mr15754047qvm.12.1689176429734;
-        Wed, 12 Jul 2023 08:40:29 -0700 (PDT)
+        bh=4IaRsnxTElzrmgzMPCUFnGA90AieYyDx7duea1us0nw=;
+        b=Kx/xTsvcPRCmeyDOUou3pAOgmYMNA6eWNkMgGeOVky52NMF42DWQssVcTo5nk+Rc2d
+         ReW1iYPJy/tqcu1NWqfQYW9c7KAQF/HK8wzh3POiVIIT1WsS/DdTMP0u229gMcjI8yna
+         Asra08B0oCp/lA4LjLwVQB6Sbocpi3Bnpi316Yh8oFUFxl1sGd5bt6R1uzBBf/OKAfuv
+         7IOeTzUvsU/uS8JyG58ab6Yf9CifXeUzUl+3EErdLScQdYCLvBBmF0wRzZ7M1syrWCpC
+         +QWLkT28kfTwykxcjWmURzxt0JDWaZ2LvSpLzwyUqrjxvRW5pQvjhibvyaVmPF+QYuKg
+         UC0A==
+X-Gm-Message-State: ABy/qLYFt6bIHq4B72bEwsEe7pclVtHXTNZNGHM2ISsC4UQXTzB5CE+8
+	oaOw5OuiVhX1bkVszN/y42AO3SlXGMqi7c6IZQ/faQ==
+X-Google-Smtp-Source: APBJJlE69DgXiJG0z8Cw9lqnju6TkBWIvi7XJHb4mmHH1VnziFqOk4eDYwAqZayrXkUXZonxcKsrXA==
+X-Received: by 2002:a05:6102:906:b0:443:55eb:ce92 with SMTP id x6-20020a056102090600b0044355ebce92mr5784967vsh.19.1689176431165;
+        Wed, 12 Jul 2023 08:40:31 -0700 (PDT)
 Received: from majuu.waya ([142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id r3-20020a0ccc03000000b0063211e61875sm2283827qvk.14.2023.07.12.08.40.28
+        by smtp.gmail.com with ESMTPSA id r3-20020a0ccc03000000b0063211e61875sm2283827qvk.14.2023.07.12.08.40.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 08:40:29 -0700 (PDT)
+        Wed, 12 Jul 2023 08:40:30 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -78,9 +78,9 @@ Cc: deb.chatterjee@intel.com,
 	toke@redhat.com,
 	mattyk@nvidia.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v4 net-next 20/22] selftests: tc-testing: add P4TC table control path tdc tests
-Date: Wed, 12 Jul 2023 11:39:47 -0400
-Message-Id: <20230712153949.6894-21-jhs@mojatatu.com>
+Subject: [PATCH RFC v4 net-next 21/22] selftests: tc-testing: add P4TC table entries control path tdc tests
+Date: Wed, 12 Jul 2023 11:39:48 -0400
+Message-Id: <20230712153949.6894-22-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712153949.6894-1-jhs@mojatatu.com>
 References: <20230712153949.6894-1-jhs@mojatatu.com>
@@ -97,86 +97,80 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Introduce tdc tests for P4TC table, which are focused on the
-control path. We test table create, update, delete, flush and
+Introduce tdc tests for P4TC table entries, which are focused on the
+control path. We test table instance create, update, delete, flush and
 dump.
 
-Here is a basic description of what we test for each operation:
-
 Create:
-    - Create valid table
-    - Try to create table without specifying mandatory arguments
-    - Create table without specifying optional arguments and check
-      optional values after creation
-    - Try to create table passing invalid arguments
-    - Try to create table with same name twice
-    - Try to create table with same id twice
-    - Create a table with table id == INX_MAX (2147483647) and
-      check for overflow warning when traversing table IDR
-    - Try to create table with name length > TTYPENAMSIZ
-    - Try to create table without specifying pipeline name or id
-    - Create valid table with more than one key
-    - Try to create table adding more than P4TC_MAXPARSE_KEYS keys
-    - Create table and update pipeline state
-    - Create table, update pipeline state and try to update pipeline
-      after pipeline is sealed
-    - Create table, update pipeline state and try to update table
-      type after pipeline is sealed
-    - Create table with keys with more than one action
+    - Create valid table entry with all possible key types
+    - Try to create table entry without specifying mandatory arguments
+    - Try to create table entry passing invalid arguments
+    - Try to create table entry with same key and prio twice
+    - Try to create table entry without sealing the pipeline
+    - Try to create table entry with action of unknown kind
+    - Try to exceed max table entries count
 
 Update:
-    - Update table with valid argument values
-    - Try to update table with invalid argument values
-    - Try to update table without specifying table name or id
-    - Try to update table without specifying pipeline name or id
-    - Try to update table with invalid values
-    - Check action bind and ref values after table's key's action
-    - Check action bind and ref values after table's postaction
-      update
-    - Update table and add new key without specifying id
-    - Try to update table adding more P4TC_MAXPARSE_KEYS keys
-    - Update table key with more than one action
-    - Try to create more table then numtclass in pipeline
+    - Try to update table entry with action of inexistent kind
+    - Try to update table entry with action of unknown kind
+    - Update table entry with new action
+    - Create table entry with action and then update table entry
+      with another action
+    - Create table entry with action, update table entry with another
+      action and check action's refs and binds
+    - Create table entry without action and then update table entry
+      with another action
+    - Try to update inexistent table entry
 
 Delete:
-    - Delete table by name
-    - Delete table by id
-    - Delete nonexistent table by name
-    - Delete nonexistent table by id
-    - Try to delete table without supplying pipeline name or id
-    - Flush table
-    - Try to flush table without supplying pipeline name or id
-    - Check action bind and ref values after table deletion
+    - Delete table entry
+    - Try to delete inexistent table entry
+    - Try to delete table entry without specifying mandatory arguments
+    - Delete table entry specifying IDs for the pipeline and its
+    components (table class and table instance)
+    - Delete table entry specifying names for the pipeline and its
+      components (table class and table instance)
+    - Delete table entry with action and check action's refs and binds
+
+Flush:
+    - Flush table entries
+    - Flush table entries specifying IDS for pipeline and its
+    components (table class and table instance)
+    - Flush table entries specifying names for pipeline and its
+    components (table class and table instance)
+    - Try to flush table entries without specifying mandatory arguments
 
 Dump:
-    - Dump table IDR using pipeline name to find pipeline
-    - Dump table IDR using pipeline id to find pipeline
-    - Try to dump table IDR without specifying pipeline name or id
-    - Dump table IDR which has more than P4TC_MAXMSG_COUNT (16)
-      elements
+    - Dump table entries
+    - Dump table entries specifying IDS for pipeline and its
+    components (table class and table instance)
+    - Dump table entries specifying names for pipeline and its
+    components (table class and table instance)
+    - Try to dump table entries without specifying mandatory arguments
+    - Dump table instance with zero table entries
+    - Dump table instance with more than P4TC_MAXMSG_COUNT entries
 
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- .../tc-testing/tc-tests/p4tc/table.json       | 5597 +++++++++++++++++
- 1 file changed, 5597 insertions(+)
- create mode 100644 tools/testing/selftests/tc-testing/tc-tests/p4tc/table.json
+ .../tc-tests/p4tc/table_entries.json          | 4269 +++++++++++++++++
+ 1 file changed, 4269 insertions(+)
+ create mode 100644 tools/testing/selftests/tc-testing/tc-tests/p4tc/table_entries.json
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/p4tc/table.json b/tools/testing/selftests/tc-testing/tc-tests/p4tc/table.json
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/p4tc/table_entries.json b/tools/testing/selftests/tc-testing/tc-tests/p4tc/table_entries.json
 new file mode 100644
-index 000000000..158c1b781
+index 000000000..13c406c07
 --- /dev/null
-+++ b/tools/testing/selftests/tc-testing/tc-tests/p4tc/table.json
-@@ -0,0 +1,5597 @@
++++ b/tools/testing/selftests/tc-testing/tc-tests/p4tc/table_entries.json
+@@ -0,0 +1,4269 @@
 +[
 +    {
-+        "id": "60b7",
-+        "name": "Create valid table",
++        "id": "4bfd",
++        "name": "Create valid table entry with args bit16",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -198,52 +192,68 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 ",
++                0
 +            ],
 +            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 1,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc",
++                        "permissions": "-RUD--R--X"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
 +            [
++                "$TC p4 del ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
++                0
++            ],
++            [
 +                "$TC p4template del pipeline/ptables",
 +                0
 +            ],
@@ -254,12 +264,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "4765",
-+        "name": "Try to create table without name",
++        "id": "d574",
++        "name": "Create valid table entry with args  and check entries count",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -281,1189 +290,27 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 ",
++                0
 +            ],
 +            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/ keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "3d3c",
-+        "name": "Try to create table without keysz",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "b48a",
-+        "name": "Try to create table with keysz zero",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 0",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "cc89",
-+        "name": "Try to create table with keysz > P4TC_MAX_KEYSZ",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 513",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "efba",
-+        "name": "Try to create table with tentries > P4TC_MAX_TENTRIES",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16 tentries 16777217",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "a24a",
-+        "name": "Create table with tentries = P4TC_MAX_TENTRIES",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 tentries 16777216",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 16777216,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "67b7",
-+        "name": "Try to create table with tentries zero",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16 tentries 0",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "e8e8",
-+        "name": "Try to create table with nummasks > P4TC_MAX_TMASKS",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16 tmasks 1025",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "6b5b",
-+        "name": "Create table wth nummasks = P4TC_MAX_TMASKS",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 nummasks 128",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 128
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "615c",
-+        "name": "Try to create table with nummasks zero",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16 nummasks 0",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "ef97",
-+        "name": "Create table with specific tt_id",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 42 keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 42,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "7a0f",
-+        "name": "Try to create table same name twice",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 1,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "bd8d",
-+        "name": "Try to create table same id twice",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname2 tblid 22 keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/ tblid 22",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "eeaf",
-+        "name": "Try to create table without supplying pipeline name or id",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ tblid 1 keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "f35d",
-+        "name": "Create table without supplying keys",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 1,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "b3c9",
-+        "name": "Try to create table with name size > TCLASSNAMSIZ",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/7eozFYyaqVCD7H0xS3M5sMnluUqPgZewfSLnYPf4s3k0lbx8lKoR32zSqiGsh84qJ32vnLPdl7f2XcUh5yIdEP7uJy2C3iPtyU7159s9CMB0EtTAlWTVz4U1jkQ5h2advwp3KCVsZ1jlGgStoJL2op5ZxoThTSUQLR61a5RNDovoSFcq86Brh6oW9DSmTbN6SYygbG3JLnEHzRC5hh0jGmJKHq5ivBK9Y9FlNZQXC9wVwX4qTFAd8ITUTj2Au2Jg1 keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "40b0",
-+        "name": "Create table with tblid of 4 bytes",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action gact pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action gact pass index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 2147483647 keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/ tblid 2147483647",
++        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname2",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
@@ -1474,100 +321,20 @@ index 000000000..158c1b781
 +            {
 +                "templates": [
 +                    {
-+                        "tblid": 2147483647,
-+                        "tname": "cb/tname"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "eea7",
-+        "name": "Update table's key size specifying table name",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname keysz 32",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
++                        "tname": "cb/tname2",
 +                        "keysz": 32,
 +                        "max_entries": 256,
-+                        "masks": 8
++                        "masks": 8,
++                        "entries": 1
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -1579,12 +346,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "5d07",
-+        "name": "Update table's key size specifying table id",
++        "id": "6c21",
++        "name": "Create valid table entry with args ipv4",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -1606,55 +372,66 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64 ",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ pipeid 22 tblid 22 keysz 32",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 17",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 17",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 32,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 1,
++                        "prio": 17,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 17",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -1666,12 +443,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "46f5",
-+        "name": "Try to update table's key size with zero",
++        "id": "a486",
++        "name": "Create valid table entry with args bit8, bit32, bit64",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -1693,229 +469,73 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 type exact",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 keysz 0",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "8306",
-+        "name": "Try to update table's key size with > P4TC_MAX_KEYSZ",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 keysz 513",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "0d12",
-+        "name": "Update table's with key size = P4TC_MAX_KEYSZ",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 keysz 512",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 512,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ]
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -1927,12 +547,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "67c0",
-+        "name": "Try to update table tentries with zero",
++        "id": "13d9",
++        "name": "Try to create table entry without table name or id",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -1954,54 +573,29 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 ",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 tentries 0",
++        "cmdUnderTest": "$TC p4 create ptables/table/ randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
++        "matchPattern": "Error: Unable to find entry.*",
 +        "teardown": [
 +            [
 +                "$TC p4template del pipeline/ptables",
@@ -2014,12 +608,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "dfd1",
-+        "name": "Try to update table wth tentries > P4TC_MAX_TENTRIES",
++        "id": "0b7c",
++        "name": "Try to create table entry without specifying any keys",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2041,54 +634,29 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 ",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 tentries 16777217",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname3 prio 1",
 +        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
++        "matchPattern": "Error: Unable to find entry.*",
 +        "teardown": [
 +            [
 +                "$TC p4template del pipeline/ptables",
@@ -2101,12 +669,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "36e3",
-+        "name": "Update table with tentries = P4TC_MAX_TENTRIES",
++        "id": "c2e7",
++        "name": "Create table entry without specifying priority",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2128,55 +695,74 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 tentries 16777216",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 16777216,
-+                        "masks": 8
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC -j p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -2188,12 +774,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "5c80",
-+        "name": "Try to update table masks with zero",
++        "id": "dff1",
++        "name": "Try to get table entry without specifying priority",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2215,229 +800,50 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 nummasks 0",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
++                "$TC p4template create action/ptables/cb/send_nh actid 1 param smac type macaddr id 1 param dmac type macaddr id 2",
 +                0
 +            ],
 +            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "011b",
-+        "name": "Try to update table with nummasks > P4TC_MAX_TMASKS",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template update action/ptables/cb/send_nh state active",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 table_acts act name ptables/cb/send_nh flags tableonly",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh param smac b8:ce:f6:4b:68:35 param dmac ac:1f:6b:e4:ff:93",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 nummasks 1025",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "102b",
-+        "name": "Update table with nummasks = P4TC_MAX_TMASKS",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 nummasks 128",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 2  action send_nh index 1",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC p4 get ptables/table/cb/tname3/ randomKey1  255 randomKey2  92 randomKey3  127",
 +        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 128
-+                    }
-+                ]
-+            }
-+        ],
++        "matchPattern": "Error: Must specify table entry priority.*",
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 2",
++                0
++            ],
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -2449,12 +855,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "a7f3",
-+        "name": "Delete table by name",
++        "id": "9a1e",
++        "name": "Try to create more table entries than allowed",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2476,38 +881,301 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64 tentries 1",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/cb/tname",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "2095",
++        "name": "Try to create more table entries than allowed after delete",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64 tentries 3",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 17",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 18",
++                0
++            ],
++            [
++                "$TC p4 del ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 18",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 18",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "4e6a",
++        "name": "Try to create more table entries than allowed after flush",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64 tentries 1",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "65a2",
++        "name": "Create two entries with same key and different priorities and check first one",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.1.0/16 prio 15",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
 +        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 1,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -2519,12 +1187,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "9524",
-+        "name": "Delete table by id",
++        "id": "a49c",
++        "name": "Create two entries with same key and different priorities and check second one",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2546,126 +1213,71 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/ tblid 22",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.169.0.0/16 prio 15",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/ tblid 22",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Unable to find table by id.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "c41b",
-+        "name": "Try to delete inexistent table by name",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/cb/tname2",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.169.0.0/16 prio 15",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 1,
++                        "prio": 15,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.169.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
 +            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
 +                "$TC p4template del pipeline/ptables",
 +                0
 +            ],
@@ -2676,12 +1288,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "faca",
-+        "name": "Try to delete inexistent table by id",
++        "id": "2314",
++        "name": "Try to create same entry twice",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2703,54 +1314,126 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/ tblid 44",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.1.0/16 prio 16",
 +        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/ tblid 22",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 1,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "7d41",
++        "name": "Try to create table entry in unsealed pipeline",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.",
 +        "teardown": [
 +            [
 +                "$TC p4template del pipeline/ptables",
@@ -2763,12 +1446,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "6da7",
-+        "name": "Try to delete table without supplying pipeline name or id",
++        "id": "d732",
++        "name": "Try to create table entry with action of inexistent kind",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2790,54 +1472,29 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ tblid 22",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16 action noexist index 1",
 +        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/ tblid 22",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
 +        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
++        "matchPattern": "Error: Unable to find entry.*",
 +        "teardown": [
 +            [
 +                "$TC p4template del pipeline/ptables",
@@ -2850,12 +1507,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "a844",
-+        "name": "Flush table",
++        "id": "525a",
++        "name": "Try to update table entry with action of inexistent kind",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -2877,134 +1533,214 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/",
++        "cmdUnderTest": "$TC p4 update ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16 action noexist index 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname2",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "ee04",
++        "name": "Update table entry and add action",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create action/ptables/cb/send_nh actid 1 param smac type macaddr id 1 param dmac type macaddr id 2",
++                0
++            ],
++            [
++                "$TC p4template update action/ptables/cb/send_nh state active",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 table_acts act name ptables/cb/send_nh flags tableonly",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 update ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh param smac b8:ce:f6:4b:68:35 param dmac ac:1f:6b:e4:ff:93 index 1",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "7f88",
-+        "name": "Try to flush table without supplying pipeline name or id",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template del table/",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ],
++                        "create_whodunnit": "tc",
++                        "update_whodunnit": "tc",
++                        "actions": {
++                            "actions": [
++                                {
++                                    "order": 1,
++                                    "kind": "ptables/cb/send_nh",
++                                    "index": 1,
++                                    "ref": 1,
++                                    "bind": 1,
++                                    "params": [
++                                        {
++                                            "name": "smac",
++                                            "id": 1,
++                                            "type": "macaddr",
++                                            "value": "ac:1f:6b:e4:ff:93"
++                                        },
++                                        {
++                                            "name": "dmac",
++                                            "id": 2,
++                                            "type": "macaddr",
++                                            "value": "b8:ce:f6:4b:68:35"
++                                        }
++                                    ]
++                                }
++                            ]
++                        }
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
 +            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
 +                "$TC p4template del pipeline/ptables",
 +                0
 +            ],
@@ -3015,12 +1751,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "778c",
-+        "name": "Create table with key size > P4TC_MAX_KEYSZ",
++        "id": "10b5",
++        "name": "Update table entry and replace action",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -3042,117 +1777,112 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
++                "$TC p4template create action/ptables/cb/send_nh actid 1 param smac type macaddr id 1 param dmac type macaddr id 2",
++                0
 +            ],
 +            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template update action/ptables/cb/send_nh state active",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 table_acts act name ptables/cb/send_nh flags tableonly",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh param smac b8:ce:f6:4b:68:34 param dmac ac:1f:6b:e4:ff:92",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 513",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "64ed",
-+        "name": "Create table with key size = P4TC_MAX_KEYSZ",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 512",
++        "cmdUnderTest": "$TC p4 update ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh param smac b8:ce:f6:4b:68:35 param dmac ac:1f:6b:e4:ff:93",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 512,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ],
++                        "create_whodunnit": "tc",
++                        "update_whodunnit": "tc",
++                        "actions": {
++                            "actions": [
++                                {
++                                    "order": 1,
++                                    "kind": "ptables/cb/send_nh",
++                                    "index": 2,
++                                    "ref": 1,
++                                    "bind": 1,
++                                    "params": [
++                                        {
++                                            "name": "smac",
++                                            "id": 1,
++                                            "type": "macaddr",
++                                            "value": "ac:1f:6b:e4:ff:93"
++                                        },
++                                        {
++                                            "name": "dmac",
++                                            "id": 2,
++                                            "type": "macaddr",
++                                            "value": "b8:ce:f6:4b:68:35"
++                                        }
++                                    ]
++                                }
++                            ]
++                        }
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -3164,12 +1894,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "508b",
-+        "name": "Create table and update pipeline state",
++        "id": "2d50",
++        "name": "Update table entry, replace action and check for action refs and binds",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -3191,55 +1920,1296 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
 +            ],
 +            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
++                "$TC p4template create action/ptables/cb/send_nh actid 1 param smac type macaddr id 1 param dmac type macaddr id 2",
 +                0
 +            ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
++                "$TC p4template update action/ptables/cb/send_nh state active",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 table_acts act name ptables/cb/send_nh flags tableonly",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC actions add action ptables/cb/send_nh param smac b8:ce:f6:4b:68:35 param dmac ac:1f:6b:e4:ff:93 index 1",
++                0
++            ],
++            [
++                "$TC p4runtime create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh index 1",
++                0
++            ],
++            [
++                "$TC actions add action ptables/cb/send_nh param smac b8:ce:f6:4b:68:34 param dmac ac:1f:6b:e4:ff:92 index 2",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4runtime update ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh index 2; sleep 1;",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j actions get action ptables/cb/send_nh index 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "total acts": 0
++            },
++            {
++                "actions": [
++                    {
++                        "order": 1,
++                        "kind": "ptables/cb/send_nh",
++                        "index": 1,
++                        "ref": 1,
++                        "bind": 0,
++                        "params": [
++                            {
++                                "name": "smac",
++                                "id": 1,
++                                "type": "macaddr",
++                                "value": "ac:1f:6b:e4:ff:93"
++                            },
++                            {
++                                "name": "dmac",
++                                "id": 2,
++                                "type": "macaddr",
++                                "value": "b8:ce:f6:4b:68:35"
++                            }
++                        ]
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "99ef",
++        "name": "Try to update inexistent table entry",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 update ptables/table/cb/tname3 randomKey1  255 randomKey2  1 randomKey3  127 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "8868",
++        "name": "Try to update table entry without specifying priority",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create action/ptables/cb/send_nh actid 1 param smac type macaddr id 1 param dmac type macaddr id 2",
++                0
++            ],
++            [
++                "$TC p4template update action/ptables/cb/send_nh state active",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 table_acts act name ptables/cb/send_nh flags tableonly",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 update ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 action send_nh",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "339a",
++        "name": "Try to update table entry without specifying table name or id",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 update ptables/table/ randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action gact index 2",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "3962",
++        "name": "Delete table entry",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "fcc7",
++        "name": "Try to delete table entry without specyfing tblid or table name",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/ randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3/ randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 3,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "randomKey1",
++                                "id": 1,
++                                "width": 8,
++                                "type": "bit8",
++                                "match_type": "exact",
++                                "fieldval": 255
++                            },
++                            {
++                                "keyfield": "randomKey2",
++                                "id": 2,
++                                "width": 32,
++                                "type": "bit32",
++                                "match_type": "exact",
++                                "fieldval": 92
++                            },
++                            {
++                                "keyfield": "randomKey3",
++                                "id": 3,
++                                "width": 64,
++                                "type": "bit64",
++                                "match_type": "exact",
++                                "fieldval": 127
++                            }
++                        ]
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "e79d",
++        "name": "Try to delete table entry without specifying prio",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 2",
++        "expExitCode": "0",
++        "verifyCmd": "$TC p4 del ptables/table/cb/tname3/ randomKey1  255 randomKey2  92 randomKey3  127",
++        "matchCount": "1",
++        "matchPattern": "Error: Must specify table entry priority.*",
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 2",
++                0
++            ],
++            [
++                "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "c5be",
++        "name": "Delete table entry with action and check action's refs and binds",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create action/ptables/cb/send_nh actid 1 param smac type macaddr id 1 param dmac type macaddr id 2",
++                0
++            ],
++            [
++                "$TC p4template update action/ptables/cb/send_nh state active",
++                0
++            ],
++            [
++                "$TC actions add action ptables/cb/send_nh param smac b8:ce:f6:4b:68:35 param dmac ac:1f:6b:e4:ff:93 index 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104 table_acts act name ptables/cb/send_nh flags tableonly",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1 action send_nh index 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1; sleep 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j actions get action ptables/cb/send_nh index 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "total acts": 0
++            },
++            {
++                "actions": [
++                    {
++                        "order": 1,
++                        "kind": "ptables/cb/send_nh",
++                        "index": 1,
++                        "ref": 1,
++                        "bind": 0,
++                        "params": [
++                            {
++                                "name": "smac",
++                                "id": 1,
++                                "type": "macaddr",
++                                "value": "ac:1f:6b:e4:ff:93"
++                            },
++                            {
++                                "name": "dmac",
++                                "id": 2,
++                                "type": "macaddr",
++                                "value": "b8:ce:f6:4b:68:35"
++                            }
++                        ]
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "4ac6",
++        "name": "Try to delete inexistent table entry",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname3 tblid 3 keysz 104",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname3 randomKey1  255 randomKey2  92 randomKey3  127 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "24a1",
++        "name": "Flush table entries",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/cb/tname",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "9770",
++        "name": "Flush table entries using table name",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/cb/tname",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "c5b9",
++        "name": "Flush table entries without specifying table name or id",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 del ptables/table/",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 1,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.56.0/24"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "03f7",
++        "name": "Dump table entries",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname",
++        "matchCount": "1",
++        "matchJSON": [
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 1,
++                        "prio": 1,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.56.0/24"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "0caa",
++        "name": "Try to dump table entries without specifying table name or id",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.56.0/24 prio 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j p4 get ptables/table/",
++        "matchCount": "1",
++        "matchPattern": "Error: Must specify table name or id.*",
++        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "6a9e",
++        "name": "Try to dump table entries when no entries were created",
++        "category": [
++            "p4tc",
++            "entries"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
 +                0
 +            ]
 +        ],
 +        "cmdUnderTest": "$TC p4template update pipeline/ptables state ready",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get pipeline/ptables",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname",
 +        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "pipeline"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "pnumtables": 2,
-+                        "pstate": "ready"
-+                    }
-+                ]
-+            }
-+        ],
++        "matchJSON": [],
 +        "teardown": [
 +            [
 +                "$TC p4template del pipeline/ptables",
@@ -3252,12 +3222,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "ac1a",
-+        "name": "Create table, update pipeline state and try to update pipeline after pipeline is sealed",
++        "id": "1406",
++        "name": "Dump table with more than P4TC_MAXMSG_COUNT entries",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -3279,1091 +3248,7 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update pipeline/ptables numtables 3",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get pipeline/ptables",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "pipeline"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "pnumtables": 2,
-+                        "pstate": "ready"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "0fb8",
-+        "name": "Create table, update pipeline state and try to update table after pipeline is sealed",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname2 keysz 32",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname2",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 42,
-+                        "tname": "cb/tname2",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "32a6",
-+        "name": "Create table with keys with more than one action",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 42 keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 42,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "ade0",
-+        "name": "Update table key with more than one action",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 5",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 42,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "95f5",
-+        "name": "Update table's key",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 5",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 42,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "e5e1",
-+        "name": "Dump table using pipeline name to find pipeline",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 3",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname3 tblid 50 keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "table"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tname": "cb/tname"
-+                    },
-+                    {
-+                        "tname": "cb/tname2"
-+                    },
-+                    {
-+                        "tname": "cb/tname3"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "7f04",
-+        "name": "Dump table using pipeline id to find pipeline",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 3",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname3 tblid 50 keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ pipeid 22",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "table"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tname": "cb/tname"
-+                    },
-+                    {
-+                        "tname": "cb/tname2"
-+                    },
-+                    {
-+                        "tname": "cb/tname3"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "96c5",
-+        "name": "Try to create more table then numtables",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname3 tblid 50 keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "table"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tname": "cb/tname"
-+                    },
-+                    {
-+                        "tname": "cb/tname2"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "e3fa",
-+        "name": "Try to dump table without specifying pipeline name or id",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 tblid 42 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname3 tblid 50 keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Must specify pipeline name or id.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "6bcf",
-+        "name": "Dump pipeline with amount of table > P4TC_MSGBATCH_SIZE",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action gact pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action gact pass index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action gact pass index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action gact pass index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 17",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname2 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname3 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname4 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname5 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname6 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname7 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname8 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname9 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname10 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname11 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname12 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname13 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname14 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname15 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname16 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname17 tblid 2147483647 keysz 16",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "table"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tname": "cb/tname"
-+                    },
-+                    {
-+                        "tname": "cb/tname2"
-+                    },
-+                    {
-+                        "tname": "cb/tname3"
-+                    },
-+                    {
-+                        "tname": "cb/tname4"
-+                    },
-+                    {
-+                        "tname": "cb/tname5"
-+                    },
-+                    {
-+                        "tname": "cb/tname6"
-+                    },
-+                    {
-+                        "tname": "cb/tname7"
-+                    },
-+                    {
-+                        "tname": "cb/tname8"
-+                    },
-+                    {
-+                        "tname": "cb/tname9"
-+                    },
-+                    {
-+                        "tname": "cb/tname10"
-+                    },
-+                    {
-+                        "tname": "cb/tname11"
-+                    },
-+                    {
-+                        "tname": "cb/tname12"
-+                    },
-+                    {
-+                        "tname": "cb/tname13"
-+                    },
-+                    {
-+                        "tname": "cb/tname14"
-+                    },
-+                    {
-+                        "tname": "cb/tname15"
-+                    },
-+                    {
-+                        "tname": "cb/tname16"
-+                    }
-+                ]
-+            },
-+            {
-+                "pname": "ptables",
-+                "pipeid": 22,
-+                "obj": "table"
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tname": "cb/tname17"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "2eb0",
-+        "name": "Try to create valid table without control block name",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 2",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/tname keysz 16",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "6d73",
-+        "name": "Update table default_hit after pipeline is sealed",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
@@ -4372,585 +3257,495 @@ index 000000000..158c1b781
 +                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify flags defaultonly",
++                "$TC p4template create table/ptables/cb/tname type lpm tblid 1 keysz 64",
 +                0
 +            ],
 +            [
 +                "$TC p4template update pipeline/ptables state ready",
 +                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 1",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 2",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 3",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 4",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 5",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 6",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 7",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 8",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 9",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 10",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 11",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 12",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 13",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 14",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 15",
++                0
++            ],
++            [
++                "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 16",
++                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 default_hit_action action ptables/MyIngress/reclassify",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname srcAddr 10.10.10.0/24 dstAddr 192.168.0.0/16 prio 17",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname/",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "default_hit": {
-+                            "actions": [
++                        "tblid": 1,
++                        "key": [
 +                            {
-+                                "order": 1,
-+                                "kind": "ptables/MyIngress/reclassify",
-+                                "index": 1,
-+                                "ref": 1,
-+                                "bind": 1,
-+                                "params": []
-+                            }
-+                            ],
-+                            "permissions": "CRUDXCRUDX"
-+                        }
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "b0e8",
-+        "name": "Update table default_miss after pipeline is sealed",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify flags defaultonly",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 default_miss_action permissions 0x37F action ptables/MyIngress/reclassify",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "default_miss": {
-+                            "actions": [
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
 +                            {
-+                                "order": 1,
-+                                "kind": "ptables/MyIngress/reclassify",
-+                                "index": 1,
-+                                "ref": 1,
-+                                "bind": 1,
-+                                "params": []
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
 +                            }
-+                            ],
-+                            "permissions": "CR-DXCRUDX"
-+                        }
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "d13e",
-+        "name": "Try to update table default_hit with permissions with more than 10 bits",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 default_hit_action permissions 0x337F",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
++                        ],
++                        "create_whodunnit": "tc"
++                    },
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "1991",
-+        "name": "Try to update table default_miss with permissions with more than 10 bits",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 default_miss_action permissions 0x337F",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "cf57",
-+        "name": "Try to update table default_miss after control update permissions are off",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ],
-+            [
-+                "$TC p4template update table/ptables/ tblid 22 default_miss_action permissions 0x37F action ptables/MyIngress/reclassify",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 default_miss_action action drop",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "default_miss": {
-+                            "actions": [
++                        "tblid": 1,
++                        "prio": 16,
++                        "key": [
 +                            {
-+                                "order": 1,
-+                                "kind": "ptables/MyIngress/reclassify",
-+                                "index": 1,
-+                                "ref": 1,
-+                                "bind": 1,
-+                                "params": []
-+                            }
-+                            ],
-+                            "permissions": "CR-DXCRUDX"
-+                        }
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "fa6c",
-+        "name": "Try to update table default_hit after control update permissions are off",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify",
-+                0
-+            ],
-+            [
-+                "$TC p4template update pipeline/ptables state ready",
-+                0
-+            ],
-+            [
-+                "$TC p4template update table/ptables/ tblid 22 default_hit_action permissions 0x37F action ptables/MyIngress/reclassify",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/ tblid 22 default_hit_action action drop",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "default_hit": {
-+                            "actions": [
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
 +                            {
-+                                "order": 1,
-+                                "kind": "ptables/MyIngress/reclassify",
-+                                "index": 1,
-+                                "ref": 1,
-+                                "bind": 1,
-+                                "params": []
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
 +                            }
-+                            ],
-+                            "permissions": "CR-DXCRUDX"
-+                        }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 15,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 14,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 13,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 12,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 11,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 10,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 9,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 8,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 7,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 6,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 5,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 4,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 3,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    },
++                    {
++                        "tblid": 1,
++                        "prio": 2,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
++                    }
++                ]
++            },
++            {
++                "pname": "ptables",
++                "pipeid": 22
++            },
++            {
++                "entries": [
++                    {
++                        "tblid": 1,
++                        "key": [
++                            {
++                                "keyfield": "srcAddr",
++                                "id": 1,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "10.10.10.0/24"
++                            },
++                            {
++                                "keyfield": "dstAddr",
++                                "id": 2,
++                                "width": 32,
++                                "type": "ipv4",
++                                "match_type": "exact",
++                                "fieldval": "192.168.0.0/16"
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -4962,8 +3757,8 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "7a70",
-+        "name": "Delete only table default_hit",
++        "id": "2515",
++        "name": "Try to create table entry without permission",
 +        "category": [
 +            "p4tc",
 +            "template",
@@ -5001,7 +3796,69 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 permissions 0x1FF",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "f803",
++        "name": "Try to create table entry without more permissions than allowed",
++        "category": [
++            "p4tc",
++            "template",
++            "table"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action drop index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action ok index 3",
 +                0,
 +                1,
 +                255
@@ -5010,16 +3867,76 @@ index 000000000..158c1b781
 +                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify",
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 permissions 0x3C9",
++                0
++            ],
++            [
++                "$TC p4template update pipeline/ptables state ready",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16 permissions 0x1CF",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
++        "matchCount": "1",
++        "matchPattern": "Error: Unable to find entry.*",
++        "teardown": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0
++            ],
++            [
++                "$TC actions flush action gact",
++                0
++            ]
++        ]
++    },
++    {
++        "id": "0de2",
++        "name": "Try to update table entry without permission",
++        "category": [
++            "p4tc",
++            "template",
++            "table"
++        ],
++        "setup": [
++            [
++                "$TC p4template del pipeline/ptables",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions flush action gact",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action pass index 1",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action drop index 2",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC actions add action ok index 3",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
++                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 permissions 0x3FF",
 +                0
 +            ],
 +            [
@@ -5027,33 +3944,53 @@ index 000000000..158c1b781
 +                0
 +            ],
 +            [
-+                "$TC p4template update table/ptables/ tblid 22 default_hit_action action ptables/MyIngress/reclassify",
++                "$TC p4 create ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16 permissions 0x16F",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/ tblid 22 default_hit_action",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "cmdUnderTest": "$TC p4 update ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
++        "expExitCode": "255",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc",
++                        "permissions": "-R-DX-RUDX"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname2",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -5065,8 +4002,8 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "6afa",
-+        "name": "Try to delete only table default_hit when delete permissions is off",
++        "id": "4540",
++        "name": "Try to delete table entry without permission",
 +        "category": [
 +            "p4tc",
 +            "template",
@@ -5104,25 +4041,11 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
 +                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify",
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 permissions 0x3FF",
 +                0
 +            ],
 +            [
@@ -5130,33 +4053,57 @@ index 000000000..158c1b781
 +                0
 +            ],
 +            [
-+                "$TC p4template update table/ptables/ tblid 22 default_hit_action permissions 0x3BF action ptables/MyIngress/reclassify",
++                "$TC p4 create ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16 permissions 0x1AF",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/ tblid 22 default_hit_action",
++        "cmdUnderTest": "$TC p4 del ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
 +        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc",
++                        "permissions": "-RU-X-RUDX"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 update ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16 permissions 0x1EF",
++                0
++            ],
++            [
++                "$TC p4 del ptables/table/cb/tname2/",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -5168,8 +4115,8 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "19cc",
-+        "name": "Delete _only table default_miss",
++        "id": "51cb",
++        "name": "Simulate constant entries",
 +        "category": [
 +            "p4tc",
 +            "template",
@@ -5207,25 +4154,11 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
 +                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify",
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 permissions 0x3FF",
 +                0
 +            ],
 +            [
@@ -5233,33 +4166,52 @@ index 000000000..158c1b781
 +                0
 +            ],
 +            [
-+                "$TC p4template update table/ptables/ tblid 22 default_miss_action action ptables/MyIngress/reclassify",
++                "$TC p4 create ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/ tblid 22 default_miss_action",
++        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname2 permissions 0x1FF",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2/",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname2/",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -5271,8 +4223,8 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "f3b2",
-+        "name": "Try to delete only table default_miss when delete permissions is off",
++        "id": "3ead",
++        "name": "Simulate constant entries and try to add additional entry",
 +        "category": [
 +            "p4tc",
 +            "template",
@@ -5310,25 +4262,11 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
 +                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
 +            ],
-+	    [
-+                "$TC p4template create action/ptables/MyIngress/reclassify actid 7",
-+		0
-+	    ],
-+	    [
-+                "$TC p4template update action/ptables/MyIngress/reclassify state active",
-+		0
-+	    ],
 +            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 table_acts act name ptables/MyIngress/reclassify",
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32 permissions 0x3FF",
 +                0
 +            ],
 +            [
@@ -5336,33 +4274,56 @@ index 000000000..158c1b781
 +                0
 +            ],
 +            [
-+                "$TC p4template update table/ptables/ tblid 22 default_miss_action permissions 0x3BF action ptables/MyIngress/reclassify",
++                "$TC p4 create ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
++                0
++            ],
++            [
++                "$TC p4template update table/ptables/cb/tname2 permissions 0x1FF",
 +                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template del table/ptables/ tblid 22 default_miss_action",
++        "cmdUnderTest": "$TC p4 create ptables/table/cb/tname2 srcPort 53 dstPort 53 prio 17",
 +        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2/",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
++            [
++                "$TC p4 del ptables/table/cb/tname2/",
++                0
++            ],
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
@@ -5374,12 +4335,11 @@ index 000000000..158c1b781
 +        ]
 +    },
 +    {
-+        "id": "07b9",
-+        "name": "Create table specifying permissions",
++        "id": "d292",
++        "name": "Create valid constant table entry with args bit16",
 +        "category": [
 +            "p4tc",
-+            "template",
-+            "table"
++            "entries"
 +        ],
 +        "setup": [
 +            [
@@ -5401,19 +4361,7 @@ index 000000000..158c1b781
 +                255
 +            ],
 +            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
++                "$TC actions add action pass index 2",
 +                0,
 +                1,
 +                255
@@ -5421,340 +4369,59 @@ index 000000000..158c1b781
 +            [
 +                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
 +                0
++            ],
++            [
++                "$TC p4template create table/ptables/cb/tname2 tblid 2 keysz 32",
++                0
++            ],
++            [
++                "$TC p4template update table/ptables/cb/tname2 entry srcPort  80 dstPort  443 prio 16",
++                0
 +            ]
 +        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 permissions 0x1FF",
++        "cmdUnderTest": "$TC p4template update pipeline/ptables state ready",
 +        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
++        "verifyCmd": "$TC -j p4 get ptables/table/cb/tname2 srcPort 80 dstPort 443 prio 16",
 +        "matchCount": "1",
 +        "matchJSON": [
 +            {
-+                "obj": "table",
 +                "pname": "ptables",
 +                "pipeid": 22
 +            },
 +            {
-+                "templates": [
++                "entries": [
 +                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "permissions": "-RUDXCRUDX"
++                        "tblid": 2,
++                        "prio": 16,
++                        "key": [
++                            {
++                                "keyfield": "srcPort",
++                                "id": 1,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 80
++                            },
++                            {
++                                "keyfield": "dstPort",
++                                "id": 2,
++                                "width": 16,
++                                "type": "bit16",
++                                "match_type": "exact",
++                                "fieldval": 443
++                            }
++                        ],
++                        "create_whodunnit": "tc",
++                        "permissions": "-RUD--R--X"
 +                    }
 +                ]
 +            }
 +        ],
 +        "teardown": [
 +            [
-+                "$TC p4template del pipeline/ptables",
++                "$TC p4 del ptables/table/cb/tname2 srcPort  80 dstPort  443 prio 16",
 +                0
 +            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "07fd",
-+        "name": "Create table specifying permissions with more than 10 bits",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 permissions 0x4FF",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "b635",
-+        "name": "Update table permissions",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 permissions 0x1FF",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname permissions 0x3F",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "permissions": "----XCRUDX"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "a226",
-+        "name": "Try to update table permissions with 0x400",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ],
-+            [
-+                "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template update table/ptables/cb/tname permissions 0x400",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchJSON": [
-+            {
-+                "obj": "table",
-+                "pname": "ptables",
-+                "pipeid": 22
-+            },
-+            {
-+                "templates": [
-+                    {
-+                        "tblid": 22,
-+                        "tname": "cb/tname",
-+                        "keysz": 16,
-+                        "max_entries": 256,
-+                        "masks": 8,
-+                        "permissions": "CRUD--R--X"
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0
-+            ]
-+        ]
-+    },
-+    {
-+        "id": "9539",
-+        "name": "Try to create table without specifying data execute permission",
-+        "category": [
-+            "p4tc",
-+            "template",
-+            "table"
-+        ],
-+        "setup": [
-+            [
-+                "$TC p4template del pipeline/ptables",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions flush action gact",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action pass index 1",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action drop index 2",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action ok index 3",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC actions add action reclassify index 4",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC p4template create pipeline/ptables pipeid 22 numtables 1",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC p4template create table/ptables/cb/tname tblid 22 keysz 16 permissions 0x3FE",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j p4template get table/ptables/cb/tname",
-+        "matchCount": "1",
-+        "matchPattern": "Error: Table name not found.*",
-+        "teardown": [
 +            [
 +                "$TC p4template del pipeline/ptables",
 +                0
