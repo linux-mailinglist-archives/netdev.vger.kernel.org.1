@@ -1,410 +1,113 @@
-Return-Path: <netdev+bounces-17133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F44750833
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:26:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37CE8750839
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD91C210EE
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A87228192B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AAB2AB21;
-	Wed, 12 Jul 2023 12:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AEE12AB27;
+	Wed, 12 Jul 2023 12:28:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B181F959
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 12:26:35 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0579B;
-	Wed, 12 Jul 2023 05:26:32 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36CCQ45f076103;
-	Wed, 12 Jul 2023 07:26:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1689164764;
-	bh=2+TJV7UTEfg4twrLPPlTtGNNmrMyxqIzMxApzACFHn8=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=vgrvu5/QLnSnojItGoa7E7Wq1AClMgEqRoXk8s+kglmq9wKte1/oQ0Ml1LuK+KRV0
-	 K+3+uF8dLc9wCt+Mpzw1XbRYDQ6knD0LfGXOIRstX/laT8yLCtxmPoPQqGfpm5I0LI
-	 MwiMGEcGPadMOpmgIWMZPRcYBf/t6Ls8+d9KoL6U=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36CCQ4Rb007083
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 12 Jul 2023 07:26:04 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 12
- Jul 2023 07:26:04 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 12 Jul 2023 07:26:04 -0500
-Received: from [10.249.135.225] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36CCPwdO053774;
-	Wed, 12 Jul 2023 07:25:58 -0500
-Message-ID: <afbd4c9d-5ff7-e366-f866-6b718907d6fa@ti.com>
-Date: Wed, 12 Jul 2023 17:55:57 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F61E27721
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 12:28:03 +0000 (UTC)
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9B1A0;
+	Wed, 12 Jul 2023 05:28:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=ZXR+7zHmkWbyYVaIYilEixXpel3+ET8rhBNIy+I7sKc=; b=burEIjw7Ax9oR6XyYXgzDOhcuF
+	Xhtc5KYLObU41T0IENhk9G9qohZmC0Yvpb0wRw7l1oWGurx+n06gfe89pV9j1He1PowmLd8jJyW8G
+	6zVp1GF2gkOuSfQqmnXwyuzEsSHJpzBzRoDcraZR5u1o/H5XlxRZYWJLxZ3Q2LE0UHn9fNAfiTk55
+	AwKLj1j/r+rbJ4LHiTTJZlao2GGhqWJsjFEZodtwqDNEFYvFkQ0yagZeMU8KXrBVYKFvCwlCCX60H
+	AgkXU1Hco0bnyVOotp2bryNT8o+jpABaFGlsKFzTpw66wm7t7tRLyXKz9AmKG+OeMgsd4mE9EXCCa
+	pxRUvSiw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qJYwd-003e8q-0G;
+	Wed, 12 Jul 2023 12:27:47 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(Client did not present a certificate)
+	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AB77B30036B;
+	Wed, 12 Jul 2023 14:27:45 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 8E54B243429D2; Wed, 12 Jul 2023 14:27:45 +0200 (CEST)
+Date: Wed, 12 Jul 2023 14:27:45 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
+	DRI Development <dri-devel@lists.freedesktop.org>,
+	linux-rtc@vger.kernel.org,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	netdev <netdev@vger.kernel.org>,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+	Linux MMC List <linux-mmc@vger.kernel.org>,
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
+ 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
+ mechanism)
+Message-ID: <20230712122745.GH3100107@hirez.programming.kicks-ass.net>
+References: <20230511181931.869812-1-tj@kernel.org>
+ <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
+ <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+ <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
+ <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
+ <20230712080504.GA3100107@hirez.programming.kicks-ass.net>
+ <CAMuHMdUMRS9_nJXp3rrWQrODRQcBQggze0k=0GjSScCknFmmgQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [EXTERNAL] Re: [PATCH v8 2/2] net: ti: icssg-prueth: Add ICSSG
- ethernet driver
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>,
-        MD Danish Anwar
-	<danishanwar@ti.com>
-CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard
- Cochran <richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230710053550.89160-1-danishanwar@ti.com>
- <20230710053550.89160-3-danishanwar@ti.com> <ZK2VRYwW8DxIZCY2@corigine.com>
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <ZK2VRYwW8DxIZCY2@corigine.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdUMRS9_nJXp3rrWQrODRQcBQggze0k=0GjSScCknFmmgQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Simon
-On 7/11/2023 11:15 PM, Simon Horman wrote:
-> On Mon, Jul 10, 2023 at 11:05:50AM +0530, MD Danish Anwar wrote:
->> From: Roger Quadros <rogerq@ti.com>
->>
->> This is the Ethernet driver for TI AM654 Silicon rev. 2
->> with the ICSSG PRU Sub-system running dual-EMAC firmware.
->>
->> The Programmable Real-time Unit and Industrial Communication Subsystem
->> Gigabit (PRU_ICSSG) is a low-latency microcontroller subsystem in the TI
->> SoCs. This subsystem is provided for the use cases like implementation of
->> custom peripheral interfaces, offloading of tasks from the other
->> processor cores of the SoC, etc.
->>
->> Every ICSSG core has two Programmable Real-Time Unit(PRUs),
->> two auxiliary Real-Time Transfer Unit (RT_PRUs), and
->> two Transmit Real-Time Transfer Units (TX_PRUs). Each one of these runs
->> its own firmware. Every ICSSG core has two MII ports connect to these
->> PRUs and also a MDIO port.
->>
->> The cores can run different firmwares to support different protocols and
->> features like switch-dev, timestamping, etc.
->>
->> It uses System DMA to transfer and receive packets and
->> shared memory register emulation between the firmware and
->> driver for control and configuration.
->>
->> This patch adds support for basic EMAC functionality with 1Gbps
->> and 100Mbps link speed. 10M and half duplex mode are not supported
->> currently as they require IEP, the support for which will be added later.
->> Support for switch-dev, timestamp, etc. will be added later
->> by subsequent patch series.
->>
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> [Vignesh Raghavendra: add 10M full duplex support]
->> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->> [Grygorii Strashko: add support for half duplex operation]
->> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
->> Signed-off-by: Puranjay Mohan <p-mohan@ti.com>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+On Wed, Jul 12, 2023 at 11:04:16AM +0200, Geert Uytterhoeven wrote:
+> Hoi Peter,
 > 
-> ...
+> On Wed, Jul 12, 2023 at 10:05 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> > On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
+> > > I wonder whether the right thing to do here is somehow scaling the threshold
+> > > according to the relative processing power. It's difficult to come up with a
+> > > threshold which works well across the latest & fastest and really tiny CPUs.
+> > > I'll think about it some more but if you have some ideas, please feel free
+> > > to suggest.
+> >
+> > We could scale by BogoMIPS I suppose, it's a bogus measurement, as per
+> > the name, but it does have some relation to how fast the machine is.
 > 
->> +/**
->> + * struct map - ICSSG Queue Map
->> + * @queue: Queue number
->> + * @pd_addr_start: Packet descriptor queue reserved memory
->> + * @flags: Flags
->> + * @special: Indicates whether this queue is a special queue or not
->> + */
->> +struct map {
->> +	int queue;
->> +	u32 pd_addr_start;
->> +	u32 flags;
->> +	bool special;
->> +};
->> +
->> +/* Hardware queue map for ICSSG */
->> +const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
+> That's gonna fail miserably on e.g. ARM and RISC-V, where BogoMIPS
+> depends on some timer frequency.
 > 
-> Should this be static?
+> R-Car M2-W with 1.5 GHz Cortex-A15: 40.00 BogoMIPS
+> R-Car V4H with 1.8 GHz Cortex-A76: 33.33 BogoMIPS
 > 
+> while the real slow 48 MHz VexRiscV gets 128 BogoMIPS.
 
-Yes this can be static. I will change this to static.
-
->> +	{
->> +		{ PORT_HI_Q_SLICE0, PORT_DESC0_HI, 0x200000, 0 },
->> +		{ PORT_LO_Q_SLICE0, PORT_DESC0_LO, 0, 0 },
->> +		{ HOST_HI_Q_SLICE0, HOST_DESC0_HI, 0x200000, 0 },
->> +		{ HOST_LO_Q_SLICE0, HOST_DESC0_LO, 0, 0 },
->> +		{ HOST_SPL_Q_SLICE0, HOST_SPPD0, 0x400000, 1 },
->> +	},
->> +	{
->> +		{ PORT_HI_Q_SLICE1, PORT_DESC1_HI, 0xa00000, 0 },
->> +		{ PORT_LO_Q_SLICE1, PORT_DESC1_LO, 0x800000, 0 },
->> +		{ HOST_HI_Q_SLICE1, HOST_DESC1_HI, 0xa00000, 0 },
->> +		{ HOST_LO_Q_SLICE1, HOST_DESC1_LO, 0x800000, 0 },
->> +		{ HOST_SPL_Q_SLICE1, HOST_SPPD1, 0xc00000, 1 },
->> +	},
->> +};
->> +
->> +static void icssg_config_mii_init(struct prueth_emac *emac)
->> +{
->> +	u32 rxcfg, txcfg, rxcfg_reg, txcfg_reg, pcnt_reg;
->> +	struct prueth *prueth = emac->prueth;
->> +	int slice = prueth_emac_slice(emac);
->> +	struct regmap *mii_rt;
->> +
->> +	mii_rt = prueth->mii_rt;
->> +
->> +	rxcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RXCFG0 :
->> +				       PRUSS_MII_RT_RXCFG1;
->> +	txcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
->> +				       PRUSS_MII_RT_TXCFG1;
->> +	pcnt_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
->> +				       PRUSS_MII_RT_RX_PCNT1;
->> +
->> +	rxcfg = MII_RXCFG_DEFAULT;
->> +	txcfg = MII_TXCFG_DEFAULT;
->> +
->> +	if (slice == ICSS_MII1)
->> +		rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
->> +
->> +	/* In MII mode TX lines swapped inside ICSSG, so TX_MUX_SEL cfg need
->> +	 * to be swapped also comparing to RGMII mode.
->> +	 */
->> +	if (emac->phy_if == PHY_INTERFACE_MODE_MII && slice == ICSS_MII0)
->> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
->> +	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && slice == ICSS_MII1)
->> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
->> +
->> +	regmap_write(mii_rt, rxcfg_reg, rxcfg);
->> +	regmap_write(mii_rt, txcfg_reg, txcfg);
->> +	regmap_write(mii_rt, pcnt_reg, 0x1);
->> +}
->> +
->> +static void icssg_miig_queues_init(struct prueth *prueth, int slice)
->> +{
->> +	struct regmap *miig_rt = prueth->miig_rt;
->> +	void __iomem *smem = prueth->shram.va;
->> +	u8 pd[ICSSG_SPECIAL_PD_SIZE];
->> +	int queue = 0, i, j;
->> +	u32 *pdword;
->> +
->> +	/* reset hwqueues */
->> +	if (slice)
->> +		queue = ICSSG_NUM_TX_QUEUES;
->> +
->> +	for (i = 0; i < ICSSG_NUM_TX_QUEUES; i++) {
->> +		regmap_write(miig_rt, ICSSG_QUEUE_RESET_OFFSET, queue);
->> +		queue++;
->> +	}
->> +
->> +	queue = slice ? RECYCLE_Q_SLICE1 : RECYCLE_Q_SLICE0;
->> +	regmap_write(miig_rt, ICSSG_QUEUE_RESET_OFFSET, queue);
->> +
->> +	for (i = 0; i < ICSSG_NUM_OTHER_QUEUES; i++) {
->> +		regmap_write(miig_rt, ICSSG_QUEUE_RESET_OFFSET,
->> +			     hwq_map[slice][i].queue);
->> +	}
->> +
->> +	/* initialize packet descriptors in SMEM */
->> +	/* push pakcet descriptors to hwqueues */
->> +
->> +	pdword = (u32 *)pd;
->> +	for (j = 0; j < ICSSG_NUM_OTHER_QUEUES; j++) {
->> +		const struct map *mp;
->> +		int pd_size, num_pds;
->> +		u32 pdaddr;
->> +
->> +		mp = &hwq_map[slice][j];
->> +		if (mp->special) {
->> +			pd_size = ICSSG_SPECIAL_PD_SIZE;
->> +			num_pds = ICSSG_NUM_SPECIAL_PDS;
->> +		} else	{
->> +			pd_size = ICSSG_NORMAL_PD_SIZE;
->> +			num_pds = ICSSG_NUM_NORMAL_PDS;
->> +		}
->> +
->> +		for (i = 0; i < num_pds; i++) {
->> +			memset(pd, 0, pd_size);
->> +
->> +			pdword[0] &= cpu_to_le32(ICSSG_FLAG_MASK);
->> +			pdword[0] |= cpu_to_le32(mp->flags);
-> 
-> Sparse warns that the endieness of pdword is not le32.
-
-I will fix this.
-
-> There are also other sparse warnings added by this patch.
-> Please look over them.
-
-There is one more warning for "expected restricted __le16 [usertype] 
-rx_base_flow got restricted __le32 [usertype]". I will fix this as well.
-
-There is one more sparse warning "warning: symbol 'icssg_ethtool_ops' 
-was not declared. Should it be static?". This should be ignored as no 
-need to change 'icssg_ethtool_ops' to static as this is decalred in 
-icssg_ethtool.c and used in icssg_prueth.c
-
-> 
->> +			pdaddr = mp->pd_addr_start + i * pd_size;
->> +
->> +			memcpy_toio(smem + pdaddr, pd, pd_size);
->> +			queue = mp->queue;
->> +			regmap_write(miig_rt, ICSSG_QUEUE_OFFSET + 4 * queue,
->> +				     pdaddr);
->> +		}
->> +	}
->> +}
-> 
-> ...
-> 
->> +static int prueth_netdev_init(struct prueth *prueth,
->> +			      struct device_node *eth_node)
->> +{
->> +	int ret, num_tx_chn = PRUETH_MAX_TX_QUEUES;
->> +	struct prueth_emac *emac;
->> +	struct net_device *ndev;
->> +	enum prueth_port port;
->> +	enum prueth_mac mac;
->> +
->> +	port = prueth_node_port(eth_node);
->> +	if (port < 0)
->> +		return -EINVAL;
->> +
->> +	mac = prueth_node_mac(eth_node);
->> +	if (mac < 0)
->> +		return -EINVAL;
->> +
->> +	ndev = alloc_etherdev_mq(sizeof(*emac), num_tx_chn);
->> +	if (!ndev)
->> +		return -ENOMEM;
-> 
-> ...
-> 
->> +	return 0;
->> +
->> +free:
->> +	pruss_release_mem_region(prueth->pruss, &emac->dram);
->> +free_wq:
->> +	destroy_workqueue(emac->cmd_wq);
->> +free_ndev:
->> +	free_netdev(ndev);
->> +	prueth->emac[mac] = NULL;
->> +
->> +	return ret;
-> 
-> ndev appears to be leaked here.
-> 
-> ...
-> 
->> +	prueth->dev = dev;
->> +	eth_ports_node = of_get_child_by_name(np, "ethernet-ports");
->> +	if (!eth_ports_node)
->> +		return -ENOENT;
->> +
->> +	for_each_child_of_node(eth_ports_node, eth_node) {
->> +		u32 reg;
->> +
->> +		if (strcmp(eth_node->name, "port"))
->> +			continue;
->> +		ret = of_property_read_u32(eth_node, "reg", &reg);
->> +		if (ret < 0) {
->> +			dev_err(dev, "%pOF error reading port_id %d\n",
->> +				eth_node, ret);
->> +		}
->> +
->> +		of_node_get(eth_node);
->> +
->> +		if (reg == 0) {
->> +			eth0_node = eth_node;
->> +			if (!of_device_is_available(eth0_node)) {
->> +				of_node_put(eth0_node);
->> +				eth0_node = NULL;
->> +			}
->> +		} else if (reg == 1) {
->> +			eth1_node = eth_node;
->> +			if (!of_device_is_available(eth1_node)) {
->> +				of_node_put(eth1_node);
->> +				eth1_node = NULL;
->> +			}
->> +		} else {
->> +			dev_err(dev, "port reg should be 0 or 1\n");
-> 
-> Should this be treated as an error and either return or goto an
-> unwind path?
-> 
-
-I don't think we should error out or return to any goto label here. Here 
-we are checking 'reg' property in all available ports. If reg=0, we 
-assign the node to eth0_node. If reg=1, we assign the node to eth1_node. 
-If the reg is neither 0 nor 1, we will just keep looking through other 
-available ports, instead of returning error. We will eventually look 
-through all available nodes.
-
-Once we come out of the for loop, we should at least have one node with 
-reg property being either 0 or 1. If no node had reg as 0 or 1, both 
-eth0_node and eth1_node will be NULL, then we will error out with 
--ENODEV error by below if check.
-
-if (!eth0_node && !eth1_node) {
-	dev_err(dev, "neither port0 nor port1 node available\n");
-	return -ENODEV;
-}
-
->> +		}
->> +	}
->> +
->> +	of_node_put(eth_ports_node);
->> +
->> +	/* At least one node must be present and available else we fail */
->> +	if (!eth0_node && !eth1_node) {
-> 
-> Smatch warns that eth0_node and eth1_node may be uninitialised here.
-> 
-
-Sure, I will initialise eth0_node and eth1_node as NULL.
-
->> +		dev_err(dev, "neither port0 nor port1 node available\n");
->> +		return -ENODEV;
->> +	}
->> +
->> +	if (eth0_node == eth1_node) {
->> +		dev_err(dev, "port0 and port1 can't have same reg\n");
->> +		of_node_put(eth0_node);
->> +		return -ENODEV;
->> +	}
-> 
-> ...
-> 
-
--- 
-Thanks and Regards,
-Md Danish Anwar
+Hehe, OK, really bogus then. Lets file this idea in the bit-bucket then.
 
