@@ -1,117 +1,90 @@
-Return-Path: <netdev+bounces-17006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7197C74FC88
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:16:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4280074FC84
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAACC1C20BFC
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:16:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE4C22817A9
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86325378;
-	Wed, 12 Jul 2023 01:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB16378;
+	Wed, 12 Jul 2023 01:16:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC5F638;
-	Wed, 12 Jul 2023 01:16:41 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1981726;
-	Tue, 11 Jul 2023 18:16:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dVMRKCtThpA0k7vZMvJIKRYdajbcjdgx3zkYzglFpvU=; b=AGieYMQVYFIP8kjVmm6NG4qKnJ
-	mjj6Q9142L9yaOxC7IH158DUfTGzsqxXCtxHpgaU7tCgpJKxfq4giT0KqlzQgrSIvA+naYP1nsNW1
-	vzEPPfo1u3rAbW0iuKuG+u0SnjWEvX7CD8/cQKZeSmPVPpEoL54n3yQiUfp3cpNiA9Ps=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qJOSs-0015Xo-Hq; Wed, 12 Jul 2023 03:16:22 +0200
-Date: Wed, 12 Jul 2023 03:16:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	dl-linux-imx <linux-imx@nxp.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: Re: [PATCH net 3/3] net: fec: increase the size of tx ring and
- update thresholds of tx ring
-Message-ID: <a0e9f344-76b6-4cdc-a755-7ee9e57ea8d3@lunn.ch>
-References: <20230704082916.2135501-1-wei.fang@nxp.com>
- <20230704082916.2135501-4-wei.fang@nxp.com>
- <0443a057-767f-4f9c-afd2-37d26b606d74@lunn.ch>
- <AM5PR04MB3139789F6CCA4BEC8A871C1D882FA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <757f7803-72b6-4649-bfff-e4559d269880@lunn.ch>
- <AM5PR04MB3139A4FDA4DB6FB5A1DB1C7E8830A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9FC362
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:16:27 +0000 (UTC)
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA221718
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 18:16:26 -0700 (PDT)
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b884781929so493989a34.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 18:16:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689124586; x=1691716586;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HVCDywhHpMOGTFqG/gDYk0S45lUTl1W6WhYjBIpoNpw=;
+        b=VQ0dPu/FwWcpJQguhSudVe+QOlVawtfbq2BakVIf5SFBw1gv3I71CI+EYNe5KN2cOu
+         rMUbhfleybK4VIYPfmxhCUfY4BfgrIWTZv95Y1tPrp0GGqwvS4OLs6ix9NO2Lq/dQBb5
+         d4I1h5eiRfR9wxKsxFaBqAqAh53m4HFkQxrHtVoWSuXzrqW8m0gQ2qHMdfPs43Hvea/A
+         /woIuXI8kd7tjwpoKD0TBJqAfY02MP9srwRQG5aikpAHedTSwGII/g35hgGnUxz0Q+at
+         NYa63lV1lioQuQTsvcoLxpFKWAOlvNNJCShnUtmy+nCT9RnS+m0vPoRyV2vJFD6sUC4t
+         ZCCg==
+X-Gm-Message-State: ABy/qLbAvjTp64Vw+BoIolOEIN1+OJ3EBK6+4dVXKG1Iy8SUoX342xo/
+	XV6Sxp92gAPEzTujFwZ6E4dVpKJrRFm3+mAhtEhsZJH571MC
+X-Google-Smtp-Source: APBJJlEfdPeTrhOct9RIcxFE/RE/xuq9yIIGgVNHdByqdXJPK44xyvBuBojGYPkI1HcFu3nt3m+tr7yZqNEffrD+pg4iJnyU9rQU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM5PR04MB3139A4FDA4DB6FB5A1DB1C7E8830A@AM5PR04MB3139.eurprd04.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6830:4524:b0:6b8:70f3:fd36 with SMTP id
+ i36-20020a056830452400b006b870f3fd36mr712756otv.2.1689124586175; Tue, 11 Jul
+ 2023 18:16:26 -0700 (PDT)
+Date: Tue, 11 Jul 2023 18:16:26 -0700
+In-Reply-To: <20230712004750.2476-1-astrajoan@yahoo.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f0c50706003ff6f3@google.com>
+Subject: Re: [syzbot] [can?] possible deadlock in j1939_sk_errqueue (2)
+From: syzbot <syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com>
+To: astrajoan@yahoo.com, davem@davemloft.net, dvyukov@google.com, 
+	edumazet@google.com, ivan.orlov0322@gmail.com, kernel@pengutronix.de, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@rempel-privat.de, mkl@pengutronix.de, netdev@vger.kernel.org, 
+	o.rempel@pengutronix.de, pabeni@redhat.com, robin@protonic.nl, 
+	skhan@linuxfoundation.org, socketcan@hartkopp.net, 
+	syzkaller-bugs@googlegroups.com, syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Sorry, the Vybrid platform is not currently maintained by us, and Vybrid is also not
-> included in our usual Yocto SDK RC version.
+Hello,
 
-Your Yocto SDK version does not matter. We are talking about mainline
-here... You are maintaining the mainline driver, and submitting
-patches to extend the mainline driver.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-> Even I find a Vybrid board, I think it
-> probably cann't run with the latest kernel image, because the latest kernel image
-> does not match with the old Yocto SDK, and new Yocto SDK does not support Vybrid
-> platform. I also asked my colleague in test team who is in charge of ethernet testing,
-> she hadn't even heard of Vybrid platform.
+Reported-and-tested-by: syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com
 
-Well 6.5-rc1 does run on Vybrid, i have a number of boards with
-it. You will also find that many inflight entertainment systems have a
-box under each row of seats in a aeroplane with a Vybrid controlling a
-Marvell switch. Take a look at arch/arm/boot/dts/vf610-zii-* You will
-also find a number of DTS files for imx5i, imx6, imx7 used for ZII
-products which are back of the seat displays, and make heavy use of
-networking with the FEC.
+Tested on:
 
-So i have in interest in the FEC for all these platforms.
+commit:         3f01e9fe Merge tag 'linux-watchdog-6.5-rc2' of git://w..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=130a98a2a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4c2acb092ca90577
+dashboard link: https://syzkaller.appspot.com/bug?extid=1591462f226d9cbf0564
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1380a782a80000
 
-> > And a bigger burst means more latency. Read about Buffer bloat.
-> > 
-> Perhaps, but not necessarily. For example, in some cases that some burst packets
-> maybe stay in Qdisc instead of hardware queue if ring size is small.
-
-Which is what you want, so high priority packets can jump to the head
-of the queue.
-
-> > While you have iperf running saturating the link, try a ping as well. How does
-> > ping latency change with more TX buffers?
-> > 
-> Per your suggestions, I tested on i.MX8ULP, i.MX8MM and i.MX93 platforms. The
-> results do not appear to be very different.
-
-Thanks for the benchmark numbers. They look O.K.
-
-       Andrew
+Note: testing is done by a robot and is best-effort only.
 
