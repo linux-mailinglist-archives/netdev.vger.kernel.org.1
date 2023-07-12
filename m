@@ -1,154 +1,256 @@
-Return-Path: <netdev+bounces-17221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 781B7750CFF
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:48:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58939750D32
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 347B9280DAB
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:48:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16C3A281A9C
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1785214F5;
-	Wed, 12 Jul 2023 15:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17114214EF;
+	Wed, 12 Jul 2023 15:55:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6067214E5
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:46:35 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F131BB
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:46:34 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9922d6f003cso912625966b.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:46:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1689176793; x=1691768793;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/qsNwSJj66luchpZzX75OoZLSwHVbA5Pm9qid51Ei6Y=;
-        b=PF6fmNqjZ/AYqva8v3NNTKu8eEoKH35QAaW5y9va6R7Ux8tb4vtt4fnEqofuxyvjZn
-         a0qMZq/JAmWMPbOGYXnJcmQacubZOqKSeNKCmAbvSBNzJdQtuv4yS6Kk+rnWfmfClGBS
-         cXP7+SuGhDwzNxvL+iujWDLk0SH2CMgt5PRsdZmx5C+WmX8GF34Se4puFXLXJd2HUjHo
-         WUMkEMnuHq2blfogwHyG3OFdUk+EkXNWRaQON2Und7zDQ6c3MKwO483lZw1WfgJ4ShdM
-         ga7iF5l42KYLzIqwup5geQ4ilZb0dKAHrextos3SS0y2+nKawPQyy4UD4jy1CfNyZRM5
-         Jm0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689176793; x=1691768793;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/qsNwSJj66luchpZzX75OoZLSwHVbA5Pm9qid51Ei6Y=;
-        b=ex6ajrWnqF8y+L+ADg3GIRovaOT4sOMpsA51XErVRFeFXKwguoMplWxn5G24SHas/+
-         tMwLiXm6qwpoK3ZMN1FDkDvcvna4RIooV3dCFUfl3NR1QwBiDCZO2b/1TovQKOUA5OUg
-         0iewBaGRxlnABAd27mi+5IaVNXNzLI1q3TR2SHXSsZ04INWQCRWjgj/7VnedoV9N3IGi
-         EyqqRKfAenMm13CmWcO6tL/tFiOwPRUHeKion6XgNXKb9VVVZaNPf1uksPi4N65FaoJa
-         8MdsTzbMLRXFFsGB5UmN3lbZ9tzu45LHaeaMpJnfHHG9ds3X3jXmuexKV+u91bUlM3o5
-         1/9w==
-X-Gm-Message-State: ABy/qLag2U6s1IIcQVIG9vWwJXLqCqpf0vDH93WKVrnlQKylM1cQMWHG
-	W0Q3esbaUzkQEPgbD9nUoF0ylQ==
-X-Google-Smtp-Source: APBJJlF+H1DxTJOqCtmKvaeOHMNy8NffqS1ilyjCJbwvGQxE5YfEKotn1UsSgKe5YzerwlwDlxNuFQ==
-X-Received: by 2002:a17:906:150b:b0:982:7545:efb6 with SMTP id b11-20020a170906150b00b009827545efb6mr16230217ejd.66.1689176792780;
-        Wed, 12 Jul 2023 08:46:32 -0700 (PDT)
-Received: from [192.168.0.161] (62-73-72-43.ip.btc-net.bg. [62.73.72.43])
-        by smtp.gmail.com with ESMTPSA id ci7-20020a170906c34700b009934707378fsm2718238ejb.87.2023.07.12.08.46.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jul 2023 08:46:32 -0700 (PDT)
-Message-ID: <28f857c9-2ee9-6a20-ecd2-b4e63307cd89@blackwall.org>
-Date: Wed, 12 Jul 2023 18:46:31 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2ABE214E0;
+	Wed, 12 Jul 2023 15:55:12 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9610A2;
+	Wed, 12 Jul 2023 08:55:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689177311; x=1720713311;
+  h=date:from:to:cc:subject:message-id;
+  bh=aeg5HCRgPYDSE0YNO6fC7Ggphbri8o6L/nfZbG5eYwY=;
+  b=ChlPUDv7rYDu/obaUP2jZIQ7e0hh7pK/Z0wbKIUdzvmdiUT7JP00AQ6C
+   yObecEx41IPmjrx9tOGLAAJPrwAXxRsrauDF/fzd42TxeAy77GuINs2L7
+   D+2RrokF8Clqujep6/dotjSn/qnaGfbJXRATVPwyDYHvPltcyN55lH1R6
+   fjcA6bIntsJB5o04Wi6JCojXz3Gqz7jGsR7Ul9G5Hpd0GWVFD4S6eaUBO
+   TQde/+yCNdfgkoV/1dkB1j5l0AcFF6UPfHvjj35fYRmFP8Ecdb7wMnhdM
+   hcA/ebGYSgCx0v6Uvunr2ux9lFgZ63TqltmbDPdcffLx9AlBtZjtODxo6
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="428664142"
+X-IronPort-AV: E=Sophos;i="6.01,200,1684825200"; 
+   d="scan'208";a="428664142"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 08:55:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="698908470"
+X-IronPort-AV: E=Sophos;i="6.01,200,1684825200"; 
+   d="scan'208";a="698908470"
+Received: from lkp-server01.sh.intel.com (HELO c544d7fc5005) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 12 Jul 2023 08:54:58 -0700
+Received: from kbuild by c544d7fc5005 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qJcB7-0005nL-2z;
+	Wed, 12 Jul 2023 15:54:57 +0000
+Date: Wed, 12 Jul 2023 23:54:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ bpf@vger.kernel.org, kunit-dev@googlegroups.com,
+ linux-kselftest@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: [linux-next:master] BUILD REGRESSION
+ 40b055fe7f276cf2c1da47316c52f2ff9255a68a
+Message-ID: <202307122332.FSootrdK-lkp@intel.com>
+User-Agent: s-nail v14.9.24
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 net] bridge: Add extack warning when enabling STP in
- netns.
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, Roopa Prabhu <roopa@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: "Eric W. Biederman" <ebiederm@xmission.com>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- bridge@lists.linux-foundation.org, Harry Coin <hcoin@quietfountain.com>,
- Ido Schimmel <idosch@idosch.org>
-References: <20230712154449.6093-1-kuniyu@amazon.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20230712154449.6093-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 12/07/2023 18:44, Kuniyuki Iwashima wrote:
-> When we create an L2 loop on a bridge in netns, we will see packets storm
-> even if STP is enabled.
-> 
->   # unshare -n
->   # ip link add br0 type bridge
->   # ip link add veth0 type veth peer name veth1
->   # ip link set veth0 master br0 up
->   # ip link set veth1 master br0 up
->   # ip link set br0 type bridge stp_state 1
->   # ip link set br0 up
->   # sleep 30
->   # ip -s link show br0
->   2: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
->       link/ether b6:61:98:1c:1c:b5 brd ff:ff:ff:ff:ff:ff
->       RX: bytes  packets  errors  dropped missed  mcast
->       956553768  12861249 0       0       0       12861249  <-. Keep
->       TX: bytes  packets  errors  dropped carrier collsns     |  increasing
->       1027834    11951    0       0       0       0         <-'   rapidly
-> 
-> This is because llc_rcv() drops all packets in non-root netns and BPDU
-> is dropped.
-> 
-> Let's add extack warning when enabling STP in netns.
-> 
->   # unshare -n
->   # ip link add br0 type bridge
->   # ip link set br0 type bridge stp_state 1
->   Warning: bridge: STP does not work in non-root netns.
-> 
-> Note this commit will be reverted later when we namespacify the whole LLC
-> infra.
-> 
-> Fixes: e730c15519d0 ("[NET]: Make packet reception network namespace safe")
-> Suggested-by: Harry Coin <hcoin@quietfountain.com>
-> Link: https://lore.kernel.org/netdev/0f531295-e289-022d-5add-5ceffa0df9bc@quietfountain.com/
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
-> v2:
->   - Just add extack instead of returning error (Ido Schimmel)
-> 
-> v1: https://lore.kernel.org/netdev/20230711235415.92166-1-kuniyu@amazon.com/
-> ---
->  net/bridge/br_stp_if.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
-> index 75204d36d7f9..b65962682771 100644
-> --- a/net/bridge/br_stp_if.c
-> +++ b/net/bridge/br_stp_if.c
-> @@ -201,6 +201,9 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
->  {
->  	ASSERT_RTNL();
->  
-> +	if (!net_eq(dev_net(br->dev), &init_net))
-> +		NL_SET_ERR_MSG_MOD(extack, "STP does not work in non-root netns");
-> +
->  	if (br_mrp_enabled(br)) {
->  		NL_SET_ERR_MSG_MOD(extack,
->  				   "STP can't be enabled if MRP is already enabled");
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 40b055fe7f276cf2c1da47316c52f2ff9255a68a  Add linux-next specific files for 20230712
 
-Thanks,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Error/Warning reports:
+
+https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306210212.N0BipYQd-lkp@intel.com
+
+Error/Warning: (recently discovered and may have been fixed)
+
+arch/parisc/kernel/pdt.c:67:6: warning: no previous prototype for 'arch_report_meminfo' [-Wmissing-prototypes]
+kernel/bpf/verifier.c:3959:12: warning: stack frame size (2064) exceeds limit (2048) in '__mark_chain_precision' [-Wframe-larger-than]
+lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c:98 mlx5_devcom_register_device() error: uninitialized symbol 'tmp_dev'.
+kernel/trace/trace_functions_graph.c:1012 print_graph_return() warn: bitwise AND condition is false here
+kernel/trace/trace_functions_graph.c:726 print_graph_entry_leaf() warn: bitwise AND condition is false here
+net/wireless/scan.c:373 cfg80211_gen_new_ie() warn: potential spectre issue 'sub->data' [r]
+net/wireless/scan.c:397 cfg80211_gen_new_ie() warn: possible spectre second half.  'ext_id'
+{standard input}: Error: local label `"2" (instance number 9 of a fb label)' is not defined
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- microblaze-randconfig-m041-20230710
+|   |-- drivers-net-ethernet-mellanox-mlx5-core-lib-devcom.c-mlx5_devcom_register_device()-error:uninitialized-symbol-tmp_dev-.
+|   |-- net-wireless-scan.c-cfg80211_gen_new_ie()-warn:possible-spectre-second-half.-ext_id
+|   `-- net-wireless-scan.c-cfg80211_gen_new_ie()-warn:potential-spectre-issue-sub-data-r
+|-- mips-randconfig-m031-20230710
+|   |-- kernel-trace-trace_functions_graph.c-print_graph_entry_leaf()-warn:bitwise-AND-condition-is-false-here
+|   `-- kernel-trace-trace_functions_graph.c-print_graph_return()-warn:bitwise-AND-condition-is-false-here
+|-- parisc-randconfig-r082-20230710
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+`-- sh-allmodconfig
+    `-- standard-input:Error:local-label-(instance-number-of-a-fb-label)-is-not-defined
+clang_recent_errors
+|-- hexagon-randconfig-r013-20230712
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- riscv-randconfig-r023-20230712
+|   `-- kernel-bpf-verifier.c:warning:stack-frame-size-()-exceeds-limit-()-in-__mark_chain_precision
+`-- s390-randconfig-r044-20230712
+    |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+    `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+
+elapsed time: 798m
+
+configs tested: 123
+configs skipped: 8
+
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r003-20230712   gcc  
+alpha                randconfig-r015-20230712   gcc  
+alpha                randconfig-r025-20230712   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                     haps_hs_smp_defconfig   gcc  
+arc                  randconfig-r043-20230712   gcc  
+arc                    vdk_hs38_smp_defconfig   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                     am200epdkit_defconfig   clang
+arm                     davinci_all_defconfig   clang
+arm                                 defconfig   gcc  
+arm                   milbeaut_m10v_defconfig   clang
+arm                        multi_v7_defconfig   gcc  
+arm                  randconfig-r046-20230712   gcc  
+arm                             rpc_defconfig   gcc  
+arm                       spear13xx_defconfig   clang
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r034-20230712   gcc  
+hexagon              randconfig-r013-20230712   clang
+hexagon              randconfig-r035-20230712   clang
+hexagon              randconfig-r041-20230712   clang
+hexagon              randconfig-r045-20230712   clang
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-r004-20230712   gcc  
+i386         buildonly-randconfig-r005-20230712   gcc  
+i386         buildonly-randconfig-r006-20230712   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230712   gcc  
+i386                 randconfig-i002-20230712   gcc  
+i386                 randconfig-i003-20230712   gcc  
+i386                 randconfig-i004-20230712   gcc  
+i386                 randconfig-i005-20230712   gcc  
+i386                 randconfig-i006-20230712   gcc  
+i386                 randconfig-i011-20230712   clang
+i386                 randconfig-i012-20230712   clang
+i386                 randconfig-i013-20230712   clang
+i386                 randconfig-i014-20230712   clang
+i386                 randconfig-i015-20230712   clang
+i386                 randconfig-i016-20230712   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze           randconfig-r021-20230712   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r031-20230712   clang
+mips                 randconfig-r032-20230712   clang
+nios2                            alldefconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r001-20230712   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r036-20230712   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                      bamboo_defconfig   gcc  
+powerpc                      cm5200_defconfig   gcc  
+powerpc                     powernv_defconfig   clang
+powerpc                  storcenter_defconfig   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r023-20230712   clang
+riscv                randconfig-r042-20230712   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r044-20230712   clang
+sh                               allmodconfig   gcc  
+sh                ecovec24-romimage_defconfig   gcc  
+sh                          landisk_defconfig   gcc  
+sh                   randconfig-r033-20230712   gcc  
+sh                        sh7757lcr_defconfig   gcc  
+sh                          urquell_defconfig   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          alldefconfig   gcc  
+sparc64              randconfig-r011-20230712   gcc  
+sparc64              randconfig-r014-20230712   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                   randconfig-r012-20230712   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-r001-20230712   gcc  
+x86_64       buildonly-randconfig-r002-20230712   gcc  
+x86_64       buildonly-randconfig-r003-20230712   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-r026-20230712   clang
+x86_64               randconfig-x001-20230712   clang
+x86_64               randconfig-x002-20230712   clang
+x86_64               randconfig-x003-20230712   clang
+x86_64               randconfig-x004-20230712   clang
+x86_64               randconfig-x005-20230712   clang
+x86_64               randconfig-x006-20230712   clang
+x86_64               randconfig-x011-20230712   gcc  
+x86_64               randconfig-x012-20230712   gcc  
+x86_64               randconfig-x013-20230712   gcc  
+x86_64               randconfig-x014-20230712   gcc  
+x86_64               randconfig-x015-20230712   gcc  
+x86_64               randconfig-x016-20230712   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa                              defconfig   gcc  
+xtensa               randconfig-r006-20230712   gcc  
+xtensa               randconfig-r016-20230712   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
