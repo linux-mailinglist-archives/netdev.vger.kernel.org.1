@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-17185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FFA0750BE5
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:09:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F09C750BE7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:09:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09EF5281A4F
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:09:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E770281A5F
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709D63D3A6;
-	Wed, 12 Jul 2023 15:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2933D3AE;
+	Wed, 12 Jul 2023 15:07:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C7434CF1
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:07:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0F1DC4167D;
-	Wed, 12 Jul 2023 15:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0564E34CF1
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:07:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77381C433C7;
+	Wed, 12 Jul 2023 15:07:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689174469;
-	bh=ddCdu6WVsdWVFfvgBcdVDn3T10QccxGUylRsenvX6jw=;
+	s=k20201202; t=1689174472;
+	bh=wG2VCl98E7sTdn8vbNFgM5GsfqltXpE2UFH1ICDLoVI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DitXThW4uKEoasdiRZYLAtA3p/W5TdLyOjeCnsFgj2M9B+fz/1FI2yRX3Xhy1XUgn
-	 SrY3Grn+AHRk5+lLLXQ1FJ0p5rS4rMSdw7ZlPaDAa5/gwJbyZ89iNebI/WpHMrR9rw
-	 5FmgNySVn+xjePRk5RwCoIhGL3rNlYrkBoeq4TJ6K5+bv2EaTBvEXL3gHQGy/fFPn7
-	 Gp6lLVEoDFO1S7Q1lQe6L/5ojU0Gug/9M5QLIViSJJ1yd7h5vM5+/jbZor4zFHBrU+
-	 cqFJZ0CBJZfqlhJnpHCmGLGvv2hAqIOuzZdD7tFqzurw3Qd+L2z4LFHAmBGk9QXlKl
-	 PJcul75F7D8oQ==
+	b=u9bv7rM/R9PXPQeYhBBV7a+UvlPuwaDwID9TEoCVyBk41ePxUv9pVkeRfkkISjx2r
+	 lAF9HXXppONmY9LExJ8q4APXl6aT7/paYskfdNfUOCeaTskSiAX6tZbcu9GS0ddlUY
+	 Ppt5eftSt8Is6HACoTj5mbpRUlD495fPtW1vnhr47Z310fusjyUevynwpMaXKIXoME
+	 cGSDa2cUdDIZPIKsQeb0ieNRoV8FKljeh/eaejtz0jTCzCHj6v9z7OhB3a/nxtHXeX
+	 VcfzL8HrLVYIxtI86DhoRjLajhNziJcdrBhaMc0dGhvRJDylEDjAEprS5c8VtoMcN4
+	 RcW0wtb7iwccA==
 From: Michael Walle <mwalle@kernel.org>
-Date: Wed, 12 Jul 2023 17:07:05 +0200
-Subject: [PATCH net-next v3 05/11] net: phy: print an info if a broken C45
- bus is found
+Date: Wed, 12 Jul 2023 17:07:06 +0200
+Subject: [PATCH net-next v3 06/11] net: phy: add error checks in
+ mmd_phy_indirect()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230620-feature-c45-over-c22-v3-5-9eb37edf7be0@kernel.org>
+Message-Id: <20230620-feature-c45-over-c22-v3-6-9eb37edf7be0@kernel.org>
 References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
 In-Reply-To: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
@@ -59,47 +59,85 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Simon Horman <simon.horman@corigine.com>, Michael Walle <mwalle@kernel.org>
 X-Mailer: b4 0.12.2
 
-If there is an PHY which gets confused by C45 transactions on the MDIO
-bus, print an info together with the PHY identifier of the offending
-one.
+Add missing error checks in mmd_phy_indirect(). The error checks need to
+be disabled to retain the current behavior in phy_read_mmd() and
+phy_write_mmd(). Therefore, add a new parameter to enable the error
+checks.
+
+This is a preparation patch to introduce a new C45-over-C22 access
+method which will make use of the new error checking.
+
+Regarding the legacy handling, Russell states:
+
+| The reason for that goes back to commit a59a4d192166 ("phy: add the
+| EEE support and the way to access to the MMD registers.")
+|
+| and to maintain compatibility with that; if we start checking for
+| errors now, we might trigger a kernel regression sadly.
 
 Signed-off-by: Michael Walle <mwalle@kernel.org>
 ---
 v3:
- - make it a dev_dbg()
- - check is phydev is not null
+ - don't export it anymore, instead there will be a dedicated helper
 ---
- drivers/net/phy/mdio_bus.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/net/phy/phy-core.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index 29ad9302fe11..bdc178671234 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -617,10 +617,10 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
-  */
- void mdiobus_scan_for_broken_c45_access(struct mii_bus *bus)
- {
-+	struct phy_device *phydev;
- 	int i;
- 
- 	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		struct phy_device *phydev;
- 		u32 oui;
- 
- 		phydev = mdiobus_get_phy(bus, i);
-@@ -633,6 +633,11 @@ void mdiobus_scan_for_broken_c45_access(struct mii_bus *bus)
- 			break;
- 		}
- 	}
-+
-+	if (phydev && bus->prevent_c45_access)
-+		dev_dbg(&bus->dev,
-+			"Detected broken PHY (ID %08lx). Disabling C45 bus transactions.\n",
-+			(unsigned long)phydev->phy_id);
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index 686a57d56885..598023610ee5 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -524,18 +524,26 @@ int phy_speed_down_core(struct phy_device *phydev)
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(mdiobus_scan_for_broken_c45_access);
  
+-static void mmd_phy_indirect(struct mii_bus *bus, int phy_addr, int devad,
+-			     u16 regnum)
++static int mmd_phy_indirect(struct mii_bus *bus, int phy_addr, int devad,
++			    u16 regnum, bool check_rc)
+ {
++	int ret;
++
+ 	/* Write the desired MMD Devad */
+-	__mdiobus_write(bus, phy_addr, MII_MMD_CTRL, devad);
++	ret = __mdiobus_write(bus, phy_addr, MII_MMD_CTRL, devad);
++	if (check_rc && ret)
++		return ret;
+ 
+ 	/* Write the desired MMD register address */
+-	__mdiobus_write(bus, phy_addr, MII_MMD_DATA, regnum);
++	ret = __mdiobus_write(bus, phy_addr, MII_MMD_DATA, regnum);
++	if (check_rc && ret)
++		return ret;
+ 
+ 	/* Select the Function : DATA with no post increment */
+-	__mdiobus_write(bus, phy_addr, MII_MMD_CTRL,
+-			devad | MII_MMD_CTRL_NOINCR);
++	ret = __mdiobus_write(bus, phy_addr, MII_MMD_CTRL,
++			      devad | MII_MMD_CTRL_NOINCR);
++
++	return check_rc ? ret : 0;
+ }
+ 
+ /**
+@@ -563,7 +571,7 @@ int __phy_read_mmd(struct phy_device *phydev, int devad, u32 regnum)
+ 		struct mii_bus *bus = phydev->mdio.bus;
+ 		int phy_addr = phydev->mdio.addr;
+ 
+-		mmd_phy_indirect(bus, phy_addr, devad, regnum);
++		mmd_phy_indirect(bus, phy_addr, devad, regnum, false);
+ 
+ 		/* Read the content of the MMD's selected register */
+ 		val = __mdiobus_read(bus, phy_addr, MII_MMD_DATA);
+@@ -619,7 +627,7 @@ int __phy_write_mmd(struct phy_device *phydev, int devad, u32 regnum, u16 val)
+ 		struct mii_bus *bus = phydev->mdio.bus;
+ 		int phy_addr = phydev->mdio.addr;
+ 
+-		mmd_phy_indirect(bus, phy_addr, devad, regnum);
++		mmd_phy_indirect(bus, phy_addr, devad, regnum, false);
+ 
+ 		/* Write the data into MMD's selected register */
+ 		__mdiobus_write(bus, phy_addr, MII_MMD_DATA, val);
 
 -- 
 2.39.2
