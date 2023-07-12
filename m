@@ -1,105 +1,98 @@
-Return-Path: <netdev+bounces-17007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5054274FC91
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:19:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DE1974FCD0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 03:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB6AA1C20E5D
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:19:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35925281827
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 01:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC85E37A;
-	Wed, 12 Jul 2023 01:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51500390;
+	Wed, 12 Jul 2023 01:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290CD362
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:19:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BECEC433C7;
-	Wed, 12 Jul 2023 01:19:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689124760;
-	bh=XXXzOg9TepOar5r/s93chuY4Kp3jgxCQsg1AJXeSjuU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H4PsSoiHErYE0qP3vtw/uQhP0gnWOUlJQhVjFFQgPDR8kgrwP16HcHGLitDo/qyKu
-	 kIW/9BJ1GKPMQdD5Gowa3RsREnyFUjHgJQNY3K2mQw8VvWI5SCIadkxZviECM7j4wd
-	 8z12eALxnZ0oMZoqPq+FoKARFbMYjYz4qNq+8Z/tPpE2k7RxS+skMcQ6dv7BRTuIf9
-	 e7Nq0zIm0aGIdx7tKeJGyksv6IH9Z9ix647G6IMdgRtVRlZnmM7pOwBiykWoK6clFF
-	 pG2vVpsU2qAQrH0FFRMgX/EMOqXaO0KdZSMPwyBaOiC0kT0vhtKup3sHu+ioRB7RKx
-	 e8bccfFR8qgrg==
-Date: Tue, 11 Jul 2023 18:19:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- michael.chan@broadcom.com
-Subject: Re: [PATCH net-next 3/3] eth: bnxt: handle invalid Tx completions
- more gracefully
-Message-ID: <20230711181919.50f27180@kernel.org>
-In-Reply-To: <774e2719376723595425067ab3a6f59b72c50bc2.camel@redhat.com>
-References: <20230710205611.1198878-1-kuba@kernel.org>
-	<20230710205611.1198878-4-kuba@kernel.org>
-	<774e2719376723595425067ab3a6f59b72c50bc2.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F877362
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 01:44:57 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 12A141712;
+	Tue, 11 Jul 2023 18:44:55 -0700 (PDT)
+Received: from [172.30.11.106] (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 66A6F60672098;
+	Wed, 12 Jul 2023 09:44:41 +0800 (CST)
+Message-ID: <284c0843-b749-00c8-95bc-6a0b220d9421@nfschina.com>
+Date: Wed, 12 Jul 2023 09:44:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH net-next v2 03/10] net: ppp: Remove unnecessary (void*)
+ conversions
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>
+Cc: mostrows@earthlink.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, xeb@mail.ru, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+X-MD-Sfrom: yunchuan@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: yunchuan <yunchuan@nfschina.com>
+In-Reply-To: <ZK2Wf4man0H4e9Zz@corigine.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 11 Jul 2023 12:10:28 +0200 Paolo Abeni wrote:
-> On Mon, 2023-07-10 at 13:56 -0700, Jakub Kicinski wrote:
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> > index 080e73496066..08ce9046bfd2 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> > @@ -1008,6 +1008,7 @@ struct bnxt_napi {
-> >  					  int);
-> >  	int			tx_pkts;
-> >  	u8			events;
-> > +	u8			tx_fault:1;  
-> 
-> Since there are still a few holes avail, I would use a plain u8 (or
-> bool) to help the compiler emit better code.
+On 2023/7/12 01:50, Simon Horman wrote:
+>> -	struct sock *sk = (struct sock *)chan->private;
+>> +	struct sock *sk = chan->private;
+>>   	struct pppox_sock *po = pppox_sk(sk);
+>>   	struct net_device *dev = po->pppoe_dev;
+> Hi,
+>
+> Please don't break reverse xmas tree ordering - longest line to shortest -
+> of local variable declarations in Networking code.
 
-Is that still true or was it only true for old compilers?
-With gcc version 13.1.1 20230614 :
+Hi,
 
-$ cat /tmp/t.c 
-#include <strings.h>
+This can't be reversed because it depends on the first declaration.
+Should I change it like this?
 
-struct some {
-    void (*f)(void);
-    unsigned char b;
-#ifdef BLA
-    _Bool a;
-#else
-    unsigned char a:1;
-#endif
-};
+-	struct sock *sk = (struct sock *)chan->private;
+- 	struct pppox_sock *po = pppox_sk(sk);
++	struct pppox_sock *po = pppox_sk(chan->private);
+  	struct net_device *dev = po->pppoe_dev;
++	struct sock *sk = chan->private;
 
-int bla(struct some *s)
-{
-    if (s->a)
-        s->f();
-    return 0;
-}
+But this seems to be bad. As the advice of Andrew[1] and Dan[2]:
 
-$ gcc -W -Wall -O2  /tmp/t.c -o /tmp/t -c
-$ objdump -S /tmp/t > /tmp/a
-$ gcc -DBLA -W -Wall -O2  /tmp/t.c -o /tmp/t -c
-$ objdump -S /tmp/t > /tmp/b
-$ diff /tmp/a /tmp/b
-8c8
-<    0:	f6 47 09 01          	testb  $0x1,0x9(%rdi)
----
->    0:	80 7f 09 00          	cmpb   $0x0,0x9(%rdi)
+"
 
-$ gcc -V
+When dealing with existing broken reverse Christmas tree, please don't
+make it worse with a change. But actually fixing it should be in a
+different patch.
 
-Shouldn't matter, right?
+We want patches to be obviously correct. By removing the cast and
+moving variables around, it is less obvious it is correct, than having
+two patches.
+
+"
+
+Wu Yunchuan
+
+[1] 
+https://lore.kernel.org/all/23e98085-8f07-4ee2-8487-8e3b439b69f4@lunn.ch/
+[2] 
+https://lore.kernel.org/all/45519aec-6ec8-49e5-b5b2-1b52d336288c@kadam.mountain/
+>
 
