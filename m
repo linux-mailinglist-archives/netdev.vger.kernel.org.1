@@ -1,113 +1,147 @@
-Return-Path: <netdev+bounces-17134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CE8750839
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:28:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B2FC75085B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:34:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A87228192B
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:28:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06906281A1B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AEE12AB27;
-	Wed, 12 Jul 2023 12:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FCB100B9;
+	Wed, 12 Jul 2023 12:34:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F61E27721
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 12:28:03 +0000 (UTC)
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9B1A0;
-	Wed, 12 Jul 2023 05:28:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=ZXR+7zHmkWbyYVaIYilEixXpel3+ET8rhBNIy+I7sKc=; b=burEIjw7Ax9oR6XyYXgzDOhcuF
-	Xhtc5KYLObU41T0IENhk9G9qohZmC0Yvpb0wRw7l1oWGurx+n06gfe89pV9j1He1PowmLd8jJyW8G
-	6zVp1GF2gkOuSfQqmnXwyuzEsSHJpzBzRoDcraZR5u1o/H5XlxRZYWJLxZ3Q2LE0UHn9fNAfiTk55
-	AwKLj1j/r+rbJ4LHiTTJZlao2GGhqWJsjFEZodtwqDNEFYvFkQ0yagZeMU8KXrBVYKFvCwlCCX60H
-	AgkXU1Hco0bnyVOotp2bryNT8o+jpABaFGlsKFzTpw66wm7t7tRLyXKz9AmKG+OeMgsd4mE9EXCCa
-	pxRUvSiw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qJYwd-003e8q-0G;
-	Wed, 12 Jul 2023 12:27:47 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AB77B30036B;
-	Wed, 12 Jul 2023 14:27:45 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 8E54B243429D2; Wed, 12 Jul 2023 14:27:45 +0200 (CEST)
-Date: Wed, 12 Jul 2023 14:27:45 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
-	DRI Development <dri-devel@lists.freedesktop.org>,
-	linux-rtc@vger.kernel.org,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	netdev <netdev@vger.kernel.org>,
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-	Linux MMC List <linux-mmc@vger.kernel.org>,
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
- mechanism)
-Message-ID: <20230712122745.GH3100107@hirez.programming.kicks-ass.net>
-References: <20230511181931.869812-1-tj@kernel.org>
- <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
- <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
- <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
- <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
- <20230712080504.GA3100107@hirez.programming.kicks-ass.net>
- <CAMuHMdUMRS9_nJXp3rrWQrODRQcBQggze0k=0GjSScCknFmmgQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDB9385
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 12:34:18 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D953B0;
+	Wed, 12 Jul 2023 05:34:16 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R1HGV6k34z1JCVN;
+	Wed, 12 Jul 2023 20:33:38 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 12 Jul
+ 2023 20:34:13 +0800
+Subject: Re: [PATCH v5 RFC 1/6] page_pool: frag API support for 32-bit arch
+ with 64-bit DMA
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Jakub Kicinski
+	<kuba@kernel.org>
+CC: Yunsheng Lin <yunshenglin0825@gmail.com>, <davem@davemloft.net>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
+	<liangchen.linux@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>
+References: <20230629120226.14854-1-linyunsheng@huawei.com>
+ <20230629120226.14854-2-linyunsheng@huawei.com>
+ <20230707170157.12727e44@kernel.org>
+ <3d973088-4881-0863-0207-36d61b4505ec@gmail.com>
+ <20230710113841.482cbeac@kernel.org>
+ <8639b838-8284-05a2-dbc3-7e4cb45f163a@intel.com>
+ <20230711093705.45454e41@kernel.org>
+ <1bec23ff-d38b-3fdf-1bb3-89658c1d465a@intel.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <46ad09d9-6596-cf07-5cab-d6ceb1e36f3c@huawei.com>
+Date: Wed, 12 Jul 2023 20:34:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuHMdUMRS9_nJXp3rrWQrODRQcBQggze0k=0GjSScCknFmmgQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <1bec23ff-d38b-3fdf-1bb3-89658c1d465a@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 11:04:16AM +0200, Geert Uytterhoeven wrote:
-> Hoi Peter,
+On 2023/7/12 0:59, Alexander Lobakin wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Tue, 11 Jul 2023 09:37:05 -0700
 > 
-> On Wed, Jul 12, 2023 at 10:05 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> > On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
-> > > I wonder whether the right thing to do here is somehow scaling the threshold
-> > > according to the relative processing power. It's difficult to come up with a
-> > > threshold which works well across the latest & fastest and really tiny CPUs.
-> > > I'll think about it some more but if you have some ideas, please feel free
-> > > to suggest.
-> >
-> > We could scale by BogoMIPS I suppose, it's a bogus measurement, as per
-> > the name, but it does have some relation to how fast the machine is.
+>> On Tue, 11 Jul 2023 12:59:00 +0200 Alexander Lobakin wrote:
+>>> I'm fine with that, although ain't really able to work on this myself
+>>> now :s (BTW I almost finished Netlink bigints, just some more libie/IAVF
+>>> crap).
+>>
+>> FWIW I was thinking about the bigints recently, and from ynl
+>> perspective I think we may want two flavors :( One which is at
+>> most the length of platform's long long, and another which is
 > 
-> That's gonna fail miserably on e.g. ARM and RISC-V, where BogoMIPS
-> depends on some timer frequency.
+> (not sure we shouldn't split a separate thread off this one at this
+>  point :D)
 > 
-> R-Car M2-W with 1.5 GHz Cortex-A15: 40.00 BogoMIPS
-> R-Car V4H with 1.8 GHz Cortex-A76: 33.33 BogoMIPS
+> `long long` or `long`? `long long` is always 64-bit unless I'm missing
+> something. On my 32-bit MIPS they were :D
+> If `long long`, what's the point then if we have %NLA_U64 and would
+> still have to add dumb padding attrs? :D I thought the idea was to carry
+> 64+ bits encapsulated in 32-bit primitives.
 > 
-> while the real slow 48 MHz VexRiscV gets 128 BogoMIPS.
+>> always a bigint. The latter will be more work for user space
+>> to handle, so given 99% of use cases don't need more than 64b
+>> we should make its life easier?
+>>
+>>> It just needs to be carefully designed, because if we want move ALL the
+>>> inlines to a new header, we may end up including 2 PP's headers in each
+>>> file. That's why I'd prefer "core/driver" separation. Let's say skbuff.c
+>>> doesn't need page_pool_create(), page_pool_alloc(), and so on, while
+>>> drivers don't need some of its internal functions.
+>>> OTOH after my patch it's included in only around 20-30 files on
+>>> allmodconfig. That is literally nothing comparing to e.g. kernel.h
+>>> (w/includes) :D
+>>
+>> Well, once you have to rebuilding 100+ files it gets pretty hard to
+>> clean things up ;) 
+>>
+>> I think I described the preferred setup, previously:
+>>
+>> $path/page_pool.h:
+>>
+>> #include <$path/page_pool/types.h>
+>> #include <$path/page_pool/helpers.h>
+>>
+>> $path/page_pool/types.h - has types
+>> $path/page_pool/helpers.h - has all the inlines
+>>
+>> C sources can include $path/page_pool.h, headers should generally only
+>> include $path/page_pool/types.h.
 
-Hehe, OK, really bogus then. Lets file this idea in the bit-bucket then.
+Does spliting the page_pool.h as above fix the problem about including
+a ton of static inline functions from "linux/dma-mapping.h" in skbuff.c?
+
+As the $path/page_pool/helpers.h which uses dma_get_cache_alignment()
+must include the "linux/dma-mapping.h" which has dma_get_cache_alignment()
+defining as a static inline function.
+and if skbuff.c include $path/page_pool.h or $path/page_pool/helpers.h,
+doesn't we still have the same problem? Or do I misunderstand something
+here?
+
+> 
+> Aaah okay, I did read it backwards ._. Moreover, generic stack barely
+> uses PP's inlines, it needs externals mostly.
+> 
+> Thanks,
+> Olek
+> 
+> .
+> 
 
