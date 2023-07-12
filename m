@@ -1,129 +1,154 @@
-Return-Path: <netdev+bounces-17094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9298D7503F3
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:58:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 087EF750523
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:51:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CC432816C9
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:58:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1FAF1C20FC0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 10:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFC9200A3;
-	Wed, 12 Jul 2023 09:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AE9200C1;
+	Wed, 12 Jul 2023 10:51:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBBA200A0
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:58:06 +0000 (UTC)
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0271720;
-	Wed, 12 Jul 2023 02:58:05 -0700 (PDT)
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5768a7e3adbso8595087b3.0;
-        Wed, 12 Jul 2023 02:58:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689155884; x=1691747884;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y6MzudJP2Fu/sGdEnelPPluUqTi475Db7xeaDmuW9Sk=;
-        b=LJrwQd7/GT/f6oIF/VO5++yTV31g4WJbSQ1fWlc/6aaAe0vQvJYr4kByUnVfNzoT7X
-         3q3FGJZT/6Z6RHfymi63tAJPT1EY2iwRa75CXHjS3Ot25+fRu84WDKLN9xUi8pxJQluj
-         PwGyOtMkZiK8HKdqp2iAgC0FDJFT+heoiVo5a8pdlw7A+EuipACA1m7X08NZYQuLg/OD
-         4BH/kujvK/Db+8rFjpsFKMfyxPvqea1avTy6JQUB0jahhM9Itqqy49SgaLfGIPhGEnbL
-         ljW/5yIUDSlUn4axOB9G4IApIlfDzHpZdHk/JMhE1rmohX36QxlmsHnsHGtr/7g1jdHD
-         Kl4w==
-X-Gm-Message-State: ABy/qLY/EwIOYS6AZrz2ivULfQAnXCA21K/X7hfKfuI+kiyLNdahXYQ4
-	UHdcDF7kMwh4RmGN6+ZFK/Up2wQ6pmTPxA==
-X-Google-Smtp-Source: APBJJlGYudo9gVR+Cou01gtan/TCm1WXI5ja4PeIWua5VW5I2pAP/ypMPtV4ncbiIL0wMtb9qlUwGw==
-X-Received: by 2002:a0d:d616:0:b0:573:284d:6476 with SMTP id y22-20020a0dd616000000b00573284d6476mr1711934ywd.1.1689155884332;
-        Wed, 12 Jul 2023 02:58:04 -0700 (PDT)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
-        by smtp.gmail.com with ESMTPSA id f67-20020a816a46000000b0057a93844c15sm1059234ywc.127.2023.07.12.02.58.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jul 2023 02:58:03 -0700 (PDT)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-ca9804dc6e4so198576276.0;
-        Wed, 12 Jul 2023 02:58:03 -0700 (PDT)
-X-Received: by 2002:a25:ae5d:0:b0:bd6:a97e:3597 with SMTP id
- g29-20020a25ae5d000000b00bd6a97e3597mr1632945ybe.30.1689155883328; Wed, 12
- Jul 2023 02:58:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FCD1F95A
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 10:51:55 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2136.outbound.protection.outlook.com [40.107.220.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F645E77
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 03:51:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EkLjwgWspxeeYRlnOVZLCeOBUontQo7OO6tizmywUkoEDuw69gF9fLuFpb8+oxdceark0YtxTdi0LbElompoSsSB18ee7uxnosSqHp1e+PZw4vM++sqcxLBLY68WI7awIsO5kEAb0JsITXcGjYodKeILk092+GX+XcsdOwjfFKCvlEHx1Kk49mhqgY8ZYpPqfDI0VdJUTkQj0Hm1UNwb2/ZjZdeNxiaqB/ipedRNFT+3Idu+0hBDcrv6uxuz5ZPuuNhIX/DOXqDUMvhAVHvugauCxKjk7ahXiyK0938+QnhS0GV980PZDVy0Ij/yuSV/DTvpVApe6BuvmX+T8g1FTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gOt2dan/IRVSxmoK5y0KQLZaF44IGqw3JG6aiAJeV9Y=;
+ b=ip3abGuBePxg12cIrL2KhpEhsLcK17LK9/MHD7UzHc9WwBAvAir1QbAeCmKkB9THKkOdewO9YKjw3OuCspqIMQQWjr+3c9pdvqhxtIfimQGFPMHVXv+vIZKOZbvnV/q78yIlru16zhR/24+RooVFqeUw/9qcgjs3AXIjaT2CdsSF9fja69Ed1Cdhhi25bpaKmj8iYTl0D/pdcBDxDipkyUlsNcLH7JXw+LMpufhl4zPDSAGE/qPdc+6zXa8IKttpLsoek1/7e50APAI9v+2aXGs5dJn2m4zvTwxUNfkDt1qD8Bj8RmK9WjDHW2bKumJ+CRhCP/GP/nVXpxnhG254dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gOt2dan/IRVSxmoK5y0KQLZaF44IGqw3JG6aiAJeV9Y=;
+ b=LJxliqR1xAMC1U87VcBTmx4+ixRIGv9KvLMe0L19JHbMIZrGSos+5+ZZuMio30GpOMjksGEqX9vYNUVY90Ky5X8boaBTkZUo+gxJC0KGYJH12afmC5dlJ8PV50OLeld9RC3yvA+E1zebbDFu1uqk3LB6TYFG+UKXubo1EU3ydZg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH0PR13MB4761.namprd13.prod.outlook.com (2603:10b6:610:c3::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Wed, 12 Jul
+ 2023 10:51:49 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
+ 10:51:48 +0000
+Date: Wed, 12 Jul 2023 11:51:38 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>, sasha.neftin@intel.com,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH net-next] e1000e: Use PME poll to circumvent unreliable
+ ACPI wake
+Message-ID: <ZK6Fuu/26apf1DGq@corigine.com>
+References: <20230710164213.2821481-1-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710164213.2821481-1-anthony.l.nguyen@intel.com>
+X-ClientProxiedBy: LNXP123CA0017.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:d2::29) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org> <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
- <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
- <ZK3MBfPS-3-tJgjO@slm.duckdns.org> <ZK30CR196rs-OWLq@slm.duckdns.org>
-In-Reply-To: <ZK30CR196rs-OWLq@slm.duckdns.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 12 Jul 2023 11:57:49 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
-Message-ID: <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
-To: Tejun Heo <tj@kernel.org>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
-	Linux PM list <linux-pm@vger.kernel.org>, 
-	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB4761:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38902077-9beb-48cd-1db5-08db82c5fe1a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	UaslAiX5DhklGNbvtG2XswBm+xHKo+E4Vb8lIF+6LkAgM2MQ6QVYD6w4hJww4YP2fC3+8hGy5GAXrBihhYXnemDspv/M5HKkQRQZ8uYdzlnOMDMYrzF4BEebZQ9k/WfsYct2+KY9l6fnW9Qcx4W/fkkyzqTnvTooJIRZfakVcwcN7n5w0T0U+ImGH+/YCNIKD8aNRZredbk8gtPCLtzDKD63/WIUGfciMjumu+DxA/MBTg5/wJMU3MHSCQNiD8MV0hue6ObdHDOEowx/KZ7N/GUw/fNTfxJ0RPIegAGtK0zitPEViRefNM+VCf01nzoNVUoxk5jUy5BUtRVi9c37maymvyfCmh0wWU5j3orC995Rzv606VndyY+P9veTWHyHf6relZDDy9viZc5TVgKlBoBFTPVQzxx+RHirYSW3mW2k3AigROxD4BpUWhNYmgTqa8gxxKsp9K+VI5UmIzpOIdzvuAsm53d7884wBWx+M/rC8a370AgEL2E0TtSa2fGaVXTAzbG4b1+A4uYNU8WGQ3AObs++f8uAPTZY0YWehN6t4SJ6DPE7jo8P5gXId+9cwjQFXEEfISJse6JmDaInoHterMc+6xzozqcHhm1Y9Z8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(366004)(39840400004)(376002)(451199021)(6916009)(6486002)(83380400001)(4326008)(66476007)(66946007)(66556008)(478600001)(6666004)(6506007)(26005)(54906003)(38100700002)(41300700001)(6512007)(316002)(8936002)(8676002)(86362001)(5660300002)(44832011)(186003)(2906002)(2616005)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ZkyAniRWHtexV3144X56R0My7esMMvI2XwOyfBja7CFq9184oeDQTJj7tz5u?=
+ =?us-ascii?Q?MHe+RP/kiK6H6kLDgJgU7yZVkV9bM8f7CVqt8v8qRqksx2C/9nihyyNmVruy?=
+ =?us-ascii?Q?RAXkUYIEUC94LOCPSvtkGjp2XoZUq6LyLaqcrmP6ibcku/78tbA7Ax5vtZdM?=
+ =?us-ascii?Q?dXHFKOpNVIWJ84PZ3TCAVi6KQBui8tIRoRQzdI3ZhztP6e0B7fWBoAiUrSdM?=
+ =?us-ascii?Q?ZIHZFWJfr5vPfxI2u7meshl6Mr+0o2kGCPpBohnQl+Ie7BXqK0kTQqL2Ryke?=
+ =?us-ascii?Q?3Rt9VGN8IXGN42KkmVDRMVgJtMK9PuBFz1in47BtucrdTtJ5PgvPI9rxAhfG?=
+ =?us-ascii?Q?Nw8vdyA0CvP69kG835yqZ3u+kyrc2JmuxVyo0YLlXEzF8VvTEfvQWdeYLUR0?=
+ =?us-ascii?Q?ZuQEhXuQFjIDwRrnsxzk03JJ5AG4JfSx24JKUUPSxrKvw3rY+zv3dZjy4OvF?=
+ =?us-ascii?Q?oSUGqHn0k49rj2AtiJduhWgTTz53Ol2OISeBDbZQUjyq0yL5eDF7QvacKi19?=
+ =?us-ascii?Q?+4JG0WhLYsGzwUJl4OGCEqkL3JSh6gE13Po7YpF7nGaROz0tu3Sp+zvediyR?=
+ =?us-ascii?Q?zVIZwMRM3DFT+b6gY1yzttiAascVpApJJT2TIbAQV96mYmqJZ0xfB/V42QvG?=
+ =?us-ascii?Q?wsTt+YhdkcoHko8w0ycv2X6Am/RI3Wp9Fg2yA+8mTk++p4/StVk28hyp6D44?=
+ =?us-ascii?Q?Yf1xmtq4uPXpsvgCStp/4ISoCG81yElXS395QWYd90p+0Yc79OKgTzMopPOb?=
+ =?us-ascii?Q?X2WOdQQrfLp74HAnuqP3DWD5B/n8P/wC85A6AYecrap9OIGEeTXlssp6lt1R?=
+ =?us-ascii?Q?608MPZHVC8W1kz2zkGjDsruOirBj7LLJBhNf8qkFsRVwpvjrvP/EqZk2nh03?=
+ =?us-ascii?Q?UrsjZwyKXa9XG311GkCn+LiaUYplubruBtjf8/0VNKNnS9QhucigsGSgeRhy?=
+ =?us-ascii?Q?/gWIG+qCITIrzwaSuTV5fk9h8s47Wv955IDZ99vNw2ExnqAa+DvxuLvdoBAX?=
+ =?us-ascii?Q?yGwUYnWpsM3qKVXuBG/QwwiiauJY5cQiIw7QiE4T71RKp5WsKj/WaBZrat2s?=
+ =?us-ascii?Q?IA+DXV9EVGyXwLIQz3ChZc6VOmU90Gq+s+Js7KlgyJeiGYB2H2rMrkA4jFBb?=
+ =?us-ascii?Q?DMPM7RiAEB7V1+ZkqEvFjtnBMZFXvvOnevlMr9iaIG/tLDx3nMAYA/heM0VI?=
+ =?us-ascii?Q?WW1ucEWnN38VFJf3/6jkiVvfvSLL3wVq/U5R2nGxu0iVgtaJKpYGaWNdUyrA?=
+ =?us-ascii?Q?bOW7CErmiZ5lNljhpa+R7FiA5tUgn7v3ELEagd4D2kJ3mB7u/bNl0bNHO98c?=
+ =?us-ascii?Q?EXHObqSH03M/pgdqhrYRwPuIsQnqhMI3Hw8xrs6nocEMlo4hvzLP92xondkA?=
+ =?us-ascii?Q?1CehG28x3ZBL7zCSvjaDeJi8FBiXwDz75kZr7EB3KhgP9R4NQPWgsYBN3+nA?=
+ =?us-ascii?Q?dRoEgf2NabOSnYlIhfflDWMgIW3A5eqiVapJhzohIxtqpmopXntziuKlWeOZ?=
+ =?us-ascii?Q?PuNxvKwFtHvF3a1I1uKyy9n3NFNY7BxehbamcLU8JC2HeZgMOttVjvw7GFWL?=
+ =?us-ascii?Q?/6yaUkhS+SOPHCrD2L+VmNMsqzSOppVVx9F5t8C6fPx4PeGysHqTytnimUSe?=
+ =?us-ascii?Q?tw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38902077-9beb-48cd-1db5-08db82c5fe1a
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 10:51:48.8684
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DSKGFtTXVeshbrwQEcmFKnELkCJViB0REFcb8vb086/VWGDnn+MpYnloTlhQIoULcjp6Au3XM10Hx+ljtB5EBYN9JFv8t72Y3NDLv2eTO14=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB4761
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Tejun,
+On Mon, Jul 10, 2023 at 09:42:13AM -0700, Tony Nguyen wrote:
+> From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> 
+> On some I219 devices, ethernet cable plugging detection only works once
+> from PCI D3 state. Subsequent cable plugging does set PME bit correctly,
+> but device still doesn't get woken up.
+> 
+> Since I219 connects to the root complex directly, it relies on platform
+> firmware (ACPI) to wake it up. In this case, the GPE from _PRW only
+> works for first cable plugging but fails to notify the driver for
+> subsequent plugging events.
+> 
+> The issue was originally found on CNP, but the same issue can be found
+> on ADL too. So workaround the issue by continuing use PME poll after
+> first ACPI wake. As PME poll is always used, the runtime suspend
+> restriction for CNP can also be removed.
+> 
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> Acked-by: Sasha Neftin <sasha.neftin@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 
-On Wed, Jul 12, 2023 at 2:30=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
-> On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
-> > On Tue, Jul 11, 2023 at 04:06:22PM +0200, Geert Uytterhoeven wrote:
-> > > On Tue, Jul 11, 2023 at 3:55=E2=80=AFPM Geert Uytterhoeven <geert@lin=
-ux-m68k.org> wrote:
-> ...
-> > > workqueue: neigh_managed_work hogged CPU for >10000us 4 times,
-> > > consider switching to WQ_UNBOUND
-> >
-> > I wonder whether the right thing to do here is somehow scaling the thre=
-shold
-> > according to the relative processing power. It's difficult to come up w=
-ith a
-> > threshold which works well across the latest & fastest and really tiny =
-CPUs.
-> > I'll think about it some more but if you have some ideas, please feel f=
-ree
-> > to suggest.
->
-> Geert, do you mind posting the full kernel logs for the affected machines=
-?
-
-https://drive.google.com/file/d/1toDs7ugZJ2eXatpdvySY4yxSsNam9xAC
-is an archive with boot and s2ram logs.  Note that my kernels do contain
-local debug code, and may be noisy.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
