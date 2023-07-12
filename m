@@ -1,186 +1,163 @@
-Return-Path: <netdev+bounces-17177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2442750B87
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:58:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D384750B89
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C624281771
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:58:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD9C92817AD
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535F634CE9;
-	Wed, 12 Jul 2023 14:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A1F34CEB;
+	Wed, 12 Jul 2023 14:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475BA34CC8
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:58:20 +0000 (UTC)
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81F71BD6
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:58:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DF934CC8
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 14:58:25 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 553601BC6
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:58:24 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-51e5da79223so3996528a12.1
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 07:58:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689173896; x=1720709896;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zcW5kz8PrZMlxYxJAbQQUtUE+T2XGM7/jXVNUV8g9aM=;
-  b=elnwPhnJsBoCvG4+uUI1zozAOGSuZBEEbjnjg2GbB45US2taD0Tkgkhy
-   4sahtDzL3IsssS5o5xZccxgDHMSMDTQyAbXF1Hz/itzwZdveor1b6nKtn
-   v+cEctY3nkKSPp9EvQX/9dTCGlBPLszGB8hkFhFWK5Sg223PSszsCzlFF
-   s=;
-X-IronPort-AV: E=Sophos;i="6.01,199,1684800000"; 
-   d="scan'208";a="15918877"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 14:58:14 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id 19BB040DAA;
-	Wed, 12 Jul 2023 14:58:14 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 12 Jul 2023 14:58:13 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.181.74) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
- Wed, 12 Jul 2023 14:58:10 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <idosch@idosch.org>
-CC: <bridge@lists.linux-foundation.org>, <davem@davemloft.net>,
-	<ebiederm@xmission.com>, <edumazet@google.com>, <hcoin@quietfountain.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <razor@blackwall.org>,
-	<roopa@nvidia.com>
-Subject: Re: [PATCH v1 net] bridge: Return an error when enabling STP in netns.
-Date: Wed, 12 Jul 2023 07:58:02 -0700
-Message-ID: <20230712145802.726-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <ZK69NDM60+N0TTFh@shredder>
-References: <ZK69NDM60+N0TTFh@shredder>
+        d=cloudflare.com; s=google; t=1689173903; x=1691765903;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u9hdB9GbF5/+huC5QUpTges7SmWqLW/8JHfy7jXuVYY=;
+        b=Bw/EHYT5YTF7yjml3rKdbNJNg5XcviPn7tArwv8Sa7+TsjX4O3R0tgLEgmp2Im2dgh
+         0QfDGOF7RV1+YAtXqfu7qg7TuEoxEE+XyTjWIp5Ua5wsUFlsNYR63JzumZK+pY0weJbz
+         kzWHKJva0Tasv37/DbhKSVYSoNhbSJS6xBnBQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689173903; x=1691765903;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u9hdB9GbF5/+huC5QUpTges7SmWqLW/8JHfy7jXuVYY=;
+        b=G5MuUGPVhtoQJR28L947oCSk0fjo5Uqw/F0SofVObk3BaJRqu1ZsyTaRMiXtilB+Q3
+         VL3VLDJtGS+vkzBlyCbjSD/9P4mUkmEPJiEVVgIZz4j1fgTnYMORVeUvHEOCf2DKnYWz
+         cmvkkdGtLnR5t+joG5c3E1GHeXqELMiZr43TTJAjLeteUlVu/RFFvzG8qcqp+TlTJWKR
+         WXyQNJy8pGtt0A/JUdYaxHfw2TzlDvy87Hmya+s8qJX+OR0BDDRfvLL7/frqaQ/aJtkO
+         s5n3LRqc5mtSc+6G6LYCPxXNXyJng/by8zlSc/972YTJrAwICx/vZirkaWRZUJjroCW4
+         gTAg==
+X-Gm-Message-State: ABy/qLY/h7Fj/eA2U94KK5SHwO0Yc4f2d7bOeA/+mGkM2o0IZsyt0vw5
+	p4FLHylKtVwInkV80kdBqc89YQ1fnMuZnReLt7QjCKOdUKgN+uq7tO4=
+X-Google-Smtp-Source: APBJJlEBGiUm4ek8IujU8Mh0NSVTdVqZUp8Kz2aD3WlJsmXSBCoHKbi7gPSaY+lWTBYLwobIP4aURHHYi0vBxBLMdgE=
+X-Received: by 2002:aa7:ccd1:0:b0:51e:12b:b989 with SMTP id
+ y17-20020aa7ccd1000000b0051e012bb989mr17362185edt.20.1689173902721; Wed, 12
+ Jul 2023 07:58:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.119.181.74]
-X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+References: <CAJPywTKDdjtwkLVUW6LRA2FU912qcDmQOQGt2WaDo28KzYDg+A@mail.gmail.com>
+In-Reply-To: <CAJPywTKDdjtwkLVUW6LRA2FU912qcDmQOQGt2WaDo28KzYDg+A@mail.gmail.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Wed, 12 Jul 2023 09:58:11 -0500
+Message-ID: <CAO3-PboqjhNDcCTicLPXawvwmvrC-Wj04Q72v0tJCME-cX4P8Q@mail.gmail.com>
+Subject: Re: Broken segmentation on UDP_GSO / VIRTIO_NET_HDR_GSO_UDP_L4
+ forwarding path
+To: Marek Majkowski <marek@cloudflare.com>
+Cc: network dev <netdev@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, 
+	Andrew Melnychenko <andrew@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Ido Schimmel <idosch@idosch.org>
-Date: Wed, 12 Jul 2023 17:48:20 +0300
-> On Tue, Jul 11, 2023 at 04:54:15PM -0700, Kuniyuki Iwashima wrote:
-> > When we create an L2 loop on a bridge in netns, we will see packets storm
-> > even if STP is enabled.
-> > 
-> >   # unshare -n
-> >   # ip link add br0 type bridge
-> >   # ip link add veth0 type veth peer name veth1
-> >   # ip link set veth0 master br0 up
-> >   # ip link set veth1 master br0 up
-> >   # ip link set br0 type bridge stp_state 1
-> >   # ip link set br0 up
-> >   # sleep 30
-> >   # ip -s link show br0
-> >   2: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-> >       link/ether b6:61:98:1c:1c:b5 brd ff:ff:ff:ff:ff:ff
-> >       RX: bytes  packets  errors  dropped missed  mcast
-> >       956553768  12861249 0       0       0       12861249  <-. Keep
-> >       TX: bytes  packets  errors  dropped carrier collsns     |  increasing
-> >       1027834    11951    0       0       0       0         <-'   rapidly
-> > 
-> > This is because llc_rcv() drops all packets in non-root netns and BPDU
-> > is dropped.
-> > 
-> > Let's show an error when enabling STP in netns.
-> > 
-> >   # unshare -n
-> >   # ip link add br0 type bridge
-> >   # ip link set br0 type bridge stp_state 1
-> >   Error: bridge: STP can't be enabled in non-root netns.
-> > 
-> > Note this commit will be reverted later when we namespacify the whole LLC
-> > infra.
-> > 
-> > Fixes: e730c15519d0 ("[NET]: Make packet reception network namespace safe")
-> > Suggested-by: Harry Coin <hcoin@quietfountain.com>
-> 
-> I'm not sure that's accurate. I read his response in the link below and
-> he says "I'd rather be warned than blocked" and "But better warned and
-> awaiting a fix than blocked", which I agree with. The patch has the
-> potential to cause a lot of regressions, but without actually fixing the
-> problem.
-> 
-> How about simply removing the error [1]? Since iproute2 commit
-> 844c37b42373 ("libnetlink: Handle extack messages for non-error case"),
-> it can print extack warnings and not only errors. With the diff below:
+On Wed, Jul 12, 2023 at 9:00=E2=80=AFAM Marek Majkowski <marek@cloudflare.c=
+om> wrote:
+>
+> Dear netdev,
+>
+> I encountered a puzzling problem, please help.
+>
+> Rootless repro:
+>    https://gist.github.com/majek/5e8fd12e7a1663cea63877920fe86f18
+>
+> To run:
+>
+> ```
+> $ unshare -Urn python3 udp-gro-forwarding-bug.py
+> tap0  In  IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, length 4000
+> lo    P   IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, bad length 4000 > 1392
+> lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 > 1392
+> lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 > 1200
+> '''
+>
+> The code is really quite simple. First I create and open a tap device.
+> Then I send a large (>MTU) packet with vnethdr over tap0. The
+> gso_type=3DGSO_UDP_L4, and gso_size=3D1400. I expect the packet to egress
+> from tap0, be forwarded somewhere, where it will eventually be
+> segmented by software or hardware.
+>
+> The egress tap0 packet looks perfectly fine:
+>
+> tap0  In  IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, length 4000
+>
+> To simplify routing I'm doing 'tc mirred' aka `bpf_redirect()` magic,
+> where I move egress tap0 packets to ingress lo, like this:
+>
+> > tc filter add dev tap0 ingress protocol ip u32 match ip src 10.0.0.2 ac=
+tion mirred egress redirect dev lo
+>
+> On ingress lo I see something really weird:
+>
+> lo    P   IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, bad length 4000 > 1392
+> lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 > 1392
+> lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 > 1200
+>
+> This looks like IPv4 fragments without the IP fragmentation bits set.
+>
+> I think there are two independent problems here:
+>
+> (1) The packet is *fragmented* and that is plain wrong here. I'm
+> asking for USO not UFO in vnethdr.
+>
 
-This is good to know and I also prefer this approach!
-I'll post v2.
+To add some context our virtio header in hex format (12 bytes) is
+01052a007805220006000000.
 
-Thanks!
+Some digging shows that the issue seems to come from this patch:
+https://lore.kernel.org/netdev/20220907125048.396126-2-andrew@daynix.com/
+At this point, skb_shared_info->gso_type is SKB_GSO_UDP_L4 |
+SKB_GSO_DODGY, here the DODGY bit is set inside tun_get_user. So the
+skb_gso_ok check will return true here, then the skb will fall to the
+fragment code. Simple tracing confirms that __udp_gso_segment is never
+called in this scenario.
+
+So the question is really how to handle the DODGY bit. IMHO it is not
+right to fall to the fragment path when the actual packet request is
+segmentation. Will it be sufficient to just recompute the gso_segs
+here and return the head skb instead?  The only missing bit in the
+device feature is the DODGY bit here.
+
+> (2) The fragmentation attempt is broken, the IPv4 fragmentation bits are =
+clear.
+>
+> Please advise. I would assume transmitting UDP_GSO packets off tap is
+> a typical thing to do.
+>
+> I was able to repro this on a 6.4 kernel.
+>
+> For a moment I thought it's a `ethtool -K X rx-udp-gro-forwarding on`
+> bug, but I'm not sure anymore.
+>
+> Marek
 
 
-> 
->  # unshare -n 
->  # ip link add name br0 type bridge
->  # ip link set dev br0 type bridge stp_state 1
->  Warning: bridge: STP can't be enabled in non-root netns.
->  # echo $?
->  0
-> 
-> [1]
-> diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
-> index a807996ac56b..b5143de37938 100644
-> --- a/net/bridge/br_stp_if.c
-> +++ b/net/bridge/br_stp_if.c
-> @@ -201,10 +201,8 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
->  {
->         ASSERT_RTNL();
->  
-> -       if (!net_eq(dev_net(br->dev), &init_net)) {
-> +       if (!net_eq(dev_net(br->dev), &init_net))
->                 NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in non-root netns");
-> -               return -EINVAL;
-> -       }
->  
->         if (br_mrp_enabled(br)) {
->                 NL_SET_ERR_MSG_MOD(extack,
-> 
-> > Link: https://lore.kernel.org/netdev/0f531295-e289-022d-5add-5ceffa0df9bc@quietfountain.com/
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/bridge/br_stp_if.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
-> > index 75204d36d7f9..a807996ac56b 100644
-> > --- a/net/bridge/br_stp_if.c
-> > +++ b/net/bridge/br_stp_if.c
-> > @@ -201,6 +201,11 @@ int br_stp_set_enabled(struct net_bridge *br, unsigned long val,
-> >  {
-> >  	ASSERT_RTNL();
-> >  
-> > +	if (!net_eq(dev_net(br->dev), &init_net)) {
-> > +		NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in non-root netns");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> >  	if (br_mrp_enabled(br)) {
-> >  		NL_SET_ERR_MSG_MOD(extack,
-> >  				   "STP can't be enabled if MRP is already enabled");
-> > -- 
-> > 2.30.2
+
+--=20
+
+Yan
 
