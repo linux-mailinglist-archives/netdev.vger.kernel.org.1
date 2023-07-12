@@ -1,304 +1,129 @@
-Return-Path: <netdev+bounces-17093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B7A7503EA
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:57:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9298D7503F3
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 11:58:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B0811C20F9C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:57:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CC432816C9
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 09:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCEA200A0;
-	Wed, 12 Jul 2023 09:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFC9200A3;
+	Wed, 12 Jul 2023 09:58:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3FD23DB
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:57:22 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4768594;
-	Wed, 12 Jul 2023 02:57:20 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4R1Cjr4d5Bz6857p;
-	Wed, 12 Jul 2023 17:53:36 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 12 Jul 2023 10:57:17 +0100
-Message-ID: <0e549107-0435-717d-4b98-7f6578919c8b@huawei.com>
-Date: Wed, 12 Jul 2023 12:57:16 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBBA200A0
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:58:06 +0000 (UTC)
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0271720;
+	Wed, 12 Jul 2023 02:58:05 -0700 (PDT)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5768a7e3adbso8595087b3.0;
+        Wed, 12 Jul 2023 02:58:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689155884; x=1691747884;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y6MzudJP2Fu/sGdEnelPPluUqTi475Db7xeaDmuW9Sk=;
+        b=LJrwQd7/GT/f6oIF/VO5++yTV31g4WJbSQ1fWlc/6aaAe0vQvJYr4kByUnVfNzoT7X
+         3q3FGJZT/6Z6RHfymi63tAJPT1EY2iwRa75CXHjS3Ot25+fRu84WDKLN9xUi8pxJQluj
+         PwGyOtMkZiK8HKdqp2iAgC0FDJFT+heoiVo5a8pdlw7A+EuipACA1m7X08NZYQuLg/OD
+         4BH/kujvK/Db+8rFjpsFKMfyxPvqea1avTy6JQUB0jahhM9Itqqy49SgaLfGIPhGEnbL
+         ljW/5yIUDSlUn4axOB9G4IApIlfDzHpZdHk/JMhE1rmohX36QxlmsHnsHGtr/7g1jdHD
+         Kl4w==
+X-Gm-Message-State: ABy/qLY/EwIOYS6AZrz2ivULfQAnXCA21K/X7hfKfuI+kiyLNdahXYQ4
+	UHdcDF7kMwh4RmGN6+ZFK/Up2wQ6pmTPxA==
+X-Google-Smtp-Source: APBJJlGYudo9gVR+Cou01gtan/TCm1WXI5ja4PeIWua5VW5I2pAP/ypMPtV4ncbiIL0wMtb9qlUwGw==
+X-Received: by 2002:a0d:d616:0:b0:573:284d:6476 with SMTP id y22-20020a0dd616000000b00573284d6476mr1711934ywd.1.1689155884332;
+        Wed, 12 Jul 2023 02:58:04 -0700 (PDT)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id f67-20020a816a46000000b0057a93844c15sm1059234ywc.127.2023.07.12.02.58.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Jul 2023 02:58:03 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-ca9804dc6e4so198576276.0;
+        Wed, 12 Jul 2023 02:58:03 -0700 (PDT)
+X-Received: by 2002:a25:ae5d:0:b0:bd6:a97e:3597 with SMTP id
+ g29-20020a25ae5d000000b00bd6a97e3597mr1632945ybe.30.1689155883328; Wed, 12
+ Jul 2023 02:58:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
- dedicated to network
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <artem.kuzin@huawei.com>, <gnoack3000@gmail.com>,
-	<willemdebruijn.kernel@gmail.com>, <yusongping@huawei.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>
-References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
- <20230706145543.1284007-1-mic@digikod.net>
- <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org> <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+ <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
+ <ZK3MBfPS-3-tJgjO@slm.duckdns.org> <ZK30CR196rs-OWLq@slm.duckdns.org>
+In-Reply-To: <ZK30CR196rs-OWLq@slm.duckdns.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 12 Jul 2023 11:57:49 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
+Message-ID: <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
+Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
+ 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
+To: Tejun Heo <tj@kernel.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
+	Linux PM list <linux-pm@vger.kernel.org>, 
+	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
+	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Tejun,
 
+On Wed, Jul 12, 2023 at 2:30=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
+> On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
+> > On Tue, Jul 11, 2023 at 04:06:22PM +0200, Geert Uytterhoeven wrote:
+> > > On Tue, Jul 11, 2023 at 3:55=E2=80=AFPM Geert Uytterhoeven <geert@lin=
+ux-m68k.org> wrote:
+> ...
+> > > workqueue: neigh_managed_work hogged CPU for >10000us 4 times,
+> > > consider switching to WQ_UNBOUND
+> >
+> > I wonder whether the right thing to do here is somehow scaling the thre=
+shold
+> > according to the relative processing power. It's difficult to come up w=
+ith a
+> > threshold which works well across the latest & fastest and really tiny =
+CPUs.
+> > I'll think about it some more but if you have some ideas, please feel f=
+ree
+> > to suggest.
+>
+> Geert, do you mind posting the full kernel logs for the affected machines=
+?
 
-7/12/2023 10:02 AM, Mickaël Salaün пишет:
-> 
-> On 06/07/2023 16:55, Mickaël Salaün wrote:
->> From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> 
->> This patch is a revamp of the v11 tests [1] with new tests (see the
->> "Changes since v11" description).  I (Mickaël) only added the following
->> todo list and the "Changes since v11" sections in this commit message.
->> I think this patch is good but it would appreciate reviews.
->> You can find the diff of my changes here but it is not really readable:
->> https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
->> [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
->> TODO:
->> - Rename all "net_service" to "net_port".
->> - Fix the two kernel bugs found with the new tests.
->> - Update this commit message with a small description of all tests.
-> 
-> [...]
-> 
->> +FIXTURE_SETUP(ipv4)
->> +{
->> +	const struct protocol_variant prot = {
->> +		.domain = AF_INET,
->> +		.type = variant->type,
->> +	};
->> +
->> +	disable_caps(_metadata);
->> +
->> +	set_service(&self->srv0, prot, 0);
->> +	set_service(&self->srv1, prot, 1);
->> +
->> +	setup_loopback(_metadata);
->> +};
->> +
->> +FIXTURE_TEARDOWN(ipv4)
->> +{
->> +}
->> +
->> +// Kernel FIXME: tcp_sandbox_with_tcp and tcp_sandbox_with_udp
->> +TEST_F(ipv4, from_unix_to_inet)
->> +{
->> +	int unix_stream_fd, unix_dgram_fd;
->> +
->> +	if (variant->sandbox == TCP_SANDBOX) {
->> +		const struct landlock_ruleset_attr ruleset_attr = {
->> +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->> +					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +		};
->> +		const struct landlock_net_service_attr tcp_bind_connect_p0 = {
->> +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
->> +					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +			.port = self->srv0.port,
->> +		};
->> +		int ruleset_fd;
->> +
->> +		/* Denies connect and bind to check errno value. */
->> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> +						     sizeof(ruleset_attr), 0);
->> +		ASSERT_LE(0, ruleset_fd);
->> +
->> +		/* Allows connect and bind for srv0.  */
->> +		ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
->> +					       LANDLOCK_RULE_NET_SERVICE,
->> +					       &tcp_bind_connect_p0, 0));
->> +
->> +		enforce_ruleset(_metadata, ruleset_fd);
->> +		EXPECT_EQ(0, close(ruleset_fd));
->> +	}
->> +
->> +	unix_stream_fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
->> +	ASSERT_LE(0, unix_stream_fd);
->> +
->> +	unix_dgram_fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
->> +	ASSERT_LE(0, unix_dgram_fd);
->> +
->> +	/* Checks unix stream bind and connect for srv0. */
->> +	EXPECT_EQ(-EINVAL, bind_variant(unix_stream_fd, &self->srv0));
->> +	EXPECT_EQ(-EINVAL, connect_variant(unix_stream_fd, &self->srv0));
->> +
->> +	/* Checks unix stream bind and connect for srv1. */
->> +	EXPECT_EQ(-EINVAL, bind_variant(unix_stream_fd, &self->srv1))
->> +	{
->> +		TH_LOG("Wrong bind error: %s", strerror(errno));
->> +	}
->> +	EXPECT_EQ(-EINVAL, connect_variant(unix_stream_fd, &self->srv1));
->> +
->> +	/* Checks unix datagram bind and connect for srv0. */
->> +	EXPECT_EQ(-EINVAL, bind_variant(unix_dgram_fd, &self->srv0));
->> +	EXPECT_EQ(-EINVAL, connect_variant(unix_dgram_fd, &self->srv0));
->> +
->> +	/* Checks unix datagram bind and connect for srv0. */
->> +	EXPECT_EQ(-EINVAL, bind_variant(unix_dgram_fd, &self->srv1));
->> +	EXPECT_EQ(-EINVAL, connect_variant(unix_dgram_fd, &self->srv1));
->> +}
-> 
-> We should also add a test to make sure errno is the same with and
-> without sandboxing when using port 0 for connect and consistent with
-> bind (using an available port). The test fixture and variants should be
-> quite similar to the "ipv4" ones, but we can also add AF_INET6 variants,
-> which will result in 8 "ip" variants:
-> 
-> TEST_F(ip, port_zero)
-> {
-> 	if (variant->sandbox == TCP_SANDBOX) {
-> 		/* Denies any connect and bind. */
-> 	}
-> 	/* Checks errno for port 0. */
-> }
+https://drive.google.com/file/d/1toDs7ugZJ2eXatpdvySY4yxSsNam9xAC
+is an archive with boot and s2ram logs.  Note that my kernels do contain
+local debug code, and may be noisy.
 
-  Ok. Got it.
-> 
-> [...]
-> 
->> +FIXTURE(inet)
->> +{
->> +	struct service_fixture srv0, srv1;
->> +};
-> 
-> The "inet" variants are useless and should be removed. The "inet"
-> fixture can then be renamed to "ipv4_tcp".
-> 
-   Right. Thanks.
-> 
->> +
->> +FIXTURE_VARIANT(inet)
->> +{
->> +	const bool is_sandboxed;
->> +	const struct protocol_variant prot;
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv4) {
->> +	/* clang-format on */
->> +	.is_sandboxed = false,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv4) {
->> +	/* clang-format on */
->> +	.is_sandboxed = true,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv6) {
->> +	/* clang-format on */
->> +	.is_sandboxed = false,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv6) {
->> +	/* clang-format on */
->> +	.is_sandboxed = true,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +	},
->> +};
->> +
->> +FIXTURE_SETUP(inet)
->> +{
->> +	const struct protocol_variant ipv4_tcp = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +	};
->> +
->> +	disable_caps(_metadata);
->> +
->> +	ASSERT_EQ(0, set_service(&self->srv0, ipv4_tcp, 0));
->> +	ASSERT_EQ(0, set_service(&self->srv1, ipv4_tcp, 1));
->> +
->> +	setup_loopback(_metadata);
->> +};
->> +
->> +FIXTURE_TEARDOWN(inet)
->> +{
->> +}
->> +
->> +TEST_F(inet, port_endianness)
->> +{
->> +	const struct landlock_ruleset_attr ruleset_attr = {
->> +		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->> +				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +	};
->> +	const struct landlock_net_service_attr bind_host_endian_p0 = {
->> +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
->> +		/* Host port format. */
->> +		.port = self->srv0.port,
->> +	};
->> +	const struct landlock_net_service_attr connect_big_endian_p0 = {
->> +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +		/* Big endian port format. */
->> +		.port = htons(self->srv0.port),
->> +	};
->> +	const struct landlock_net_service_attr bind_connect_host_endian_p1 = {
->> +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
->> +				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +		/* Host port format. */
->> +		.port = self->srv1.port,
->> +	};
->> +	const unsigned int one = 1;
->> +	const char little_endian = *(const char *)&one;
->> +	int ruleset_fd;
->> +
->> +	ruleset_fd =
->> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->> +	ASSERT_LE(0, ruleset_fd);
->> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
->> +				       &bind_host_endian_p0, 0));
->> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
->> +				       &connect_big_endian_p0, 0));
->> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
->> +				       &bind_connect_host_endian_p1, 0));
->> +	enforce_ruleset(_metadata, ruleset_fd);
->> +
->> +	/* No restriction for big endinan CPU. */
->> +	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
->> +
->> +	/* No restriction for any CPU. */
->> +	test_bind_and_connect(_metadata, &self->srv1, false, false);
->> +}
->> +
->> +TEST_HARNESS_MAIN
-> .
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
