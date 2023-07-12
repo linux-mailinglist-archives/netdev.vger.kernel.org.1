@@ -1,131 +1,109 @@
-Return-Path: <netdev+bounces-17046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C4274FE88
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 07:00:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4638874FE9B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 07:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BE471C210B3
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 05:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD271281682
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 05:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93007A34;
-	Wed, 12 Jul 2023 04:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF944644;
+	Wed, 12 Jul 2023 05:10:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817D9644;
-	Wed, 12 Jul 2023 04:59:59 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F1E10C7;
-	Tue, 11 Jul 2023 21:59:57 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4f4b2bc1565so10385332e87.2;
-        Tue, 11 Jul 2023 21:59:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689137996; x=1691729996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d0nFJ9ERKduwN8ULZvzUXn+MtjUmRnV2HCG69mnBhK8=;
-        b=mm3xhdJqTh1tV30DlTX99oaqpiDinnqIDaXmEjNFnT0h16+C2saMoI4auqNvqm5H12
-         DuuPdWpniks5XNxdmaFdU9ygUf7ESZtMj7zyyEo3sRsGLbD/m1Jc9CQzOTW62LPhNSdx
-         UlemSHcuEK+LDFwe/1WMxLGFkm786cxsvvBosfV6KCybBrOK3a+xTgsVZ2SscKpG9N19
-         Zdy27ULxJ4wFHp2RZh/njMTYNbDxSdy9O4gC91EZzRBUjd1n5QBWZGOkuJrw+yuMoBjs
-         gYYAo8hN6fv5OJg7b+5K5mRkGaITXN6aRrH3sdeQuF9e30eOANbh1d+Lo34AQJNJYbMn
-         tYTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689137996; x=1691729996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d0nFJ9ERKduwN8ULZvzUXn+MtjUmRnV2HCG69mnBhK8=;
-        b=BDrZHnSaYDBj1foxBi4Fyo8GRvrUQCGpheIaNF9gzIpX0HLPSWNWxt4IhIRHNTPKGU
-         9BGsmPDsDUBG+69Bt2Cb4F+GlTDZ3dmfa8D/3eFk8USBZ80LnUTifTDsRBNZwJme6t+t
-         m4JBqRg8CfFYDSBmaSGe4rQIlFS7fmLN7KRdGwbeJQmMMupZjr6iwCikX79pTQaHRfW5
-         MmHhyZ5A/tBkW8QlC8zhfvjCg9mo1cfwhyItN9tKAUGtje6dFAYMBoFm+i34GzZQU0kP
-         wHMdx4CUEujCsx4MLP7bU3QkbnwQl54YzjtXSzuoPr1Rs25wx//U9OM4Q/dBBzkySHPr
-         Cdfw==
-X-Gm-Message-State: ABy/qLYBPZ2dJ6CoGHKdEcs6OnTNWGBKXPAcMOvwJMUAM5tCAoPoVAWz
-	hoLet0N2Lz0IdPtn0ASIeGJ363bk3pfIDpe0HKI=
-X-Google-Smtp-Source: APBJJlFaaf77IGocKXUdXiMyBlI3WZuaxFDPMzG9kVlYpgvOg+4oaPKP+qk5uBD26e9FrfNvlKQvdVYstfGq+B6RmzM=
-X-Received: by 2002:a05:6512:15a3:b0:4fb:89f2:594c with SMTP id
- bp35-20020a05651215a300b004fb89f2594cmr17084021lfb.56.1689137995800; Tue, 11
- Jul 2023 21:59:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C235F1C2F
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 05:10:17 +0000 (UTC)
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E48E1989
+	for <netdev@vger.kernel.org>; Tue, 11 Jul 2023 22:10:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1689138600; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=SpoCVInNA3Jppapcw4lFzPA4zjLczR8k/VhZOAUfY/2i9i6sdbx7vNP302wqHYbjFjeNMNuq8cR1j5dTOdvykjKAqQgrEIz1mG7QwA3Canbqg58EFwkFsylttIe1f5N3VU89rISu1CxJu+5sovQkO/2C9cn4SsOk7YWcrWEpg+g=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1689138600; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+	bh=F/DeEoVoc0cNDW5+tJ5hqWU4NMH63S3DSr2k3QR8BZY=; 
+	b=jv7WxIkDyEtWVZD1FKEpZLFSoax8kopd4SdJItmd/z6Z4bHVvN2KhJicsxY6Kg/01OHZXjapQCeApNplkBw+c4zAMOQSj7GmvTzY8Y6cUBWQ8HbRDg+fgaScAfOxwklmlSFCqXTK2t0t+bIaOz7bciEPxqg6ImTEwjdiD2t5up8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=chandergovind.org;
+	spf=pass  smtp.mailfrom=mail@chandergovind.org;
+	dmarc=pass header.from=<mail@chandergovind.org>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1689138600;
+	s=zoho; d=chandergovind.org; i=mail@chandergovind.org;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=F/DeEoVoc0cNDW5+tJ5hqWU4NMH63S3DSr2k3QR8BZY=;
+	b=X5n7UNNA6A52Ni+WrbtgIfTgLwHxryhW259NEMB6dBOdJqSA7T87QHouNm99Qv3u
+	WSj3T0WS2GEIXjwy7Tm9MaiNloR10RbKUTjfDwCervIKtoC/dULOrEeOpzafS0Hvdji
+	+EBD4Y7OPD/n8ZprzrjOUBdPIZCdDQrwFExcm0F8=
+Received: from [192.168.1.43] (101.0.62.3 [101.0.62.3]) by mx.zohomail.com
+	with SMTPS id 1689138599020849.8587474068147; Tue, 11 Jul 2023 22:09:59 -0700 (PDT)
+Message-ID: <88be2564-c5cf-58f5-b35c-d61e1db504de@chandergovind.org>
+Date: Wed, 12 Jul 2023 10:39:54 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230707193006.1309662-1-sdf@google.com> <20230707193006.1309662-10-sdf@google.com>
- <20230711225657.kuvkil776fajonl5@MacBook-Pro-8.local> <CAKH8qBtawUTjFQ=hhTzXa2zTBwOpxurjhduxZV+eUg8rnJUJVw@mail.gmail.com>
- <CAADnVQKnWCYjOQA-=61pDP4TQ-LKC7S-tOSX9Lm6tB3vJcf4dw@mail.gmail.com>
- <CAKH8qBvnMd2JgobQf1bvc=x7uEn1RPVHcuu3F7gB6vS627g-Xg@mail.gmail.com>
- <CAADnVQLCRrPtQMPBuYiKv44SLDiYwz69KZ=0e0HxJdPQz4x2HQ@mail.gmail.com> <ZK4eFox0DwbpyIJv@google.com>
-In-Reply-To: <ZK4eFox0DwbpyIJv@google.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 11 Jul 2023 21:59:44 -0700
-Message-ID: <CAADnVQJnf=KJ17MJWujkj+oSxp7kNNK1k08PvH+Wx617yAtZ8Q@mail.gmail.com>
-Subject: Re: [RFC bpf-next v3 09/14] net/mlx5e: Implement devtx kfuncs
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH iproute2] misc/ifstat: ignore json_output when run using
+ "-d"
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+References: <2d76c788-4957-b0eb-bd5f-40ea2d497962@chandergovind.org>
+ <20230711133040.2fef3caf@hermes.local>
+From: Chander Govindarajan <mail@chandergovind.org>
+In-Reply-To: <20230711133040.2fef3caf@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 8:29=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
- wrote:
->
->
-> This will slow things down, but not to the point where it's on par
-> with doing sw checksum. At least in theory.
-> We can't stay at skb when using AF_XDP. AF_XDP would benefit from having
-> the offloads.
+Hi,
 
-To clarify: yes, AF_XDP needs generalized HW offloads.
-I just don't see how xdp tx offloads are moving a needle in that direction.
+So, this does solve the problem correctly, in the sense:
+1. First you should start ifstat in daemon mode (without -j, with the 
+patch, it will anyway be ignored)
+2. Then, you can run ifstat in normal or in json mode; where it will 
+connect to the daemon, get back results and then print it in the 
+required format (table or json).
 
-> I hope we can both agree that with an api like
-> mlx5_l4_csum_offload(bool encap) we can't be 100% certain that the
-> hw is gonna handle any packet layout? So how is that different
-> from a generic api that also can't work in all cases?
+So, this patch only ensures that the communication between the daemon 
+and other instances happen correctly (not in json).
 
-If it's hw specific then yes.
-Will [mlx5|...]_l4_csum_offload apply to other nics? I doubt.
+PS: in the process of testing this, I figured out a bug in the -j mode, 
+I will submit a separate patch. :-)
 
-> AF_XDP is a generic layer for low-level access and it provides generic
-> descriptor format, so why suddenly we have this requirement where we have
-> to do prog rewrite for every new nic?
->
-> Current AF_XDP programs are pretty portable (obviously depend on
-> a bunch of nic features), it seems like a good idea to try to preserve
-> this property? (again, with an asterisk, where we should allow some
-> differentiation, etc, etc)
+Regards,
+Chander
 
-Agree. AF_XDP needs a generic api that will allow user space
-request HW to do TSO, csum offload, etc.
-xdp tx and af_xdp are too different to pull under the same framework.
-xdp progs will interact with the kernel via kfuncs.
-af_xdp needs a different api to express packet geometry and offload request=
-s.
-The user space cannot do it with bpf programs.
-In case of AF_XDP the bpf prog in the kernel is a filter only.
-For the majority of the cases bpf prog is not necessary and shouldn't be
-required to express HW offloads.
+On 7/12/23 02:00, Stephen Hemminger wrote:
+> On Mon, 10 Jul 2023 16:15:22 +0530
+> Chander Govindarajan <mail@chandergovind.org> wrote:
+> 
+>> If ifstat is run with a command like:
+>> ifstat -d 5 -j
+>>
+>> subsequent commands (with or without the "-j" flag) fail with:
+>> Aborted (core dumped)
+>>
+>> Unsets json_ouput when using the "-d" flag. Also, since the "-d"
+>> daemon behaviour is not immediately obvious, add a 1 line
+>> description in the man page.
+>>
+>> Signed-off-by: ChanderG <mail@chandergovind.org>
+> 
+> Rather than avoiding the problem, why not have ifstat support json in daemon mode?
 
