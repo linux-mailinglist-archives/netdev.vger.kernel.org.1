@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-17239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB704750E37
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 18:20:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F33750E39
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 18:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3962E2819F3
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:20:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88CC22818E0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 16:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDF821516;
-	Wed, 12 Jul 2023 16:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA48A14F88;
+	Wed, 12 Jul 2023 16:18:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF5314F7B
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 16:18:33 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2061.outbound.protection.outlook.com [40.107.95.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA4B30DE
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:18:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A419D214F4
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 16:18:43 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA81B3583
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 09:18:23 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ik1HBSS+rd4JYZLVSOPLJMrRKjJHPUqMwLZWGMm3W8D7P7VPn9jSnoEP89m4n+o39eNicHhJbL26X7ka5ACsXoxTRlAXLwyYsX53UFy37yWvXKd11bJKSX4gZTYy3W5eyGPLbaeWy4THKAVAgKcF8SurJYJAdpJ6GdbnAtytoBgT2DXij8JvfttdLQVt6YwC2dW4RmfhSGVPFFB4TGBJgN/U03N8bLVajyLTH6KG6N+ZKyeqdYokrzH9jseN+xgu070teeIENRINfs1ikvCDNTZTyDccn9XEIrE2PsVptRQQBoGwoPedV6+J/3LuGuScdzvNSMOH3h/m3fMSV0KQaQ==
+ b=jEieajnqrUFg6+zOagL/95rg2uCPQ865joghLdqZOytrK0zakEpJfihNCctAxIQDSWQwS0TtjcmWSsJBuHcmYgRp4A5gn2ZAUr0U714U7/sJdS4bFIincyRyW0m815sRyyk5VSlee++QnApJWcS7W8q0SU684rK8oaEp4E2Jo+bY3qzdplzkdPJOXZawbpQddynjoFghjxNzusKGPCtlwOeiNBEwYtB5fO5bp3PhsElTzCiaWy+tD+3MSvnVQCvpUY0Zm0Bz796FDp04gE7BzZsH7GOzogpgTFANZleoQxrDmiz5+f6hTa/RdKvHzQgnNAmHASBVj0lghxAm22aL2w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VDFji7ZSja+g0pa5F1amy5BI7kyjyiwids4F1LjKljE=;
- b=OWpVz+epRWAe5SGpWfekBaRnb/W1nCVwegYEvdhwPeOOD4kpOWTXgn3a2dB6vHbbKdJs18lwe+0HU1wjpnt9MzNSKeJAXu3iUxLw2C5JcPihiKv3atojY7ZoYJE7BrcK90e4I5MQm+w+QbrVRfuk5ftAruMQs6+b0tCyRkeOVa46OUX2xjmONEin7a1/MpDpaEvVZfW7zDfHbrLmQYSDdGghyL3G2X60UDQxFpYJjPfk9NfEel7hUkcSxi6IiBp90xR1mlABMzK63e+u4PNSHIokpzIngjuJUj+P5PuSEyadnd2vhc+6FOAcVikSMkL6k2aEELEmAUHSU6IIS0V4Fg==
+ bh=iZpAyx5UST9GbP4ClZobLoWyP5wUA/2jDvUyhpoQKaQ=;
+ b=NGKWFGdyTgqESv/7M558rEx81g0oIuOzrJrWkmZXYpD4Guux6r9YCYaEXXpRvNVx2upZ1g9xQwsWGlQNbrbkic660DqHKqgOHJ+g2v7LdIhzsqAnjmngNmWaAmLoaPvuNNeZL6Kt0fl8Thic6cAsuNCvcMqZvONAkqu7bJaHuiQtFHzMasV8yE6j/4LiLiKDwtgeQGTrtunWuS7B1ZyyFSaF89zHa8Zs5i8KiKomg6z6xfDiQI9TOiV8DoEks8AthZkjGWLuqEP787jD6/uYFw8r79EGXdK6nJbfvSHluzMb12/vHh2Sp2h75k268drc5Di8yMeGSwFgLsmDIDG9Hw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VDFji7ZSja+g0pa5F1amy5BI7kyjyiwids4F1LjKljE=;
- b=otdcP7vo5B3jVoHmFd47vGjxDQRTPHODhj5lqrr4lci+ypUa0REktOtHosaQsqYte7LGrWrp/9uIa3iZkMh6NN2cegHxwGHcSX9+ygDu1gJ6dKsn545HOB9f9418VgYyWvnxob8aPXA6myIvARhgy7HnTxcm1FsUpj/QnrYgwa2aLlFn/ws19dzf/uMjjflMyB7qo+4SUrC2So4uNfWdL25oeIufzyX3MntYAdPD7h7BqaTFB+h7FfEybKhOZtvZ3tlUam3IFaWnrKsB/7EJ5IhSOPcu1shHE6A2JogEXsuPDYWxg0i0qo9BpdXkcbrW/aUeXAY6MRJR1N4pIMBUQQ==
+ bh=iZpAyx5UST9GbP4ClZobLoWyP5wUA/2jDvUyhpoQKaQ=;
+ b=CRd68IswBhaqcamWRxvjod4jaJYLqw9QRSkBnmUzmywqZ4yRmuYySRAOGB1MEhLi8T9310pKhGquxyKBEiUHVTLKyJXy+4BUXhk8Y7mG8ROvoVHLoRuVV6j3czi+saFyAqqrLy2F0LiHdyYd9XbWG6QTFWT/wLlFUjndJ+NTIDG69VltCeZMoE+qcn94Gh2s82r7lDYo3UXMVUR00eliRor/qZb5pgWBmejQuhBTcIU83Qvp9EduNz7vLXf8BA3WpNBsXVqQDJuuMgqqvNFgK+QY+T2YgYgZCRixQtoNm7mR7v8zFF92rLGjb4SZVSmznn/S7KG+gt7twQFx7Sr3Zw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by PH7PR12MB7212.namprd12.prod.outlook.com (2603:10b6:510:207::18) with
+ by DM4PR12MB6640.namprd12.prod.outlook.com (2603:10b6:8:8f::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Wed, 12 Jul
- 2023 16:17:30 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22; Wed, 12 Jul
+ 2023 16:17:36 +0000
 Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
  ([fe80::3f6a:7977:dcd4:9ad1]) by SJ1PR12MB6075.namprd12.prod.outlook.com
  ([fe80::3f6a:7977:dcd4:9ad1%4]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
- 16:17:30 +0000
+ 16:17:36 +0000
 From: Aurelien Aptel <aaptel@nvidia.com>
 To: linux-nvme@lists.infradead.org,
 	netdev@vger.kernel.org,
@@ -66,16 +66,16 @@ Cc: Aurelien Aptel <aaptel@nvidia.com>,
 	borisp@nvidia.com,
 	galshalom@nvidia.com,
 	mgurtovoy@nvidia.com
-Subject: [PATCH v12 11/26] nvme-tcp: Add modparam to control the ULP offload enablement
-Date: Wed, 12 Jul 2023 16:14:58 +0000
-Message-Id: <20230712161513.134860-12-aaptel@nvidia.com>
+Subject: [PATCH v12 12/26] nvme-tcp: Only enable offload with TLS if the driver supports it
+Date: Wed, 12 Jul 2023 16:14:59 +0000
+Message-Id: <20230712161513.134860-13-aaptel@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712161513.134860-1-aaptel@nvidia.com>
 References: <20230712161513.134860-1-aaptel@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: VE1PR03CA0008.eurprd03.prod.outlook.com
- (2603:10a6:802:a0::20) To SJ1PR12MB6075.namprd12.prod.outlook.com
+X-ClientProxiedBy: FR2P281CA0160.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:99::9) To SJ1PR12MB6075.namprd12.prod.outlook.com
  (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,55 +84,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|PH7PR12MB7212:EE_
-X-MS-Office365-Filtering-Correlation-Id: 33ec3428-2cbb-43c1-6896-08db82f37dff
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|DM4PR12MB6640:EE_
+X-MS-Office365-Filtering-Correlation-Id: 58cac26b-d6cd-4fc9-ffe7-08db82f3816e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	JfSYm3Z+LzuhB5f/kz+DugkeQpF2GuQtl0s3qfoeJxtEmxKkplOz/GvGrZb2q1rgXyh2jQvb7upbXPMOWRTLtwFF7SVXzyjDkFYxx0YSoY39EXsdFMIEF5C+D0O1pUAAXqAUGCD+iglYiYDwuTY2N4nbjZyx9qwx1yQgGRahdxCbC5W3katd83nlbinIbVYIR4IgNVjV1johzRaL5c44MUjyBsdBXQFJycz9UQ6+IVBM+fV+gUDwBeFdFJrx+IBCsFJeJjWJiIOhXPbiavlG4eQQ8WhajGWyvHonIfnFrmygxRetVItLJ2x7eICw7PRuNB8PCiA4PwmER+Jj5+XxSakJaSJSMlqAxRZXsAxCgMiHvk4jVQddWJjtdkatLhtsp6uM4Ib4OgPSrB8dSFi2X08NfOi8B+XEYgFrzKX7pfWYjPeu7CSGJn82banAdgMydWjdMFCkSu0IYbonBHPLvmfKdhQ193cUxC1SJruNpEQzAUIQdlm60Ex3IXEuWfyTElxd0xfr+XhedxWI5p8BUSeLiKhsYCAe2iV4SCG9GDHCkS7Km+5pcK2oSvGB+3yY
+	LNUMUgzNbka1t7bZlnA17u4CShMO++B15beM4gFnfEelsTooJmrCWdjJu1yi1OFESkZiAp7aku58ZKXP6gwXOD7RoWpKDGXUS3opU0hMCYaYVvOV2BO/d/BBAIHwe0lsPqlJaDJ1VlCADMp4lTpkW1GfNBfZs3OeMGRH1oI2LGrdzJXa/XwnfES2XYCfU88GvrcYwLvpD0vT6cBg9G3+W4QELbFmaw7RKNO3Gdb3ybeMK1StK92B0W8AeyEGs9m5R9Bssh6DxVUaeoOK1HGOcZR6lJyDM3SZRqmktJnwDaSBkUdBE6ZPJ9bnRJ1Qbp3As4sExbpnFVYDX/4/o7bVDgwl/OL00nEQosUeFsC3IxXdfx1Tq+gygOA8n5e3jy3zRmNvW09aNdf14mwJ/jpYhWyPKg/HH9jJ9esLDFWJHHNnRITHS2tDH4oCdCqZdk7PxnBXhY0c9BTtwejJB1sMU1mCnPJVSv9jf3vw4x/jRmJQh2doFPCkJdUiVGY1zwRfegvrBpQnLhvD3sHUoMFEES6gLtd0yNPzfEm+VFjVGioOzMPz/wSwVXY+2OE14piS
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(136003)(346002)(376002)(396003)(451199021)(186003)(2616005)(86362001)(66476007)(66946007)(66556008)(316002)(83380400001)(107886003)(4326008)(6512007)(1076003)(26005)(6506007)(478600001)(2906002)(6486002)(36756003)(6666004)(38100700002)(41300700001)(7416002)(8676002)(8936002)(5660300002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(366004)(396003)(346002)(376002)(451199021)(4326008)(66556008)(66946007)(66476007)(6512007)(38100700002)(107886003)(86362001)(186003)(26005)(6506007)(1076003)(2616005)(83380400001)(36756003)(478600001)(6486002)(6666004)(41300700001)(5660300002)(8676002)(8936002)(4744005)(316002)(2906002)(7416002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AvNEpHg7ADK0YX2NoF276lSH/0WVBy5U37nDPbcrgTyJRblzPS6aNFNuljvQ?=
- =?us-ascii?Q?xb73RQ/RZHgVoc6E6AuSSVDXxJok8jjhYQNoll102b+0yGrqn3Guz4CKZjHq?=
- =?us-ascii?Q?ZRFh+FW4IrKJ2Qq8x2AaLogMvVoNRP2L6fLpPIDRmx5pLwKsPxiuaNc4KRFD?=
- =?us-ascii?Q?IITtJIsQWcFnVSvr9rGr+AQyZ3kzF2H5rCZR9R/aafWqgQFSY9xmYeaH8Jaa?=
- =?us-ascii?Q?lNFPD9/odtktYxeVbJ1jjjLxsNVk/TRlwqMKi/OEJ3y44p77+8FCE8YJONdG?=
- =?us-ascii?Q?lH4TLSLaMs1YWvPuMT8pm/0KWFD0pp89MBKKb2os6+cduFJUZdQ+EYw2PxZ6?=
- =?us-ascii?Q?Dmx8qFLhVxFcrxhEytxIbdjeu8mNOOBNEdQImlE0/oFYU6Pn9GShG/6PocVe?=
- =?us-ascii?Q?aAPlwhVSaSfIu+uvxRGniZ4R9sa1smz1doEyrUtA/ZDOCRE69qmcTm3wklcy?=
- =?us-ascii?Q?bG7MdC0tsfmG7OwDC/HRE2xaBarWpsp5j6vyS815+3vPa4kQ9c06mIrnJuqQ?=
- =?us-ascii?Q?0yTTj4jjkalzcnAZeot9rxAWgNLNtwS+OV5pBIz3O+SJ6zI0Vz3dHa5Z8K6m?=
- =?us-ascii?Q?Uhv6hvwpNSKtKtJOSZHJY+qCOrXxvy5RIgheqV/JPw+eQw+auWlz98Jo5QpB?=
- =?us-ascii?Q?ZhfRwW6WvO0TsGDQNRpFI3MjKqQ2srawmHgWgZyMfZ2bJU8APjsIDGOHZOlp?=
- =?us-ascii?Q?vbCF0ybAx0+2GJlAtO1qSEoIldH5WGvrbAXBqFlQZEJotFKYNSkQwKhuxSXo?=
- =?us-ascii?Q?wO9yC09HHy9wOtFLqLk74C6BKUml5CFGlII1IA2COpaDjf2qovypCJ+N8Upg?=
- =?us-ascii?Q?K9TF/I7h8qkON+JxEuAy70x8mq2u57k8sYBl5FaEWOFawQAufOrGwSKZXF9b?=
- =?us-ascii?Q?+ov/ezgU4aIglLztl5tYa8MeFAeOxgYqLvxuhesfV11pGURi752CYrmaY2EW?=
- =?us-ascii?Q?xmYdLLmpN1z5cFkiLa4+94++SQFrWHLy1ZbNEzp5T+RlCyOQM1B2g0HsV/VZ?=
- =?us-ascii?Q?QZ3Iu1NoGWTpmewi1x+r7JtSG0aNg2XHJFCY1TF7UgZGLs/kjY7B0U3nUX12?=
- =?us-ascii?Q?keZveWHE/4WlxjgzQRG5saSSF38GQM2LcFnoRIX7FPiHIbuVKKuVPI5mD3Mj?=
- =?us-ascii?Q?xs4/W5s2AhpYHqv9Sl+K3juvfRwFotd2x3AOSu/yzLTWGOn9kLaz8GI/LY6M?=
- =?us-ascii?Q?fnT10hRa2GuEbCjkSrt8/ptGSywxduCLFrBttUbc22B2llk01JZ/mz6s1SoP?=
- =?us-ascii?Q?hS1vXmLuxYLf0Onh/cc2tHmcTb5GnzFaX6zk8l5ZkSizHVkriyG8Jd4sfkfr?=
- =?us-ascii?Q?T/wIPMpP8qPFHiG9l3vC5/h70oLCdeUdGhcTtd3P9cL+kLfVQHav012hvqNK?=
- =?us-ascii?Q?2Jw584/ToUAIRUVDw7HGm4X9DgCs4HhSVxlOfa6/MAeXGUcjAB/hUPLCF119?=
- =?us-ascii?Q?U+KSbOBBGeSEhvdGeoUrZy4RPUEoT6esVlLqMMkSMwZUnOPv6Rd2MkLClUR+?=
- =?us-ascii?Q?kdKdFJidVzAWsOGA9zWPfz8d7Cdf3FjkQX9bTGbkZsuGJFJwq4bNXW4RQYWR?=
- =?us-ascii?Q?wkxIfJP+UfpXoGPy90QlDU4M+UYDQDcPhMEjjFYa?=
+	=?us-ascii?Q?TzaZ/bQ4lz5pQgv1hfF1eg1Tfnv6JCfJN7uDHaN3YF4K9a1YJa/Tkr+E9AQJ?=
+ =?us-ascii?Q?jS5Ug1GrJq7MfNV+jxmZswzgcVHx8D2SSn5tOduXc5AinBWNpGaPaZhrVI3l?=
+ =?us-ascii?Q?p78MrdIgm7AO8e5ksTFPDVCSxv1WRBNExZ5hdzUHB9PXoE3Xe28N0ZyoQQ0k?=
+ =?us-ascii?Q?VT/s6ueBA1kdW1uyWwun0VgFdWNkRtmXyC0BB1X1VExrWgF4UwLXdu+lpKdW?=
+ =?us-ascii?Q?uaS7iBKoj8ou4yd3e3huGPrEtcYVbNJDFacfPSYpZ6vOqBieOlOZxF8Aco5a?=
+ =?us-ascii?Q?8xzkmAV2s92fS2aNtavvu6vkVQXHCe/A7bdxCkifHVezXiXFxWJ9wGLAj8bq?=
+ =?us-ascii?Q?LqJxdy4AwgfS9tuiEc7U8nUqFgDtpcexQBk7B7SGRzSNBvjOUBd76Z1HERH6?=
+ =?us-ascii?Q?vcr8up+ZgcAvwxAAk09MOoACY2hpN9XzV5aRIv/RbAfjrXzyiglseldJLm8d?=
+ =?us-ascii?Q?DEk01raHNfKEOKW/ggiBmh8oj2rOXBiOeKFUhHM+9nl7FLmWXPne7xje70NY?=
+ =?us-ascii?Q?aGnRVaDE4JUJlLddvsL621KCabinBSDmn1pbyPiXZ0YFt5Oxycy0YdLkcrUR?=
+ =?us-ascii?Q?fs9g38XdKOdhlrDMIYnF/FqAKNhtHZ4nqdsNv5T6a15GjG0fjZOsRGJ9hG32?=
+ =?us-ascii?Q?Hmu0vZP/zFHaAp7E/p6BbQprIopJTuBUgSVJ+YKGcP8g7xj+mrgEWcBiE3rH?=
+ =?us-ascii?Q?4AvKFEFye8J7u+HxrWoLgUme6vC1NOZf8V90GGZOAs8peIowiNVPgfifrqqi?=
+ =?us-ascii?Q?ISU3zPWC0K0y38kIzjM8AGIu+x2gZrCGfJMpRyoySJ3twNPrBbSs4PGZquru?=
+ =?us-ascii?Q?ODjxkeWLEbE4Eb0PUMBJdOqxrgArCivChTnSGxX78j87NNH+zbWieHUn4+RW?=
+ =?us-ascii?Q?bGezpu+rUik6tf9xHQpivRwTcekeNfvQnsAH1BdewKxIRh4XXnAokV0rl+81?=
+ =?us-ascii?Q?w/dNOxb3SUpXCcWVRmqoOChtP+kw4+WgAjUaWUOxQuAxdQCuD88MELIaR0R4?=
+ =?us-ascii?Q?SHfZCx2jV2MRRMgj1jjp5x8gWOQ2OaTddxj7e0sSHiFy5NEi6i2bdrePhRqK?=
+ =?us-ascii?Q?tE6eduoS7wwWk/20Ur5r4tqpS5pZO0zDCC13qsOdq51/npP4rPSmKspnjvqO?=
+ =?us-ascii?Q?sjkKuiXxVDTrhv7QQlIbqw6N/rsolqg2moleoqFsJ9lk3TTW1YPLhfpXMCho?=
+ =?us-ascii?Q?jdNrHDfp3OMuIbSE11zV/gzjzwALTYF4tpuvImViS41fDA4oL4xtRu7n5B3C?=
+ =?us-ascii?Q?tLxKRdSGItp/7NbjSA3wmVyfxJ/ShmqRUub/C6vsW/xeGuSMDe04li5mJzmj?=
+ =?us-ascii?Q?rCBII7tlv9ZI+15QqGdxO/AnxztUS0SXOqrFQItByCKcpnNPHjaMJMBCPgza?=
+ =?us-ascii?Q?aMw5JMs+nifQy+mFoXMBf7BPFqoLLXpBWq1eNyU2PZC6J2yuSLmM8t4qetZP?=
+ =?us-ascii?Q?tjE6lGiAmP0VdsrmlSWe+ik9CLWe+vdV67+gKX2oXrzD70+iGIf6uKBUIuTN?=
+ =?us-ascii?Q?tkKlU1Sr4DJxHIJwcEfKvswplAm9WnFEvhzE4DvcGHfAzVEY3oIKPaUSY1D/?=
+ =?us-ascii?Q?imf2WDyAZPtQFUiTAvzphNERORt5KoaaiLsLnY5j?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33ec3428-2cbb-43c1-6896-08db82f37dff
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58cac26b-d6cd-4fc9-ffe7-08db82f3816e
 X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 16:17:30.7724
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 16:17:36.5094
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: svkPIJ+OIc4lJBWtpLQAVzJ7wBANQ0eFYh44SHVpxxglxUzld4M8UyljTxw9AoHGHkAwVU1/0pXcCijKg8vPZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7212
+X-MS-Exchange-CrossTenant-UserPrincipalName: fIRzAH5qW8glofavVbAxRplj1gG1yJLjcqjcpr5l/uTwtO8jEogS96LG+iVHBlZWdFmb5o1jmUsrTKaArKypXg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6640
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -141,53 +141,31 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add ulp_offload module parameter to the nvme-tcp module to control
-ULP offload at the NVMe-TCP layer.
+Check if ULP offload driver supports ULP-over-TLS before enabling the
+offload with tls.
 
-Turn ULP offload off be default, regardless of the NIC driver support.
-
-Overall, in order to enable ULP offload:
-- nvme-tcp ulp_offload modparam must be set to 1
-- netdev->ulp_ddp_caps.active must have ULP_DDP_C_NVME_TCP and/or
-  ULP_DDP_C_NVME_TCP_DDGST_RX capabilities flag set.
-
-Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-Signed-off-by: Shai Malin <smalin@nvidia.com>
 Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
+Signed-off-by: Shai Malin <smalin@nvidia.com>
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 ---
- drivers/nvme/host/tcp.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ drivers/nvme/host/tcp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index e68e5da3df76..e560bdf3a023 100644
+index e560bdf3a023..afb3dedcbc0c 100644
 --- a/drivers/nvme/host/tcp.c
 +++ b/drivers/nvme/host/tcp.c
-@@ -49,6 +49,16 @@ MODULE_PARM_DESC(tls_handshake_timeout,
- 		 "nvme TLS handshake timeout in seconds (default 10)");
- #endif
- 
-+#ifdef CONFIG_ULP_DDP
-+/* NVMeTCP direct data placement and data digest offload will not
-+ * happen if this parameter false (default), regardless of what the
-+ * underlying netdev capabilities are.
-+ */
-+static bool ulp_offload;
-+module_param(ulp_offload, bool, 0644);
-+MODULE_PARM_DESC(ulp_offload, "Enable or disable NVMeTCP ULP support");
-+#endif
-+
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- /* lockdep can detect a circular dependency of the form
-  *   sk_lock -> mmap_lock (page fault) -> fs locks -> sk_lock
-@@ -350,7 +360,7 @@ static bool nvme_tcp_ddp_query_limits(struct net_device *netdev,
- static inline bool is_netdev_ulp_offload_active(struct net_device *netdev,
- 						struct nvme_tcp_queue *queue)
- {
--	if (!netdev || !queue)
-+	if (!ulp_offload || !netdev || !queue)
+@@ -367,6 +367,10 @@ static inline bool is_netdev_ulp_offload_active(struct net_device *netdev,
+ 	if (!nvme_tcp_ddp_query_limits(netdev, queue))
  		return false;
  
- 	/* If we cannot query the netdev limitations, do not offload */
++	/* If we are using TLS and netdev doesn't support it, do not offload */
++	if (queue->ctrl->ctrl.opts->tls && !queue->ddp_limits.tls)
++		return false;
++
+ 	/* If netdev supports nvme-tcp ddp offload, we can offload */
+ 	if (test_bit(ULP_DDP_C_NVME_TCP_BIT, netdev->ulp_ddp_caps.active))
+ 		return true;
 -- 
 2.34.1
 
