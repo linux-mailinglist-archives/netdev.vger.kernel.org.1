@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-17200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D462750CCA
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:41:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16C2750CC6
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 17:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E4771C211B7
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:41:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8468E281543
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 15:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA7A2AB35;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B73524195;
 	Wed, 12 Jul 2023 15:40:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B216C24160
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:40:08 +0000 (UTC)
-Received: from mail-ua1-x933.google.com (mail-ua1-x933.google.com [IPv6:2607:f8b0:4864:20::933])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ADC11BD5
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:04 -0700 (PDT)
-Received: by mail-ua1-x933.google.com with SMTP id a1e0cc1a2514c-791a0651fa3so2349501241.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC69224160
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 15:40:09 +0000 (UTC)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A621BF2
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:05 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-403713e7344so50471071cf.2
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 08:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689176403; x=1691768403;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689176404; x=1691768404;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wqAMunIjQg4b+DWKEbmOBlkwSanJ21tKzH7b3xa9RSc=;
-        b=T7kpfxWMY5YLu2gwz6SK4bc8YTkccXYhS4lu90yuvYqwfDglJDPBJu24KUxPsysyRQ
-         PR5aDpm3Oig5nmOnAFh1wfq2Dm/Dg2LxgA1RKcw3EU78kU5vbDQWpV37zkvUR898bsOV
-         B13UzzFEd1Vku/LoNHBG4t/V/tTYjni/9zY4Av8wEFbr+Q4iT+qDkUrnyKyVYBnM+tka
-         /N47ujLwisfO82Pb1doMFHQiob0alI0AI+BtljjVqTJoJeqomXaHzJKjkXhXdiQ+kGf/
-         BZB60Mn1Wu2J0IbuEk8WwA+x9H8N7BK14VE8Qb6ZB6q/qccxuhU4lwNajwJebgyXzeza
-         aADg==
+        bh=zLEqBZv0yHse70T+YIr7i1j8Cjw/hXFYuk3GhrKwMuY=;
+        b=1qgZnea37YItGGZjIlhQNi8B0rGgrIkheiq116Bc4Fndv6RJZ9wC27ikq+uzfQ8FgM
+         ZnVzJR+Gt3t9iOLMr+ReLFKRP7jxwSvTj5uxACWP2Pclj6OehahlHHA/LkkZj8D423R5
+         WGO4RFV1aDziUWvaNjk+5j1mbmpM8YVizwPNRZ5OPrI/2nWpIgiAjUchf/9l5mhjzCjp
+         OWR+U04bNz1tU4UWKgDsCSmWynZcQtBNyQCnHtPqHJOo3i4MBN8fDcD3uqVz4BVHNzVI
+         17DFhhu/c8o1Sh/PC1gpvJe82/f6npan2Mq2Es/mgMwEOSZvEs70YF44nJS2UZBiycc5
+         Xz/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689176403; x=1691768403;
+        d=1e100.net; s=20221208; t=1689176404; x=1691768404;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wqAMunIjQg4b+DWKEbmOBlkwSanJ21tKzH7b3xa9RSc=;
-        b=VjcgaKN4xPzIrGLeOeIUusCxo0TqGzho6E5/JaXxy3R9LokhH01LjNS/zA3YBEUPVv
-         t+NpqNt9f6F/rh3B42DBumZl8WTGfJ58vvIawKtANHBEHFlHKll7rSDVY7qBWhj9ZYWK
-         xPCYyZAZ7LdwvTuN4cCRbw1B/hOI+dM5xCUji/Pq9kL+NPo9rCGk9Vs42TkzNwcR/O9C
-         eFVcH6AqgmddBAL3yuPeDasxb8eumzQuY9+eFUJgAr5FpZPBuJWxAYzbjbhV/PKEMJF4
-         mmX7G/SJLuuPX4S6SU64NoJUzB6jrgwyNcM3P4D5xOIL29Bz5qUvJBKgTHW5aREb3gKo
-         ISPw==
-X-Gm-Message-State: ABy/qLa+jJCb62LkyWhhUafxQmn0pT+N8vJi3Ochya2l/ir/FM8nVbfj
-	+xThnvlfX/JfCA7+JzHpVxmpsiaHVX32lEMfW6KRMg==
-X-Google-Smtp-Source: APBJJlE+ajJSjIIAaxKJjN2CGDi+Q/cTIq6YSV9vIfOkRy9hd19wCOSEJcLl3PySfcjcac9Ft71gMg==
-X-Received: by 2002:a67:ce18:0:b0:443:8a7b:f76d with SMTP id s24-20020a67ce18000000b004438a7bf76dmr926560vsl.28.1689176402880;
-        Wed, 12 Jul 2023 08:40:02 -0700 (PDT)
+        bh=zLEqBZv0yHse70T+YIr7i1j8Cjw/hXFYuk3GhrKwMuY=;
+        b=YM2w6PECB4flc6ZRLk8Ye0s+w1WJDOA1+vAjNDO1sebeGBLUaDsbHb2IT8q6LCvdI/
+         I3o9ZnfzMIc2oWq0+HIK0kfb7P8lZy268+wX3/W+3cz3nfL4M5UNUSnzsm5BXCXk4Zce
+         ob+Lrflx4ZdvjOuxQWTzpJrwNWCMOHNWitiLvPd90AAx1CNUIrwsESxawu3KTj3OLhxH
+         IxCRSeTX9HmjnHBFWkMoWOXIg6UYvsbipxxfvTFhXtJ+nKfMgTyMMHIW6cclqnS95JzJ
+         vvRiX4xA15erfdjGsrZsmBJe06z5aHBwVCjCD6PU5IURIcnmGAhcO5ujWxNvjoQIJIJZ
+         h9ZA==
+X-Gm-Message-State: ABy/qLYUHVNJD7py/xQywGiIoLvFniiM+PFnfDYoZAOwYK3nUH69xrda
+	zjbC3aCikqXNjKuN1citxc3kbuFQarxyhMplkNv0zg==
+X-Google-Smtp-Source: APBJJlFVtjhlp1IWg01Mcb4FQVunj8XvLjxMt1QbSdyYVShW3Q/uSxMkGeCfS2ysDnPnETY3zN4r3w==
+X-Received: by 2002:a0c:8d8a:0:b0:636:b0b5:3198 with SMTP id t10-20020a0c8d8a000000b00636b0b53198mr16522615qvb.50.1689176404214;
+        Wed, 12 Jul 2023 08:40:04 -0700 (PDT)
 Received: from majuu.waya ([142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id r3-20020a0ccc03000000b0063211e61875sm2283827qvk.14.2023.07.12.08.40.01
+        by smtp.gmail.com with ESMTPSA id r3-20020a0ccc03000000b0063211e61875sm2283827qvk.14.2023.07.12.08.40.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 08:40:02 -0700 (PDT)
+        Wed, 12 Jul 2023 08:40:03 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -78,9 +78,9 @@ Cc: deb.chatterjee@intel.com,
 	toke@redhat.com,
 	mattyk@nvidia.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v4 net-next 02/22] net/sched: act_api: increase action kind string length
-Date: Wed, 12 Jul 2023 11:39:29 -0400
-Message-Id: <20230712153949.6894-3-jhs@mojatatu.com>
+Subject: [PATCH RFC v4 net-next 03/22] net/sched: act_api: add init_ops to struct tc_action_op
+Date: Wed, 12 Jul 2023 11:39:30 -0400
+Message-Id: <20230712153949.6894-4-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712153949.6894-1-jhs@mojatatu.com>
 References: <20230712153949.6894-1-jhs@mojatatu.com>
@@ -97,13 +97,17 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Increase action kind string length from IFNAMSIZ to 64
-
-The new P4TC dynamic actions, created via templates, will have longer names
-of format: "pipeline_name/act_name". IFNAMSIZ is currently 16 and is most
-of the times undersized for the above format.
-So, to conform to this new format, we increase the maximum name length
-to account for this extra string (pipeline name) and the '/' character.
+The initialisation of P4TC action instances require access to a struct p4tc_act
+(which appears in later patches) to help us to retrieve information like the
+dynamic action parameters etc. In order to retrieve struct p4tc_act we need the
+pipeline name or id and the action name or id. Also recall that P4TC
+action IDs are dynamic and  are net namespace specific. The init callback from
+tc_action_ops parameters had no way of supplying us that information. To solve
+this issue, we decided to create a new tc_action_ops callback (init_ops), that
+provides us with the tc_action_ops struct which then provides us with the
+pipeline and action name. In addition we add a new refcount to struct
+tc_action_ops called dyn_ref, which accounts for how many action instances we
+have of a specific dynamic action.
 
 Co-developed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
@@ -111,67 +115,66 @@ Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/act_api.h        | 2 +-
- include/uapi/linux/pkt_cls.h | 1 +
- net/sched/act_api.c          | 6 +++---
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ include/net/act_api.h |  6 ++++++
+ net/sched/act_api.c   | 14 +++++++++++---
+ 2 files changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 54754deed..a414c0f94 100644
+index a414c0f94..363f7f8b5 100644
 --- a/include/net/act_api.h
 +++ b/include/net/act_api.h
-@@ -105,7 +105,7 @@ typedef void (*tc_action_priv_destructor)(void *priv);
- 
- struct tc_action_ops {
- 	struct list_head head;
--	char    kind[IFNAMSIZ];
-+	char    kind[ACTNAMSIZ];
+@@ -108,6 +108,7 @@ struct tc_action_ops {
+ 	char    kind[ACTNAMSIZ];
  	enum tca_id  id; /* identifier should match kind */
  	unsigned int	net_id;
++	refcount_t dyn_ref;
  	size_t	size;
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index 648a82f32..1849f4f4b 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -6,6 +6,7 @@
- #include <linux/pkt_sched.h>
- 
- #define TC_COOKIE_MAX_SIZE 16
-+#define ACTNAMSIZ 64
- 
- /* Action attributes */
- enum {
+ 	struct module		*owner;
+ 	int     (*act)(struct sk_buff *, const struct tc_action *,
+@@ -119,6 +120,11 @@ struct tc_action_ops {
+ 			struct nlattr *est, struct tc_action **act,
+ 			struct tcf_proto *tp,
+ 			u32 flags, struct netlink_ext_ack *extack);
++	/* This should be merged with the original init action */
++	int     (*init_ops)(struct net *net, struct nlattr *nla,
++			    struct nlattr *est, struct tc_action **act,
++			   struct tcf_proto *tp, struct tc_action_ops *ops,
++			   u32 flags, struct netlink_ext_ack *extack);
+ 	int     (*walk)(struct net *, struct sk_buff *,
+ 			struct netlink_callback *, int,
+ 			const struct tc_action_ops *,
 diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 5e5f299d2..420cf2617 100644
+index 420cf2617..6749f8d94 100644
 --- a/net/sched/act_api.c
 +++ b/net/sched/act_api.c
-@@ -479,7 +479,7 @@ static size_t tcf_action_shared_attrs_size(const struct tc_action *act)
- 	rcu_read_unlock();
+@@ -1007,7 +1007,7 @@ int tcf_register_action(struct tc_action_ops *act,
+ 	struct tc_action_ops *a;
+ 	int ret;
  
- 	return  nla_total_size(0) /* action number nested */
--		+ nla_total_size(IFNAMSIZ) /* TCA_ACT_KIND */
-+		+ nla_total_size(ACTNAMSIZ) /* TCA_ACT_KIND */
- 		+ cookie_len /* TCA_ACT_COOKIE */
- 		+ nla_total_size(sizeof(struct nla_bitfield32)) /* TCA_ACT_HW_STATS */
- 		+ nla_total_size(0) /* TCA_ACT_STATS nested */
-@@ -1404,7 +1404,7 @@ struct tc_action_ops *tc_action_load_ops(struct net *net, struct nlattr *nla,
- {
- 	struct nlattr *tb[TCA_ACT_MAX + 1];
- 	struct tc_action_ops *a_o;
--	char act_name[IFNAMSIZ];
-+	char act_name[ACTNAMSIZ];
- 	struct nlattr *kind;
- 	int err;
+-	if (!act->act || !act->dump || !act->init)
++	if (!act->act || !act->dump || (!act->init && !act->init_ops))
+ 		return -EINVAL;
  
-@@ -1419,7 +1419,7 @@ struct tc_action_ops *tc_action_load_ops(struct net *net, struct nlattr *nla,
- 			NL_SET_ERR_MSG(extack, "TC action kind must be specified");
- 			return ERR_PTR(err);
+ 	/* We have to register pernet ops before making the action ops visible,
+@@ -1495,8 +1495,16 @@ struct tc_action *tcf_action_init_1(struct net *net, struct tcf_proto *tp,
+ 			}
  		}
--		if (nla_strscpy(act_name, kind, IFNAMSIZ) < 0) {
-+		if (nla_strscpy(act_name, kind, ACTNAMSIZ) < 0) {
- 			NL_SET_ERR_MSG(extack, "TC action name too long");
- 			return ERR_PTR(err);
- 		}
+ 
+-		err = a_o->init(net, tb[TCA_ACT_OPTIONS], est, &a, tp,
+-				userflags.value | flags, extack);
++		/* When we arrive here we guarantee that a_o->init or
++		 * a_o->init_ops exist.
++		 */
++		if (a_o->init)
++			err = a_o->init(net, tb[TCA_ACT_OPTIONS], est, &a, tp,
++					userflags.value | flags, extack);
++		else
++			err = a_o->init_ops(net, tb[TCA_ACT_OPTIONS], est, &a,
++					    tp, a_o, userflags.value | flags,
++					    extack);
+ 	} else {
+ 		err = a_o->init(net, nla, est, &a, tp, userflags.value | flags,
+ 				extack);
 -- 
 2.34.1
 
