@@ -1,242 +1,410 @@
-Return-Path: <netdev+bounces-17132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92081750812
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:21:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41F44750833
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 14:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEA541C20F73
-	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:21:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD91C210EE
+	for <lists+netdev@lfdr.de>; Wed, 12 Jul 2023 12:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29CBF2AB33;
-	Wed, 12 Jul 2023 12:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AAB2AB21;
+	Wed, 12 Jul 2023 12:26:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17CA22AB22
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 12:21:20 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2088.outbound.protection.outlook.com [40.107.220.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849E99B;
-	Wed, 12 Jul 2023 05:21:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h2RvdASv7me2uF4K2GYEcW2fTmZqhaNVWMYj1OwjJDYRS/Eh/f/NKV5b9T6NoEoH62R2ep7JfWkCNjXbZhV86GPHCHIu6+fVJ776YRN1ihy/stQ6KY0otmPqF/0qWxWF+p8blR4WW1BLsSU3xOImuabldgxQRlpqY5eZwNXqOANLo8yVWoM7yzV3OEREH3mik4BfwuHPXsHdK8Weh5hK23ROKkW/cFtUWBJfuQHU0Vc5M+M+pNK+Ku64NJewpGrgt3tOuWyJVx5mGkbX+yUHNdpjeprVWtAJSujEEP5Hm1hAXZqDqJyI+rf8jGB8OrP88CxWRqlUbl5nsl92rLab2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qSRPxJPPzUh8j2dtkBxrWA1T6LN0Fqp3ZmASMfuZjUY=;
- b=J2W/2gLpzxDWUV2tn/ePAU0DeNWl81Hre1eEMSD7bytyRpNwmWAlfYYPzEpYRtVF1XN0GZ0NW8oDsG72N+DhLx+QCX5Ti0Pd/olsJW7ipLvueUJhMdDrhoZ6TeInrV5tOrhlIxTv2C2ejL8m827EQAuSkWIr9o6CKmFK4M7Xb84WbvVQ9mEEF7N4t8h40L0FNuNr2Qphd1RHLilxnBzYVwibXhTtEzPKwso4UTamleNKtXj2PzlUJuFkpMc+w/s0Yvps2cS/EUrWgCnrPmoRcAUIuc2Snkqz5TTYxqxmMtKMlSdPpUSxvtX1tSyLY26D8LJDNJhA3G630DN3G+YmQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qSRPxJPPzUh8j2dtkBxrWA1T6LN0Fqp3ZmASMfuZjUY=;
- b=Cal/C92YPqqdke5ZFH2Q3pBNgLaWHJuj2bdvBTHpjTzoj0nueaOlE1FqdnIzJi0RLzrBtSL4NTZzqF+W8BTmNGD7bDP5ge15zX1P2sSU6osdIkpERCvB/mDUG7eNd3X0DtrRzh9kayf0zzx0NdoUokoYbDuF3UgQyjLWouWiGfc=
-Received: from BN9PR03CA0504.namprd03.prod.outlook.com (2603:10b6:408:130::29)
- by CH0PR12MB5156.namprd12.prod.outlook.com (2603:10b6:610:bb::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Wed, 12 Jul
- 2023 12:21:16 +0000
-Received: from BN8NAM11FT021.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:130:cafe::61) by BN9PR03CA0504.outlook.office365.com
- (2603:10b6:408:130::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22 via Frontend
- Transport; Wed, 12 Jul 2023 12:21:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT021.mail.protection.outlook.com (10.13.177.114) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6588.22 via Frontend Transport; Wed, 12 Jul 2023 12:21:15 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 12 Jul
- 2023 07:20:56 -0500
-From: Michal Simek <michal.simek@amd.com>
-To: <linux-kernel@vger.kernel.org>, <monstr@monstr.eu>,
-	<michal.simek@xilinx.com>, <git@xilinx.com>
-CC: Srinivas Neeli <srinivas.neeli@amd.com>, Appana Durga Kedareswara rao
-	<appana.durga.rao@xilinx.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Marc
- Kleine-Budde" <mkl@pengutronix.de>, Naga Sureshkumar Relli
-	<naga.sureshkumar.relli@xilinx.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Philipp Zabel" <p.zabel@pengutronix.de>, Wolfgang Grandegger
-	<wg@grandegger.com>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 2/2] can: xilinx_can: Add support for controller reset
-Date: Wed, 12 Jul 2023 14:20:46 +0200
-Message-ID: <ab7e6503aa3343e39ead03c1797e765be6c50de2.1689164442.git.michal.simek@amd.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <cover.1689164442.git.michal.simek@amd.com>
-References: <cover.1689164442.git.michal.simek@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B181F959
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 12:26:35 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0579B;
+	Wed, 12 Jul 2023 05:26:32 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36CCQ45f076103;
+	Wed, 12 Jul 2023 07:26:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1689164764;
+	bh=2+TJV7UTEfg4twrLPPlTtGNNmrMyxqIzMxApzACFHn8=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=vgrvu5/QLnSnojItGoa7E7Wq1AClMgEqRoXk8s+kglmq9wKte1/oQ0Ml1LuK+KRV0
+	 K+3+uF8dLc9wCt+Mpzw1XbRYDQ6knD0LfGXOIRstX/laT8yLCtxmPoPQqGfpm5I0LI
+	 MwiMGEcGPadMOpmgIWMZPRcYBf/t6Ls8+d9KoL6U=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36CCQ4Rb007083
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 12 Jul 2023 07:26:04 -0500
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 12
+ Jul 2023 07:26:04 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 12 Jul 2023 07:26:04 -0500
+Received: from [10.249.135.225] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36CCPwdO053774;
+	Wed, 12 Jul 2023 07:25:58 -0500
+Message-ID: <afbd4c9d-5ff7-e366-f866-6b718907d6fa@ti.com>
+Date: Wed, 12 Jul 2023 17:55:57 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3587; i=michal.simek@amd.com; h=from:subject:message-id; bh=zjASbYlHTwyXN6GaTTSSuNwXIgN88Y29PGWBuEMwemk=; b=owGbwMvMwCR4yjP1tKYXjyLjabUkhpR1s+Z8Pb2wK39he5xC5ZTCPfwKkSdZdm0+sKAs9tfcZ 1dz9WoOd8SyMAgyMciKKbJI21w5s7dyxhThi4flYOawMoEMYeDiFICJ8M1jmF9QzOZl3RtrPTvS fSHPnSLOQHXzrwzzHQ6y3mC7HC4sr/33w/lo385Io6abAA==
-X-Developer-Key: i=michal.simek@amd.com; a=openpgp; fpr=67350C9BF5CCEE9B5364356A377C7F21FE3D1F91
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT021:EE_|CH0PR12MB5156:EE_
-X-MS-Office365-Filtering-Correlation-Id: fa9d4992-12b3-43e2-3c7f-08db82d27d62
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	CZ/K3zwwJe3USGdCSGRF94WTx/Sgui/l76wnlnMxEB2TxGk4xXz+chWfgbmX5A/3X77+m4ZDian+eEOGf35DmEdGHGoI9OoTJmY6n3iYmMwCjvIdkbLOyWYTwQz2y3Ly2/zaZQIqnrMV23QdvWpL1I1o5HL0feBYZU4orCH2S8sOe3iWBaYt52fleTKFxQh2ejjREBz0Z/YC5hucOHJzr9mhdywLTz2uvpx/ip9vV+cBCttc5+q2AfOfWsDxwcAGAPSd/V+MEDmGMbfY1Jq/Mo0YTLM76CwNoEi0hmlYU3TsKnHpVCYOu150sRA7wd+Nd4fpQQNH+mBoOUlLBBPiWoWHXsItzfTCg325oe7B+hALjDeWkhTyo+3DNiJ44K3R4CDjLoxnj1qbmG+4ptekpQHCa0Q1vqWF/+FR3htBWBhF3SEsOda1eSNBK5PcIrudV4giblLZpWu7cXSifhQefma7QjlHWJ8Z7dk162EHRec4i/4Syf4ibCfY9r1zafqa8WyC11XuuV4xr8wDFjxfTVllVn23YNLHinzDH/jB2MEwXIJlxPZ7soJYE+/gkIemfOuZWfHrxHDw87d7uiJfVLcbFpJ0ZW0Rjyflk4oIxPn9/+/bUfZD2F03K72f2f9kd9BbT9RqX9cjPbbJWVMfNRoorOz0AOH5RcXMNEV8R5PoAB3xm0IS8HbHJ09gdZ1ELot1VyQxyzTlznZZOTEaxQ8JQk/A9SWUQdI1xv+dmuFKFetZBFlDfEwoS6g8h0OuFDCpY0D1b4gGCzBn0yPsHftQUdS3dzlCpZxPkdjqcpw=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(396003)(136003)(376002)(451199021)(36840700001)(46966006)(40470700004)(41300700001)(8936002)(36756003)(82310400005)(8676002)(5660300002)(36860700001)(26005)(7416002)(44832011)(316002)(70586007)(70206006)(47076005)(4326008)(2906002)(83380400001)(81166007)(54906003)(16526019)(82740400003)(356005)(426003)(336012)(186003)(2616005)(110136005)(478600001)(86362001)(6666004)(40460700003)(40480700001)(36900700001)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 12:21:15.6703
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa9d4992-12b3-43e2-3c7f-08db82d27d62
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN8NAM11FT021.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5156
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [EXTERNAL] Re: [PATCH v8 2/2] net: ti: icssg-prueth: Add ICSSG
+ ethernet driver
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>,
+        MD Danish Anwar
+	<danishanwar@ti.com>
+CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20230710053550.89160-1-danishanwar@ti.com>
+ <20230710053550.89160-3-danishanwar@ti.com> <ZK2VRYwW8DxIZCY2@corigine.com>
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <ZK2VRYwW8DxIZCY2@corigine.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Srinivas Neeli <srinivas.neeli@amd.com>
+Hi Simon
+On 7/11/2023 11:15 PM, Simon Horman wrote:
+> On Mon, Jul 10, 2023 at 11:05:50AM +0530, MD Danish Anwar wrote:
+>> From: Roger Quadros <rogerq@ti.com>
+>>
+>> This is the Ethernet driver for TI AM654 Silicon rev. 2
+>> with the ICSSG PRU Sub-system running dual-EMAC firmware.
+>>
+>> The Programmable Real-time Unit and Industrial Communication Subsystem
+>> Gigabit (PRU_ICSSG) is a low-latency microcontroller subsystem in the TI
+>> SoCs. This subsystem is provided for the use cases like implementation of
+>> custom peripheral interfaces, offloading of tasks from the other
+>> processor cores of the SoC, etc.
+>>
+>> Every ICSSG core has two Programmable Real-Time Unit(PRUs),
+>> two auxiliary Real-Time Transfer Unit (RT_PRUs), and
+>> two Transmit Real-Time Transfer Units (TX_PRUs). Each one of these runs
+>> its own firmware. Every ICSSG core has two MII ports connect to these
+>> PRUs and also a MDIO port.
+>>
+>> The cores can run different firmwares to support different protocols and
+>> features like switch-dev, timestamping, etc.
+>>
+>> It uses System DMA to transfer and receive packets and
+>> shared memory register emulation between the firmware and
+>> driver for control and configuration.
+>>
+>> This patch adds support for basic EMAC functionality with 1Gbps
+>> and 100Mbps link speed. 10M and half duplex mode are not supported
+>> currently as they require IEP, the support for which will be added later.
+>> Support for switch-dev, timestamp, etc. will be added later
+>> by subsequent patch series.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>> [Vignesh Raghavendra: add 10M full duplex support]
+>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+>> [Grygorii Strashko: add support for half duplex operation]
+>> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
+>> Signed-off-by: Puranjay Mohan <p-mohan@ti.com>
+>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> 
+> ...
+> 
+>> +/**
+>> + * struct map - ICSSG Queue Map
+>> + * @queue: Queue number
+>> + * @pd_addr_start: Packet descriptor queue reserved memory
+>> + * @flags: Flags
+>> + * @special: Indicates whether this queue is a special queue or not
+>> + */
+>> +struct map {
+>> +	int queue;
+>> +	u32 pd_addr_start;
+>> +	u32 flags;
+>> +	bool special;
+>> +};
+>> +
+>> +/* Hardware queue map for ICSSG */
+>> +const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
+> 
+> Should this be static?
+> 
 
-Add support for an optional reset for the CAN controller using the reset
-driver. If the CAN node contains the "resets" property, then this logic
-will perform CAN controller reset.
+Yes this can be static. I will change this to static.
 
-Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
-Signed-off-by: Michal Simek <michal.simek@amd.com>
----
+>> +	{
+>> +		{ PORT_HI_Q_SLICE0, PORT_DESC0_HI, 0x200000, 0 },
+>> +		{ PORT_LO_Q_SLICE0, PORT_DESC0_LO, 0, 0 },
+>> +		{ HOST_HI_Q_SLICE0, HOST_DESC0_HI, 0x200000, 0 },
+>> +		{ HOST_LO_Q_SLICE0, HOST_DESC0_LO, 0, 0 },
+>> +		{ HOST_SPL_Q_SLICE0, HOST_SPPD0, 0x400000, 1 },
+>> +	},
+>> +	{
+>> +		{ PORT_HI_Q_SLICE1, PORT_DESC1_HI, 0xa00000, 0 },
+>> +		{ PORT_LO_Q_SLICE1, PORT_DESC1_LO, 0x800000, 0 },
+>> +		{ HOST_HI_Q_SLICE1, HOST_DESC1_HI, 0xa00000, 0 },
+>> +		{ HOST_LO_Q_SLICE1, HOST_DESC1_LO, 0x800000, 0 },
+>> +		{ HOST_SPL_Q_SLICE1, HOST_SPPD1, 0xc00000, 1 },
+>> +	},
+>> +};
+>> +
+>> +static void icssg_config_mii_init(struct prueth_emac *emac)
+>> +{
+>> +	u32 rxcfg, txcfg, rxcfg_reg, txcfg_reg, pcnt_reg;
+>> +	struct prueth *prueth = emac->prueth;
+>> +	int slice = prueth_emac_slice(emac);
+>> +	struct regmap *mii_rt;
+>> +
+>> +	mii_rt = prueth->mii_rt;
+>> +
+>> +	rxcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RXCFG0 :
+>> +				       PRUSS_MII_RT_RXCFG1;
+>> +	txcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
+>> +				       PRUSS_MII_RT_TXCFG1;
+>> +	pcnt_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
+>> +				       PRUSS_MII_RT_RX_PCNT1;
+>> +
+>> +	rxcfg = MII_RXCFG_DEFAULT;
+>> +	txcfg = MII_TXCFG_DEFAULT;
+>> +
+>> +	if (slice == ICSS_MII1)
+>> +		rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
+>> +
+>> +	/* In MII mode TX lines swapped inside ICSSG, so TX_MUX_SEL cfg need
+>> +	 * to be swapped also comparing to RGMII mode.
+>> +	 */
+>> +	if (emac->phy_if == PHY_INTERFACE_MODE_MII && slice == ICSS_MII0)
+>> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+>> +	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && slice == ICSS_MII1)
+>> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+>> +
+>> +	regmap_write(mii_rt, rxcfg_reg, rxcfg);
+>> +	regmap_write(mii_rt, txcfg_reg, txcfg);
+>> +	regmap_write(mii_rt, pcnt_reg, 0x1);
+>> +}
+>> +
+>> +static void icssg_miig_queues_init(struct prueth *prueth, int slice)
+>> +{
+>> +	struct regmap *miig_rt = prueth->miig_rt;
+>> +	void __iomem *smem = prueth->shram.va;
+>> +	u8 pd[ICSSG_SPECIAL_PD_SIZE];
+>> +	int queue = 0, i, j;
+>> +	u32 *pdword;
+>> +
+>> +	/* reset hwqueues */
+>> +	if (slice)
+>> +		queue = ICSSG_NUM_TX_QUEUES;
+>> +
+>> +	for (i = 0; i < ICSSG_NUM_TX_QUEUES; i++) {
+>> +		regmap_write(miig_rt, ICSSG_QUEUE_RESET_OFFSET, queue);
+>> +		queue++;
+>> +	}
+>> +
+>> +	queue = slice ? RECYCLE_Q_SLICE1 : RECYCLE_Q_SLICE0;
+>> +	regmap_write(miig_rt, ICSSG_QUEUE_RESET_OFFSET, queue);
+>> +
+>> +	for (i = 0; i < ICSSG_NUM_OTHER_QUEUES; i++) {
+>> +		regmap_write(miig_rt, ICSSG_QUEUE_RESET_OFFSET,
+>> +			     hwq_map[slice][i].queue);
+>> +	}
+>> +
+>> +	/* initialize packet descriptors in SMEM */
+>> +	/* push pakcet descriptors to hwqueues */
+>> +
+>> +	pdword = (u32 *)pd;
+>> +	for (j = 0; j < ICSSG_NUM_OTHER_QUEUES; j++) {
+>> +		const struct map *mp;
+>> +		int pd_size, num_pds;
+>> +		u32 pdaddr;
+>> +
+>> +		mp = &hwq_map[slice][j];
+>> +		if (mp->special) {
+>> +			pd_size = ICSSG_SPECIAL_PD_SIZE;
+>> +			num_pds = ICSSG_NUM_SPECIAL_PDS;
+>> +		} else	{
+>> +			pd_size = ICSSG_NORMAL_PD_SIZE;
+>> +			num_pds = ICSSG_NUM_NORMAL_PDS;
+>> +		}
+>> +
+>> +		for (i = 0; i < num_pds; i++) {
+>> +			memset(pd, 0, pd_size);
+>> +
+>> +			pdword[0] &= cpu_to_le32(ICSSG_FLAG_MASK);
+>> +			pdword[0] |= cpu_to_le32(mp->flags);
+> 
+> Sparse warns that the endieness of pdword is not le32.
 
-Changes in v2:
-- Fix use-after-free in xcan_remove reported by Marc.
+I will fix this.
 
- drivers/net/can/xilinx_can.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+> There are also other sparse warnings added by this patch.
+> Please look over them.
 
-diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-index 4d3283db3a13..abe58f103043 100644
---- a/drivers/net/can/xilinx_can.c
-+++ b/drivers/net/can/xilinx_can.c
-@@ -30,6 +30,7 @@
- #include <linux/can/error.h>
- #include <linux/phy/phy.h>
- #include <linux/pm_runtime.h>
-+#include <linux/reset.h>
- 
- #define DRIVER_NAME	"xilinx_can"
- 
-@@ -200,6 +201,7 @@ struct xcan_devtype_data {
-  * @can_clk:			Pointer to struct clk
-  * @devtype:			Device type specific constants
-  * @transceiver:		Optional pointer to associated CAN transceiver
-+ * @rstc:			Pointer to reset control
-  */
- struct xcan_priv {
- 	struct can_priv can;
-@@ -218,6 +220,7 @@ struct xcan_priv {
- 	struct clk *can_clk;
- 	struct xcan_devtype_data devtype;
- 	struct phy *transceiver;
-+	struct reset_control *rstc;
- };
- 
- /* CAN Bittiming constants as per Xilinx CAN specs */
-@@ -1799,6 +1802,16 @@ static int xcan_probe(struct platform_device *pdev)
- 	priv->can.do_get_berr_counter = xcan_get_berr_counter;
- 	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
- 					CAN_CTRLMODE_BERR_REPORTING;
-+	priv->rstc = devm_reset_control_get_optional_exclusive(&pdev->dev, NULL);
-+	if (IS_ERR(priv->rstc)) {
-+		dev_err(&pdev->dev, "Cannot get CAN reset.\n");
-+		ret = PTR_ERR(priv->rstc);
-+		goto err_free;
-+	}
-+
-+	ret = reset_control_reset(priv->rstc);
-+	if (ret)
-+		goto err_free;
- 
- 	if (devtype->cantype == XAXI_CANFD) {
- 		priv->can.data_bittiming_const =
-@@ -1827,7 +1840,7 @@ static int xcan_probe(struct platform_device *pdev)
- 	/* Get IRQ for the device */
- 	ret = platform_get_irq(pdev, 0);
- 	if (ret < 0)
--		goto err_free;
-+		goto err_reset;
- 
- 	ndev->irq = ret;
- 
-@@ -1843,21 +1856,21 @@ static int xcan_probe(struct platform_device *pdev)
- 	if (IS_ERR(priv->can_clk)) {
- 		ret = dev_err_probe(&pdev->dev, PTR_ERR(priv->can_clk),
- 				    "device clock not found\n");
--		goto err_free;
-+		goto err_reset;
- 	}
- 
- 	priv->bus_clk = devm_clk_get(&pdev->dev, devtype->bus_clk_name);
- 	if (IS_ERR(priv->bus_clk)) {
- 		ret = dev_err_probe(&pdev->dev, PTR_ERR(priv->bus_clk),
- 				    "bus clock not found\n");
--		goto err_free;
-+		goto err_reset;
- 	}
- 
- 	transceiver = devm_phy_optional_get(&pdev->dev, NULL);
- 	if (IS_ERR(transceiver)) {
- 		ret = PTR_ERR(transceiver);
- 		dev_err_probe(&pdev->dev, ret, "failed to get phy\n");
--		goto err_free;
-+		goto err_reset;
- 	}
- 	priv->transceiver = transceiver;
- 
-@@ -1904,6 +1917,8 @@ static int xcan_probe(struct platform_device *pdev)
- err_disableclks:
- 	pm_runtime_put(priv->dev);
- 	pm_runtime_disable(&pdev->dev);
-+err_reset:
-+	reset_control_assert(priv->rstc);
- err_free:
- 	free_candev(ndev);
- err:
-@@ -1920,9 +1935,11 @@ static int xcan_probe(struct platform_device *pdev)
- static void xcan_remove(struct platform_device *pdev)
- {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
-+	struct xcan_priv *priv = netdev_priv(ndev);
- 
- 	unregister_candev(ndev);
- 	pm_runtime_disable(&pdev->dev);
-+	reset_control_assert(priv->rstc);
- 	free_candev(ndev);
- }
- 
+There is one more warning for "expected restricted __le16 [usertype] 
+rx_base_flow got restricted __le32 [usertype]". I will fix this as well.
+
+There is one more sparse warning "warning: symbol 'icssg_ethtool_ops' 
+was not declared. Should it be static?". This should be ignored as no 
+need to change 'icssg_ethtool_ops' to static as this is decalred in 
+icssg_ethtool.c and used in icssg_prueth.c
+
+> 
+>> +			pdaddr = mp->pd_addr_start + i * pd_size;
+>> +
+>> +			memcpy_toio(smem + pdaddr, pd, pd_size);
+>> +			queue = mp->queue;
+>> +			regmap_write(miig_rt, ICSSG_QUEUE_OFFSET + 4 * queue,
+>> +				     pdaddr);
+>> +		}
+>> +	}
+>> +}
+> 
+> ...
+> 
+>> +static int prueth_netdev_init(struct prueth *prueth,
+>> +			      struct device_node *eth_node)
+>> +{
+>> +	int ret, num_tx_chn = PRUETH_MAX_TX_QUEUES;
+>> +	struct prueth_emac *emac;
+>> +	struct net_device *ndev;
+>> +	enum prueth_port port;
+>> +	enum prueth_mac mac;
+>> +
+>> +	port = prueth_node_port(eth_node);
+>> +	if (port < 0)
+>> +		return -EINVAL;
+>> +
+>> +	mac = prueth_node_mac(eth_node);
+>> +	if (mac < 0)
+>> +		return -EINVAL;
+>> +
+>> +	ndev = alloc_etherdev_mq(sizeof(*emac), num_tx_chn);
+>> +	if (!ndev)
+>> +		return -ENOMEM;
+> 
+> ...
+> 
+>> +	return 0;
+>> +
+>> +free:
+>> +	pruss_release_mem_region(prueth->pruss, &emac->dram);
+>> +free_wq:
+>> +	destroy_workqueue(emac->cmd_wq);
+>> +free_ndev:
+>> +	free_netdev(ndev);
+>> +	prueth->emac[mac] = NULL;
+>> +
+>> +	return ret;
+> 
+> ndev appears to be leaked here.
+> 
+> ...
+> 
+>> +	prueth->dev = dev;
+>> +	eth_ports_node = of_get_child_by_name(np, "ethernet-ports");
+>> +	if (!eth_ports_node)
+>> +		return -ENOENT;
+>> +
+>> +	for_each_child_of_node(eth_ports_node, eth_node) {
+>> +		u32 reg;
+>> +
+>> +		if (strcmp(eth_node->name, "port"))
+>> +			continue;
+>> +		ret = of_property_read_u32(eth_node, "reg", &reg);
+>> +		if (ret < 0) {
+>> +			dev_err(dev, "%pOF error reading port_id %d\n",
+>> +				eth_node, ret);
+>> +		}
+>> +
+>> +		of_node_get(eth_node);
+>> +
+>> +		if (reg == 0) {
+>> +			eth0_node = eth_node;
+>> +			if (!of_device_is_available(eth0_node)) {
+>> +				of_node_put(eth0_node);
+>> +				eth0_node = NULL;
+>> +			}
+>> +		} else if (reg == 1) {
+>> +			eth1_node = eth_node;
+>> +			if (!of_device_is_available(eth1_node)) {
+>> +				of_node_put(eth1_node);
+>> +				eth1_node = NULL;
+>> +			}
+>> +		} else {
+>> +			dev_err(dev, "port reg should be 0 or 1\n");
+> 
+> Should this be treated as an error and either return or goto an
+> unwind path?
+> 
+
+I don't think we should error out or return to any goto label here. Here 
+we are checking 'reg' property in all available ports. If reg=0, we 
+assign the node to eth0_node. If reg=1, we assign the node to eth1_node. 
+If the reg is neither 0 nor 1, we will just keep looking through other 
+available ports, instead of returning error. We will eventually look 
+through all available nodes.
+
+Once we come out of the for loop, we should at least have one node with 
+reg property being either 0 or 1. If no node had reg as 0 or 1, both 
+eth0_node and eth1_node will be NULL, then we will error out with 
+-ENODEV error by below if check.
+
+if (!eth0_node && !eth1_node) {
+	dev_err(dev, "neither port0 nor port1 node available\n");
+	return -ENODEV;
+}
+
+>> +		}
+>> +	}
+>> +
+>> +	of_node_put(eth_ports_node);
+>> +
+>> +	/* At least one node must be present and available else we fail */
+>> +	if (!eth0_node && !eth1_node) {
+> 
+> Smatch warns that eth0_node and eth1_node may be uninitialised here.
+> 
+
+Sure, I will initialise eth0_node and eth1_node as NULL.
+
+>> +		dev_err(dev, "neither port0 nor port1 node available\n");
+>> +		return -ENODEV;
+>> +	}
+>> +
+>> +	if (eth0_node == eth1_node) {
+>> +		dev_err(dev, "port0 and port1 can't have same reg\n");
+>> +		of_node_put(eth0_node);
+>> +		return -ENODEV;
+>> +	}
+> 
+> ...
+> 
+
 -- 
-2.36.1
-
+Thanks and Regards,
+Md Danish Anwar
 
