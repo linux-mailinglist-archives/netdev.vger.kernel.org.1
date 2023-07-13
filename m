@@ -1,248 +1,125 @@
-Return-Path: <netdev+bounces-17362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA2E97515FE
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:02:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A62F0751613
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:12:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 793BD281AD4
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 02:02:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E1628162F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 02:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71BA632;
-	Thu, 13 Jul 2023 02:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0529F648;
+	Thu, 13 Jul 2023 02:12:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5C87C
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:02:36 +0000 (UTC)
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEF3E1FD6;
-	Wed, 12 Jul 2023 19:02:34 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-444c5209861so114471137.2;
-        Wed, 12 Jul 2023 19:02:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689213754; x=1691805754;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aiS3BGLVDtj4R25tckJIQtyqK9hOLbEea2jDynKrbjU=;
-        b=KZMBpTBH33didekshXEgRJxJXueNDxLw+OpJOIIGIFg19vFpc8eHiiFgaqQzvx0eC2
-         y28J42zKZ35/vfYYazEAvbf1np9k5Z2RZ7MJw1CTLZVgLIdWI9htYO+6ZMZSufdsQPS0
-         T0VO1cew0ZSA8Ou/So3CxboIfYIBMoDu2mOpgQx50brRYWJEv6LgmlHKKylIm6Amzvq9
-         JCXGdD7TQXYBjwQ0cBtz6rpQKcwmvT6C1osF8oPIN2qlEn/qCq+uhNSaBx+/16jUWVyP
-         ugwYZ/KFo7TH83eHvL0ZXk+YlCBe9HWzpSOdU/2IPJz8sgbiqPdf5Qzxavev9KgOKEA0
-         mwcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689213754; x=1691805754;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aiS3BGLVDtj4R25tckJIQtyqK9hOLbEea2jDynKrbjU=;
-        b=Fg9EW0+h2YxIk6KXPCZaKdMLZLP9aD6KyKPIb9h0iaa/uhdrx8JHJALsUhLJl/oT0r
-         OrpXJyrJqiPhPY12kPNqX1QCdGLxyL7SaQ/SUaRhH/pJTB1vf8yUkCnVs7bFqhs+ucFF
-         sWXH2TkfWgW/IXQtOSSd+GXE8su7AoFPOwVDyeHqDit01fY9yO8cT6/N+DIfWrF7/2kL
-         pB4DVZP/+tv1FYWXTkrCdFR5hNhV96smc93wph5y2eMXjPWGzSGVKMw7M83H18qDfitI
-         EybEtIi+6wQe4ePyQMXp5Wy6dwWHSSS2QVUtwEuZVRyXbamsDueZRDfqLtmShPGbsFT7
-         Rg6w==
-X-Gm-Message-State: ABy/qLYxrdpCGsTvvt8mbDdNDN3+voEgjkfX9iN5+5FUX6hUpdAaqk0J
-	HGgX6vsamD0+Idfbs62GTiwiUyQ2pTOO7315Ycwucy0UxcQ=
-X-Google-Smtp-Source: APBJJlF9aHgncchT+3cRAkCk1U/N1nOJx8LUbmT2m7uCdGfKinqaEBite8KPp6bClIsoX63QdPZ64zMhrTdsmYuYFqU=
-X-Received: by 2002:a67:ef99:0:b0:443:5bec:a2fd with SMTP id
- r25-20020a67ef99000000b004435beca2fdmr270251vsp.18.1689213753738; Wed, 12 Jul
- 2023 19:02:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB687C
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:12:15 +0000 (UTC)
+X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Jul 2023 19:12:12 PDT
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91FCC1FFD;
+	Wed, 12 Jul 2023 19:12:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=m3po4FiRsuRaodVf3w1lKGRDQNG5T/ke8/cTCsTCpi0=;
+	t=1689214333; x=1690423933; b=E22ul75fr+5+v6gvlvmdzVYkzTKgV8KpXxuShdglCbaZkFq
+	K3/tqvuBzXYsmX0aSEtMM+JMqYO2SKNtKGmHxLef2472a+FuJwnC7TRflR37GgdnuOyS38teXpjEY
+	2exj3/EPBputVLEqTmUTAcZM1PKxO2JE9zYnLwX76Ha7qAdoEW7o/T+UWfRSHSqPpESjc3Qq7L/Is
+	gQehyLr5LQe6ANkqt0UgYXkfsgidVbHvJGZ/vXBTlxcOmNuu++JmCNdlEXKJHHxdDL1gqOYqRCgkp
+	8YQS98wARzf3d6om4hRSpG9pesthdYT9VvDOj+rUJ+RRQZ3C+BmV30uoO5f3wu/Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qJkC3-0004Hv-1i;
+	Thu, 13 Jul 2023 02:28:27 +0200
+Message-ID: <2d26c0028590a80e7aa80487cbeffd5ca6e6a5ea.camel@sipsolutions.net>
+Subject: Re: [PATCH] USB: disable all RNDIS protocol drivers
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Oliver Neukum <oneukum@suse.com>, Enrico Mioso <mrkiko.rs@gmail.com>, 
+ Jan Engelhardt <jengelh@inai.de>, linux-kernel@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kalle Valo
+ <kvalo@kernel.org>,  Oleksij Rempel <linux@rempel-privat.de>, Maciej
+ =?UTF-8?Q?=C5=BBenczykowski?= <maze@google.com>, Neil Armstrong
+ <neil.armstrong@linaro.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+ Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>, Jacopo Mondi
+ <jacopo@jmondi.org>, =?UTF-8?Q?=C5=81ukasz?= Stelmach
+ <l.stelmach@samsung.com>, Laurent Pinchart
+ <laurent.pinchart@ideasonboard.com>,  linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-wireless@vger.kernel.org, Ilja Van Sprundel
+ <ivansprundel@ioactive.com>,  Joseph Tartaro <joseph.tartaro@ioactive.com>
+Date: Thu, 13 Jul 2023 02:28:26 +0200
+In-Reply-To: <2023071222-asleep-vacancy-4cfa@gregkh>
+References: <20221123124620.1387499-1-gregkh@linuxfoundation.org>
+	 <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr> <ZKM5nbDnKnFZLOlY@rivendell>
+	 <2023070430-fragment-remember-2fdd@gregkh>
+	 <e5a92f9c-2d56-00fc-5e01-56e7df8dc1c1@suse.com>
+	 <6a4a8980912380085ea628049b5e19e38bcd8e1d.camel@sipsolutions.net>
+	 <2023071222-asleep-vacancy-4cfa@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZK9ZiNMsJX8+1F3N@debian.debian>
-In-Reply-To: <ZK9ZiNMsJX8+1F3N@debian.debian>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Wed, 12 Jul 2023 22:01:57 -0400
-Message-ID: <CAF=yD-Lb2k02TLaCQHwFSG=eQrWCnvqHVaWuK2viGqiCdwAxwg@mail.gmail.com>
-Subject: Re: [PATCH net] gso: fix GSO_DODGY bit handling for related protocols
-To: Yan Zhai <yan@cloudflare.com>
-Cc: "open list:NETWORKING [TCP]" <netdev@vger.kernel.org>, kernel-team@cloudflare.com, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Andrew Melnychenko <andrew@daynix.com>, 
-	Jason Wang <jasowang@redhat.com>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 9:55=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> SKB_GSO_DODGY bit indicates a GSO packet comes from an untrusted source.
-> The canonical way is to recompute the gso_segs to avoid device driver
-> issues. Afterwards, the DODGY bit can be removed to avoid re-check at the
-> egress of later devices, e.g. packets can egress to a vlan device backed
-> by a real NIC.
->
-> Commit 1fd54773c267 ("udp: allow header check for dodgy GSO_UDP_L4
-> packets.") checks DODGY bit for UDP, but for packets that can be fed
-> directly to the device after gso_segs reset, it actually falls through
-> to fragmentation [1].
->
-> Commit 90017accff61 ("sctp: Add GSO support") and commit 3820c3f3e417
-> ("[TCP]: Reset gso_segs if packet is dodgy") both didn't remove the DODGY
-> bit after recomputing gso_segs.
->
-> This change fixes the GSO_UDP_L4 handling case, and remove the DODGY bit
-> at other places.
+On Wed, 2023-07-12 at 18:39 +0200, Greg Kroah-Hartman wrote:
+> On Wed, Jul 12, 2023 at 03:00:55PM +0200, Johannes Berg wrote:
+> > On Wed, 2023-07-12 at 11:22 +0200, Oliver Neukum wrote:
+> > >=20
+> > > On 04.07.23 08:47, Greg Kroah-Hartman wrote:
+> > > > On Mon, Jul 03, 2023 at 11:11:57PM +0200, Enrico Mioso wrote:
+> > > > > Hi all!!
+> > > > >=20
+> > > > > I think the rndis_host USB driver might emit a warning in the dme=
+sg, but disabling the driver wouldn't be a good idea.
+> > > > > The TP-Link MR6400 V1 LTE modem and also some ZTE modems integrat=
+ed in routers do use this protocol.
+> > > > >=20
+> > > > > We may also distinguish between these cases and devices you might=
+ plug in - as they pose different risk levels.
+> > > >=20
+> > > > Again, you have to fully trust the other side of an RNDIS connectio=
+n,
+> > > > any hints on how to have the kernel determine that?
+> >=20
+> > > it is a network protocol. So this statement is kind of odd.
+> > > Are you saying that there are RNDIS messages that cannot be verified
+> > > for some reason, that still cannot be disclosed?
+> >=20
+> > Agree, it's also just a USB device, so no special trickery with DMA,
+> > shared buffers, etc.
+> >=20
+> > I mean, yeah, the RNDIS code is really old and almost certainly has a
+> > severe lack of input validation, but that still doesn't mean it's
+> > fundamentally impossible.
+>=20
+> You all are going to make me have to write some exploits aren't you...
 
-These two things should not be conflated.
+This is getting a bit childish. Nobody ever said that wasn't possible,
+in fact I did say exactly above that I'm sure since it's old and all it
+lacks input validation. So yeah, I full well believe that you can write
+exploits for it.
 
-Only the USO fix is strictly needed to fix the reported issue.
+All we said is that your statement of "RNDIS is fundamentally unfixable"
+doesn't make a lot of sense. If this were the case, all USB drivers
+would have to "trust the other side" as well, right?
 
-> Fixes: 90017accff61 ("sctp: Add GSO support")
-> Fixes: 3820c3f3e417 ("[TCP]: Reset gso_segs if packet is dodgy")
-> Fixes: 1fd54773c267 ("udp: allow header check for dodgy GSO_UDP_L4 packet=
-s.")
-
-Link: https://lore.kernel.org/all/CAJPywTKDdjtwkLVUW6LRA2FU912qcDmQOQGt2WaD=
-o28KzYDg+A@mail.gmail.com/
-
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
->
-> ---
-> [1]:
-> https://lore.kernel.org/all/CAJPywTKDdjtwkLVUW6LRA2FU912qcDmQOQGt2WaDo28K=
-zYDg+A@mail.gmail.com/
->
-> ---
->  net/ipv4/tcp_offload.c |  1 +
->  net/ipv4/udp_offload.c | 19 +++++++++++++++----
->  net/ipv6/udp_offload.c | 19 +++++++++++++++----
->  net/sctp/offload.c     |  2 ++
->  4 files changed, 33 insertions(+), 8 deletions(-)
->
-> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-> index 8311c38267b5..f9b93708c22e 100644
-> --- a/net/ipv4/tcp_offload.c
-> +++ b/net/ipv4/tcp_offload.c
-> @@ -87,6 +87,7 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
->                 /* Packet is from an untrusted source, reset gso_segs. */
->
->                 skb_shinfo(skb)->gso_segs =3D DIV_ROUND_UP(skb->len, mss)=
-;
-> +               skb_shinfo(skb)->gso_type &=3D ~SKB_GSO_DODGY;
->
->                 segs =3D NULL;
->                 goto out;
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 75aa4de5b731..bd29cf19bb6b 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -388,11 +388,22 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_=
-buff *skb,
->         if (!pskb_may_pull(skb, sizeof(struct udphdr)))
->                 goto out;
->
-> -       if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> -           !skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST))
-> -               return __udp_gso_segment(skb, features, false);
-> -
->         mss =3D skb_shinfo(skb)->gso_size;
-
-Why move the block below this line?
-
-> +
-> +       if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
-> +               if (skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST)) {
-> +                       /* Packet is from an untrusted source, reset actu=
-al gso_segs */
-> +                       skb_shinfo(skb)->gso_segs =3D DIV_ROUND_UP(skb->l=
-en - sizeof(*uh),
-> +                                                                mss);
-> +                       skb_shinfo(skb)->gso_type &=3D ~SKB_GSO_DODGY;
-> +
-> +                       segs =3D NULL;
-> +                       goto out;
-> +               } else {
-> +                       return __udp_gso_segment(skb, features, false);
-> +               }
-> +       }
-> +
-
-The validation should take place inside __udp_gso_segment.
-
-Revert the previous patch to always enter that function for USO packets:
-
-       if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
-                return __udp_gso_segment(skb, features, false);
-
-And in that function decide to return NULL after validation.
-
-
->         if (unlikely(skb->len <=3D mss))
->                 goto out;
->
-> diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-> index ad3b8726873e..6857d9f7bd06 100644
-> --- a/net/ipv6/udp_offload.c
-> +++ b/net/ipv6/udp_offload.c
-> @@ -43,11 +43,22 @@ static struct sk_buff *udp6_ufo_fragment(struct sk_bu=
-ff *skb,
->                 if (!pskb_may_pull(skb, sizeof(struct udphdr)))
->                         goto out;
->
-> -               if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-> -                   !skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST))
-> -                       return __udp_gso_segment(skb, features, true);
-> -
->                 mss =3D skb_shinfo(skb)->gso_size;
-> +
-> +               if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
-> +                       if (skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST=
-)) {
-> +                               /* Packet is from an untrusted source, re=
-set actual gso_segs */
-> +                               skb_shinfo(skb)->gso_segs =3D DIV_ROUND_U=
-P(skb->len - sizeof(*uh),
-> +                                                                        =
-mss);
-> +                               skb_shinfo(skb)->gso_type &=3D ~SKB_GSO_D=
-ODGY;
-> +
-> +                               segs =3D NULL;
-> +                               goto out;
-> +                       } else {
-> +                               return __udp_gso_segment(skb, features, t=
-rue);
-> +                       }
-> +               }
-> +
->                 if (unlikely(skb->len <=3D mss))
->                         goto out;
->
-> diff --git a/net/sctp/offload.c b/net/sctp/offload.c
-> index 502095173d88..3d2b44db0d42 100644
-> --- a/net/sctp/offload.c
-> +++ b/net/sctp/offload.c
-> @@ -65,6 +65,8 @@ static struct sk_buff *sctp_gso_segment(struct sk_buff =
-*skb,
->                 skb_walk_frags(skb, frag_iter)
->                         pinfo->gso_segs++;
->
-> +               pinfo->gso_type &=3D ~SKB_GSO_DODGY;
-> +
->                 segs =3D NULL;
->                 goto out;
->         }
-> --
-> 2.30.2
->
+johannes
 
