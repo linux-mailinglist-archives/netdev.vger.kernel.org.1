@@ -1,287 +1,418 @@
-Return-Path: <netdev+bounces-17598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260B175247D
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:59:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3D37524D7
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:14:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37D1281DFE
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:59:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7D4281E0B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC25217AB5;
-	Thu, 13 Jul 2023 13:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94BB18010;
+	Thu, 13 Jul 2023 14:14:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC4415ADC
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:59:34 +0000 (UTC)
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C95D31FF7
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:59:30 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31434226a2eso947241f8f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689256769; x=1691848769;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AfWuI9qC9sSl5G8mUvdZleATnoptt0fLzhcLQ6QfpPU=;
-        b=rQ2syeW//8GSAhxzDqbdhHqx+WnrmHR0kftOz3f2BZNJqXXREvpAL3RsD4osK69TJm
-         znHrXPvOZ/W/bQ5DnUZrurhshsgZmcLE07Y1PGmigSD5vEGPMNLjpv9KvPOfUK798Th5
-         zABPwy/fqGqWDlNQOxTB7Z51ovLsnwEJCWNDvJ1dAIw1mmAFAnY7ky67nE4CKv/V+d3G
-         BUuWEtlLVLrfoOn+M85Yh0Eby6NYyRkuuaFCKDZbgEdeTNR771BqWGfO5k9NOhnCTv5p
-         uD+GaxBh4/qquL6tXWxRr+GCZGCfhAON2m0ufVK1tdkyYpPPQBlAxHUxfzshx8UOLqJJ
-         XENg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689256769; x=1691848769;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AfWuI9qC9sSl5G8mUvdZleATnoptt0fLzhcLQ6QfpPU=;
-        b=gB4k/pJTP3XakumqkQVqWKGXFvxEQiLeiIF5bYTrujGulZlrhsOx7rjB1P1HaTuEqU
-         7rL/jErhIpXhBe2PEihpM2ijlc6NEBKLLwQ2G1nLOhyx19bYQQGXR2yr6ORwmIxTlepU
-         c1bDKYKt1WuJ8wLip1noXPkeEidcrHbktWCumsQa/VqqZfFT0Z9CjIXsvMg/TG3RhOzJ
-         YzG7zNGZkN5EL1U2h51SfOwylZ59kQTMgwUjj2wHdKUrv7x0evXAO64r74UyxeV1aWGd
-         C4Wf8sM/pnSKUeuMuBK9l22DdDJpblu/rN/umm45UH5SSgWtnLwKQL0W6126ACVrZaZr
-         saKQ==
-X-Gm-Message-State: ABy/qLYZ3Je6h1HvpVD3y0xRYe8oznWhhaxo5FrNbMk1FDSUZe2p9tDH
-	V+pvCitKvwEZIAnImUQ2g4IUHA==
-X-Google-Smtp-Source: APBJJlGKibgDaBJ+4uK71NwkTvmYFy/WHklfMbOwTW3d0GOW/rEZH1eBKfYN2QGjUZsoUcFpoELgyw==
-X-Received: by 2002:adf:cd8a:0:b0:313:dfa3:4f7b with SMTP id q10-20020adfcd8a000000b00313dfa34f7bmr1781185wrj.20.1689256769071;
-        Thu, 13 Jul 2023 06:59:29 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:c2e6:680:ced7:5e59? ([2a02:578:8593:1200:c2e6:680:ced7:5e59])
-        by smtp.gmail.com with ESMTPSA id c18-20020a7bc012000000b003fbd2a9e94asm7980965wmb.31.2023.07.13.06.59.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 06:59:28 -0700 (PDT)
-Message-ID: <35329166-56a7-a57e-666e-6a5e6616ac4d@tessares.net>
-Date: Thu, 13 Jul 2023 15:59:27 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B734A1800C
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:14:52 +0000 (UTC)
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F5030F2
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:14:43 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230713141440epoutp04c7f7bdfe78a01178ca1cde7a0aa4560f~xcukQTCRK0643906439epoutp04p
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:14:40 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230713141440epoutp04c7f7bdfe78a01178ca1cde7a0aa4560f~xcukQTCRK0643906439epoutp04p
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1689257680;
+	bh=312JiJGC50Aj03UfODorZ4eyzLGFpA+dccvHEKWz2wc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Lx2SwbQrvK0pAGF1dV+FBobR7Eg4lsL+FGfaal6l9laiUYB+yiqsQdN/DvxphWk9a
+	 q/d+kpI2sxW8klyuCeAWdAzSbnhStGAy7uzggJ4MJcX1ikH81ILiXWopRHEV9bJmKq
+	 G90YddvyZVbUuq845ADP7tQiutE276wZkF9TwABY=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20230713141439epcas5p21a8cf4cb3db697195df6ff3f9eabb4c0~xcujsTmok2001320013epcas5p2j;
+	Thu, 13 Jul 2023 14:14:39 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4R1xSZ14WLz4x9Pq; Thu, 13 Jul
+	2023 14:14:38 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	62.ED.06099.DC600B46; Thu, 13 Jul 2023 23:14:38 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20230713125228epcas5p122d9f0aa599efc466a3f454573851561~xbmzJkSOd3021230212epcas5p10;
+	Thu, 13 Jul 2023 12:52:28 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20230713125228epsmtrp16d4b01c733440f765be741403a77afa6~xbmzI0WdD2369923699epsmtrp1y;
+	Thu, 13 Jul 2023 12:52:28 +0000 (GMT)
+X-AuditID: b6c32a4b-cafff700000017d3-f4-64b006cd5864
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	1A.C3.14748.C83FFA46; Thu, 13 Jul 2023 21:52:28 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20230713125227epsmtip10d24c81460e7a758f8362c73e9f2c1a1~xbmxiWefW0033900339epsmtip1k;
+	Thu, 13 Jul 2023 12:52:26 +0000 (GMT)
+Date: Thu, 13 Jul 2023 18:19:14 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: davem@davemloft.net, holger@applied-asynchrony.com,
+	kai.heng.feng@canonical.com, simon.horman@corigine.com,
+	nic_swsd@realtek.com, netdev@vger.kernel.org,
+	linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de
+Subject: Re: Performance Regression due to ASPM disable patch
+Message-ID: <20230713124914.GA12924@green245>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: TC: selftests: current timeout (45s) is too low
-Content-Language: en-GB
-To: Pedro Tammela <pctammela@mojatatu.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell
- <anders.roxell@linaro.org>, Davide Caratti <dcaratti@redhat.com>
-References: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
- <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
- <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
- <0f762e7b-f392-9311-6afc-ed54bf73a980@mojatatu.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <0f762e7b-f392-9311-6afc-ed54bf73a980@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <16fa03d5-c110-75d6-9181-d239578db0a2@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAJsWRmVeSWpSXmKPExsWy7bCmuu45tg0pBg/bmS3mnG9hsVi5+iiT
+	xaL3M1gtvh38xmrxr3sZm8X8ZU/ZLY4tELP40juL1WLd6/csFtdv2zhwefw+eZ7dY1ZDL5vH
+	olWLmDy2rLzJ5LFz1l12j/P3NrJ4bF5S77H7ZgObx+O3m9k9Pm+SC+CKyrbJSE1MSS1SSM1L
+	zk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMAbpVSaEsMacUKBSQWFyspG9n
+	U5RfWpKqkJFfXGKrlFqQklNgUqBXnJhbXJqXrpeXWmJlaGBgZApUmJCdMefFPOaCjcYVsw4X
+	NDCu0epi5OSQEDCROHflGlsXIxeHkMBuRonJbX9YIJxPjBJr1h1ghXC+MUp8fbyCFabl7cVZ
+	UFV7GSXWv1kDVfWMUeL0vE/sIFUsAqoSz99cZAKx2QTUJY48b2UEsUUEtCQmvF4DtpBZ4AGj
+	xOu/P8ASwgK2EvvmvgGzeQV0Jaa+mQtlC0qcnPmEBcTmBKrpXnGGGcQWFVCWOLDtOBPESVs4
+	JPq31EPYLhL9rw6xQ9jCEq+Ob4GypSRe9rdB2ekSPy4/heotkGg+to8RwraXaD3VDzafWSBD
+	Yvvkm1BxWYmpp9YxQcT5JHp/P4Hq5ZXYMQ/GVpJoXzkHypaQ2HuuAcjmALI9JDq2CkICaBOj
+	xIHJ3xgnMMrPQvLaLCTrIGwdiQW7P7HNAmpnFpCWWP6PA8LUlFi/S38BI+sqRsnUguLc9NRi
+	0wLjvNRyeIQn5+duYgQnZS3vHYyPHnzQO8TIxMF4iFGCg1lJhFdl27oUId6UxMqq1KL8+KLS
+	nNTiQ4ymwLiayCwlmpwPzAt5JfGGJpYGJmZmZiaWxmaGSuK8r1vnpggJpCeWpGanphakFsH0
+	MXFwSjUwMUw1tlzGvf696OmjxYvnrK/e5fVFoK3kx3MnV8Hd5XVn3998et7vUc7N3cbnQnpP
+	RvQEfLp6pH1SyIEPDJLLSg0+2DMEzHAqumRq9WW7ftqkS7XhE39nvUj8k5jLLsd9wt5pjnXe
+	wsAeRc8O76Cq6z8zKs28fi+NC26peLXv/45w0Xm9Wqd3ci/P37UiqKHK+3xM8f7QjGeML+Yk
+	ffadeXVZxNbT0xoX+TyYoTzHzOku41bNc8l2EavMtTj2/C77qiHzQzruTKRWldbMBP0VdXuC
+	Qm/nr7249HKNH6cD6yMRu4aXCiIHd9QeiLZlvCESIOX/7OX/3lcODJwrWC5cDpm88kHDrMs8
+	739cjTFyU2Ipzkg01GIuKk4EANxXWaVTBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphkeLIzCtJLcpLzFFi42LZdlhJTrfn8/oUgwnflSzmnG9hsVi5+iiT
+	xaL3M1gtvh38xmrxr3sZm8X8ZU/ZLY4tELP40juL1WLd6/csFtdv2zhwefw+eZ7dY1ZDL5vH
+	olWLmDy2rLzJ5LFz1l12j/P3NrJ4bF5S77H7ZgObx+O3m9k9Pm+SC+CK4rJJSc3JLEst0rdL
+	4Mq4ceoFU8FHg4r2KZ+YGhhbNboYOTkkBEwk3l6cxdLFyMUhJLCbUWJa32pmiISExKmXyxgh
+	bGGJlf+es0MUPWGUePZ2MVgRi4CqxPM3F5lAbDYBdYkjz1vBGkQEtCQmvF7DBtLALPCAUeL1
+	3x9gCWEBW4l9c9+A2bwCuhJT38xlhJi6iVFi0px7TBAJQYmTM5+wgNjMQJNu/HsJFOcAsqUl
+	lv/jAAlzAs3pXnEG7AhRAWWJA9uOM01gFJyFpHsWku5ZCN0LGJlXMUqmFhTnpucmGxYY5qWW
+	6xUn5haX5qXrJefnbmIER5SWxg7Ge/P/6R1iZOJgPMQowcGsJMKrsm1dihBvSmJlVWpRfnxR
+	aU5q8SFGaQ4WJXFewxmzU4QE0hNLUrNTUwtSi2CyTBycUg1M2jK/VjVvaOcXZLrLstvyotZU
+	wVO58Q4sP0IWtnLN+JjuXHf57lotC6+1PE6sR2RnaW797cn1fL3suzCWH/v/vO238F9jzOqR
+	UP/W3j220mrG9b8BPa0Hnix5kX9VMqraaX38lOSmcn3vkP6c6ZsObV1WsvTGVzM5fvtUP9d/
+	je8/sL0IFWt+qfBZ/c6v6Zt/LTeviayZlt8zzZKd5eHhXaGKdw0SeMOeWk7k5T+WlpwxT2sC
+	w+Ym62v+h2svaKuz7TyatVBz+YUHdnPW7/366llgxvSzmWsuBX/Xv5r+wFrOJ7SH7a1K4a3/
+	RY8PTqh46GP2unJHj72Lyfr5Fm/qvbqb907dIzbBe9ZttwozJZbijERDLeai4kQA2HIH2RcD
+	AAA=
+X-CMS-MailID: 20230713125228epcas5p122d9f0aa599efc466a3f454573851561
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_bd9c2_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230712155834epcas5p1140d90c8a0a181930956622728c4dd89
+References: <CGME20230712155834epcas5p1140d90c8a0a181930956622728c4dd89@epcas5p1.samsung.com>
+	<20230712155052.GA946@green245>
+	<16fa03d5-c110-75d6-9181-d239578db0a2@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Pedro,
+------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_bd9c2_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-On 12/07/2023 19:12, Pedro Tammela wrote:
-> On 12/07/2023 11:43, Matthieu Baerts wrote:
->> Hi Pedro,
->>
->> On 12/07/2023 15:43, Pedro Tammela wrote:
->>> I have been involved in tdc for a while now, here are my comments.
->>
->> Thank you for your reply!
->>
->>> On 12/07/2023 06:47, Matthieu Baerts wrote:
->>>> Hi Jamal, Cong, Jiri,
->>>>
->>>> When looking for something else [1] in LKFT reports [2], I noticed that
->>>> the TC selftest ended with a timeout error:
->>>>
->>>>     not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
->>>>
->>>> The timeout has been introduced 3 years ago:
->>>>
->>>>     852c8cbf34d3 ("selftests/kselftest/runner.sh: Add 45 second timeout
->>>> per test")
->>>>
->>>> Recently, a new option has been introduced to override the value when
->>>> executing the code:
->>>>
->>>>     f6a01213e3f8 ("selftests: allow runners to override the timeout")
->>>>
->>>> But I guess it is still better to set a higher default value for TC
->>>> tests. This is easy to fix by simply adding "timeout=<seconds>" in a
->>>> "settings" file in 'tc-testing' directory, e.g.
->>>>
->>>>     echo timeout=1200 > tools/testing/selftests/tc-testing/settings
->>>>
->>>> I'm sending this email instead of a patch because I don't know which
->>>> value makes sense. I guess you know how long the tests can take in a
->>>> (very) slow environment and you might want to avoid this timeout error.
->>>
->>> I believe a timeout between 5-10 to minutes should cover the entire
->>> suite
->>
->> Thank you for your feedback.
->> If we want to be on the safe side, I guess it is better to put 10
->> minutes or even 15, no?
-> 
-> Sure, makes sense.
-> If someone complains we can lower it.
-> 
->>
->>>> I also noticed most of the tests were skipped [2], probably because
->>>> something is missing in the test environment? Do not hesitate to
->>>> contact
->>>> the lkft team [3], that's certainly easy to fix and it would increase
->>>> the TC test coverage when they are validating all the different kernel
->>>> versions :)
->>>
->>>  From the logs it seems like the kernel image is missing the 'ct'
->>> action.
->>> Possibly also missing other actions/tc components, so it seems like a
->>> kernel config issue.
->>
->> According to [1], the kconfig is generated by merging these files:
->>
->>    defconfig, systemd.config [2], tools/testing/selftests/kexec/config,
->> tools/testing/selftests/net/config,
->> tools/testing/selftests/net/mptcp/config,
->> tools/testing/selftests/net/hsr/config,
->> tools/testing/selftests/net/forwarding/config,
->> tools/testing/selftests/tc-testing/config
->>
->> You can see the final .config file in [3].
->>
->> I can see "CONFIG_NET_ACT_CTINFO(=m)" but not "CONFIG_NET_ACT_CT" while
->> they are both in tc-testing/config file. Maybe a conflict with another
->> selftest config?
->>
->> I don't see any mention of "NET_ACT_CT" in the build logs [4].
-> 
-> There's a requirement for NET_ACT_CT which is not set in the final
-> config (CONFIG_NF_FLOW_TABLE).
-> 
-> Perhaps this could fix?
-> diff --git a/tools/testing/selftests/tc-testing/config
-> b/tools/testing/selftests/tc-testing/config
-> index 6e73b09c20c8..d1ad29040c02 100644
-> --- a/tools/testing/selftests/tc-testing/config
-> +++ b/tools/testing/selftests/tc-testing/config
-> @@ -5,6 +5,7 @@ CONFIG_NF_CONNTRACK=m
->  CONFIG_NF_CONNTRACK_MARK=y
->  CONFIG_NF_CONNTRACK_ZONES=y
->  CONFIG_NF_CONNTRACK_LABELS=y
-> +CONFIG_NF_FLOW_TABLE=m
->  CONFIG_NF_NAT=m
->  CONFIG_NETFILTER_XT_TARGET_LOG=m
+On Thu, Jul 13, 2023 at 07:59:32AM +0200, Heiner Kallweit wrote:
+> On 12.07.2023 17:55, Anuj Gupta wrote:
+> > Hi,
+> > 
+> > I see a performance regression for read/write workloads on our NVMe over
+> > fabrics using TCP as transport setup.
+> > IOPS drop by 23% for 4k-randread [1] and by 18% for 4k-randwrite [2].
+> > 
+> > I bisected and found that the commit
+> > e1ed3e4d91112027b90c7ee61479141b3f948e6a ("r8169: disable ASPM during
+> > NAPI poll") is the trigger.
+> > When I revert this commit, the performance drop goes away.
+> > 
+> > The target machine uses a realtek ethernet controller - 
+> > root@testpc:/home/test# lspci | grep -i eth
+> > 29:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. Device 2600
+> > (rev 21)
+> > 2a:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. Killer
+> > E3000 2.5GbE Controller (rev 03)
+> > 
+> > I tried to disable aspm by passing "pcie_aspm=off" as boot parameter and
+> > by setting pcie aspm policy to performance. But it didn't improve the
+> > performance.
+> > I wonder if this is already known, and something different should be
+> > done to handle the original issue? 
+> > 
+> > [1] fio randread
+> > fio -direct=1 -iodepth=1 -rw=randread -ioengine=psync -bs=4k -numjobs=1
+> > -runtime=30 -group_reporting -filename=/dev/nvme1n1 -name=psync_read
+> > -output=psync_read
+> > [2] fio randwrite
+> > fio -direct=1 -iodepth=1 -rw=randwrite -ioengine=psync -bs=4k -numjobs=1
+> > -runtime=30 -group_reporting -filename=/dev/nvme1n1 -name=psync_read
+> > -output=psync_write
+> > 
+> > 
+> I can imagine a certain performance impact of this commit if there are
+> lots of small packets handled by individual NAPI polls.
+> Maybe it's also chip version specific.
+> You have two NIC's, do you see the issue with both of them?
 
-Yes it does!
+I see this issue with the Realtek Semiconductor Co., Ltd. Killer NIC.
+I haven't used the other NIC.
 
-I got access to the tuxsuite to reproduce the issues with the suggested
-fixes. The i386 build job is visible in [1] (kconfig in [2]) and the
-test job in [3] (logs in [4]).
+> Related: What's your line speed, 1Gbps or 2.5Gbps?
+
+Speed is 1000Mb/s [1].
+
+> Can you reproduce the performance impact with iperf?
+
+I was not able to reproduce it with iperf [2]. One of the reasons could
+be that, currently performance drop happends in nvme over fabrics scenario,
+where block IO processing takes sometime before sending next I/O and hence
+network packets. I suspect iperf works by sending packets continuously,
+rather than at intervals, let me know If I am missing something here.
+
+> Do you use any network optimization settings for latency vs. performance?
+
+No, I haven't set any network optimization settings. We are using
+default Ubuntu values. If you suspect some particular setting, I can check.
+
+> Interrupt coalescing, is TSO(6) enabled?
+
+I tried this command on different PC containing the same realtek NIC and
+a intel NIC. The command worked fine for the intel NIC, but failed for the
+realtek nic. It seems that, the error is specific to realtek nic.
+Is there some other way to check for Interrupt coalescing?
+
+> An ethtool -k output may provide further insight.
+
+Please see [3].
 
 [1]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/builds/2SW6Vk3VYTGyW90OBecA3knJFIz
+# ethtool enp42s0
+Settings for enp42s0:
+        Speed: 1000Mb/s
+
 [2]
-https://storage.tuxsuite.com/public/community/matthieu.baerts/builds/2SW6Vk3VYTGyW90OBecA3knJFIz/config
+
+WITH ASPM patch :
+
+------------------------------------------------------------
+# iperf -c 107.99.41.147 -l 4096 -i 1 -t 10
+------------------------------------------------------------
+Client connecting to 107.99.41.147, TCP port 5001
+TCP window size:  531 KByte (default)
+------------------------------------------------------------
+[  3] local 107.99.41.244 port 40340 connected with 107.99.41.147 port
+5001
+[  3]  0.0-10.0 sec  1.10 GBytes   942 Mbits/sec
+
+-----------------------------------------------------------
+
+WITHOUT ASPM patch :
+------------------------------------------------------------
+# iperf -c 107.99.41.147 -l 4096 -i 1 -t 10
+------------------------------------------------------------
+Client connecting to 107.99.41.147, TCP port 5001
+TCP window size:  472 KByte (default)
+------------------------------------------------------------
+[  3] local 107.99.41.244 port 51766 connected with 107.99.41.147 port
+5001
+[  3]  0.0-10.0 sec  1.10 GBytes   942 Mbits/sec
+
 [3]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/tests/2SWB6sYne9afpOxqp3CNE5BxAn8
-[4]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/tests/2SWB6sYne9afpOxqp3CNE5BxAn8/logs?format=html
+
+# ethtool -k enp42s0
+Features for enp42s0:
+rx-checksumming: on
+tx-checksumming: on
+tx-checksum-ipv4: on
+tx-checksum-ip-generic: off [fixed]
+tx-checksum-ipv6: on
+tx-checksum-fcoe-crc: off [fixed]
+tx-checksum-sctp: off [fixed]
+scatter-gather: off
+tx-scatter-gather: off
+tx-scatter-gather-fraglist:
+off [fixed]
+tcp-segmentation-offload:
+off
+tx-tcp-segmentation:
+off
+tx-tcp-ecn-segmentation:
+off
+[fixed]
+tx-tcp-mangleid-segmentation:
+off
+tx-tcp6-segmentation:
+off
+generic-segmentation-offload:
+off
+[requested
+on]
+generic-receive-offload:
+on
+large-receive-offload:
+off
+[fixed]
+rx-vlan-offload:
+on
+tx-vlan-offload:
+on
+ntuple-filters:
+off
+[fixed]
+receive-hashing:
+off
+[fixed]
+highdma:
+on
+[fixed]
+rx-vlan-filter:
+off
+[fixed]
+vlan-challenged:
+off
+[fixed]
+tx-lockless:
+off
+[fixed]
+netns-local:
+off
+[fixed]
+tx-gso-robust:
+off
+[fixed]
+tx-fcoe-segmentation:
+off
+[fixed]
+tx-gre-segmentation:
+off
+[fixed]
+tx-gre-csum-segmentation:
+off
+[fixed]
+tx-ipxip4-segmentation:
+off
+[fixed]
+tx-ipxip6-segmentation:
+off
+[fixed]
+tx-udp_tnl-segmentation:
+off
+[fixed]
+tx-udp_tnl-csum-segmentation:
+off
+[fixed]
+tx-gso-partial:
+off
+[fixed]
+tx-tunnel-remcsum-segmentation:
+off
+[fixed]
+tx-sctp-segmentation:
+off
+[fixed]
+tx-esp-segmentation:
+off
+[fixed]
+tx-udp-segmentation:
+off
+[fixed]
+tx-gso-list:
+off
+[fixed]
+fcoe-mtu:
+off
+[fixed]
+tx-nocache-copy:
+off
+loopback:
+off
+[fixed]
+rx-fcs:
+off
+rx-all:
+off
+tx-vlan-stag-hw-insert:
+off
+[fixed]
+rx-vlan-stag-hw-parse:
+off
+[fixed]
+rx-vlan-stag-filter:
+off
+[fixed]
+l2-fwd-offload:
+off
+[fixed]
+hw-tc-offload:
+off
+[fixed]
+esp-hw-offload:
+off
+[fixed]
+esp-tx-csum-hw-offload:
+off
+[fixed]
+rx-udp_tunnel-port-offload:
+off
+[fixed]
+tls-hw-tx-offload:
+off
+[fixed]
+tls-hw-rx-offload:
+off
+[fixed]
+rx-gro-hw:
+off
+[fixed]
+tls-hw-record:
+off
+[fixed]
+rx-gro-list:
+off
+macsec-hw-offload:
+off
+[fixed]
+rx-udp-gro-forwarding:
+off
+hsr-tag-ins-offload:
+off
+[fixed]
+hsr-tag-rm-offload:
+off
+[fixed]
+hsr-fwd-offload:
+off
+[fixed]
+hsr-dup-offload:
+off
+[fixed]
+
+> 
+> 
+
+------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_bd9c2_
+Content-Type: text/plain; charset="utf-8"
 
 
-Note that the TC tests have been executed in less than 3 minutes. 15
-minutes seem more than enough then! (I don't know how "fast" is this
-environment).
-
-We can see that all tests have been executed except one:
-
-> # ok 495 6bda - Add tunnel_key action with nofrag option # skipped - probe command: test skipped.
-
-Maybe something else missing?
-
-Other than that, 6 tests have failed:
-
-- Add skbedit action with valid mark and mask with invalid format
-
-> # not ok 284 bc15 - Add skbedit action with valid mark and mask with invalid format
-> # 	Command exited with 0, expected 255
-
-- Add ct action triggering DNAT tuple conflict:
-
-> # not ok 373 3992 - Add ct action triggering DNAT tuple conflict
-> # 	Could not match regex pattern. Verify command output:
-> # cat: /proc/net/nf_conntrack: No such file or directory
-
-- Add xt action with log-prefix
-
-> # not ok 408 2029 - Add xt action with log-prefix
-> # 	Could not match regex pattern. Verify command output:
-> # total acts 1
-> # 
-> # 	action order 0: tablename: mangle  hook: NF_IP_POST_ROUTING
-> # 	target  LOG level warn prefix \"PONG\"
-> # 	index 100 ref 1 bind 0
-> # 	not_in_hw
-
-- Replace xt action log-prefix
-
-> # not ok 409 3562 - Replace xt action log-prefix
-> # 	Could not match regex pattern. Verify command output:
-> # total acts 0
-> # 
-> # 	action order 1: tablename: mangle  hook: NF_IP_POST_ROUTING
-> # 	target  LOG level warn prefix \"WIN\"
-> # 	index 1 ref 1 bind 0
-> # 	not_in_hw
-
-- Delete xt action with invalid index
-
-> # not ok 411 5169 - Delete xt action with invalid index
-> # 	Could not match regex pattern. Verify command output:
-> # total acts 0
-> # 
-> # 	action order 1: tablename: mangle  hook: NF_IP_POST_ROUTING
-> # 	target  LOG level warn prefix \"PONG\"
-> # 	index 1000 ref 1 bind 0
-> # 	not_in_hw
-
-- Add xt action with duplicate index
-
-> # not ok 414 8437 - Add xt action with duplicate index
-> # 	Could not match regex pattern. Verify command output:
-> # total acts 0
-> # 
-> # 	action order 1: tablename: mangle  hook: NF_IP_POST_ROUTING
-> # 	target  LOG level warn prefix \"PONG\"
-> # 	index 101 ref 1 bind 0
-> # 	not_in_hw
-
-I can see that at least "CONFIG_NF_CONNTRACK_PROCFS" kconfig is needed
-as well for the 373rd test (adding it seems helping: [5]).
-
-Not sure about the 5 others, I don't know what these tests are doing, I
-came here by accident and I don't think I'm the most appropriated person
-to fix that: do you know if someone can look at the 5 other errors? :)
-
-I can send patches to fix the timeout + the two missing kconfig if you want.
-
-Cheers,
-Matt
-
-[5]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/tests/2SWHb7PJfqkUX1m8rLu3GXbsHE0/logs?format=html
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_bd9c2_--
 
