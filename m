@@ -1,141 +1,127 @@
-Return-Path: <netdev+bounces-17676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F42752A8F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 20:54:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29BCA752A9F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 20:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697691C2142B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 18:54:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 129991C21414
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 18:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BB01ED3A;
-	Thu, 13 Jul 2023 18:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E2D1ED53;
+	Thu, 13 Jul 2023 18:58:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AB11F165
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 18:54:35 +0000 (UTC)
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41BE3589;
-	Thu, 13 Jul 2023 11:54:08 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-262fa79e97fso524530a91.2;
-        Thu, 13 Jul 2023 11:54:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689274437; x=1691866437;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S/Rh3N7Hpk2RvvFOi7xZjggtoYOkILDnWZuYI4DoA10=;
-        b=HW5cIj8f6UrrRKqCSEGCEMigQIuAtz5FZOoyenrcfjQXnkfk3x91KqAgmOfMu8rjb0
-         Ck7tu7PddO79GoM9qYGS7C5Xmp7NtD3l3Ns10x1+yAakLRUN0IwG4ffbzHFORM5JjEK7
-         XoqNvaQKUfKQuOFxG8WDYi3aM5Mwe7+AaPuBKK9Iih+Z8SC1e7KILlhVi9WuzfQdrHlp
-         tX9sJsE4pQET7vVqcOht85rsQOHTeT9LGfxwrSPrzw69KHgZP3dH4E01yzu5A0S6DWwQ
-         7EBTGYF8Cw5Pp86VOfuv5xYomnc9HKvK9VUJmyCveJoOvbxWORxNPPNzkQ1CVAsvt35m
-         O2XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689274437; x=1691866437;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S/Rh3N7Hpk2RvvFOi7xZjggtoYOkILDnWZuYI4DoA10=;
-        b=Q4zGKmKl3FfJ0jQjeHwnZedqU36DzpOMEd8XvNjxrsiY+7JEl8jdnoyBngf0HMJXXq
-         l6Iz7U15V46irymToyX+50XyLH2Mo7rYjFPehEZnETASLIfi7nnktEodehKtKnC+cV/l
-         g4g9VSrfvT30crZwf/ynQZXHehufoQyhg2jh8kTRtEU7sld6RWQlCZEJqfmPALv0fD5R
-         CFNsDzr7AHlDY3XuGL4aVS5dFvK41qq2P8IzuZMHJ6Zq3xzF642J6/qOk9FgUAHSQHuy
-         eV2nDR9RBBdzl373mRmNwavfNbsoCW2Tkgx2EYU7dm23bS/FPJf1wAQF3A6bqdl1bvaO
-         IvNg==
-X-Gm-Message-State: ABy/qLbMADM/57V1QEUvcfMFHsF4+M5JYfbZa+GtQBGr5HFEYNnizQUO
-	nC7oVVsw9CN0x6LIaCJHqvs=
-X-Google-Smtp-Source: APBJJlH+ZBRMwsng5OvfXU8dbB3Xd4jXwQ7bYsHQHvrkPh/St/88lWUsQjEONL/kaZAV4BM6m8npqA==
-X-Received: by 2002:a17:90a:43c3:b0:260:d8c0:ae79 with SMTP id r61-20020a17090a43c300b00260d8c0ae79mr1339393pjg.35.1689274436784;
-        Thu, 13 Jul 2023 11:53:56 -0700 (PDT)
-Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
-        by smtp.gmail.com with ESMTPSA id d13-20020a17090a2a4d00b00262eccfa29fsm13036699pjg.33.2023.07.13.11.53.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 11:53:56 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 13 Jul 2023 08:53:55 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
-	DRI Development <dri-devel@lists.freedesktop.org>,
-	linux-rtc@vger.kernel.org,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	netdev <netdev@vger.kernel.org>,
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-	Linux MMC List <linux-mmc@vger.kernel.org>,
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
- mechanism)
-Message-ID: <ZLBIQ550U-PhkuKJ@slm.duckdns.org>
-References: <20230511181931.869812-1-tj@kernel.org>
- <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
- <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
- <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
- <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
- <20230712080504.GA3100107@hirez.programming.kicks-ass.net>
- <CAMuHMdUMRS9_nJXp3rrWQrODRQcBQggze0k=0GjSScCknFmmgQ@mail.gmail.com>
- <20230712122745.GH3100107@hirez.programming.kicks-ass.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15A81ED3A
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 18:58:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E5A9C433C9;
+	Thu, 13 Jul 2023 18:58:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689274718;
+	bh=xvdOsy9jelIped55WfaZShRn7G15Xhu03qrC3/vIrIk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ftif1alvjsdPjOWQxa5NQKlghAlSruaRScbTYaIPLWsQXZuHUtphjOCGACTDdjKfr
+	 3Kuib8McUEtrNDpbxH7WJoP3mpQCy5I+hfQ/TdpWrfG5MPSfMTPpESXSlkxDjL9J3A
+	 +JEiZIhNQ7vpV47cHw1EQWSC23St3zgSvxBvigNE9WMDtav1A/sWizjb+kYQ0Ixkwe
+	 6nQscZ21Bc8Y76Wd1RK5Xzf79vHdzweQu1XaRmn1/oXTwRSD15WlG1TFGUnjHzz3Oz
+	 dUArtl3TPEGw54qYFnhgXuHYwKFCDF5mCG6Eo/9gEHv0uw63UFzzzXWm7Ch4qYP9LD
+	 r7wOI+NP9ayCg==
+Date: Thu, 13 Jul 2023 21:58:33 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
+ modify rule destination
+Message-ID: <20230713185833.GI41919@unreal>
+References: <cover.1689064922.git.leonro@nvidia.com>
+ <5fd15672173653d6904333ef197b605b0644e205.1689064922.git.leonro@nvidia.com>
+ <20230712173259.4756fe08@kernel.org>
+ <20230713063345.GG41919@unreal>
+ <20230713100401.5fe0fa77@kernel.org>
+ <20230713174317.GH41919@unreal>
+ <20230713110556.682d21ba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230712122745.GH3100107@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230713110556.682d21ba@kernel.org>
 
-On Wed, Jul 12, 2023 at 02:27:45PM +0200, Peter Zijlstra wrote:
-> On Wed, Jul 12, 2023 at 11:04:16AM +0200, Geert Uytterhoeven wrote:
-> > Hoi Peter,
+On Thu, Jul 13, 2023 at 11:05:56AM -0700, Jakub Kicinski wrote:
+> On Thu, 13 Jul 2023 20:43:17 +0300 Leon Romanovsky wrote:
+> > > Reads like "can't be triggered with current code", in which case 
+> > > the right thing to do is to add "can't be triggered with current
+> > > code" to the commit message, rather than the Fixes tag.  
 > > 
-> > On Wed, Jul 12, 2023 at 10:05 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> > > On Tue, Jul 11, 2023 at 11:39:17AM -1000, Tejun Heo wrote:
-> > > > I wonder whether the right thing to do here is somehow scaling the threshold
-> > > > according to the relative processing power. It's difficult to come up with a
-> > > > threshold which works well across the latest & fastest and really tiny CPUs.
-> > > > I'll think about it some more but if you have some ideas, please feel free
-> > > > to suggest.
-> > >
-> > > We could scale by BogoMIPS I suppose, it's a bogus measurement, as per
-> > > the name, but it does have some relation to how fast the machine is.
-> > 
-> > That's gonna fail miserably on e.g. ARM and RISC-V, where BogoMIPS
-> > depends on some timer frequency.
-> > 
-> > R-Car M2-W with 1.5 GHz Cortex-A15: 40.00 BogoMIPS
-> > R-Car V4H with 1.8 GHz Cortex-A76: 33.33 BogoMIPS
-> > 
-> > while the real slow 48 MHz VexRiscV gets 128 BogoMIPS.
+> > The code is wrong, so comes Fixes line, but I can remove it.
 > 
-> Hehe, OK, really bogus then. Lets file this idea in the bit-bucket then.
+> Yes, perhaps after death we will inhabit a world with clear,
+> non-conflicting rules, where law can be followed to the letter
+> and "truth" and "good" are clearly and objectively defined.
+> 
+> Until the sweat release, tho, let's apply common sense, and 
+> not add Fixes tags to patches which can't possibly be of interest 
+> to backporters.
+> 
+> Please and thank you...
 
-I think it can still be useful. On ryzen 3975wx, it's 6989.92, so while it
-may be off by some hundreds of percents, there are still orders of magnitude
-signal range and that should be enough to suppress most spurious warnings.
-I'll post something later today.
+Sure
 
-Thanks.
+> 
+> > > I had a look thru the series yesterday, and it looks good to me
+> > > (tho I'm no ipsec expert). Thanks for putting in the work!
+> > > 
+> > > Could you add some info about how the code in the series can be
+> > > exercised / example configurations? And please CC Simon, it'd be
+> > > great to get him / someone at Corigine to review.
+> > > 
+> > > And obviously Steffen, why did you not CC Steffen?! :o  
+> > 
+> > It works exactly like "regular" IPsec, nothing special, except
+> > now users can switch to switchdev before adding IPsec rules.
+> > 
+> >  devlink dev eswitch set pci/0000:06:00.0 mode switchdev
+> > 
+> > Same configurations as here:
+> > https://lore.kernel.org/netdev/cover.1670005543.git.leonro@nvidia.com/
+> > Packet offload mode:
+> >   ip xfrm state offload packet dev <if-name> dir <in|out>
+> >   ip xfrm policy .... offload packet dev <if-name>
+> > Crypto offload mode:
+> >   ip xfrm state offload crypto dev <if-name> dir <in|out>
+> > or (backward compatibility)
+> >   ip xfrm state offload dev <if-name> dir <in|out>
+> 
+> I see, so all policy based IPsec?
 
--- 
-tejun
+Yes, it is.
+
+> Does the order of processing in the device match the kernel?
+
+Yes and this it why this fix was needed to make sure that we update
+destinations properly.
+
+> TC packet rewrites or IPsec comes first?
+
+In theory, we support any order, but in real life I don't think that TC
+before IPsec is really valuable.
+
+> 
+> > I didn't add Steffen as it is more flow steering magic series
+> > and not IPsec :).
+> > 
+> > I'll resubmit on Sunday.
+> 
+> Thanks!
 
