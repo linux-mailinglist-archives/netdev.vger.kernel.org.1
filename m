@@ -1,78 +1,73 @@
-Return-Path: <netdev+bounces-17718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D108752CF5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 00:23:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B8E752D07
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 00:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D81E1C21475
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 22:23:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06696281F3E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 22:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC9E24199;
-	Thu, 13 Jul 2023 22:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BC82419D;
+	Thu, 13 Jul 2023 22:28:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAD0200CE
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:23:44 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EAC6359A
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:23:16 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-676f16e0bc4so832438b3a.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:23:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5511200CE
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:28:52 +0000 (UTC)
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE07A2D50
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:28:48 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-262e66481c4so611104a91.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:28:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1689286988; x=1691878988;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1689287328; x=1691879328;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gPJRqg7ajyeL4du6RG8R0w4sPMlBCtxY9hG6485AJxc=;
-        b=tkAIp3Mxs21mO0syOvSfhIJnKbHEVEWbvFyzLoto2x01rHRZ8u1RSlARS0Jjlpqp60
-         mwI0Ec4wbZb4Tb3Gl0z6J1C+dotBmDCo7JoSo5Q46IEFDvJy+Gw2H8Vsh8+z0So4FqQ/
-         0ljRfD3HTiiUR3KT2bc+9DvNkkWRwCSMB1GL6eXyfF/ox2YPReN074r8Y6q63gDBPQUj
-         ibJfaqcG+mnZ6j5SNPPaKgafx/W9hAED42Op91PlcJaZ7h5JlLZ1/P5I/i7xnu4eTbZY
-         SNeV6g82RNy5LBSs826Z7HTv+YPXpWVnyR4UXj7Ci13ol3xKBgDH9gF0D0byBnGA7i4Z
-         yhHg==
+        bh=eB0B1D41F7qTaQfOXZwvohesj/AKxEzgOQAEnIiBKUw=;
+        b=zazJSiDAmHAjpZrGMYWBTzKOIlIFHwZqg8hoBfrC/xh+NopgxXCh7sj8U/fI7JjF3g
+         e/p68eM+TKjWGsO7q12WL9qUBlq/8oVQBKaOsHmh+E6b1VtFl9ctemDaExHc9Yv6ZwrD
+         JZaxicy6ps2l3hdQDfWyLPymn6je6GDfcl9jF8HzCRTEW/3vGPsex9l38LKzGVhbie87
+         T+bRFc2E3aute2X9y2g/yjahXHJG8vQ4SZ7b0QUQevlgVUDy2slEZJ4txnrH/jWxVrBH
+         qKHY7uXoJrZB+3RWEfv+TDGvS7s+9Tf8nXedMUMDPva07d6AepBrJRbnKmTmBex2pXdf
+         R11w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689286988; x=1691878988;
+        d=1e100.net; s=20221208; t=1689287328; x=1691879328;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gPJRqg7ajyeL4du6RG8R0w4sPMlBCtxY9hG6485AJxc=;
-        b=cFuZATsmoRU3Mz0Sson+j8O6GLW0GQRF7r4e+5IwzRTrPcnzhOBZDYpH1gHWg/kRxb
-         yxkkH/B6aQORlw36g09VwAXsag0qEgkJ2eCd72LaFUztkCaScEkA9nARWhk5hbd+kjY0
-         3dczFtRvhJPxPFRqRQ23/K2oo3RJiboU76zCVQe6Mdyn0rDYVwtj6jYxng+X9KDb/W1z
-         /U6lhLpAV1pus4v6mQ+mQLCd6EJ7OLvl5vvmposDdvEILFgHesGvfoc2xMi8UxP5gv5c
-         /KLIqHEXGTYwmVINFOdtE7PfW0RyqmpmTuxBxWOkLIL+8nsjZWB4PYdjDbfU6D63MAbf
-         x3lQ==
-X-Gm-Message-State: ABy/qLZvvJ10/RFv93yc0PbdLNURJ2V5vs/8lEWQ2pfd+M6jbGeuD88l
-	UgPaS32DKBkTRT3qboD+vf85CQ==
-X-Google-Smtp-Source: APBJJlFHVWSKYJGwaAF7RyGQ4hb39qQwi3/2ZA1sbjnSW0v8O2cboYPbu0mc5q6Qgzb9OnBBytt9Ag==
-X-Received: by 2002:a05:6a00:1a51:b0:657:f26e:b01a with SMTP id h17-20020a056a001a5100b00657f26eb01amr2433653pfv.26.1689286987833;
-        Thu, 13 Jul 2023 15:23:07 -0700 (PDT)
+        bh=eB0B1D41F7qTaQfOXZwvohesj/AKxEzgOQAEnIiBKUw=;
+        b=J97LdN1QziiHF60DTZmaBZQEJ8XxSY/KgVG+cYxO51ZUies+60NfBc+uUgBvNa41zK
+         J8txkbdLPlqA/xipaXWszWMZ/Yez09kJEsBp3wMI6Hv+jS35Xoly27wMmui3cqwAsqmW
+         1jIARN5k9S0OMdXvzsjOuOpTyXneCoD3HL26qiZYGyaAkRVprBTeRz8LWpdjInxgkiHv
+         L0BLnYI1Vv61aqQzWfsJh4cM+rw7XrmNJYS41zOhzoIq1y4rT12gnl1D6Tk2BJ38ibKj
+         z9wPveqNhkBkSCqlM3YkXBYecaJxHu1pUlMCHn7jSBKYYjaX07Lb4fC86LdQN4XSw/I7
+         V4gw==
+X-Gm-Message-State: ABy/qLYPWIePrT2sewB75xiXNkxJTfLCWE5df2uJ4LmT2zGljdN6+wfT
+	YOjzSm78mVZPL8HMY7pBvE281A==
+X-Google-Smtp-Source: APBJJlG+tl0E9oeziL45JqEVRD9LFb5QBvZoZHutsZGWn0ARXa7X7NmPd5PW1RIVuVXL5NIaxkKfbQ==
+X-Received: by 2002:a17:902:aa07:b0:1b8:2ba0:c9c0 with SMTP id be7-20020a170902aa0700b001b82ba0c9c0mr1862538plb.59.1689287328251;
+        Thu, 13 Jul 2023 15:28:48 -0700 (PDT)
 Received: from hermes.local (204-195-116-219.wavecable.com. [204.195.116.219])
-        by smtp.gmail.com with ESMTPSA id j20-20020aa79294000000b006833bcc95b0sm2482755pfa.115.2023.07.13.15.23.07
+        by smtp.gmail.com with ESMTPSA id c9-20020a170902c1c900b001b567bbe82dsm6397001plc.150.2023.07.13.15.28.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 15:23:07 -0700 (PDT)
-Date: Thu, 13 Jul 2023 15:23:05 -0700
+        Thu, 13 Jul 2023 15:28:48 -0700 (PDT)
+Date: Thu, 13 Jul 2023 15:28:46 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Ziqi Zhao <astrajoan@yahoo.com>
-Cc: syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com,
- davem@davemloft.net, dvyukov@google.com, edumazet@google.com,
- ivan.orlov0322@gmail.com, kernel@pengutronix.de, kuba@kernel.org,
- linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux@rempel-privat.de, mkl@pengutronix.de, netdev@vger.kernel.org,
- o.rempel@pengutronix.de, pabeni@redhat.com, robin@protonic.nl,
- skhan@linuxfoundation.org, socketcan@hartkopp.net,
- syzkaller-bugs@googlegroups.com, syzkaller@googlegroups.com
-Subject: Re: [PATCH] can: j1939: prevent deadlock by changing
- j1939_socks_lock to rwlock
-Message-ID: <20230713152305.153e7aba@hermes.local>
-In-Reply-To: <20230712004750.2476-1-astrajoan@yahoo.com>
-References: <000000000000b57ce3060025aa46@google.com>
-	<20230712004750.2476-1-astrajoan@yahoo.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, Andrea Claudi
+ <aclaudi@redhat.com>, Ying Xu <yinxu@redhat.com>
+Subject: Re: [PATCH iproute2] lib: move rtnl_echo_talk from libnetlink to
+ utils
+Message-ID: <20230713152846.5735066e@hermes.local>
+In-Reply-To: <ZK4Z8j7hFHcjWv1i@Laptop-X1>
+References: <20230711073117.1105575-1-liuhangbin@gmail.com>
+	<20230711090011.4e4c4fec@hermes.local>
+	<ZK4Z8j7hFHcjWv1i@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,44 +77,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 11 Jul 2023 17:47:50 -0700
-Ziqi Zhao <astrajoan@yahoo.com> wrote:
+On Wed, 12 Jul 2023 11:11:46 +0800
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-> The following 3 locks would race against each other, causing the
-> deadlock situation in the Syzbot bug report:
+> > compatibility if an application links with it.  Collect2 should be
+> > using a supported library like libmnl instea.  
 > 
-> - j1939_socks_lock
-> - active_session_list_lock
-> - sk_session_queue_lock
-> 
-> A reasonable fix is to change j1939_socks_lock to an rwlock, since in
-> the rare situations where a write lock is required for the linked list
-> that j1939_socks_lock is protecting, the code does not attempt to
-> acquire any more locks. This would break the circular lock dependency,
-> where, for example, the current thread already locks j1939_socks_lock
-> and attempts to acquire sk_session_queue_lock, and at the same time,
-> another thread attempts to acquire j1939_socks_lock while holding
-> sk_session_queue_lock.
-> 
-> NOTE: This patch along does not fix the unregister_netdevice bug
-> reported by Syzbot; instead, it solves a deadlock situation to prepare
-> for one or more further patches to actually fix the Syzbot bug, which
-> appears to be a reference counting problem within the j1939 codebase.
-> 
-> #syz test:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-> 
-> Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
-> ---
+> It's not about compatibility. If an application linked with netlink.a, the
+> build will failed. e.g. 
 
-Reader-writer locks are not the best way to fix a lock hierarchy problem.
-Instead either fix the lock ordering, or use RCU.
+Applications that link with libnetlink.a do so at their own risk.
+It is not guaranteed to be a standalone library.
+If it worked be for, that was by accident not intention.
 
-Other devices don't have this problem, so perhaps the unique locking
-in this device is the problem.
+The reason libnetlink.a is not supported is that the same reason that
+kernel API's are not fixed. Also, there is no test suite for just libnetlink.
+
 
