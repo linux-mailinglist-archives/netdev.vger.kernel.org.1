@@ -1,250 +1,193 @@
-Return-Path: <netdev+bounces-17727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31BFE752DCE
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:10:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49DBB752DDF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:17:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2B46281FCF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:10:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F394B281F28
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5F263D6;
-	Thu, 13 Jul 2023 23:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06AF6AA2;
+	Thu, 13 Jul 2023 23:17:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6E611E;
-	Thu, 13 Jul 2023 23:10:18 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18BBAA;
-	Thu, 13 Jul 2023 16:10:16 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b6f9edac8dso19238281fa.3;
-        Thu, 13 Jul 2023 16:10:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37566AA1
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:17:45 +0000 (UTC)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA404CE
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 16:17:43 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbf1b82d9cso11843525e9.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 16:17:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689289815; x=1691881815;
+        d=cloudflare.com; s=google; t=1689290262; x=1691882262;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+GmlXdgctY//6EFLp5mb4ooQ/uW3kyekwB8T9pUoHMQ=;
-        b=svVT9V6DInVTbCtZ3X0AR636Qs8t7S9qRV0Z61EvjvxF9Xl5YpYClQSWPiTPcasKGa
-         NluXDLpndLX7LJJ3Z6xoAEhbAu9abkbJrRFthQJvJWi26ip1t1yNkSkP3WKveoD2Zl69
-         CkV55WR2VxhT40EA9WU9Of6x4///LQl5YrwgKbNkmW9wLBQcbUzmxhg+W53iobHIC0TG
-         bRM/oHG+kUAKI+SHm7YUYnxINYRBeZzRg8tmzZYZiDVjO2HWZvV3LnH+sJzJzL5vIh9O
-         Bcgupng+exdVeNgQ0xoHlTeIHLooQyKHWa1ZQWEcPIlL+mvG3fgMzA9Stml0lb9UNEJt
-         OvWg==
+        bh=BNtZQAU+1NBnYl0Q7O+PJo/Su/S1HUk8FojQN4NQ24s=;
+        b=k8IDe/uPC0xHXo/NTi3jSm7SkyXIR9Bh0lo7NjYKS+gBjLs/XroiHhv7uhxA8J+mhl
+         A16G/vHZF/BM5tmlPQ5EnbwrgLr3MzpMbYi3CTMXGCP+UgJFPQKtZe5PJB6zK4g2Y9Lw
+         pj5x3zVg9tXkYS73F9hBQdQr3k6SumC+FBv1o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689289815; x=1691881815;
+        d=1e100.net; s=20221208; t=1689290262; x=1691882262;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+GmlXdgctY//6EFLp5mb4ooQ/uW3kyekwB8T9pUoHMQ=;
-        b=f3zlds0EevRJNBR4h/KrFP0nYxHW50zeJPOAAn2NyZN/dELxFBnm5dk8bdvuB8ga9O
-         negxNK+72eqi4iqSKD5Ym9kVXJyIHJOr4NFU9eRH4aYOMaFFTSs2QW4bknAhkWNqZb1y
-         PkafXE0DRm9KEn+ucCTyBtHhZ1HnOJ72sF9XGA+wjbtZCWyX/3BZXGgmc0ALDhXeebOQ
-         Wk71ijeaMD5QGFb5SRLf27Qi0O2HGkWShbXp0hiUjy6B0LwWWby6owIN6nJJTyJmk8tB
-         0Vr2XndEnoBdJhtGxLIXtScABwnKPII02c7SzWq8osqqQkYgvKIL1Y4iOGQ5nv019fNp
-         ZQyA==
-X-Gm-Message-State: ABy/qLbwigOhDhANlp60EGDD+Oa9BAD2mJ7T65xrN+wz23k0PLziSump
-	eZTXnXvS9EWN2dAWR+3ofkECZDrglBnk5j1WkNM=
-X-Google-Smtp-Source: APBJJlHuGM2oO0vfKzNECyrU+Ex5pNwnmpqCr7IRXNShvMCCT3G2RAOCJZRzYGgbLlXB8Zlx0th3YvTGgNtT5yoXtog=
-X-Received: by 2002:a2e:94c7:0:b0:2b6:e2aa:8fc2 with SMTP id
- r7-20020a2e94c7000000b002b6e2aa8fc2mr2201041ljh.46.1689289814589; Thu, 13 Jul
- 2023 16:10:14 -0700 (PDT)
+        bh=BNtZQAU+1NBnYl0Q7O+PJo/Su/S1HUk8FojQN4NQ24s=;
+        b=gTK+jgVp7bkmHhMPeXvPDeZZ9EOclffcAhGrbL8x7+3vaA+zrTMXerSZkhRuUvdTEt
+         kGUqSdLorf6o7BY8sq/wubLUA1uxYjaP9UC8ghJ69TXlVO44ygfhtyMi2HfT7egUDtF6
+         0g1pt0Ch5Drs2nlmByn9YXFkre8QMVG/IydZY1lVbq5xCNlHXbyZb3/+vDXyIHSyi0Er
+         Yx66siZtKvXarDg7RjFjzzJjKbSs+8zRbziK2T9epwDg3lmFiT084Z4Bq5+uj0OFGk4V
+         OCI2kKGbViHdyVwYt7Lp2FW6/MOnHw5j6383v1CvL74BmKfl/kmz4GsJ3WtPsZXYQJo8
+         QQFQ==
+X-Gm-Message-State: ABy/qLauyc5Oz4Mef83HoGomFm7A1gSoIRf4m3PHprmL5hCNYE0Z+3iJ
+	vQJumbB/vv9MJ3Yyo+0nzIWRaOHpA9oJwyOgqe5upA==
+X-Google-Smtp-Source: APBJJlGNC6oG8/QWhSI5r2zsxypKTf1HJt7tVzfVXeqTqpTDsp/qJUc1tboLolvdeM3uQaU/w0HMFrbkrpoeBKZiH1M=
+X-Received: by 2002:a1c:6a19:0:b0:3fb:cfe8:8d12 with SMTP id
+ f25-20020a1c6a19000000b003fbcfe88d12mr2252182wmc.14.1689290262143; Thu, 13
+ Jul 2023 16:17:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1689203090.git.dxu@dxuuu.xyz> <d3b0ff95c58356192ea3b50824f8cdbf02c354e3.1689203090.git.dxu@dxuuu.xyz>
- <CAADnVQKKfEtZYZxihxvG3aQ34E1m95qTZ=jTD7yd0qvOASpAjQ@mail.gmail.com>
- <kwiwaeaijj6sxwz5fhtxyoquhz2kpujbsbeajysufgmdjgyx5c@f6lqrd23xr5f>
- <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com> <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
-In-Reply-To: <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 13 Jul 2023 16:10:03 -0700
-Message-ID: <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 2/6] netfilter: bpf: Support
- BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	"David S. Miller" <davem@davemloft.net>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
-	Network Development <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20230711043453.64095-1-ivan@cloudflare.com> <20230711193612.22c9bc04@kernel.org>
+ <CAO3-PbrZHn1syvhb3V57oeXigE_roiHCbzYz5Mi4wiymogTg2A@mail.gmail.com> <20230712104210.3b86b779@kernel.org>
+In-Reply-To: <20230712104210.3b86b779@kernel.org>
+From: Ivan Babrou <ivan@cloudflare.com>
+Date: Thu, 13 Jul 2023 16:17:31 -0700
+Message-ID: <CABWYdi3VJU7HUxzKJBKgX9wF9GRvmA0TKVpjuHvJyz_EdpxZFA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] tcp: add a tracepoint for tcp_listen_queue_drop
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, 
+	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, David Ahern <dsahern@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 9:33=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
-> On Wed, Jul 12, 2023 at 06:26:13PM -0700, Alexei Starovoitov wrote:
-> > On Wed, Jul 12, 2023 at 6:22=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote=
-:
-> > >
-> > > Hi Alexei,
-> > >
-> > > On Wed, Jul 12, 2023 at 05:43:49PM -0700, Alexei Starovoitov wrote:
-> > > > On Wed, Jul 12, 2023 at 4:44=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> w=
+On Wed, Jul 12, 2023 at 10:42=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
 rote:
-> > > > > +#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
-> > > > > +       case NFPROTO_IPV6:
-> > > > > +               rcu_read_lock();
-> > > > > +               v6_hook =3D rcu_dereference(nf_defrag_v6_hook);
-> > > > > +               if (!v6_hook) {
-> > > > > +                       rcu_read_unlock();
-> > > > > +                       err =3D request_module("nf_defrag_ipv6");
-> > > > > +                       if (err)
-> > > > > +                               return err < 0 ? err : -EINVAL;
-> > > > > +
-> > > > > +                       rcu_read_lock();
-> > > > > +                       v6_hook =3D rcu_dereference(nf_defrag_v6_=
-hook);
-> > > > > +                       if (!v6_hook) {
-> > > > > +                               WARN_ONCE(1, "nf_defrag_ipv6_hook=
-s bad registration");
-> > > > > +                               err =3D -ENOENT;
-> > > > > +                               goto out_v6;
-> > > > > +                       }
-> > > > > +               }
-> > > > > +
-> > > > > +               err =3D v6_hook->enable(link->net);
-> > > >
-> > > > I was about to apply, but luckily caught this issue in my local tes=
-t:
-> > > >
-> > > > [   18.462448] BUG: sleeping function called from invalid context a=
-t
-> > > > kernel/locking/mutex.c:283
-> > > > [   18.463238] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pi=
-d:
-> > > > 2042, name: test_progs
-> > > > [   18.463927] preempt_count: 0, expected: 0
-> > > > [   18.464249] RCU nest depth: 1, expected: 0
-> > > > [   18.464631] CPU: 15 PID: 2042 Comm: test_progs Tainted: G
-> > > > O       6.4.0-04319-g6f6ec4fa00dc #4896
-> > > > [   18.465480] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996=
-),
-> > > > BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-> > > > [   18.466531] Call Trace:
-> > > > [   18.466767]  <TASK>
-> > > > [   18.466975]  dump_stack_lvl+0x32/0x40
-> > > > [   18.467325]  __might_resched+0x129/0x180
-> > > > [   18.467691]  mutex_lock+0x1a/0x40
-> > > > [   18.468057]  nf_defrag_ipv4_enable+0x16/0x70
-> > > > [   18.468467]  bpf_nf_link_attach+0x141/0x300
-> > > > [   18.468856]  __sys_bpf+0x133e/0x26d0
-> > > >
-> > > > You cannot call mutex under rcu_read_lock.
-> > >
-> > > Whoops, my bad. I think this patch should fix it:
-> > >
-> > > ```
-> > > From 7e8927c44452db07ddd7cf0e30bb49215fc044ed Mon Sep 17 00:00:00 200=
-1
-> > > Message-ID: <7e8927c44452db07ddd7cf0e30bb49215fc044ed.1689211250.git.=
-dxu@dxuuu.xyz>
-> > > From: Daniel Xu <dxu@dxuuu.xyz>
-> > > Date: Wed, 12 Jul 2023 19:17:35 -0600
-> > > Subject: [PATCH] netfilter: bpf: Don't hold rcu_read_lock during
-> > >  enable/disable
-> > >
-> > > ->enable()/->disable() takes a mutex which can sleep. You can't sleep
-> > > during RCU read side critical section.
-> > >
-> > > Our refcnt on the module will protect us from ->enable()/->disable()
-> > > from going away while we call it.
-> > >
-> > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > > ---
-> > >  net/netfilter/nf_bpf_link.c | 10 ++++++++--
-> > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.=
-c
-> > > index 77ffbf26ba3d..79704cc596aa 100644
-> > > --- a/net/netfilter/nf_bpf_link.c
-> > > +++ b/net/netfilter/nf_bpf_link.c
-> > > @@ -60,9 +60,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link=
- *link)
-> > >                         goto out_v4;
-> > >                 }
-> > >
-> > > +               rcu_read_unlock();
-> > >                 err =3D v4_hook->enable(link->net);
-> > >                 if (err)
-> > >                         module_put(v4_hook->owner);
-> > > +
-> > > +               return err;
-> > >  out_v4:
-> > >                 rcu_read_unlock();
-> > >                 return err;
-> > > @@ -92,9 +95,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link=
- *link)
-> > >                         goto out_v6;
-> > >                 }
-> > >
-> > > +               rcu_read_unlock();
-> > >                 err =3D v6_hook->enable(link->net);
-> > >                 if (err)
-> > >                         module_put(v6_hook->owner);
-> > > +
-> > > +               return err;
-> > >  out_v6:
-> > >                 rcu_read_unlock();
-> > >                 return err;
-> > > @@ -114,11 +120,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf=
-_link *link)
-> > >         case NFPROTO_IPV4:
-> > >                 rcu_read_lock();
-> > >                 v4_hook =3D rcu_dereference(nf_defrag_v4_hook);
-> > > +               rcu_read_unlock();
-> > >                 if (v4_hook) {
-> > >                         v4_hook->disable(link->net);
-> > >                         module_put(v4_hook->owner);
-> > >                 }
-> > > -               rcu_read_unlock();
-> > >
-> > >                 break;
-> > >  #endif
-> > > @@ -126,11 +132,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf=
-_link *link)
-> > >         case NFPROTO_IPV6:
-> > >                 rcu_read_lock();
-> > >                 v6_hook =3D rcu_dereference(nf_defrag_v6_hook);
-> > > +               rcu_read_unlock();
-> >
-> > No. v6_hook is gone as soon as you unlock it.
 >
-> I think we're protected here by the try_module_get() on the enable path.
-> And we only disable defrag if enabling succeeds. The module shouldn't
-> be able to deregister its hooks until we call the module_put() later.
+> On Wed, 12 Jul 2023 11:42:26 -0500 Yan Zhai wrote:
+> >   The issue with kfree_skb is not that it fires too frequently (not in
+> > the 6.x kernel now). Rather, it is unable to locate the socket info
+> > when a SYN is dropped due to the accept queue being full. The sk is
+> > stolen upon inet lookup, e.g. in tcp_v4_rcv. This makes it unable to
+> > tell in kfree_skb which socket a SYN skb is targeting (when TPROXY or
+> > socket lookup are used). A tracepoint with sk information will be more
+> > useful to monitor accurately which service/socket is involved.
 >
-> I think READ_ONCE() would've been more appropriate but I wasn't sure if
-> that was ok given nf_defrag_v(4|6)_hook is written to by
-> rcu_assign_pointer() and I was assuming symmetry is necessary.
+> No doubt that kfree_skb isn't going to solve all our needs, but I'd
+> really like you to clean up the unnecessary callers on your systems
+> first, before adding further tracepoints. That way we'll have a clear
+> picture of which points can be solved by kfree_skb and where we need
+> further work.
 
-Why is rcu_assign_pointer() used?
-If it's not RCU protected, what is the point of rcu_*() accessors
-and rcu_read_lock() ?
+The existing UDP tracepoint was there for 12 years and it's a part of
+what kernel exposes to userspace, so I don't think it's fair to remove
+this and break its consumers. I think "do not break userspace" applies
+here. The proposed TCP tracepoint mostly mirrors it, so I think it's
+fair to have it.
 
-In general, the pattern:
-rcu_read_lock();
-ptr =3D rcu_dereference(...);
-rcu_read_unlock();
-ptr->..
-is a bug. 100%.
+I don't know why kfree_skb is called so much. I also don't agree with
+Yan that it's not actually too much, because it's a lot (especially
+compared with near zero for my proposed tracepoint). I can easily see
+300-500k calls per second into it:
+
+$ perf stat -I 1000 -a -e skb:kfree_skb -- sleep 10
+#           time             counts unit events
+     1.000520165             10,108      skb:kfree_skb
+     2.010494526             11,178      skb:kfree_skb
+     3.075503743             10,770      skb:kfree_skb
+     4.122814843             11,334      skb:kfree_skb
+     5.128518432             12,020      skb:kfree_skb
+     6.176504094             11,117      skb:kfree_skb
+     7.201504214             12,753      skb:kfree_skb
+     8.229523643             10,566      skb:kfree_skb
+     9.326499044            365,239      skb:kfree_skb
+    10.002106098            313,105      skb:kfree_skb
+$ perf stat -I 1000 -a -e skb:kfree_skb -- sleep 10
+#           time             counts unit events
+     1.000767744             52,240      skb:kfree_skb
+     2.069762695            508,310      skb:kfree_skb
+     3.102763492            417,895      skb:kfree_skb
+     4.142757608            385,981      skb:kfree_skb
+     5.190759795            430,154      skb:kfree_skb
+     6.243765384            405,707      skb:kfree_skb
+     7.290818228            362,934      skb:kfree_skb
+     8.297764298            336,702      skb:kfree_skb
+     9.314287243            353,039      skb:kfree_skb
+    10.002288423            251,414      skb:kfree_skb
+
+Most of it is NOT_SPECIFIED (1s data from one CPU during a spike):
+
+$ perf script | sed 's/.*skbaddr=3D//' | awk '{ print $NF }' | sort |
+uniq -c | sort -n | tail
+      1 TCP_CLOSE
+      2 NO_SOCKET
+      4 TCP_INVALID_SEQUENCE
+      4 TCP_RESET
+     13 TCP_OLD_DATA
+     14 NETFILTER_DROP
+   4594 NOT_SPECIFIED
+
+We can start a separate discussion to break it down by category if it
+would help. Let me know what kind of information you would like us to
+provide to help with that. I assume you're interested in kernel stacks
+leading to kfree_skb with NOT_SPECIFIED reason, but maybe there's
+something else.
+
+Even if I was only interested in one specific reason, I would still
+have to arm the whole tracepoint and route a ton of skbs I'm not
+interested in into my bpf code. This seems like a lot of overhead,
+especially if I'm dropping some attack packets.
+
+Perhaps a lot of extra NOT_SPECIFIED stuff can be fixed and removed
+from kfree_skb. It's not something I can personally do as it requires
+much deeper network code understanding than I possess. For TCP we'll
+also have to add some extra reasons for kfree_skb, because currently
+it's all NOT_SPECIFIED (no reason set in the accept path):
+
+* https://elixir.bootlin.com/linux/v6.5-rc1/source/net/ipv4/tcp_input.c#L64=
+99
+* https://elixir.bootlin.com/linux/v6.5-rc1/source/net/ipv4/tcp_ipv4.c#L174=
+9
+
+For UDP we already have SKB_DROP_REASON_SOCKET_RCVBUFF, so I tried my
+best to implement what I wanted based on that. It's not very
+approachable, as you'd have to extract the destination port yourself
+from the raw skb. As Yan said, for TCP people often rely on skb->sk,
+which is just not present when the incoming SYN is dropped. I failed
+to find a good example of extracting a destination port that I could
+replicate. So far I have just a per-reason breakdown working:
+
+* https://github.com/cloudflare/ebpf_exporter/pull/233
+
+If you have an ebpf example that would help me extract the destination
+port from an skb in kfree_skb, I'd be interested in taking a look and
+trying to make it work.
+
+The need to extract the protocol level information in ebpf is only
+making kfree_skb more expensive for the needs of catching rare cases
+when we run out of buffer space (UDP) or listen queue (TCP). These two
+cases are very common failure scenarios that people are interested in
+catching with straightforward tracepoints that can give them the
+needed information easily and cheaply.
+
+I sympathize with the desire to keep the number of tracepoints in
+check, but I also feel like UDP buffer drops and TCP listen drops
+tracepoints are very much justified to exist.
 
