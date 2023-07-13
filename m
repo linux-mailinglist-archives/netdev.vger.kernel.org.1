@@ -1,249 +1,199 @@
-Return-Path: <netdev+bounces-17528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF26751E64
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:07:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DE4751E7C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CA1A1C212BB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23B24281D13
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3EC101EC;
-	Thu, 13 Jul 2023 10:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A6710782;
+	Thu, 13 Jul 2023 10:11:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4022410782
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 10:07:29 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B64358B
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:07:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689242831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oeiJEO4/e4/Pi4P4IfUJO/7SFEKkMj+6/FbuO8fjYfY=;
-	b=Hu3ngx2kvWRzTOBdNuuKyxxWQXWHKdJEi4jGSjoK0hN8ZMkHNmk9hy6HAZ7zHQyL6LEIqO
-	mX0MUlj5gHPlx6gvcNvu6gGH4sxw4yyfwQln3l3kS9xCbN7/eCHNN3l1H1F++RB7picqoO
-	6XvgvuS8o+OEzCPmGWv83g+523T32w8=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-Kat4BbOjNuWpvt_Y5DU45Q-1; Thu, 13 Jul 2023 06:07:10 -0400
-X-MC-Unique: Kat4BbOjNuWpvt_Y5DU45Q-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-992e684089aso38007366b.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:07:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689242828; x=1691834828;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oeiJEO4/e4/Pi4P4IfUJO/7SFEKkMj+6/FbuO8fjYfY=;
-        b=iTB43QBkCcncOIhpZPAB0TjObs0O4nuIG126xSZkyN7b5aLzPlTIqqpRHtx8f5GeNn
-         ie2/JPOViDMX+4lCsil5vDZxoMRCkEfVwx3oYnaQuRZUlSG1RIVdXNmcvSmliio6EJaL
-         Vhrfwladbme2hRBI70WVu1fJBTwjKN7qH0V+XC7KE61hna1o4F4/VprlUhoVBiBhrwYQ
-         So4IQ9bIpQAhdacvjoGhoxhfi1vugLpH5ZkmK1nBBrQsJZQK2vJGCRtx1PtC4IMoDIoY
-         RxvYO5UNwM7lzuJZd+1TwJ6AMVcrNbVtkNqhdP1X1NSPUCHyh3a0gPHt0MvSYKYifC+5
-         nX+Q==
-X-Gm-Message-State: ABy/qLanNAgDwaGnR0fpRtlSEZ/2VPbfcQtwaueztDfKNRp5TFJHWF5L
-	PSk6opJLuovPHKxBVC9u6ayu3cqBpFCnZDe3VwHMcDTYhgBfAEfos9pFxP1XY7kna7iGXwh+Azu
-	dqq7y7solJH2hgfhp
-X-Received: by 2002:a17:906:51d1:b0:993:d920:87cb with SMTP id v17-20020a17090651d100b00993d92087cbmr1034494ejk.23.1689242828706;
-        Thu, 13 Jul 2023 03:07:08 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFzGyushSXF3bttQVjI1kRPdv0j06kRdrCZSXuj9SmS4floj6HURzhYyVaZ6S2WeIQxiPsOBg==
-X-Received: by 2002:a17:906:51d1:b0:993:d920:87cb with SMTP id v17-20020a17090651d100b00993d92087cbmr1034470ejk.23.1689242828333;
-        Thu, 13 Jul 2023 03:07:08 -0700 (PDT)
-Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id jo7-20020a170906f6c700b0098e34446464sm3782668ejb.25.2023.07.13.03.07.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 03:07:07 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <4b42f2eb-dc29-153e-ace9-5584ea2e5070@redhat.com>
-Date: Thu, 13 Jul 2023 12:07:06 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71AB8C14;
+	Thu, 13 Jul 2023 10:11:07 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2086.outbound.protection.outlook.com [40.107.244.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AB31FDB;
+	Thu, 13 Jul 2023 03:11:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GQNzMX4L4Xf6QALnIr7mmNWUGc86C8azyMQD7YfoCymWWhbavVOZ2JaXSVqEZcvM/zcHKoSXRoHNjPup2reia+17Wxf/iPAauEqFdzM9F8DBLorwHZ+q3dbD1XeBWwVaFW5eS/RTfbzyaZnJKsUMX0I98NUQ370ZvziyE8DxK6g/ytwPoLAGHOAh7j6XYerVWIFi0bqsmzlemqL6kzlaEpNhTxpBWJH6hTe+MN6Nm3TuAGb07c8wvhPZckdwwokWRMLEunYHSvqUwE3+MmTBZurqSbdYS1KlkiiwvPoPbOvDdnPns4//btCdXixpg+BbFjGd/pS1hMCruoo2LSqt5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=82xmBzEr0kqSC1Qz09taIv8q//MR4jRNLNUN4gmULok=;
+ b=S6zveb6yYJ3jkhIS25+NldsTC6lJ6gKCqFpQ07m/T9dXrA69cw4SkpNe5Hbt7eypIKgoi8lHPc9FViMTChLITUlyOuR9Iqy1z9YqzDeoiuOBzLAhvD6O/tvMf4c8iLHQJIzABa4g8+v/k/7w6OfJQ0oz2awntd3hLUZHBbBqDi/ZaSSWibaHvINhXg/KSSozQAeeVnce2vARulCmJoQ0fFzQFDS2gt17KXBUdo6rozP2W46xt70DhsPl8xDnADPj7gZO/J/1oMa00MXv4ckO+weVDWZV5L897OpH6V4k/se/zuU5K9ZityTuSslU6LV6wdLIB/4HQzMeUL4N3N2tCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=82xmBzEr0kqSC1Qz09taIv8q//MR4jRNLNUN4gmULok=;
+ b=UPmLxu/lZcrasIeEbJYiAJr+7xqY6jR2Pe+Iyz8i2mPfVyq5CEv5+rf9JRsCgBdMGrnt5Z4jFPfx4I0zRjdd1GbEGu1fhczU+wE8ONhvN62BxkY1jpvpQjHwNZU5EzK5CDlRjSA1V3ovG0h13giecxbNVaG6Pze9kUHPiTL3RxEmDVu3fsKw2HVviu0i4gztmUdZUL/jss0DHvt9IuPYU2iOVr1wgnDwnKkMOmwEZPiTCHe5x7sU0yk3dOU1b+w8hdt+XbQMKk0HnWUa3rE4AbdKCuhHEp8xHxDSRB/z5qToCw4JEKnpHy62ridq7W5s+aoIZyvWQMem01XK7MDcMg==
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
+ by CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.24; Thu, 13 Jul
+ 2023 10:11:04 +0000
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::e9ca:72a9:17b1:f859]) by DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::e9ca:72a9:17b1:f859%3]) with mapi id 15.20.6588.017; Thu, 13 Jul 2023
+ 10:11:03 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>, "ttoukan.linux@gmail.com"
+	<ttoukan.linux@gmail.com>, "jbrouer@redhat.com" <jbrouer@redhat.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, "saeed@kernel.org" <saeed@kernel.org>,
+	"linyunsheng@huawei.com" <linyunsheng@huawei.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "maxtram95@gmail.com" <maxtram95@gmail.com>, "lorenzo@kernel.org"
+	<lorenzo@kernel.org>, "alexander.duyck@gmail.com"
+	<alexander.duyck@gmail.com>, "kheib@redhat.com" <kheib@redhat.com>,
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+	"mkabat@redhat.com" <mkabat@redhat.com>, "brouer@redhat.com"
+	<brouer@redhat.com>, "atzin@redhat.com" <atzin@redhat.com>,
+	"fmaurer@redhat.com" <fmaurer@redhat.com>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>, "jbenc@redhat.com" <jbenc@redhat.com>
+Subject: Re: mlx5 XDP redirect leaking memory on kernel 6.3
+Thread-Topic: mlx5 XDP redirect leaking memory on kernel 6.3
+Thread-Index: AQHZjY743nR7ST598kifD6Q1M3DiL69oDfyAgE+tU4CAAA45gA==
+Date: Thu, 13 Jul 2023 10:11:02 +0000
+Message-ID: <cc918a244723bffe17f528fc1b9a82c0808a22be.camel@nvidia.com>
+References: <d862a131-5e31-bd26-84f7-fd8764ca9d48@redhat.com>
+	 <00ca7beb7fe054a3ba1a36c61c1e3b1314369f11.camel@nvidia.com>
+	 <6d47e22e-f128-ec8f-bbdc-c030483a8783@redhat.com>
+In-Reply-To: <6d47e22e-f128-ec8f-bbdc-c030483a8783@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|CY5PR12MB6323:EE_
+x-ms-office365-filtering-correlation-id: 7ae9d0d5-7ee1-42e4-231a-08db838976a9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ f/j3HeyBYgenrO38m4321fYVue1oSTqeLPUfeDLp/tjuJuu1QlxyHouJcWWQLcwQXbsICoZ8IHTJqhT83YQix1jZJn0CT+qvSGAFN/f8r4F3lqlB9nsdMXPTcbt6xuLUC58wcbI1W0cmcXbYOIi6IhC9i1zPvySbLZbFIu2cPcQ0Od4wLZ1jplZkZBoPLYGKfMGjqjXJfvbSYcVil4KCYo27qf+/YYig6XBqzv97dq9my68j5HgmOJiWiTDYbD5JdTCaV0EkA/qMfp/p4VqAo3ScxeMUByPQ5QPcK2/Lmm9OhwZndpCIND/FxYUYgC6gU30W7LqYCz9ZSNHz3ep2ZYwDuaHGiKXTnR1hVINKI/VBLtHPCSRtcvh8XdkLJdie/L5MIHxfYCow/Olj+kCplt2CFn1KaHO6WH4D2TryRmF4nbnYcphPLy/W+Tk87XDYJNQB9woYctcf5D38EZUaNiZG5nOK/7YGJEMAqHuqQlo1vrXyd3e3fx9XSsMTSZDiCbjVkWv1wpDtjaJrxLj8A4lwVfi5DIzVHVLOIyXB4sY73+ZsrNv0eOPf/AsNwvrP5egPlZ8Fj+O1Z5umz7U5PigLoN0NZCOmjVWTYRCNhui7v9Xlm2prAG16lfwWLpSlQe4ilMapZnW3eLa3/qBl1oU2T7rnEjl3a9XKk2Lpyl9Z3ZPk5Qv87t58BJeSBLJ22otZqy2VAE2hlWYVH1IhSA==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(39860400002)(136003)(396003)(346002)(451199021)(2906002)(38070700005)(83380400001)(6506007)(186003)(66556008)(66946007)(71200400001)(76116006)(91956017)(966005)(6486002)(6512007)(66446008)(66476007)(54906003)(110136005)(478600001)(38100700002)(86362001)(122000001)(2616005)(4326008)(316002)(36756003)(7416002)(41300700001)(64756008)(5660300002)(8936002)(8676002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?MkVuWm9WVzBlQTg4ZGgwbFpaMW5Sd0RDZU0vZUlWN0J6bUIzYUFQc3AvMVBx?=
+ =?utf-8?B?YVQ4TFZUanZ3S3FzN04wSUFHYlR6Y05OMlA5b1hqK3JjK095QUhFeEZYRjRu?=
+ =?utf-8?B?dkdtMEtoYUZYajE0bGZNS0J1WktTbDNLOFdpbjRsTDlFRFQ0dmY2M3dOdWRS?=
+ =?utf-8?B?WnllRU0yMk95LzJkMWZIb2orUXA2NHdFRGRiSFJ3bEdWNHl0ZWJDb0FsakVD?=
+ =?utf-8?B?a0RFTUhOS0ltVFQrc1ZpNzRnUExVelR4dU1qLzRHK3FveGZWeEdxSkRLNkV6?=
+ =?utf-8?B?K0hiTkZBc0wvV244alJjWklnOEFXK0VoQkJoaUwxTG5qRmVxc242V3cyY3hK?=
+ =?utf-8?B?bENNd25kajRadFRVemwxdDZnejRqVXFQL0pHQ1MvTUVlcVozckVYLzdwNE83?=
+ =?utf-8?B?TjE4UGoyYlAwVXRNNTJleERnTzlndDluc2MvWnF3TEhHSDdEQThRV0NNbzEy?=
+ =?utf-8?B?MnRubFJ2MHpHbTEzemViK1Z6UjcxN3ZqUFZxUGJvN01hczNIeWVOMnRUVzlV?=
+ =?utf-8?B?bkh2TjhlRFF2Q0diYnFYbDJDU1doNGIvSU1adXdMUnZYcUp6NFAwZVVZT2dH?=
+ =?utf-8?B?ajVjNlZUZ0pqOTVoZFo2V2szbUt2cXY1VTR4c2pKZWd6MmdPaVE1MktFd3VW?=
+ =?utf-8?B?SDYrYUU3aWFLOWxrbG9YUlB1SWsxTFdsZnRFV3JLRzZxM0oyVkp5SjQrQUdX?=
+ =?utf-8?B?WUREQTFmc2k2Rm5idHZ3OEpXdG41ZFBpaXlaNVVMTVNGTjkvZnlUTlo3QS80?=
+ =?utf-8?B?Y3Fzd0ZiNGV0QU9BVlN1bUdNQ01HcDhVczJjZGMyRHVWVi9EeWJ4eU04N3E1?=
+ =?utf-8?B?MTBDV1g1OG5IZFVSY3RtZ0F4ay9BM3lySFdIQXZNbld6QndtUjBFbWp0VlR0?=
+ =?utf-8?B?U01UcVYva2d6ZXlXRHBuZlE4Vi9CTUZZb1FnbVRyZ01MTzZGTjMxWlNVQXFN?=
+ =?utf-8?B?SE4vMzRMR2lPclBnTW5MRDNOcVlzRW15NUR0SGdIY0MvQWxiajJEc3VjcDlp?=
+ =?utf-8?B?MlRTNGFsd0lnMlRucnBVWHM4Q2FoV1hhdkVRVmxMd05jcVZyRFJLZFBLbk4y?=
+ =?utf-8?B?R3dmWjkxaWFLT2wwYzZiY2x5cVA2MCsyYW1BbTlpdTlVT3cvU1ZOSmhGMk9l?=
+ =?utf-8?B?eVFpNVRuSXBnVHhtVEVhTTluaW5YK0VrR0NIc3BhekJabCtsQlJlQ0M4U3dF?=
+ =?utf-8?B?bWYxNnhxRzNVV01LeS9PdXJZTldzZ3A1VFNwZ1VyRDBNdlN0OEhrUGZNMUZp?=
+ =?utf-8?B?a2w1UWlPb1dFQ09nM3F4anM1ZDZQY1RNWVoycGJwYU5nMHlkam02Z05oREFp?=
+ =?utf-8?B?T3VyY3lqOVdTVnZ5a1QyVXJSUzBPZWVJdGZ0QmFtK1c2Q1VWck1xRmprbHJD?=
+ =?utf-8?B?SGZDSjVkL1RzVWRGdXVMaytjZVNGVVYvdjVyZ0R5VmpyaSt0NXdRUjBlWE9s?=
+ =?utf-8?B?SWtLNU1kYWc1czNpS21Kb29IUGpwZlhJRU1PQ2ZRTVpUUi9kL2hyT3pOZW1u?=
+ =?utf-8?B?RmpDajkrYjBGUUZTM3JaQ1c2UzFSOVlucGQ1RXZSYXF6dkIyVWJLa0poMkNS?=
+ =?utf-8?B?Zk9JRnpFT0srYkZYT05CQ2g4T25CRGdZV1JEbk8xTm1raE9GL3NIelBDMWlO?=
+ =?utf-8?B?U2hFYXc4QW5YSzBISFh1SHF5VXRrK0lOSGZ2dGtTREZJZFFhamhNVXp6L0lH?=
+ =?utf-8?B?dTZWY3NkdTRadlJsMmRmTXRveHJDckxHUmFnV1VDZjVtOEd4UVVrYXZhcXBN?=
+ =?utf-8?B?S3J6cGtVK04zTjBobHZLcUVaaUtRWGtpN0pnOWpaeTFUeGhTZEhISWYwOS9S?=
+ =?utf-8?B?a09QWkpuME96NjhraGhDNWd0ZXdOMU14ZXFnaDVOVHNVSDcwTldvMFA0TEJD?=
+ =?utf-8?B?THJTVEswWDBYUmtMWklpWTFlbFBtTGhWcDBtTVJMRGVoUUZwY1VTV3BZa3Nr?=
+ =?utf-8?B?WWZCV2pFblQ0Ri8rdjhCSzNuNGVQd1AwczRTOEdpMi96V2p6YTZKdUJJNVhz?=
+ =?utf-8?B?SE8xc08rNGhYYXZQRUVxakxCd3psa1I2cVNKWVNndEZoWGkwNVRqWlF1RHZQ?=
+ =?utf-8?B?NWphbFZMd3BQS2wwdmFvVTUrWWpoSGp2TVBtOUZEU3B5bFBTMjNCOWlxdU1y?=
+ =?utf-8?B?VE91RTkrVHg4bS9rSWJWOEladXVwUlorMldSdWpuSkRrbTVIT3FTK1d5WU5M?=
+ =?utf-8?Q?byMSCejhu0QkQ97zOJf13Efm1x8UfvR3Rc5OJSJG8BQI?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6900D55A300AF24B90125E8BB065D315@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: brouer@redhat.com, netdev@vger.kernel.org, almasrymina@google.com,
- hawk@kernel.org, ilias.apalodimas@linaro.org, edumazet@google.com,
- dsahern@gmail.com, michael.chan@broadcom.com, willemb@google.com,
- Ulrich Drepper <drepper@redhat.com>, Luigi Rizzo <lrizzo@google.com>,
- Luigi Rizzo <rizzo@iet.unipi.it>, farshin@kth.se
-Subject: Re: [RFC 00/12] net: huge page backed page_pool
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <jbrouer@redhat.com>
-References: <20230707183935.997267-1-kuba@kernel.org>
- <1721282f-7ec8-68bd-6d52-b4ef209f047b@redhat.com>
- <20230711170838.08adef4c@kernel.org>
- <28bde9e2-7d9c-50d9-d26c-a3a9d37e9e50@redhat.com>
- <20230712101926.6444c1cc@kernel.org>
-In-Reply-To: <20230712101926.6444c1cc@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ae9d0d5-7ee1-42e4-231a-08db838976a9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2023 10:11:02.7442
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MQ0FRDw9mZ3ZyPKApB08sVoMPoHtbmB9N0VEzXi420C61WaAgcH5EHwGjChsZkH9IzGhqqQ/VwDUCyHHmlNPXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6323
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 12/07/2023 19.19, Jakub Kicinski wrote:
-> On Wed, 12 Jul 2023 16:00:46 +0200 Jesper Dangaard Brouer wrote:
->> On 12/07/2023 02.08, Jakub Kicinski wrote:
->>>> Generally the pp_provider's will have to use the refcnt schemes
->>>> supported by page_pool.  (Which is why I'm not 100% sure this fits
->>>> Mina's use-case).
->>>>
->>>> [IOTLB details]:
->>>>
->>>> As mentioned on [RFC 08/12] there are other techniques for reducing
->>>> IOTLB misses, described in:
->>>>     IOMMU: Strategies for Mitigating the IOTLB Bottleneck
->>>>      - https://inria.hal.science/inria-00493752/document
->>>>
->>>> I took a deeper look at also discovered Intel's documentation:
->>>>     - Intel virtualization technology for directed I/O, arch spec
->>>>     -
->>>> https://www.intel.com/content/www/us/en/content-details/774206/intel-virtualization-technology-for-directed-i-o-architecture-specification.html
->>>>
->>>> One problem that is interesting to notice is how NICs access the packets
->>>> via ring-queue, which is likely larger that number of IOTLB entries.
->>>> Thus, a high change of IOTLB misses.  They suggest marking pages with
->>>> Eviction Hints (EH) that cause pages to be marked as Transient Mappings
->>>> (TM) which allows IOMMU to evict these faster (making room for others).
->>>> And then combine this with prefetching.
->>>
->>> Interesting, didn't know about EH.
->>
->> I was looking for a way to set this Eviction Hint (EH) the article
->> talked about, but I'm at a loss.
-> 
-> Could possibly be something that the NIC has to set inside the PCIe
-> transaction headers? Like the old cache hints that predated DDIO?
-> 
-
-Yes, perhaps it is outdated?
-
->>>> In this context of how fast a page is reused by NIC and spatial
->>>> locality, it is worth remembering that PP have two schemes, (1) the fast
->>>> alloc cache that in certain cases can recycle pages (and it based on a
->>>> stack approach), (2) normal recycling via the ptr_ring that will have a
->>>> longer time before page gets reused.
->>>
->>> I read somewhere that Intel IOTLB can be as small as 256 entries.
->>
->> Are IOTLB hardware different from the TLB hardware block?
-
-Anyone knows this?
-
->> I can find data on TLB sizes, which says there are two levels on Intel,
->> quote from "248966-Software-Optimization-Manual-R047.pdf":
->>
->>    Nehalem microarchitecture implements two levels of translation
->> lookaside buffer (TLB). The first level consists of separate TLBs for
->> data and code. DTLB0 handles address translation for data accesses, it
->> provides 64 entries to support 4KB pages and 32 entries for large pages.
->> The ITLB provides 64 entries (per thread) for 4KB pages and 7 entries
->> (per thread) for large pages.
->>
->>    The second level TLB (STLB) handles both code and data accesses for
->> 4KB pages. It support 4KB page translation operation that missed DTLB0
->> or ITLB. All entries are 4-way associative. Here is a list of entries
->> in each DTLB:
->>
->>    • STLB for 4-KByte pages: 512 entries (services both data and
->> instruction look-ups).
->>    • DTLB0 for large pages: 32 entries.
->>    • DTLB0 for 4-KByte pages: 64 entries.
->>
->>    An DTLB0 miss and STLB hit causes a penalty of 7cycles. Software only
->> pays this penalty if the DTLB0 is used in some dispatch cases. The
->> delays associated with a miss to the STLB and PMH are largely nonblocking.
-> 
-> No idea :( This is an old paper from Rolf in his Netronome days which
-> says ~Sandy Bridge had only IOTLB 64 entries:
-> 
-> https://dl.acm.org/doi/pdf/10.1145/3230543.3230560
-> 
-Title: "Understanding PCIe performance for end host networking"
-
-> But it's a pretty old paper.
-
-I *HIGHLY* recommend this paper, and I've recommended it before [1].
-
-  [1] 
-https://lore.kernel.org/all/b8fa06c4-1074-7b48-6868-4be6fecb4791@redhat.com/
-
-There is a very new (May 2023) publication[2].
-  - Title: Overcoming the IOTLB wall for multi-100-Gbps Linux-based 
-networking
-  - By Luigi Rizzo (netmap inventor) and Alireza Farshin (author of prev 
-paper).
-  - [2] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10280580/
-
-There are actually benchmarking page_pool and are suggesting using 2MiB
-huge-pages, which you just implemented for page_pool.
-p.s. pretty cool to see my page_pool design being described in such 
-details and with a picture [3]/
-
-  [3] 
-https://www.ncbi.nlm.nih.gov/core/lw/2.0/html/tileshop_pmc/tileshop_pmc_inline.html?title=Click%20on%20image%20to%20zoom&p=PMC3&id=10280580_peerj-cs-09-1385-g020.jpg
-
-> 
->>> So it seems pretty much impossible for it to cache accesses to 4k
->>> pages thru recycling. I thought that even 2M pages will start to
->>> be problematic for multi queue devices (1k entries on each ring x
->>> 32 rings == 128MB just sitting on the ring, let alone circulation).
->>>    
->>
->> Yes, I'm also worried about how badly these NIC rings and PP ptr_ring
->> affects the IOTLB's ability to cache entries.  Why I suggested testing
->> out the Eviction Hint (EH), but I have not found a way to use/enable
->> these as a quick test in your environment.
-> 
-> FWIW the first version of the code I wrote actually had the coherent
-> ring memory also use the huge pages - the MEP allocator underlying the
-> page pool can be used by the driver directly to allocate memory for
-> other uses than the page pool.
-> 
-> But I figured that's going to be a nightmare to upstream, and Alex said
-> that even on x86 coherent DMA memory is just write combining not cached
-> (which frankly IDK why, possibly yet another thing we could consider
-> optimizing?!)
-> 
-> So I created two allocators, one for coherent (backed by 2M pages) and
-> one for non-coherent (backed by 1G pages).
-
-I think it is called Coherent vs Streaming DMA.
-
-> 
-> For the ptr_ring I was considering bumping the refcount of pages
-> allocated from outside the 1G pool, so that they do not get recycled.
-> I deferred optimizing that until I can get some production results.
-> The extra CPU cost of loss of recycling could outweigh the IOTLB win.
-> 
-> All very exciting stuff, I wish the days were slightly longer :)
-> 
-
-Know the problem of (human) cycles in a day.
-Rizzo's article describes a lot of experiments, that might save us/you 
-some time.
-
---Jesper
-
-
+R2kgSmVzcGVyLA0KT24gVGh1LCAyMDIzLTA3LTEzIGF0IDExOjIwICswMjAwLCBKZXNwZXIgRGFu
+Z2FhcmQgQnJvdWVyIHdyb3RlOg0KPiBIaSBEcmFnb3MsDQo+IA0KPiBCZWxvdyB5b3UgcHJvbWlz
+ZWQgdG8gd29yayBvbiBhIGZpeCBmb3IgWERQIHJlZGlyZWN0IG1lbW9yeSBsZWFrLi4uDQo+IFdo
+YXQgaXMgdGhlIHN0YXR1cz8NCj4gDQpUaGUgZml4IGdvdCBtZXJnZWQgaW50byBuZXQgYSB3ZWVr
+IGFnbzoNCmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L25l
+dGRldi9uZXQuZ2l0L2NvbW1pdC9kcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2Nv
+cmU/aWQ9N2FiZDk1NWE1OGZiMGZjZDRlNzU2ZmEyMDY1YzAzYWU0ODhmY2ZhNw0KDQpKdXN0IGZv
+cmdvdCB0byBmb2xsb3cgdXAgb24gdGhpcyB0aHJlYWQuIFNvcnJ5IGFib3V0IHRoYXQuLi4NCg0K
+VGhhbmtzLA0KRHJhZ29zDQoNCj4gT24gMjMvMDUvMjAyMyAxOC4zNSwgRHJhZ29zIFRhdHVsZWEg
+d3JvdGU6DQo+ID4gDQo+ID4gT24gVHVlLCAyMDIzLTA1LTIzIGF0IDE3OjU1ICswMjAwLCBKZXNw
+ZXIgRGFuZ2FhcmQgQnJvdWVyIHdyb3RlOg0KPiA+ID4gDQo+ID4gPiBXaGVuIHRoZSBtbHg1IGRy
+aXZlciBydW5zIGFuIFhEUCBwcm9ncmFtIGRvaW5nIFhEUF9SRURJUkVDVCwgdGhlbiBtZW1vcnkN
+Cj4gPiA+IGlzIGdldHRpbmcgbGVha2VkLiBPdGhlciBYRFAgYWN0aW9ucywgbGlrZSBYRFBfRFJP
+UCwgWERQX1BBU1MgYW5kIFhEUF9UWA0KPiA+ID4gd29ya3MgY29ycmVjdGx5LiBJIHRlc3RlZCBi
+b3RoIHJlZGlyZWN0aW5nIGJhY2sgb3V0IHNhbWUgbWx4NSBkZXZpY2UgYW5kDQo+ID4gPiBjcHVt
+YXAgcmVkaXJlY3QgKHdpdGggWERQX1BBU1MpLCB3aGljaCBib3RoIGNhdXNlIGxlYWtpbmcuDQo+
+ID4gPiANCj4gPiA+IEFmdGVyIHJlbW92aW5nIHRoZSBYRFAgcHJvZywgd2hpY2ggYWxzbyBjYXVz
+ZSB0aGUgcGFnZV9wb29sIHRvIGJlDQo+ID4gPiByZWxlYXNlZCBieSBtbHg1LCB0aGVuIHRoZSBs
+ZWFrcyBhcmUgdmlzaWJsZSB2aWEgdGhlIHBhZ2VfcG9vbCBwZXJpb2RpYw0KPiA+ID4gaW5mbGln
+aHQgcmVwb3J0cy4gSSBoYXZlIHRoaXMgYnBmdHJhY2VbMV0gdG9vbCB0aGF0IEkgYWxzbyB1c2Ug
+dG8gZGV0ZWN0DQo+ID4gPiB0aGUgcHJvYmxlbSBmYXN0ZXIgKG5vdCB3YWl0aW5nIDYwIHNlYyBm
+b3IgYSByZXBvcnQpLg0KPiA+ID4gDQo+ID4gPiDCoMKgIFsxXQ0KPiA+ID4gaHR0cHM6Ly9naXRo
+dWIuY29tL3hkcC1wcm9qZWN0L3hkcC1wcm9qZWN0L2Jsb2IvbWFzdGVyL2FyZWFzL21lbS9icGZ0
+cmFjZS9wYWdlX3Bvb2xfdHJhY2tfc2h1dGRvd24wMS5idA0KPiA+ID4gDQo+ID4gPiBJJ3ZlIGJl
+ZW4gZGVidWdnaW5nIGFuZCByZWFkaW5nIHRocm91Z2ggdGhlIGNvZGUgZm9yIGEgY291cGxlIG9m
+IGRheXMsDQo+ID4gPiBidXQgSSd2ZSBub3QgZm91bmQgdGhlIHJvb3QtY2F1c2UsIHlldC4gSSB3
+b3VsZCBhcHByZWNpYXRlIG5ldyBpZGVhcw0KPiA+ID4gd2hlcmUgdG8gbG9vayBhbmQgZnJlc2gg
+ZXllcyBvbiB0aGUgaXNzdWUuDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gVG8gTGluLCBpdCBsb29r
+cyBsaWtlIG1seDUgdXNlcyBQUF9GTEFHX1BBR0VfRlJBRywgYW5kIG15IGN1cnJlbnQNCj4gPiA+
+IHN1c3BpY2lvbiBpcyB0aGF0IG1seDUgZHJpdmVyIGRvZXNuJ3QgZnVsbHkgcmVsZWFzZSB0aGUg
+YmlhcyBjb3VudCAoaGludA0KPiA+ID4gc2VlIE1MWDVFX1BBR0VDTlRfQklBU19NQVgpLg0KPiA+
+ID4gDQo+ID4gDQo+ID4gVGhhbmtzIGZvciB0aGUgcmVwb3J0IEplc3Blci4gSW5jaWRlbnRhbGx5
+IEkndmUganVzdCBwaWNrZWQgdXAgdGhpcyBpc3N1ZQ0KPiA+IHRvZGF5DQo+ID4gYXMgd2VsbC4N
+Cj4gPiANCj4gPiBPbiBYRFAgcmVkaXJlY3QgYW5kIHR4LCB0aGUgcGFnZSBpcyBzZXQgdG8gc2tp
+cCB0aGUgYmlhcyBjb3VudGVyIHJlbGVhc2UNCj4gPiB3aXRoDQo+ID4gdGhlIGV4cGVjdGF0aW9u
+IHRoYXQgcGFnZV9wb29sX3B1dF9kZWZyYWdnZWRfcGFnZSB3aWxsIGJlIGNhbGxlZCBmcm9tIFsx
+XS4NCj4gPiBCdXQsDQo+ID4gYXMgSSBmb3VuZCBvdXQgbm93LCBkdXJpbmcgWERQIHJlZGlyZWN0
+IG9ubHkgb25lIGZyYWdtZW50IG9mIHRoZSBwYWdlIGlzDQo+ID4gcmVsZWFzZWQgaW4geGRwIGNv
+cmUgWzJdLiBUaGlzIGlzIHdoZXJlIHRoZSBsZWFrIGlzIGNvbWluZyBmcm9tLg0KPiA+IA0KPiA+
+IFdlJ2xsIHByb3ZpZGUgYSBmaXggc29vbi4NCj4gPiANCj4gPiBbMV0NCj4gPiBodHRwczovL2dp
+dC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9uZXRkZXYvbmV0LW5leHQuZ2l0
+L3RyZWUvZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2VuL3hkcC5jI242
+NjUNCj4gPiANCj4gPiBbMl0NCj4gPiBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGlu
+dXgva2VybmVsL2dpdC9uZXRkZXYvbmV0LW5leHQuZ2l0L3RyZWUvbmV0L2NvcmUveGRwLmMjbjM5
+MA0KPiA+IA0KPiA+IFRoYW5rcywNCj4gPiBEcmFnb3MNCj4gPiANCj4gPiANCj4gDQoNCg==
 
