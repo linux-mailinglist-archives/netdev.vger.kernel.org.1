@@ -1,212 +1,118 @@
-Return-Path: <netdev+bounces-17610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 471BB7525A6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:53:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693ED752598
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:52:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778ED1C20B8F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:53:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A4B51C20B9E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6527014F9D;
-	Thu, 13 Jul 2023 14:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A279C18AE9;
+	Thu, 13 Jul 2023 14:52:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23CF19BDB
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:52:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA899C433C7;
-	Thu, 13 Jul 2023 14:52:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689259971;
-	bh=R4Hkl4iroQ+C4d3AaFA6aa52uzI7aPnAyTDDN/lwc78=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RS/6gRgqvF3ybwn8Ovqq43iLhI7Yv15SZZP2U5CNn6IhgXHQH9mo4nByA/g4W736R
-	 AkMi1WqcMsHhNrtO7dGPqCwKIYlgvLK+7FW5vJj2elL3FTubJgM81//BHDuM8QqyRP
-	 Csacjb3yQ3aRtIn7A1i9sInqtS8VRY/O0QwqwwSlh+wJ04gvPtGAbDZaSnmdfd209l
-	 vt3KpAe4HIE13hYrO1C7jusvVYug5pHUh1tQDDmm+XtqhW6CbXRqbqDYOCl1W9QxOQ
-	 VXNT8IMNIH9hLd1wzLndR4KoVQB79H/FYLq25P8lOlildm0R+bpsuSo9TwClPA0kLV
-	 csu2vX1i0ECSg==
-Date: Thu, 13 Jul 2023 16:52:34 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-fsdevel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-	Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Zhi Wang <zhi.a.wang@intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Frederic Barrat <fbarrat@linux.ibm.com>,
-	Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Eric Farman <farman@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Tony Krowiak <akrowiak@linux.ibm.com>,
-	Jason Herne <jjherne@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9437811C9D
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:52:52 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B246919B
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:52:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689259971;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a2zCtBlVMSfdNhn49F5fvGTfds6ip8Yk0SLr5SlzCTc=;
+	b=ed/otZgvy/UyyX9Q+zmgkKF0WMj4VvaSOiQOuSpM/jZxh2mgeb2Bq0GTiSWg6Wp6Jxf1/+
+	eVPsS78e7H/pGP1jFNz8vrCD76WKdNSHOCvjaI/b2eEZFm0V/AXmasoyJ3obL0F4MAO/IP
+	wT7LniqQ5Y7bexPpFahoFIifjOFaXzs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-sYQX1ipMPZWkGgXgYW0DqA-1; Thu, 13 Jul 2023 10:52:49 -0400
+X-MC-Unique: sYQX1ipMPZWkGgXgYW0DqA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31429e93f26so585024f8f.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:52:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689259968; x=1691851968;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a2zCtBlVMSfdNhn49F5fvGTfds6ip8Yk0SLr5SlzCTc=;
+        b=U0zCwR/qa5q4c2c19XYSz4BIRv1Ho1dzwcTuLBEpANsrOIPYO3LUzELanP7+n9OwRV
+         EOCsaMApGfYWwRYToj0QzwZnsvc9eMlP6UWI4202GN2ZZj1GXj6MEY3YHsK5Km9OF08/
+         kxMB0CeykzcBxhZpZIXZPd6t1YtTqyP+RzJju+Do793HtCS35uJm970hkG3Tj7X1g+qy
+         Aso2hxqLqFWAyTr77Js7GXcWa2I1738LGUCy5ZIurBnjiAwOhm3ZGfL96yFyLiCgAeYQ
+         6YYxEsGi5GlGrbnLh3jZZ6gI/dq4FDBLJt62WJ101wkSYpVU+Z+j3bG4GOWxPFWFJhYZ
+         Eamw==
+X-Gm-Message-State: ABy/qLaMlR+ooYk0Ufj7euU0+R2n8TR0WPNkU75UHmDEVGsbzlv/y1vp
+	hb0Mw16MC+zDQFFJRPuqcz3+WOnvQ/0FpI7ofi2+tAu0FT1/lc+aYO+Vyz/UYjjoK+NDa853cG3
+	1b7y914XUbbC+y8Fu
+X-Received: by 2002:adf:f802:0:b0:314:3503:15ac with SMTP id s2-20020adff802000000b00314350315acmr1739349wrp.10.1689259968668;
+        Thu, 13 Jul 2023 07:52:48 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHIe9bIwU8uwonGb/X776+z7KNCl4G7bhOiTrPif1cQEJqDIP/Vb7HU5xOiBtQ+0jRV7Mj+VA==
+X-Received: by 2002:adf:f802:0:b0:314:3503:15ac with SMTP id s2-20020adff802000000b00314350315acmr1739345wrp.10.1689259968500;
+        Thu, 13 Jul 2023 07:52:48 -0700 (PDT)
+Received: from redhat.com ([2.52.158.233])
+        by smtp.gmail.com with ESMTPSA id s14-20020adfea8e000000b00301a351a8d6sm8230571wrm.84.2023.07.13.07.52.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 07:52:48 -0700 (PDT)
+Date: Thu, 13 Jul 2023 10:52:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux-foundation.org,
 	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Diana Craciun <diana.craciun@oss.nxp.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeelb@google.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Subject: Re: [PATCH 2/2] eventfd: simplify eventfd_signal_mask()
-Message-ID: <20230713-mahnen-drosseln-fa717117e827@brauner>
-References: <20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org>
- <20230713-vfs-eventfd-signal-v1-2-7fda6c5d212b@kernel.org>
- <ZLAK+FA3qgbHW0YK@google.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v11 03/10] virtio_ring: introduce
+ virtqueue_set_premapped()
+Message-ID: <20230713105230-mutt-send-email-mst@kernel.org>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-4-xuanzhuo@linux.alibaba.com>
+ <ZK/cpSceLMovhmfR@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZLAK+FA3qgbHW0YK@google.com>
+In-Reply-To: <ZK/cpSceLMovhmfR@infradead.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 07:33:05AM -0700, Sean Christopherson wrote:
-> On Thu, Jul 13, 2023, Christian Brauner wrote:
-> > diff --git a/fs/eventfd.c b/fs/eventfd.c
-> > index dc9e01053235..077be5da72bd 100644
-> > --- a/fs/eventfd.c
-> > +++ b/fs/eventfd.c
-> > @@ -43,9 +43,10 @@ struct eventfd_ctx {
-> >  	int id;
-> >  };
-> >  
-> > -__u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
-> > +bool eventfd_signal_mask(struct eventfd_ctx *ctx, __poll_t mask)
-> >  {
-> >  	unsigned long flags;
-> > +	__u64 n = 1;
-> >  
-> >  	/*
-> >  	 * Deadlock or stack overflow issues can happen if we recurse here
-> > @@ -68,7 +69,7 @@ __u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
-> >  	current->in_eventfd = 0;
-> >  	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
-> >  
-> > -	return n;
-> > +	return n == 1;
-> >  }
+On Thu, Jul 13, 2023 at 04:14:45AM -0700, Christoph Hellwig wrote:
+> On Mon, Jul 10, 2023 at 11:42:30AM +0800, Xuan Zhuo wrote:
+> > This helper allows the driver change the dma mode to premapped mode.
+> > Under the premapped mode, the virtio core do not do dma mapping
+> > internally.
+> > 
+> > This just work when the use_dma_api is true. If the use_dma_api is false,
+> > the dma options is not through the DMA APIs, that is not the standard
+> > way of the linux kernel.
 > 
-> ...
-> 
-> > @@ -58,13 +58,12 @@ static inline struct eventfd_ctx *eventfd_ctx_fdget(int fd)
-> >  	return ERR_PTR(-ENOSYS);
-> >  }
-> >  
-> > -static inline int eventfd_signal(struct eventfd_ctx *ctx)
-> > +static inline bool eventfd_signal(struct eventfd_ctx *ctx)
-> >  {
-> >  	return -ENOSYS;
-> >  }
-> >  
-> > -static inline int eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n,
-> > -				      unsigned mask)
-> > +static inline bool eventfd_signal_mask(struct eventfd_ctx *ctx, unsigned mask)
-> >  {
-> >  	return -ENOSYS;
-> 
-> This will morph to "true" for what should be an error case.  One option would be
+> I have a hard time parsing this.
 
-Ewww, that means it did return -ENOSYS before any of this.
+Me too unfortunately.
 
-> to have eventfd_signal_mask() return 0/-errno instead of the count, but looking
-> at all the callers, nothing ever actually consumes the result.
-> 
-> KVMGT morphs failure into -EFAULT
-> 
-> 	if (vgpu->msi_trigger && eventfd_signal(vgpu->msi_trigger, 1) != 1)
-> 		return -EFAULT;
-> 
-> but the only caller of that user ignores the return value.
-> 
-> 	if (vgpu_vreg(vgpu, i915_mmio_reg_offset(GEN8_MASTER_IRQ))
-> 			& ~GEN8_MASTER_IRQ_CONTROL)
-> 		inject_virtual_interrupt(vgpu);
-> 
-> The sample driver in samples/vfio-mdev/mtty.c uses a similar pattern: prints an
-> error but otherwise ignores the result.
-> 
-> So why not return nothing?  That will simplify eventfd_signal_mask() a wee bit
-> more, and eliminate that bizarre return value confusion for the ugly stubs, e.g.
+-- 
+MST
 
-Yeah, it used to return an int in the non-eventfd and a __u64 in the
-eventfd case.
-
-> 
-> void eventfd_signal_mask(struct eventfd_ctx *ctx, unsigned mask)
-> {
-> 	unsigned long flags;
-> 
-> 	/*
-> 	 * Deadlock or stack overflow issues can happen if we recurse here
-> 	 * through waitqueue wakeup handlers. If the caller users potentially
-> 	 * nested waitqueues with custom wakeup handlers, then it should
-> 	 * check eventfd_signal_allowed() before calling this function. If
-> 	 * it returns false, the eventfd_signal() call should be deferred to a
-> 	 * safe context.
-> 	 */
-> 	if (WARN_ON_ONCE(current->in_eventfd))
-> 		return;
-> 
-> 	spin_lock_irqsave(&ctx->wqh.lock, flags);
-> 	current->in_eventfd = 1;
-> 	if (ctx->count < ULLONG_MAX)
-> 		ctx->count++;
-> 	if (waitqueue_active(&ctx->wqh))
-> 		wake_up_locked_poll(&ctx->wqh, EPOLLIN | mask);
-> 	current->in_eventfd = 0;
-> 	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
-> }
-> 
-> You could even go further and unify the real and stub versions of eventfd_signal().
-
-The reason I didn't make eventfd_signal_mask() return void was that it
-was called from eventfd_signal() which did, I didn't realize the caller
-didn't actually consume the return value.
-
-If we can let both return void it gets simpler.
-
-Thanks for that.
 
