@@ -1,129 +1,113 @@
-Return-Path: <netdev+bounces-17586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E377521A8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:48:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1C6D7521DD
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 915E71C21380
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:48:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AAE21C21396
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E815F9E3;
-	Thu, 13 Jul 2023 12:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778CDF9F7;
+	Thu, 13 Jul 2023 12:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7035C6124
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:48:17 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F252D42
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:47:54 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3090d3e9c92so855955f8f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:47:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689252459; x=1691844459;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z+Z95kHJar6LgJuF8EaQ4xrWI5fsRo898PQkWtblwYA=;
-        b=ZWtafz1E6fk6SAsYpf4lGZD1+nSgipZ/1yHk8BiiBeCPmDYFNw/BHXw8sle+l2vVmS
-         HiRfDaiEutO8CKyd/tWcIbzDH68IKAq0P+wq6L3O+yCRnGWEZXF20jAOZurQ/poTKzrb
-         g2OnlU1tMldBasNoMoKBcVuVSBCTsyKGMaByUKioVd4KMVuWxyelDtQjMhVnKsq5Iagw
-         6P15f+uhPUS8d9HS9De43ANQUipGV+9v29ZgjBforFnnWFgsbssKQyogmv4hd+73mvAv
-         lE4BynPqwqichj7yZRCL2JXaPbqySmT8UZO4u9PrfLAkj4WOjTJ+83c7+Pw5b6vArAq9
-         /iXQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEBBF9E3
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:50:27 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE53326AC
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:50:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689252553;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hEH+MIbrb/f0v8KKIqNFOQt9+3/4sgWJ0QURBPgwaPk=;
+	b=OTHE4v/ARkxBH1wm75oJ9spachPpZ+XGK8hgkRs6Qf4Qtn1UVJ9f6il4/Szjc5z8iE9at8
+	MPpI9rE1k6qEht0M5DTcGEYgWHP3gVhkA/iX0aJin2zdJNL5mQ9Q/NVLhYg8BUNB5GiolI
+	w7/NiMn5Uw4KBoN4AlXbPlOxcMB/pvg=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-0b650qBMOr-iFiC2FmGXZA-1; Thu, 13 Jul 2023 08:49:11 -0400
+X-MC-Unique: 0b650qBMOr-iFiC2FmGXZA-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-403a1b0e259so1721881cf.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:49:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689252459; x=1691844459;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z+Z95kHJar6LgJuF8EaQ4xrWI5fsRo898PQkWtblwYA=;
-        b=dxNJRuMZDohbnGb8KIUxCNB3Hza0rgWk3Gzlvzqylu54U3QwA38HOE64fXcvEmee1B
-         pJE3rGjjfzzolQAgj3X7uo4tQXuJkpc00cMwN/wdOtWptduhadrn6NhudKaXTFgZ3GgO
-         4041wXmTXwwGuCbDyHoPQhUTdtmlPVSrHnrOlmNZKta7/nYO16AXXsh3ZDDRe4R7twJ1
-         pHm1QG+Jdsa2Zw91t7qsILh0CaMutFXZ5xH8UOtwVYu/yPVr7DIkhHQJUiPuHsNecm9q
-         Gxi8qD6VtRQp6+nf2szexhKrP2N7orOIqoZIHVNcht0/NkWogkmHEFeX6wnelRxfBfTv
-         IzUg==
-X-Gm-Message-State: ABy/qLZtiGTLPaAwKx4evd4M7mldSZ/gRi/YCtIJsj5awFkNHG0oMlV0
-	Qf8IySOvQO4o49hbgqikJVJoAQ==
-X-Google-Smtp-Source: APBJJlFbNLe7S8IsK2vPmgsjbKmKD9UvXXP3v3+dBxQYsKg50wEXZp6DtXoc8BrOfzOVUcWK2M8cHA==
-X-Received: by 2002:a05:6000:18f:b0:315:a1d5:a3d5 with SMTP id p15-20020a056000018f00b00315a1d5a3d5mr1544161wrx.22.1689252459616;
-        Thu, 13 Jul 2023 05:47:39 -0700 (PDT)
-Received: from [192.168.10.46] (146725694.box.freepro.com. [130.180.211.218])
-        by smtp.googlemail.com with ESMTPSA id m15-20020adfdc4f000000b003142ea7a661sm7905018wrj.21.2023.07.13.05.47.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 05:47:39 -0700 (PDT)
-Message-ID: <cb852190-2128-ee92-ff64-a47bd262154a@linaro.org>
-Date: Thu, 13 Jul 2023 14:47:37 +0200
+        d=1e100.net; s=20221208; t=1689252551; x=1691844551;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hEH+MIbrb/f0v8KKIqNFOQt9+3/4sgWJ0QURBPgwaPk=;
+        b=Rl8VFoXSMLRp83IALor6BKUznRWL3AHiWOoz2kj6Nlcn++R2CnZr3EVMBBR8nBUdrp
+         sm3O+445lIZzOuA3yLjKOoQEkzrZ4PdmzA0fHUWpAvAQHijP9aMzIvSQYGevZnF9OlJZ
+         8dTsBafYwfirRoEIBuYIXt/GGypxF4A3G+gI9EqTNwAOyV5P4LRdTt7VyEt5F04KhBq6
+         aF3oNhYY4vSp6CEO6Odm1qoGXcZe1fVnaA4MWVEcJXZryNljtuVWHxK0o4U84IFK/997
+         jTssuQIbx7FjTXaY5HCjhdvAEfRtZBjBbmU76i43fIoHgktgAedNfPuqbRKEuwdveZpn
+         z1fA==
+X-Gm-Message-State: ABy/qLYu1qZRsAzzelZrvQW2EekMduy7Q/pHKzPotVoyt3jfPV4OFtpX
+	FIEJnO6jEhmwGCUv2KG76ggriTdckkJZoOM7Rppr8nHXVSpgUU03HK8qvfB0XLVQ7w3wmNITOZd
+	u6qWEJEAhl5j1Zm044P80DIBv
+X-Received: by 2002:a05:622a:19a9:b0:400:990c:8f7c with SMTP id u41-20020a05622a19a900b00400990c8f7cmr1485987qtc.0.1689252551280;
+        Thu, 13 Jul 2023 05:49:11 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGACOfct0D1KMNQ/eKeMW3LT+7MZHHtob9ZvnwA3uh1XUKTFGMvfSrzPZ5DZu8VUZgso2Jcmg==
+X-Received: by 2002:a05:622a:19a9:b0:400:990c:8f7c with SMTP id u41-20020a05622a19a900b00400990c8f7cmr1485971qtc.0.1689252551002;
+        Thu, 13 Jul 2023 05:49:11 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-235-188.dyn.eolo.it. [146.241.235.188])
+        by smtp.gmail.com with ESMTPSA id cr16-20020a05622a429000b003f9bccc3182sm3050553qtb.32.2023.07.13.05.49.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 05:49:10 -0700 (PDT)
+Message-ID: <520aeaeae454ed7e044e147be4b4edd9495d480b.camel@redhat.com>
+Subject: Re: [PATCH net-next v3] net: txgbe: change LAN reset mode
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com
+Date: Thu, 13 Jul 2023 14:49:08 +0200
+In-Reply-To: <20230711062623.3058-1-jiawenwu@trustnetic.com>
+References: <20230711062623.3058-1-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 04/15] dt-bindings: timer: oxsemi,rps-timer: remove
- obsolete bindings
-Content-Language: en-US
-To: Neil Armstrong <neil.armstrong@linaro.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Sebastian Reichel <sre@kernel.org>, Marc Zyngier <maz@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-mtd@lists.infradead.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-oxnas@groups.io,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Arnd Bergmann <arnd@arndb.de>, Daniel Golle <daniel@makrotopia.org>
-References: <20230630-topic-oxnas-upstream-remove-v2-0-fb6ab3dea87c@linaro.org>
- <20230630-topic-oxnas-upstream-remove-v2-4-fb6ab3dea87c@linaro.org>
-From: Daniel Lezcano <daniel.lezcano@linaro.org>
-In-Reply-To: <20230630-topic-oxnas-upstream-remove-v2-4-fb6ab3dea87c@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 30/06/2023 18:58, Neil Armstrong wrote:
-> Due to lack of maintenance and stall of development for a few years now,
-> and since no new features will ever be added upstream, remove the
-> OX810 and OX820 timer bindings.
-> 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Acked-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
+Hi,
 
-Applied, thanks
+On Tue, 2023-07-11 at 14:26 +0800, Jiawen Wu wrote:
+> The old way to do LAN reset is sending reset command to firmware. Once
+> firmware performs reset, it reconfigures what it needs.
+>=20
+> In the new firmware versions, veto bit is introduced for NCSI/LLDP to
+> block PHY domain in LAN reset. At this point, writing register of LAN
+> reset directly makes the same effect as the old way. And it does not
+> reset MNG domain, so that veto bit does not change.
+>=20
+> And this change is compatible with old firmware versions, since veto
+> bit was never used.
 
+As the current commit message wording still raises questions, could you
+please explicitly the level of compatibility of both the old and new
+firmware pre/after this change?
 
--- 
-<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
+And please drop the fixes tag, thanks!
 
-Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
-<http://twitter.com/#!/linaroorg> Twitter |
-<http://www.linaro.org/linaro-blog/> Blog
+Paolo
+
 
 
