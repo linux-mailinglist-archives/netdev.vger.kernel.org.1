@@ -1,126 +1,262 @@
-Return-Path: <netdev+bounces-17439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C6875195B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:08:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A043751965
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F174281BB4
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:08:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 624DB281BF4
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6CA5698;
-	Thu, 13 Jul 2023 07:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24629569D;
+	Thu, 13 Jul 2023 07:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CBE7FC
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:08:02 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22C7211E;
-	Thu, 13 Jul 2023 00:08:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hdGx1K3RjF5TT01b8U4Kk8AYjp2IPrWjWa8zM6ieITE=; b=JugqstoBFWytUNEtdyZjbsNqKN
-	kg6eSi0xlUBPQzyzpt/3EGI2RiTg6w98eeegWwfxItBXDFEkcV/CBfNG4Goh0Q7jPe9icSD7oStGn
-	+Q7ZfTbcHLCuxSAKJhy/IqJVClovAg+DoEsjXB/pcaJ7wKYmaLpHZCKvw8oQfCq/WRkJWWnKF1Rmp
-	ll2W0Vcwantvht6diGhv2s0QO+n0RvNrOYsFFgBa3+YWIHDDId6xWmHqdioWQbA2lsfivpoY1lD3B
-	5pTjBgwFZIRaoCx6Yqegqa9CDx6CHJ0GSWxo0OttJ9WAz330MqclE6MzFbMVOGc9QWjXww81bDlDb
-	5uqB3Www==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33956)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qJqQg-0005py-0o;
-	Thu, 13 Jul 2023 08:07:58 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qJqQf-0005uz-Dm; Thu, 13 Jul 2023 08:07:57 +0100
-Date: Thu, 13 Jul 2023 08:07:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Greg Ungerer <gerg@kernel.org>
-Subject: Re: [PATCH v2 net-next 4/9] net: ethernet: mtk_eth_soc: increase
- MAX_DEVS to 3
-Message-ID: <ZK+izTulIcse2aG5@shell.armlinux.org.uk>
-References: <cover.1689012506.git.daniel@makrotopia.org>
- <2cc8012ec538106c6bcf22a40b647ec342e687a8.1689012506.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17704366
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:10:28 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53709119
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 00:10:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k6kIaESIlHpNbu/xkyxJ0MjukXgb//0XtgpbL3h9KO0GUGEJE+hNN4TBHaHY+BwqJnlbbPgrW+l1yIqe9v3jKppmZyxHjWll5P3wYZ34A6sZgZ+Xz3cfIWvGoBOlZYeInHt5iPsSKQiNAbfjiodcPdV9bONk58gvkzxSMEzecjvG+r4GCZKcw+nNhWy8G/dZF2ZGQo7Y0V0oQrODq5ktkLmLZn4gVI1bH4TDuokRFri2b1dRkAivaj28HFZrvlgMDtg0WJhszmVXVUMCQa1ncZ+DuNid6boFGCDq7wQKkfzXy2MfBRJ9MSHY4t0xIcyb6oD7tvTeBDG6hwyM4eMB7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yhnOvr4tIltaRv9D/Dtp3wMF3c4zFuy5h5no/eP0Owo=;
+ b=OczuUMVsWwFxa2f4ySy5zzLi9rgjXB1Aqr4+t71zLpPy7y9Uzg0jLaZOLgKopBpgHI5EjQB/NaDTpwZzMujpF9xofQAdiPCWKHBppEpeKGypPBAxxxT/qm1jpUkR9ZmFr6V8zMsr+kGeopquQYkSgWMm4TH5fw0SVwc8DaZZoGbcL548N2uz0zCr0m3DD88VINend1om0o9sl9kdpB/q6nyzyFe6/DiltP4KUvuvmnwaWuaaqYlOBK4cg5TNCz12Vn1raa31+c53ulyLiunGBO9tXsjj/xBVT7uys149EdMhY9N6IVOtExP+UukRauqc9xlwIEG+HBw3uoSwxIGxwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yhnOvr4tIltaRv9D/Dtp3wMF3c4zFuy5h5no/eP0Owo=;
+ b=jnzsF4BqbVr1PuL9TKVN+GUeDZzujv3nx0ztUiIyJyIBb+PI7JVGOOfUkLbn++EP2jZyIuVL6j4BanAYtbNhgRiVFV+Zfsj0wJcOCAsXo/uTXacWZoREeZnKGLGYTfxyOdrYiG3r+W0jLkCzFz3ZC4Jk6oqjNXWMqjkouMtA/PMeAQ5mTrRiE5POTCBJBTRYBZhxDWRkOrdbQM5fb6lMP/QagsIq7q/RmcbCcbx/BTxZ/pYyoiunT9BOBu7/xSLgmk19qDwzZS+i4e+Wqj+eP9TmL23SdYEQTIPklB0kNjcd7/Y97UCCyOMpvgtONPZCyPAQSQ9uEqYahzglSNeZ3A==
+Received: from SJ0PR13CA0100.namprd13.prod.outlook.com (2603:10b6:a03:2c5::15)
+ by BN9PR12MB5193.namprd12.prod.outlook.com (2603:10b6:408:11a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Thu, 13 Jul
+ 2023 07:10:22 +0000
+Received: from DM6NAM11FT010.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:a03:2c5:cafe::a9) by SJ0PR13CA0100.outlook.office365.com
+ (2603:10b6:a03:2c5::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22 via Frontend
+ Transport; Thu, 13 Jul 2023 07:10:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DM6NAM11FT010.mail.protection.outlook.com (10.13.172.222) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.20 via Frontend Transport; Thu, 13 Jul 2023 07:10:21 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 13 Jul 2023
+ 00:10:08 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Thu, 13 Jul 2023 00:10:05 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>, <bridge@lists.linux-foundation.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <razor@blackwall.org>, <roopa@nvidia.com>,
+	<dsahern@gmail.com>, <petrm@nvidia.com>, <taspelund@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [RFC PATCH net-next 0/4] Add backup nexthop ID support
+Date: Thu, 13 Jul 2023 10:09:21 +0300
+Message-ID: <20230713070925.3955850-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2cc8012ec538106c6bcf22a40b647ec342e687a8.1689012506.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT010:EE_|BN9PR12MB5193:EE_
+X-MS-Office365-Filtering-Correlation-Id: 895dfac4-8ddb-4bbc-fff3-08db837038cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4FnzueCJb6Zkc4DQK3OLXrh3PFCHOJaISxi5fQNV3efXZBgE7XPU89g5Sze2rAoTanHvq0iWa/GOCa1Qw6ljWkNRo4SW2RbzRtePk1+f+g2yW+/ZcAwijjNd7cvsn5Q2H6j10eA4arjTmgCtwNSeJb942nYOG2+QsZr8R7yGqZupcUn395ARrosZRGdm5atdt9c8kGMAU7T+jm42khP9Jf8sb07jS/dfPYPBwE0WWe/ZNWtsvuo1cmoY8XDmv652Lnk4d+QGxQESh/x4/y9rOBm9qYueQkJX0bzB3l8JmV0elK0qklk2BRub5uomyuWuCENeU9dziqTyZcUfJjxwnEzB5lQ2viCdrMDQg9PcgjwAKiLqwvOTOCzmdD2jgCKPXT+qFl2faD6mf9gGEre2azmfJM6mEVLHrRAcC7kXa7OiyLrvhkF5Zsl5NTO6u13/SiTHs84b+Pw4/bMVe/oUkyIiDLfzALkDq+zeg7bSkQoyUFUsw/hdZrZ30iwyoqhD0iqvrGxd980jQE0Mx9nEsyfXfg1McAZ+XfFn8PROEFuF5OOk7N+DG0d6lpECVzlimUbKmNj/nUpx8vldve97LYsdAFILXztZJogcuDs9jysif5oZdH59j5kpVeq9FoK5b6VkYAEqY6xy1rbM1pYSIvHqUUR5x3UU92ZDs+4bgbJiow9Z1m+yoxxMvZ+MbHXqmCnRes+qgsXbfoxchYmGt9Bn5f40946wER5iVPFQXNkyxdU6UfuFfQDV97yMlaDUFFl+2dv+guvTTZcxjx0Tt74PBs2xjdVXtMULQzIeY0t0JN1onmCKRXRtFWasMlxo
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(346002)(396003)(376002)(451199021)(46966006)(36840700001)(40470700004)(2906002)(82310400005)(110136005)(7636003)(356005)(966005)(336012)(82740400003)(47076005)(83380400001)(2616005)(107886003)(186003)(1076003)(26005)(40480700001)(16526019)(36860700001)(86362001)(5660300002)(426003)(40460700003)(8676002)(8936002)(36756003)(41300700001)(54906003)(6666004)(478600001)(70206006)(70586007)(4326008)(316002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 07:10:21.4382
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 895dfac4-8ddb-4bbc-fff3-08db837038cf
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DM6NAM11FT010.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5193
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 03:18:52AM +0100, Daniel Golle wrote:
-> From: Lorenzo Bianconi <lorenzo@kernel.org>
-> 
-> This is a preliminary patch to add MT7988 SoC support since it runs 3
-> macs instead of 2.
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 6 +++++-
->  drivers/net/ethernet/mediatek/mtk_eth_soc.h | 4 ++--
->  2 files changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> index 7014e0d108b27..7f191e4337dd8 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -4030,8 +4030,12 @@ static void mtk_sgmii_destroy(struct mtk_eth *eth)
->  {
->  	int i;
->  
-> -	for (i = 0; i < MTK_MAX_DEVS; i++)
-> +	for (i = 0; i < MTK_MAX_DEVS; i++) {
-> +		if (!eth->sgmii_pcs[i])
-> +			continue;
-> +
->  		mtk_pcs_lynxi_destroy(eth->sgmii_pcs[i]);
-> +	}
+tl;dr
+=====
 
-Please instead arrange for mtk_pcs_lynxi_destroy() to be a no-op if it's
-passed a NULL pointer, which makes it easier to use in error paths (it
-means mtk_pcs_lynxi_destroy() can be called without checks - like
-kfree() etc.)
+This patchset adds a new bridge port attribute specifying the nexthop
+object ID to attach to a redirected skb as tunnel metadata. The ID is
+used by the VXLAN driver to choose the target VTEP for the skb. This is
+useful for EVPN multi-homing, where we want to redirect local
+(intra-rack) traffic upon carrier loss through one of the other VTEPs
+(ES peers) connected to the target host.
 
-Since error paths don't get often tested, we need to do as much as
-possible to make error paths trivial.
+Background
+==========
+
+In a typical EVPN multi-homing setup each host is multi-homed using a
+set of links called ES (Ethernet Segment, i.e., LAG) to multiple leaf
+switches in a rack. These switches act as VTEPs and are not directly
+connected (as opposed to MLAG), but can communicate with each other (as
+well as with VTEPs in remote racks) via spine switches over L3.
+
+The control plane uses Type 1 routes [1] to create a mapping between an
+ES and VTEPs where the ES has active links. In addition, the control
+plane uses Type 2 routes [2] to create a mapping between {MAC, VLAN} and
+an ES.
+
+These tables are then used by the control plane to instruct VTEPs how to
+reach remote hosts. For example, assuming {MAC X, VLAN Y} is accessible
+via ES1 and this ES has active links to VTEP1 and VTEP2. The control
+plane will program the following entries to a remote VTEP:
+
+ # ip nexthop add id 1 via $VTEP1_IP fdb
+ # ip nexthop add id 2 via $VTEP2_IP fdb
+ # ip nexthop add id 10 group 1/2 fdb
+ # bridge fdb add $MAC_X dev vx0 master extern_learn vlan $VLAN_Y
+ # bridge fdb add $MAC_Y dev vx0 self extern_learn nhid 10 src_vni $VNI_Y
+
+Remote traffic towards the host will be load balanced between VTEP1 and
+VTEP2. If the control plane notices a carrier loss on the ES1 link
+connected to VTEP1, it will issue a Type 1 route withdraw, prompting
+remote VTEPs to remove the effected nexthop from the group:
+
+ # ip nexthop replace id 10 group 2 fdb
+
+Motivation
+==========
+
+While remote traffic can be redirected to a VTEP with an active ES link
+by withdrawing a Type 1 route, the same is not true for local traffic. A
+host that is multi-homed to VTEP1 and VTEP2 via another ES (e.g., ES2)
+will send its traffic to {MAC X, VLAN Y} via one of these two switches,
+according to its LAG hash algorithm which is not under our control. If
+the traffic arrives at VTEP1 - which no longer has an active ES1 link -
+it will be dropped due to the carrier loss.
+
+In MLAG setups, the above problem is solved by redirecting the traffic
+through the peer link upon carrier loss. This is achieved by defining
+the peer link as the backup port of the host facing bond. For example:
+
+ # bridge link set dev bond0 backup_port bond_peer
+
+Unlike MLAG, there is no peer link between the leaf switches in EVPN.
+Instead, upon carrier loss, local traffic should be redirected through
+one of the active ES peers. This can be achieved by defining the VXLAN
+port as the backup port of the host facing bonds. For example:
+
+ # bridge link set dev es1_bond backup_port vx0
+
+However, the VXLAN driver is not programmed with FDB entries for locally
+attached hosts and therefore does not know to which VTEP to redirect the
+traffic to. This will result in the traffic being replicated to all the
+VTEPs (potentially hundreds) in the network and each VTEP dropping the
+traffic, except for the active ES peer.
+
+Avoiding the flooding by programming local FDB entries in the VXLAN
+driver is not a viable solution as it requires to significantly increase
+the number of programmed FDB entries.
+
+Implementation
+==============
+
+The proposed solution is to create an FDB nexthop group for each ES with
+the IP addresses of the active ES peers and set this ID as the backup
+nexthop ID (new bridge port attribute) of the ES link. For example, on
+VTEP1:
+
+ # ip nexthop add id 1 via $VTEP2_IP fdb
+ # ip nexthop add id 10 group 1 fdb
+ # bridge link set dev es1_bond backup_nhid 10
+ # bridge link set dev es1_bond backup_port vx0
+
+When the ES link loses its carrier, traffic will be redirected to the
+VXLAN port, but instead of only attaching the tunnel ID (i.e., VNI) as
+tunnel metadata to the skb, the backup nexthop ID will be attached as
+well. The VXLAN driver will then use this information to forward the skb
+via the nexthop object associated with the ID, as if the skb hit an FDB
+entry associated with this ID.
+
+Testing
+=======
+
+A test for both the existing backup port attribute as well as the new
+backup nexthop ID attribute is added in patch #4.
+
+Patchset overview
+=================
+
+Patch #1 extends the tunnel key structure with the new nexthop ID field.
+
+Patch #2 uses the new field in the VXLAN driver to forward packets via
+the specified nexthop ID.
+
+Patch #3 adds the new backup nexthop ID bridge port attribute and
+adjusts the bridge driver to attach the ID as tunnel metadata upon
+redirection.
+
+Patch #4 adds a selftest.
+
+iproute2 patches can be found here [3].
+
+[1] https://datatracker.ietf.org/doc/html/rfc7432#section-7.1
+[2] https://datatracker.ietf.org/doc/html/rfc7432#section-7.2
+[3] https://github.com/idosch/iproute2/tree/submit/backup_nhid_v1
+
+Ido Schimmel (4):
+  ip_tunnels: Add nexthop ID field to ip_tunnel_key
+  vxlan: Add support for nexthop ID metadata
+  bridge: Add backup nexthop ID support
+  selftests: net: Add bridge backup port and backup nexthop ID test
+
+ drivers/net/vxlan/vxlan_core.c                |  44 +
+ include/net/ip_tunnels.h                      |   1 +
+ include/uapi/linux/if_link.h                  |   1 +
+ net/bridge/br_forward.c                       |   1 +
+ net/bridge/br_netlink.c                       |  12 +
+ net/bridge/br_private.h                       |   3 +
+ net/bridge/br_vlan_tunnel.c                   |  15 +
+ net/core/rtnetlink.c                          |   2 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../selftests/net/test_bridge_backup_port.sh  | 759 ++++++++++++++++++
+ 10 files changed, 838 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/net/test_bridge_backup_port.sh
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.40.1
+
 
