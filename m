@@ -1,224 +1,279 @@
-Return-Path: <netdev+bounces-17729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD4F6752E01
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:38:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D75752E09
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F70281FC8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:38:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4C01C2146E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99FE6AA1;
-	Thu, 13 Jul 2023 23:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001426AA6;
+	Thu, 13 Jul 2023 23:42:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918A263C2
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:38:39 +0000 (UTC)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088E22707;
-	Thu, 13 Jul 2023 16:38:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689291517; x=1720827517;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=LPp44NDWEpqZiucKtKHsWJi0KIS3OeymkPkpzDsPPo8=;
-  b=YXjlCJTTthtNWP+3J4hQjXe+gt076HeuURzC6E+x1zBUDbu1vU5XljZ7
-   1JS/73W3H4XLwA+6N+nm7qgiTStHYcW0jQ1+S7k3AoiChxPb9whEARjrN
-   o/UCnI6cxrV1EnyCGN6CXqUYXv948JvyXnq6XvW+1/plbqenEvi+H+HI8
-   WNOg6GT+Heeyi1OozLoVGZq1jNBG0gfOucu+2fxlkgHDR+gVvJnw4b2Z0
-   TPxhJV2UDC649Hdq64TbB/dWZObejfPoCC040Hb6SsGW/kdrO2QsHtogd
-   P6KYPPqRgOeB3wVC5V87BN+eYtE2SJ3X0aGAPeNdFVOpKDVex6uu7cXl9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="345661006"
-X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="345661006"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2023 16:38:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="699448885"
-X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="699448885"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga006.jf.intel.com with ESMTP; 13 Jul 2023 16:38:37 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 13 Jul 2023 16:38:36 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 13 Jul 2023 16:38:36 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.47) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 13 Jul 2023 16:38:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XZt1S5oef8UiU26S2wDkb6DMty05j2epC02S6NnWIHu0kbJj7wspZZoczzTEAn2tZxR4AQdDyeHABcJTNjnexPQ4M4ImJUaD+baNs9QIb0Hj3UoJReF9FciCtF+osRuDyedQq09iz/Uzrpt4MEHeswzSwxeqM/o5gJgng4pHjRkQ3Ir7FLo/2AhXaeV0FvMdC+QPfKSkmBGs9ddXe+/oDul/wQyKtmjyCH9qaKdX4vaL9RxuErpAv7EPdnVxsrOl5oEy0v0kxQeIaayJNS8cwy96qhWwuBaCCSAESbgLjkcl0ILEAk6NRxpW/UkJP7F2EpkW4maIHjKM6SXgO3odGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bq+OuGiNUS3CnBfTa+x0i6UJrgRUyWbAaQh0UiCa4NI=;
- b=SVEz60cuQPWmNVS6lR4Kc/DtMdshPIoNCgpOQfC5KeJI5C+/mI46N3DszImZnRS2qXzkNqQ7Wpa617bBzE95UBY6jlbjP2VEN6eHwB9PPOlT65RcF8kgRGKZRBdRJE3OTSs1+zW1aJYpIDBqEXcy+5gAUooFgzePTYssG5q6R5X40OpeVPwmNwMZLOzFAl0eNrcATOeOwXIt/FaDLjUSVGxDWNm5wZiFdZcIKnD0eY1DS9FKAwXM37p40JU0AfRW2Ppje/c6mi1SdqB8qVJ/HIrz58rE3SSh6VYSwr+l1yxdIw1Lc9N2UuQf13XzBPVIXXuk5u1cLHc+P8KaqrtxpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5028.namprd11.prod.outlook.com (2603:10b6:303:9a::12)
- by SJ1PR11MB6226.namprd11.prod.outlook.com (2603:10b6:a03:45b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22; Thu, 13 Jul
- 2023 23:38:33 +0000
-Received: from CO1PR11MB5028.namprd11.prod.outlook.com
- ([fe80::d166:2444:2f40:e0b6]) by CO1PR11MB5028.namprd11.prod.outlook.com
- ([fe80::d166:2444:2f40:e0b6%4]) with mapi id 15.20.6565.028; Thu, 13 Jul 2023
- 23:38:33 +0000
-From: "Mekala, SunithaX D" <sunithax.d.mekala@intel.com>
-To: "Ma, Aaron" <aaron.ma@canonical.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jeff Garzik <jgarzik@redhat.com>, Auke Kok
-	<auke-jan.h.kok@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER error
- during resume
-Thread-Topic: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER
- error during resume
-Thread-Index: AQHZmOOokxjOvODuMEq7FIpYqOTT2K+4k6ww
-Date: Thu, 13 Jul 2023 23:38:33 +0000
-Message-ID: <CO1PR11MB5028DD73CD9601FEA281FC0DA037A@CO1PR11MB5028.namprd11.prod.outlook.com>
-References: <20230526163001.67626-1-aaron.ma@canonical.com>
- <20230607015646.558534-1-aaron.ma@canonical.com>
-In-Reply-To: <20230607015646.558534-1-aaron.ma@canonical.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5028:EE_|SJ1PR11MB6226:EE_
-x-ms-office365-filtering-correlation-id: c094633e-309a-4bbf-aadc-08db83fa45c4
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pavSv80tDw55nvFzuKbeFFa6jPKDc9MD0mqs1h9Im/8tMx6pk78zQc09b/ZFsDknCkNLjf9+CzWxhPHg3vN/0DTM2YpGyDHaMkzmwMsyVH7InfdPMJgHWXbiAMp7qz5+/DzeBiAaKwebmnQBPr3leiL7JthmNbLf8nx0PylXmwjYwtFzpC012AxpSViydjp1nIaKK1SCoc7M7W40kclV3Cqya9nVVDBT10h0sEWdeAIZ53EDyDMIx6taXYoHDaoWdEpcVmwcHP9D4Lp0Vf0pinzsf+FUUDZxuwVx48aoYzzi6vhOhto1SDtQu0Ufe5/S1Sfy7j7Dg+ha5XxpyNBsJGsiWSgL6FRh5TKo8wbo6ClVtZIQQA/DeKtLvaj3v+JQkNfNXSSAR8Uh5sIRgS5+v6ALSoHXbU1WlqEt+9BzE27jVZjzuQbJe9BKIghvcdY7cB2VUwWoyQHURLLPIioOmW+T6XiP9YYb2NY/K7r6a6qWSVKXZasDcYX5Zavqp3c5nOOXKzdaq1x2+1KzhXJV7OtI1ZeGEAC5rPOHmNPQjNZLS1xMZcgUFjouOb66fWfNaAnRzdW5R4xeBCEjyO5DXugNp6CLqjn0Lz74fLrn7yDmhCbljDqmR7tW+TGHctn2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5028.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(396003)(39860400002)(366004)(346002)(451199021)(8676002)(41300700001)(8936002)(55016003)(110136005)(7696005)(2906002)(316002)(52536014)(5660300002)(71200400001)(66476007)(66946007)(66556008)(76116006)(64756008)(66446008)(33656002)(9686003)(82960400001)(966005)(478600001)(86362001)(186003)(38070700005)(122000001)(921005)(38100700002)(83380400001)(53546011)(26005)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mFZP+7SIjqkudHFyPYabC4CYAKQxyNqR4gmXXGNqe8d6numrlWBtTzpCfl8m?=
- =?us-ascii?Q?9xrFT5C21QXDs8DFClDR5Gggg4Ty1FDMz6F42VGVjQZ9t2gJwfZWQRApKAmh?=
- =?us-ascii?Q?f3NudDr4MZlwd8BlYh5a5ze8G5cXh9tmC7J37QBcBCGInwxbKiEYQ+K0eaRW?=
- =?us-ascii?Q?03RzaR4/sMDa3cy4XpqqGn6sg/LmKwAyV1yUMf91y2WqswzENMyZiQsAFhPf?=
- =?us-ascii?Q?ooPq8Y8RqBnANDotc5nDcGo4vRvMv4D7WLuPU1pSEG19C3UWEePjutbJOCGu?=
- =?us-ascii?Q?tG3QeuG/oWXmu5bOmxo65ufu/mxSRMuO1WIAM5N7OuNRgY9D2uvOALck4W1Z?=
- =?us-ascii?Q?5UlFJO279h6OIJYSD5KnkFVjmSVFlOoOui3F0RV7DJ69LfQY0nzV9JRqsiXG?=
- =?us-ascii?Q?cTnjyIwJjNjJy+z7nnfIGFiyN18VVTRy10I0d17ANRKGwt3kwOluYVJOr+66?=
- =?us-ascii?Q?bkj2sEHNhMYJW30n+eZxZ5cgeCNeoofjSWi5RFEuC0eqQohmEkChx7sp63P3?=
- =?us-ascii?Q?a0z6WW0rCm9w5BOEt/3PSmimDhq7X+Wbb8nKKL6YVdMIXgqPGP/r9bGmIthA?=
- =?us-ascii?Q?dxB2Gg2nuywg2iqP84rMDsR8Zy9zJb9iHHjLv2MoT+mtRkuA6cffvvbRRTNb?=
- =?us-ascii?Q?KzgGtln2abyh9J978xSK9WbpyOF5mbLq1T1pyzxz3dcHKgfcuK9DhLt+6H7Z?=
- =?us-ascii?Q?9dyLzHbHpM3uXclmL/PNOzy5wc0D/0xIzx7Kk9qX4x17BcY82m+o4EhqLGhf?=
- =?us-ascii?Q?Ms02WfpvPOVvej5MQFkIRroCXQuw4jVHnBhMeEgns6abRKRHq01ruCQ4/Bsp?=
- =?us-ascii?Q?PGDoSTKZXRuW+ev8LBMVV5z3zWHIng29rmu0blmB7U/WELCE66lJBJ/eL/94?=
- =?us-ascii?Q?Gm7tLdigljHNrEr+XtGKSZqqLMHaDzdT+rYfrG52McAiaFj/Aim8hn0dmvVe?=
- =?us-ascii?Q?ON/K10/KaLdhuge7hHkLpTzGgO/2n/Cj72I02f6A7FmQVJv9O6UwqLwveFTk?=
- =?us-ascii?Q?6IxSkz8Rls4GQBqisZX1eR1mIAocEmtRncyUJObc5mG/YonBKUrZVzrpaR3d?=
- =?us-ascii?Q?ZOQp9PgacUVBJVM7P9Nr2zy/LETDlpnzVUDSqqT9rNKLD714sc2gvxUsLmu7?=
- =?us-ascii?Q?mw58jD54+K+plCSz6lzcuo5Nie0/nWa0OWQzomRl34HnHvRL+bFf92PXBg8h?=
- =?us-ascii?Q?0OQ4xCGWixXZYZvEEJ8/IP3VYN3wr7VVT4ALZAEjKtvPjyxjQLtHrCYC00Zb?=
- =?us-ascii?Q?7DW96loiWHy6DTLJN5frdGv812LLfeVeuYpCdDf5aLElPBAGzeqRDW1POkqM?=
- =?us-ascii?Q?xfuG9ufQfg8R8p+wheNBAelgVNJKBHGlP/3qTvh1CQQ6CRZhYAJi1VsfEHBM?=
- =?us-ascii?Q?HN/pFrn6lNXZzjlNx+4mJLjKXhS8F4fIS/bK5h92QFK9cKkdXs/a/eRr2idh?=
- =?us-ascii?Q?yjVHpf+TggJxVrkvN3n/jaT8utIwIHNSDpwYIbKGHzxg2XHAVI8X7oXBMZnE?=
- =?us-ascii?Q?QgP/oL0tiaTQrvTtGhGu96fBBwwLa+mNm/2YNhVMJOIH1t0bS3tL3XTLw0kF?=
- =?us-ascii?Q?FvRcPBeQ2GJVqtDmU/E0CKlJF9wBuUMySrQN5uODwxbiPsRmU0ti0d+XS4Oj?=
- =?us-ascii?Q?kg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D694463D6;
+	Thu, 13 Jul 2023 23:42:41 +0000 (UTC)
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDCA2707;
+	Thu, 13 Jul 2023 16:42:39 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailnew.west.internal (Postfix) with ESMTP id DA1652B0005E;
+	Thu, 13 Jul 2023 19:42:36 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Thu, 13 Jul 2023 19:42:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm2; t=
+	1689291756; x=1689298956; bh=EzNZ4lSIA6Q11ERKP9wL6gbe1PTUeztr8yy
+	uoNBS6xI=; b=lwlN9tGh2djU92nCaw14L8DOqRSFUea9bxC8PzEXViIRwkgKWqx
+	0PRLwA5GyEoUkqZgV1OG38xgf06awiPK/inuCCPe/Kfj5rUfl9H/R2CtkCeGrb0d
+	rzPplFlSpf95be0DK5IsgGZU+gJBUFXJmUGFUAybOXr71Jq8mPd6ceJzUfY3f255
+	qNVnrFmzEbSFVFAuWB3oBe3On59NB36ZAFBmvTyEG5shK9v0ghBSIbefS1mCoJ9N
+	MsAp6xN4ks/32ErGWlJTufHJm4PysC0mQsXSpRzFZHI5whQEU7V8oztTJ5Kwj8ka
+	gz0t/2WkL15AZj1t7l+lvC93oN+Dga/jTOw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1689291756; x=1689298956; bh=EzNZ4lSIA6Q11ERKP9wL6gbe1PTUeztr8yy
+	uoNBS6xI=; b=eZJGBYtpogIteZ9RY7DGwiLXsVU/AqBs/HcGcGkMDp/pYEUXq6z
+	SZPjvwdwZEzt+zwUC2De3idEBM0U0osNYUkUyWq1asZoSFByDWQ2AVlXu8WO+XEh
+	ysyyF5jDChkqvWYUVpU16spKxznJVtdM4jWqTvtzFkbmSy8gDfJLpfdGa/kkib7u
+	tB/RuBEFy8P6Qhr49mYQJHzDLxr4CF6k6dtByzMPPBROjTM/UK8qgwdUUFybN45k
+	CwNhklHrGUHl7ePHvMXTUNfxlc72ckZYkBTj1v+GzHPog/FypI6Tb0F5mGeGQBMN
+	YSSV8+Jo00+juInO/9wZi6newj/p6znX/sw==
+X-ME-Sender: <xms:64uwZNVacJ5NUMpvwo4iBGdlz67l-Saew17mLJ9DGWISMv1STsy4sg>
+    <xme:64uwZNkmxCGIcKVXB_023ZUf6kZtqfnCDLP7xp3cTx1MVvgvGPD2vbvRHbMLx-MgZ
+    SINkvuIcruTIlQ9Hw>
+X-ME-Received: <xmr:64uwZJbY15BAcpgo3svwKSXkanT3Gwo0NVAcVat7o2_lZg4kgigM3fv6qA9fljl7IL_pvhGsOV-iD0fuMdvI3nZNc8p4UA6N_osh>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrfeehgddviecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
+    hrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefstddt
+    tdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
+    cuggftrfgrthhtvghrnhepieektdefhffhjeejgeejhfekkeejgfegvdeuhfeitdeiueeh
+    hffgvedthedviefgnecuffhomhgrihhnpehqvghmuhdrohhrghenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:64uwZAVoqZuK6x0Zc470yxBCCCwJDEP4Qn6U_z-4FamVbPQsKNVyww>
+    <xmx:64uwZHmMdfE20ZbIMwCnk2Tv5iOsFcfU8e0MFy4Q1SLaJ3Hnd0YUpQ>
+    <xmx:64uwZNchtFnRTMKgfQWpij797GJxGPhaHZ5HAvm4cuVvy_7wdmjnzw>
+    <xmx:7IuwZFF3iowhMRQ7rNsPyJKSznXv9vLz1UWVUst5UFCrNPSvFcu3j8iw4Lo>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 13 Jul 2023 19:42:34 -0400 (EDT)
+Date: Thu, 13 Jul 2023 17:42:32 -0600
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Florian Westphal <fw@strlen.de>, 
+	"David S. Miller" <davem@davemloft.net>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
+	Network Development <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH bpf-next v4 2/6] netfilter: bpf: Support
+ BPF_F_NETFILTER_IP_DEFRAG in netfilter link
+Message-ID: <t6wypww537golmoosbikfuombrqq555fh5mbycwl4whto6joo4@hcqlospkgqyr>
+References: <cover.1689203090.git.dxu@dxuuu.xyz>
+ <d3b0ff95c58356192ea3b50824f8cdbf02c354e3.1689203090.git.dxu@dxuuu.xyz>
+ <CAADnVQKKfEtZYZxihxvG3aQ34E1m95qTZ=jTD7yd0qvOASpAjQ@mail.gmail.com>
+ <kwiwaeaijj6sxwz5fhtxyoquhz2kpujbsbeajysufgmdjgyx5c@f6lqrd23xr5f>
+ <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com>
+ <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
+ <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5028.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c094633e-309a-4bbf-aadc-08db83fa45c4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2023 23:38:33.8458
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ml87HlC/LErCyv1XeWrO9qArbl+SQuJiFzzjw+1ZwC9zv8e5ZEUCgxy/j7Lc2wHT8bBaMKuls0vC8Pi6dWL5Fi1VX+acAaaL5dryUs5zTQw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6226
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
-aron Ma
-> Sent: Tuesday, June 6, 2023 6:57 PM
-> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
-thony.l.nguyen@intel.com>; David S. Miller <davem@davemloft.net>; Eric Duma=
-zet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <p=
-abeni@redhat.com>; Jeff Garzik <jgarzik@redhat.com>; Auke Kok <auke-jan.h.k=
-ok@intel.com>; intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; li=
-nux-kernel@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER erro=
-r during resume
->
-> PCIe AER error_detected caused a race issue with igb_resume.
-> Protect error_detected when igb is in down state.
->
-> Error logs:
-> kernel: igb 0000:02:00.0: disabling already-disabled device
-> kernel: WARNING: CPU: 0 PID: 277 at drivers/pci/pci.c:2248 pci_disable_de=
-vice+0xc4/0xf0
-> kernel: RIP: 0010:pci_disable_device+0xc4/0xf0
-> kernel: Call Trace:
-> kernel:  <TASK>
-> kernel:  igb_io_error_detected+0x3e/0x60
-> kernel:  report_error_detected+0xd6/0x1c0
-> kernel:  ? __pfx_report_normal_detected+0x10/0x10
-> kernel:  report_normal_detected+0x16/0x30
-> kernel:  pci_walk_bus+0x74/0xa0
-> kernel:  pcie_do_recovery+0xb9/0x340
-> kernel:  ? __pfx_aer_root_reset+0x10/0x10
-> kernel:  aer_process_err_devices+0x168/0x220
-> kernel:  aer_isr+0x1b5/0x1e0
-> kernel:  ? __pfx_irq_thread_fn+0x10/0x10
-> kernel:  irq_thread_fn+0x21/0x70
-> kernel:  irq_thread+0xf8/0x1c0
-> kernel:  ? __pfx_irq_thread_dtor+0x10/0x10
-> kernel:  ? __pfx_irq_thread+0x10/0x10
-> kernel:  kthread+0xef/0x120
-> kernel:  ? __pfx_kthread+0x10/0x10
-> kernel:  ret_from_fork+0x29/0x50
-> kernel:  </TASK>
-> kernel: ---[ end trace 0000000000000000 ]---
->
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D217446
-> Fixes: 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet driver")
-> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
-> Reviewed-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
-> ---
-> V1->V2: Add target tree tag net and Fixes tag.
->
->  drivers/net/ethernet/intel/igb/igb_main.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worke=
-r at Intel)
+On Thu, Jul 13, 2023 at 04:10:03PM -0700, Alexei Starovoitov wrote:
+> On Wed, Jul 12, 2023 at 9:33 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
+> >
+> > On Wed, Jul 12, 2023 at 06:26:13PM -0700, Alexei Starovoitov wrote:
+> > > On Wed, Jul 12, 2023 at 6:22 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
+> > > >
+> > > > Hi Alexei,
+> > > >
+> > > > On Wed, Jul 12, 2023 at 05:43:49PM -0700, Alexei Starovoitov wrote:
+> > > > > On Wed, Jul 12, 2023 at 4:44 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
+> > > > > > +#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
+> > > > > > +       case NFPROTO_IPV6:
+> > > > > > +               rcu_read_lock();
+> > > > > > +               v6_hook = rcu_dereference(nf_defrag_v6_hook);
+> > > > > > +               if (!v6_hook) {
+> > > > > > +                       rcu_read_unlock();
+> > > > > > +                       err = request_module("nf_defrag_ipv6");
+> > > > > > +                       if (err)
+> > > > > > +                               return err < 0 ? err : -EINVAL;
+> > > > > > +
+> > > > > > +                       rcu_read_lock();
+> > > > > > +                       v6_hook = rcu_dereference(nf_defrag_v6_hook);
+> > > > > > +                       if (!v6_hook) {
+> > > > > > +                               WARN_ONCE(1, "nf_defrag_ipv6_hooks bad registration");
+> > > > > > +                               err = -ENOENT;
+> > > > > > +                               goto out_v6;
+> > > > > > +                       }
+> > > > > > +               }
+> > > > > > +
+> > > > > > +               err = v6_hook->enable(link->net);
+> > > > >
+> > > > > I was about to apply, but luckily caught this issue in my local test:
+> > > > >
+> > > > > [   18.462448] BUG: sleeping function called from invalid context at
+> > > > > kernel/locking/mutex.c:283
+> > > > > [   18.463238] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid:
+> > > > > 2042, name: test_progs
+> > > > > [   18.463927] preempt_count: 0, expected: 0
+> > > > > [   18.464249] RCU nest depth: 1, expected: 0
+> > > > > [   18.464631] CPU: 15 PID: 2042 Comm: test_progs Tainted: G
+> > > > > O       6.4.0-04319-g6f6ec4fa00dc #4896
+> > > > > [   18.465480] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+> > > > > BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+> > > > > [   18.466531] Call Trace:
+> > > > > [   18.466767]  <TASK>
+> > > > > [   18.466975]  dump_stack_lvl+0x32/0x40
+> > > > > [   18.467325]  __might_resched+0x129/0x180
+> > > > > [   18.467691]  mutex_lock+0x1a/0x40
+> > > > > [   18.468057]  nf_defrag_ipv4_enable+0x16/0x70
+> > > > > [   18.468467]  bpf_nf_link_attach+0x141/0x300
+> > > > > [   18.468856]  __sys_bpf+0x133e/0x26d0
+> > > > >
+> > > > > You cannot call mutex under rcu_read_lock.
+> > > >
+> > > > Whoops, my bad. I think this patch should fix it:
+> > > >
+> > > > ```
+> > > > From 7e8927c44452db07ddd7cf0e30bb49215fc044ed Mon Sep 17 00:00:00 2001
+> > > > Message-ID: <7e8927c44452db07ddd7cf0e30bb49215fc044ed.1689211250.git.dxu@dxuuu.xyz>
+> > > > From: Daniel Xu <dxu@dxuuu.xyz>
+> > > > Date: Wed, 12 Jul 2023 19:17:35 -0600
+> > > > Subject: [PATCH] netfilter: bpf: Don't hold rcu_read_lock during
+> > > >  enable/disable
+> > > >
+> > > > ->enable()/->disable() takes a mutex which can sleep. You can't sleep
+> > > > during RCU read side critical section.
+> > > >
+> > > > Our refcnt on the module will protect us from ->enable()/->disable()
+> > > > from going away while we call it.
+> > > >
+> > > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> > > > ---
+> > > >  net/netfilter/nf_bpf_link.c | 10 ++++++++--
+> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
+> > > > index 77ffbf26ba3d..79704cc596aa 100644
+> > > > --- a/net/netfilter/nf_bpf_link.c
+> > > > +++ b/net/netfilter/nf_bpf_link.c
+> > > > @@ -60,9 +60,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
+> > > >                         goto out_v4;
+> > > >                 }
+> > > >
+> > > > +               rcu_read_unlock();
+> > > >                 err = v4_hook->enable(link->net);
+> > > >                 if (err)
+> > > >                         module_put(v4_hook->owner);
+> > > > +
+> > > > +               return err;
+> > > >  out_v4:
+> > > >                 rcu_read_unlock();
+> > > >                 return err;
+> > > > @@ -92,9 +95,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
+> > > >                         goto out_v6;
+> > > >                 }
+> > > >
+> > > > +               rcu_read_unlock();
+> > > >                 err = v6_hook->enable(link->net);
+> > > >                 if (err)
+> > > >                         module_put(v6_hook->owner);
+> > > > +
+> > > > +               return err;
+> > > >  out_v6:
+> > > >                 rcu_read_unlock();
+> > > >                 return err;
+> > > > @@ -114,11 +120,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
+> > > >         case NFPROTO_IPV4:
+> > > >                 rcu_read_lock();
+> > > >                 v4_hook = rcu_dereference(nf_defrag_v4_hook);
+> > > > +               rcu_read_unlock();
+> > > >                 if (v4_hook) {
+> > > >                         v4_hook->disable(link->net);
+> > > >                         module_put(v4_hook->owner);
+> > > >                 }
+> > > > -               rcu_read_unlock();
+> > > >
+> > > >                 break;
+> > > >  #endif
+> > > > @@ -126,11 +132,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
+> > > >         case NFPROTO_IPV6:
+> > > >                 rcu_read_lock();
+> > > >                 v6_hook = rcu_dereference(nf_defrag_v6_hook);
+> > > > +               rcu_read_unlock();
+> > >
+> > > No. v6_hook is gone as soon as you unlock it.
+> >
+> > I think we're protected here by the try_module_get() on the enable path.
+> > And we only disable defrag if enabling succeeds. The module shouldn't
+> > be able to deregister its hooks until we call the module_put() later.
+> >
+> > I think READ_ONCE() would've been more appropriate but I wasn't sure if
+> > that was ok given nf_defrag_v(4|6)_hook is written to by
+> > rcu_assign_pointer() and I was assuming symmetry is necessary.
+> 
+> Why is rcu_assign_pointer() used?
+> If it's not RCU protected, what is the point of rcu_*() accessors
+> and rcu_read_lock() ?
+> 
+> In general, the pattern:
+> rcu_read_lock();
+> ptr = rcu_dereference(...);
+> rcu_read_unlock();
+> ptr->..
+> is a bug. 100%.
+> 
+
+The reason I left it like this is b/c otherwise I think there is a race
+with module unload and taking a refcnt. For example:
+
+ptr = READ_ONCE(global_var)
+                                             <module unload on other cpu>
+// ptr invalid
+try_module_get(ptr->owner) 
+
+I think the the synchronize_rcu() call in
+kernel/module/main.c:free_module() protects against that race based on
+my reading.
+
+Maybe the ->enable() path can store a copy of the hook ptr in
+struct bpf_nf_link to get rid of the odd rcu_dereference()?
+
+Open to other ideas too -- would appreciate any hints.
+
+Thanks,
+Daniel
 
