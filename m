@@ -1,133 +1,116 @@
-Return-Path: <netdev+bounces-17422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F1775186C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:59:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12EF4751875
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA871C2127F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:59:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A64281B44
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEEB5677;
-	Thu, 13 Jul 2023 05:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CF85678;
+	Thu, 13 Jul 2023 06:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D460F566E
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:59:42 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 477E11FDE
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 22:59:41 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fbc5d5742bso2131065e9.2
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 22:59:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689227979; x=1691819979;
-        h=content-transfer-encoding:in-reply-to:subject:from:content-language
-         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TonyGlZrPLTfaA/nGE3oSsXI8nFtOJ8w/o5RAeOZAAw=;
-        b=nwW1SQbH3bX5iVluDTu625cIH6qOiTFEpMh7/NHoHeubKCR6ldajfreHD3crgVtaKl
-         gJNN1v01M56knNU8LgXG5Fe0aTj+LWDjD3o5jaEjUa1vnI1SzqKxWjwsic6/9UU49uZY
-         LFU8C11eO+9M4zdGW/Ywawx4sO/wg6I33/1tGPwUM54z4exaM9oJvdivq8Vv5akeP32A
-         WJvJ0PVujUpFKJcN78qCP+e6tsbEDj2IcOdbOjy31ah9eLCP2y4Y+UakHL17pCNvf8Ju
-         PUulnwIMjFPcIZP5XHrUL8LMpLQtvY65WjGPUEeSNYASQVzlS5kUJ/ItFHa3h8Sd7vM5
-         oP5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689227979; x=1691819979;
-        h=content-transfer-encoding:in-reply-to:subject:from:content-language
-         :references:cc:to:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TonyGlZrPLTfaA/nGE3oSsXI8nFtOJ8w/o5RAeOZAAw=;
-        b=jqLIsVgEtczKOB+76lTZ2dl6MURJclCdh9grSPh6Y8MyirEeh1LMSABPCMy+UT9o+c
-         sfGQCWk+eldaHgxJiNRYOSb0tfhzq58acycqe3sv4wK5GY5VUMuHuR4HSB7c/j/i5L/J
-         6+CudbTpXX3TGpQkxUNoBp433mp+IpTNNMSd9tArBKE/UsfQRiOPxV2YphegJ84wVjtE
-         WVA7dXIrGiru3TV8VagcANH9DNRYlTfWA3iZd5xcpQia6nPBUG4OrmiXCvZwIPor/+3U
-         6lrUM3h0uUgyStpFU27nyxB3yJInE8vi6Gtg4N/qVUgpwdNr29W882Ek7WiUgbAajFVH
-         WN7w==
-X-Gm-Message-State: ABy/qLZj+o9NahYXqJdibXRe4KesAbWLMKuadxrbQseGqyj5J42X9Y6J
-	T3v7k01UudxtmTaA9v0FmpU=
-X-Google-Smtp-Source: APBJJlED7Vq9rOXUbdrXtYCHP/Df/58CDfglI/owsskIfYVf6B78MwAKnJXfStqtPQ3ISqkXR2boqQ==
-X-Received: by 2002:a1c:4b18:0:b0:3fa:9e61:19ed with SMTP id y24-20020a1c4b18000000b003fa9e6119edmr479684wma.23.1689227979254;
-        Wed, 12 Jul 2023 22:59:39 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:b8ac:4400:515d:f19b:9d70:d3fc? (dynamic-2a01-0c23-b8ac-4400-515d-f19b-9d70-d3fc.c23.pool.telefonica.de. [2a01:c23:b8ac:4400:515d:f19b:9d70:d3fc])
-        by smtp.googlemail.com with ESMTPSA id f11-20020a7bc8cb000000b003fa98908014sm17441619wml.8.2023.07.12.22.59.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jul 2023 22:59:38 -0700 (PDT)
-Message-ID: <16fa03d5-c110-75d6-9181-d239578db0a2@gmail.com>
-Date: Thu, 13 Jul 2023 07:59:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4E353B1
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:01:42 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D1CD269D;
+	Wed, 12 Jul 2023 23:01:36 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36D1U1pS028125;
+	Wed, 12 Jul 2023 23:01:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=fqHrSBL3hoY+JjPtKwIfd8KWeoYZRh46fiQOckzwMdQ=;
+ b=cDimJe33RrMIlHzeEvuLSzTg346kCs0ClHbxAIu5ZA2lktVBp5ekg5ylN0XbXn5F5qIo
+ 1SygmAgHXCRz0ygq/5sPM6NVUyYvWUzX7LhvFE2mGR/KsYbsw2JTwanoENiNgCOT1z4/
+ 7411nzZ+FItlKBlegLBZcIQqi/+ixGrQA7YsAn4dEPRFMES3vgaiajjpRfDqlnTT9vbW
+ iNRNXubQNVaJ4udr3eVwwtCyNslFGGjYc9BuA7Z4JIUR0OkZUDr9A76CK6buOnF5RIUB
+ Mp78iKJ1d9WneOyte0TwkANUJfpRnMx3t9p1nQ7s366cAfUMqTqFClblzrsyzaZAcTu7 wA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rsb7rf06d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jul 2023 23:01:21 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 12 Jul
+ 2023 23:01:19 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 12 Jul 2023 23:01:19 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id ABC873F707B;
+	Wed, 12 Jul 2023 23:01:12 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>,
+        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
+        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
+Subject: [net-next Patchv2 0/3] support Round Robin scheduling
+Date: Thu, 13 Jul 2023 11:31:08 +0530
+Message-ID: <20230713060111.14169-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-To: Anuj Gupta <anuj20.g@samsung.com>, davem@davemloft.net
-Cc: holger@applied-asynchrony.com, kai.heng.feng@canonical.com,
- simon.horman@corigine.com, nic_swsd@realtek.com, netdev@vger.kernel.org,
- linux-nvme@lists.infradead.org
-References: <CGME20230712155834epcas5p1140d90c8a0a181930956622728c4dd89@epcas5p1.samsung.com>
- <20230712155052.GA946@green245>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: Performance Regression due to ASPM disable patch
-In-Reply-To: <20230712155052.GA946@green245>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Proofpoint-GUID: Yb-o6J9QFiPlFuhPxNFeow5bG3IBEEQF
+X-Proofpoint-ORIG-GUID: Yb-o6J9QFiPlFuhPxNFeow5bG3IBEEQF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-13_02,2023-07-11_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 12.07.2023 17:55, Anuj Gupta wrote:
-> Hi,
-> 
-> I see a performance regression for read/write workloads on our NVMe over
-> fabrics using TCP as transport setup.
-> IOPS drop by 23% for 4k-randread [1] and by 18% for 4k-randwrite [2].
-> 
-> I bisected and found that the commit
-> e1ed3e4d91112027b90c7ee61479141b3f948e6a ("r8169: disable ASPM during
-> NAPI poll") is the trigger.
-> When I revert this commit, the performance drop goes away.
-> 
-> The target machine uses a realtek ethernet controller - 
-> root@testpc:/home/test# lspci | grep -i eth
-> 29:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. Device 2600
-> (rev 21)
-> 2a:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. Killer
-> E3000 2.5GbE Controller (rev 03)
-> 
-> I tried to disable aspm by passing "pcie_aspm=off" as boot parameter and
-> by setting pcie aspm policy to performance. But it didn't improve the
-> performance.
-> I wonder if this is already known, and something different should be
-> done to handle the original issue? 
-> 
-> [1] fio randread
-> fio -direct=1 -iodepth=1 -rw=randread -ioengine=psync -bs=4k -numjobs=1
-> -runtime=30 -group_reporting -filename=/dev/nvme1n1 -name=psync_read
-> -output=psync_read
-> [2] fio randwrite
-> fio -direct=1 -iodepth=1 -rw=randwrite -ioengine=psync -bs=4k -numjobs=1
-> -runtime=30 -group_reporting -filename=/dev/nvme1n1 -name=psync_read
-> -output=psync_write
-> 
-> 
-I can imagine a certain performance impact of this commit if there are
-lots of small packets handled by individual NAPI polls.
-Maybe it's also chip version specific.
-You have two NIC's, do you see the issue with both of them?
-Related: What's your line speed, 1Gbps or 2.5Gbps?
-Can you reproduce the performance impact with iperf?
-Do you use any network optimization settings for latency vs. performance?
-Interrupt coalescing, is TSO(6) enabled?
-An ethtool -k output may provide further insight.
+octeontx2 and CN10K silicons support Round Robin scheduling. When multiple
+traffic flows reach transmit level with the same priority, with Round Robin
+scheduling traffic flow with the highest quantum value is picked. With this
+support, the user can add multiple classes with the same priority and
+different quantum in htb offload.
 
+This series of patches adds support for the same.
+
+Patch1: implement transmit schedular allocation algorithm as preparation
+        for support round robin scheduling.
+
+Patch2: Allow quantum parameter in HTB offload mode.
+
+Patch3: extends octeontx2 htb offload support for  Round Robin scheduling
+
+
+Naveen Mamindlapalli (3):
+  octeontx2-pf: implement transmit schedular allocation algorithm
+  sch_htb: Allow HTB quantum parameter in offload mode
+  octeontx2-pf: htb offload support for Round Robin scheduling
+--
+v2 * change data type of otx2_index_used to reduce size of structure
+     otx2_qos_cfg
+
+
+ .../marvell/octeontx2/nic/otx2_common.c       |   1 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   1 +
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  | 347 ++++++++++++++++--
+ .../net/ethernet/marvell/octeontx2/nic/qos.h  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |   4 +-
+ include/net/pkt_cls.h                         |   1 +
+ net/sched/sch_htb.c                           |   7 +-
+ 7 files changed, 329 insertions(+), 43 deletions(-)
+
+--
+2.17.1
 
