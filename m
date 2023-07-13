@@ -1,210 +1,204 @@
-Return-Path: <netdev+bounces-17360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737897515EE
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 03:55:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9117515FB
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B56C281AA6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 01:55:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDA6E2811DC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 02:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF7A632;
-	Thu, 13 Jul 2023 01:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4EF63D;
+	Thu, 13 Jul 2023 02:02:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536B77C
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:55:32 +0000 (UTC)
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A839B173F
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 18:55:24 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-7659924cd9bso23289785a.1
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 18:55:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990467C
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:02:03 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ACE71BEC
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 19:02:01 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-3110ab7110aso293117f8f.3
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 19:02:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1689213323; x=1691805323;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IC4l+DMQhb6kc5rWIsMuFvnWetpCKotmNlfSav918o4=;
-        b=VdDCd2rwQPbltzkne/8cYfxnkuaCKmFeRcipHkeV5r5b9iyVOJ/o/XOTDIvxXsoZRq
-         kzJrj9I6zxi8mHbcPDLKrJ/iTuQu+OTIzr6ATwW+JkoDfWEFyD+x2vOHh7fxGo4ZF1Xs
-         PvudhpsE7CEWCSNNZfNksQ00yWADTZWPg5X8w=
+        d=cloudflare.com; s=google; t=1689213719; x=1691805719;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m/m1iIGRAEVez5/UJLInDOwYLbUQP9TFtpWuFVr4tgo=;
+        b=WGQefeZNbFEGsugx1WY6seIS0Hs2h2xIM4QLojZogcNBRQ72ElgdzJZYuwpD5OhacN
+         cPHpcaSNdrTEDDfnmuCdTxP8WffJjd/iti1osceyWHa2hJkx1EstLRoYSm7cWsI7/GHH
+         VTV32ClrVLnnkE4BSwOE9v4ZSOU9o/mLFBM1M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689213323; x=1691805323;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IC4l+DMQhb6kc5rWIsMuFvnWetpCKotmNlfSav918o4=;
-        b=DMSK18ACMTDZqjbzNMs8vBUZYjF6NEPyhBmDGZaUpQtXq2clZ5K1ztis0XWCp/V+Nm
-         WJO2atE5QUrGkc/IpN2hurOcPN7atGmonzBti3lXzH6K+gHZ7Cc51ykgMUS1zeuZ9iIy
-         mmcDS8Cw3KBnwOk31cejU+O/2TvNpohxIblMtvij2x8AEOi+TASafYJhtt11+zva6ob9
-         6o0Q2BdnxHDVXl2NVI94i8k5SnDIUyA+uPUELHbPp9CavFrL9pcsecwIqaXl0Hf/HejT
-         th3gY3q4IFRE7s8j7SarsN0sYywdfkhLrEZf/bGknvGhZ8hhM9//MrEMknHH3NtRpo3I
-         OYAQ==
-X-Gm-Message-State: ABy/qLbA39mPL6FjLjWxbgRX3oRYk4nOJH3eiKN8+8ehCj7kaEv2kIaa
-	MiYkFEIbR+SiBmZk770XrIlBG/LTDxfIP07UL82jEw==
-X-Google-Smtp-Source: APBJJlHXnjSSjDOxycQFia95pEocVbUmuLmuF+evJsLCFSQS9qAmMqhl9alS5Ioe+fxOUCbJ3wKqug==
-X-Received: by 2002:a05:620a:198e:b0:767:173e:9 with SMTP id bm14-20020a05620a198e00b00767173e0009mr233241qkb.58.1689213323421;
-        Wed, 12 Jul 2023 18:55:23 -0700 (PDT)
-Received: from debian.debian ([140.141.197.139])
-        by smtp.gmail.com with ESMTPSA id e1-20020a05620a208100b0076729e726cbsm2580913qka.22.2023.07.12.18.55.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 18:55:22 -0700 (PDT)
-Date: Wed, 12 Jul 2023 18:55:20 -0700
-From: Yan Zhai <yan@cloudflare.com>
-To: "open list:NETWORKING [TCP]" <netdev@vger.kernel.org>
-Cc: kernel-team@cloudflare.com, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Melnychenko <andrew@daynix.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>
-Subject: [PATCH net] gso: fix GSO_DODGY bit handling for related protocols
-Message-ID: <ZK9ZiNMsJX8+1F3N@debian.debian>
+        d=1e100.net; s=20221208; t=1689213719; x=1691805719;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m/m1iIGRAEVez5/UJLInDOwYLbUQP9TFtpWuFVr4tgo=;
+        b=T2PzV6IRi/R6/P+dAOK62c1B+nFrTiFIEggSiQuQDICcg5+kvs6Vk8wD+nHdAi6Ah1
+         1OVqoo8pfSuXhKrThYqVpHDxvBzsZTkUNnvnoKokscCYto6Fa60qN6afrROJAJGI22Db
+         U4f7e9rqvvvlWcrBUb8dllAARdSgTtsblOlMx7xmQJAsb//dstThaP0RSt/PN0pzz4l+
+         msHswlHt/HUQthPS6gE+xhvffWKm18l0OFyn6nrsb+vrP8t5tuq1NzdZ8Rz7NpsbZW4+
+         t5rpoMlgLp/VcDRwBjLsSoKIuXyVYKy83zfPh1q2JQVyGEafKPhMQRO0Plb7Ol2PiN8E
+         RtNA==
+X-Gm-Message-State: ABy/qLZUdruDkFNyoa6OmyE2lFgEvkso3zuOT79HGNrNYncBmSSBRQMq
+	r0N7/qteuualk/KKuWYYYEeJ5XDD9kOYtNZUNnWesQ==
+X-Google-Smtp-Source: APBJJlGNJbnvNstTIVO4c/8TYzRzeCIRAByACkHvrz2rPeGZkUvncLxJ/F+6+FLClwQtXFvUTdY23qMsmPMK1xQmJic=
+X-Received: by 2002:a5d:4b8d:0:b0:313:f0d7:a43 with SMTP id
+ b13-20020a5d4b8d000000b00313f0d70a43mr184023wrt.23.1689213719404; Wed, 12 Jul
+ 2023 19:01:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <CAJPywTKDdjtwkLVUW6LRA2FU912qcDmQOQGt2WaDo28KzYDg+A@mail.gmail.com>
+ <CAO3-PboqjhNDcCTicLPXawvwmvrC-Wj04Q72v0tJCME-cX4P8Q@mail.gmail.com>
+ <1c27e65962f983ae5fbe76b108f3b0b6be22ea1f.camel@redhat.com> <CAF=yD-LbXxa3g2YMUtGSaJRb5S6ggXJK9nmEf1TJzGf+tBbbaw@mail.gmail.com>
+In-Reply-To: <CAF=yD-LbXxa3g2YMUtGSaJRb5S6ggXJK9nmEf1TJzGf+tBbbaw@mail.gmail.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Wed, 12 Jul 2023 21:01:46 -0500
+Message-ID: <CAO3-PbpmNx+Ja2DkW+R6jwCVTxS6zKP4VxJ8+HXCuo4s-7xPiQ@mail.gmail.com>
+Subject: Re: Broken segmentation on UDP_GSO / VIRTIO_NET_HDR_GSO_UDP_L4
+ forwarding path
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Marek Majkowski <marek@cloudflare.com>, 
+	network dev <netdev@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, 
+	Andrew Melnychenko <andrew@daynix.com>, Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SKB_GSO_DODGY bit indicates a GSO packet comes from an untrusted source.
-The canonical way is to recompute the gso_segs to avoid device driver
-issues. Afterwards, the DODGY bit can be removed to avoid re-check at the
-egress of later devices, e.g. packets can egress to a vlan device backed
-by a real NIC.
+On Wed, Jul 12, 2023 at 7:51=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> On Wed, Jul 12, 2023 at 11:20=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >
+> > Adding Jason,
+> > On Wed, 2023-07-12 at 09:58 -0500, Yan Zhai wrote:
+> > > On Wed, Jul 12, 2023 at 9:00=E2=80=AFAM Marek Majkowski <marek@cloudf=
+lare.com> wrote:
+> > > >
+> > > > Dear netdev,
+> > > >
+> > > > I encountered a puzzling problem, please help.
+> > > >
+> > > > Rootless repro:
+> > > >    https://gist.github.com/majek/5e8fd12e7a1663cea63877920fe86f18
+> > > >
+> > > > To run:
+> > > >
+> > > > ```
+> > > > $ unshare -Urn python3 udp-gro-forwarding-bug.py
+> > > > tap0  In  IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, length 4000
+> > > > lo    P   IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, bad length 4000 > =
+1392
+> > > > lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 =
+> 1392
+> > > > lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 =
+> 1200
+> > > > '''
+> > > >
+> > > > The code is really quite simple. First I create and open a tap devi=
+ce.
+> > > > Then I send a large (>MTU) packet with vnethdr over tap0. The
+> > > > gso_type=3DGSO_UDP_L4, and gso_size=3D1400. I expect the packet to =
+egress
+> > > > from tap0, be forwarded somewhere, where it will eventually be
+> > > > segmented by software or hardware.
+> > > >
+> > > > The egress tap0 packet looks perfectly fine:
+> > > >
+> > > > tap0  In  IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, length 4000
+> > > >
+> > > > To simplify routing I'm doing 'tc mirred' aka `bpf_redirect()` magi=
+c,
+> > > > where I move egress tap0 packets to ingress lo, like this:
+> > > >
+> > > > > tc filter add dev tap0 ingress protocol ip u32 match ip src 10.0.=
+0.2 action mirred egress redirect dev lo
+>
+> This is the opposite of stated, attach to tap0 at ingress and send to
+> lo on egress?
+>
+> It might matter only in the sense that tc_mirred on egress acts in
+> dev_queue_xmit before any segmentation would occur.
+>
+> Probably irrelevant, as your example clearly hits the segmentation
+> logic, and it sounds like the root cause there is already well
+> understood.
+>
+> > > >
+> > > > On ingress lo I see something really weird:
+> > > >
+> > > > lo    P   IP 10.0.0.2.55892 > 1.1.1.1.5021: UDP, bad length 4000 > =
+1392
+> > > > lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 =
+> 1392
+> > > > lo    P   IP 10.0.0.2.43690 > 1.1.1.1.43690: UDP, bad length 43682 =
+> 1200
+> > > >
+> > > > This looks like IPv4 fragments without the IP fragmentation bits se=
+t.
+> > > >
+> > > > I think there are two independent problems here:
+> > > >
+> > > > (1) The packet is *fragmented* and that is plain wrong here. I'm
+> > > > asking for USO not UFO in vnethdr.
+> > > >
+> > >
+> > > To add some context our virtio header in hex format (12 bytes) is
+> > > 01052a007805220006000000.
+> > >
+> > > Some digging shows that the issue seems to come from this patch:
+> > > https://lore.kernel.org/netdev/20220907125048.396126-2-andrew@daynix.=
+com/
+> > > At this point, skb_shared_info->gso_type is SKB_GSO_UDP_L4 |
+> > > SKB_GSO_DODGY, here the DODGY bit is set inside tun_get_user. So the
+> > > skb_gso_ok check will return true here, then the skb will fall to the
+> > > fragment code. Simple tracing confirms that __udp_gso_segment is neve=
+r
+> > > called in this scenario.
+> > >
+> > > So the question is really how to handle the DODGY bit. IMHO it is not
+> > > right to fall to the fragment path when the actual packet request is
+> > > segmentation.
+> >
+> > I do agree with the above.
+> >
+> > > Will it be sufficient to just recompute the gso_segs
+> > > here and return the head skb instead?
+> >
+> > Something alike what TCP is currently doing:
+> >
+> > https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_offload.c#L=
+85
+> >
+> > should be fine - constrained to the skb_shinfo(skb)->gso_type &
+> > SKB_GSO_UDP_L4 case.
+>
+> Agreed. That's the canonical way to check dodgy segmentation offload
+> packets. All USO packets should enter __udp_gso_segment.
+>
+> After validation and DODGY removal, a packet may fall through to
+> device segmentation if the devices advertises the feature (by returning
+> segs =3D=3D NULL).
 
-Commit 1fd54773c267 ("udp: allow header check for dodgy GSO_UDP_L4
-packets.") checks DODGY bit for UDP, but for packets that can be fed
-directly to the device after gso_segs reset, it actually falls through
-to fragmentation [1].
+I sent a patch at
+https://lore.kernel.org/netdev/ZK9ZiNMsJX8+1F3N@debian.debian/T/#u.
+Tested on my local machine it is working correctly now.
 
-Commit 90017accff61 ("sctp: Add GSO support") and commit 3820c3f3e417
-("[TCP]: Reset gso_segs if packet is dodgy") both didn't remove the DODGY
-bit after recomputing gso_segs.
+--=20
 
-This change fixes the GSO_UDP_L4 handling case, and remove the DODGY bit
-at other places.
-
-Fixes: 90017accff61 ("sctp: Add GSO support")
-Fixes: 3820c3f3e417 ("[TCP]: Reset gso_segs if packet is dodgy")
-Fixes: 1fd54773c267 ("udp: allow header check for dodgy GSO_UDP_L4 packets.")
-Signed-off-by: Yan Zhai <yan@cloudflare.com>
-
----
-[1]:
-https://lore.kernel.org/all/CAJPywTKDdjtwkLVUW6LRA2FU912qcDmQOQGt2WaDo28KzYDg+A@mail.gmail.com/
-
----
- net/ipv4/tcp_offload.c |  1 +
- net/ipv4/udp_offload.c | 19 +++++++++++++++----
- net/ipv6/udp_offload.c | 19 +++++++++++++++----
- net/sctp/offload.c     |  2 ++
- 4 files changed, 33 insertions(+), 8 deletions(-)
-
-diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index 8311c38267b5..f9b93708c22e 100644
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -87,6 +87,7 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
- 		/* Packet is from an untrusted source, reset gso_segs. */
- 
- 		skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(skb->len, mss);
-+		skb_shinfo(skb)->gso_type &= ~SKB_GSO_DODGY;
- 
- 		segs = NULL;
- 		goto out;
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 75aa4de5b731..bd29cf19bb6b 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -388,11 +388,22 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
- 	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
- 		goto out;
- 
--	if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
--	    !skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST))
--		return __udp_gso_segment(skb, features, false);
--
- 	mss = skb_shinfo(skb)->gso_size;
-+
-+	if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
-+		if (skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST)) {
-+			/* Packet is from an untrusted source, reset actual gso_segs */
-+			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(skb->len - sizeof(*uh),
-+								 mss);
-+			skb_shinfo(skb)->gso_type &= ~SKB_GSO_DODGY;
-+
-+			segs = NULL;
-+			goto out;
-+		} else {
-+			return __udp_gso_segment(skb, features, false);
-+		}
-+	}
-+
- 	if (unlikely(skb->len <= mss))
- 		goto out;
- 
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index ad3b8726873e..6857d9f7bd06 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -43,11 +43,22 @@ static struct sk_buff *udp6_ufo_fragment(struct sk_buff *skb,
- 		if (!pskb_may_pull(skb, sizeof(struct udphdr)))
- 			goto out;
- 
--		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
--		    !skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST))
--			return __udp_gso_segment(skb, features, true);
--
- 		mss = skb_shinfo(skb)->gso_size;
-+
-+		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
-+			if (skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST)) {
-+				/* Packet is from an untrusted source, reset actual gso_segs */
-+				skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(skb->len - sizeof(*uh),
-+									 mss);
-+				skb_shinfo(skb)->gso_type &= ~SKB_GSO_DODGY;
-+
-+				segs = NULL;
-+				goto out;
-+			} else {
-+				return __udp_gso_segment(skb, features, true);
-+			}
-+		}
-+
- 		if (unlikely(skb->len <= mss))
- 			goto out;
- 
-diff --git a/net/sctp/offload.c b/net/sctp/offload.c
-index 502095173d88..3d2b44db0d42 100644
---- a/net/sctp/offload.c
-+++ b/net/sctp/offload.c
-@@ -65,6 +65,8 @@ static struct sk_buff *sctp_gso_segment(struct sk_buff *skb,
- 		skb_walk_frags(skb, frag_iter)
- 			pinfo->gso_segs++;
- 
-+		pinfo->gso_type &= ~SKB_GSO_DODGY;
-+
- 		segs = NULL;
- 		goto out;
- 	}
--- 
-2.30.2
-
+Yan
 
