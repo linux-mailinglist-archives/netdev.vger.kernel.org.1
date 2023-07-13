@@ -1,100 +1,116 @@
-Return-Path: <netdev+bounces-17625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAD8752699
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:19:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F13497526F4
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 302791C213B2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:19:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC5BD281E54
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F611EA9B;
-	Thu, 13 Jul 2023 15:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0F11ED4D;
+	Thu, 13 Jul 2023 15:29:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F0318B12
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:19:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E068AC433C7;
-	Thu, 13 Jul 2023 15:19:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689261594;
-	bh=VsVd6c6fcDYfKRrByNwWM9qnQW5+5Y5fBRbciDWv40I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l5mdgSePHnomeUDlfS+pkzxKFrwwHpKsTuWkBqUg0484adSopLIhookQKA9b9+J7z
-	 WYum0Nt1IzXiXiTYLXuJYE08RGoyhlqtANzpZdb8GwRbiikqy6vZ9lPzwpRJlVVGWu
-	 LrQBNXSwL8x8zvgzAwA02tIAbpVCl6ILYu1xoaJslNOWRBh7hyqw1+bpuL73c81MyW
-	 xDs/Fzh6+vMBPhjxx2U/Brmcjiy5fXO8rUzDvazvIkLv6G2AfAzb4Gccj0rzhrjcBl
-	 YwjBnBZeaUPvY+7q8qht2BqYB/1m6thCFspv2U/58EJR9yA88OYfbxRImfY+eVHIKg
-	 DKCbJvpV9aDFw==
-Date: Thu, 13 Jul 2023 16:19:50 +0100
-From: Lee Jones <lee@kernel.org>
-To: Min Li <min.li.xe@renesas.com>
-Cc: Min Li <lnimi@hotmail.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH mfd v2 1/3] mfd: rsmu: support 32-bit address space
-Message-ID: <20230713151950.GA968624@google.com>
-References: <MW5PR03MB693295AF31ABCAF6AE52EE74A08B9@MW5PR03MB6932.namprd03.prod.outlook.com>
- <20230330132600.GR434339@google.com>
- <OS3PR01MB6593BFFA683814654C957589BA37A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9F71ED43
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:29:16 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5262030FA
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:28:54 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fbfa811667so13451625e9.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689262133; x=1691854133;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dk7c3gz9VhsIx4qVgTGY12ilcIgctHPAd46AqzeX33s=;
+        b=cvKVgzY0rvgm4OkvM4Iyp4VIJ+PMtQ0TtSrTsq3VM3ULcOvJcio8bd6Sm3OT8W5bSv
+         ijBer0POVkuOR93O6WwiHa7TAwLdQXpWx7mykj/+4qZznjSfilLlZLzcxUOyPWK0YIe6
+         A189xDDkFTFaE14+wZpmkUGOw2fw+10Od0z05HNnCGPj160YV/yl1DOqRKHwRTd5HeCz
+         OKwhmrRDlCHqDeQsvvdUPxHL0mYQiKmTCni60oP/tyRSv9E910w/Fol7Js0dSeMlsyxb
+         thgC0pLBIaIIIFh8BqSkeh+ETqabVWiRNwx8KV460nyLaQiACy5oWAyD+AoJNwFQJ6DK
+         LHJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689262133; x=1691854133;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dk7c3gz9VhsIx4qVgTGY12ilcIgctHPAd46AqzeX33s=;
+        b=OE7dOZveDdw37bNftt8sf8zLBtCZ4i00b0a/x7zAbyLP2R7XBxXakE/cGon6Ra+p+0
+         9VulUQ12HKOzoH03ikjAMsfgLnRs1Mm+E+UMIKdciFvzYJKb69lgL2mTjfM8ecczRgnj
+         4PpCR9aBGtXhwKdeTgXZqthAnTdcgQHSJhhKyN7uiCUIrzw+JE0IgYiGdjKd0Yz4NA1a
+         U/C4hedUTGjM9s3sAH18xOT5gkrkbjdKtR4/AduViHttzxlRydFB8aXBByOnEZd7vSR1
+         zqVw58PxnQPxxIKb1Czug25OaOo9JzFkD90j50S64tyk/S4k5CShMRVKbiT+dhZZ4GBf
+         l99A==
+X-Gm-Message-State: ABy/qLZ922syWHegNpGXJ9X5/VAL0EWMqHyqHpfNa4Mp2RBX3j7QYBMa
+	jBtVfIl8HMv7xQ3MfFzauHLl//7iMFc1gOIeOKrC5w==
+X-Google-Smtp-Source: APBJJlEWUoeuf5dGWkDvdxMoAKsG/Z2DJAjtQ1HCUphj+qd1f83rh/PkeY7QfHENnfGc0LkAkETEIg==
+X-Received: by 2002:a05:600c:3105:b0:3fa:9996:8e03 with SMTP id g5-20020a05600c310500b003fa99968e03mr14988wmo.10.1689262132820;
+        Thu, 13 Jul 2023 08:28:52 -0700 (PDT)
+Received: from krzk-bin.. ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id l22-20020a7bc456000000b003fbb5142c4bsm18563121wmi.18.2023.07.13.08.28.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 08:28:52 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Paul Cercueil <paul@crapouillou.net>,
+	Marek Vasut <marex@denx.de>,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 0/3] dt-bindings: net: davicom,dm9000: convert to DT schema
+Date: Thu, 13 Jul 2023 17:28:45 +0200
+Message-Id: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <OS3PR01MB6593BFFA683814654C957589BA37A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-> Hi Lee
+Hi,
 
-> > -----Original Message-----
-> > From: Lee Jones <lee@kernel.org>
-> > Sent: March 30, 2023 9:26 AM
-> > To: Min Li <lnimi@hotmail.com>
-> > Cc: richardcochran@gmail.com; linux-kernel@vger.kernel.org;
-> > netdev@vger.kernel.org; Min Li <min.li.xe@renesas.com>
-> > Subject: Re: [PATCH mfd v2 1/3] mfd: rsmu: support 32-bit address space
-> > 
-> > On Mon, 27 Mar 2023, Min Li wrote:
-> > 
-> > > From: Min Li <min.li.xe@renesas.com>
-> > >
-> > > We used to assume 0x2010xxxx address. Now that we need to access
-> > > 0x2011xxxx address, we need to support read/write the whole 32-bit
-> > > address space.
-> > >
-> > > Also defined RSMU_MAX_WRITE_COUNT and
-> > > RSMU_MAX_READ_COUNT for readability
-> > >
-> > > Signed-off-by: Min Li <min.li.xe@renesas.com>
-> > > ---
-> > > changelog
-> > > -change commit message to include defining
-> > RSMU_MAX_WRITE/WRITE_COUNT
-> > >
-> > >  drivers/mfd/rsmu.h       |   2 +
-> > >  drivers/mfd/rsmu_i2c.c   | 172 +++++++++++++++++++++++++++++++--
-> > ------
-> > >  drivers/mfd/rsmu_spi.c   |  52 +++++++-----
-> > >  include/linux/mfd/rsmu.h |   5 +-
-> > >  4 files changed, 175 insertions(+), 56 deletions(-)
-> > 
-> > I changed the commit message a little and reworded/moved a comment and:
-> > 
-> > Applied, thanks
-> 
-> I am writing to follow up with the following change. But I can't track it being merged with any branch, can anyone tell me where it is now? Thanks
+Memory controller bindings have to be updated before we can convert
+davicom,dm9000 to DT schema.
 
-67d6c76fc815c ("mfd: rsmu: Support 32-bit address space")
+Please take it via net-next.
+
+Best regards,
+Krzysztof
+
+Krzysztof Kozlowski (3):
+  dt-bindings: memory-controllers: ingenic,nemc: reference peripheral
+    properties
+  dt-bindings: memory-controllers: reference TI GPMC peripheral
+    properties
+  dt-bindings: net: davicom,dm9000: convert to DT schema
+
+ .../memory-controllers/ingenic,nemc.yaml      |  1 +
+ .../mc-peripheral-props.yaml                  |  2 +
+ .../bindings/net/davicom,dm9000.yaml          | 59 +++++++++++++++++++
+ .../bindings/net/davicom-dm9000.txt           | 27 ---------
+ 4 files changed, 62 insertions(+), 27 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/davicom,dm9000.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/davicom-dm9000.txt
 
 -- 
-Lee Jones [李琼斯]
+2.34.1
+
 
