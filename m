@@ -1,173 +1,153 @@
-Return-Path: <netdev+bounces-17580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF0D4752135
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:23:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF09752136
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C7AA1C21373
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379E6281E05
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C7613ACE;
-	Thu, 13 Jul 2023 12:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF4C14AA7;
+	Thu, 13 Jul 2023 12:22:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58E8134A9
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:21:24 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C38272A;
-	Thu, 13 Jul 2023 05:20:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RO+tL0RH5hcsHYxjbbGJ6x1kIU1LDA80YyifalsUSjZ+cAdZGH+KldMjYYocnJUpWFD8Xhedzaly75x4WUCcB1De+ABEpq20+Df24zmTJ7AnnJ1TRUgqqo3vfKwgOPRZgL27oNo1JYBeHEth1tk4oB0hWxMGkkAOQbSFe6xW2iVOf3oFICCXChfOjHg5IDdUwR8eztozle1Gaiaxorl7poLuDUoGYZxsIpnqyERujJ62OiFY/gToX6ypJVNpuglFhvtGNFhAySKXu5qrG959LB/FDzt0eIWa1jKUalhopPiNfeIhZr8OwkJcW5kPcPG2hdq3kRDOJnf+i0tCZ/8qsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ANQ4C2tnrCk+CSroawOo7OH++aM+F0pp908RZsdICNA=;
- b=nfBjdTOcM1Umy/0ZwMMzCqOos9WR691vZqcLbf63r+f3w+enz5hAqG7982LJbkkQm1oZ9YaPpvQhL7V7fzNkRVY5s/7aPfZo5XSve9ZGNcySRhgPkAzenkSsrSpJ5616HrbUiRZSQYM0WeV2O8mFrWK2Xxpar58D0dIkbbSbkTqUyC99Df4xiKFC6sZzQIjhrmg8qjckAf3hfWjsbNfM0in1sg0CHMhXzAQepObfJlFAYmFUf2Y66Y31CtBMtZfvvbfGJRtGHR55udq3Z7E5mwbzRYcnifsVRsuaxhkKdU/87wNSE/2lMzr/OLalcg9zZ/XiBfhMceIMf3TT4w8GLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ANQ4C2tnrCk+CSroawOo7OH++aM+F0pp908RZsdICNA=;
- b=I7Q2lo3BbAYah6K9zhl0kX7bcs3VV18J5wkxc6qHn+EHWaJyZx56oZg+sMotbXdc34qkTPhFRZD8vEv6T2ZEepp0YMAP+5mfj7Z2zU3eHSGx0Wng61vemR53kgBmErt1ZPQgvkUc6A7DlnO9hVdTNhR2IGuihA2Juny/8EpY/Zw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MW5PR13MB5996.namprd13.prod.outlook.com (2603:10b6:303:1cd::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Thu, 13 Jul
- 2023 12:20:19 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
- 12:20:19 +0000
-Date: Thu, 13 Jul 2023 13:20:11 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Md Danish Anwar <a0501179@ti.com>
-Cc: MD Danish Anwar <danishanwar@ti.com>,
-	Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v8 2/2] net: ti:
- icssg-prueth: Add ICSSG ethernet driver
-Message-ID: <ZK/r+xgo4oeCjAxw@corigine.com>
-References: <20230710053550.89160-1-danishanwar@ti.com>
- <20230710053550.89160-3-danishanwar@ti.com>
- <ZK2VRYwW8DxIZCY2@corigine.com>
- <afbd4c9d-5ff7-e366-f866-6b718907d6fa@ti.com>
- <ZK+6zVnUSJG5GKd4@corigine.com>
- <b6e49136-1bad-8d32-ac6c-f9185dfaa9d3@ti.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6e49136-1bad-8d32-ac6c-f9185dfaa9d3@ti.com>
-X-ClientProxiedBy: LO4P123CA0277.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:195::12) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE3C15ADA
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:22:51 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9302D5F;
+	Thu, 13 Jul 2023 05:22:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=vjuO5R/KxvsMqsY6ylLB1bwZHDgruZucXbpLJVFeYDU=;
+	t=1689250939; x=1690460539; b=mKvjJVr/i8ovv/d+lTmhaL2gKpxwIkmD5UG/8hnbjyvNHTB
+	miUia7QyZxTWojZ0IninjFs9CA1av/gY7z/gqNY6wkExvZnMeGgidmnNBQf7zwEmUNVHVif0dLMjS
+	wFshQMwZfAUWujcj3suK+gimlFTTRH24/b60xDgQARU1SuprKjEVZit+d0oOvvRBZHAhQeRWByW3n
+	xCTtGwO2/zoOgCfhUexJmrAKrpia7UrffiNBDWY/vgEvQzRyfY/hAkiyPRIXYqQqq0EHPS/0oi1LW
+	0gH0tSlEQ/KHVjcGHkKbuCbgJ+Rv5q0vDltPPhaIfJ6pXp+N9th4dSnEQV2HNS7A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qJvKO-001IDj-0c;
+	Thu, 13 Jul 2023 14:21:48 +0200
+Message-ID: <42f91f17602fea258fecb443ba81fa573bae1acb.camel@sipsolutions.net>
+Subject: Re: [PATCH] USB: disable all RNDIS protocol drivers
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Oliver Neukum <oneukum@suse.com>, Enrico Mioso <mrkiko.rs@gmail.com>, 
+ Jan Engelhardt <jengelh@inai.de>, linux-kernel@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kalle Valo
+ <kvalo@kernel.org>,  Oleksij Rempel <linux@rempel-privat.de>, Maciej
+ =?UTF-8?Q?=C5=BBenczykowski?= <maze@google.com>, Neil Armstrong
+ <neil.armstrong@linaro.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+ Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>, Jacopo Mondi
+ <jacopo@jmondi.org>, =?UTF-8?Q?=C5=81ukasz?= Stelmach
+ <l.stelmach@samsung.com>, Laurent Pinchart
+ <laurent.pinchart@ideasonboard.com>,  linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-wireless@vger.kernel.org, Ilja Van Sprundel
+ <ivansprundel@ioactive.com>,  Joseph Tartaro <joseph.tartaro@ioactive.com>
+Date: Thu, 13 Jul 2023 14:21:46 +0200
+In-Reply-To: <2023071333-wildly-playroom-878b@gregkh>
+References: <20221123124620.1387499-1-gregkh@linuxfoundation.org>
+	 <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr> <ZKM5nbDnKnFZLOlY@rivendell>
+	 <2023070430-fragment-remember-2fdd@gregkh>
+	 <e5a92f9c-2d56-00fc-5e01-56e7df8dc1c1@suse.com>
+	 <6a4a8980912380085ea628049b5e19e38bcd8e1d.camel@sipsolutions.net>
+	 <2023071222-asleep-vacancy-4cfa@gregkh>
+	 <2d26c0028590a80e7aa80487cbeffd5ca6e6a5ea.camel@sipsolutions.net>
+	 <2023071333-wildly-playroom-878b@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW5PR13MB5996:EE_
-X-MS-Office365-Filtering-Correlation-Id: 750ec54c-2c19-46ab-e10b-08db839b85d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	H7FAYXSJ3hNC9faHBJGas4NntJoTB1zGn05sxN9SqMa7f7k3DfNzZuHcbS3JjtZ3BlxRWgNsJs7hZL2cFeXUMDoXRquenJ8u0uK1gSCCPvaJTar1M/CSelC226dLdLkUkaY++2bkFwfFajrL+p/usQPq/lfses+0aQ0SN+lC9TFcQco+lfiVD3KrvZ5S2HkKzB0jqlf9l8YNzplWTqbJ2Tw4YQjVaYtBZfkJC6SrGwm/B5OrZvWcXyNIk03wec7QsiGmBq8WvtzudNngywjulQQMPAu8WJn1bvehULUkDgxV2DHCG+BlJuv54wHfwb+NbxFaR6pZFnJ6AJvRH/B4FzhGE5aXkIYY95SyA2oPVZ+QK4L/hE42zdyH9e9TtU1BG6qbklsT99o2RBIfHA6rRJoACnZgtmTOj+Uo92jRP6NT0Kq1G8KBsZw5ylT9a6OtPVMXC47RFjCYIlPUS65DNDDTZ0vybCf2afmYnOX9xbMnrDeXcqbJjgasYaTQ22dWaJ4kHMjz7J2D2SNXUoT6+LNO1jEyYvdmNaeAeg3AkKE4GCGSJHoNyM2gQrp/Joal0vyiqRESBOjghE11RBU/2F21Sgs/GPVuWGI3pRRbto8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(396003)(136003)(366004)(346002)(376002)(451199021)(36756003)(86362001)(38100700002)(478600001)(6666004)(41300700001)(8676002)(54906003)(6486002)(6512007)(8936002)(44832011)(5660300002)(7416002)(2906002)(6916009)(4326008)(316002)(66476007)(66556008)(66946007)(2616005)(4744005)(186003)(26005)(6506007)(53546011)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?A8n9mpeKJpC8R08Z42Otz8qpKaLBWzEkwOi/sfXBOjEcR/vQwX5dNi0TIudl?=
- =?us-ascii?Q?RaUFQbarbTdmAkOM1xbshwhDuBMG/5HovRmQ8/DqB3gWFA1LC/5oKkwEx2nZ?=
- =?us-ascii?Q?uRT1LaqABPc6Xz1b65wwe9z1q7Osx51gr/f2Z8/QkX+2pPQ5LUC24YzuHuk7?=
- =?us-ascii?Q?Lhx2TJRjeVgQfhxPqlsUBxy92++LtnXL9FR1rNh6aXRYNPoAWeEXQA2JUxbE?=
- =?us-ascii?Q?HpSk6UVh5JcyOpOekI13Ag8nCTBAY8+KPdgVJQLy8vkeGOxKE1WPl/pEwN7R?=
- =?us-ascii?Q?5ru6w8icHvAAmdpE3DYdlTXj4bOTPuqwswTCBDbo1yzdwMgdYp8kgvy5LcFm?=
- =?us-ascii?Q?AM4VWxn/CIyMuNk48ySw/h6DDbhlRnptDiFJYWW09csZ6pIqInhAEb0XoZ47?=
- =?us-ascii?Q?rbXwkGO/E9rPbocx48/Cpdt0TZyBR0qTFRazc9A7hQNM3DEMVpw6hMZ9gArn?=
- =?us-ascii?Q?7VGqfPbDkMSgarK05h66JtC4mFzLuWl4mDedXefm7bU7J1AgCaTN2XCbQhD8?=
- =?us-ascii?Q?2Vc4X9QFTtrFKHvHgDMz6fNa1+YpiOA7ggundYLRMlEabg6BZvU7JrlSqhAu?=
- =?us-ascii?Q?VIv5RzJRNNT+9FwGGsEwaAazPvby3iTgQ1EGLbHMtZ26ilooFv31XAFtHYqg?=
- =?us-ascii?Q?/+54+jGKC2ELjfR0cNkmPFwJVD+9L/pxLNx/WQQ0G7D6E/BIdVFAJTGFX1aQ?=
- =?us-ascii?Q?g/wSb93Xi6uuLaOqUNuRTyT+htapPW4PTz3jo6yz0ffQLeuVP7YfDFbpEuB0?=
- =?us-ascii?Q?kA1Pa2GkMLl/Rcp0yeGGZpGOSdbS2GyMdUkQJNqEQ/Xh7G7gKEVLtRAWMUzZ?=
- =?us-ascii?Q?chG7A3bMFJZMDLXAJsLtrELJxTK1F36QSnoL0RnES3CgwsGhS/JUqqDboJl6?=
- =?us-ascii?Q?jNPaNr40GJiwtUlxmHQ0rBQj6YtBPSLrkK6kTU0cMUWTWZlfu+7gjEe3P+8I?=
- =?us-ascii?Q?BdJMDdppNuQ86Yd8uALq3s/mEL7FXmcpunr5zIiRAtAJsV6i1iZtKAeYqchV?=
- =?us-ascii?Q?A/EJ+35uCC3LpML7w5wXl4dhPRq+yN+WocRphLLjsM7khUhJBfyajmDMp8SE?=
- =?us-ascii?Q?HP1qilap6PsW4ArAQFFYPOZO30lVNQKZhrWv58W18kavIw+45ruD67jr3wjZ?=
- =?us-ascii?Q?9810wm6Z9xmq26xLQozb+C2zTXY3HA5GNAFPFFxzv5ZwUHJW7cIJ3/JVxJfJ?=
- =?us-ascii?Q?dejAHHbiuLez0DGIbzsf52BEFdsANc6JQMhuUE72nn+ER9STWpquQJOiRN8g?=
- =?us-ascii?Q?9GeL/divTgl7NnQrOgJiDpaxOXwp3PCCZueqwMNiJhrjKJeOiuK7AUhjvAlP?=
- =?us-ascii?Q?GM7t8V3ARVI6/Gf8iRkpLJHX1WyM6eKg1xeZz8desHhvwjpb72lhKie671ZF?=
- =?us-ascii?Q?BL5WdY13+F/MgjukxQFjAwo4laOilfbxRkr9cv908v69k8PSHCa1yuXQZTBv?=
- =?us-ascii?Q?auk+ApHc7hGi8KXGkDBTAA0Bq2eJS2339NxXt9f6HDGRGEAuXLvfpJ+7lU7q?=
- =?us-ascii?Q?4ibW4HqmXLmD1oR6BtNq+uHgOkd/PLzDa7Z0AUUjILeLx8XbtCf6iJtPMrY9?=
- =?us-ascii?Q?GUaMiKHTpl5R2j8rfmNHivmEYYDtWzKjbXeoj8plUHUcFMIHctS7Eibr4/BL?=
- =?us-ascii?Q?qQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 750ec54c-2c19-46ab-e10b-08db839b85d2
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 12:20:19.2865
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: amoRQvsfVwvP9f3jZIqZjGePvTa1QO2Ewhla8nsARprPzVQXPQ+rcnmBqJoCN6G6HXyM1ivipfcHY8CeJhApL9mDTSGoWqeGHg4iPWHU8Xo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR13MB5996
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Danish,
+On Thu, 2023-07-13 at 07:34 +0200, Greg Kroah-Hartman wrote:
+> I wasn't trying to be glib here, sorry if it came across that way.  I'll
+> blame the heat...
 
-On Thu, Jul 13, 2023 at 05:11:12PM +0530, Md Danish Anwar wrote:
-> Hi Simon,
-> 
-> On 13/07/23 2:20 pm, Simon Horman wrote:
-> > Hi Anwar,
-> > 
-> > On Wed, Jul 12, 2023 at 05:55:57PM +0530, Anwar, Md Danish wrote:
-> >> Hi Simon
-> >> On 7/11/2023 11:15 PM, Simon Horman wrote:
-> >>> On Mon, Jul 10, 2023 at 11:05:50AM +0530, MD Danish Anwar wrote:
-> >>>> From: Roger Quadros <rogerq@ti.com>
+No worries.
 
-...
+> > All we said is that your statement of "RNDIS is fundamentally unfixable=
+"
+> > doesn't make a lot of sense. If this were the case, all USB drivers
+> > would have to "trust the other side" as well, right?
+>=20
+> No, well, yes.  See the zillion patches we have had to apply to the
+> kernel over the years when someone decided that "usb devices are not to
+> be trusted" that syzbot has helped find :)
 
-> >>> Smatch warns that eth0_node and eth1_node may be uninitialised here.
-> >>>
-> >>
-> >> Sure, I will initialise eth0_node and eth1_node as NULL.
-> > 
-> > Thanks.
-> > 
-> > ...
-> 
-> I will fix all the sparse and smatch warning and send next revision.
+Sure, I'm well aware of that. But that's also exactly my point - nowhere
+has anyone previously suggested that the protocol for any of those
+devices is fundamentally broken and the drivers should be removed. We've
+fixed those things and moved on.
 
-Perfect, thanks!
+I can even understand the initial reaction of "oh hey this ancient thing
+is probably not used any more, let's just remove it", but even that's a
+different reasoning, along the lines of "this has bugs and nobody needs
+it". Though that nobody uses it has in fact been proven wrong, which is
+pretty much why we're have this discussion at all.
+
+> It's not a DMA issue here, it's a "the protocol allows for buffer
+> overflows and does not seem to be able to be verified to prevent this"
+> from what I remember (it's been a year since I looked at this last,
+> details are hazy.)
+
+If you s/be able to be verified/be verified in the code/ I entirely
+believe it, in fact I think it's quite likely given the age of the code
+and all. It's just that not being _able_ to verify it seems questionable
+to me (and you haven't given any reasons), given that it's USB and you
+always have a full buffer in hand when processing it, at a time where
+the device can no longer modify it (IOW no TOCTTOU issues either.)
+
+(As an aside, I've wondered about TOCTTOU with PCI, given that IOMMUs
+can and will do lazy unmap ... but that's a different discussion.)
+
+
+> At the time, I didn't see a way that it could be
+> fixed, hence this patch.
+
+Yeah I mean, the code isn't great, even if it's not _that_ much, but all
+the likely() and things in there don't make it easy to read, and the
+buffer size handling seems not immediately clear to me. So I probably
+couldn't fix it quickly either, though I haven't even seen the reports.
+Maciej seems to think it's fixable, at least. And yeah, we'd want to
+actually review/audit that, I suppose.
+
+
+So if you'd have said something like
+
+   Let's disable the RNDIS driver(s) because there are known exploits
+   there, nobody really knows how to fix this, and we need a short-term
+   solution until the issues are public and somebody steps up to fix and
+   maintain it.
+
+I'd have much less of a problem with that. That's not _great_, but at
+least it's honest and realistic. That could give us some time and maybe
+then we can get the bug reports public once it's no longer an immediate
+threat for all kernels, and go about fixing it with more time, maybe
+eventually backporting fixes and reverting the disablement etc.
+
+I guess this is why secret bug reports suck so much :-)
+
+Thanks,
+johannes
 
