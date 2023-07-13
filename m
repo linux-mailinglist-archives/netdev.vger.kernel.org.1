@@ -1,193 +1,224 @@
-Return-Path: <netdev+bounces-17728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49DBB752DDF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:17:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD4F6752E01
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F394B281F28
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:17:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F70281FC8
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06AF6AA2;
-	Thu, 13 Jul 2023 23:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99FE6AA1;
+	Thu, 13 Jul 2023 23:38:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37566AA1
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:17:45 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA404CE
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 16:17:43 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbf1b82d9cso11843525e9.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 16:17:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1689290262; x=1691882262;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNtZQAU+1NBnYl0Q7O+PJo/Su/S1HUk8FojQN4NQ24s=;
-        b=k8IDe/uPC0xHXo/NTi3jSm7SkyXIR9Bh0lo7NjYKS+gBjLs/XroiHhv7uhxA8J+mhl
-         A16G/vHZF/BM5tmlPQ5EnbwrgLr3MzpMbYi3CTMXGCP+UgJFPQKtZe5PJB6zK4g2Y9Lw
-         pj5x3zVg9tXkYS73F9hBQdQr3k6SumC+FBv1o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689290262; x=1691882262;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BNtZQAU+1NBnYl0Q7O+PJo/Su/S1HUk8FojQN4NQ24s=;
-        b=gTK+jgVp7bkmHhMPeXvPDeZZ9EOclffcAhGrbL8x7+3vaA+zrTMXerSZkhRuUvdTEt
-         kGUqSdLorf6o7BY8sq/wubLUA1uxYjaP9UC8ghJ69TXlVO44ygfhtyMi2HfT7egUDtF6
-         0g1pt0Ch5Drs2nlmByn9YXFkre8QMVG/IydZY1lVbq5xCNlHXbyZb3/+vDXyIHSyi0Er
-         Yx66siZtKvXarDg7RjFjzzJjKbSs+8zRbziK2T9epwDg3lmFiT084Z4Bq5+uj0OFGk4V
-         OCI2kKGbViHdyVwYt7Lp2FW6/MOnHw5j6383v1CvL74BmKfl/kmz4GsJ3WtPsZXYQJo8
-         QQFQ==
-X-Gm-Message-State: ABy/qLauyc5Oz4Mef83HoGomFm7A1gSoIRf4m3PHprmL5hCNYE0Z+3iJ
-	vQJumbB/vv9MJ3Yyo+0nzIWRaOHpA9oJwyOgqe5upA==
-X-Google-Smtp-Source: APBJJlGNC6oG8/QWhSI5r2zsxypKTf1HJt7tVzfVXeqTqpTDsp/qJUc1tboLolvdeM3uQaU/w0HMFrbkrpoeBKZiH1M=
-X-Received: by 2002:a1c:6a19:0:b0:3fb:cfe8:8d12 with SMTP id
- f25-20020a1c6a19000000b003fbcfe88d12mr2252182wmc.14.1689290262143; Thu, 13
- Jul 2023 16:17:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918A263C2
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:38:39 +0000 (UTC)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088E22707;
+	Thu, 13 Jul 2023 16:38:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689291517; x=1720827517;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=LPp44NDWEpqZiucKtKHsWJi0KIS3OeymkPkpzDsPPo8=;
+  b=YXjlCJTTthtNWP+3J4hQjXe+gt076HeuURzC6E+x1zBUDbu1vU5XljZ7
+   1JS/73W3H4XLwA+6N+nm7qgiTStHYcW0jQ1+S7k3AoiChxPb9whEARjrN
+   o/UCnI6cxrV1EnyCGN6CXqUYXv948JvyXnq6XvW+1/plbqenEvi+H+HI8
+   WNOg6GT+Heeyi1OozLoVGZq1jNBG0gfOucu+2fxlkgHDR+gVvJnw4b2Z0
+   TPxhJV2UDC649Hdq64TbB/dWZObejfPoCC040Hb6SsGW/kdrO2QsHtogd
+   P6KYPPqRgOeB3wVC5V87BN+eYtE2SJ3X0aGAPeNdFVOpKDVex6uu7cXl9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="345661006"
+X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
+   d="scan'208";a="345661006"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2023 16:38:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="699448885"
+X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
+   d="scan'208";a="699448885"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga006.jf.intel.com with ESMTP; 13 Jul 2023 16:38:37 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 13 Jul 2023 16:38:36 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 13 Jul 2023 16:38:36 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.47) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 13 Jul 2023 16:38:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XZt1S5oef8UiU26S2wDkb6DMty05j2epC02S6NnWIHu0kbJj7wspZZoczzTEAn2tZxR4AQdDyeHABcJTNjnexPQ4M4ImJUaD+baNs9QIb0Hj3UoJReF9FciCtF+osRuDyedQq09iz/Uzrpt4MEHeswzSwxeqM/o5gJgng4pHjRkQ3Ir7FLo/2AhXaeV0FvMdC+QPfKSkmBGs9ddXe+/oDul/wQyKtmjyCH9qaKdX4vaL9RxuErpAv7EPdnVxsrOl5oEy0v0kxQeIaayJNS8cwy96qhWwuBaCCSAESbgLjkcl0ILEAk6NRxpW/UkJP7F2EpkW4maIHjKM6SXgO3odGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bq+OuGiNUS3CnBfTa+x0i6UJrgRUyWbAaQh0UiCa4NI=;
+ b=SVEz60cuQPWmNVS6lR4Kc/DtMdshPIoNCgpOQfC5KeJI5C+/mI46N3DszImZnRS2qXzkNqQ7Wpa617bBzE95UBY6jlbjP2VEN6eHwB9PPOlT65RcF8kgRGKZRBdRJE3OTSs1+zW1aJYpIDBqEXcy+5gAUooFgzePTYssG5q6R5X40OpeVPwmNwMZLOzFAl0eNrcATOeOwXIt/FaDLjUSVGxDWNm5wZiFdZcIKnD0eY1DS9FKAwXM37p40JU0AfRW2Ppje/c6mi1SdqB8qVJ/HIrz58rE3SSh6VYSwr+l1yxdIw1Lc9N2UuQf13XzBPVIXXuk5u1cLHc+P8KaqrtxpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5028.namprd11.prod.outlook.com (2603:10b6:303:9a::12)
+ by SJ1PR11MB6226.namprd11.prod.outlook.com (2603:10b6:a03:45b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22; Thu, 13 Jul
+ 2023 23:38:33 +0000
+Received: from CO1PR11MB5028.namprd11.prod.outlook.com
+ ([fe80::d166:2444:2f40:e0b6]) by CO1PR11MB5028.namprd11.prod.outlook.com
+ ([fe80::d166:2444:2f40:e0b6%4]) with mapi id 15.20.6565.028; Thu, 13 Jul 2023
+ 23:38:33 +0000
+From: "Mekala, SunithaX D" <sunithax.d.mekala@intel.com>
+To: "Ma, Aaron" <aaron.ma@canonical.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jeff Garzik <jgarzik@redhat.com>, Auke Kok
+	<auke-jan.h.kok@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER error
+ during resume
+Thread-Topic: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER
+ error during resume
+Thread-Index: AQHZmOOokxjOvODuMEq7FIpYqOTT2K+4k6ww
+Date: Thu, 13 Jul 2023 23:38:33 +0000
+Message-ID: <CO1PR11MB5028DD73CD9601FEA281FC0DA037A@CO1PR11MB5028.namprd11.prod.outlook.com>
+References: <20230526163001.67626-1-aaron.ma@canonical.com>
+ <20230607015646.558534-1-aaron.ma@canonical.com>
+In-Reply-To: <20230607015646.558534-1-aaron.ma@canonical.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5028:EE_|SJ1PR11MB6226:EE_
+x-ms-office365-filtering-correlation-id: c094633e-309a-4bbf-aadc-08db83fa45c4
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pavSv80tDw55nvFzuKbeFFa6jPKDc9MD0mqs1h9Im/8tMx6pk78zQc09b/ZFsDknCkNLjf9+CzWxhPHg3vN/0DTM2YpGyDHaMkzmwMsyVH7InfdPMJgHWXbiAMp7qz5+/DzeBiAaKwebmnQBPr3leiL7JthmNbLf8nx0PylXmwjYwtFzpC012AxpSViydjp1nIaKK1SCoc7M7W40kclV3Cqya9nVVDBT10h0sEWdeAIZ53EDyDMIx6taXYoHDaoWdEpcVmwcHP9D4Lp0Vf0pinzsf+FUUDZxuwVx48aoYzzi6vhOhto1SDtQu0Ufe5/S1Sfy7j7Dg+ha5XxpyNBsJGsiWSgL6FRh5TKo8wbo6ClVtZIQQA/DeKtLvaj3v+JQkNfNXSSAR8Uh5sIRgS5+v6ALSoHXbU1WlqEt+9BzE27jVZjzuQbJe9BKIghvcdY7cB2VUwWoyQHURLLPIioOmW+T6XiP9YYb2NY/K7r6a6qWSVKXZasDcYX5Zavqp3c5nOOXKzdaq1x2+1KzhXJV7OtI1ZeGEAC5rPOHmNPQjNZLS1xMZcgUFjouOb66fWfNaAnRzdW5R4xeBCEjyO5DXugNp6CLqjn0Lz74fLrn7yDmhCbljDqmR7tW+TGHctn2
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5028.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(396003)(39860400002)(366004)(346002)(451199021)(8676002)(41300700001)(8936002)(55016003)(110136005)(7696005)(2906002)(316002)(52536014)(5660300002)(71200400001)(66476007)(66946007)(66556008)(76116006)(64756008)(66446008)(33656002)(9686003)(82960400001)(966005)(478600001)(86362001)(186003)(38070700005)(122000001)(921005)(38100700002)(83380400001)(53546011)(26005)(6506007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mFZP+7SIjqkudHFyPYabC4CYAKQxyNqR4gmXXGNqe8d6numrlWBtTzpCfl8m?=
+ =?us-ascii?Q?9xrFT5C21QXDs8DFClDR5Gggg4Ty1FDMz6F42VGVjQZ9t2gJwfZWQRApKAmh?=
+ =?us-ascii?Q?f3NudDr4MZlwd8BlYh5a5ze8G5cXh9tmC7J37QBcBCGInwxbKiEYQ+K0eaRW?=
+ =?us-ascii?Q?03RzaR4/sMDa3cy4XpqqGn6sg/LmKwAyV1yUMf91y2WqswzENMyZiQsAFhPf?=
+ =?us-ascii?Q?ooPq8Y8RqBnANDotc5nDcGo4vRvMv4D7WLuPU1pSEG19C3UWEePjutbJOCGu?=
+ =?us-ascii?Q?tG3QeuG/oWXmu5bOmxo65ufu/mxSRMuO1WIAM5N7OuNRgY9D2uvOALck4W1Z?=
+ =?us-ascii?Q?5UlFJO279h6OIJYSD5KnkFVjmSVFlOoOui3F0RV7DJ69LfQY0nzV9JRqsiXG?=
+ =?us-ascii?Q?cTnjyIwJjNjJy+z7nnfIGFiyN18VVTRy10I0d17ANRKGwt3kwOluYVJOr+66?=
+ =?us-ascii?Q?bkj2sEHNhMYJW30n+eZxZ5cgeCNeoofjSWi5RFEuC0eqQohmEkChx7sp63P3?=
+ =?us-ascii?Q?a0z6WW0rCm9w5BOEt/3PSmimDhq7X+Wbb8nKKL6YVdMIXgqPGP/r9bGmIthA?=
+ =?us-ascii?Q?dxB2Gg2nuywg2iqP84rMDsR8Zy9zJb9iHHjLv2MoT+mtRkuA6cffvvbRRTNb?=
+ =?us-ascii?Q?KzgGtln2abyh9J978xSK9WbpyOF5mbLq1T1pyzxz3dcHKgfcuK9DhLt+6H7Z?=
+ =?us-ascii?Q?9dyLzHbHpM3uXclmL/PNOzy5wc0D/0xIzx7Kk9qX4x17BcY82m+o4EhqLGhf?=
+ =?us-ascii?Q?Ms02WfpvPOVvej5MQFkIRroCXQuw4jVHnBhMeEgns6abRKRHq01ruCQ4/Bsp?=
+ =?us-ascii?Q?PGDoSTKZXRuW+ev8LBMVV5z3zWHIng29rmu0blmB7U/WELCE66lJBJ/eL/94?=
+ =?us-ascii?Q?Gm7tLdigljHNrEr+XtGKSZqqLMHaDzdT+rYfrG52McAiaFj/Aim8hn0dmvVe?=
+ =?us-ascii?Q?ON/K10/KaLdhuge7hHkLpTzGgO/2n/Cj72I02f6A7FmQVJv9O6UwqLwveFTk?=
+ =?us-ascii?Q?6IxSkz8Rls4GQBqisZX1eR1mIAocEmtRncyUJObc5mG/YonBKUrZVzrpaR3d?=
+ =?us-ascii?Q?ZOQp9PgacUVBJVM7P9Nr2zy/LETDlpnzVUDSqqT9rNKLD714sc2gvxUsLmu7?=
+ =?us-ascii?Q?mw58jD54+K+plCSz6lzcuo5Nie0/nWa0OWQzomRl34HnHvRL+bFf92PXBg8h?=
+ =?us-ascii?Q?0OQ4xCGWixXZYZvEEJ8/IP3VYN3wr7VVT4ALZAEjKtvPjyxjQLtHrCYC00Zb?=
+ =?us-ascii?Q?7DW96loiWHy6DTLJN5frdGv812LLfeVeuYpCdDf5aLElPBAGzeqRDW1POkqM?=
+ =?us-ascii?Q?xfuG9ufQfg8R8p+wheNBAelgVNJKBHGlP/3qTvh1CQQ6CRZhYAJi1VsfEHBM?=
+ =?us-ascii?Q?HN/pFrn6lNXZzjlNx+4mJLjKXhS8F4fIS/bK5h92QFK9cKkdXs/a/eRr2idh?=
+ =?us-ascii?Q?yjVHpf+TggJxVrkvN3n/jaT8utIwIHNSDpwYIbKGHzxg2XHAVI8X7oXBMZnE?=
+ =?us-ascii?Q?QgP/oL0tiaTQrvTtGhGu96fBBwwLa+mNm/2YNhVMJOIH1t0bS3tL3XTLw0kF?=
+ =?us-ascii?Q?FvRcPBeQ2GJVqtDmU/E0CKlJF9wBuUMySrQN5uODwxbiPsRmU0ti0d+XS4Oj?=
+ =?us-ascii?Q?kg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230711043453.64095-1-ivan@cloudflare.com> <20230711193612.22c9bc04@kernel.org>
- <CAO3-PbrZHn1syvhb3V57oeXigE_roiHCbzYz5Mi4wiymogTg2A@mail.gmail.com> <20230712104210.3b86b779@kernel.org>
-In-Reply-To: <20230712104210.3b86b779@kernel.org>
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Thu, 13 Jul 2023 16:17:31 -0700
-Message-ID: <CABWYdi3VJU7HUxzKJBKgX9wF9GRvmA0TKVpjuHvJyz_EdpxZFA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] tcp: add a tracepoint for tcp_listen_queue_drop
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5028.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c094633e-309a-4bbf-aadc-08db83fa45c4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2023 23:38:33.8458
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ml87HlC/LErCyv1XeWrO9qArbl+SQuJiFzzjw+1ZwC9zv8e5ZEUCgxy/j7Lc2wHT8bBaMKuls0vC8Pi6dWL5Fi1VX+acAaaL5dryUs5zTQw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6226
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 10:42=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
+aron Ma
+> Sent: Tuesday, June 6, 2023 6:57 PM
+> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
+thony.l.nguyen@intel.com>; David S. Miller <davem@davemloft.net>; Eric Duma=
+zet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <p=
+abeni@redhat.com>; Jeff Garzik <jgarzik@redhat.com>; Auke Kok <auke-jan.h.k=
+ok@intel.com>; intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; li=
+nux-kernel@vger.kernel.org
+> Subject: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER erro=
+r during resume
 >
-> On Wed, 12 Jul 2023 11:42:26 -0500 Yan Zhai wrote:
-> >   The issue with kfree_skb is not that it fires too frequently (not in
-> > the 6.x kernel now). Rather, it is unable to locate the socket info
-> > when a SYN is dropped due to the accept queue being full. The sk is
-> > stolen upon inet lookup, e.g. in tcp_v4_rcv. This makes it unable to
-> > tell in kfree_skb which socket a SYN skb is targeting (when TPROXY or
-> > socket lookup are used). A tracepoint with sk information will be more
-> > useful to monitor accurately which service/socket is involved.
+> PCIe AER error_detected caused a race issue with igb_resume.
+> Protect error_detected when igb is in down state.
 >
-> No doubt that kfree_skb isn't going to solve all our needs, but I'd
-> really like you to clean up the unnecessary callers on your systems
-> first, before adding further tracepoints. That way we'll have a clear
-> picture of which points can be solved by kfree_skb and where we need
-> further work.
-
-The existing UDP tracepoint was there for 12 years and it's a part of
-what kernel exposes to userspace, so I don't think it's fair to remove
-this and break its consumers. I think "do not break userspace" applies
-here. The proposed TCP tracepoint mostly mirrors it, so I think it's
-fair to have it.
-
-I don't know why kfree_skb is called so much. I also don't agree with
-Yan that it's not actually too much, because it's a lot (especially
-compared with near zero for my proposed tracepoint). I can easily see
-300-500k calls per second into it:
-
-$ perf stat -I 1000 -a -e skb:kfree_skb -- sleep 10
-#           time             counts unit events
-     1.000520165             10,108      skb:kfree_skb
-     2.010494526             11,178      skb:kfree_skb
-     3.075503743             10,770      skb:kfree_skb
-     4.122814843             11,334      skb:kfree_skb
-     5.128518432             12,020      skb:kfree_skb
-     6.176504094             11,117      skb:kfree_skb
-     7.201504214             12,753      skb:kfree_skb
-     8.229523643             10,566      skb:kfree_skb
-     9.326499044            365,239      skb:kfree_skb
-    10.002106098            313,105      skb:kfree_skb
-$ perf stat -I 1000 -a -e skb:kfree_skb -- sleep 10
-#           time             counts unit events
-     1.000767744             52,240      skb:kfree_skb
-     2.069762695            508,310      skb:kfree_skb
-     3.102763492            417,895      skb:kfree_skb
-     4.142757608            385,981      skb:kfree_skb
-     5.190759795            430,154      skb:kfree_skb
-     6.243765384            405,707      skb:kfree_skb
-     7.290818228            362,934      skb:kfree_skb
-     8.297764298            336,702      skb:kfree_skb
-     9.314287243            353,039      skb:kfree_skb
-    10.002288423            251,414      skb:kfree_skb
-
-Most of it is NOT_SPECIFIED (1s data from one CPU during a spike):
-
-$ perf script | sed 's/.*skbaddr=3D//' | awk '{ print $NF }' | sort |
-uniq -c | sort -n | tail
-      1 TCP_CLOSE
-      2 NO_SOCKET
-      4 TCP_INVALID_SEQUENCE
-      4 TCP_RESET
-     13 TCP_OLD_DATA
-     14 NETFILTER_DROP
-   4594 NOT_SPECIFIED
-
-We can start a separate discussion to break it down by category if it
-would help. Let me know what kind of information you would like us to
-provide to help with that. I assume you're interested in kernel stacks
-leading to kfree_skb with NOT_SPECIFIED reason, but maybe there's
-something else.
-
-Even if I was only interested in one specific reason, I would still
-have to arm the whole tracepoint and route a ton of skbs I'm not
-interested in into my bpf code. This seems like a lot of overhead,
-especially if I'm dropping some attack packets.
-
-Perhaps a lot of extra NOT_SPECIFIED stuff can be fixed and removed
-from kfree_skb. It's not something I can personally do as it requires
-much deeper network code understanding than I possess. For TCP we'll
-also have to add some extra reasons for kfree_skb, because currently
-it's all NOT_SPECIFIED (no reason set in the accept path):
-
-* https://elixir.bootlin.com/linux/v6.5-rc1/source/net/ipv4/tcp_input.c#L64=
-99
-* https://elixir.bootlin.com/linux/v6.5-rc1/source/net/ipv4/tcp_ipv4.c#L174=
-9
-
-For UDP we already have SKB_DROP_REASON_SOCKET_RCVBUFF, so I tried my
-best to implement what I wanted based on that. It's not very
-approachable, as you'd have to extract the destination port yourself
-from the raw skb. As Yan said, for TCP people often rely on skb->sk,
-which is just not present when the incoming SYN is dropped. I failed
-to find a good example of extracting a destination port that I could
-replicate. So far I have just a per-reason breakdown working:
-
-* https://github.com/cloudflare/ebpf_exporter/pull/233
-
-If you have an ebpf example that would help me extract the destination
-port from an skb in kfree_skb, I'd be interested in taking a look and
-trying to make it work.
-
-The need to extract the protocol level information in ebpf is only
-making kfree_skb more expensive for the needs of catching rare cases
-when we run out of buffer space (UDP) or listen queue (TCP). These two
-cases are very common failure scenarios that people are interested in
-catching with straightforward tracepoints that can give them the
-needed information easily and cheaply.
-
-I sympathize with the desire to keep the number of tracepoints in
-check, but I also feel like UDP buffer drops and TCP listen drops
-tracepoints are very much justified to exist.
+> Error logs:
+> kernel: igb 0000:02:00.0: disabling already-disabled device
+> kernel: WARNING: CPU: 0 PID: 277 at drivers/pci/pci.c:2248 pci_disable_de=
+vice+0xc4/0xf0
+> kernel: RIP: 0010:pci_disable_device+0xc4/0xf0
+> kernel: Call Trace:
+> kernel:  <TASK>
+> kernel:  igb_io_error_detected+0x3e/0x60
+> kernel:  report_error_detected+0xd6/0x1c0
+> kernel:  ? __pfx_report_normal_detected+0x10/0x10
+> kernel:  report_normal_detected+0x16/0x30
+> kernel:  pci_walk_bus+0x74/0xa0
+> kernel:  pcie_do_recovery+0xb9/0x340
+> kernel:  ? __pfx_aer_root_reset+0x10/0x10
+> kernel:  aer_process_err_devices+0x168/0x220
+> kernel:  aer_isr+0x1b5/0x1e0
+> kernel:  ? __pfx_irq_thread_fn+0x10/0x10
+> kernel:  irq_thread_fn+0x21/0x70
+> kernel:  irq_thread+0xf8/0x1c0
+> kernel:  ? __pfx_irq_thread_dtor+0x10/0x10
+> kernel:  ? __pfx_irq_thread+0x10/0x10
+> kernel:  kthread+0xef/0x120
+> kernel:  ? __pfx_kthread+0x10/0x10
+> kernel:  ret_from_fork+0x29/0x50
+> kernel:  </TASK>
+> kernel: ---[ end trace 0000000000000000 ]---
+>
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D217446
+> Fixes: 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet driver")
+> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+> Reviewed-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
+> ---
+> V1->V2: Add target tree tag net and Fixes tag.
+>
+>  drivers/net/ethernet/intel/igb/igb_main.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worke=
+r at Intel)
 
