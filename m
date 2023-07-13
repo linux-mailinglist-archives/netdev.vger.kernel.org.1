@@ -1,327 +1,112 @@
-Return-Path: <netdev+bounces-17419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4E2375184C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:47:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBEC1751855
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B251281AB2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:47:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 266251C2127E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B36566D;
-	Thu, 13 Jul 2023 05:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B477D566E;
+	Thu, 13 Jul 2023 05:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D89553B9;
-	Thu, 13 Jul 2023 05:47:28 +0000 (UTC)
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E3C1BD5;
-	Wed, 12 Jul 2023 22:47:26 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VnFltKF_1689227242;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VnFltKF_1689227242)
-          by smtp.aliyun-inc.com;
-          Thu, 13 Jul 2023 13:47:23 +0800
-Message-ID: <1689227123.7112546-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v11 06/10] virtio_ring: skip unmap for premapped
-Date: Thu, 13 Jul 2023 13:45:23 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-7-xuanzhuo@linux.alibaba.com>
- <CACGkMEtb_wYyXLU6kAaC2Ju2d4K=J+YbytUCMvKcNtPF+BvpJw@mail.gmail.com>
- <1689220976.8908284-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEtt8Po5saxdEQDK_RkML3UK4LKRp3B4owyoLQQYXHt+oA@mail.gmail.com>
-In-Reply-To: <CACGkMEtt8Po5saxdEQDK_RkML3UK4LKRp3B4owyoLQQYXHt+oA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A897153B9
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:50:27 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAAC1BD5;
+	Wed, 12 Jul 2023 22:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=GFMF1ikSol53pF8uOEYCDZ1uK/JIIE1rXx1j7+aTy1Y=; b=x5xLgY8KePVopF6k6iKAFKM/QG
+	P+4A2RB3luT+Ws8svb8REwmQaHeRbkoCjA9Af2WrJZb8mRuM/yjfryuJsmtFM69Y3IssVptJJTksC
+	RG7x556xM0UQIkcBxlIIN4Zef6sOPTp7Q7twuECA1YqrVG/8ndJnKCf6zs2HF9dS78IC1uh+Xx4Oj
+	t4AIjyGIugFrOD3fIoJWGFZZsKCWJuYJyxdguKPnI5u/yIuAme0Fo3ySGMVufMUWtgEHpKsatIIxP
+	+L1qSalel55POdhvo+0+AVTAhscTS70DCmxARuO5QPwJaRhSPxGTKTjsvNOuWm2FuZ7Luup69oQ2A
+	lQDDfFrg==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qJpDS-0022Nf-05;
+	Thu, 13 Jul 2023 05:50:14 +0000
+Message-ID: <27105f25-f3f9-0856-86e5-86236ce83dee@infradead.org>
+Date: Wed, 12 Jul 2023 22:50:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net v1] bna:Fix error checking for debugfs_create_dir()
+Content-Language: en-US
+To: Wang Ming <machel@vivo.com>, Rasesh Mody <rmody@marvell.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Krishna Gudipati <kgudipat@brocade.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com
+References: <20230713053823.14898-1-machel@vivo.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230713053823.14898-1-machel@vivo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 13 Jul 2023 12:21:26 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Thu, Jul 13, 2023 at 12:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibab=
-a.com> wrote:
-> >
-> > On Thu, 13 Jul 2023 11:50:57 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.al=
-ibaba.com> wrote:
-> > > >
-> > > > Now we add a case where we skip dma unmap, the vq->premapped is tru=
-e.
-> > > >
-> > > > We can't just rely on use_dma_api to determine whether to skip the =
-dma
-> > > > operation. For convenience, I introduced the "do_unmap". By default=
-, it
-> > > > is the same as use_dma_api. If the driver is configured with premap=
-ped,
-> > > > then do_unmap is false.
-> > > >
-> > > > So as long as do_unmap is false, for addr of desc, we should skip d=
-ma
-> > > > unmap operation.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/virtio/virtio_ring.c | 42 ++++++++++++++++++++++++--------=
-----
-> > > >  1 file changed, 28 insertions(+), 14 deletions(-)
-> > > >
-> > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_r=
-ing.c
-> > > > index 1fb2c6dca9ea..10ee3b7ce571 100644
-> > > > --- a/drivers/virtio/virtio_ring.c
-> > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > @@ -175,6 +175,11 @@ struct vring_virtqueue {
-> > > >         /* Do DMA mapping by driver */
-> > > >         bool premapped;
-> > > >
-> > > > +       /* Do unmap or not for desc. Just when premapped is False a=
-nd
-> > > > +        * use_dma_api is true, this is true.
-> > > > +        */
-> > > > +       bool do_unmap;
-> > > > +
-> > > >         /* Head of free buffer list. */
-> > > >         unsigned int free_head;
-> > > >         /* Number we've added since last sync. */
-> > > > @@ -440,7 +445,7 @@ static void vring_unmap_one_split_indirect(cons=
-t struct vring_virtqueue *vq,
-> > > >  {
-> > > >         u16 flags;
-> > > >
-> > > > -       if (!vq->use_dma_api)
-> > > > +       if (!vq->do_unmap)
-> > > >                 return;
-> > > >
-> > > >         flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
-> > > > @@ -458,18 +463,21 @@ static unsigned int vring_unmap_one_split(con=
-st struct vring_virtqueue *vq,
-> > > >         struct vring_desc_extra *extra =3D vq->split.desc_extra;
-> > > >         u16 flags;
-> > > >
-> > > > -       if (!vq->use_dma_api)
-> > > > -               goto out;
-> > > > -
-> > > >         flags =3D extra[i].flags;
-> > > >
-> > > >         if (flags & VRING_DESC_F_INDIRECT) {
-> > > > +               if (!vq->use_dma_api)
-> > > > +                       goto out;
-> > > > +
-> > > >                 dma_unmap_single(vring_dma_dev(vq),
-> > > >                                  extra[i].addr,
-> > > >                                  extra[i].len,
-> > > >                                  (flags & VRING_DESC_F_WRITE) ?
-> > > >                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> > > >         } else {
-> > > > +               if (!vq->do_unmap)
-> > > > +                       goto out;
-> > > > +
-> > > >                 dma_unmap_page(vring_dma_dev(vq),
-> > > >                                extra[i].addr,
-> > > >                                extra[i].len,
-> > > > @@ -635,7 +643,7 @@ static inline int virtqueue_add_split(struct vi=
-rtqueue *_vq,
-> > > >         }
-> > > >         /* Last one doesn't continue. */
-> > > >         desc[prev].flags &=3D cpu_to_virtio16(_vq->vdev, ~VRING_DES=
-C_F_NEXT);
-> > > > -       if (!indirect && vq->use_dma_api)
-> > > > +       if (!indirect && vq->do_unmap)
-> > > >                 vq->split.desc_extra[prev & (vq->split.vring.num - =
-1)].flags &=3D
-> > > >                         ~VRING_DESC_F_NEXT;
-> > > >
-> > > > @@ -794,7 +802,7 @@ static void detach_buf_split(struct vring_virtq=
-ueue *vq, unsigned int head,
-> > > >                                 VRING_DESC_F_INDIRECT));
-> > > >                 BUG_ON(len =3D=3D 0 || len % sizeof(struct vring_de=
-sc));
-> > > >
-> > > > -               if (vq->use_dma_api) {
-> > > > +               if (vq->do_unmap) {
-> > > >                         for (j =3D 0; j < len / sizeof(struct vring=
-_desc); j++)
-> > > >                                 vring_unmap_one_split_indirect(vq, =
-&indir_desc[j]);
-> > > >                 }
-> > > > @@ -1217,17 +1225,20 @@ static void vring_unmap_extra_packed(const =
-struct vring_virtqueue *vq,
-> > > >  {
-> > > >         u16 flags;
-> > > >
-> > > > -       if (!vq->use_dma_api)
-> > > > -               return;
-> > > > -
-> > > >         flags =3D extra->flags;
-> > > >
-> > > >         if (flags & VRING_DESC_F_INDIRECT) {
-> > > > +               if (!vq->use_dma_api)
-> > > > +                       return;
-> > > > +
-> > > >                 dma_unmap_single(vring_dma_dev(vq),
-> > > >                                  extra->addr, extra->len,
-> > > >                                  (flags & VRING_DESC_F_WRITE) ?
-> > > >                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> > > >         } else {
-> > > > +               if (!vq->do_unmap)
-> > > > +                       return;
-> > >
-> > > This seems not straightforward than:
-> > >
-> > > if (!vq->use_dma_api)
-> > >     return;
-> > >
-> > > if (INDIRECT) {
-> > > } else if (!vq->premapped) {
-> > > }
-> > >
-> > > ?
-> >
-> >
-> > My logic here is that for the real buffer, we use do_unmap to judge uni=
-formly.
-> > And indirect still use use_dma_api to judge.
-> >
-> > From this point of view, how do you feel?
->
-> We can hear from others but a state machine with three booleans seems
-> not easy for me to read.
+Hi--
 
-Yes, I also think too many booleans, so I introduce do_unmap, then
-for the real buffer(not the indirect desc array), we just check do_unmap.
+On 7/12/23 22:38, Wang Ming wrote:
+> The debugfs_create_dir() function returns error pointers,
+> it never returns NULL. Most incorrect error checks were fixed,
+> but the one in bnad_debugfs_init() was forgotten.
+> 
+> Fix the remaining error check.
+> 
+> Signed-off-by: Wang Ming <machel@vivo.com>
+> 
+> Fixes: 7afc5dbde091 ("bna: Add debugfs interface.")
 
-Thanks.
+Comment from fs/debugfs/inode.c:
 
+ * NOTE: it's expected that most callers should _ignore_ the errors returned
+ * by this function. Other debugfs functions handle the fact that the "dentry"
+ * passed to them could be an error and they don't crash in that case.
+ * Drivers should generally work fine even if debugfs fails to init anyway.
 
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Thanks
-> > >
-> > > > +
-> > > >                 dma_unmap_page(vring_dma_dev(vq),
-> > > >                                extra->addr, extra->len,
-> > > >                                (flags & VRING_DESC_F_WRITE) ?
-> > > > @@ -1240,7 +1251,7 @@ static void vring_unmap_desc_packed(const str=
-uct vring_virtqueue *vq,
-> > > >  {
-> > > >         u16 flags;
-> > > >
-> > > > -       if (!vq->use_dma_api)
-> > > > +       if (!vq->do_unmap)
-> > > >                 return;
-> > > >
-> > > >         flags =3D le16_to_cpu(desc->flags);
-> > > > @@ -1329,7 +1340,7 @@ static int virtqueue_add_indirect_packed(stru=
-ct vring_virtqueue *vq,
-> > > >                                 sizeof(struct vring_packed_desc));
-> > > >         vq->packed.vring.desc[head].id =3D cpu_to_le16(id);
-> > > >
-> > > > -       if (vq->use_dma_api) {
-> > > > +       if (vq->do_unmap) {
-> > > >                 vq->packed.desc_extra[id].addr =3D addr;
-> > > >                 vq->packed.desc_extra[id].len =3D total_sg *
-> > > >                                 sizeof(struct vring_packed_desc);
-> > > > @@ -1470,7 +1481,7 @@ static inline int virtqueue_add_packed(struct=
- virtqueue *_vq,
-> > > >                         desc[i].len =3D cpu_to_le32(sg->length);
-> > > >                         desc[i].id =3D cpu_to_le16(id);
-> > > >
-> > > > -                       if (unlikely(vq->use_dma_api)) {
-> > > > +                       if (unlikely(vq->do_unmap)) {
-> > > >                                 vq->packed.desc_extra[curr].addr =
-=3D addr;
-> > > >                                 vq->packed.desc_extra[curr].len =3D=
- sg->length;
-> > > >                                 vq->packed.desc_extra[curr].flags =
-=3D
-> > > > @@ -1604,7 +1615,7 @@ static void detach_buf_packed(struct vring_vi=
-rtqueue *vq,
-> > > >         vq->free_head =3D id;
-> > > >         vq->vq.num_free +=3D state->num;
-> > > >
-> > > > -       if (unlikely(vq->use_dma_api)) {
-> > > > +       if (unlikely(vq->do_unmap)) {
-> > > >                 curr =3D id;
-> > > >                 for (i =3D 0; i < state->num; i++) {
-> > > >                         vring_unmap_extra_packed(vq,
-> > > > @@ -1621,7 +1632,7 @@ static void detach_buf_packed(struct vring_vi=
-rtqueue *vq,
-> > > >                 if (!desc)
-> > > >                         return;
-> > > >
-> > > > -               if (vq->use_dma_api) {
-> > > > +               if (vq->do_unmap) {
-> > > >                         len =3D vq->packed.desc_extra[id].len;
-> > > >                         for (i =3D 0; i < len / sizeof(struct vring=
-_packed_desc);
-> > > >                                         i++)
-> > > > @@ -2080,6 +2091,7 @@ static struct virtqueue *vring_create_virtque=
-ue_packed(
-> > > >         vq->dma_dev =3D dma_dev;
-> > > >         vq->use_dma_api =3D vring_use_dma_api(vdev);
-> > > >         vq->premapped =3D false;
-> > > > +       vq->do_unmap =3D vq->use_dma_api;
-> > > >
-> > > >         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_IND=
-IRECT_DESC) &&
-> > > >                 !context;
-> > > > @@ -2587,6 +2599,7 @@ static struct virtqueue *__vring_new_virtqueu=
-e(unsigned int index,
-> > > >         vq->dma_dev =3D dma_dev;
-> > > >         vq->use_dma_api =3D vring_use_dma_api(vdev);
-> > > >         vq->premapped =3D false;
-> > > > +       vq->do_unmap =3D vq->use_dma_api;
-> > > >
-> > > >         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_IND=
-IRECT_DESC) &&
-> > > >                 !context;
-> > > > @@ -2765,6 +2778,7 @@ int virtqueue_set_premapped(struct virtqueue =
-*_vq)
-> > > >                 return -EINVAL;
-> > > >
-> > > >         vq->premapped =3D true;
-> > > > +       vq->do_unmap =3D false;
-> > > >
-> > > >         return 0;
-> > > >  }
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > > >
-> > >
-> >
->
+so no, drivers should not usually care about debugfs function call results.
+Is there some special case here?
+
+> ---
+>  drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
+> index 04ad0f2b9677..678a3668a041 100644
+> --- a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
+> +++ b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
+> @@ -512,7 +512,7 @@ bnad_debugfs_init(struct bnad *bnad)
+>  	if (!bnad->port_debugfs_root) {
+>  		bnad->port_debugfs_root =
+>  			debugfs_create_dir(name, bna_debugfs_root);
+> -		if (!bnad->port_debugfs_root) {
+> +		if (IS_ERR(bnad->port_debugfs_root)) {
+>  			netdev_warn(bnad->netdev,
+>  				    "debugfs root dir creation failed\n");
+>  			return;
+
+-- 
+~Randy
 
