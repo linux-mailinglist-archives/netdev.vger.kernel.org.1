@@ -1,103 +1,89 @@
-Return-Path: <netdev+bounces-17639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55AB27527CB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:55:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647837527DF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC54B281D75
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:55:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33D701C212DF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0076B1F16B;
-	Thu, 13 Jul 2023 15:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4D71F173;
+	Thu, 13 Jul 2023 15:59:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28EB1F163
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:55:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05263C433C8;
-	Thu, 13 Jul 2023 15:55:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689263720;
-	bh=aTDQFeJnCth4yhiGkdJtIbFRpdsRRx4M6qGsTSEIjsE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aytymDobKFwO7OsH8ByDpS0qD4T329WMNw35oErlz+OdHzWiCpx8pCt6R4LtgUx1Y
-	 KAoqNSJEL6fOnIF3W4jK61tASR3tEOnfYud5qIwssqXHlLvQNov3+FN+3dGDtf5RS6
-	 zmCE2TvAcrOfSb1h7DLWBxr5qGYvD9eregs05Z+RfRpVkVK5oCfeIpA+4kaXiLognv
-	 I6y+/YiH0VStbO6jqhGRmLzmb1e+PyWvbq0/iEKWwRqJccaTONVGrX6es3fbD4gExJ
-	 SYcDB88+YCdnEly0rjzU/qEW393lc8exwmxbV056m2OVVXqxRQdt9fmmFB0j39bYV0
-	 BNodIXYB1833g==
-Date: Thu, 13 Jul 2023 08:55:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
- moshe@nvidia.com
-Subject: Re: [patch net-next] devlink: remove reload failed checks in params
- get/set callbacks
-Message-ID: <20230713085519.1297db1a@kernel.org>
-In-Reply-To: <ZK+9Q/5NC7/eNGH8@nanopsycho>
-References: <20230712113710.2520129-1-jiri@resnulli.us>
-	<ZK6u8UFXjyD+a9R0@shredder>
-	<ZK7EyBcE7sFVvYvh@nanopsycho>
-	<20230712122103.4263c112@kernel.org>
-	<ZK+9Q/5NC7/eNGH8@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BC61F163
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:59:24 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E98D1BEB;
+	Thu, 13 Jul 2023 08:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kbRaRAb0JOL2/28VqRGpCqPBtBaSf/qjgEEPz4Ozblw=; b=0YXzfhdXgCkaLlwHWfhq7w7NBW
+	B2yrKFup3FthFeXz+uny9omFu8uiDopmfNCRlhggOeUmyNdYrKGpvg0BFkhNVzp4j+/EijFlqpEDw
+	yQT2CMGgWn0IUnANOuPuAnvUVnW5lUC6888a0ba4McrU1KWCPA+LVlSPS+Bo6KLGYF7c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qJyip-001Gmy-Eb; Thu, 13 Jul 2023 17:59:15 +0200
+Date: Thu, 13 Jul 2023 17:59:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Pranavi Somisetty <pranavi.somisetty@amd.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, michal.simek@amd.com, harini.katakam@amd.com,
+	git@amd.com, radhey.shyam.pandey@amd.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] dt-bindings: net: xilinx_gmii2rgmii: Convert to json
+ schema
+Message-ID: <a17b0a4f-619d-47dd-b0ad-d5f3c1a558fc@lunn.ch>
+References: <20230713103453.24018-1-pranavi.somisetty@amd.com>
+ <f6c11605-56d7-7228-b86d-bc317a8496d0@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6c11605-56d7-7228-b86d-bc317a8496d0@linaro.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 13 Jul 2023 11:00:51 +0200 Jiri Pirko wrote:
-> >Feel free to toss in
-> >
-> >pw-bot: changes-requested  
+> > +examples:
+> > +  - |
+> > +    mdio {
+> > +        #address-cells = <1>;
+> > +        #size-cells = <0>;
+> > +        phy: ethernet-phy@0 {
+> > +            reg = <0>;
+> > +        };
 > 
-> I see, is this documented somewhere?
+> Drop this node, quite obvious.
 
-Aha, recently. I try to mark emails with important stuff with [ANN]
-maybe we need a better form of broadcast :S
+Dumb question. Isn't it needed since it is referenced by phy-handle =
+<&phy> below. Without it, the fragment is not valid DT and so the
+checking tools will fail?
 
-Quoting documentation:
+> > +        gmiitorgmii@8 {
+> > +            compatible = "xlnx,gmii-to-rgmii-1.0";
+> > +            reg = <8>;
+> > +            phy-handle = <&phy>;
+> > +        };
+> > +    };
 
-  Updating patch status
-  ~~~~~~~~~~~~~~~~~~~~~
-  
-  Contributors and reviewers do not have the permissions to update patch
-  state directly in patchwork. Patchwork doesn't expose much information
-  about the history of the state of patches, therefore having multiple
-  people update the state leads to confusion.
-  
-  Instead of delegating patchwork permissions netdev uses a simple mail
-  bot which looks for special commands/lines within the emails sent to
-  the mailing list. For example to mark a series as Changes Requested
-  one needs to send the following line anywhere in the email thread::
-  
-    pw-bot: changes-requested
-  
-  As a result the bot will set the entire series to Changes Requested.
-  This may be useful when author discovers a bug in their own series
-  and wants to prevent it from getting applied.
-  
-  The use of the bot is entirely optional, if in doubt ignore its existence
-  completely. Maintainers will classify and update the state of the patches
-  themselves. No email should ever be sent to the list with the main purpose
-  of communicating with the bot, the bot commands should be seen as metadata.
-  
-  The use of the bot is restricted to authors of the patches (the ``From:``
-  header on patch submission and command must match!), maintainers of
-  the modified code according to the MAINTAINERS file (again, ``From:``
-  must match the MAINTAINERS entry) and a handful of senior reviewers.
-  
-  Bot records its activity here:
-  
-    https://patchwork.hopto.org/pw-bot.html
-  
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#updating-patch-status
+	Andrew
 
