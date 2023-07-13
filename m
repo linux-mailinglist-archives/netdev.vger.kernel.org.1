@@ -1,132 +1,156 @@
-Return-Path: <netdev+bounces-17531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A1BD751E89
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:12:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C638E751E95
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D95BB281CCB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:11:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82624280E07
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9431510782;
-	Thu, 13 Jul 2023 10:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0781078C;
+	Thu, 13 Jul 2023 10:14:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886241094A
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 10:11:37 +0000 (UTC)
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8207E2700
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:11:32 -0700 (PDT)
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3159b524c56so146949f8f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:11:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689243090; x=1689847890;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iPR1yMWcnyOiGmafPtw2/cYgBmCNFxdYca8sNpEDilo=;
-        b=DCRBuXVhhR6zhl4kHOeLtqq+oCIodGEIyX7ozcZ+OmtrvFK6jEJzan8zckib+2Imb8
-         OMC/SYRFlJCesZ0g/HdAYxAO79/9X0xMhq2XtTOq/KeLL4VAA6CV3VAQMllQQGJMBMr+
-         rZ/pg/lXWmH9pdPw6dq1DaGsrDDWtGQ87AGC+zH0/+1zejMfrnWLZccVg98/PrgeeLtL
-         p18TkQaxh0K7o2bsRpPfFfjkE9wtzoNieWBhfuVOMTL+TcIEcUtZuxYDWrFm2Lq0bh5B
-         267EZ4fxHWiz8t2gBGXRzYX7g8WrHqfNM82Pf1fRL9TctSoK/WBs4onPgWwdkX/iwJ9O
-         1bGg==
-X-Gm-Message-State: ABy/qLY19pNf4hGJtyhRpntp8/ppELHCu8IW0frEtshEPWwNqjOqswYw
-	+Q2WvP4lm2k+dA1WR7rSidY=
-X-Google-Smtp-Source: APBJJlHSSOwWWcq5EnKi0HGVpp3whUMYunvm9+18uatw5jvZuogV3lrMw4sMRIzHpNVOkOhyf5vxaw==
-X-Received: by 2002:adf:dd8a:0:b0:313:dfa5:291c with SMTP id x10-20020adfdd8a000000b00313dfa5291cmr957156wrl.7.1689243090288;
-        Thu, 13 Jul 2023 03:11:30 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id y18-20020adffa52000000b00313f031876esm7493988wrr.43.2023.07.13.03.11.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 03:11:29 -0700 (PDT)
-Message-ID: <9da64307-c52d-bdf7-bb60-02ed00f44a61@grimberg.me>
-Date: Thu, 13 Jul 2023 13:11:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400CF100BF
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 10:14:32 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22DE31724
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:14:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ky9/hMiNUPtOH1F0y78DWeK8XQvZNu7GiyGd7lx/p0Q=; b=pCdpkrWZmiOxMONSKcXZ/jlT8i
+	tIlhjF46d3CcWI/UUWQGMDy7zzfmCg0gurWQD4J1UXt9xASeWO0qL8Ec6BtFOXqgtutyprbdx2GeT
+	d8E+vOXdwqE6hhuygO3nXYeD53RltdF6jJuT55SfkKEPLeNOxOwLIT8+1hHuWHbaufO0ZlmemFQqU
+	Ojm+88rlk8ACogbBQhAZPdRmuqrIvM/+nyLhB0ZcxhNlL4+KIg3rkOKWC2akNzEfoODaCG1zHd2AY
+	XyccR+1BHTJ7x8jkm/xX7JZkVaGErNvANdeKtsHlKdqbmb48ecC6Mu4geIu8TO7XdhEgLVZGjxoSb
+	f6epSl4A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49932)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qJtL6-0006S5-31;
+	Thu, 13 Jul 2023 11:14:24 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qJtL5-000645-4X; Thu, 13 Jul 2023 11:14:23 +0100
+Date: Thu, 13 Jul 2023 11:14:23 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	hkallweit1@gmail.com, francesco.dolcini@toradex.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 4/4] net: phy: marvell-88q2xxx: add driver
+ for the Marvell 88Q2110 PHY
+Message-ID: <ZK/Of27YzREq+Z9V@shell.armlinux.org.uk>
+References: <20230710205900.52894-1-eichest@gmail.com>
+ <20230710205900.52894-5-eichest@gmail.com>
+ <2de0a6e1-0946-4d4f-8e57-1406a437b94e@lunn.ch>
+ <ZK/G9FMPSabQCGNk@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: nvme-tls and TCP window full
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Jakub Kicinski <kuba@kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-References: <f10a9e4a-b545-429d-803e-c1d63a084afe@suse.de>
- <49422387-5ea3-af84-3f94-076c94748fff@grimberg.me>
- <ed5b22c6-d862-8706-fc2e-5306ed1eaad2@grimberg.me>
- <a50ee71b-8ee9-7636-917d-694eb2a482b4@suse.de>
- <6a9e0fbf-ca1a-aadd-e79a-c70ecd14bc28@grimberg.me>
- <1496b59a-10b1-bb49-2d04-5552e002c960@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <1496b59a-10b1-bb49-2d04-5552e002c960@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZK/G9FMPSabQCGNk@eichest-laptop>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Jul 13, 2023 at 11:42:12AM +0200, Stefan Eichenberger wrote:
+> Hi Andrew,
+> 
+> Thanks a lot for the review and all the hints, I have one short question
+> below.
+> 
+> > > +static int mv88q2xxx_read_link(struct phy_device *phydev)
+> > > +{
+> > > +	u16 ret1, ret2;
+> > > +
+> > > +	/* The 88Q2XXX PHYs do not have the PMA/PMD status register available,
+> > > +	 * therefore we need to read the link status from the vendor specific
+> > > +	 * registers.
+> > > +	 */
+> > > +	if (phydev->speed == SPEED_1000) {
+> > > +		/* Read twice to clear the latched status */
+> > > +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
+> > > +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
+> > 
+> > This is generally wrong. See for example genphy_update_link() and
+> > genphy_c45_read_link().
+> 
+> Would something like this look fine to you? The issue is that I mix
+> realtime data with latched data because the local and remote rx status
+> is only available in realtime from what I can find in the datasheet.
+> This would be for gbit, I split that up compared to the last version:
 
->> skbs are unrelated to the TCP window. They relate to the socket send
->> buffer. skbs left dangling would cause server side to run out of memory,
->> not for the TCP window to close. The two are completely unrelated.
-> 
-> Ouch.
-> Wasn't me, in the end:
-> 
-> diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
-> index f37f4a0fcd3c..ca1e0e198ceb 100644
-> --- a/net/tls/tls_strp.c
-> +++ b/net/tls/tls_strp.c
-> @@ -369,7 +369,6 @@ static int tls_strp_copyin(read_descriptor_t *desc, 
-> struct sk_buff *in_skb,
-> 
->   static int tls_strp_read_copyin(struct tls_strparser *strp)
->   {
-> -       struct socket *sock = strp->sk->sk_socket;
->          read_descriptor_t desc;
-> 
->          desc.arg.data = strp;
-> @@ -377,7 +376,7 @@ static int tls_strp_read_copyin(struct tls_strparser 
-> *strp)
->          desc.count = 1; /* give more than one skb per call */
-> 
->          /* sk should be locked here, so okay to do read_sock */
-> -       sock->ops->read_sock(strp->sk, &desc, tls_strp_copyin);
-> +       tcp_read_sock(strp->sk, &desc, tls_strp_copyin);
-> 
->          return desc.error;
->   }
-> 
-> Otherwise we'd enter a recursion calling ->read_sock(), which will 
-> redirect to tls_sw_read_sock(), calling tls_strp_check_rcv(), calling 
-> ->read_sock() ...
+I've never really understood this kind of reaction from people. A bit
+of example code gets suggested, and then the code gets sort of used
+as a half-hearted template...
 
-Is this new? How did this pop up just now?
+> static int mv88q2xxx_read_link_gbit(struct phy_device *phydev)
+> {
+> 	int ret1, ret2;
+> 
+> 	/* The link state is latched low so that momentary link drops can be
+> 	 * detected. Do not double-read the status in polling mode to detect
+> 	 * such short link drops except the link was already down. In case we
+> 	 * are not polling, we always read the realtime status.
+> 	 */
+> 	if (!phy_polling_mode(phydev) || !phydev->link) {
+> 		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
+> 		if (ret1 < 0)
+> 			return ret1;
 
-> It got covered up with the tls_rx_reader_lock() Jakub put in, so I 
-> really only noticed it when instrumenting that one.
+Both genphy_update_link() and genphy_c45_read_link() check here whether
+the link is up, and if it is, it bypasses the second read (because
+there's no point re-reading it.) I've no idea why you dropped that
+optimisation.
 
-So without it, you get two contexts reading from the socket?
-Not sure how this works, but obviously wrong...
+MDIO accesses aren't the cheapest thing...
 
-> And my reading seems that the current in-kernel TLS implementation 
-> assumes TCP as the underlying transport anyway, so no harm done.
-> Jakub?
+> With this we will detect link loss in polling mode and read the realtime
+> status in non-polling mode. Compared to genphy_c45_read_link we will not
+> immediately return "link up" in non polling mode but always do the
+> second read to get the realtime link status.
 
-While it is correct that the assumption for tcp only, I think the
-right thing to do would be to store the original read_sock and call
-that...
+Why do you think that's better? "Link" only latches low, and the
+entire point of that behaviour is so that management software can
+detect when the link has failed at some point since it last read
+the link status.
+
+There is only any point in re-reading the status register if on the
+first read it reports that the link has failed, and only then if we
+already knew that the link has failed.
+
+If we're using interrupt mode, then we need the current link status
+but that's only because of the way phylib has been written.
+
+> If we are only interested in the link status we could also skip the
+> remote and local receiver check. However, as I understand the software
+> initialization guide it could be that the receivers are not ready in
+> that moment.
+
+With copper PHYs, link up status means that the link is ready to pass
+data. Is this not the case with T1 PHYs?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
