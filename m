@@ -1,73 +1,116 @@
-Return-Path: <netdev+bounces-17432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796357518D6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:33:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1DE7518F2
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:42:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF8AD2811D1
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:33:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14307281BD8
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A415EC7;
-	Thu, 13 Jul 2023 06:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3335469F;
+	Thu, 13 Jul 2023 06:42:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D11366
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:33:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4B05C433C8;
-	Thu, 13 Jul 2023 06:33:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689230030;
-	bh=LqgghM2Zej1VAWt7omsVvgwe20Q8z8XEZpXrbAV10SY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Iw9RGwDK+QYaciKqeb98iq3tpPQrDwW4c+ruxvfllPKiBriByJRDn3z7LYQFUgtWc
-	 rRmkMXmyeJYxI3zw/Sg/nBYPahe3lKpckq0h1mkG8vbfJi7XgLeAas27wBRLET3NpT
-	 gZF+sQZCFQpMbM8Fcgga3QPWyAW/QVEZo3281uYy7RX1xo92pEkJpiNEinzx5stLRi
-	 I9P+ayGV9217tRnhxFKzy0Q1TP0FynqeXDGjMgtZMrPf57le7zpp2dIwS43E40Gniq
-	 WKQJQ7WMmP28aOv8kAsNHO+40d5KXXotPK3WArR4qU8qdqOPFaNipeheExE5Y2tgt3
-	 L6OD8Zr61rAuA==
-Date: Thu, 13 Jul 2023 09:33:45 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
- modify rule destination
-Message-ID: <20230713063345.GG41919@unreal>
-References: <cover.1689064922.git.leonro@nvidia.com>
- <5fd15672173653d6904333ef197b605b0644e205.1689064922.git.leonro@nvidia.com>
- <20230712173259.4756fe08@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39BD366
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:42:10 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8624E106;
+	Wed, 12 Jul 2023 23:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZT+ZP4gLMq+7/P1Ak/8Bkb5D3BtAhEM5pNeOau8WjUI=; b=Ti662E+d3nUaNeg5Fk1rdN+p4v
+	kNAuIrmvPhzfuKr6LDbfZPJDc57/6jfxBA2eK9qzhUrRFFaxJNfwJ8E1zBnH24VfzNzTpVdabJ7Xw
+	4k/rF1lNW4DOUuWRmYUdzUS0tF+vM1TqxWqsT4I2FWSmrJmf6CAVtMZgRBVsTYzcQvtEUldx0VRVG
+	+dOW8MZrm6Rv52jS/d5A8y/BSli7r8F++XBQcBzWoOlOZpNd4xa5fb6SDXCMkAHZbzRwTCunoYF9c
+	yB2P1Vqx0Pqjg5aMInsDeJN9YnbYIMfzcOPmu+kliuKvuR4yPy7YxEZ5aqX/sWQFX0qOJeardEC/Y
+	b/r2NKHw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57626)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qJq1e-0005ls-1e;
+	Thu, 13 Jul 2023 07:42:06 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qJq1d-0005ts-Jb; Thu, 13 Jul 2023 07:42:05 +0100
+Date: Thu, 13 Jul 2023 07:42:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Haener, Michael" <michael.haener@siemens.com>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
+	"olteanv@gmail.com" <olteanv@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"Sverdlin, Alexander" <alexander.sverdlin@siemens.com>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>
+Subject: Re: [PATCH v2 0/3] net: dsa: SERDES support for mv88e632x family
+Message-ID: <ZK+cvZJmYRkKKZ0d@shell.armlinux.org.uk>
+References: <20230704065916.132486-1-michael.haener@siemens.com>
+ <20a135919ac7d54699d1eca5486fd640d667ad05.camel@siemens.com>
+ <67189741-efd5-4f54-8438-66a6e2a693f5@lunn.ch>
+ <6594cbb5b83312b73127f6bf23bbf988bb40c491.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230712173259.4756fe08@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6594cbb5b83312b73127f6bf23bbf988bb40c491.camel@siemens.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 05:32:59PM -0700, Jakub Kicinski wrote:
-> On Tue, 11 Jul 2023 12:29:07 +0300 Leon Romanovsky wrote:
-> > From: Jianbo Liu <jianbol@nvidia.com>
+On Thu, Jul 06, 2023 at 06:51:51AM +0000, Haener, Michael wrote:
+> On Wed, 2023-07-05 at 01:31 +0200, Andrew Lunn wrote:
+> > On Tue, Jul 04, 2023 at 07:17:55AM +0000, Haener, Michael wrote:
+> > > On Tue, 2023-07-04 at 08:59 +0200, M. Haener wrote:
+> > > > From: Michael Haener <michael.haener@siemens.com>
+> > > > 
+> > > > This patch series brings SERDES support for the mv88e632x family.
+> > > 
+> > > Changelog:
+> > > v2: rebased onto Russell Kings series dsa/88e6xxx/phylink
 > > 
-> > The rule destination must be comprared with the old_dest passed in.
+> > Russell King will be interested in a Tested-by: for his patchset.
+> > That will also help get that patchset merged so yours can then
+> > follow. So please keep an eye on the netdev list, and repost your
+> > patches once Russells have been merged.
 > > 
-> > Fixes: 74491de93712 ("net/mlx5: Add multi dest support")
+> >         Andrew
 > 
-> This says Fixes, should I quickly toss it into net so it makes
-> tomorrow's PR?
+> Once the other patch is merged, I will rebase this patch and resubmit.
 
-This is a fix, but it useful for this series only, which actually
-needs to modify flow steering rule destinations on the fly.
+From your response, I can only assume you have not understood Andrew's
+comment.
 
-There is no other code in mlx5 which needs this fix.
+Andrew is asking you to _test_ my patch set, and _then_ give a
+Tested-by. It's useless to do that after my patch set has been merged.
+This will give more confidence to my patch set when I submit it. Since
+I'll be doing so maybe later today, you'll probably have to reply to
+the series once it's been posted.
 
-Thanks
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
