@@ -1,85 +1,144 @@
-Return-Path: <netdev+bounces-17486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E350C751C6C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:00:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2AC8751C7D
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FAC2280A83
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:00:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17CD5281482
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBCFF9D9;
-	Thu, 13 Jul 2023 09:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533BAF9DA;
+	Thu, 13 Jul 2023 09:01:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6BDF9D7
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:00:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2E5C433C7;
-	Thu, 13 Jul 2023 09:00:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689238813;
-	bh=FS6IGHNIU+MsMLrPhkS4TbBRHtXLi8wWNk5j5osD+DU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QCOtMw1RQz6X/mHeK6QOPmbM+fyZdqhp0fggevlZYpEuq1pw1vpKcJ2uzfyxCpIua
-	 3jagn/cfJzfeULxuMz1Tja3ZWYf32FI/VLi3zC4mrEvd6aOhyFZADhbRAnHVpgxsbg
-	 4aBg4BZ1LUcjZhpUC+aENAYzbEhtrbjU0ldeuW7n3y3n2QDnmZOLpVw8bAy4ypsbVS
-	 XbckHjyyCkyrXjb5qOu8qa8s2LIIxF5MfnquOaItWrPLbIb7qHrwKXe6p4t6gJhy2s
-	 0Uq9TL0WFJR20G1SKTWC3R8LQLqH4+umIzM258NPLNK+gtwnbKYfVXpiX5SNaktZ0p
-	 DBjTzeS2fAtwA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469F6F9D7
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:01:08 +0000 (UTC)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4A87268A
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:00:54 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-314417861b9so586600f8f.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:00:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689238853; x=1691830853;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5WxbRdD6fBUeo+fFC+dWQDKMnZVyapN3LxYNlhp9Eso=;
+        b=4r/fUa3oOr+WjxNrYmUMGO5vTqxKmBUPFmXyBgP75UEx+ygXTW/0rgqVI5YqTZGzU4
+         D1V1+t3xOOqHgK4dfbTShEhYuMnaiMdim78hi8EZVnGFseoWlEvNgOSTY2EPwimAHWeg
+         JBmlBsctQFUWZicZccMH9nkmEMGVmc5B7L1D9EJtQxYnq+MUdiJDp23bse73NXRzGKVR
+         +H2m1qP0qtJZxU/td4Ga4irajFw+rRmCjrZ/YowbN/u+l+PnCQvow9fdoYGz8YMr5kgB
+         ownrsJAJnwiiFVvOQgss4Zbxp0mz2rrpD8Dgtm9qCMJsFNvbS1stwzSF02YKZIGkB3Ec
+         PSkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689238853; x=1691830853;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5WxbRdD6fBUeo+fFC+dWQDKMnZVyapN3LxYNlhp9Eso=;
+        b=L0EY0nYwUJ6k0nEPFPBYL/6BE49GupwcM/w8hZLk5YTv3DTbtBdaFqgwp8V5Q13JRl
+         WaeUun8nmmXiaHVe48tDzgyWCCNwyEyR1zVMVQaqnfPbl8W4e3vbsJX9Pqp3k96Khbs8
+         +HGEGW7Y0wr4YnqiZu//z8/CfevW/VwR418unOHSjlxM/mmVdUJJyAxDywWugfoD0l+v
+         swRTpHzTBlyJRLhaqg4iYslZjSROJzXLfpwurcCMtpUPm2KCsB1eY6axFTceQqeu7noo
+         kXhWui8NUjw3cSbCJm5HMJ6IrCWqkcQRGoS6/a/n+ssVMpJ0dxVYLlQ5Eb2JbkpVpIQj
+         r7Qw==
+X-Gm-Message-State: ABy/qLZzDrFGrpCIdMqThvu+2H45f1LJqs3WrchmycW7lbGikm62vGrg
+	rPnyCm3q6/4jsqc9KjQmI9ovrw==
+X-Google-Smtp-Source: APBJJlHMSurDVK6f/K5b2ktLDjdptAO+VfkknexFQZf6xmhvCQPTEMp8/HxKplcTnWy64QZb5q03sg==
+X-Received: by 2002:a5d:5544:0:b0:313:f907:ceed with SMTP id g4-20020a5d5544000000b00313f907ceedmr853402wrw.39.1689238852888;
+        Thu, 13 Jul 2023 02:00:52 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id v16-20020a5d4b10000000b003143be36d99sm7352109wrq.58.2023.07.13.02.00.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 02:00:52 -0700 (PDT)
+Date: Thu, 13 Jul 2023 11:00:51 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+	pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+	moshe@nvidia.com
+Subject: Re: [patch net-next] devlink: remove reload failed checks in params
+ get/set callbacks
+Message-ID: <ZK+9Q/5NC7/eNGH8@nanopsycho>
+References: <20230712113710.2520129-1-jiri@resnulli.us>
+ <ZK6u8UFXjyD+a9R0@shredder>
+ <ZK7EyBcE7sFVvYvh@nanopsycho>
+ <20230712122103.4263c112@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 13 Jul 2023 11:00:07 +0200
-From: Michael Walle <mwalle@kernel.org>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yisen Zhuang
- <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_Beh?=
- =?UTF-8?Q?=C3=BAn?= <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 08/11] net: phy: add support for C45-over-C22
- transfers
-In-Reply-To: <ZK+8M+FxJxY7UIyt@corigine.com>
-References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
- <20230620-feature-c45-over-c22-v3-8-9eb37edf7be0@kernel.org>
- <ZK+8M+FxJxY7UIyt@corigine.com>
-Message-ID: <1bef1179238e09cdfce281cc2428ba56@kernel.org>
-X-Sender: mwalle@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230712122103.4263c112@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi Simon,
+Wed, Jul 12, 2023 at 09:21:03PM CEST, kuba@kernel.org wrote:
+>On Wed, 12 Jul 2023 17:20:40 +0200 Jiri Pirko wrote:
+>> >> Back then, it was a possible fix. Alternative way to fix this was to
+>> >> make sure drivers register/unregister params in the code where it is
+>> >> ensured that the data accessed by params callbacks are available.
+>> >> But that was problematic as the list of params wes static durint  
+>> >
+>> >s/wes/was/
+>> >s/durint/during/  
+>> 
+>> Maintainers, I will send v2 with these typos fixed tomorrow, if these
+>> are not any other comments.
+>
+>Feel free to toss in
+>
+>pw-bot: changes-requested
 
-Am 2023-07-13 10:56, schrieb Simon Horman:
-> On Wed, Jul 12, 2023 at 05:07:08PM +0200, Michael Walle wrote:
-> 
-> ...
-> 
->> @@ -780,6 +782,7 @@ static int get_phy_c45_devs_in_pkg(struct mii_bus 
->> *bus, int addr, int dev_addr,
->>   * the "devices in package" is invalid.
->>   */
->>  static int get_phy_c45_ids(struct mii_bus *bus, int addr,
->> +			   enum phy_access_mode mode,
-> 
-> Please add the new mode parameter to the kernel doc for this function,
-> which is in the lines preceding this hunk.
+I see, is this documented somewhere?
 
-Ahh. Sorry. You've already mentioned that last time :/
+>
+>so we don't have to update the status manually.
+>
+>The commit message would benefit from a rewrite, TBH I don't understand
+>half of it, specially:
 
-Also true for get_phy_c45_devs_in_pkg().
+Will do.
 
--michael
+>
+>  Alternative way to fix this was to make sure drivers
+>  register/unregister params in the code where it is ensured that 
+>  the data accessed by params callbacks are available.
+>
+>Can't parse.
+>
+>  list of params [was] static [during] devlink instance being
+>  registered.
+>
+>You mean that list of params can't change after the instance was
+>registered?
+
+Yeah, that was a limitation in history IIRC.
+
+
+>
+>  register/unregister params alongside with the data it touches
+>
+>Meaning params for a sub-object are registered when the sub-object 
+>is registered? An example could help clarify the meaning.
+>
+>> >> devlink instance being registered.
+>> >> 
+>> >> Eventually this limitation was lifted and also the alternative fix
+>> >> (which also fixed another issue) was done for mlxsw by
+>> >> commit 74cbc3c03c82 ("mlxsw: spectrum_acl_tcam: Move devlink param to TCAM code").
+>> >> 
+>> >> The checks are no longer relevant, each driver should make sure to
+>> >> register/unregister params alongside with the data it touches. Remove
+>> >> the checks.
 
