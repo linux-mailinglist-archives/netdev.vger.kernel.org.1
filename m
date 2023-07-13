@@ -1,96 +1,83 @@
-Return-Path: <netdev+bounces-17579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294DA752132
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:23:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF0D4752135
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C1251C210E7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:23:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C7AA1C21373
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0FB1ED31;
-	Thu, 13 Jul 2023 12:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C7613ACE;
+	Thu, 13 Jul 2023 12:21:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E3E14F8F
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:20:14 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2073.outbound.protection.outlook.com [40.107.104.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC5B26A5;
-	Thu, 13 Jul 2023 05:20:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58E8134A9
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:21:24 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C38272A;
+	Thu, 13 Jul 2023 05:20:49 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WYN07h8fU/HlFd+/X7Y1mund7TJCa7xSIHaftfNcnrk3MmCcc+Wn+tTkrBu49ZH16isS1O6htkNJGOE78kiTCT6NS/46ssA6XGV14c5+8RNTmblNVgZANu2bBoHxAeQWt0p3/2Blt0doRl0otErhPEbm7BjY8IJ59BdQo2XuuXzWwkiDKc90koZV//vTgSwznKMqSguKJbhm/YE8ZiTzxQW+zz299Yz4d3we6qQCb+8mC3Bzjn/rYpE4i9NWXEvXBYltQ074X5DAsz/z3rqJ3J4cO0xE2JZiRwhoyxNs5+2tfATSudyTWwuLxhksNagr6m5dZm3VY+qQl0mum+4HSg==
+ b=RO+tL0RH5hcsHYxjbbGJ6x1kIU1LDA80YyifalsUSjZ+cAdZGH+KldMjYYocnJUpWFD8Xhedzaly75x4WUCcB1De+ABEpq20+Df24zmTJ7AnnJ1TRUgqqo3vfKwgOPRZgL27oNo1JYBeHEth1tk4oB0hWxMGkkAOQbSFe6xW2iVOf3oFICCXChfOjHg5IDdUwR8eztozle1Gaiaxorl7poLuDUoGYZxsIpnqyERujJ62OiFY/gToX6ypJVNpuglFhvtGNFhAySKXu5qrG959LB/FDzt0eIWa1jKUalhopPiNfeIhZr8OwkJcW5kPcPG2hdq3kRDOJnf+i0tCZ/8qsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GtEZXWH40iTCJjTrtnzMzW5xGDiQeL/VMCcTYWylmyU=;
- b=SGOsl32BOCHHhQ5aGmoyGVuUTQIxX6uo+SJ4rv0ZwU3akn6oqcfzExw4UGAV43ojYZ/x62JMiOshWbZN0Za4AS7vNOhWR5OQHtPey+eyGhy/afnGa6NEOsMCKwmu3SM7eTDscvQzhgwWqKccej8dbiCa3ywkuc6isS7vXE7qQlp0aMwkAlyZzRYycllYafMykqO6LQcUnLZvhagKD+ENwdV4HVew/6CEBoBqT252YHsIXL3hv81NXRgbvBmOnwIE7eWRPYS4LUXlJnSSK7OOs5dLqEvGwkQZ+MxtWM1D0nNzbqbdEmRMj8KeozoVIsH6SmyvP/X17g6i5Nc0GWP0NA==
+ bh=ANQ4C2tnrCk+CSroawOo7OH++aM+F0pp908RZsdICNA=;
+ b=nfBjdTOcM1Umy/0ZwMMzCqOos9WR691vZqcLbf63r+f3w+enz5hAqG7982LJbkkQm1oZ9YaPpvQhL7V7fzNkRVY5s/7aPfZo5XSve9ZGNcySRhgPkAzenkSsrSpJ5616HrbUiRZSQYM0WeV2O8mFrWK2Xxpar58D0dIkbbSbkTqUyC99Df4xiKFC6sZzQIjhrmg8qjckAf3hfWjsbNfM0in1sg0CHMhXzAQepObfJlFAYmFUf2Y66Y31CtBMtZfvvbfGJRtGHR55udq3Z7E5mwbzRYcnifsVRsuaxhkKdU/87wNSE/2lMzr/OLalcg9zZ/XiBfhMceIMf3TT4w8GLQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GtEZXWH40iTCJjTrtnzMzW5xGDiQeL/VMCcTYWylmyU=;
- b=OvIU8z6LMN9o+EUjH0YObpsv4NUbv8mY7DoRPR/6nUmvaCk8yfBIK6La5z/TuDFYV7qtSyBn6yGiNbB3W6l2XWbex++KzDlO5pBbjNjBH++PykHTPm/h3Numlzc342DJrusI4QWgUcmWgp2LoOjV8OaoXPdfhwihuzgmmb30IR4=
+ bh=ANQ4C2tnrCk+CSroawOo7OH++aM+F0pp908RZsdICNA=;
+ b=I7Q2lo3BbAYah6K9zhl0kX7bcs3VV18J5wkxc6qHn+EHWaJyZx56oZg+sMotbXdc34qkTPhFRZD8vEv6T2ZEepp0YMAP+5mfj7Z2zU3eHSGx0Wng61vemR53kgBmErt1ZPQgvkUc6A7DlnO9hVdTNhR2IGuihA2Juny/8EpY/Zw=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBBPR04MB8010.eurprd04.prod.outlook.com (2603:10a6:10:1f1::14) with
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MW5PR13MB5996.namprd13.prod.outlook.com (2603:10b6:303:1cd::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Thu, 13 Jul
- 2023 12:19:47 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::cc2a:5d80:9dbd:d850]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::cc2a:5d80:9dbd:d850%7]) with mapi id 15.20.6588.017; Thu, 13 Jul 2023
- 12:19:47 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Thu, 13 Jul
+ 2023 12:20:19 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
+ 12:20:19 +0000
+Date: Thu, 13 Jul 2023 13:20:11 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Md Danish Anwar <a0501179@ti.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>,
+	Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
 	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 net-next 10/10] net: remove phy_has_hwtstamp() -> phy_mii_ioctl() decision from converted drivers
-Date: Thu, 13 Jul 2023 15:19:07 +0300
-Message-Id: <20230713121907.3249291-11-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
-References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR2P281CA0157.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:99::18) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v8 2/2] net: ti:
+ icssg-prueth: Add ICSSG ethernet driver
+Message-ID: <ZK/r+xgo4oeCjAxw@corigine.com>
+References: <20230710053550.89160-1-danishanwar@ti.com>
+ <20230710053550.89160-3-danishanwar@ti.com>
+ <ZK2VRYwW8DxIZCY2@corigine.com>
+ <afbd4c9d-5ff7-e366-f866-6b718907d6fa@ti.com>
+ <ZK+6zVnUSJG5GKd4@corigine.com>
+ <b6e49136-1bad-8d32-ac6c-f9185dfaa9d3@ti.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6e49136-1bad-8d32-ac6c-f9185dfaa9d3@ti.com>
+X-ClientProxiedBy: LO4P123CA0277.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:195::12) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,403 +85,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB8010:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7504661b-f009-4df4-fc47-08db839b7296
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW5PR13MB5996:EE_
+X-MS-Office365-Filtering-Correlation-Id: 750ec54c-2c19-46ab-e10b-08db839b85d2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	sXl7/eFXc+WVdiH7Jl7/FEu1SGpSQu3dexTEN3xZPod4ruNAkvvy52wDOo1kEgn21UW7iBu9vZGmqpGg5wYcpmcloirzX213icMsHK38pB7mrl6lMJHD4Fj3yWCvs4tb2tkStCVSmZaBSIzKlWqxthVOkxc7Ho4IVr5PUDt0lHueWvN2m3/sI+atmVRTeyVId6uX9fOtGC8QfNs6RueRbe4cdrD5xPsDT7nf188+Tzlk6pYILLHxKHVi1oMpuU3b761KJjSy9Vv74E8c/KatxnLqoeacfLYvlxT59q6WJTJ7SdPlnkUfFyxCDRKgSjwcMmLSAJL6BsngiiiroVSSSDw5B8uU81klplgiOwlRaG23+j340xgHUR0TikufDcg4VAaD+lmFaaur/c+xB6RLHFlUJ1+6sFXWgU0ivL2BSUHjy5gVmZufndLi7VIMsL7hixnVfNoGrcvimKPCcb9ZjPoPV4T3v/8UMnXVGw51uxSEAgJwKuoDk6t8xMNfpURE1vCnePy2K82KQguuV5qhKhcIXesZ0vFTL6k2R9mwjokHkbKsVnRUNtuDCF2PZJ8+3ZjgMdAGtkWH65iFaWQ83rQbOl2Zl1FOYsrzd0RIjmVJ48YME1jUkaDV8YEAp8q2
+	H7FAYXSJ3hNC9faHBJGas4NntJoTB1zGn05sxN9SqMa7f7k3DfNzZuHcbS3JjtZ3BlxRWgNsJs7hZL2cFeXUMDoXRquenJ8u0uK1gSCCPvaJTar1M/CSelC226dLdLkUkaY++2bkFwfFajrL+p/usQPq/lfses+0aQ0SN+lC9TFcQco+lfiVD3KrvZ5S2HkKzB0jqlf9l8YNzplWTqbJ2Tw4YQjVaYtBZfkJC6SrGwm/B5OrZvWcXyNIk03wec7QsiGmBq8WvtzudNngywjulQQMPAu8WJn1bvehULUkDgxV2DHCG+BlJuv54wHfwb+NbxFaR6pZFnJ6AJvRH/B4FzhGE5aXkIYY95SyA2oPVZ+QK4L/hE42zdyH9e9TtU1BG6qbklsT99o2RBIfHA6rRJoACnZgtmTOj+Uo92jRP6NT0Kq1G8KBsZw5ylT9a6OtPVMXC47RFjCYIlPUS65DNDDTZ0vybCf2afmYnOX9xbMnrDeXcqbJjgasYaTQ22dWaJ4kHMjz7J2D2SNXUoT6+LNO1jEyYvdmNaeAeg3AkKE4GCGSJHoNyM2gQrp/Joal0vyiqRESBOjghE11RBU/2F21Sgs/GPVuWGI3pRRbto8=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(39860400002)(376002)(396003)(451199021)(6512007)(6916009)(4326008)(66556008)(66946007)(66476007)(38350700002)(38100700002)(86362001)(186003)(1076003)(26005)(6506007)(2616005)(83380400001)(52116002)(36756003)(478600001)(54906003)(41300700001)(5660300002)(8676002)(8936002)(44832011)(6486002)(6666004)(30864003)(316002)(2906002)(7416002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(396003)(136003)(366004)(346002)(376002)(451199021)(36756003)(86362001)(38100700002)(478600001)(6666004)(41300700001)(8676002)(54906003)(6486002)(6512007)(8936002)(44832011)(5660300002)(7416002)(2906002)(6916009)(4326008)(316002)(66476007)(66556008)(66946007)(2616005)(4744005)(186003)(26005)(6506007)(53546011)(83380400001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?mKcPrP35ZFhj5+EBtper1GvFtudJnBXKPw3jyEzwliMhHPtWwJg5We00bg8q?=
- =?us-ascii?Q?Qb1aefv2ryUZu3u1w0GbmUbUl5CQFFvJjHePbmy5jDeYcvVvFfiDJm9fyTQ2?=
- =?us-ascii?Q?h66yTdeeMluapqcaGr70DKvQsojNnzm/79xAshGI+KfthPJpmy2dZ47AmTKs?=
- =?us-ascii?Q?NP9Hp/34ZDQSO18JPOvqois02P12oVEPZPRn9Wf7kZI6gqNqUVM+Bujfm3AH?=
- =?us-ascii?Q?QZxLIbUNqXQ3V5IOap5bn41DhM49rKFt79ItevCxONORcwv99qaN/b9U75/4?=
- =?us-ascii?Q?/Tff/VrPRDhvGK9xqVK9uYOQdGdPIOxRkP4z3bVkVd+Czq1M3MW9GtEhwXKl?=
- =?us-ascii?Q?Jca9tTEOhYbGXDEWMbAmXP47ImJ9tXCcHsJmUa58QyyGyOtwh3lam1px20JP?=
- =?us-ascii?Q?3ml8t3HatS2LGipikna0OWBAA9a5hRRFocTuGRimGTBAFwQ+2PuxisenxYlh?=
- =?us-ascii?Q?0IJDCoNDTHN0nJHqSLBAi6JmObXLW0iutX6T5S1D0Ni79eAIgEaGaCgcVODK?=
- =?us-ascii?Q?O9iQV+Qix+8oRu6aEbKStcXrqiTjqbxANv+GhB45s4qef+EF8OR35FuDGA4v?=
- =?us-ascii?Q?TSeTrAnX9K8jgOtFpJAAPf4gfYPxKyF+V9grGrU49WsQAyxMU3MwyOOKXh8w?=
- =?us-ascii?Q?0vdRj4lR4V68hW5I/tNoArTJno8pJ1vxZU/P7i9Pq6+leyYdOvJNp2eBIc27?=
- =?us-ascii?Q?YN5Qje6jfEt8+Mj44c3aZ7oALkkddlyyeZrR3StGgCRe4YbgcFjgDgfEwBXs?=
- =?us-ascii?Q?53BqgxOaLrtALuiKHQvFxCOt2e4jmtTrIkegL/I4rPOyry58jsjLVHYes1M9?=
- =?us-ascii?Q?QDquhVeV16d4qgJY7Lihz8kGcMKsQoNW98lE012FMcDyInkKcoBa2U2GpNJq?=
- =?us-ascii?Q?CMuZQuy7iMw3sXXKjw5xZ0OLxet0nnUhbnbmJlDhx0Vdh4Z93Cepsm0YfA/z?=
- =?us-ascii?Q?RtpLI7+P6T0lrvRtthrU/Rz6LsgBoS0Csy32Ofa9KcRjRzB6gP3rQFyzCImX?=
- =?us-ascii?Q?k1EqiSLPGBSzheZalszm2hnWuea4WSJVl9a5tLGhpfooS40J82vRTi8ixxQY?=
- =?us-ascii?Q?uBSDCZdcXkhIvjzVgJuE0bxw2ymc5Ble66Hk0yNK8nKjYmjHZSgFzRTjIrJg?=
- =?us-ascii?Q?IZkInqGxkCct87/qBfC5vQ6NboP1cqkGg312Weagu+3AtyX+DHspu3jZvkGC?=
- =?us-ascii?Q?Qh/8p/OXwPibunCqBRETToqwTPHOxaEldShba1qNMp9U0ithLiTjvI1shcwa?=
- =?us-ascii?Q?yiWqvx4fMGMsnURKBxSzLV+zXwdDGkVWdblxwwUtYr2IcA5900BB0Mv5Znlf?=
- =?us-ascii?Q?u+Q0s5Qne9exaGFs6Wd1VnDuyR6J0U107cvuDrWxahiaSvDfKBVz11yAsTIP?=
- =?us-ascii?Q?SPnbjytVQyhYNlvM9rEs4l+mVVVXt1C+Ybdct7upM4hIJ2mKyNUAagB0N+4s?=
- =?us-ascii?Q?lMDfMXQXztJazvCzRMcx8wFvDhAdvQUXjvupDjgfWpzDNaKCWZrJEAT+kXUZ?=
- =?us-ascii?Q?4mMhZnNFGV1QwQ7A+DOUoUu5l+BY0HDEfWWyHLR7YqtaCKXXWpAspI+Tkr6U?=
- =?us-ascii?Q?7GEC+F05cYoQlt/82RihhzvaXnUYba4wU/GHxdC8PhoHpDYOt7rv3FNCa3bL?=
- =?us-ascii?Q?Zw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7504661b-f009-4df4-fc47-08db839b7296
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+	=?us-ascii?Q?A8n9mpeKJpC8R08Z42Otz8qpKaLBWzEkwOi/sfXBOjEcR/vQwX5dNi0TIudl?=
+ =?us-ascii?Q?RaUFQbarbTdmAkOM1xbshwhDuBMG/5HovRmQ8/DqB3gWFA1LC/5oKkwEx2nZ?=
+ =?us-ascii?Q?uRT1LaqABPc6Xz1b65wwe9z1q7Osx51gr/f2Z8/QkX+2pPQ5LUC24YzuHuk7?=
+ =?us-ascii?Q?Lhx2TJRjeVgQfhxPqlsUBxy92++LtnXL9FR1rNh6aXRYNPoAWeEXQA2JUxbE?=
+ =?us-ascii?Q?HpSk6UVh5JcyOpOekI13Ag8nCTBAY8+KPdgVJQLy8vkeGOxKE1WPl/pEwN7R?=
+ =?us-ascii?Q?5ru6w8icHvAAmdpE3DYdlTXj4bOTPuqwswTCBDbo1yzdwMgdYp8kgvy5LcFm?=
+ =?us-ascii?Q?AM4VWxn/CIyMuNk48ySw/h6DDbhlRnptDiFJYWW09csZ6pIqInhAEb0XoZ47?=
+ =?us-ascii?Q?rbXwkGO/E9rPbocx48/Cpdt0TZyBR0qTFRazc9A7hQNM3DEMVpw6hMZ9gArn?=
+ =?us-ascii?Q?7VGqfPbDkMSgarK05h66JtC4mFzLuWl4mDedXefm7bU7J1AgCaTN2XCbQhD8?=
+ =?us-ascii?Q?2Vc4X9QFTtrFKHvHgDMz6fNa1+YpiOA7ggundYLRMlEabg6BZvU7JrlSqhAu?=
+ =?us-ascii?Q?VIv5RzJRNNT+9FwGGsEwaAazPvby3iTgQ1EGLbHMtZ26ilooFv31XAFtHYqg?=
+ =?us-ascii?Q?/+54+jGKC2ELjfR0cNkmPFwJVD+9L/pxLNx/WQQ0G7D6E/BIdVFAJTGFX1aQ?=
+ =?us-ascii?Q?g/wSb93Xi6uuLaOqUNuRTyT+htapPW4PTz3jo6yz0ffQLeuVP7YfDFbpEuB0?=
+ =?us-ascii?Q?kA1Pa2GkMLl/Rcp0yeGGZpGOSdbS2GyMdUkQJNqEQ/Xh7G7gKEVLtRAWMUzZ?=
+ =?us-ascii?Q?chG7A3bMFJZMDLXAJsLtrELJxTK1F36QSnoL0RnES3CgwsGhS/JUqqDboJl6?=
+ =?us-ascii?Q?jNPaNr40GJiwtUlxmHQ0rBQj6YtBPSLrkK6kTU0cMUWTWZlfu+7gjEe3P+8I?=
+ =?us-ascii?Q?BdJMDdppNuQ86Yd8uALq3s/mEL7FXmcpunr5zIiRAtAJsV6i1iZtKAeYqchV?=
+ =?us-ascii?Q?A/EJ+35uCC3LpML7w5wXl4dhPRq+yN+WocRphLLjsM7khUhJBfyajmDMp8SE?=
+ =?us-ascii?Q?HP1qilap6PsW4ArAQFFYPOZO30lVNQKZhrWv58W18kavIw+45ruD67jr3wjZ?=
+ =?us-ascii?Q?9810wm6Z9xmq26xLQozb+C2zTXY3HA5GNAFPFFxzv5ZwUHJW7cIJ3/JVxJfJ?=
+ =?us-ascii?Q?dejAHHbiuLez0DGIbzsf52BEFdsANc6JQMhuUE72nn+ER9STWpquQJOiRN8g?=
+ =?us-ascii?Q?9GeL/divTgl7NnQrOgJiDpaxOXwp3PCCZueqwMNiJhrjKJeOiuK7AUhjvAlP?=
+ =?us-ascii?Q?GM7t8V3ARVI6/Gf8iRkpLJHX1WyM6eKg1xeZz8desHhvwjpb72lhKie671ZF?=
+ =?us-ascii?Q?BL5WdY13+F/MgjukxQFjAwo4laOilfbxRkr9cv908v69k8PSHCa1yuXQZTBv?=
+ =?us-ascii?Q?auk+ApHc7hGi8KXGkDBTAA0Bq2eJS2339NxXt9f6HDGRGEAuXLvfpJ+7lU7q?=
+ =?us-ascii?Q?4ibW4HqmXLmD1oR6BtNq+uHgOkd/PLzDa7Z0AUUjILeLx8XbtCf6iJtPMrY9?=
+ =?us-ascii?Q?GUaMiKHTpl5R2j8rfmNHivmEYYDtWzKjbXeoj8plUHUcFMIHctS7Eibr4/BL?=
+ =?us-ascii?Q?qQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 750ec54c-2c19-46ab-e10b-08db839b85d2
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 12:19:47.0553
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 12:20:19.2865
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pwRjC23kV8Onul9aatQlCBqqbZsTBy30YniXM+DWH4kOCCi7YsKd0/w0CtuJ7QqmC1RaZoxMf93YIvPzeWUYOA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB8010
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: amoRQvsfVwvP9f3jZIqZjGePvTa1QO2Ewhla8nsARprPzVQXPQ+rcnmBqJoCN6G6HXyM1ivipfcHY8CeJhApL9mDTSGoWqeGHg4iPWHU8Xo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR13MB5996
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-It is desirable that the new .ndo_hwtstamp_set() API gives more
-uniformity, less overhead and future flexibility w.r.t. the PHY
-timestamping behavior.
+Hi Danish,
 
-Currently there are some drivers which allow PHY timestamping through
-the procedure mentioned in Documentation/networking/timestamping.rst.
-They don't do anything locally if phy_has_hwtstamp() is set, except for
-lan966x which installs PTP packet traps.
+On Thu, Jul 13, 2023 at 05:11:12PM +0530, Md Danish Anwar wrote:
+> Hi Simon,
+> 
+> On 13/07/23 2:20 pm, Simon Horman wrote:
+> > Hi Anwar,
+> > 
+> > On Wed, Jul 12, 2023 at 05:55:57PM +0530, Anwar, Md Danish wrote:
+> >> Hi Simon
+> >> On 7/11/2023 11:15 PM, Simon Horman wrote:
+> >>> On Mon, Jul 10, 2023 at 11:05:50AM +0530, MD Danish Anwar wrote:
+> >>>> From: Roger Quadros <rogerq@ti.com>
 
-Centralize that behavior in a new dev_set_hwtstamp_phylib() code
-function, which calls either phy_mii_ioctl() for the phylib PHY,
-or .ndo_hwtstamp_set() of the netdev, based on a single policy
-(currently simplistic: phy_has_hwtstamp()).
+...
 
-Any driver converted to .ndo_hwtstamp_set() will automatically opt into
-the centralized phylib timestamping policy. Unconverted drivers still
-get to choose whether they let the PHY handle timestamping or not.
+> >>> Smatch warns that eth0_node and eth1_node may be uninitialised here.
+> >>>
+> >>
+> >> Sure, I will initialise eth0_node and eth1_node as NULL.
+> > 
+> > Thanks.
+> > 
+> > ...
+> 
+> I will fix all the sparse and smatch warning and send next revision.
 
-Netdev drivers with integrated PHY drivers that don't use phylib
-presumably don't set dev->phydev, and those will always see
-HWTSTAMP_SOURCE_NETDEV requests even when converted. The timestamping
-policy will remain 100% up to them.
-
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
-Changes in v7:
-- Patch is new
-
- drivers/net/ethernet/freescale/fec_main.c     |  8 --
- .../ethernet/microchip/lan966x/lan966x_main.c | 25 +++---
- .../ethernet/microchip/sparx5/sparx5_netdev.c |  6 --
- include/linux/net_tstamp.h                    | 14 +++
- include/linux/netdevice.h                     |  4 +
- net/core/dev_ioctl.c                          | 90 +++++++++++++++++--
- 6 files changed, 114 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 08744e8164e3..fa81e70eb2ab 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -3858,10 +3858,6 @@ static int fec_hwtstamp_get(struct net_device *ndev,
- 			    struct kernel_hwtstamp_config *config)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct phy_device *phydev = ndev->phydev;
--
--	if (phy_has_hwtstamp(phydev))
--		return phy_mii_ioctl(phydev, config->ifr, SIOCGHWTSTAMP);
- 
- 	if (!fep->bufdesc_ex)
- 		return -EOPNOTSUPP;
-@@ -3876,10 +3872,6 @@ static int fec_hwtstamp_set(struct net_device *ndev,
- 			    struct netlink_ext_ack *extack)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct phy_device *phydev = ndev->phydev;
--
--	if (phy_has_hwtstamp(phydev))
--		return phy_mii_ioctl(phydev, config->ifr, SIOCSHWTSTAMP);
- 
- 	if (!fep->bufdesc_ex)
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-index c8fce4e79c63..5185691e10c1 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-@@ -463,9 +463,6 @@ static int lan966x_port_hwtstamp_get(struct net_device *dev,
- {
- 	struct lan966x_port *port = netdev_priv(dev);
- 
--	if (phy_has_hwtstamp(dev->phydev))
--		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCGHWTSTAMP);
--
- 	if (!port->lan966x->ptp)
- 		return -EOPNOTSUPP;
- 
-@@ -481,21 +478,26 @@ static int lan966x_port_hwtstamp_set(struct net_device *dev,
- 	struct lan966x_port *port = netdev_priv(dev);
- 	int err;
- 
-+	if (cfg->source != HWTSTAMP_SOURCE_NETDEV &&
-+	    cfg->source != HWTSTAMP_SOURCE_PHYLIB)
-+		return -EOPNOTSUPP;
-+
- 	err = lan966x_ptp_setup_traps(port, cfg);
- 	if (err)
- 		return err;
- 
--	if (phy_has_hwtstamp(dev->phydev)) {
--		err = phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCSHWTSTAMP);
--		if (err)
-+	if (cfg->source == HWTSTAMP_SOURCE_NETDEV) {
-+		if (!port->lan966x->ptp)
-+			return -EOPNOTSUPP;
-+
-+		err = lan966x_ptp_hwtstamp_set(port, cfg, extack);
-+		if (err) {
- 			lan966x_ptp_del_traps(port);
--		return err;
-+			return err;
-+		}
- 	}
- 
--	if (!port->lan966x->ptp)
--		return -EOPNOTSUPP;
--
--	return lan966x_ptp_hwtstamp_set(port, cfg, extack);
-+	return 0;
- }
- 
- static const struct net_device_ops lan966x_port_netdev_ops = {
-@@ -823,6 +825,7 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
- 			 NETIF_F_HW_VLAN_STAG_TX |
- 			 NETIF_F_HW_TC;
- 	dev->hw_features |= NETIF_F_HW_TC;
-+	dev->priv_flags |= IFF_SEE_ALL_HWTSTAMP_REQUESTS;
- 	dev->needed_headroom = IFH_LEN_BYTES;
- 
- 	eth_hw_addr_gen(dev, lan966x->base_mac, p + 1);
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c b/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
-index 573662d2e01a..48f7022d3fb7 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
-@@ -222,9 +222,6 @@ static int sparx5_port_hwtstamp_get(struct net_device *dev,
- 	struct sparx5_port *sparx5_port = netdev_priv(dev);
- 	struct sparx5 *sparx5 = sparx5_port->sparx5;
- 
--	if (phy_has_hwtstamp(dev->phydev))
--		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCGHWTSTAMP);
--
- 	if (!sparx5->ptp)
- 		return -EOPNOTSUPP;
- 
-@@ -240,9 +237,6 @@ static int sparx5_port_hwtstamp_set(struct net_device *dev,
- 	struct sparx5_port *sparx5_port = netdev_priv(dev);
- 	struct sparx5 *sparx5 = sparx5_port->sparx5;
- 
--	if (phy_has_hwtstamp(dev->phydev))
--		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCSHWTSTAMP);
--
- 	if (!sparx5->ptp)
- 		return -EOPNOTSUPP;
- 
-diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
-index 03e922814851..f4aff9137724 100644
---- a/include/linux/net_tstamp.h
-+++ b/include/linux/net_tstamp.h
-@@ -5,6 +5,11 @@
- 
- #include <uapi/linux/net_tstamp.h>
- 
-+enum hwtstamp_source {
-+	HWTSTAMP_SOURCE_NETDEV,
-+	HWTSTAMP_SOURCE_PHYLIB,
-+};
-+
- /**
-  * struct kernel_hwtstamp_config - Kernel copy of struct hwtstamp_config
-  *
-@@ -26,6 +31,7 @@ struct kernel_hwtstamp_config {
- 	int rx_filter;
- 	struct ifreq *ifr;
- 	bool copied_to_user;
-+	enum hwtstamp_source source;
- };
- 
- static inline void hwtstamp_config_to_kernel(struct kernel_hwtstamp_config *kernel_cfg,
-@@ -44,4 +50,12 @@ static inline void hwtstamp_config_from_kernel(struct hwtstamp_config *cfg,
- 	cfg->rx_filter = kernel_cfg->rx_filter;
- }
- 
-+static inline bool kernel_hwtstamp_config_changed(const struct kernel_hwtstamp_config *a,
-+						  const struct kernel_hwtstamp_config *b)
-+{
-+	return a->flags != b->flags ||
-+	       a->tx_type != b->tx_type ||
-+	       a->rx_filter != b->rx_filter;
-+}
-+
- #endif /* _LINUX_NET_TIMESTAMPING_H_ */
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index ca3bcf2257c0..0d8a7ac67cf1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1724,6 +1724,9 @@ struct xdp_metadata_ops {
-  * @IFF_TX_SKB_NO_LINEAR: device/driver is capable of xmitting frames with
-  *	skb_headlen(skb) == 0 (data starts from frag0)
-  * @IFF_CHANGE_PROTO_DOWN: device supports setting carrier via IFLA_PROTO_DOWN
-+ * @IFF_SEE_ALL_HWTSTAMP_REQUESTS: device wants to see calls to
-+ *	ndo_hwtstamp_set() for all timestamp requests regardless of source,
-+ *	even if those aren't HWTSTAMP_SOURCE_NETDEV.
-  */
- enum netdev_priv_flags {
- 	IFF_802_1Q_VLAN			= 1<<0,
-@@ -1759,6 +1762,7 @@ enum netdev_priv_flags {
- 	IFF_NO_ADDRCONF			= BIT_ULL(30),
- 	IFF_TX_SKB_NO_LINEAR		= BIT_ULL(31),
- 	IFF_CHANGE_PROTO_DOWN		= BIT_ULL(32),
-+	IFF_SEE_ALL_HWTSTAMP_REQUESTS	= BIT_ULL(33),
- };
- 
- #define IFF_802_1Q_VLAN			IFF_802_1Q_VLAN
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index d0223ecd6f6f..caaba0db8cb3 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -252,6 +252,30 @@ static int dev_eth_ioctl(struct net_device *dev,
- 	return ops->ndo_eth_ioctl(dev, ifr, cmd);
- }
- 
-+/**
-+ * dev_get_hwtstamp_phylib() - Get hardware timestamping settings of NIC
-+ *	or of attached phylib PHY
-+ * @dev: Network device
-+ * @cfg: Timestamping configuration structure
-+ *
-+ * Helper for enforcing a common policy that phylib timestamping, if available,
-+ * should take precedence in front of hardware timestamping provided by the
-+ * netdev.
-+ *
-+ * Note: phy_mii_ioctl() only handles SIOCSHWTSTAMP (not SIOCGHWTSTAMP), and
-+ * there only exists a phydev->mii_ts->hwtstamp() method. So this will return
-+ * -EOPNOTSUPP for phylib for now, which is still more accurate than letting
-+ * the netdev handle the GET request.
-+ */
-+static int dev_get_hwtstamp_phylib(struct net_device *dev,
-+				   struct kernel_hwtstamp_config *cfg)
-+{
-+	if (phy_has_hwtstamp(dev->phydev))
-+		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCGHWTSTAMP);
-+
-+	return dev->netdev_ops->ndo_hwtstamp_get(dev, cfg);
-+}
-+
- static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
-@@ -266,7 +290,7 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 		return -ENODEV;
- 
- 	kernel_cfg.ifr = ifr;
--	err = ops->ndo_hwtstamp_get(dev, &kernel_cfg);
-+	err = dev_get_hwtstamp_phylib(dev, &kernel_cfg);
- 	if (err)
- 		return err;
- 
-@@ -283,6 +307,59 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 	return 0;
- }
- 
-+/**
-+ * dev_set_hwtstamp_phylib() - Change hardware timestamping of NIC
-+ *	or of attached phylib PHY
-+ * @dev: Network device
-+ * @cfg: Timestamping configuration structure
-+ * @extack: Netlink extended ack message structure, for error reporting
-+ *
-+ * Helper for enforcing a common policy that phylib timestamping, if available,
-+ * should take precedence in front of hardware timestamping provided by the
-+ * netdev. If the netdev driver needs to perform specific actions even for PHY
-+ * timestamping to work properly (a switch port must trap the timestamped
-+ * frames and not forward them), it must set IFF_SEE_ALL_HWTSTAMP_REQUESTS in
-+ * dev->priv_flags.
-+ */
-+static int dev_set_hwtstamp_phylib(struct net_device *dev,
-+				   struct kernel_hwtstamp_config *cfg,
-+				   struct netlink_ext_ack *extack)
-+{
-+	const struct net_device_ops *ops = dev->netdev_ops;
-+	bool phy_ts = phy_has_hwtstamp(dev->phydev);
-+	struct kernel_hwtstamp_config old_cfg = {};
-+	bool changed = false;
-+	int err;
-+
-+	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
-+
-+	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
-+		err = ops->ndo_hwtstamp_get(dev, &old_cfg);
-+		if (err)
-+			return err;
-+
-+		err = ops->ndo_hwtstamp_set(dev, cfg, extack);
-+		if (err) {
-+			if (extack->_msg)
-+				netdev_err(dev, "%s\n", extack->_msg);
-+			return err;
-+		}
-+
-+		changed = kernel_hwtstamp_config_changed(&old_cfg, cfg);
-+	}
-+
-+	if (phy_ts) {
-+		err = phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCSHWTSTAMP);
-+		if (err) {
-+			if (changed)
-+				ops->ndo_hwtstamp_set(dev, &old_cfg, NULL);
-+			return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
-@@ -314,12 +391,9 @@ static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
- 
--	err = ops->ndo_hwtstamp_set(dev, &kernel_cfg, &extack);
--	if (err) {
--		if (extack._msg)
--			netdev_err(dev, "%s\n", extack._msg);
-+	err = dev_set_hwtstamp_phylib(dev, &kernel_cfg, &extack);
-+	if (err)
- 		return err;
--	}
- 
- 	/* The driver may have modified the configuration, so copy the
- 	 * updated version of it back to user space
-@@ -362,7 +436,7 @@ int generic_hwtstamp_get_lower(struct net_device *dev,
- 		return -ENODEV;
- 
- 	if (ops->ndo_hwtstamp_get)
--		return ops->ndo_hwtstamp_get(dev, kernel_cfg);
-+		return dev_get_hwtstamp_phylib(dev, kernel_cfg);
- 
- 	/* Legacy path: unconverted lower driver */
- 	return generic_hwtstamp_ioctl_lower(dev, SIOCGHWTSTAMP, kernel_cfg);
-@@ -379,7 +453,7 @@ int generic_hwtstamp_set_lower(struct net_device *dev,
- 		return -ENODEV;
- 
- 	if (ops->ndo_hwtstamp_set)
--		return ops->ndo_hwtstamp_set(dev, kernel_cfg, extack);
-+		return dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
- 
- 	/* Legacy path: unconverted lower driver */
- 	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
--- 
-2.34.1
-
+Perfect, thanks!
 
