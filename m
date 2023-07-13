@@ -1,101 +1,103 @@
-Return-Path: <netdev+bounces-17633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61866752780
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:42:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898FD752786
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 792A61C2134A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:42:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9F7A1C213E0
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600081ED5E;
-	Thu, 13 Jul 2023 15:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33361ED5F;
+	Thu, 13 Jul 2023 15:43:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5321B1ED55
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:42:18 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F15A2686;
-	Thu, 13 Jul 2023 08:42:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79151EA74
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:43:17 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18DCF2680;
+	Thu, 13 Jul 2023 08:43:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lxBEygaiq1yvneOQNiYJ4HmAjugX4hVDNt255vDNtYU=; b=a5Bb5HuGOvtvYz10jaqYXn2B9c
-	03sshjquaJ1kpHmmNOQzFVJstSllubRWkVybucPXYmnUuPfuMU8Cn162S3DcaKBzSzjPIelPtvPgY
-	l8hYndEspd4NsahsEdMsxPXe1nfSoe0V8qSNzU3lzS4q7Dw+Zn9ajHfbpzo2oeWlMtCr9pb2Zq6Xn
-	93DWocfkPkqy1XgziGUgWFcusTIJVJUobuduXAo1bm3wXv+8ArFNJ/Bk/BzDPmRGbBWsX3IRccdMC
-	DK6sdNdL0FZ91Srybdh/OES41vNYb2U9M6QDA4W3jNbpS+if/Ziaftv5FE/pXFZsLuJF8xQkBncT1
-	/acEEIcQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50256)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qJySK-0007iP-1t;
-	Thu, 13 Jul 2023 16:42:12 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qJySJ-0006HW-2H; Thu, 13 Jul 2023 16:42:11 +0100
-Date: Thu, 13 Jul 2023 16:42:11 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>,
-	"Haener, Michael" <michael.haener@siemens.com>,
-	"olteanv@gmail.com" <olteanv@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>
-Subject: Re: [PATCH v2 0/3] net: dsa: SERDES support for mv88e632x family
-Message-ID: <ZLAbUxCLg1gP2gle@shell.armlinux.org.uk>
-References: <20230704065916.132486-1-michael.haener@siemens.com>
- <20a135919ac7d54699d1eca5486fd640d667ad05.camel@siemens.com>
- <67189741-efd5-4f54-8438-66a6e2a693f5@lunn.ch>
- <6594cbb5b83312b73127f6bf23bbf988bb40c491.camel@siemens.com>
- <ZK+cvZJmYRkKKZ0d@shell.armlinux.org.uk>
- <d154d59edd2883b30de8f80fa9c08ec7700504d6.camel@siemens.com>
- <d7466827-7f39-495b-a129-91188e3d150f@lunn.ch>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=e1RschMAietqo4yrW4fae/Y/YBT6qlJyR4H15nx9b/c=; b=j+Mu6xLXRTrrXKeT6HECd8Ud04
+	XKOaZ9pu9coE1LMrRTG2GcvkI/IbXHqweQ6930xoT+KufQV8LMto4yh74B3+Ef03ZTIV8/vOA2Gnw
+	IKaPSyDnh/vMH9OdwrRJ5yBbONMxeeGdxBnaXlKuZGgQZaNoQHw6B6y43IknlVytCnAALiCbPLqB0
+	2RWjhUsQdJF4cIQfvCEWpEgzxhG8hVjOVQqBIjVY7FAbW0smvrVAZbu0nJhexL/Z1So+u9u5z6nl9
+	8NfBvA2IojHJjXevR+bPzh4IX8WOXd/pF/ZDZw3nteZ9TfDZ43IfYkfGzYnwADsBmv++TDYfl4uhc
+	2QKB5qZw==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qJyT1-003o2A-0C;
+	Thu, 13 Jul 2023 15:42:55 +0000
+Message-ID: <04a96ba2-6952-e6de-93a2-dc2998ce519d@infradead.org>
+Date: Thu, 13 Jul 2023 08:42:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7466827-7f39-495b-a129-91188e3d150f@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net-next v2] net: tcp: support to probe tcp receiver OOM
+Content-Language: en-US
+To: menglong8.dong@gmail.com, edumazet@google.com, ncardwell@google.com
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ dsahern@kernel.org, kuniyu@amazon.com, morleyd@google.com,
+ imagedong@tencent.com, mfreemon@cloudflare.com, mubashirq@google.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230713112404.2022373-1-imagedong@tencent.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230713112404.2022373-1-imagedong@tencent.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 05:34:25PM +0200, Andrew Lunn wrote:
-> > we did understand Andrew's request indeed, however we were not able to
-> > backport your series quickly to the version we are able to test on the
-> > HW.
-> 
-> But your own patchset has been tested on net-next by yourself? So it
-> should be trivial to use "b4 am <threadid>" to get Russells patchset,
-> apply them on top of net-next, and then add your patches as well.
 
-And it's even easier as today I submitted a patch set on top of current
-net-next - not that there were any conflicts.
 
-https://lore.kernel.org/netdev/ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk/T/#t
+On 7/13/23 04:24, menglong8.dong@gmail.com wrote:
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+> index 4a010a7cde7f..3de2dce74037 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -694,6 +694,20 @@ tcp_retries2 - INTEGER
+>  	RFC 1122 recommends at least 100 seconds for the timeout,
+>  	which corresponds to a value of at least 8.
+>  
+> +tcp_oom_retries - INTEGER
+> +	RTO retransmissions count of the receiver is recognised as OOM.
+> +	Given a value N, a hypothetical TCP connection will enter probe
+> +	state if N times RTO retransmissions performed and every
+> +	retransmission gets a pure ack, who doesn't contain SACK block.
+
+	                           ACK
+> +
+> +	The default value is 0, which means disable the OOM detection.
+> +	If disabled, skb will be dropped directly, without sending an
+> +	ACK, when rmem schedule fails. The function is valid only if sack
+
+	                                                             SACK
+
+> +	is enabled.
+> +
+> +	3 is the suggested value to enable this function. Do't make it
+
+	                                                  Don't
+
+> +	greater than tcp_retries2.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+~Randy
 
