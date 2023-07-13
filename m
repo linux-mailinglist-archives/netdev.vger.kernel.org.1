@@ -1,112 +1,98 @@
-Return-Path: <netdev+bounces-17420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBEC1751855
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:50:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B212751862
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 07:56:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 266251C2127E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BCAE1C21277
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B477D566E;
-	Thu, 13 Jul 2023 05:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4627C5672;
+	Thu, 13 Jul 2023 05:56:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A897153B9
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:50:27 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAAC1BD5;
-	Wed, 12 Jul 2023 22:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=GFMF1ikSol53pF8uOEYCDZ1uK/JIIE1rXx1j7+aTy1Y=; b=x5xLgY8KePVopF6k6iKAFKM/QG
-	P+4A2RB3luT+Ws8svb8REwmQaHeRbkoCjA9Af2WrJZb8mRuM/yjfryuJsmtFM69Y3IssVptJJTksC
-	RG7x556xM0UQIkcBxlIIN4Zef6sOPTp7Q7twuECA1YqrVG/8ndJnKCf6zs2HF9dS78IC1uh+Xx4Oj
-	t4AIjyGIugFrOD3fIoJWGFZZsKCWJuYJyxdguKPnI5u/yIuAme0Fo3ySGMVufMUWtgEHpKsatIIxP
-	+L1qSalel55POdhvo+0+AVTAhscTS70DCmxARuO5QPwJaRhSPxGTKTjsvNOuWm2FuZ7Luup69oQ2A
-	lQDDfFrg==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qJpDS-0022Nf-05;
-	Thu, 13 Jul 2023 05:50:14 +0000
-Message-ID: <27105f25-f3f9-0856-86e5-86236ce83dee@infradead.org>
-Date: Wed, 12 Jul 2023 22:50:12 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F61566E
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 05:56:22 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8661FD8
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 22:56:21 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b741cf99f8so3796381fa.0
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 22:56:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689227780; x=1691819780;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z28waPMMcML4FxoCgp2g5KyfqzPG+MLJOa6/wcRK7uU=;
+        b=bO+N6KPY0vpCtdeu7jj+uZ4+2yeYFGnQL2Jnzboq8IiPSfPKVkRgLPPaP+SXIKDwJM
+         TRBT2eCk8ZZPvUvPJ78DvzT5/mm2T3N+JHX9En6rzou7fRVG9YX2mT8LuBp9bgjDew72
+         bTueo75T0uCD6fJDhaDMTKgxH4/6GAOn+WfRQV/uIPUUdEnaqHxcfuHQditZH5SLrwdN
+         kVaQahwsvx/XlqDOykkVBTsNbXOuig+aRozCvwkGKs1Jhpvq+s5+ekdD1vnjDbcecu3H
+         rG1f8MMr6Bdib3QVlmmG5Sip1tyYhA6aifHqhoG/qENuqlRlL8rabwViV8czM/BzBbXf
+         w5UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689227780; x=1691819780;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z28waPMMcML4FxoCgp2g5KyfqzPG+MLJOa6/wcRK7uU=;
+        b=D3RisaGTmarV+unL7khj+Fkv3ERl6dPvyTvu2dCs8VvVtyTNnKy7FZgU5ZyVlw18+J
+         nJnwNbhTQrRFUOXUXzUVhyPWGWasm0jc4/W1lLJisQsDRimh5guOCbujj8tNx1xsA1nB
+         +0FnHxDftGU/CJXtdFGy0qzxnWWXzNuGViOZ6wRgmrT4ltTry888/Iui1tO0eeBbNJjV
+         4crjjE8MgzzN/tEzIaADqwRSTLDaR9b7DcvANdkIMYfh5xmZq2dv8Uw3L2azx72BgtMX
+         MgUUf/AmGkBJTUJqBp5UgrCUFz34GcV2R5ZKsGtjTxHyU26hqJ2h9DpyvyTCp4qpMiM+
+         T09Q==
+X-Gm-Message-State: ABy/qLYnRAeOMtL/LpZ4Gbd9n3mjPAhrnTh91WmKXdo0+mfDZpoLj9tU
+	46t5s4mOiwuYe5zcTjy51yU4kw==
+X-Google-Smtp-Source: APBJJlFLVxyJe1Fgg/t322tKLr9Egq9wOZ4YCi+x7AaVR7Q8Q8xc6dIUgyfsVpSerCmTRFG9LkKLHQ==
+X-Received: by 2002:a05:6512:68c:b0:4f8:711b:18b0 with SMTP id t12-20020a056512068c00b004f8711b18b0mr441810lfe.3.1689227779717;
+        Wed, 12 Jul 2023 22:56:19 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id t12-20020a5d6a4c000000b00314329f7d8asm6871477wrw.29.2023.07.12.22.56.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 22:56:17 -0700 (PDT)
+Date: Thu, 13 Jul 2023 08:56:14 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@mellanox.com>, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] devlink: uninitialized data in
+ nsim_dev_trap_fa_cookie_write()
+Message-ID: <3f07832b-a595-4d3b-b4d3-b9256bdd1fd0@kadam.mountain>
+References: <7c1f950b-3a7d-4252-82a6-876e53078ef7@moroto.mountain>
+ <20230712124806.5ed7a1eb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net v1] bna:Fix error checking for debugfs_create_dir()
-Content-Language: en-US
-To: Wang Ming <machel@vivo.com>, Rasesh Mody <rmody@marvell.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Krishna Gudipati <kgudipat@brocade.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com
-References: <20230713053823.14898-1-machel@vivo.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230713053823.14898-1-machel@vivo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230712124806.5ed7a1eb@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi--
-
-On 7/12/23 22:38, Wang Ming wrote:
-> The debugfs_create_dir() function returns error pointers,
-> it never returns NULL. Most incorrect error checks were fixed,
-> but the one in bnad_debugfs_init() was forgotten.
+On Wed, Jul 12, 2023 at 12:48:06PM -0700, Jakub Kicinski wrote:
+> On Tue, 11 Jul 2023 11:52:26 +0300 Dan Carpenter wrote:
+> > Subject: [PATCH net] devlink: uninitialized data in  nsim_dev_trap_fa_cookie_write()
 > 
-> Fix the remaining error check.
-> 
-> Signed-off-by: Wang Ming <machel@vivo.com>
-> 
-> Fixes: 7afc5dbde091 ("bna: Add debugfs interface.")
+> We usually reserve the "devlink: " prefix for net/devlink/ changes
+> rather than driver changes, so I adjust the subject when applying.
 
-Comment from fs/debugfs/inode.c:
+Thanks!  I should have seen that, sorry.
 
- * NOTE: it's expected that most callers should _ignore_ the errors returned
- * by this function. Other debugfs functions handle the fact that the "dentry"
- * passed to them could be an error and they don't crash in that case.
- * Drivers should generally work fine even if debugfs fails to init anyway.
+regards,
+dan carpenter
 
-so no, drivers should not usually care about debugfs function call results.
-Is there some special case here?
-
-> ---
->  drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-> index 04ad0f2b9677..678a3668a041 100644
-> --- a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-> +++ b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-> @@ -512,7 +512,7 @@ bnad_debugfs_init(struct bnad *bnad)
->  	if (!bnad->port_debugfs_root) {
->  		bnad->port_debugfs_root =
->  			debugfs_create_dir(name, bna_debugfs_root);
-> -		if (!bnad->port_debugfs_root) {
-> +		if (IS_ERR(bnad->port_debugfs_root)) {
->  			netdev_warn(bnad->netdev,
->  				    "debugfs root dir creation failed\n");
->  			return;
-
--- 
-~Randy
 
