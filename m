@@ -1,79 +1,75 @@
-Return-Path: <netdev+bounces-17560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB6475203C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:40:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B05752041
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:41:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C8D528186F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:40:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A16531C21272
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A96511C9D;
-	Thu, 13 Jul 2023 11:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ECD11C9E;
+	Thu, 13 Jul 2023 11:41:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0F211C80
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 11:40:40 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFE43588
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689248419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=guFh+wPFNIRuesCzeZY5yldfMavaJ0y5Zd0rOUtQc9o=;
-	b=h6DJ05wp9e9KrmT3f6LWUu2SVoi/Lqj0PsOcZ++L+lcWf4yCuw8uPfGxvfzW/S2IAGZwqi
-	xY5aO3Xqz258UYtzOfGrvXho41qlW+B31DaU0/njV1Hhz8ItY5ZLYPcZHmI7P2XetpVKkG
-	lOV8AGxoYsjT8BjPKKKbcESrVJlGUJk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-191-VsoZQ78-PtKn5qo96oyJ9w-1; Thu, 13 Jul 2023 07:40:18 -0400
-X-MC-Unique: VsoZQ78-PtKn5qo96oyJ9w-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3fbfc766a78so3176575e9.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:40:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A68100CE
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 11:41:39 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D262123
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:41:10 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51e590a8ab5so756313a12.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:41:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689248466; x=1691840466;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MYn1xiwWvev+wcwyHFa2B8ci9P2T3l/8wXVLYJm21Ug=;
+        b=RvrEHRK3IY6VQR/Nd4BHA1fUaehtXCq/JcCtnKw13dcrOQ4f2kIPKaHPE4VnxpAHdt
+         LRysP9avDd2Nx3CjM0jIklrqrmxXdHvRakAw6ZLv0fd66tE6HSU6cjFGtih4oj6jPths
+         r7BetnbFlXrbWH0SjCH9P1mkf2axjcekf4UN8BZZCCYQMxVqACtrDdWuOMzNByg1iWPV
+         97bw5b1jElF2YnfU6a2TAJ4t5n1GUKyu2iA1HBU6T0BPnC4oY4wojdIoqryyskzC7yB5
+         emSyrmkii57Hu3fu2eUCrhdG3KpUzqFSgvKQcmrNksaN+UmLycQoh7GBAWoRLa11TAIj
+         hQZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689248417; x=1691840417;
+        d=1e100.net; s=20221208; t=1689248466; x=1691840466;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=guFh+wPFNIRuesCzeZY5yldfMavaJ0y5Zd0rOUtQc9o=;
-        b=Y0eLOSm7Hi/zvyAtTXwYsTUGOu8+307R6A96p1idk0kKYoJga2bvURjkN9x7Vp8v2x
-         VkgRLCSKHJSfIT/KccTr33k53RhpwUnoDWoZax5R6f1TYZ6Hp21tnQbWolTh8rjaPxXP
-         LtYLE5CpDqf/KSM0hnJ/hB6wVYl2utpi4b4AgNGuo9vV2aP384f7oZEEyzJVMetGotIl
-         6xWN/NrxBCprU1sJGbxyPSUqybnKibbN+NdtPI5L/9s0MbAv8Ayq4Hm2hXvOQQ02ardj
-         UgUlXveVu8IId2KO5CXRUKX7Demc7Hs7rqVpRvn+GYuHBH8vQq5PEmWBszzGiTQkJTdJ
-         Z5BQ==
-X-Gm-Message-State: ABy/qLZK6Z/H6Y0YqreG+88JGOQgt9lkaLFhWJGXFcP1MjpQAtw7TLlj
-	w2FVx/8NxdtWMeSXrHaZ4nvjJ38yb1PxabbLeeDKmIwq1zlMxyAcBqaEgbVg9rPOH+9nnWbnYqn
-	Yt1m7wLqVYASgvV7e
-X-Received: by 2002:a05:600c:240d:b0:3fb:b5dc:dab1 with SMTP id 13-20020a05600c240d00b003fbb5dcdab1mr1150139wmp.39.1689248417231;
-        Thu, 13 Jul 2023 04:40:17 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHd/eNeg4sLyvuXqL+tXWMQGEDTMZBr/VxoDrK+A9Qk8/hmWz5tdxZsKTFz4SAT52dsIuaXmA==
-X-Received: by 2002:a05:600c:240d:b0:3fb:b5dc:dab1 with SMTP id 13-20020a05600c240d00b003fbb5dcdab1mr1150120wmp.39.1689248416901;
-        Thu, 13 Jul 2023 04:40:16 -0700 (PDT)
-Received: from redhat.com ([2.52.158.233])
-        by smtp.gmail.com with ESMTPSA id v21-20020a7bcb55000000b003fba9db141esm18158573wmj.38.2023.07.13.04.40.14
+        bh=MYn1xiwWvev+wcwyHFa2B8ci9P2T3l/8wXVLYJm21Ug=;
+        b=Wk7NJo+MBjfF6WEjQxmtUQ2WIXoAj9ZK5+TDRbw0OpN8rAMOumjkn3XK23RWWvXVUn
+         Q0P38ajY/sJyQuOJbxUbLej3p5Pzj85G/iYmx13PNnrQL5Oyb0KYSaGzaIOcE7bSPudB
+         dL0YowRzBUh96FEflGwQbvaC+gHij/pTTXsP+QepnxCKd+AEtb+2W5aVuzVaSq7jJ+AX
+         L980mhUnjKK8NhQF+V/LcvL9uhuRXKwc1YZAW2AauamU4joCr9fNnIjJKycDSw1iAXcf
+         JtZ62C2QivMy08hfydwDaCMP7p6DsTlPEd9wvDsd2BmgHPGY0ODHW6bQO/PIRBqetWH5
+         t2fw==
+X-Gm-Message-State: ABy/qLaMQMM02VjZvOpkY9+WktXNrumiPWI5OvLhgqfLPLAMhMcRQyW3
+	MwAWmgal7vkSW9JZ4BAxCBE=
+X-Google-Smtp-Source: APBJJlEc6HcBpMQZig1dSSP9AeYWGb5pcpDbMlsjmlIhG8h3z7AkCr089VTjuLRnAnv70YosuBf8mw==
+X-Received: by 2002:a17:906:24f:b0:993:ffcb:ad56 with SMTP id 15-20020a170906024f00b00993ffcbad56mr1507339ejl.10.1689248466368;
+        Thu, 13 Jul 2023 04:41:06 -0700 (PDT)
+Received: from eichest-laptop ([2a02:168:af72:0:9d33:114d:9337:5e4d])
+        by smtp.gmail.com with ESMTPSA id t14-20020a17090616ce00b0094e7d196aa4sm3841154ejd.160.2023.07.13.04.41.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 04:40:16 -0700 (PDT)
-Date: Thu, 13 Jul 2023 07:40:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gavin Li <gavinl@nvidia.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, jiri@nvidia.com, dtatulea@nvidia.com,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next V1 0/4] virtio_net: add per queue interrupt
- coalescing support
-Message-ID: <20230713074001-mutt-send-email-mst@kernel.org>
-References: <20230710092005.5062-1-gavinl@nvidia.com>
+        Thu, 13 Jul 2023 04:41:05 -0700 (PDT)
+Date: Thu, 13 Jul 2023 13:41:04 +0200
+From: Stefan Eichenberger <eichest@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	hkallweit1@gmail.com, francesco.dolcini@toradex.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 4/4] net: phy: marvell-88q2xxx: add driver
+ for the Marvell 88Q2110 PHY
+Message-ID: <ZK/i0AEC6nfSDZCG@eichest-laptop>
+References: <20230710205900.52894-1-eichest@gmail.com>
+ <20230710205900.52894-5-eichest@gmail.com>
+ <2de0a6e1-0946-4d4f-8e57-1406a437b94e@lunn.ch>
+ <ZK/G9FMPSabQCGNk@eichest-laptop>
+ <ZK/Of27YzREq+Z9V@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,80 +78,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230710092005.5062-1-gavinl@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <ZK/Of27YzREq+Z9V@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 12:20:01PM +0300, Gavin Li wrote:
-> Currently, coalescing parameters are grouped for all transmit and receive
-> virtqueues. This patch series add support to set or get the parameters for
-> a specified virtqueue.
-> 
-> When the traffic between virtqueues is unbalanced, for example, one virtqueue
-> is busy and another virtqueue is idle, then it will be very useful to
-> control coalescing parameters at the virtqueue granularity.
+Hi Russell,
 
-series:
+Thanks for your reply.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+On Thu, Jul 13, 2023 at 11:14:23AM +0100, Russell King (Oracle) wrote:
+> On Thu, Jul 13, 2023 at 11:42:12AM +0200, Stefan Eichenberger wrote:
+> > With this we will detect link loss in polling mode and read the realtime
+> > status in non-polling mode. Compared to genphy_c45_read_link we will not
+> > immediately return "link up" in non polling mode but always do the
+> > second read to get the realtime link status.
+> 
+> Why do you think that's better? "Link" only latches low, and the
+> entire point of that behaviour is so that management software can
+> detect when the link has failed at some point since it last read
+> the link status.
+> 
+> There is only any point in re-reading the status register if on the
+> first read it reports that the link has failed, and only then if we
+> already knew that the link has failed.
+> 
+> If we're using interrupt mode, then we need the current link status
+> but that's only because of the way phylib has been written.
+> 
 
+I agree with you. I missunderstood how the link status worked. I thought
+it will always show the status since the last read, independent of
+whether it went up or down. But it only latches link down.
 
+> > If we are only interested in the link status we could also skip the
+> > remote and local receiver check. However, as I understand the software
+> > initialization guide it could be that the receivers are not ready in
+> > that moment.
+> 
+> With copper PHYs, link up status means that the link is ready to pass
+> data. Is this not the case with T1 PHYs?
 
-> Example command:
-> $ ethtool -Q eth5 queue_mask 0x1 --coalesce tx-packets 10
-> Would set max_packets=10 to VQ 1.
-> $ ethtool -Q eth5 queue_mask 0x1 --coalesce rx-packets 10
-> Would set max_packets=10 to VQ 0.
-> $ ethtool -Q eth5 queue_mask 0x1 --show-coalesce
->  Queue: 0
->  Adaptive RX: off  TX: off
->  stats-block-usecs: 0
->  sample-interval: 0
->  pkt-rate-low: 0
->  pkt-rate-high: 0
-> 
->  rx-usecs: 222
->  rx-frames: 0
->  rx-usecs-irq: 0
->  rx-frames-irq: 256
-> 
->  tx-usecs: 222
->  tx-frames: 0
->  tx-usecs-irq: 0
->  tx-frames-irq: 256
-> 
->  rx-usecs-low: 0
->  rx-frame-low: 0
->  tx-usecs-low: 0
->  tx-frame-low: 0
-> 
->  rx-usecs-high: 0
->  rx-frame-high: 0
->  tx-usecs-high: 0
->  tx-frame-high: 0
-> 
-> In this patch series:
-> Patch-1: Extract interrupt coalescing settings to a structure.
-> Patch-2: Extract get/set interrupt coalesce to a function.
-> Patch-3: Support per queue interrupt coalesce command.
-> Patch-4: Enable per queue interrupt coalesce feature.
-> 
-> Gavin Li (4):
->   virtio_net: extract interrupt coalescing settings to a structure
->   virtio_net: extract get/set interrupt coalesce to a function
->   virtio_net: support per queue interrupt coalesce command
->   virtio_net: enable per queue interrupt coalesce feature
-> 
->  drivers/net/virtio_net.c        | 169 ++++++++++++++++++++++++++------
->  include/uapi/linux/virtio_net.h |  14 +++
->  2 files changed, 154 insertions(+), 29 deletions(-)
-> 
-> -- 
-> 2.39.1
+If I interpret their documentation correctly, they differentiate between
+PMA and PCS. The PMA link status could be up while the PCS link status
+is not. Maybe when the cable test is running this happens. Therefore, I
+keep the read for MDIO_MMD_AN_MV_STAT for now.
 
+Regards,
+Stefan
 
