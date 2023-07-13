@@ -1,204 +1,99 @@
-Return-Path: <netdev+bounces-17629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D24C7526FA
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B09752716
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8BD1C21421
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:30:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54F441C2129D
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6290A1F170;
-	Thu, 13 Jul 2023 15:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019531ED51;
+	Thu, 13 Jul 2023 15:31:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565D11F167
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:29:19 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED1F271C
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:28:59 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fbc54cab6fso7834425e9.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:28:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689262138; x=1691854138;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fQO6gNAEktA8kEixN8D27EH+Cpq5epFEey0edwAdXMY=;
-        b=oQo6Gx7KIFLJF9/K18gtoCqYQ33/wKzBynQefMMsCw64qAU+lu7pQHtH+wC+8mwry1
-         PyLLEWVT2oYpK9MntYve7kl+T0UZdJO2rwtz/IqOfahsHem9ft+J39t8LMKhfqbhRnBX
-         9id4DrC3Ane9yGZuPBdqgKLthyhi85yLXeNVLyVDlzKjzrbq/yVyLi97nmUSRThibz/p
-         5NS4ThHGgmBjmGO6t6CSmK23j3XuCMSHASFmNWMNYbDef1HPeMin265rAqmpTrpXwwqI
-         AIgoZDtZzWQnpuy/mVHhbVRcNLj2eNpZMcm5QhBhCDGnT9iTckx9J9b54oB7H14QfQ8n
-         XokA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689262138; x=1691854138;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fQO6gNAEktA8kEixN8D27EH+Cpq5epFEey0edwAdXMY=;
-        b=jGjdfrNt+IbU+U23hh89s5XX8Hh66T6HOaA5HmHBODcU4tFwwKEw9g15r45sDwzy6j
-         023Crq61YSod6ptqpc3mlYOLLDP612tY4kObQHJgE4rZPLJUlbznzDODB4mJ3rQOjKzP
-         4S4Q+0XdbSrUx4LQhPudevEMCL0ym5UdRLG0nEbVyilIVeEOA+Vc9unzdSnhAQbcT/Z9
-         +Y/zEJ/HdcvkqVK5G9hL/YYDxUSfA0ufXBiH+0jRZ5SbR0kCHKb9aKejQ031hgjjrpTD
-         ZX9DLXDHcCxn4BdelU/6hRTI+Kqha5Bpu1yx6WTjbZCVQ+ElG5mBDdw8f8q/qTBOXzqZ
-         AeRw==
-X-Gm-Message-State: ABy/qLaxPWQqlv08f6TkNyEEha8D8q3sYDsTcsaMiViK3ML3UcOPnT2z
-	3SVDhKLpZTy6ix8VLI5Qo5Wuuw==
-X-Google-Smtp-Source: APBJJlGvxD217zUNMBN8WO2s3a+6x9vPlciyEoAeCGQQ7j2Yltg/heP99SNtLyfacrt14HvPp1etHg==
-X-Received: by 2002:a05:600c:2902:b0:3fc:80a:993e with SMTP id i2-20020a05600c290200b003fc080a993emr1650459wmd.17.1689262137885;
-        Thu, 13 Jul 2023 08:28:57 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.223.104])
-        by smtp.gmail.com with ESMTPSA id l22-20020a7bc456000000b003fbb5142c4bsm18563121wmi.18.2023.07.13.08.28.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 08:28:57 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paul Cercueil <paul@crapouillou.net>,
-	Marek Vasut <marex@denx.de>,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 3/3] dt-bindings: net: davicom,dm9000: convert to DT schema
-Date: Thu, 13 Jul 2023 17:28:48 +0200
-Message-Id: <20230713152848.82752-4-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
-References: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63CA1ED43;
+	Thu, 13 Jul 2023 15:31:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B949C433C7;
+	Thu, 13 Jul 2023 15:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1689262270;
+	bh=FiMNv6GuPmzcqm62REpDacT876SMRfV/Kt+uQ7F3tVg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C/Qp+v/Kka9UlJlhXuT05kVORdlkTpXGhuc2SgtNo1uyVihbxO0rG/heUajAg8Cim
+	 IpgvK1XtFYGBLiayPuojvjanlcxKHi6WpwJCqY5ykqqDaxspRzgwP9UZUmfigZ6Y1a
+	 fyR8b5ck51BKpWQbFt/b55IQKDw7khg1eQ/P9CyA=
+Date: Thu, 13 Jul 2023 17:31:07 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"saeed@kernel.org" <saeed@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	brouer@redhat.com, "maxtram95@gmail.com" <maxtram95@gmail.com>,
+	"lorenzo@kernel.org" <lorenzo@kernel.org>,
+	"alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
+	"kheib@redhat.com" <kheib@redhat.com>,
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+	"mkabat@redhat.com" <mkabat@redhat.com>,
+	"atzin@redhat.com" <atzin@redhat.com>,
+	"fmaurer@redhat.com" <fmaurer@redhat.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"jbenc@redhat.com" <jbenc@redhat.com>,
+	"linyunsheng@huawei.com" <linyunsheng@huawei.com>,
+	"ttoukan.linux@gmail.com" <ttoukan.linux@gmail.com>
+Subject: Re: mlx5 XDP redirect leaking memory on kernel 6.3
+Message-ID: <2023071357-unscrew-customary-fbae@gregkh>
+References: <d862a131-5e31-bd26-84f7-fd8764ca9d48@redhat.com>
+ <00ca7beb7fe054a3ba1a36c61c1e3b1314369f11.camel@nvidia.com>
+ <6d47e22e-f128-ec8f-bbdc-c030483a8783@redhat.com>
+ <cc918a244723bffe17f528fc1b9a82c0808a22be.camel@nvidia.com>
+ <324a5a08-3053-6ab6-d47e-7413d9f2f443@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <324a5a08-3053-6ab6-d47e-7413d9f2f443@redhat.com>
 
-Convert the Davicom DM9000 Fast Ethernet Controller bindings to DT
-schema.
+On Thu, Jul 13, 2023 at 04:58:04PM +0200, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 13/07/2023 12.11, Dragos Tatulea wrote:
+> > Gi Jesper,
+> > On Thu, 2023-07-13 at 11:20 +0200, Jesper Dangaard Brouer wrote:
+> > > Hi Dragos,
+> > > 
+> > > Below you promised to work on a fix for XDP redirect memory leak...
+> > > What is the status?
+> > > 
+> > The fix got merged into net a week ago:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/drivers/net/ethernet/mellanox/mlx5/core?id=7abd955a58fb0fcd4e756fa2065c03ae488fcfa7
+> > 
+> > Just forgot to follow up on this thread. Sorry about that...
+> > 
+> 
+> Good to see it being fixed in net.git commit:
+>  7abd955a58fb ("net/mlx5e: RX, Fix page_pool page fragment tracking for
+> XDP")
+> 
+> This need to be backported into stable tree 6.3, but I can see 6.3.13 is
+> marked EOL (End-of-Life).
+> Can we still get this fix applied? (Cc. GregKH)
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- .../bindings/net/davicom,dm9000.yaml          | 59 +++++++++++++++++++
- .../bindings/net/davicom-dm9000.txt           | 27 ---------
- 2 files changed, 59 insertions(+), 27 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/davicom,dm9000.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/davicom-dm9000.txt
+<formletter>
 
-diff --git a/Documentation/devicetree/bindings/net/davicom,dm9000.yaml b/Documentation/devicetree/bindings/net/davicom,dm9000.yaml
-new file mode 100644
-index 000000000000..66a7c6eec767
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/davicom,dm9000.yaml
-@@ -0,0 +1,59 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/davicom,dm9000.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Davicom DM9000 Fast Ethernet Controller
-+
-+maintainers:
-+  - Paul Cercueil <paul@crapouillou.net>
-+
-+properties:
-+  compatible:
-+    const: davicom,dm9000
-+
-+  reg:
-+    items:
-+      - description: Address registers
-+      - description: Data registers
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  davicom,no-eeprom:
-+    type: boolean
-+    description: Configuration EEPROM is not available
-+
-+  davicom,ext-phy:
-+    type: boolean
-+    description: Use external PHY
-+
-+  reset-gpios:
-+    maxItems: 1
-+
-+  vcc-supply: true
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+
-+allOf:
-+  - $ref: /schemas/memory-controllers/mc-peripheral-props.yaml#
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    ethernet@a8000000 {
-+        compatible = "davicom,dm9000";
-+        reg = <0xa8000000 0x2>, <0xa8000002 0x2>;
-+        interrupt-parent = <&gph1>;
-+        interrupts = <1 IRQ_TYPE_LEVEL_HIGH>;
-+        local-mac-address = [00 00 de ad be ef];
-+        davicom,no-eeprom;
-+    };
-diff --git a/Documentation/devicetree/bindings/net/davicom-dm9000.txt b/Documentation/devicetree/bindings/net/davicom-dm9000.txt
-deleted file mode 100644
-index 64c159e9cbf7..000000000000
---- a/Documentation/devicetree/bindings/net/davicom-dm9000.txt
-+++ /dev/null
-@@ -1,27 +0,0 @@
--Davicom DM9000 Fast Ethernet controller
--
--Required properties:
--- compatible = "davicom,dm9000";
--- reg : physical addresses and sizes of registers, must contain 2 entries:
--    first entry : address register,
--    second entry : data register.
--- interrupts : interrupt specifier specific to interrupt controller
--
--Optional properties:
--- davicom,no-eeprom : Configuration EEPROM is not available
--- davicom,ext-phy : Use external PHY
--- reset-gpios : phandle of gpio that will be used to reset chip during probe
--- vcc-supply : phandle of regulator that will be used to enable power to chip
--
--Example:
--
--	ethernet@18000000 {
--		compatible = "davicom,dm9000";
--		reg = <0x18000000 0x2 0x18000004 0x2>;
--		interrupt-parent = <&gpn>;
--		interrupts = <7 4>;
--		local-mac-address = [00 00 de ad be ef];
--		davicom,no-eeprom;
--		reset-gpios = <&gpf 12 GPIO_ACTIVE_LOW>;
--		vcc-supply = <&eth0_power>;
--	};
--- 
-2.34.1
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
+</formletter>
 
