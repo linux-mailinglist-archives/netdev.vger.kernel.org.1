@@ -1,87 +1,92 @@
-Return-Path: <netdev+bounces-17455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A3B751ACA
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:06:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF4C751B74
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:25:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CEF0281C71
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:06:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA9231C212E5
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8307B749D;
-	Thu, 13 Jul 2023 08:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A35079DB;
+	Thu, 13 Jul 2023 08:25:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7210F6FC0
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:06:32 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D93BF2D58
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=osGQCoFsA115itAF/3BRNwmc8iArLh4T0+7xb0MN6Bo=; b=rZaFP+SEDm2h0rjMfKJOM3RZHB
-	L1PP/QfKYymasVkkRcpz8rGmopiwUQTpQCr8YYphU6FIoTmPnxcHJtym08gVTztXdyQl9swjK7oBZ
-	lTw4E8tCaPHpJOnjcAkfXO2wJIJKsJ4GaIb1zFizIjhf21xTXeCS0PvdbABWSUwYu739tivLfZAkb
-	J/VRdd2LTLbhReE5tbp+HJPJ5fCxy4V8oVNGb+o9OjmIVvUKCIcsmffHke86pO8Bh+VGDHsI/KoCi
-	ocwFp0dy0uJZDRugP6vOesiO2ciAJwc/X08kcq2+B9hlaPPbOPW/46BY81NQEidTd7Ol3rtc6tCbA
-	XqHtfclA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41290)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qJrL8-0005zI-14;
-	Thu, 13 Jul 2023 09:06:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qJrL4-0005xc-La; Thu, 13 Jul 2023 09:06:14 +0100
-Date: Thu, 13 Jul 2023 09:06:14 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Feiyang Chen <chenfeiyang@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	chenhuacai@loongson.cn, dongbiao@loongson.cn,
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
-Subject: Re: [RFC PATCH 10/10] net: stmmac: dwmac-loongson: Add GNET support
-Message-ID: <ZK+wdvepjYPigfOh@shell.armlinux.org.uk>
-References: <cover.1689215889.git.chenfeiyang@loongson.cn>
- <98b53d15bb983c309f79acf9619b88ea4fbb8f14.1689215889.git.chenfeiyang@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A23C6120
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:25:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DDD6C433BC;
+	Thu, 13 Jul 2023 08:25:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689236704;
+	bh=8p5xcaf3HE4Ic/cijtEkzbVhG0wqo8rKSFTK7zHVrMA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZjsyftYoNuNsqKIj484NfJYi5IsnrY6qIF+TXNF15X+cj0hQstyIZmorNYjudJeYd
+	 TwCp+vciJGMDlxJNN37xUieR3YB3E2rv5k2VC/DiBD+luVT2GMtm8YV86d/zU188SX
+	 LFXerXS8lGV6scqSXTpLsWoW+RwRY0IJD+gXWH2IFddV30EH32yUACyrV48TD/CcWk
+	 hOQMdLjfF0kc78iya1Tj0FY2DtSVQ6HIia/e4rVwE8E6mt4x1LFSnLyiY6K5FSOA3r
+	 mz3iZy1gar147qsetUMHPRfel12HFO6ErP1w8qQQREPDJvsdVkcr0XmqFivfYoL/CZ
+	 KfXNTVyJtCcug==
+Message-ID: <c8ffee03-8a6b-1612-37ee-e5ec69853ab7@kernel.org>
+Date: Thu, 13 Jul 2023 10:24:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98b53d15bb983c309f79acf9619b88ea4fbb8f14.1689215889.git.chenfeiyang@loongson.cn>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 2/2] net: dwmac_socfpga: use the standard "ahb" reset
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Dinh Nguyen <dinguyen@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ joabreu@synopsys.com, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowskii+dt@linaro.org, conor+dt@kernel.org,
+ devicetree@vger.kernel.org
+References: <20230710211313.567761-1-dinguyen@kernel.org>
+ <20230710211313.567761-2-dinguyen@kernel.org>
+ <20230712170840.3d66da6a@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <20230712170840.3d66da6a@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 13, 2023 at 10:49:38AM +0800, Feiyang Chen wrote:
-> Add GNET support. Use the fix_mac_speed() callback to workaround
-> issues with the Loongson PHY.
+On 13/07/2023 02:08, Jakub Kicinski wrote:
+> On Mon, 10 Jul 2023 16:13:13 -0500 Dinh Nguyen wrote:
+>> -	dwmac->stmmac_ocp_rst = devm_reset_control_get_optional(dev, "stmmaceth-ocp");
+>> -	if (IS_ERR(dwmac->stmmac_ocp_rst)) {
+>> -		ret = PTR_ERR(dwmac->stmmac_ocp_rst);
+>> -		dev_err(dev, "error getting reset control of ocp %d\n", ret);
+>> -		goto err_remove_config_dt;
+>> -	}
+>> -
+>> -	reset_control_deassert(dwmac->stmmac_ocp_rst);
+> 
+> Noob question, perhaps - what's the best practice for incompatible
+> device tree changes?
 
-It would be good to document what those issue(s) are, and if they are a
-PHY issue, why they need to be resolved in a MAC driver rather than
-using the PHY driver's link_change_notify().
+They are an ABI break.
 
-Thanks.
+> Updating the in-tree definitions is good enough?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+No, because this is an ABI so we expect:
+1. old DTS
+2. out-of-tree DTS
+to work properly with new kernel (not broken by a change).
+
+However for ABI breaks with scope limited to only one given platform, it
+is the platform's maintainer choice to allow or not allow ABI breaks.
+What we, Devicetree maintainers expect, is to mention and provide
+rationale for the ABI break in the commit msg.
+
+> Seems like we could quite easily continue to support "stmmaceth-ocp"
+> but no point complicating the code if not required.
+
+Best regards,
+Krzysztof
+
 
