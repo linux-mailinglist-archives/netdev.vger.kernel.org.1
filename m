@@ -1,121 +1,137 @@
-Return-Path: <netdev+bounces-17679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEB0752AA8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:00:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C55B7752AF3
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 179941C21423
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 19:00:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B15D11C21435
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 19:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D6E1F179;
-	Thu, 13 Jul 2023 19:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267F2200AF;
+	Thu, 13 Jul 2023 19:30:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275C11ED53
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:00:54 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7822D67
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:00:50 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fc075d9994so14835e9.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689274849; x=1691866849;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fpaS1t14ocFfpWfA4r7YMHKUrjpT8EG6McsCuyMXf0w=;
-        b=h9CKt8tSLkeJqOlX42EdZhaSr8bEX0S67A2Fv1Ie4Tfvr7GPUEj9PsQrGnrr4No529
-         b5LH5p9kuuAsBuL+n74M89Z1UxADUNF+ST35xiT0fUvhzcwX4BVrGup61WLB06Ad4Qyv
-         qSFsiKabxnzIDjXfPxlJPO9uE3kHtgilGhDVUUOL1WsKtNrxU/HcP+vi2/I7SzxFCNnS
-         e0TbzhhhT39vKFu7OA3UIDktN5kO/Ez3tWvdbO27cOwn46Yy7giRCn9e/xbzKV8CM9Y0
-         ncoTdlOJnr+VxbIAbl6myJ7j14xK+FsXckuhrapTzOMvRdDGJfQBH4UTPq211e79UkEH
-         KWjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689274849; x=1691866849;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fpaS1t14ocFfpWfA4r7YMHKUrjpT8EG6McsCuyMXf0w=;
-        b=kjTQuT2yubBy+oKFIxkd2r0AtkzdpOuQotIX/55NptNKPsgEnTblXEkCztiE9AMU9M
-         gIUMaZyKg3nJTyjQ5uV4C9Ft+y5BRXEd6M8PA2iBLnQbOsiF9tAqlSueGr/ZULdB3gxQ
-         z0X/6Fh1BDivn1rIT0R13/F5yKYrIkk2q7G3NBkPMNLm5H7jSqz063YjWeYishYHA+MM
-         9AFTM8O0LaZGI1kzz6tn5HetEOzl2NKGIQI3uf/2ftmvcpu5cabp0ZaeDV7mHwhvz9/N
-         JMuXcO/14+5yxaRW/hj+EoFBQBWe5ez62Cqv0G0aTqaUHPai6MPUwiSZVyVX02Sao7zB
-         g1+A==
-X-Gm-Message-State: ABy/qLakl+m3IBcw6qW83a4SOtLvbnsJGV4SK/2YU1l357Mt3qLtyzWN
-	CLR7/6UtY4v8d3Z3R3lu6DKjPQgKYLoudxStztyZ6w==
-X-Google-Smtp-Source: APBJJlESmB4Lu5P8++T2+oASx3PmdOOp2AtvnTbFgHLS7YLoUktqE/L70NW9IqnTBuc0Qz9I3BB4CHYA2RnxaglJevc=
-X-Received: by 2002:a05:600c:2196:b0:3f7:e4d8:2569 with SMTP id
- e22-20020a05600c219600b003f7e4d82569mr241283wme.5.1689274848857; Thu, 13 Jul
- 2023 12:00:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7931F938
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:30:10 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2041.outbound.protection.outlook.com [40.107.94.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174D42D7D
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:30:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fmzEZvAlbyOr9bQZPDrsSlghzMhJ0BMtFtkRGUNKNmgYP03k5UpkKcQdVs4/vfx/8wv9m+p0d90FUAWD151lzwCBQozKwZlu3lPE+L7xcokWIZDtYA94rOe1m5oDlhQEIDJMwns3v0cAzCmxLoQDnjDllJ01yNiJ/wUYtPMzvcCvTeetsXRJJaTRQokZQdX6H2D49l2UcoEv0ZKMTUEzvosI4+I27nyZ9famnNeXa99qhvNiqN0zYDhyskjPxI0KyHF1nLYoKsIRpSfE0AdtDwL5TYRyR006IBiCOW3z521wlafFkfo78+I5yLTdA3qARGomkflQkQi0agsSxiPz9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J1LUvmYZNHbbFvTECQLdP4IK0iaKlGV513FeiI5rqeA=;
+ b=PF4x3msuZojQfVEvu0ahEr+355eGTAj6yAPC+qbzcCXKY+rSFoiUvCN1crECW+rJt7sYdHjUNcBLpMxwRPRYei5EaSThvOWE06peDGHNuyTXzKyxzOntKeUME+jZbHcs0/I2xPcGt1sISsYatFIw5UZsKKDf1h96p9r6twAhTjgsNIoxNZziZdMDz7+9a/PsH9wvcFzvYaO0aQxfK/LPBOUDnleAU3p+WQBcTsvfLdLAWXZ7Y2pP9Pq70UY8WCCtzjF76QcVvTZqIsowX/Z6oJHGLQlPIpvEoYyRI8CLxxZBLP402fTIEoSmnL6Unhp9CgzBz9iqq3nFDfa4IcF4Ig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J1LUvmYZNHbbFvTECQLdP4IK0iaKlGV513FeiI5rqeA=;
+ b=PgAOYeQpQRUn0fUPOe0svqyt+vI4ZcNF+shZRzrM8Ift8YstKNjre6vzkzahpNUYa0ogI2V24e4DzURr8rrFJ38+BR6CIOTDsv5cpYxnavxT2v8iScmdYp/y0O/wLq3keN/C92c8SrzjLH6it0Q1rktX3y8wOdaTkc2X0E3Wcjk=
+Received: from BN8PR16CA0032.namprd16.prod.outlook.com (2603:10b6:408:4c::45)
+ by CH3PR12MB8933.namprd12.prod.outlook.com (2603:10b6:610:17a::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Thu, 13 Jul
+ 2023 19:29:57 +0000
+Received: from BN8NAM11FT076.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:4c:cafe::7e) by BN8PR16CA0032.outlook.office365.com
+ (2603:10b6:408:4c::45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.24 via Frontend
+ Transport; Thu, 13 Jul 2023 19:29:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT076.mail.protection.outlook.com (10.13.176.174) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6588.26 via Frontend Transport; Thu, 13 Jul 2023 19:29:56 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 13 Jul
+ 2023 14:29:55 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<idosch@idosch.org>
+CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
+	<shannon.nelson@amd.com>
+Subject: [PATCH v2 net-next 0/5] ionic: add FLR support
+Date: Thu, 13 Jul 2023 12:29:31 -0700
+Message-ID: <20230713192936.45152-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000c2dccb05d0cee49a@google.com> <0000000000005ac8fc060061f4c5@google.com>
-In-Reply-To: <0000000000005ac8fc060061f4c5@google.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Thu, 13 Jul 2023 21:00:37 +0200
-Message-ID: <CANp29Y4ANdDSd4R8u=H5GX7t+1WZr=a2pemZ-VwQRraknJ8Pew@mail.gmail.com>
-Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_free_ack_frame (2)
-To: syzbot <syzbot+ac648b0525be1feba506@syzkaller.appspotmail.com>
-Cc: casey@schaufler-ca.com, davem@davemloft.net, edumazet@google.com, 
-	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	paul@paul-moore.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT076:EE_|CH3PR12MB8933:EE_
+X-MS-Office365-Filtering-Correlation-Id: 066100e9-abe8-4317-04e0-08db83d78a94
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LTfb0Fa7tiuWU+78v0HTDsfzqGoFj99TlqMuAc5mqrLiNmBVprPsJQe0QY0YMF8opUVsnFysfD7FpWahBlp/6iiQR+00l6ni57Gd2ydjk/Exbr6OQSyqzqavODk1DFyN5jo3uV7sZEgxHSW4tur6VPySCKCbcjOvTUBJl0Ch8AY/cQcuTY/5BAYNYPTmVCUATaALJrKGWu6Irla06FiPoUFtsTHwTjeSNDNI8xPaViWJcpd7F3h9lyHPaH5vwPHhR5exJXTWmCKwNRooXArppFtQktIbY6Ze9wK6DCBlKH6xmNPDFm56r00Ei8vQZEx0d3C7DL5cJP++UqUqRCdd6e/NmooNNVk3fY+LrqmSTsUegRHhDUuiVNXD2x9ciZpJHbFGWn//KiUw9EPZOTfrmNK4WlxKSG/hi6mQc+D7/l2TYNx4AvxMxyDQOuTAWdlKlnM/O+C+woxfWJfphFdzZeDrmSZXT9OrajmLrpE8CAz3cWzssYrRAfPF3lx5R1cirUV4TI2/Yf+s7WOX7cuh6I4+k4ounCj0aEpS02jdiT/Hw/k7DNa/yTzBq5/d7M3tXd5OLq3ckrzQcngiHqhzOyPQ/qVYkRmhrkbzhII/AZt69HrdWLq/qETeK4cVRGx477Noe3CB7aolNhJqnTWUXSdcLp8bU5AnhfAU2IYjqztHRTrO1r45YTrz1ALjcB0n0xaA1wEp6ueg4bdc6xau4jF+OME580l4Ku3zxqNctKfGAWYVQHvUJSzRWd0+dCDODnSRNgAzB72V/k3glmSO7Q==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(376002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(36860700001)(36756003)(82310400005)(86362001)(40480700001)(40460700003)(81166007)(82740400003)(356005)(478600001)(110136005)(6666004)(41300700001)(8676002)(54906003)(44832011)(5660300002)(2906002)(4326008)(316002)(70206006)(70586007)(8936002)(2616005)(4744005)(47076005)(336012)(426003)(26005)(1076003)(186003)(16526019)(83380400001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 19:29:56.8752
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 066100e9-abe8-4317-04e0-08db83d78a94
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN8NAM11FT076.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8933
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 7:49=E2=80=AFPM syzbot
-<syzbot+ac648b0525be1feba506@syzkaller.appspotmail.com> wrote:
->
-> syzbot suspects this issue was fixed by commit:
->
-> commit 1661372c912d1966e21e0cb5463559984df8249b
-> Author: Paul Moore <paul@paul-moore.com>
-> Date:   Tue Feb 7 22:06:51 2023 +0000
->
->     lsm: move the program execution hook comments to security/security.c
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1024a074a8=
-0000
-> start commit:   33189f0a94b9 r8169: fix RTL8168H and RTL8107E rx crc erro=
-r
-> git tree:       net
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dea09b0836073e=
-e4
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dac648b0525be1fe=
-ba506
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D15346b1ec80=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D162e3b89c8000=
-0
->
-> If the result looks correct, please mark the issue as fixed by replying w=
-ith:
+Add support for handing and recovering from a PCI FLR event.
+This patchset first moves some code around to make it usable
+from multiple paths, then adds the PCI error handler callbacks
+for reset_prepare and reset_done.
 
-No, this one is invalid.
+Example test:
+    echo 1 > /sys/bus/pci/devices/0000:2a:00.0/reset
 
->
-> #syz fix: lsm: move the program execution hook comments to security/secur=
-ity.c
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
-ion
->
-> --
+v2:
+ - removed redundant pci_save/restore_state() calls
+
+Shannon Nelson (5):
+  ionic: remove dead device fail path
+  ionic: extract common bits from ionic_remove
+  ionic: extract common bits from ionic_probe
+  ionic: pull out common bits from fw_up
+  ionic: add FLR recovery support
+
+ .../ethernet/pensando/ionic/ionic_bus_pci.c   | 167 ++++++++++++------
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |  72 +++++---
+ .../net/ethernet/pensando/ionic/ionic_lif.h   |   5 +
+ 3 files changed, 165 insertions(+), 79 deletions(-)
+
+-- 
+2.17.1
+
 
