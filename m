@@ -1,70 +1,54 @@
-Return-Path: <netdev+bounces-17596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE957752435
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:51:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 492A7752474
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9272281DC4
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:51:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E49E281DD5
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6100515490;
-	Thu, 13 Jul 2023 13:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DA417AB2;
+	Thu, 13 Jul 2023 13:59:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493AB747E
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:51:28 +0000 (UTC)
-Received: from mail2-1.quietfountain.com (mail2-1.quietfountain.com [64.111.48.224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0991BF4
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:51:25 -0700 (PDT)
-Received: from mail2-1.quietfountain.com (localhost [127.0.0.1])
-	by mail2-1.quietfountain.com (Postfix) with ESMTP id 4R1wxl56xhzshQy
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:51:23 -0500 (CDT)
-Authentication-Results: mail2-1.quietfountain.com (amavisd-new);
-	dkim=pass (4096-bit key) reason="pass (just generated, assumed good)"
-	header.d=quietfountain.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-	quietfountain.com; h=content-transfer-encoding:content-type
-	:in-reply-to:organization:from:references:to:content-language
-	:subject:user-agent:mime-version:date:message-id; s=dkim; t=
-	1689256276; x=1691848277; bh=t3KoUQ576nwgQDgQyh6XtUiiZCI2C4INCDa
-	FAm36//8=; b=gkFQci5JzMnJYZTa4VVrEO32X+ZMlFK51nry/4fbXhRWssz41eM
-	1l0DswKdHoLjU5W04x3MHHfssXAGF9iztUPPpCL3vmNHPQykc/ZKJMkYuUSqftQK
-	i14lgrWvBQlvNx6ywf2eMkDIZU2FcRPHq8NrA3A9HyFvwYYYO25rTk30bHwzCeY2
-	nzk8LcAe8mTBvxwYVoKkh4TzXxDY3K5Q73nJp/lblyP7X3qM+X6d0lzMjV1AmQMX
-	MOeo8a7RKDltEw6sanQWN7b19bYEARl7n9dBohcXVvKADiwizkbkxT7I3mf5D7Tl
-	KWGd2tcOr4fJ5UbpfgGH5Kkst7AtLl8ViVON/Gy3QG6miCQzcw+Pc6h9kH2cvhL5
-	9snIlsX3iqI7CiSclU1E5x2geECUuUplhoMgpjzMmr5EOmSA+4jOuH5lut/37Ip2
-	EbQCQv3FszoY1Nsi/o6uslTFwdhWKIsH7D0N3Y2akqep0L5QpcAcm36fcC3Gfcq1
-	+59q8b8VOAYUcbaT5TuwM3AEcLzm1PG3/m6a+WIyEFRqHm5RvYSmo6gsOv2lS098
-	LjJSouSP/TZP578p5WcNxnq3/R3ogisir+7KFWzFNaK7wEBZKQFjTBN1Rwm7XOSK
-	zh2pxrJikDd+tTOKYCLBW4J67f1Am7AO7yZl0FC4dgyLOPqHe77QDK60=
-X-Virus-Scanned: Debian amavisd-new at email2.1.quietfountain.com
-Received: from mail2-1.quietfountain.com ([127.0.0.1])
-	by mail2-1.quietfountain.com (mail2-1.quietfountain.com [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id vwJFlvjCiYl5 for <netdev@vger.kernel.org>;
-	Thu, 13 Jul 2023 08:51:16 -0500 (CDT)
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-X-Greylist: whitelisted by SQLgrey-1.8.0
-Received: from [10.12.114.193] (unknown [10.12.114.193])
-	by mail2-1.quietfountain.com (Postfix) with ESMTPSA id 4R1wxC6C8lzsfvj;
-	Thu, 13 Jul 2023 08:50:55 -0500 (CDT)
-Message-ID: <f4f1b9b4-abc9-842a-205a-35588916115d@quietfountain.com>
-Date: Thu, 13 Jul 2023 08:50:44 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7189A13ACE
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:59:00 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAB371FF1;
+	Thu, 13 Jul 2023 06:58:57 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36DDG3DB009960;
+	Thu, 13 Jul 2023 15:58:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=jScQfB7dHrSC/WSmDV+VXYQZhrTRCDcVOleEzuAMkbE=;
+ b=SfPoPLnnS6bLH20C2mmzuSXgd6/LCZxaRC927PE4Mq989cPc8vsuiDIrNcox0JeecTgk
+ vPSy+TZQ0MWOr5EnYuFBdJ4IeZx8ly3L7dJBVxGjU8klO2sMHXDNayHV0IEhjmSJsuCp
+ iGud6dnNZMDNTsd/DkUniBS2IpTUNWOe4vjqh2vsQwrqhmWN8E7LzuSEP4zI2yQiwW3+
+ zBpv9EiLZwUwirVLGu0eG1qtyzqzjsy3ii1suiVs0vmb/OiOXk2oEMI3chtxRqniHYa3
+ X9F+QSqs4L8qMuMBivzwcYURTgZbAwRpZYfPZh60JsRQFYr2leCnOExEUKEI2GdCBMLi ZA== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rtedthy7f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Jul 2023 15:58:16 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 4F4DC100056;
+	Thu, 13 Jul 2023 15:58:14 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E240A21A21E;
+	Thu, 13 Jul 2023 15:58:14 +0200 (CEST)
+Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 13 Jul
+ 2023 15:58:12 +0200
+Message-ID: <ba409196-06a1-bf2b-3536-1e1420550ff4@foss.st.com>
+Date: Thu, 13 Jul 2023 15:58:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,140 +56,214 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v1 net] bridge: Return an error when enabling STP in
- netns.
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 05/10] firewall: introduce stm32_firewall framework
 Content-Language: en-US
-To: Nikolay Aleksandrov <razor@blackwall.org>,
- Ido Schimmel <idosch@idosch.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org, bridge@lists.linux-foundation.org
-References: <20230711235415.92166-1-kuniyu@amazon.com>
- <ZK69NDM60+N0TTFh@shredder>
- <caf5bc87-0b5f-cd44-3c1c-5842549c8c6e@blackwall.org>
-From: Harry Coin <hcoin@quietfountain.com>
-Organization: Quiet Fountain LLC / Rock Stable Systems
-In-Reply-To: <caf5bc87-0b5f-cd44-3c1c-5842549c8c6e@blackwall.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+To: Rob Herring <robh@kernel.org>
+CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>, Peng Fan <peng.fan@oss.nxp.com>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
+ <20230706150906.GB3858320-robh@kernel.org>
+ <d13f935c-568b-3c0d-8e7d-006b7d4e7d50@foss.st.com>
+ <20230707150724.GA112541-robh@kernel.org>
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20230707150724.GA112541-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.121]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-13_05,2023-07-13_01,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello Rob,
 
-On 7/12/23 09:52, Nikolay Aleksandrov wrote:
-> On 12/07/2023 17:48, Ido Schimmel wrote:
->> On Tue, Jul 11, 2023 at 04:54:15PM -0700, Kuniyuki Iwashima wrote:
->>> When we create an L2 loop on a bridge in netns, we will see packets s=
-torm
->>> even if STP is enabled.
->>>
->>>    # unshare -n
->>>    # ip link add br0 type bridge
->>>    # ip link add veth0 type veth peer name veth1
->>>    # ip link set veth0 master br0 up
->>>    # ip link set veth1 master br0 up
->>>    # ip link set br0 type bridge stp_state 1
->>>    # ip link set br0 up
->>>    # sleep 30
->>>    # ip -s link show br0
->>>    2: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue s=
-tate UP mode DEFAULT group default qlen 1000
->>>        link/ether b6:61:98:1c:1c:b5 brd ff:ff:ff:ff:ff:ff
->>>        RX: bytes  packets  errors  dropped missed  mcast
->>>        956553768  12861249 0       0       0       12861249  <-. Keep
->>>        TX: bytes  packets  errors  dropped carrier collsns     |  inc=
-reasing
->>>        1027834    11951    0       0       0       0         <-'   ra=
-pidly
->>>
->>> This is because llc_rcv() drops all packets in non-root netns and BPD=
-U
->>> is dropped.
->>>
->>> Let's show an error when enabling STP in netns.
->>>
->>>    # unshare -n
->>>    # ip link add br0 type bridge
->>>    # ip link set br0 type bridge stp_state 1
->>>    Error: bridge: STP can't be enabled in non-root netns.
->>>
->>> Note this commit will be reverted later when we namespacify the whole=
- LLC
->>> infra.
->>>
->>> Fixes: e730c15519d0 ("[NET]: Make packet reception network namespace =
-safe")
->>> Suggested-by: Harry Coin <hcoin@quietfountain.com>
->> I'm not sure that's accurate. I read his response in the link below an=
-d
->> he says "I'd rather be warned than blocked" and "But better warned and
->> awaiting a fix than blocked", which I agree with. The patch has the
->> potential to cause a lot of regressions, but without actually fixing t=
-he
->> problem.
+On 7/7/23 17:07, Rob Herring wrote:
+> On Fri, Jul 07, 2023 at 03:43:15PM +0200, Gatien CHEVALLIER wrote:
 >>
->> How about simply removing the error [1]? Since iproute2 commit
->> 844c37b42373 ("libnetlink: Handle extack messages for non-error case")=
-,
->> it can print extack warnings and not only errors. With the diff below:
 >>
->>   # unshare -n
->>   # ip link add name br0 type bridge
->>   # ip link set dev br0 type bridge stp_state 1
->>   Warning: bridge: STP can't be enabled in non-root netns.
->>   # echo $?
->>   0
+>> On 7/6/23 17:09, Rob Herring wrote:
+>>> On Wed, Jul 05, 2023 at 07:27:54PM +0200, Gatien Chevallier wrote:
+>>>> Introduce a firewall framework that offers to firewall consumers different
+>>>> firewall services such as the ability to check their access rights against
+>>>> their firewall controller(s).
+>>>>
+>>>> The firewall framework offers a generic API that is defined in firewall
+>>>> controllers drivers to best fit the specificity of each firewall.
+>>>>
+>>>> There are various types of firewalls:
+>>>> -Peripheral firewalls that filter accesses to peripherals
+>>>> -Memory firewalls that filter accesses to memories or memory regions
+>>>> -Resource firewalls that filter accesses to internal resources such as
+>>>> reset and clock controllers
+>>>
+>>> How do resource firewalls work? Access to registers for some clocks in a
+>>> clock controller are disabled? Or something gates off clocks/resets to
+>>> a block?
 >>
->> [1]
->> diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
->> index a807996ac56b..b5143de37938 100644
->> --- a/net/bridge/br_stp_if.c
->> +++ b/net/bridge/br_stp_if.c
->> @@ -201,10 +201,8 @@ int br_stp_set_enabled(struct net_bridge *br, uns=
-igned long val,
->>   {
->>          ASSERT_RTNL();
->>  =20
->> -       if (!net_eq(dev_net(br->dev), &init_net)) {
->> +       if (!net_eq(dev_net(br->dev), &init_net))
->>                  NL_SET_ERR_MSG_MOD(extack, "STP can't be enabled in n=
-on-root netns");
->> -               return -EINVAL;
->> -       }
->>  =20
->>          if (br_mrp_enabled(br)) {
->>                  NL_SET_ERR_MSG_MOD(extack,
+>> To take a practical example:
 >>
-> I'd prefer this approach to changing user-visible behaviour and potenti=
-al regressions.
-> Just change the warning message.
->
-> Thanks,
->   Nik
+>> A clock controller can be firewall-aware and have its own firewall registers
+>> to configure. To access a clock/reset that is handled this way, a device
+>> would need to check this "resource firewall". I thought that for these kinds
+>> of hardware blocks, having a common API would help.
+> 
+> We already have the concept of 'protected clocks' which are ones
+> controlled by secure mode which limits what Linux can do with them. I
+> think you should extend this mechanism if needed and use the existing
+> clock/reset APIs for managing resources.
+> 
 
-Remember, the only way it's honest to 'warn but not block' STP in netns=20
-is trust in the Kuniyuki's assertion that the llc will be=20
-'namespacified' in a near term frame.=C2=A0=C2=A0 As STP is not only=20
-non-functional in a netns, but will in fact bring down every connected=20
-system in a packet storm should a L2 loop exist the situation is much=20
-worse than a merely inaccessible extra feature. This as the only reason=20
-STP exists is to avoid crashing sites owing to packet storms arising=20
-from L2 loops.=C2=A0=C2=A0=C2=A0 I think as this bug is a potential 'site=
- killer'=20
-(which in fact happened to me!) The Linux dev community has an=20
-obligation to either hard block this or commit to a fix time frame and=20
-merely warn.
+Ok, thank you for the input. I'll remove this type of firewall for V2 as
+I no longer have a use case.
 
-Thanks
+>>>
+>>> It might make more sense for "resource" accesses to be managed within
+>>> those resource APIs (i.e. the clock and reset frameworks) and leave this
+>>> framework to bus accesses.
+>>>
+>>
+>> Okay, I'll drop this for V2 if you find that the above explaination do not
+>> justify this.
+>>
+>>>> A firewall controller must be probed at arch_initcall level and register
+>>>> to the framework so that consumers can use their services.
+>>>
+>>> initcall ordering hacks should not be needed. We have both deferred
+>>> probe and fw_devlinks to avoid that problem.
+>>>
+>>
+>> Greg also doubts this.
+>>
+>> Drivers like reset/clock controllers drivers (core_initcall level) will have
+>> a dependency on the firewall controllers in order to initialize their
+>> resources. I was not sure how to manage these dependencies.
+>>
+>> Now, looking at init/main.c, I've realized that core_initcall() level comes
+>> before arch_initcall() level...
+>>
+>> If managed by fw_devlink, the feature-domains property should be supported
+>> as well I suppose? I'm not sure how to handle this properly. I'd welcome
+>> your suggestion.
+> 
+> DT parent/child child dependencies are already handled which might be
+> enough for you. Otherwise, adding a new provider/consumer binding is a
+> couple of lines to add the property names. See drivers/of/property.c.
+> 
 
-Harry Coin
+Ok, I'll try with a modification of drivers/of/property.c as the
+parent/child dependency won't be enough. Thanks for pointing this out.
 
+>>>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>>>> ---
+>>>>    MAINTAINERS                               |   5 +
+>>>>    arch/arm64/Kconfig.platforms              |   1 +
+>>>>    drivers/bus/Kconfig                       |  10 +
+>>>>    drivers/bus/Makefile                      |   1 +
+>>>>    drivers/bus/stm32_firewall.c              | 252 ++++++++++++++++++++++
+>>>>    drivers/bus/stm32_firewall.h              |  83 +++++++
+>>>
+>>> Why something stm32 specific? We know there are multiple platforms
+>>> wanting something in this area. Wasn't the last attempt common?
+>>>
+>>> For a common binding, I'm not eager to accept anything new with only 1
+>>> user.
+>>>
+>>
+>> Last attempt was common for the feature-domain bindings. The system-bus
+>> driver was ST-specific. I don't know if other platforms needs this kind
+>> of framework. Are you suggesting that this framework should be generic? Or
+>> that this framework should have a st-specific property?
+> 
+> Ah right, the posting for SCMI device permissions was the binding only.
+> The binding should be generic and support more than 1 user. That somewhat
+> implies a generic framework, but not necessarily.
+> 
+>> I've oriented this firewall framework to serve ST purpose. There may be a
+>> need for other platforms but I'm not sure that this framework serves them
+>> well. One can argue that it is quite minimalist and covers basic purposes of
+>> a hardware firewall but I would need more feedback from other vendors to
+>> submit it as a generic one.
+> 
+> We already know there are at least 2 users. Why would we make the 2nd
+> user refactor your driver into a common framework?
+> 
+> [...]
+> 
 
+If one thinks this framework is generic enough so it can be of use for
+them, so yes, I can submit it as a common framework. I'm not that sure
+Oleksii finds a use case with it. He seemed interested by the bindings.
+Maybe I'm wrong Oleksii?
+
+For V2, I'd rather submit it again as an ST-specific framework again to
+address the generic comments. This way, other people have time to
+manifest themselves.
+
+>>>> +int stm32_firewall_get_firewall(struct device_node *np,
+>>>> +				struct stm32_firewall *firewall)
+>>>> +{
+>>>> +	struct stm32_firewall_controller *ctrl;
+>>>> +	struct of_phandle_args args;
+>>>> +	u32 controller_phandle;
+>>>> +	bool match = false;
+>>>> +	size_t i;
+>>>> +	int err;
+>>>> +
+>>>> +	if (!firewall)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	/* The controller phandle is always the first argument of the feature-domains property. */
+>>>> +	err = of_property_read_u32(np, "feature-domains", &controller_phandle);
+>>>
+>>> Why do you need to parse the property twice?
+>>>
+>>
+>> The first parsing is to have the first argument, which is the controller
+>> phandle. The second parsing is here to get the firewall arguments based on
+>> the number of arguments defined by #feature-domain-cells. Maybe using
+>> of_property_read_u32_array() would be better.
+> 
+> No. It's not a u32 array. It's a phandle+args property, so you should
+> only use phandle+args APIs.
+> 
+>> I did not want to close the
+>> door for supporting several feature domain controllers, hence multiple
+>> phandles. of_parse_phandle_with_args() seemed fine for this purpose but the
+>> phandle is parsed out.
+> 
+> There's an iterator for handling multiple phandle+args cases.
+> 
+> Rob
+
+Ok, will look into that for V2.
+
+Best regards,
+Gatien
 
