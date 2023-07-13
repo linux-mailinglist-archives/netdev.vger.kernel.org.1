@@ -1,128 +1,162 @@
-Return-Path: <netdev+bounces-17393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD407516AC
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:18:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 994FC7516CF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDB5F1C210DF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 03:18:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB4D28183B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 03:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBFA80A;
-	Thu, 13 Jul 2023 03:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C2CEBD;
+	Thu, 13 Jul 2023 03:36:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611BE7C
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:18:23 +0000 (UTC)
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D455510FC;
-	Wed, 12 Jul 2023 20:18:21 -0700 (PDT)
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3463de183b0so846895ab.2;
-        Wed, 12 Jul 2023 20:18:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689218301; x=1691810301;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qawsrB2QjObGFKdtBJBr24bS4klgjaH5RnlsFvFaqdA=;
-        b=FlASqXf7vRR5t3eTnmT7e/V8WHJv239bInW7MXYkyKN8IDb0MXkkL9DE8fwlIqVTp3
-         RXe7cnLfEmmC+YkWvAlca1ij/QbStsSF0+woa8c+b9OeHedWU8fdla8kHhSA/xcvaOE8
-         dp5sYxDBvkyb2WtCVYkG1tqrYFs5V7njTU0zzCG4q8IbwftkUPlFTsqH/2+mH46aPYKZ
-         EUReysGNjY1l6s2NhaN70XW0faywWJugXDHD80cvbP+tI9fwrTVJkJ/aNLyCE2t0MTnT
-         qMxefhnLViZoFaPkPetjGxUg7wMyAco0WTBy9w/jJRmK7OhSRifzPSBt5NMj5+Kt2PLF
-         tXRA==
-X-Gm-Message-State: ABy/qLY1lPqTdVrZLrSZ36c1oWe2AjtLuGgt2Z46eR1apdDQBflSBRQk
-	MU/zhdU/6eWWH63kwN52kw==
-X-Google-Smtp-Source: APBJJlHY6uobXkZ7Ot/PXNS2zXB03TK8FxoMtNQm5K2O57QB9S+kej4dH9EdpogJCIV4sH4ZYuGddw==
-X-Received: by 2002:a92:cf4a:0:b0:345:aba5:3780 with SMTP id c10-20020a92cf4a000000b00345aba53780mr405972ilr.22.1689218301057;
-        Wed, 12 Jul 2023 20:18:21 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id g2-20020a92d7c2000000b0034579ffe2b1sm1745730ilq.29.2023.07.12.20.18.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 20:18:20 -0700 (PDT)
-Received: (nullmailer pid 2687664 invoked by uid 1000);
-	Thu, 13 Jul 2023 03:18:17 -0000
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220077C
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:36:27 +0000 (UTC)
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2138.outbound.protection.outlook.com [40.107.215.138])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7879F1FEE;
+	Wed, 12 Jul 2023 20:36:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RHmkGBiTLxQ5/KO8G/rWtLtorNDGd8dQ9+TwSa1suQFGh0AiRC0jemggTR5ONnHbyQsRy1ANXI1zBt8u0sn3RwdfjyGAp2/Ke9ukQWgK+C7qPveXT03ZG28TLQgFG0V9+HPseGVep8wkX339ItUe55m+/5H84lEu9714PvhDXo/O5jRY5n7gI12y6DWsezJngE0m9WLliksJnW5vNR0ry0aRJUhPbCptbgiPECqwAe/1Lvhy053eqK2jGql45/9e260666jrOUtD4G1zqybtGekezAKh5yysTaU9/sKnux2o1BoGXxkMKqrFwoscu0pu7oABKWly3xLbBPEwNNDyjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Lc9YVJilcupA9pmwEo5AjWmwYra46BWwjKr/918sM9I=;
+ b=bfQxCYMg6lbaO2csilyEhpuVCU9lYjBYrBf5egqozVfLuGQGQx8mxnb3qBBWIndZjf3MgA2HRExT0Cp+dWYvjs81NkEnj4u6fB3ms4G36+/P9nT+cvN3cgrpaTHusf+0hbRScR0vJRVJS1U2XvTZRjOyHj6at0VD/bSufyYPFDRU8IEdLNP8d66mMr2MyO4Q3Lo7TH7/EmIBxQRx3ALFUPZ3pJQQEBtUyg/+DySFKUaWcTOq0g5b6mj+z2LNTcH1ix91gsCJGnHem8+u3JE+UaCCxBYRpFewAfb7EKt1QC8IeNfdzBIld3Pv+WE0NkCrD2JTEPqeTC1P0LM3VtN4zQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Lc9YVJilcupA9pmwEo5AjWmwYra46BWwjKr/918sM9I=;
+ b=GnHxu4gN2BVH7VuXw8VhaIPtRMk2QUXMdtrwjKrfkGOc15W6ff5dGv+2oQ+oSlHXiDd33KKKWkbI0JSumVoi7IyMYETizoCo+FFhrllB8otKAzR+GxZAwol9G7UYnJKga+tfJ1c45GlPeNNlYiEDxwWBBNlk7WKwK7zd4V+FZdoUfxMc9+VtwNqGfOPJ01FF437t1sbt59TSoJXtkRD7Zg3QIU7/IWKvmb8wazhNJ8QzmooCDu5TWlcSn4oEaC+xK1TjtgAZN6oxw727rTNjPHuS0s5xoB2CmLX4ESNzHDWBXYb64vPCa2cMos4m18h2DNiWz7rRNlE0RPZlSZ1kbw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ SEZPR06MB5608.apcprd06.prod.outlook.com (2603:1096:101:c8::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.22; Thu, 13 Jul 2023 03:36:17 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
+ 03:36:17 +0000
+From: Wang Ming <machel@vivo.com>
+To: Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yufeng Mo <moyufeng@huawei.com>,
+	Guangbin Huang <huangguangbin2@huawei.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	Wang Ming <machel@vivo.com>
+Subject: [PATCH net v1] net:bonding:Fix error checking for debugfs_create_dir()
+Date: Thu, 13 Jul 2023 11:35:54 +0800
+Message-Id: <20230713033607.12804-1-machel@vivo.com>
+X-Mailer: git-send-email 2.25.1
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR03CA0095.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::23) To SG2PR06MB3743.apcprd06.prod.outlook.com
+ (2603:1096:4:d0::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, linux-mediatek@lists.infradead.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Eric Dumazet <edumazet@google.com>, Greg Ungerer <gerg@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org, AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-arm-kernel@lists.infradead.org, Felix Fietkau <nbd@nbd.name>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, =?utf-8?q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, Conor Dooley <conor+dt@kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Lee <Mark-MC.Lee@mediatek.com>, Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>
-In-Reply-To: <6c2e9caddfb9427444307d8443f1b231e500787b.1689012506.git.daniel@makrotopia.org>
-References: <cover.1689012506.git.daniel@makrotopia.org>
- <6c2e9caddfb9427444307d8443f1b231e500787b.1689012506.git.daniel@makrotopia.org>
-Message-Id: <168921829748.2687635.17297461907605978671.robh@kernel.org>
-Subject: Re: [PATCH v2 net-next 2/9] dt-bindings: net: mediatek,net: add
- mt7988-eth binding
-Date: Wed, 12 Jul 2023 21:18:17 -0600
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|SEZPR06MB5608:EE_
+X-MS-Office365-Filtering-Correlation-Id: cf575fd8-ac0d-47df-628c-08db83525098
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Y6dAVVfkoRUBMkU0X1fVZmi8tSKPMeAaZFPxrato3BKHxDbWZE3ltMFLBSIJ5TUTun2ZHznexeUIAsyF7H0qRKhBJsXghRTT2XwLiRhcmfa1j883syHSzhjJzXDADuzx5Ne+xY+pZ2vzIFFiBeCehx/gQAIa4wiZvFm6SAtIddulTW+S0XZefv2lfrjgq84NcNkbJBBBU9WL9K2amB2jc+2mAQyKO2sYY/cfAFjcoVv2hoSJE+oiZo1ZOl08ZjHlUIXaGWQtdWiB7R7bwwWYABqY1vheN1CCdVsk6V4ChnngerLVNSBMbcb/sQoqR/IdeQMB4A+NnphDhWJ+sgVYcI4GqIK5to/iLx4qwTsq1GFW6dzpcYsYY4FEv+NGUUoT+bgyjQlVUp1ZoO1hy8EraE8Wdro8AIFEU7O0BPaJmFAXkdeQGLL04IFevIOfi9getrDRgSAhQr3vOrTEMBOmxaoItG43Tv45uMP39uNFD1JdVTgXo8c53mcqW5v5TXdcp8h09Fc9OOwwEgeNOx9BqY4Z08xe12WENIIA575yLgZsLoDqyVHWpfHT6XcuraOP3ioObH6t9aptxw3dDQAovv3LV57pYHPQvHGKTfB3QrFxDwBOpr2Y0LTXgHC7kT7k
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(451199021)(186003)(4744005)(36756003)(2616005)(2906002)(41300700001)(83380400001)(7416002)(26005)(6506007)(1076003)(5660300002)(107886003)(8936002)(8676002)(921005)(110136005)(6486002)(66476007)(66556008)(66946007)(4326008)(6666004)(52116002)(86362001)(478600001)(38350700002)(38100700002)(6512007)(316002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?34KInPvA0g6483uUp/FL/ePs3lWa4tlZ1KTqgyKBctdzPD7DSdIEUm8i9Wtj?=
+ =?us-ascii?Q?WEd3dH0yNYwkewHRoFFb0NsAOYUNUmEOjR4sgPakD0UCgCA7dJGiSf4wHIKV?=
+ =?us-ascii?Q?FyGpNRYxPVB3KZahRClzksemaoVpXToJPrn1yn/t40eCH+pJv+ngbarJbPLI?=
+ =?us-ascii?Q?hfAIkvA1jjmwjcWj75RZIcvYqc8iZ7qo/wfgqHfDbv1YbdwrpzUXCm0UIfus?=
+ =?us-ascii?Q?6jRmhLwEXBMDDc3w+oW4xW/fTf0mRIZeBTk3gOO0ONVhJHIPEtyAcQ37RB1Q?=
+ =?us-ascii?Q?29w0yGz8UEJILvdwEEjPcSFdxQPdZaVAxEK9t2fYtK5ZEnCSM0MIUE8X9PjY?=
+ =?us-ascii?Q?qIMKLyegtNEEGVjOu/Z2P23AI5Z0RkxQa3HP43nv98zNXhH/6xH6+ipoXr2N?=
+ =?us-ascii?Q?V7qUW5r2BG6d1ePSP7e5FTIrTWEVhnEnhzdADy8FiiyiNTUfaBde/GAXS1sT?=
+ =?us-ascii?Q?P0jx9zD4cRjnjv18TBIms7z5M5In4qZX1pZooVwgdManfngFyXdYdvf0YvbI?=
+ =?us-ascii?Q?pckm/d+aTmOc36yrMSeUTLEj6EZUVOO9i6ls13ND0RPejWusrIH2nOB50ZWD?=
+ =?us-ascii?Q?F+g1CFhb00Mpr7poBCQWcmg6ywtFD2IKScO5S8XcQDA5quIusDisBs2C5cvM?=
+ =?us-ascii?Q?1wV+9aQLNTeuGgQq8oA9KtsWIPs6Ny/N2SaEkJRa1Fr+bnMT+1p+GXyj67hc?=
+ =?us-ascii?Q?Zt4oR2c0G9BgNnGUQc5Cb3LABPGHNsBCTRMAJTP1TE56bg+xps+7f/O6LXE7?=
+ =?us-ascii?Q?kktkc2WWEQ9Xz1Z5cauEWqBW4zoolVLMqmNBx/11NhK8xxPBQTah7scNU6wO?=
+ =?us-ascii?Q?QgIGxmQiyfIIfs8Y+/BmnrchQG8epL/U+3LiZRn8Ek7oybzyzRZNXP9ug4MH?=
+ =?us-ascii?Q?wwsO5oUZI5BCy1wscUNO2uPPX/LxTvbPGsg7nzc5CmYNA9YXesUAtyDZzvHL?=
+ =?us-ascii?Q?KG0xxN97/v1Qrs+FTPaVckzCTAMybP8CO8Qzx1km8j0aNozxhbnBbmEwQq7K?=
+ =?us-ascii?Q?RGQPikl0ZTbP4n/iaHN7KBAP2ZOYuvZQHT/jfVW9hMpvEY572bEqM3IWAsoY?=
+ =?us-ascii?Q?GvKaeypQEdlXIsOSSTWAy98+bho226eSD0VkbTq6OSeddtws42HrC6Zqbd1v?=
+ =?us-ascii?Q?3z4Og06HZ9wbBAPS+a/rSG1ZDjwtxa5cyPNYqWPqWSVvjwbY3926SdujEkPb?=
+ =?us-ascii?Q?jA+hka5qjv+7TJrdYbDeJK9CicduKkT40iTfIRTRw/hdpdmWBs/mGQRk1boJ?=
+ =?us-ascii?Q?nD+9vefS6uE60Oxmr4aTOzWRUenAiK+vhp2W0xc9M3ZNe2hkSmsMIGwFyXaa?=
+ =?us-ascii?Q?yLNPLSD1Fu8zIeqGlfmHJbT6HQMS0nLorAzC7J8PRjYsn16l1Sxu1DorR/FN?=
+ =?us-ascii?Q?aIdexPFZFxyLx+RQINW1fSv88oql32mNDm6GUPYKRQbqv5yyteb1ox9D4sJ0?=
+ =?us-ascii?Q?6XGqXo/bKhnfZWWfZhWmE9titrutxQ2oNXB8M2ZjCJwiCWh5CP/SRmW+vpVn?=
+ =?us-ascii?Q?MCfxlV8lqHqZoaG3gKmLJFdN1GhQqFw/ksKJeh3xX9y8DpnanceIaST8OY3A?=
+ =?us-ascii?Q?LDSq/G3V2lwI/ZSQWzhrucA2/705pRCXLFZcg3ri?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf575fd8-ac0d-47df-628c-08db83525098
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 03:36:16.9493
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0dtRJZXkCtCb2A1YQfW+7o9udPN6R1WBwMxIQL9ugk8h26i5Sdyw9bRuFeAEoP9VWHGlCGbPhW1u4JHrpJoVDA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5608
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The debugfs_create_dir() function returns error pointers,
+it never returns NULL. Most incorrect error checks were fixed,
+but the one in bond_create_debugfs() was forgotten.
 
-On Thu, 13 Jul 2023 03:17:55 +0100, Daniel Golle wrote:
-> Introduce DT bindings for the MT7988 SoC to mediatek,net.yaml.
-> The MT7988 SoC got 3 Ethernet MACs operating at a maximum of
-> 10 Gigabit/sec supported by 2 packet processor engines for
-> offloading tasks.
-> The first MAC is hard-wired to a built-in switch which exposes
-> four 1000Base-T PHYs as user ports.
-> It also comes with built-in 2500Base-T PHY which can be used
-> with the 2nd GMAC.
-> The 2nd and 3rd GMAC can be connected to external PHYs or provide
-> SFP(+) cages attached via SGMII, 1000Base-X, 2500Base-X, USXGMII,
-> 5GBase-R or 10GBase-KR.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  .../devicetree/bindings/net/mediatek,net.yaml | 111 ++++++++++++++++++
->  1 file changed, 111 insertions(+)
-> 
+Fix the remaining error check.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Signed-off-by: Wang Ming <machel@vivo.com>
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/mediatek,net.yaml:76:9: [error] syntax error: could not find expected ':' (syntax)
+Fixes: 52333512701b ("net: bonding: remove unnecessary braces")
+---
+ drivers/net/bonding/bond_debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-dtschema/dtc warnings/errors:
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/mediatek,net.example.dts'
-Documentation/devicetree/bindings/net/mediatek,net.yaml:76:9: could not find expected ':'
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/mediatek,net.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-./Documentation/devicetree/bindings/net/mediatek,net.yaml:76:9: could not find expected ':'
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mediatek,net.yaml: ignoring, error parsing file
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1500: dt_binding_check] Error 2
-make: *** [Makefile:234: __sub-make] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/6c2e9caddfb9427444307d8443f1b231e500787b.1689012506.git.daniel@makrotopia.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bond_debugfs.c
+index 594094526648..d4a82f276e87 100644
+--- a/drivers/net/bonding/bond_debugfs.c
++++ b/drivers/net/bonding/bond_debugfs.c
+@@ -88,7 +88,7 @@ void bond_create_debugfs(void)
+ {
+ 	bonding_debug_root = debugfs_create_dir("bonding", NULL);
+ 
+-	if (!bonding_debug_root)
++	if (IS_ERR(bonding_debug_root))
+ 		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
+ }
+ 
+-- 
+2.25.1
 
 
