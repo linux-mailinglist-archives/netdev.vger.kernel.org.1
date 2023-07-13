@@ -1,141 +1,70 @@
-Return-Path: <netdev+bounces-17701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6839E752C08
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5607F752C2B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C429281F32
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:18:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E70B281F36
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6355424196;
-	Thu, 13 Jul 2023 21:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACDA20F8A;
+	Thu, 13 Jul 2023 21:33:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9F51F938
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:17:51 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ED92D68
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:17:47 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbc63c2e84so9884885e9.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:17:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689283066; x=1691875066;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TsJALsxCC7W/CAsd1l447Gkg4QP+b67KVu4aEHXx1H8=;
-        b=bt3cywbmI2xlzlVR6vRTSp+EcwPMU/Po0YAkZsTxYd4qeBDWmBtWWW1L7ZLZu7/Rp0
-         /rorCNOUTXNVUWcLrGeCXbk9yTbznrWpdKIZ7g9alJTVVuqw2gcb2COuguuFWoQ4WVon
-         8Np8h5Mwx8NsaQNfcxYyX911xkWytdrDTsxbw4eODsgaFgUIe4+SqpMumx7RaLTQ5+8X
-         MIOFF8AO8Bz0TWAlXVTJYgThE16Hn01Y+16mpzsUXW83Vbix9Z+QtRQAytDsiOD3+9vj
-         z9e71xvYt+xLgB2ItMz8f8lLgv4n2Y8YAhJ+U0f4CoRe+c31H6HDYo85nab2G+EVApeg
-         4c9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689283066; x=1691875066;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TsJALsxCC7W/CAsd1l447Gkg4QP+b67KVu4aEHXx1H8=;
-        b=cceQimm/poXcd4NGBizKNoXsSMZ4iFQRSzZHsKmZFFpjUVbapThh78ChWVDqz1V5NJ
-         ldyeVhh+PXNXIeZDeg5h1XZMR/b8JYR2KmUuvJd7bzy8g+8rLtl1OQWf3PYNqY++mOlk
-         Y+rwk70DrSI+0Jn0/0geA7zWfdB7qS0ccso2PCs9y5LQkbS+JaMROkf9ZhjqlOwoSDF8
-         bp2iEjfUdhUNaTiKYP0aGbcmMOjj2N9FAKOVEbk19D4+e4PUMGuMlgtS80+BhHcjd6dy
-         S7dd0CJ9hlHS39S68d0AC5d7C3ldbVhGiThhhdph5VgQJbkcWt8TAYENN7owfSMD/x4E
-         0CMQ==
-X-Gm-Message-State: ABy/qLbUzDThtWGyNzhCzef0YE4ZTpa2KrDfUfHP1XvAj+Cb6bsTMA7j
-	bW08ASjXgbd4SfkslIZiqHqrmg==
-X-Google-Smtp-Source: APBJJlEqHDqd/DaR1zZg8FeNIPs0jDRzB47sGZJXntmh5xucKXav31Pxi0b1G9aQg7Zs3wM4F2CWHg==
-X-Received: by 2002:a7b:cbc9:0:b0:3fb:e1ed:7f83 with SMTP id n9-20020a7bcbc9000000b003fbe1ed7f83mr2882825wmi.33.1689283066347;
-        Thu, 13 Jul 2023 14:17:46 -0700 (PDT)
-Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id m20-20020a7bcb94000000b003fbfea1afffsm8734136wmi.27.2023.07.13.14.17.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 14:17:45 -0700 (PDT)
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Thu, 13 Jul 2023 23:16:46 +0200
-Subject: [PATCH net 3/3] selftests: tc: add ConnTrack procfs kconfig
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42661E536
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:33:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D80CDC433C8;
+	Thu, 13 Jul 2023 21:33:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689284014;
+	bh=f62+zk3mg61VJyk+vVG/K2+LpzgQpWJdCw2pNNF0Vng=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XCkQKxTpRmjn7pJt88/43gRB7lyDMT3MaewwuKhy59IsDkSHKNvQ46oIWAAjfGgMB
+	 ZMLpla0O1TEfVUsD8HALBDS7CUCKteecClk+nsuoZ180sK8j/WLkqHg0KeIJARXS2N
+	 lhmj+PmLAWGkFnP1hY1OiRjcYpHuUqolqzYUB/x6QIp259oa+3ma+UG7WzEN9TboHV
+	 zQLOslsyYT4bcBZkxb2ibygQw0EjD+1IXEd+d97f6PPk/zvWn1GdogXVHncEUEQro1
+	 2FYRrCOJkwCBF7dBVa8PShm0QRuOROlnNlF6J29Zgc6NnaFKNTpz7mrIGQQ2ojXUGw
+	 M7jLOaMjkK2hQ==
+Message-ID: <6bfa5087-210e-6c96-3ad0-947ef9480b8d@kernel.org>
+Date: Thu, 13 Jul 2023 15:33:33 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH net-next 2/4] ipv4: Constify the sk parameter of
+ ip_route_output_*().
+Content-Language: en-US
+To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>
+References: <cover.1689077819.git.gnault@redhat.com>
+ <195d71a41fb3e6d2fc36bc843e5909c9240ef163.1689077819.git.gnault@redhat.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <195d71a41fb3e6d2fc36bc843e5909c9240ef163.1689077819.git.gnault@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230713-tc-selftests-lkft-v1-3-1eb4fd3a96e7@tessares.net>
-References: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
-In-Reply-To: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, 
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
- Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
- "David S. Miller" <davem@davemloft.net>, Paul Blakey <paulb@mellanox.com>, 
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, mptcp@lists.linux.dev
-Cc: Pedro Tammela <pctammela@mojatatu.com>, 
- Shuah Khan <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1295;
- i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=YxZMkeKTSYd/i12Y6hiS0Va0uPxVYaw6onSJrdJZ2xk=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBksGn1bBYwvMN9ZJOmDSJeapOx7V3gAfyEaaHiq
- u4fgEkD5s+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLBp9QAKCRD2t4JPQmmg
- c/79EADA/xNSe+OXe+fAkOmIazz02wIFBl+djuhBXh/Wq7uTJ/wXX2LVXz7haAPg0yi452RyvW6
- Y3umutQuwMqvWzIStUfkZHrvVTBjBp2u7zvgkknGe2hDS7tDLYXmbQ667Qs340s8OUMGqvptQk7
- y25FKL03KNuLSokg0OhB1Dp1u9hAYsuDmp18420NV6kDA3jPi1WMMzd9FV0iajheLOgk3TM1/JM
- CmY1+0inJwGExfLshAmG5soMIwQwZql8d1Lq4lD4hn2tkfUPO5tsrcoOaj3y2rDxE6vECvC9sWI
- 3syinI2F9TgnuGw/+OXCL7GkqLbD/1ok/fTu0M2AQV1e6dOEbi4xTxMlqhAOYlqC48rsNVrwiIC
- 5xxByReFo7qwwKI9y8JVMf98hF04OY8vwow1gw/Cbwf15/GZpWnIWqFRfA9PrYpyxFs0iq4ASeL
- 6opLFLVqXBXpeOsySZvp6gl3GqxMk0oNCpDRg29Q9E8EkzzMlIjqJKZUsQnFvrwJOOKNPzi00cZ
- +AWTZiSk7qawGmeIBg1KKMdLx0xcG1puAieB1bzmmSB4ZXlR4aogcXkAE+ku92dZ6PYvTxdt8nt
- 2UUXOHdQmUX2S4etArxuBVMbnXQ7cHk7oHy9Fat5T/EwBWQK3QQiWZEmdI/qPOxJotVjg3ZIiaG
- r69EzqvS4gPH/QQ==
-X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-When looking at the TC selftest reports, I noticed one test was failing
-because /proc/net/nf_conntrack was not available.
+On 7/11/23 7:06 AM, Guillaume Nault wrote:
+> These functions don't need to modify the socket, so let's allow the
+> callers to pass a const struct sock *.
+> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
+>  include/net/route.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
 
-  not ok 373 3992 - Add ct action triggering DNAT tuple conflict
-  	Could not match regex pattern. Verify command output:
-  cat: /proc/net/nf_conntrack: No such file or directory
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-It is only available if NF_CONNTRACK_PROCFS kconfig is set. So the issue
-can be fixed simply by adding it to the list of required kconfig.
-
-Fixes: e46905641316 ("tc-testing: add test for ct DNAT tuple collision")
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/netdev/0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net/T/ [1]
-Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
----
- tools/testing/selftests/tc-testing/config | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/tc-testing/config b/tools/testing/selftests/tc-testing/config
-index d1ad29040c02..71706197ba0f 100644
---- a/tools/testing/selftests/tc-testing/config
-+++ b/tools/testing/selftests/tc-testing/config
-@@ -5,6 +5,7 @@ CONFIG_NF_CONNTRACK=m
- CONFIG_NF_CONNTRACK_MARK=y
- CONFIG_NF_CONNTRACK_ZONES=y
- CONFIG_NF_CONNTRACK_LABELS=y
-+CONFIG_NF_CONNTRACK_PROCFS=y
- CONFIG_NF_FLOW_TABLE=m
- CONFIG_NF_NAT=m
- CONFIG_NETFILTER_XT_TARGET_LOG=m
-
--- 
-2.40.1
 
 
