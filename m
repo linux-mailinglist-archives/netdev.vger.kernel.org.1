@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-17469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A405751BEB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:43:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C9E751BED
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05E84280FE5
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:43:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0F68281C45
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB80DDCD;
-	Thu, 13 Jul 2023 08:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D2C8839;
+	Thu, 13 Jul 2023 08:42:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD3F8BEC
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0DF8821
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:42:38 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6D32D43
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:42:26 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0908830D2
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:42:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EIbrC/QnC1yWICHK9dA9n6QgBQeW2TU6rE65I9505Hk=; b=L/1a6OfothezRh8WE+2P80A3/O
-	ntNGb2IyKDnMJ2tH4oqPL5ZY7GgyxYgDbPe2hfPzWtfIflkzEe9jfX01wgC3w8f4Wc5TQXGpMdaua
-	3qCWgFwffN+Xvh7Z6pgKeP4a/Rov6uPm/CjvHGkUQRXeqCriUYR2Q6uBoDN9+tPpq8PKhn/dl5Ntg
-	VuFHdMqOZb7F7cGVQniGl9c8Zy2UtSV6brVEryr3XhCfY7dDZniD7H88jfB43OqtPBL2Hvxvgz5yn
-	pjKLrOYFNcPsIECjNCbzYDTgzk20s2OfvQU/CueQW8oFa/o4KZFLLvWCGYI5FMeBFJcXd4b1ei4eW
-	dQ90Pmow==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42362 helo=rmk-PC.armlinux.org.uk)
+	bh=jH7OWMKMHF5X4g44U88d9uH3zI9I+qq1L8rJ7BjhyvA=; b=lOLXTkuD3CmfG6iZ7zNCvDiYkj
+	28SWtcj/8XrbBVw1Au3F951G41YihXVYAFWxfUoX9GxFLI+gVb/p/BsxLM7K81JwuYqAIwe9YKQch
+	Isjji61UydYpk1iCK/13T8rYkyn8iDd9BM5oknHnoGLJGKScJuoKRAiNTW7N3dq97UvBY3v36ojGd
+	B437+I6ALEiK8/JT/xlDyo2Uj9BK8Z7b6d39PcRQbd1xaY1d8Smq8gonrNwb2xHZucsthahirLqBa
+	iR30dNsf08DnGFoF0/H1kPXxxfz9JKif+2XYAOXCMyEN9LjZV7GOKQnH5ZUNpm6A+QPqvfc6LFaGd
+	o6TOpqGQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38662 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qJru3-00068d-0U;
-	Thu, 13 Jul 2023 09:42:23 +0100
+	id 1qJru8-00068p-14;
+	Thu, 13 Jul 2023 09:42:28 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qJru2-00GkjY-VH; Thu, 13 Jul 2023 09:42:23 +0100
+	id 1qJru8-00Gkje-3c; Thu, 13 Jul 2023 09:42:28 +0100
 In-Reply-To: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
 References: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -54,8 +54,8 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 04/11] net: mdio: add unlocked mdiobus and mdiodev
- bus accessors
+Subject: [PATCH net-next 05/11] net: dsa: mv88e6xxx: remove handling for DSA
+ and CPU ports
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,9 +65,9 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qJru2-00GkjY-VH@rmk-PC.armlinux.org.uk>
+Message-Id: <E1qJru8-00Gkje-3c@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 13 Jul 2023 09:42:22 +0100
+Date: Thu, 13 Jul 2023 09:42:28 +0100
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
 	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -75,109 +75,91 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add the following unlocked accessors to complete the set:
-__mdiobus_modify()
-__mdiodev_read()
-__mdiodev_write()
-__mdiodev_modify()
-__mdiodev_modify_changed()
-which we will need for Marvell DSA PCS conversion.
+As we now always use a fixed-link for DSA and CPU ports, we no longer
+need the hack in the Marvell code to make this work. Remove it.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This is especially important with the conversion of DSA drivers to
+phylink_pcs, as the PCS code only gets called if we are using
+phylink for the port.
+
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/mdio_bus.c | 24 ++++++++++++++++++++++--
- include/linux/mdio.h       | 26 ++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 2 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c | 48 ++++----------------------------
+ 1 file changed, 5 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index 8b3618d3da4a..bc04048de2fa 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -1210,6 +1210,26 @@ int mdiobus_c45_write_nested(struct mii_bus *bus, int addr, int devad,
- }
- EXPORT_SYMBOL(mdiobus_c45_write_nested);
- 
-+/*
-+ * __mdiobus_modify - Convenience function for modifying a given mdio device
-+ *	register
-+ * @bus: the mii_bus struct
-+ * @addr: the phy address
-+ * @regnum: register number to write
-+ * @mask: bit mask of bits to clear
-+ * @set: bit mask of bits to set
-+ */
-+int __mdiobus_modify(struct mii_bus *bus, int addr, u32 regnum, u16 mask,
-+		     u16 set)
-+{
-+	int err;
-+
-+	err = __mdiobus_modify_changed(bus, addr, regnum, mask, set);
-+
-+	return err < 0 ? err : 0;
-+}
-+EXPORT_SYMBOL_GPL(__mdiobus_modify);
-+
- /**
-  * mdiobus_modify - Convenience function for modifying a given mdio device
-  *	register
-@@ -1224,10 +1244,10 @@ int mdiobus_modify(struct mii_bus *bus, int addr, u32 regnum, u16 mask, u16 set)
- 	int err;
- 
- 	mutex_lock(&bus->mdio_lock);
--	err = __mdiobus_modify_changed(bus, addr, regnum, mask, set);
-+	err = __mdiobus_modify(bus, addr, regnum, mask, set);
- 	mutex_unlock(&bus->mdio_lock);
- 
--	return err < 0 ? err : 0;
-+	return err;
- }
- EXPORT_SYMBOL_GPL(mdiobus_modify);
- 
-diff --git a/include/linux/mdio.h b/include/linux/mdio.h
-index c1b7008826e5..8fa23bdcedbf 100644
---- a/include/linux/mdio.h
-+++ b/include/linux/mdio.h
-@@ -537,6 +537,8 @@ static inline void mii_c73_mod_linkmode(unsigned long *adv, u16 *lpa)
- 
- int __mdiobus_read(struct mii_bus *bus, int addr, u32 regnum);
- int __mdiobus_write(struct mii_bus *bus, int addr, u32 regnum, u16 val);
-+int __mdiobus_modify(struct mii_bus *bus, int addr, u32 regnum, u16 mask,
-+		     u16 set);
- int __mdiobus_modify_changed(struct mii_bus *bus, int addr, u32 regnum,
- 			     u16 mask, u16 set);
- 
-@@ -564,6 +566,30 @@ int mdiobus_c45_modify(struct mii_bus *bus, int addr, int devad, u32 regnum,
- int mdiobus_c45_modify_changed(struct mii_bus *bus, int addr, int devad,
- 			       u32 regnum, u16 mask, u16 set);
- 
-+static inline int __mdiodev_read(struct mdio_device *mdiodev, u32 regnum)
-+{
-+	return __mdiobus_read(mdiodev->bus, mdiodev->addr, regnum);
-+}
-+
-+static inline int __mdiodev_write(struct mdio_device *mdiodev, u32 regnum,
-+				  u16 val)
-+{
-+	return __mdiobus_write(mdiodev->bus, mdiodev->addr, regnum, val);
-+}
-+
-+static inline int __mdiodev_modify(struct mdio_device *mdiodev, u32 regnum,
-+				   u16 mask, u16 set)
-+{
-+	return __mdiobus_modify(mdiodev->bus, mdiodev->addr, regnum, mask, set);
-+}
-+
-+static inline int __mdiodev_modify_changed(struct mdio_device *mdiodev,
-+					   u32 regnum, u16 mask, u16 set)
-+{
-+	return __mdiobus_modify_changed(mdiodev->bus, mdiodev->addr, regnum,
-+					mask, set);
-+}
-+
- static inline int mdiodev_read(struct mdio_device *mdiodev, u32 regnum)
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 8b51756bd805..42c325409ac4 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -3315,56 +3315,17 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
  {
- 	return mdiobus_read(mdiodev->bus, mdiodev->addr, regnum);
+ 	struct device_node *phy_handle = NULL;
+ 	struct dsa_switch *ds = chip->ds;
+-	phy_interface_t mode;
+ 	struct dsa_port *dp;
+-	int tx_amp, speed;
++	int tx_amp;
+ 	int err;
+ 	u16 reg;
+ 
+ 	chip->ports[port].chip = chip;
+ 	chip->ports[port].port = port;
+ 
+-	dp = dsa_to_port(ds, port);
+-
+-	/* MAC Forcing register: don't force link, speed, duplex or flow control
+-	 * state to any particular values on physical ports, but force the CPU
+-	 * port and all DSA ports to their maximum bandwidth and full duplex.
+-	 */
+-	if (dsa_is_cpu_port(ds, port) || dsa_is_dsa_port(ds, port)) {
+-		struct phylink_config pl_config = {};
+-		unsigned long caps;
+-
+-		chip->info->ops->phylink_get_caps(chip, port, &pl_config);
+-
+-		caps = pl_config.mac_capabilities;
+-
+-		if (chip->info->ops->port_max_speed_mode)
+-			mode = chip->info->ops->port_max_speed_mode(chip, port);
+-		else
+-			mode = PHY_INTERFACE_MODE_NA;
+-
+-		if (caps & MAC_10000FD)
+-			speed = SPEED_10000;
+-		else if (caps & MAC_5000FD)
+-			speed = SPEED_5000;
+-		else if (caps & MAC_2500FD)
+-			speed = SPEED_2500;
+-		else if (caps & MAC_1000)
+-			speed = SPEED_1000;
+-		else if (caps & MAC_100)
+-			speed = SPEED_100;
+-		else
+-			speed = SPEED_10;
+-
+-		err = mv88e6xxx_port_setup_mac(chip, port, LINK_FORCED_UP,
+-					       speed, DUPLEX_FULL,
+-					       PAUSE_OFF, mode);
+-	} else {
+-		err = mv88e6xxx_port_setup_mac(chip, port, LINK_UNFORCED,
+-					       SPEED_UNFORCED, DUPLEX_UNFORCED,
+-					       PAUSE_ON,
+-					       PHY_INTERFACE_MODE_NA);
+-	}
++	err = mv88e6xxx_port_setup_mac(chip, port, LINK_UNFORCED,
++				       SPEED_UNFORCED, DUPLEX_UNFORCED,
++				       PAUSE_ON, PHY_INTERFACE_MODE_NA);
+ 	if (err)
+ 		return err;
+ 
+@@ -3541,6 +3502,7 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
+ 	}
+ 
+ 	if (chip->info->ops->serdes_set_tx_amplitude) {
++		dp = dsa_to_port(ds, port);
+ 		if (dp)
+ 			phy_handle = of_parse_phandle(dp->dn, "phy-handle", 0);
+ 
 -- 
 2.30.2
 
