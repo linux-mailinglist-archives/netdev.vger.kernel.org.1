@@ -1,139 +1,286 @@
-Return-Path: <netdev+bounces-17508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6152E751D47
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:33:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C42751D4C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:33:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD51281C5F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:33:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 300B4281BF0
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEBA100C2;
-	Thu, 13 Jul 2023 09:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE321100CD;
+	Thu, 13 Jul 2023 09:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60414F4E9
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:33:22 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2114.outbound.protection.outlook.com [40.107.243.114])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED6E1FD7
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:33:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RcMnX2bLXAsetR2IzrbL8d+vj/9teTFTMdMCIJdj3OWLfxE0ISEp28Vuacmdo7WbdC57IvJ3uRhiBAh9J8VEtDK1WzJ7hW8Pq2NK8lRFZmblFGXpjOeXQPALTRrHA1Xvbp2obAed+DwKeW2i1i6h3hRc2bU9zDHumBOet6W+W4abwFuoRF9dgY5ug7gjKj1TEHn6NCZWc2q3x2XJzC01l/RUGeo3oeFL6fOLMYL4tCv5M/t+DBXl4oQ9DswtUY/rPcMk0mw8+vrpNrbWky6LH/tR6XWvbBGNixLSEU9KgpExQKSYXoEC0+QfBTV5NRYTPGAfZDAh1UYYlOP4GiM7VQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0cShZncFkDLb5FQU7P+Qxrr/h3ChMaeSsWl7/JyyDVc=;
- b=Mph1eNiK+eqJySlwGj2jkUod4XMBCqB6lFepsaYbXGDw7cXdxQPsjtMf86Rk1oP2Lp8mS5sNimwLRuzQIOtXN+8SbWEy9lkGbycc37recDpmqQtrKqX90+FoXQTQL0Cn5vRDGLjxY/a6HDmcyxjlbTwifNzEs+xJ1FtEkzf4zllR24i+Il0u4O7nPGQBa7Hu4yiCpsvRknf2rdUzliNzicNS0hBExiBA5NxqCiNku8iGhufgrIIQ6uq1F2sRjcKphw1sBmdVIZZeipWu0EMrj3U6te6H6JbIml1UyOQKuHVLtTwbzgbWbIMJXnzsa7Z2VKHFKlKZG9LVfzGJ+lOuoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A207E100CC
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:33:24 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC1341FC7
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:33:22 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4faaaa476a9so873370e87.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:33:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0cShZncFkDLb5FQU7P+Qxrr/h3ChMaeSsWl7/JyyDVc=;
- b=Cny9QR7aby6rYVRnWTJ4hvrOnMdBL9HWqrVnsEpfTdesi1oHWXJ+h5h3+YOg+lW73KBaztzH+2kP/0GORFDQcVqnS9dySPAi96YLG+Hd97BpcLeJo4zlYkB0zs6AcJC+NPZwTjHPmx5Idf33NXcQSHf5ZlK5PzS2DI6i+x/OzR0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CO1PR13MB5016.namprd13.prod.outlook.com (2603:10b6:303:f9::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.22; Thu, 13 Jul
- 2023 09:33:20 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
- 09:33:19 +0000
-Date: Thu, 13 Jul 2023 10:33:13 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH net-next 3/4] ipv6: Constify the sk parameter of several
- helper functions.
-Message-ID: <ZK/E2SSK9/RzaPm+@corigine.com>
-References: <cover.1689077819.git.gnault@redhat.com>
- <38ea4cdcbd51177aae71c2e9fd9ca4a837ae01ec.1689077819.git.gnault@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38ea4cdcbd51177aae71c2e9fd9ca4a837ae01ec.1689077819.git.gnault@redhat.com>
-X-ClientProxiedBy: LO4P123CA0036.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:151::23) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1689240801; x=1691832801;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PuoUSzTMaeW0KxRIpsbhRn0c0o1kWoxhrZZUjrUIJ00=;
+        b=UHzdVh0Gxk+0ZZOvx0u4Z9RCt92RV0rJAtiU8cRZFeZ4nXzjCSxd725RCAkRTZS5eA
+         0mdRFNx/Tg6rgiwqq8Jz8zBVkuDTp8OxVXU7Ne9kp5zrsamMxFgIC+h76CPW1XphMbZS
+         xGgKJd7n92SO38N+/Tmt1moBtdClFhdSBZ52+k98dCA4Kv4v/rBRabDmGUkUDTPk/ouj
+         XRO0HFt0Gcbe8FOGQUvAiF5qTPDr5gnfkcIgGPPpMom7TEeRt19aaPyEmc+OObrjsqgt
+         xYN3yeF0rDvFy2RIVIQT2gTlzL7dPCiqhZJmc9u1W7Q/ZkDvWk1cU/bcL3lV4YlgiYU6
+         ZboA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689240801; x=1691832801;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PuoUSzTMaeW0KxRIpsbhRn0c0o1kWoxhrZZUjrUIJ00=;
+        b=Lvf0iXwAmbc0mntMG5vPtzX2w4i7eBVAZUSWuqIirJi3plgZ87jnLaMf7IRGaNcEFz
+         35YBfLoZZbiKQCqCLCuJzZ2VF4NpMk9Jw/bHEBSlo4TqgL0LgSnmCNtqEYxLG+N1HyGw
+         A5XFt58ubezfcWNK26tAUE7TSYcwtr/HRmMs3gOZuV+K8miSCwS82elYkU5xderjq8rn
+         yRseev5qNQVG4MSrV9C/k8J7AmAdR6bHuEYP4dlk8yceY4eycLHT9p54ZybFHKSg5XHW
+         /vhA3hq8GHw22IkwFupYxQpEJlndKrMIIDiDIMjnHDKAYYMT4o0kUS7a1zgDM+11cOxi
+         DTLQ==
+X-Gm-Message-State: ABy/qLYyCrVzj/2TY9FEiYXFaq8LxLDdlmbvQpcnKD/1fWGlLTeNZcL5
+	bFx0bzyY5i0eyYbKq2bA/kEcXw==
+X-Google-Smtp-Source: APBJJlHjCNfr204Lo2+tZHlL5G7RRcflxH+dvgrFeYiMweKPU1WjaL7kXrHOt7fKK8GOcPX2DULRHg==
+X-Received: by 2002:a05:6512:3ad:b0:4f8:7614:48a5 with SMTP id v13-20020a05651203ad00b004f8761448a5mr644791lfp.66.1689240800781;
+        Thu, 13 Jul 2023 02:33:20 -0700 (PDT)
+Received: from [192.168.51.243] ([78.128.78.220])
+        by smtp.gmail.com with ESMTPSA id c11-20020ac2530b000000b004fba1170087sm1042563lfh.224.2023.07.13.02.33.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 02:33:20 -0700 (PDT)
+Message-ID: <ef77b43d-0b5a-9e5f-640a-5e3c981bd642@blackwall.org>
+Date: Thu, 13 Jul 2023 12:33:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CO1PR13MB5016:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea24e1c8-f1bb-45b8-371b-08db838431c6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	jeLVt5YGQNhJTX+tpnC0CDoU348SFv/RgmEMD4nRRh6FDnZpI1sh1mXTIlV30f8gTFGZLA+MupxqP3aSW7ODx48pZNd49CCI85c/MFj4Xj8nknG5ZWgMK0tT0lnM1ImoUYPuZQ5mbjNJldJnBMANS0Sr334z+D3BBvQcSWIfsbZD1YXmxBVv5LWnYxYF595Oa+nZt2YGTlNGLk8QQg6Sshs2VqdupCGmB2lv+kbjQd3CFzst5loUBwmYtx3GkBcOz3bTvZ8hMJqwLg2hq3bduy0e2yeU9Qm/MH+4cjl+jbpConmJpYoRoKXGctPGkTuvxiLM5yoSQVzgbwxieuwLBS+L9j3IONwMSndc+zclzwbYi+W5SQY+O6zHJlnKUeF8KSFfNmGlVYH0J2Sxl9aYJGWbbIoAFwF4X89MdXCqs1sKtEKIiWFY+GuKNCfhbOojXXU/WwMIm83VxUI5f7CEHKN1yBdRLsO+ULzRIsqYwaItp8cCOz+6PuFniipLDikQewapwvNx1bt+ShLzNfLeCiAiCswsfuTN2NOzG22eAOhzMu7wxXnh3i1HGb7XfJs9Sc0iA64ZQ+Zie8N6NF1SBpcjoZFr20VuzkNtZ28Nm38=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(366004)(39840400004)(376002)(346002)(451199021)(44832011)(6916009)(66556008)(66946007)(66476007)(4326008)(316002)(41300700001)(4744005)(2906002)(478600001)(5660300002)(8676002)(8936002)(54906003)(6666004)(6486002)(6512007)(6506007)(26005)(186003)(36756003)(38100700002)(2616005)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xM0Y7lME7TZrLLAXgEvxTnPt5pJkivQHWRwhRfnaapE6sl8sTsUPvl7O5RPU?=
- =?us-ascii?Q?+d7uXwRc/7b7w5zeiebvf0mMRs7qSZsmJsZsUaksF18QkSj1TggO3WMxZaUT?=
- =?us-ascii?Q?H/9ISG9rb96MxGTHEp68lurlHFePZ7CPcjq1Oap0c1lheYLat3Qr9rC0xSLU?=
- =?us-ascii?Q?5ftwDJhoGmXMvsKap6FScjS8CEejuThRmgu4o8aQjJ7Vdx1gycROGIGABf60?=
- =?us-ascii?Q?ueSOK5jbR2upaw2SM0zbugnZ94ZPRFKVtIaG5nv6YZnwiTKkBVtn6FZv2y+W?=
- =?us-ascii?Q?3vsgSorUz0cV4tK9imi24oKbFWoUmHGupQOPzlRTECQj/VTj8d8NdyUfpMlU?=
- =?us-ascii?Q?xbeHQo6Z8lKchPVQ6qQVhv59crZA3QtXtC9bqSjzCwMbqhEyzrkcZtC/UKqm?=
- =?us-ascii?Q?gnNeYECzLgVVWu9cSdQmEhqYMHI3vbL6cD/DMNFmz/fAF3Erwf/X9VDK3xMw?=
- =?us-ascii?Q?FBmfWcjrwLTY2IgavM5FvEsUYtPOvLcRm/M5HaFROMNlhf5scpgGw/K2aZp8?=
- =?us-ascii?Q?t8bAkDnvvpOB9togRlDn6d9BmhqUl7AlSwyz1Q5mGNbztjpCFV4Z/IctBfpQ?=
- =?us-ascii?Q?uW5BSMJytvNp+Zyh2Cv328WKBWVGXZkseQ/V76+JXpHy94JGAnTFwgL2Ffxn?=
- =?us-ascii?Q?ZJurqZY6HmBmFxOR7ZvO95EV5r+dwOxMfzJcq1tgEirjqxov6vWLfxQ6QvJa?=
- =?us-ascii?Q?/dVPjPXcf4a5n+mELKvyk7JYP9OaCWMl7nolWNzGlonUzjve1G4juJJlobdQ?=
- =?us-ascii?Q?Ljv8wAfhPHi868S/KaLKfWAdM3naJqk+IGHRkkzrlqNcY/RRI6FBQNDZa9uo?=
- =?us-ascii?Q?yeeqOEfN6kwSRwdGIjjwA8BENXJKxPw36CVda3af3UyQjmoMK5PMwAFzdO1e?=
- =?us-ascii?Q?/ejt4EGoNXkCBs1g0ZJNYLad+B2dYUpzuwPpdvPW5BSbKUQJ1BF8VFPHlhKm?=
- =?us-ascii?Q?e2yI7RYQL8kYz++7MMm1fDuGKJAuQsiHWJgD6iOK/WzrPqrRcfcajPCP/SIR?=
- =?us-ascii?Q?ug34sfMUOImC/uM89lhREk20LkKb6/BusWTBROuTLNHDzjWPadi3ADCBXV8J?=
- =?us-ascii?Q?lORhmtl0M/VHinFZEZbAWHg3YM6A+8BEPuwrQOO8RNc1g6zuFtakp8eIke0l?=
- =?us-ascii?Q?+M4zeNNhq4vtm/tR3ywqAxSQI9WLiFlh3ZGJfEE748lKZ/lQUbHmgJ1dOSsD?=
- =?us-ascii?Q?JUHJPWCj1n4CJVp9cc5QETQ6RDxE0jm59agTuZdP/e4Yr6gB915x9vCGC2l8?=
- =?us-ascii?Q?devhHDJ5QF6f3JECpVd1A0zBUwb6CN27wbUNDgonoXZSu7GJUHEljgv8+8HX?=
- =?us-ascii?Q?OS5aUbduU0BBkOepmd5G1V4B1FJ6/UuE+/+ENgb/fdkd2JzIvsazgObWhBkY?=
- =?us-ascii?Q?EP04QgfsLDhlX0wTirW3ViLPt42p473th5QRUFrm5chy3RhkGgI0zp1im4Qa?=
- =?us-ascii?Q?Ekhh8T6/Uq7687SnQwL1mFWShbJCHMS5YTnhaN3giQKccMTvdEVUbJHXcKLh?=
- =?us-ascii?Q?hRzJv59U0XLx2Rhy89iuhK1lJW6LFePoHUKb109zBBL4aGjL8DDzIpkLosoM?=
- =?us-ascii?Q?w7/ol14mlWZHYKBKgdd0rard2bEn02cVp0kkqlywt/YWmAqwzp8mODUU/Xt2?=
- =?us-ascii?Q?cw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea24e1c8-f1bb-45b8-371b-08db838431c6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 09:33:19.8431
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pnHtSqADD+CikwpOjz4LDUMJwlh4+J+GCpcx8QO5uQDuTkPFuL1DAzahot+2v1Dk8cVGjp9cuDm3paB7qJOaCG1Ye15odkepkbxrg8eUHHw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR13MB5016
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [RFC PATCH net-next 3/4] bridge: Add backup nexthop ID support
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ bridge@lists.linux-foundation.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, roopa@nvidia.com, dsahern@gmail.com, petrm@nvidia.com,
+ taspelund@nvidia.com
+References: <20230713070925.3955850-1-idosch@nvidia.com>
+ <20230713070925.3955850-4-idosch@nvidia.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230713070925.3955850-4-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 03:06:21PM +0200, Guillaume Nault wrote:
-> icmpv6_flow_init(), ip6_datagram_flow_key_init() and ip6_mc_hdr() don't
-> need to modify their sk argument. Make that explicit using const.
+On 13/07/2023 10:09, Ido Schimmel wrote:
+> Add a new bridge port attribute that allows attaching a nexthop object
+> ID to an skb that is redirected to a backup bridge port with VLAN
+> tunneling enabled.
 > 
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> Specifically, when redirecting a known unicast packet, read the backup
+> nexthop ID from the bridge port that lost its carrier and set it in the
+> bridge control block of the skb before forwarding it via the backup
+> port. Note that reading the ID from the bridge port should not result in
+> a cache miss as the ID is added next to the 'backup_port' field that was
+> already accessed. After this change, the 'state' field still stays on
+> the first cache line, together with other data path related fields such
+> as 'flags and 'vlgrp':
+> 
+> struct net_bridge_port {
+>          struct net_bridge *        br;                   /*     0     8 */
+>          struct net_device *        dev;                  /*     8     8 */
+>          netdevice_tracker          dev_tracker;          /*    16     0 */
+>          struct list_head           list;                 /*    16    16 */
+>          long unsigned int          flags;                /*    32     8 */
+>          struct net_bridge_vlan_group * vlgrp;            /*    40     8 */
+>          struct net_bridge_port *   backup_port;          /*    48     8 */
+>          u32                        backup_nhid;          /*    56     4 */
+>          u8                         priority;             /*    60     1 */
+>          u8                         state;                /*    61     1 */
+>          u16                        port_no;              /*    62     2 */
+>          /* --- cacheline 1 boundary (64 bytes) --- */
+> [...]
+> } __attribute__((__aligned__(8)));
+> 
+> When forwarding an skb via a bridge port that has VLAN tunneling
+> enabled, check if the backup nexthop ID stored in the bridge control
+> block is valid (i.e., not zero). If so, instead of attaching the
+> pre-allocated metadata (that only has the tunnel key set), allocate a
+> new metadata, set both the tunnel key and the nexthop object ID and
+> attach it to the skb.
+> 
+> By default, do not dump the new attribute to user space as a value of
+> zero is an invalid nexthop object ID.
+> 
+> The above is useful for EVPN multihoming. When one of the links
+> composing an Ethernet Segment (ES) fails, traffic needs to be redirected
+> towards the host via one of the other ES peers. For example, if a host
+> is multihomed to three different VTEPs, the backup port of each ES link
+> needs to be set to the VXLAN device and the backup nexthop ID needs to
+> point to an FDB nexthop group that includes the IP addresses of the
+> other two VTEPs. The VXLAN driver will extract the ID from the metadata
+> of the redirected skb, calculate its flow hash and forward it towards
+> one of the other VTEPs. If the ID does not exist, or represents an
+> invalid nexthop object, the VXLAN driver will drop the skb. This
+> relieves the bridge driver from the need to validate the ID.
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   include/uapi/linux/if_link.h |  1 +
+>   net/bridge/br_forward.c      |  1 +
+>   net/bridge/br_netlink.c      | 12 ++++++++++++
+>   net/bridge/br_private.h      |  3 +++
+>   net/bridge/br_vlan_tunnel.c  | 15 +++++++++++++++
+>   net/core/rtnetlink.c         |  2 +-
+>   6 files changed, 33 insertions(+), 1 deletion(-)
+> 
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+One comment below, with that fixed you can add
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index 0f6a0fe09bdb..ce3117df9cec 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -570,6 +570,7 @@ enum {
+>   	IFLA_BRPORT_MCAST_N_GROUPS,
+>   	IFLA_BRPORT_MCAST_MAX_GROUPS,
+>   	IFLA_BRPORT_NEIGH_VLAN_SUPPRESS,
+> +	IFLA_BRPORT_BACKUP_NHID,
+>   	__IFLA_BRPORT_MAX
+>   };
+>   #define IFLA_BRPORT_MAX (__IFLA_BRPORT_MAX - 1)
+> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+> index 6116eba1bd89..9d7bc8b96b53 100644
+> --- a/net/bridge/br_forward.c
+> +++ b/net/bridge/br_forward.c
+> @@ -154,6 +154,7 @@ void br_forward(const struct net_bridge_port *to,
+>   		backup_port = rcu_dereference(to->backup_port);
+>   		if (unlikely(!backup_port))
+>   			goto out;
+> +		BR_INPUT_SKB_CB(skb)->backup_nhid = READ_ONCE(to->backup_nhid);
+>   		to = backup_port;
+>   	}
+>   
+> diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+> index 05c5863d2e20..10f0d33d8ccf 100644
+> --- a/net/bridge/br_netlink.c
+> +++ b/net/bridge/br_netlink.c
+> @@ -211,6 +211,7 @@ static inline size_t br_port_info_size(void)
+>   		+ nla_total_size(sizeof(u8))	/* IFLA_BRPORT_MRP_IN_OPEN */
+>   		+ nla_total_size(sizeof(u32))	/* IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT */
+>   		+ nla_total_size(sizeof(u32))	/* IFLA_BRPORT_MCAST_EHT_HOSTS_CNT */
+> +		+ nla_total_size(sizeof(u32))	/* IFLA_BRPORT_BACKUP_NHID */
+>   		+ 0;
+>   }
+>   
+> @@ -319,6 +320,10 @@ static int br_port_fill_attrs(struct sk_buff *skb,
+>   			    backup_p->dev->ifindex);
+>   	rcu_read_unlock();
+>   
+> +	if (p->backup_nhid &&
+> +	    nla_put_u32(skb, IFLA_BRPORT_BACKUP_NHID, p->backup_nhid))
+> +		return -EMSGSIZE;
+> +
+
+READ_ONCE(), see the comment above backup_port :)
+
+>   	return 0;
+>   }
+>   
+> @@ -895,6 +900,7 @@ static const struct nla_policy br_port_policy[IFLA_BRPORT_MAX + 1] = {
+>   	[IFLA_BRPORT_MCAST_N_GROUPS] = { .type = NLA_REJECT },
+>   	[IFLA_BRPORT_MCAST_MAX_GROUPS] = { .type = NLA_U32 },
+>   	[IFLA_BRPORT_NEIGH_VLAN_SUPPRESS] = NLA_POLICY_MAX(NLA_U8, 1),
+> +	[IFLA_BRPORT_BACKUP_NHID] = { .type = NLA_U32 },
+>   };
+>   
+>   /* Change the state of the port and notify spanning tree */
+> @@ -1065,6 +1071,12 @@ static int br_setport(struct net_bridge_port *p, struct nlattr *tb[],
+>   			return err;
+>   	}
+>   
+> +	if (tb[IFLA_BRPORT_BACKUP_NHID]) {
+> +		u32 backup_nhid = nla_get_u32(tb[IFLA_BRPORT_BACKUP_NHID]);
+> +
+> +		WRITE_ONCE(p->backup_nhid, backup_nhid);
+> +	}
+> +
+>   	return 0;
+>   }
+>   
+> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+> index a63b32c1638e..05a965ef76f1 100644
+> --- a/net/bridge/br_private.h
+> +++ b/net/bridge/br_private.h
+> @@ -387,6 +387,7 @@ struct net_bridge_port {
+>   	struct net_bridge_vlan_group	__rcu *vlgrp;
+>   #endif
+>   	struct net_bridge_port		__rcu *backup_port;
+> +	u32				backup_nhid;
+>   
+>   	/* STP */
+>   	u8				priority;
+> @@ -605,6 +606,8 @@ struct br_input_skb_cb {
+>   	 */
+>   	unsigned long fwd_hwdoms;
+>   #endif
+> +
+> +	u32 backup_nhid;
+>   };
+>   
+>   #define BR_INPUT_SKB_CB(__skb)	((struct br_input_skb_cb *)(__skb)->cb)
+> diff --git a/net/bridge/br_vlan_tunnel.c b/net/bridge/br_vlan_tunnel.c
+> index 6399a8a69d07..81833ca7a2c7 100644
+> --- a/net/bridge/br_vlan_tunnel.c
+> +++ b/net/bridge/br_vlan_tunnel.c
+> @@ -201,6 +201,21 @@ int br_handle_egress_vlan_tunnel(struct sk_buff *skb,
+>   	if (err)
+>   		return err;
+>   
+> +	if (BR_INPUT_SKB_CB(skb)->backup_nhid) {
+> +		tunnel_dst = __ip_tun_set_dst(0, 0, 0, 0, 0, TUNNEL_KEY,
+> +					      tunnel_id, 0);
+> +		if (!tunnel_dst)
+> +			return -ENOMEM;
+> +
+> +		tunnel_dst->u.tun_info.mode |= IP_TUNNEL_INFO_TX |
+> +					       IP_TUNNEL_INFO_BRIDGE;
+> +		tunnel_dst->u.tun_info.key.nhid =
+> +			BR_INPUT_SKB_CB(skb)->backup_nhid;
+> +		skb_dst_set(skb, &tunnel_dst->dst);
+> +
+> +		return 0;
+> +	}
+> +
+>   	tunnel_dst = rcu_dereference(vlan->tinfo.tunnel_dst);
+>   	if (tunnel_dst && dst_hold_safe(&tunnel_dst->dst))
+>   		skb_dst_set(skb, &tunnel_dst->dst);
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index 3ad4e030846d..9e7e3377ec10 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -61,7 +61,7 @@
+>   #include "dev.h"
+>   
+>   #define RTNL_MAX_TYPE		50
+> -#define RTNL_SLAVE_MAX_TYPE	43
+> +#define RTNL_SLAVE_MAX_TYPE	44
+>   
+>   struct rtnl_link {
+>   	rtnl_doit_func		doit;
 
 
