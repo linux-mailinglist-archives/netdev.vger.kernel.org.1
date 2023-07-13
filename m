@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-17552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3505751F98
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:11:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A81751FA8
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:15:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61FBE281D6D
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:11:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5B2D1C21368
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB021094E;
-	Thu, 13 Jul 2023 11:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357D91096F;
+	Thu, 13 Jul 2023 11:15:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD2B79CB
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 11:11:51 +0000 (UTC)
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 284361FF1;
-	Thu, 13 Jul 2023 04:11:49 -0700 (PDT)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1qJuEa-00082a-0L;
-	Thu, 13 Jul 2023 11:11:44 +0000
-Date: Thu, 13 Jul 2023 12:11:30 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C19E1094E;
+	Thu, 13 Jul 2023 11:14:59 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F304D26A2;
+	Thu, 13 Jul 2023 04:14:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=MDuT703ngKhFlRZyWWMSEsAM8ty4gmUzqQMXJQcuvVk=; b=wYDk+bN1++5rhyjrI8cgWC7POg
+	DA2dP0rGbqmN9RskyM2L70JP8xgSx8GQ1Le2mFgzrQmGX1tVs//odE1KLPY/OvxYDCVdtFQC+eJBt
+	SVuxX0ZGL0Ypzj9q/geyGyF2D1rByT9ZVyQgMvmzjlq6CkHiJOH7WyhMmSg2kMvKw9aC3Sgmp7pia
+	N9jIQLDN8sbzZ1Br3d0dptlPpJtXRshxzqPaZQ1Q/e0dVraBupePz2s02k69AgQGBlZA/SLJZHzDa
+	NI45kxHVkjzxplnEacIbr1fVJFcwpUuqx7eShf8M6QOjPdPnDWgDCIk+RoyoN0W3BjtNfTd205eFD
+	ykdxn+AQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qJuHV-00339M-2s;
+	Thu, 13 Jul 2023 11:14:45 +0000
+Date: Thu, 13 Jul 2023 04:14:45 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Greg Ungerer <gerg@kernel.org>
-Subject: Re: [PATCH v2 net-next 4/9] net: ethernet: mtk_eth_soc: increase
- MAX_DEVS to 3
-Message-ID: <ZK_b4s6cQd-lhz1Y@makrotopia.org>
-References: <cover.1689012506.git.daniel@makrotopia.org>
- <2cc8012ec538106c6bcf22a40b647ec342e687a8.1689012506.git.daniel@makrotopia.org>
- <ZK+izTulIcse2aG5@shell.armlinux.org.uk>
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH vhost v11 03/10] virtio_ring: introduce
+ virtqueue_set_premapped()
+Message-ID: <ZK/cpSceLMovhmfR@infradead.org>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,53 +61,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZK+izTulIcse2aG5@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230710034237.12391-4-xuanzhuo@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 08:07:57AM +0100, Russell King (Oracle) wrote:
-> On Thu, Jul 13, 2023 at 03:18:52AM +0100, Daniel Golle wrote:
-> > From: Lorenzo Bianconi <lorenzo@kernel.org>
-> > 
-> > This is a preliminary patch to add MT7988 SoC support since it runs 3
-> > macs instead of 2.
-> > 
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > ---
-> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 6 +++++-
-> >  drivers/net/ethernet/mediatek/mtk_eth_soc.h | 4 ++--
-> >  2 files changed, 7 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > index 7014e0d108b27..7f191e4337dd8 100644
-> > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > @@ -4030,8 +4030,12 @@ static void mtk_sgmii_destroy(struct mtk_eth *eth)
-> >  {
-> >  	int i;
-> >  
-> > -	for (i = 0; i < MTK_MAX_DEVS; i++)
-> > +	for (i = 0; i < MTK_MAX_DEVS; i++) {
-> > +		if (!eth->sgmii_pcs[i])
-> > +			continue;
-> > +
-> >  		mtk_pcs_lynxi_destroy(eth->sgmii_pcs[i]);
-> > +	}
+On Mon, Jul 10, 2023 at 11:42:30AM +0800, Xuan Zhuo wrote:
+> This helper allows the driver change the dma mode to premapped mode.
+> Under the premapped mode, the virtio core do not do dma mapping
+> internally.
 > 
-> Please instead arrange for mtk_pcs_lynxi_destroy() to be a no-op if it's
-> passed a NULL pointer, which makes it easier to use in error paths (it
-> means mtk_pcs_lynxi_destroy() can be called without checks - like
-> kfree() etc.)
-> 
-> Since error paths don't get often tested, we need to do as much as
-> possible to make error paths trivial.
+> This just work when the use_dma_api is true. If the use_dma_api is false,
+> the dma options is not through the DMA APIs, that is not the standard
+> way of the linux kernel.
 
-This is the case already, so the above if-clause can be dropped.
-I will do so in v3.
+I have a hard time parsing this.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/pcs/pcs-mtk-lynxi.c#n291
+More importantly having two modes seems very error prone going down
+the route.  If the premapping is so important, why don't we do it
+always?
 
