@@ -1,160 +1,140 @@
-Return-Path: <netdev+bounces-17697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3112752BE6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:11:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 857E7752BF4
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18C8B1C21478
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:11:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B65D61C2147D
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D7F200CB;
-	Thu, 13 Jul 2023 21:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67484200D4;
+	Thu, 13 Jul 2023 21:17:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB461E536
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:11:11 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C4C2D43
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:11:07 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fbc1218262so11024885e9.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:11:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A649200D0
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:17:48 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3508226A3
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:17:45 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fc0aecf15bso9987675e9.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:17:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689282666; x=1691874666;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FMcwAFTjOnyTS+kPT7yXnXht1Htba9oLhdBwkNZOrQ4=;
-        b=HL8jQ3LyPgEPU16NjfsR2p8bRYNW/X0XlJ9VN5Gqjtw/4rabJpqSq4wYbOheeQlCy6
-         Q/SwvwqCZ9okt5+8oWF72X4T9FAnKhGs5HWw8Tzimr1A+rzm5R/0xBMbTePbsa6BJgPw
-         jLkT1JbHrRrHrgSr8tj7Nk3J7z62fKrTwhQ54nxiNDMoQC6yi+Z/Kr/33gVCigS3aCTI
-         xlQezl+Nw0mur6GktElFlYzrvt9EE0mOPAsodCbP0CYntsbinuoviJodV3+iEa96IY37
-         7SmKX6UesrH38NWFVmOOYOJQPiXeP+6+HP30nbSyY5E0QUCDVA1KJ/NpQM7TRU4cyO5x
-         WapQ==
+        d=tessares.net; s=google; t=1689283063; x=1691875063;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0SJ39/4emjSBqidxqqm+hSVoBmdKYwJWI9c6gIRJrwY=;
+        b=MQOKyAjPYTanB89cWMCX2J4We8mHG/LwU02ZcPmSgvFXX3VCxt/Gmx+J1azXF3R6Yu
+         kcZ7fHr7qI1B148BEzwGy4YwZlRXHns/ugmQ/gvvf6bYFUSC5BiBuZqZt912g4NVqHY8
+         2dA7NLxQ0fEZcLM6uMflFeSsnhAs1wvKDjMc9DLqH1XZCwVdt1e4H1LVRptsM1XHVxln
+         VMOxXII4JBos2e5ca7dSGI9hlq/pVSiNHy67kW5dVmSfEpz4LB/w9Gf8Nm8PgHYm2Xgk
+         fnfth5OVGJ0WCDxZQ9Rb7BMRcrrDaorWW6RiWeK5d/epMXUkey8zak8iLGf5Jg9Vylhm
+         aaBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689282666; x=1691874666;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMcwAFTjOnyTS+kPT7yXnXht1Htba9oLhdBwkNZOrQ4=;
-        b=bLrOWtAzCdi/aQyHFROYdHNcmvz+EIwj8CdCKmjYE63B+oUtvUIr4RFdFTk7DsXuau
-         OIxBlsfjPItYyp8TNKRUImgqvIeyau8qgnTviRHms4Gq4o93lIogzsviKpa6ZjOGmPQr
-         +R6RQyJMPls4J1LPWPwd3s4rqL1esEW9j8L7UJsaMi+f/zPSJ/+eMWPqbATi3qS9NZQ0
-         7C11TPLtSg5/XUE/qgW7co/WXkAPnOBJzvA7FVng8hde7PC57eU7IO9N5sMCTXnNIZkU
-         Iu+iSXYlPx7ygsUkiKF5QdLwg+OXZP2JD+H/pkEkb6zv3aoH0bOHYrc8g4pAT9arfLru
-         xIlg==
-X-Gm-Message-State: ABy/qLa2Ocg8Yidt48KUBmzwtIRzXTEY2K3kDIrbDlQ6vmTjKN8GEcsx
-	x1S97fjPPxoTg2nV+9ANnVwh/vJxhbqe5TqeCpv8cugS
-X-Google-Smtp-Source: APBJJlEsZI5b3rB95rgwRwJjbq6f1zRZykRdfsSjNc5zztMVV0dFxADNv0U8NwUiMpw5SA4EVg8DZw==
-X-Received: by 2002:a7b:c7c5:0:b0:3fb:cf8e:c934 with SMTP id z5-20020a7bc7c5000000b003fbcf8ec934mr2399027wmk.27.1689282666056;
-        Thu, 13 Jul 2023 14:11:06 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:d855:a28a:e0c1:ddc1? ([2a02:578:8593:1200:d855:a28a:e0c1:ddc1])
-        by smtp.gmail.com with ESMTPSA id u18-20020a05600c211200b003fbbe41fd78sm8755849wml.10.2023.07.13.14.11.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 14:11:05 -0700 (PDT)
-Message-ID: <ccfa7c51-d328-4222-1921-631f10057349@tessares.net>
-Date: Thu, 13 Jul 2023 23:11:04 +0200
+        d=1e100.net; s=20221208; t=1689283063; x=1691875063;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0SJ39/4emjSBqidxqqm+hSVoBmdKYwJWI9c6gIRJrwY=;
+        b=DCo4aR/HkUJO7ir/0MpTwGJgDV9LtNi5IRwzImjsgH1dK3Fs095YqEKONjQ6Fd2o31
+         vkSgJypFvM0rj3dhAk3BoNIFFT9MmWjJlR/7JLuzW3M7RTMi6mQ/xiPmZDxBhA306xzs
+         7XPHHbByXtl2vSt1LYMpdCQtO/oFl8E7PEOHBKwD6l3hmkRk8eTRF6ikLknxLoetIdQm
+         /kjK1a/LQfVw+VGw4777f/jqWrCWpdbeB/N77aI6b44CQrrvWC1Ze6sc13LaLIYIna+m
+         6fwqPu3ZKc1gAKjEdhRXV23QjFLlmvPLUq/k8YuKX0+DxQRR2OdXRrngHIrHooCKA5w8
+         4y9w==
+X-Gm-Message-State: ABy/qLZeflL0l6OPI3sGdbM31yEnGW94wQ2a8o06ujtMIHekjL1xKlWD
+	CRYNimucpDuc+BJwRH+jkQ8CEA==
+X-Google-Smtp-Source: APBJJlHK1/lG2hgNlfU5T9vUiKYKjvPj4CCwde7DgVzxA8j+DT7soIe9qcuZieyexN1nyGW+IoLbPA==
+X-Received: by 2002:a7b:cbc9:0:b0:3fb:e1ed:7f83 with SMTP id n9-20020a7bcbc9000000b003fbe1ed7f83mr2882736wmi.33.1689283062844;
+        Thu, 13 Jul 2023 14:17:42 -0700 (PDT)
+Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
+        by smtp.gmail.com with ESMTPSA id m20-20020a7bcb94000000b003fbfea1afffsm8734136wmi.27.2023.07.13.14.17.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 14:17:42 -0700 (PDT)
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+Subject: [PATCH net 0/3] selftests: tc: increase timeout and add missing
+ kconfig
+Date: Thu, 13 Jul 2023 23:16:43 +0200
+Message-Id: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: TC: selftests: current timeout (45s) is too low
-Content-Language: en-GB
-To: Pedro Tammela <pctammela@mojatatu.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Linux Kernel Functional Testing <lkft@linaro.org>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell
- <anders.roxell@linaro.org>, Davide Caratti <dcaratti@redhat.com>
-References: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
- <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
- <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
- <0f762e7b-f392-9311-6afc-ed54bf73a980@mojatatu.com>
- <35329166-56a7-a57e-666e-6a5e6616ac4d@tessares.net>
- <593be21c-b559-8e9c-25ad-5f4291811411@mojatatu.com>
- <fdf52d83-6e58-3284-8c61-66cf218c7083@tessares.net>
- <3b7a96db-70a1-9907-6caf-e89e811d40f6@mojatatu.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <3b7a96db-70a1-9907-6caf-e89e811d40f6@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+X-B4-Tracking: v=1; b=H4sIALtpsGQC/x3MQQqDMBBG4avIrB1ITLXYq4iLon/qUIklM0hBv
+ LvB5bd47yBFFii9qoMydlHZUoGvK5qWd/qAZS6mxjXBPX1gm1ixRoOa8vqNxqELeLS9i961VLp
+ fRpT//RwowWg8zwsrw3IxaAAAAA==
+To: Jamal Hadi Salim <jhs@mojatatu.com>, 
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+ Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
+ "David S. Miller" <davem@davemloft.net>, Paul Blakey <paulb@mellanox.com>, 
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, mptcp@lists.linux.dev
+Cc: Pedro Tammela <pctammela@mojatatu.com>, 
+ Shuah Khan <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1319;
+ i=matthieu.baerts@tessares.net; h=from:subject:message-id;
+ bh=X7TmH0nuyH8IYOau93/uRL5n5B40ehly9tSIh/k77XU=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBksGn1fSBHW3xBP1UUe+C5C8geDtkmfExF5YBV1
+ KB1xfHHozKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLBp9QAKCRD2t4JPQmmg
+ c2IiD/4275C6eSBB6If2iVSrVVuu040rBtAxF3vjZTgGMw4h1d+VzvS52fSGSIksGR8bdY0gjED
+ UnmPuLzrChpaGx+m8o8fuVpTgFLQNUn6BUt3Q68ipTHyWVQDMBSgW80Djso53UtEmSKZqRSBsXH
+ cCHlqwShwov5L7sl6kQz5a9skY8LJPJAWxAUz5kSkHobGdmQpSwO/DPqryh9SY+1D08GKVoA0Va
+ 4Qyjxw9CWe2EsjHfF6nShg7ufvS5hALVhw5cG68jOhIypW/DNnUvUFjaKaZHYRUjTOaj4RDJA/+
+ 4o5mqV1FkNGcSh7fJArppllho7Uu3f7UlO+xL6eS0Hw6+09lsqR4xuFCsGetegggREG3S3LpYNa
+ hhQu9xkgAvCbyI1a9dlZJCIoNHZyaafvRpaOqqBVlIofwEXPnKJaRSgylHtC4rAKtH3Le8lcP4f
+ RJP5G5VN4mTwd/kfGHccEEviE+OBdGyD6GZAh+fJQz0Yo3F9IVeRGW+S3+zlfZOhZmCFFAzkIk1
+ y5X3DK27ZQ6o+Na+sLw3htKtxW/Yixy4Np1IPAVsB5W5qA8U7s8UfXksSIRXcUYGGSb7gtsqkeS
+ vDsqBg+WiFThnjxvJAsJuOZyRBJ/CyTaQeJFTXwVk6HoRjFQyhpz3yM2VX4E/kIulcaZqI+Tzt1
+ 8YasD0mMn5Z06Mw==
+X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Pedro, LKFT team,
+When looking for something else in LKFT reports [1], I noticed that the
+TC selftest ended with a timeout error:
 
-@LKFT team: there is question for you below.
+  not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
 
-On 13/07/2023 22:32, Pedro Tammela wrote:
-> On 13/07/2023 16:59, Matthieu Baerts wrote:
->> On 13/07/2023 19:30, Pedro Tammela wrote:
+I also noticed most of the tests were skipped because the "teardown
+stage" did not complete successfully. It was due to missing kconfig.
 
-(...)
+These patches fix these two errors plus an extra one because this
+selftest reads info from "/proc/net/nf_conntrack". Thank you Pedro for
+having helped me fixing these issues [2].
 
->>> Could you also do one final test with the following?
->>> It will increase the total testing wall time but it's ~time~ we let the
->>> bull loose.
->>
->> Just did, it took just over 3 minutes (~3:05), see the log file in [1]
->> (test job in [2] and build job in [3]).
->>
->> Not much longer but 15 more tests failing :)
->> Also, 12 new tests have been skipped:
->>
->>> Tests using the DEV2 variable must define the name of a physical NIC
->>> with the -d option when running tdc.
->> But I guess that's normal when executing tdc.sh.
->>
-> 
-> Yep, some tests could require physical hardware, so it's ok to skip those.
+Link: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230711/testrun/18267241/suite/kselftest-tc-testing/test/tc-testing_tdc_sh/log [1]
+Link: https://lore.kernel.org/netdev/0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net/T/ [2]
+Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+---
+Matthieu Baerts (3):
+      selftests: tc: set timeout to 15 minutes
+      selftests: tc: add 'ct' action kconfig dep
+      selftests: tc: add ConnTrack procfs kconfig
 
-OK
+ tools/testing/selftests/tc-testing/config   | 2 ++
+ tools/testing/selftests/tc-testing/settings | 1 +
+ 2 files changed, 3 insertions(+)
+---
+base-commit: 9d23aac8a85f69239e585c8656c6fdb21be65695
+change-id: 20230713-tc-selftests-lkft-363e4590f105
 
-> As for some of the tests that failed / skipped, it might be because of
-> an old iproute2.
-> I see that's using bookworm as the rootfs, which has the 6.1 iproute2.
-> Generally tdc should run with the matching iproute2 version although
-> it's not really required but rather recommended.
-
-Ah yes, it makes sense!
-
-> We do have a 'dependsOn' directive to skip in case of mismatches, so
-> perhaps it might be necessary to adjust some of these tests.
-
-Yes, better to skip. Especially because the selftests are supposed to
-support old tools and kernel versions:
-
-  https://lore.kernel.org/stable/ZAHLYvOPEYghRcJ1@kroah.com/
-
-> OTOH, is it possible to have a rootfs which runs the tests in tandem
-> with iproute2-next?
-
-I don't know :)
-But I hope the LKFT team can help answering this question!
-
-@LKFT team: is it possible to run the latest iproute2 version, even the
-one from iproute2-next when validating linux-next?
-
-> Thanks for chasing this! I will let the guys know and we will try to fix
-> the test failures.
-
-Thank you for your support!
-
-Cheers,
-Matt
+Best regards,
 -- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+Matthieu Baerts <matthieu.baerts@tessares.net>
+
 
