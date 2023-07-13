@@ -1,118 +1,223 @@
-Return-Path: <netdev+bounces-17609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693ED752598
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:52:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 369FB7525A7
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A4B51C20B9E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:52:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 669C81C213EF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A279C18AE9;
-	Thu, 13 Jul 2023 14:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8D218AED;
+	Thu, 13 Jul 2023 14:53:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9437811C9D
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:52:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B246919B
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:52:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689259971;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a2zCtBlVMSfdNhn49F5fvGTfds6ip8Yk0SLr5SlzCTc=;
-	b=ed/otZgvy/UyyX9Q+zmgkKF0WMj4VvaSOiQOuSpM/jZxh2mgeb2Bq0GTiSWg6Wp6Jxf1/+
-	eVPsS78e7H/pGP1jFNz8vrCD76WKdNSHOCvjaI/b2eEZFm0V/AXmasoyJ3obL0F4MAO/IP
-	wT7LniqQ5Y7bexPpFahoFIifjOFaXzs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-sYQX1ipMPZWkGgXgYW0DqA-1; Thu, 13 Jul 2023 10:52:49 -0400
-X-MC-Unique: sYQX1ipMPZWkGgXgYW0DqA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31429e93f26so585024f8f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:52:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689259968; x=1691851968;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a2zCtBlVMSfdNhn49F5fvGTfds6ip8Yk0SLr5SlzCTc=;
-        b=U0zCwR/qa5q4c2c19XYSz4BIRv1Ho1dzwcTuLBEpANsrOIPYO3LUzELanP7+n9OwRV
-         EOCsaMApGfYWwRYToj0QzwZnsvc9eMlP6UWI4202GN2ZZj1GXj6MEY3YHsK5Km9OF08/
-         kxMB0CeykzcBxhZpZIXZPd6t1YtTqyP+RzJju+Do793HtCS35uJm970hkG3Tj7X1g+qy
-         Aso2hxqLqFWAyTr77Js7GXcWa2I1738LGUCy5ZIurBnjiAwOhm3ZGfL96yFyLiCgAeYQ
-         6YYxEsGi5GlGrbnLh3jZZ6gI/dq4FDBLJt62WJ101wkSYpVU+Z+j3bG4GOWxPFWFJhYZ
-         Eamw==
-X-Gm-Message-State: ABy/qLaMlR+ooYk0Ufj7euU0+R2n8TR0WPNkU75UHmDEVGsbzlv/y1vp
-	hb0Mw16MC+zDQFFJRPuqcz3+WOnvQ/0FpI7ofi2+tAu0FT1/lc+aYO+Vyz/UYjjoK+NDa853cG3
-	1b7y914XUbbC+y8Fu
-X-Received: by 2002:adf:f802:0:b0:314:3503:15ac with SMTP id s2-20020adff802000000b00314350315acmr1739349wrp.10.1689259968668;
-        Thu, 13 Jul 2023 07:52:48 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHIe9bIwU8uwonGb/X776+z7KNCl4G7bhOiTrPif1cQEJqDIP/Vb7HU5xOiBtQ+0jRV7Mj+VA==
-X-Received: by 2002:adf:f802:0:b0:314:3503:15ac with SMTP id s2-20020adff802000000b00314350315acmr1739345wrp.10.1689259968500;
-        Thu, 13 Jul 2023 07:52:48 -0700 (PDT)
-Received: from redhat.com ([2.52.158.233])
-        by smtp.gmail.com with ESMTPSA id s14-20020adfea8e000000b00301a351a8d6sm8230571wrm.84.2023.07.13.07.52.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 07:52:48 -0700 (PDT)
-Date: Thu, 13 Jul 2023 10:52:44 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	virtualization@lists.linux-foundation.org,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH vhost v11 03/10] virtio_ring: introduce
- virtqueue_set_premapped()
-Message-ID: <20230713105230-mutt-send-email-mst@kernel.org>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-4-xuanzhuo@linux.alibaba.com>
- <ZK/cpSceLMovhmfR@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6AB182CD
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:53:02 +0000 (UTC)
+Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc08])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 857442706
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:52:59 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4R1yJn3WBTzMq415;
+	Thu, 13 Jul 2023 14:52:57 +0000 (UTC)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4R1yJm3CT1z14C;
+	Thu, 13 Jul 2023 16:52:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1689259977;
+	bh=dEQYMfSXUaWkKspb9SxMOMoHBtzyGDP/6J/1GVJZfUg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nY77TqlNFbf6nsOAUoDxh+bXB19VA0Y67zndsCbzTQBca7rTMvDg/OmmvHNHJEABN
+	 Nkkd8n5EpjpZqdqKsc4axJfF8+lN1dTcN2YSRh78Tf4FoCRlPhPbUgRzTDJX6A42Hd
+	 B4bRLfVpUp+6jDSNv+oFqex8SspJ6wMxYq5V828o=
+Message-ID: <263c1eb3-602f-57fe-8450-3f138581bee7@digikod.net>
+Date: Thu, 13 Jul 2023 16:52:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZK/cpSceLMovhmfR@infradead.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent:
+Subject: Re: [PATCH v9 00/12] Network support for Landlock - allowed list of
+ protocols
+Content-Language: en-US
+To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>,
+ Jeff Xu <jeffxu@google.com>
+Cc: Jeff Xu <jeffxu@chromium.org>, =?UTF-8?Q?G=c3=bcnther_Noack?=
+ <gnoack@google.com>, =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack3000@gmail.com>,
+ willemdebruijn.kernel@gmail.com, linux-security-module@vger.kernel.org,
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ yusongping@huawei.com, artem.kuzin@huawei.com,
+ Jorge Lucangeli Obes <jorgelo@chromium.org>,
+ Allen Webb <allenwebb@google.com>, Dmitry Torokhov <dtor@google.com>
+References: <20230116085818.165539-1-konstantin.meskhidze@huawei.com>
+ <Y/fl5iEbkL5Pj5cJ@galopp> <c20fc9eb-518e-84b4-0dd5-7b97c0825259@huawei.com>
+ <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net>
+ <b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net>
+ <ZJvy2SViorgc+cZI@google.com>
+ <CABi2SkX-dzUO6NnbyqfrAg7Bbn+Ne=Xi1qC1XMrzHqVEVucQ0Q@mail.gmail.com>
+ <43e8acb2-d696-c001-b54b-d2b7cf244de7@digikod.net>
+ <CABi2SkV1Q-cvMScEtcsHbgNRuGc39eJo6KT=GwUxsWPpFGSR4A@mail.gmail.com>
+ <b4440d19-93b9-e234-007b-4fc4f987550b@digikod.net>
+ <CABi2SkVbD8p0AHhvKLXPh-bQSNAk__8_ONxpE+8hisoZxF-h6g@mail.gmail.com>
+ <fb206d63-e51d-c701-8987-42078f8ccb5f@digikod.net>
+ <CALmYWFuJOae2mNp47NCzuz251Asm5Cm3hRZNtPOb7+1oty67Tg@mail.gmail.com>
+ <9fc33a12-276d-8f68-eeb8-1258559b30d4@digikod.net>
+ <bbd68f64-4e5a-b5e5-5b18-08261b9f1cdf@huawei.com>
+From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+In-Reply-To: <bbd68f64-4e5a-b5e5-5b18-08261b9f1cdf@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 04:14:45AM -0700, Christoph Hellwig wrote:
-> On Mon, Jul 10, 2023 at 11:42:30AM +0800, Xuan Zhuo wrote:
-> > This helper allows the driver change the dma mode to premapped mode.
-> > Under the premapped mode, the virtio core do not do dma mapping
-> > internally.
-> > 
-> > This just work when the use_dma_api is true. If the use_dma_api is false,
-> > the dma options is not through the DMA APIs, that is not the standard
-> > way of the linux kernel.
+
+On 13/07/2023 15:20, Konstantin Meskhidze (A) wrote:
 > 
-> I have a hard time parsing this.
+> 
+> 7/12/2023 2:30 PM, Mickaël Salaün пишет:
+>>
+>> On 05/07/2023 17:00, Jeff Xu wrote:
+>>> On Fri, Jun 30, 2023 at 11:23 AM Mickaël Salaün <mic@digikod.net> wrote:
+>>>>
+>>>>
+>>>> On 30/06/2023 06:18, Jeff Xu wrote:
+>>>>> On Thu, Jun 29, 2023 at 4:07 AM Mickaël Salaün <mic@digikod.net> wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 29/06/2023 05:18, Jeff Xu wrote:
+>>>>>>> resend.
+>>>>>>>
+>>>>>>> On Wed, Jun 28, 2023 at 12:29 PM Mickaël Salaün <mic@digikod.net> wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 28/06/2023 19:03, Jeff Xu wrote:
+>>
+>> [...]
+>>
+>>>> The sandboxing/Landlock threat model is to restrict a process when it is
+>>>> sandboxed, but this sandboxing is a request from the same process (or
+>>>> one of its parent) that happen when it is more trustworthy (or at least
+>>>> has more privileges) than after it sandbox itself.
+>>>>
+>>>> The process sandboxing itself can use several kernel features, and one
+>>>> of it is Landlock. In any case, it should take care of closing file
+>>>> descriptors that should not be passed to the sandboxed process.
+>>>>
+>>> Agree.
+>>>
+>>>> The limits of sandboxing are the communication channels from and to
+>>>> outside the sandbox. The peers talking with sandboxed processes should
+>>>> then not be subject to confused deputy attacks, which means they must
+>>>> not enable to bypass the user-defined security policy (from which the
+>>>> Landlock policy is only a part). Receiving file descriptors should then
+>>>> not be more important than controlling the communication channels. If a
+>>>> not-sandboxed process is willing to give more right to a sandboxed
+>>>> process, by passing FDs or just receiving commands, then this
+>>>> not-sandboxed process need to be fixed.
+>>>>
+>>>> This is the rationale to not care about received nor sent file
+>>>> descriptors. The communication channels and the remote peers must be
+>>>> trusted to not give more privileges to the sandboxed processes.
+>>>>
+>>>> If a peer is malicious, it doesn't need to pass a file descriptor to the
+>>>> sandboxed process, it can just read (data) commands and apply them to
+>>>> its file descriptors.
+>>>
+>>> I see the reasoning. i.e. sandboxing the process is not more
+>>> important than securing communication channels, or securing the peer.
+>>>
+>>> So in a system that let a peer process to pass a socket into a
+>>> higher privileged process, when the communication channel or the peer
+>>> process is compromised,  e.g. swapping the fd/socket into a different
+>>> one that the attacker controls, confuse deputy attack can happen. The
+>>> recommendation here is to secure peer and communication.
+>>> I agree with this approach in general.  I need to think about how it
+>>> applies to specific cases.
+>>>
+>>>> I think the ability to pass file descriptors
+>>>> should be seen as a way to improve performance by avoiding a user space
+>>>> process to act as a proxy receiving read/write commands and managing
+>>>> file descriptors itself. On the other hand, file descriptors could be
+>>>> used as real capabilities/tokens to manage access, but senders still
+>>>> need to be careful to only pass the required ones.
+>>>>
+>>>> All this to say that being able to restrict actions on file descriptors
+>>>> would be useful for senders/services to send a subset of the file
+>>>> descriptor capabilities (cf. Capsicum), but not the other way around.
+>>>>
+>>> In the Landlock kernel doc:
+>>> Similarly to file access modes (e.g. O_RDWR), Landlock access rights
+>>> attached to file descriptors are retained even if they are passed
+>>> between processes (e.g. through a Unix domain socket). Such access
+>>> rights will then be enforced even if the receiving process is not
+>>> sandboxed by Landlock. Indeed, this is required to keep a consistent
+>>> access control over the whole system, and this avoids unattended
+>>> bypasses through file descriptor passing (i.e. confused deputy
+>>> attack).
+>>>
+>>> iiuc, the design for file and socket in landlock is different. For
+>>> socket, the access rules are applied only to the current process (more
+>>> like seccomp), while for file restriction, the rules can be passed
+>>> into another un-landlocked process.
+>>
+>> The O_RDWR restrictions are enforced by the basic kernel access control,
+>> not Landlock. However, for file truncation, Landlock complements the
+>> basic kernel access rights and behave the same.
+>>
+>> There is indeed slight differences between file system and socket
+>> restrictions. For the file system, a file descriptor is a direct access
+>> to a file/data. For the network, we cannot identify for which data/peer
+>> a newly created socket will give access to, we need to wait for a
+>> connect or bind request to identify the use case for this socket. We
+>> could tie the access rights (related to ports) to an opened socket, but
+>> this would not align with the way Landlock access control works for the
+>> file system. Indeed, a directory file descriptor may enable to open
+>> another file (i.e. a new data item), but this opening is restricted by
+>> Landlock. A newly created socket gives access to the network (or a
+>> subset of it), but binding or connecting to a peer (i.e. accessing new
+>> data) is restricted by Landlock. Accesses tied to FDs are those that
+>> enable to get access to the underlying data (e.g. read, write,
+>> truncate). A newly created socket is harmless until it is connected to a
+>> peer, similarly to a memfd file descriptor. A directory opened by a
+>> sandboxed process can be passed to a process outside this sandbox and it
+>> might be allowed to open a relative path/file, which might not be the
+>> case for the sandboxed process.
+> 
+>     I would like to mention that in case of files a Landlock rule is tied
+> to undreliying file's inode ( already existing at the moment of creating
+>      a landlock's rule), and it's impossible to tie a new landlock rule
+> to a socket before it's creating. Thats why all network access rules
+> work with "port objects", representing network connections.
 
-Me too unfortunately.
+Correct, even if a port is not a *kernel* object.
 
--- 
-MST
+> 
+> I was thinking about sendind socket's FD to another process.
+> If one process creates a socket and binds it to some port N. Then it
+> sends socket's FD to a landlocked process with rule restricting to bind
+> to port N. Is this situation theoretically possible???
 
+Yes, it's possible an it's OK because the bind action was performed by 
+an unsandboxed process. If this unsandboxed process is not trusted or if 
+it can be fooled by a malicious client, the system should be designed to 
+make it not able to talk to the sandboxed process.
+
+> 
+> 
+>>
+>> I think it might be summarize by the difference between underlying FD
+>> data in the case of a regular file (i.e. tied access rights), and
+>> relative new data in the case of a directory or a socket (i.e.
+>> sandboxing policy scope).
+>> .
 
