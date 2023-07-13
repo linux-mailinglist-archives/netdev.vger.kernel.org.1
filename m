@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-17644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45AE175281E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 18:16:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7389F75281F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 18:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ED1E1C2140B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:16:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D881C21347
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB1D1F178;
-	Thu, 13 Jul 2023 16:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCF71F187;
+	Thu, 13 Jul 2023 16:16:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7211F176
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 16:16:19 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4680E1BEB
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:16:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CCE1F176
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 16:16:22 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2052.outbound.protection.outlook.com [40.107.237.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E43E74
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:16:21 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gnO2DLikgbv3HapNB56a63rPRuTRA7P3uzh73t3xlYnHkwlQia4a9GDIBWIuzxPOEwf6l4QQup5OBY0NfwQDAj1x5/m0oqaH98f1N6d+PXMM3L6uuqBU9DJKq4h1YG43uNjZURCF8qROLVILXh6OB0Rkab/JR5dHHQPiqefOxXTRzJKcg4lDEu7tCdR9KYMYeMtX7Eofz6b3atJTV6q2CJigPnn9p0J0cX51aMHcutQR1EgaqXtMfHynAJYUPLi+OOnmiavJEQAFYOlJQyZRXaD9e9EqvNS+A6q139taymbA6GaU2Nupwb/6ma9wdHvLDlLpLK1OH4uBUxEU8dwqxA==
+ b=hazaCP6+g0Kb+k1cCDDgt3Au9fYtzwDg22ekuYn023BN1IvKwySdQb9a8i9IsQQ+KyXRs1s/NWX/lMEXKPP0s6cWs/2e03qqDkbHWLp7QvV2KIHK8vruzKORwD1EgEJmDK/7739KwU7satSydt9kRk5soRs0xaf+OAIqLvy4sxVn/R7wGw5QCRqHqnRL2YXIfGUStOFsQ7w3Mue1O4QJa9wMbe+JSVR0T2bAhW7Rc/kZM3mpec2g+1+dtfQP5U9G3xLE5Hd0qWHlC1sa433lvh5a56wSI8zxSl2SpAgzcf/YpgOLHqGclmbFwTioEL26mFUsgkkeAKAQc6pXnhWdyw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fNoONxnONQ5YsGLIY9k2JyGDdyLNXnVi1rNncdgvQSs=;
- b=UkysmI7t67TQz/OzhYs5yMY8d8LLHyYlSHM0ZQCREh0xzmkiwsk/+XwVFtxNKCDH37VeULxOk0wgJhIJ7ojiaU64DLbwqxC8GvYmZS6yqs67wmn7YDa5j9DMJNOb8JbJTpcu0OZ21+JrRkAv0leF9aRKo4cnFeDsn0cawfTaS77tNod7jKadLGa+LP/qsX4TIumfT33hMLktIbv7iRPS/lep4yM+tukmByCI0fj22GGIYt6pXCDttSJVLIZEPWLfZcBoDBP6faeRlsVhR8LYYcexOpKqEf9u/Y5FZRo0YIZoVF26XARV4MLbiR22JlkG4cXZQ8q7Icle5gDq/Yg6gQ==
+ bh=dHzbskb8OlTrd+JBYEIKSR2B9MLhKkgJuFLpwCCT03A=;
+ b=BuHo04xEu+rBXAFm0TQZDd+UA951FywL37N/+M2Kq3sxBN59QAJBeNXFelqNt041fGf/TCDdF6KbZl0vQfNguECpf3g4sMwRc6HgJqPtdg4yh4+2L1mrsBPF2VU7eoGAf0IQzVeSBKkbUgn6euORYdxv8n1Wf3o96Z7BasIPPYcs1SQC6Mu1JwWF6sRIVwocZSoktUOWyx6SbF18pxV0JLnOpVDwUqlMKA94865Xt72akdPWEYZiPCFeeweBYD9d8uz9DyvK51q7zas/CeHCaZWkskYiAWiLAhppC9RWdu3SH6udQZJTH5K6l7CRE+lmNQQcC0wLtSB7w5p1eV8D9Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -35,18 +35,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fNoONxnONQ5YsGLIY9k2JyGDdyLNXnVi1rNncdgvQSs=;
- b=dTNPvzN11L8EyvB0rfcFe6X2tb4TgLd7yxrvbJ/ilTsZrwKC36EV2XPQGItJyof3DQQVNIN64PQd+M+tvUQPaDnbYbyQt/F3qNUXgJXwfGM+KYkIFLWez8Z0BaXjau36yNw79rorGPT1MY+6+wlHRx97sOhRTyn6+PWKUlcpoZ/91HJOA+zCNdDC1uAeqLACvEme+/95h+CiLNFFJAyeXulO0KOAQ9ratQJs1DNR/q5clx+WpYKTbtVSilP0Z7wstN8JHcOoIKth3XY+uCshyPgxfybr8flOiMtnRc04KTxbWlhJLA/7voDC/bexwCFty20BK0g/kql20c9ORuPthA==
-Received: from BN0PR04CA0126.namprd04.prod.outlook.com (2603:10b6:408:ed::11)
- by PH8PR12MB7157.namprd12.prod.outlook.com (2603:10b6:510:22b::8) with
+ bh=dHzbskb8OlTrd+JBYEIKSR2B9MLhKkgJuFLpwCCT03A=;
+ b=dbDGfGkSq7Yubios0r6AB2CdiaPsVqkdLsNKXUdr53g0IQ0MLqwBcnF2Ncks/2sp2wwHx9vJhzKI4ktl8z7hrb+QgJXsr+gcoEpBFN0RY4EubSe4WtZd5adkoKlBdhMUpN4/98jZSoZiWYdtkN0PmSLyJKA2eghzogSu5e0fVJiWGdzl6w/IsbEKkOLa7yMOrHSNyS0tAHuHIpqhfCpEsgz1aW6PW2gRCSuhM/2DSljLVa4JhwE3FycScbt0qwhtwACgwczxJ4/jtsFzgrmZ1QvdfTVBB+i/XzOBiNGhHJfZowQiPVmY8h54VsCNAu7XKuPd57XbxCsQNfNuEf/YXQ==
+Received: from BN0PR03CA0016.namprd03.prod.outlook.com (2603:10b6:408:e6::21)
+ by DM8PR12MB5463.namprd12.prod.outlook.com (2603:10b6:8:27::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.24; Thu, 13 Jul
- 2023 16:16:15 +0000
-Received: from BN8NAM11FT053.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ed:cafe::46) by BN0PR04CA0126.outlook.office365.com
- (2603:10b6:408:ed::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Thu, 13 Jul
+ 2023 16:16:17 +0000
+Received: from BN8NAM11FT099.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e6:cafe::9b) by BN0PR03CA0016.outlook.office365.com
+ (2603:10b6:408:e6::21) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.25 via Frontend
- Transport; Thu, 13 Jul 2023 16:16:14 +0000
+ Transport; Thu, 13 Jul 2023 16:16:17 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -54,27 +54,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT053.mail.protection.outlook.com (10.13.177.209) with Microsoft SMTP
+ BN8NAM11FT099.mail.protection.outlook.com (10.13.177.197) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.24 via Frontend Transport; Thu, 13 Jul 2023 16:16:14 +0000
+ 15.20.6588.24 via Frontend Transport; Thu, 13 Jul 2023 16:16:16 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 13 Jul 2023
- 09:16:01 -0700
+ 09:16:04 -0700
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 13 Jul
- 2023 09:15:58 -0700
+ 2023 09:16:01 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	Danielle Ratson <danieller@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 00/11] mlxsw: Manage RIF across PVID changes
-Date: Thu, 13 Jul 2023 18:15:23 +0200
-Message-ID: <cover.1689262695.git.petrm@nvidia.com>
+Subject: [PATCH net-next 01/11] mlxsw: spectrum_switchdev: Pass extack to mlxsw_sp_br_ban_rif_pvid_change()
+Date: Thu, 13 Jul 2023 18:15:24 +0200
+Message-ID: <3bf4fd2d1776fb70015f5d4ebb996fce8f427a1c.1689262695.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <cover.1689262695.git.petrm@nvidia.com>
+References: <cover.1689262695.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,26 +90,26 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT053:EE_|PH8PR12MB7157:EE_
-X-MS-Office365-Filtering-Correlation-Id: afa06b7a-2a8f-421f-40fc-08db83bc7b16
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT099:EE_|DM8PR12MB5463:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c752059-71ae-4abb-2b4e-08db83bc7ca9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	P9t7VmHHIT4TuQHWlIdZgA8pXPIPZqDacxrLg41Cq5KNskyCqJ3/FhYTX9nAR/RzBeJ5R/Od9R4akXdJ1/myijJEI1kfy5DUvm8qkkQHaObFiyd/6v1jln8VfX4CFN8mE+PUxV7Pq/fWyT1Nh+zMKN1T7Thp/WVDqlVo/6XH+K7MZdwkH3jLak7Kr3sstEp7Jxn1um8yQ1j8LDfsf8kBH8g9M8lQZcxKF7UtXoYLMaPKq2xbA/nq2s2cl6jMZUtgqigB4nlCX+GWu6Ds3QUHBXCC/jXDCFbkGs3XddoT8RYH+O/WajkhIyHXfdeeeMy+0wShl26lkuYqaQP6MTpHKZselIouo5vtVrBHNNjI/ABFfuU+zXxg70fLQT0RxKeu0Ajtkwz7eLPKs1M2qxnou0K+rEamOn5rQUfjETQYYxFF1zdrJrN5Q8vJe5DR6DL0JNYMIO18qu1Xg5wRQsHnSvDhxJOFOFfsgJriUYpchw9PqfwIK1e1U+HqDSn/exc5xTH7+OMOpz6qCp3xKtzS1fgGQxyVZvmuSKQaVMT42W//7I6TGH6UMUZm5tps9zCld727ryuhz9W2pMiPQgS7pgVsvUq5khHEJzDN+GX+RQpwa7xIb4wmlRdBGvypDgYYO8wGlyfAspTZQWvBN3/EFKpdp1FMhiQGSeerqp2nO24P5reH1QjL5gEwNeAeZQXejaad1bWzBoht70OWDWzb96lgL8cHKD4ey/wI1PH+3/UbDKtMt1dXawhotLtGo/JL
+	iT1hu6tnZKeqSP7JGJ1xmfhAVxXMEzr4o/facPVFkdUwYfMOIc+Y23hsKp7BXzJC0jqc05GxaWW5SXmXmZHBvV2zGYVyYSWB5KbRnfhCJzc7PWZLwx0Frdbw1wD3igKPsBikE/QU8xTAyNKy5yJpryTNFYRT4KqJPYExPuPNfK3gWJpjkDdrGSAOGtf5r/uy3oSo+P5PMX+518nz9980UmXC8ZzdGUWK4Yi4bxmu1bgMzGzKVzubf16Aszvom/EjswNwhtLYlBLgabazkhXY8wkSuH267JCEmrk9aKmvwpGkfBkZOKeqIb7DxGZZPbpj1ohfUSdUzthWvLXzfpZoPWomniAmdEuV9x8xvc8mo849MFZ8vdN6KTqZ0zbohS/9RHZ9oNliWBL0sazP85qoFrWxG0RC8qx+1xe8GFxJvDHxUkq2D8XwhqWoONzi1TV5q319G+NPLUtdUFb/rQoYH6xKEreu6TCMBlR5fHI7IK5UCm2TP1TzRf9A9NIGR3/HDPpBW7ubUmbyanWbRDb8DN/Kc2jINrnbJU1jc6Hm04CTwg9KYP6W+rYsSIeJGkK/bHjmVYaqp/0cpzaVv2LJMWVlov3MVwYL4yd0jmqE9HqjC5Sw6LuHCEwnRv9ZJf0rEWP4T4hbdChihSyWFcPfNPOA4uMT7je8EvAPOXbfexBOxy+tPfrYYoUL78DqFLg8pA0AVpIw1XnSpx6KJTPN7x8Y0q7MKJU7Lq/XC9u08Gc=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(346002)(136003)(451199021)(40470700004)(36840700001)(46966006)(4326008)(70586007)(70206006)(316002)(41300700001)(2906002)(478600001)(5660300002)(8676002)(8936002)(54906003)(110136005)(36860700001)(6666004)(40460700003)(26005)(40480700001)(107886003)(186003)(36756003)(66574015)(426003)(336012)(83380400001)(47076005)(16526019)(2616005)(7636003)(356005)(82740400003)(82310400005)(86362001);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(396003)(376002)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(4326008)(70586007)(70206006)(478600001)(82740400003)(7636003)(356005)(40480700001)(26005)(6666004)(54906003)(110136005)(41300700001)(316002)(82310400005)(8676002)(8936002)(86362001)(40460700003)(107886003)(16526019)(186003)(5660300002)(2616005)(83380400001)(2906002)(36756003)(36860700001)(66574015)(426003)(47076005)(336012);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 16:16:14.3172
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 16:16:16.9577
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: afa06b7a-2a8f-421f-40fc-08db83bc7b16
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c752059-71ae-4abb-2b4e-08db83bc7ca9
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN8NAM11FT053.eop-nam11.prod.protection.outlook.com
+	BN8NAM11FT099.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7157
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5463
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -115,96 +117,74 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The mlxsw driver currently makes the assumption that the user applies
-configuration in a bottom-up manner. Thus netdevices need to be added to
-the bridge before IP addresses are configured on that bridge or SVI added
-on top of it. Enslaving a netdevice to another netdevice that already has
-uppers is in fact forbidden by mlxsw for this reason. Despite this safety,
-it is rather easy to get into situations where the offloaded configuration
-is just plain wrong.
+Currently the reason for rejection of PVID manipulation is dumped to
+syslog, and a generic -EBUSY is returned to the userspace. But
+switchdev_handle_port_obj_add(), through which we get to
+mlxsw_sp_port_vlans_add(), handles extack just fine, and we can pass the
+message this way.
 
-As an example, take a front panel port, configure an IP address: it gets a
-RIF. Now enslave the port to the bridge, and the RIF is gone. Remove the
-port from the bridge again, but the RIF never comes back. There is a number
-of similar situations, where changing the configuration there and back
-utterly breaks the offload.
+This improves visibility into reasons why the request to change PVID
+was rejected. Before the change:
 
-The situation is going to be made better by implementing a range of replays
-and post-hoc offloads.
+ # bridge vlan add dev br vid 2 self pvid untagged
+ RTNETLINK answers: Device or resource busy
+ (plus a syslog line)
 
-In this patch set, address the ordering issues related to creation of
-bridge RIFs. Currently, mlxsw has several shortcomings with regards to RIF
-handling due to PVID changes:
+After the change:
 
-- In order to cause RIF for a bridge device to be created, the user is
-  expected first to set PVID, then to add an IP address. The reverse
-  ordering is disallowed, which is not very user-friendly.
+ # bridge vlan add dev br vid 2 self pvid untagged
+ Error: mlxsw_spectrum: Can't change PVID, it's used by router interface.
 
-- When such bridge gets a VLAN upper whose VID was the same as the existing
-  PVID, and this VLAN netdevice gets an IP address, a RIF is created for
-  this netdevice. The new RIF is then assigned to the 802.1Q FID for the
-  given VID. This results in a working configuration. However, then, when
-  the VLAN netdevice is removed again, the RIF for the bridge itself is
-  never reassociated to the PVID.
+Note that this particular error message is going away in the following
+patches. However the ability to pass error messages through extack will be
+useful more broadly for communicating in particular reasons why a RIF
+failed to be created.
 
-- PVID cannot be changed once the bridge has uppers. Presumably this is
-  because the driver does not manage RIFs properly in face of PVID changes.
-  However, as the previous point shows, it is still possible to get into
-  invalid configurations.
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Danielle Ratson <danieller@nvidia.com>
+---
+ .../net/ethernet/mellanox/mlxsw/spectrum_switchdev.c   | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-This patch set addresses these issues and relaxes some of the ordering
-requirements that mlxsw had. The patch set proceeds as follows:
-
-- In patch #1, pass extack to mlxsw_sp_br_ban_rif_pvid_change()
-
-- To relax ordering between setting PVID and adding an IP address to a
-  bridge, mlxsw must be able to request that a RIF is created with a given
-  VLAN ID, instead of trying to deduce it from the current netdevice
-  settings, which do not reflect the user-requested values yet. This is
-  done in patches #2 and #3.
-
-- Similarly, mlxsw_sp_inetaddr_bridge_event() will need to make decisions
-  based on the user-requested value of PVID, not the current value. Thus in
-  patches #4 and #5, add a new argument which carries the requested PVID
-  value.
-
-- Finally in patch #6 relax the ban on PVID changes when a bridge has
-  uppers. Instead, add the logic necessary for creation of a RIF as a
-  result of PVID change.
-
-- Relevant selftests are presented afterwards. In patch #7 a preparatory
-  helper is added to lib.sh. Patches #8, #9, #10 and #11 include selftests
-  themselves.
-
-Petr Machata (11):
-  mlxsw: spectrum_switchdev: Pass extack to
-    mlxsw_sp_br_ban_rif_pvid_change()
-  mlxsw: spectrum_router: Pass struct mlxsw_sp_rif_params to fid_get
-  mlxsw: spectrum_router: Take VID for VLAN FIDs from RIF params
-  mlxsw: spectrum_router: Adjust mlxsw_sp_inetaddr_vlan_event() coding
-    style
-  mlxsw: spectrum_router: mlxsw_sp_inetaddr_bridge_event: Add an
-    argument
-  mlxsw: spectrum_switchdev: Manage RIFs on PVID change
-  selftests: forwarding: lib: Add ping6_, ping_test_fails()
-  selftests: router_bridge: Add tests to remove and add PVID
-  selftests: router_bridge_vlan: Add PVID change test
-  selftests: router_bridge_vlan_upper_pvid: Add a new selftest
-  selftests: router_bridge_pvid_vlan_upper: Add a new selftest
-
- .../ethernet/mellanox/mlxsw/spectrum_router.c | 169 +++++++++++++++--
- .../ethernet/mellanox/mlxsw/spectrum_router.h |   4 +
- .../mellanox/mlxsw/spectrum_switchdev.c       |  32 +---
- .../testing/selftests/net/forwarding/Makefile |   2 +
- tools/testing/selftests/net/forwarding/lib.sh |  18 ++
- .../selftests/net/forwarding/router_bridge.sh |  50 +++++
- .../router_bridge_pvid_vlan_upper.sh          | 155 ++++++++++++++++
- .../net/forwarding/router_bridge_vlan.sh      | 100 ++++++++--
- .../router_bridge_vlan_upper_pvid.sh          | 171 ++++++++++++++++++
- 9 files changed, 643 insertions(+), 58 deletions(-)
- create mode 100755 tools/testing/selftests/net/forwarding/router_bridge_pvid_vlan_upper.sh
- create mode 100755 tools/testing/selftests/net/forwarding/router_bridge_vlan_upper_pvid.sh
-
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
+index d88e62bc759f..a3365f7437d6 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
+@@ -1481,7 +1481,8 @@ mlxsw_sp_bridge_port_vlan_add(struct mlxsw_sp_port *mlxsw_sp_port,
+ static int
+ mlxsw_sp_br_ban_rif_pvid_change(struct mlxsw_sp *mlxsw_sp,
+ 				const struct net_device *br_dev,
+-				const struct switchdev_obj_port_vlan *vlan)
++				const struct switchdev_obj_port_vlan *vlan,
++				struct netlink_ext_ack *extack)
+ {
+ 	u16 pvid;
+ 
+@@ -1491,12 +1492,12 @@ mlxsw_sp_br_ban_rif_pvid_change(struct mlxsw_sp *mlxsw_sp,
+ 
+ 	if (vlan->flags & BRIDGE_VLAN_INFO_PVID) {
+ 		if (vlan->vid != pvid) {
+-			netdev_err(br_dev, "Can't change PVID, it's used by router interface\n");
++			NL_SET_ERR_MSG_MOD(extack, "Can't change PVID, it's used by router interface");
+ 			return -EBUSY;
+ 		}
+ 	} else {
+ 		if (vlan->vid == pvid) {
+-			netdev_err(br_dev, "Can't remove PVID, it's used by router interface\n");
++			NL_SET_ERR_MSG_MOD(extack, "Can't remove PVID, it's used by router interface");
+ 			return -EBUSY;
+ 		}
+ 	}
+@@ -1519,7 +1520,8 @@ static int mlxsw_sp_port_vlans_add(struct mlxsw_sp_port *mlxsw_sp_port,
+ 
+ 		if (br_vlan_enabled(orig_dev))
+ 			err = mlxsw_sp_br_ban_rif_pvid_change(mlxsw_sp,
+-							      orig_dev, vlan);
++							      orig_dev, vlan,
++							      extack);
+ 		if (!err)
+ 			err = -EOPNOTSUPP;
+ 		return err;
 -- 
 2.40.1
 
