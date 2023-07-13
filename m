@@ -1,168 +1,141 @@
-Return-Path: <netdev+bounces-17463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D089751BCF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:38:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C69751BE0
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5954728104C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:38:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E5542816BA
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B38847D;
-	Thu, 13 Jul 2023 08:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE3E8821;
+	Thu, 13 Jul 2023 08:41:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872C9613B
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:38:56 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2104.outbound.protection.outlook.com [40.107.92.104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E44A5254;
-	Thu, 13 Jul 2023 01:38:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EAg9uHBLerG9G4sakFAHpqLp2lFHATa3McAjTmSrN3D+LApniBs4K7DCAT2WNpsuu/uXvyZSnCfDwzEF/Vzpz86w1Jb7/oi6GoGg9ZPOboy/IBNdI3E7Vtr9iWAh00w0WH587eLPZySubnQ0lujWBe1+ssxpp3ph9vIz4eZNyEQETJ7bWGYjjcwDn4PK+WXCtAO4PLY7a48rzo10KE3szpC7r99e1c4ph83LV/SZej5cC7XbF4WLKLVxNnSbP1t1iJ5ZJzH5pzJhdTR6OUZmMFHA2jWSVKwKlEPUSXOpUcKjX0uoCShRiZ1U5iY4PasRPw9XKllB1xfGUVOcfJF6YQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mpZFY14jlOY/H3o28bfR5F8srul8P/YUbHP0ZqUB06o=;
- b=VjldtiTjfy5wUBi0MoKsJ116bzNOmVs3y7NpUgviHDVWbdy6R++ru3ePIk9WOcz6qV31zYtll9oFYYyPZrUH+i/gVfXM31jGWeMUPNx+5M5t0g0nCQsRSvjtN3+u53ORex7apPeL5Z4X3+ay/23cMnsUWcfGadz8gjJLVpObmqq6qKacycAhyc0ALPNlBoGuz49fQOR6qpzYz5osI5PdY43Xbw0aGmTnvd3r62nG/hw8pbOVmEHH6nko3EJ+8iqmj4jZ6VIjwDMahCTpT0jgaZ7jIdRYD+zCJarhsTFxEtAfV0MGuhifbJf1en3siNGRzNc9is3YoRX/X/3ALdi8OA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mpZFY14jlOY/H3o28bfR5F8srul8P/YUbHP0ZqUB06o=;
- b=weLJF3AM5njgotszid2UsX7i++rebMWJ70EhFEzvodhw7Rhy1BfbbI/ex0ImHk3F74dTi/DYxZ4V16ssolAguQmJdEtAXuVwAlYpVF+WA7941xtSLBD5nrcK2DenMyrQbwN1CRUKsj6vqMw55//JAHae8y6BUz8ZrMZTg+676jU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH7PR13MB5866.namprd13.prod.outlook.com (2603:10b6:510:158::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Thu, 13 Jul
- 2023 08:38:49 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
- 08:38:49 +0000
-Date: Thu, 13 Jul 2023 09:38:43 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kalle Valo <kvalo@kernel.org>, linux-wireless@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF898478
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:41:31 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DD81989
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:41:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UZIU+yt5ajx2m4cu+I+YULCa2MRBJfOAXZw4l6Tt6IU=; b=NpXAKLmyT5CRQHMMKqOZwVMepm
+	GojzYcXwe/Mhclgn8Lav0qfeyCpn2K1QJUlvvcq0rNpPkHiH/pJjzHO4qfs0KOPNy2nTLdq0UkGuX
+	GBW5VCxEvO45iPmOxig0y/gpT3EkQU94LxXI5pB4BYtURyzHp/1QxEH3/n/+aGPSohIeCGzlT1Ffm
+	H2qsHjSacnJmKZ3/ltNbyPOq3huVkQ2q7/wR+p4UtjDHWNNrcWTEGrXuHSmnrDw8+6A/PqpWUe0XC
+	VyWZ7yA3ofcyo7D0Pt4V4RIPn9//+i9pjgnZgFFBjL6f9B5cGTLwVs9Mul+Pa1Iu/neW4d2ours6m
+	ILR862dg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58544)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qJrt7-00067T-1V;
+	Thu, 13 Jul 2023 09:41:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qJrt6-0005zt-5S; Thu, 13 Jul 2023 09:41:24 +0100
+Date: Thu, 13 Jul 2023 09:41:24 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] wifi: airo: avoid uninitialized warning in
- airo_get_rate()
-Message-ID: <ZK+4E7GMIUtzc9Qw@corigine.com>
-References: <20230709133154.26206-1-rdunlap@infradead.org>
- <ZK2QeBZKWi0Q6vuW@corigine.com>
- <fc25d296-b245-9a5d-302f-c313f239569e@infradead.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc25d296-b245-9a5d-302f-c313f239569e@infradead.org>
-X-ClientProxiedBy: LO4P123CA0348.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18d::11) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: [PATCH net-next 00/11] Convert mv88e6xxx to phylink_pcs
+Message-ID: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB5866:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5b02bcc4-9301-4b15-79e2-08db837c947d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	dwpGK4Ap9UaaStqk2jPPsiLSO8nm5PymxqO3zw+oZsFpqyvfnX7WWiiEBbx5nq00QN8If1yil090pmVQKwUpeZeRPhNW3LaSWCUyeim5uFqtYhc60zsK2ZFuCN8/sESU7nPY02JAxvCLU4WqjBzoB0ZIPQbwkRY99Az/UkBkeKH1VDTaTSRoJZrrro7xYp0xXALqlAd2PhMWfQ25geIAX/vnvrLKN0XgCLXS5DnM7bE7/wVYvAhyU87kPxnBRQoRvt8N+OCv3YnbmYlR7VFtEyp01RPrf0mAsEBvcOg6B8qWKdRCLvWd43KHH9K8dv16qewBrp5fB76qM+IwfIgcI5wmga5lCI32tCVDPaggZXTFMwf4sD6KMV1tVCm4iF0twMvuwXyV2fP+3MrZIJcPh8zg9QtebWVtGF7v+LtWV6z2sR0SpdM3dnmKDMV8+WXIH/qOfCpPk48ZGw4t+Ahe4uePGavF2R5fSMk60wq7T5NCi0WqDCHOFt1viPOBLrtLFYI/HbypDh4eTwuCxjRNZ5t29ILo9Ef10D4aQiFB2h0BFh7vXADhB2vJbHc/Gxde/b33mk0pdwbhUZSusgfo7PdBCG7gFgBFu2BOLxGdTRdsRLuzfCGTdgM4KC+omPB6cOFpMGPnRQXfEbE6tNkV1Q==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(376002)(346002)(366004)(396003)(136003)(451199021)(44832011)(41300700001)(2906002)(316002)(7416002)(8936002)(8676002)(5660300002)(66556008)(66476007)(6916009)(4326008)(66946007)(53546011)(26005)(6506007)(86362001)(38100700002)(83380400001)(6512007)(6666004)(966005)(6486002)(2616005)(36756003)(54906003)(478600001)(186003)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sCGOKe8YgLfSbKY/hRmWFwehti+9QHwy2rH87UMQ65KKC5dZ6YBqE0DcN/Br?=
- =?us-ascii?Q?N3wv1werG6um3Sx0rvKkZX9guQJrBFuup/b7tThZmCPJQhQKiDUiE4fDyLK8?=
- =?us-ascii?Q?f48rEWpJiys98FVEFAw1kMe+aAR29cUYHmTdP8c20sjmRr0lx20qbaX2+XhJ?=
- =?us-ascii?Q?g7DzpLKgd+htCUpYeg3saom1QIFbyu+XGdMEvxQnMecF0ljf1chz0Taby8hy?=
- =?us-ascii?Q?dyDGZoKKpqY1qFW9edFO75tdd0IpNYfzWRLZBO9EgFR71FZeZjp1nYO6d5A6?=
- =?us-ascii?Q?YlkmyfAiiLNmY9rAmQKQFawKa7QZ0U45PrSq46q6dJPR+nx4DTz/Ycpcu2Eh?=
- =?us-ascii?Q?TiH5h4M6eNBpAwuEhBStyLehGPYrKxSRrbdlLbFXPyosXg5abP0QNVwSMveJ?=
- =?us-ascii?Q?nbrs7fNGTQKkcBU3KQi6gFWiHI9qNnPFhcwtPe2o0WkghU2txj1HR7VSgWmh?=
- =?us-ascii?Q?hiGvZxfy9vfA71uWSsLTkZXQboOTIs40bZDaZeg2/LuJvqjjQq5NI4lK8AH5?=
- =?us-ascii?Q?v8l1fMDygn8jZoFK43m6LsdkXq0ZpT2opY6s/rdrUuOkVeDJ5pbrE73V5ruo?=
- =?us-ascii?Q?RsxAC9WJViYzrqNcJb5ZPy3nYSQCwh7SqjtVr+eIq6ZzYod93W1GEF6SLM/l?=
- =?us-ascii?Q?dWbWk5DX/xJlIBWCZ5H/iVZL4Lv+K3mgoiUF2LBGc4FaBIUMaZK1E+301aj1?=
- =?us-ascii?Q?p27bqD8v0gucDWqCN4+bq4br9j1mVWVSpS8iQlYZ2TMaDsLqr42EUis1rSJ6?=
- =?us-ascii?Q?k2pcc4MNK9GaFVI7c2sp9jGG6D7EF8F2w/366W8B8ctWU86jtNxWGrjeu9pg?=
- =?us-ascii?Q?X4KA4R7agVG2oaHoT1oZ/ZCPqSHnqlA5yviDwnfMW/noRHt0/U0FSe42Aj2l?=
- =?us-ascii?Q?FGPBM1puW4kl42JU/uzZiAd+wyuKFYfafkpCNvGjI1o8uOd33ci5wLs5RjT2?=
- =?us-ascii?Q?I2NpPStfCDosl7i59lcVvLNWJHYqO9uvmEW8E5znjJxVX0V0N8xHHNn8nIWM?=
- =?us-ascii?Q?CCgzVLEHmH2OXrSXbH6K7VWFQX2mITctQo73K+wfQrQAG1sOjy1stnoOtUx+?=
- =?us-ascii?Q?9CU/y7iz9OjlLtrtBQRqc0gDMK2RlP28RCHqWT/dS6MPALnNvwF4ddWMDSNX?=
- =?us-ascii?Q?OP+4HT8c8XCo5bbOLEV8w9qJiWNn9yfiJRyAAYze6rPg2UNLzPy0y2knzWls?=
- =?us-ascii?Q?qFuX5VDrvy16eMNAF7Y/0EfWnKzoQ+grfQdWhPVsBJE6ZKKHBwExi1WNUwhP?=
- =?us-ascii?Q?d2SbgRED7vzkYd2ZKK5jjIyeYLz5EzYNcJatzOHjYik/GErgo2Mqyyu+qqVu?=
- =?us-ascii?Q?ckrcxueaIMkzuIO5nDTWO/dQ8N4+o8mT9EGPdIkO2ojioUC3M1Xlf6Il1sEU?=
- =?us-ascii?Q?syL4HhAkcCFdY8lbasWpU2k1o+q36uLfUFV27sYud+T/YrLrIBifGNhxlDSk?=
- =?us-ascii?Q?AkKu6PsSUpfMWr5tETCLmqrY9yQFKvD/PfHTJ2BoJbINiPjWpq3s+5JzCjTs?=
- =?us-ascii?Q?s63LT63BUL3dagqjenz4ccEYZ0XIK3tfh3HVvKnV54maMwKawtpNGDDlSlLy?=
- =?us-ascii?Q?vAkd9zTXOf3SPtz8Cju+KhkByXMpMDlYlav7fboA/KIJzPxRY8QawAsoq0MF?=
- =?us-ascii?Q?mA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b02bcc4-9301-4b15-79e2-08db837c947d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 08:38:49.5011
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ImApln75Sn1VC6+REwiRtt409VFYvJIm6v/fUm09J9jIVyOJcDjo7JY17JPFLS2yKPUdWYNVPJIDI7iZd+smeqCEheEhdKHFk+bb/3QSI4U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB5866
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 02:07:57PM -0700, Randy Dunlap wrote:
-> Hi Simon,
-> 
-> On 7/11/23 10:25, Simon Horman wrote:
-> > On Sun, Jul 09, 2023 at 06:31:54AM -0700, Randy Dunlap wrote:
-> >> Quieten a gcc (11.3.0) build error or warning by checking the function
-> >> call status and returning -EBUSY if the function call failed.
-> >> This is similar to what several other wireless drivers do for the
-> >> SIOCGIWRATE ioctl call when there is a locking problem.
-> >>
-> >> drivers/net/wireless/cisco/airo.c: error: 'status_rid.currentXmitRate' is used uninitialized [-Werror=uninitialized]
-> > 
-> > Hi Randy,
-> > 
-> > There seem to be other calls to readStatusRid() in the same file
-> > with similar properties. Perhaps it would be best to fix them too?
-> > 
-> 
-> Yes, there are 40+ calls that could have problems.
-> Please see this thread:
->   https://lore.kernel.org/all/2f6ffd1c-a756-b7b8-bba4-77c2308f26b9@infradead.org/
-> 
-> This is an attempt to shut up the build error/warning, which only occurs after
-> this one function call.
-> 
-> For such an old driver/hardware, I don't plan to do massive surgery
-> to it.
+Hi,
 
-Thanks Randy,
+This series (previously posted with further patches on the 26 June as
+RFC) converts mv88e6xxx to phylink_pcs, and thus moves it from being
+a pre-March 2020 legacy driver.
 
-given the circumstances I agree this is a reasonable approach.
+The first four patches lay the ground-work for the conversion by
+adding four new methods to the phylink_pcs operations structure:
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+  pcs_enable() - called when the PCS is going to start to be used
+  pcs_disable() - called when the PCS is no longer being used
+
+  pcs_pre_config() - called before the MAC configuration method
+  pcs_post_config() - called after the MAC configuration method
+      Both of these are necessary for some of the mv88e639x
+      workarounds.
+
+We also add the ability to inform phylink of a change to the PCS
+state without involving the MAC later, by providing
+phylink_pcs_change() which takes a phylink_pcs structure rather than
+a phylink structure. phylink maintains which instance the PCS is
+conencted to, so internally it can do the right thing when the PCS
+is in-use.
+
+Then we provide some additional mdiobus and mdiodev accessors that
+we will be using in the new PCS drivers.
+
+The changes for mv88e6xxx follow, and the first one needs to be
+explicitly pointed out - we (Andrew and myself) have both decided that
+all possible approaches to maintaining backwards compatibility with DT
+have been exhaused - everyone has some objection to everything that
+has been proposed. So, after many years of trying, we have decided
+that this is just an impossibility, and with this patch, we are now
+intentionally and knowingly breaking any DT that does not specify the
+CPU and DSA port fixed-link parameters. Hence why Andrew has recently
+been submitting DT update patches. It is regrettable that it has come
+to this.
+
+Following this, we start preparing 88e6xxx for phylink_pcs conversion
+by padding the mac_select_pcs() DSA method, and the internal hooks to
+create and tear-down PCS instances. Rather than bloat the already very
+large mv88e6xxx_ops structure, I decided that it would be better that
+the new internal chip specific PCS methods are all grouped within their
+own structure - and this structure can be declared in the PCS drivers
+themselves.
+
+Then we have the actual conversion patches, one for each family of PCS.
+
+Lastly, we clean up the driver after conversion, removing all the now
+redundant code.
+
+ drivers/net/dsa/mv88e6xxx/Makefile   |    3 +
+ drivers/net/dsa/mv88e6xxx/chip.c     |  428 ++-----------
+ drivers/net/dsa/mv88e6xxx/chip.h     |   33 +-
+ drivers/net/dsa/mv88e6xxx/pcs-6185.c |  190 ++++++
+ drivers/net/dsa/mv88e6xxx/pcs-6352.c |  390 ++++++++++++
+ drivers/net/dsa/mv88e6xxx/pcs-639x.c |  898 +++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/port.c     |   30 -
+ drivers/net/dsa/mv88e6xxx/serdes.c   | 1106 +---------------------------------
+ drivers/net/dsa/mv88e6xxx/serdes.h   |  108 +---
+ drivers/net/phy/mdio_bus.c           |   24 +-
+ drivers/net/phy/phylink.c            |  110 +++-
+ include/linux/mdio.h                 |   26 +
+ include/linux/phylink.h              |   29 +
+ 13 files changed, 1737 insertions(+), 1638 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
