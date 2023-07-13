@@ -1,556 +1,489 @@
-Return-Path: <netdev+bounces-17476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D2E751C02
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:45:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388EB751C08
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCCE4281B2A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ACED1C212E9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95348100CC;
-	Thu, 13 Jul 2023 08:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0608C14;
+	Thu, 13 Jul 2023 08:44:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ADD100B8
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:43:04 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F532721
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:43:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fp+iPXGU+ofGNpuw4c7q87rA9G9GeDdX/yYLpvLpTl4=; b=ul2pp7mH5fmzfp50AYXsI1uo//
-	m1SaJl7U812YEszl0NhqXQZWaIygRsNnBSyVIhQcyryI/McSacS52eNTQGqd+pF3htg1ptMt/Gqn0
-	tyoivdYf3TwoP6OMxNigjaIMdJPDcHgyzRYi+we0ZY0Nb7+ztUyEVhx+UTIzkPay3Ua3daPwX3/N6
-	KluQjTxyPzr08YHaPcd0yWc8deYV5YrixOiDCrEU3JdqJR1lpFx+F2eRDnNJq3APw5W5hy67ktXLv
-	Wct9uurOPpVS5xweXf0eoCe2JcfeSLZRGEoORpTVS7+i3midU1l6a4w0bnHC2PQZOlzGtqVNW1fHW
-	aGYuup0g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53666 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qJrud-0006A2-0n;
-	Thu, 13 Jul 2023 09:42:59 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qJrud-00GkkE-15; Thu, 13 Jul 2023 09:42:59 +0100
-In-Reply-To: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
-References: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 11/11] net: dsa: mv88e6xxx: cleanup after phylink_pcs
- conversion
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9D98839
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:44:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E2B02101
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689237855;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rR7Iv9w+XHBj08BP3jRidlSyx8eIsHtx4pnPO3UYAbg=;
+	b=Yg8BttrKUzA/J9xuERKf0nccuNW7I2cOWiqwtAFgRDTRGCHUggSOoo3xHwvf6jNBdLrGB6
+	iAPjxuL1DMtf9XQeAAr3oZ9uk/bs9ZlfNbXI3xCyyb7qdBBlB+2tzE+bxHNKRw1dBB2VZP
+	fkYAmBq2Vi581gq4VuqLR030ZZJFK6k=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-622-cBNQTXrlM3Kt9USaGnhzTA-1; Thu, 13 Jul 2023 04:44:14 -0400
+X-MC-Unique: cBNQTXrlM3Kt9USaGnhzTA-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4034b144d3bso1509291cf.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:44:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689237853; x=1689842653;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rR7Iv9w+XHBj08BP3jRidlSyx8eIsHtx4pnPO3UYAbg=;
+        b=Lm0A4J2NzPi+ZvCBPrGJ9eFtxSz3tZwPIq/wOTor44KHzv+4PhASsgKEhVMMH0z4xr
+         ZKkHYElGaICKPnIiYzrlAhcSy8Ri4CsYk6qJe3yhddgYTy+s+qOjZuZo1EPVEQ9EGQTc
+         q8JqRS15Arbkxnc8e9uUyasGS2tYSQJI8JKeQUaN2CdLHbhp1APmB1KspsX1QAZyqWHO
+         po9mzExIAMX5S6ZFBmjBwSf8tn6w6TZ5ksuQTCJpOR2RO6Rwa0sb94oVvjf7PaNNoXwr
+         VHR5njK3PoAOGtIac8roAh6QmpwdkjvPH0ibOXfpQZoFg8MjQsWg1GB5yUz53pXZ+PBh
+         y5Cg==
+X-Gm-Message-State: ABy/qLZQ9hVLiGkjTw3eWF4MtNaJQbJLrFE+CwW0FiA8czUn9f9fe84/
+	k0tOmB/GiEK/+D5A65wLnZWd2qJ4QMFLOBz0tHk0/cbUTacoRmKVi0Y3EOqQ8RoC+/LwLTEivnF
+	8kj5c3pi5dqlhqslY
+X-Received: by 2002:a05:622a:1990:b0:400:aa1a:bb4c with SMTP id u16-20020a05622a199000b00400aa1abb4cmr1308875qtc.3.1689237853680;
+        Thu, 13 Jul 2023 01:44:13 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG8TJAsr29yMqQMjwRnQEyiUvd8lgShe4ZmGN8Uh7I/0BM+IlrGANT3Q/ihOr4BJrsWdN27SA==
+X-Received: by 2002:a05:622a:1990:b0:400:aa1a:bb4c with SMTP id u16-20020a05622a199000b00400aa1abb4cmr1308862qtc.3.1689237853408;
+        Thu, 13 Jul 2023 01:44:13 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-235-188.dyn.eolo.it. [146.241.235.188])
+        by smtp.gmail.com with ESMTPSA id a21-20020aed2795000000b004039e9199cesm2910488qtd.60.2023.07.13.01.44.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 01:44:13 -0700 (PDT)
+Message-ID: <bb9e2a2685447a704e0fd94c078519f3ce587805.camel@redhat.com>
+Subject: Re: [PATCH net] net/ipv6: Remove expired routes with a separated
+ list of routes.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kui-Feng Lee <thinker.li@gmail.com>, dsahern@kernel.org, 
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org,  martin.lau@linux.dev, kernel-team@meta.com,
+ yhs@meta.com
+Cc: Kui-Feng Lee <kuifeng@meta.com>
+Date: Thu, 13 Jul 2023 10:44:09 +0200
+In-Reply-To: <20230710203609.520720-1-kuifeng@meta.com>
+References: <20230710203609.520720-1-kuifeng@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qJrud-00GkkE-15@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 13 Jul 2023 09:42:59 +0100
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Now that mv88e6xxx is completely converted to using phylink_pcs
-support, we have no need for the serdes methods. Remove all this
-infrastructure. Also remove the __maybe_unused from
-mv88e6xxx_pcs_select().
+Hi,
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/dsa/mv88e6xxx/chip.c   | 238 +----------------------------
- drivers/net/dsa/mv88e6xxx/chip.h   |  21 ---
- drivers/net/dsa/mv88e6xxx/port.c   |  30 ----
- drivers/net/dsa/mv88e6xxx/serdes.h |  45 ------
- 4 files changed, 2 insertions(+), 332 deletions(-)
+On Mon, 2023-07-10 at 13:36 -0700, Kui-Feng Lee wrote:
+> FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tr=
+ee
+> can be expensive if the number of routes in a table is big, even if most =
+of
+> them are permanent. Checking routes in a separated list of routes having
+> expiration will avoid this potential issue.
+>=20
+> Background
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> The size of a Linux IPv6 routing table can become a big problem if not
+> managed appropriately.  Now, Linux has a garbage collector to remove
+> expired routes periodically.  However, this may lead to a situation in
+> which the routing path is blocked for a long period due to an
+> excessive number of routes.
+>=20
+> For example, years ago, there is a commit about "ICMPv6 Packet too big
+> messages". The root cause is that malicious ICMPv6 packets were sent back
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index a1ca82715714..6174855188d9 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -492,81 +492,6 @@ static int mv88e6xxx_port_ppu_updates(struct mv88e6xxx_chip *chip, int port)
- 	return !!(reg & MV88E6XXX_PORT_STS_PHY_DETECT);
- }
- 
--static int mv88e6xxx_serdes_pcs_get_state(struct dsa_switch *ds, int port,
--					  struct phylink_link_state *state)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--	int lane;
--	int err;
--
--	mv88e6xxx_reg_lock(chip);
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane >= 0 && chip->info->ops->serdes_pcs_get_state)
--		err = chip->info->ops->serdes_pcs_get_state(chip, port, lane,
--							    state);
--	else
--		err = -EOPNOTSUPP;
--	mv88e6xxx_reg_unlock(chip);
--
--	return err;
--}
--
--static int mv88e6xxx_serdes_pcs_config(struct mv88e6xxx_chip *chip, int port,
--				       unsigned int mode,
--				       phy_interface_t interface,
--				       const unsigned long *advertise)
--{
--	const struct mv88e6xxx_ops *ops = chip->info->ops;
--	int lane;
--
--	if (ops->serdes_pcs_config) {
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane >= 0)
--			return ops->serdes_pcs_config(chip, port, lane, mode,
--						      interface, advertise);
--	}
--
--	return 0;
--}
--
--static void mv88e6xxx_serdes_pcs_an_restart(struct dsa_switch *ds, int port)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--	const struct mv88e6xxx_ops *ops;
--	int err = 0;
--	int lane;
--
--	ops = chip->info->ops;
--
--	if (ops->serdes_pcs_an_restart) {
--		mv88e6xxx_reg_lock(chip);
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane >= 0)
--			err = ops->serdes_pcs_an_restart(chip, port, lane);
--		mv88e6xxx_reg_unlock(chip);
--
--		if (err)
--			dev_err(ds->dev, "p%d: failed to restart AN\n", port);
--	}
--}
--
--static int mv88e6xxx_serdes_pcs_link_up(struct mv88e6xxx_chip *chip, int port,
--					unsigned int mode,
--					int speed, int duplex)
--{
--	const struct mv88e6xxx_ops *ops = chip->info->ops;
--	int lane;
--
--	if (!phylink_autoneg_inband(mode) && ops->serdes_pcs_link_up) {
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane >= 0)
--			return ops->serdes_pcs_link_up(chip, port, lane,
--						       speed, duplex);
--	}
--
--	return 0;
--}
--
- static const u8 mv88e6185_phy_interface_modes[] = {
- 	[MV88E6185_PORT_STS_CMODE_GMII_FD]	 = PHY_INTERFACE_MODE_GMII,
- 	[MV88E6185_PORT_STS_CMODE_MII_100_FD_PS] = PHY_INTERFACE_MODE_MII,
-@@ -845,15 +770,8 @@ static void mv88e6xxx_get_caps(struct dsa_switch *ds, int port,
- 			  config->supported_interfaces);
- 	}
- 
--	/* If we have a .pcs_ops, or don't have a .serdes_pcs_get_state,
--	 * serdes_pcs_config, serdes_pcs_an_restart, or serdes_pcs_link_up,
--	 * we are not legacy.
--	 */
--	if (chip->info->ops->pcs_ops ||
--	    (!chip->info->ops->serdes_pcs_get_state &&
--	     !chip->info->ops->serdes_pcs_config &&
--	     !chip->info->ops->serdes_pcs_an_restart &&
--	     !chip->info->ops->serdes_pcs_link_up))
-+	/* If we have a .pcs_init, we are not legacy. */
-+	if (chip->info->ops->pcs_ops)
- 		config->legacy_pre_march2020 = false;
- }
- 
-@@ -907,16 +825,6 @@ static void mv88e6xxx_mac_config(struct dsa_switch *ds, int port,
- 						      state->interface);
- 		if (err && err != -EOPNOTSUPP)
- 			goto err_unlock;
--
--		err = mv88e6xxx_serdes_pcs_config(chip, port, mode,
--						  state->interface,
--						  state->advertising);
--		/* FIXME: we should restart negotiation if something changed -
--		 * which is something we get if we convert to using phylinks
--		 * PCS operations.
--		 */
--		if (err > 0)
--			err = 0;
- 	}
- 
- err_unlock:
-@@ -1000,17 +908,6 @@ static void mv88e6xxx_mac_link_up(struct dsa_switch *ds, int port,
- 	 */
- 	if (!mv88e6xxx_port_ppu_updates(chip, port) ||
- 	    mode == MLO_AN_FIXED) {
--		/* FIXME: for an automedia port, should we force the link
--		 * down here - what if the link comes up due to "other" media
--		 * while we're bringing the port up, how is the exclusivity
--		 * handled in the Marvell hardware? E.g. port 2 on 88E6390
--		 * shared between internal PHY and Serdes.
--		 */
--		err = mv88e6xxx_serdes_pcs_link_up(chip, port, mode, speed,
--						   duplex);
--		if (err)
--			goto error;
--
- 		if (ops->port_set_speed_duplex) {
- 			err = ops->port_set_speed_duplex(chip, port,
- 							 speed, duplex);
-@@ -3181,102 +3078,6 @@ static int mv88e6xxx_setup_egress_floods(struct mv88e6xxx_chip *chip, int port)
- 	return 0;
- }
- 
--static irqreturn_t mv88e6xxx_serdes_irq_thread_fn(int irq, void *dev_id)
--{
--	struct mv88e6xxx_port *mvp = dev_id;
--	struct mv88e6xxx_chip *chip = mvp->chip;
--	irqreturn_t ret = IRQ_NONE;
--	int port = mvp->port;
--	int lane;
--
--	mv88e6xxx_reg_lock(chip);
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane >= 0)
--		ret = mv88e6xxx_serdes_irq_status(chip, port, lane);
--	mv88e6xxx_reg_unlock(chip);
--
--	return ret;
--}
--
--static int mv88e6xxx_serdes_irq_request(struct mv88e6xxx_chip *chip, int port,
--					int lane)
--{
--	struct mv88e6xxx_port *dev_id = &chip->ports[port];
--	unsigned int irq;
--	int err;
--
--	/* Nothing to request if this SERDES port has no IRQ */
--	irq = mv88e6xxx_serdes_irq_mapping(chip, port);
--	if (!irq)
--		return 0;
--
--	snprintf(dev_id->serdes_irq_name, sizeof(dev_id->serdes_irq_name),
--		 "mv88e6xxx-%s-serdes-%d", dev_name(chip->dev), port);
--
--	/* Requesting the IRQ will trigger IRQ callbacks, so release the lock */
--	mv88e6xxx_reg_unlock(chip);
--	err = request_threaded_irq(irq, NULL, mv88e6xxx_serdes_irq_thread_fn,
--				   IRQF_ONESHOT, dev_id->serdes_irq_name,
--				   dev_id);
--	mv88e6xxx_reg_lock(chip);
--	if (err)
--		return err;
--
--	dev_id->serdes_irq = irq;
--
--	return mv88e6xxx_serdes_irq_enable(chip, port, lane);
--}
--
--static int mv88e6xxx_serdes_irq_free(struct mv88e6xxx_chip *chip, int port,
--				     int lane)
--{
--	struct mv88e6xxx_port *dev_id = &chip->ports[port];
--	unsigned int irq = dev_id->serdes_irq;
--	int err;
--
--	/* Nothing to free if no IRQ has been requested */
--	if (!irq)
--		return 0;
--
--	err = mv88e6xxx_serdes_irq_disable(chip, port, lane);
--
--	/* Freeing the IRQ will trigger IRQ callbacks, so release the lock */
--	mv88e6xxx_reg_unlock(chip);
--	free_irq(irq, dev_id);
--	mv88e6xxx_reg_lock(chip);
--
--	dev_id->serdes_irq = 0;
--
--	return err;
--}
--
--static int mv88e6xxx_serdes_power(struct mv88e6xxx_chip *chip, int port,
--				  bool on)
--{
--	int lane;
--	int err;
--
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane < 0)
--		return 0;
--
--	if (on) {
--		err = mv88e6xxx_serdes_power_up(chip, port, lane);
--		if (err)
--			return err;
--
--		err = mv88e6xxx_serdes_irq_request(chip, port, lane);
--	} else {
--		err = mv88e6xxx_serdes_irq_free(chip, port, lane);
--		if (err)
--			return err;
--
--		err = mv88e6xxx_serdes_power_down(chip, port, lane);
--	}
--
--	return err;
--}
--
- static int mv88e6xxx_set_egress_port(struct mv88e6xxx_chip *chip,
- 				     enum mv88e6xxx_egress_direction direction,
- 				     int port)
-@@ -3601,37 +3402,6 @@ static int mv88e6xxx_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
- 	return ret;
- }
- 
--static int mv88e6xxx_port_enable(struct dsa_switch *ds, int port,
--				 struct phy_device *phydev)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--	int err;
--
--	/* Do not control power or request irqs if using PCS */
--	if (chip->info->ops->pcs_ops)
--		return 0;
--
--	mv88e6xxx_reg_lock(chip);
--	err = mv88e6xxx_serdes_power(chip, port, true);
--	mv88e6xxx_reg_unlock(chip);
--
--	return err;
--}
--
--static void mv88e6xxx_port_disable(struct dsa_switch *ds, int port)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--
--	/* Do not control power or request irqs if using PCS */
--	if (chip->info->ops->pcs_ops)
--		return;
--
--	mv88e6xxx_reg_lock(chip);
--	if (mv88e6xxx_serdes_power(chip, port, false))
--		dev_err(chip->dev, "failed to power off SERDES\n");
--	mv88e6xxx_reg_unlock(chip);
--}
--
- static int mv88e6xxx_set_ageing_time(struct dsa_switch *ds,
- 				     unsigned int ageing_time)
- {
-@@ -7013,18 +6783,14 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 	.port_teardown		= mv88e6xxx_port_teardown,
- 	.phylink_get_caps	= mv88e6xxx_get_caps,
- 	.phylink_mac_select_pcs	= mv88e6xxx_mac_select_pcs,
--	.phylink_mac_link_state	= mv88e6xxx_serdes_pcs_get_state,
- 	.phylink_mac_prepare	= mv88e6xxx_mac_prepare,
- 	.phylink_mac_config	= mv88e6xxx_mac_config,
- 	.phylink_mac_finish	= mv88e6xxx_mac_finish,
--	.phylink_mac_an_restart	= mv88e6xxx_serdes_pcs_an_restart,
- 	.phylink_mac_link_down	= mv88e6xxx_mac_link_down,
- 	.phylink_mac_link_up	= mv88e6xxx_mac_link_up,
- 	.get_strings		= mv88e6xxx_get_strings,
- 	.get_ethtool_stats	= mv88e6xxx_get_ethtool_stats,
- 	.get_sset_count		= mv88e6xxx_get_sset_count,
--	.port_enable		= mv88e6xxx_port_enable,
--	.port_disable		= mv88e6xxx_port_disable,
- 	.port_max_mtu		= mv88e6xxx_get_max_mtu,
- 	.port_change_mtu	= mv88e6xxx_change_mtu,
- 	.get_mac_eee		= mv88e6xxx_get_mac_eee,
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index 1dd310a3c41f..44383a03ef2f 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -286,8 +286,6 @@ struct mv88e6xxx_port {
- 	u8 cmode;
- 	bool mirror_ingress;
- 	bool mirror_egress;
--	unsigned int serdes_irq;
--	char serdes_irq_name[64];
- 	struct devlink_region *region;
- 	void *pcs_private;
- 
-@@ -592,31 +590,12 @@ struct mv88e6xxx_ops {
- 
- 	int (*mgmt_rsvd2cpu)(struct mv88e6xxx_chip *chip);
- 
--	/* Power on/off a SERDES interface */
--	int (*serdes_power)(struct mv88e6xxx_chip *chip, int port, int lane,
--			    bool up);
--
- 	/* SERDES lane mapping */
- 	int (*serdes_get_lane)(struct mv88e6xxx_chip *chip, int port);
- 
--	int (*serdes_pcs_get_state)(struct mv88e6xxx_chip *chip, int port,
--				    int lane, struct phylink_link_state *state);
--	int (*serdes_pcs_config)(struct mv88e6xxx_chip *chip, int port,
--				 int lane, unsigned int mode,
--				 phy_interface_t interface,
--				 const unsigned long *advertise);
--	int (*serdes_pcs_an_restart)(struct mv88e6xxx_chip *chip, int port,
--				     int lane);
--	int (*serdes_pcs_link_up)(struct mv88e6xxx_chip *chip, int port,
--				  int lane, int speed, int duplex);
--
- 	/* SERDES interrupt handling */
- 	unsigned int (*serdes_irq_mapping)(struct mv88e6xxx_chip *chip,
- 					   int port);
--	int (*serdes_irq_enable)(struct mv88e6xxx_chip *chip, int port, int lane,
--				 bool enable);
--	irqreturn_t (*serdes_irq_status)(struct mv88e6xxx_chip *chip, int port,
--					 int lane);
- 
- 	/* Statistics from the SERDES interface */
- 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index dd66ec902d4c..5394a8cf7bf1 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -524,7 +524,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 				    phy_interface_t mode, bool force)
- {
- 	u16 cmode;
--	int lane;
- 	u16 reg;
- 	int err;
- 
-@@ -577,19 +576,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 	if (cmode == chip->ports[port].cmode && !force)
- 		return 0;
- 
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane >= 0) {
--		if (chip->ports[port].serdes_irq) {
--			err = mv88e6xxx_serdes_irq_disable(chip, port, lane);
--			if (err)
--				return err;
--		}
--
--		err = mv88e6xxx_serdes_power_down(chip, port, lane);
--		if (err)
--			return err;
--	}
--
- 	chip->ports[port].cmode = 0;
- 
- 	if (cmode) {
-@@ -605,22 +591,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 			return err;
- 
- 		chip->ports[port].cmode = cmode;
--
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane == -ENODEV)
--			return 0;
--		if (lane < 0)
--			return lane;
--
--		err = mv88e6xxx_serdes_power_up(chip, port, lane);
--		if (err)
--			return err;
--
--		if (chip->ports[port].serdes_irq) {
--			err = mv88e6xxx_serdes_irq_enable(chip, port, lane);
--			if (err)
--				return err;
--		}
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
-index 67584cb1fdb9..aac95cab46e3 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.h
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.h
-@@ -153,24 +153,6 @@ static inline int mv88e6xxx_serdes_get_lane(struct mv88e6xxx_chip *chip,
- 	return chip->info->ops->serdes_get_lane(chip, port);
- }
- 
--static inline int mv88e6xxx_serdes_power_up(struct mv88e6xxx_chip *chip,
--					    int port, int lane)
--{
--	if (!chip->info->ops->serdes_power)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_power(chip, port, lane, true);
--}
--
--static inline int mv88e6xxx_serdes_power_down(struct mv88e6xxx_chip *chip,
--					      int port, int lane)
--{
--	if (!chip->info->ops->serdes_power)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_power(chip, port, lane, false);
--}
--
- static inline unsigned int
- mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
- {
-@@ -180,33 +162,6 @@ mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
- 	return chip->info->ops->serdes_irq_mapping(chip, port);
- }
- 
--static inline int mv88e6xxx_serdes_irq_enable(struct mv88e6xxx_chip *chip,
--					      int port, int lane)
--{
--	if (!chip->info->ops->serdes_irq_enable)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_irq_enable(chip, port, lane, true);
--}
--
--static inline int mv88e6xxx_serdes_irq_disable(struct mv88e6xxx_chip *chip,
--					       int port, int lane)
--{
--	if (!chip->info->ops->serdes_irq_enable)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_irq_enable(chip, port, lane, false);
--}
--
--static inline irqreturn_t
--mv88e6xxx_serdes_irq_status(struct mv88e6xxx_chip *chip, int port, int lane)
--{
--	if (!chip->info->ops->serdes_irq_status)
--		return IRQ_NONE;
--
--	return chip->info->ops->serdes_irq_status(chip, port, lane);
--}
--
- extern const struct mv88e6xxx_pcs_ops mv88e6185_pcs_ops;
- extern const struct mv88e6xxx_pcs_ops mv88e6352_pcs_ops;
- extern const struct mv88e6xxx_pcs_ops mv88e6390_pcs_ops;
--- 
-2.30.2
+Please use the customary commit reference: <hash> ("<title>")
+
+> for every small packet sent to them. These packets add routes with an
+> expiration time that prompts the GC to periodically check all routes in t=
+he
+> tables, including permanent ones.
+>=20
+> Why Route Expires
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Users can add IPv6 routes with an expiration time manually. However,
+> the Neighbor Discovery protocol may also generate routes that can
+> expire.  For example, Router Advertisement (RA) messages may create a
+> default route with an expiration time. [RFC 4861] For IPv4, it is not
+> possible to set an expiration time for a route, and there is no RA, so
+> there is no need to worry about such issues.
+>=20
+> Create Routes with Expires
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+>=20
+> You can create routes with expires with the  command.
+>=20
+> For example,
+>=20
+>     ip -6 route add 2001:b000:591::3 via fe80::5054:ff:fe12:3457 \
+>         dev enp0s3 expires 30
+>=20
+> The route that has been generated will be deleted automatically in 30
+> seconds.
+>=20
+> GC of FIB6
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> The function called fib6_run_gc() is responsible for performing
+> garbage collection (GC) for the Linux IPv6 stack. It checks for the
+> expiration of every route by traversing the trees of routing
+> tables. The time taken to traverse a routing table increases with its
+> size. Holding the routing table lock during traversal is particularly
+> undesirable. Therefore, it is preferable to keep the lock for the
+> shortest possible duration.
+>=20
+> Solution
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> The cause of the issue is keeping the routing table locked during the
+> traversal of large trees. To solve this problem, we can create a separate
+> list of routes that have expiration. This will prevent GC from checking
+> permanent routes.
+>=20
+> Result
+> =3D=3D=3D=3D=3D=3D
+>=20
+> We conducted a test to measure the execution times of fib6_gc_timer_cb()
+> and observed that it enhances the GC of FIB6. During the test, we added
+> permanent routes with the following numbers: 1000, 3000, 6000, and
+> 9000. Additionally, we added a route with an expiration time.
+>=20
+> Here are the average execution times for the kernel without the patch.
+>  - 120020 ns with 1000 permanent routes
+>  - 308920 ns with 3000 ...
+>  - 581470 ns with 6000 ...
+>  - 855310 ns with 9000 ...
+>=20
+> The kernel with the patch consistently takes around 14000 ns to execute,
+> regardless of the number of permanent routes that are installed.
+>=20
+> Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
+> ---
+>  include/net/ip6_fib.h |  31 ++++++++-----
+>  net/ipv6/ip6_fib.c    | 104 ++++++++++++++++++++++++++++++++++++++++--
+>  net/ipv6/route.c      |   6 +--
+>  3 files changed, 123 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+> index 05e6f756feaf..fb4d8bf4b938 100644
+> --- a/include/net/ip6_fib.h
+> +++ b/include/net/ip6_fib.h
+> @@ -177,6 +177,8 @@ struct fib6_info {
+>  	};
+>  	unsigned int			fib6_nsiblings;
+> =20
+> +	struct hlist_node		gc_link;
+> +
+
+It looks like placing the new field here will create 2 4bytes holes, I
+think it should be better moving it after 'fib6_ref'
+
+>  	refcount_t			fib6_ref;
+>  	unsigned long			expires;
+>  	struct dst_metrics		*fib6_metrics;
+> @@ -247,18 +249,19 @@ static inline bool fib6_requires_src(const struct f=
+ib6_info *rt)
+>  	return rt->fib6_src.plen > 0;
+>  }
+> =20
+> -static inline void fib6_clean_expires(struct fib6_info *f6i)
+> -{
+> -	f6i->fib6_flags &=3D ~RTF_EXPIRES;
+> -	f6i->expires =3D 0;
+> -}
+> +void fib6_clean_expires(struct fib6_info *f6i);
+> +/* fib6_info must be locked by the caller, and fib6_info->fib6_table can=
+ be
+> + * NULL.  If fib6_table is NULL, the fib6_info will no be inserted into =
+the
+> + * list of GC candidates until it is inserted into a table.
+> + */
+
+This comment should be probably paired with  'fib6_set_expires'
+instead.
+
+> +void fib6_clean_expires_locked(struct fib6_info *f6i);
+> =20
+> -static inline void fib6_set_expires(struct fib6_info *f6i,
+> -				    unsigned long expires)
+> -{
+> -	f6i->expires =3D expires;
+> -	f6i->fib6_flags |=3D RTF_EXPIRES;
+> -}
+> +void fib6_set_expires(struct fib6_info *f6i, unsigned long expires);
+> +/* fib6_info must be locked by the caller, and fib6_info->fib6_table can=
+ be
+> + * NULL.
+> + */
+> +void fib6_set_expires_locked(struct fib6_info *f6i,
+> +			     unsigned long expires);
+> =20
+>  static inline bool fib6_check_expired(const struct fib6_info *f6i)
+>  {
+> @@ -267,6 +270,11 @@ static inline bool fib6_check_expired(const struct f=
+ib6_info *f6i)
+>  	return false;
+>  }
+> =20
+> +static inline bool fib6_has_expires(const struct fib6_info *f6i)
+> +{
+> +	return f6i->fib6_flags & RTF_EXPIRES;
+> +}
+> +
+>  /* Function to safely get fn->fn_sernum for passed in rt
+>   * and store result in passed in cookie.
+>   * Return true if we can get cookie safely
+> @@ -388,6 +396,7 @@ struct fib6_table {
+>  	struct inet_peer_base	tb6_peers;
+>  	unsigned int		flags;
+>  	unsigned int		fib_seq;
+> +	struct hlist_head       tb6_gc_hlist;	/* GC candidates */
+>  #define RT6_TABLE_HAS_DFLT_ROUTER	BIT(0)
+>  };
+> =20
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index bac768d36cc1..32292a758722 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -160,6 +160,8 @@ struct fib6_info *fib6_info_alloc(gfp_t gfp_flags, bo=
+ol with_fib6_nh)
+>  	INIT_LIST_HEAD(&f6i->fib6_siblings);
+>  	refcount_set(&f6i->fib6_ref, 1);
+> =20
+> +	INIT_HLIST_NODE(&f6i->gc_link);
+> +
+>  	return f6i;
+>  }
+> =20
+> @@ -246,6 +248,7 @@ static struct fib6_table *fib6_alloc_table(struct net=
+ *net, u32 id)
+>  				   net->ipv6.fib6_null_entry);
+>  		table->tb6_root.fn_flags =3D RTN_ROOT | RTN_TL_ROOT | RTN_RTINFO;
+>  		inet_peer_base_init(&table->tb6_peers);
+> +		INIT_HLIST_HEAD(&table->tb6_gc_hlist);
+>  	}
+> =20
+>  	return table;
+> @@ -1057,6 +1060,11 @@ static void fib6_purge_rt(struct fib6_info *rt, st=
+ruct fib6_node *fn,
+>  				    lockdep_is_held(&table->tb6_lock));
+>  		}
+>  	}
+> +
+> +	if (fib6_has_expires(rt)) {
+> +		hlist_del_init(&rt->gc_link);
+> +		rt->fib6_flags &=3D ~RTF_EXPIRES;
+> +	}
+>  }
+> =20
+>  /*
+> @@ -1118,9 +1126,9 @@ static int fib6_add_rt2node(struct fib6_node *fn, s=
+truct fib6_info *rt,
+>  				if (!(iter->fib6_flags & RTF_EXPIRES))
+>  					return -EEXIST;
+>  				if (!(rt->fib6_flags & RTF_EXPIRES))
+> -					fib6_clean_expires(iter);
+> +					fib6_clean_expires_locked(iter);
+>  				else
+> -					fib6_set_expires(iter, rt->expires);
+> +					fib6_set_expires_locked(iter, rt->expires);
+
+The above looks buggy. At this point 'iter' should be already inserted
+into the 'tb6_gc_hlist' list and fib6_set_expires_locked() will
+inconditionally re-add it.
+
+> =20
+>  				if (rt->fib6_pmtu)
+>  					fib6_metric_set(iter, RTAX_MTU,
+> @@ -1480,6 +1488,9 @@ int fib6_add(struct fib6_node *root, struct fib6_in=
+fo *rt,
+>  			list_add(&rt->nh_list, &rt->nh->f6i_list);
+>  		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
+>  		fib6_start_gc(info->nl_net, rt);
+> +
+> +		if (fib6_has_expires(rt))
+> +			hlist_add_head(&rt->gc_link, &table->tb6_gc_hlist);
+>  	}
+> =20
+>  out:
+> @@ -2267,6 +2278,91 @@ void fib6_clean_all(struct net *net, int (*func)(s=
+truct fib6_info *, void *),
+>  	__fib6_clean_all(net, func, FIB6_NO_SERNUM_CHANGE, arg, false);
+>  }
+> =20
+> +void fib6_set_expires(struct fib6_info *f6i, unsigned long expires)
+> +{
+> +	struct fib6_table *tb6;
+> +
+> +	tb6 =3D f6i->fib6_table;
+> +	spin_lock_bh(&tb6->tb6_lock);
+> +	f6i->expires =3D expires;
+> +	if (!fib6_has_expires(f6i))
+> +		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
+> +	f6i->fib6_flags |=3D RTF_EXPIRES;
+
+This duplicates most of the code from 'fib6_set_expires_locked'.
+Instead you could call the latter here, too. Then fib6_set_expires()
+could be small enough to be defined as a static inline function in the
+header file.
+
+> +	spin_unlock_bh(&tb6->tb6_lock);
+> +}
+> +
+> +void fib6_set_expires_locked(struct fib6_info *f6i, unsigned long expire=
+s)
+> +{
+> +	struct fib6_table *tb6;
+> +
+> +	tb6 =3D f6i->fib6_table;
+> +	f6i->expires =3D expires;
+> +	if (tb6 && !fib6_has_expires(f6i))
+> +		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
+> +	f6i->fib6_flags |=3D RTF_EXPIRES;
+> +}
+> +
+> +void fib6_clean_expires(struct fib6_info *f6i)
+> +{
+> +	struct fib6_table *tb6;
+> +
+> +	tb6 =3D f6i->fib6_table;
+> +	spin_lock_bh(&tb6->tb6_lock);
+> +	if (fib6_has_expires(f6i))
+> +		hlist_del_init(&f6i->gc_link);
+> +	f6i->fib6_flags &=3D ~RTF_EXPIRES;
+> +	f6i->expires =3D 0;
+
+Same here.
+
+> +	spin_unlock_bh(&tb6->tb6_lock);
+> +}
+> +
+> +void fib6_clean_expires_locked(struct fib6_info *f6i)
+> +{
+> +	struct fib6_table *tb6;
+> +
+> +	tb6 =3D f6i->fib6_table;
+> +	if (tb6 && fib6_has_expires(f6i))
+> +		hlist_del_init(&f6i->gc_link);
+> +	f6i->fib6_flags &=3D ~RTF_EXPIRES;
+> +	f6i->expires =3D 0;
+> +}
+> +
+> +static void fib6_gc_table(struct net *net,
+> +			  struct fib6_table *tb6,
+> +			  int (*func)(struct fib6_info *, void *arg),
+> +			  void *arg)
+> +{
+> +	struct fib6_info *rt;
+> +	struct hlist_node *n;
+> +	struct nl_info info =3D {
+> +		.nl_net =3D net,
+> +		.skip_notify =3D false,
+> +	};
+> +
+> +	hlist_for_each_entry_safe(rt, n, &tb6->tb6_gc_hlist, gc_link)
+> +		if (func(rt, arg) =3D=3D -1)
+
+As 'func' is always fib6_age, you don't need to use an indirect call
+here.
+
+> +			fib6_del(rt, &info);
+> +}
+> +
+> +static void fib6_gc_all(struct net *net,
+> +			int (*func)(struct fib6_info *, void *),
+> +			void *arg)
+
+
+> +{
+> +	struct fib6_table *table;
+> +	struct hlist_head *head;
+> +	unsigned int h;
+> +
+> +	rcu_read_lock();
+> +	for (h =3D 0; h < FIB6_TABLE_HASHSZ; h++) {
+> +		head =3D &net->ipv6.fib_table_hash[h];
+> +		hlist_for_each_entry_rcu(table, head, tb6_hlist) {
+> +			spin_lock_bh(&table->tb6_lock);
+> +			fib6_gc_table(net, table, func, arg);
+> +			spin_unlock_bh(&table->tb6_lock);
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +}
+> +
+>  void fib6_clean_all_skip_notify(struct net *net,
+>  				int (*func)(struct fib6_info *, void *),
+>  				void *arg)
+> @@ -2295,7 +2391,7 @@ static int fib6_age(struct fib6_info *rt, void *arg=
+)
+>  	 *	Routes are expired even if they are in use.
+>  	 */
+> =20
+> -	if (rt->fib6_flags & RTF_EXPIRES && rt->expires) {
+> +	if (fib6_has_expires(rt) && rt->expires) {
+>  		if (time_after(now, rt->expires)) {
+>  			RT6_TRACE("expiring %p\n", rt);
+>  			return -1;
+> @@ -2327,7 +2423,7 @@ void fib6_run_gc(unsigned long expires, struct net =
+*net, bool force)
+>  			  net->ipv6.sysctl.ip6_rt_gc_interval;
+>  	gc_args.more =3D 0;
+> =20
+> -	fib6_clean_all(net, fib6_age, &gc_args);
+> +	fib6_gc_all(net, fib6_age, &gc_args);
+>  	now =3D jiffies;
+>  	net->ipv6.ip6_rt_last_gc =3D now;
+> =20
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 64e873f5895f..a69083563689 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -3760,10 +3760,10 @@ static struct fib6_info *ip6_route_info_create(st=
+ruct fib6_config *cfg,
+>  		rt->dst_nocount =3D true;
+> =20
+>  	if (cfg->fc_flags & RTF_EXPIRES)
+> -		fib6_set_expires(rt, jiffies +
+> -				clock_t_to_jiffies(cfg->fc_expires));
+> +		fib6_set_expires_locked(rt, jiffies +
+> +					clock_t_to_jiffies(cfg->fc_expires));
+>  	else
+> -		fib6_clean_expires(rt);
+> +		fib6_clean_expires_locked(rt);
+> =20
+>  	if (cfg->fc_protocol =3D=3D RTPROT_UNSPEC)
+>  		cfg->fc_protocol =3D RTPROT_BOOT;
+
+I think this feature deserves a new paired self test: please add it
+with the next revision, and please explicitly insert the target tree
+into the patch prefix (in this case 'net-next')
+
+Thanks,
+
+Paolo
 
 
