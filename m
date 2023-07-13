@@ -1,252 +1,111 @@
-Return-Path: <netdev+bounces-17623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A99475266A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:15:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02B6C752693
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92F72281E37
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:15:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3638E1C210F3
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989A41EA94;
-	Thu, 13 Jul 2023 15:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7133B1EA94;
+	Thu, 13 Jul 2023 15:18:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8363A1EA74
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:15:43 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6927FA2
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:15:32 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-991ef0b464cso453205066b.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689261331; x=1691853331;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sSOMyhPHQHsjkQqbe1+Sy5kPDPFeX1/HO98Z7nr1IRw=;
-        b=tCA4ACsn5Jt/1IPY+UNtTPFBsBAl31J+322bpYm/DmWc3MaCL3nktarCAUyuflH3wc
-         fsQW6Jyd1mpF4FUWSym/IvCwzDAoMvUtzR3N2zUq/hGSUnqkezo8DcGnJNLGWdXuYJIF
-         lD5o96byH0C+SzDpHYKYkSlr6q019anAsvajz527zg9YaowLAg0+ldeqXiav1SrkL4l1
-         Qs5nV7uVSYtAjAkB3qlEL7m3CzQmBb7x/lnPtLarYGVni8WwyOXgMWqA9FHKtpuqqTvD
-         rX74+qrXYBDP4TIWVk2fwQWTLXVHq+lTvMh6m8/KuPv/OXLJxcRVNjw9lhzU98qWyfDZ
-         H2GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689261331; x=1691853331;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sSOMyhPHQHsjkQqbe1+Sy5kPDPFeX1/HO98Z7nr1IRw=;
-        b=gLc7nlAszoqbbMiVVyVMiPeQ+7WQOThoki2XLUzaPcPP7steqfRQgTxseQkEOtdRUi
-         DXhJCXdsCnap0DFMf242TP67/69M6GogVS1vVd1I7/En1dFVQjgqszkevY9h0fPX/y3J
-         EYMwBxA5W/0w99yCJfXmQKsnK+pAzRajX6plJPByi6N6ExnLkc3gewLHifVQutRHRQMk
-         k0hBbuFEDyJs7DaMqDQnKEICRc3hh9hE11oSYxMmq9bJ/0y3XJ4135UzlSDR75kbGuVg
-         6xdYGgj+eh0PyZShiPNZfIteyxwyfOwjNDQUIVeIOBfhMfkeGNV0Lpb5DwMK4BlJLBDq
-         Eygw==
-X-Gm-Message-State: ABy/qLbdCvwO6Yt2lw3vaYb3iB0xITLsJTms6MXT9AOU8NgRaFOdYGUZ
-	xF8TW2/sDlHucQiYP7wvyrnwOjRpkoC3AkcWT3I=
-X-Google-Smtp-Source: APBJJlEyGVKGYEUqZoR7juJ/3MaFsqxup3FkrtueuevcXuPnx1JZzZZii4Tr/HZFYT7gSiQOBjrxow==
-X-Received: by 2002:a17:906:1019:b0:98f:8481:24b3 with SMTP id 25-20020a170906101900b0098f848124b3mr2781103ejm.37.1689261330632;
-        Thu, 13 Jul 2023 08:15:30 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id z26-20020a1709064e1a00b009937dbabbd5sm4088513eju.220.2023.07.13.08.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 08:15:30 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	moshe@nvidia.com
-Subject: [patch net-next] devlink: introduce dump selector attr and implement it for port dumps
-Date: Thu, 13 Jul 2023 17:15:28 +0200
-Message-Id: <20230713151528.2546909-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6200118B12
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 15:18:29 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5641B6
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:18:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=LS/5lGFAZMJk/69HvYubpmP2liqeL42cX0dbzWPZD04=; b=XzyKgTU0VG1Go7jsz1GoCcY/rw
+	UQ8OkCps8VD6Ln9j55PWly3tRpwaz9lm5l/nnlgdKTesGHCDV0nHsBx5rVLaUyAHdIR/PS1Tbaz21
+	0A7JJ0xkQilD3lfIWHhwKlHTKFlCgD+yBeuemG4AMaOy0B5XXHn686cFa71MotSRPGjE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qJy4w-001GUL-A6; Thu, 13 Jul 2023 17:18:02 +0200
+Date: Thu, 13 Jul 2023 17:18:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	francesco.dolcini@toradex.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 1/4] net: phy: add the link modes for
+ 1000BASE-T1 Ethernet PHY
+Message-ID: <f33be5e3-cfb4-473f-8669-58e1982d2a17@lunn.ch>
+References: <20230710205900.52894-1-eichest@gmail.com>
+ <20230710205900.52894-2-eichest@gmail.com>
+ <cad4c420-470d-497a-9a1d-a43654af9a7e@lunn.ch>
+ <ZLAFzaN7IRzerGpX@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLAFzaN7IRzerGpX@eichest-laptop>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Thu, Jul 13, 2023 at 04:10:21PM +0200, Stefan Eichenberger wrote:
+> Hi Andrew,
+> 
+> On Mon, Jul 10, 2023 at 11:10:17PM +0200, Andrew Lunn wrote:
+> > On Mon, Jul 10, 2023 at 10:58:57PM +0200, Stefan Eichenberger wrote:
+> > > This patch adds the link modes for the 1000BASE-T1 Ethernet PHYs. It
+> > > supports 100BASE-T1/1000BASE-T1 in full duplex mode. So far I could not
+> > > find a 1000BASE-T1 PHY that also supports 10BASE-T1, so this mode is not
+> > > added.
+> > 
+> > Is this actually needed? Ideally you want to extend
+> > genphy_c45_pma_read_abilities() to look in the PHY registers and
+> > determine what the PHY can do. You should only use .features if it is
+> > impossible to determine the PHY abilities by reading registers.
+> 
+> Unfortunately the MDIO_PMA_EXTABLE register does not work on this PHY.
+> It will not signalize that it is BT1 capable (MDIO_PMA_EXTABLE_BT1). I
+> tested it again (should be 0x0800):
 
-For SFs, one devlink instance per SF is created. There might be
-thousands of these on a single host. When a user needs to know port
-handle for specific SF, he needs to dump all devlink ports on the host
-which does not scale good.
+**
+ * genphy_c45_baset1_able - checks if the PMA has BASE-T1 extended abilities
+ * @phydev: target phy_device struct
+ */
+static bool genphy_c45_baset1_able(struct phy_device *phydev)
+{
+        int val;
 
-Allow user to pass devlink handle alongside the dump command for
-ports and dump only ports which are under selected devlink instance.
+        if (phydev->pma_extable == -ENODATA) {
+                val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_PMA_EXTABLE);
+                if (val < 0)
+                        return false;
 
-Introduce new attr DEVLINK_ATTR_DUMP_SELECTOR to nest the selection
-attributes. This way the userspace can use maxattr to tell if dump
-selector is supported by kernel or not.
+                phydev->pma_extable = val;
+        }
 
-Each object (port in this case), has to pass nla_policy array to expose
-what are the supported selection attributes. If user passes attr unknown
-to kernel, netlink validation errors out.
+        return !!(phydev->pma_extable & MDIO_PMA_EXTABLE_BT1);
+}
 
-Note this infrastructure could be later on easily extended by:
-1) Other commands to select dumps by devlink instance.
-2) Include other attrs into selection for specific object type. For that
-   the dump_one() op would be extended by selector attrs arg.
+This is rather odd, but might help you. You already have a workaround
+in mv88q2xxx_config_init(). Have you tried adding a get_features()
+callback with sets phydev->pma_extable to the correct value, and then
+calls genphy_c45_pma_read_abilities()?
 
-Example:
-$ devlink port show
-auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
-auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
+Please also report the bug in the PHY to Marvell. Maybe a later
+revision might have it fixed.
 
-$ devlink port show auxiliary/mlx5_core.eth.0
-auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
-
-$ devlink port show auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- include/uapi/linux/devlink.h |  2 ++
- net/devlink/devl_internal.h  |  3 +++
- net/devlink/leftover.c       |  5 +++--
- net/devlink/netlink.c        | 32 ++++++++++++++++++++++++++++++++
- 4 files changed, 40 insertions(+), 2 deletions(-)
-
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 3782d4219ac9..8b74686512ae 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -612,6 +612,8 @@ enum devlink_attr {
- 
- 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
- 
-+	DEVLINK_ATTR_DUMP_SELECTOR,		/* nested */
-+
- 	/* add new attributes above here, update the policy in devlink.c */
- 
- 	__DEVLINK_ATTR_MAX,
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 62921b2eb0d3..4f5cf18af6a1 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -117,6 +117,7 @@ struct devlink_nl_dump_state {
- struct devlink_cmd {
- 	int (*dump_one)(struct sk_buff *msg, struct devlink *devlink,
- 			struct netlink_callback *cb);
-+	const struct nla_policy *dump_selector_nla_policy;
- };
- 
- extern const struct genl_small_ops devlink_nl_ops[56];
-@@ -127,6 +128,8 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs);
- void devlink_notify_unregister(struct devlink *devlink);
- void devlink_notify_register(struct devlink *devlink);
- 
-+extern const struct nla_policy devlink_nl_handle_policy[DEVLINK_ATTR_MAX + 1];
-+
- int devlink_nl_instance_iter_dumpit(struct sk_buff *msg,
- 				    struct netlink_callback *cb);
- 
-diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index 5128b9c7eea8..aeb61b8e9e62 100644
---- a/net/devlink/leftover.c
-+++ b/net/devlink/leftover.c
-@@ -1119,7 +1119,8 @@ devlink_nl_cmd_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
- }
- 
- const struct devlink_cmd devl_cmd_port_get = {
--	.dump_one		= devlink_nl_cmd_port_get_dump_one,
-+	.dump_one			= devlink_nl_cmd_port_get_dump_one,
-+	.dump_selector_nla_policy	= devlink_nl_handle_policy,
- };
- 
- static int devlink_port_type_set(struct devlink_port *devlink_port,
-@@ -6288,7 +6289,7 @@ const struct genl_small_ops devlink_nl_ops[56] = {
- 	},
- 	{
- 		.cmd = DEVLINK_CMD_PORT_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP_STRICT,
- 		.doit = devlink_nl_cmd_port_get_doit,
- 		.dumpit = devlink_nl_instance_iter_dumpit,
- 		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 7a332eb70f70..f6cd06bd1f09 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -80,6 +80,7 @@ static const struct nla_policy devlink_nl_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32 },
- 	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32 },
- 	[DEVLINK_ATTR_REGION_DIRECT] = { .type = NLA_FLAG },
-+	[DEVLINK_ATTR_DUMP_SELECTOR] = { .type = NLA_NESTED },
- };
- 
- struct devlink *
-@@ -196,17 +197,47 @@ static const struct devlink_cmd *devl_cmds[] = {
- 	[DEVLINK_CMD_SELFTESTS_GET]	= &devl_cmd_selftests_get,
- };
- 
-+const struct nla_policy devlink_nl_handle_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING },
-+	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING },
-+};
-+
- int devlink_nl_instance_iter_dumpit(struct sk_buff *msg,
- 				    struct netlink_callback *cb)
- {
- 	const struct genl_dumpit_info *info = genl_dumpit_info(cb);
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
-+	struct nlattr **attrs = info->attrs;
- 	const struct devlink_cmd *cmd;
- 	struct devlink *devlink;
- 	int err = 0;
- 
- 	cmd = devl_cmds[info->op.cmd];
- 
-+	/* If the user provided selector attribute with devlink handle, dump only
-+	 * objects that belong under this instance.
-+	 */
-+	if (cmd->dump_selector_nla_policy &&
-+	    attrs[DEVLINK_ATTR_DUMP_SELECTOR]) {
-+		struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
-+
-+		err = nla_parse_nested(tb, DEVLINK_ATTR_MAX,
-+				       attrs[DEVLINK_ATTR_DUMP_SELECTOR],
-+				       cmd->dump_selector_nla_policy,
-+				       cb->extack);
-+		if (err)
-+			return err;
-+		if (tb[DEVLINK_ATTR_BUS_NAME] && tb[DEVLINK_ATTR_DEV_NAME]) {
-+			devlink = devlink_get_from_attrs_lock(sock_net(msg->sk), tb);
-+			if (IS_ERR(devlink))
-+				return PTR_ERR(devlink);
-+			err = cmd->dump_one(msg, devlink, cb);
-+			devl_unlock(devlink);
-+			devlink_put(devlink);
-+			goto out;
-+		}
-+	}
-+
- 	while ((devlink = devlinks_xa_find_get(sock_net(msg->sk),
- 					       &state->instance))) {
- 		devl_lock(devlink);
-@@ -228,6 +259,7 @@ int devlink_nl_instance_iter_dumpit(struct sk_buff *msg,
- 		state->idx = 0;
- 	}
- 
-+out:
- 	if (err != -EMSGSIZE)
- 		return err;
- 	return msg->len;
--- 
-2.39.2
-
+      Andrew
 
