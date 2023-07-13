@@ -1,89 +1,135 @@
-Return-Path: <netdev+bounces-17667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9C2752A01
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 19:49:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C3B752A1F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 20:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 803F71C213D2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 17:49:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469D41C2142F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 18:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC3B1F19B;
-	Thu, 13 Jul 2023 17:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0CD1F921;
+	Thu, 13 Jul 2023 18:05:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E295C1F173
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 17:49:33 +0000 (UTC)
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5678E2720
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 10:49:32 -0700 (PDT)
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3a3df1e1f38so1715734b6e.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 10:49:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186E11F173
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 18:05:27 +0000 (UTC)
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BC2271F
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 11:05:26 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-39ca120c103so836156b6e.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 11:05:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689271525; x=1691863525;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vZj4h+6Yk/nzRuccIArEHBriQ4j+wGA3124QyzvZzuE=;
+        b=bVxZoXCMeo38bw+i06/BUypFN/wAJ5ERz3aOwZf+3IDdP5CnG8HWAy8+uCoRvSXMo7
+         kbxliRu5Ds/ZLJdqmC+QDgvURHnDHuoBbtqAhNcD/gclUgX8YXaizMq6OIWC+JKAVCoU
+         rNsdDddk+clZ6RZSJqLfom6KSUW+MPz3eXs5xbuauNSlVbTqKMVNr31fVF9ne8pJcan9
+         MxKhtOnS1cU3x8fjoM4wTqhfEYuFjJpkPPBzwhQPUC5rcucUECjouZHljB9ZmUMx3DgS
+         M91p6S/sN5YaoNMsF1dWCWQmFf12l4CMUaKRaO6GQHJmpIwFTGJrgMKwJMVJ8E1zjE/N
+         LTug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689270571; x=1691862571;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zpXZu9kLoCoL0GAf9Mkv1VSpnIG+XGAoWicN/hHKyA4=;
-        b=gKQDBjWjhOEmHe1S+qAx+4tzdebgfUAqzrhk7S9DGCM2tQDChF+RBVY9WKPipjH20k
-         Cv2oUgUV8J5xef+V2hbD7nQRVOwWlhqNuVkkLFvnJJEX+0/LtFY8FWBXsqUYQ3bizM5/
-         VU/NC9Hii5b2YoYYvP31FQAyl9MGtRi/fv5zlXwn9S8Dqe5lJqRmWl8xtcBI6Ouc9kFA
-         jXlYXHSfaliZVCpH+I6Tud5f4OqQwouFBEP/dKD6ZIvHGvIEXEyGji0gKfyTfRRVTms2
-         W1mlSHLWMsNreFpx49k7530WIcgMlON9IbaeuqjIThkrNw+hNTw9lpySOx5ABMzk959P
-         0m4A==
-X-Gm-Message-State: ABy/qLYDpifXD/3R4p4lxjEpPGfbJnW02HGNboGFGJxTQUw5c2CyYBQN
-	n6/B8cY4IvcW7u7b2QX8SCMUWwppiNKvov/cUApo+JS+O+EO
-X-Google-Smtp-Source: APBJJlGN9W5XdNXXehBzjUnB4kBTA2iqNXiDhtVJyC/P38CxxXOcAxcnjlKaW1qshLuWFfQkyWklM43sW3RYct+1AdFj3tYAOsQS
+        d=1e100.net; s=20221208; t=1689271525; x=1691863525;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vZj4h+6Yk/nzRuccIArEHBriQ4j+wGA3124QyzvZzuE=;
+        b=YmdvAhJ4/lC7oAGYzeDplj5QqPKinRbevYSSVn+2HUdYUbfIWQluOrP0zGkWGdX+ds
+         bK2cu4jNV5MPfXbcXFroQWHWRHLP4Vshmpj/ScXmedm9sppwNGR45+6SgWqPAu6e2lMg
+         5m3M/UIzXN4xZdQf46VZC2h3/bNbV5xF8v5ZHAmMt+CNcW5Mt5na8tNN9tPJJAqzBWrp
+         U5COsHSn/IoGvFfa6Yruh9ru+ykJ8VdumytHh8Pckqrqs9Te0v26rg0r/RVsDCx6dUjE
+         Vlb0kRRrtBEmt6uFWZ51+8SNecOog+Djx3Ow1Au7T2hy2ecfWSoU/r/qJrvd61FFQ9xW
+         ytjA==
+X-Gm-Message-State: ABy/qLaLMCJK5g2Wi52D0xxRx7R9+YDC5gFsE37Prb4Uf2CsNKj7O2wi
+	oEgGxWuAg2e00KLRLYLKTmggVVCnqhyQj1BxCpk=
+X-Google-Smtp-Source: APBJJlG5b80I/6PBLz3cAxkCzPH9kDxYuuErro8/FF6+lSD0ITkW3N9IEdDkpeBziaXWIsQ3BIVahw==
+X-Received: by 2002:aca:f2d6:0:b0:3a3:6cb2:d5bf with SMTP id q205-20020acaf2d6000000b003a36cb2d5bfmr2198282oih.4.1689271525284;
+        Thu, 13 Jul 2023 11:05:25 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f1:e2c1:1622:34af:d3bb:8e9a:95c5])
+        by smtp.gmail.com with ESMTPSA id t65-20020a4a5444000000b005660b585a00sm3175299ooa.22.2023.07.13.11.05.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 11:05:24 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pctammela@mojatatu.com,
+	simon.horman@corigine.com,
+	kernel@mojatatu.com
+Subject: [PATCH net v5 0/5] net: sched: Fixes for classifiers
+Date: Thu, 13 Jul 2023 15:05:09 -0300
+Message-Id: <20230713180514.592812-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:f8b:b0:3a1:edf0:c79f with SMTP id
- o11-20020a0568080f8b00b003a1edf0c79fmr2890448oiw.3.1689270571679; Thu, 13 Jul
- 2023 10:49:31 -0700 (PDT)
-Date: Thu, 13 Jul 2023 10:49:31 -0700
-In-Reply-To: <000000000000c2dccb05d0cee49a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005ac8fc060061f4c5@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_free_ack_frame (2)
-From: syzbot <syzbot+ac648b0525be1feba506@syzkaller.appspotmail.com>
-To: casey@schaufler-ca.com, davem@davemloft.net, edumazet@google.com, 
-	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	paul@paul-moore.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot suspects this issue was fixed by commit:
+Four different classifiers (bpf, u32, matchall, and flower) are
+calling tcf_bind_filter in their callbacks, but arent't undoing it by
+calling tcf_unbind_filter if their was an error after binding.
 
-commit 1661372c912d1966e21e0cb5463559984df8249b
-Author: Paul Moore <paul@paul-moore.com>
-Date:   Tue Feb 7 22:06:51 2023 +0000
+This patch set fixes all this by calling tcf_unbind_filter in such
+cases.
 
-    lsm: move the program execution hook comments to security/security.c
+This set also undoes a refcount decrement in cls_u32 when an update
+fails under specific conditions which are described in patch #3.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1024a074a80000
-start commit:   33189f0a94b9 r8169: fix RTL8168H and RTL8107E rx crc error
-git tree:       net
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ea09b0836073ee4
-dashboard link: https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15346b1ec80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=162e3b89c80000
+v1 -> v2:
+* Remove blank line after fixes tag
+* Fix reverse xmas tree issues pointed out by Simon
 
-If the result looks correct, please mark the issue as fixed by replying with:
+v2 -> v3:
+* Inline functions cls_bpf_set_parms and fl_set_parms to avoid adding
+  yet another parameter (and a return value at it) to them.
+* Remove similar fixes for u32 and matchall, which will be sent soon,
+  once we find a way to do the fixes without adding a return parameter
+  to their set_parms functions.
 
-#syz fix: lsm: move the program execution hook comments to security/security.c
+v3 -> v4:
+* Inline mall_set_parms to avoid adding yet another parameter.
+* Remove set_flags parameter from u32_set_parms and create a separate
+  function for calling tcf_bind_filter and tcf_unbind_filter in case of
+  failure.
+* Change cover letter title to also encompass refcnt fix for u32
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+v4 -> v5:
+* Change back tag to net
+
+Victor Nogueira (5):
+  net: sched: cls_matchall: Undo tcf_bind_filter in case of failure
+    after mall_set_parms
+  net: sched: cls_u32: Undo tcf_bind_filter if u32_replace_hw_knode
+  net: sched: cls_u32: Undo refcount decrement in case update failed
+  net: sched: cls_bpf: Undo tcf_bind_filter in case of an error
+  net: sched: cls_flower: Undo tcf_bind_filter in case of an error
+
+ net/sched/cls_bpf.c      | 99 +++++++++++++++++++---------------------
+ net/sched/cls_flower.c   | 99 +++++++++++++++++++---------------------
+ net/sched/cls_matchall.c | 35 +++++---------
+ net/sched/cls_u32.c      | 48 ++++++++++++++-----
+ 4 files changed, 143 insertions(+), 138 deletions(-)
+
+-- 
+2.25.1
+
 
