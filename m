@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-17475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D258751BFC
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:45:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D2E751C02
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 10:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71F041C212B9
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCCE4281B2A
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 08:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18589DDC4;
-	Thu, 13 Jul 2023 08:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95348100CC;
+	Thu, 13 Jul 2023 08:43:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0060F100B8
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ADD100B8
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 08:43:04 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A4B2738
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:42:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F532721
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 01:43:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pWRCX7ucccxVFAXpk+tkSQfe8vf6MO5iyNUW3FKuzjk=; b=fMoPVPeOaVrhIszBjoRxiy97j1
-	9S1/pBcc7qxoMgqyquG6Jr5PNT9QYUSMHZxNJmLwAVwwwLS3tE5BSAC+oBJyb/7iCicqpl/pBsmhw
-	QCP26djfyMqalM9Skur0eDSWFu2raz3/GK4y11ZE4Z2Xb2MfISpGS2UJ2SMji+hjyA3IuatIVfj5/
-	2TaRk2Ew5VRGxSQw0zna3sl4VMutys0UdP5fgD9qqZFMkMXs4PeD9hnNRUBnvoGasf40dCuUDtRkr
-	6pD4TIGtCkDW0++QeYrFgi5K5PwhDZKfDwkutANwwcyOKiVmcS1DvdIMQKvNqzqD+7qGdTS4ifBKG
-	u3Li1ArA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58764 helo=rmk-PC.armlinux.org.uk)
+	bh=fp+iPXGU+ofGNpuw4c7q87rA9G9GeDdX/yYLpvLpTl4=; b=ul2pp7mH5fmzfp50AYXsI1uo//
+	m1SaJl7U812YEszl0NhqXQZWaIygRsNnBSyVIhQcyryI/McSacS52eNTQGqd+pF3htg1ptMt/Gqn0
+	tyoivdYf3TwoP6OMxNigjaIMdJPDcHgyzRYi+we0ZY0Nb7+ztUyEVhx+UTIzkPay3Ua3daPwX3/N6
+	KluQjTxyPzr08YHaPcd0yWc8deYV5YrixOiDCrEU3JdqJR1lpFx+F2eRDnNJq3APw5W5hy67ktXLv
+	Wct9uurOPpVS5xweXf0eoCe2JcfeSLZRGEoORpTVS7+i3midU1l6a4w0bnHC2PQZOlzGtqVNW1fHW
+	aGYuup0g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53666 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qJruY-00069r-0I;
-	Thu, 13 Jul 2023 09:42:54 +0100
+	id 1qJrud-0006A2-0n;
+	Thu, 13 Jul 2023 09:42:59 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qJruX-00Gkk8-RY; Thu, 13 Jul 2023 09:42:53 +0100
+	id 1qJrud-00GkkE-15; Thu, 13 Jul 2023 09:42:59 +0100
 In-Reply-To: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
 References: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -54,8 +54,8 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 10/11] net: dsa: mv88e6xxx: convert 88e639x to
- phylink_pcs
+Subject: [PATCH net-next 11/11] net: dsa: mv88e6xxx: cleanup after phylink_pcs
+ conversion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,9 +65,9 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qJruX-00Gkk8-RY@rmk-PC.armlinux.org.uk>
+Message-Id: <E1qJrud-00GkkE-15@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 13 Jul 2023 09:42:53 +0100
+Date: Thu, 13 Jul 2023 09:42:59 +0100
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
 	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -75,2029 +75,481 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Convert the 88E6390, 88E6390X, and 88E6393X family of switches to use
-the phylink_pcs infrastructure.
+Now that mv88e6xxx is completely converted to using phylink_pcs
+support, we have no need for the serdes methods. Remove all this
+infrastructure. Also remove the __maybe_unused from
+mv88e6xxx_pcs_select().
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/dsa/mv88e6xxx/Makefile   |   1 +
- drivers/net/dsa/mv88e6xxx/chip.c     |  80 +--
- drivers/net/dsa/mv88e6xxx/pcs-639x.c | 898 +++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/serdes.c   | 785 -----------------------
- drivers/net/dsa/mv88e6xxx/serdes.h   |  31 +-
- 5 files changed, 914 insertions(+), 881 deletions(-)
- create mode 100644 drivers/net/dsa/mv88e6xxx/pcs-639x.c
+ drivers/net/dsa/mv88e6xxx/chip.c   | 238 +----------------------------
+ drivers/net/dsa/mv88e6xxx/chip.h   |  21 ---
+ drivers/net/dsa/mv88e6xxx/port.c   |  30 ----
+ drivers/net/dsa/mv88e6xxx/serdes.h |  45 ------
+ 4 files changed, 2 insertions(+), 332 deletions(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/Makefile b/drivers/net/dsa/mv88e6xxx/Makefile
-index 05976e1f93f6..a9a9651187db 100644
---- a/drivers/net/dsa/mv88e6xxx/Makefile
-+++ b/drivers/net/dsa/mv88e6xxx/Makefile
-@@ -11,6 +11,7 @@ mv88e6xxx-objs += global2_scratch.o
- mv88e6xxx-$(CONFIG_NET_DSA_MV88E6XXX_PTP) += hwtstamp.o
- mv88e6xxx-objs += pcs-6185.o
- mv88e6xxx-objs += pcs-6352.o
-+mv88e6xxx-objs += pcs-639x.o
- mv88e6xxx-objs += phy.o
- mv88e6xxx-objs += port.o
- mv88e6xxx-objs += port_hidden.o
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 90573407d404..a1ca82715714 100644
+index a1ca82715714..6174855188d9 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -4417,16 +4417,8 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
- 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6341_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.serdes_get_sset_count = mv88e6390_serdes_get_sset_count,
- 	.serdes_get_strings = mv88e6390_serdes_get_strings,
-@@ -4434,6 +4426,7 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.phylink_get_caps = mv88e6341_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6161_ops = {
-@@ -4808,22 +4801,15 @@ static const struct mv88e6xxx_ops mv88e6190_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6390_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.serdes_get_strings = mv88e6390_serdes_get_strings,
- 	.serdes_get_stats = mv88e6390_serdes_get_stats,
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6190x_ops = {
-@@ -4873,22 +4859,15 @@ static const struct mv88e6xxx_ops mv88e6190x_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6390x_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.serdes_get_strings = mv88e6390_serdes_get_strings,
- 	.serdes_get_stats = mv88e6390_serdes_get_stats,
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6390x_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6191_ops = {
-@@ -4936,16 +4915,8 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6390_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.serdes_get_strings = mv88e6390_serdes_get_strings,
- 	.serdes_get_stats = mv88e6390_serdes_get_stats,
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
-@@ -4953,6 +4924,7 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
- 	.avb_ops = &mv88e6390_avb_ops,
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6240_ops = {
-@@ -5102,16 +5074,8 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6390_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.serdes_get_strings = mv88e6390_serdes_get_strings,
- 	.serdes_get_stats = mv88e6390_serdes_get_stats,
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
-@@ -5120,6 +5084,7 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
- 	.avb_ops = &mv88e6390_avb_ops,
- 	.ptp_ops = &mv88e6390_ptp_ops,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6320_ops = {
-@@ -5264,16 +5229,8 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
- 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6341_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.avb_ops = &mv88e6390_avb_ops,
- 	.ptp_ops = &mv88e6352_ptp_ops,
-@@ -5283,6 +5240,7 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.phylink_get_caps = mv88e6341_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6350_ops = {
-@@ -5488,16 +5446,8 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6390_serdes_get_lane,
--	/* Check status register pause & lpa register */
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.avb_ops = &mv88e6390_avb_ops,
- 	.ptp_ops = &mv88e6390_ptp_ops,
-@@ -5507,6 +5457,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
- 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6390x_ops = {
-@@ -5557,15 +5508,8 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6390_serdes_power,
- 	.serdes_get_lane = mv88e6390x_serdes_get_lane,
--	.serdes_pcs_get_state = mv88e6390_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6390_serdes_irq_enable,
--	.serdes_irq_status = mv88e6390_serdes_irq_status,
- 	.serdes_get_sset_count = mv88e6390_serdes_get_sset_count,
- 	.serdes_get_strings = mv88e6390_serdes_get_strings,
- 	.serdes_get_stats = mv88e6390_serdes_get_stats,
-@@ -5575,11 +5519,11 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
- 	.avb_ops = &mv88e6390_avb_ops,
- 	.ptp_ops = &mv88e6390_ptp_ops,
- 	.phylink_get_caps = mv88e6390x_phylink_get_caps,
-+	.pcs_ops = &mv88e6390_pcs_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6393x_ops = {
- 	/* MV88E6XXX_FAMILY_6393 */
--	.setup_errata = mv88e6393x_serdes_setup_errata,
- 	.irl_init_all = mv88e6390_g2_irl_init_all,
- 	.get_eeprom = mv88e6xxx_g2_get_eeprom8,
- 	.set_eeprom = mv88e6xxx_g2_set_eeprom8,
-@@ -5629,20 +5573,14 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
- 	.vtu_loadpurge = mv88e6390_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6390_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
--	.serdes_power = mv88e6393x_serdes_power,
- 	.serdes_get_lane = mv88e6393x_serdes_get_lane,
--	.serdes_pcs_get_state = mv88e6393x_serdes_pcs_get_state,
--	.serdes_pcs_config = mv88e6390_serdes_pcs_config,
--	.serdes_pcs_an_restart = mv88e6390_serdes_pcs_an_restart,
--	.serdes_pcs_link_up = mv88e6390_serdes_pcs_link_up,
- 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
--	.serdes_irq_enable = mv88e6393x_serdes_irq_enable,
--	.serdes_irq_status = mv88e6393x_serdes_irq_status,
- 	/* TODO: serdes stats */
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.avb_ops = &mv88e6390_avb_ops,
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6393x_phylink_get_caps,
-+	.pcs_ops = &mv88e6393x_pcs_ops,
- };
- 
- static const struct mv88e6xxx_info mv88e6xxx_table[] = {
-diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-new file mode 100644
-index 000000000000..98dd49dac421
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-@@ -0,0 +1,898 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Marvell 88E6352 family SERDES PCS support
-+ *
-+ * Copyright (c) 2008 Marvell Semiconductor
-+ *
-+ * Copyright (c) 2017 Andrew Lunn <andrew@lunn.ch>
-+ */
-+#include <linux/interrupt.h>
-+#include <linux/irqdomain.h>
-+#include <linux/mii.h>
-+
-+#include "chip.h"
-+#include "global2.h"
-+#include "phy.h"
-+#include "port.h"
-+#include "serdes.h"
-+
-+struct mv88e639x_pcs {
-+	struct mdio_device mdio;
-+	struct phylink_pcs sgmii_pcs;
-+	struct phylink_pcs xg_pcs;
-+	bool supports_5g;
-+	phy_interface_t interface;
-+	unsigned int irq;
-+	char name[64];
-+	irqreturn_t (*handle_irq)(struct mv88e639x_pcs *mpcs);
-+};
-+
-+static int mv88e639x_read(struct mv88e639x_pcs *mpcs, u16 regnum, u16 *val)
-+{
-+	int err;
-+
-+	err = mdiodev_c45_read(&mpcs->mdio, MDIO_MMD_PHYXS, regnum);
-+	if (err < 0)
-+		return err;
-+
-+	*val = err;
-+
-+	return 0;
-+}
-+
-+static int mv88e639x_write(struct mv88e639x_pcs *mpcs, u16 regnum, u16 val)
-+{
-+	return mdiodev_c45_write(&mpcs->mdio, MDIO_MMD_PHYXS, regnum, val);
-+}
-+
-+static int mv88e639x_modify(struct mv88e639x_pcs *mpcs, u16 regnum, u16 mask,
-+			    u16 val)
-+{
-+	return mdiodev_c45_modify(&mpcs->mdio, MDIO_MMD_PHYXS, regnum, mask,
-+				  val);
-+}
-+
-+static int mv88e639x_modify_changed(struct mv88e639x_pcs *mpcs, u16 regnum,
-+				    u16 mask, u16 set)
-+{
-+	return mdiodev_c45_modify_changed(&mpcs->mdio, MDIO_MMD_PHYXS, regnum,
-+					  mask, set);
-+}
-+
-+static struct mv88e639x_pcs *
-+mv88e639x_pcs_alloc(struct device *dev, struct mii_bus *bus, unsigned int addr,
-+		    int port)
-+{
-+	struct mv88e639x_pcs *mpcs;
-+
-+	mpcs = kzalloc(sizeof(*mpcs), GFP_KERNEL);
-+	if (!mpcs)
-+		return NULL;
-+
-+	mpcs->mdio.dev.parent = dev;
-+	mpcs->mdio.bus = bus;
-+	mpcs->mdio.addr = addr;
-+
-+	snprintf(mpcs->name, sizeof(mpcs->name),
-+		 "mv88e6xxx-%s-serdes-%d", dev_name(dev), port);
-+
-+	return mpcs;
-+}
-+
-+static irqreturn_t mv88e639x_pcs_handle_irq(int irq, void *dev_id)
-+{
-+	struct mv88e639x_pcs *mpcs = dev_id;
-+	irqreturn_t (*handler)(struct mv88e639x_pcs *);
-+
-+	handler = READ_ONCE(mpcs->handle_irq);
-+	if (!handler)
-+		return IRQ_NONE;
-+
-+	return handler(mpcs);
-+}
-+
-+static int mv88e639x_pcs_setup_irq(struct mv88e639x_pcs *mpcs,
-+				   struct mv88e6xxx_chip *chip, int port)
-+{
-+	unsigned int irq;
-+
-+	irq = mv88e6xxx_serdes_irq_mapping(chip, port);
-+	if (!irq) {
-+		/* Use polling mode */
-+		mpcs->sgmii_pcs.poll = true;
-+		mpcs->xg_pcs.poll = true;
-+		return 0;
-+	}
-+
-+	mpcs->irq = irq;
-+
-+	return request_threaded_irq(irq, NULL, mv88e639x_pcs_handle_irq,
-+				    IRQF_ONESHOT, mpcs->name, mpcs);
-+}
-+
-+static void mv88e639x_pcs_teardown(struct mv88e6xxx_chip *chip, int port)
-+{
-+	struct mv88e639x_pcs *mpcs = chip->ports[port].pcs_private;
-+
-+	if (!mpcs)
-+		return;
-+
-+	if (mpcs->irq)
-+		free_irq(mpcs->irq, mpcs);
-+
-+	kfree(mpcs);
-+
-+	chip->ports[port].pcs_private = NULL;
-+}
-+
-+static struct mv88e639x_pcs *sgmii_pcs_to_mv88e639x_pcs(struct phylink_pcs *pcs)
-+{
-+	return container_of(pcs, struct mv88e639x_pcs, sgmii_pcs);
-+}
-+
-+static irqreturn_t mv88e639x_sgmii_handle_irq(struct mv88e639x_pcs *mpcs)
-+{
-+	u16 int_status;
-+	int err;
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_SGMII_INT_STATUS, &int_status);
-+	if (err)
-+		return IRQ_NONE;
-+
-+	if (int_status & (MV88E6390_SGMII_INT_LINK_DOWN |
-+			  MV88E6390_SGMII_INT_LINK_UP)) {
-+		phylink_pcs_change(&mpcs->sgmii_pcs,
-+				   int_status & MV88E6390_SGMII_INT_LINK_UP);
-+
-+		return IRQ_HANDLED;
-+	}
-+
-+	return IRQ_NONE;
-+}
-+
-+static int mv88e639x_sgmii_pcs_control_irq(struct mv88e639x_pcs *mpcs,
-+					   bool enable)
-+{
-+	u16 val = 0;
-+
-+	if (enable)
-+		val |= MV88E6390_SGMII_INT_LINK_DOWN |
-+		       MV88E6390_SGMII_INT_LINK_UP;
-+
-+	return mv88e639x_modify(mpcs, MV88E6390_SGMII_INT_ENABLE,
-+				MV88E6390_SGMII_INT_LINK_DOWN |
-+				MV88E6390_SGMII_INT_LINK_UP, val);
-+}
-+
-+static int mv88e639x_sgmii_pcs_control_pwr(struct mv88e639x_pcs *mpcs,
-+					   bool enable)
-+{
-+	u16 mask, val;
-+
-+	if (enable) {
-+		mask = BMCR_RESET | BMCR_LOOPBACK | BMCR_PDOWN;
-+		val = 0;
-+	} else {
-+		mask = val = BMCR_PDOWN;
-+	}
-+
-+	return mv88e639x_modify(mpcs, MV88E6390_SGMII_BMCR, mask, val);
-+}
-+
-+static int mv88e639x_sgmii_pcs_enable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	/* power enable done in post_config */
-+	mpcs->handle_irq = mv88e639x_sgmii_handle_irq;
-+
-+	return mv88e639x_sgmii_pcs_control_irq(mpcs, !!mpcs->irq);
-+}
-+
-+static void mv88e639x_sgmii_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_sgmii_pcs_control_irq(mpcs, false);
-+	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
-+}
-+
-+static void mv88e639x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
-+					   phy_interface_t interface)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
-+}
-+
-+static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
-+					   phy_interface_t interface)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
-+
-+	return 0;
-+}
-+
-+static void mv88e639x_sgmii_pcs_get_state(struct phylink_pcs *pcs,
-+					  struct phylink_link_state *state)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+	u16 bmsr, lpa, status;
-+	int err;
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_SGMII_BMSR, &bmsr);
-+	if (err) {
-+		dev_err(mpcs->mdio.dev.parent,
-+			"can't read Serdes PHY %s: %pe\n",
-+			"BMSR", ERR_PTR(err));
-+		state->link = false;
-+		return;
-+	}
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_SGMII_LPA, &lpa);
-+	if (err) {
-+		dev_err(mpcs->mdio.dev.parent,
-+			"can't read Serdes PHY %s: %pe\n",
-+			"LPA", ERR_PTR(err));
-+		state->link = false;
-+		return;
-+	}
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_SGMII_PHY_STATUS, &status);
-+	if (err) {
-+		dev_err(mpcs->mdio.dev.parent,
-+			"can't read Serdes PHY %s: %pe\n",
-+			"status", ERR_PTR(err));
-+		state->link = false;
-+		return;
-+	}
-+
-+	mv88e6xxx_pcs_decode_state(mpcs->mdio.dev.parent, bmsr, lpa, status,
-+				   state);
-+}
-+
-+static int mv88e639x_sgmii_pcs_config(struct phylink_pcs *pcs,
-+				      unsigned int neg_mode,
-+				      phy_interface_t interface,
-+				      const unsigned long *advertising,
-+				      bool permit_pause_to_mac)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+	u16 val, bmcr;
-+	bool changed;
-+	int adv, err;
-+
-+	adv = phylink_mii_c22_pcs_encode_advertisement(interface, advertising);
-+	if (adv < 0)
-+		return 0;
-+
-+	mpcs->interface = interface;
-+
-+	err = mv88e639x_modify_changed(mpcs, MV88E6390_SGMII_ADVERTISE,
-+				       0xffff, adv);
-+	if (err < 0)
-+		return err;
-+
-+	changed = err > 0;
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_SGMII_BMCR, &val);
-+	if (err)
-+		return err;
-+
-+	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-+		bmcr = val | BMCR_ANENABLE;
-+	else
-+		bmcr = val & ~BMCR_ANENABLE;
-+
-+	/* setting ANENABLE triggers a restart of negotiation */
-+	if (bmcr == val)
-+		return changed;
-+
-+	return mv88e639x_write(mpcs, MV88E6390_SGMII_BMCR, bmcr);
-+}
-+
-+static void mv88e639x_sgmii_pcs_an_restart(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_modify(mpcs, MV88E6390_SGMII_BMCR,
-+			 BMCR_ANRESTART, BMCR_ANRESTART);
-+}
-+
-+static void mv88e639x_sgmii_pcs_link_up(struct phylink_pcs *pcs,
-+					unsigned int mode,
-+					phy_interface_t interface,
-+					int speed, int duplex)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+	u16 bmcr;
-+	int err;
-+
-+	if (phylink_autoneg_inband(mode))
-+		return;
-+
-+	bmcr = mii_bmcr_encode_fixed(speed, duplex);
-+
-+	err = mv88e639x_modify(mpcs, MV88E6390_SGMII_BMCR,
-+			       BMCR_SPEED1000 | BMCR_SPEED100 | BMCR_FULLDPLX,
-+			       bmcr);
-+	if (err)
-+		dev_err(mpcs->mdio.dev.parent,
-+			"can't access Serdes PHY %s: %pe\n",
-+			"BMCR", ERR_PTR(err));
-+}
-+
-+static const struct phylink_pcs_ops mv88e639x_sgmii_pcs_ops = {
-+	.pcs_enable = mv88e639x_sgmii_pcs_enable,
-+	.pcs_disable = mv88e639x_sgmii_pcs_disable,
-+	.pcs_pre_config = mv88e639x_sgmii_pcs_pre_config,
-+	.pcs_post_config = mv88e639x_sgmii_pcs_post_config,
-+	.pcs_get_state = mv88e639x_sgmii_pcs_get_state,
-+	.pcs_an_restart = mv88e639x_sgmii_pcs_an_restart,
-+	.pcs_config = mv88e639x_sgmii_pcs_config,
-+	.pcs_link_up = mv88e639x_sgmii_pcs_link_up,
-+};
-+
-+static struct mv88e639x_pcs *xg_pcs_to_mv88e639x_pcs(struct phylink_pcs *pcs)
-+{
-+	return container_of(pcs, struct mv88e639x_pcs, xg_pcs);
-+}
-+
-+static int mv88e639x_xg_pcs_enable(struct mv88e639x_pcs *mpcs)
-+{
-+	return mv88e639x_modify(mpcs, MV88E6390_10G_CTRL1,
-+				MDIO_CTRL1_RESET | MDIO_PCS_CTRL1_LOOPBACK |
-+				MDIO_CTRL1_LPOWER, 0);
-+}
-+
-+static void mv88e639x_xg_pcs_disable(struct mv88e639x_pcs *mpcs)
-+{
-+	mv88e639x_modify(mpcs, MV88E6390_10G_CTRL1, MDIO_CTRL1_LPOWER,
-+			 MDIO_CTRL1_LPOWER);
-+}
-+
-+static void mv88e639x_xg_pcs_get_state(struct phylink_pcs *pcs,
-+				       struct phylink_link_state *state)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+	u16 status;
-+	int err;
-+
-+	state->link = false;
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_10G_STAT1, &status);
-+	if (err) {
-+		dev_err(mpcs->mdio.dev.parent,
-+			"can't read Serdes PHY %s: %pe\n",
-+			"STAT1", ERR_PTR(err));
-+		return;
-+	}
-+
-+	state->link = !!(status & MDIO_STAT1_LSTATUS);
-+	if (state->link) {
-+		switch (state->interface) {
-+		case PHY_INTERFACE_MODE_5GBASER:
-+			state->speed = SPEED_5000;
-+			break;
-+
-+		case PHY_INTERFACE_MODE_10GBASER:
-+		case PHY_INTERFACE_MODE_RXAUI:
-+		case PHY_INTERFACE_MODE_XAUI:
-+			state->speed = SPEED_10000;
-+			break;
-+
-+		default:
-+			state->link = false;
-+			return;
-+		}
-+
-+		state->duplex = DUPLEX_FULL;
-+	}
-+}
-+
-+static int mv88e639x_xg_pcs_config(struct phylink_pcs *pcs,
-+				   unsigned int neg_mode,
-+				   phy_interface_t interface,
-+				   const unsigned long *advertising,
-+				   bool permit_pause_to_mac)
-+{
-+	return 0;
-+}
-+
-+static struct phylink_pcs *
-+mv88e639x_pcs_select(struct mv88e6xxx_chip *chip, int port,
-+		     phy_interface_t mode)
-+{
-+	struct mv88e639x_pcs *mpcs;
-+
-+	mpcs = chip->ports[port].pcs_private;
-+	if (!mpcs)
-+		return NULL;
-+
-+	switch (mode) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		return &mpcs->sgmii_pcs;
-+
-+	case PHY_INTERFACE_MODE_5GBASER:
-+		if (!mpcs->supports_5g)
-+			return NULL;
-+		fallthrough;
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_XAUI:
-+	case PHY_INTERFACE_MODE_RXAUI:
-+		return &mpcs->xg_pcs;
-+
-+	default:
-+		return NULL;
-+	}
-+}
-+
-+/* Marvell 88E6390 Specific support */
-+
-+static irqreturn_t mv88e6390_xg_handle_irq(struct mv88e639x_pcs *mpcs)
-+{
-+	u16 int_status;
-+	int err;
-+
-+	err = mv88e639x_read(mpcs, MV88E6390_10G_INT_STATUS, &int_status);
-+	if (err)
-+		return IRQ_NONE;
-+
-+	if (int_status & (MV88E6390_10G_INT_LINK_DOWN |
-+			  MV88E6390_10G_INT_LINK_UP)) {
-+		phylink_pcs_change(&mpcs->xg_pcs,
-+				   int_status & MV88E6390_10G_INT_LINK_UP);
-+
-+		return IRQ_HANDLED;
-+	}
-+
-+	return IRQ_NONE;
-+}
-+
-+static int mv88e6390_xg_control_irq(struct mv88e639x_pcs *mpcs, bool enable)
-+{
-+	u16 val = 0;
-+
-+	if (enable)
-+		val = MV88E6390_10G_INT_LINK_DOWN | MV88E6390_10G_INT_LINK_UP;
-+
-+	return mv88e639x_modify(mpcs, MV88E6390_10G_INT_ENABLE,
-+				MV88E6390_10G_INT_LINK_DOWN |
-+				MV88E6390_10G_INT_LINK_UP, val);
-+}
-+
-+static int mv88e6390_xg_pcs_enable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+	int err;
-+
-+	err = mv88e639x_xg_pcs_enable(mpcs);
-+	if (err)
-+		return err;
-+
-+	mpcs->handle_irq = mv88e6390_xg_handle_irq;
-+
-+	return mv88e6390_xg_control_irq(mpcs, !!mpcs->irq);
-+}
-+
-+static void mv88e6390_xg_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e6390_xg_control_irq(mpcs, false);
-+	mv88e639x_xg_pcs_disable(mpcs);
-+}
-+
-+static const struct phylink_pcs_ops mv88e6390_xg_pcs_ops = {
-+	.pcs_enable = mv88e6390_xg_pcs_enable,
-+	.pcs_disable = mv88e6390_xg_pcs_disable,
-+	.pcs_get_state = mv88e639x_xg_pcs_get_state,
-+	.pcs_config = mv88e639x_xg_pcs_config,
-+};
-+
-+static int mv88e6390_pcs_enable_checker(struct mv88e639x_pcs *mpcs)
-+{
-+	return mv88e639x_modify(mpcs, MV88E6390_PG_CONTROL,
-+				MV88E6390_PG_CONTROL_ENABLE_PC,
-+				MV88E6390_PG_CONTROL_ENABLE_PC);
-+}
-+
-+static int mv88e6390_pcs_init(struct mv88e6xxx_chip *chip, int port)
-+{
-+	struct mv88e639x_pcs *mpcs;
-+	struct mii_bus *bus;
-+	struct device *dev;
-+	int lane, err;
-+
-+	lane = mv88e6xxx_serdes_get_lane(chip, port);
-+	if (lane < 0)
-+		return 0;
-+
-+	bus = mv88e6xxx_default_mdio_bus(chip);
-+	dev = chip->dev;
-+
-+	mpcs = mv88e639x_pcs_alloc(dev, bus, lane, port);
-+	if (!mpcs)
-+		return -ENOMEM;
-+
-+	mpcs->sgmii_pcs.ops = &mv88e639x_sgmii_pcs_ops;
-+	mpcs->sgmii_pcs.neg_mode = true;
-+	mpcs->xg_pcs.ops = &mv88e6390_xg_pcs_ops;
-+	mpcs->xg_pcs.neg_mode = true;
-+
-+	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
-+	if (err)
-+		goto err_free;
-+
-+	/* 6390 and 6390x has the checker, 6393x doesn't appear to? */
-+	/* This is to enable gathering the statistics. Maybe this
-+	 * should call out to a helper? Or we could do this at init time.
-+	 */
-+	err = mv88e6390_pcs_enable_checker(mpcs);
-+	if (err)
-+		goto err_free;
-+
-+	chip->ports[port].pcs_private = mpcs;
-+
-+	return 0;
-+
-+err_free:
-+	kfree(mpcs);
-+	return err;
-+}
-+
-+const struct mv88e6xxx_pcs_ops mv88e6390_pcs_ops = {
-+	.pcs_init = mv88e6390_pcs_init,
-+	.pcs_teardown = mv88e639x_pcs_teardown,
-+	.pcs_select = mv88e639x_pcs_select,
-+};
-+
-+/* Marvell 88E6393X Specific support */
-+
-+static int mv88e6393x_power_lane(struct mv88e639x_pcs *mpcs, bool enable)
-+{
-+	u16 val = MV88E6393X_SERDES_CTRL1_TX_PDOWN |
-+		  MV88E6393X_SERDES_CTRL1_RX_PDOWN;
-+
-+	return mv88e639x_modify(mpcs, MV88E6393X_SERDES_CTRL1, val,
-+				enable ? 0 : val);
-+}
-+
-+/* mv88e6393x family errata 4.6:
-+ * Cannot clear PwrDn bit on SERDES if device is configured CPU_MGD mode or
-+ * P0_mode is configured for [x]MII.
-+ * Workaround: Set SERDES register 4.F002 bit 5=0 and bit 15=1.
-+ *
-+ * It seems that after this workaround the SERDES is automatically powered up
-+ * (the bit is cleared), so power it down.
-+ */
-+static int mv88e6393x_erratum_4_6(struct mv88e639x_pcs *mpcs)
-+{
-+	int err;
-+
-+	err = mv88e639x_modify(mpcs, MV88E6393X_SERDES_POC,
-+			       MV88E6393X_SERDES_POC_PDOWN |
-+			       MV88E6393X_SERDES_POC_RESET,
-+			       MV88E6393X_SERDES_POC_RESET);
-+	if (err)
-+		return err;
-+
-+	err = mv88e639x_modify(mpcs, MV88E6390_SGMII_BMCR,
-+			       BMCR_PDOWN, BMCR_PDOWN);
-+	if (err)
-+		return err;
-+
-+	err = mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
-+	if (err)
-+		return err;
-+
-+	return mv88e6393x_power_lane(mpcs, false);
-+}
-+
-+/* mv88e6393x family errata 4.8:
-+ * When a SERDES port is operating in 1000BASE-X or SGMII mode link may not
-+ * come up after hardware reset or software reset of SERDES core. Workaround
-+ * is to write SERDES register 4.F074.14=1 for only those modes and 0 in all
-+ * other modes.
-+ */
-+static int mv88e6393x_erratum_4_8(struct mv88e639x_pcs *mpcs)
-+{
-+	u16 reg, poc;
-+	int err;
-+
-+	err = mv88e639x_read(mpcs, MV88E6393X_SERDES_POC, &poc);
-+	if (err)
-+		return err;
-+
-+	poc &= MV88E6393X_SERDES_POC_PCS_MASK;
-+	if (poc == MV88E6393X_SERDES_POC_PCS_1000BASEX ||
-+	    poc == MV88E6393X_SERDES_POC_PCS_SGMII_PHY ||
-+	    poc == MV88E6393X_SERDES_POC_PCS_SGMII_MAC)
-+		reg = MV88E6393X_ERRATA_4_8_BIT;
-+	else
-+		reg = 0;
-+
-+	return mv88e639x_modify(mpcs, MV88E6393X_ERRATA_4_8_REG,
-+				MV88E6393X_ERRATA_4_8_BIT, reg);
-+}
-+
-+/* mv88e6393x family errata 5.2:
-+ * For optimal signal integrity the following sequence should be applied to
-+ * SERDES operating in 10G mode. These registers only apply to 10G operation
-+ * and have no effect on other speeds.
-+ */
-+static int mv88e6393x_erratum_5_2(struct mv88e639x_pcs *mpcs)
-+{
-+	static const struct {
-+		u16 dev, reg, val, mask;
-+	} fixes[] = {
-+		{ MDIO_MMD_VEND1, 0x8093, 0xcb5a, 0xffff },
-+		{ MDIO_MMD_VEND1, 0x8171, 0x7088, 0xffff },
-+		{ MDIO_MMD_VEND1, 0x80c9, 0x311a, 0xffff },
-+		{ MDIO_MMD_VEND1, 0x80a2, 0x8000, 0xff7f },
-+		{ MDIO_MMD_VEND1, 0x80a9, 0x0000, 0xfff0 },
-+		{ MDIO_MMD_VEND1, 0x80a3, 0x0000, 0xf8ff },
-+		{ MDIO_MMD_PHYXS, MV88E6393X_SERDES_POC,
-+		  MV88E6393X_SERDES_POC_RESET, MV88E6393X_SERDES_POC_RESET },
-+	};
-+	int err, i;
-+
-+	for (i = 0; i < ARRAY_SIZE(fixes); ++i) {
-+		err = mdiodev_c45_modify(&mpcs->mdio, fixes[i].dev,
-+					 fixes[i].reg, fixes[i].mask,
-+					 fixes[i].val);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+/* Inband AN is broken on Amethyst in 2500base-x mode when set by standard
-+ * mechanism (via cmode).
-+ * We can get around this by configuring the PCS mode to 1000base-x and then
-+ * writing value 0x58 to register 1e.8000. (This must be done while SerDes
-+ * receiver and transmitter are disabled, which is, when this function is
-+ * called.)
-+ * It seem that when we do this configuration to 2500base-x mode (by changing
-+ * PCS mode to 1000base-x and frequency to 3.125 GHz from 1.25 GHz) and then
-+ * configure to sgmii or 1000base-x, the device thinks that it already has
-+ * SerDes at 1.25 GHz and does not change the 1e.8000 register, leaving SerDes
-+ * at 3.125 GHz.
-+ * To avoid this, change PCS mode back to 2500base-x when disabling SerDes from
-+ * 2500base-x mode.
-+ */
-+static int mv88e6393x_fix_2500basex_an(struct mv88e639x_pcs *mpcs, bool on)
-+{
-+	u16 reg;
-+	int err;
-+
-+	if (on)
-+		reg = MV88E6393X_SERDES_POC_PCS_1000BASEX |
-+		      MV88E6393X_SERDES_POC_AN;
-+	else
-+		reg = MV88E6393X_SERDES_POC_PCS_2500BASEX;
-+
-+	reg |= MV88E6393X_SERDES_POC_RESET;
-+
-+	err = mv88e639x_modify(mpcs, MV88E6393X_SERDES_POC,
-+			       MV88E6393X_SERDES_POC_PCS_MASK |
-+			       MV88E6393X_SERDES_POC_AN |
-+			       MV88E6393X_SERDES_POC_RESET, reg);
-+	if (err)
-+		return err;
-+
-+	return mdiodev_c45_write(&mpcs->mdio, MDIO_MMD_VEND1, 0x8000, 0x58);
-+}
-+
-+static int mv88e6393x_sgmii_apply_2500basex_an(struct mv88e639x_pcs *mpcs,
-+					       phy_interface_t interface,
-+					       bool enable)
-+{
-+	int err;
-+
-+	if (interface != PHY_INTERFACE_MODE_2500BASEX)
-+		return 0;
-+
-+	err = mv88e6393x_fix_2500basex_an(mpcs, enable);
-+	if (err)
-+		dev_err(mpcs->mdio.dev.parent,
-+			"failed to %s 2500basex fix: %pe\n",
-+			enable ? "enable" : "disable", ERR_PTR(err));
-+
-+	return err;
-+}
-+
-+static void mv88e6393x_sgmii_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_sgmii_pcs_disable(pcs);
-+	mv88e6393x_power_lane(mpcs, false);
-+	mv88e6393x_sgmii_apply_2500basex_an(mpcs, mpcs->interface, false);
-+}
-+
-+static void mv88e6393x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
-+					    phy_interface_t interface)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_sgmii_pcs_pre_config(pcs, interface);
-+	mv88e6393x_power_lane(mpcs, false);
-+	mv88e6393x_sgmii_apply_2500basex_an(mpcs, mpcs->interface, false);
-+}
-+
-+static int mv88e6393x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
-+					    phy_interface_t interface)
-+{
-+	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+	int err;
-+
-+	err = mv88e6393x_erratum_4_8(mpcs);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6393x_sgmii_apply_2500basex_an(mpcs, interface, true);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6393x_power_lane(mpcs, true);
-+	if (err)
-+		return err;
-+
-+	return mv88e639x_sgmii_pcs_post_config(pcs, interface);
-+}
-+
-+static const struct phylink_pcs_ops mv88e6393x_sgmii_pcs_ops = {
-+	.pcs_enable = mv88e639x_sgmii_pcs_enable,
-+	.pcs_disable = mv88e6393x_sgmii_pcs_disable,
-+	.pcs_pre_config = mv88e6393x_sgmii_pcs_pre_config,
-+	.pcs_post_config = mv88e6393x_sgmii_pcs_post_config,
-+	.pcs_get_state = mv88e639x_sgmii_pcs_get_state,
-+	.pcs_an_restart = mv88e639x_sgmii_pcs_an_restart,
-+	.pcs_config = mv88e639x_sgmii_pcs_config,
-+	.pcs_link_up = mv88e639x_sgmii_pcs_link_up,
-+};
-+
-+static irqreturn_t mv88e6393x_xg_handle_irq(struct mv88e639x_pcs *mpcs)
-+{
-+	u16 int_status, stat1;
-+	bool link_down;
-+	int err;
-+
-+	err = mv88e639x_read(mpcs, MV88E6393X_10G_INT_STATUS, &int_status);
-+	if (err)
-+		return IRQ_NONE;
-+
-+	if (int_status & MV88E6393X_10G_INT_LINK_CHANGE) {
-+		err = mv88e639x_read(mpcs, MV88E6390_10G_STAT1, &stat1);
-+		if (err)
-+			return IRQ_NONE;
-+
-+		link_down = !(stat1 & MDIO_STAT1_LSTATUS);
-+
-+		phylink_pcs_change(&mpcs->xg_pcs, !link_down);
-+
-+		return IRQ_HANDLED;
-+	}
-+
-+	return IRQ_NONE;
-+}
-+
-+static int mv88e6393x_xg_control_irq(struct mv88e639x_pcs *mpcs, bool enable)
-+{
-+	u16 val = 0;
-+
-+	if (enable)
-+		val = MV88E6393X_10G_INT_LINK_CHANGE;
-+
-+	return mv88e639x_modify(mpcs, MV88E6393X_10G_INT_ENABLE,
-+				MV88E6393X_10G_INT_LINK_CHANGE, val);
-+}
-+
-+static int mv88e6393x_xg_pcs_enable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mpcs->handle_irq = mv88e6393x_xg_handle_irq;
-+
-+	return mv88e6393x_xg_control_irq(mpcs, !!mpcs->irq);
-+}
-+
-+static void mv88e6393x_xg_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e6393x_xg_control_irq(mpcs, false);
-+	mv88e639x_xg_pcs_disable(mpcs);
-+	mv88e6393x_power_lane(mpcs, false);
-+}
-+
-+/* The PCS has to be powered down while CMODE is changed */
-+static void mv88e6393x_xg_pcs_pre_config(struct phylink_pcs *pcs,
-+					 phy_interface_t interface)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+
-+	mv88e639x_xg_pcs_disable(mpcs);
-+	mv88e6393x_power_lane(mpcs, false);
-+}
-+
-+static int mv88e6393x_xg_pcs_post_config(struct phylink_pcs *pcs,
-+					 phy_interface_t interface)
-+{
-+	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-+	int err;
-+
-+	if (interface == PHY_INTERFACE_MODE_10GBASER) {
-+		err = mv88e6393x_erratum_5_2(mpcs);
-+		if (err)
-+			return err;
-+	}
-+
-+	err = mv88e6393x_power_lane(mpcs, true);
-+	if (err)
-+		return err;
-+
-+	return mv88e639x_xg_pcs_enable(mpcs);
-+}
-+
-+static const struct phylink_pcs_ops mv88e6393x_xg_pcs_ops = {
-+	.pcs_enable = mv88e6393x_xg_pcs_enable,
-+	.pcs_disable = mv88e6393x_xg_pcs_disable,
-+	.pcs_pre_config = mv88e6393x_xg_pcs_pre_config,
-+	.pcs_post_config = mv88e6393x_xg_pcs_post_config,
-+	.pcs_get_state = mv88e639x_xg_pcs_get_state,
-+	.pcs_config = mv88e639x_xg_pcs_config,
-+};
-+
-+static int mv88e6393x_pcs_init(struct mv88e6xxx_chip *chip, int port)
-+{
-+	struct mv88e639x_pcs *mpcs;
-+	struct mii_bus *bus;
-+	struct device *dev;
-+	int lane, err;
-+
-+	lane = mv88e6xxx_serdes_get_lane(chip, port);
-+	if (lane < 0)
-+		return 0;
-+
-+	bus = mv88e6xxx_default_mdio_bus(chip);
-+	dev = chip->dev;
-+
-+	mpcs = mv88e639x_pcs_alloc(dev, bus, lane, port);
-+	if (!mpcs)
-+		return -ENOMEM;
-+
-+	mpcs->sgmii_pcs.ops = &mv88e6393x_sgmii_pcs_ops;
-+	mpcs->sgmii_pcs.neg_mode = true;
-+	mpcs->xg_pcs.ops = &mv88e6393x_xg_pcs_ops;
-+	mpcs->xg_pcs.neg_mode = true;
-+	mpcs->supports_5g = true;
-+
-+	err = mv88e6393x_erratum_4_6(mpcs);
-+	if (err)
-+		goto err_free;
-+
-+	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
-+	if (err)
-+		goto err_free;
-+
-+	chip->ports[port].pcs_private = mpcs;
-+
-+	return 0;
-+
-+err_free:
-+	kfree(mpcs);
-+	return err;
-+}
-+
-+const struct mv88e6xxx_pcs_ops mv88e6393x_pcs_ops = {
-+	.pcs_init = mv88e6393x_pcs_init,
-+	.pcs_teardown = mv88e639x_pcs_teardown,
-+	.pcs_select = mv88e639x_pcs_select,
-+};
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-index 5eea0cba3ee0..3b4b42651fa3 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.c
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-@@ -375,57 +375,6 @@ int mv88e6393x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port)
- 	return lane;
+@@ -492,81 +492,6 @@ static int mv88e6xxx_port_ppu_updates(struct mv88e6xxx_chip *chip, int port)
+ 	return !!(reg & MV88E6XXX_PORT_STS_PHY_DETECT);
  }
  
--/* Set power up/down for 10GBASE-R and 10GBASE-X4/X2 */
--static int mv88e6390_serdes_power_10g(struct mv88e6xxx_chip *chip, int lane,
--				      bool up)
+-static int mv88e6xxx_serdes_pcs_get_state(struct dsa_switch *ds, int port,
+-					  struct phylink_link_state *state)
 -{
--	u16 val, new_val;
+-	struct mv88e6xxx_chip *chip = ds->priv;
+-	int lane;
 -	int err;
 -
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_10G_CTRL1, &val);
--
--	if (err)
--		return err;
--
--	if (up)
--		new_val = val & ~(MDIO_CTRL1_RESET |
--				  MDIO_PCS_CTRL1_LOOPBACK |
--				  MDIO_CTRL1_LPOWER);
+-	mv88e6xxx_reg_lock(chip);
+-	lane = mv88e6xxx_serdes_get_lane(chip, port);
+-	if (lane >= 0 && chip->info->ops->serdes_pcs_get_state)
+-		err = chip->info->ops->serdes_pcs_get_state(chip, port, lane,
+-							    state);
 -	else
--		new_val = val | MDIO_CTRL1_LPOWER;
--
--	if (val != new_val)
--		err = mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--					     MV88E6390_10G_CTRL1, new_val);
+-		err = -EOPNOTSUPP;
+-	mv88e6xxx_reg_unlock(chip);
 -
 -	return err;
 -}
 -
--/* Set power up/down for SGMII and 1000Base-X */
--static int mv88e6390_serdes_power_sgmii(struct mv88e6xxx_chip *chip, int lane,
--					bool up)
+-static int mv88e6xxx_serdes_pcs_config(struct mv88e6xxx_chip *chip, int port,
+-				       unsigned int mode,
+-				       phy_interface_t interface,
+-				       const unsigned long *advertise)
 -{
--	u16 val, new_val;
--	int err;
+-	const struct mv88e6xxx_ops *ops = chip->info->ops;
+-	int lane;
 -
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_BMCR, &val);
--	if (err)
--		return err;
--
--	if (up)
--		new_val = val & ~(BMCR_RESET | BMCR_LOOPBACK | BMCR_PDOWN);
--	else
--		new_val = val | BMCR_PDOWN;
--
--	if (val != new_val)
--		err = mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--					     MV88E6390_SGMII_BMCR, new_val);
--
--	return err;
--}
--
- struct mv88e6390_serdes_hw_stat {
- 	char string[ETH_GSTRING_LEN];
- 	int reg;
-@@ -499,484 +448,6 @@ int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
- 	return ARRAY_SIZE(mv88e6390_serdes_hw_stats);
- }
- 
--static int mv88e6390_serdes_enable_checker(struct mv88e6xxx_chip *chip, int lane)
--{
--	u16 reg;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_PG_CONTROL, &reg);
--	if (err)
--		return err;
--
--	reg |= MV88E6390_PG_CONTROL_ENABLE_PC;
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6390_PG_CONTROL, reg);
--}
--
--int mv88e6390_serdes_power(struct mv88e6xxx_chip *chip, int port, int lane,
--			   bool up)
--{
--	u8 cmode = chip->ports[port].cmode;
--	int err;
--
--	switch (cmode) {
--	case MV88E6XXX_PORT_STS_CMODE_SGMII:
--	case MV88E6XXX_PORT_STS_CMODE_1000BASEX:
--	case MV88E6XXX_PORT_STS_CMODE_2500BASEX:
--		err = mv88e6390_serdes_power_sgmii(chip, lane, up);
--		break;
--	case MV88E6XXX_PORT_STS_CMODE_XAUI:
--	case MV88E6XXX_PORT_STS_CMODE_RXAUI:
--		err = mv88e6390_serdes_power_10g(chip, lane, up);
--		break;
--	default:
--		err = -EINVAL;
--		break;
+-	if (ops->serdes_pcs_config) {
+-		lane = mv88e6xxx_serdes_get_lane(chip, port);
+-		if (lane >= 0)
+-			return ops->serdes_pcs_config(chip, port, lane, mode,
+-						      interface, advertise);
 -	}
 -
--	if (!err && up)
--		err = mv88e6390_serdes_enable_checker(chip, lane);
--
--	return err;
+-	return 0;
 -}
 -
--int mv88e6390_serdes_pcs_config(struct mv88e6xxx_chip *chip, int port,
--				int lane, unsigned int mode,
--				phy_interface_t interface,
--				const unsigned long *advertise)
+-static void mv88e6xxx_serdes_pcs_an_restart(struct dsa_switch *ds, int port)
 -{
--	u16 val, bmcr, adv;
--	bool changed;
--	int err;
+-	struct mv88e6xxx_chip *chip = ds->priv;
+-	const struct mv88e6xxx_ops *ops;
+-	int err = 0;
+-	int lane;
 -
--	switch (interface) {
--	case PHY_INTERFACE_MODE_SGMII:
--		adv = 0x0001;
--		break;
+-	ops = chip->info->ops;
 -
--	case PHY_INTERFACE_MODE_1000BASEX:
--		adv = linkmode_adv_to_mii_adv_x(advertise,
--					ETHTOOL_LINK_MODE_1000baseX_Full_BIT);
--		break;
+-	if (ops->serdes_pcs_an_restart) {
+-		mv88e6xxx_reg_lock(chip);
+-		lane = mv88e6xxx_serdes_get_lane(chip, port);
+-		if (lane >= 0)
+-			err = ops->serdes_pcs_an_restart(chip, port, lane);
+-		mv88e6xxx_reg_unlock(chip);
 -
--	case PHY_INTERFACE_MODE_2500BASEX:
--		adv = linkmode_adv_to_mii_adv_x(advertise,
--					ETHTOOL_LINK_MODE_2500baseX_Full_BIT);
--		break;
--
--	default:
--		return 0;
--	}
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_ADVERTISE, &val);
--	if (err)
--		return err;
--
--	changed = val != adv;
--	if (changed) {
--		err = mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--					     MV88E6390_SGMII_ADVERTISE, adv);
 -		if (err)
--			return err;
+-			dev_err(ds->dev, "p%d: failed to restart AN\n", port);
 -	}
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_BMCR, &val);
--	if (err)
--		return err;
--
--	if (phylink_autoneg_inband(mode))
--		bmcr = val | BMCR_ANENABLE;
--	else
--		bmcr = val & ~BMCR_ANENABLE;
--
--	/* setting ANENABLE triggers a restart of negotiation */
--	if (bmcr == val)
--		return changed;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6390_SGMII_BMCR, bmcr);
 -}
 -
--static int mv88e6390_serdes_pcs_get_state_sgmii(struct mv88e6xxx_chip *chip,
--	int port, int lane, struct phylink_link_state *state)
+-static int mv88e6xxx_serdes_pcs_link_up(struct mv88e6xxx_chip *chip, int port,
+-					unsigned int mode,
+-					int speed, int duplex)
 -{
--	u16 bmsr, lpa, status;
--	int err;
+-	const struct mv88e6xxx_ops *ops = chip->info->ops;
+-	int lane;
 -
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_BMSR, &bmsr);
--	if (err) {
--		dev_err(chip->dev, "can't read Serdes PHY BMSR: %d\n", err);
--		return err;
--	}
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_PHY_STATUS, &status);
--	if (err) {
--		dev_err(chip->dev, "can't read Serdes PHY status: %d\n", err);
--		return err;
--	}
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_LPA, &lpa);
--	if (err) {
--		dev_err(chip->dev, "can't read Serdes PHY LPA: %d\n", err);
--		return err;
--	}
--
--	return mv88e6xxx_pcs_decode_state(chip->dev, bmsr, lpa, status, state);
--}
--
--static int mv88e6390_serdes_pcs_get_state_10g(struct mv88e6xxx_chip *chip,
--	int port, int lane, struct phylink_link_state *state)
--{
--	u16 status;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_10G_STAT1, &status);
--	if (err)
--		return err;
--
--	state->link = !!(status & MDIO_STAT1_LSTATUS);
--	if (state->link) {
--		state->speed = SPEED_10000;
--		state->duplex = DUPLEX_FULL;
+-	if (!phylink_autoneg_inband(mode) && ops->serdes_pcs_link_up) {
+-		lane = mv88e6xxx_serdes_get_lane(chip, port);
+-		if (lane >= 0)
+-			return ops->serdes_pcs_link_up(chip, port, lane,
+-						       speed, duplex);
 -	}
 -
 -	return 0;
 -}
 -
--static int mv88e6393x_serdes_pcs_get_state_10g(struct mv88e6xxx_chip *chip,
--					       int port, int lane,
--					       struct phylink_link_state *state)
+ static const u8 mv88e6185_phy_interface_modes[] = {
+ 	[MV88E6185_PORT_STS_CMODE_GMII_FD]	 = PHY_INTERFACE_MODE_GMII,
+ 	[MV88E6185_PORT_STS_CMODE_MII_100_FD_PS] = PHY_INTERFACE_MODE_MII,
+@@ -845,15 +770,8 @@ static void mv88e6xxx_get_caps(struct dsa_switch *ds, int port,
+ 			  config->supported_interfaces);
+ 	}
+ 
+-	/* If we have a .pcs_ops, or don't have a .serdes_pcs_get_state,
+-	 * serdes_pcs_config, serdes_pcs_an_restart, or serdes_pcs_link_up,
+-	 * we are not legacy.
+-	 */
+-	if (chip->info->ops->pcs_ops ||
+-	    (!chip->info->ops->serdes_pcs_get_state &&
+-	     !chip->info->ops->serdes_pcs_config &&
+-	     !chip->info->ops->serdes_pcs_an_restart &&
+-	     !chip->info->ops->serdes_pcs_link_up))
++	/* If we have a .pcs_init, we are not legacy. */
++	if (chip->info->ops->pcs_ops)
+ 		config->legacy_pre_march2020 = false;
+ }
+ 
+@@ -907,16 +825,6 @@ static void mv88e6xxx_mac_config(struct dsa_switch *ds, int port,
+ 						      state->interface);
+ 		if (err && err != -EOPNOTSUPP)
+ 			goto err_unlock;
+-
+-		err = mv88e6xxx_serdes_pcs_config(chip, port, mode,
+-						  state->interface,
+-						  state->advertising);
+-		/* FIXME: we should restart negotiation if something changed -
+-		 * which is something we get if we convert to using phylinks
+-		 * PCS operations.
+-		 */
+-		if (err > 0)
+-			err = 0;
+ 	}
+ 
+ err_unlock:
+@@ -1000,17 +908,6 @@ static void mv88e6xxx_mac_link_up(struct dsa_switch *ds, int port,
+ 	 */
+ 	if (!mv88e6xxx_port_ppu_updates(chip, port) ||
+ 	    mode == MLO_AN_FIXED) {
+-		/* FIXME: for an automedia port, should we force the link
+-		 * down here - what if the link comes up due to "other" media
+-		 * while we're bringing the port up, how is the exclusivity
+-		 * handled in the Marvell hardware? E.g. port 2 on 88E6390
+-		 * shared between internal PHY and Serdes.
+-		 */
+-		err = mv88e6xxx_serdes_pcs_link_up(chip, port, mode, speed,
+-						   duplex);
+-		if (err)
+-			goto error;
+-
+ 		if (ops->port_set_speed_duplex) {
+ 			err = ops->port_set_speed_duplex(chip, port,
+ 							 speed, duplex);
+@@ -3181,102 +3078,6 @@ static int mv88e6xxx_setup_egress_floods(struct mv88e6xxx_chip *chip, int port)
+ 	return 0;
+ }
+ 
+-static irqreturn_t mv88e6xxx_serdes_irq_thread_fn(int irq, void *dev_id)
 -{
--	u16 status;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_10G_STAT1, &status);
--	if (err)
--		return err;
--
--	state->link = !!(status & MDIO_STAT1_LSTATUS);
--	if (state->link) {
--		if (state->interface == PHY_INTERFACE_MODE_5GBASER)
--			state->speed = SPEED_5000;
--		else
--			state->speed = SPEED_10000;
--		state->duplex = DUPLEX_FULL;
--	}
--	return 0;
--}
--
--/* USXGMII registers for Marvell switch 88e639x are undocumented and this function is based
-- * on some educated guesses. It appears that there are no status bits related to
-- * autonegotiation complete or flow control.
-- */
--static int mv88e639x_serdes_pcs_get_state_usxgmii(struct mv88e6xxx_chip *chip,
--						  int port, int lane,
--						  struct phylink_link_state *state)
--{
--	u16 status, lp_status;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_USXGMII_PHY_STATUS, &status);
--	if (err) {
--		dev_err(chip->dev, "can't read Serdes USXGMII PHY status: %d\n", err);
--		return err;
--	}
--	dev_dbg(chip->dev, "USXGMII PHY status: 0x%x\n", status);
--
--	state->link = !!(status & MDIO_USXGMII_LINK);
--	state->an_complete = state->link;
--
--	if (state->link) {
--		err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--					    MV88E6390_USXGMII_LP_STATUS, &lp_status);
--		if (err) {
--			dev_err(chip->dev, "can't read Serdes USXGMII LP status: %d\n", err);
--			return err;
--		}
--		dev_dbg(chip->dev, "USXGMII LP status: 0x%x\n", lp_status);
--		/* lp_status appears to include the "link" bit as per USXGMII spec. */
--		phylink_decode_usxgmii_word(state, lp_status);
--	}
--	return 0;
--}
--
--int mv88e6390_serdes_pcs_get_state(struct mv88e6xxx_chip *chip, int port,
--				   int lane, struct phylink_link_state *state)
--{
--	switch (state->interface) {
--	case PHY_INTERFACE_MODE_SGMII:
--	case PHY_INTERFACE_MODE_1000BASEX:
--	case PHY_INTERFACE_MODE_2500BASEX:
--		return mv88e6390_serdes_pcs_get_state_sgmii(chip, port, lane,
--							    state);
--	case PHY_INTERFACE_MODE_XAUI:
--	case PHY_INTERFACE_MODE_RXAUI:
--		return mv88e6390_serdes_pcs_get_state_10g(chip, port, lane,
--							  state);
--
--	default:
--		return -EOPNOTSUPP;
--	}
--}
--
--int mv88e6393x_serdes_pcs_get_state(struct mv88e6xxx_chip *chip, int port,
--				    int lane, struct phylink_link_state *state)
--{
--	switch (state->interface) {
--	case PHY_INTERFACE_MODE_SGMII:
--	case PHY_INTERFACE_MODE_1000BASEX:
--	case PHY_INTERFACE_MODE_2500BASEX:
--		return mv88e6390_serdes_pcs_get_state_sgmii(chip, port, lane,
--							    state);
--	case PHY_INTERFACE_MODE_5GBASER:
--	case PHY_INTERFACE_MODE_10GBASER:
--		return mv88e6393x_serdes_pcs_get_state_10g(chip, port, lane,
--							   state);
--	case PHY_INTERFACE_MODE_USXGMII:
--		return mv88e639x_serdes_pcs_get_state_usxgmii(chip, port, lane,
--							   state);
--
--	default:
--		return -EOPNOTSUPP;
--	}
--}
--
--int mv88e6390_serdes_pcs_an_restart(struct mv88e6xxx_chip *chip, int port,
--				    int lane)
--{
--	u16 bmcr;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_BMCR, &bmcr);
--	if (err)
--		return err;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6390_SGMII_BMCR,
--				      bmcr | BMCR_ANRESTART);
--}
--
--int mv88e6390_serdes_pcs_link_up(struct mv88e6xxx_chip *chip, int port,
--				 int lane, int speed, int duplex)
--{
--	u16 val, bmcr;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_BMCR, &val);
--	if (err)
--		return err;
--
--	bmcr = val & ~(BMCR_SPEED100 | BMCR_FULLDPLX | BMCR_SPEED1000);
--	switch (speed) {
--	case SPEED_2500:
--	case SPEED_1000:
--		bmcr |= BMCR_SPEED1000;
--		break;
--	case SPEED_100:
--		bmcr |= BMCR_SPEED100;
--		break;
--	case SPEED_10:
--		break;
--	}
--
--	if (duplex == DUPLEX_FULL)
--		bmcr |= BMCR_FULLDPLX;
--
--	if (bmcr == val)
--		return 0;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6390_SGMII_BMCR, bmcr);
--}
--
--static void mv88e6390_serdes_irq_link_sgmii(struct mv88e6xxx_chip *chip,
--					    int port, int lane)
--{
--	u16 bmsr;
--	int err;
--
--	/* If the link has dropped, we want to know about it. */
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_BMSR, &bmsr);
--	if (err) {
--		dev_err(chip->dev, "can't read Serdes BMSR: %d\n", err);
--		return;
--	}
--
--	dsa_port_phylink_mac_change(chip->ds, port, !!(bmsr & BMSR_LSTATUS));
--}
--
--static void mv88e6393x_serdes_irq_link_10g(struct mv88e6xxx_chip *chip,
--					   int port, u8 lane)
--{
--	u16 status;
--	int err;
--
--	/* If the link has dropped, we want to know about it. */
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_10G_STAT1, &status);
--	if (err) {
--		dev_err(chip->dev, "can't read Serdes STAT1: %d\n", err);
--		return;
--	}
--
--	dsa_port_phylink_mac_change(chip->ds, port, !!(status & MDIO_STAT1_LSTATUS));
--}
--
--static int mv88e6390_serdes_irq_enable_sgmii(struct mv88e6xxx_chip *chip,
--					     int lane, bool enable)
--{
--	u16 val = 0;
--
--	if (enable)
--		val |= MV88E6390_SGMII_INT_LINK_DOWN |
--			MV88E6390_SGMII_INT_LINK_UP;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6390_SGMII_INT_ENABLE, val);
--}
--
--int mv88e6390_serdes_irq_enable(struct mv88e6xxx_chip *chip, int port, int lane,
--				bool enable)
--{
--	u8 cmode = chip->ports[port].cmode;
--
--	switch (cmode) {
--	case MV88E6XXX_PORT_STS_CMODE_SGMII:
--	case MV88E6XXX_PORT_STS_CMODE_1000BASEX:
--	case MV88E6XXX_PORT_STS_CMODE_2500BASEX:
--		return mv88e6390_serdes_irq_enable_sgmii(chip, lane, enable);
--	}
--
--	return 0;
--}
--
--static int mv88e6390_serdes_irq_status_sgmii(struct mv88e6xxx_chip *chip,
--					     int lane, u16 *status)
--{
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6390_SGMII_INT_STATUS, status);
--
--	return err;
--}
--
--static int mv88e6393x_serdes_irq_enable_10g(struct mv88e6xxx_chip *chip,
--					    u8 lane, bool enable)
--{
--	u16 val = 0;
--
--	if (enable)
--		val |= MV88E6393X_10G_INT_LINK_CHANGE;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6393X_10G_INT_ENABLE, val);
--}
--
--int mv88e6393x_serdes_irq_enable(struct mv88e6xxx_chip *chip, int port,
--				 int lane, bool enable)
--{
--	u8 cmode = chip->ports[port].cmode;
--
--	switch (cmode) {
--	case MV88E6XXX_PORT_STS_CMODE_SGMII:
--	case MV88E6XXX_PORT_STS_CMODE_1000BASEX:
--	case MV88E6XXX_PORT_STS_CMODE_2500BASEX:
--		return mv88e6390_serdes_irq_enable_sgmii(chip, lane, enable);
--	case MV88E6393X_PORT_STS_CMODE_5GBASER:
--	case MV88E6393X_PORT_STS_CMODE_10GBASER:
--	case MV88E6393X_PORT_STS_CMODE_USXGMII:
--		return mv88e6393x_serdes_irq_enable_10g(chip, lane, enable);
--	}
--
--	return 0;
--}
--
--static int mv88e6393x_serdes_irq_status_10g(struct mv88e6xxx_chip *chip,
--					    u8 lane, u16 *status)
--{
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6393X_10G_INT_STATUS, status);
--
--	return err;
--}
--
--irqreturn_t mv88e6393x_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
--					 int lane)
--{
--	u8 cmode = chip->ports[port].cmode;
+-	struct mv88e6xxx_port *mvp = dev_id;
+-	struct mv88e6xxx_chip *chip = mvp->chip;
 -	irqreturn_t ret = IRQ_NONE;
--	u16 status;
--	int err;
+-	int port = mvp->port;
+-	int lane;
 -
--	switch (cmode) {
--	case MV88E6XXX_PORT_STS_CMODE_SGMII:
--	case MV88E6XXX_PORT_STS_CMODE_1000BASEX:
--	case MV88E6XXX_PORT_STS_CMODE_2500BASEX:
--		err = mv88e6390_serdes_irq_status_sgmii(chip, lane, &status);
--		if (err)
--			return ret;
--		if (status & (MV88E6390_SGMII_INT_LINK_DOWN |
--			      MV88E6390_SGMII_INT_LINK_UP)) {
--			ret = IRQ_HANDLED;
--			mv88e6390_serdes_irq_link_sgmii(chip, port, lane);
--		}
--		break;
--	case MV88E6393X_PORT_STS_CMODE_5GBASER:
--	case MV88E6393X_PORT_STS_CMODE_10GBASER:
--	case MV88E6393X_PORT_STS_CMODE_USXGMII:
--		err = mv88e6393x_serdes_irq_status_10g(chip, lane, &status);
--		if (err)
--			return err;
--		if (status & MV88E6393X_10G_INT_LINK_CHANGE) {
--			ret = IRQ_HANDLED;
--			mv88e6393x_serdes_irq_link_10g(chip, port, lane);
--		}
--		break;
--	}
+-	mv88e6xxx_reg_lock(chip);
+-	lane = mv88e6xxx_serdes_get_lane(chip, port);
+-	if (lane >= 0)
+-		ret = mv88e6xxx_serdes_irq_status(chip, port, lane);
+-	mv88e6xxx_reg_unlock(chip);
 -
 -	return ret;
 -}
 -
--irqreturn_t mv88e6390_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
+-static int mv88e6xxx_serdes_irq_request(struct mv88e6xxx_chip *chip, int port,
 -					int lane)
 -{
--	u8 cmode = chip->ports[port].cmode;
--	irqreturn_t ret = IRQ_NONE;
--	u16 status;
+-	struct mv88e6xxx_port *dev_id = &chip->ports[port];
+-	unsigned int irq;
 -	int err;
 -
--	switch (cmode) {
--	case MV88E6XXX_PORT_STS_CMODE_SGMII:
--	case MV88E6XXX_PORT_STS_CMODE_1000BASEX:
--	case MV88E6XXX_PORT_STS_CMODE_2500BASEX:
--		err = mv88e6390_serdes_irq_status_sgmii(chip, lane, &status);
--		if (err)
--			return ret;
--		if (status & (MV88E6390_SGMII_INT_LINK_DOWN |
--			      MV88E6390_SGMII_INT_LINK_UP)) {
--			ret = IRQ_HANDLED;
--			mv88e6390_serdes_irq_link_sgmii(chip, port, lane);
--		}
--	}
--
--	return ret;
--}
--
- unsigned int mv88e6390_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
- {
- 	return irq_find_mapping(chip->g2_irq.domain, port);
-@@ -1075,259 +546,3 @@ int mv88e6352_serdes_set_tx_amplitude(struct mv88e6xxx_chip *chip, int port,
- 
- 	return mv88e6352_serdes_write(chip, MV88E6352_SERDES_SPEC_CTRL2, ctrl);
- }
--
--static int mv88e6393x_serdes_power_lane(struct mv88e6xxx_chip *chip, int lane,
--					bool on)
--{
--	u16 reg;
--	int err;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6393X_SERDES_CTRL1, &reg);
--	if (err)
--		return err;
--
--	if (on)
--		reg &= ~(MV88E6393X_SERDES_CTRL1_TX_PDOWN |
--			 MV88E6393X_SERDES_CTRL1_RX_PDOWN);
--	else
--		reg |= MV88E6393X_SERDES_CTRL1_TX_PDOWN |
--		       MV88E6393X_SERDES_CTRL1_RX_PDOWN;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6393X_SERDES_CTRL1, reg);
--}
--
--static int mv88e6393x_serdes_erratum_4_6(struct mv88e6xxx_chip *chip, int lane)
--{
--	u16 reg;
--	int err;
--
--	/* mv88e6393x family errata 4.6:
--	 * Cannot clear PwrDn bit on SERDES if device is configured CPU_MGD
--	 * mode or P0_mode is configured for [x]MII.
--	 * Workaround: Set SERDES register 4.F002 bit 5=0 and bit 15=1.
--	 *
--	 * It seems that after this workaround the SERDES is automatically
--	 * powered up (the bit is cleared), so power it down.
--	 */
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6393X_SERDES_POC, &reg);
--	if (err)
--		return err;
--
--	reg &= ~MV88E6393X_SERDES_POC_PDOWN;
--	reg |= MV88E6393X_SERDES_POC_RESET;
--
--	err = mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				     MV88E6393X_SERDES_POC, reg);
--	if (err)
--		return err;
--
--	err = mv88e6390_serdes_power_sgmii(chip, lane, false);
--	if (err)
--		return err;
--
--	return mv88e6393x_serdes_power_lane(chip, lane, false);
--}
--
--int mv88e6393x_serdes_setup_errata(struct mv88e6xxx_chip *chip)
--{
--	int err;
--
--	err = mv88e6393x_serdes_erratum_4_6(chip, MV88E6393X_PORT0_LANE);
--	if (err)
--		return err;
--
--	err = mv88e6393x_serdes_erratum_4_6(chip, MV88E6393X_PORT9_LANE);
--	if (err)
--		return err;
--
--	return mv88e6393x_serdes_erratum_4_6(chip, MV88E6393X_PORT10_LANE);
--}
--
--static int mv88e6393x_serdes_erratum_4_8(struct mv88e6xxx_chip *chip, int lane)
--{
--	u16 reg, pcs;
--	int err;
--
--	/* mv88e6393x family errata 4.8:
--	 * When a SERDES port is operating in 1000BASE-X or SGMII mode link may
--	 * not come up after hardware reset or software reset of SERDES core.
--	 * Workaround is to write SERDES register 4.F074.14=1 for only those
--	 * modes and 0 in all other modes.
--	 */
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6393X_SERDES_POC, &pcs);
--	if (err)
--		return err;
--
--	pcs &= MV88E6393X_SERDES_POC_PCS_MASK;
--
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6393X_ERRATA_4_8_REG, &reg);
--	if (err)
--		return err;
--
--	if (pcs == MV88E6393X_SERDES_POC_PCS_1000BASEX ||
--	    pcs == MV88E6393X_SERDES_POC_PCS_SGMII_PHY ||
--	    pcs == MV88E6393X_SERDES_POC_PCS_SGMII_MAC)
--		reg |= MV88E6393X_ERRATA_4_8_BIT;
--	else
--		reg &= ~MV88E6393X_ERRATA_4_8_BIT;
--
--	return mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				      MV88E6393X_ERRATA_4_8_REG, reg);
--}
--
--static int mv88e6393x_serdes_erratum_5_2(struct mv88e6xxx_chip *chip, int lane,
--					 u8 cmode)
--{
--	static const struct {
--		u16 dev, reg, val, mask;
--	} fixes[] = {
--		{ MDIO_MMD_VEND1, 0x8093, 0xcb5a, 0xffff },
--		{ MDIO_MMD_VEND1, 0x8171, 0x7088, 0xffff },
--		{ MDIO_MMD_VEND1, 0x80c9, 0x311a, 0xffff },
--		{ MDIO_MMD_VEND1, 0x80a2, 0x8000, 0xff7f },
--		{ MDIO_MMD_VEND1, 0x80a9, 0x0000, 0xfff0 },
--		{ MDIO_MMD_VEND1, 0x80a3, 0x0000, 0xf8ff },
--		{ MDIO_MMD_PHYXS, MV88E6393X_SERDES_POC,
--		  MV88E6393X_SERDES_POC_RESET, MV88E6393X_SERDES_POC_RESET },
--	};
--	int err, i;
--	u16 reg;
--
--	/* mv88e6393x family errata 5.2:
--	 * For optimal signal integrity the following sequence should be applied
--	 * to SERDES operating in 10G mode. These registers only apply to 10G
--	 * operation and have no effect on other speeds.
--	 */
--	if (cmode != MV88E6393X_PORT_STS_CMODE_10GBASER &&
--	    cmode != MV88E6393X_PORT_STS_CMODE_USXGMII)
+-	/* Nothing to request if this SERDES port has no IRQ */
+-	irq = mv88e6xxx_serdes_irq_mapping(chip, port);
+-	if (!irq)
 -		return 0;
 -
--	for (i = 0; i < ARRAY_SIZE(fixes); ++i) {
--		err = mv88e6390_serdes_read(chip, lane, fixes[i].dev,
--					    fixes[i].reg, &reg);
--		if (err)
--			return err;
+-	snprintf(dev_id->serdes_irq_name, sizeof(dev_id->serdes_irq_name),
+-		 "mv88e6xxx-%s-serdes-%d", dev_name(chip->dev), port);
 -
--		reg &= ~fixes[i].mask;
--		reg |= fixes[i].val;
+-	/* Requesting the IRQ will trigger IRQ callbacks, so release the lock */
+-	mv88e6xxx_reg_unlock(chip);
+-	err = request_threaded_irq(irq, NULL, mv88e6xxx_serdes_irq_thread_fn,
+-				   IRQF_ONESHOT, dev_id->serdes_irq_name,
+-				   dev_id);
+-	mv88e6xxx_reg_lock(chip);
+-	if (err)
+-		return err;
 -
--		err = mv88e6390_serdes_write(chip, lane, fixes[i].dev,
--					     fixes[i].reg, reg);
--		if (err)
--			return err;
--	}
+-	dev_id->serdes_irq = irq;
 -
--	return 0;
+-	return mv88e6xxx_serdes_irq_enable(chip, port, lane);
 -}
 -
--static int mv88e6393x_serdes_fix_2500basex_an(struct mv88e6xxx_chip *chip,
--					      int lane, u8 cmode, bool on)
+-static int mv88e6xxx_serdes_irq_free(struct mv88e6xxx_chip *chip, int port,
+-				     int lane)
 -{
--	u16 reg;
+-	struct mv88e6xxx_port *dev_id = &chip->ports[port];
+-	unsigned int irq = dev_id->serdes_irq;
 -	int err;
 -
--	if (cmode != MV88E6XXX_PORT_STS_CMODE_2500BASEX)
+-	/* Nothing to free if no IRQ has been requested */
+-	if (!irq)
 -		return 0;
 -
--	/* Inband AN is broken on Amethyst in 2500base-x mode when set by
--	 * standard mechanism (via cmode).
--	 * We can get around this by configuring the PCS mode to 1000base-x
--	 * and then writing value 0x58 to register 1e.8000. (This must be done
--	 * while SerDes receiver and transmitter are disabled, which is, when
--	 * this function is called.)
--	 * It seem that when we do this configuration to 2500base-x mode (by
--	 * changing PCS mode to 1000base-x and frequency to 3.125 GHz from
--	 * 1.25 GHz) and then configure to sgmii or 1000base-x, the device
--	 * thinks that it already has SerDes at 1.25 GHz and does not change
--	 * the 1e.8000 register, leaving SerDes at 3.125 GHz.
--	 * To avoid this, change PCS mode back to 2500base-x when disabling
--	 * SerDes from 2500base-x mode.
--	 */
--	err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
--				    MV88E6393X_SERDES_POC, &reg);
--	if (err)
--		return err;
+-	err = mv88e6xxx_serdes_irq_disable(chip, port, lane);
 -
--	reg &= ~(MV88E6393X_SERDES_POC_PCS_MASK | MV88E6393X_SERDES_POC_AN);
--	if (on)
--		reg |= MV88E6393X_SERDES_POC_PCS_1000BASEX |
--		       MV88E6393X_SERDES_POC_AN;
--	else
--		reg |= MV88E6393X_SERDES_POC_PCS_2500BASEX;
--	reg |= MV88E6393X_SERDES_POC_RESET;
+-	/* Freeing the IRQ will trigger IRQ callbacks, so release the lock */
+-	mv88e6xxx_reg_unlock(chip);
+-	free_irq(irq, dev_id);
+-	mv88e6xxx_reg_lock(chip);
 -
--	err = mv88e6390_serdes_write(chip, lane, MDIO_MMD_PHYXS,
--				     MV88E6393X_SERDES_POC, reg);
--	if (err)
--		return err;
+-	dev_id->serdes_irq = 0;
 -
--	err = mv88e6390_serdes_write(chip, lane, MDIO_MMD_VEND1, 0x8000, 0x58);
--	if (err)
--		return err;
--
--	return 0;
+-	return err;
 -}
 -
--int mv88e6393x_serdes_power(struct mv88e6xxx_chip *chip, int port, int lane,
--			    bool on)
+-static int mv88e6xxx_serdes_power(struct mv88e6xxx_chip *chip, int port,
+-				  bool on)
 -{
--	u8 cmode = chip->ports[port].cmode;
+-	int lane;
 -	int err;
 -
--	if (port != 0 && port != 9 && port != 10)
--		return -EOPNOTSUPP;
+-	lane = mv88e6xxx_serdes_get_lane(chip, port);
+-	if (lane < 0)
+-		return 0;
 -
 -	if (on) {
--		err = mv88e6393x_serdes_erratum_4_8(chip, lane);
+-		err = mv88e6xxx_serdes_power_up(chip, port, lane);
 -		if (err)
 -			return err;
 -
--		err = mv88e6393x_serdes_erratum_5_2(chip, lane, cmode);
+-		err = mv88e6xxx_serdes_irq_request(chip, port, lane);
+-	} else {
+-		err = mv88e6xxx_serdes_irq_free(chip, port, lane);
 -		if (err)
 -			return err;
 -
--		err = mv88e6393x_serdes_fix_2500basex_an(chip, lane, cmode,
--							 true);
--		if (err)
--			return err;
--
--		err = mv88e6393x_serdes_power_lane(chip, lane, true);
--		if (err)
--			return err;
--	}
--
--	switch (cmode) {
--	case MV88E6XXX_PORT_STS_CMODE_SGMII:
--	case MV88E6XXX_PORT_STS_CMODE_1000BASEX:
--	case MV88E6XXX_PORT_STS_CMODE_2500BASEX:
--		err = mv88e6390_serdes_power_sgmii(chip, lane, on);
--		break;
--	case MV88E6393X_PORT_STS_CMODE_5GBASER:
--	case MV88E6393X_PORT_STS_CMODE_10GBASER:
--	case MV88E6393X_PORT_STS_CMODE_USXGMII:
--		err = mv88e6390_serdes_power_10g(chip, lane, on);
--		break;
--	default:
--		err = -EINVAL;
--		break;
--	}
--
--	if (err)
--		return err;
--
--	if (!on) {
--		err = mv88e6393x_serdes_power_lane(chip, lane, false);
--		if (err)
--			return err;
--
--		err = mv88e6393x_serdes_fix_2500basex_an(chip, lane, cmode,
--							 false);
+-		err = mv88e6xxx_serdes_power_down(chip, port, lane);
 -	}
 -
 -	return err;
 -}
+-
+ static int mv88e6xxx_set_egress_port(struct mv88e6xxx_chip *chip,
+ 				     enum mv88e6xxx_egress_direction direction,
+ 				     int port)
+@@ -3601,37 +3402,6 @@ static int mv88e6xxx_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
+ 	return ret;
+ }
+ 
+-static int mv88e6xxx_port_enable(struct dsa_switch *ds, int port,
+-				 struct phy_device *phydev)
+-{
+-	struct mv88e6xxx_chip *chip = ds->priv;
+-	int err;
+-
+-	/* Do not control power or request irqs if using PCS */
+-	if (chip->info->ops->pcs_ops)
+-		return 0;
+-
+-	mv88e6xxx_reg_lock(chip);
+-	err = mv88e6xxx_serdes_power(chip, port, true);
+-	mv88e6xxx_reg_unlock(chip);
+-
+-	return err;
+-}
+-
+-static void mv88e6xxx_port_disable(struct dsa_switch *ds, int port)
+-{
+-	struct mv88e6xxx_chip *chip = ds->priv;
+-
+-	/* Do not control power or request irqs if using PCS */
+-	if (chip->info->ops->pcs_ops)
+-		return;
+-
+-	mv88e6xxx_reg_lock(chip);
+-	if (mv88e6xxx_serdes_power(chip, port, false))
+-		dev_err(chip->dev, "failed to power off SERDES\n");
+-	mv88e6xxx_reg_unlock(chip);
+-}
+-
+ static int mv88e6xxx_set_ageing_time(struct dsa_switch *ds,
+ 				     unsigned int ageing_time)
+ {
+@@ -7013,18 +6783,14 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
+ 	.port_teardown		= mv88e6xxx_port_teardown,
+ 	.phylink_get_caps	= mv88e6xxx_get_caps,
+ 	.phylink_mac_select_pcs	= mv88e6xxx_mac_select_pcs,
+-	.phylink_mac_link_state	= mv88e6xxx_serdes_pcs_get_state,
+ 	.phylink_mac_prepare	= mv88e6xxx_mac_prepare,
+ 	.phylink_mac_config	= mv88e6xxx_mac_config,
+ 	.phylink_mac_finish	= mv88e6xxx_mac_finish,
+-	.phylink_mac_an_restart	= mv88e6xxx_serdes_pcs_an_restart,
+ 	.phylink_mac_link_down	= mv88e6xxx_mac_link_down,
+ 	.phylink_mac_link_up	= mv88e6xxx_mac_link_up,
+ 	.get_strings		= mv88e6xxx_get_strings,
+ 	.get_ethtool_stats	= mv88e6xxx_get_ethtool_stats,
+ 	.get_sset_count		= mv88e6xxx_get_sset_count,
+-	.port_enable		= mv88e6xxx_port_enable,
+-	.port_disable		= mv88e6xxx_port_disable,
+ 	.port_max_mtu		= mv88e6xxx_get_max_mtu,
+ 	.port_change_mtu	= mv88e6xxx_change_mtu,
+ 	.get_mac_eee		= mv88e6xxx_get_mac_eee,
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index 1dd310a3c41f..44383a03ef2f 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -286,8 +286,6 @@ struct mv88e6xxx_port {
+ 	u8 cmode;
+ 	bool mirror_ingress;
+ 	bool mirror_egress;
+-	unsigned int serdes_irq;
+-	char serdes_irq_name[64];
+ 	struct devlink_region *region;
+ 	void *pcs_private;
+ 
+@@ -592,31 +590,12 @@ struct mv88e6xxx_ops {
+ 
+ 	int (*mgmt_rsvd2cpu)(struct mv88e6xxx_chip *chip);
+ 
+-	/* Power on/off a SERDES interface */
+-	int (*serdes_power)(struct mv88e6xxx_chip *chip, int port, int lane,
+-			    bool up);
+-
+ 	/* SERDES lane mapping */
+ 	int (*serdes_get_lane)(struct mv88e6xxx_chip *chip, int port);
+ 
+-	int (*serdes_pcs_get_state)(struct mv88e6xxx_chip *chip, int port,
+-				    int lane, struct phylink_link_state *state);
+-	int (*serdes_pcs_config)(struct mv88e6xxx_chip *chip, int port,
+-				 int lane, unsigned int mode,
+-				 phy_interface_t interface,
+-				 const unsigned long *advertise);
+-	int (*serdes_pcs_an_restart)(struct mv88e6xxx_chip *chip, int port,
+-				     int lane);
+-	int (*serdes_pcs_link_up)(struct mv88e6xxx_chip *chip, int port,
+-				  int lane, int speed, int duplex);
+-
+ 	/* SERDES interrupt handling */
+ 	unsigned int (*serdes_irq_mapping)(struct mv88e6xxx_chip *chip,
+ 					   int port);
+-	int (*serdes_irq_enable)(struct mv88e6xxx_chip *chip, int port, int lane,
+-				 bool enable);
+-	irqreturn_t (*serdes_irq_status)(struct mv88e6xxx_chip *chip, int port,
+-					 int lane);
+ 
+ 	/* Statistics from the SERDES interface */
+ 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index dd66ec902d4c..5394a8cf7bf1 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -524,7 +524,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
+ 				    phy_interface_t mode, bool force)
+ {
+ 	u16 cmode;
+-	int lane;
+ 	u16 reg;
+ 	int err;
+ 
+@@ -577,19 +576,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
+ 	if (cmode == chip->ports[port].cmode && !force)
+ 		return 0;
+ 
+-	lane = mv88e6xxx_serdes_get_lane(chip, port);
+-	if (lane >= 0) {
+-		if (chip->ports[port].serdes_irq) {
+-			err = mv88e6xxx_serdes_irq_disable(chip, port, lane);
+-			if (err)
+-				return err;
+-		}
+-
+-		err = mv88e6xxx_serdes_power_down(chip, port, lane);
+-		if (err)
+-			return err;
+-	}
+-
+ 	chip->ports[port].cmode = 0;
+ 
+ 	if (cmode) {
+@@ -605,22 +591,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
+ 			return err;
+ 
+ 		chip->ports[port].cmode = cmode;
+-
+-		lane = mv88e6xxx_serdes_get_lane(chip, port);
+-		if (lane == -ENODEV)
+-			return 0;
+-		if (lane < 0)
+-			return lane;
+-
+-		err = mv88e6xxx_serdes_power_up(chip, port, lane);
+-		if (err)
+-			return err;
+-
+-		if (chip->ports[port].serdes_irq) {
+-			err = mv88e6xxx_serdes_irq_enable(chip, port, lane);
+-			if (err)
+-				return err;
+-		}
+ 	}
+ 
+ 	return 0;
 diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
-index 73cf2d0b8bb3..67584cb1fdb9 100644
+index 67584cb1fdb9..aac95cab46e3 100644
 --- a/drivers/net/dsa/mv88e6xxx/serdes.h
 +++ b/drivers/net/dsa/mv88e6xxx/serdes.h
-@@ -46,6 +46,10 @@ struct phylink_link_state;
- /* 10GBASE-R and 10GBASE-X4/X2 */
- #define MV88E6390_10G_CTRL1		(0x1000 + MDIO_CTRL1)
- #define MV88E6390_10G_STAT1		(0x1000 + MDIO_STAT1)
-+#define MV88E6390_10G_INT_ENABLE	0x9001
-+#define MV88E6390_10G_INT_LINK_DOWN	BIT(3)
-+#define MV88E6390_10G_INT_LINK_UP	BIT(2)
-+#define MV88E6390_10G_INT_STATUS	0x9003
- #define MV88E6393X_10G_INT_ENABLE	0x9000
- #define MV88E6393X_10G_INT_LINK_CHANGE	BIT(2)
- #define MV88E6393X_10G_INT_STATUS	0x9001
-@@ -116,35 +120,10 @@ int mv88e6341_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
- int mv88e6390_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
- int mv88e6390x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
- int mv88e6393x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
--int mv88e6390_serdes_pcs_config(struct mv88e6xxx_chip *chip, int port,
--				int lane, unsigned int mode,
--				phy_interface_t interface,
--				const unsigned long *advertise);
--int mv88e6390_serdes_pcs_get_state(struct mv88e6xxx_chip *chip, int port,
--				   int lane, struct phylink_link_state *state);
--int mv88e6393x_serdes_pcs_get_state(struct mv88e6xxx_chip *chip, int port,
--				    int lane, struct phylink_link_state *state);
--int mv88e6390_serdes_pcs_an_restart(struct mv88e6xxx_chip *chip, int port,
--				    int lane);
--int mv88e6390_serdes_pcs_link_up(struct mv88e6xxx_chip *chip, int port,
--				 int lane, int speed, int duplex);
- unsigned int mv88e6352_serdes_irq_mapping(struct mv88e6xxx_chip *chip,
- 					  int port);
- unsigned int mv88e6390_serdes_irq_mapping(struct mv88e6xxx_chip *chip,
- 					  int port);
--int mv88e6390_serdes_power(struct mv88e6xxx_chip *chip, int port, int lane,
--			   bool on);
--int mv88e6393x_serdes_power(struct mv88e6xxx_chip *chip, int port, int lane,
--			    bool on);
--int mv88e6393x_serdes_setup_errata(struct mv88e6xxx_chip *chip);
--int mv88e6390_serdes_irq_enable(struct mv88e6xxx_chip *chip, int port, int lane,
--				bool enable);
--int mv88e6393x_serdes_irq_enable(struct mv88e6xxx_chip *chip, int port,
--				 int lane, bool enable);
--irqreturn_t mv88e6390_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
--					int lane);
--irqreturn_t mv88e6393x_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
--					 int lane);
- int mv88e6352_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
- int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 				 int port, uint8_t *data);
-@@ -230,5 +209,7 @@ mv88e6xxx_serdes_irq_status(struct mv88e6xxx_chip *chip, int port, int lane)
+@@ -153,24 +153,6 @@ static inline int mv88e6xxx_serdes_get_lane(struct mv88e6xxx_chip *chip,
+ 	return chip->info->ops->serdes_get_lane(chip, port);
+ }
  
+-static inline int mv88e6xxx_serdes_power_up(struct mv88e6xxx_chip *chip,
+-					    int port, int lane)
+-{
+-	if (!chip->info->ops->serdes_power)
+-		return -EOPNOTSUPP;
+-
+-	return chip->info->ops->serdes_power(chip, port, lane, true);
+-}
+-
+-static inline int mv88e6xxx_serdes_power_down(struct mv88e6xxx_chip *chip,
+-					      int port, int lane)
+-{
+-	if (!chip->info->ops->serdes_power)
+-		return -EOPNOTSUPP;
+-
+-	return chip->info->ops->serdes_power(chip, port, lane, false);
+-}
+-
+ static inline unsigned int
+ mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
+ {
+@@ -180,33 +162,6 @@ mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
+ 	return chip->info->ops->serdes_irq_mapping(chip, port);
+ }
+ 
+-static inline int mv88e6xxx_serdes_irq_enable(struct mv88e6xxx_chip *chip,
+-					      int port, int lane)
+-{
+-	if (!chip->info->ops->serdes_irq_enable)
+-		return -EOPNOTSUPP;
+-
+-	return chip->info->ops->serdes_irq_enable(chip, port, lane, true);
+-}
+-
+-static inline int mv88e6xxx_serdes_irq_disable(struct mv88e6xxx_chip *chip,
+-					       int port, int lane)
+-{
+-	if (!chip->info->ops->serdes_irq_enable)
+-		return -EOPNOTSUPP;
+-
+-	return chip->info->ops->serdes_irq_enable(chip, port, lane, false);
+-}
+-
+-static inline irqreturn_t
+-mv88e6xxx_serdes_irq_status(struct mv88e6xxx_chip *chip, int port, int lane)
+-{
+-	if (!chip->info->ops->serdes_irq_status)
+-		return IRQ_NONE;
+-
+-	return chip->info->ops->serdes_irq_status(chip, port, lane);
+-}
+-
  extern const struct mv88e6xxx_pcs_ops mv88e6185_pcs_ops;
  extern const struct mv88e6xxx_pcs_ops mv88e6352_pcs_ops;
-+extern const struct mv88e6xxx_pcs_ops mv88e6390_pcs_ops;
-+extern const struct mv88e6xxx_pcs_ops mv88e6393x_pcs_ops;
- 
- #endif
+ extern const struct mv88e6xxx_pcs_ops mv88e6390_pcs_ops;
 -- 
 2.30.2
 
