@@ -1,184 +1,210 @@
-Return-Path: <netdev+bounces-17591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF52C752367
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:21:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3204752377
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 15:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA4311C2132A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8FF281D44
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 13:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A6E111B3;
-	Thu, 13 Jul 2023 13:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAFC107B7;
+	Thu, 13 Jul 2023 13:21:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAED1094A
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:20:59 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCE930C5
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 06:20:49 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-3wzTFMkIM1C2YrMdrEhgpg-1; Thu, 13 Jul 2023 09:20:32 -0400
-X-MC-Unique: 3wzTFMkIM1C2YrMdrEhgpg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BBFF588D06C;
-	Thu, 13 Jul 2023 13:20:31 +0000 (UTC)
-Received: from hog.localdomain (unknown [10.45.224.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C3ADD2166B26;
-	Thu, 13 Jul 2023 13:20:30 +0000 (UTC)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	kuba@kernel.org,
-	simon.horman@corigine.com,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] selftests: rtnetlink: add MACsec offload tests
-Date: Thu, 13 Jul 2023 15:20:24 +0200
-Message-Id: <c31ec07ad34e8ed5249e0667e44091332d1d48d4.1689173906.git.sd@queasysnail.net>
-In-Reply-To: <cover.1689173906.git.sd@queasysnail.net>
-References: <cover.1689173906.git.sd@queasysnail.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EB017AB4
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:21:08 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C5B358B;
+	Thu, 13 Jul 2023 06:20:55 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.201])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4R1wBt6QR6z6J6C1;
+	Thu, 13 Jul 2023 21:17:42 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 13 Jul 2023 14:20:51 +0100
+Message-ID: <bbd68f64-4e5a-b5e5-5b18-08261b9f1cdf@huawei.com>
+Date: Thu, 13 Jul 2023 16:20:50 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
-X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v9 00/12] Network support for Landlock - allowed list of
+ protocols
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>, Jeff Xu
+	<jeffxu@google.com>
+CC: Jeff Xu <jeffxu@chromium.org>, =?UTF-8?Q?G=c3=bcnther_Noack?=
+	<gnoack@google.com>, =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack3000@gmail.com>,
+	<willemdebruijn.kernel@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>, Jorge Lucangeli Obes
+	<jorgelo@chromium.org>, Allen Webb <allenwebb@google.com>, Dmitry Torokhov
+	<dtor@google.com>
+References: <20230116085818.165539-1-konstantin.meskhidze@huawei.com>
+ <Y/fl5iEbkL5Pj5cJ@galopp> <c20fc9eb-518e-84b4-0dd5-7b97c0825259@huawei.com>
+ <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net>
+ <b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net>
+ <ZJvy2SViorgc+cZI@google.com>
+ <CABi2SkX-dzUO6NnbyqfrAg7Bbn+Ne=Xi1qC1XMrzHqVEVucQ0Q@mail.gmail.com>
+ <43e8acb2-d696-c001-b54b-d2b7cf244de7@digikod.net>
+ <CABi2SkV1Q-cvMScEtcsHbgNRuGc39eJo6KT=GwUxsWPpFGSR4A@mail.gmail.com>
+ <b4440d19-93b9-e234-007b-4fc4f987550b@digikod.net>
+ <CABi2SkVbD8p0AHhvKLXPh-bQSNAk__8_ONxpE+8hisoZxF-h6g@mail.gmail.com>
+ <fb206d63-e51d-c701-8987-42078f8ccb5f@digikod.net>
+ <CALmYWFuJOae2mNp47NCzuz251Asm5Cm3hRZNtPOb7+1oty67Tg@mail.gmail.com>
+ <9fc33a12-276d-8f68-eeb8-1258559b30d4@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <9fc33a12-276d-8f68-eeb8-1258559b30d4@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Like the IPsec offload test, this requires netdevsim.
 
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- tools/testing/selftests/net/rtnetlink.sh | 83 ++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
 
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selft=
-ests/net/rtnetlink.sh
-index ba286d680fd9..488f4964365e 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -21,6 +21,7 @@ ALL_TESTS=3D"
- =09kci_test_vrf
- =09kci_test_encap
- =09kci_test_macsec
-+=09kci_test_macsec_offload
- =09kci_test_ipsec
- =09kci_test_ipsec_offload
- =09kci_test_fdb_get
-@@ -643,6 +644,88 @@ kci_test_macsec()
- =09echo "PASS: macsec"
- }
-=20
-+kci_test_macsec_offload()
-+{
-+=09sysfsd=3D/sys/kernel/debug/netdevsim/netdevsim0/ports/0/
-+=09sysfsnet=3D/sys/bus/netdevsim/devices/netdevsim0/net/
-+=09probed=3Dfalse
-+=09local ret=3D0
-+
-+=09ip macsec help 2>&1 | grep -q "^Usage: ip macsec"
-+=09if [ $? -ne 0 ]; then
-+=09=09echo "SKIP: macsec: iproute2 too old"
-+=09=09return $ksft_skip
-+=09fi
-+
-+=09# setup netdevsim since dummydev doesn't have offload support
-+=09if [ ! -w /sys/bus/netdevsim/new_device ] ; then
-+=09=09modprobe -q netdevsim
-+=09=09check_err $?
-+=09=09if [ $ret -ne 0 ]; then
-+=09=09=09echo "SKIP: macsec_offload can't load netdevsim"
-+=09=09=09return $ksft_skip
-+=09=09fi
-+=09=09probed=3Dtrue
-+=09fi
-+
-+=09echo "0" > /sys/bus/netdevsim/new_device
-+=09while [ ! -d $sysfsnet ] ; do :; done
-+=09udevadm settle
-+=09dev=3D`ls $sysfsnet`
-+
-+=09ip link set $dev up
-+=09if [ ! -d $sysfsd ] ; then
-+=09=09echo "FAIL: macsec_offload can't create device $dev"
-+=09=09return 1
-+=09fi
-+
-+=09ethtool -k $dev | grep -q 'macsec-hw-offload: on'
-+=09if [ $? -eq 1 ] ; then
-+=09=09echo "FAIL: macsec_offload netdevsim doesn't support MACsec offload"
-+=09=09return 1
-+=09fi
-+
-+=09ip link add link $dev kci_macsec1 type macsec port 4 offload mac
-+=09check_err $?
-+
-+=09ip link add link $dev kci_macsec2 type macsec address "aa:bb:cc:dd:ee:f=
-f" port 5 offload mac
-+=09check_err $?
-+
-+=09ip link add link $dev kci_macsec3 type macsec sci abbacdde01020304 offl=
-oad mac
-+=09check_err $?
-+
-+=09ip link add link $dev kci_macsec4 type macsec port 8 offload mac 2> /de=
-v/null
-+=09check_fail $?
-+
-+=09msname=3Dkci_macsec1
-+
-+=09ip macsec add "$msname" tx sa 0 pn 1024 on key 01 123456789012345678901=
-23456789012
-+=09check_err $?
-+
-+=09ip macsec add "$msname" rx port 1234 address "1c:ed:de:ad:be:ef"
-+=09check_err $?
-+
-+=09ip macsec add "$msname" rx port 1234 address "1c:ed:de:ad:be:ef" sa 0 p=
-n 1 on \
-+=09=09key 00 0123456789abcdef0123456789abcdef
-+=09check_err $?
-+
-+=09ip macsec add "$msname" rx port 1235 address "1c:ed:de:ad:be:ef" 2> /de=
-v/null
-+=09check_fail $?
-+
-+=09# clean up any leftovers
-+=09for msdev in kci_macsec{1,2,3,4} ; do
-+=09    ip link del $msdev 2> /dev/null
-+=09done
-+=09echo 0 > /sys/bus/netdevsim/del_device
-+=09$probed && rmmod netdevsim
-+
-+=09if [ $ret -ne 0 ]; then
-+=09=09echo "FAIL: macsec_offload"
-+=09=09return 1
-+=09fi
-+=09echo "PASS: macsec_offload"
-+}
-+
- #-------------------------------------------------------------------
- # Example commands
- #   ip x s add proto esp src 14.0.0.52 dst 14.0.0.70 \
---=20
-2.40.1
+7/12/2023 2:30 PM, Mickaël Salaün пишет:
+> 
+> On 05/07/2023 17:00, Jeff Xu wrote:
+>> On Fri, Jun 30, 2023 at 11:23 AM Mickaël Salaün <mic@digikod.net> wrote:
+>>>
+>>>
+>>> On 30/06/2023 06:18, Jeff Xu wrote:
+>>>> On Thu, Jun 29, 2023 at 4:07 AM Mickaël Salaün <mic@digikod.net> wrote:
+>>>>>
+>>>>>
+>>>>> On 29/06/2023 05:18, Jeff Xu wrote:
+>>>>>> resend.
+>>>>>>
+>>>>>> On Wed, Jun 28, 2023 at 12:29 PM Mickaël Salaün <mic@digikod.net> wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 28/06/2023 19:03, Jeff Xu wrote:
+> 
+> [...]
+> 
+>>> The sandboxing/Landlock threat model is to restrict a process when it is
+>>> sandboxed, but this sandboxing is a request from the same process (or
+>>> one of its parent) that happen when it is more trustworthy (or at least
+>>> has more privileges) than after it sandbox itself.
+>>>
+>>> The process sandboxing itself can use several kernel features, and one
+>>> of it is Landlock. In any case, it should take care of closing file
+>>> descriptors that should not be passed to the sandboxed process.
+>>>
+>> Agree.
+>> 
+>>> The limits of sandboxing are the communication channels from and to
+>>> outside the sandbox. The peers talking with sandboxed processes should
+>>> then not be subject to confused deputy attacks, which means they must
+>>> not enable to bypass the user-defined security policy (from which the
+>>> Landlock policy is only a part). Receiving file descriptors should then
+>>> not be more important than controlling the communication channels. If a
+>>> not-sandboxed process is willing to give more right to a sandboxed
+>>> process, by passing FDs or just receiving commands, then this
+>>> not-sandboxed process need to be fixed.
+>>>
+>>> This is the rationale to not care about received nor sent file
+>>> descriptors. The communication channels and the remote peers must be
+>>> trusted to not give more privileges to the sandboxed processes.
+>>>
+>>> If a peer is malicious, it doesn't need to pass a file descriptor to the
+>>> sandboxed process, it can just read (data) commands and apply them to
+>>> its file descriptors.
+>> 
+>> I see the reasoning. i.e. sandboxing the process is not more
+>> important than securing communication channels, or securing the peer.
+>> 
+>> So in a system that let a peer process to pass a socket into a
+>> higher privileged process, when the communication channel or the peer
+>> process is compromised,  e.g. swapping the fd/socket into a different
+>> one that the attacker controls, confuse deputy attack can happen. The
+>> recommendation here is to secure peer and communication.
+>> I agree with this approach in general.  I need to think about how it
+>> applies to specific cases.
+>> 
+>>> I think the ability to pass file descriptors
+>>> should be seen as a way to improve performance by avoiding a user space
+>>> process to act as a proxy receiving read/write commands and managing
+>>> file descriptors itself. On the other hand, file descriptors could be
+>>> used as real capabilities/tokens to manage access, but senders still
+>>> need to be careful to only pass the required ones.
+>>>
+>>> All this to say that being able to restrict actions on file descriptors
+>>> would be useful for senders/services to send a subset of the file
+>>> descriptor capabilities (cf. Capsicum), but not the other way around.
+>>>
+>> In the Landlock kernel doc:
+>> Similarly to file access modes (e.g. O_RDWR), Landlock access rights
+>> attached to file descriptors are retained even if they are passed
+>> between processes (e.g. through a Unix domain socket). Such access
+>> rights will then be enforced even if the receiving process is not
+>> sandboxed by Landlock. Indeed, this is required to keep a consistent
+>> access control over the whole system, and this avoids unattended
+>> bypasses through file descriptor passing (i.e. confused deputy
+>> attack).
+>> 
+>> iiuc, the design for file and socket in landlock is different. For
+>> socket, the access rules are applied only to the current process (more
+>> like seccomp), while for file restriction, the rules can be passed
+>> into another un-landlocked process.
+> 
+> The O_RDWR restrictions are enforced by the basic kernel access control,
+> not Landlock. However, for file truncation, Landlock complements the
+> basic kernel access rights and behave the same.
+> 
+> There is indeed slight differences between file system and socket
+> restrictions. For the file system, a file descriptor is a direct access
+> to a file/data. For the network, we cannot identify for which data/peer
+> a newly created socket will give access to, we need to wait for a
+> connect or bind request to identify the use case for this socket. We
+> could tie the access rights (related to ports) to an opened socket, but
+> this would not align with the way Landlock access control works for the
+> file system. Indeed, a directory file descriptor may enable to open
+> another file (i.e. a new data item), but this opening is restricted by
+> Landlock. A newly created socket gives access to the network (or a
+> subset of it), but binding or connecting to a peer (i.e. accessing new
+> data) is restricted by Landlock. Accesses tied to FDs are those that
+> enable to get access to the underlying data (e.g. read, write,
+> truncate). A newly created socket is harmless until it is connected to a
+> peer, similarly to a memfd file descriptor. A directory opened by a
+> sandboxed process can be passed to a process outside this sandbox and it
+> might be allowed to open a relative path/file, which might not be the
+> case for the sandboxed process.
 
+   I would like to mention that in case of files a Landlock rule is tied 
+to undreliying file's inode ( already existing at the moment of creating
+    a landlock's rule), and it's impossible to tie a new landlock rule 
+to a socket before it's creating. Thats why all network access rules 
+work with "port objects", representing network connections.
+
+I was thinking about sendind socket's FD to another process.
+If one process creates a socket and binds it to some port N. Then it 
+sends socket's FD to a landlocked process with rule restricting to bind
+to port N. Is this situation theoretically possible???
+
+
+> 
+> I think it might be summarize by the difference between underlying FD
+> data in the case of a regular file (i.e. tied access rights), and
+> relative new data in the case of a directory or a socket (i.e.
+> sandboxing policy scope).
+> .
 
