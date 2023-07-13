@@ -1,226 +1,198 @@
-Return-Path: <netdev+bounces-17405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B5917517A2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:43:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07FFF7517A9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 110BD1C2126F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:43:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6181281B2A
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0369645;
-	Thu, 13 Jul 2023 04:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE51629;
+	Thu, 13 Jul 2023 04:45:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F78629
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:43:13 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E722118;
-	Wed, 12 Jul 2023 21:43:09 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 4653F100018;
-	Thu, 13 Jul 2023 07:43:06 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4653F100018
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1689223386;
-	bh=GZsDJxsvZ7S25s8E+UbwVCfAMZkZAWT3goxw3fP22mM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=RSy8b8KlZtEmzoiCosMgw8Igh0S8157B2Eu48m0x8y4lF9Hy6+rI5rxho1R53/eha
-	 gLEoqnumfn/fQRWzSJoQ4+bqLYQ4nO7FhA16MrtNRa+PS8fl+Hla4j2pwcAFkhFlTF
-	 eNFYJmiftztIiWVB54lnLbL2ea/uZEdxdbc/NyLMEQfzHFaJ0Pd8X0KLeOz0Tbf6Ya
-	 10hlFtPAqu+GgmeCE7qTYwtIenPG4a78vXOd4z7gDgluBZrYjufmQ7J7RiNEqCW95x
-	 yhbUfkMsMSWK10aRVvrLxg7dfnFHJDlJjkhnbMtq65bXBsW1WOm1uHRSVE6A/tFy4r
-	 o0VGMgzYgG0rg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 13 Jul 2023 07:43:06 +0300 (MSK)
-Received: from [192.168.0.12] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 13 Jul 2023 07:42:44 +0300
-Message-ID: <cafa9b17-1cb2-543d-8e74-7cf47a92853e@sberdevices.ru>
-Date: Thu, 13 Jul 2023 07:37:49 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95206469F
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:45:25 +0000 (UTC)
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2131.outbound.protection.outlook.com [40.107.255.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856A61FE1;
+	Wed, 12 Jul 2023 21:45:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wbc2gvxdjkVyTsW0T+XMpIIEZ2txtDuX6k0nEspVmCvEGblbNEBgRJ+PN5liOgSe6tdW2wpklMVKv6p5jibjHqmwItzYiVUysRoIjkPcW922AAcQMm6+cI2/jTW1pUPDLDj/RypSDBkKSUqulX1Lmm+0Aosm7dotWeMmoAQq5S9Wx+ABZH9BG1sQ3VqKz60Ex4UpomHRluu2/dvwvVSTiio0EqR73TJGHZCOHaVYlWfEBMsuh2XBqH7bDePQvW/nzUdXGvBsf9xv5B/XA042NrvZ2z96RC1Kn2YWQA6evZYS7n+AnbdPVoff3SKdvvU1BmAlXJQtVSbtarYYuF5IMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0DtoWOi/YOJRa7O/0BDuo7bEUlJKJJq+3DSOtwhf9uU=;
+ b=RoFB+iLzaFCrHTw9Qvab5OOii+Pb2SYG71snkW1TfiTLvwGBr/lAJ6J9fHgANehHPbS3ROAPTxM8vFGuMWDVhXGYVrVFUtGxa7HjapjK/tj5gPf2iyWCxDwdPJ39I7/y3DtnqrER7p5GAyKt0LNl5W5va6wIBuo5wmGCJO+hz8O/iaRriCvIS/5oBhd8Ru50RJ68lgpWh5iC/VZP5iuHYAkrJJurU/E/drJFfM5HZI5srYXeRnT3TOyNAjvqlnLC/EfhQI8weNKdvy9XgCivj58B3HEiA0hBb6tFqXZRmMgMaVkhfse+lO18bOWQZ7g+KeR+GQiAtknfvcGCtHV6jA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0DtoWOi/YOJRa7O/0BDuo7bEUlJKJJq+3DSOtwhf9uU=;
+ b=qEC8w/9CvXR+DNIntAdo1e/B9DUGKxkqWt2HHtuRpy8Wcn3uCOVOg130rimyVZ/A6q+9okd/glywJh3m9KLJBuJktZubIgooVb+lLBYzTINi6+YKbyymK+8RaX0KVrFS6DnVoUAphZfnEaYeNeBJ0zs5I3qrGOzMT8lkrljR+uWUktfOXLwQV3Zo2ST/cAlczy0EZPmNHUxwJXrJo/yhKwzJMN+KNv8AamLrOhwOrUohpeXaG3jI8wr9cxSToyPgW9Q/0C0t0fExAyBJ9/642+zPhqs9kQ7WctIV4c1uhqKg7hcHVwxL335Q59eWDC7eg0x7pfgEX9xdiP4w5QQ1Kw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB5288.apcprd06.prod.outlook.com (2603:1096:4:1dc::9) by
+ KL1PR06MB6651.apcprd06.prod.outlook.com (2603:1096:820:fc::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.24; Thu, 13 Jul 2023 04:45:18 +0000
+Received: from SG2PR06MB5288.apcprd06.prod.outlook.com
+ ([fe80::f9b8:80b5:844e:f49a]) by SG2PR06MB5288.apcprd06.prod.outlook.com
+ ([fe80::f9b8:80b5:844e:f49a%6]) with mapi id 15.20.6565.028; Thu, 13 Jul 2023
+ 04:45:18 +0000
+From: Minjie Du <duminjie@vivo.com>
+To: Marcin Wojtas <mw@semihalf.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org (open list:MARVELL MVPP2 ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Cc: opensource.kernel@vivo.com,
+	Minjie Du <duminjie@vivo.com>
+Subject: [PATCH v1] drivers/net: marvell: mvpp2: fix debugfs_create_dir() return check in three functions
+Date: Thu, 13 Jul 2023 12:45:07 +0800
+Message-Id: <20230713044507.3275-1-duminjie@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYWPR01CA0050.jpnprd01.prod.outlook.com
+ (2603:1096:400:17f::19) To SG2PR06MB5288.apcprd06.prod.outlook.com
+ (2603:1096:4:1dc::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v5 13/17] vsock: enable setting SO_ZEROCOPY
-Content-Language: en-US
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
- <20230701063947.3422088-14-AVKrasnov@sberdevices.ru>
- <ZK8pxrbkrH2bEgw7@bullseye>
-From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <ZK8pxrbkrH2bEgw7@bullseye>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178587 [Jul 12 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 521 521 0c3391dd6036774f2e1052158c81e48587b96e95, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/13 02:50:00 #21606476
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB5288:EE_|KL1PR06MB6651:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97d1f0fb-3f30-4816-5238-08db835bf523
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	HdRsiCJ1UTzAJsTl1Lf1hkzYkqEipZIP/Ad6xt4M3bRXo8speroSmo4GX0RbLiJ2dK+I+duPiBh8OCgj5lryTtzxhDfJCFVmsrnoQh3rC+f9DtXWnvdh+nx6t+fthMciVLKPRUW4/y6NNYHhUDj2HFmZr+jDsLA2URApv0ZaQAXs46z5hcKnkgOXdbCNc0GiMNzMsCSFdsPAWGQnvSGdEe9vDRtO2c1B+dTMBFjxWrT3JG9fEzQ35XHexNagjNHzKSA4xzpzdL1iPX7kW+/7Vx1eruKCL4kyhJiFM+RMtnDwzKmkmFKN4VzrJeEvs8ShEXraf86SYrxEwWrevCN4gT0BE3k6O2lPJ4D/YQUCeDve4nBvH1dt4fRJegIHJqEEzKNQG9vs5R7pQy4zIV15Lf1/hIc6+K7EQDJ2YE6+q9/3WuARuG79CDXq77FJlpt43aKneFJjKHSk480rKefM25xLRy4f08dWuOPR/whDQG2qsrFOlyGZo0hdRd+oDuVVQREtrPXoGSw5VZFMqZefejDJ2acefgBY1MGmTdlbyOmfrgJdR48ItOabAAUKU8paczvpdEnx7tw6FHEg5DHa2kFYkb+08erpCpRXnG0CNV/znJwLozWUDk6z67hu3XZR
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB5288.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(136003)(366004)(39860400002)(396003)(451199021)(2906002)(83380400001)(186003)(6506007)(26005)(1076003)(66946007)(52116002)(6512007)(6486002)(6666004)(66476007)(66556008)(478600001)(110136005)(38350700002)(38100700002)(2616005)(107886003)(86362001)(8936002)(4326008)(316002)(36756003)(41300700001)(8676002)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NKi8YAHDGSIWLbl1x3nlle1R2Zcvzox3KrCVFnpIDz2MVWUTqT3RJRcKLVK6?=
+ =?us-ascii?Q?zwZyCfSwInD7BK9CxqOIwkCdkcy8NRQ2smK8szazbDk/xx8eyuGs/AsGezVU?=
+ =?us-ascii?Q?W+G2KgeFEpylTsTF8kRJUZHiJf+iXvEnpdJzYKY2ZxfHq4NXgmlEzoU/C7Is?=
+ =?us-ascii?Q?ugCXWsaBp/TcocZZsL8Y3g72PxayfLGdcys0LmZldFRCPQH5JlzDVZX0xNlw?=
+ =?us-ascii?Q?SMQ9Ucx1ZTumVgDIU8TcvcvDB2cx/J09KFAkXpzlqwusyl89FOjmeql8P+dg?=
+ =?us-ascii?Q?/YR7qRpPQw/NFfQQkMSwF/GkwAdEZ27sIxauzcrCpdXUbKmYz3l1Xv0TwWTz?=
+ =?us-ascii?Q?0HdM30bqVVwxGVKoqtI/G59LFsuMBWtX8Uo3NK9okiWpWI9FtYcCUwpGBlzq?=
+ =?us-ascii?Q?5WbFTIiDtEHTt9iEFaXV3v6PakSC020zfaTeeh86LOddzpc7BeZB8wq70bkm?=
+ =?us-ascii?Q?F1iYzxpWGZv0WISuzANOlNt19JRNAdLlMDZ13SeYrnHMycYxn4+kNu9skAxX?=
+ =?us-ascii?Q?W8Mzc0wPSHD6Zo9JY+0R4LSnXmn6/sTv3wx1W9JDzaqyzn+f3aduGP2fOL95?=
+ =?us-ascii?Q?jGGVuQmX3EqQH6bl7AJK+iwnJRNSJBpttw8OXlJP97bzZqf2F5FqzgGfMSrl?=
+ =?us-ascii?Q?AvZKygDYWR7bXpWEBze46zuKXH4RJy5PqtmVYhjfze5JlW9BGOBrW4Dw1oad?=
+ =?us-ascii?Q?8N3CSCv0oOOJQSsnGciYPtN5CdYKlqf5rAsQwdXmFJITrYE7a5zlqfS3v47d?=
+ =?us-ascii?Q?KSSITPWc+0oFBqFF+DE9FGj9493yI4jvJGOhwgXHLynerwpWZkQxQxhbhIkS?=
+ =?us-ascii?Q?P46ezc26NoO930ZBXcf9CgrayN15zDelDzoQZ4tc22I3C2L9LZgk5LhnAoFd?=
+ =?us-ascii?Q?Pmc94gxFWSZYPaU8gJBcOlnD8mMkkFBhNPYMMUDpnq2GDZq4uh81q4xW9W3S?=
+ =?us-ascii?Q?4JBJ9/ArtnPR4qxCRlfGxHLXPsrmExmQaZg8pH9FAZSJYFQLrf+2meDLp5PL?=
+ =?us-ascii?Q?TFU2yxW84P08f50G1lR4urpqR2faY+rFh8YblmbQsXk4T7S/q93SqeobqjAI?=
+ =?us-ascii?Q?PtgVfXzR74O1Jnp2haeqZWWF/5/jQmCjyVCYibleMiQOA/hvPGOr9KweV8QO?=
+ =?us-ascii?Q?5Gwq1aKvvCnJD4xptPpxJrCJ16YM773wZnNQoUSX4AXDcs0FJK/iFM/EGSn1?=
+ =?us-ascii?Q?Boe70/DoSrVmYSLojP1U7HEFlfgU0p7iggg25YpOkGl7savJ34/S14+xiTm6?=
+ =?us-ascii?Q?UgWIEyk6mos3I9YwCKvJgVL51hKaSi2evNDqx3JGw17N6JlMGLBhPc9vcLaU?=
+ =?us-ascii?Q?w13P9Tg6l5r7Uok+VuWgjxv/DUV5tGjQoHF1SeiB7DWx2a84SiIDdvwQ/Bey?=
+ =?us-ascii?Q?dWG8hayRZhBiVORIoDPbK+eGwHoGt394X5TitKKy+qcpnAde0t3xc+Sc4KMk?=
+ =?us-ascii?Q?+o0Y9Ug6ZS75qwjvCzSU1/H8bjs3y74MEQK+z+vZqiQ5RYCnchzZ+/lec0cP?=
+ =?us-ascii?Q?7nWVLwRGS90aqBLaV8oLWd9Z45BQ+9f/3LU5zsbpj9mYuP5cuACA0iaatace?=
+ =?us-ascii?Q?1XgZuQss5Md+rpHZXD+s5CjyUJpmLlX4+1THcxtt?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97d1f0fb-3f30-4816-5238-08db835bf523
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB5288.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 04:45:18.2965
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: insJmeHjhukUHnDutOWW/GNapEuli/exdBGkGh1KTDZhn3NCxkMBx3CbHIjwDgzqD3CTTz1reStWgwIYYitAZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR06MB6651
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Make IS_ERR() judge the debugfs_create_dir() function return
+in mvpp2_dbgfs_c2_entry_init(), mvpp2_dbgfs_flow_tbl_entry_init()
+ and mvpp2_dbgfs_cls_init()
+Line 562 deletes the space because checkpatch reports an error.
 
+Signed-off-by: Minjie Du <duminjie@vivo.com>
+---
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_debugfs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-On 13.07.2023 01:31, Bobby Eshleman wrote:
-> On Sat, Jul 01, 2023 at 09:39:43AM +0300, Arseniy Krasnov wrote:
->> For AF_VSOCK, zerocopy tx mode depends on transport, so this option must
->> be set in AF_VSOCK implementation where transport is accessible (if
->> transport is not set during setting SO_ZEROCOPY: for example socket is
->> not connected, then SO_ZEROCOPY will be enabled, but once transport will
->> be assigned, support of this type of transmission will be checked).
->>
->> To handle SO_ZEROCOPY, AF_VSOCK implementation uses SOCK_CUSTOM_SOCKOPT
->> bit, thus handling SOL_SOCKET option operations, but all of them except
->> SO_ZEROCOPY will be forwarded to the generic handler by calling
->> 'sock_setsockopt()'.
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> ---
->>  Changelog:
->>  v4 -> v5:
->>   * This patch is totally reworked. Previous version added check for
->>     PF_VSOCK directly to 'net/core/sock.c', thus allowing to set
->>     SO_ZEROCOPY for AF_VSOCK type of socket. This new version catches
->>     attempt to set SO_ZEROCOPY in 'af_vsock.c'. All other options
->>     except SO_ZEROCOPY are forwarded to generic handler. Only this
->>     option is processed in 'af_vsock.c'. Handling this option includes
->>     access to transport to check that MSG_ZEROCOPY transmission is
->>     supported by the current transport (if it is set, if not - transport
->>     will be checked during 'connect()').
->>
->>  net/vmw_vsock/af_vsock.c | 44 ++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 42 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index da22ae0ef477..8acc77981d01 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -1406,8 +1406,18 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>  			goto out;
->>  		}
->>  
->> -		if (vsock_msgzerocopy_allow(transport))
->> +		if (!vsock_msgzerocopy_allow(transport)) {
->> +			/* If this option was set before 'connect()',
->> +			 * when transport was unknown, check that this
->> +			 * feature is supported here.
->> +			 */
->> +			if (sock_flag(sk, SOCK_ZEROCOPY)) {
->> +				err = -EOPNOTSUPP;
->> +				goto out;
->> +			}
->> +		} else {
->>  			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
->> +		}
->>  
->>  		err = vsock_auto_bind(vsk);
->>  		if (err)
->> @@ -1643,7 +1653,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
->>  	const struct vsock_transport *transport;
->>  	u64 val;
->>  
->> -	if (level != AF_VSOCK)
->> +	if (level != AF_VSOCK && level != SOL_SOCKET)
->>  		return -ENOPROTOOPT;
->>  
->>  #define COPY_IN(_v)                                       \
->> @@ -1666,6 +1676,34 @@ static int vsock_connectible_setsockopt(struct socket *sock,
->>  
->>  	transport = vsk->transport;
->>  
->> +	if (level == SOL_SOCKET) {
->> +		if (optname == SO_ZEROCOPY) {
->> +			int zc_val;
->> +
->> +			/* Use 'int' type here, because variable to
->> +			 * set this option usually has this type.
->> +			 */
->> +			COPY_IN(zc_val);
->> +
->> +			if (zc_val < 0 || zc_val > 1) {
->> +				err = -EINVAL;
->> +				goto exit;
->> +			}
->> +
->> +			if (transport && !vsock_msgzerocopy_allow(transport)) {
->> +				err = -EOPNOTSUPP;
->> +				goto exit;
->> +			}
->> +
->> +			sock_valbool_flag(sk, SOCK_ZEROCOPY,
->> +					  zc_val ? true : false);
->> +			goto exit;
->> +		}
->> +
->> +		release_sock(sk);
->> +		return sock_setsockopt(sock, level, optname, optval, optlen);
->> +	}
->> +
->>  	switch (optname) {
->>  	case SO_VM_SOCKETS_BUFFER_SIZE:
->>  		COPY_IN(val);
->> @@ -2321,6 +2359,8 @@ static int vsock_create(struct net *net, struct socket *sock,
->>  		}
->>  	}
->>  
->> +	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
->> +
-> 
-> I found that because datagrams have !ops->setsockopt this bit causes
-> setsockopt() to fail (the related logic can be found in
-> __sys_setsockopt). Maybe we should only set this for connectibles?
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_debugfs.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_debugfs.c
+index 75e83ea2a..37bff3304 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_debugfs.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_debugfs.c
+@@ -559,7 +559,7 @@ static int mvpp2_dbgfs_prs_entry_init(struct dentry *parent,
+ 			    &mvpp2_dbgfs_prs_hits_fops);
+ 
+ 	debugfs_create_file("pmap", 0444, prs_entry_dir, entry,
+-			     &mvpp2_dbgfs_prs_pmap_fops);
++			    &mvpp2_dbgfs_prs_pmap_fops);
+ 
+ 	return 0;
+ }
+@@ -593,7 +593,7 @@ static int mvpp2_dbgfs_c2_entry_init(struct dentry *parent,
+ 	sprintf(c2_entry_name, "%03d", id);
+ 
+ 	c2_entry_dir = debugfs_create_dir(c2_entry_name, parent);
+-	if (!c2_entry_dir)
++	if (IS_ERR(c2_entry_dir))
+ 		return -ENOMEM;
+ 
+ 	entry = &priv->dbgfs_entries->c2_entries[id];
+@@ -626,7 +626,7 @@ static int mvpp2_dbgfs_flow_tbl_entry_init(struct dentry *parent,
+ 	sprintf(flow_tbl_entry_name, "%03d", id);
+ 
+ 	flow_tbl_entry_dir = debugfs_create_dir(flow_tbl_entry_name, parent);
+-	if (!flow_tbl_entry_dir)
++	if (IS_ERR(flow_tbl_entry_dir))
+ 		return -ENOMEM;
+ 
+ 	entry = &priv->dbgfs_entries->flt_entries[id];
+@@ -646,11 +646,11 @@ static int mvpp2_dbgfs_cls_init(struct dentry *parent, struct mvpp2 *priv)
+ 	int i, ret;
+ 
+ 	cls_dir = debugfs_create_dir("classifier", parent);
+-	if (!cls_dir)
++	if (IS_ERR(cls_dir))
+ 		return -ENOMEM;
+ 
+ 	c2_dir = debugfs_create_dir("c2", cls_dir);
+-	if (!c2_dir)
++	if (IS_ERR(c2_dir))
+ 		return -ENOMEM;
+ 
+ 	for (i = 0; i < MVPP22_CLS_C2_N_ENTRIES; i++) {
+@@ -660,7 +660,7 @@ static int mvpp2_dbgfs_cls_init(struct dentry *parent, struct mvpp2 *priv)
+ 	}
+ 
+ 	flow_tbl_dir = debugfs_create_dir("flow_table", cls_dir);
+-	if (!flow_tbl_dir)
++	if (IS_ERR(flow_tbl_dir))
+ 		return -ENOMEM;
+ 
+ 	for (i = 0; i < MVPP2_CLS_FLOWS_TBL_SIZE; i++) {
+-- 
+2.39.0
 
-Agree! I'll add this check in the next version
-
-Thanks, Arseniy
-
-> 
-> Best,
-> Bobby
-> 
->>  	vsock_insert_unbound(vsk);
->>  
->>  	return 0;
->> -- 
->> 2.25.1
->>
 
