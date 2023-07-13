@@ -1,158 +1,143 @@
-Return-Path: <netdev+bounces-17512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71EDB751D95
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:42:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944FB751D9E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B8B9281CBC
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:42:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D68D1C2130E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12807100DA;
-	Thu, 13 Jul 2023 09:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F399100DB;
+	Thu, 13 Jul 2023 09:44:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0327B100D6
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:42:45 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1680330E2
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:42:18 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-992b66e5affso79715166b.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:42:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14359100C7
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:44:24 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43C62127
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:44:22 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so3799617a12.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:44:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689241334; x=1691833334;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PKiW2pF15hMHCaDxQaIgbd1AvnmLAavLr0qvJQpEsic=;
-        b=g7tQfQuZFH7I4trabZSATPW2027Fd+86PAdU0VFIufgdgo0EV+4Z6qpfCtMZE4lesj
-         s23DZIeifJv9auCmJKgljmPxGR+eTiplBDHnPLbAolQ+gOWYyaX6rtBrXauRG7moP5Ja
-         Q26Qz6IXoBJXAEf80/ZWkt9rKv5f5d3h0yjc2h3Gbjqd4mr5XgLzxYoG+TUv1xHsDmeo
-         dhE1IizRiY1ldq7znEzbkjIAuOZxUF5G0dg40iAj2ZHEL+Mi0fdvg6M63ccJnXaD/z/U
-         3lUph/ze8UIBF18KOTkmaObVuNokhXOLz/s5HZFlOB6ISjufrtN1x6AlwFZ2Pl6VpjTF
-         W52w==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689241461; x=1691833461;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/WF01g77rvTakuBVRU1mzsD6krXsErLBlaQLu2CdouQ=;
+        b=lVqrsFtQCTffxF7Ro9t9SoMEiAtDHF3LAaoD+XX2N81+pI5nnCEJqowa/QJmM+iJCn
+         O7ADQgMqtp49EOnJoS0PA0hMFbeuVhnr8178mEntc0IpJBfxIot22Axo7fw9Ti9VMs/7
+         mhpcSTNiLSc9Vd1CzWZsXLwJVMFprgoFKJVE8i35EChMqr8r4Eg8MIYfOOi7VzQJjqt7
+         wIH7LZnTc59rrNig0v0cUOr93lGz0DejO601UmnqjoANazfp6q+uFZxjiF0WjDUHn1yK
+         ODRx4F3IqhnMq1oZRxqd1k7JX28xNnAJolVmVHvriewlhaKebWyx85Kp9nxUgDvK+rYF
+         2fcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689241334; x=1691833334;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PKiW2pF15hMHCaDxQaIgbd1AvnmLAavLr0qvJQpEsic=;
-        b=CJw5/SsfqU+PzjQkiHcJQ0GSdh6JMOMUTZMP0GSodCqGHQoYIFTBFoLg9J8ZEIwheh
-         ngW4sP3ZFlTnc1n8JMOLwLwsZhURMGgGpF6Ixyh5kHSw08yCTqaqYgYYfAGQXrILvVWD
-         CP9Uc6/ZYcJw5Y/ST6d4HiMEBcjgfk83hu7i1qed4orcYDTHW+GsXnkaeJFOPpksQVs7
-         jjVT2P4c061uWSFdWRasIgV50ZIAOkrx7h5VyzNSPr+EAnUIYN19DCV11aQPD/bTJflt
-         sxoFKH3pYwm0XL981BzTK3Fb5hbGKvkM4gEAx7c1mghYFKrJrzksx3LqNfMCTCUJVNX5
-         9B3Q==
-X-Gm-Message-State: ABy/qLZWYuq+Aik75Ju5I3ge40MVOn3XsiIJRl/zlRsRqeq6/y4RO/LT
-	WGBoYkINVibFZanDabbu6LQ=
-X-Google-Smtp-Source: APBJJlEX2iQausZX29mW/C9QDnafU3HDQk8ZHQlPHekWVnjs+5x+vQt4KzeF0/+K7mC4cbTQyhz3LQ==
-X-Received: by 2002:a17:906:2091:b0:987:6372:c31f with SMTP id 17-20020a170906209100b009876372c31fmr978510ejq.37.1689241333969;
-        Thu, 13 Jul 2023 02:42:13 -0700 (PDT)
-Received: from eichest-laptop ([2a02:168:af72:0:9d33:114d:9337:5e4d])
-        by smtp.gmail.com with ESMTPSA id p11-20020a170906140b00b0099297782aa9sm3694996ejc.49.2023.07.13.02.42.13
+        d=1e100.net; s=20221208; t=1689241461; x=1691833461;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/WF01g77rvTakuBVRU1mzsD6krXsErLBlaQLu2CdouQ=;
+        b=P63PJVieu2iWcOzFs6EjjUr5pFvdesOBIDv6IEl5wOemyfwKpu/Qja8yoeNsCNdT7K
+         whSka2ojg5vZ/AgyqqiE956ATqcLDkPBDS/43YMoKVeLmo+ENubJafK+JGRwQfIRPx8h
+         xgvQ+g5g7cK9YV4YPNvMm8mZnd3yEvW2FAdxTcntGU5KlfvsF0ZXhO3Pg8C1V4qFjfCo
+         BjoMZ/2FKm3x1pR2rkwiuz0cY6plsy4dWmnXAIII6hCs49JX5NCEAdUAAKd5NrbAP3VZ
+         OXTqt8UPSHwWrk5HI38USm8dgCwP9Dllfwa2d3sC6qQMl/vdBVHWN+/yeCHera8yEVUN
+         kDaQ==
+X-Gm-Message-State: ABy/qLZqUElSbRSJ+IHx81EMTVbw7N7pAKLVbjT6RaHCG+KVrfp6KbYP
+	wc4sCX0tbeXjM6PFt2sBItcWvQhM1Y954pS5RF8=
+X-Google-Smtp-Source: APBJJlEcvUThalS8/XrPjIHcGnTl0DaUMbnWs4yu6/ULHVnqJmmH8GtdJwK4iK7xvCcGiiSdvamfRQ==
+X-Received: by 2002:a05:6402:35cd:b0:51e:5206:d69e with SMTP id z13-20020a05640235cd00b0051e5206d69emr5622445edc.10.1689241461034;
+        Thu, 13 Jul 2023 02:44:21 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id w22-20020a056402071600b0051de3c6c5e5sm3985451edx.94.2023.07.13.02.44.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 02:42:13 -0700 (PDT)
-Date: Thu, 13 Jul 2023 11:42:12 +0200
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	francesco.dolcini@toradex.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 4/4] net: phy: marvell-88q2xxx: add driver
- for the Marvell 88Q2110 PHY
-Message-ID: <ZK/G9FMPSabQCGNk@eichest-laptop>
-References: <20230710205900.52894-1-eichest@gmail.com>
- <20230710205900.52894-5-eichest@gmail.com>
- <2de0a6e1-0946-4d4f-8e57-1406a437b94e@lunn.ch>
+        Thu, 13 Jul 2023 02:44:20 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	moshe@nvidia.com,
+	idosch@nvidia.com
+Subject: [patch net-next v2] devlink: remove reload failed checks in params get/set callbacks
+Date: Thu, 13 Jul 2023 11:44:19 +0200
+Message-Id: <20230713094419.2534581-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2de0a6e1-0946-4d4f-8e57-1406a437b94e@lunn.ch>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andrew,
+From: Jiri Pirko <jiri@nvidia.com>
 
-Thanks a lot for the review and all the hints, I have one short question
-below.
+The checks in question were introduced by:
+commit 6b4db2e528f6 ("devlink: Fix use-after-free after a failed reload").
+That fixed an issue of reload with mlxsw driver.
 
-> > +static int mv88q2xxx_read_link(struct phy_device *phydev)
-> > +{
-> > +	u16 ret1, ret2;
-> > +
-> > +	/* The 88Q2XXX PHYs do not have the PMA/PMD status register available,
-> > +	 * therefore we need to read the link status from the vendor specific
-> > +	 * registers.
-> > +	 */
-> > +	if (phydev->speed == SPEED_1000) {
-> > +		/* Read twice to clear the latched status */
-> > +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
-> > +		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
-> 
-> This is generally wrong. See for example genphy_update_link() and
-> genphy_c45_read_link().
-> 
+Back then, that was a valid fix, because there was a limitation
+in place that prevented drivers from registering/unregistering params
+when devlink instance was registered.
 
-Would something like this look fine to you? The issue is that I mix
-realtime data with latched data because the local and remote rx status
-is only available in realtime from what I can find in the datasheet.
-This would be for gbit, I split that up compared to the last version:
+It was possible to do the fix differently by changing drivers to
+register/unregister params in appropriate places making sure the ops
+operate only on memory which is allocated and initialized. But that,
+as a dependency, would require to remove the limitation mentioned above.
 
-static int mv88q2xxx_read_link_gbit(struct phy_device *phydev)
-{
-	int ret1, ret2;
+Eventually, this limitation was lifted by:
+commit 1d18bb1a4ddd ("devlink: allow registering parameters after the instance")
 
-	/* The link state is latched low so that momentary link drops can be
-	 * detected. Do not double-read the status in polling mode to detect
-	 * such short link drops except the link was already down. In case we
-	 * are not polling, we always read the realtime status.
-	 */
-	if (!phy_polling_mode(phydev) || !phydev->link) {
-		ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
-		if (ret1 < 0)
-			return ret1;
-	}
+Also, the alternative fix (which also fixed another issue) was done by:
+commit 74cbc3c03c82 ("mlxsw: spectrum_acl_tcam: Move devlink param to TCAM code").
 
-	ret1 = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
-	if (ret1 < 0)
-		return ret1;
+Therefore, the checks are no longer relevant. Each driver should make
+sure to have the params registered only when the memory the ops
+are working with is allocated and initialized.
 
-	/* Read vendor specific Auto-Negotiation status register to get local
-	 * and remote receiver status according to software initialization
-	 * guide.
-	 */
-	ret2 = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STATUS);
-	if (ret2 < 0)
-		return ret2;
+So remove the checks.
 
-	/* Check if we have link and if the remote and local receiver are ok */
-	return (ret1 & MDIO_PCS_1000BT1_STAT_LINK) &&
-	       (ret2 & MDIO_MMD_AN_MV_STATUS_LOCAL_RX) &&
-	       (ret2 & MDIO_MMD_AN_MV_STATUS_REMOTE_RX);
-}
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+v1->v2:
+- rephrased some bits of the patch description
+---
+ net/devlink/leftover.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-With this we will detect link loss in polling mode and read the realtime
-status in non-polling mode. Compared to genphy_c45_read_link we will not
-immediately return "link up" in non polling mode but always do the
-second read to get the realtime link status.
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index 1f00f874471f..5128b9c7eea8 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -3946,7 +3946,7 @@ static int devlink_param_get(struct devlink *devlink,
+ 			     const struct devlink_param *param,
+ 			     struct devlink_param_gset_ctx *ctx)
+ {
+-	if (!param->get || devlink->reload_failed)
++	if (!param->get)
+ 		return -EOPNOTSUPP;
+ 	return param->get(devlink, param->id, ctx);
+ }
+@@ -3955,7 +3955,7 @@ static int devlink_param_set(struct devlink *devlink,
+ 			     const struct devlink_param *param,
+ 			     struct devlink_param_gset_ctx *ctx)
+ {
+-	if (!param->set || devlink->reload_failed)
++	if (!param->set)
+ 		return -EOPNOTSUPP;
+ 	return param->set(devlink, param->id, ctx);
+ }
+-- 
+2.39.2
 
-If we are only interested in the link status we could also skip the
-remote and local receiver check. However, as I understand the software
-initialization guide it could be that the receivers are not ready in
-that moment.
-
-Regards,
-Stefan
 
