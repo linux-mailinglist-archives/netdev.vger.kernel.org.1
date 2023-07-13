@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-17575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F0875212A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:21:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ACA875212B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:22:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38BEC281D8E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:21:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E6831C21371
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 12:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC68182BD;
-	Thu, 13 Jul 2023 12:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E68814AA7;
+	Thu, 13 Jul 2023 12:20:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D79B18AE5
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:19:55 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2073.outbound.protection.outlook.com [40.107.104.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 139A7272A;
-	Thu, 13 Jul 2023 05:19:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F006318AE5
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:19:59 +0000 (UTC)
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2089.outbound.protection.outlook.com [40.107.104.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AA62D49;
+	Thu, 13 Jul 2023 05:19:54 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fHKMIsxVFuWv+u1FlgV36epDugR5lm2g1g81ryFSnms7RRtxedATJbony0keivdRthk2RxaZbm6CctG3ZXb/kKpYxSswxsJdNs6HZ6PFDJu8U6CWc/O7z8prJ9ruiYa0n9EbkzI/3PBPjzLmE8dod1lwTQmLsPvp1p0tFG2RWCEksB8mqKhsQ63RyNM1G/Pw+SWstXOc62TDbZD2icCA78iyiCSzf/3NAal+bvsG0rnhott9rWjBLB8d3bXjvRVcKcUMnvcdDTIpV59jBcNLFSYdejWBZVvwWwAaW7NIb1v74zV2Ns3qsC64ara4klXBKZPwJ4o3948q8/WRp10o8w==
+ b=Z60wVrX3qFpvvnFsymNPA8f2rXxXQnqmCVR4ZCYNIAjRJie/p1iAl1x2LP8JHo2BrNVBX2AqDJ2036P5WCcAfEH0OdeZtY5MSuAiAnd3Qn2cFwRWkKS/JrMhWTmx6+VJdKyxi/rf5E9qtwWsjl/5YtDiIFjXRxQjcP2qjI+9bX18yUBdfndP2dberZsUgKeEA4jeCb0xWx6aipJEg2JUaZsoEQ0/ni39zydyrK2jX/0OPCkMx1DbKho2+1iAjj9yFBKBALOlB2VOkne8D0IEfXpsHNdvNqAPr877Bfa0zptI+oX+8v9OI40NCBzJds7VGXY9Vmjnd2dPBagf4rj1uQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tAt9jn4u8b6uI1uKhfP0bkrH/svMOBmv1bRyEkomSGo=;
- b=hOeO0I5RhRVynyO4NeMUPhTF1HzXP2MYac6//8hH1ZR/VlBXPOhrlbBrLZgcg9j7VEhxJJen67iV3JVMAsjnwV3rzfQYuqh9E6vtedu7RNO4ZSHzOPMWq5E6logons/HxaIqmz+m7KlkLJCwHMw4fElExAffp7KGpIo/CcpO7wA187mqfkLy2Q8cHHyII2Nxb60DZzT9Frag8T0NQiQMlsvNQILu68B/z4KshWElCcvxpciqhnVWsGVLmwIStOjmJSEKTEHK3XDSY2sr7XuS4xaFySygNJSx7/fBFyqlia3YW8SUmUoxWj8pw6wgLRCFHB+n7/nNgy1CM4iMrrpL6A==
+ bh=vZN3LC1u84wbWSCmba9zZEM9FLZr7JSy2wnRUwg4LxQ=;
+ b=hDE0eyEfquQHFN0K4dJTKpO0XdYY5KL6OEbIZli8sF8aya/8MWxU3CERB7DnKrhyDVkydImPpbUwe3w0onCnmw2tKoNFH+L0SvpW8enE3HzlrEPHwfG+XzXkwNwc9QiK8ERKhQ5T+nqk4tM6xqmEgIuBvLHdA9R2wQkX4tvYPUAogfeyd3DQ/Z6KhN1fKAV8R2aariNH/h2ejcKwtfOQUi7hTQpweuHrLLBJVeF3vJhY1km9YY0/7ZAE2XjxocnZVOs9tRu3fsZ2OIdqS7YJPrDaBUJHHU4d3LfuQJLMF+QpQhpty2d/ERHC5O3hJ/UV4SlqZjX6XyBquJXs8guvmg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tAt9jn4u8b6uI1uKhfP0bkrH/svMOBmv1bRyEkomSGo=;
- b=aCjoZoWxhU9uuzvntqi0Zox1q60nbKEr9Xn7LJnKTzrLk0DrI16H6U+xukh2edaZJNCzVvZZgv6+sorWQBdRICH7cbp980FHLgpES7tukETp57BVBEjMZxYgU4DI113zqyfO1tXsehMFcozSSNrUTdKyvpiMImCaOBt9PTP2Aq0=
+ bh=vZN3LC1u84wbWSCmba9zZEM9FLZr7JSy2wnRUwg4LxQ=;
+ b=rU8wCBTxhHxI9Pb0ei+GXi7gqKjud8uvUr5zLZ1QgXJrPO0qw7b5dOVLq9dEzlHCNaHwp0ALR4dU3Dml69ubMKKnEyi77FHzwZde54LQXYmspuz+9P9zc52NVrk6TLOERXxNPy1gtAdHpXpRqyOZjIoRAXDgJEIZAJKxZPN/Y0M=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
  by DBBPR04MB8010.eurprd04.prod.outlook.com (2603:10a6:10:1f1::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.20; Thu, 13 Jul
- 2023 12:19:40 +0000
+ 2023 12:19:41 +0000
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::cc2a:5d80:9dbd:d850]) by AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::cc2a:5d80:9dbd:d850%7]) with mapi id 15.20.6588.017; Thu, 13 Jul 2023
- 12:19:40 +0000
+ 12:19:41 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -80,9 +80,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Sergey Organov <sorganov@gmail.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 net-next 06/10] net: fec: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
-Date: Thu, 13 Jul 2023 15:19:03 +0300
-Message-Id: <20230713121907.3249291-7-vladimir.oltean@nxp.com>
+Subject: [PATCH v7 net-next 07/10] net: fec: delete fec_ptp_disable_hwts()
+Date: Thu, 13 Jul 2023 15:19:04 +0300
+Message-Id: <20230713121907.3249291-8-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
 References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
@@ -99,54 +99,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB8010:EE_
-X-MS-Office365-Filtering-Correlation-Id: 30727cc3-e684-4c56-60a3-08db839b6e80
+X-MS-Office365-Filtering-Correlation-Id: 5aa13af7-6970-4802-a018-08db839b6f86
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	/2+wSp5p/SiA7e8bky5EVt3yXTcFmzagHgHSJpZtX2Y7iZrz9J9/4wezXlXuW5zI91vo0u2wsQVtv95JVuds7po2LFDApbX4MbCDN8tA6Ii5gZ0mu3Sqx0iyJ1GuVaG+0WlMVOy6hKYJ07PHgb78hdLBMpvV/Lp+sG8Yyusq+pslxioaAQPieouFhwRsF78HSPtS1ghMhxwGP29Y/djuFJYM3MYyDRw7fqROQUdMBhflcMbMiJ9pMlvmg15ikishOiNoksmZmeAwxpep+vTahTaEEAXDc61SHLe6V+rEuxubwG+157SjySJltdUs55+YuV0YWfCI08LqazedsBtlhOrD7gtbadwCviPVNapueYxSVL0gCgNk22gVVtGOIYKSTqWDcEM+eN9YPvSBxpq3sK4tqIyc6CiVO5JhwHeW66UJlGHoAjS/aIBlpRSyaOyOCs6vgKZDzSGa8+kMFuAzAUp7QuC2x23k8QaH9NJ/8XSUoSf7WMt+3XuwJZEuUvAVCBIOyP7FK5GvzzVXZUXxL1nfOAs1BZHS/7Z7tkFnEFu9lXXyye9mxAyx697XGJPUySw5EwqtDEcuuXrYf1XGINzAY9jLbAciY5KvXrNDNuTv173/XR5FuGbBZ1Tq+qtp
+	S7uUtpWorxFa8hby1Y9VsDSlsvoiqWIH98vRX8FLyhyBDHOmrWLDpCMZt+l54D/n339ZmdFFWAJh6Zeyh6WcLGjFIqVnkMtT+wh8KeaUugaHeFkPTjoNJR2TfWa9eD9wpqAeWbO6iSVO958jSocYH9nu7+kC8q/6wBVC/Z2/uhzbpVzmV093gZxWVKK0it7shNTGv80+cBrIbT9SbV1J6E+wSqVpO7sT/wWelH8FZ3o2wyxEPelvIFanxqOza6cKoWPENW9Sy+l5B88nS3zu5q3+v020ggZXVpMYyRBevSV3aH2YgO8XY2+udv8vpJpAlEocy/mMeSk8QEAzulEQr/HSZ6vJKf4l8UiEqMry657oiDqsLvQCx/wEL+deIevVoilxIGDOa+KDImFTqKsB2auoj+Tj2462VgZ3Mht9HdRUZoI+GiggIL3l462FO50anwrwj0mdhyrmMyG3cw998fuGZP9LP92J8xjJOTuj4SS7AmhsjUQD9FyWZCTcgv/6AXUFcp/0ZuJzNDZENAvhrKJ01zSUN8CtmDDdXOJ2Hxoraxi+RQzCKLIKSRKSHYewafB+yvL9qdrsicsHLrg+D/iqaA50Y33HoxTVOsHTCM82XWI5kuu/YgO+Z234vqMH
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(39860400002)(376002)(396003)(451199021)(6512007)(6916009)(4326008)(66556008)(66946007)(66476007)(38350700002)(38100700002)(86362001)(186003)(1076003)(26005)(6506007)(2616005)(83380400001)(52116002)(36756003)(478600001)(54906003)(41300700001)(5660300002)(8676002)(8936002)(44832011)(6486002)(6666004)(316002)(2906002)(7416002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?OtMPoGsiJyQgNRQsSonMqcpmujqFUBVc+X2Tg5rlLK3jQYtWQYmgdIgS3XAx?=
- =?us-ascii?Q?+wU+4w8gMr2XQj5ki+2aZRvn1Q+Gt8bHT1AYGtT2/Py5KV074Vjvl6+a8k6T?=
- =?us-ascii?Q?riVKJrbJsqkKUEHRC+WUz3VvFbt0nLyeiMo0qt0n80Q8NSmj+ZT10gMkQ2f+?=
- =?us-ascii?Q?jNhTlb9RNPE+bhMJ2w5DlcpDwRQONEKs7lqAeFR1skCYMikqyC6uKmdsxERa?=
- =?us-ascii?Q?WAAobLzFrXmqRjUkAL1R0VLu3q4NrwBLm1BbLY1rhI1fnq6uKkEuMAjibuQm?=
- =?us-ascii?Q?kWukDJ7O1gQENJTKydAGYXzNOaBLFKLrxqv4pxH8Tkq7lMdpB3geqp4WEtaM?=
- =?us-ascii?Q?a72d1i/+S17ESnyAcHKMmjpFljki81duCmO2mKsaa7P5Dwxdv4roXf1QRJrQ?=
- =?us-ascii?Q?k2azAgv+twCtfF5pfvB2R6prBp4EVAUsp5FI7btJ+y1SrMdvUuTUwt3rzz/f?=
- =?us-ascii?Q?wheyJS0czAmg+anyLlg1rq5wnJ91l8t7eORPdo0ibTWHawdWF5DHBfpTPUUM?=
- =?us-ascii?Q?G7DYQ9EALf+G/ctZtlCPGApj5F++rIxC4cF4dua8Daw7rpEOS8mlqSbGodX/?=
- =?us-ascii?Q?J5vMDuFJ0ijHMtHNZrfKdmrYwmsgoctO1wAYpLe84/uONMacu5OnRQwFVRyp?=
- =?us-ascii?Q?L9QwFnznfVj3ed1Hpihhgj77uCeCEmlf3ov0zInDCQk5bcOGZHmZqtHpKTmO?=
- =?us-ascii?Q?YWho2TY4bUSYiSzIOvBM8mbg+iTIyfTPbVxA02YVIvMPatWixBzIn5Om645E?=
- =?us-ascii?Q?mjgoei3Nykc40Xjh4vi0WVVR4i81x5ju53BuWzwCulbnBNM15AdMYdUlHCxs?=
- =?us-ascii?Q?3GJhSarvzvOXrGXBWLdMdDc5c8SAjz7tbSJJvs4yjafHWciY/36n5P2Wb1E0?=
- =?us-ascii?Q?eyoy049G8uPVsYu2YthsxVhnM3bwzdlc4HM759JdZfaUy1OYVWMsbiaBZyEc?=
- =?us-ascii?Q?CBn9rJClAiHFIIRWp/n5kDYCoWnhoKLwl2utrPR2GVgKd0HxDqdPLegXF0AA?=
- =?us-ascii?Q?0XbmJSde33DMTD3l7Ijywa3OJYKOx0Elr4FlkN2RO/Bj0Ynuu1GY51m4SOo5?=
- =?us-ascii?Q?UMhbWr+ij0tD9QNhADeV7Y9cT+RWCslBUv8KGpKH3RtxfUO9nHigCD/zquEF?=
- =?us-ascii?Q?trG1Uh+YefnDmusHkm2wOZXSQ7WCKBQaul03KqO/X39UUV7heRV5pT5xxK5c?=
- =?us-ascii?Q?7rrib/r+PfvyJi0AbCY/JmM1GDz+89r9H+Z4CGBPxA/9zATKq9+4pLZD0vK4?=
- =?us-ascii?Q?C06Ox1H8UVG0yn7wKd6l5eFRmIREQDm3/Fnk3UZRDBhqSEH1ny31GOFpBQS0?=
- =?us-ascii?Q?rgz1vMRAOdus/+Fjk4q1Mq7LgxpmoGrNtD+aWjIU9o4qdDqh9waggAnyRhKT?=
- =?us-ascii?Q?gOrZI1wqLvzM8QiS3bl9cwrwCpR3gjBCZXc+32qfMEjO+lslwRsGFFRRF3TK?=
- =?us-ascii?Q?tOBOHrIaWfnNjip8o7fm/zJAU0BMZoBZJ8VBWRZLhDTnTt5MUyIqQveo9U94?=
- =?us-ascii?Q?pIVtt45t2rM5bZm/GqcnkJ499a1+tBjgdFDBWzvrUkIILgpmyXRk2+sdtBfE?=
- =?us-ascii?Q?aMTT5VsX4GLhzjGpezx/mQUlIbuBiNJi7+VaCSTNnEwPlhxPFxs6/7QpNVWo?=
- =?us-ascii?Q?ZQ=3D=3D?=
+	=?us-ascii?Q?F5JjBa29qsf58ncpZe/tDQqwh8pnYYjItFE+RNXqy2Ha/DMLQNHF7gAPa2R+?=
+ =?us-ascii?Q?JzoInO1vONNvcUTfSOSL73uYFo+wX2GF/f9lNc2U72Na8kqGjD7WCAd5AzA/?=
+ =?us-ascii?Q?T3rMmRresUrw1GwDwR32MYcPapJa4AQX/4+HgV3ZE2wqD5G1D5NY92ZUy2Od?=
+ =?us-ascii?Q?bQkK72OdRhKLsZcjFl2zP8JqJuDsO3Iyjsli5pr13s/D67UTIqi+qZTEmOBj?=
+ =?us-ascii?Q?LC3ePvXu1k+PrFBnBf3S7bZF+IjcsdLdOMBKWPyGwRdCzut91m8ZYzZS4JkY?=
+ =?us-ascii?Q?7NDma2sSogPGr2PqWg41MTz1bPK1aHQTVTNZHT5n3KTzVct+umu+roPNA6jW?=
+ =?us-ascii?Q?ZWR7tofcic3BQ+tJ/ReVTi2dXPBnhKilM3x+aBRq00Hk8Zj7gH24p0cdb/Cy?=
+ =?us-ascii?Q?TbVrPsDEv2QpuNSgH71rDzNoL36sCU1A3/TMDkG9r+3Ur7O8JLQ3mF7sVN+E?=
+ =?us-ascii?Q?AI7g99LIr9rkyv3QNE45UToEdIHc67kz3in2OzqnZhr7LDLwha0xLd/9QBYu?=
+ =?us-ascii?Q?Y5dLqh9itYvqpnR8dNvBynHoVtgp5e4oluSEY9bbhDr2aVQ5mr+48zkroY++?=
+ =?us-ascii?Q?wX0e1iJ09HduPPWjNl8nGuRgc4sJcW9hFqldMpdHnV/Jua7xgF0NEppTWd3Y?=
+ =?us-ascii?Q?tBQgXR6fC2kktT4jqDCnBL5UpT6dAUgCIuXvmTVWI5cBBv7bb77bJeZwvJzK?=
+ =?us-ascii?Q?8eNR+BCQSjldWSdStt7sgl3cN7fCRJke+1MFT/GT1HAMEcnuxnJvEyVdgZf/?=
+ =?us-ascii?Q?gmSMSpV+5nEjRzVBoObCLqfmzw4PujaThHnuGdYQbL2EDZlisRpU86skplV3?=
+ =?us-ascii?Q?VaSTlpgI7R21S147zdt7YwqAhjD5Rg47EGJrQTtrH6D5bWLRHE1fCONmB89Z?=
+ =?us-ascii?Q?M15Yq8s+vnLw2bhdTmejDU6+3dxkVd8ssxIbWS32mO4Vl9Ah0VOeu9zy3lqm?=
+ =?us-ascii?Q?oK4/Dm2SXOMKzVIDjVm4KbdE17T9EdSIPIm/dU4PICrEKAmAAzB2Tn2uZO9V?=
+ =?us-ascii?Q?FwW3qzzUmbxBiVYJJrJ3ZfI1tOJQVwb4V3ez+9Ot+Y1Z3Ldhg6Fcwlx/VNcC?=
+ =?us-ascii?Q?rPgBaHVOiqGnyHPKAR/UJxfBBOIwUuCEEZsdFXypaCAcQY5yYgfWLjVh4BeA?=
+ =?us-ascii?Q?KrZQjOMVJArjGa0hA19X75J2MvMSBv0hbnplurbP0/R5ez1YF/gUKmu2cvLw?=
+ =?us-ascii?Q?cDM6+LtCAAQoiGJSMs8wUzreEwukWTqNXHsAPEbNSPd4yIc+VsG/ylbPkFgM?=
+ =?us-ascii?Q?sjMrK16HISt/UoWCbBf+GUg67KzLy53qY6uwos0yR+cHLSb0agf6omNqaSv7?=
+ =?us-ascii?Q?l1QtU4IWtiUc2JDZ+T0sinmpdv8dFYOwkgKFFd3EuH5jWF0q60fQ1iHtejPZ?=
+ =?us-ascii?Q?1dKqoucZUO9DD+RsFqsz+TzI5yweXgWwRrXOV0yArnerlvQg8g7KWfOvEksz?=
+ =?us-ascii?Q?UucQtP1kZIUq0UPmX/od8tauYAd/o6i2pyRXTGU46bg8HKGmTs+3X3m5YFcP?=
+ =?us-ascii?Q?0DdN1QYkRPW4QTAz9i3qAELvS7WR6Q2fRdop5/VtIQZe2bgrAI96x87JjJqH?=
+ =?us-ascii?Q?ZBECVL8/IsYTvatLQ4ezxisIp8l0H2XkVZIqQKob66Ndzga6ywUOH7bNktUi?=
+ =?us-ascii?Q?2A=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30727cc3-e684-4c56-60a3-08db839b6e80
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5aa13af7-6970-4802-a018-08db839b6f86
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 12:19:40.2151
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 12:19:41.8778
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rYUvwGL+e/loYarrmwALywTFUMMaD+Mqd0uHddnZNNLwOAhzm7V42zclADX/R5no5Fz+jQg6sQ3J2wkmsbngZw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZvTheOHjBPRlKT4zN0iv0xJbncTRtjBVQL+m0qolAYvylJ5t5ivHOsfuozLzuYrqo5Uo0ugXwDHpishDffO75g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB8010
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
@@ -155,185 +155,84 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The hardware timestamping through ndo_eth_ioctl() is going away.
-Convert the FEC driver to the new API before that can be removed.
+Commit 340746398b67 ("net: fec: fix hardware time stamping by external
+devices") was overly cautious with calling fec_ptp_disable_hwts() when
+cmd == SIOCSHWTSTAMP and use_fec_hwts == false, because use_fec_hwts is
+based on a runtime invariant (phy_has_hwtstamp()). Thus, if use_fec_hwts
+is false, then fep->hwts_tx_en and fep->hwts_rx_en cannot be changed at
+runtime; their values depend on the initial memory allocation, which
+already sets them to zeroes.
+
+If the core will ever gain support for switching timestamping layers,
+it will arrange for a more organized calling convention and disable
+timestamping in the previous layer as a first step. This means that the
+code in the FEC driver is not necessary in any case.
+
+The purpose of this change is to arrange the phy_has_hwtstamp() code in
+a way in which it can be refactored away into generic logic.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
 Changes in v7:
 - Patch is new
 
- drivers/net/ethernet/freescale/fec.h      |  5 ++-
- drivers/net/ethernet/freescale/fec_main.c | 52 +++++++++++++++++------
- drivers/net/ethernet/freescale/fec_ptp.c  | 31 +++++---------
- 3 files changed, 52 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/freescale/fec.h      |  1 -
+ drivers/net/ethernet/freescale/fec_main.c |  5 +----
+ drivers/net/ethernet/freescale/fec_ptp.c  | 12 ------------
+ 3 files changed, 1 insertion(+), 17 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-index 9939ccafb556..d4ae0e7c0a44 100644
+index d4ae0e7c0a44..e273129d44c9 100644
 --- a/drivers/net/ethernet/freescale/fec.h
 +++ b/drivers/net/ethernet/freescale/fec.h
-@@ -691,8 +691,9 @@ void fec_ptp_init(struct platform_device *pdev, int irq_idx);
+@@ -690,7 +690,6 @@ struct fec_enet_private {
+ void fec_ptp_init(struct platform_device *pdev, int irq_idx);
  void fec_ptp_stop(struct platform_device *pdev);
  void fec_ptp_start_cyclecounter(struct net_device *ndev);
- void fec_ptp_disable_hwts(struct net_device *ndev);
--int fec_ptp_set(struct net_device *ndev, struct ifreq *ifr);
--int fec_ptp_get(struct net_device *ndev, struct ifreq *ifr);
-+int fec_ptp_set(struct net_device *ndev, struct kernel_hwtstamp_config *config,
-+		struct netlink_ext_ack *extack);
-+void fec_ptp_get(struct net_device *ndev, struct kernel_hwtstamp_config *config);
- 
- /****************************************************************************/
- #endif /* FEC_H */
+-void fec_ptp_disable_hwts(struct net_device *ndev);
+ int fec_ptp_set(struct net_device *ndev, struct kernel_hwtstamp_config *config,
+ 		struct netlink_ext_ack *extack);
+ void fec_ptp_get(struct net_device *ndev, struct kernel_hwtstamp_config *config);
 diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 1280da699fa3..c0b68fc3ec8b 100644
+index c0b68fc3ec8b..08744e8164e3 100644
 --- a/drivers/net/ethernet/freescale/fec_main.c
 +++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -3196,7 +3196,6 @@ static const struct ethtool_ops fec_enet_ethtool_ops = {
- 
- static int fec_enet_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
- {
--	struct fec_enet_private *fep = netdev_priv(ndev);
+@@ -3878,11 +3878,8 @@ static int fec_hwtstamp_set(struct net_device *ndev,
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
  	struct phy_device *phydev = ndev->phydev;
  
- 	if (!netif_running(ndev))
-@@ -3205,19 +3204,6 @@ static int fec_enet_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
- 	if (!phydev)
- 		return -ENODEV;
- 
--	if (fep->bufdesc_ex) {
--		bool use_fec_hwts = !phy_has_hwtstamp(phydev);
+-	if (phy_has_hwtstamp(phydev)) {
+-		fec_ptp_disable_hwts(ndev);
 -
--		if (cmd == SIOCSHWTSTAMP) {
--			if (use_fec_hwts)
--				return fec_ptp_set(ndev, rq);
--			fec_ptp_disable_hwts(ndev);
--		} else if (cmd == SIOCGHWTSTAMP) {
--			if (use_fec_hwts)
--				return fec_ptp_get(ndev, rq);
--		}
--	}
--
- 	return phy_mii_ioctl(phydev, rq, cmd);
- }
- 
-@@ -3868,6 +3854,42 @@ static int fec_enet_xdp_xmit(struct net_device *dev,
- 	return sent_frames;
- }
- 
-+static int fec_hwtstamp_get(struct net_device *ndev,
-+			    struct kernel_hwtstamp_config *config)
-+{
-+	struct fec_enet_private *fep = netdev_priv(ndev);
-+	struct phy_device *phydev = ndev->phydev;
-+
 +	if (phy_has_hwtstamp(phydev))
-+		return phy_mii_ioctl(phydev, config->ifr, SIOCGHWTSTAMP);
-+
-+	if (!fep->bufdesc_ex)
-+		return -EOPNOTSUPP;
-+
-+	fec_ptp_get(ndev, config);
-+
-+	return 0;
-+}
-+
-+static int fec_hwtstamp_set(struct net_device *ndev,
-+			    struct kernel_hwtstamp_config *config,
-+			    struct netlink_ext_ack *extack)
-+{
-+	struct fec_enet_private *fep = netdev_priv(ndev);
-+	struct phy_device *phydev = ndev->phydev;
-+
-+	if (phy_has_hwtstamp(phydev)) {
-+		fec_ptp_disable_hwts(ndev);
-+
-+		return phy_mii_ioctl(phydev, config->ifr, SIOCSHWTSTAMP);
-+	}
-+
-+	if (!fep->bufdesc_ex)
-+		return -EOPNOTSUPP;
-+
-+	return fec_ptp_set(ndev, config, extack);
-+}
-+
- static const struct net_device_ops fec_netdev_ops = {
- 	.ndo_open		= fec_enet_open,
- 	.ndo_stop		= fec_enet_close,
-@@ -3884,6 +3906,8 @@ static const struct net_device_ops fec_netdev_ops = {
- 	.ndo_set_features	= fec_set_features,
- 	.ndo_bpf		= fec_enet_bpf,
- 	.ndo_xdp_xmit		= fec_enet_xdp_xmit,
-+	.ndo_hwtstamp_get	= fec_hwtstamp_get,
-+	.ndo_hwtstamp_set	= fec_hwtstamp_set,
- };
+ 		return phy_mii_ioctl(phydev, config->ifr, SIOCSHWTSTAMP);
+-	}
  
- static const unsigned short offset_des_active_rxq[] = {
+ 	if (!fep->bufdesc_ex)
+ 		return -EOPNOTSUPP;
 diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
-index ab86bb8562ef..3f53b8ae57dd 100644
+index 3f53b8ae57dd..55cf98557e02 100644
 --- a/drivers/net/ethernet/freescale/fec_ptp.c
 +++ b/drivers/net/ethernet/freescale/fec_ptp.c
-@@ -618,16 +618,12 @@ void fec_ptp_disable_hwts(struct net_device *ndev)
- 	fep->hwts_rx_en = 0;
- }
- 
--int fec_ptp_set(struct net_device *ndev, struct ifreq *ifr)
-+int fec_ptp_set(struct net_device *ndev, struct kernel_hwtstamp_config *config,
-+		struct netlink_ext_ack *extack)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 
--	struct hwtstamp_config config;
--
--	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
--		return -EFAULT;
--
--	switch (config.tx_type) {
-+	switch (config->tx_type) {
- 	case HWTSTAMP_TX_OFF:
- 		fep->hwts_tx_en = 0;
- 		break;
-@@ -638,33 +634,28 @@ int fec_ptp_set(struct net_device *ndev, struct ifreq *ifr)
- 		return -ERANGE;
+@@ -606,18 +606,6 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
  	}
- 
--	switch (config.rx_filter) {
-+	switch (config->rx_filter) {
- 	case HWTSTAMP_FILTER_NONE:
- 		fep->hwts_rx_en = 0;
- 		break;
- 
- 	default:
- 		fep->hwts_rx_en = 1;
--		config.rx_filter = HWTSTAMP_FILTER_ALL;
-+		config->rx_filter = HWTSTAMP_FILTER_ALL;
- 		break;
- 	}
- 
--	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
--	    -EFAULT : 0;
-+	return 0;
  }
  
--int fec_ptp_get(struct net_device *ndev, struct ifreq *ifr)
-+void fec_ptp_get(struct net_device *ndev, struct kernel_hwtstamp_config *config)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct hwtstamp_config config;
+-/**
+- * fec_ptp_disable_hwts - disable hardware time stamping
+- * @ndev: pointer to net_device
+- */
+-void fec_ptp_disable_hwts(struct net_device *ndev)
+-{
+-	struct fec_enet_private *fep = netdev_priv(ndev);
 -
--	config.flags = 0;
--	config.tx_type = fep->hwts_tx_en ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
--	config.rx_filter = (fep->hwts_rx_en ?
--			    HWTSTAMP_FILTER_ALL : HWTSTAMP_FILTER_NONE);
- 
--	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
--		-EFAULT : 0;
-+	config->flags = 0;
-+	config->tx_type = fep->hwts_tx_en ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
-+	config->rx_filter = (fep->hwts_rx_en ?
-+			     HWTSTAMP_FILTER_ALL : HWTSTAMP_FILTER_NONE);
- }
- 
- /*
+-	fep->hwts_tx_en = 0;
+-	fep->hwts_rx_en = 0;
+-}
+-
+ int fec_ptp_set(struct net_device *ndev, struct kernel_hwtstamp_config *config,
+ 		struct netlink_ext_ack *extack)
+ {
 -- 
 2.34.1
 
