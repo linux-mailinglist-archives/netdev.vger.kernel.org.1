@@ -1,165 +1,195 @@
-Return-Path: <netdev+bounces-17692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C869752B47
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:59:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D99752B8E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 22:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21545281F06
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 19:59:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AD73281E93
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 20:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130D1200B9;
-	Thu, 13 Jul 2023 19:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FED1200C4;
+	Thu, 13 Jul 2023 20:21:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4D1ED53
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:59:11 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17362D4B
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:59:09 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-314313f127fso1259792f8f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 12:59:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1451ED53
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 20:21:31 +0000 (UTC)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAB082709
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:21:28 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3141fa31c2bso1254068f8f.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 13:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689278348; x=1691870348;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hf9EFrDukg/UctSblWVYGPFrQvoDqNmRl1qffi8QnfI=;
-        b=E4ONS0nMC6r0npatR37rMk7v2k02drkzGMM9nYXSkhhAf7EqNvv96poBwSyBQNVegh
-         73e+We3rSsHRcNUOc4TEZHONyEUDIstW96n0oaw5r2Dv2Ug01/7brWGBCtPAnThyktpG
-         wwU9Ig05hTRUWw5N/5CKGOZo32eOgnEOBFCzvU5JrvKl9J0mHiPox6D2DT2DxyKmTFGJ
-         j6RjzqN7/YqMxx5ne1mc7sbPyEMl7a8awGZaS+siDoJ/U7z5dhP4ZhO4Ec0w3Iukj4t7
-         0YwCV98TemYDGIQD0Bch3D6bG8Y3nwirQuxNcljXGVas1kheFaTSvudoTZolpqBm2SiM
-         dwPQ==
+        d=shruggie-ro.20221208.gappssmtp.com; s=20221208; t=1689279687; x=1691871687;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v4CrEIfrjQ2FMKZX2ewx6d372/dw3pvGNTCu7mW4Pns=;
+        b=gkiTYElMTDBnu1cdXyXHvgBU4WRMsZ2e0jQndmpTL9Q9PAo2YUKoHPO3Cxb1CtjNx0
+         CDWaBqwpB/tNblbkeyftrlujX/t1qvXjLtJOtB4cAe2BQuw9PE7OqzI6Oks/WOCOidf7
+         LxHdXmqXi9pWmjWQ8A3dFHBp9z3uuD7jGxxvo74uzOZUQInY+Sp8EgtkNWapzJiN47V7
+         /EoMw+1JMJtQX1e1ri91SViJ/UOUjhqxL4KsOsPksWAOhUa1zztI3cBhc39Yfp2/WTRi
+         nVwQeGbi7g2vQnITRqm47VjpxsEQRV55DaxnaaJVT+5Oq9AMubklN9gA0qdrhQjkkKGi
+         re0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689278348; x=1691870348;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hf9EFrDukg/UctSblWVYGPFrQvoDqNmRl1qffi8QnfI=;
-        b=c2FYKuLsFQHfhcVPHJ+85fDJcNvIuWJYCpN5UKUKw6E5EUMjfTeIYhDk4wwtyeFB5l
-         dSaBpRW7/I/BpzQCJi9uKnTgs4kMUkd06neF5pUnQvrlrRDnDjxZ+Cx90CWOdPLKa73j
-         00VTqlHDxrusSUily6/j8DwqGD+vcBTtMnL1pmYL0Ds5Rm2+pNUHZSrIprsQ3p5awCd1
-         KEaN92FalqpLmAI5Uz1HFwHyd5DCAPtO0y6YAdltJGdC92zdkkX8LzU4qd44pACBiN/p
-         KU/h8bFhpCp84/74WF8qgf7IY5m4E1lkRU+V0pxsOnDXb6THwBh6NeBqRqLyZXxp8lcM
-         bRWg==
-X-Gm-Message-State: ABy/qLY4UAF0clVzO8JYMBdGt7Zk4GlI9r54L09otcPPNMF6fm8CGCKP
-	A8TI8DGqL94WHnHdmTGi40vGWw==
-X-Google-Smtp-Source: APBJJlEtnR6yceyE2Iyf5t5Lms7Aig6d22/AdyN9Po/qn143FRpmRv3rDbgUV4D3wK83/NEFZNoQYw==
-X-Received: by 2002:a05:6000:11c4:b0:314:248d:d9df with SMTP id i4-20020a05600011c400b00314248dd9dfmr2356201wrx.13.1689278347948;
-        Thu, 13 Jul 2023 12:59:07 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:d855:a28a:e0c1:ddc1? ([2a02:578:8593:1200:d855:a28a:e0c1:ddc1])
-        by smtp.gmail.com with ESMTPSA id i17-20020adff311000000b003143853590csm8812187wro.104.2023.07.13.12.59.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 12:59:07 -0700 (PDT)
-Message-ID: <fdf52d83-6e58-3284-8c61-66cf218c7083@tessares.net>
-Date: Thu, 13 Jul 2023 21:59:06 +0200
+        d=1e100.net; s=20221208; t=1689279687; x=1691871687;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v4CrEIfrjQ2FMKZX2ewx6d372/dw3pvGNTCu7mW4Pns=;
+        b=FFA8MBitoGLncHIXEio6+RCzvNiVSMMH62BjkBBvrch6jvp1tjuTzDADQfZiNI8NCm
+         TP6Ej2a9Pzfy2GRIFt6WO6xUDPTBOVP2JN3Ewsw7jKg/faljnXYLOr4cxC1eVjUIfKoj
+         u/SYxVGD1IiesLNtLM3PvATIENmU8NCsuqA+HELjHewelZGvTZ4Fg2p9rZKMyPQZD9te
+         CuQIP+pMxga7s7KfvA39aGJXDV57eLmcs+bZQSyvxeLW3T6TP3S9YSg6wDb87+VnHPEy
+         OzjodoaU9cSLEruO9Uys1d8yBhMUqyb9gis1RcLPh1pIHHhgl9XQfAErKel4bxPAdf05
+         L3kA==
+X-Gm-Message-State: ABy/qLZaraThfakSwhbIb404bq8D27Y09bsWL9M3sTSY1yAS7tBmSQ3V
+	Aw1bzZG28sn0t6CrUMypj5ETdIw0DEho2DDRj7HUUg==
+X-Google-Smtp-Source: APBJJlHq2pUSPgBx5Tj6uSYMyYQXaacAVg9+vui4gpLQ5d0tkeJ9qBx5xIDImovX3hluY8+Wyit8Vw==
+X-Received: by 2002:a5d:490f:0:b0:314:4237:8832 with SMTP id x15-20020a5d490f000000b0031442378832mr2246109wrq.48.1689279686899;
+        Thu, 13 Jul 2023 13:21:26 -0700 (PDT)
+Received: from localhost.localdomain ([188.27.129.168])
+        by smtp.gmail.com with ESMTPSA id l13-20020a5d560d000000b0031590317c26sm8880170wrv.61.2023.07.13.13.21.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 13:21:26 -0700 (PDT)
+From: Alexandru Ardelean <alex@shruggie.ro>
+To: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	olteanv@gmail.com,
+	alex@shruggie.ro,
+	marius.muresan@mxt.ro
+Subject: [PATCH v2 1/2 net-next] net: phy: mscc: add support for CLKOUT ctrl reg for VSC8531 and similar
+Date: Thu, 13 Jul 2023 23:21:22 +0300
+Message-ID: <20230713202123.231445-1-alex@shruggie.ro>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: TC: selftests: current timeout (45s) is too low
-Content-Language: en-GB
-To: Pedro Tammela <pctammela@mojatatu.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell
- <anders.roxell@linaro.org>, Davide Caratti <dcaratti@redhat.com>
-References: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
- <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
- <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
- <0f762e7b-f392-9311-6afc-ed54bf73a980@mojatatu.com>
- <35329166-56a7-a57e-666e-6a5e6616ac4d@tessares.net>
- <593be21c-b559-8e9c-25ad-5f4291811411@mojatatu.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <593be21c-b559-8e9c-25ad-5f4291811411@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Pedro,
+The VSC8531 and similar PHYs (i.e. VSC8530, VSC8531, VSC8540 & VSC8541)
+have a CLKOUT pin on the chip that can be controlled by register (13G in
+the General Purpose Registers page) that can be configured to output a
+frequency of 25, 50 or 125 Mhz.
 
-On 13/07/2023 19:30, Pedro Tammela wrote:
-> On 13/07/2023 10:59, Matthieu Baerts wrote:
+This is useful when wanting to provide a clock source for the MAC in some
+board designs.
 
-(...)
+Signed-off-by: Marius Muresan <marius.muresan@mxt.ro>
+Signed-off-by: Alexandru Ardelean <alex@shruggie.ro>
+---
 
->> We can see that all tests have been executed except one:
->>
->>> # ok 495 6bda - Add tunnel_key action with nofrag option # skipped -
->>> probe command: test skipped.
->>
->> Maybe something else missing?
+Changelog v1 -> v2:
+* https://lore.kernel.org/netdev/20230706081554.1616839-1-alex@shruggie.ro/
+* changed property name 'vsc8531,clkout-freq-mhz' -> 'mscc,clkout-freq-mhz'
+  as requested by Rob
+* introduced 'goto set_reg' to reduce indentation (no idea why I did not
+  think of that sooner)
+* added 'net-next' tag as requested by Andrew
 
-Do you think this one can be due to a missing kconfig? This command is
-failing:
+ drivers/net/phy/mscc/mscc.h      |  5 ++++
+ drivers/net/phy/mscc/mscc_main.c | 41 ++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
 
-  $TC actions add action tunnel_key help 2>&1 | grep -q nofrag
-
-Or maybe that's normal, e.g. a feature no longer there?
-
->> Other than that, 6 tests have failed:
-
-(...)
-
-> Cool! So it seems we have some tests that bit rotted...
-
-Who doesn't? :)
-
->> I can see that at least "CONFIG_NF_CONNTRACK_PROCFS" kconfig is needed
->> as well for the 373rd test (adding it seems helping: [5]).
->>
->> Not sure about the 5 others, I don't know what these tests are doing, I
->> came here by accident and I don't think I'm the most appropriated person
->> to fix that: do you know if someone can look at the 5 other errors? :)
-> 
-> We can take a look, thank you.
-
-Thank you!
-
->> I can send patches to fix the timeout + the two missing kconfig if you
->> want.
-> 
-> Yes, please.
-
-Sure, will do!
-
-> Could you also do one final test with the following?
-> It will increase the total testing wall time but it's ~time~ we let the
-> bull loose.
-
-Just did, it took just over 3 minutes (~3:05), see the log file in [1]
-(test job in [2] and build job in [3]).
-
-Not much longer but 15 more tests failing :)
-Also, 12 new tests have been skipped:
-
-> Tests using the DEV2 variable must define the name of a physical NIC with the -d option when running tdc.
-But I guess that's normal when executing tdc.sh.
-
-Cheers,
-Matt
-
-[1]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/tests/2SWzPV0rAEkfm82nptjEpjN1syj/logs?format=html
-[2]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/tests/2SWzPV0rAEkfm82nptjEpjN1syj
-[3]
-https://tuxapi.tuxsuite.com/v1/groups/community/projects/matthieu.baerts/builds/2SWwyRVr1ZCKUNJ7wUqESGnRnjq
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index 7a962050a4d4..4ea21921a7ba 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -181,6 +181,11 @@ enum rgmii_clock_delay {
+ #define VSC8502_RGMII_TX_DELAY_MASK	  0x0007
+ #define VSC8502_RGMII_RX_CLK_DISABLE	  0x0800
+ 
++/* CKLOUT Control register, for VSC8531 and similar */
++#define VSC8531_CLKOUT_CNTL		  13
++#define VSC8531_CLKOUT_CNTL_ENABLE	  BIT(15)
++#define VSC8531_CLKOUT_CNTL_FREQ_MASK	  GENMASK(14, 13)
++
+ #define MSCC_PHY_WOL_LOWER_MAC_ADDR	  21
+ #define MSCC_PHY_WOL_MID_MAC_ADDR	  22
+ #define MSCC_PHY_WOL_UPPER_MAC_ADDR	  23
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 4171f01d34e5..ec029d26071d 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -618,6 +618,42 @@ static void vsc85xx_tr_write(struct phy_device *phydev, u16 addr, u32 val)
+ 	__phy_write(phydev, MSCC_PHY_TR_CNTL, TR_WRITE | TR_ADDR(addr));
+ }
+ 
++static int vsc8531_clkout_config(struct phy_device *phydev)
++{
++	static const u32 freq_vals[] = { 25, 50, 125 };
++	struct device *dev = &phydev->mdio.dev;
++	u16 mask, set;
++	u32 freq, i;
++	int rc;
++
++	mask = VSC8531_CLKOUT_CNTL_ENABLE | VSC8531_CLKOUT_CNTL_FREQ_MASK;
++	set = 0;
++
++	if (device_property_read_u32(dev, "mscc,clkout-freq-mhz", &freq))
++		goto set_reg;
++
++	/* The indices from 'freq_vals' are used in the register */
++	for (i = 0; i < ARRAY_SIZE(freq_vals); i++) {
++		if (freq != freq_vals[i])
++			continue;
++
++		set |= VSC8531_CLKOUT_CNTL_ENABLE |
++		       FIELD_PREP(VSC8531_CLKOUT_CNTL_FREQ_MASK, i);
++		break;
++	}
++	if (set == 0)
++		dev_warn(dev, "Invalid 'mscc,clkout-freq-mhz' value %u\n",
++			 freq);
++
++set_reg:
++	mutex_lock(&phydev->lock);
++	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_GPIO,
++			      VSC8531_CLKOUT_CNTL, mask, set);
++	mutex_unlock(&phydev->lock);
++
++	return rc;
++}
++
+ static int vsc8531_pre_init_seq_set(struct phy_device *phydev)
+ {
+ 	int rc;
+@@ -1852,6 +1888,11 @@ static int vsc85xx_config_init(struct phy_device *phydev)
+ 		rc = vsc8531_pre_init_seq_set(phydev);
+ 		if (rc)
+ 			return rc;
++
++		rc = vsc8531_clkout_config(phydev);
++		if (rc)
++			return rc;
++
+ 	}
+ 
+ 	rc = vsc85xx_eee_init_seq_set(phydev);
 -- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+2.41.0
+
 
