@@ -1,199 +1,139 @@
-Return-Path: <netdev+bounces-17604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E0D752531
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:33:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8578752539
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 16:34:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF6281C2134B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:33:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 781F31C213B0
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 14:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FC18495;
-	Thu, 13 Jul 2023 14:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D672F9DC;
+	Thu, 13 Jul 2023 14:34:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929255693
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:33:10 +0000 (UTC)
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1B926B6
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:33:07 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b9de3e7fb1so3390275ad.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 07:33:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689258787; x=1691850787;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fr2vYa/Ch6xYV487nmzxcm8iM/FlpnkWVHQ5jynQTbg=;
-        b=jacaK9M2p8ae07DYtf3WTwW4sJ88AeR0PMoTM/K8Zom80G9CNsRED8/7OkNACpL4FI
-         vSrK+poAQrpW9b9XXAEX3N+/eJqGG0fl2uSilp/V2zhMmynFGmkNp19rQMAPCUIgro+L
-         8wZFnIyWuBTpd6inSk0jhwWPq/qOKDhiCmrdy2nICENUOLQPMx4zm5vkc1J+N+jf8F/9
-         NWijWeXBKP6nhRWfAZooF9dECtwpwP1B06LROVi+ZRGQWEPDlF+8FcWtS7IpVg38LWBC
-         sabPszkfHQCdZSa4qO28HKir4zE3m+cUi5LtAFjCZb9xEKl25slyjVF3CoaXZrvttifT
-         RnQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689258787; x=1691850787;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fr2vYa/Ch6xYV487nmzxcm8iM/FlpnkWVHQ5jynQTbg=;
-        b=AWY3GHvlT834F3KQsrjXRsgEsg/R3NkMJUxis+joWPwRP3uw0rFEU3vkWoeWryPw+b
-         KpEO8oQU61JW9ZtaTtknrffWJ2YkFZlYB2nhjglttxRKCcGKCoSSpOCvjaAlVBXh/2a4
-         5olrMv3KB7ikCq9on/Ysl9+RmlapONfi732MBm4bQ262l+aVwy8Pb/KEzq1GA0E5Kh0l
-         dOIGT7iKFeWfdJnM15/4viNf4UW+1/MDzOdqKDmxO6MW+xTtp7nQBbvbcdvJTPrU3683
-         RaPZc+Me5Bmgat+Lmg8SC4LtxPjOFXkQ3lNncqYtbvCvPP2JZT/hekSJDFYCFGC1AVoX
-         cnKg==
-X-Gm-Message-State: ABy/qLaOygVimd8IW1rormEZ29ayFNfXxDE4nm0/lxk9X/E9W4EbiVc3
-	6F9SuaqJ04F15FuK8ytlJCVuSBKd7+U=
-X-Google-Smtp-Source: APBJJlFAAhWItEMB5PDxlVd4/XD0kDAeGPn5ZZPTnMU3ojU8FDM9Oji9AhkfLIh7rpZuc1o0H3AhYJQLwhY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b282:b0:1ba:1704:89d1 with SMTP id
- u2-20020a170902b28200b001ba170489d1mr5846plr.10.1689258786828; Thu, 13 Jul
- 2023 07:33:06 -0700 (PDT)
-Date: Thu, 13 Jul 2023 07:33:05 -0700
-In-Reply-To: <20230713-vfs-eventfd-signal-v1-2-7fda6c5d212b@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B156FB1
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:34:18 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 034A61734;
+	Thu, 13 Jul 2023 07:34:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=1cn7Q6I73HV7gvnlU7oQKxFR3wKoCxsTSAluUNEqkHc=; b=sOgaJ6qdj54VtOsq1KfsidmtDT
+	DSiGDNgH4inaB2oU94f3BPqpXBg9phkOiRHg0PNO9Wzexpsofd1PT1A++mo2wAg1AqHEk5lgRwKVN
+	jN6xyeGp3xCPzyP7EW1aiESBfhNcch5zQuAS8e/kjm3DrtGgre231nG1T+EA0PWNUsoAVQb6/+WqR
+	JPwVj+zA/nGBCHTUuJVmxK0px6hKgwf8gMCDPD6pIpz8b8NwOGXDJorzzBuSlgJWDiHQSfwTmLREJ
+	HSeK9beUgz7cDtl5p0iYlCzalxv30mST4xUQlMpX5L/41GqnpgN+BhltBjIFHUnmX9vH3fWtHpl/I
+	FDQSYCpg==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qJxOT-003ZqM-0i;
+	Thu, 13 Jul 2023 14:34:09 +0000
+Message-ID: <d83f5767-a98f-a258-f0c4-e7228345b93f@infradead.org>
+Date: Thu, 13 Jul 2023 07:34:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org> <20230713-vfs-eventfd-signal-v1-2-7fda6c5d212b@kernel.org>
-Message-ID: <ZLAK+FA3qgbHW0YK@google.com>
-Subject: Re: [PATCH 2/2] eventfd: simplify eventfd_signal_mask()
-From: Sean Christopherson <seanjc@google.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, Oded Gabbay <ogabbay@kernel.org>, 
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, 
-	Xu Yilun <yilun.xu@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Zhi Wang <zhi.a.wang@intel.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>, David Airlie <airlied@gmail.com>, 
-	Daniel Vetter <daniel@ffwll.ch>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Frederic Barrat <fbarrat@linux.ibm.com>, Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Eric Farman <farman@linux.ibm.com>, 
-	Matthew Rosato <mjrosato@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, 
-	Vineeth Vijayan <vneethv@linux.ibm.com>, Peter Oberparleiter <oberpar@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
-	Jason Herne <jjherne@linux.ibm.com>, Harald Freudenberger <freude@linux.ibm.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Diana Craciun <diana.craciun@oss.nxp.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-	Fei Li <fei1.li@intel.com>, Benjamin LaHaise <bcrl@kvack.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Shakeel Butt <shakeelb@google.com>, Muchun Song <muchun.song@linux.dev>, 
-	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-fpga@vger.kernel.org, 
-	intel-gvt-dev@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
-	linux-rdma@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-s390@vger.kernel.org, linux-usb@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: =?UTF-8?B?UmU6IOWbnuWkjTogW1BBVENIIG5ldCB2MV0gYm5hOkZpeCBlcnJvciBj?=
+ =?UTF-8?Q?hecking_for_debugfs=5fcreate=5fdir=28=29?=
+Content-Language: en-US
+To: =?UTF-8?B?546L5piOLei9r+S7tuW6leWxguaKgOacr+mDqA==?= <machel@vivo.com>
+Cc: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru
+ <skalluru@marvell.com>,
+ "GR-Linux-NIC-Dev@marvell.com" <GR-Linux-NIC-Dev@marvell.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Krishna Gudipati <kgudipat@brocade.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+References: <20230713053823.14898-1-machel@vivo.com>
+ <27105f25-f3f9-0856-86e5-86236ce83dee@infradead.org>
+ <SG2PR06MB37438F03D13983B7F603E43DBD37A@SG2PR06MB3743.apcprd06.prod.outlook.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <SG2PR06MB37438F03D13983B7F603E43DBD37A@SG2PR06MB3743.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023, Christian Brauner wrote:
-> diff --git a/fs/eventfd.c b/fs/eventfd.c
-> index dc9e01053235..077be5da72bd 100644
-> --- a/fs/eventfd.c
-> +++ b/fs/eventfd.c
-> @@ -43,9 +43,10 @@ struct eventfd_ctx {
->  	int id;
->  };
->  
-> -__u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
-> +bool eventfd_signal_mask(struct eventfd_ctx *ctx, __poll_t mask)
->  {
->  	unsigned long flags;
-> +	__u64 n = 1;
->  
->  	/*
->  	 * Deadlock or stack overflow issues can happen if we recurse here
-> @@ -68,7 +69,7 @@ __u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
->  	current->in_eventfd = 0;
->  	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
->  
-> -	return n;
-> +	return n == 1;
->  }
 
-...
 
-> @@ -58,13 +58,12 @@ static inline struct eventfd_ctx *eventfd_ctx_fdget(int fd)
->  	return ERR_PTR(-ENOSYS);
->  }
->  
-> -static inline int eventfd_signal(struct eventfd_ctx *ctx)
-> +static inline bool eventfd_signal(struct eventfd_ctx *ctx)
->  {
->  	return -ENOSYS;
->  }
->  
-> -static inline int eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n,
-> -				      unsigned mask)
-> +static inline bool eventfd_signal_mask(struct eventfd_ctx *ctx, unsigned mask)
->  {
->  	return -ENOSYS;
+On 7/13/23 02:05, 王明-软件底层技术部 wrote:
+> Ok, so I think we should delete the check operation. What do you think? If it is consistent, I will submit it again
+> : )
 
-This will morph to "true" for what should be an error case.  One option would be
-to have eventfd_signal_mask() return 0/-errno instead of the count, but looking
-at all the callers, nothing ever actually consumes the result.
+Yes, that's the idea. Thanks.
 
-KVMGT morphs failure into -EFAULT
+> Ming
+> -----邮件原件-----
+> 发件人: Randy Dunlap <rdunlap@infradead.org> 
+> 发送时间: 2023年7月13日 13:50
+> 收件人: 王明-软件底层技术部 <machel@vivo.com>; Rasesh Mody <rmody@marvell.com>; Sudarsana Kalluru <skalluru@marvell.com>; GR-Linux-NIC-Dev@marvell.com; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Krishna Gudipati <kgudipat@brocade.com>; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+> 抄送: opensource.kernel <opensource.kernel@vivo.com>
+> 主题: Re: [PATCH net v1] bna:Fix error checking for debugfs_create_dir()
+> 
+> [Some people who received this message don't often get email from rdunlap@infradead.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> 
+> Hi--
+> 
+> On 7/12/23 22:38, Wang Ming wrote:
+>> The debugfs_create_dir() function returns error pointers, it never 
+>> returns NULL. Most incorrect error checks were fixed, but the one in 
+>> bnad_debugfs_init() was forgotten.
+>>
+>> Fix the remaining error check.
+>>
+>> Signed-off-by: Wang Ming <machel@vivo.com>
+>>
+>> Fixes: 7afc5dbde091 ("bna: Add debugfs interface.")
+> 
+> Comment from fs/debugfs/inode.c:
+> 
+>  * NOTE: it's expected that most callers should _ignore_ the errors returned
+>  * by this function. Other debugfs functions handle the fact that the "dentry"
+>  * passed to them could be an error and they don't crash in that case.
+>  * Drivers should generally work fine even if debugfs fails to init anyway.
+> 
+> so no, drivers should not usually care about debugfs function call results.
+> Is there some special case here?
+> 
+>> ---
+>>  drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c 
+>> b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
+>> index 04ad0f2b9677..678a3668a041 100644
+>> --- a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
+>> +++ b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
+>> @@ -512,7 +512,7 @@ bnad_debugfs_init(struct bnad *bnad)
+>>       if (!bnad->port_debugfs_root) {
+>>               bnad->port_debugfs_root =
+>>                       debugfs_create_dir(name, bna_debugfs_root);
+>> -             if (!bnad->port_debugfs_root) {
+>> +             if (IS_ERR(bnad->port_debugfs_root)) {
+>>                       netdev_warn(bnad->netdev,
+>>                                   "debugfs root dir creation failed\n");
+>>                       return;
+> 
+> --
+> ~Randy
 
-	if (vgpu->msi_trigger && eventfd_signal(vgpu->msi_trigger, 1) != 1)
-		return -EFAULT;
-
-but the only caller of that user ignores the return value.
-
-	if (vgpu_vreg(vgpu, i915_mmio_reg_offset(GEN8_MASTER_IRQ))
-			& ~GEN8_MASTER_IRQ_CONTROL)
-		inject_virtual_interrupt(vgpu);
-
-The sample driver in samples/vfio-mdev/mtty.c uses a similar pattern: prints an
-error but otherwise ignores the result.
-
-So why not return nothing?  That will simplify eventfd_signal_mask() a wee bit
-more, and eliminate that bizarre return value confusion for the ugly stubs, e.g.
-
-void eventfd_signal_mask(struct eventfd_ctx *ctx, unsigned mask)
-{
-	unsigned long flags;
-
-	/*
-	 * Deadlock or stack overflow issues can happen if we recurse here
-	 * through waitqueue wakeup handlers. If the caller users potentially
-	 * nested waitqueues with custom wakeup handlers, then it should
-	 * check eventfd_signal_allowed() before calling this function. If
-	 * it returns false, the eventfd_signal() call should be deferred to a
-	 * safe context.
-	 */
-	if (WARN_ON_ONCE(current->in_eventfd))
-		return;
-
-	spin_lock_irqsave(&ctx->wqh.lock, flags);
-	current->in_eventfd = 1;
-	if (ctx->count < ULLONG_MAX)
-		ctx->count++;
-	if (waitqueue_active(&ctx->wqh))
-		wake_up_locked_poll(&ctx->wqh, EPOLLIN | mask);
-	current->in_eventfd = 0;
-	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
-}
-
-You could even go further and unify the real and stub versions of eventfd_signal().
+-- 
+~Randy
 
