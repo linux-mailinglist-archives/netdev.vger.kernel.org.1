@@ -1,162 +1,308 @@
-Return-Path: <netdev+bounces-17394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 994FC7516CF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:36:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410F67516E7
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB4D28183B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 03:36:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B955E1C21220
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 03:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C2CEBD;
-	Thu, 13 Jul 2023 03:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFCF443F;
+	Thu, 13 Jul 2023 03:51:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220077C
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:36:27 +0000 (UTC)
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2138.outbound.protection.outlook.com [40.107.215.138])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7879F1FEE;
-	Wed, 12 Jul 2023 20:36:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RHmkGBiTLxQ5/KO8G/rWtLtorNDGd8dQ9+TwSa1suQFGh0AiRC0jemggTR5ONnHbyQsRy1ANXI1zBt8u0sn3RwdfjyGAp2/Ke9ukQWgK+C7qPveXT03ZG28TLQgFG0V9+HPseGVep8wkX339ItUe55m+/5H84lEu9714PvhDXo/O5jRY5n7gI12y6DWsezJngE0m9WLliksJnW5vNR0ry0aRJUhPbCptbgiPECqwAe/1Lvhy053eqK2jGql45/9e260666jrOUtD4G1zqybtGekezAKh5yysTaU9/sKnux2o1BoGXxkMKqrFwoscu0pu7oABKWly3xLbBPEwNNDyjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lc9YVJilcupA9pmwEo5AjWmwYra46BWwjKr/918sM9I=;
- b=bfQxCYMg6lbaO2csilyEhpuVCU9lYjBYrBf5egqozVfLuGQGQx8mxnb3qBBWIndZjf3MgA2HRExT0Cp+dWYvjs81NkEnj4u6fB3ms4G36+/P9nT+cvN3cgrpaTHusf+0hbRScR0vJRVJS1U2XvTZRjOyHj6at0VD/bSufyYPFDRU8IEdLNP8d66mMr2MyO4Q3Lo7TH7/EmIBxQRx3ALFUPZ3pJQQEBtUyg/+DySFKUaWcTOq0g5b6mj+z2LNTcH1ix91gsCJGnHem8+u3JE+UaCCxBYRpFewAfb7EKt1QC8IeNfdzBIld3Pv+WE0NkCrD2JTEPqeTC1P0LM3VtN4zQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lc9YVJilcupA9pmwEo5AjWmwYra46BWwjKr/918sM9I=;
- b=GnHxu4gN2BVH7VuXw8VhaIPtRMk2QUXMdtrwjKrfkGOc15W6ff5dGv+2oQ+oSlHXiDd33KKKWkbI0JSumVoi7IyMYETizoCo+FFhrllB8otKAzR+GxZAwol9G7UYnJKga+tfJ1c45GlPeNNlYiEDxwWBBNlk7WKwK7zd4V+FZdoUfxMc9+VtwNqGfOPJ01FF437t1sbt59TSoJXtkRD7Zg3QIU7/IWKvmb8wazhNJ8QzmooCDu5TWlcSn4oEaC+xK1TjtgAZN6oxw727rTNjPHuS0s5xoB2CmLX4ESNzHDWBXYb64vPCa2cMos4m18h2DNiWz7rRNlE0RPZlSZ1kbw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
- SEZPR06MB5608.apcprd06.prod.outlook.com (2603:1096:101:c8::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.22; Thu, 13 Jul 2023 03:36:17 +0000
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
- 03:36:17 +0000
-From: Wang Ming <machel@vivo.com>
-To: Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yufeng Mo <moyufeng@huawei.com>,
-	Guangbin Huang <huangguangbin2@huawei.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com,
-	Wang Ming <machel@vivo.com>
-Subject: [PATCH net v1] net:bonding:Fix error checking for debugfs_create_dir()
-Date: Thu, 13 Jul 2023 11:35:54 +0800
-Message-Id: <20230713033607.12804-1-machel@vivo.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR03CA0095.apcprd03.prod.outlook.com
- (2603:1096:4:7c::23) To SG2PR06MB3743.apcprd06.prod.outlook.com
- (2603:1096:4:d0::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67161ECE
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:51:15 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2121991
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 20:51:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689220271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sp0rdUOcjWH48xIddYuMFWG09V+pGjldr43WMxi/P/A=;
+	b=a6KLl00YYaTOz219z+WWhZVBE/LtFW1Bn0Dp7lvrtxmsrOjS3tfmSk2lW4w4I9PtbykiPX
+	kvRt1q0D14p5b/vDU5D4IDP9ghc6T3PoVlfW8gRnbOWRF9WcanRrBHI2OYJiXVpzQsdFw7
+	Z+DiRePb8cFXK0FqJWYxvBFRl150QSQ=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-Ccz1R5T1NLOhiV1wOuYlyw-1; Wed, 12 Jul 2023 23:51:10 -0400
+X-MC-Unique: Ccz1R5T1NLOhiV1wOuYlyw-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-62fe5abe808so1931186d6.1
+        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 20:51:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689220270; x=1691812270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sp0rdUOcjWH48xIddYuMFWG09V+pGjldr43WMxi/P/A=;
+        b=Cj8NjJvZtVk3AbXhqQZxUrSiF4PQFUikfqJ9TEKdx5UHtR8/SHmH2AGTlOA83CadrE
+         tanK1lgdMN2X6HuPHpqbus/fjF8BM2ptedQyHO9WLcTpg5syEiLO1Hxg2NOzKrEMFwAQ
+         LP+ZpgUBtGSYDWO2ceWPj5FSM81Rt1of6/5bOFmub4Y2gwLGYdc8bs9FGTx1Ect51fRB
+         7nzzf5LN8VFisCIRKWCqPw+UeaXhditvJemsYm69IjfrW21GuwRvztM7IzAfzManbPCV
+         yQXzSbuIGJ0Pjsx2PTy42RqMl7NQBa3cl2hyQiKZB099MYHMrp6gQ0T/sFpNA9EY1N12
+         Y8mA==
+X-Gm-Message-State: ABy/qLbaKSJFfv+7KTlTncekFfLF74Oir13v/KDefCj7ETQ/CyFxU6m1
+	+uzUv4rDC23SoVwOobYncySgvu0YHbcX7qVvvr8YcWymd0IROQpMDgAuAlabja4WPYZ7jLrblSe
+	ZCHuKPrs1C6rL+CknDDtka/1eRji8Yf4z
+X-Received: by 2002:a05:6214:20a7:b0:623:8494:9945 with SMTP id 7-20020a05621420a700b0062384949945mr3609953qvd.26.1689220270077;
+        Wed, 12 Jul 2023 20:51:10 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEdeIOd4SfutUHuafWv1+DVep1fvFF9G/+LzDtbweHq5KCbT57EhMqzI9n7HvJhty6c7cN7gBdORh9yNkR8tt8=
+X-Received: by 2002:a05:6214:20a7:b0:623:8494:9945 with SMTP id
+ 7-20020a05621420a700b0062384949945mr3609936qvd.26.1689220269824; Wed, 12 Jul
+ 2023 20:51:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|SEZPR06MB5608:EE_
-X-MS-Office365-Filtering-Correlation-Id: cf575fd8-ac0d-47df-628c-08db83525098
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Y6dAVVfkoRUBMkU0X1fVZmi8tSKPMeAaZFPxrato3BKHxDbWZE3ltMFLBSIJ5TUTun2ZHznexeUIAsyF7H0qRKhBJsXghRTT2XwLiRhcmfa1j883syHSzhjJzXDADuzx5Ne+xY+pZ2vzIFFiBeCehx/gQAIa4wiZvFm6SAtIddulTW+S0XZefv2lfrjgq84NcNkbJBBBU9WL9K2amB2jc+2mAQyKO2sYY/cfAFjcoVv2hoSJE+oiZo1ZOl08ZjHlUIXaGWQtdWiB7R7bwwWYABqY1vheN1CCdVsk6V4ChnngerLVNSBMbcb/sQoqR/IdeQMB4A+NnphDhWJ+sgVYcI4GqIK5to/iLx4qwTsq1GFW6dzpcYsYY4FEv+NGUUoT+bgyjQlVUp1ZoO1hy8EraE8Wdro8AIFEU7O0BPaJmFAXkdeQGLL04IFevIOfi9getrDRgSAhQr3vOrTEMBOmxaoItG43Tv45uMP39uNFD1JdVTgXo8c53mcqW5v5TXdcp8h09Fc9OOwwEgeNOx9BqY4Z08xe12WENIIA575yLgZsLoDqyVHWpfHT6XcuraOP3ioObH6t9aptxw3dDQAovv3LV57pYHPQvHGKTfB3QrFxDwBOpr2Y0LTXgHC7kT7k
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(451199021)(186003)(4744005)(36756003)(2616005)(2906002)(41300700001)(83380400001)(7416002)(26005)(6506007)(1076003)(5660300002)(107886003)(8936002)(8676002)(921005)(110136005)(6486002)(66476007)(66556008)(66946007)(4326008)(6666004)(52116002)(86362001)(478600001)(38350700002)(38100700002)(6512007)(316002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?34KInPvA0g6483uUp/FL/ePs3lWa4tlZ1KTqgyKBctdzPD7DSdIEUm8i9Wtj?=
- =?us-ascii?Q?WEd3dH0yNYwkewHRoFFb0NsAOYUNUmEOjR4sgPakD0UCgCA7dJGiSf4wHIKV?=
- =?us-ascii?Q?FyGpNRYxPVB3KZahRClzksemaoVpXToJPrn1yn/t40eCH+pJv+ngbarJbPLI?=
- =?us-ascii?Q?hfAIkvA1jjmwjcWj75RZIcvYqc8iZ7qo/wfgqHfDbv1YbdwrpzUXCm0UIfus?=
- =?us-ascii?Q?6jRmhLwEXBMDDc3w+oW4xW/fTf0mRIZeBTk3gOO0ONVhJHIPEtyAcQ37RB1Q?=
- =?us-ascii?Q?29w0yGz8UEJILvdwEEjPcSFdxQPdZaVAxEK9t2fYtK5ZEnCSM0MIUE8X9PjY?=
- =?us-ascii?Q?qIMKLyegtNEEGVjOu/Z2P23AI5Z0RkxQa3HP43nv98zNXhH/6xH6+ipoXr2N?=
- =?us-ascii?Q?V7qUW5r2BG6d1ePSP7e5FTIrTWEVhnEnhzdADy8FiiyiNTUfaBde/GAXS1sT?=
- =?us-ascii?Q?P0jx9zD4cRjnjv18TBIms7z5M5In4qZX1pZooVwgdManfngFyXdYdvf0YvbI?=
- =?us-ascii?Q?pckm/d+aTmOc36yrMSeUTLEj6EZUVOO9i6ls13ND0RPejWusrIH2nOB50ZWD?=
- =?us-ascii?Q?F+g1CFhb00Mpr7poBCQWcmg6ywtFD2IKScO5S8XcQDA5quIusDisBs2C5cvM?=
- =?us-ascii?Q?1wV+9aQLNTeuGgQq8oA9KtsWIPs6Ny/N2SaEkJRa1Fr+bnMT+1p+GXyj67hc?=
- =?us-ascii?Q?Zt4oR2c0G9BgNnGUQc5Cb3LABPGHNsBCTRMAJTP1TE56bg+xps+7f/O6LXE7?=
- =?us-ascii?Q?kktkc2WWEQ9Xz1Z5cauEWqBW4zoolVLMqmNBx/11NhK8xxPBQTah7scNU6wO?=
- =?us-ascii?Q?QgIGxmQiyfIIfs8Y+/BmnrchQG8epL/U+3LiZRn8Ek7oybzyzRZNXP9ug4MH?=
- =?us-ascii?Q?wwsO5oUZI5BCy1wscUNO2uPPX/LxTvbPGsg7nzc5CmYNA9YXesUAtyDZzvHL?=
- =?us-ascii?Q?KG0xxN97/v1Qrs+FTPaVckzCTAMybP8CO8Qzx1km8j0aNozxhbnBbmEwQq7K?=
- =?us-ascii?Q?RGQPikl0ZTbP4n/iaHN7KBAP2ZOYuvZQHT/jfVW9hMpvEY572bEqM3IWAsoY?=
- =?us-ascii?Q?GvKaeypQEdlXIsOSSTWAy98+bho226eSD0VkbTq6OSeddtws42HrC6Zqbd1v?=
- =?us-ascii?Q?3z4Og06HZ9wbBAPS+a/rSG1ZDjwtxa5cyPNYqWPqWSVvjwbY3926SdujEkPb?=
- =?us-ascii?Q?jA+hka5qjv+7TJrdYbDeJK9CicduKkT40iTfIRTRw/hdpdmWBs/mGQRk1boJ?=
- =?us-ascii?Q?nD+9vefS6uE60Oxmr4aTOzWRUenAiK+vhp2W0xc9M3ZNe2hkSmsMIGwFyXaa?=
- =?us-ascii?Q?yLNPLSD1Fu8zIeqGlfmHJbT6HQMS0nLorAzC7J8PRjYsn16l1Sxu1DorR/FN?=
- =?us-ascii?Q?aIdexPFZFxyLx+RQINW1fSv88oql32mNDm6GUPYKRQbqv5yyteb1ox9D4sJ0?=
- =?us-ascii?Q?6XGqXo/bKhnfZWWfZhWmE9titrutxQ2oNXB8M2ZjCJwiCWh5CP/SRmW+vpVn?=
- =?us-ascii?Q?MCfxlV8lqHqZoaG3gKmLJFdN1GhQqFw/ksKJeh3xX9y8DpnanceIaST8OY3A?=
- =?us-ascii?Q?LDSq/G3V2lwI/ZSQWzhrucA2/705pRCXLFZcg3ri?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf575fd8-ac0d-47df-628c-08db83525098
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 03:36:16.9493
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0dtRJZXkCtCb2A1YQfW+7o9udPN6R1WBwMxIQL9ugk8h26i5Sdyw9bRuFeAEoP9VWHGlCGbPhW1u4JHrpJoVDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5608
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com> <20230710034237.12391-7-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20230710034237.12391-7-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 13 Jul 2023 11:50:57 +0800
+Message-ID: <CACGkMEtb_wYyXLU6kAaC2Ju2d4K=J+YbytUCMvKcNtPF+BvpJw@mail.gmail.com>
+Subject: Re: [PATCH vhost v11 06/10] virtio_ring: skip unmap for premapped
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The debugfs_create_dir() function returns error pointers,
-it never returns NULL. Most incorrect error checks were fixed,
-but the one in bond_create_debugfs() was forgotten.
+On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+>
+> Now we add a case where we skip dma unmap, the vq->premapped is true.
+>
+> We can't just rely on use_dma_api to determine whether to skip the dma
+> operation. For convenience, I introduced the "do_unmap". By default, it
+> is the same as use_dma_api. If the driver is configured with premapped,
+> then do_unmap is false.
+>
+> So as long as do_unmap is false, for addr of desc, we should skip dma
+> unmap operation.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 42 ++++++++++++++++++++++++------------
+>  1 file changed, 28 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 1fb2c6dca9ea..10ee3b7ce571 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -175,6 +175,11 @@ struct vring_virtqueue {
+>         /* Do DMA mapping by driver */
+>         bool premapped;
+>
+> +       /* Do unmap or not for desc. Just when premapped is False and
+> +        * use_dma_api is true, this is true.
+> +        */
+> +       bool do_unmap;
+> +
+>         /* Head of free buffer list. */
+>         unsigned int free_head;
+>         /* Number we've added since last sync. */
+> @@ -440,7 +445,7 @@ static void vring_unmap_one_split_indirect(const stru=
+ct vring_virtqueue *vq,
+>  {
+>         u16 flags;
+>
+> -       if (!vq->use_dma_api)
+> +       if (!vq->do_unmap)
+>                 return;
+>
+>         flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
+> @@ -458,18 +463,21 @@ static unsigned int vring_unmap_one_split(const str=
+uct vring_virtqueue *vq,
+>         struct vring_desc_extra *extra =3D vq->split.desc_extra;
+>         u16 flags;
+>
+> -       if (!vq->use_dma_api)
+> -               goto out;
+> -
+>         flags =3D extra[i].flags;
+>
+>         if (flags & VRING_DESC_F_INDIRECT) {
+> +               if (!vq->use_dma_api)
+> +                       goto out;
+> +
+>                 dma_unmap_single(vring_dma_dev(vq),
+>                                  extra[i].addr,
+>                                  extra[i].len,
+>                                  (flags & VRING_DESC_F_WRITE) ?
+>                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
+>         } else {
+> +               if (!vq->do_unmap)
+> +                       goto out;
+> +
+>                 dma_unmap_page(vring_dma_dev(vq),
+>                                extra[i].addr,
+>                                extra[i].len,
+> @@ -635,7 +643,7 @@ static inline int virtqueue_add_split(struct virtqueu=
+e *_vq,
+>         }
+>         /* Last one doesn't continue. */
+>         desc[prev].flags &=3D cpu_to_virtio16(_vq->vdev, ~VRING_DESC_F_NE=
+XT);
+> -       if (!indirect && vq->use_dma_api)
+> +       if (!indirect && vq->do_unmap)
+>                 vq->split.desc_extra[prev & (vq->split.vring.num - 1)].fl=
+ags &=3D
+>                         ~VRING_DESC_F_NEXT;
+>
+> @@ -794,7 +802,7 @@ static void detach_buf_split(struct vring_virtqueue *=
+vq, unsigned int head,
+>                                 VRING_DESC_F_INDIRECT));
+>                 BUG_ON(len =3D=3D 0 || len % sizeof(struct vring_desc));
+>
+> -               if (vq->use_dma_api) {
+> +               if (vq->do_unmap) {
+>                         for (j =3D 0; j < len / sizeof(struct vring_desc)=
+; j++)
+>                                 vring_unmap_one_split_indirect(vq, &indir=
+_desc[j]);
+>                 }
+> @@ -1217,17 +1225,20 @@ static void vring_unmap_extra_packed(const struct=
+ vring_virtqueue *vq,
+>  {
+>         u16 flags;
+>
+> -       if (!vq->use_dma_api)
+> -               return;
+> -
+>         flags =3D extra->flags;
+>
+>         if (flags & VRING_DESC_F_INDIRECT) {
+> +               if (!vq->use_dma_api)
+> +                       return;
+> +
+>                 dma_unmap_single(vring_dma_dev(vq),
+>                                  extra->addr, extra->len,
+>                                  (flags & VRING_DESC_F_WRITE) ?
+>                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
+>         } else {
+> +               if (!vq->do_unmap)
+> +                       return;
 
-Fix the remaining error check.
+This seems not straightforward than:
 
-Signed-off-by: Wang Ming <machel@vivo.com>
+if (!vq->use_dma_api)
+    return;
 
-Fixes: 52333512701b ("net: bonding: remove unnecessary braces")
----
- drivers/net/bonding/bond_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+if (INDIRECT) {
+} else if (!vq->premapped) {
+}
 
-diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bond_debugfs.c
-index 594094526648..d4a82f276e87 100644
---- a/drivers/net/bonding/bond_debugfs.c
-+++ b/drivers/net/bonding/bond_debugfs.c
-@@ -88,7 +88,7 @@ void bond_create_debugfs(void)
- {
- 	bonding_debug_root = debugfs_create_dir("bonding", NULL);
- 
--	if (!bonding_debug_root)
-+	if (IS_ERR(bonding_debug_root))
- 		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
- }
- 
--- 
-2.25.1
+?
+
+Thanks
+
+> +
+>                 dma_unmap_page(vring_dma_dev(vq),
+>                                extra->addr, extra->len,
+>                                (flags & VRING_DESC_F_WRITE) ?
+> @@ -1240,7 +1251,7 @@ static void vring_unmap_desc_packed(const struct vr=
+ing_virtqueue *vq,
+>  {
+>         u16 flags;
+>
+> -       if (!vq->use_dma_api)
+> +       if (!vq->do_unmap)
+>                 return;
+>
+>         flags =3D le16_to_cpu(desc->flags);
+> @@ -1329,7 +1340,7 @@ static int virtqueue_add_indirect_packed(struct vri=
+ng_virtqueue *vq,
+>                                 sizeof(struct vring_packed_desc));
+>         vq->packed.vring.desc[head].id =3D cpu_to_le16(id);
+>
+> -       if (vq->use_dma_api) {
+> +       if (vq->do_unmap) {
+>                 vq->packed.desc_extra[id].addr =3D addr;
+>                 vq->packed.desc_extra[id].len =3D total_sg *
+>                                 sizeof(struct vring_packed_desc);
+> @@ -1470,7 +1481,7 @@ static inline int virtqueue_add_packed(struct virtq=
+ueue *_vq,
+>                         desc[i].len =3D cpu_to_le32(sg->length);
+>                         desc[i].id =3D cpu_to_le16(id);
+>
+> -                       if (unlikely(vq->use_dma_api)) {
+> +                       if (unlikely(vq->do_unmap)) {
+>                                 vq->packed.desc_extra[curr].addr =3D addr=
+;
+>                                 vq->packed.desc_extra[curr].len =3D sg->l=
+ength;
+>                                 vq->packed.desc_extra[curr].flags =3D
+> @@ -1604,7 +1615,7 @@ static void detach_buf_packed(struct vring_virtqueu=
+e *vq,
+>         vq->free_head =3D id;
+>         vq->vq.num_free +=3D state->num;
+>
+> -       if (unlikely(vq->use_dma_api)) {
+> +       if (unlikely(vq->do_unmap)) {
+>                 curr =3D id;
+>                 for (i =3D 0; i < state->num; i++) {
+>                         vring_unmap_extra_packed(vq,
+> @@ -1621,7 +1632,7 @@ static void detach_buf_packed(struct vring_virtqueu=
+e *vq,
+>                 if (!desc)
+>                         return;
+>
+> -               if (vq->use_dma_api) {
+> +               if (vq->do_unmap) {
+>                         len =3D vq->packed.desc_extra[id].len;
+>                         for (i =3D 0; i < len / sizeof(struct vring_packe=
+d_desc);
+>                                         i++)
+> @@ -2080,6 +2091,7 @@ static struct virtqueue *vring_create_virtqueue_pac=
+ked(
+>         vq->dma_dev =3D dma_dev;
+>         vq->use_dma_api =3D vring_use_dma_api(vdev);
+>         vq->premapped =3D false;
+> +       vq->do_unmap =3D vq->use_dma_api;
+>
+>         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_=
+DESC) &&
+>                 !context;
+> @@ -2587,6 +2599,7 @@ static struct virtqueue *__vring_new_virtqueue(unsi=
+gned int index,
+>         vq->dma_dev =3D dma_dev;
+>         vq->use_dma_api =3D vring_use_dma_api(vdev);
+>         vq->premapped =3D false;
+> +       vq->do_unmap =3D vq->use_dma_api;
+>
+>         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_=
+DESC) &&
+>                 !context;
+> @@ -2765,6 +2778,7 @@ int virtqueue_set_premapped(struct virtqueue *_vq)
+>                 return -EINVAL;
+>
+>         vq->premapped =3D true;
+> +       vq->do_unmap =3D false;
+>
+>         return 0;
+>  }
+> --
+> 2.32.0.3.g01195cf9f
+>
 
 
