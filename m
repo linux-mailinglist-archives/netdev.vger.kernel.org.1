@@ -1,94 +1,89 @@
-Return-Path: <netdev+bounces-17686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B560752B00
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:32:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F73752B01
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB1442814E1
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 19:32:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73261281EF6
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 19:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4E11F935;
-	Thu, 13 Jul 2023 19:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76EA200B0;
+	Thu, 13 Jul 2023 19:30:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4436A20FBF
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:30:21 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FAAD1989;
-	Thu, 13 Jul 2023 12:30:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9OIrt/LgsHugPSDybSGY5Tydet8PUGjuftpAsOzUygI=; b=SF2KSfyiyKBIjg1pTzJBc8Wq8R
-	P0fq1t2LK8VL3lH2LxoUt/4IIMfRRoEvMerYDo8Bc3m7Yk4nwboPghuHQYY0XZZi7E4qYVJwJIwkN
-	to7BbbeeDX8S+G9GyRY0CZrCZFmwgeoWWkN11DI7OmFVC/sHsK39eOwIC2pDDC8uNoLc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qK20q-001Hfz-32; Thu, 13 Jul 2023 21:30:04 +0200
-Date: Thu, 13 Jul 2023 21:30:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3491F943
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:30:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30829C433C7;
+	Thu, 13 Jul 2023 19:30:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689276641;
+	bh=yHyleVf55ms5OcbTmxlWVK0NQdIvDY066IjRVG6q0Z8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QdigQ6RU6vfvQNsqmZxPwN25ZmnXh80xsn+RuEvGOr/DbpVvcv6y2nR4cdAuxwkM1
+	 UzWKhWr4Pp98kcxtFf2TJxiLKi7hTXXKsubITcfk4fYT4wscvT0DlmE2jzJ3+a7ZpN
+	 UOp/Nmk7CDi699x8IIDjbxjrN9Z11JTEOLGcdzLQtTyNdxAHJ0epfw4a3G6e2d39lc
+	 0EiyUbA22YSCNuLVbbboo/VTbVCuyZyPpqQqBQxyEyeueQKMtBK9FHW3SMymyjlqEM
+	 B5CiKpEcicOPSEXhHNkzcz9UZw2ojvuTZZC30/6Aroi/28UP9O7e2n/RApHg9SRCHG
+	 IdtEzW4ceSjVg==
+Date: Thu, 13 Jul 2023 20:30:36 +0100
+From: Conor Dooley <conor@kernel.org>
 To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Pranavi Somisetty <pranavi.somisetty@amd.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, michal.simek@amd.com, harini.katakam@amd.com,
-	git@amd.com, radhey.shyam.pandey@amd.com, netdev@vger.kernel.org,
+Cc: Rob Herring <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Paul Cercueil <paul@crapouillou.net>, Marek Vasut <marex@denx.de>,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] dt-bindings: net: xilinx_gmii2rgmii: Convert to json
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 3/3] dt-bindings: net: davicom,dm9000: convert to DT
  schema
-Message-ID: <cd0fb281-b621-4d6b-be94-be6095e35328@lunn.ch>
-References: <20230713103453.24018-1-pranavi.somisetty@amd.com>
- <f6c11605-56d7-7228-b86d-bc317a8496d0@linaro.org>
- <a17b0a4f-619d-47dd-b0ad-d5f3c1a558fc@lunn.ch>
- <ebd30cd0-5081-f05d-28f7-5d5b637041e4@linaro.org>
+Message-ID: <20230713-putdown-submersed-ec2306a7e484@spud>
+References: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
+ <20230713152848.82752-4-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="KOCyIo0M2eMeOzL3"
+Content-Disposition: inline
+In-Reply-To: <20230713152848.82752-4-krzysztof.kozlowski@linaro.org>
+
+
+--KOCyIo0M2eMeOzL3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ebd30cd0-5081-f05d-28f7-5d5b637041e4@linaro.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 13, 2023 at 08:53:34PM +0200, Krzysztof Kozlowski wrote:
-> On 13/07/2023 17:59, Andrew Lunn wrote:
-> >>> +examples:
-> >>> +  - |
-> >>> +    mdio {
-> >>> +        #address-cells = <1>;
-> >>> +        #size-cells = <0>;
-> >>> +        phy: ethernet-phy@0 {
-> >>> +            reg = <0>;
-> >>> +        };
-> >>
-> >> Drop this node, quite obvious.
-> > 
-> > Dumb question. Isn't it needed since it is referenced by phy-handle =
-> > <&phy> below. Without it, the fragment is not valid DT and so the
-> > checking tools will fail?
-> 
-> No, because the example is compiled with silencing missing phandles.
+On Thu, Jul 13, 2023 at 05:28:48PM +0200, Krzysztof Kozlowski wrote:
+> Convert the Davicom DM9000 Fast Ethernet Controller bindings to DT
+> schema.
+>=20
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Ah, thanks.
+Seems like a faithful conversion to me,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-This is a rather odd device, there is no other like it in mainline, so
-i think having that PHY is useful, even if you think it is obvious
-what is going on here.
+Cheers,
+Conor.
 
-     Andrew
+--KOCyIo0M2eMeOzL3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZLBQ3AAKCRB4tDGHoIJi
+0vhaAP0QNEgWAMAo3BUKQl5mNSLdydSpPdJ6kTA1v6E2KB2DgAEApWcE5EffscXW
+ZWE1qQYgjo8yAE4+7qq2Jy49AcDfqgM=
+=mOdJ
+-----END PGP SIGNATURE-----
+
+--KOCyIo0M2eMeOzL3--
 
