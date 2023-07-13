@@ -1,308 +1,193 @@
-Return-Path: <netdev+bounces-17395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410F67516E7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 05:51:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F0EE75170F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:00:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B955E1C21220
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 03:51:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ED1C1C21242
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFCF443F;
-	Thu, 13 Jul 2023 03:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481FD468C;
+	Thu, 13 Jul 2023 04:00:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67161ECE
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 03:51:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2121991
-	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 20:51:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689220271;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sp0rdUOcjWH48xIddYuMFWG09V+pGjldr43WMxi/P/A=;
-	b=a6KLl00YYaTOz219z+WWhZVBE/LtFW1Bn0Dp7lvrtxmsrOjS3tfmSk2lW4w4I9PtbykiPX
-	kvRt1q0D14p5b/vDU5D4IDP9ghc6T3PoVlfW8gRnbOWRF9WcanRrBHI2OYJiXVpzQsdFw7
-	Z+DiRePb8cFXK0FqJWYxvBFRl150QSQ=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-Ccz1R5T1NLOhiV1wOuYlyw-1; Wed, 12 Jul 2023 23:51:10 -0400
-X-MC-Unique: Ccz1R5T1NLOhiV1wOuYlyw-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-62fe5abe808so1931186d6.1
-        for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 20:51:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689220270; x=1691812270;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sp0rdUOcjWH48xIddYuMFWG09V+pGjldr43WMxi/P/A=;
-        b=Cj8NjJvZtVk3AbXhqQZxUrSiF4PQFUikfqJ9TEKdx5UHtR8/SHmH2AGTlOA83CadrE
-         tanK1lgdMN2X6HuPHpqbus/fjF8BM2ptedQyHO9WLcTpg5syEiLO1Hxg2NOzKrEMFwAQ
-         LP+ZpgUBtGSYDWO2ceWPj5FSM81Rt1of6/5bOFmub4Y2gwLGYdc8bs9FGTx1Ect51fRB
-         7nzzf5LN8VFisCIRKWCqPw+UeaXhditvJemsYm69IjfrW21GuwRvztM7IzAfzManbPCV
-         yQXzSbuIGJ0Pjsx2PTy42RqMl7NQBa3cl2hyQiKZB099MYHMrp6gQ0T/sFpNA9EY1N12
-         Y8mA==
-X-Gm-Message-State: ABy/qLbaKSJFfv+7KTlTncekFfLF74Oir13v/KDefCj7ETQ/CyFxU6m1
-	+uzUv4rDC23SoVwOobYncySgvu0YHbcX7qVvvr8YcWymd0IROQpMDgAuAlabja4WPYZ7jLrblSe
-	ZCHuKPrs1C6rL+CknDDtka/1eRji8Yf4z
-X-Received: by 2002:a05:6214:20a7:b0:623:8494:9945 with SMTP id 7-20020a05621420a700b0062384949945mr3609953qvd.26.1689220270077;
-        Wed, 12 Jul 2023 20:51:10 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEdeIOd4SfutUHuafWv1+DVep1fvFF9G/+LzDtbweHq5KCbT57EhMqzI9n7HvJhty6c7cN7gBdORh9yNkR8tt8=
-X-Received: by 2002:a05:6214:20a7:b0:623:8494:9945 with SMTP id
- 7-20020a05621420a700b0062384949945mr3609936qvd.26.1689220269824; Wed, 12 Jul
- 2023 20:51:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7464437
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:00:24 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A611FD7
+	for <netdev@vger.kernel.org>; Wed, 12 Jul 2023 21:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HCCbc9dS3Rkl9GwfyawmEYlu85U025YSKjXy+dXGU4U=; b=zecyfIoWoTPG8HH87lSCM6SrOo
+	xCwN+29/7tJ+JvYobmj86mTFFrmYjFH8XKABvuGXMH3oV2ROR4cVbFZwITMfJCfSNZs9X+j4u8x6k
+	z4zF6H2gesYCwWvvv7KnCMkfScvi4GpS8V/3krl2pp0CVssjdMnAX437CvVjc/56ivYM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qJnUo-001CT0-Bs; Thu, 13 Jul 2023 06:00:02 +0200
+Date: Thu, 13 Jul 2023 06:00:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Feiyang Chen <chenfeiyang@loongson.cn>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [RFC PATCH 01/10] net: phy: Add driver for Loongson PHY
+Message-ID: <9e0b3466-10e1-4267-ab9b-d9f8149b6b6b@lunn.ch>
+References: <cover.1689215889.git.chenfeiyang@loongson.cn>
+ <be1874e517f4f4cc50906f18689a0add3594c2e0.1689215889.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com> <20230710034237.12391-7-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20230710034237.12391-7-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 13 Jul 2023 11:50:57 +0800
-Message-ID: <CACGkMEtb_wYyXLU6kAaC2Ju2d4K=J+YbytUCMvKcNtPF+BvpJw@mail.gmail.com>
-Subject: Re: [PATCH vhost v11 06/10] virtio_ring: skip unmap for premapped
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux-foundation.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <be1874e517f4f4cc50906f18689a0add3594c2e0.1689215889.git.chenfeiyang@loongson.cn>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
->
-> Now we add a case where we skip dma unmap, the vq->premapped is true.
->
-> We can't just rely on use_dma_api to determine whether to skip the dma
-> operation. For convenience, I introduced the "do_unmap". By default, it
-> is the same as use_dma_api. If the driver is configured with premapped,
-> then do_unmap is false.
->
-> So as long as do_unmap is false, for addr of desc, we should skip dma
-> unmap operation.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+On Thu, Jul 13, 2023 at 10:46:53AM +0800, Feiyang Chen wrote:
+> Add support for the Loongson PHY.
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 > ---
->  drivers/virtio/virtio_ring.c | 42 ++++++++++++++++++++++++------------
->  1 file changed, 28 insertions(+), 14 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 1fb2c6dca9ea..10ee3b7ce571 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -175,6 +175,11 @@ struct vring_virtqueue {
->         /* Do DMA mapping by driver */
->         bool premapped;
->
-> +       /* Do unmap or not for desc. Just when premapped is False and
-> +        * use_dma_api is true, this is true.
-> +        */
-> +       bool do_unmap;
+>  drivers/net/phy/Kconfig        |  5 +++
+>  drivers/net/phy/Makefile       |  1 +
+>  drivers/net/phy/loongson-phy.c | 69 ++++++++++++++++++++++++++++++++++
+
+Please drop -phy from the filename. No other phy driver does this.
+
+>  drivers/net/phy/phy_device.c   | 16 ++++++++
+>  include/linux/phy.h            |  2 +
+>  5 files changed, 93 insertions(+)
+>  create mode 100644 drivers/net/phy/loongson-phy.c
+> 
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index 93b8efc79227..4f8ea32cbc68 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -202,6 +202,11 @@ config INTEL_XWAY_PHY
+>  	  PEF 7061, PEF 7071 and PEF 7072 or integrated into the Intel
+>  	  SoCs xRX200, xRX300, xRX330, xRX350 and xRX550.
+>  
+> +config LOONGSON_PHY
+> +	tristate "Loongson PHY driver"
+> +	help
+> +	  Supports the Loongson PHY.
 > +
->         /* Head of free buffer list. */
->         unsigned int free_head;
->         /* Number we've added since last sync. */
-> @@ -440,7 +445,7 @@ static void vring_unmap_one_split_indirect(const stru=
-ct vring_virtqueue *vq,
->  {
->         u16 flags;
->
-> -       if (!vq->use_dma_api)
-> +       if (!vq->do_unmap)
->                 return;
->
->         flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
-> @@ -458,18 +463,21 @@ static unsigned int vring_unmap_one_split(const str=
-uct vring_virtqueue *vq,
->         struct vring_desc_extra *extra =3D vq->split.desc_extra;
->         u16 flags;
->
-> -       if (!vq->use_dma_api)
-> -               goto out;
-> -
->         flags =3D extra[i].flags;
->
->         if (flags & VRING_DESC_F_INDIRECT) {
-> +               if (!vq->use_dma_api)
-> +                       goto out;
+>  config LSI_ET1011C_PHY
+>  	tristate "LSI ET1011C PHY"
+>  	help
+> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+> index f289ab16a1da..f775373e12b7 100644
+> --- a/drivers/net/phy/Makefile
+> +++ b/drivers/net/phy/Makefile
+> @@ -62,6 +62,7 @@ obj-$(CONFIG_DP83TD510_PHY)	+= dp83td510.o
+>  obj-$(CONFIG_FIXED_PHY)		+= fixed_phy.o
+>  obj-$(CONFIG_ICPLUS_PHY)	+= icplus.o
+>  obj-$(CONFIG_INTEL_XWAY_PHY)	+= intel-xway.o
+> +obj-$(CONFIG_LOONGSON_PHY)	+= loongson-phy.o
+>  obj-$(CONFIG_LSI_ET1011C_PHY)	+= et1011c.o
+>  obj-$(CONFIG_LXT_PHY)		+= lxt.o
+>  obj-$(CONFIG_MARVELL_10G_PHY)	+= marvell10g.o
+> diff --git a/drivers/net/phy/loongson-phy.c b/drivers/net/phy/loongson-phy.c
+> new file mode 100644
+> index 000000000000..d4aefa2110f8
+> --- /dev/null
+> +++ b/drivers/net/phy/loongson-phy.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * LS7A PHY driver
+> + *
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + *
+> + * Author: Zhang Baoqi <zhangbaoqi@loongson.cn>
+> + */
 > +
->                 dma_unmap_single(vring_dma_dev(vq),
->                                  extra[i].addr,
->                                  extra[i].len,
->                                  (flags & VRING_DESC_F_WRITE) ?
->                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
->         } else {
-> +               if (!vq->do_unmap)
-> +                       goto out;
+> +#include <linux/mii.h>
+> +#include <linux/module.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/pci.h>
+> +#include <linux/phy.h>
 > +
->                 dma_unmap_page(vring_dma_dev(vq),
->                                extra[i].addr,
->                                extra[i].len,
-> @@ -635,7 +643,7 @@ static inline int virtqueue_add_split(struct virtqueu=
-e *_vq,
->         }
->         /* Last one doesn't continue. */
->         desc[prev].flags &=3D cpu_to_virtio16(_vq->vdev, ~VRING_DESC_F_NE=
-XT);
-> -       if (!indirect && vq->use_dma_api)
-> +       if (!indirect && vq->do_unmap)
->                 vq->split.desc_extra[prev & (vq->split.vring.num - 1)].fl=
-ags &=3D
->                         ~VRING_DESC_F_NEXT;
->
-> @@ -794,7 +802,7 @@ static void detach_buf_split(struct vring_virtqueue *=
-vq, unsigned int head,
->                                 VRING_DESC_F_INDIRECT));
->                 BUG_ON(len =3D=3D 0 || len % sizeof(struct vring_desc));
->
-> -               if (vq->use_dma_api) {
-> +               if (vq->do_unmap) {
->                         for (j =3D 0; j < len / sizeof(struct vring_desc)=
-; j++)
->                                 vring_unmap_one_split_indirect(vq, &indir=
-_desc[j]);
->                 }
-> @@ -1217,17 +1225,20 @@ static void vring_unmap_extra_packed(const struct=
- vring_virtqueue *vq,
->  {
->         u16 flags;
->
-> -       if (!vq->use_dma_api)
-> -               return;
-> -
->         flags =3D extra->flags;
->
->         if (flags & VRING_DESC_F_INDIRECT) {
-> +               if (!vq->use_dma_api)
-> +                       return;
+> +#define PHY_ID_LS7A2000		0x00061ce0
+
+What is Loongson OUI?
+
+> +#define GNET_REV_LS7A2000	0x00
 > +
->                 dma_unmap_single(vring_dma_dev(vq),
->                                  extra->addr, extra->len,
->                                  (flags & VRING_DESC_F_WRITE) ?
->                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
->         } else {
-> +               if (!vq->do_unmap)
-> +                       return;
+> +static int ls7a2000_config_aneg(struct phy_device *phydev)
+> +{
+> +	if (phydev->speed == SPEED_1000)
+> +		phydev->autoneg = AUTONEG_ENABLE;
 
-This seems not straightforward than:
-
-if (!vq->use_dma_api)
-    return;
-
-if (INDIRECT) {
-} else if (!vq->premapped) {
-}
-
-?
-
-Thanks
+Please explain.
 
 > +
->                 dma_unmap_page(vring_dma_dev(vq),
->                                extra->addr, extra->len,
->                                (flags & VRING_DESC_F_WRITE) ?
-> @@ -1240,7 +1251,7 @@ static void vring_unmap_desc_packed(const struct vr=
-ing_virtqueue *vq,
->  {
->         u16 flags;
->
-> -       if (!vq->use_dma_api)
-> +       if (!vq->do_unmap)
->                 return;
->
->         flags =3D le16_to_cpu(desc->flags);
-> @@ -1329,7 +1340,7 @@ static int virtqueue_add_indirect_packed(struct vri=
-ng_virtqueue *vq,
->                                 sizeof(struct vring_packed_desc));
->         vq->packed.vring.desc[head].id =3D cpu_to_le16(id);
->
-> -       if (vq->use_dma_api) {
-> +       if (vq->do_unmap) {
->                 vq->packed.desc_extra[id].addr =3D addr;
->                 vq->packed.desc_extra[id].len =3D total_sg *
->                                 sizeof(struct vring_packed_desc);
-> @@ -1470,7 +1481,7 @@ static inline int virtqueue_add_packed(struct virtq=
-ueue *_vq,
->                         desc[i].len =3D cpu_to_le32(sg->length);
->                         desc[i].id =3D cpu_to_le16(id);
->
-> -                       if (unlikely(vq->use_dma_api)) {
-> +                       if (unlikely(vq->do_unmap)) {
->                                 vq->packed.desc_extra[curr].addr =3D addr=
-;
->                                 vq->packed.desc_extra[curr].len =3D sg->l=
-ength;
->                                 vq->packed.desc_extra[curr].flags =3D
-> @@ -1604,7 +1615,7 @@ static void detach_buf_packed(struct vring_virtqueu=
-e *vq,
->         vq->free_head =3D id;
->         vq->vq.num_free +=3D state->num;
->
-> -       if (unlikely(vq->use_dma_api)) {
-> +       if (unlikely(vq->do_unmap)) {
->                 curr =3D id;
->                 for (i =3D 0; i < state->num; i++) {
->                         vring_unmap_extra_packed(vq,
-> @@ -1621,7 +1632,7 @@ static void detach_buf_packed(struct vring_virtqueu=
-e *vq,
->                 if (!desc)
->                         return;
->
-> -               if (vq->use_dma_api) {
-> +               if (vq->do_unmap) {
->                         len =3D vq->packed.desc_extra[id].len;
->                         for (i =3D 0; i < len / sizeof(struct vring_packe=
-d_desc);
->                                         i++)
-> @@ -2080,6 +2091,7 @@ static struct virtqueue *vring_create_virtqueue_pac=
-ked(
->         vq->dma_dev =3D dma_dev;
->         vq->use_dma_api =3D vring_use_dma_api(vdev);
->         vq->premapped =3D false;
-> +       vq->do_unmap =3D vq->use_dma_api;
->
->         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_=
-DESC) &&
->                 !context;
-> @@ -2587,6 +2599,7 @@ static struct virtqueue *__vring_new_virtqueue(unsi=
-gned int index,
->         vq->dma_dev =3D dma_dev;
->         vq->use_dma_api =3D vring_use_dma_api(vdev);
->         vq->premapped =3D false;
-> +       vq->do_unmap =3D vq->use_dma_api;
->
->         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_=
-DESC) &&
->                 !context;
-> @@ -2765,6 +2778,7 @@ int virtqueue_set_premapped(struct virtqueue *_vq)
->                 return -EINVAL;
->
->         vq->premapped =3D true;
-> +       vq->do_unmap =3D false;
->
->         return 0;
->  }
-> --
-> 2.32.0.3.g01195cf9f
->
+> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> +	    phydev->advertising) ||
+> +	    linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> +	    phydev->advertising) ||
+> +	    linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +	    phydev->advertising))
+> +	    return genphy_config_aneg(phydev);
+> +
+> +	netdev_info(phydev->attached_dev, "Parameter Setting Error\n");
 
+This also needs explaining. How can it be asked to do something it
+does not support?
+
+> +	return -1;
+
+Always use error codes. In this case EINVAL.
+
+> +}
+> +
+> +int ls7a2000_match_phy_device(struct phy_device *phydev)
+> +{
+> +	struct net_device *ndev;
+> +	struct pci_dev *pdev;
+> +
+> +	if ((phydev->phy_id & 0xfffffff0) != PHY_ID_LS7A2000)
+> +		return 0;
+> +
+> +	ndev = phydev->mdio.bus->priv;
+> +	pdev = to_pci_dev(ndev->dev.parent);
+> +
+> +	return pdev->revision == GNET_REV_LS7A2000;
+
+That is very unusual. Why is the PHY ID not sufficient?
+
+> +}
+> +
+> +static struct phy_driver loongson_phy_driver[] = {
+> +	{
+> +		PHY_ID_MATCH_MODEL(PHY_ID_LS7A2000),
+> +		.name			= "LS7A2000 PHY",
+> +		.features		= PHY_LOONGSON_FEATURES,
+
+So what are the capabilities of this PHY? You seem to have some very
+odd hacks here, and no explanation of why they are needed. If you do
+something which no other device does, you need to explain it.
+
+Does the PHY itself only support full duplex? No half duplex? Does the
+PHY support autoneg? Does it support fixed settings? What does
+genphy_read_abilities() return for this PHY?
+
+	Andrew
 
