@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-17698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 857E7752BF4
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:17:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FF26752C01
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B65D61C2147D
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:17:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 199C41C21480
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 21:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67484200D4;
-	Thu, 13 Jul 2023 21:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A18214FA;
+	Thu, 13 Jul 2023 21:17:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A649200D0
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:17:48 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3508226A3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B44214F1
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:17:49 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80362D57
 	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:17:45 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fc0aecf15bso9987675e9.1
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fc04692e20so11266775e9.0
         for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 14:17:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689283063; x=1691875063;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0SJ39/4emjSBqidxqqm+hSVoBmdKYwJWI9c6gIRJrwY=;
-        b=MQOKyAjPYTanB89cWMCX2J4We8mHG/LwU02ZcPmSgvFXX3VCxt/Gmx+J1azXF3R6Yu
-         kcZ7fHr7qI1B148BEzwGy4YwZlRXHns/ugmQ/gvvf6bYFUSC5BiBuZqZt912g4NVqHY8
-         2dA7NLxQ0fEZcLM6uMflFeSsnhAs1wvKDjMc9DLqH1XZCwVdt1e4H1LVRptsM1XHVxln
-         VMOxXII4JBos2e5ca7dSGI9hlq/pVSiNHy67kW5dVmSfEpz4LB/w9Gf8Nm8PgHYm2Xgk
-         fnfth5OVGJ0WCDxZQ9Rb7BMRcrrDaorWW6RiWeK5d/epMXUkey8zak8iLGf5Jg9Vylhm
-         aaBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689283063; x=1691875063;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=tessares.net; s=google; t=1689283064; x=1691875064;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0SJ39/4emjSBqidxqqm+hSVoBmdKYwJWI9c6gIRJrwY=;
-        b=DCo4aR/HkUJO7ir/0MpTwGJgDV9LtNi5IRwzImjsgH1dK3Fs095YqEKONjQ6Fd2o31
-         vkSgJypFvM0rj3dhAk3BoNIFFT9MmWjJlR/7JLuzW3M7RTMi6mQ/xiPmZDxBhA306xzs
-         7XPHHbByXtl2vSt1LYMpdCQtO/oFl8E7PEOHBKwD6l3hmkRk8eTRF6ikLknxLoetIdQm
-         /kjK1a/LQfVw+VGw4777f/jqWrCWpdbeB/N77aI6b44CQrrvWC1Ze6sc13LaLIYIna+m
-         6fwqPu3ZKc1gAKjEdhRXV23QjFLlmvPLUq/k8YuKX0+DxQRR2OdXRrngHIrHooCKA5w8
-         4y9w==
-X-Gm-Message-State: ABy/qLZeflL0l6OPI3sGdbM31yEnGW94wQ2a8o06ujtMIHekjL1xKlWD
-	CRYNimucpDuc+BJwRH+jkQ8CEA==
-X-Google-Smtp-Source: APBJJlHK1/lG2hgNlfU5T9vUiKYKjvPj4CCwde7DgVzxA8j+DT7soIe9qcuZieyexN1nyGW+IoLbPA==
-X-Received: by 2002:a7b:cbc9:0:b0:3fb:e1ed:7f83 with SMTP id n9-20020a7bcbc9000000b003fbe1ed7f83mr2882736wmi.33.1689283062844;
-        Thu, 13 Jul 2023 14:17:42 -0700 (PDT)
+        bh=nYnx/VDo8lOzEkd9RFmD+hOFqRYo9o9+grAoqaC0M7M=;
+        b=rLPmayOWzc6g9V910/q65nAuOjv00BAzsVc6mSA3lR0UWmv1lKPpxAH2Aab7J0z+Aq
+         DoZ3QmD9/bqByDzA8UvfhuoDOg0LF09+jj13aeqiKONl0qANDzxgLpwCoiQs5MwMCL/8
+         cdIXQ4Ed82QlAbNgMzo/kWfthEGfwBwUYbW3UnKd3BnRiPMNZu5fAAcM4f4NX117JN6Y
+         LNXh3yiJJECnC+45b1CCU1L9/4UEAel3HQ0rXqRjr23xxQd6nh02TMvdV1OkGGhISXog
+         JTJDvLxvlYAj+3bPRs1NH6MCSlJ9Srfe8p69z6lDtBxKExRFXlDJC6gaYtMj7ktSQJxh
+         Mkew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689283064; x=1691875064;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nYnx/VDo8lOzEkd9RFmD+hOFqRYo9o9+grAoqaC0M7M=;
+        b=jOrdVZc/XSB8QgqRtvkY5VunHDErNRRCaCV+k/BAtEHT30xl5tOtZdGFh1soDcYNFS
+         7UOeY4gAK8QzFr0lMAEChVYdA+oNstTChByfvJetIpTtnu8n0Rfwc4BZept6CDJrDpQp
+         tG/bOSsxFUCi4aRzMPrT/czx5j4+J5nn7udIdc8KG5RnsiYFvIzh0WvzzOAeovdCHblU
+         6GblkXq9Q2lpx2SeoO6LJ2wLTP4pJlEB065Zk3V/IbZGOFhwy0bnxuMN7n8LEtfOoLdQ
+         0G/sgSy84TrEVXmQEpjZgcO12dYCjgiyt7lhsQm9qUsR2GxTZrv6Uf2GkYCbu5jEb3f1
+         2mEQ==
+X-Gm-Message-State: ABy/qLYhrgXAghtlCmk2xyxdbwM3s20X4cTxV8t5eR1wnqdppthvTeRI
+	QEfK0aVLyqRzZmV9JRiAlGhXew==
+X-Google-Smtp-Source: APBJJlHeiVWzk4vdAI2ZN1b5nV0LGC0UwmaZEvJCTS/gMBXCGRbwK8bTiEpYGGZ853jMECajY/qKhQ==
+X-Received: by 2002:a7b:cc15:0:b0:3fa:9561:3016 with SMTP id f21-20020a7bcc15000000b003fa95613016mr2331758wmh.30.1689283063981;
+        Thu, 13 Jul 2023 14:17:43 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id m20-20020a7bcb94000000b003fbfea1afffsm8734136wmi.27.2023.07.13.14.17.41
+        by smtp.gmail.com with ESMTPSA id m20-20020a7bcb94000000b003fbfea1afffsm8734136wmi.27.2023.07.13.14.17.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 14:17:42 -0700 (PDT)
+        Thu, 13 Jul 2023 14:17:43 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Subject: [PATCH net 0/3] selftests: tc: increase timeout and add missing
- kconfig
-Date: Thu, 13 Jul 2023 23:16:43 +0200
-Message-Id: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
+Date: Thu, 13 Jul 2023 23:16:44 +0200
+Subject: [PATCH net 1/3] selftests: tc: set timeout to 15 minutes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,9 +67,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALtpsGQC/x3MQQqDMBBG4avIrB1ITLXYq4iLon/qUIklM0hBv
- LvB5bd47yBFFii9qoMydlHZUoGvK5qWd/qAZS6mxjXBPX1gm1ixRoOa8vqNxqELeLS9i961VLp
- fRpT//RwowWg8zwsrw3IxaAAAAA==
+Message-Id: <20230713-tc-selftests-lkft-v1-1-1eb4fd3a96e7@tessares.net>
+References: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
+In-Reply-To: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
 To: Jamal Hadi Salim <jhs@mojatatu.com>, 
  Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
  Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
@@ -81,21 +80,21 @@ Cc: Pedro Tammela <pctammela@mojatatu.com>,
  netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1319;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1433;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=X7TmH0nuyH8IYOau93/uRL5n5B40ehly9tSIh/k77XU=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBksGn1fSBHW3xBP1UUe+C5C8geDtkmfExF5YBV1
- KB1xfHHozKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLBp9QAKCRD2t4JPQmmg
- c2IiD/4275C6eSBB6If2iVSrVVuu040rBtAxF3vjZTgGMw4h1d+VzvS52fSGSIksGR8bdY0gjED
- UnmPuLzrChpaGx+m8o8fuVpTgFLQNUn6BUt3Q68ipTHyWVQDMBSgW80Djso53UtEmSKZqRSBsXH
- cCHlqwShwov5L7sl6kQz5a9skY8LJPJAWxAUz5kSkHobGdmQpSwO/DPqryh9SY+1D08GKVoA0Va
- 4Qyjxw9CWe2EsjHfF6nShg7ufvS5hALVhw5cG68jOhIypW/DNnUvUFjaKaZHYRUjTOaj4RDJA/+
- 4o5mqV1FkNGcSh7fJArppllho7Uu3f7UlO+xL6eS0Hw6+09lsqR4xuFCsGetegggREG3S3LpYNa
- hhQu9xkgAvCbyI1a9dlZJCIoNHZyaafvRpaOqqBVlIofwEXPnKJaRSgylHtC4rAKtH3Le8lcP4f
- RJP5G5VN4mTwd/kfGHccEEviE+OBdGyD6GZAh+fJQz0Yo3F9IVeRGW+S3+zlfZOhZmCFFAzkIk1
- y5X3DK27ZQ6o+Na+sLw3htKtxW/Yixy4Np1IPAVsB5W5qA8U7s8UfXksSIRXcUYGGSb7gtsqkeS
- vDsqBg+WiFThnjxvJAsJuOZyRBJ/CyTaQeJFTXwVk6HoRjFQyhpz3yM2VX4E/kIulcaZqI+Tzt1
- 8YasD0mMn5Z06Mw==
+ bh=aRf2NUlWpQteg42pbw7DyQllMQTrdJ1OPx8sg9BiW2M=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBksGn1E1CyU82GEtiTz9Kn3atBqLCeF8gHpWsl/
+ QfpMKoJ40OJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLBp9QAKCRD2t4JPQmmg
+ c/WRD/9f1JjmbA0ekElLhLbwzV9QM7ML9tP6qiaEiGIRxESQJvVnvwoBM74lJGLNLwoxh1RTPM7
+ BazpQpnWcvtP1g7+T5PLIajJ9xNxBasm+wLsssacLKdxMc4KkKZ9N4j4gg71aaWrNaM22Gsu9DO
+ x5K148C72MuH7vzcg1qKfmSUl3nLkzB+FYCIoHLl7Rm40IWR3ccHOdiw1lkGoABBHCYzjMUZkSR
+ 5HjtOkWwjuWMurPnW3JNrSYBtDszpC33kjxz9PJH6+mWYxG9f9YRMOX5+umyyTnRUeAQ6/78BBB
+ X3Ux4Aa3T4g1AIlUFJls0Drv8mX4fkf0qfi+brN4XGI3KSq6MLVqdl6fCSnRbN5Ab4NhWw0ZqhJ
+ SYcAiecUnZWjpz1GNOA9utPRGzEy+z4mXXKOjjLpOxVRahOMwjXzdYg03VaJ2EIH5nMTfwzL+Fv
+ j4IPDaulMsxNThGDll6SSx9jjYM3IZYAk4Vv6RH6te9TiXmv39crSUJaCraIAYFS3t0ZDnXjIgQ
+ OljCjFLAtHfBn6bj4Yu5MWLHiM0uXVHvUpljYAj/Rk7rGymqVpXmjUr4CbPTM1Dsor2JwGwzLR0
+ KghInxltcEu0T+ui9/rzcjCAr5SCzVGSzhBamCR3CRttgCxmGdcmEHtTOUuR6d0jOFK28wnNkRE
+ zgAHC1Q6JIX0V7g==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -110,31 +109,34 @@ TC selftest ended with a timeout error:
 
   not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
 
-I also noticed most of the tests were skipped because the "teardown
-stage" did not complete successfully. It was due to missing kconfig.
+The timeout had been introduced 3 years ago, see the Fixes commit below.
 
-These patches fix these two errors plus an extra one because this
-selftest reads info from "/proc/net/nf_conntrack". Thank you Pedro for
-having helped me fixing these issues [2].
+This timeout is only in place when executing the selftests via the
+kselftests runner scripts. I guess this is not what most TC devs are
+using and nobody noticed the issue before.
 
+The new timeout is set to 15 minutes as suggested by Pedro [2]. It looks
+like it is plenty more time than what it takes in "normal" conditions.
+
+Fixes: 852c8cbf34d3 ("selftests/kselftest/runner.sh: Add 45 second timeout per test")
+Cc: stable@vger.kernel.org
 Link: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230711/testrun/18267241/suite/kselftest-tc-testing/test/tc-testing_tdc_sh/log [1]
 Link: https://lore.kernel.org/netdev/0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net/T/ [2]
+Suggested-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
-Matthieu Baerts (3):
-      selftests: tc: set timeout to 15 minutes
-      selftests: tc: add 'ct' action kconfig dep
-      selftests: tc: add ConnTrack procfs kconfig
-
- tools/testing/selftests/tc-testing/config   | 2 ++
  tools/testing/selftests/tc-testing/settings | 1 +
- 2 files changed, 3 insertions(+)
----
-base-commit: 9d23aac8a85f69239e585c8656c6fdb21be65695
-change-id: 20230713-tc-selftests-lkft-363e4590f105
+ 1 file changed, 1 insertion(+)
 
-Best regards,
+diff --git a/tools/testing/selftests/tc-testing/settings b/tools/testing/selftests/tc-testing/settings
+new file mode 100644
+index 000000000000..e2206265f67c
+--- /dev/null
++++ b/tools/testing/selftests/tc-testing/settings
+@@ -0,0 +1 @@
++timeout=900
+
 -- 
-Matthieu Baerts <matthieu.baerts@tessares.net>
+2.40.1
 
 
