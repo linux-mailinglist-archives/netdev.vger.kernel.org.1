@@ -1,247 +1,226 @@
-Return-Path: <netdev+bounces-17404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF7375177E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5917517A2
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 06:43:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6301F1C2128A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 110BD1C2126F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 04:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E93F63A;
-	Thu, 13 Jul 2023 04:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0369645;
+	Thu, 13 Jul 2023 04:43:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F66629;
-	Thu, 13 Jul 2023 04:33:25 +0000 (UTC)
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A70912F;
-	Wed, 12 Jul 2023 21:33:24 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailnew.nyi.internal (Postfix) with ESMTP id A651158014A;
-	Thu, 13 Jul 2023 00:33:20 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Thu, 13 Jul 2023 00:33:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm1; t=
-	1689222800; x=1689230000; bh=v+lGBq+GJvpo2kNvySw6OJjRn6Dau/dhBqQ
-	PgKVw2CQ=; b=Ydxif1r282/SQPhrzrY2GmsMajEwfmQ8a79fOmJp2JCCyCO1H5e
-	EPewr9Zx+Us62Lyk0Uq67G9wzmJ4CGJldD2IU4Y0QlAki+1RznNT1RUL4ppEW468
-	a4zFolkEu8Jd+YOYrLHwzkIX3geDGNQvTaKCRGh3jtv20ZK8sgbzN8UOr4rxTadu
-	xpKwmfmDF8Rhkna2/u7+B5pkOrg7Nh5f1iStoZGT9S/2h12q5BrjLd9FmMvW/mou
-	4FexsgaHFbDOupyzvCR3NCa7Ko/8w00K+IcUVjWgCxtNX1klziRCDEQQP3SQFY8i
-	IvTl24b4Y5X4GDzULEUY/sRyWvZSs7ufpqA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1689222800; x=1689230000; bh=v+lGBq+GJvpo2kNvySw6OJjRn6Dau/dhBqQ
-	PgKVw2CQ=; b=fgeaCodm8HH0aE7shD+BHhQYqHpMXe9BsL9VSsSN/WJWSEeBrEC
-	BTk7kBvJrQLLHaQYyNb7zrDFBKLB2THEbzyMh9+9L/Yc5KOv49G46KVti8zYVa46
-	GaKpMMFfWXSmNTraqwyzR7FRS2Ag7G0BGX+XD8Ha1hSJZOWrZglRWBqqOeIqH6bh
-	i5OT0a9PzcDvxVqOExTrfgqW57QvhX2IBLR+7ev+zBf2j2igL9FeujM/Dx+oFQ7I
-	JFNLhQgUonkgeRqvJn2i7UcpcQ2EPY/AST+v8wW7TF5kFYE9Jhv8JTFWVBDbdcsO
-	U7Omy3Fhtv1h8GcVR2+hgUWu/89F4Vvj70g==
-X-ME-Sender: <xms:kH6vZCNvEuQFvMAjH-eqZdA5Z6iqj2kWh2GCbX9JTLDgB7G3kYd1Qg>
-    <xme:kH6vZA_g7MGZi1EGlBsUW_9alzrF2TWPmqvsL7cbHI9yDxizyAG8NSxyI1fEVuCZ1
-    JsQQo6UlHzfyoaMkQ>
-X-ME-Received: <xmr:kH6vZJQ4Xep3pgUvzJa2NYPw0HCQ9lUnWNACwK_oCo_a1lE7gnxhrjgF3gfhrdd5hy0Z3T3GHqZLRuraZbih0MxWyS3FRCH_I-Bt>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrfeefgdekvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
-    hrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefstddt
-    tdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
-    cuggftrfgrthhtvghrnhepieektdefhffhjeejgeejhfekkeejgfegvdeuhfeitdeiueeh
-    hffgvedthedviefgnecuffhomhgrihhnpehqvghmuhdrohhrghenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:kH6vZCt72U-FBVX6tLrqaPeaPoUfUH9z-P6Nj1hqnigQJ_pjsvGDmA>
-    <xmx:kH6vZKfXKXYQo42k5IQHOLv_7RzDdWkSNJgYftSK6yp142O-PgxGzQ>
-    <xmx:kH6vZG14awhZMY8fhJ3e837cipMAXfutZEyzNfuLpCfYkYs8asLuqg>
-    <xmx:kH6vZIcDhoL_pWLsJEg5zCMGqqwT0nqZgobChfCa9hCQiPXfbh_9sA>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 13 Jul 2023 00:33:18 -0400 (EDT)
-Date: Wed, 12 Jul 2023 22:33:17 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	"David S. Miller" <davem@davemloft.net>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
-	Network Development <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH bpf-next v4 2/6] netfilter: bpf: Support
- BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-Message-ID: <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
-References: <cover.1689203090.git.dxu@dxuuu.xyz>
- <d3b0ff95c58356192ea3b50824f8cdbf02c354e3.1689203090.git.dxu@dxuuu.xyz>
- <CAADnVQKKfEtZYZxihxvG3aQ34E1m95qTZ=jTD7yd0qvOASpAjQ@mail.gmail.com>
- <kwiwaeaijj6sxwz5fhtxyoquhz2kpujbsbeajysufgmdjgyx5c@f6lqrd23xr5f>
- <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F78629
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 04:43:13 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E722118;
+	Wed, 12 Jul 2023 21:43:09 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 4653F100018;
+	Thu, 13 Jul 2023 07:43:06 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4653F100018
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1689223386;
+	bh=GZsDJxsvZ7S25s8E+UbwVCfAMZkZAWT3goxw3fP22mM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=RSy8b8KlZtEmzoiCosMgw8Igh0S8157B2Eu48m0x8y4lF9Hy6+rI5rxho1R53/eha
+	 gLEoqnumfn/fQRWzSJoQ4+bqLYQ4nO7FhA16MrtNRa+PS8fl+Hla4j2pwcAFkhFlTF
+	 eNFYJmiftztIiWVB54lnLbL2ea/uZEdxdbc/NyLMEQfzHFaJ0Pd8X0KLeOz0Tbf6Ya
+	 10hlFtPAqu+GgmeCE7qTYwtIenPG4a78vXOd4z7gDgluBZrYjufmQ7J7RiNEqCW95x
+	 yhbUfkMsMSWK10aRVvrLxg7dfnFHJDlJjkhnbMtq65bXBsW1WOm1uHRSVE6A/tFy4r
+	 o0VGMgzYgG0rg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 13 Jul 2023 07:43:06 +0300 (MSK)
+Received: from [192.168.0.12] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 13 Jul 2023 07:42:44 +0300
+Message-ID: <cafa9b17-1cb2-543d-8e74-7cf47a92853e@sberdevices.ru>
+Date: Thu, 13 Jul 2023 07:37:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v5 13/17] vsock: enable setting SO_ZEROCOPY
+Content-Language: en-US
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
+ <20230701063947.3422088-14-AVKrasnov@sberdevices.ru>
+ <ZK8pxrbkrH2bEgw7@bullseye>
+From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <ZK8pxrbkrH2bEgw7@bullseye>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178587 [Jul 12 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 521 521 0c3391dd6036774f2e1052158c81e48587b96e95, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/13 02:50:00 #21606476
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 06:26:13PM -0700, Alexei Starovoitov wrote:
-> On Wed, Jul 12, 2023 at 6:22 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> >
-> > Hi Alexei,
-> >
-> > On Wed, Jul 12, 2023 at 05:43:49PM -0700, Alexei Starovoitov wrote:
-> > > On Wed, Jul 12, 2023 at 4:44 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> > > > +#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
-> > > > +       case NFPROTO_IPV6:
-> > > > +               rcu_read_lock();
-> > > > +               v6_hook = rcu_dereference(nf_defrag_v6_hook);
-> > > > +               if (!v6_hook) {
-> > > > +                       rcu_read_unlock();
-> > > > +                       err = request_module("nf_defrag_ipv6");
-> > > > +                       if (err)
-> > > > +                               return err < 0 ? err : -EINVAL;
-> > > > +
-> > > > +                       rcu_read_lock();
-> > > > +                       v6_hook = rcu_dereference(nf_defrag_v6_hook);
-> > > > +                       if (!v6_hook) {
-> > > > +                               WARN_ONCE(1, "nf_defrag_ipv6_hooks bad registration");
-> > > > +                               err = -ENOENT;
-> > > > +                               goto out_v6;
-> > > > +                       }
-> > > > +               }
-> > > > +
-> > > > +               err = v6_hook->enable(link->net);
-> > >
-> > > I was about to apply, but luckily caught this issue in my local test:
-> > >
-> > > [   18.462448] BUG: sleeping function called from invalid context at
-> > > kernel/locking/mutex.c:283
-> > > [   18.463238] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid:
-> > > 2042, name: test_progs
-> > > [   18.463927] preempt_count: 0, expected: 0
-> > > [   18.464249] RCU nest depth: 1, expected: 0
-> > > [   18.464631] CPU: 15 PID: 2042 Comm: test_progs Tainted: G
-> > > O       6.4.0-04319-g6f6ec4fa00dc #4896
-> > > [   18.465480] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> > > BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-> > > [   18.466531] Call Trace:
-> > > [   18.466767]  <TASK>
-> > > [   18.466975]  dump_stack_lvl+0x32/0x40
-> > > [   18.467325]  __might_resched+0x129/0x180
-> > > [   18.467691]  mutex_lock+0x1a/0x40
-> > > [   18.468057]  nf_defrag_ipv4_enable+0x16/0x70
-> > > [   18.468467]  bpf_nf_link_attach+0x141/0x300
-> > > [   18.468856]  __sys_bpf+0x133e/0x26d0
-> > >
-> > > You cannot call mutex under rcu_read_lock.
-> >
-> > Whoops, my bad. I think this patch should fix it:
-> >
-> > ```
-> > From 7e8927c44452db07ddd7cf0e30bb49215fc044ed Mon Sep 17 00:00:00 2001
-> > Message-ID: <7e8927c44452db07ddd7cf0e30bb49215fc044ed.1689211250.git.dxu@dxuuu.xyz>
-> > From: Daniel Xu <dxu@dxuuu.xyz>
-> > Date: Wed, 12 Jul 2023 19:17:35 -0600
-> > Subject: [PATCH] netfilter: bpf: Don't hold rcu_read_lock during
-> >  enable/disable
-> >
-> > ->enable()/->disable() takes a mutex which can sleep. You can't sleep
-> > during RCU read side critical section.
-> >
-> > Our refcnt on the module will protect us from ->enable()/->disable()
-> > from going away while we call it.
-> >
-> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > ---
-> >  net/netfilter/nf_bpf_link.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-> > index 77ffbf26ba3d..79704cc596aa 100644
-> > --- a/net/netfilter/nf_bpf_link.c
-> > +++ b/net/netfilter/nf_bpf_link.c
-> > @@ -60,9 +60,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
-> >                         goto out_v4;
-> >                 }
-> >
-> > +               rcu_read_unlock();
-> >                 err = v4_hook->enable(link->net);
-> >                 if (err)
-> >                         module_put(v4_hook->owner);
-> > +
-> > +               return err;
-> >  out_v4:
-> >                 rcu_read_unlock();
-> >                 return err;
-> > @@ -92,9 +95,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
-> >                         goto out_v6;
-> >                 }
-> >
-> > +               rcu_read_unlock();
-> >                 err = v6_hook->enable(link->net);
-> >                 if (err)
-> >                         module_put(v6_hook->owner);
-> > +
-> > +               return err;
-> >  out_v6:
-> >                 rcu_read_unlock();
-> >                 return err;
-> > @@ -114,11 +120,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
-> >         case NFPROTO_IPV4:
-> >                 rcu_read_lock();
-> >                 v4_hook = rcu_dereference(nf_defrag_v4_hook);
-> > +               rcu_read_unlock();
-> >                 if (v4_hook) {
-> >                         v4_hook->disable(link->net);
-> >                         module_put(v4_hook->owner);
-> >                 }
-> > -               rcu_read_unlock();
-> >
-> >                 break;
-> >  #endif
-> > @@ -126,11 +132,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
-> >         case NFPROTO_IPV6:
-> >                 rcu_read_lock();
-> >                 v6_hook = rcu_dereference(nf_defrag_v6_hook);
-> > +               rcu_read_unlock();
+
+
+On 13.07.2023 01:31, Bobby Eshleman wrote:
+> On Sat, Jul 01, 2023 at 09:39:43AM +0300, Arseniy Krasnov wrote:
+>> For AF_VSOCK, zerocopy tx mode depends on transport, so this option must
+>> be set in AF_VSOCK implementation where transport is accessible (if
+>> transport is not set during setting SO_ZEROCOPY: for example socket is
+>> not connected, then SO_ZEROCOPY will be enabled, but once transport will
+>> be assigned, support of this type of transmission will be checked).
+>>
+>> To handle SO_ZEROCOPY, AF_VSOCK implementation uses SOCK_CUSTOM_SOCKOPT
+>> bit, thus handling SOL_SOCKET option operations, but all of them except
+>> SO_ZEROCOPY will be forwarded to the generic handler by calling
+>> 'sock_setsockopt()'.
+>>
+>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>> ---
+>>  Changelog:
+>>  v4 -> v5:
+>>   * This patch is totally reworked. Previous version added check for
+>>     PF_VSOCK directly to 'net/core/sock.c', thus allowing to set
+>>     SO_ZEROCOPY for AF_VSOCK type of socket. This new version catches
+>>     attempt to set SO_ZEROCOPY in 'af_vsock.c'. All other options
+>>     except SO_ZEROCOPY are forwarded to generic handler. Only this
+>>     option is processed in 'af_vsock.c'. Handling this option includes
+>>     access to transport to check that MSG_ZEROCOPY transmission is
+>>     supported by the current transport (if it is set, if not - transport
+>>     will be checked during 'connect()').
+>>
+>>  net/vmw_vsock/af_vsock.c | 44 ++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 42 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index da22ae0ef477..8acc77981d01 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -1406,8 +1406,18 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>>  			goto out;
+>>  		}
+>>  
+>> -		if (vsock_msgzerocopy_allow(transport))
+>> +		if (!vsock_msgzerocopy_allow(transport)) {
+>> +			/* If this option was set before 'connect()',
+>> +			 * when transport was unknown, check that this
+>> +			 * feature is supported here.
+>> +			 */
+>> +			if (sock_flag(sk, SOCK_ZEROCOPY)) {
+>> +				err = -EOPNOTSUPP;
+>> +				goto out;
+>> +			}
+>> +		} else {
+>>  			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
+>> +		}
+>>  
+>>  		err = vsock_auto_bind(vsk);
+>>  		if (err)
+>> @@ -1643,7 +1653,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>>  	const struct vsock_transport *transport;
+>>  	u64 val;
+>>  
+>> -	if (level != AF_VSOCK)
+>> +	if (level != AF_VSOCK && level != SOL_SOCKET)
+>>  		return -ENOPROTOOPT;
+>>  
+>>  #define COPY_IN(_v)                                       \
+>> @@ -1666,6 +1676,34 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>>  
+>>  	transport = vsk->transport;
+>>  
+>> +	if (level == SOL_SOCKET) {
+>> +		if (optname == SO_ZEROCOPY) {
+>> +			int zc_val;
+>> +
+>> +			/* Use 'int' type here, because variable to
+>> +			 * set this option usually has this type.
+>> +			 */
+>> +			COPY_IN(zc_val);
+>> +
+>> +			if (zc_val < 0 || zc_val > 1) {
+>> +				err = -EINVAL;
+>> +				goto exit;
+>> +			}
+>> +
+>> +			if (transport && !vsock_msgzerocopy_allow(transport)) {
+>> +				err = -EOPNOTSUPP;
+>> +				goto exit;
+>> +			}
+>> +
+>> +			sock_valbool_flag(sk, SOCK_ZEROCOPY,
+>> +					  zc_val ? true : false);
+>> +			goto exit;
+>> +		}
+>> +
+>> +		release_sock(sk);
+>> +		return sock_setsockopt(sock, level, optname, optval, optlen);
+>> +	}
+>> +
+>>  	switch (optname) {
+>>  	case SO_VM_SOCKETS_BUFFER_SIZE:
+>>  		COPY_IN(val);
+>> @@ -2321,6 +2359,8 @@ static int vsock_create(struct net *net, struct socket *sock,
+>>  		}
+>>  	}
+>>  
+>> +	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
+>> +
 > 
-> No. v6_hook is gone as soon as you unlock it.
+> I found that because datagrams have !ops->setsockopt this bit causes
+> setsockopt() to fail (the related logic can be found in
+> __sys_setsockopt). Maybe we should only set this for connectibles?
 
-I think we're protected here by the try_module_get() on the enable path.
-And we only disable defrag if enabling succeeds. The module shouldn't
-be able to deregister its hooks until we call the module_put() later.
+Agree! I'll add this check in the next version
 
-I think READ_ONCE() would've been more appropriate but I wasn't sure if
-that was ok given nf_defrag_v(4|6)_hook is written to by
-rcu_assign_pointer() and I was assuming symmetry is necessary.
+Thanks, Arseniy
 
-Does that sound right?
-
-Thanks,
-Daniel
+> 
+> Best,
+> Bobby
+> 
+>>  	vsock_insert_unbound(vsk);
+>>  
+>>  	return 0;
+>> -- 
+>> 2.25.1
+>>
 
