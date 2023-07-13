@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-17514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71AD751DA7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:46:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A114751DAA
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 11:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30A68281CBF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:46:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 749E01C21106
+	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 09:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6942B100DC;
-	Thu, 13 Jul 2023 09:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46983100DE;
+	Thu, 13 Jul 2023 09:49:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B19100D6
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:46:14 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0E42113
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:46:12 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4f96d680399so870952e87.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1689241570; x=1691833570;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xN6Kb5J+9QWBrMEWZT5CJCFZg1nR/z1fy+PIOKZtWdg=;
-        b=a6sdMqFl1Vm+4kzc9aTSRXzjBVZQx7aAyXLkZpyNTtmfnIqe1uELYtL9rDd9swHhrj
-         EFrqpQdKBmN3Yn2p4UnfcjMj4aThh0xqaPyB4jBV42T90NHaqHMBGIe49ugDGT7lV+EO
-         DPJ1bZyaM3CU3kiEh8Ox8P0LQoumz9Tv75ko3fXTHR3YH6SkVp0bOBzN11f4D20PZO/h
-         q674WDG7yJDmdnWihGZDtxqDwQupnkTyDkTFP8Sd5ytDJyEuPuYu+60XnRwrtsvvWwi/
-         6pHZV4F0KW/ijcJuwYiEiFWZbc/YRHPwgNosfhLVfAr5PcoAPC1ecHuFN1KpzS+L5Dno
-         MLYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689241570; x=1691833570;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xN6Kb5J+9QWBrMEWZT5CJCFZg1nR/z1fy+PIOKZtWdg=;
-        b=ewxFBU+d4ZibIGAOUofjacy8kmGdVduydzA7I9ANZ3P0U2tG1qRNfbiNpK/gjp7R5x
-         e3nfIKOAb/KMEpWWmM6qvGc+Izb3eUA9Dy/+KUDPG8zbVwuibaz02A8rW5//Rzn/LnGD
-         leaNajzvQRiMfICeczHSrySS6fkYvlFUj4FFnIBLZ34D5A2MUDm6RvT02tKgTWKn/qie
-         d+eToJj63VHa1WiRPIb4+zBKnVpND03o7rbvdnkDkdOpcvBeguhNmr+tblxu/OF6SyB3
-         7hBPdreXvViNMNP4Ywk7It1N8qWzBdnaHN6yZqL6vRhKInGJvHJWVujk530+IIicsvpr
-         7Qag==
-X-Gm-Message-State: ABy/qLYHfMWZmJ1FJDn67LNQm5GSLFdyZJsyjr41ePOhMVGdVyO+u/Dp
-	x7/AVdxVMQwZPHptb4iGvQBk8w==
-X-Google-Smtp-Source: APBJJlHUOJzuwGo9OC3JAs49N7xR49/3ERb2ro6C6WSUdW7HBaG/5+x3Y+5j8TVtFpulBD3/BAoBkQ==
-X-Received: by 2002:ac2:464a:0:b0:4f8:651f:9bbe with SMTP id s10-20020ac2464a000000b004f8651f9bbemr823848lfo.54.1689241570305;
-        Thu, 13 Jul 2023 02:46:10 -0700 (PDT)
-Received: from [192.168.51.243] ([78.128.78.220])
-        by smtp.gmail.com with ESMTPSA id u30-20020a056512041e00b004f86673a47dsm1052827lfk.75.2023.07.13.02.46.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 02:46:10 -0700 (PDT)
-Message-ID: <c8e6c501-7006-d051-872c-3e86cf627ed3@blackwall.org>
-Date: Thu, 13 Jul 2023 12:46:08 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1FA100C7
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 09:49:01 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5D392126
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 02:48:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7F2AE1F385;
+	Thu, 13 Jul 2023 09:48:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1689241738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j20Ygka2bvL/7ZoZfn4Cq0kxCBYxWfaUGWpBpPbqXmM=;
+	b=q6lVBZ9S98kr4n7JLThEdEhwF/hlwDA3x84qTd1RBdhG9rup9B2+t9CAl7Oy3J9ECrtnl2
+	cpdE4NOph9VqLtYhNMgF2E0e8wLO+hmljvN3ifg8OoHCJ/2uegUxW7HLa4EHM4Q64r5lu8
+	2XS5/M6XBxjE63nm2a2K9zKoY9bdCJw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1689241738;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j20Ygka2bvL/7ZoZfn4Cq0kxCBYxWfaUGWpBpPbqXmM=;
+	b=1ZRFGKHK0qxCeJJ8qvOO4w+N6fjRAJ3rpmmugPQS6oGpeb8RvaWAKQdKTBGq7AzImjWczr
+	5GIWJgvYBgdbuYAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A21D133D6;
+	Thu, 13 Jul 2023 09:48:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id xoJpGIrIr2SkVwAAMHmgww
+	(envelope-from <hare@suse.de>); Thu, 13 Jul 2023 09:48:58 +0000
+Message-ID: <1496b59a-10b1-bb49-2d04-5552e002c960@suse.de>
+Date: Thu, 13 Jul 2023 11:48:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,127 +64,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [RFC PATCH net-next 3/4] bridge: Add backup nexthop ID support
+ Thunderbird/102.12.0
+Subject: Re: nvme-tls and TCP window full
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- bridge@lists.linux-foundation.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, roopa@nvidia.com, dsahern@gmail.com, petrm@nvidia.com,
- taspelund@nvidia.com
-References: <20230713070925.3955850-1-idosch@nvidia.com>
- <20230713070925.3955850-4-idosch@nvidia.com>
- <ef77b43d-0b5a-9e5f-640a-5e3c981bd642@blackwall.org>
-In-Reply-To: <ef77b43d-0b5a-9e5f-640a-5e3c981bd642@blackwall.org>
+To: Sagi Grimberg <sagi@grimberg.me>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+References: <f10a9e4a-b545-429d-803e-c1d63a084afe@suse.de>
+ <49422387-5ea3-af84-3f94-076c94748fff@grimberg.me>
+ <ed5b22c6-d862-8706-fc2e-5306ed1eaad2@grimberg.me>
+ <a50ee71b-8ee9-7636-917d-694eb2a482b4@suse.de>
+ <6a9e0fbf-ca1a-aadd-e79a-c70ecd14bc28@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <6a9e0fbf-ca1a-aadd-e79a-c70ecd14bc28@grimberg.me>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 13/07/2023 12:33, Nikolay Aleksandrov wrote:
-> On 13/07/2023 10:09, Ido Schimmel wrote:
->> Add a new bridge port attribute that allows attaching a nexthop object
->> ID to an skb that is redirected to a backup bridge port with VLAN
->> tunneling enabled.
->>
->> Specifically, when redirecting a known unicast packet, read the backup
->> nexthop ID from the bridge port that lost its carrier and set it in the
->> bridge control block of the skb before forwarding it via the backup
->> port. Note that reading the ID from the bridge port should not result in
->> a cache miss as the ID is added next to the 'backup_port' field that was
->> already accessed. After this change, the 'state' field still stays on
->> the first cache line, together with other data path related fields such
->> as 'flags and 'vlgrp':
->>
->> struct net_bridge_port {
->>          struct net_bridge *        br;                   /*     0     8 */
->>          struct net_device *        dev;                  /*     8     8 */
->>          netdevice_tracker          dev_tracker;          /*    16     0 */
->>          struct list_head           list;                 /*    16    16 */
->>          long unsigned int          flags;                /*    32     8 */
->>          struct net_bridge_vlan_group * vlgrp;            /*    40     8 */
->>          struct net_bridge_port *   backup_port;          /*    48     8 */
->>          u32                        backup_nhid;          /*    56     4 */
->>          u8                         priority;             /*    60     1 */
->>          u8                         state;                /*    61     1 */
->>          u16                        port_no;              /*    62     2 */
->>          /* --- cacheline 1 boundary (64 bytes) --- */
->> [...]
->> } __attribute__((__aligned__(8)));
->>
->> When forwarding an skb via a bridge port that has VLAN tunneling
->> enabled, check if the backup nexthop ID stored in the bridge control
->> block is valid (i.e., not zero). If so, instead of attaching the
->> pre-allocated metadata (that only has the tunnel key set), allocate a
->> new metadata, set both the tunnel key and the nexthop object ID and
->> attach it to the skb.
->>
->> By default, do not dump the new attribute to user space as a value of
->> zero is an invalid nexthop object ID.
->>
->> The above is useful for EVPN multihoming. When one of the links
->> composing an Ethernet Segment (ES) fails, traffic needs to be redirected
->> towards the host via one of the other ES peers. For example, if a host
->> is multihomed to three different VTEPs, the backup port of each ES link
->> needs to be set to the VXLAN device and the backup nexthop ID needs to
->> point to an FDB nexthop group that includes the IP addresses of the
->> other two VTEPs. The VXLAN driver will extract the ID from the metadata
->> of the redirected skb, calculate its flow hash and forward it towards
->> one of the other VTEPs. If the ID does not exist, or represents an
->> invalid nexthop object, the VXLAN driver will drop the skb. This
->> relieves the bridge driver from the need to validate the ID.
->>
->> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
->> ---
->>   include/uapi/linux/if_link.h |  1 +
->>   net/bridge/br_forward.c      |  1 +
->>   net/bridge/br_netlink.c      | 12 ++++++++++++
->>   net/bridge/br_private.h      |  3 +++
->>   net/bridge/br_vlan_tunnel.c  | 15 +++++++++++++++
->>   net/core/rtnetlink.c         |  2 +-
->>   6 files changed, 33 insertions(+), 1 deletion(-)
->>
-[snip]
->> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
->> index 6116eba1bd89..9d7bc8b96b53 100644
->> --- a/net/bridge/br_forward.c
->> +++ b/net/bridge/br_forward.c
->> @@ -154,6 +154,7 @@ void br_forward(const struct net_bridge_port *to,
->>           backup_port = rcu_dereference(to->backup_port);
->>           if (unlikely(!backup_port))
->>               goto out;
->> +        BR_INPUT_SKB_CB(skb)->backup_nhid = READ_ONCE(to->backup_nhid);
->>           to = backup_port;
->>       }
->> diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
->> index 05c5863d2e20..10f0d33d8ccf 100644
->> --- a/net/bridge/br_netlink.c
->> +++ b/net/bridge/br_netlink.c
->> @@ -211,6 +211,7 @@ static inline size_t br_port_info_size(void)
->>           + nla_total_size(sizeof(u8))    /* IFLA_BRPORT_MRP_IN_OPEN */
->>           + nla_total_size(sizeof(u32))    /* IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT */
->>           + nla_total_size(sizeof(u32))    /* IFLA_BRPORT_MCAST_EHT_HOSTS_CNT */
->> +        + nla_total_size(sizeof(u32))    /* IFLA_BRPORT_BACKUP_NHID */
->>           + 0;
->>   }
->> @@ -319,6 +320,10 @@ static int br_port_fill_attrs(struct sk_buff *skb,
->>                   backup_p->dev->ifindex);
->>       rcu_read_unlock();
->> +    if (p->backup_nhid &&
->> +        nla_put_u32(skb, IFLA_BRPORT_BACKUP_NHID, p->backup_nhid))
->> +        return -EMSGSIZE;
->> +
+On 7/11/23 14:05, Sagi Grimberg wrote:
 > 
-> READ_ONCE(), see the comment above backup_port :)
+>>> Hey Hannes,
+>>>
+>>> Any progress on this one?
+>>>
+>> Oh well; slow going.
+[ .. ]
+>> Maybe the server doesn't retire skbs (or not all of them), causing the 
+>> TCP window to shrink.
+>> That, of course, is wild guessing, as I have no idea if and how calls 
+>> to 'consume_skb' reflect back to the TCP window size.
 > 
+> skbs are unrelated to the TCP window. They relate to the socket send
+> buffer. skbs left dangling would cause server side to run out of memory,
+> not for the TCP window to close. The two are completely unrelated.
 
-Actually the updates are done with port lock as well.
-This should be fine. Patch looks good.
+Ouch.
+Wasn't me, in the end:
 
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index f37f4a0fcd3c..ca1e0e198ceb 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -369,7 +369,6 @@ static int tls_strp_copyin(read_descriptor_t *desc, 
+struct sk_buff *in_skb,
 
+  static int tls_strp_read_copyin(struct tls_strparser *strp)
+  {
+-       struct socket *sock = strp->sk->sk_socket;
+         read_descriptor_t desc;
+
+         desc.arg.data = strp;
+@@ -377,7 +376,7 @@ static int tls_strp_read_copyin(struct tls_strparser 
+*strp)
+         desc.count = 1; /* give more than one skb per call */
+
+         /* sk should be locked here, so okay to do read_sock */
+-       sock->ops->read_sock(strp->sk, &desc, tls_strp_copyin);
++       tcp_read_sock(strp->sk, &desc, tls_strp_copyin);
+
+         return desc.error;
+  }
+
+Otherwise we'd enter a recursion calling ->read_sock(), which will 
+redirect to tls_sw_read_sock(), calling tls_strp_check_rcv(), calling 
+->read_sock() ...
+It got covered up with the tls_rx_reader_lock() Jakub put in, so I 
+really only noticed it when instrumenting that one.
+
+And my reading seems that the current in-kernel TLS implementation 
+assumes TCP as the underlying transport anyway, so no harm done.
+Jakub?
+
+Cheers,
+
+Hannes
 
 
