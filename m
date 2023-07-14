@@ -1,129 +1,83 @@
-Return-Path: <netdev+bounces-17866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C6F7534E8
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:18:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29237534F3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D175C2821A0
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:18:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90A11C215CE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC222C8F1;
-	Fri, 14 Jul 2023 08:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A6AD313;
+	Fri, 14 Jul 2023 08:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00D2D2E7
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:18:17 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420F31B6;
-	Fri, 14 Jul 2023 01:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1689322696; x=1720858696;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=O/X2f8LTxeBpseEWtQTCQinmCmN6v3Zs9Ep5/+MhYq4=;
-  b=XOaYrlPdqV5d2WMhEualoMjFswG+FnXYxyagjXNlbqgU1TLzQwITpagf
-   2tUy4zVWo/sloWvMkYtarlLfF2wbKEO3g6HMFy7xQiB4PTILtLNZYobYL
-   Poci9KiAd4kjwE1XYEd6G3YHm0mzVDXh1y8Mh/WIwJoLjE8X1V62D34iY
-   QQjcHOd5omnZH41NqXygX0/YuOBgcnpMEt3+hsAWi48zi/D0qQ0cZD7Qx
-   t3yKrsRdPtRhVFqXbCIvoH26n7EZf61j8Pdzb5mD4nUe7iWOuN2AZCzWu
-   ztB9D/no4bU+/Jv3szHQucsY/i/vhioCua9MBM8GJ2c4K+T+yYiFaQfaF
-   A==;
-X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="161331392"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 14 Jul 2023 01:18:15 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 14 Jul 2023 01:18:14 -0700
-Received: from localhost (10.10.115.15) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
- Transport; Fri, 14 Jul 2023 01:18:14 -0700
-Date: Fri, 14 Jul 2023 10:18:14 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Minjie Du <duminjie@vivo.com>
-CC: <dkirjanov@suse.de>, "maintainer:MICROCHIP LAN966X ETHERNET DRIVER"
-	<UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "open
- list:MICROCHIP LAN966X ETHERNET DRIVER" <netdev@vger.kernel.org>, open list
-	<linux-kernel@vger.kernel.org>, <opensource.kernel@vivo.com>
-Subject: Re: [PATCH v2] net: lan966x: fix parameter check in two functions
-Message-ID: <20230714081814.3jltswaui6gbgkhc@soft-dev3-1>
-References: <20230714012220.891-1-duminjie@vivo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E74D2E8
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DD753C433CD;
+	Fri, 14 Jul 2023 08:20:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689322820;
+	bh=H9U0qqTJn3MA7ez4KLxI1hnCbYJTzbxfSNFtUYz2bQA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eXsySg3bh+pEtmDg/kffaWOVJMavb0GIx+XtnBjEdtgBZVMKPNnMjZxLw+debCFFu
+	 tetpQ6GSbhf1N7zM45/9YL6fqgtW5xWZC0B19/yEbM4lHNPQd8uy35G6pY8wzHsnDO
+	 FaQwqDhLF+2A53hExfjIuPPW1rTUBaTeP0Fu3DVO7wIlEuc0IN2b/g0AbLhxlHwiIJ
+	 NT+Mx166u5mGIu7CknVI40k7pjPu0aKX6ub8D401AeymWInR6JYwwiYicc5JQzcwrS
+	 MfBfcfkie6PT2WFkCckhcr+tpDX+Ghr5i8Qw6+NkS2/nq+CNVIrZH4FYgeM3HqkxxX
+	 SPOtVAlgnzQww==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CAF9BE49BBF;
+	Fri, 14 Jul 2023 08:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20230714012220.891-1-duminjie@vivo.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/2] add MACsec offload selftests
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168932282082.1632.13701675853325201374.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Jul 2023 08:20:20 +0000
+References: <cover.1689173906.git.sd@queasysnail.net>
+In-Reply-To: <cover.1689173906.git.sd@queasysnail.net>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, simon.horman@corigine.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org
 
-The 07/14/2023 09:22, Minjie Du wrote:
+Hello:
 
-Hi Minjie,
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
+On Thu, 13 Jul 2023 15:20:22 +0200 you wrote:
+> Patch 1 adds MACsec offload to netdevsim (unchanged from v2).
 > 
-> Make IS_ERR_OR_NULL() judge the vcap_get_rule() function return.
-> in lan966x_ptp_add_trap() and lan966x_ptp_del_trap().
+> Patch 2 adds a corresponding selftest to the rtnetlink testsuite.
 > 
-> Fixes: 72df3489fb10 ("net: lan966x: Add ptp trap rules")
-> Signed-off-by: Minjie Du <duminjie@vivo.com>
+> Sabrina Dubroca (2):
+>   netdevsim: add dummy macsec offload
+>   selftests: rtnetlink: add MACsec offload tests
+> 
+> [...]
 
-You forgot to set the target tree in the subject. You can do that when
-you create the patch using the command:
-git format-patch ... --subject-prefix "PATCH net" ...
+Here is the summary with links:
+  - [net-next,v3,1/2] netdevsim: add dummy macsec offload
+    https://git.kernel.org/netdev/net-next/c/02b34d03a24b
+  - [net-next,v3,2/2] selftests: rtnetlink: add MACsec offload tests
+    https://git.kernel.org/netdev/net-next/c/3b5222e2ac57
 
-Other than that, it looks OK:
-Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-
-> ---
->  drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
-> index 266a21a2d..59dd14247 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
-> @@ -59,7 +59,7 @@ static int lan966x_ptp_add_trap(struct lan966x_port *port,
->         int err;
-> 
->         vrule = vcap_get_rule(lan966x->vcap_ctrl, rule_id);
-> -       if (vrule) {
-> +       if (!IS_ERR_OR_NULL(vrule)) {
->                 u32 value, mask;
-> 
->                 /* Just modify the ingress port mask and exit */
-> @@ -106,7 +106,7 @@ static int lan966x_ptp_del_trap(struct lan966x_port *port,
->         int err;
-> 
->         vrule = vcap_get_rule(lan966x->vcap_ctrl, rule_id);
-> -       if (!vrule)
-> +       if (IS_ERR_OR_NULL(vrule))
->                 return -EEXIST;
-> 
->         vcap_rule_get_key_u32(vrule, VCAP_KF_IF_IGR_PORT_MASK, &value, &mask);
-> --
-> 2.39.0
-> 
-> 
-
+You are awesome, thank you!
 -- 
-/Horatiu
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
