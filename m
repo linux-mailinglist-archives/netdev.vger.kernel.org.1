@@ -1,55 +1,47 @@
-Return-Path: <netdev+bounces-18014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA2EF7542AE
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:40:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C0B7542B7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA54A2822A1
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:40:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2118E1C21636
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1829C156F1;
-	Fri, 14 Jul 2023 18:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D147915AC4;
+	Fri, 14 Jul 2023 18:43:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9C7154A0
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 18:40:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4511C433C8;
-	Fri, 14 Jul 2023 18:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689360018;
-	bh=qHaTl4yRkeaUJ6f/KP5OJUSTQcmrqQslpzQe+gfTY30=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GXaheJtTBBAWepRARnwP718bg8S0UMWm4fKromRkzOEA6UYYCf3x5/g4kVitZqmfl
-	 DnHW1a6fVY5qyWDMzfbB4jbYRLiC9UMqbDv6EcGUf5MvYhQ7je9pBApVOTkOfM8VEV
-	 PMxH05dIwNUW6MiWFdmuwok489GVuxnSL1WOPWFd4qZNm1g/OAZu6Hg9X80/F51YkD
-	 WbI3WW9o4jrFWUym43tCzlxDrZQP/GUeX13+7HeZ9DiIyVeKfJYokBypvKC6eEeJFO
-	 SBN9aUgEoCMiVa3ZLeAlSpEjWI1/FK4y0AmdUHbmrwsQYgDEdLdr1oeo0K3c93Snae
-	 0d8No1aI9NG0Q==
-Date: Fri, 14 Jul 2023 21:40:13 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
- modify rule destination
-Message-ID: <20230714184013.GJ41919@unreal>
-References: <cover.1689064922.git.leonro@nvidia.com>
- <5fd15672173653d6904333ef197b605b0644e205.1689064922.git.leonro@nvidia.com>
- <20230712173259.4756fe08@kernel.org>
- <20230713063345.GG41919@unreal>
- <20230713100401.5fe0fa77@kernel.org>
- <20230713174317.GH41919@unreal>
- <20230713110556.682d21ba@kernel.org>
- <20230713185833.GI41919@unreal>
- <20230713201727.6dfe7549@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AEB154A0
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 18:43:06 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40ED81BEB;
+	Fri, 14 Jul 2023 11:43:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JZx+EsagLFfzXkniJTLpW4tHLMZwxvgnsHOs68GtYNs=; b=U6MBuf2GSlpWW7QoCReRmNCqhs
+	s0+ZgIoosJ2jhZ58X0H+Bk0Jye1TgTPcTupvfdvPDHbj0G2Y+ObmW7OwlMiPKUWgArPZXEx+DyUVw
+	VjU/riDh/u7Ik2LuTI1Xld5UBtXfNxMHVl/etZATRcP5K84g4+JM6nHkqVUCmCIsUT1I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qKNkX-001NiP-GD; Fri, 14 Jul 2023 20:42:41 +0200
+Date: Fri, 14 Jul 2023 20:42:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for
+ 88E6390X and 88E6190X
+Message-ID: <fb82f66f-35dc-4e50-81d7-b5a08cfe75e0@lunn.ch>
+References: <20230714160612.11701-1-ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,27 +50,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230713201727.6dfe7549@kernel.org>
+In-Reply-To: <20230714160612.11701-1-ante.knezic@helmholz.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 08:17:27PM -0700, Jakub Kicinski wrote:
-> On Thu, 13 Jul 2023 21:58:33 +0300 Leon Romanovsky wrote:
-> > > TC packet rewrites or IPsec comes first?  
-> > 
-> > In theory, we support any order, but in real life I don't think that TC
-> > before IPsec is really valuable.
+On Fri, Jul 14, 2023 at 06:06:12PM +0200, Ante Knezic wrote:
+> Fixes XAUI/RXAUI lane alignment errors.
+> Issue causes dropped packets when trying to communicate over
+> fiber via SERDES lanes of port 9 and 10.
+> Errata document applies only to 88E6190X and 88E6390X devices.
+> Requires poking in undocumented registers.
 > 
-> I asked the question poorly. To clearer, you're saying that:
-> 
-> a)  host <-> TC <-> IPsec <-> "wire"/switch
->   or
-> b)  host <-> IPsec <-> TC <-> "wire"/switch
-> 
-> ?
+> Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
 
-It depends on configuration order, if user configures TC first, it will
-be a), if he/she configures IPsec first, it will be b).
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-I just think that option b) is really matters.
-
-Thanks
+    Andrew
 
