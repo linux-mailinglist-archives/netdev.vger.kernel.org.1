@@ -1,83 +1,96 @@
-Return-Path: <netdev+bounces-17968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E11753DE8
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 16:44:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E874753E0A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 16:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92CC1282097
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 14:44:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440831C2107F
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 14:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADADD310;
-	Fri, 14 Jul 2023 14:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F243C134AD;
+	Fri, 14 Jul 2023 14:49:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6938A13AC4
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 14:44:17 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A51510FA;
-	Fri, 14 Jul 2023 07:44:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MkhC/ndNHwMBGL3IpCk8DrD4ouCBr3YRHuq0s+rIhPw=; b=Dd1LX1bv4ykZZ1jEqmrSgntGFZ
-	WfakM4wO+lvRxqbJBGTNAiFKFrSEBOwitjMzyQyWORG0/GrxxVFNuJKOPzhcThD5fud7bGYoEul/D
-	TxAzzZzEsdLXoUwGlGuAWyXPwQqCPTjBom4OWtczJf1L0vK5KjdGSTUGxGWTmeJY17Ec=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qKK1g-001MQN-AY; Fri, 14 Jul 2023 16:44:08 +0200
-Date: Fri, 14 Jul 2023 16:44:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: davem@davemloft.net, edumazet@google.com, f.fainelli@gmail.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: Add erratum 3.14 for
- 88E6390X and 88E6190X
-Message-ID: <22008be3-3706-45c9-b370-7df94662fea4@lunn.ch>
-References: <570d32ad-e475-4a0b-a6ee-a2bdf5f67b69@lunn.ch>
- <20230714143650.25818-1-ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11A513715
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 14:49:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3B66C433C7;
+	Fri, 14 Jul 2023 14:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689346196;
+	bh=nTr+kzLq/OZ0kdWmmt3bLM3t2AwhfqHv1qzEXhKG0TE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GeqjzZ5QkJb63S9MQd/1en/jHkVFNM9s4wj/nSw43+zAioAFukB361JzAVey1hjvE
+	 YNIxOZBB/T6mAVQr5sryI5HRgDFL3X5jaE1/O8srMIyC9AEI91NUfYxFyRdu1TCVtw
+	 rNjR+RFXq5kWcN92f9CbP6m10JjXDsq9PACL6Tcjz462RCxpHgezaAeNfplrbue6Os
+	 bDGSLvq7UQOJlJGPywfoSN19eMFkcJlufVTI2jwk7EM3YBxXnm7NuEmP1KABWOVGoc
+	 L4GqQqxF/5c4o9ZRhvGzYl2SBJZs1wmwknIeTsACkhi5siluM6O46Ez86u3unKI2PC
+	 tLj+uhvh3sH0A==
+Message-ID: <7f295784-b833-479a-daf4-84e4f89ec694@kernel.org>
+Date: Fri, 14 Jul 2023 08:49:55 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714143650.25818-1-ante.knezic@helmholz.de>
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SORTED_RECIPS,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH net] ipv6 addrconf: fix bug where deleting a mngtmpaddr
+ can create a new temporary address
+Content-Language: en-US
+To: =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <maze@google.com>,
+ Jiri Pirko <jiri@resnulli.us>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20230712135520.743211-1-maze@google.com>
+ <ca044aea-e9ee-788c-f06d-5f148382452d@kernel.org>
+ <CANP3RGeR8oKQ=JfRWofb47zt9YF3FRqtemjg63C_Mn4i8R79Dg@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CANP3RGeR8oKQ=JfRWofb47zt9YF3FRqtemjg63C_Mn4i8R79Dg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> >Does Marvell give this register a name? If so, please add a #define.
-> >Are the bits in the register documented?
+On 7/13/23 9:03 AM, Maciej Żenczykowski wrote:
+> On Thu, Jul 13, 2023 at 4:59 PM David Ahern <dsahern@kernel.org> wrote:
+>>
+>> On 7/12/23 7:55 AM, Maciej Żenczykowski wrote:
+>>> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+>>> index e5213e598a04..94cec2075eee 100644
+>>> --- a/net/ipv6/addrconf.c
+>>> +++ b/net/ipv6/addrconf.c
+>>> @@ -2561,12 +2561,18 @@ static void manage_tempaddrs(struct inet6_dev *idev,
+>>>                       ipv6_ifa_notify(0, ift);
+>>>       }
+>>>
+>>> -     if ((create || list_empty(&idev->tempaddr_list)) &&
+>>> -         idev->cnf.use_tempaddr > 0) {
+>>> +     /* Also create a temporary address if it's enabled but no temporary
+>>> +      * address currently exists.
+>>> +      * However, we get called with valid_lft == 0, prefered_lft == 0, create == false
+>>> +      * as part of cleanup (ie. deleting the mngtmpaddr).
+>>> +      * We don't want that to result in creating a new temporary ip address.
+>>> +      */
+>>> +     if (list_empty(&idev->tempaddr_list) && (valid_lft || prefered_lft))
+>>> +             create = true;
+>>
+>> I am not so sure about this part. manage_tempaddrs has 4 callers --
+>> autoconf (prefix receive), address add, address modify and address
+>> delete. Seems like all of them have 'create' set properly when an
+>> address is wanted in which case maybe the answer here is don't let empty
+>> address list override `create`.
 > 
-> Unfortunately, no. This is one of those undocumented registers. I will
-> make a note of it in the commit message.
-
-Undocumented magic is typical for Marvell Erratas.
-
+> I did consider that and I couldn't quite convince myself that simply
+> removing "|| list_empty()" from the if statement is necessarily correct
+> (thus I went with the more obviously correct change).
 > 
-> >> +     if (!err && up) {
-> >> +             if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X ||
-> >> +                 chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X)
-> 
-> >6191X? 6193X?
-> 
-> Errata I have available refers only to 6190x and 6390x. Not sure about other devices.
+> Are you convinced dropping the || list_empty would work?
+> I assume it's there for some reason...
 
-Please mention this in the commit message.
-
-Thanks
-	Andrew
+I am hoping Jiri can recall why that part was added since it has the
+side effect of adding an address on a delete which should not happen.
 
