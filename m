@@ -1,249 +1,181 @@
-Return-Path: <netdev+bounces-17757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA8F752FB1
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:06:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54A4752FC7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:14:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8AB1C214F7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 03:06:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 089C7281F73
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 03:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C62F10F4;
-	Fri, 14 Jul 2023 03:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8A8110D;
+	Fri, 14 Jul 2023 03:14:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B7DED0
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 03:06:43 +0000 (UTC)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2047.outbound.protection.outlook.com [40.107.14.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F1E26A5;
-	Thu, 13 Jul 2023 20:06:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PsjKENEETaoK8urcR9izZcdqSQomqIgFJZW7YIRCk4lK/L9UCHDXxNDVLIuHITAu1vfUMkKbbbhw7Sf5TB/pzDidjgcqnmItI09iel93H/XX+e56A56EUnX4cNV7Zc70uLkdntQQt4lP86uggikYJrSYXR6NlhjhidNpIAUH4sNm+uypNbECmvVK9y+7OM5Mu3ISafcAWXREIU0ZAeqsxN5l521SvGU+cVHWVj3JE2F34jLchYyv3drgk49K8YBXRPFWO6f3xrZQycrKrInmmIXaH3XInU7wEFyhZdIhQ8Sbng3uGqRLeCF2vpCFJbvoMrffEY+j6LQYdEM4K1CB/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=27Urh9IsD/DamBxqXdFBWA94kAni+ZWECMQrpX2zWiU=;
- b=UTTnn75GquSsd3Pwyzta/ZinwD7PYpltAG6XdW+hP7GwUJw3Pv9jPG7gEnw9EFnNvPF3US+w0awpGVSCciluRr9RMQ6wXrl/TxXVNzQk4GtRNil4D/OrudgeUE3QGNQIgpXyAdd9VgaKkIf8bCm4qm6Kn4HNv46iJD3HFZHR3AP44affJA3Xf4vCCekDzkZOTKPtzPnjQNuFa49sAWH/kRKUsuqeG9kwF9RYh+wXGmi3kRy6nfA37QPZJmND3PxDw3bHGWaVJ/Xc7SIgDKYygg4OrAnYI5a3e3W3CFtIELc/hfqdXD8xv/dTA4HP30w3DAARQ2mnWuZSobIpHcqrNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=27Urh9IsD/DamBxqXdFBWA94kAni+ZWECMQrpX2zWiU=;
- b=QhwdKAGvm7W5/TsoIX6EdcA27hMfK0MYRA4nCK+7b74lBCZTvVvCTfCxRmRcxzZ4YUjckk7QlGa1unKeX/KffXac5Si6WJG62J3QR7DwB/yjwR2Ovyp6/BPZn5zpF1GJYjhHb1B0Ilmah9qceZs/MK/9yegThxUIbGZ3jIu9da4=
-Received: from HE1PR04MB3148.eurprd04.prod.outlook.com (2603:10a6:7:1d::16) by
- GVXPR04MB9802.eurprd04.prod.outlook.com (2603:10a6:150:110::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Fri, 14 Jul
- 2023 03:06:37 +0000
-Received: from HE1PR04MB3148.eurprd04.prod.outlook.com
- ([fe80::94dc:3b07:140f:5f2d]) by HE1PR04MB3148.eurprd04.prod.outlook.com
- ([fe80::94dc:3b07:140f:5f2d%5]) with mapi id 15.20.6588.017; Fri, 14 Jul 2023
- 03:06:38 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
-	<f.fainelli@gmail.com>, Maxim Georgiev <glipus@gmail.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, =?utf-8?B?S8O2cnkgTWFpbmNlbnQ=?=
-	<kory.maincent@bootlin.com>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Gerhard Engleder
-	<gerhard@engleder-embedded.com>, Hangbin Liu <liuhangbin@gmail.com>, Russell
- King <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, Jacob
- Keller <jacob.e.keller@intel.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Shenwei Wang <shenwei.wang@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, dl-linux-imx <linux-imx@nxp.com>,
-	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>, Simon Horman
-	<simon.horman@corigine.com>, Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v7 net-next 07/10] net: fec: delete fec_ptp_disable_hwts()
-Thread-Topic: [PATCH v7 net-next 07/10] net: fec: delete
- fec_ptp_disable_hwts()
-Thread-Index: AQHZtYRNMufXqmf+XUyjhz+62LtBnK+4lUhQ
-Date: Fri, 14 Jul 2023 03:06:37 +0000
-Message-ID:
- <HE1PR04MB3148CFA008F1E89C9F8F6B9E8834A@HE1PR04MB3148.eurprd04.prod.outlook.com>
-References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
- <20230713121907.3249291-8-vladimir.oltean@nxp.com>
-In-Reply-To: <20230713121907.3249291-8-vladimir.oltean@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: HE1PR04MB3148:EE_|GVXPR04MB9802:EE_
-x-ms-office365-filtering-correlation-id: 057551c7-fff7-4326-df32-08db841756d6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- JWI0q/CLuJlsgGZlVYae3+DHSPX8yfdWUY15rR2/llmD1Wc75JQ+QZr0pObNmScfK+ciUW1fPKkG34b7oBl+BO5p3MbfVFIfIUF7VUDkkz08LmvTd+O8VDEuyp6s6BcBMn4u1ww8gu0ER9eCft+J5nDVhfk/gxDSubMxnjbHxiMkftCrYKf3J1UjhrnbZ5xZbIMhyL2bz1gSaYBQ0c+61xfM5L9kMWFHRt8hD1agfPPwCdlZcOmHspnxpEX+y3vZ01SzIY5QfQ9kr7kGT1p3jcvDEz7xgMicyHR0VapCzpgcPSlnnoDcqjVmQnD1vkAs4HVsTwZ9YzQsYYuHHV1CFpgWvBpd21izIv8Xw3ayBHL3W+NKPWbhZ2JliKCmJ3pZZ/AfXOECdLSaOCyeOIMj1o6Z4pmuR4wEAZWwgVDKyvK4SqmQys2X5xgm2mXZkVLUzpxWC0pG+pq71b8Ys5VJ89e9cNA+vm3lCB179HQg+pzxkDHs8xU0RZB5BUi0JX3PigtLcaiur0Ouh3OAznjiAkktizdq5IU7078rjycZiNyhWh0VS2ju9+/MiWXv3yXelNCVhTX+QAyidAN5l4NZml6Ci8PHd3oUDgRGnLVRSkV4NR9cWIDzBst7AVgs+voU
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR04MB3148.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(39860400002)(376002)(136003)(346002)(451199021)(55016003)(83380400001)(66574015)(66476007)(64756008)(66446008)(478600001)(76116006)(316002)(66556008)(9686003)(4326008)(71200400001)(7696005)(66946007)(2906002)(54906003)(110136005)(6506007)(186003)(44832011)(7416002)(53546011)(41300700001)(5660300002)(8676002)(52536014)(26005)(8936002)(38100700002)(122000001)(86362001)(38070700005)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?a1orQXRrRStFZ2dBcXc5eHFhU3ptY0dOSzc3cTFhbUppb0xISnNHd3MrdExs?=
- =?utf-8?B?UUZZQ0xIekJWeFltUm16Uno1b01ld2xOVXJLbVJIek91WVlLM2ozL2JpQitz?=
- =?utf-8?B?TmZ0RGJXd1RiZURzYjdhZk53eVdpYjNaMmpSbkwzQU02MG9SejZoMmVnUEhi?=
- =?utf-8?B?UTdNRStQTGpQOHFZSTlSRkJSL2tuMzQrYTcwVjBrc0NCczllbkpLajNTSzho?=
- =?utf-8?B?VkNCUi90cWtvb0oxdHBWbDFYVFp6NGRjVkg4dlNMbzd6VXZpeFN3UjYrQW02?=
- =?utf-8?B?L0NjaTFOZTN4MmpSSUZSVmh1dlFHclVRNlVPazZ5NjBQcTNxT2xLblZ4cHMv?=
- =?utf-8?B?eHpLWHk3NFpTbzg0TDQ1STVYK1pBSTJOazFsK3JuYjlQTnJ4QzliMEova04y?=
- =?utf-8?B?K21YbEFqcEE3NmdrZkNxa1RuQ28yU2FHU3JnV3dWNU9JcjFpaEZKMmQ3K1ZT?=
- =?utf-8?B?UktjTFdheXh5M0kxSCtUd3dPY1FxVDAvMVo0eVhFQXZPaTJIR0pDcWpYOTlV?=
- =?utf-8?B?ZkxVSjdPRk1TSzQxbSs0ZGY4M2NQVENiR0tyT0JqTmFvYUNEZHF1aXVzRnU3?=
- =?utf-8?B?cDVoMVdhL09Ra1pFcHZlaDNuWDFUU3VxUktBVzNDTnRxZWJ5R1pUMzlwRm1T?=
- =?utf-8?B?c3BYa0s4VUkzOXNwYmlJaG0zZTdWMEt3OGpyQkpaT0NSVXVBT21BRVBnSGk0?=
- =?utf-8?B?Zjl1dmZaamFoa2RxbjVuVDRlcXlzc0x2OEtMUVNqdW03dU5ZZUpVM2svbEhZ?=
- =?utf-8?B?dFl3N2doRUxUVEowRXQ1UmMwS09UTTF3dk1mbGtSOGplRWU3N0d3aDg2c3VD?=
- =?utf-8?B?RmtYaG1jSXFSaFBkNHgrVDhac0J5eEhwL1E4MmVzYUJxYzlXVjY3bThRVEI3?=
- =?utf-8?B?djZMVTVUREF5OVJCVkxNd0g4S3daT0EzdVNBQWQ2Z2VEWVhZL3BEdU1teUQx?=
- =?utf-8?B?UjF1eURWL3NsNFlDR2F6VXF4dnBuck9ybjFsamg4TVBpRFA5VlhhSWZIZEFS?=
- =?utf-8?B?Uk1wNHhvcExHL0Z4QVBDMnZVVlZaTmg5RlVXbWplNlk3ZkdmNmUzTS8xNFFq?=
- =?utf-8?B?TmdmdXJ6cFFZTlBTamtpL0pVL0hYbkxtZVg3cUk5TUZEWXlzY3FhWnlBL2tW?=
- =?utf-8?B?ZDNvc3dSREJDS1VMSmVIS0IxekorYkNldXU2TUVUaStwSXVnZUppUkx6RTAr?=
- =?utf-8?B?Rmova3dMUmw1S1lUYXZBMFVYRlZDZSsyTGRQcmVMYSs2YytocDZZYTNwckdQ?=
- =?utf-8?B?M2VhZXhaR25EZGRkWUhsT0pHYWpERHNyRnhvcndTWXlCUERQelZiL1JGczJP?=
- =?utf-8?B?NldGdzR6RStYaCs0SXg5ZXlnZGttTlRiTVZmMUlaNmhUbGovZURxcjF0b0Vw?=
- =?utf-8?B?WXR5Sms3QnhMeTR4RkpzT1o3K3YrUWtaQ1k3cU5Gd0NDbVRzeSsvQTBvampB?=
- =?utf-8?B?UFJKSk5mUFhZQm0yUkNLOG4yRjNOd0U2cVo5Qm1VUmFVbWxRam1iNUVMWTIv?=
- =?utf-8?B?ZGxLZlI2TzB4TnBEZ0M0cW5SMWpPRFU1eTF2RVhXU0UxRWdwSTJFNllvU0k4?=
- =?utf-8?B?RTlUSXpGM2xSTGgvWER5NWlsdTdPNlJ5bnlWekNDYUhRa2FheW52ZytnVHBD?=
- =?utf-8?B?NXcyNWVkd0Uwb2NDaEdFM2FtZlR1dm5BSkdEa2ZRWi9KSXhsWjZmaGVmZmN4?=
- =?utf-8?B?cS9icmI2TndjZmMzUVVRbEpRMEhsOFhCcEdXMXdESk1sWHhuWlBJQ0RuK2Fn?=
- =?utf-8?B?STNSY2lYL2JMcEN5QS84dTl2LytCU0dxNEtBS0JPZDV0bFI5SXA2VkdEakpB?=
- =?utf-8?B?RTA5R3pDRnFJVTI1MzA4N0hFVW12YWxUL1RHRVFEMCtaZFBJajRIazhpK3l6?=
- =?utf-8?B?d0YvU1U4dCtEK2xyclFiT2lCL3VpMHhNZEFPdUlPRnpxMnBUVmIzNEtMM3Rt?=
- =?utf-8?B?aEdxSDFMMU9PbUlNanorRmswcFNlYWZjUHBBSnQ4RitWN1ZqTHpjK3RLOHlq?=
- =?utf-8?B?TDZmOU1DUjlBUGdUd0Vxai9LNTQ2S0d4U2QweHhIM21qMmJBMUZNZXUvMWdu?=
- =?utf-8?B?azV0MmltSWF0ZFlrQ3RDY1VXNjNEQnZIc3hCYmY2Qm9jVlNGUEpKdzNkc2VV?=
- =?utf-8?Q?+wLc=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7351410F4
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 03:14:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66436C433C8;
+	Fri, 14 Jul 2023 03:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689304468;
+	bh=G0wOFd16i2t4/e9fIRlP6CAsoeA68X4NI5FK14YAD8Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZNu7xBxCf9Vsw1SJPsfLP5h3K0zgfNky+Dl7SEL6cbFiCwahG6nG1vxDbnk0Nh9wz
+	 aEgChbG8fFTbUExxLEkqZWsiwlwwpQnMQ9BJTt5yG3M2nUsie0dlAv6HXNYN2X+XN9
+	 I+KlTryRVt5+ax5h0fZMbqjJKuj13cIKJwYl3wbVorIyXoX/e8cAcelGTOt6wBFhj8
+	 roTRejPe0FoC2+fakAWhpLP+IFCYq+NikUIJwkPUzBPQcqL0JTXOqoFnjSwYMfkR6W
+	 +6KKvoc3M9o/ZQsZ2vGOZgMx7j5DKeNJ/FVS7axS1Smc08k5/P0hjFCDEj56uWHlpq
+	 VoOHF4atR0jdw==
+Date: Thu, 13 Jul 2023 20:14:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ivan Babrou <ivan@cloudflare.com>
+Cc: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, David Ahern <dsahern@kernel.org>
+Subject: Re: [RFC PATCH net-next] tcp: add a tracepoint for
+ tcp_listen_queue_drop
+Message-ID: <20230713201427.2c50fc7b@kernel.org>
+In-Reply-To: <CABWYdi3VJU7HUxzKJBKgX9wF9GRvmA0TKVpjuHvJyz_EdpxZFA@mail.gmail.com>
+References: <20230711043453.64095-1-ivan@cloudflare.com>
+	<20230711193612.22c9bc04@kernel.org>
+	<CAO3-PbrZHn1syvhb3V57oeXigE_roiHCbzYz5Mi4wiymogTg2A@mail.gmail.com>
+	<20230712104210.3b86b779@kernel.org>
+	<CABWYdi3VJU7HUxzKJBKgX9wF9GRvmA0TKVpjuHvJyz_EdpxZFA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR04MB3148.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 057551c7-fff7-4326-df32-08db841756d6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2023 03:06:37.8710
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: l3zM2Lxbl491s3sj3Qa1orJzEsm0pXqgXjFWtrOgwDzmvdTZilJBnkJRlFVyp1yp4hPpDgzST+hkLdEkcnVXHg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9802
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBWbGFkaW1pciBPbHRlYW4gPHZs
-YWRpbWlyLm9sdGVhbkBueHAuY29tPg0KPiBTZW50OiAyMDIz5bm0N+aciDEz5pelIDIwOjE5DQo+
-IFRvOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnDQo+IENjOiBEYXZpZCBTLiBNaWxsZXIgPGRhdmVt
-QGRhdmVtbG9mdC5uZXQ+OyBFcmljIER1bWF6ZXQNCj4gPGVkdW1hemV0QGdvb2dsZS5jb20+OyBK
-YWt1YiBLaWNpbnNraSA8a3ViYUBrZXJuZWwub3JnPjsgUGFvbG8gQWJlbmkNCj4gPHBhYmVuaUBy
-ZWRoYXQuY29tPjsgQW5kcmV3IEx1bm4gPGFuZHJld0BsdW5uLmNoPjsgRmxvcmlhbiBGYWluZWxs
-aQ0KPiA8Zi5mYWluZWxsaUBnbWFpbC5jb20+OyBNYXhpbSBHZW9yZ2lldiA8Z2xpcHVzQGdtYWls
-LmNvbT47IEhvcmF0aXUgVnVsdHVyDQo+IDxob3JhdGl1LnZ1bHR1ckBtaWNyb2NoaXAuY29tPjsg
-S8O2cnkgTWFpbmNlbnQNCj4gPGtvcnkubWFpbmNlbnRAYm9vdGxpbi5jb20+OyBNYXhpbWUgQ2hl
-dmFsbGllcg0KPiA8bWF4aW1lLmNoZXZhbGxpZXJAYm9vdGxpbi5jb20+OyBSaWNoYXJkIENvY2hy
-YW4NCj4gPHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbT47IFZhZGltIEZlZG9yZW5rbw0KPiA8dmFk
-aW0uZmVkb3JlbmtvQGxpbnV4LmRldj47IEdlcmhhcmQgRW5nbGVkZXINCj4gPGdlcmhhcmRAZW5n
-bGVkZXItZW1iZWRkZWQuY29tPjsgSGFuZ2JpbiBMaXUgPGxpdWhhbmdiaW5AZ21haWwuY29tPjsN
-Cj4gUnVzc2VsbCBLaW5nIDxsaW51eEBhcm1saW51eC5vcmcudWs+OyBIZWluZXIgS2FsbHdlaXQN
-Cj4gPGhrYWxsd2VpdDFAZ21haWwuY29tPjsgSmFjb2IgS2VsbGVyIDxqYWNvYi5lLmtlbGxlckBp
-bnRlbC5jb20+OyBKYXkNCj4gVm9zYnVyZ2ggPGoudm9zYnVyZ2hAZ21haWwuY29tPjsgQW5keSBH
-b3Nwb2RhcmVrIDxhbmR5QGdyZXlob3VzZS5uZXQ+Ow0KPiBXZWkgRmFuZyA8d2VpLmZhbmdAbnhw
-LmNvbT47IFNoZW53ZWkgV2FuZyA8c2hlbndlaS53YW5nQG54cC5jb20+Ow0KPiBDbGFyayBXYW5n
-IDx4aWFvbmluZy53YW5nQG54cC5jb20+OyBkbC1saW51eC1pbXggPGxpbnV4LWlteEBueHAuY29t
-PjsNCj4gVU5HTGludXhEcml2ZXJAbWljcm9jaGlwLmNvbTsgTGFycyBQb3Zsc2VuIDxsYXJzLnBv
-dmxzZW5AbWljcm9jaGlwLmNvbT47DQo+IFN0ZWVuIEhlZ2VsdW5kIDxTdGVlbi5IZWdlbHVuZEBt
-aWNyb2NoaXAuY29tPjsgRGFuaWVsIE1hY2hvbg0KPiA8ZGFuaWVsLm1hY2hvbkBtaWNyb2NoaXAu
-Y29tPjsgU2ltb24gSG9ybWFuDQo+IDxzaW1vbi5ob3JtYW5AY29yaWdpbmUuY29tPjsgQ2FzcGVy
-IEFuZGVyc3Nvbg0KPiA8Y2FzcGVyLmNhc2FuQGdtYWlsLmNvbT47IFNlcmdleSBPcmdhbm92IDxz
-b3JnYW5vdkBnbWFpbC5jb20+Ow0KPiBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5v
-cmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogW1BBVENIIHY3IG5l
-dC1uZXh0IDA3LzEwXSBuZXQ6IGZlYzogZGVsZXRlIGZlY19wdHBfZGlzYWJsZV9od3RzKCkNCj4g
-DQo+IENvbW1pdCAzNDA3NDYzOThiNjcgKCJuZXQ6IGZlYzogZml4IGhhcmR3YXJlIHRpbWUgc3Rh
-bXBpbmcgYnkgZXh0ZXJuYWwNCj4gZGV2aWNlcyIpIHdhcyBvdmVybHkgY2F1dGlvdXMgd2l0aCBj
-YWxsaW5nIGZlY19wdHBfZGlzYWJsZV9od3RzKCkgd2hlbg0KPiBjbWQgPT0gU0lPQ1NIV1RTVEFN
-UCBhbmQgdXNlX2ZlY19od3RzID09IGZhbHNlLCBiZWNhdXNlIHVzZV9mZWNfaHd0cyBpcw0KPiBi
-YXNlZCBvbiBhIHJ1bnRpbWUgaW52YXJpYW50IChwaHlfaGFzX2h3dHN0YW1wKCkpLiBUaHVzLCBp
-ZiB1c2VfZmVjX2h3dHMNCj4gaXMgZmFsc2UsIHRoZW4gZmVwLT5od3RzX3R4X2VuIGFuZCBmZXAt
-Pmh3dHNfcnhfZW4gY2Fubm90IGJlIGNoYW5nZWQgYXQNCj4gcnVudGltZTsgdGhlaXIgdmFsdWVz
-IGRlcGVuZCBvbiB0aGUgaW5pdGlhbCBtZW1vcnkgYWxsb2NhdGlvbiwgd2hpY2gNCj4gYWxyZWFk
-eSBzZXRzIHRoZW0gdG8gemVyb2VzLg0KPiANCj4gSWYgdGhlIGNvcmUgd2lsbCBldmVyIGdhaW4g
-c3VwcG9ydCBmb3Igc3dpdGNoaW5nIHRpbWVzdGFtcGluZyBsYXllcnMsDQo+IGl0IHdpbGwgYXJy
-YW5nZSBmb3IgYSBtb3JlIG9yZ2FuaXplZCBjYWxsaW5nIGNvbnZlbnRpb24gYW5kIGRpc2FibGUN
-Cj4gdGltZXN0YW1waW5nIGluIHRoZSBwcmV2aW91cyBsYXllciBhcyBhIGZpcnN0IHN0ZXAuIFRo
-aXMgbWVhbnMgdGhhdCB0aGUNCj4gY29kZSBpbiB0aGUgRkVDIGRyaXZlciBpcyBub3QgbmVjZXNz
-YXJ5IGluIGFueSBjYXNlLg0KPiANCj4gVGhlIHB1cnBvc2Ugb2YgdGhpcyBjaGFuZ2UgaXMgdG8g
-YXJyYW5nZSB0aGUgcGh5X2hhc19od3RzdGFtcCgpIGNvZGUgaW4NCj4gYSB3YXkgaW4gd2hpY2gg
-aXQgY2FuIGJlIHJlZmFjdG9yZWQgYXdheSBpbnRvIGdlbmVyaWMgbG9naWMuDQo+IA0KPiBTaWdu
-ZWQtb2ZmLWJ5OiBWbGFkaW1pciBPbHRlYW4gPHZsYWRpbWlyLm9sdGVhbkBueHAuY29tPg0KPiAt
-LS0NCj4gQ2hhbmdlcyBpbiB2NzoNCj4gLSBQYXRjaCBpcyBuZXcNCj4gDQo+ICBkcml2ZXJzL25l
-dC9ldGhlcm5ldC9mcmVlc2NhbGUvZmVjLmggICAgICB8ICAxIC0NCj4gIGRyaXZlcnMvbmV0L2V0
-aGVybmV0L2ZyZWVzY2FsZS9mZWNfbWFpbi5jIHwgIDUgKy0tLS0NCj4gIGRyaXZlcnMvbmV0L2V0
-aGVybmV0L2ZyZWVzY2FsZS9mZWNfcHRwLmMgIHwgMTIgLS0tLS0tLS0tLS0tDQo+ICAzIGZpbGVz
-IGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxNyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1n
-aXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVlc2NhbGUvZmVjLmgNCj4gYi9kcml2ZXJzL25l
-dC9ldGhlcm5ldC9mcmVlc2NhbGUvZmVjLmgNCj4gaW5kZXggZDRhZTBlN2MwYTQ0Li5lMjczMTI5
-ZDQ0YzkgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWMu
-aA0KPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVlc2NhbGUvZmVjLmgNCj4gQEAgLTY5
-MCw3ICs2OTAsNiBAQCBzdHJ1Y3QgZmVjX2VuZXRfcHJpdmF0ZSB7DQo+ICB2b2lkIGZlY19wdHBf
-aW5pdChzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2LCBpbnQgaXJxX2lkeCk7DQo+ICB2b2lk
-IGZlY19wdHBfc3RvcChzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KTsNCj4gIHZvaWQgZmVj
-X3B0cF9zdGFydF9jeWNsZWNvdW50ZXIoc3RydWN0IG5ldF9kZXZpY2UgKm5kZXYpOw0KPiAtdm9p
-ZCBmZWNfcHRwX2Rpc2FibGVfaHd0cyhzdHJ1Y3QgbmV0X2RldmljZSAqbmRldik7DQo+ICBpbnQg
-ZmVjX3B0cF9zZXQoc3RydWN0IG5ldF9kZXZpY2UgKm5kZXYsIHN0cnVjdCBrZXJuZWxfaHd0c3Rh
-bXBfY29uZmlnDQo+ICpjb25maWcsDQo+ICAJCXN0cnVjdCBuZXRsaW5rX2V4dF9hY2sgKmV4dGFj
-ayk7DQo+ICB2b2lkIGZlY19wdHBfZ2V0KHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2LCBzdHJ1Y3Qg
-a2VybmVsX2h3dHN0YW1wX2NvbmZpZw0KPiAqY29uZmlnKTsNCj4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWNfbWFpbi5jDQo+IGIvZHJpdmVycy9uZXQvZXRo
-ZXJuZXQvZnJlZXNjYWxlL2ZlY19tYWluLmMNCj4gaW5kZXggYzBiNjhmYzNlYzhiLi4wODc0NGU4
-MTY0ZTMgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWNf
-bWFpbi5jDQo+ICsrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWNfbWFpbi5j
-DQo+IEBAIC0zODc4LDExICszODc4LDggQEAgc3RhdGljIGludCBmZWNfaHd0c3RhbXBfc2V0KHN0
-cnVjdCBuZXRfZGV2aWNlDQo+ICpuZGV2LA0KPiAgCXN0cnVjdCBmZWNfZW5ldF9wcml2YXRlICpm
-ZXAgPSBuZXRkZXZfcHJpdihuZGV2KTsNCj4gIAlzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2ID0g
-bmRldi0+cGh5ZGV2Ow0KPiANCj4gLQlpZiAocGh5X2hhc19od3RzdGFtcChwaHlkZXYpKSB7DQo+
-IC0JCWZlY19wdHBfZGlzYWJsZV9od3RzKG5kZXYpOw0KPiAtDQo+ICsJaWYgKHBoeV9oYXNfaHd0
-c3RhbXAocGh5ZGV2KSkNCj4gIAkJcmV0dXJuIHBoeV9taWlfaW9jdGwocGh5ZGV2LCBjb25maWct
-PmlmciwgU0lPQ1NIV1RTVEFNUCk7DQo+IC0JfQ0KPiANCj4gIAlpZiAoIWZlcC0+YnVmZGVzY19l
-eCkNCj4gIAkJcmV0dXJuIC1FT1BOT1RTVVBQOw0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQv
-ZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19wdHAuYw0KPiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2Zy
-ZWVzY2FsZS9mZWNfcHRwLmMNCj4gaW5kZXggM2Y1M2I4YWU1N2RkLi41NWNmOTg1NTdlMDIgMTAw
-NjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWNfcHRwLmMNCj4g
-KysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19wdHAuYw0KPiBAQCAtNjA2
-LDE4ICs2MDYsNiBAQCBzdGF0aWMgaW50IGZlY19wdHBfZW5hYmxlKHN0cnVjdCBwdHBfY2xvY2tf
-aW5mbyAqcHRwLA0KPiAgCX0NCj4gIH0NCj4gDQo+IC0vKioNCj4gLSAqIGZlY19wdHBfZGlzYWJs
-ZV9od3RzIC0gZGlzYWJsZSBoYXJkd2FyZSB0aW1lIHN0YW1waW5nDQo+IC0gKiBAbmRldjogcG9p
-bnRlciB0byBuZXRfZGV2aWNlDQo+IC0gKi8NCj4gLXZvaWQgZmVjX3B0cF9kaXNhYmxlX2h3dHMo
-c3RydWN0IG5ldF9kZXZpY2UgKm5kZXYpDQo+IC17DQo+IC0Jc3RydWN0IGZlY19lbmV0X3ByaXZh
-dGUgKmZlcCA9IG5ldGRldl9wcml2KG5kZXYpOw0KPiAtDQo+IC0JZmVwLT5od3RzX3R4X2VuID0g
-MDsNCj4gLQlmZXAtPmh3dHNfcnhfZW4gPSAwOw0KPiAtfQ0KPiAtDQo+ICBpbnQgZmVjX3B0cF9z
-ZXQoc3RydWN0IG5ldF9kZXZpY2UgKm5kZXYsIHN0cnVjdCBrZXJuZWxfaHd0c3RhbXBfY29uZmln
-DQo+ICpjb25maWcsDQo+ICAJCXN0cnVjdCBuZXRsaW5rX2V4dF9hY2sgKmV4dGFjaykNCj4gIHsN
-Cj4gLS0NCj4gMi4zNC4xDQoNClRoYW5rcyENClJldmlld2VkLWJ5OiBXZWkgRmFuZyA8IHdlaS5m
-YW5nQG54cC5jb20gPg0K
+On Thu, 13 Jul 2023 16:17:31 -0700 Ivan Babrou wrote:
+> On Wed, Jul 12, 2023 at 10:42=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> > On Wed, 12 Jul 2023 11:42:26 -0500 Yan Zhai wrote: =20
+> > >   The issue with kfree_skb is not that it fires too frequently (not in
+> > > the 6.x kernel now). Rather, it is unable to locate the socket info
+> > > when a SYN is dropped due to the accept queue being full. The sk is
+> > > stolen upon inet lookup, e.g. in tcp_v4_rcv. This makes it unable to
+> > > tell in kfree_skb which socket a SYN skb is targeting (when TPROXY or
+> > > socket lookup are used). A tracepoint with sk information will be more
+> > > useful to monitor accurately which service/socket is involved. =20
+> >
+> > No doubt that kfree_skb isn't going to solve all our needs, but I'd
+> > really like you to clean up the unnecessary callers on your systems
+> > first, before adding further tracepoints. That way we'll have a clear
+> > picture of which points can be solved by kfree_skb and where we need
+> > further work. =20
+>=20
+> The existing UDP tracepoint was there for 12 years and it's a part of
+> what kernel exposes to userspace, so I don't think it's fair to remove
+> this and break its consumers. I think "do not break userspace" applies
+> here. The proposed TCP tracepoint mostly mirrors it, so I think it's
+> fair to have it.
+>=20
+> I don't know why kfree_skb is called so much. I also don't agree with
+> Yan that it's not actually too much, because it's a lot (especially
+> compared with near zero for my proposed tracepoint). I can easily see
+> 300-500k calls per second into it:
+>=20
+> $ perf stat -I 1000 -a -e skb:kfree_skb -- sleep 10
+> #           time             counts unit events
+>      1.000520165             10,108      skb:kfree_skb
+>      2.010494526             11,178      skb:kfree_skb
+>      3.075503743             10,770      skb:kfree_skb
+>      4.122814843             11,334      skb:kfree_skb
+>      5.128518432             12,020      skb:kfree_skb
+>      6.176504094             11,117      skb:kfree_skb
+>      7.201504214             12,753      skb:kfree_skb
+>      8.229523643             10,566      skb:kfree_skb
+>      9.326499044            365,239      skb:kfree_skb
+>     10.002106098            313,105      skb:kfree_skb
+> $ perf stat -I 1000 -a -e skb:kfree_skb -- sleep 10
+> #           time             counts unit events
+>      1.000767744             52,240      skb:kfree_skb
+>      2.069762695            508,310      skb:kfree_skb
+>      3.102763492            417,895      skb:kfree_skb
+>      4.142757608            385,981      skb:kfree_skb
+>      5.190759795            430,154      skb:kfree_skb
+>      6.243765384            405,707      skb:kfree_skb
+>      7.290818228            362,934      skb:kfree_skb
+>      8.297764298            336,702      skb:kfree_skb
+>      9.314287243            353,039      skb:kfree_skb
+>     10.002288423            251,414      skb:kfree_skb
+>=20
+> Most of it is NOT_SPECIFIED (1s data from one CPU during a spike):
+>=20
+> $ perf script | sed 's/.*skbaddr=3D//' | awk '{ print $NF }' | sort |
+> uniq -c | sort -n | tail
+>       1 TCP_CLOSE
+>       2 NO_SOCKET
+>       4 TCP_INVALID_SEQUENCE
+>       4 TCP_RESET
+>      13 TCP_OLD_DATA
+>      14 NETFILTER_DROP
+>    4594 NOT_SPECIFIED
+>=20
+> We can start a separate discussion to break it down by category if it
+> would help. Let me know what kind of information you would like us to
+> provide to help with that. I assume you're interested in kernel stacks
+> leading to kfree_skb with NOT_SPECIFIED reason, but maybe there's
+> something else.
+
+Just the stacks.
+
+> Even if I was only interested in one specific reason, I would still
+> have to arm the whole tracepoint and route a ton of skbs I'm not
+> interested in into my bpf code. This seems like a lot of overhead,
+> especially if I'm dropping some attack packets.
+
+That's what I meant with my drop vs exception comment. We already have
+two tracepoints on the skb free path (free and consume), adding another
+shouldn't rise too many eyebrows.
+
+> Perhaps a lot of extra NOT_SPECIFIED stuff can be fixed and removed
+> from kfree_skb. It's not something I can personally do as it requires
+> much deeper network code understanding than I possess. For TCP we'll
+> also have to add some extra reasons for kfree_skb, because currently
+> it's all NOT_SPECIFIED (no reason set in the accept path):
+>=20
+> * https://elixir.bootlin.com/linux/v6.5-rc1/source/net/ipv4/tcp_input.c#L=
+6499
+> * https://elixir.bootlin.com/linux/v6.5-rc1/source/net/ipv4/tcp_ipv4.c#L1=
+749
+>=20
+> For UDP we already have SKB_DROP_REASON_SOCKET_RCVBUFF, so I tried my
+> best to implement what I wanted based on that. It's not very
+> approachable, as you'd have to extract the destination port yourself
+> from the raw skb. As Yan said, for TCP people often rely on skb->sk,
+> which is just not present when the incoming SYN is dropped. I failed
+> to find a good example of extracting a destination port that I could
+> replicate. So far I have just a per-reason breakdown working:
+>=20
+> * https://github.com/cloudflare/ebpf_exporter/pull/233
+>=20
+> If you have an ebpf example that would help me extract the destination
+> port from an skb in kfree_skb, I'd be interested in taking a look and
+> trying to make it work.
+>=20
+> The need to extract the protocol level information in ebpf is only
+> making kfree_skb more expensive for the needs of catching rare cases
+> when we run out of buffer space (UDP) or listen queue (TCP). These two
+> cases are very common failure scenarios that people are interested in
+> catching with straightforward tracepoints that can give them the
+> needed information easily and cheaply.
+>=20
+> I sympathize with the desire to keep the number of tracepoints in
+> check, but I also feel like UDP buffer drops and TCP listen drops
+> tracepoints are very much justified to exist.
+
+I'm not completely opposed to the tracepoints where needed. It's more=20
+of trying to make sure we do due diligence on the existing solutions.
+Or maybe not even due diligence as much as pay off some technical debt.
 
