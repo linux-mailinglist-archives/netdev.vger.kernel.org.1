@@ -1,164 +1,96 @@
-Return-Path: <netdev+bounces-17893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CC07536F9
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:48:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E9DE753705
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC511C21628
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:48:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABDF1C215D5
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96273FC03;
-	Fri, 14 Jul 2023 09:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F44FC03;
+	Fri, 14 Jul 2023 09:49:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5826AD51F;
-	Fri, 14 Jul 2023 09:48:05 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8A32D73;
-	Fri, 14 Jul 2023 02:47:59 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qKFOn-0002GU-MB; Fri, 14 Jul 2023 11:47:41 +0200
-Date: Fri, 14 Jul 2023 11:47:41 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>,
-	coreteam@netfilter.org,
-	Network Development <netdev@vger.kernel.org>,
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH bpf-next v4 2/6] netfilter: bpf: Support
- BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-Message-ID: <20230714094741.GA7912@breakpoint.cc>
-References: <cover.1689203090.git.dxu@dxuuu.xyz>
- <d3b0ff95c58356192ea3b50824f8cdbf02c354e3.1689203090.git.dxu@dxuuu.xyz>
- <CAADnVQKKfEtZYZxihxvG3aQ34E1m95qTZ=jTD7yd0qvOASpAjQ@mail.gmail.com>
- <kwiwaeaijj6sxwz5fhtxyoquhz2kpujbsbeajysufgmdjgyx5c@f6lqrd23xr5f>
- <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com>
- <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
- <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
- <t6wypww537golmoosbikfuombrqq555fh5mbycwl4whto6joo4@hcqlospkgqyr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC09D51F
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:49:06 +0000 (UTC)
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B96635A9
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:49:00 -0700 (PDT)
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b75153caabso2724632a34.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:49:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689328140; x=1691920140;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dIJT0ZLagHJlynN87dwgjc9pwkbprQ7JENblyAxgUpI=;
+        b=GqIvUNxqNJSnIAHiVT1W23F6VY3K6zc1TPbTwLWISURq3qB5/bk4ERKOseIUL/Ak5t
+         336u83MfkY2sIBQRWrk0o1lpvE58eSufE0RoFrUUZYeLw626Lo6gnxWMUNhlzcwpFv72
+         FGy/jRo7dkfbSfNffFstTvz2Mq+X5j9RjRJnINpXmBXOiOtmUBS8fA0ZnmQcGjrqcjGi
+         AJ5sAgRPI+m87n+E+CJqpG/QnWZ91/boC+KVA7QDiQycaGfckMjFw/97veJcpOT0xBbC
+         Saef3XumuwdeNDp00k9Eudc49KYzHzAx5z5hgnIaAEUnTsmCl7AvbEmjo6qfa4NOCsPx
+         6IQw==
+X-Gm-Message-State: ABy/qLa08nkgtehL9fgJ4qJ2nGU9EDD+zmNMiYZrYwE6Z8OeVnDmTgs2
+	CfRmo6myF5f5gR5yciWi7OqvZxljUXpStafzifRwyice1tF3
+X-Google-Smtp-Source: APBJJlHaBvTxSTzaoCKzHeb7VIUiIrzCsedgZoxW6XeenbWmzrRrC0sG9tlKEsNnYR0dN+w8kgqAFrFtzAU2XEUxH7OA4JBgy0Q/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <t6wypww537golmoosbikfuombrqq555fh5mbycwl4whto6joo4@hcqlospkgqyr>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE,
-	T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a9d:7618:0:b0:6b7:3eba:59d3 with SMTP id
+ k24-20020a9d7618000000b006b73eba59d3mr3509845otl.6.1689328140182; Fri, 14 Jul
+ 2023 02:49:00 -0700 (PDT)
+Date: Fri, 14 Jul 2023 02:49:00 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b46bf806006f5b02@google.com>
+Subject: [syzbot] Monthly wireguard report (Jul 2023)
+From: syzbot <syzbot+list1615f52d4d969bd05dc8@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Daniel Xu <dxu@dxuuu.xyz> wrote:
-> On Thu, Jul 13, 2023 at 04:10:03PM -0700, Alexei Starovoitov wrote:
-> > Why is rcu_assign_pointer() used?
-> > If it's not RCU protected, what is the point of rcu_*() accessors
-> > and rcu_read_lock() ?
-> > 
-> > In general, the pattern:
-> > rcu_read_lock();
-> > ptr = rcu_dereference(...);
-> > rcu_read_unlock();
-> > ptr->..
-> > is a bug. 100%.
+Hello wireguard maintainers/developers,
 
-FWIW, I agree with Alexei, it does look... dodgy.
+This is a 31-day syzbot report for the wireguard subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireguard
 
-> The reason I left it like this is b/c otherwise I think there is a race
-> with module unload and taking a refcnt. For example:
-> 
-> ptr = READ_ONCE(global_var)
->                                              <module unload on other cpu>
-> // ptr invalid
-> try_module_get(ptr->owner) 
->
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 3 issues are still open and 13 have been fixed so far.
 
-Yes, I agree.
+Some of the still happening issues:
 
-> I think the the synchronize_rcu() call in
-> kernel/module/main.c:free_module() protects against that race based on
-> my reading.
-> 
-> Maybe the ->enable() path can store a copy of the hook ptr in
-> struct bpf_nf_link to get rid of the odd rcu_dereference()?
-> 
-> Open to other ideas too -- would appreciate any hints.
+Ref Crashes Repro Title
+<1> 714     No    KCSAN: data-race in wg_packet_send_staged_packets / wg_packet_send_staged_packets (3)
+                  https://syzkaller.appspot.com/bug?extid=6ba34f16b98fe40daef1
+<2> 480     No    KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll (2)
+                  https://syzkaller.appspot.com/bug?extid=d1de830e4ecdaac83d89
+<3> 3       Yes   INFO: rcu detected stall in wg_packet_handshake_receive_worker
+                  https://syzkaller.appspot.com/bug?extid=dbb6a05624cf5064858c
 
-I would suggest the following:
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-- Switch ordering of patches 2 and 3.
-  What is currently patch 3 would add the .owner fields only.
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-Then, what is currently patch #2 would document the rcu/modref
-interaction like this (omitting error checking for brevity):
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-rcu_read_lock();
-v6_hook = rcu_dereference(nf_defrag_v6_hook);
-if (!v6_hook) {
-        rcu_read_unlock();
-        err = request_module("nf_defrag_ipv6");
-        if (err)
-                 return err < 0 ? err : -EINVAL;
-        rcu_read_lock();
-	v6_hook = rcu_dereference(nf_defrag_v6_hook);
-}
-
-if (v6_hook && try_module_get(v6_hook->owner))
-	v6_hook = rcu_pointer_handoff(v6_hook);
-else
-	v6_hook = NULL;
-
-rcu_read_unlock();
-
-if (!v6_hook)
-	err();
-v6_hook->enable();
-
-
-I'd store the v4/6_hook pointer in the nf bpf link struct, its probably more
-self-explanatory for the disable side in that we did pick up a module reference
-that we still own at delete time, without need for any rcu involvement.
-
-Because above handoff is repetitive for ipv4 and ipv6,
-I suggest to add an agnostic helper for this.
-
-I know you added distinct structures for ipv4 and ipv6 but if they would use
- the same one you could add
-
-static const struct nf_defrag_hook *get_proto_frag_hook(const struct nf_defrag_hook __rcu *hook,
-							const char *modulename);
-
-And then use it like:
-
-v4_hook = get_proto_frag_hook(nf_defrag_v4_hook, "nf_defrag_ipv4");
-
-Without a need to copy the modprobe and handoff part.
-
-What do you think?
+You may send multiple commands in a single email message.
 
