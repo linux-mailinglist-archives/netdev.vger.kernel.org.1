@@ -1,279 +1,231 @@
-Return-Path: <netdev+bounces-17730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D75752E09
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 01:42:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 588B2752E1F
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4C01C2146E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jul 2023 23:42:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 110331C214AA
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 00:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001426AA6;
-	Thu, 13 Jul 2023 23:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84840370;
+	Fri, 14 Jul 2023 00:05:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D694463D6;
-	Thu, 13 Jul 2023 23:42:41 +0000 (UTC)
-Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDCA2707;
-	Thu, 13 Jul 2023 16:42:39 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailnew.west.internal (Postfix) with ESMTP id DA1652B0005E;
-	Thu, 13 Jul 2023 19:42:36 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Thu, 13 Jul 2023 19:42:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm2; t=
-	1689291756; x=1689298956; bh=EzNZ4lSIA6Q11ERKP9wL6gbe1PTUeztr8yy
-	uoNBS6xI=; b=lwlN9tGh2djU92nCaw14L8DOqRSFUea9bxC8PzEXViIRwkgKWqx
-	0PRLwA5GyEoUkqZgV1OG38xgf06awiPK/inuCCPe/Kfj5rUfl9H/R2CtkCeGrb0d
-	rzPplFlSpf95be0DK5IsgGZU+gJBUFXJmUGFUAybOXr71Jq8mPd6ceJzUfY3f255
-	qNVnrFmzEbSFVFAuWB3oBe3On59NB36ZAFBmvTyEG5shK9v0ghBSIbefS1mCoJ9N
-	MsAp6xN4ks/32ErGWlJTufHJm4PysC0mQsXSpRzFZHI5whQEU7V8oztTJ5Kwj8ka
-	gz0t/2WkL15AZj1t7l+lvC93oN+Dga/jTOw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1689291756; x=1689298956; bh=EzNZ4lSIA6Q11ERKP9wL6gbe1PTUeztr8yy
-	uoNBS6xI=; b=eZJGBYtpogIteZ9RY7DGwiLXsVU/AqBs/HcGcGkMDp/pYEUXq6z
-	SZPjvwdwZEzt+zwUC2De3idEBM0U0osNYUkUyWq1asZoSFByDWQ2AVlXu8WO+XEh
-	ysyyF5jDChkqvWYUVpU16spKxznJVtdM4jWqTvtzFkbmSy8gDfJLpfdGa/kkib7u
-	tB/RuBEFy8P6Qhr49mYQJHzDLxr4CF6k6dtByzMPPBROjTM/UK8qgwdUUFybN45k
-	CwNhklHrGUHl7ePHvMXTUNfxlc72ckZYkBTj1v+GzHPog/FypI6Tb0F5mGeGQBMN
-	YSSV8+Jo00+juInO/9wZi6newj/p6znX/sw==
-X-ME-Sender: <xms:64uwZNVacJ5NUMpvwo4iBGdlz67l-Saew17mLJ9DGWISMv1STsy4sg>
-    <xme:64uwZNkmxCGIcKVXB_023ZUf6kZtqfnCDLP7xp3cTx1MVvgvGPD2vbvRHbMLx-MgZ
-    SINkvuIcruTIlQ9Hw>
-X-ME-Received: <xmr:64uwZJbY15BAcpgo3svwKSXkanT3Gwo0NVAcVat7o2_lZg4kgigM3fv6qA9fljl7IL_pvhGsOV-iD0fuMdvI3nZNc8p4UA6N_osh>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrfeehgddviecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
-    hrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefstddt
-    tdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
-    cuggftrfgrthhtvghrnhepieektdefhffhjeejgeejhfekkeejgfegvdeuhfeitdeiueeh
-    hffgvedthedviefgnecuffhomhgrihhnpehqvghmuhdrohhrghenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:64uwZAVoqZuK6x0Zc470yxBCCCwJDEP4Qn6U_z-4FamVbPQsKNVyww>
-    <xmx:64uwZHmMdfE20ZbIMwCnk2Tv5iOsFcfU8e0MFy4Q1SLaJ3Hnd0YUpQ>
-    <xmx:64uwZNchtFnRTMKgfQWpij797GJxGPhaHZ5HAvm4cuVvy_7wdmjnzw>
-    <xmx:7IuwZFF3iowhMRQ7rNsPyJKSznXv9vLz1UWVUst5UFCrNPSvFcu3j8iw4Lo>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 13 Jul 2023 19:42:34 -0400 (EDT)
-Date: Thu, 13 Jul 2023 17:42:32 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	"David S. Miller" <davem@davemloft.net>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
-	Network Development <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH bpf-next v4 2/6] netfilter: bpf: Support
- BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-Message-ID: <t6wypww537golmoosbikfuombrqq555fh5mbycwl4whto6joo4@hcqlospkgqyr>
-References: <cover.1689203090.git.dxu@dxuuu.xyz>
- <d3b0ff95c58356192ea3b50824f8cdbf02c354e3.1689203090.git.dxu@dxuuu.xyz>
- <CAADnVQKKfEtZYZxihxvG3aQ34E1m95qTZ=jTD7yd0qvOASpAjQ@mail.gmail.com>
- <kwiwaeaijj6sxwz5fhtxyoquhz2kpujbsbeajysufgmdjgyx5c@f6lqrd23xr5f>
- <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com>
- <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
- <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7596336D
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 00:05:37 +0000 (UTC)
+Received: from bird.elm.relay.mailchannels.net (bird.elm.relay.mailchannels.net [23.83.212.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E322713
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 17:05:35 -0700 (PDT)
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 89684541E98
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 00:05:34 +0000 (UTC)
+Received: from pdx1-sub0-mail-a234.dreamhost.com (unknown [127.0.0.6])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id DC3B5541941
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 00:05:33 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1689293133; a=rsa-sha256;
+	cv=none;
+	b=26x6HcDg22hGi+PnuktCln16KSOoRy8kP6pjBWssNnX4i6JMgk3jin5kYa3oitbbQVm7zk
+	mCdNOjN+wVz16yja6o0Mm/sgJ0Ptv/lvZwF3uNFlrrXcN1zSy5dswEJUS/se3vmXWG4MrU
+	4C61svM03yphgFgRxa0F5TrvGHGWqgxe/6sfdLYsLhkA4u6hREuMr+WS3LX2CiWAHWZUPs
+	mQ2Oht4Er2O0f+RIE4uKZvPOSFsnzWRrz3xGX3x+EzS8rKGll70JFdEgoUCrTtGc4hAlqu
+	EWQfMfKFvGT1NHEJCEsuPaU6ZWxz/b9EuRXXI9XYb38W4KWSmlhJ7YQsEauPfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1689293133;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=R8IPVAKRYoAh+2qBZdjxKyh15eT0GXaiYypTj4LP2gA=;
+	b=7mG/iDvEXmuOwBrCyg4aL/cJMhnzU2at/OEo/V6GUi2GIldPHReXVRRFhIUIkARv4y6+dE
+	K34c+1CdFMwStSKB6O8EsQ38FhhSsQyaEJRFRUQgv7LSPymI0S1FkpPbMZuWOvVZGeFlkC
+	gYakF+u7kDhQ9WHbaNS+RffQQG/ifS1/rluPnE1cGxd67vvuQZ5/f92dS0RQ3RPEy2X8F9
+	UPI0SeC/PMRRK750SRFmST7uwyxmXJ2EPojapIKkSnvsTEpntByydkfPYp/gQ4qgEmHWMQ
+	Gl/efH3c9nI64wTf01HVIRnXq6Z8rWMGLlEow30VkE8fLOTeK8H/vum+jcyiAQ==
+ARC-Authentication-Results: i=1;
+	rspamd-7d9c4d5c9b-l8p8j;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MailChannels-Auth-Id: dreamhost
+X-Cooperative-Desert: 7d30a2bc145b8634_1689293134199_464073002
+X-MC-Loop-Signature: 1689293134199:2242671907
+X-MC-Ingress-Time: 1689293134199
+Received: from pdx1-sub0-mail-a234.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.120.163.61 (trex/6.9.1);
+	Fri, 14 Jul 2023 00:05:34 +0000
+Received: from kmjvbox (unknown [71.198.86.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kjlx@templeofstupid.com)
+	by pdx1-sub0-mail-a234.dreamhost.com (Postfix) with ESMTPSA id 4R2BZP4BYyzRW
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 17:05:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
+	s=dreamhost; t=1689293133;
+	bh=R8IPVAKRYoAh+2qBZdjxKyh15eT0GXaiYypTj4LP2gA=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=FTUI5mVxk5yIpkR9Cj7ubkeVm6t9XunDqMWwtOmkdKrGFrvtMizro/R5MckVCw58/
+	 Y1OM3pUQqibVsiXtenaMMqYx0N8ecAB/VPC0qSeFNVx6Ft1G0fzdLk0dekeKap8az5
+	 t76G2oXgDgB4NQIdME84lhMZcWbkP6mHzqJLTAXg=
+Received: from johansen (uid 1000)
+	(envelope-from kjlx@templeofstupid.com)
+	id e00cb
+	by kmjvbox (DragonFly Mail Agent v0.12);
+	Thu, 13 Jul 2023 17:05:30 -0700
+Date: Thu, 13 Jul 2023 17:05:30 -0700
+From: Krister Johansen <kjlx@templeofstupid.com>
+To: Shay Agroskin <shayagr@amazon.com>
+Cc: Krister Johansen <kjlx@templeofstupid.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH net] net: ena: fix shift-out-of-bounds in exponential
+ backoff
+Message-ID: <20230714000530.GA1982@templeofstupid.com>
+References: <20230711013621.GE1926@templeofstupid.com>
+ <pj41zllefmpbw7.fsf@u95c7fd9b18a35b.ant.amazon.com>
+ <20230711225210.GA2088@templeofstupid.com>
+ <pj41zlilao9rqt.fsf@u95c7fd9b18a35b.ant.amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <pj41zlilao9rqt.fsf@u95c7fd9b18a35b.ant.amazon.com>
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 04:10:03PM -0700, Alexei Starovoitov wrote:
-> On Wed, Jul 12, 2023 at 9:33 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> >
-> > On Wed, Jul 12, 2023 at 06:26:13PM -0700, Alexei Starovoitov wrote:
-> > > On Wed, Jul 12, 2023 at 6:22 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> > > >
-> > > > Hi Alexei,
-> > > >
-> > > > On Wed, Jul 12, 2023 at 05:43:49PM -0700, Alexei Starovoitov wrote:
-> > > > > On Wed, Jul 12, 2023 at 4:44 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> > > > > > +#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
-> > > > > > +       case NFPROTO_IPV6:
-> > > > > > +               rcu_read_lock();
-> > > > > > +               v6_hook = rcu_dereference(nf_defrag_v6_hook);
-> > > > > > +               if (!v6_hook) {
-> > > > > > +                       rcu_read_unlock();
-> > > > > > +                       err = request_module("nf_defrag_ipv6");
-> > > > > > +                       if (err)
-> > > > > > +                               return err < 0 ? err : -EINVAL;
-> > > > > > +
-> > > > > > +                       rcu_read_lock();
-> > > > > > +                       v6_hook = rcu_dereference(nf_defrag_v6_hook);
-> > > > > > +                       if (!v6_hook) {
-> > > > > > +                               WARN_ONCE(1, "nf_defrag_ipv6_hooks bad registration");
-> > > > > > +                               err = -ENOENT;
-> > > > > > +                               goto out_v6;
-> > > > > > +                       }
-> > > > > > +               }
-> > > > > > +
-> > > > > > +               err = v6_hook->enable(link->net);
-> > > > >
-> > > > > I was about to apply, but luckily caught this issue in my local test:
-> > > > >
-> > > > > [   18.462448] BUG: sleeping function called from invalid context at
-> > > > > kernel/locking/mutex.c:283
-> > > > > [   18.463238] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid:
-> > > > > 2042, name: test_progs
-> > > > > [   18.463927] preempt_count: 0, expected: 0
-> > > > > [   18.464249] RCU nest depth: 1, expected: 0
-> > > > > [   18.464631] CPU: 15 PID: 2042 Comm: test_progs Tainted: G
-> > > > > O       6.4.0-04319-g6f6ec4fa00dc #4896
-> > > > > [   18.465480] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> > > > > BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-> > > > > [   18.466531] Call Trace:
-> > > > > [   18.466767]  <TASK>
-> > > > > [   18.466975]  dump_stack_lvl+0x32/0x40
-> > > > > [   18.467325]  __might_resched+0x129/0x180
-> > > > > [   18.467691]  mutex_lock+0x1a/0x40
-> > > > > [   18.468057]  nf_defrag_ipv4_enable+0x16/0x70
-> > > > > [   18.468467]  bpf_nf_link_attach+0x141/0x300
-> > > > > [   18.468856]  __sys_bpf+0x133e/0x26d0
-> > > > >
-> > > > > You cannot call mutex under rcu_read_lock.
-> > > >
-> > > > Whoops, my bad. I think this patch should fix it:
-> > > >
-> > > > ```
-> > > > From 7e8927c44452db07ddd7cf0e30bb49215fc044ed Mon Sep 17 00:00:00 2001
-> > > > Message-ID: <7e8927c44452db07ddd7cf0e30bb49215fc044ed.1689211250.git.dxu@dxuuu.xyz>
-> > > > From: Daniel Xu <dxu@dxuuu.xyz>
-> > > > Date: Wed, 12 Jul 2023 19:17:35 -0600
-> > > > Subject: [PATCH] netfilter: bpf: Don't hold rcu_read_lock during
-> > > >  enable/disable
-> > > >
-> > > > ->enable()/->disable() takes a mutex which can sleep. You can't sleep
-> > > > during RCU read side critical section.
-> > > >
-> > > > Our refcnt on the module will protect us from ->enable()/->disable()
-> > > > from going away while we call it.
-> > > >
-> > > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > > > ---
-> > > >  net/netfilter/nf_bpf_link.c | 10 ++++++++--
-> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-> > > > index 77ffbf26ba3d..79704cc596aa 100644
-> > > > --- a/net/netfilter/nf_bpf_link.c
-> > > > +++ b/net/netfilter/nf_bpf_link.c
-> > > > @@ -60,9 +60,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
-> > > >                         goto out_v4;
-> > > >                 }
-> > > >
-> > > > +               rcu_read_unlock();
-> > > >                 err = v4_hook->enable(link->net);
-> > > >                 if (err)
-> > > >                         module_put(v4_hook->owner);
+On Thu, Jul 13, 2023 at 10:46:55AM +0300, Shay Agroskin wrote:
+> 
+> Krister Johansen <kjlx@templeofstupid.com> writes:
+> 
+> > 
+> > On Tue, Jul 11, 2023 at 08:47:32PM +0300, Shay Agroskin wrote:
+> > > 
+> > > Krister Johansen <kjlx@templeofstupid.com> writes:
+> > > 
+> > > > diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c
+> > > > b/drivers/net/ethernet/amazon/ena/ena_com.c
+> > > > index 451c3a1b6255..633b321d7fdd 100644
+> > > > --- a/drivers/net/ethernet/amazon/ena/ena_com.c
+> > > > +++ b/drivers/net/ethernet/amazon/ena/ena_com.c
+> > > > @@ -35,6 +35,8 @@
+> > > >  #define ENA_REGS_ADMIN_INTR_MASK 1
+> > > > +#define ENA_MAX_BACKOFF_DELAY_EXP 16U
 > > > > +
-> > > > +               return err;
-> > > >  out_v4:
-> > > >                 rcu_read_unlock();
-> > > >                 return err;
-> > > > @@ -92,9 +95,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
-> > > >                         goto out_v6;
-> > > >                 }
-> > > >
-> > > > +               rcu_read_unlock();
-> > > >                 err = v6_hook->enable(link->net);
-> > > >                 if (err)
-> > > >                         module_put(v6_hook->owner);
-> > > > +
-> > > > +               return err;
-> > > >  out_v6:
-> > > >                 rcu_read_unlock();
-> > > >                 return err;
-> > > > @@ -114,11 +120,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
-> > > >         case NFPROTO_IPV4:
-> > > >                 rcu_read_lock();
-> > > >                 v4_hook = rcu_dereference(nf_defrag_v4_hook);
-> > > > +               rcu_read_unlock();
-> > > >                 if (v4_hook) {
-> > > >                         v4_hook->disable(link->net);
-> > > >                         module_put(v4_hook->owner);
-> > > >                 }
-> > > > -               rcu_read_unlock();
-> > > >
-> > > >                 break;
-> > > >  #endif
-> > > > @@ -126,11 +132,11 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
-> > > >         case NFPROTO_IPV6:
-> > > >                 rcu_read_lock();
-> > > >                 v6_hook = rcu_dereference(nf_defrag_v6_hook);
-> > > > +               rcu_read_unlock();
-> > >
-> > > No. v6_hook is gone as soon as you unlock it.
-> >
-> > I think we're protected here by the try_module_get() on the enable path.
-> > And we only disable defrag if enabling succeeds. The module shouldn't
-> > be able to deregister its hooks until we call the module_put() later.
-> >
-> > I think READ_ONCE() would've been more appropriate but I wasn't sure if
-> > that was ok given nf_defrag_v(4|6)_hook is written to by
-> > rcu_assign_pointer() and I was assuming symmetry is necessary.
+> > > >  #define ENA_MIN_ADMIN_POLL_US 100
+> > > >  #define ENA_MAX_ADMIN_POLL_US 5000
+> > > > @@ -536,6 +538,7 @@ static int >
+> > > ena_com_comp_status_to_errno(struct
+> > > > ena_com_admin_queue *admin_queue,
+> > > >    static void ena_delay_exponential_backoff_us(u32 exp, u32 >
+> > > delay_us)
+> > > >  {
+> > > > +   exp = min_t(u32, exp, ENA_MAX_BACKOFF_DELAY_EXP);
+> > > >     delay_us = max_t(u32, ENA_MIN_ADMIN_POLL_US, delay_us);
+> > > >     delay_us = min_t(u32, delay_us * (1U << exp), >
+> > > ENA_MAX_ADMIN_POLL_US);
+> > > >     usleep_range(delay_us, 2 * delay_us);
+> > > 
+> > > Hi, thanks for submitting this patch (:
+> > 
+> > Absolutely; thanks for the review!
+> > 
+> > > Going over the logic here, the driver sleeps for `delay_us`
+> > > micro-seconds in
+> > > each iteration that this function gets called.
+> > > 
+> > > For an exp = 14 it'd sleep (I added units notation)
+> > > delay_us * (2 ^ exp) us = 100 * (2 ^ 14) us = (10 * (2 ^ 14)) /
+> > > (1000000) s
+> > > = 1.6 s
+> > > 
+> > > For an exp = 15 it'd sleep
+> > > (10 * (2 ^ 15)) / (1000000) = 3.2s
+> > > 
+> > > To even get close to an overflow value, say exp=29 the driver would
+> > > sleep in
+> > > a single iteration
+> > > 53687 s = 14.9 hours.
+> > > 
+> > > The driver should stop trying to get a response from the device
+> > > after a
+> > > timeout period received from the device which is 3 seconds by
+> > > default.
+> > > 
+> > > The point being, it seems very unlikely to hit this overflow. Did
+> > > you
+> > > experience it or was the issue discovered by a static analyzer ?
+> > 
+> > No, no use of fuzzing or static analysis.  This was hit on a production
+> > instance that was having ENA trouble.
+> > 
+> > I'm apparently reading the code differently.  I thought this line:
+> > 
+> > > >     delay_us = min_t(u32, delay_us * (1U << exp), >
+> > > ENA_MAX_ADMIN_POLL_US);
+> > 
+> > Was going to cap that delay_us at (delay_us * (1U << exp)) or
+> > 5000us, whichever is smaller.  By that measure, if delay_us is 100 and
+> > ENA_MAX_ADMIN_POLL_US is 5000, this should start getting capped after
+> > exp = 6, correct?  By my estimate, that puts it at between 160ms and
+> > 320ms of sleeping before one could hit this problem.
+> > 
+> > I went and pulled the logs out of the archive and have the following
+> > timeline.  This is seconds from boot as reported by dmesg:
+> > 
+> >    11244.226583 - ena warns TX not completed on time, 10112000    usecs
+> > since
+> >     last napi execution, missing tx timeout val of 5000 msec
+> > 
+> >    11245.190453 - netdev watchdog fires
+> > 
+> >    11245.190781 - ena records Transmit timeout
+> >    11245.250739 - ena records Trigger reset on
+> > 
+> >    11246.812620 - UBSAN message to console
+> > 
+> >    11248.590441 - ena reports Reset inidication didn't turn off
+> >    11250.633545 - ena reports failure to reset device
+> >    12013.529338 - last logline before new boot
+> > 
+> > While the difference between the panic and the trigger reset is more
+> > than 320ms, it is definitely on the order of seconds instead of hours.
+> > 
 > 
-> Why is rcu_assign_pointer() used?
-> If it's not RCU protected, what is the point of rcu_*() accessors
-> and rcu_read_lock() ?
+> Yup you're right. I was so entangled in my exponent calculations that I
+> completely missed the min_t expression there.
 > 
-> In general, the pattern:
-> rcu_read_lock();
-> ptr = rcu_dereference(...);
-> rcu_read_unlock();
-> ptr->..
-> is a bug. 100%.
+> That's quite an awkward design to be honest, I hope to submit a re-write for
+> it in one of the releases.
 > 
+> Thanks again for the work you've put into it
 
-The reason I left it like this is b/c otherwise I think there is a race
-with module unload and taking a refcnt. For example:
+Totally welcome. I appreciate the speedy reviews from you and Leon.
 
-ptr = READ_ONCE(global_var)
-                                             <module unload on other cpu>
-// ptr invalid
-try_module_get(ptr->owner) 
+Thanks again,
 
-I think the the synchronize_rcu() call in
-kernel/module/main.c:free_module() protects against that race based on
-my reading.
-
-Maybe the ->enable() path can store a copy of the hook ptr in
-struct bpf_nf_link to get rid of the odd rcu_dereference()?
-
-Open to other ideas too -- would appreciate any hints.
-
-Thanks,
-Daniel
+-K
 
