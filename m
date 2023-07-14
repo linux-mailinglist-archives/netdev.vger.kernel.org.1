@@ -1,390 +1,317 @@
-Return-Path: <netdev+bounces-17910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 743DD75393A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 13:05:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61FF2753951
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 13:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06F21C2153E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:05:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38CE21C215AE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F76FDDB2;
-	Fri, 14 Jul 2023 11:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0BF100BB;
+	Fri, 14 Jul 2023 11:14:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4D06FC8
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 11:05:08 +0000 (UTC)
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1224C0;
-	Fri, 14 Jul 2023 04:05:05 -0700 (PDT)
-Date: Fri, 14 Jul 2023 13:05:00 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter <netfilter@vger.kernel.org>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>
-Cc: netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
-	lwn@lwn.net
-Subject: [ANNOUNCE] nftables 1.0.8 release
-Message-ID: <ZLEr3Eg59HyPUUSR@calendula>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE99B6FC8
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 11:14:36 +0000 (UTC)
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA1626AE;
+	Fri, 14 Jul 2023 04:14:34 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-3fba8e2aa52so17451685e9.1;
+        Fri, 14 Jul 2023 04:14:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689333273; x=1691925273;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ka9amKpo1CCxEHUIhHtGYAE4Tvgc7QiGZQoTsn95Ms8=;
+        b=J8RTQIi42flq/BuJbnkc5dF9B/tmxjCjU2d/ur5E17e2E55/Dw7/zmAZw4CKZHjmsJ
+         0peDvlM66FThrjbv9SdqW6aMf0OJGhchRdNQc/UQYmScp7FVb3o8r2Uyhnc9iYTU6ERU
+         9y/fork9Y6sEouj6MaoYHpid5dIkNcfuZqN0RfadvNexBPEY5nqWfIz7yijklRpu2zRY
+         biWDfnbMlcujfGG4JpDfyQLkm0c595ZE6HeGtDG3HXcMx7TAhPOS4QJTCkOwRdJEmK7o
+         ZZ8j2doHmvKi/ne4MW52F56FTfY/ZJ1CZDOzCtxUBuGAkf8FhPk44h8XX+i61r+LX2g4
+         jBNw==
+X-Gm-Message-State: ABy/qLY5UoC0b2XwLLX6gy/rQ+2s1vUrID0kllLe+D912xwpIQD6ZiJE
+	MosrsFt0vstwhUZ2JYtztTo=
+X-Google-Smtp-Source: APBJJlHFDFUTYl5i3lcE0ReA3pP/WgSjIrl97snzNpFAEYsdN4uRpVr56VBh/MshrCYdHI/KWxq3rg==
+X-Received: by 2002:a7b:cd97:0:b0:3fc:92:73d6 with SMTP id y23-20020a7bcd97000000b003fc009273d6mr4009310wmj.11.1689333273092;
+        Fri, 14 Jul 2023 04:14:33 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-000.fbsv.net. [2a03:2880:31ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 8-20020a05600c028800b003fba94c9e18sm1228715wmk.4.2023.07.14.04.14.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jul 2023 04:14:32 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: leit@meta.com,
+	Dave Jones <davej@codemonkey.org.uk>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH next-next v3] netconsole: Append kernel version to message
+Date: Fri, 14 Jul 2023 04:13:29 -0700
+Message-Id: <20230714111330.3069605-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="MMz8IM/2NqTZrRD0"
-Content-Disposition: inline
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Create a new netconsole runtime option that prepends the kernel version in
+the netconsole message. This is useful to map kernel messages to kernel
+version in a simple way, i.e., without checking somewhere which kernel
+version the host that sent the message is using.
+
+If this option is selected, then the "<release>," is prepended before the
+netconsole message. This is an example of a netconsole output, with
+release feature enabled:
+
+	6.4.0-01762-ga1ba2ffe946e;12,426,112883998,-;this is a test
+
+Cc: Dave Jones <davej@codemonkey.org.uk>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+V1 -> V2:
+ * Configured at runtime instead of at compilation time.
+ * Reuse send_ext_msg_udp to avoid extra memory allocation.
+V2 -> V3:
+ * Do no enable netcons if parameters release is set but not extended
+   log.
+---
+ Documentation/networking/netconsole.rst | 11 +++-
+ drivers/net/netconsole.c                | 81 ++++++++++++++++++++++++-
+ 2 files changed, 88 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+index dd0518e002f6..7a9de0568e84 100644
+--- a/Documentation/networking/netconsole.rst
++++ b/Documentation/networking/netconsole.rst
+@@ -13,6 +13,8 @@ IPv6 support by Cong Wang <xiyou.wangcong@gmail.com>, Jan 1 2013
+ 
+ Extended console support by Tejun Heo <tj@kernel.org>, May 1 2015
+ 
++Release prepend support by Breno Leitao <leitao@debian.org>, Jul 7 2023
++
+ Please send bug reports to Matt Mackall <mpm@selenic.com>
+ Satyam Sharma <satyam.sharma@gmail.com>, and Cong Wang <xiyou.wangcong@gmail.com>
+ 
+@@ -34,10 +36,11 @@ Sender and receiver configuration:
+ It takes a string configuration parameter "netconsole" in the
+ following format::
+ 
+- netconsole=[+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
++ netconsole=[+][r][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
+ 
+    where
+ 	+             if present, enable extended console support
++	r             if present, prepend kernel version (release) to the message
+ 	src-port      source for UDP packets (defaults to 6665)
+ 	src-ip        source IP to use (interface address)
+ 	dev           network interface (eth0)
+@@ -125,6 +128,7 @@ The interface exposes these parameters of a netconsole target to userspace:
+ 	==============  =================================       ============
+ 	enabled		Is this target currently enabled?	(read-write)
+ 	extended	Extended mode enabled			(read-write)
++	release		Prepend kernel release to message	(read-write)
+ 	dev_name	Local network interface name		(read-write)
+ 	local_port	Source UDP port to use			(read-write)
+ 	remote_port	Remote agent's UDP port			(read-write)
+@@ -165,6 +169,11 @@ following format which is the same as /dev/kmsg::
+ 
+  <level>,<sequnum>,<timestamp>,<contflag>;<message text>
+ 
++If 'r' (release) feature is enabled, the kernel release version is
++prepended to the start of the message. Example::
++
++ 6.4.0,6,444,501151268,-;netconsole: network logging started
++
+ Non printable characters in <message text> are escaped using "\xff"
+ notation. If the message contains optional dictionary, verbatim
+ newline is used as the delimiter.
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 4f4f79532c6c..31cbe02eda49 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -36,6 +36,7 @@
+ #include <linux/inet.h>
+ #include <linux/configfs.h>
+ #include <linux/etherdevice.h>
++#include <linux/utsname.h>
+ 
+ MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@selenic.com>");
+ MODULE_DESCRIPTION("Console driver for network interfaces");
+@@ -84,6 +85,8 @@ static struct console netconsole_ext;
+  *		Also, other parameters of a target may be modified at
+  *		runtime only when it is disabled (enabled == 0).
+  * @extended:	Denotes whether console is extended or not.
++ * @release:	Denotes whether kernel release version should be prepended
++ *		to the message. Depends on extended console.
+  * @np:		The netpoll structure for this target.
+  *		Contains the other userspace visible parameters:
+  *		dev_name	(read-write)
+@@ -101,6 +104,7 @@ struct netconsole_target {
+ #endif
+ 	bool			enabled;
+ 	bool			extended;
++	bool			release;
+ 	struct netpoll		np;
+ };
+ 
+@@ -188,6 +192,15 @@ static struct netconsole_target *alloc_param_target(char *target_config)
+ 		target_config++;
+ 	}
+ 
++	if (*target_config == 'r') {
++		if (!nt->extended) {
++			pr_err("Netconsole configuration error. Release feature requires extended log message");
++			goto fail;
++		}
++		nt->release = true;
++		target_config++;
++	}
++
+ 	/* Parse parameters and setup netpoll */
+ 	err = netpoll_parse_options(&nt->np, target_config);
+ 	if (err)
+@@ -222,6 +235,7 @@ static void free_param_target(struct netconsole_target *nt)
+  *				|
+  *				<target>/
+  *				|	enabled
++ *				|	release
+  *				|	dev_name
+  *				|	local_port
+  *				|	remote_port
+@@ -254,6 +268,11 @@ static ssize_t extended_show(struct config_item *item, char *buf)
+ 	return snprintf(buf, PAGE_SIZE, "%d\n", to_target(item)->extended);
+ }
+ 
++static ssize_t release_show(struct config_item *item, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE, "%d\n", to_target(item)->release);
++}
++
+ static ssize_t dev_name_show(struct config_item *item, char *buf)
+ {
+ 	return snprintf(buf, PAGE_SIZE, "%s\n", to_target(item)->np.dev_name);
+@@ -332,6 +351,11 @@ static ssize_t enabled_store(struct config_item *item,
+ 	}
+ 
+ 	if (enabled) {	/* true */
++		if (nt->release && !nt->extended) {
++			pr_err("Not enabling netconsole. Release feature requires extended log message");
++			goto out_unlock;
++		}
++
+ 		if (nt->extended && !console_is_registered(&netconsole_ext))
+ 			register_console(&netconsole_ext);
+ 
+@@ -366,6 +390,38 @@ static ssize_t enabled_store(struct config_item *item,
+ 	return err;
+ }
+ 
++static ssize_t release_store(struct config_item *item, const char *buf,
++			     size_t count)
++{
++	struct netconsole_target *nt = to_target(item);
++	int release;
++	int err;
++
++	mutex_lock(&dynamic_netconsole_mutex);
++	if (nt->enabled) {
++		pr_err("target (%s) is enabled, disable to update parameters\n",
++		       config_item_name(&nt->item));
++		err = -EINVAL;
++		goto out_unlock;
++	}
++
++	err = kstrtoint(buf, 10, &release);
++	if (err < 0)
++		goto out_unlock;
++	if (release < 0 || release > 1) {
++		err = -EINVAL;
++		goto out_unlock;
++	}
++
++	nt->release = release;
++
++	mutex_unlock(&dynamic_netconsole_mutex);
++	return strnlen(buf, count);
++out_unlock:
++	mutex_unlock(&dynamic_netconsole_mutex);
++	return err;
++}
++
+ static ssize_t extended_store(struct config_item *item, const char *buf,
+ 		size_t count)
+ {
+@@ -576,10 +632,12 @@ CONFIGFS_ATTR(, local_ip);
+ CONFIGFS_ATTR(, remote_ip);
+ CONFIGFS_ATTR_RO(, local_mac);
+ CONFIGFS_ATTR(, remote_mac);
++CONFIGFS_ATTR(, release);
+ 
+ static struct configfs_attribute *netconsole_target_attrs[] = {
+ 	&attr_enabled,
+ 	&attr_extended,
++	&attr_release,
+ 	&attr_dev_name,
+ 	&attr_local_port,
+ 	&attr_remote_port,
+@@ -772,9 +830,23 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	const char *header, *body;
+ 	int offset = 0;
+ 	int header_len, body_len;
++	const char *msg_ready = msg;
++	const char *release;
++	int release_len = 0;
++
++	if (nt->release) {
++		release = init_utsname()->release;
++		release_len = strlen(release) + 1;
++	}
+ 
+-	if (msg_len <= MAX_PRINT_CHUNK) {
+-		netpoll_send_udp(&nt->np, msg, msg_len);
++	if (msg_len + release_len <= MAX_PRINT_CHUNK) {
++		/* No fragmentation needed */
++		if (nt->release) {
++			scnprintf(buf, MAX_PRINT_CHUNK, "%s,%s", release, msg);
++			msg_len += release_len;
++			msg_ready = buf;
++		}
++		netpoll_send_udp(&nt->np, msg_ready, msg_len);
+ 		return;
+ 	}
+ 
+@@ -792,7 +864,10 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	 * Transfer multiple chunks with the following extra header.
+ 	 * "ncfrag=<byte-offset>/<total-bytes>"
+ 	 */
+-	memcpy(buf, header, header_len);
++	if (nt->release)
++		scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
++	memcpy(buf + release_len, header, header_len);
++	header_len += release_len;
+ 
+ 	while (offset < body_len) {
+ 		int this_header = header_len;
+-- 
+2.34.1
 
---MMz8IM/2NqTZrRD0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-
-Hi!
-
-The Netfilter project proudly presents:
-
-        nftables 1.0.8
-
-This release contains enhancements and fixes such as:
-
-- Support for setting meta and ct mark from other fields in rules,
-  eg. set meta mark to ip dscp header field.
-
-    ... meta mark set ip dscp
-
-  You can also combining it with expressions such as:
-
-    ... meta mark set ip dscp and 0x0f
-    ... meta mark set ip dscp << 8
-    ... meta mark set (ip dscp and 0xf) << 8
-
-- Enhacements for -o/--optimize to deal with NAT statements, to compact
-  masquerade statements:
-
-     Merging:
-     masq.nft:3:3-36:              ip saddr 10.141.11.0/24 masquerade
-     masq.nft:4:3-36:              ip saddr 10.141.13.0/24 masquerade
-     into:
-                ip saddr { 10.141.11.0/24, 10.141.13.0/24 } masquerade
-
-  ... and redirect statements too:
-
-     Merging:
-     redir.nft:3:3-32:              tcp dport 83 redirect to :8083
-     redir.nft:4:3-32:              tcp dport 84 redirect to :8084
-     into:
-                redirect to :tcp dport map { 83 : 8083, 84 : 8084 }
-
-- Support for stateful statements in anonymous maps, such as counters.
-
-    ... meta mark { 0xa counter, 0xb counter }
-
-  this can also be used in verdict maps:
-
-    ... ip saddr vmap { 127.0.0.1 counter : drop, * counter : accept }
-
-  this allows to compact 'ct state' matching in rulesets without losing
-  the ability to count packets:
-
-    ... ct state vmap { established counter : accept, \
-                        related counter : accept, \
-                        invalid counter : drop }
-
-- Support for resetting stateful expressions in sets, maps and elements,
-  e.g. counters:
-
-    reset element t m '{ 1.2.3.4 }'
-    reset map ip t m
-    reset set ip t m
-
-  Note that this feature requires Linux kernel >= 6.5-rc1.
-
-- Simplify reset command syntax. This command allows you to reset
-  stateful information in rules, such as counters and quotas:
-
-    reset rules                  # reset all counters regardless family
-    reset rules ip               # reset all counters for family 'ip'
-    reset rules ip t             # reset all counters for table 'filter' in family 'ip'
-    reset rules ip t c           # reset all counters in chain 'input'
-
-  Similarly, you do not have to specify the table keyword anymore when
-  resetting named stateful objects:
-
-    reset counters
-    reset counters ip
-    reset counters ip filter
-
-- Fix bogus error reporting on missing transport protocol when using
-  layer 4 keys in maps:
-
-    ... redirect to :tcp dport map { 83 : 8083, 84 : 8084 }
-
-  This redirects traffic to the localhost ports depending on the TCP
-  destination port, ie. packets going to TCP destination port 83 are
-  redirected to localhost TCP port 8083.
-
-- Provide a hint in unpriviledged namespaces to allow for large rulesets:
-
-    # nft -f test.nft
-    netlink: Error: Could not process rule: Message too long
-    Please, rise /proc/sys/net/core/wmem_max on the host namespace. Hint: 4194304 bytes
-
-  This has been an issue for people loading GeoIP sets from containers,
-  with large IP source address sets.
-
-- Allow for updating devices on existing netdev chain (This requires Linux kernel >= 6.3).
-
-    This patch allows you to add/remove devices to an existing chain:
-
-     # cat ruleset.nft
-     table netdev x {
-            chain y {
-                    type filter hook ingress devices = { eth0 } priority 0; policy accept;
-            }
-     }
-     # nft -f ruleset.nft
-     # nft add chain netdev x y '{ devices = { eth1 };  }'
-     # nft list ruleset
-     table netdev x {
-            chain y {
-                    type filter hook ingress devices = { eth0, eth1 } priority 0; policy accept;
-            }
-     }
-     # nft delete chain netdev x y '{ devices = { eth0 }; }'
-     # nft list ruleset
-     table netdev x {
-            chain y {
-                    type filter hook ingress devices = { eth1 } priority 0; policy accept;
-            }
-     }
-
-- Make "nft list sets" include set elements in listing by default,
-  please, use -t/--terse to fetch the sets without elements.
-
-- Improve error reporting with suggestions on datatype mistypes:
-
-     test.nft:3:11-14: Error: Could not parse Differentiated Services Code Point expression; did you you mean `cs0`?
-                     ip dscp ccs0
-                             ^^^^
-
-  Provide a suggestion too for incorrect jump/goto to chain in map:
-
-     # cat test.nft
-     table ip x {
-            map y {
-                    typeof ip saddr : verdict
-                    elements = { 1.2.3.4 : filter_server1 }
-            }
-     }
-     # nft -f test.nft
-     test.nft:4:26-39: Error: Could not parse netfilter verdict; did you mean `jump filter_server1'?
-                     elements = { 1.2.3.4 : filter_server1 }
-                                            ^^^^^^^^^^^^^^
-
-- Support for constant values in concatenations. For example, allow to
-  update a set from packet path using constants:
-
-    ... update @s1 { ip saddr . 10.180.0.4 . 80 }
-
-- broute support to short-circuit bridge logic from the bridge prerouting hook
-  and pass up packets to the local IP stack.
-
-    ... meta broute set 1
-
-- JSON support for table and chain comments:
-
-    # nft -j list ruleset
-    {"nftables": [{"metainfo": {"version": "1.0.7", "release_name": "Old Doc Yak", "json_schema_version": 1}}, {"table": {"family": "inet", "name": "test3", "handle": 4, "comment": "this is a comment"}}]}
-
-- JSON support for inner/tunnel matching. This example shows how match
-  on the IP dscp field encapsulated under vxlan header.
-
-    # udp dport 4789 vxlan ip dscp 0x02
-    [
-        {
-            "match": {
-                "left": {
-                    "payload": {
-                        "field": "dport",
-                        "protocol": "udp"
-                    }
-                },
-                "op": "==",
-                "right": 4789
-            }
-        },
-        {
-            "match": {
-               "left": {
-                    "payload": {
-                        "field": "dscp",
-                        "protocol": "ip",
-                        "tunnel": "vxlan"
-                    }
-                },
-                "op": "==",
-                "right": 2
-            }
-        }
-    ]
-
-- JSON support for 'last used' statement, that tells when a rule/set
-  element has been used last time.
-
-- Update 'nft list hooks' command to display registered bpf hooks in the
-  netfilter dataplane.
-
-- disallow combining -i/--interactive and -f/--filename.
-
-- distutils has been replaced with setuptools in nftables Python binding.
-
-... as well as asorted fixes and manpage documentation updates.
-
-See changelog for more details (attached to this email).
-
-You can download this new release from:
-
-https://www.netfilter.org/projects/nftables/downloads.html
-https://www.netfilter.org/pub/nftables/
-
-[ NOTE: We have switched to .tar.xz files for releases. ]
-
-To build the code, libnftnl >= 1.2.6 and libmnl >= 1.0.4 are required:
-
-* https://netfilter.org/projects/libnftnl/index.html
-* https://netfilter.org/projects/libmnl/index.html
-
-Visit our wikipage for user documentation at:
-
-* https://wiki.nftables.org
-
-For the manpage reference, check man(8) nft.
-
-In case of bugs and feature requests, file them via:
-
-* https://bugzilla.netfilter.org
-
-Happy firewalling.
-
---MMz8IM/2NqTZrRD0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: attachment; filename="changes-nftables-1.0.8.txt"
-
-Fernando Fernandez Mancera (1):
-      tests: extend tests for destroy command
-
-Florian Westphal (17):
-      meta: don't crash if meta key isn't known
-      src: fix enum/integer mismatches
-      doc: list set/map flag keywords in a table
-      doc: add nat examples
-      netlink: restore typeof interval map data type
-      mnl: support bpf id decode in nft list hooks
-      src: permit use of constant values in set lookup keys
-      tests: shell: add test case for chain-in-use-splat
-      cache: include set elements in "nft set list"
-      json: dccp: remove erroneous const qualifier
-      evaluate: do not abort when prefix map has non-map element
-      parser: don't assert on scope underflows
-      parser: reject zero-length interface names
-      parser: reject zero-length interface names in flowtables
-      ct timeout: fix 'list object x' vs. 'list objects in table' confusion
-      src: avoid IPPROTO_MAX for array definitions
-      tests: json: add missing/expected json output
-
-Jeremy Sowden (9):
-      evaluate: insert byte-order conversions for expressions between 9 and 15 bits
-      evaluate: don't eval unary arguments
-      tests: py: add test-cases for ct and packet mark payload expressions
-      tests: shell: rename and move bitwise test-cases
-      tests: shell: add test-cases for ct and packet mark payload expressions
-      netlink_delinearize: correct type and byte-order of shifts
-      json: formatting fixes
-      doc: correct NAT statement description
-      exthdr: add boolean DCCP option matching
-
-Jose M. Guisado Gomez (1):
-      py: replace distutils with setuptools
-
-Pablo Neira Ayuso (45):
-      Revert "evaluate: relax type-checking for integer arguments in mark statements"
-      parser_bison: simplify reset syntax
-      evaluate: support shifts larger than the width of the left operand
-      evaluate: relax type-checking for integer arguments in mark statements
-      evaluate: set up integer type to shift expression
-      evaluate: honor statement length in integer evaluation
-      evaluate: honor statement length in bitwise evaluation
-      netlink_delinerize: incorrect byteorder in mark statement listing
-      tests: py: extend test-cases for mark statements with bitwise expressions
-      payload: set byteorder when completing expression
-      intervals: use expression location when translating to intervals
-      optimize: assert nat type on nat statement helper
-      evaluate: bogus missing transport protocol
-      netlink_delinearize: do not reset protocol context for nat protocol expression
-      optimize: support for redirect and masquerade
-      main: Error out when combining -i/--interactive and -f/--file
-      mnl: set SO_SNDBUF before SO_SNDBUFFORCE
-      mnl: flowtable support for extended netlink error reporting
-      src: allow for updating devices on existing netdev chain
-      evaluate: bail out if new flowtable does not specify hook and priority
-      meta: skip protocol context update for nfproto with same table family
-      json: allow to specify comment on table
-      json: allow to specify comment on chain
-      mnl: handle singleton element in netdevice set
-      mnl: incomplete extended error reporting for singleton device in chain
-      tests: py: missing json updates on ct and meta mark payload expression
-      evaluate: allow stateful statements with anonymous verdict maps
-      evaluate: skip optimization if anonymous set uses stateful statement
-      optimize: do not remove counter in verdict maps
-      datatype: misspell support with symbol table parser for error reporting
-      datatype: add hint error handler
-      evaluate: set NFT_SET_EVAL flag if dynamic set already exists
-      tests: shell: fix spurious errors in terse listing in json
-      tests: shell: bogus EBUSY errors in transactions
-      src: add json support for last statement
-      json: add inner payload support
-      tests: shell: coverage for simple port knocking ruleset
-      tests: shell: cover refcount leak of mapping rhs
-      expression: define .clone for catchall set element
-      tests: shell: refcount memleak in map rhs with timeouts
-      netlink_linearize: use div_round_up in byteorder length
-      evaluate: place byteorder conversion before rshift in payload statement
-      tests: shell: cover old scanner bug
-      include: missing dccpopt.h breaks make distcheck
-      build: Bump version to 1.0.8
-
-Phil Sutter (12):
-      Reduce signature of do_list_table()
-      Avoid a memleak with 'reset rules' command
-      xt: Fix translation error path
-      tests: shell: Fix for unstable sets/0043concatenated_ranges_0
-      tests: py: Document JSON mode in README
-      main: Make 'buf' variable branch-local
-      main: Call nft_ctx_free() before exiting
-      cli: Make cli_init() return to caller
-      tests: shell: Introduce valgrind mode
-      evaluate: Merge some cases in cmd_evaluate_list()
-      evaluate: Cache looked up set for list commands
-      Implement 'reset {set,map,element}' commands
-
-Sriram Yagnaraman (1):
-      meta: introduce meta broute support
-
-Thomas Haller (4):
-      libnftables: always initialize netlink socket in nft_ctx_new()
-      libnftables: drop unused argument nf_sock from nft_netlink()
-      libnftables: inline creation of nf_sock in nft_ctx_new()
-      libnftables: drop check for nf_sock in nft_ctx_free()
-
-
---MMz8IM/2NqTZrRD0--
 
