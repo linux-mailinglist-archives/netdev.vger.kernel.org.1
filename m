@@ -1,178 +1,92 @@
-Return-Path: <netdev+bounces-18035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034E9754515
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 00:45:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8145375453D
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 01:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BA431C213B0
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26AD71C2165F
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 23:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFD415AE2;
-	Fri, 14 Jul 2023 22:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5BE2772E;
+	Fri, 14 Jul 2023 23:01:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761464C9E
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 22:45:16 +0000 (UTC)
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D3135A6
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 15:45:08 -0700 (PDT)
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id E8EE63F18D
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 22:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1689374705;
-	bh=FP8NFo5ttl/GuZaVvQMiK1O2vkwG6/VwhootU2UrwC8=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=r+rXyLF7jsf2GuBfJrSdhn8efT8sA85PXz5nUtexayV55R8ScRxL+ZU0w1iiEKOEc
-	 UmbeIc5OPCpHLdga69o1SGGinA5elbklAzIZKFBzBs+k68gRXysUSwZhXBuKFLEYbI
-	 RLeO59VVTbUDe5UuCdwLerajwG+KxsakUw/7yjXu3sYGboRU21hjPGZbIBlFdkbHrK
-	 N5ym46qYfY6ZBOAcgMRSHVF8rkKJysS7QD8L+91UcVeLWl0dPOxSaeFA9E2sHirBcV
-	 7vm3m2v1X6G6hjXgnvLS5WCA26oo/6HJ/v2jnwe6nxMURPK3es89t5nkX625Ktrf9W
-	 F2aGcuWwZa6qA==
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-55b82f399f9so1216119a12.1
-        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 15:45:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689374704; x=1691966704;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FP8NFo5ttl/GuZaVvQMiK1O2vkwG6/VwhootU2UrwC8=;
-        b=EV3ntV8BFJQzQAqicKH/O14XwVQ9D0Mnejaa4LpSf2klsAe91EUQWI07fWHYVYbEMt
-         nQbDYognKEbqiZjZYPE94R43R1c+q0JGqZC7y0cRFuzJo1lxifhRtadvIgT28+6lvOdV
-         53TFjUYTcAKXSVsMM2XuM/7Uq8NaleTC1zwlIiP6JLM4hirqlT/8+Qgh662GIl9IGfdz
-         rDerScI8EPTgfT92HCSq+FUCoAON9JwZnfUBAAErKf/kRGcXHU6MqHnPCBY1GBaV2cYi
-         YJbywCXA4+sCdsKmUv+rgorMup2w0Wquzcy2wjbyj2fwxTxoIWBS74WjUlmOwHpakUlA
-         uOPQ==
-X-Gm-Message-State: ABy/qLaDXTYeQTEcgAnVz6beojfluAWixp8i/Ng3l1mL3OSnHMGiPBKs
-	tfPFy99NoD06BqsgbeFdNGEP6OWM1T5W0XvONvDIfhA4l5rQLKdfA+b4oHXQDhoWwAHh6PipeMh
-	SwBuBzrnc5utfFJi3XnvVBTwpMqjBOtFIFTHnDwpMkQ==
-X-Received: by 2002:a05:6a20:1451:b0:132:e1ec:796f with SMTP id a17-20020a056a20145100b00132e1ec796fmr5071581pzi.26.1689374704096;
-        Fri, 14 Jul 2023 15:45:04 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHgjpMNALXZnAKw+OgXUuJ3hVL/R2N+iBUFv3O9Iq5/ifwPwKWAZjErpko1jUdHuH4DijWuQg==
-X-Received: by 2002:a05:6a20:1451:b0:132:e1ec:796f with SMTP id a17-20020a056a20145100b00132e1ec796fmr5071566pzi.26.1689374703660;
-        Fri, 14 Jul 2023 15:45:03 -0700 (PDT)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id g7-20020aa78187000000b00659b8313d08sm7638033pfi.78.2023.07.14.15.45.03
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jul 2023 15:45:03 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id DDB3D5FEAC; Fri, 14 Jul 2023 15:45:02 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id D65DC9FABB;
-	Fri, 14 Jul 2023 15:45:02 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-cc: "David S. Miller" <davem@davemloft.net>,
-    David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] tcp: Add memory pressure flag to sockstat
-In-reply-to: <a35a5881c3280bd7a4fd1943a8b40b890e3bf280.1689316697.git.jamie.bainbridge@gmail.com>
-References: <a35a5881c3280bd7a4fd1943a8b40b890e3bf280.1689316697.git.jamie.bainbridge@gmail.com>
-Comments: In-reply-to Jamie Bainbridge <jamie.bainbridge@gmail.com>
-   message dated "Fri, 14 Jul 2023 16:39:53 +1000."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DBB2C80
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 23:01:40 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2FA83594
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 16:01:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qpJvNL+t8Hog1pKq7NUbiWNX/O0ahKnhN2A4HE2k0Zs=; b=kLW4iyp5c6b9WCmDRNaPRKpOzi
+	4/phE5zK8Tw6RrnPJPAQE0rW8Wjuic+VH1eN6NRoRItEH2Drvdn8802ue2UNfZRuY5gcdKeUPJVtK
+	RbdivElij8XueVnVDn2JeszH/zO6Wkgsn5trNIklx23f4cziyS8yJ8D+hX6bpnYpQZxQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qKRn5-001OcW-Sn; Sat, 15 Jul 2023 01:01:35 +0200
+Date: Sat, 15 Jul 2023 01:01:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: Query on acpi support for dsa driver
+Message-ID: <af5a6be0-40e5-4c05-ac25-45b0e913d8aa@lunn.ch>
+References: <5D6DFE0F-940B-4AAD-AD39-B8780389B67E@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <30996.1689374702.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Jul 2023 15:45:02 -0700
-Message-ID: <30997.1689374702@famine>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5D6DFE0F-940B-4AAD-AD39-B8780389B67E@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jamie Bainbridge <jamie.bainbridge@gmail.com> wrote:
+On Fri, Jul 14, 2023 at 12:38:24PM -0700, SIMON BABY wrote:
+> Hello Team ,
 
->When tuning a system it can be helpful to know whether the protocol is
->in memory pressure state or not. This can be determined by corresponding
->the number of pages in "net.ipv4.tcp_mem" with the current allocation,
->but a global variable already tracks this as the source of truth.
->
->Expose that variable in sockstat where other protocol memory usage is
->already reported.
->
->Add "pressure" which is 0 in normal state and 1 under pressure:
->
-> # grep TCP /proc/net/sockstat
-> TCP: inuse 5 orphan 0 tw 0 alloc 7 mem 1 pressure 0
->
-> # grep TCP /proc/net/sockstat
-> TCP: inuse 5 orphan 0 tw 0 alloc 7 mem 1 pressure 1
+> I am new to this group . I have a query on adding a switch device (
+> microchip EVB-KSZ9897) to my Intel based x86 board which uses ACPI
+> instead of device tree. The Intel x86 is running Linux Ubuntu 5.15
+> kernel .
 
-	Isn't this already available in /proc/net/protocols?
+> Do I need any changes in the drive code to get the acpi table and
+> invoke the functions ? When I looked the code
+> drivers/net/dsa/microchip/ksz9477_i2c.c it has support only for DSA.
 
-protocol  size sockets  memory press maxhdr  slab module     cl co di ac i=
-o in de sh ss gs se re sp bi br ha uh gp em
-[...]
-UDP       1472      7       6   NI       0   yes  kernel      y  y  y  n  =
-y  y  y  n  y  y  y  y  y  n  n  y  y  y  n
-TCP       2512      5       1   no     320   yes  kernel      y  y  y  y  =
-y  y  y  y  y  y  y  y  y  n  y  y  y  y  y
+> Please provide your inputs .
 
-	-J
+ACPI is generally not used for networking. Nobody who cares enough
+about ACPI has taken the time to understand the DT concepts, find the
+equivalent in ACPI, write a proposal to extend the ACPI standard, get
+it accepted in, and then done the implementation work.
 
->Tested by writing a large value to global variable tcp_memory_pressure
->(it usually stores jiffies when memory pressure was entered) and not
->just by code review or editing example output.
->
->Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
->---
-> net/ipv4/proc.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
->
->diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
->index eaf1d3113b62f7dc93fdc7b7c4041140ac63bf69..f4c5ced2de49d5c6d7f5d7ccd=
-aa76c89dcf8c932 100644
->--- a/net/ipv4/proc.c
->+++ b/net/ipv4/proc.c
->@@ -51,16 +51,17 @@
-> static int sockstat_seq_show(struct seq_file *seq, void *v)
-> {
-> 	struct net *net =3D seq->private;
->-	int orphans, sockets;
->+	int orphans, sockets, tcp_pressure;
-> =
+What some people have tried in the past is just accept DT is the way
+describe this sort of hardware, and stuff all the DT properties into
+ACPI tables. But they often do it wrongly, including all the DT
+legacy, deprecated properties etc.
 
-> 	orphans =3D tcp_orphan_count_sum();
-> 	sockets =3D proto_sockets_allocated_sum_positive(&tcp_prot);
->+	tcp_pressure =3D READ_ONCE(tcp_memory_pressure) ? 1 : 0;
-> =
+The mv88e6xxx driver can be instantiated via a platform driver. I have
+a couple of x86 targets with drivers placed in drivers/platform/x86
+which instantiate mv88e6xxx instances. For simple setups, using just
+the internal PHYs that is sufficient.
 
-> 	socket_seq_show(seq);
->-	seq_printf(seq, "TCP: inuse %d orphan %d tw %d alloc %d mem %ld\n",
->+	seq_printf(seq, "TCP: inuse %d orphan %d tw %d alloc %d mem %ld pressur=
-e %d\n",
-> 		   sock_prot_inuse_get(net, &tcp_prot), orphans,
-> 		   refcount_read(&net->ipv4.tcp_death_row.tw_refcount) - 1,
->-		   sockets, proto_memory_allocated(&tcp_prot));
->+		   sockets, proto_memory_allocated(&tcp_prot), tcp_pressure);
-> 	seq_printf(seq, "UDP: inuse %d mem %ld\n",
-> 		   sock_prot_inuse_get(net, &udp_prot),
-> 		   proto_memory_allocated(&udp_prot));
->-- =
+Take a look at drivers/platform/x86/asus-tf103c-dock.c and how it uses
+i2c_new_client_device() to instantiate i2c devices. And
+mv88e6xxx_probe() and its use of pdata.
 
->2.41.0
->
->
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+	Andrew
 
