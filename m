@@ -1,150 +1,87 @@
-Return-Path: <netdev+bounces-17936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CCCB753A19
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 13:49:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20122753A1B
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 13:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EA99282341
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:49:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF706282347
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4361513716;
-	Fri, 14 Jul 2023 11:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6337013721;
+	Fri, 14 Jul 2023 11:38:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3210713702;
-	Fri, 14 Jul 2023 11:38:00 +0000 (UTC)
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21A3AE65;
-	Fri, 14 Jul 2023 04:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689334679; x=1720870679;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=btMEqfPJdz24ajU0aJZF0IeGeFF/1NrmUw/U4+YuNPo=;
-  b=R0XvL/BSVujwHAo/VYte9AvPiiHGW3Ip4Rbfl1PYkfygCaDI7kULa0K7
-   Fti1wfQklR9UzuXnCOZ19XiO/lekpSp/hdBKJ6MaWQzP4VjovoIhGgBtU
-   5F9Qk0Dty857bePHGapCRsPxZyJly3cBw2Wve1Pk/qDvvpDJtJghHlyS/
-   CPEvRzPqZheDIuTgHDlC7ZLxypaLgRmOdOsVpkX5GX1Wy3fY7E93dP/1Q
-   BFnyyIXnBEWRKgpBgvwzRBJxk6ww3AzY1BKE9ChRIJVeOhSj9e1vTKiQN
-   /Chvj2q2X/tVx6+HB4tVUrtYDhT5fxp6dLap72R4JbVI023s3ZJOvcyy1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="345048361"
-X-IronPort-AV: E=Sophos;i="6.01,205,1684825200"; 
-   d="scan'208";a="345048361"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 04:37:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="846425332"
-X-IronPort-AV: E=Sophos;i="6.01,205,1684825200"; 
-   d="scan'208";a="846425332"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orsmga004.jf.intel.com with ESMTP; 14 Jul 2023 04:37:56 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	tirthendu.sarkar@intel.com,
-	toke@kernel.org,
-	kuba@kernel.org,
-	horms@kernel.org,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH v6 bpf-next 24/24] selftests/xsk: reset NIC settings to default after running test suite
-Date: Fri, 14 Jul 2023 13:36:40 +0200
-Message-Id: <20230714113640.556893-25-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230714113640.556893-1-maciej.fijalkowski@intel.com>
-References: <20230714113640.556893-1-maciej.fijalkowski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B0213702
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 11:38:18 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F203BE65;
+	Fri, 14 Jul 2023 04:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=etB5FWqkDs6X4Rn7GAXNm/T16rPDkssdK4DTMsJ6/0U=; b=yYZTIDMkPB4zqMlV1JflC3bRv0
+	BV/aoI2LdSbXrjLYdVS1CRn0EbSk++8xyNY8hwnvZwCrdhVowfvLh3z2878vmC4Dg+h7+oR5ENSKf
+	Rk4FRaZFv6Rsu7EUGXoOrLSgLyGkHKgTc1VrleTJjiCfkILp2myFLNsJcd7IS/yJWk1HFhBNxWG3M
+	X0dx11polYnNtxAJzhWUqAGFNl1s5kl4P5xZdKPHBwpZYbvaFQnuW45K4dq9wKXUKVfo2EOgFRh9J
+	KO6oBooeHIwIsYMh3R0d+Np9q4wtv6pV0Z56gkcqwFEtOksRk8Ame31K6PvgV3V4Fciekjyh1uxrC
+	z7hNldSQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47964)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qKH7k-0000bd-1b;
+	Fri, 14 Jul 2023 12:38:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qKH7j-0007BH-20; Fri, 14 Jul 2023 12:38:11 +0100
+Date: Fri, 14 Jul 2023 12:38:11 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/6] net: phy: at803x: support qca8081 1G chip type
+Message-ID: <ZLEzo4jGGSXxFdVp@shell.armlinux.org.uk>
+References: <20230714063136.21368-1-quic_luoj@quicinc.com>
+ <20230714063136.21368-5-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714063136.21368-5-quic_luoj@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Currently, when running ZC test suite, after finishing first run of test
-suite and then switching to busy-poll tests within xskxceiver, such
-errors are observed:
+On Fri, Jul 14, 2023 at 02:31:34PM +0800, Luo Jie wrote:
+> The qca8081 1G chip version does not support 2.5 capability, which
+> is distinguished from qca8081 2.5G chip according to the bit0 of
+> register mmd7.0x901d, the 1G version chip also has the same PHY ID
+> as the normal qca8081 2.5G chip.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 
-libbpf: Kernel error message: ice: MTU is too large for linear frames and XDP prog does not support frags
-1..26
-libbpf: Kernel error message: Native and generic XDP can't be active at the same time
-Error attaching XDP program
-not ok 1 [xskxceiver.c:xsk_reattach_xdp:1568]: ERROR: 17/"File exists"
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-this is because test suite ends with 9k MTU and native xdp program being
-loaded. Busy-poll tests start non-multi-buffer tests for generic mode.
-To fix this, let us introduce bash function that will reset NIC settings
-to default (e.g. 1500 MTU and no xdp progs loaded) so that test suite
-can continue without interrupts. It also means that after busy-poll
-tests NIC will have those default settings, whereas right now it is left
-with 9k MTU and xdp prog loaded in native mode.
+Thanks!
 
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- tools/testing/selftests/bpf/test_xsk.sh    | 5 +++++
- tools/testing/selftests/bpf/xsk_prereqs.sh | 7 +++++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
-index c2ad50f26b63..2aa5a3445056 100755
---- a/tools/testing/selftests/bpf/test_xsk.sh
-+++ b/tools/testing/selftests/bpf/test_xsk.sh
-@@ -171,7 +171,10 @@ exec_xskxceiver
- 
- if [ -z $ETH ]; then
- 	cleanup_exit ${VETH0} ${VETH1}
-+else
-+	cleanup_iface ${ETH} ${MTU}
- fi
-+
- TEST_NAME="XSK_SELFTESTS_${VETH0}_BUSY_POLL"
- busy_poll=1
- 
-@@ -184,6 +187,8 @@ exec_xskxceiver
- 
- if [ -z $ETH ]; then
- 	cleanup_exit ${VETH0} ${VETH1}
-+else
-+	cleanup_iface ${ETH} ${MTU}
- fi
- 
- failures=0
-diff --git a/tools/testing/selftests/bpf/xsk_prereqs.sh b/tools/testing/selftests/bpf/xsk_prereqs.sh
-index ae697a10a056..29175682c44d 100755
---- a/tools/testing/selftests/bpf/xsk_prereqs.sh
-+++ b/tools/testing/selftests/bpf/xsk_prereqs.sh
-@@ -53,6 +53,13 @@ test_exit()
- 	exit 1
- }
- 
-+cleanup_iface()
-+{
-+	ip link set $1 mtu $2
-+	ip link set $1 xdp off
-+	ip link set $1 xdpgeneric off
-+}
-+
- clear_configs()
- {
- 	[ $(ip link show $1 &>/dev/null; echo $?;) == 0 ] &&
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
