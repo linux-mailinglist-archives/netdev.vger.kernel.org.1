@@ -1,103 +1,152 @@
-Return-Path: <netdev+bounces-17852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530CA753473
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:00:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD123753478
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BFD1281E56
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:00:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FDA42821A7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5A5748D;
-	Fri, 14 Jul 2023 08:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29273748E;
+	Fri, 14 Jul 2023 08:00:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F01D7485
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2349AC433CB;
-	Fri, 14 Jul 2023 08:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689321623;
-	bh=3L4dficg1XpxI6I9oVcETUQzYBmSnqL7G/ZAG4fHi5Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GN27g4FWiacWpcUmSlQGigv0FnbPl6hjSDjpW6f5pstLoeodz+f/zHFX4OsHcFqc9
-	 Mb3kH4yvIEjdFwgQgO2v8Q8Bcus4e42EETfyT109A8ZgOHdMx4QxP0YqytcWNOm27B
-	 pvkP5y8uExuOWv0RKqyNJochhcsFCuF23K/uSWjNMxZxPujdhToEMYwbEEUiM2+c8h
-	 og5ztdtio99Xe7gAq8EZsFgeEdJfv5plqF/MN+hp+Bwjd3+vVqCpA4xJiawohflIJq
-	 HgFpRxwStdCHgNeYh9YlGd9TGDZQj1LaBDgWddlQDY3ZKvvkRRYaqybpQtAEzMy1KB
-	 ToyUvKEgmZ/dQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0EC21E4508F;
-	Fri, 14 Jul 2023 08:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD468486
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:00:58 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5FE3C02
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 01:00:52 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-986d8332f50so213026466b.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 01:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689321651; x=1691913651;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TrnCz7Hfa4sPSf5kg/sc1xt8fKauTd641qFFpeMSqVw=;
+        b=5S7EK8awIjLEzgP9Gn9bymlk7alkjE8hfmrAQJwffEyZmYHYb0LtdrYdly5Jqx27Ra
+         /EmEZAf7EGtlXrpTMVfS4sAdBVSFq2/8IEcqb3KleCqHpTDgqvpFIKrXTyDIEeX9U/7I
+         X0Z1Uc5QqcFXziH/VKFa1xVLpBe0lxrwm5pXoLyQlqY/UY+CJ11CnDDs5vkYIqShnwgG
+         i3F3otwWz4QtiadTpvgKJCUMjGU7pqmg9QEbmtvM8Zm+3Jes4/1OzR2O7ymTKmZ91cxj
+         5yBWBycETnbf8C1eiZk47vEkgRvQMGz9NU/c7wNB6t6QLO9Vk4n+m4pXs3HdMMZJ0JiB
+         YtOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689321651; x=1691913651;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TrnCz7Hfa4sPSf5kg/sc1xt8fKauTd641qFFpeMSqVw=;
+        b=Ag21VBJpzXW6NuD29NyGgM1wJ6nGBptTkFAry/9q/xbFGuBOFpIC4KA4oQeI+cRYQ6
+         0lFP8OrdJ8RH2qsXwJEnXnvqBQexR8Ju+PHDembwzuZzexcBTXXXYQS59QMKzB2Hw3qI
+         dX2DgJR1/sDnQ8XUaMBSwExIdJzzc5Ul7rYy0XtjYd1RQA9ZczT83ibD8GACvS28K0CO
+         989FP2OAi9fHc5lI3uU7LfRRMIAMn9gpReoE8P98NzfwYehxQ4V3d7VWLDxlwK9ofkEg
+         amYe/whj4BzzYPyIW0hoDx4pxINkoNUF4i+fNnJ9e4t1Etw3Bw/Eqz6NSrJZHnENzl+C
+         nPog==
+X-Gm-Message-State: ABy/qLZYaSVNbuH9N6pgrLgYRVJJP5Hg50qP3i72x4b6BxSPBWDJcrp+
+	oCWIjT95CS+cWaY2ka3kk7F4FQ==
+X-Google-Smtp-Source: APBJJlFwon6C/Lhq8iTmXP+SeHRj0Uw1dcqS6fqyACGMQ9EKMiNbvq5k8UPGdSNDkn1fl2Czz+/LQw==
+X-Received: by 2002:a17:907:9541:b0:978:b94e:83dd with SMTP id ex1-20020a170907954100b00978b94e83ddmr3157602ejc.75.1689321650871;
+        Fri, 14 Jul 2023 01:00:50 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id l24-20020a1709065a9800b00991bba473e1sm4999149ejq.3.2023.07.14.01.00.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jul 2023 01:00:50 -0700 (PDT)
+Date: Fri, 14 Jul 2023 10:00:49 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com
+Subject: Re: [patch net-next] devlink: introduce dump selector attr and
+ implement it for port dumps
+Message-ID: <ZLEAsaKj+eKYlceM@nanopsycho>
+References: <20230713151528.2546909-1-jiri@resnulli.us>
+ <20230713205141.781b3759@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/11] Convert mv88e6xxx to phylink_pcs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168932162305.21677.4150891719279129759.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Jul 2023 08:00:23 +0000
-References: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
-In-Reply-To: <ZK+4tOD4EpFzNM9x@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, olteanv@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230713205141.781b3759@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Fri, Jul 14, 2023 at 05:51:41AM CEST, kuba@kernel.org wrote:
+>On Thu, 13 Jul 2023 17:15:28 +0200 Jiri Pirko wrote:
+>> +	/* If the user provided selector attribute with devlink handle, dump only
+>> +	 * objects that belong under this instance.
+>> +	 */
+>> +	if (cmd->dump_selector_nla_policy &&
+>> +	    attrs[DEVLINK_ATTR_DUMP_SELECTOR]) {
+>> +		struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
+>> +
+>> +		err = nla_parse_nested(tb, DEVLINK_ATTR_MAX,
+>> +				       attrs[DEVLINK_ATTR_DUMP_SELECTOR],
+>> +				       cmd->dump_selector_nla_policy,
+>> +				       cb->extack);
+>> +		if (err)
+>> +			return err;
+>> +		if (tb[DEVLINK_ATTR_BUS_NAME] && tb[DEVLINK_ATTR_DEV_NAME]) {
+>> +			devlink = devlink_get_from_attrs_lock(sock_net(msg->sk), tb);
+>> +			if (IS_ERR(devlink))
+>> +				return PTR_ERR(devlink);
+>> +			err = cmd->dump_one(msg, devlink, cb);
+>> +			devl_unlock(devlink);
+>> +			devlink_put(devlink);
+>> +			goto out;
+>> +		}
+>
+>This implicitly depends on the fact that cmd->dump_one() will set and
+>pay attention to state->idx. If it doesn't kernel will infinitely dump
+>the same instance. I think we should explicitly check state->idx and
+>set it to 1 after calling ->dump_one.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Nothing changes, only instead of iterating over multiple devlinks, we
+just work with one.
 
-On Thu, 13 Jul 2023 09:41:24 +0100 you wrote:
-> Hi,
-> 
-> This series (previously posted with further patches on the 26 June as
-> RFC) converts mv88e6xxx to phylink_pcs, and thus moves it from being
-> a pre-March 2020 legacy driver.
-> 
-> The first four patches lay the ground-work for the conversion by
-> adding four new methods to the phylink_pcs operations structure:
-> 
-> [...]
+So, the state->idx is in-devlink-instance index. That means, after
+iterating to next devlink instance it is reset to 0 below (state->idx = 0;).
+Here however, as we stay only within a single devlink instance,
+the reset is not needed.
 
-Here is the summary with links:
-  - [net-next,01/11] net: phylink: add pcs_enable()/pcs_disable() methods
-    https://git.kernel.org/netdev/net-next/c/90ef0a7b0622
-  - [net-next,02/11] net: phylink: add pcs_pre_config()/pcs_post_config() methods
-    https://git.kernel.org/netdev/net-next/c/aee6098822ed
-  - [net-next,03/11] net: phylink: add support for PCS link change notifications
-    https://git.kernel.org/netdev/net-next/c/24699cc1ff3e
-  - [net-next,04/11] net: mdio: add unlocked mdiobus and mdiodev bus accessors
-    https://git.kernel.org/netdev/net-next/c/e6a45700e7e1
-  - [net-next,05/11] net: dsa: mv88e6xxx: remove handling for DSA and CPU ports
-    https://git.kernel.org/netdev/net-next/c/40da0c32c3fc
-  - [net-next,06/11] net: dsa: mv88e6xxx: add infrastructure for phylink_pcs
-    https://git.kernel.org/netdev/net-next/c/b92143d4420f
-  - [net-next,07/11] net: dsa: mv88e6xxx: export mv88e6xxx_pcs_decode_state()
-    https://git.kernel.org/netdev/net-next/c/05407b0ebc39
-  - [net-next,08/11] net: dsa: mv88e6xxx: convert 88e6185 to phylink_pcs
-    https://git.kernel.org/netdev/net-next/c/4aabe35c385c
-  - [net-next,09/11] net: dsa: mv88e6xxx: convert 88e6352 to phylink_pcs
-    https://git.kernel.org/netdev/net-next/c/85764555442f
-  - [net-next,10/11] net: dsa: mv88e6xxx: convert 88e639x to phylink_pcs
-    https://git.kernel.org/netdev/net-next/c/e5b732a275f5
-  - [net-next,11/11] net: dsa: mv88e6xxx: cleanup after phylink_pcs conversion
-    https://git.kernel.org/netdev/net-next/c/d20acfdd3f88
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Am I missing something?
 
 
+>
+>Could you also move the filtered dump to a separate function which
+>either does this or calls devlink_nl_instance_iter_dumpit()?
+>I like the concise beauty that devlink_nl_instance_iter_dumpit()
+>currently is, it'd be a shame to side load it with other logic :]
+
+No problem. I put the code here as if in future the selector attr nest
+would be passed down to dump_one(), there is one DEVLINK_ATTR_DUMP_SELECTOR
+processing here. But could be resolved later on.
+
+Will do.
+
+>
+>> +	}
+>> +
+>>  	while ((devlink = devlinks_xa_find_get(sock_net(msg->sk),
+>>  					       &state->instance))) {
+>>  		devl_lock(devlink);
+>> @@ -228,6 +259,7 @@ int devlink_nl_instance_iter_dumpit(struct sk_buff *msg,
+>>  		state->idx = 0;
+>>  	}
+>>  
+>> +out:
+>>  	if (err != -EMSGSIZE)
+>>  		return err;
+>>  	return msg->len;
+>-- 
+>pw-bot: cr
 
