@@ -1,91 +1,102 @@
-Return-Path: <netdev+bounces-17980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A408F753EF0
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 17:34:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEAF6753F27
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 17:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E251B281F59
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 15:34:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D59661C20DEB
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 15:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBF314A97;
-	Fri, 14 Jul 2023 15:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BFF13AD2;
+	Fri, 14 Jul 2023 15:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEEE13715;
-	Fri, 14 Jul 2023 15:34:34 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897EF1980;
-	Fri, 14 Jul 2023 08:34:33 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b734aea34aso32529501fa.0;
-        Fri, 14 Jul 2023 08:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689348872; x=1691940872;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+8uvHNk2u3IePlrVGerYCmip0Mv9HhoiBvdBWnQYaSc=;
-        b=k+nK85u3EyT5mN7LjJbr3AIuoAx4OKHiV2MeSrxUbCLp/F400wdGQMMT0H5kCyXt0H
-         43FYEuPP24DDD3EcggY/3iFHuRDq/QgFiaHb31WDplNabOx0m93OkD/wYPJv+wpVDSYQ
-         Ldal++1O49jD6VzVaN5twgiUfNBU3XQKg4vYEZ86119Z566XIi57bUIrDVFThdMJMp0T
-         YubySX7uKw37YvH71QmWDzgf5rGTUYsmu3g641zPoZu7LwZkV5jf75UiAkelT8UALvQr
-         rIcNimHK881wnWo2/cOZvJVQRQGnA8ASJYT8pAGrsEmvP8XgQEBE6uW0791MMHCcsunt
-         52bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689348872; x=1691940872;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+8uvHNk2u3IePlrVGerYCmip0Mv9HhoiBvdBWnQYaSc=;
-        b=dFlRTva2mfKi/PzIg461l5gW5UQPa68cGnttG+ut/aZNs8gqfP0rH+iA3a53asfp8k
-         kftgMWK+NAS1XEZRqFhcJUhXW//HCFG6eOnDIoiXbfAVNy1Ivi/9r5wBmBx06xERnfNN
-         FXrVxnPJ3toY4qLmKjJCYR/7MQX34jmbtVi0/fyt8olW7LXKZAmX/5+uxL5n8qQyLxzb
-         Icos2prbheRKdGFWz50QtKoa2CRx4hiBrKqB3vQKrwHNaq2i/DaTMsUQhuv7Y4f3R0Mc
-         4ZYYvTKdv3bOYDo6hOmdKznC7WLDmOrzVVKJ0SGbJYnnW9to6LswU9sYmaaw9Nkr9kc4
-         nD8w==
-X-Gm-Message-State: ABy/qLb5hpV2HFYnCOOEjvesxuaN+5/+9xvSC0Rt9IclacYZVQTEt6eU
-	2NO2yPImQsU2BPzm7UG0JCKgwL+wuZL0RszKuw8=
-X-Google-Smtp-Source: APBJJlGnSSaCsbYJsQNOjRVX77bpCr+vkJgPlJ964TQc3AOMDL5SjDwZ23XxSOKxygjqmvCv0kIEOOp7SZveApz8LVY=
-X-Received: by 2002:a05:651c:d1:b0:2b6:fe75:b8f3 with SMTP id
- 17-20020a05651c00d100b002b6fe75b8f3mr4234907ljr.29.1689348871370; Fri, 14 Jul
- 2023 08:34:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1791DD521
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 15:40:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38BBFC433C8;
+	Fri, 14 Jul 2023 15:40:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689349222;
+	bh=p3p6Og0Z4fCiXTSjfLnp4jo9We/cCE+HP1x6M5ILaA0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EiKivC6BmKNGaq2NxW6kOxBD7T3w2I4HU0/Ja+8Bbg+p++EGtiDmBekc4/oTlj/jP
+	 lMuctgLQ0mP3fVjj8kZFdbqBEEN+1Tj0+eC6znuWmaH4sJ6wCwuRY7nA3mcI+9m/W4
+	 2Iomk6yL0/YIfS+YvEZ5cV7LsVuGKNROgMPwxbAGn1pPCTxbGtfhjMWJIGBYVDYWUs
+	 imogAlOngAuDanZ/99lCt+CMkuR50bYiQqHgrKvPZ9ZFjLaNFLY2ZLgUehVHzSYBUM
+	 AxZhi5hrO03KJ2EGpIHk9avzRerj6IBnh+X18rtn8WJqtJ0hrjUWIZBS0jDdPcgA20
+	 e2OCLYTQLb21w==
+Date: Fri, 14 Jul 2023 08:40:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, moshe@nvidia.com
+Subject: Re: [patch net-next] devlink: introduce dump selector attr and
+ implement it for port dumps
+Message-ID: <20230714084021.51fea890@kernel.org>
+In-Reply-To: <ZLEAsaKj+eKYlceM@nanopsycho>
+References: <20230713151528.2546909-1-jiri@resnulli.us>
+	<20230713205141.781b3759@kernel.org>
+	<ZLEAsaKj+eKYlceM@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230714113640.556893-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20230714113640.556893-1-maciej.fijalkowski@intel.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 14 Jul 2023 08:34:19 -0700
-Message-ID: <CAADnVQK=pMJ6XC_4YMEWGBq954L7B8mK_9N3Z4pQV429whKYjg@mail.gmail.com>
-Subject: Re: [PATCH v6 bpf-next 00/24] xsk: multi-buffer support
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	"Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 14, 2023 at 4:37=E2=80=AFAM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> v5->v6:
-> - update bpf_xdp_query_opts__last_field in patch 10 [Alexei]
+On Fri, 14 Jul 2023 10:00:49 +0200 Jiri Pirko wrote:
+> Fri, Jul 14, 2023 at 05:51:41AM CEST, kuba@kernel.org wrote:
+> >On Thu, 13 Jul 2023 17:15:28 +0200 Jiri Pirko wrote:  
+> >> +	/* If the user provided selector attribute with devlink handle, dump only
+> >> +	 * objects that belong under this instance.
+> >> +	 */
+> >> +	if (cmd->dump_selector_nla_policy &&
+> >> +	    attrs[DEVLINK_ATTR_DUMP_SELECTOR]) {
+> >> +		struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
+> >> +
+> >> +		err = nla_parse_nested(tb, DEVLINK_ATTR_MAX,
+> >> +				       attrs[DEVLINK_ATTR_DUMP_SELECTOR],
+> >> +				       cmd->dump_selector_nla_policy,
+> >> +				       cb->extack);
+> >> +		if (err)
+> >> +			return err;
+> >> +		if (tb[DEVLINK_ATTR_BUS_NAME] && tb[DEVLINK_ATTR_DEV_NAME]) {
+> >> +			devlink = devlink_get_from_attrs_lock(sock_net(msg->sk), tb);
+> >> +			if (IS_ERR(devlink))
+> >> +				return PTR_ERR(devlink);
+> >> +			err = cmd->dump_one(msg, devlink, cb);
+> >> +			devl_unlock(devlink);
+> >> +			devlink_put(devlink);
+> >> +			goto out;
+> >> +		}  
+> >
+> >This implicitly depends on the fact that cmd->dump_one() will set and
+> >pay attention to state->idx. If it doesn't kernel will infinitely dump
+> >the same instance. I think we should explicitly check state->idx and
+> >set it to 1 after calling ->dump_one.  
+> 
+> Nothing changes, only instead of iterating over multiple devlinks, we
+> just work with one.
+> 
+> So, the state->idx is in-devlink-instance index. That means, after
+> iterating to next devlink instance it is reset to 0 below (state->idx = 0;).
+> Here however, as we stay only within a single devlink instance,
+> the reset is not needed.
+> 
+> Am I missing something?
 
-It doesn't apply. Pls rebase.
+The case I was thinking of is if we support filtering of dumps which
+do not have sub-objects. In that case state->idx does not get touched
+by the dump_one.
+
+Looking closer, tho, there's no case of this sort today, so my concern
+is premature. Also what I suggested won't really work. So ignore this
+comment, sorry :)
 
