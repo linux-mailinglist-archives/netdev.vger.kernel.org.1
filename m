@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-18017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C016A7542CB
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:49:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086007542E1
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:54:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0B051C213A6
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:49:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D4311C215CD
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D072B15AD6;
-	Fri, 14 Jul 2023 18:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC37715AD9;
+	Fri, 14 Jul 2023 18:54:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41A213ADD
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 18:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A124313ADD
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 18:54:28 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35F0E2D6B;
-	Fri, 14 Jul 2023 11:49:55 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BDA30FC;
+	Fri, 14 Jul 2023 11:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jdawOEEHyRUT7F57ZiuPLdAc3zWki3KVkFdsKJ+iCp0=; b=3OB7ozN7Bi7W1GClBi9FNObJ1b
-	3R3hCiaACaJAKSBr30C0ShpVIzJcIHDy4xnxGn3GLFYXLJ8pLDHnHTBdE4A1JG8ddQytsoId3KsE0
-	fKvTUMvmeQy6gBdcUYkIxY/yZmQ9tT9qiTZfnc+8/JiKOXVw8wyZgyaDAE2xrWlkv/hg=;
+	bh=iJvvs9dOIGayOcerhrBaLhd0TaO38lkSU2S3p/bJwE8=; b=BJInmMfmI+72o4t0/qKzcQD2zi
+	8VH4rFNHZmk5NRtlCUqYHzlzRFrQLrNhnYi0ym5fM28T+ItwzIDA34QcOw5cTgfdFoDrM4EaI9Is7
+	G2ckWv6hyIO2QVmNEVCb7B11QeLghcNUOk4p7hCQLvzcvM+qb2gedx42ctNs41OGgiGs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qKNrR-001NkM-TZ; Fri, 14 Jul 2023 20:49:49 +0200
-Date: Fri, 14 Jul 2023 20:49:49 +0200
+	id 1qKNvr-001Nlf-TA; Fri, 14 Jul 2023 20:54:23 +0200
+Date: Fri, 14 Jul 2023 20:54:23 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Samin Guo <samin.guo@starfivetech.com>
 Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
@@ -46,11 +46,11 @@ Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	Yanhong Wang <yanhong.wang@starfivetech.com>
-Subject: Re: [PATCH v4 2/2] net: phy: motorcomm: Add pad drive strength cfg
- support
-Message-ID: <55cd8a47-89e5-4f62-8162-c744e1a99ad5@lunn.ch>
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: motorcomm: Add pad driver
+ strength cfg
+Message-ID: <4efd8643-455e-4f7f-b031-a0a02dd65210@lunn.ch>
 References: <20230714101406.17686-1-samin.guo@starfivetech.com>
- <20230714101406.17686-3-samin.guo@starfivetech.com>
+ <20230714101406.17686-2-samin.guo@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230714101406.17686-3-samin.guo@starfivetech.com>
+In-Reply-To: <20230714101406.17686-2-samin.guo@starfivetech.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
@@ -67,24 +67,33 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +static u32 yt8531_get_ds_map(struct phy_device *phydev, u32 cur)
-> +{
-> +	u32 vol;
-> +	int i;
-> +
-> +	vol = yt8531_get_ldo_vol(phydev);
-> +	for (i = 0; i < ARRAY_SIZE(yt8531_ldo_vol); i++) {
-> +		if (yt8531_ldo_vol[i].vol == vol && yt8531_ldo_vol[i].cur == cur)
-> +			return yt8531_ldo_vol[i].ds;
-> +	}
-> +
-> +	phydev_warn(phydev,
-> +		    "No matching current value was found %d, Use default value.\n", cur);
-> +
-> +	return YT8531_RGMII_RX_DS_DEFAULT;
+> +  motorcomm,rx-clk-driver-strength:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +      drive strength of rx_clk rgmii pad.
+> +      |----------------------------------|
+> +      |        rx_clk ds map table       |
+> +      |----------------------------------|
+> +      | DS(3b) |  wol@1.8v  |  wol@3.3v  |
+> +      |________|_________________________|
+> +      |        | current(uA)| current(uA)|
+> +      |   000  |     1200   |    3070    |
+> +      |   001  |     2100   |    4080    |
+> +      |   010  |     2700   |    4370    |
+> +      |   011  |     2910   |    4680    |
+> +      |   100  |     3110   |    5020    |
+> +      |   101  |     3600   |    5450    |
+> +      |   110  |     3970   |    5740    |
+> +      |   111  |     4350   |    6140    |
+> +      |--------|------------|------------|
+> +    enum: [ 1200, 2100, 2700, 2910, 3070, 3110, 3600, 3970,
+> +            4080, 4350, 4370, 4680, 5020, 5450, 5740, 6140 ]
+> +    default: 2910
 
-If there is a value in DT and it is invalid, return -EINVAL and fail
-the probe. Only use the default if there is no value in DT.
+The DS(3b) value is not relevant to the binding. It is a driver
+detail. So i would not bother listing it.
 
-    Andrew
+Please add a comment explaining what wol is. 
+
+       Andrew
 
