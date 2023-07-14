@@ -1,86 +1,102 @@
-Return-Path: <netdev+bounces-17750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99EA7752F8B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:50:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59357752F90
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0754281E32
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:50:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 424ED1C21516
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24365373;
-	Fri, 14 Jul 2023 02:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27625A3F;
+	Fri, 14 Jul 2023 02:52:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D377EB
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:50:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE102C433C7;
-	Fri, 14 Jul 2023 02:50:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689303040;
-	bh=2Op+uXao1BbAqsYxyDGL7x1AspWkNmMOL52H6O8XlrA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XgXytrA5xctbXjnmKoyAio6gnsSaqZ1ilmeF5UOrm8ZyS9SJkBWB0OD73V8oBfKS4
-	 LT7K79XTgwvCsSvTJ7qwcYZZ1c88OjOoPLZSNNymE9wd7QkucyWkXXbgePE/QeqmU0
-	 4hy3IJRRyBWKSMXsYQ+cYv04mk0+K36hK1VHeHFNHRo9npBQEUr+SepA46756m3jja
-	 RT9l2c9Rt0hmRLjxFzwIH4nviMnbqAtyzpSahOI53kLaCk4/OSeCkBbcnuLPNY5jvj
-	 11G9hol5O4Tco7KHtx2J3pGiYmLRhZ0v/jSME55360ZSAcklyWRVJE7cs4dquGpsod
-	 /hrVlu4Zz6yRg==
-Date: Thu, 13 Jul 2023 19:50:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Maxim Georgiev
- <glipus@gmail.com>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, Richard Cochran
- <richardcochran@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Gerhard Engleder <gerhard@engleder-embedded.com>, Hangbin Liu
- <liuhangbin@gmail.com>, Russell King <linux@armlinux.org.uk>, Heiner
- Kallweit <hkallweit1@gmail.com>, Jacob Keller <jacob.e.keller@intel.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>,
- UNGLinuxDriver@microchip.com, Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, Simon Horman <simon.horman@corigine.com>,
- Casper Andersson <casper.casan@gmail.com>, Sergey Organov
- <sorganov@gmail.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 net-next 10/10] net: remove phy_has_hwtstamp() ->
- phy_mii_ioctl() decision from converted drivers
-Message-ID: <20230713195037.34444454@kernel.org>
-In-Reply-To: <20230713121907.3249291-11-vladimir.oltean@nxp.com>
-References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
-	<20230713121907.3249291-11-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDAE7EB
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:52:10 +0000 (UTC)
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B6F2D48
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:52:09 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3a1ebb79579so1152581b6e.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:52:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689303128; x=1691895128;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZnlQS3noY/RfWKtReon0Ltmp7lqRCjXLTHuUkj1IuNc=;
+        b=RSmgwyrFRx1dH8qwPo2df/uHcCEZvqdix0VlHP47iE0Gz6mYyVEBn4Yf3666J+bQIp
+         FV7VPy2bEEun9Rgxi66hI9p7GmzqzX1tA/DnG1mPoLnBpFep1EPYhAK53ZdQuJLa9QBw
+         ysCo2mMEH4b4udWh1ArvRtrYCZwWzdi6V1LmCT+fG/7wsamCwOfJqq6RceMBb+W7yUT6
+         7jmuug3KLjHMtrk6lHogKt41iyHqVpDKTRjCZ/hzcQvKnTJIjtHz8xZHpupyUye/COZm
+         YguMOeIYOZ7vU/H+S99VmUHdC7YNjBpeeuUmBhPrf3G9L3mQl8eLMIuiS+W/UzaiQ5vf
+         Bt/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689303128; x=1691895128;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZnlQS3noY/RfWKtReon0Ltmp7lqRCjXLTHuUkj1IuNc=;
+        b=RLBMIK+vdrVA7eOmBLYxkJcn0vhwRJGi4A2bnXFdiddTQsr67r7/pnE1pU07HDLa7w
+         w/WN7Y9i3l0sgG5k/nkAwMwpUSy023ylnW0Q4v9or6FFXX8uWYOaY4rf/nYFJ3JPlU3h
+         XdCU8lRg9SGTxhzi6KMnzYrbLMb9M1MJJqsv4kEDFneFskcZ7jA1V5bsE2W+OG4M+RsK
+         bS1U0PGvpMBume9SNQTKqvdI0FCm1Zbp4qpoownCvFfp25gnVQYGpwfxu3dyBGl7Bqdk
+         eirY4MFc7OncNpWbRulW2KmVavC6BZ3M+Rhd0RClIpk1hraydkwgOVO78hfKtMq3SR9r
+         1UJw==
+X-Gm-Message-State: ABy/qLbvYROS5AzFWi1VWmy3wGMM4GeP99UInQaMylIgqodBMyq+mXMk
+	WGVQKBv4VcIYprFhFmNbmV2+P1fLeF2tSQ==
+X-Google-Smtp-Source: APBJJlEfkwLGpxk4z3s52ozScVrDYDNM515CzH60xV2njfAJ/RJpZEWScLE6iP/6itr61r89ojKoTQ==
+X-Received: by 2002:a05:6808:1701:b0:3a1:ed1b:9541 with SMTP id bc1-20020a056808170100b003a1ed1b9541mr4649621oib.40.1689303128522;
+        Thu, 13 Jul 2023 19:52:08 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([2409:8a02:782f:8f50:d380:ebf:ef24:ac51])
+        by smtp.gmail.com with ESMTPSA id l6-20020a637006000000b0055b07fcb6ddsm6347930pgc.72.2023.07.13.19.52.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 19:52:07 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Jiri Pirko <jiri@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net 0/2] Fix up dev flags when add P2P down link
+Date: Fri, 14 Jul 2023 10:51:59 +0800
+Message-Id: <20230714025201.2038731-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 13 Jul 2023 15:19:07 +0300 Vladimir Oltean wrote:
->  /**
->   * struct kernel_hwtstamp_config - Kernel copy of struct hwtstamp_config
->   *
-> @@ -26,6 +31,7 @@ struct kernel_hwtstamp_config {
->  	int rx_filter;
->  	struct ifreq *ifr;
->  	bool copied_to_user;
-> +	enum hwtstamp_source source;
->  };
+When adding p2p interfaces to bond/team. The POINTOPOINT, NOARP flags are
+not inherit to up devices. Which will trigger IPv6 DAD. Since there is
+no ethernet MAC address for P2P devices. This will cause unexpected DAD
+failures.
 
-source is missing from the kdoc
+Hangbin Liu (2):
+  bonding: reset bond's flags when down link is P2P device
+  team: reset team's flags when down link is P2P device
 
-phy_mii_ioctl() can be in a module so we need a stub / indirection
+ drivers/net/bonding/bond_main.c | 4 ++++
+ drivers/net/team/team.c         | 4 ++++
+ 2 files changed, 8 insertions(+)
+
 -- 
-pw-bot: cr
+2.38.1
+
 
