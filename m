@@ -1,96 +1,125 @@
-Return-Path: <netdev+bounces-17894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9DE753705
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:49:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E731D75372E
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABDF1C215D5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:49:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97E65282146
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F44FC03;
-	Fri, 14 Jul 2023 09:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B25210947;
+	Fri, 14 Jul 2023 09:56:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC09D51F
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:49:06 +0000 (UTC)
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B96635A9
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:49:00 -0700 (PDT)
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b75153caabso2724632a34.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:49:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDBDF514
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:56:16 +0000 (UTC)
+Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F5E71989;
+	Fri, 14 Jul 2023 02:56:15 -0700 (PDT)
+Received: by mail-yb1-xb42.google.com with SMTP id 3f1490d57ef6-c15a5ed884dso1607291276.2;
+        Fri, 14 Jul 2023 02:56:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689328574; x=1691920574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iLc4IFOrSQMumdSS27cGww/H0solCQj99/m3cUx+za0=;
+        b=U0+zCc7J47tgv3aokD+C9AbGUM0547IcCiSQEMzpBI+mYOOCtmzjv7TLV+15+Way2l
+         uIapCaUXBbx/phM9GIB5BFOIQNEHzbA7jNpWh7+Q0iZmZlO65IBlPd0HnXlJWqMc85kk
+         H5Q4LKdYKUNGqjL37XpunuGMoJ+Mtpl/BpDiZ03rfuXmWzrYel5MjIzmIiBpL+k04NA0
+         kIairDRA5S1vy0oVMkSwlo7M5XJ/2BC54TEVtGPKe6UNZB69tMRoq1VkITMgaXFHnnev
+         jeNCPG4T6jWGDnPKvbonN9yBfdH9GzBYSvFo4RyjgabhCFa4S3I4hdoNRXo1mIFSILk5
+         15TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689328140; x=1691920140;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dIJT0ZLagHJlynN87dwgjc9pwkbprQ7JENblyAxgUpI=;
-        b=GqIvUNxqNJSnIAHiVT1W23F6VY3K6zc1TPbTwLWISURq3qB5/bk4ERKOseIUL/Ak5t
-         336u83MfkY2sIBQRWrk0o1lpvE58eSufE0RoFrUUZYeLw626Lo6gnxWMUNhlzcwpFv72
-         FGy/jRo7dkfbSfNffFstTvz2Mq+X5j9RjRJnINpXmBXOiOtmUBS8fA0ZnmQcGjrqcjGi
-         AJ5sAgRPI+m87n+E+CJqpG/QnWZ91/boC+KVA7QDiQycaGfckMjFw/97veJcpOT0xBbC
-         Saef3XumuwdeNDp00k9Eudc49KYzHzAx5z5hgnIaAEUnTsmCl7AvbEmjo6qfa4NOCsPx
-         6IQw==
-X-Gm-Message-State: ABy/qLa08nkgtehL9fgJ4qJ2nGU9EDD+zmNMiYZrYwE6Z8OeVnDmTgs2
-	CfRmo6myF5f5gR5yciWi7OqvZxljUXpStafzifRwyice1tF3
-X-Google-Smtp-Source: APBJJlHaBvTxSTzaoCKzHeb7VIUiIrzCsedgZoxW6XeenbWmzrRrC0sG9tlKEsNnYR0dN+w8kgqAFrFtzAU2XEUxH7OA4JBgy0Q/
+        d=1e100.net; s=20221208; t=1689328574; x=1691920574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iLc4IFOrSQMumdSS27cGww/H0solCQj99/m3cUx+za0=;
+        b=CuG1wJK4rCKUeQrs4VmvNSzlLQlFVi2ZuQygDuSfZpeJW8pGKCbMpHRdVSJP8Db4oL
+         56zM0z16dwhz9sA1lJL0osvIUQk6jzrJUgc3UzwKdFl9ta27kfGtWBTJB3UDp9CZBDDK
+         +Reah7AcM+F7LfkoqsTWJ2RZgKO8WBkc/NzoA16W0iH++2SJwbCu36WCFdNiRdMABnXm
+         XYSyXxUeRUldK3kvu4nqYFOdGt/lBiQBmwNUWiqtjvDjDqAyUlAedRRdkp6dXb3Dr58v
+         LZXtKZcMgVglCczkvX7ce3tqGJtOYEMEufR6vZTlFVPz4aHztjjVkfUf1n+lF/gTYYEv
+         03og==
+X-Gm-Message-State: ABy/qLZi4k6YPzzIMNE21fHX7+iga9kPqaweKN0mrem0do0+WlJpi+6S
+	BCPmf+ipdMuAcRyx7PmFtghOB9t/7S/wl4aChuI=
+X-Google-Smtp-Source: APBJJlEP9rHYkKqqEeB1DAv7b3BU8yZcSQXF4+FqdKNDY/5pBH0h3wFr0gaoNioOqIHxzaGSE7p70VM3SMLPFrINvDs=
+X-Received: by 2002:a25:32d8:0:b0:ba7:7664:916b with SMTP id
+ y207-20020a2532d8000000b00ba77664916bmr3607425yby.20.1689328574374; Fri, 14
+ Jul 2023 02:56:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a9d:7618:0:b0:6b7:3eba:59d3 with SMTP id
- k24-20020a9d7618000000b006b73eba59d3mr3509845otl.6.1689328140182; Fri, 14 Jul
- 2023 02:49:00 -0700 (PDT)
-Date: Fri, 14 Jul 2023 02:49:00 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b46bf806006f5b02@google.com>
-Subject: [syzbot] Monthly wireguard report (Jul 2023)
-From: syzbot <syzbot+list1615f52d4d969bd05dc8@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+References: <20230713112404.2022373-1-imagedong@tencent.com> <04a96ba2-6952-e6de-93a2-dc2998ce519d@infradead.org>
+In-Reply-To: <04a96ba2-6952-e6de-93a2-dc2998ce519d@infradead.org>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Fri, 14 Jul 2023 17:56:03 +0800
+Message-ID: <CADxym3Y2f6-FfyG3RfvPDXLS3b3FqUfxaDPgju6OoQPy-0i9bQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: tcp: support to probe tcp receiver OOM
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, dsahern@kernel.org, 
+	kuniyu@amazon.com, morleyd@google.com, imagedong@tencent.com, 
+	mfreemon@cloudflare.com, mubashirq@google.com, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello wireguard maintainers/developers,
+On Thu, Jul 13, 2023 at 11:43=E2=80=AFPM Randy Dunlap <rdunlap@infradead.or=
+g> wrote:
+>
+>
+>
+> On 7/13/23 04:24, menglong8.dong@gmail.com wrote:
+> > diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/net=
+working/ip-sysctl.rst
+> > index 4a010a7cde7f..3de2dce74037 100644
+> > --- a/Documentation/networking/ip-sysctl.rst
+> > +++ b/Documentation/networking/ip-sysctl.rst
+> > @@ -694,6 +694,20 @@ tcp_retries2 - INTEGER
+> >       RFC 1122 recommends at least 100 seconds for the timeout,
+> >       which corresponds to a value of at least 8.
+> >
+> > +tcp_oom_retries - INTEGER
+> > +     RTO retransmissions count of the receiver is recognised as OOM.
+> > +     Given a value N, a hypothetical TCP connection will enter probe
+> > +     state if N times RTO retransmissions performed and every
+> > +     retransmission gets a pure ack, who doesn't contain SACK block.
+>
+>                                    ACK
+> > +
+> > +     The default value is 0, which means disable the OOM detection.
+> > +     If disabled, skb will be dropped directly, without sending an
+> > +     ACK, when rmem schedule fails. The function is valid only if sack
+>
+>                                                                      SACK
+>
+> > +     is enabled.
+> > +
+> > +     3 is the suggested value to enable this function. Do't make it
+>
+>                                                           Don't
+>
+> > +     greater than tcp_retries2.
+>
 
-This is a 31-day syzbot report for the wireguard subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireguard
+Thanks! I'll fix them in the next version.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 3 issues are still open and 13 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 714     No    KCSAN: data-race in wg_packet_send_staged_packets / wg_packet_send_staged_packets (3)
-                  https://syzkaller.appspot.com/bug?extid=6ba34f16b98fe40daef1
-<2> 480     No    KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll (2)
-                  https://syzkaller.appspot.com/bug?extid=d1de830e4ecdaac83d89
-<3> 3       Yes   INFO: rcu detected stall in wg_packet_handshake_receive_worker
-                  https://syzkaller.appspot.com/bug?extid=dbb6a05624cf5064858c
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+> --
+> ~Randy
 
