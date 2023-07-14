@@ -1,116 +1,172 @@
-Return-Path: <netdev+bounces-17872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11AC375356F
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:48:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEC717535A6
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0B442821C5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:48:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B992821C5
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA42C7461;
-	Fri, 14 Jul 2023 08:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98530748A;
+	Fri, 14 Jul 2023 08:51:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA936AB3
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:48:02 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF3126B1;
-	Fri, 14 Jul 2023 01:47:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ukLURrr2bIK9DTTyXWhDi4/gbp9xmLNeouwknAeqvEQ=; b=T3EixX7fGPOXbC38STC91IUwPu
-	ZkGuMOEUp/vhYlguZSR8qy8Rl4FsI5eHRfUsnJ4gZyX8EvrppMyhEFjeqoACf78XWZ70fu6UBC2Q9
-	T/JWd03lIA/RWZ1ha/rJEfg+a68K6YIrGXOnpm8MeXRzh9bRXs8DPI4/v2pagRzismkw6YOyZnrnS
-	jyMEqhVm2D6CyoW7CVfN8AIua/ztSM3u6XsC81lFOCeiX9ls4j//0jRGL72gZINpBzkwGf1yIBmO0
-	wNbLro7B/fGklEGn9xJ3Ya41QtX9FxOck91JbcU/m3/LA9LWXCKCj5hGGSr8uV3clinfQfX6YmP8I
-	dRsQBc2w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52718)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qKESw-0000Jf-31;
-	Fri, 14 Jul 2023 09:47:54 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qKESt-00074O-DK; Fri, 14 Jul 2023 09:47:51 +0100
-Date: Fri, 14 Jul 2023 09:47:51 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843AF6FD3
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:51:36 +0000 (UTC)
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2101.outbound.protection.outlook.com [40.107.215.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5522713;
+	Fri, 14 Jul 2023 01:51:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZbaySADE63tBgQ5D248KMcpcek565RdcC93nYOKcWr9i+/65Kwb3kz1kdvqa4ELhAnHe7dj0Y2nGm1vMbzyqAgna2XxAzQLnpZPgesfSCYlo3EB2mW5ZdIOnOvZqakbtiZJtBxVlZyFrHxi3uGXsqesTzHtAx6D5DGH5mQBcFUZss5LY5uLTUYKBpShL8dYMUo9fYZGxa/sCraHw3kHx9BuTDeeSBUCGIOlg70BcFyH+G3u0K/lLgweFQBI0tMuAvmuM1ng0/NDOjfW8+D5hlrmbL4E/KBUiTCrU48FWorwHDbzj0DdCkHiKfwcTFHwwJkAkCJcbCuWfQR3tVY90Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=15Lwfe0WBVeBBgSfPvWK73Bw83rebUol8cj5oCaGGxU=;
+ b=YSGx1UX1o3LzBOEx94l4cT7rWbrXzYOqOxfr6cvabN55P9764He9F+m9rJTS8vT8tCvsTW/7RO+aRutNKFo8O0Mkc03gkE0FEUp+BVBkXU3KVrU0tkVLfRw2o3fL6z0xL7JxF1b9gLJAjjudx3AaK++iG401m6dLM3aT+OR7ZlNnNohbYSt251Oib3uA5bOQReXFQzZiKQXw15AphmqqBNJ9Nn5skw6Faq9v40ZOdufb2KIJdpxDp7uUKK5WapalsgrllHKqWH9W61Vc0aohGyIpa27hGCXSd3T2YXXtO8YSBMRVeWGDSlDrAAqSYQfrvvbH+BJqyMsEXNu9qmFo2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=15Lwfe0WBVeBBgSfPvWK73Bw83rebUol8cj5oCaGGxU=;
+ b=WtEm/4cNCP7RKPnZfs8kDLhurlWzL1YV+njiMT/A02v67e53CNRvXCRGpplRvpTW02Op3rC3l7V0U53YW3lfgLOrv44rr9jH1ZXHSf4VsMEUCw7OGnMQmf16dzFbxesrG6NZsAZZMrjfohfzS1tdNdrYRhtmjv1+0x6T3dezUOj4vMeBax6nKW8sWfwc2tKd8VASjJLztI8nvzr7giOcUNHAn4LInjbuWIRobf8Ylc3SZ6g7EwNQFVj5HtP7sNx4W88eQNSGFx5lI0CETrv8qWR9wdQUe1ADtSE5AXptyEcmpQ6JX6Cpd6iuyg7hIyCWBNuniU0uulMYBb50EYgl8Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB5288.apcprd06.prod.outlook.com (2603:1096:4:1dc::9) by
+ KL1PR0601MB4291.apcprd06.prod.outlook.com (2603:1096:820:76::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Fri, 14 Jul
+ 2023 08:51:26 +0000
+Received: from SG2PR06MB5288.apcprd06.prod.outlook.com
+ ([fe80::f9b8:80b5:844e:f49a]) by SG2PR06MB5288.apcprd06.prod.outlook.com
+ ([fe80::f9b8:80b5:844e:f49a%6]) with mapi id 15.20.6565.037; Fri, 14 Jul 2023
+ 08:51:26 +0000
+From: Minjie Du <duminjie@vivo.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com (maintainer:MICROCHIP LAN966X ETHERNET DRIVER),
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	dl-linux-imx <linux-imx@nxp.com>,
-	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 net-next 06/10] net: fec: convert to
- ndo_hwtstamp_get() and ndo_hwtstamp_set()
-Message-ID: <ZLELt4Ove4tKDQPS@shell.armlinux.org.uk>
-References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
- <20230713121907.3249291-7-vladimir.oltean@nxp.com>
- <HE1PR04MB31480DBFDFA823EACCD399CB8834A@HE1PR04MB3148.eurprd04.prod.outlook.com>
+	netdev@vger.kernel.org (open list:MICROCHIP LAN966X ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Cc: opensource.kernel@vivo.com,
+	Minjie Du <duminjie@vivo.com>
+Subject: [PATCH net v3] net: lan966x: fix parameter check in two functions
+Date: Fri, 14 Jul 2023 16:51:15 +0800
+Message-Id: <20230714085115.2379-1-duminjie@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TY2PR02CA0051.apcprd02.prod.outlook.com
+ (2603:1096:404:e2::15) To SG2PR06MB5288.apcprd06.prod.outlook.com
+ (2603:1096:4:1dc::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <HE1PR04MB31480DBFDFA823EACCD399CB8834A@HE1PR04MB3148.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB5288:EE_|KL1PR0601MB4291:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4a367aa-b114-4d46-cfe0-08db844781f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	en1cqslyXVTNBNWkQqDl9qRrob0+Z6AF594omJAKLIBwBIFtzGijuMfvvLx1imVwXgaJ0eQHacGYBq6sN0tWoNk6W52ZD20a57NWKcVgwOuJTNh3IG1OPia845AfJn/NM5z4p+99E8M0yCxTMmheWM8t2764CXuG8g1tgbBgHUX0TK8WFjwUId0EZzH6YTsCVMqQNbs/cciQ5QKyOluRrxV+oK0gxo9m1f1lqbuqWfja69Hi7aFuAjcykNGFVn946g+bgcthDFV3LOPnpjqs8okhgXKen9TKWiCKkBG8OjJO+zYIyAsASxAq9SK3AmcZ5S/LBC8mKGl+TCsa5ts8xU2tEVcrvyCtqyi466J8kt7lAqUodGPv2qer/TSITa/9E+OJWlEWngOHZCyyws62dens6K0xHuv3Dn+YVG1WwLRH5sbpdEVhmh1ukSaVJYfXuVZ/iO+SJqPGB0OjeQZjH0m2XZI/xkk+JcvVRfR0pKC/WIEMDiHMC8Sc3W2l+qNFxGnOzKFhyjn2wXlzCejx1lh8DFgBtBoBiBJnyqHLm/YfOb8tvWToItXh9OVSNj13siHO4pb7LqGEmFpBF7iPXgfKt5/Le+dT4OnV9NFJGJX6OUg2p+8IRO5mRZhaXm5y
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB5288.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(366004)(346002)(376002)(451199021)(2906002)(38100700002)(38350700002)(6512007)(83380400001)(2616005)(186003)(107886003)(26005)(1076003)(6506007)(5660300002)(86362001)(8676002)(8936002)(36756003)(110136005)(478600001)(41300700001)(6486002)(52116002)(6666004)(316002)(4326008)(66476007)(66556008)(66946007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/vX4WCB0OCllJ26P6rEpqIrKhitVfQsOM4M/oYu64shrsrH2qZsJWoo5w1W5?=
+ =?us-ascii?Q?OQ9EvLHZ+9W568RbmP67kL7p2k5ovBgQY+/zWfTJPNPoB1jJSNuck3emXrfX?=
+ =?us-ascii?Q?S/ovrJ879aRsgRFOIJe+VNK0MSdRDniAxwAlwf5IqYz1G4gkP8l+wdA7L/A0?=
+ =?us-ascii?Q?ArQJmGftQlWhmzk9XEdPruIv94/SekSkhDAoYOLUOGZJlPWNT97k3mlCCHps?=
+ =?us-ascii?Q?G6oSm0vX4Hp4dbKXua+XQrOp/mKk49SAH6nZcRR5usvfS3PFttqHyOcBqf5Y?=
+ =?us-ascii?Q?rJJxYbws8gumsVDrN5CiUNOFEiV+6n/yK2Ljw7a922w5Yal3cIdedq38eT7h?=
+ =?us-ascii?Q?6KgqFXlcm4GMs1Yn1kh0fiQdpjWi83t25zUCsYFOx8AC/0JlDrUhoiNIF2Rc?=
+ =?us-ascii?Q?7JNZLWv818OxqpLdKsj14SEMzbcMoczSWR72vkfWTUFeYvD3yhxSNqx0n5hO?=
+ =?us-ascii?Q?9dJoTcdyhdmOe1DBJjxy+QroKBWK96czqhdfJ5FN1OIxPfHXEK2cjn80tUAT?=
+ =?us-ascii?Q?FBNvph2PfHzhVSRau+uNBK9SvXDovbz1faZI3XbBR5uPKYmzY9bis3bCK4N+?=
+ =?us-ascii?Q?c/+vwez7zaLOoo1P4Cc8g/p1wivWlGfxi6P9UWuBrq3Df52PElFNSYOYR5ye?=
+ =?us-ascii?Q?jjd2TGKRRr3NAAXI4MwEFPL5vyhhMbTarM7snLQAMCu6+ZAJ396W2eEQuJ4k?=
+ =?us-ascii?Q?M6gtZ/2uvW3DMGBtvz+hqOdgmkWMv/yYRqbr1241W0kYc43FwYxlT+wdxXmi?=
+ =?us-ascii?Q?lhZNp5ZxBPc8AIsEp0n0GH4FZ0BahjmQG14f4C98jz2mNZvMB/pLBUm1WYtG?=
+ =?us-ascii?Q?EhhQ/gXT8Rj5l8wtROhkaPFMdMhANaSbCXuZXjDLbJSbQNj4oMHdLnyvVBLZ?=
+ =?us-ascii?Q?wvb16VetUnHgKsjXcK+PSPZ6s3xxyx58bbKQYtaK1QlgignfBuv+H1LAKUEU?=
+ =?us-ascii?Q?ToeErh/SvsLG95y1Rvoh+azkIpn4KXS+WOJz2ic9UeUvB1UOcgkp0pUn8r/K?=
+ =?us-ascii?Q?aX8oAUegcfhNdJIm1lfi0Q/Aq3aPXE+f/UBfupIffu+15m6XB9mJI0l02soL?=
+ =?us-ascii?Q?aPb/d/o4rnGY0NPltrZpgTtE/TMEbQWU2rqA6JtRMU/fCfk5hyWovCnPrK1J?=
+ =?us-ascii?Q?yBQsb3ka0jD6i4L6tBBrq0wpNfH+dS8imxcFC8PH4ketHheDIVbTRd9DGNJx?=
+ =?us-ascii?Q?XOuaTAL6jA8ZPShlifryHPAmE+l+7srb5lsbOKV1xeklmJ31otGRKFafTAql?=
+ =?us-ascii?Q?Mb3E4P0sB38TZMqFYUJR+fZ6e1zl+PLHCiqS7MTsJTvCODt/nCtQMvbG5XJJ?=
+ =?us-ascii?Q?FMo6sWJAcDcDvFcnRuoCPU2GAR5P1LkBxxR5Pe0CVlLAyw2iVTTgkWHHwgVq?=
+ =?us-ascii?Q?ea9Gg3i5dYTMESqZhpcu8jBjmwiUjiqWBCE0BSwFKSASfkDa9nt9YOYv8p/3?=
+ =?us-ascii?Q?BVp9Czm1bMWtVcCW/neb6Xgq4LoTkTVcEUNJ4LXJvy66M31EAFDijEEZeIUa?=
+ =?us-ascii?Q?9AM/OMw9Dzbrkr3p6TAi/MPuctLyaTPu09A9iP7GwXRtyLbCZYMScQHSTYBh?=
+ =?us-ascii?Q?9j4Ag2cTif/B82eJV25WLrCOuHLWAdAuA14QG2s0?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4a367aa-b114-4d46-cfe0-08db844781f4
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB5288.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2023 08:51:26.2754
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6AieI4fprRBIyH8QQbvaJ92p033j3EL+zqjgeiEq9nDyaPxY5H50uX2ZO61yYXluX6/00B1/xOil1FILGa5CPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR0601MB4291
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 03:05:36AM +0000, Wei Fang wrote:
-> Thanks!
-> Reviewed-by: Wei Fang < wei.fang@nxp.com >
+Make IS_ERR_OR_NULL() judge the vcap_get_rule() function return.
+in lan966x_ptp_add_trap() and lan966x_ptp_del_trap().
 
-Please note that correct formatting is:
+Fixes: 72df3489fb10 ("net: lan966x: Add ptp trap rules")
+Signed-off-by: Minjie Du <duminjie@vivo.com>
+Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+V2 -> V3: set the target tree in the subject and add 'Reviewed-by:' tag.
+V1 -> V2: add Fixes tag.
+V1: fix parameter check in two functions.
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
-
-No spaces between the <> and the email address itself. It's exactly the
-same format used in email headers on the Internet.
-
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+index 266a21a2d..59dd14247 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+@@ -59,7 +59,7 @@ static int lan966x_ptp_add_trap(struct lan966x_port *port,
+ 	int err;
+ 
+ 	vrule = vcap_get_rule(lan966x->vcap_ctrl, rule_id);
+-	if (vrule) {
++	if (!IS_ERR_OR_NULL(vrule)) {
+ 		u32 value, mask;
+ 
+ 		/* Just modify the ingress port mask and exit */
+@@ -106,7 +106,7 @@ static int lan966x_ptp_del_trap(struct lan966x_port *port,
+ 	int err;
+ 
+ 	vrule = vcap_get_rule(lan966x->vcap_ctrl, rule_id);
+-	if (!vrule)
++	if (IS_ERR_OR_NULL(vrule))
+ 		return -EEXIST;
+ 
+ 	vcap_rule_get_key_u32(vrule, VCAP_KF_IF_IGR_PORT_MASK, &value, &mask);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.0
+
 
