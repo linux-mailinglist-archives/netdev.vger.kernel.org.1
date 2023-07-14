@@ -1,298 +1,112 @@
-Return-Path: <netdev+bounces-17832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BC53753293
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 714467532AA
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:11:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41B95282047
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24C9128207F
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DD56FC5;
-	Fri, 14 Jul 2023 07:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633AC6FD1;
+	Fri, 14 Jul 2023 07:11:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA646FA1
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 07:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563856FA1
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 07:11:56 +0000 (UTC)
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295222713;
-	Fri, 14 Jul 2023 00:07:18 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 172E726BC;
+	Fri, 14 Jul 2023 00:11:55 -0700 (PDT)
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36DLUSl1029992;
-	Fri, 14 Jul 2023 00:07:13 -0700
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rtptx9sga-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jul 2023 00:07:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ga6djSdf2SWJQUHx7syvwI8zuptpAf5AImen8he+JKNKej927Pez2eLHOSjdhMeKfuphrPM0ZiyTgoEqyHKp61nLAia3rrMdO/MG6sERXSIhIcEs91FpEWT3na1xxwS7/9zv9ilMlrUuER95r9TJmwhABo5wKznwxpaErsoqgJPTa8qbjmR9limHkwJrrpbhzXuy1PKA/xD8uVhUPgesWfjWfxIpJcA1s3SV3GxXVrzLIsFpKMNuMZ0sKbyiCJM9h+R4sEwCYbyv9kFpSXOaxnCvfdmzdLOYL+F5cPLY1fneBKZMnbzgQH/IprKLi56AcOo8RBfMv9cnefvb80lhrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1Q27FxpOCsd5SgmjlDTyd/HIm3Yuy6Lz6hrIzdbdulo=;
- b=TdeCnwpEvMT2BKo5dDjNd6NtQSalcK1Dyku6kCVzR5xp02KUnQMnNpQiGfyIM3HowP2aTPSF4821dr5V/vsBCLD9dbnkeme/hSm70x7YoYnpYOG64/2YlkCmDKnizdbzonFhTV5XrgGzva08Cw7v1fCF3n/aJum1VAoeY0EkKivvezu5Nct0Pk5mBYp/f+ZG5NITsoBmK0RbNtv4VrTOAUF9FV5G0vuloT07eQbkCFJJRzqsf/jrDirb72u1lD5nSOLM34PhxhQekjZ21X7TKHALHSzka0DQBV3JH8XkJuxJ+mu0wZq0aq6nZTod9oDhrH3xwkq7aByBjoXfi4t+tA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Q27FxpOCsd5SgmjlDTyd/HIm3Yuy6Lz6hrIzdbdulo=;
- b=otiM339FHd6014N3VQXaGQS2Qd+Ybf8DMhFD+Dgjv5/lLqkdMPlvSNGNrM8Q8sLv5mEf8RRoZG/BNdW1h6kXlLdbu1XliV6d4AjbIRlgKjkKgkVKeD7QRM+STarPUHVxWb+1auG53O/jmO6vK/9nCC3f9V/8grI5l5ckrjqGrW8=
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com (2603:10b6:a03:430::6)
- by SJ0PR18MB4108.namprd18.prod.outlook.com (2603:10b6:a03:2e9::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Fri, 14 Jul
- 2023 07:07:10 +0000
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::ec1d:671b:dbbf:706a]) by SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::ec1d:671b:dbbf:706a%6]) with mapi id 15.20.6588.024; Fri, 14 Jul 2023
- 07:07:10 +0000
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36DLUPrC029957;
+	Fri, 14 Jul 2023 00:11:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=eietfSoD+b0bITyQQrSikcmT4WSlhR+3d6lnEZaIHBY=;
+ b=Rd7nUPpAJO2cWjA5W9odrf8Hcokdoa/kDIGYLI55n/zauL5fi6JpdPm3OZvt+LcIXnXu
+ btrPaV2+ycJ0ieUg4K44fJbxjUBPTlOGrTI2q+9J/INdfI+JabhuxodyByHpKuFvNFjk
+ YYFa944KZ0xgAqdDIQLmiEMY2OJNddT3B35s0WDvYgYb5sPfFj4RX1Z3FYDuejD2SNu6
+ BzMjPJO8OO4iz7l84vbUMR3KKXmsiqoEHni5+T6v0UP/EZ/PTcpynHFfhAjJGk0MYX7O
+ z7qS/bRHzY1K6EEQjBjcAFNE34sp+GuKpU3r/y4OtE9KDk3zmzG9mcZW5wjviMP4rEQN gw== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rtptx9sve-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Fri, 14 Jul 2023 00:11:48 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 14 Jul
+ 2023 00:11:46 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Fri, 14 Jul 2023 00:11:46 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id A4BFE3F7065;
+	Fri, 14 Jul 2023 00:11:43 -0700 (PDT)
 From: Suman Ghosh <sumang@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula
-	<gakula@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Hariprasad Kelam <hkelam@marvell.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [EXT] Re: [net PATCH 2/3] octeontx2-af: Fix hash extraction
- enable configuration
-Thread-Topic: [EXT] Re: [net PATCH 2/3] octeontx2-af: Fix hash extraction
- enable configuration
-Thread-Index: AQHZtLJMNkTdDDyouEytRXp50UG79q+3KhWAgAGwFIA=
-Date: Fri, 14 Jul 2023 07:07:10 +0000
-Message-ID: 
- <SJ0PR18MB5216D12954CBDAC40D6C928ADB34A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20230712111604.2290974-1-sumang@marvell.com>
-	<20230712111604.2290974-3-sumang@marvell.com>
- <20230712222029.6a918a58@kernel.org>
-In-Reply-To: <20230712222029.6a918a58@kernel.org>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: 
- =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcc3VtYW5nXGFw?=
- =?us-ascii?Q?cGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0YmEy?=
- =?us-ascii?Q?OWUzNWJcbXNnc1xtc2ctMGI1MjA2YzctMjIxNS0xMWVlLWI2ZGMtODQxNDRk?=
- =?us-ascii?Q?ZWVhNTRjXGFtZS10ZXN0XDBiNTIwNmM5LTIyMTUtMTFlZS1iNmRjLTg0MTQ0?=
- =?us-ascii?Q?ZGVlYTU0Y2JvZHkudHh0IiBzej0iNTAwIiB0PSIxMzMzMzc5MjAyODQ3NTI2?=
- =?us-ascii?Q?NTkiIGg9Ii9oWmhzT3Y4a3ptOGIxSlVqWFpRYkFNVVRYMD0iIGlkPSIiIGJs?=
- =?us-ascii?Q?PSIwIiBibz0iMSIgY2k9ImNBQUFBRVJIVTFSU1JVRk5DZ1VBQU40UEFBQVRl?=
- =?us-ascii?Q?Nm5OSWJiWkFWMS92WDVuYUYvWVhYKzlmbWRvWDlnWkFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFIQUFBQUJ1RHdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFF?=
- =?us-ascii?Q?QUFRRUJBQUFBSTdxVHBBQ0FBUUFBQUFBQUFBQUFBSjRBQUFCaEFHUUFaQUJ5?=
- =?us-ascii?Q?QUdVQWN3QnpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVB?=
- =?us-ascii?Q?QUFBQUFBQUFBZ0FBQUFBQW5nQUFBR01BZFFCekFIUUFid0J0QUY4QWNBQmxB?=
- =?us-ascii?Q?SElBY3dCdkFHNEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFB?=
- =?us-ascii?Q?QUNlQUFBQVl3QjFBSE1BZEFCdkFHMEFYd0J3QUdnQWJ3QnVBR1VBYmdCMUFH?=
- =?us-ascii?Q?MEFZZ0JsQUhJQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJqQUhVQWN3?=
- =?us-ascii?Q?QjBBRzhBYlFCZkFITUFjd0J1QUY4QVpBQmhBSE1BYUFCZkFIWUFNQUF5QUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-refone: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFHTUFk?=
- =?us-ascii?Q?UUJ6QUhRQWJ3QnRBRjhBY3dCekFHNEFYd0JyQUdVQWVRQjNBRzhBY2dCa0FI?=
- =?us-ascii?Q?TUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBWXdCMUFITUFkQUJ2QUcwQVh3?=
- =?us-ascii?Q?QnpBSE1BYmdCZkFHNEFid0JrQUdVQWJBQnBBRzBBYVFCMEFHVUFjZ0JmQUhZ?=
- =?us-ascii?Q?QU1BQXlBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFB?=
- =?us-ascii?Q?SUFBQUFBQUo0QUFBQmpBSFVBY3dCMEFHOEFiUUJmQUhNQWN3QnVBRjhBY3dC?=
- =?us-ascii?Q?d0FHRUFZd0JsQUY4QWRnQXdBRElBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdR?=
- =?us-ascii?Q?QWJBQndBRjhBY3dCckFIa0FjQUJsQUY4QVl3Qm9BR0VBZEFCZkFHMEFaUUJ6?=
- =?us-ascii?Q?QUhNQVlRQm5BR1VBWHdCMkFEQUFNZ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFDZUFBQUFaQUJzQUhBQVh3QnpBR3dB?=
- =?us-ascii?Q?WVFCakFHc0FYd0JqQUdnQVlRQjBBRjhBYlFCbEFITUFjd0JoQUdjQVpRQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reftwo: 
- =?us-ascii?Q?QUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCa0FHd0FjQUJmQUhR?=
- =?us-ascii?Q?QVpRQmhBRzBBY3dCZkFHOEFiZ0JsQUdRQWNnQnBBSFlBWlFCZkFHWUFhUUJz?=
- =?us-ascii?Q?QUdVQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFB?=
- =?us-ascii?Q?QUFBQUFBZ0FBQUFBQW5nQUFBR1VBYlFCaEFHa0FiQUJmQUdFQVpBQmtBSElB?=
- =?us-ascii?Q?WlFCekFITUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNl?=
- =?us-ascii?Q?QUFBQWJRQmhBSElBZGdCbEFHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFi?=
- =?us-ascii?Q?Z0JoQUcwQVpRQnpBRjhBWXdCdkFHNEFaZ0JwQUdRQVpRQnVBSFFBYVFCaEFH?=
- =?us-ascii?Q?d0FYd0JoQUd3QWJ3QnVBR1VBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJB?=
- =?us-ascii?Q?R1VBYkFCZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdCdUFHRUFiUUJsQUhNQVh3?=
- =?us-ascii?Q?QnlBR1VBY3dCMEFISUFhUUJqQUhRQVpRQmtBRjhBWVFCc0FHOEFiZ0JsQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFB?=
- =?us-ascii?Q?QUFBQUFBQUFnQUFBQUFBbmdBQUFHMEFZUUJ5QUhZQVpRQnNBRjhBY0FCeUFH?=
- =?us-ascii?Q?OEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFjd0JmQUhJQVpRQnpBSFFBY2dC?=
- =?us-ascii?Q?cEFHTUFkQUJsQUdRQVh3Qm9BR1VBZUFCakFHOEFaQUJsQUhNQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFB?=
- =?us-ascii?Q?Q2VBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBR0VBY2dCdEFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-rorf: true
-x-dg-refthree: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFB?=
- =?us-ascii?Q?QUFBQUo0QUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QVp3QnZBRzhBWndCc0FH?=
- =?us-ascii?Q?VUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUcwQVlR?=
- =?us-ascii?Q?QnlBSFlBWlFCc0FHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFZd0J2QUdR?=
- =?us-ascii?Q?QVpRQnpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBUUFBQUFBQUFBQUNBQUFBQUFDZUFBQUFiUUJoQUhJQWRnQmxBR3dBYkFC?=
- =?us-ascii?Q?ZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdCakFHOEFaQUJsQUhNQVh3QmtBR2tB?=
- =?us-ascii?Q?WXdCMEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJ?=
- =?us-ascii?Q?QUFBQUFBSjRBQUFCdEFHRUFjZ0IyQUdVQWJBQnNBRjhBY0FCeUFHOEFhZ0Js?=
- =?us-ascii?Q?QUdNQWRBQmZBRzRBWVFCdEFHVUFjd0JmQUdNQWJ3QnVBR1lBYVFCa0FHVUFi?=
- =?us-ascii?Q?Z0IwQUdrQVlRQnNBRjhBYlFCaEFISUFkZ0JsQUd3QWJBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFBRzBB?=
- =?us-ascii?Q?WVFCeUFIWUFaUUJzQUd3QVh3QndBSElBYndCcUFHVUFZd0IwQUY4QWJnQmhB?=
- =?us-ascii?Q?RzBBWlFCekFGOEFZd0J2QUc0QVpnQnBBR1FBWlFCdUFIUUFhUUJoQUd3QVh3?=
- =?us-ascii?Q?QnRBR0VBY2dCMkFHVUFiQUJzQUY4QWJ3QnlBRjhBWVFCeUFHMEFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reffour: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNlQUFB?=
- =?us-ascii?Q?QWJRQmhBSElBZGdCbEFHd0FiQUJmQUhBQWNnQnZBR29BWlFCakFIUUFYd0J1?=
- =?us-ascii?Q?QUdFQWJRQmxBSE1BWHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRBZEFCcEFHRUFi?=
- =?us-ascii?Q?QUJmQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J2QUhJQVh3Qm5BRzhBYndCbkFH?=
- =?us-ascii?Q?d0FaUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJBR1VB?=
- =?us-ascii?Q?YkFCc0FGOEFjQUJ5QUc4QWFnQmxBR01BZEFCZkFHNEFZUUJ0QUdVQWN3QmZB?=
- =?us-ascii?Q?SElBWlFCekFIUUFjZ0JwQUdNQWRBQmxBR1FBWHdCdEFHRUFjZ0IyQUdVQWJB?=
- =?us-ascii?Q?QnNBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFB?=
- =?us-ascii?Q?QUFBQUFnQUFBQUFBbmdBQUFHMEFZUUJ5QUhZQVpRQnNBR3dBWHdCd0FISUFi?=
- =?us-ascii?Q?d0JxQUdVQVl3QjBBRjhBYmdCaEFHMEFaUUJ6QUY4QWNnQmxBSE1BZEFCeUFH?=
- =?us-ascii?Q?a0FZd0IwQUdVQVpBQmZBRzBBWVFCeUFIWUFaUUJzQUd3QVh3QnZBSElBWHdC?=
- =?us-ascii?Q?aEFISUFiUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VB?=
- =?us-ascii?Q?QUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBSFFBWlFCeUFHMEFhUUJ1QUhVQWN3?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFBQUFBQUo0QUFBQnRBR0VBY2dCMkFH?=
- =?us-ascii?Q?VUFiQUJzQUY4QWR3QnZBSElBWkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFB?=
- =?us-ascii?Q?QUFBQUFBQWdBQUFBQUEiLz48L21ldGE+?=
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR18MB5216:EE_|SJ0PR18MB4108:EE_
-x-ms-office365-filtering-correlation-id: e2e595d0-778e-48db-2c07-08db8438f158
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- VRQsMeAzwnu0AGZ+5ZGxqu2aj29TtaM4gOfoXrdDi6URROlgiY+9g/WLCctA1L5uJzPKGxBkJKHCu3zrcr5PpVRfNYRXP0Z0b2wnBzr2QS9xcak46ReTzRsVSDV5wsiiG3yos8q0IOGCw9r4TLGcQ0/tIdXjuINyYDBwOZn3AASfenUeQfF/Qcw/pn/TcbP4vqHzJyKhzqFgpg98XmLuyj0hPSmxaN0lvXlee5KCAFmrF0TeaPDfd/RUKwnsjnJe43i94+vmqcF1GqPVjO4vOJckCkIvGMitscaq7H9LbDY2G1FtHPcg8rX4QUw14Hxum2l3SDFFHUfxtoQSbBAAJEnsqUeObnpi4Spk71U10dHZMYkpAPEswpWiXQ5Sv5rT1NWTjt/DZPqRseBsllCdymu6DbeIKMe/AQQAy9VdxtRsDJHdoXm6eCJ+yT7GYsfUYfZSO7fY7EkQ2bkhw3iqiM/vEQheBGo/PWx0Px8eyhNotQ8JZealXjM+xyOfcnDmfCmlZpq46hYtSDEdYHDRkXgFtKZVHBL/sEaOZQnJE6kz6ahFZt5DXS5NFqiATN1nq5TZj3iUoW0P7/iEs0+RYv+YBuQjjrM2CbmCOepZXdlw2tn6KOU115beVXJftiCj
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR18MB5216.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(451199021)(122000001)(76116006)(71200400001)(478600001)(54906003)(7696005)(38070700005)(83380400001)(33656002)(55016003)(2906002)(86362001)(6506007)(26005)(186003)(9686003)(66946007)(316002)(8936002)(8676002)(64756008)(38100700002)(4744005)(6916009)(5660300002)(66476007)(41300700001)(66446008)(4326008)(52536014)(66556008);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?BQKuSeUbagjO8wy+Yw/fXe9RbEQ7vfLGpq5tve9PR8UHHY24PD0sgOmWG4Z3?=
- =?us-ascii?Q?niW+GEY+enkmaCh9SmmWvu/FLCfBKcwkZ6Rt8ddcR2NXIimn4G8Vo07g2Ej0?=
- =?us-ascii?Q?ANy6JwYeARwf2uFaHPRs34dVztfgghBsKjuYvbpYXTJAXj7q6J2wWF/GpI+n?=
- =?us-ascii?Q?7AWRlUJE+EYFJVOlGjXwnd+Jut5K8+wOYEWwrne15iI92jhbDeScz5Bh2pnk?=
- =?us-ascii?Q?iAhDisBbW+q6El+9Arst0Nw2L+U53vUXt2h1aqYVgiVhVRMXCpNhJlhTrLjb?=
- =?us-ascii?Q?MY2OY9GrjAaLtSzqKGucZkb4TMv5PE60iUxGZ9maeta2o6AcWHb7gnY8W8A7?=
- =?us-ascii?Q?TQbZ+zZ9VW3ise/GuIL6iyoJ9e6U0hTbyI2c+0csNIqMiDA1l7zzp2qd/UOJ?=
- =?us-ascii?Q?Bq6eAfc/OtCpR+NCvVt+m/btJhedZ7P/jYygXae9XiXFb5FLkqsrUg3OPN5v?=
- =?us-ascii?Q?L1YKC4eB0t1FGR/jMcOOSmk/1oL9RU+eggj68YxdqIhNsWVC9zVMibTjepn1?=
- =?us-ascii?Q?woXpmfHY7GwNC6Yb4NPdBbYi8IfLAngWMBNgK/NAicuxQ/kiqMXKrMvQYP7F?=
- =?us-ascii?Q?8WcerHCDBWc31j+ZbLOv0Q2xy9xY6WQHbxEIX+PvOVprlpFX6M2fB+Ba0xmd?=
- =?us-ascii?Q?y+bHvE2tgy/IH78Dim+43kyFow+krFpt1wDNHMNGueqk35Y1Giek3UbmVjbu?=
- =?us-ascii?Q?BFiRaemG1u2IKcF3E/nlCEaNZVSZmPFOGQKTZlDH9Tk9pzyZWt1YBVuB6tiN?=
- =?us-ascii?Q?l7zv++Y4Q9jAW/MRUZXGeep+enJZ3cHXCAI0yTUnaQ7PPNPX+j0Vcm9Sa6Zx?=
- =?us-ascii?Q?/F41vwLjA0WiVZJ5gNfx1bI+TuXVYWNDZjxF1g1Kli7iZvhF0M+1zTFvOgMJ?=
- =?us-ascii?Q?lbG0WhslNs04W6QLSnADAvg00ej1OJSFYZMEbvXsxbqlIMGwzDaCQITAiP6I?=
- =?us-ascii?Q?zzPMnKIaTUvNdmvXha+8jnWpm+1YDsW1RBDOLXFqTFtai24eRiS+08AW7lsl?=
- =?us-ascii?Q?+kbc60D5zclRtDPVuAdDCVVfjiGYO3gm36dzhAo8FQQj3sJPEgAFb5Qg2YXQ?=
- =?us-ascii?Q?iuxTDa0U9+g87XJloJWbdGQh1pItUAnKTvFZ7gHxNmIfGYuIbK+TMhGvG9zS?=
- =?us-ascii?Q?vpaY/S6Kk8a4GgZGIkT1Ngwj2jVn3PpYZLMvK+mAxtm4lAIHgMbLXA64ww/3?=
- =?us-ascii?Q?MnbZkO3E/TNS0bsg7z8dHxR8Vl2oIzsQipDn4eG68cp8edKYRsbTGGTWYrsj?=
- =?us-ascii?Q?lqZlsKGUcrDOcsTZTSG3fcbJYjTm/w7DypZtb6m4rCEaAEato8Z8Zru10/2U?=
- =?us-ascii?Q?IeT1X3ff7O4vEr+76xLof4E5awp5B4x3fISkqcORHBIj2EtHbLHRbiaw4LBQ?=
- =?us-ascii?Q?YqAl/AE7GRPAhG4Bo3PuX8OiSgvLSTz/2OQMyuDodk+fuyIAtOxR/5JCYPtO?=
- =?us-ascii?Q?TC/fAdwgZ6B41bqIU9mqxCpbOmngjOGn2VlJ6fAQweFKKwoPmmhNIBHf9kf5?=
- =?us-ascii?Q?ky1JU9DaiL2ETtQmM6vua8lXvxEgSl17PW5PVQb3gOj1+WqDUn+O1MpGVsM+?=
- =?us-ascii?Q?bnnKcx0wuTmlIoiWYoI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH V2 0/3] octeontx2-af: Fix issues with NPC field hash extract
+Date: Fri, 14 Jul 2023 12:41:38 +0530
+Message-ID: <20230714071141.2428144-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR18MB5216.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2e595d0-778e-48db-2c07-08db8438f158
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2023 07:07:10.5090
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: h3MCPaGlLKETcx208Qba3xnK7Vw46eUlKfc6dEZFOok1qzJgfF0b9boYnylB4bI3TZaNMUVrwOOSljUTSr21pQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB4108
-X-Proofpoint-GUID: iH1Tn7dKSrly9kntymCP9vS7uWCexX1l
-X-Proofpoint-ORIG-GUID: iH1Tn7dKSrly9kntymCP9vS7uWCexX1l
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 4rv3Y67UkmmIcKvFN0XlQ8tZiE1O6kZ8
+X-Proofpoint-ORIG-GUID: 4rv3Y67UkmmIcKvFN0XlQ8tZiE1O6kZ8
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-14_04,2023-07-13_01,2023-05-22_02
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->On Wed, 12 Jul 2023 16:46:03 +0530 Suman Ghosh wrote:
->> As of today, hash extraction was enabled by default for the default
->> MKEX profile. This patch fixes that and enable the support based on
->> customer specific MKEX profile.
->
->I'm not sure what this means, can the commit message be readable for
->people who don't know your HW, please?
-[Suman] Update the messages in v2
+This patchset fixes the issues with NPC field hash extract. This feature is
+supported only for CN10KB variant of CN10K series of silicons. This features
+helps to hash reduce 128 bit IPv6 source/destination address to 32 bit(also
+configurable) which can save 96 bit and can be used to store other key information
+during packet filtering.
+
+Patch #1 Fix hash extraction mbox message
+
+Patch #2 Fix hash extraction enable configuration
+
+Patch #3 Fix hash configuration for both source and destination IPv6
+
+Suman Ghosh (3):
+  octeontx2-af: Fix hash extraction mbox message
+  octeontx2-af: Fix hash extraction enable configuration
+  octeontx2-af: Fix hash configuration for both source and destination
+    IPv6
+
+---
+v2 changes:
+	Fixed review comment from Jakub Kicinski
+	1. Updated detailed commit messages
+	2. Updated cover letter.
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  16 +-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  22 ++-
+ .../marvell/octeontx2/af/rvu_npc_fs.h         |   4 +
+ .../marvell/octeontx2/af/rvu_npc_hash.c       | 160 ++++++++++++------
+ .../marvell/octeontx2/af/rvu_npc_hash.h       |  21 ++-
+ 5 files changed, 150 insertions(+), 73 deletions(-)
+
+-- 
+2.25.1
+
 
