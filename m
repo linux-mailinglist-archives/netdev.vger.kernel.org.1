@@ -1,101 +1,90 @@
-Return-Path: <netdev+bounces-18005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECE6A754163
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 19:52:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B86754160
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 19:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2402F28225B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 17:52:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A0BC1C20A0C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 17:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D454156EE;
-	Fri, 14 Jul 2023 17:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD17156E3;
+	Fri, 14 Jul 2023 17:52:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409AF14A83
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 17:52:29 +0000 (UTC)
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622F035B3;
-	Fri, 14 Jul 2023 10:51:59 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-78625caa702so86594139f.1;
-        Fri, 14 Jul 2023 10:51:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689356998; x=1691948998;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iEIKeE5pM9zn9D8Srf35AY3/pDLGKpItW+k06EDlZ4c=;
-        b=T+glcA/GY2in6tncWfqRwgewx+njuySKLH4W/3brlllKqRKpl4oN8siRhvtlbHky9T
-         xoQJCcaYRmqJ52iDvSz7rqMEL05L8AasBVietGVMwEbPi6qOa961SzhZ/CVIGWV7jKtv
-         dF3XYBMtFGB9PLS5g2vqw6saaqtHMZT7rPuZP/60nHW4XTHpc0ui6SixthLwjbjdUilg
-         eUkXwqFO7HvPIX1RmxW3Eno0KipOaBBxAYqb7EB7ub/r37M8q7+ug5l5827qYI1uPaGk
-         CN/cKpkpveLwKvKogIJt4EKFIvF3MCPVncqtbtTVI5WARCkxt12ZyD7bjzLpMi8ZIFoj
-         I41A==
-X-Gm-Message-State: ABy/qLYVawoLV4jRHHGINCr3dQRUs6FzT1MKtR+Oqf+gh4pWDe1/Cwoc
-	9vcDqwigf4WlG6tcRQSGTg==
-X-Google-Smtp-Source: APBJJlF8MQmWVa6E2TnegdqPcO3I1VDTQ1vLGqnfLDaaes0YHjMlxxjcIMvwXsd2XFLbvrUUN/Wh3Q==
-X-Received: by 2002:a6b:5b08:0:b0:787:1990:d2ec with SMTP id v8-20020a6b5b08000000b007871990d2ecmr5563567ioh.12.1689356998520;
-        Fri, 14 Jul 2023 10:49:58 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id x25-20020a6bda19000000b00786dffc04e2sm2772310iob.25.2023.07.14.10.49.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 10:49:57 -0700 (PDT)
-Received: (nullmailer pid 4063275 invoked by uid 1000);
-	Fri, 14 Jul 2023 17:49:27 -0000
-From: Rob Herring <robh@kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>, Yangbo Lu <yangbo.lu@nxp.com>
-Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] ptp: Explicitly include correct DT includes
-Date: Fri, 14 Jul 2023 11:49:22 -0600
-Message-Id: <20230714174922.4063153-1-robh@kernel.org>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B719D14A83
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 17:52:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF584C433C7;
+	Fri, 14 Jul 2023 17:52:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689357136;
+	bh=Q9mezWlx47FebY29tWWEXbHoAxzft3y2EeUU3sZ0gkw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FLwX4HmX2J4hRmpABq6/J0Cp639OF2XY5geuZlVWMHG8hD+tvdkhL3D7hXDw+XsVo
+	 GTWzxiyFMqEbEQO48a8ctdZPliEp9bEvCwFEggf+uoD7jkhPzb+Bkj87TVDu6xaai9
+	 luEPYgasVrQUleaJ/JkYvlR3s1cvUC66fjPn0GFBGxzy9h/pn90+oiZAnTDhfjxmEy
+	 LUeOnU1au67JqPJBetoxluJm8r8IuFengcH/1micfGkjnT1KaOiqySmnGwnEsxM0l/
+	 wAgzNyXJYun6Nu6qseq7LfnXh2YwU0nHmQHklFz5JtCGOw6aps5sf3BGEHY2Dn0BB1
+	 7tNnToNT240yg==
+Date: Fri, 14 Jul 2023 10:52:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Yunsheng Lin
+ <yunshenglin0825@gmail.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang
+ Chen <liangchen.linux@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH v5 RFC 1/6] page_pool: frag API support for 32-bit arch
+ with 64-bit DMA
+Message-ID: <20230714105214.39ad4e4d@kernel.org>
+In-Reply-To: <9a5b4c50-2401-b3e7-79aa-33d3ccee41c5@huawei.com>
+References: <20230629120226.14854-1-linyunsheng@huawei.com>
+	<20230629120226.14854-2-linyunsheng@huawei.com>
+	<20230707170157.12727e44@kernel.org>
+	<3d973088-4881-0863-0207-36d61b4505ec@gmail.com>
+	<20230710113841.482cbeac@kernel.org>
+	<8639b838-8284-05a2-dbc3-7e4cb45f163a@intel.com>
+	<20230711093705.45454e41@kernel.org>
+	<1bec23ff-d38b-3fdf-1bb3-89658c1d465a@intel.com>
+	<46ad09d9-6596-cf07-5cab-d6ceb1e36f3c@huawei.com>
+	<20230712102603.5038980e@kernel.org>
+	<9a5b4c50-2401-b3e7-79aa-33d3ccee41c5@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The DT of_device.h and of_platform.h date back to the separate
-of_platform_bus_type before it as merged into the regular platform bus.
-As part of that merge prepping Arm DT support 13 years ago, they
-"temporarily" include each other. They also include platform_device.h
-and of.h. As a result, there's a pretty much random mix of those include
-files used throughout the tree. In order to detangle these headers and
-replace the implicit includes with struct declarations, users need to
-explicitly include the correct includes.
+On Fri, 14 Jul 2023 20:16:34 +0800 Yunsheng Lin wrote:
+> > I should have clarified that "types.h" should also include pure
+> > function declarations (and possibly static line wrappers like
+> > pure get/set functions which only need locally defined types).  
+> 
+> So "types.h" is not supposed/allowed to include any header and
+> it can include any function declarations and static line wrappers
+> which do not depend on any other header? It means we need to forward
+> declaring a lot of 'struct' type for function declarations, right?
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- drivers/ptp/ptp_qoriq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Only those used in function prototypes. Pointers in structures 
+are somewhat special and don't require fwd declaration.
 
-diff --git a/drivers/ptp/ptp_qoriq.c b/drivers/ptp/ptp_qoriq.c
-index 350154e4c2b5..a52859d024f0 100644
---- a/drivers/ptp/ptp_qoriq.c
-+++ b/drivers/ptp/ptp_qoriq.c
-@@ -12,7 +12,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/timex.h>
- #include <linux/slab.h>
- #include <linux/clk.h>
--- 
-2.40.1
+> If it is the case, the "types.h" does not seems to match it's
+> naming when we can not really define most of the 'struct' in "types.h",
+> such as 'struct page_pool' need to include some header in order to
+> have definition of 'struct delayed_work'.
 
+Obviously. And refcount.h, and types.h.
+
+> Similar issue for 'helpers.h', as it will include most of the
+> definition of 'struct', which are not really helpers, right?
 
