@@ -1,67 +1,61 @@
-Return-Path: <netdev+bounces-18024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AAE17543A1
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:16:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CC67543A8
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CEF1C21614
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:16:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E38BC1C2163E
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99F820F96;
-	Fri, 14 Jul 2023 20:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B30D20FBF;
+	Fri, 14 Jul 2023 20:18:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A399E134CB
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:16:35 +0000 (UTC)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD3D93AB1
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 13:16:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDDE1371C
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:18:39 +0000 (UTC)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5469430E3
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 13:18:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689365784; x=1720901784;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gx3Ark/CDNPqPFWYGmvigBv3HBWmV1qxAretQWxrlqE=;
-  b=bgNj0ssHmxWmVpuyO5XeZHq93BPtVDf7wFu2FNBel7SrT5yByFD5pBdm
-   bKD0gGtN4MXvk2enebJi65jsVOsdE36e9sCCiiFa8Kc4ox9Jw08AXpwle
-   MEK99quayKiL/vUxZdN5ly9L+9dnw1zastJspKQactRgCbiSU/L3197If
-   ZCs6YNbVp6ElEihmVH1khvxbETtGf7Ao2uRH5zX+9yXF1V3m2mByXXvIv
-   1JyNIfSgb3cokU9f/yOJkrRQrIoDEIVS+4pzzpPhs6OoYjCvKwQqJHxK/
-   e5IQlCrVtES/GmACOQdCSTMEAmHyqeEdYTp/isOn1xOopGundeKrcy4Qt
+  t=1689365918; x=1720901918;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/LZcqc1Pgi6BXW3TmIuVYbyW2/o8blhZJqemO+v4cv4=;
+  b=U26NwINeih/OldhJOYUtZAXEkUOyLpzp7LZ63O04gBY9t4jPOJkAAgJu
+   O+57bUP5l+ZIPu6qDl0o+ZVW7mv46RmGW4kWc4fpzxlnuV0xCwufGjYSO
+   6pFbGrHC1JS9q+U5chGZj7pcuX2xNxsCkT2lDDMM/kiTOa9tbEZyRhdwJ
+   VCwCaOytBgPIIQzHQZl3tkpfC/5Hx+DQf3hKTuV2fknYWspala/gMx3FX
+   /ot+hlC5u4wJXt0nrZBhyQPfErXX50FiKh0KLw89UaoA0Y5+ExdyG2eq+
+   Y9DEzNF4iZgHg3Y1PbAO8h+/kfwbgf06i2/L+P0c7hcmOtBlwSdIjGMtq
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="431744613"
+X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="364438484"
 X-IronPort-AV: E=Sophos;i="6.01,206,1684825200"; 
-   d="scan'208";a="431744613"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 13:16:23 -0700
+   d="scan'208";a="364438484"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 13:18:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="752168802"
+X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="722521105"
 X-IronPort-AV: E=Sophos;i="6.01,206,1684825200"; 
-   d="scan'208";a="752168802"
+   d="scan'208";a="722521105"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga008.jf.intel.com with ESMTP; 14 Jul 2023 13:16:23 -0700
+  by orsmga002.jf.intel.com with ESMTP; 14 Jul 2023 13:18:37 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net 2/2] ice: prevent NULL pointer deref during reload
-Date: Fri, 14 Jul 2023 13:10:41 -0700
-Message-Id: <20230714201041.1717834-3-anthony.l.nguyen@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v2 0/2][pull request] Intel Wired LAN Driver Updates 2023-07-14 (i40e)
+Date: Fri, 14 Jul 2023 13:12:51 -0700
+Message-Id: <20230714201253.1717957-1-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230714201041.1717834-1-anthony.l.nguyen@intel.com>
-References: <20230714201041.1717834-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,182 +70,23 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+This series contains updates to i40e driver only.
 
-Calling ethtool during reload can lead to call trace, because VSI isn't
-configured for some time, but netdev is alive.
+Ivan Vecera adds waiting for VF to complete initialization on VF related
+configuration callbacks.
 
-To fix it add rtnl lock for VSI deconfig and config. Set ::num_q_vectors
-to 0 after freeing and add a check for ::tx/rx_rings in ring related
-ethtool ops.
+The following are changes since commit 68af900072c157c0cdce0256968edd15067e1e5a:
+  gve: trivial spell fix Recive to Receive
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
 
-Add proper unroll of filters in ice_start_eth().
+Ivan Vecera (2):
+  i40e: Add helper for VF inited state check with timeout
+  i40e: Wait for pending VF reset in VF set callbacks
 
-Reproduction:
-$watch -n 0.1 -d 'ethtool -g enp24s0f0np0'
-$devlink dev reload pci/0000:18:00.0 action driver_reinit
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 65 +++++++++++--------
+ 1 file changed, 38 insertions(+), 27 deletions(-)
 
-Call trace before fix:
-[66303.926205] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[66303.926259] #PF: supervisor read access in kernel mode
-[66303.926286] #PF: error_code(0x0000) - not-present page
-[66303.926311] PGD 0 P4D 0
-[66303.926332] Oops: 0000 [#1] PREEMPT SMP PTI
-[66303.926358] CPU: 4 PID: 933821 Comm: ethtool Kdump: loaded Tainted: G           OE      6.4.0-rc5+ #1
-[66303.926400] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.00.01.0014.070920180847 07/09/2018
-[66303.926446] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
-[66303.926649] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
-[66303.926722] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
-[66303.926749] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
-[66303.926781] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
-[66303.926811] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
-[66303.926843] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
-[66303.926874] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
-[66303.926906] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
-[66303.926941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[66303.926967] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
-[66303.926999] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[66303.927029] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[66303.927060] PKRU: 55555554
-[66303.927075] Call Trace:
-[66303.927094]  <TASK>
-[66303.927111]  ? __die+0x23/0x70
-[66303.927140]  ? page_fault_oops+0x171/0x4e0
-[66303.927176]  ? exc_page_fault+0x7f/0x180
-[66303.927209]  ? asm_exc_page_fault+0x26/0x30
-[66303.927244]  ? ice_get_ringparam+0x22/0x50 [ice]
-[66303.927433]  rings_prepare_data+0x62/0x80
-[66303.927469]  ethnl_default_doit+0xe2/0x350
-[66303.927501]  genl_family_rcv_msg_doit.isra.0+0xe3/0x140
-[66303.927538]  genl_rcv_msg+0x1b1/0x2c0
-[66303.927561]  ? __pfx_ethnl_default_doit+0x10/0x10
-[66303.927590]  ? __pfx_genl_rcv_msg+0x10/0x10
-[66303.927615]  netlink_rcv_skb+0x58/0x110
-[66303.927644]  genl_rcv+0x28/0x40
-[66303.927665]  netlink_unicast+0x19e/0x290
-[66303.927691]  netlink_sendmsg+0x254/0x4d0
-[66303.927717]  sock_sendmsg+0x93/0xa0
-[66303.927743]  __sys_sendto+0x126/0x170
-[66303.927780]  __x64_sys_sendto+0x24/0x30
-[66303.928593]  do_syscall_64+0x5d/0x90
-[66303.929370]  ? __count_memcg_events+0x60/0xa0
-[66303.930146]  ? count_memcg_events.constprop.0+0x1a/0x30
-[66303.930920]  ? handle_mm_fault+0x9e/0x350
-[66303.931688]  ? do_user_addr_fault+0x258/0x740
-[66303.932452]  ? exc_page_fault+0x7f/0x180
-[66303.933193]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-
-Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_base.c    |  2 ++
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 13 +++++++++++--
- drivers/net/ethernet/intel/ice/ice_main.c    | 10 ++++++++--
- 3 files changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 4a12316f7b46..b678bdf96f3a 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -800,6 +800,8 @@ void ice_vsi_free_q_vectors(struct ice_vsi *vsi)
- 
- 	ice_for_each_q_vector(vsi, v_idx)
- 		ice_free_q_vector(vsi, v_idx);
-+
-+	vsi->num_q_vectors = 0;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 8d5cbbd0b3d5..ad4d4702129f 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -2681,8 +2681,13 @@ ice_get_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 
- 	ring->rx_max_pending = ICE_MAX_NUM_DESC;
- 	ring->tx_max_pending = ICE_MAX_NUM_DESC;
--	ring->rx_pending = vsi->rx_rings[0]->count;
--	ring->tx_pending = vsi->tx_rings[0]->count;
-+	if (vsi->tx_rings && vsi->rx_rings) {
-+		ring->rx_pending = vsi->rx_rings[0]->count;
-+		ring->tx_pending = vsi->tx_rings[0]->count;
-+	} else {
-+		ring->rx_pending = 0;
-+		ring->tx_pending = 0;
-+	}
- 
- 	/* Rx mini and jumbo rings are not supported */
- 	ring->rx_mini_max_pending = 0;
-@@ -2716,6 +2721,10 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 		return -EINVAL;
- 	}
- 
-+	/* Return if there is no rings (device is reloading) */
-+	if (!vsi->tx_rings || !vsi->rx_rings)
-+		return -EBUSY;
-+
- 	new_tx_cnt = ALIGN(ring->tx_pending, ICE_REQ_DESC_MULTIPLE);
- 	if (new_tx_cnt != ring->tx_pending)
- 		netdev_info(netdev, "Requested Tx descriptor count rounded up to %d\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 19a5e7f3a075..f02d44455772 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4430,9 +4430,9 @@ static int ice_start_eth(struct ice_vsi *vsi)
- 	if (err)
- 		return err;
- 
--	rtnl_lock();
- 	err = ice_vsi_open(vsi);
--	rtnl_unlock();
-+	if (err)
-+		ice_fltr_remove_all(vsi);
- 
- 	return err;
- }
-@@ -4895,6 +4895,7 @@ int ice_load(struct ice_pf *pf)
- 	params = ice_vsi_to_params(vsi);
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
-+	rtnl_lock();
- 	err = ice_vsi_cfg(vsi, &params);
- 	if (err)
- 		goto err_vsi_cfg;
-@@ -4902,6 +4903,7 @@ int ice_load(struct ice_pf *pf)
- 	err = ice_start_eth(ice_get_main_vsi(pf));
- 	if (err)
- 		goto err_start_eth;
-+	rtnl_unlock();
- 
- 	err = ice_init_rdma(pf);
- 	if (err)
-@@ -4916,9 +4918,11 @@ int ice_load(struct ice_pf *pf)
- 
- err_init_rdma:
- 	ice_vsi_close(ice_get_main_vsi(pf));
-+	rtnl_lock();
- err_start_eth:
- 	ice_vsi_decfg(ice_get_main_vsi(pf));
- err_vsi_cfg:
-+	rtnl_unlock();
- 	ice_deinit_dev(pf);
- 	return err;
- }
-@@ -4931,8 +4935,10 @@ void ice_unload(struct ice_pf *pf)
- {
- 	ice_deinit_features(pf);
- 	ice_deinit_rdma(pf);
-+	rtnl_lock();
- 	ice_stop_eth(ice_get_main_vsi(pf));
- 	ice_vsi_decfg(ice_get_main_vsi(pf));
-+	rtnl_unlock();
- 	ice_deinit_dev(pf);
- }
- 
 -- 
 2.38.1
 
