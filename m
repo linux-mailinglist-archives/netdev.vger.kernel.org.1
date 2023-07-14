@@ -1,138 +1,100 @@
-Return-Path: <netdev+bounces-17824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07AF0753224
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:40:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41078753241
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31129282053
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:40:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 484D71C204E8
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145D54C85;
-	Fri, 14 Jul 2023 06:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB706AB3;
+	Fri, 14 Jul 2023 06:48:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008D41C35
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:40:08 +0000 (UTC)
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EECB2D5F;
-	Thu, 13 Jul 2023 23:40:07 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-666eef03ebdso1008691b3a.1;
-        Thu, 13 Jul 2023 23:40:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD17B1C35
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:48:58 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C8D1993
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:48:56 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-98de21518fbso213604666b.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:48:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689316807; x=1691908807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nq4AlzIUYH74DwmP1AytKvtmR3itDA2LKj6kldjoWZU=;
-        b=Isnpl4d5csD+Aw1s1azsAEeue2LVPzDM371sqUNpQhontnLuOCkx6NHelmtJgSlxno
-         oSqv8mKM9rZP9r9rx6F1ae+YnpqVB8wu/jzFkYNrCovFImrCkCwaz/yS6ZL6PMSzTjok
-         rKkU+HB/14IIa1qaKIBgAwljAvSuFSwGbBMXKdiV7ZuV5vTuInpjmJja+rPQtxaAKVgR
-         tVF5HC9BBB6FAp90L3XazivDj1QkHUQVEEMCm4MWguvjd2bFNlsWOCEC1+bHCSt7+vbj
-         v1YK0fj7mWBbmMVjoFRGJ2AyG2N2dR+uryOMeu7RQ8evtO4oahx0D6DI1H5gPB6+eXBn
-         GDCg==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689317335; x=1691909335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FQQW8GAQA9pOKPwWwqdNITi/jwsebaBcC1R0yG2LAbE=;
+        b=dmrcB46PtgOlUXq1ZuB5PBk1kRbzgKKcf5rFPZ8WPMxeCVWIJrc3PbfqhHC5vcUcus
+         01gSQ5w4HaIqKRcxf7s6ABTEdyZ8KwiYrecdcgkHEz6SL9yugsr0rnUVJT89Uv+JtusK
+         YuRjqSRxIXUiRITnowuik15yHrPOPH6TuwYBji7YY7RvhZCFLTjaNJo5AOyoA8w9G8ng
+         5LLLv31hcuOFnLZc0l8wxp2vQPdC28a5AoFAhxNVX2ylDv2z9Wd526qCQG3GRyzgl14x
+         OPZ6cBieRngm7qBil8LX4iqBRiIepkzZRQ467BmRNx1FzzARbIyaGzxluiCmDI4YEayh
+         fhqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689316807; x=1691908807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nq4AlzIUYH74DwmP1AytKvtmR3itDA2LKj6kldjoWZU=;
-        b=Fke493LHADl60xAWcMgrvl0h1NJN+nqzddiw3BTAw+TRheNTyBHIn1yUk8DDELNui+
-         Anlm0otKZaEEFVomIcl27he1t2zGJah4Uc21dob4wa6qtvF9PFsaotLHfFq128mPcov7
-         mJmfkW1UZHKGFZACDzo7SFhYxCrdqA7LxiN7frTCXeC4wVpQtfzGLaMg7qbpideK2njL
-         tjwms20BPzgl576IsJMe3c0JHbXAEqGoIr4/uFI5Lyzc6ECBWQRcQ9fospRJom9DY5D8
-         giT4lO1DoquucX3mOLqPVP/Yyrk2Z4ZMMOL9vGZ+LcyaBPdQrckNRJK03YGOtV/3o5HF
-         YtsA==
-X-Gm-Message-State: ABy/qLbNXHdhWHu5/m/Qh5AjCDXzg1A8cWLyvLK4Xw/geVfwzLFju1pT
-	+0gURRfSEFKd3lgsKm6vVJw=
-X-Google-Smtp-Source: APBJJlG9n6m+b2RmRfHQoTbrXXIPC84zw9M8gNUwTmGMbWoFBAKOO3sl8nWYLCmlyD9N2H+oHttvIw==
-X-Received: by 2002:a05:6a00:b47:b0:653:de9a:d933 with SMTP id p7-20020a056a000b4700b00653de9ad933mr3505236pfo.17.1689316806795;
-        Thu, 13 Jul 2023 23:40:06 -0700 (PDT)
-Received: from localhost.localdomain ([159.196.197.79])
-        by smtp.gmail.com with ESMTPSA id h21-20020a62b415000000b0067b24701daasm6358986pfn.86.2023.07.13.23.40.03
+        d=1e100.net; s=20221208; t=1689317335; x=1691909335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FQQW8GAQA9pOKPwWwqdNITi/jwsebaBcC1R0yG2LAbE=;
+        b=MRvurcbh4qNyMe6p5Mfdpz8fdvykmRZ50WCeFjBGeyVHarIO27uCtgXULDvxZtUqts
+         yRnR8xnvM2cSsOgF2rNYTSXemsJYWoXwEOxsEROuIEGHDoXrIiqW0A9FQZSyFL4jmkDH
+         3Ga+N2kEQX8yqQXuwiqljkLJgC+BHgefQ0bxpNhs+z6kPdva9UFADZTvIypMPaH4H1Qi
+         nzrLqYU9iX1tzsq8Ij2QlfYqgykESpCblPX8TqC61EerulR0c1Qz+RMO17XSNCdjt4D4
+         sUZssYWo/r14Vqbq7E/S51r2xjhJVCQ4Nm0k8pI8Z+03BwyFfRS64WPqx7as9eY4YFP1
+         2RRg==
+X-Gm-Message-State: ABy/qLZOcEnEVZv5tD2IRFr8fxYJoVcv68pF0coxexadfD7eckXynlW1
+	SHIXao3y3S/DemfnlHNGNumCkA==
+X-Google-Smtp-Source: APBJJlELsUncEJG60AGsjpedzeYKF3DAPJS7ajpo+APkVL1OxsZ2QVtts64bYGpyNsl8VstFMW9ymA==
+X-Received: by 2002:a17:907:1b05:b0:994:b53:77fc with SMTP id mp5-20020a1709071b0500b009940b5377fcmr4132218ejc.12.1689317334654;
+        Thu, 13 Jul 2023 23:48:54 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d24-20020a170906175800b009928b4e3b9fsm4942253eje.114.2023.07.13.23.48.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 23:40:06 -0700 (PDT)
-From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] tcp: Add memory pressure flag to sockstat
-Date: Fri, 14 Jul 2023 16:39:53 +1000
-Message-ID: <a35a5881c3280bd7a4fd1943a8b40b890e3bf280.1689316697.git.jamie.bainbridge@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Thu, 13 Jul 2023 23:48:53 -0700 (PDT)
+Date: Fri, 14 Jul 2023 08:48:52 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, Liang Li <liali@redhat.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net 2/2] team: reset team's flags when down link is P2P
+ device
+Message-ID: <ZLDv1E4LAuL0SDac@nanopsycho>
+References: <20230714025201.2038731-1-liuhangbin@gmail.com>
+ <20230714025201.2038731-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714025201.2038731-3-liuhangbin@gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When tuning a system it can be helpful to know whether the protocol is
-in memory pressure state or not. This can be determined by corresponding
-the number of pages in "net.ipv4.tcp_mem" with the current allocation,
-but a global variable already tracks this as the source of truth.
+Fri, Jul 14, 2023 at 04:52:01AM CEST, liuhangbin@gmail.com wrote:
+>When adding a point to point downlink to team device, we neglected to reset
+>the team's flags, which were still using flags like BROADCAST and
+>MULTICAST. Consequently, this would initiate ARP/DAD for P2P downlink
+>interfaces, such as when adding a GRE device to team device.
+>
+>Fix this by remove multicast/broadcast flags and add p2p and noarp flags.
+>
+>Reported-by: Liang Li <liali@redhat.com>
+>Links: https://bugzilla.redhat.com/show_bug.cgi?id=2221438
+>Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
+>Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Expose that variable in sockstat where other protocol memory usage is
-already reported.
-
-Add "pressure" which is 0 in normal state and 1 under pressure:
-
- # grep TCP /proc/net/sockstat
- TCP: inuse 5 orphan 0 tw 0 alloc 7 mem 1 pressure 0
-
- # grep TCP /proc/net/sockstat
- TCP: inuse 5 orphan 0 tw 0 alloc 7 mem 1 pressure 1
-
-Tested by writing a large value to global variable tcp_memory_pressure
-(it usually stores jiffies when memory pressure was entered) and not
-just by code review or editing example output.
-
-Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
----
- net/ipv4/proc.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-index eaf1d3113b62f7dc93fdc7b7c4041140ac63bf69..f4c5ced2de49d5c6d7f5d7ccdaa76c89dcf8c932 100644
---- a/net/ipv4/proc.c
-+++ b/net/ipv4/proc.c
-@@ -51,16 +51,17 @@
- static int sockstat_seq_show(struct seq_file *seq, void *v)
- {
- 	struct net *net = seq->private;
--	int orphans, sockets;
-+	int orphans, sockets, tcp_pressure;
- 
- 	orphans = tcp_orphan_count_sum();
- 	sockets = proto_sockets_allocated_sum_positive(&tcp_prot);
-+	tcp_pressure = READ_ONCE(tcp_memory_pressure) ? 1 : 0;
- 
- 	socket_seq_show(seq);
--	seq_printf(seq, "TCP: inuse %d orphan %d tw %d alloc %d mem %ld\n",
-+	seq_printf(seq, "TCP: inuse %d orphan %d tw %d alloc %d mem %ld pressure %d\n",
- 		   sock_prot_inuse_get(net, &tcp_prot), orphans,
- 		   refcount_read(&net->ipv4.tcp_death_row.tw_refcount) - 1,
--		   sockets, proto_memory_allocated(&tcp_prot));
-+		   sockets, proto_memory_allocated(&tcp_prot), tcp_pressure);
- 	seq_printf(seq, "UDP: inuse %d mem %ld\n",
- 		   sock_prot_inuse_get(net, &udp_prot),
- 		   proto_memory_allocated(&udp_prot));
--- 
-2.41.0
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
