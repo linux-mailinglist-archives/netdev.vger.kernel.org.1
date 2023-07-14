@@ -1,78 +1,147 @@
-Return-Path: <netdev+bounces-17787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA707530B5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:50:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9DC7530C6
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:54:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A12D8281FE0
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:50:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B7B281FE1
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C232010F0;
-	Fri, 14 Jul 2023 04:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC616FB3;
+	Fri, 14 Jul 2023 04:51:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78166A59
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 04:50:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E998CC433C7;
-	Fri, 14 Jul 2023 04:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689310249;
-	bh=EcQVGwWcJPMYxthhMryajaVCcmz6AHwCcf1NupuDKag=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=PqKLZx74vek/k7fNDzHgHyawsDb7rqGJEP79fRXcwxTZBz68d8p5lzJNzHDVe8wKT
-	 Gg7/Fl2pGNt/+zOppdhDpNO6uSRwKUVCxApEKODxem54Ym9KFTQyM7BWBcqW1G+huK
-	 TX0C3Q5GEkEq1+zOgnGJv46D7fiUrXQ0uLbBvIj8XYX7PZ8Lne4m+NrgY3Q4kdd7LE
-	 sSNIm50wnH8GieelBGg/tC4cAQD03tA6BMxdyWEcdqESmKJ9pdDaXcdvifHrGPh26k
-	 AiVdOqiuINwuS2ylsZR8/LcsrQihKmZ7UxwaLMoC33bj7UMjYvcVe4lpxtkYYrtrHa
-	 QQPrkgVWH2SaQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 7C613CE009E; Thu, 13 Jul 2023 21:50:43 -0700 (PDT)
-Date: Thu, 13 Jul 2023 21:50:43 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: duplicate patch in the rcu tree
-Message-ID: <6f655ef5-b236-4683-92b0-da8b19e79eca@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20230714144330.3c0a4074@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA8C6FDD
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 04:51:35 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B782D63;
+	Thu, 13 Jul 2023 21:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=fBHNk/5teiKF0xP49UxyZpW8fISmJXjYny9DANXhPDk=; b=2COurhKX5QFYivf6i7Zr/aNn73
+	QFFQ79/cPF9S01KhV09HQkEqM5Bt35VjzWKVmNOKOT3MEeM6pkE3uEDw8ivqQBpq9erUaV3YkcIvf
+	4KKB3kjBHTP34sgqauv/08O/xu4iuu66FaTGHGzWq+YYuAeG1ih+6cqEkeUsYVeJQ23Ksa24W33I3
+	eIVIANOCr6Z4LCeia34z+kHDpbc3bsUYs8FLvJPlbpV5AWHUNH/9CxsPCBrqTMHsyr6o+iU71HABO
+	HhpCvEEbemhL+GihI88F8uZQPx0QmjmcwABlhqL2FW8SBPTYWqGXFgOvVYXoRjVyNu5+T2K6gZcvL
+	8CIe6Kgw==;
+Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qKAm8-0050ZV-2k;
+	Fri, 14 Jul 2023 04:51:28 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Dave Taht <dave.taht@bufferbloat.net>,
+	Moshe Shemesh <moshe@mellanox.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Jiri Benc <jbenc@redhat.com>,
+	Leslie Monis <lesliemonis@gmail.com>,
+	"Mohit P. Tahiliani" <tahiliani@nitk.edu.in>,
+	Gautam Ramakrishnan <gautamramk@gmail.com>,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+	Kalle Valo <kvalo@kernel.org>
+Subject: [PATCH v2 net 0/9] net: fix kernel-doc problems in include/net/
+Date: Thu, 13 Jul 2023 21:51:18 -0700
+Message-ID: <20230714045127.18752-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714144330.3c0a4074@canb.auug.org.au>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 02:43:30PM +1000, Stephen Rothwell wrote:
-> Hi all,
-> 
-> The following commit is also in net-next tree as a different commit
-> (but the same patch):
-> 
->   a2b38823280d ("rcu: Export rcu_request_urgent_qs_task()")
-> 
-> This is commit
-> 
->   43a89baecfe2 ("rcu: Export rcu_request_urgent_qs_task()")
-> 
-> in the net-next tree.
+Fix many (but not all) kernel-doc warnings in include/net/.
 
-The net-next tree needs it for BPF, correct?  So if you guys intend to
-push it to mainline, I will be happy to drop if from -rcu.
+ [PATCH v2 net 1/9] net: bonding: remove kernel-doc comment marker
+ [PATCH v2 net 2/9] net: cfg802154: fix kernel-doc notation warnings
+ [PATCH v2 net 3/9] codel: fix kernel-doc notation warnings
+ [PATCH v2 net 4/9] devlink: fix kernel-doc notation warnings
+ [PATCH v2 net 5/9] inet: frags: remove kernel-doc comment marker
+ [PATCH v2 net 6/9] net: llc: fix kernel-doc notation warnings
+ [PATCH v2 net 7/9] net: NSH: fix kernel-doc notation warning
+ [PATCH v2 net 8/9] pie: fix kernel-doc notation warning
+ [PATCH v2 net 9/9] rsi: remove kernel-doc comment marker
 
-Either way, please let me know!
+v2: drop the wifi/80211 patches, waiting for their reviewers or
+    maintainers;
+    include/linux/inet_frag.h: keep the kernel-doc comment;
 
-							Thanx, Paul
+ include/net/bonding.h            |    2 +-
+ include/net/cfg80211.h           |    1 -
+ include/net/cfg802154.h          |    3 ++-
+ include/net/codel.h              |    4 ++--
+ include/net/devlink.h            |   28 ++++++++++++++++------------
+ include/net/ieee80211_radiotap.h |    3 ++-
+ include/net/inet_frag.h          |    2 +-
+ include/net/llc_pdu.h            |    6 ++++--
+ include/net/mac80211.h           |    1 +
+ include/net/nsh.h                |    2 +-
+ include/net/pie.h                |    2 +-
+ include/net/rsi_91x.h            |    2 +-
+ 12 files changed, 32 insertions(+), 24 deletions(-)
+
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-wireless@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>
+Cc: Andy Gospodarek <andy@greyhouse.net>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>
+Cc: Dave Taht <dave.taht@bufferbloat.net>
+Cc: Moshe Shemesh <moshe@mellanox.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Benjamin Berg <benjamin.berg@intel.com>
+Cc: Jiri Benc <jbenc@redhat.com>
+Cc: Leslie Monis <lesliemonis@gmail.com>
+Cc: "Mohit P. Tahiliani" <tahiliani@nitk.edu.in>
+Cc: Gautam Ramakrishnan <gautamramk@gmail.com>
+Cc: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Cc: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Cc: Kalle Valo <kvalo@kernel.org>
 
