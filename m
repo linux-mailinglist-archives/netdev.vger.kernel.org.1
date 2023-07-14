@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-17744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D849D752F4C
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:21:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B52752F4D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:21:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3161C214C2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:21:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A267E281F7D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6669381D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D243A4D;
 	Fri, 14 Jul 2023 02:21:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA18806;
-	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B598C433CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E900809
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 72FCFC433C7;
 	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689301265;
-	bh=gcOWOcoU3m4AKQgrhUcZd930T6NkJk8Bd3Kg/KylIxs=;
+	bh=Z+YyNKft/yNO6HkbCw8ttg+W0kytJcV940yRY0t2Ph8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Kj5zj6Esoz/jR1eGzxf8CYW6Ow5b+CCJOk7iIRDUjEhn95F8Q1fDBXu5oulNs7TRB
-	 eacaMu/TyarIzRmNn/NV9K8YwEb1d5ciT4DJkj1gFq8O0mnf5VnIzhoLatilmzYA+X
-	 KPT7diCwmHkd1HOTrY/M3FXba8afua2ZB1Tz6lJHQ7tTxtpfFS/5PixAzrUFOTJCF3
-	 3H23V/seTnfllnaATztTO4mYlphLS5PUZpUQGhEjs7VpQ3twmWGCPbOZFjctKvUQwI
-	 j8fsL8Zp7X9vYMyaBq9623XF4pVsBYuxSpY5J023+je49lJAKvmFX3CTp3PzghtnPw
-	 AuZUaZ6S/8DVw==
+	b=hEvBNn55OuTTo6ozQ5WHPulQtyagnEBq9ws80QGSgGL/LXtKp8MTmnJ9Es7ys2eJq
+	 KZIL3Co4VxUOBy6h2SpNdU/K0Lp6jNviyUOaTbi3SwsB+wZiA1spCxC2c5pxKBBDSJ
+	 11tsxxTJq+QTDbTxLLQ+XlBoZHEF/c3nM+K5RYAd1VPtfOMCICDR3rDYk4S73UI5ls
+	 NM+Du30y9hRLmP6+IHQ3MwJVMWUVhaT79b9KrMdL54qulZ54P4toJiphmoN/CbrEU4
+	 /cX4LVPi5YNo7uCBykskNl53MdhkDS4MqeuHcjFzCdL+qQcCXWUdEyxmIVIPkwYoA7
+	 Zz38BdVxEgckQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 609D7E4D006;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58EAEE29F46;
 	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,36 +41,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2023-07-13
+Subject: Re: [PATCH v2 net-next 0/5] ionic: add FLR support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168930126539.23383.7014345364901035760.git-patchwork-notify@kernel.org>
+ <168930126535.23383.301042946156500503.git-patchwork-notify@kernel.org>
 Date: Fri, 14 Jul 2023 02:21:05 +0000
-References: <20230714020910.80794-1-alexei.starovoitov@gmail.com>
-In-Reply-To: <20230714020910.80794-1-alexei.starovoitov@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, daniel@iogearbox.net, andrii@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, kernel-team@fb.com
+References: <20230713192936.45152-1-shannon.nelson@amd.com>
+In-Reply-To: <20230713192936.45152-1-shannon.nelson@amd.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ idosch@idosch.org, brett.creeley@amd.com, drivers@pensando.io
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On Thu, 13 Jul 2023 19:09:10 -0700 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, 13 Jul 2023 12:29:31 -0700 you wrote:
+> Add support for handing and recovering from a PCI FLR event.
+> This patchset first moves some code around to make it usable
+> from multiple paths, then adds the PCI error handler callbacks
+> for reset_prepare and reset_done.
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 67 non-merge commits during the last 15 day(s) which contain
-> a total of 106 files changed, 4444 insertions(+), 619 deletions(-).
+> Example test:
+>     echo 1 > /sys/bus/pci/devices/0000:2a:00.0/reset
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: bpf-next 2023-07-13
-    https://git.kernel.org/netdev/net-next/c/b0b0ab6f0131
+  - [v2,net-next,1/5] ionic: remove dead device fail path
+    https://git.kernel.org/netdev/net-next/c/3a7af34fb6ec
+  - [v2,net-next,2/5] ionic: extract common bits from ionic_remove
+    (no matching commit)
+  - [v2,net-next,3/5] ionic: extract common bits from ionic_probe
+    (no matching commit)
+  - [v2,net-next,4/5] ionic: pull out common bits from fw_up
+    (no matching commit)
+  - [v2,net-next,5/5] ionic: add FLR recovery support
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
