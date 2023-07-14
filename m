@@ -1,130 +1,177 @@
-Return-Path: <netdev+bounces-17778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7D0753075
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:17:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A8EB753080
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 071B31C214F3
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:17:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98F06281CC7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2DC74A16;
-	Fri, 14 Jul 2023 04:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C7A4A1B;
+	Fri, 14 Jul 2023 04:20:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29E4ED1
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 04:17:13 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1854C2699
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:17:11 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fbc12181b6so14291845e9.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:17:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689308229; x=1691900229;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xB/IGZDPnnKzBMS/uR9nCWt1rTBAIheIt2NnWe/dYHI=;
-        b=UNYIAl0vsymRIV81hpbAM66PgpgMTE89AFouUWLP1w1RraUDKL9AvjeiYIumNQwc29
-         svyZaYTBvy/b1O7qxhoTGLCGlueRkm90gCIbBaj+ctopiT9P0fp4UaH/VdEkk8uBKNam
-         pnoa7lhg4Re/qsnUu/tH8l/aRlpa3sYXkDZLiz49CID4eOdzRIcuZdWPPRltQ0XA5Jzo
-         fUeH6GdsYvrJgdKZUzbsFcpXbR3kritk4CX7KtLt11FWVerJPuoNNMDGG96a/dRUXnP+
-         SAAuKA3n14tOiSVYjJkH1almbhqT1yOXW5cQF/2UX+yq9CC6zUGeSf6yZw52IPaCruYU
-         Uv4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689308229; x=1691900229;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xB/IGZDPnnKzBMS/uR9nCWt1rTBAIheIt2NnWe/dYHI=;
-        b=SJg+utqQAzKTmzjuBY6JfwKmW2TJVDfSS504G67xe+lat+IMPmaPx1EEs6YSJ0bLLq
-         NlGJT9Tr7llCN0dL2+ROUT5m5LI+YBOVtKbM0YxAoNJul2/Blyv2EY0tJTKc/XIzuPn0
-         cZb3eISOfrI5Y0jHvdfR1egFwlT0UGDTX9Xp8cyIx7d2bTzNvEezHQ6lLPltATq4kmzY
-         en8iyZP6bX9emqi4O2HXq3S0DIXoehG4bcpQRmXBzFCQvxz+Y3NVDxLWm/iKRpzONzSE
-         IiNk3ZY4PhtUxLyUwGDW0eEiBD0nt7fYg8dlCRcjXH/H7zrToVkGChBgpbPuf/DAI20n
-         3Iew==
-X-Gm-Message-State: ABy/qLbBkmJDeg+c0lQqRtXbRF3d+rDMFHIO8BED64xXPN9WVBnb6UPE
-	W2R2qaJo8apEG+7JDfEf4ivTsA==
-X-Google-Smtp-Source: APBJJlGMTT+Q4sPyu75nqGgHG+kkV8epB2p2rGKmjJwUcZIt6Tzxsk9RJHs91dM0VdrCYvMc8ap/lQ==
-X-Received: by 2002:a1c:7c0b:0:b0:3fb:ce46:c0b3 with SMTP id x11-20020a1c7c0b000000b003fbce46c0b3mr3107048wmc.35.1689308229457;
-        Thu, 13 Jul 2023 21:17:09 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.223.104])
-        by smtp.gmail.com with ESMTPSA id z16-20020a05600c221000b003fbaa2903f4sm480617wml.19.2023.07.13.21.17.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 21:17:08 -0700 (PDT)
-Message-ID: <391132d5-de6b-8208-8996-bb3db250d9c4@linaro.org>
-Date: Fri, 14 Jul 2023 06:17:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC8E4C7E
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 04:20:16 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5541995
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 21:20:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kgZWFSVDiDmk6YDdDdf49KaPkLtd1ObXt9w/aSKaZ3w=; b=mSN5k4UE9yXCufhi9yYBDqp8wW
+	qpjynSl2hgGKF+vaoplyfw1LxzDz9Vn11lGy3Qevgykl2NZnUE80HVmNc4pmuS0sZ0eynGLHlmlOz
+	X1cJXzaXPH0y5QwWqAgKIg2oPssTLlGjLb948FLcBH/rV/3M3o4TJYuZ9z/JIWjZZYv0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qKAHe-001JfI-8R; Fri, 14 Jul 2023 06:19:58 +0200
+Date: Fri, 14 Jul 2023 06:19:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
+	dongbiao@loongson.cn, loongson-kernel@lists.loongnix.cn,
+	netdev@vger.kernel.org, loongarch@lists.linux.dev
+Subject: Re: [RFC PATCH 01/10] net: phy: Add driver for Loongson PHY
+Message-ID: <3cff46b0-5621-4881-8e70-362bb7a70ed1@lunn.ch>
+References: <cover.1689215889.git.chenfeiyang@loongson.cn>
+ <be1874e517f4f4cc50906f18689a0add3594c2e0.1689215889.git.chenfeiyang@loongson.cn>
+ <9e0b3466-10e1-4267-ab9b-d9f8149b6b6b@lunn.ch>
+ <CACWXhKkX-syR01opOky=t-b8C3nhV5f_WNfCQ-kOE+4o0xh4tA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] dt-bindings: net: xilinx_gmii2rgmii: Convert to json
- schema
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Pranavi Somisetty <pranavi.somisetty@amd.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- michal.simek@amd.com, harini.katakam@amd.com, git@amd.com,
- radhey.shyam.pandey@amd.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20230713103453.24018-1-pranavi.somisetty@amd.com>
- <f6c11605-56d7-7228-b86d-bc317a8496d0@linaro.org>
- <a17b0a4f-619d-47dd-b0ad-d5f3c1a558fc@lunn.ch>
- <ebd30cd0-5081-f05d-28f7-5d5b637041e4@linaro.org>
- <cd0fb281-b621-4d6b-be94-be6095e35328@lunn.ch>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <cd0fb281-b621-4d6b-be94-be6095e35328@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACWXhKkX-syR01opOky=t-b8C3nhV5f_WNfCQ-kOE+4o0xh4tA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 13/07/2023 21:30, Andrew Lunn wrote:
-> On Thu, Jul 13, 2023 at 08:53:34PM +0200, Krzysztof Kozlowski wrote:
->> On 13/07/2023 17:59, Andrew Lunn wrote:
->>>>> +examples:
->>>>> +  - |
->>>>> +    mdio {
->>>>> +        #address-cells = <1>;
->>>>> +        #size-cells = <0>;
->>>>> +        phy: ethernet-phy@0 {
->>>>> +            reg = <0>;
->>>>> +        };
->>>>
->>>> Drop this node, quite obvious.
->>>
->>> Dumb question. Isn't it needed since it is referenced by phy-handle =
->>> <&phy> below. Without it, the fragment is not valid DT and so the
->>> checking tools will fail?
->>
->> No, because the example is compiled with silencing missing phandles.
+> > > +#include <linux/mii.h>
+> > > +#include <linux/module.h>
+> > > +#include <linux/netdevice.h>
+> > > +#include <linux/pci.h>
+> > > +#include <linux/phy.h>
+> > > +
+> > > +#define PHY_ID_LS7A2000              0x00061ce0
+> >
+> > What is Loongson OUI?
+> >
 > 
-> Ah, thanks.
+> Currently, we do not have an OUI for Loongson, but we are in the
+> process of applying for one.
+
+Is the value 0x00061ce0 baked into the silicon? Or can it be changed
+once you have an OUI?
+
+> > > +#define GNET_REV_LS7A2000    0x00
+> > > +
+> > > +static int ls7a2000_config_aneg(struct phy_device *phydev)
+> > > +{
+> > > +     if (phydev->speed == SPEED_1000)
+> > > +             phydev->autoneg = AUTONEG_ENABLE;
+> >
+> > Please explain.
+> >
 > 
-> This is a rather odd device, there is no other like it in mainline, so
-> i think having that PHY is useful, even if you think it is obvious
-> what is going on here.
+> The PHY itself supports half-duplex, but there are issues with the
+> controller used in the 7A2000 chip. Moreover, the controller only
+> supports auto-negotiation for gigabit speeds.
 
-For almost all other devices in other subsystems we do not provides such
-nodes. The "ethernet-phy" node should be obvious because nothing else is
-expected to be in "phy-handle". However, if you find it useful, then I
-am also fine with it.
+So you can force 10/100/1000, but auto neg only succeeds for 1G?
 
-Best regards,
-Krzysztof
+Are the LP autoneg values available for genphy_read_lpa() to read? If
+the LP values are available, maybe the PHY driver can resolve the
+autoneg for 10 an 100.
 
+> > > +     if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> > > +         phydev->advertising) ||
+> > > +         linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> > > +         phydev->advertising) ||
+> > > +         linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> > > +         phydev->advertising))
+> > > +         return genphy_config_aneg(phydev);
+> > > +
+> > > +     netdev_info(phydev->attached_dev, "Parameter Setting Error\n");
+> >
+> > This also needs explaining. How can it be asked to do something it
+> > does not support?
+> >
+> 
+> Perhaps I missed something, but I think that if someone uses ethtool,
+> they can request it to perform actions or configurations that the
+> tool does not support.
+
+No. The PHY should indicate what it can do, via the .get_abilities()
+etc. The MAC can also remove some of those link modes if it is more
+limited than the PHY. phylib will then not allow ksetting_set() to
+enable things which are not supported. So this should not happen.  It
+would actually be a bad design, since it would force every driver to
+do such checks, rather than implement it once in the core.
+
+> > > +int ls7a2000_match_phy_device(struct phy_device *phydev)
+> > > +{
+> > > +     struct net_device *ndev;
+> > > +     struct pci_dev *pdev;
+> > > +
+> > > +     if ((phydev->phy_id & 0xfffffff0) != PHY_ID_LS7A2000)
+> > > +             return 0;
+> > > +
+> > > +     ndev = phydev->mdio.bus->priv;
+> > > +     pdev = to_pci_dev(ndev->dev.parent);
+> > > +
+> > > +     return pdev->revision == GNET_REV_LS7A2000;
+> >
+> > That is very unusual. Why is the PHY ID not sufficient?
+> >
+> 
+> To work around the controller's issues, we enable the usage of this
+> driver specifically for a certain version of the 7A2000 chip.
+> 
+> > > +}
+> > > +
+> > > +static struct phy_driver loongson_phy_driver[] = {
+> > > +     {
+> > > +             PHY_ID_MATCH_MODEL(PHY_ID_LS7A2000),
+> > > +             .name                   = "LS7A2000 PHY",
+> > > +             .features               = PHY_LOONGSON_FEATURES,
+> >
+> > So what are the capabilities of this PHY? You seem to have some very
+> > odd hacks here, and no explanation of why they are needed. If you do
+> > something which no other device does, you need to explain it.
+> >
+> > Does the PHY itself only support full duplex? No half duplex? Does the
+> > PHY support autoneg? Does it support fixed settings? What does
+> > genphy_read_abilities() return for this PHY?
+> >
+> 
+> As mentioned earlier, this driver is specifically designed for the PHY
+> on the problematic 7A2000 chip. Therefore, we assume that this PHY only
+> supports full- duplex mode and performs auto-negotiation exclusively for
+> gigabit speeds.
+
+So what does genphy_read_abilities() return?
+
+Nobody else going to use PHY_LOONGSON_FEATURES, so i would prefer not
+to add it to the core. If your PHY is designed correctly,
+genphy_read_abilities() should determine what the PHY can do from its
+registers. If the registers are wrong, it is better to add a
+.get_features function.
+
+	Andrew
 
