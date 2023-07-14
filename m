@@ -1,129 +1,109 @@
-Return-Path: <netdev+bounces-17811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1427531A7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:00:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C3627531B5
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:04:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C55B02820DC
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:00:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B26C2820CF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05126FAE;
-	Fri, 14 Jul 2023 05:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05536D18;
+	Fri, 14 Jul 2023 06:04:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40006FA4
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 05:59:35 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A00B430CB;
-	Thu, 13 Jul 2023 22:59:33 -0700 (PDT)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36E4wrIG022549;
-	Fri, 14 Jul 2023 05:59:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=0c9gx394O2KZ9g52PIHyILTHpIsvOLIJK8hhHHaQizQ=;
- b=fa9rnjLSBe+R9sZRSjuEBytmD35fWvAY2yuYxcLbC7ZCt47/4huiywaBt85BmfIdRXPD
- BIDgUVHnZKldbNCEBVCMuxRBSUKGBqpTvYDgiJySfKmNrOAgeDQBBCzAnl17QLY/hwyC
- EGBj7KUj4Q8e+XN2uT1f0fSppkoB5Ftooi0KShmjpq0WuWObIqCW9jdymZFUefgNxoVP
- F6TSufQVj9coAd+s9u37FEKekImLcIaAAyT3IJmjfKejUsJ2xphYjhOqikQpCqB0Oh6D
- qV9cqpi4N/aAtsF2IWHhSScxpQZImIQ2A4bhcXBPmQnXQ01KMgZ+5U5J7TkZT9OGVmWp rA== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rtpts10sq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jul 2023 05:59:26 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36E5xPbk009830
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jul 2023 05:59:25 GMT
-Received: from hu-viswanat-blr.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 13 Jul 2023 22:59:20 -0700
-From: Vignesh Viswanathan <quic_viswanat@quicinc.com>
-To: <mani@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <quic_srichara@quicinc.com>, <quic_clew@quicinc.com>,
-        Vignesh Viswanathan
-	<quic_viswanat@quicinc.com>,
-        Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH V2 net-next 3/3] net: qrtr: Handle IPCR control port format of older targets
-Date: Fri, 14 Jul 2023 11:28:46 +0530
-Message-ID: <20230714055846.1481015-4-quic_viswanat@quicinc.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230714055846.1481015-1-quic_viswanat@quicinc.com>
-References: <20230714055846.1481015-1-quic_viswanat@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85DF6AD9
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:04:26 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43EE9271F;
+	Thu, 13 Jul 2023 23:04:25 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b8392076c9so9956771fa.1;
+        Thu, 13 Jul 2023 23:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689314663; x=1691906663;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gjmA4vOTkGwFP6byVeuNX5GJuZ4Uxjvbd1dybkUi9gI=;
+        b=gPhvisrPuH0rQjgD5Hi9MFnrsv910eO34eUc1RGHcccB844nvWd9hml7pRuR4djqUU
+         cG8EI/0uXHzF7oSZ3I0YZ9PNlXVXi9kTLPaSVVr4cqC6EpouWqnYfMLMKdTPiMrbhpws
+         zm8W9vljDAm+eVQF41e+vjsPJb8p2YBW9Vy8kM7V0ISRzb4imcwL/S+VTSk8LwTa/105
+         SGaCs4aHpTIXbgw00XXKhhdzSVEhfTrY+LAetqiCDF8LhZNnHmIMq9xDcca7fEejLE+g
+         M0Hwx+8zPik68+9+YPJMQk3O1ZDOEV+FJ9glwThDS+6IEwiBx048z2+bYRbF7cp74ZNX
+         9GTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689314663; x=1691906663;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gjmA4vOTkGwFP6byVeuNX5GJuZ4Uxjvbd1dybkUi9gI=;
+        b=OzUiesCbLh0aNbMa2S578LzP2NB0IOTQKYbmDYoDYYAij/kCpBpBHKNyUaVhvirSY7
+         wuj8Z7DiAyWn/E0EaJf3+qTT7yTOy8HG7ZOElNBpYS3q+Jl0BaU8WsxrU1NmRKsOUdha
+         COfv/MDI8mTly8illbiLM3lJmLuqdtfrmxBcvjReK/aD5ct4xZXjdeyPSQbqMvnbSm8b
+         r8I5dqSyHGD/D+y7J9NDWmNfbcnpfNNzByp7DbOD9o1blFR83sDtkeobOgG3Lpn7YR3+
+         mfmLrDS1SbCZ1HzYdzEbebzCgcpTLHFDm4ACjVTvCPUGIUe6OUPxoB/2bxtZ1L07aBBF
+         ig8w==
+X-Gm-Message-State: ABy/qLYP8cmzWaQ/Wx5Hy7KSMeWAveWIQjtV7UKiZIT8t7Ji6Eeuez8T
+	7hIivsvf6to/midq01TbC/W3h6TaKJtf4EYXYwsnm1DJ
+X-Google-Smtp-Source: APBJJlEyzFmZTxDSLZlKXTyqY5UP1cP5IIpdqO6/ly8Nf2PhalxOwEhK/FxafwqY0Azgc1rBday0xBVHfmmMuvLx1L8=
+X-Received: by 2002:a2e:9b8b:0:b0:2b7:3b73:2589 with SMTP id
+ z11-20020a2e9b8b000000b002b73b732589mr3103159lji.32.1689314663201; Thu, 13
+ Jul 2023 23:04:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: rITQFGwi2QpkbynFwHnpFUbYtxWJsuYM
-X-Proofpoint-ORIG-GUID: rITQFGwi2QpkbynFwHnpFUbYtxWJsuYM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-14_02,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 phishscore=0 spamscore=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999
- clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307140055
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230714144330.3c0a4074@canb.auug.org.au> <6f655ef5-b236-4683-92b0-da8b19e79eca@paulmck-laptop>
+In-Reply-To: <6f655ef5-b236-4683-92b0-da8b19e79eca@paulmck-laptop>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 13 Jul 2023 23:04:11 -0700
+Message-ID: <CAADnVQLF0BP-_Fjxi1S-0Shus38vAVdNbB2JHsBd6_RudYWF0A@mail.gmail.com>
+Subject: Re: linux-next: duplicate patch in the rcu tree
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, David Miller <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The destination port value in the IPCR control buffer on older
-targets is 0xFFFF. Handle the same by updating the dst_port to
-QRTR_PORT_CTRL.
+On Thu, Jul 13, 2023 at 9:50=E2=80=AFPM Paul E. McKenney <paulmck@kernel.or=
+g> wrote:
+>
+> On Fri, Jul 14, 2023 at 02:43:30PM +1000, Stephen Rothwell wrote:
+> > Hi all,
+> >
+> > The following commit is also in net-next tree as a different commit
+> > (but the same patch):
+> >
+> >   a2b38823280d ("rcu: Export rcu_request_urgent_qs_task()")
+> >
+> > This is commit
+> >
+> >   43a89baecfe2 ("rcu: Export rcu_request_urgent_qs_task()")
+> >
+> > in the net-next tree.
+>
+> The net-next tree needs it for BPF, correct?
 
-Signed-off-by: Vignesh Viswanathan <quic_viswanat@quicinc.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
----
- net/qrtr/af_qrtr.c | 5 +++++
- 1 file changed, 5 insertions(+)
+yes.
 
-diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-index 78beb74146e7..41ece61eb57a 100644
---- a/net/qrtr/af_qrtr.c
-+++ b/net/qrtr/af_qrtr.c
-@@ -23,6 +23,8 @@
- #define QRTR_EPH_PORT_RANGE \
- 		XA_LIMIT(QRTR_MIN_EPH_SOCKET, QRTR_MAX_EPH_SOCKET)
- 
-+#define QRTR_PORT_CTRL_LEGACY 0xffff
-+
- /**
-  * struct qrtr_hdr_v1 - (I|R)PCrouter packet header version 1
-  * @version: protocol version
-@@ -495,6 +497,9 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
- 		goto err;
- 	}
- 
-+	if (cb->dst_port == QRTR_PORT_CTRL_LEGACY)
-+		cb->dst_port = QRTR_PORT_CTRL;
-+
- 	if (!size || len != ALIGN(size, 4) + hdrlen)
- 		goto err;
- 
--- 
-2.41.0
+> So if you guys intend to
+> push it to mainline, I will be happy to drop if from -rcu.
 
+That's the intent. Please drop it from -rcu.
+Thank you!
 
