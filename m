@@ -1,178 +1,136 @@
-Return-Path: <netdev+bounces-17805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A1E75317D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:49:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1483753196
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:59:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF0CB2820A5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C94C282073
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF9A6AB8;
-	Fri, 14 Jul 2023 05:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BAF6ABB;
+	Fri, 14 Jul 2023 05:59:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8BD6AA4
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 05:49:17 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54F692123;
-	Thu, 13 Jul 2023 22:49:16 -0700 (PDT)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36E3RrXv017354;
-	Fri, 14 Jul 2023 05:49:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=YEvKqjFAdJD2n4b5sCv9GE47BLTIESk4XQOBmzcRYyE=;
- b=A/dJt6ihjUQGj39jCNyEL53PYcFem2qpO2HiCZfa+nZeCxLHUFlzhwY/L97j9G15YMHd
- BkxwNiqQJ7sL1Hfq7294rGqFJun1+Zbx5AIFZGqNfIv0IXBwZBspxqJ99ki1CQ+xddFY
- OJI5c97uIUURsDE2dKXjluYyzqLx/+ThhyRX+kJI8I2rb+0O5MzHYhpRbicDF0WX/Y3a
- scUuHZGGXnlMmGHvrAD5ihnuJV3KfFy2e11uE7YAiDaz6DGmg4SbYUcF5NhI8wtYOOoK
- cJs2gb5a5QpsD8gOnWFU3G8GU9Q9zw8lx55xBvHx0mRRypdPwLOdkwY+TojdhPMfX9jO uw== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rtpu90xyb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jul 2023 05:49:07 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36E5n5QA000314
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jul 2023 05:49:06 GMT
-Received: from [10.201.162.56] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Thu, 13 Jul
- 2023 22:49:01 -0700
-Message-ID: <a69a750a-884b-c60b-9d52-f4ae2cd1b2ea@quicinc.com>
-Date: Fri, 14 Jul 2023 11:18:58 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5096AB0
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 05:59:04 +0000 (UTC)
+Received: from sonic316-8.consmr.mail.gq1.yahoo.com (sonic316-8.consmr.mail.gq1.yahoo.com [98.137.69.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFCB330DF
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:58:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1689314339; bh=IucuZFC4twdSE0wiFurhHfuChGoft8hemvnGyTnB2oU=; h=From:Subject:Date:Cc:To:References:From:Subject:Reply-To; b=PkM+mJcvXPYLqS1Kb5QbjkNy8YUEYamtSmNGZ64qqE5wWhBieeCgvkN7lXldF6BnzbdZUJE3U9kYGoO3c5DaGdfXObdlRPULcVOgBym+/RyW8d1W2jcrDZWhbxguWQA3lkNHZ6aJFjvv+s/7NpAXuiZ61g0kKUOfnQgWg1x3AanYxg586ae7FYCWE/ZQ+5dqflxQ03HMQWKCjeJSjeUr9Uwd7geQ8stcnFEA49NXYWuxEZ8tCIZQAOHat8+ePuNm4Lhbs7bwmsfRMecMCez5i82U190PaDty9k6u8ihZWueH5Tsk2yRklNV1H4QcF7mYYLoycuLbNoIKmLUeUYfp1A==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1689314339; bh=gDJtLqCmwB/b5UnrUpzqw+I7MiQedvdQ1kpudJY+5Zi=; h=X-Sonic-MF:From:Subject:Date:To:From:Subject; b=HRLWvAw1CxOmKQ9Uq/QJg/hdj25Apcr78L9aBSRW9ByFfvCTCyf40oefrte2viTFOAMZA7ya7g9224Hd7heGjNPbcAo/PTPOYVQT4rInHQA+Tk42mVi+5O+pPxWKsFiHG/QxBHzDFfV0wsy9zkzhy7Zbo5W4cTF9QSDqcQJnJJHvs23ryQs5JWpAlNlvzvSnv1oSYfkqnDC9EP9shiWN96golhlX0CTaMI0l/1hEIh6x9S1KNhNZre2u8yhTRJQjqrewr1Le2Z+xZIHHOyc1B4N03kLMgKKXqIbT45RF7xzcLSKxCpBmsqB+KcApIQfqSEqr6W4wDNijDfRf9Ws7LA==
+X-YMail-OSG: 34PR9ggVM1leORt9Do80bJelaPt9qlzbqFreflBLXJYofAOjhSr0GDN6xjBj1uN
+ 6ZGx0sv4kDCrTeT7qwkCQqN.6c5IdGSobx1mpXu76yQSLfH6pZUSIrhgA9IQlff8NMBUJ5ddFeuq
+ k4D6H6SIpwUO9i9rrUH2vUEJu7R3xtvf.fY4Ppj6ykSZX.nmoFBnws.CG54dv1ZdWWcCDoOiXu3H
+ fUUijARxPFrgEFK3qFNygya.xCxGdOMrcGJtqZgincgFZOSYjrFhf0x80OEQFPgJvVG_trCZvfg6
+ GPJPrKLV6tWG1ve6RzywjyhQOUsQeGr2NEJmautxcjseG9x0bYGLLywzyz5M3DFsqTpjROBaWXkG
+ kEyhtEJI1q2fS3ITdikIOozGdTliZlE.iztUa3QcSnZGiYddGZlVAf3j3VipL1eI1pB8DzZGALir
+ Js4DK3bqbkedr7yFBH6T2qFhiMy_D9J_ewphiub3fTG6_VHvLg7MOKUG8CtqkRtGltlDfK6b1tJx
+ bPOROCtFMxpAjkNw7eGjSPKSLs.AYWDXoT7ekEO6ERO6uL8YvQbwEFHy1jwe1MMM2JXD50AAdZ4y
+ .h8UZ3Ed_pMTKebr70xIQ_ErgmVZ7Rj4DuwggJSTzBF0pNKAzOa4GoAK_RJZeWlv7wdQ2R7p9utP
+ vpheuMgaSH4P482BM4ZJ9Vg0oBe7rw1lNPUPtZS4TrhkwVTAPmb_V0Sm6CGAN3Z2bpIvMsVNY5gv
+ RU1mfEjuMK2kiEikBcMYd5vlwaE5QXMCZ.BWSM7fpCjMUGhY3E6jYFJcKKwk.saHyWmA7G5udox1
+ F86L6EmvUNfhXRCFRDZSSXbWWEVe41cpf5rNo4tFDUjRjmcqD2XQMmRerT8QT4I_HuCBct9RGcf2
+ lgsbrwrrPSGh6Xmkzg2_eT64zOvHmsDASDnSeZIdT1KGcOd2zJryON8Pb04egrE7pIEDKK0huvq.
+ Yl_xbQeB5yA2cogt9qT_hzrXTAUL0nVCfo1ESQ78zGr9XqfqVry8sw_M_8j2fnMFci5O7_h1NMBb
+ VZUZwyM7UKQmBzYAEYtcfodiToQ_RUTRBgNxTNoi2eWtC2Vw2CW_cp8ZaA1e81HcpdjUuAnbMxfe
+ lsyWWh0gbq2_PIodg6iOj0NDu11sVHFwlhrRF9CO8y5.BZcFRoKfS16_PX_t9PNuZEZcNbno_xtQ
+ PrQpPUYOxVWzjcc0BTmKTtvGHD7KOnrVEtQmTNl7kfMHAm1RVjy4etJrrIMAZW9Gheqt0kMwr8e8
+ PbbHkRtvTDJ5LO2ZzGAcTvqJg.5x3PTZyVY9dDcEV1cBJeeMHXj8pAnC0L9L05Ao4GZPAv6mc_Oa
+ PyC1XP0BzhOMvpkwDnwy.MkQiLOGwLYJ44BiRupIfjKCMnVPqIys3dbNCZp4Jbk0BeAE3vhgK2ZL
+ O2sCTQToFuFqulqf7Jv2Ou0xQZh2ApKrjyXjb.nL2hCrNn7jH8hCMtzFFGyq5oTY7ETfGkGx34HW
+ PFNIjiNKcYO.XrM5vjXlrlzeDg6.NmKGnnz__tkoHmgYaaX_g5lVBl0bTya2fBa_ZRXGn4bONb3L
+ x8VVmzQdE6LxAetwrLgwzQEUKQmmqyrSENvFZwubAlmbtGoIvri3xAiNb.0bwfqYS.jZ.UHnvfpH
+ _Nr8XrsYPlbRL6E0opC3CP7jWT82MVcr1OxWIoYAADNxcUuvV30lOaeaY.Z5R2bJ3y8prxr4TKdu
+ WwGamtdkyOHyuMaqpK2e.klGtSKHgIOJPFYfplIbikGoePbOKQksbOF.ec7RU3cKGxulYKSGSHy.
+ 16Awl6rC6g70JxzeoMzCPBWDb2FiUGWKMm5Rk1Sdu96aXlYJFDmM8CWNJ0e0mucInZMza14n1iQR
+ .IKD23pvjIvtpqujAt5ua2rk5hlWZoftjpqCMIfSFrJzeZCyP3EoB8jPJ0Pyio9FjgqjvN3J7siq
+ 7lG6EK7h_VcNM3fewKCfdtPvZa3JcMeYjWNcYSxE3_HzLoFtPGDoABc6EQic37gU_wV9rCwoynI3
+ 220NXzqtZdgYEijJEPSgG_QgFGYGeMPJuXs0mogVM2Bb1Aw3IpRxUjpH97FWnkazpGFelntF_AVY
+ 5ncY_RzQOqjKFYW8CnUMO_TmnDgNc.9VJGXZEu4uJ1N2r0JgYrSaUjDjtUj0px_f0pf0VOq0anAn
+ pD0wJuIuYm1df9sqQ6CdKQCFdHzHKIK0F6UXntFegYKjy3uWgdX8r1vpJJWhC5EGSkW2uKHuwkIj
+ eq60FWjZZUT3gnNVFjPeZvdUl3tCy3Dl5sZN2YjA-
+X-Sonic-MF: <astrajoan@yahoo.com>
+X-Sonic-ID: 1e113b65-0bf8-4b14-9874-4d35986be21d
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.gq1.yahoo.com with HTTP; Fri, 14 Jul 2023 05:58:59 +0000
+Received: by hermes--production-ne1-6d679867d5-v44lc (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID bbdd96f8525c35c4842d0f43644d9042;
+          Fri, 14 Jul 2023 05:58:55 +0000 (UTC)
+From: Astra Joan <astrajoan@yahoo.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH net-next 1/3] net: qrtr: ns: Change servers radix tree to
- xarray
-To: Simon Horman <simon.horman@corigine.com>
-CC: <mani@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>,
-        <quic_clew@quicinc.com>
-References: <20230712112631.3461793-1-quic_viswanat@quicinc.com>
- <20230712112631.3461793-2-quic_viswanat@quicinc.com>
- <ZLAQCTcRd2uoHE9i@corigine.com>
-Content-Language: en-US
-From: Vignesh Viswanathan <quic_viswanat@quicinc.com>
-In-Reply-To: <ZLAQCTcRd2uoHE9i@corigine.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: byorVKFOtfZqsdQH2xvNCFhM_ZQFCjny
-X-Proofpoint-ORIG-GUID: byorVKFOtfZqsdQH2xvNCFhM_ZQFCjny
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-14_02,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 mlxlogscore=924 clxscore=1011 adultscore=0 spamscore=0
- impostorscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307140053
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [PATCH] can: j1939: prevent deadlock by changing j1939_socks_lock
+ to rwlock
+Message-Id: <C29A816B-6E28-4A36-AE59-F446180C910B@yahoo.com>
+Date: Thu, 13 Jul 2023 22:58:42 -0700
+Cc: Astra Joan <astrajoan@yahoo.com>,
+ davem@davemloft.net,
+ Dmitry Vyukov <dvyukov@google.com>,
+ edumazet@google.com,
+ ivan.orlov0322@gmail.com,
+ kernel@pengutronix.de,
+ kuba@kernel.org,
+ linux-can@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux@rempel-privat.de,
+ mkl@pengutronix.de,
+ netdev@vger.kernel.org,
+ o.rempel@pengutronix.de,
+ pabeni@redhat.com,
+ robin@protonic.nl,
+ skhan@linuxfoundation.org,
+ socketcan@hartkopp.net,
+ syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com,
+ syzkaller@googlegroups.com
+To: stephen@networkplumber.org
+X-Mailer: Apple Mail (2.3731.600.7)
+References: <C29A816B-6E28-4A36-AE59-F446180C910B.ref@yahoo.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FAKE_REPLY_B,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Stephen,
 
+Thank you for your reply!
 
-On 7/13/2023 8:24 PM, Simon Horman wrote:
-> On Wed, Jul 12, 2023 at 04:56:29PM +0530, Vignesh Viswanathan wrote:
->> There is a use after free scenario while iterating through the servers
->> radix tree despite the ns being a single threaded process. This can
->> happen when the radix tree APIs are not synchronized with the
->> rcu_read_lock() APIs.
->>
->> Convert the radix tree for servers to xarray to take advantage of the
->> built in rcu lock usage provided by xarray.
->>
->> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
->> Signed-off-by: Vignesh Viswanathan <quic_viswanat@quicinc.com>
-> 
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> 
-> A few very minor nits below.
+Changing the lock sequence may be difficult here since the function
 
-Thanks Simon for the review. Will fix both the comments in V2.
+- j1939_sk_errqueue
 
-Thanks,
-Vignesh
-> 
-> ...
-> 
->> @@ -256,14 +240,17 @@ static struct qrtr_server *server_add(unsigned int service,
->>   		goto err;
->>   
->>   	/* Delete the old server on the same port */
->> -	old = radix_tree_lookup(&node->servers, port);
->> +	old = xa_store(&node->servers, port, srv, GFP_KERNEL);
->>   	if (old) {
->> -		radix_tree_delete(&node->servers, port);
->> -		kfree(old);
->> +		if (xa_is_err(old)) {
->> +			pr_err("failed to add server [0x%x:0x%x] ret:%d\n",
->> +				srv->service, srv->instance, xa_err(old));
-> 
-> The indentation of the line above is not correct.
-> It should be:
-> 
-> 			pr_err("failed to add server [0x%x:0x%x] ret:%d\n",
-> 			       srv->service, srv->instance, xa_err(old));
-> 
->> +			goto err;
->> +		} else {
->> +			kfree(old);
->> +		}
->>   	}
->>   
->> -	radix_tree_insert(&node->servers, port, srv);
->> -
->>   	trace_qrtr_ns_server_add(srv->service, srv->instance,
->>   				 srv->node, srv->port);
->>   
-> 
-> ...
-> 
->> @@ -576,13 +518,12 @@ static int ctrl_cmd_del_server(struct sockaddr_qrtr *from,
->>   static int ctrl_cmd_new_lookup(struct sockaddr_qrtr *from,
->>   			       unsigned int service, unsigned int instance)
->>   {
->> -	struct radix_tree_iter node_iter;
->>   	struct qrtr_server_filter filter;
->> -	struct radix_tree_iter srv_iter;
->>   	struct qrtr_lookup *lookup;
->>   	struct qrtr_node *node;
->> -	void __rcu **node_slot;
->> -	void __rcu **srv_slot;
->> +	struct qrtr_server *srv;
-> 
-> This breaks reverse xmas tree ordering of local variables.
-> The srv line should be directly above rather than below the node line.
-> 
->> +	unsigned long node_idx;
->> +	unsigned long srv_idx;
->>   
->>   	/* Accept only local observers */
->>   	if (from->sq_node != qrtr_ns.local_node)
-> 
-> ...
+has may call sites. However, this function attempts to hold the
+
+- j1939_socks_lock
+
+whose hierchy is pretty high in the given code logic. On the other hand,
+this function only reads from the
+
+- j1939_socks_list
+
+which the above lock protects against. Therefore, it seems appropriate to
+lock the above list inside the function for read access only.
+
+The RCU approach makes sense here, but I probably need to use RCU in
+conjunction with other spinlocks and rwlocks in the codebase. Would that
+be okay? If not, should I be looking into replacing all the locks with
+RCU? I'm actually a mentee for the bug fixing mentorship this summer.
+So please bear with me if some of these questions seem a bit naive :D
+Thank you so much for your time!
+
+Best regards,
+Ziqi
 
