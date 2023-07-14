@@ -1,148 +1,149 @@
-Return-Path: <netdev+bounces-17986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038C0753F80
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:06:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A876753FA8
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33AAF1C2145E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 16:06:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 541961C214C8
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 16:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F6415482;
-	Fri, 14 Jul 2023 16:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52AD15485;
+	Fri, 14 Jul 2023 16:12:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8036D521
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 16:06:33 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19AE535A4
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:06:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
-	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=1k5GroWq4JCpJQz7Xqh6qwVBRPC8oeGSG7kWkRzGWT4=; b=KG4Aa75e/6yy5taZ7i3d7bcLJS
-	05lY5mkAPtUaQBFxHv50OoSOxUqXDQ2WReZ1UeuEDfPwVNhtl+KDPGfgP3r+CWIZsdQ81mNmsP1M3
-	3WGkDT6YMqOAHEf0QYa5EmzNSUGacZRxixlvVVQ7oFgUlmNSb2Gw3o2S3dVQbhKObepbdPgY3So/f
-	kmoPRB1IaQcTz3eXssfojTSkt/2lgmm6m6PIfM5Y7r72AizHwm2hF2GhwNWTI8EZnqjeUAz6rmiqX
-	ODYiFKBkqO1ZJ4pVb19JW4mxzOOeP4GLH+kLFWRQO3SXvLQs42zVOnk1kb1kjDXX9TtJK7p0Imst9
-	OOleXz7A==;
-Received: from [192.168.1.4] (port=29409 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qKLJL-0000Qk-1M;
-	Fri, 14 Jul 2023 18:06:27 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Fri, 14 Jul 2023 18:06:26 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <netdev@vger.kernel.org>
-CC: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, Ante Knezic
-	<ante.knezic@helmholz.de>
-Subject: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Fri, 14 Jul 2023 18:06:12 +0200
-Message-ID: <20230714160612.11701-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CFB4C7D
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 16:12:55 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19E4A4227
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:12:27 -0700 (PDT)
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 963783F734
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 16:12:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1689351145;
+	bh=CwaSp74uZftYhoTLsMnm8U4NTHT3a9L0i+07xUPdu00=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID;
+	b=L3Ks7uE3keZzuwd4io+Rbk3aJyz4oJSetSXq520qTT9SFvuBxcVRa36h4mFY/1Qg6
+	 ff3KScB2Agpl4kvhCUK/KMTKjcA4JqUq+6aSD8iGcmnS3R3/H1WJWC3aiV+8ukt0Tq
+	 DzbsZboWFjNpgVRNQoNeHnFUKD71WsffLYZRd+GKnYPHoaJjFKNOza1SQWG7PsIUXI
+	 Dddfz6AqGKJ7Zian+n2k2CDyZrqmuJmWkxZvN7LvNgsz9N+c1NSmOooV4IKne285Tn
+	 G+2sQeN8fyCkZVQnZEaX8dXPmY36KT8Qi7wNMt6Lfq58Qlh6nyhNPf0R7jP4hmdq3C
+	 NLnDOlLacOFqw==
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1b89f6463deso15276145ad.1
+        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:12:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689351144; x=1691943144;
+        h=message-id:date:content-transfer-encoding:content-id:mime-version
+         :comments:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwaSp74uZftYhoTLsMnm8U4NTHT3a9L0i+07xUPdu00=;
+        b=Iqvhk6+uOi12wK3KjynDrUtDUHwrh8hDx+CVLIQMO3OfaYUppy+lITxrXT2fYmS5f3
+         rQB/+fKxOnbCZSeu84h/pP2aJ1kidh86dwchPfk44OPYDYmVt7009N/AnRm4kZOng7tn
+         PCP9LpdfLjAOAbpHP9odcWba3WEDFtF7PlX1ggAAAlyNEHF/J4uEKMHcc4Hpep1l8Pue
+         CPLYze4ie6KRv2SOMih6arBJTKI4nTGRvNPwcogyA7rOyZfpiyKwtfX78AIoRtzvHrRw
+         CNph/tkl03O3pmJ+o1CbQeSoejuwR9usntB21PXPrM7xbCvAKEuvJdJH++FFJ71xbvVO
+         zcfQ==
+X-Gm-Message-State: ABy/qLaS2a6tk2p+Fl1qb3KMatfcxP/jMaoGT3Di8Ov65EmjJl9QTXE1
+	hD5zlaIaWWKna4gPkTrWdU+iiUemOK3Sz+scnXUhU8GcMswjoddLIKa/iOAUFJjZYr+S1rc0SV1
+	15jL2f6CsmqG/Rxqhl5iqhSvgRpEj2kYGIg==
+X-Received: by 2002:a17:903:32c9:b0:1b8:9598:6508 with SMTP id i9-20020a17090332c900b001b895986508mr6807247plr.18.1689351143743;
+        Fri, 14 Jul 2023 09:12:23 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFepLrKkDT4u/qlVRlTziDggnm7/uTnrvyRnUgN69tZrzr6A0mZXP6lmaKx6mU0TCY3nHKpVA==
+X-Received: by 2002:a17:903:32c9:b0:1b8:9598:6508 with SMTP id i9-20020a17090332c900b001b895986508mr6807220plr.18.1689351143478;
+        Fri, 14 Jul 2023 09:12:23 -0700 (PDT)
+Received: from famine.localdomain ([50.125.80.253])
+        by smtp.gmail.com with ESMTPSA id b18-20020a170902d51200b001b895a18472sm7951284plg.117.2023.07.14.09.12.23
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Jul 2023 09:12:23 -0700 (PDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 9C68B5FEAC; Fri, 14 Jul 2023 09:12:22 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 948B99FABB;
+	Fri, 14 Jul 2023 09:12:22 -0700 (PDT)
+From: Jay Vosburgh <jay.vosburgh@canonical.com>
+To: Wang Ming <machel@vivo.com>
+cc: Andy Gospodarek <andy@greyhouse.net>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
+Subject: Re: [PATCH net v2] net: bonding: Remove error checking for debugfs_create_dir()
+In-reply-to: <20230714090856.11571-1-machel@vivo.com>
+References: <20230714090856.11571-1-machel@vivo.com>
+Comments: In-reply-to Wang Ming <machel@vivo.com>
+   message dated "Fri, 14 Jul 2023 17:08:42 +0800."
+X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3369.1689351142.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 14 Jul 2023 09:12:22 -0700
+Message-ID: <3370.1689351142@famine>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fixes XAUI/RXAUI lane alignment errors.
-Issue causes dropped packets when trying to communicate over
-fiber via SERDES lanes of port 9 and 10.
-Errata document applies only to 88E6190X and 88E6390X devices.
-Requires poking in undocumented registers.
+Wang Ming <machel@vivo.com> wrote:
 
-Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+>It is expected that most callers should _ignore_ the errors
+>return by debugfs_create_dir() in bond_debug_reregister().
+
+	Why should the error be ignored?  It's not a fatal error, in the
+sense that the bond itself should be unregistered, but I'm not sure why
+an error message that the debugfs registration failed is undesirable.
+
+	Also, the code in question is in bond_create_debugfs(), not
+bond_debug_reregister().  The diff below looks a bit odd in that the
+context line lists _reregister, but that's not the function being
+changed.
+
+	I thought the v1 patch was fine.
+
+	-J
+
+>Signed-off-by: Wang Ming <machel@vivo.com>
+>---
+> drivers/net/bonding/bond_debugfs.c | 3 ---
+> 1 file changed, 3 deletions(-)
+>
+>diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bon=
+d_debugfs.c
+>index 594094526648..a41f765420dc 100644
+>--- a/drivers/net/bonding/bond_debugfs.c
+>+++ b/drivers/net/bonding/bond_debugfs.c
+>@@ -87,9 +87,6 @@ void bond_debug_reregister(struct bonding *bond)
+> void bond_create_debugfs(void)
+> {
+> 	bonding_debug_root =3D debugfs_create_dir("bonding", NULL);
+>-
+>-	if (!bonding_debug_root)
+>-		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
+> }
+> =
+
+> void bond_destroy_debugfs(void)
+>-- =
+
+>2.25.1
+>
+
 ---
-V2 : Rework as suggested by Andrew Lunn <andrew@lun.ch> 
- * make int lanes[] const 
- * reorder prod_nums
- * update commit message to indicate we are dealing with
-   undocumented Marvell registers and magic values
----
- drivers/net/dsa/mv88e6xxx/serdes.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-index 80167d53212f..b36049595c6b 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.c
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-@@ -829,6 +829,37 @@ static int mv88e6390_serdes_enable_checker(struct mv88e6xxx_chip *chip, int lane
- 				      MV88E6390_PG_CONTROL, reg);
- }
- 
-+static int mv88e6390x_serdes_erratum_3_14(struct mv88e6xxx_chip *chip)
-+{
-+	const int lanes[] = { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
-+		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
-+		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
-+		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
-+	int err, i;
-+
-+	/* 88e6190x and 88e6390x errata 3.14:
-+	 * After chip reset, SERDES reconfiguration or SERDES core
-+	 * Software Reset, the SERDES lanes may not be properly aligned
-+	 * resulting in CRC errors
-+	 */
-+
-+	for (i = 0; i < ARRAY_SIZE(lanes); i++) {
-+		err = mv88e6390_serdes_write(chip, lanes[i],
-+					     MDIO_MMD_PHYXS,
-+					     0xf054, 0x400C);
-+		if (err)
-+			return err;
-+
-+		err = mv88e6390_serdes_write(chip, lanes[i],
-+					     MDIO_MMD_PHYXS,
-+					     0xf054, 0x4000);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- int mv88e6390_serdes_power(struct mv88e6xxx_chip *chip, int port, int lane,
- 			   bool up)
- {
-@@ -853,6 +884,12 @@ int mv88e6390_serdes_power(struct mv88e6xxx_chip *chip, int port, int lane,
- 	if (!err && up)
- 		err = mv88e6390_serdes_enable_checker(chip, lane);
- 
-+	if (!err && up) {
-+		if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
-+		    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
-+			err = mv88e6390x_serdes_erratum_3_14(chip);
-+	}
-+
- 	return err;
- }
- 
--- 
-2.11.0
-
+	-Jay Vosburgh, jay.vosburgh@canonical.com
 
