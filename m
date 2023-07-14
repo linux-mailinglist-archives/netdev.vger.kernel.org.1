@@ -1,43 +1,42 @@
-Return-Path: <netdev+bounces-18011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A677D754254
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:11:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF83754256
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:11:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC21C2821ED
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:11:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA9C61C21458
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 18:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D508215AD1;
-	Fri, 14 Jul 2023 18:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E584115ACA;
+	Fri, 14 Jul 2023 18:10:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6166B15AC0
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 18:10:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96005C433C8;
-	Fri, 14 Jul 2023 18:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7221F931
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 18:10:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1272CC433C7;
+	Fri, 14 Jul 2023 18:10:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689358251;
-	bh=nIwnDpeLNNXqIqXQ2IZyBusc1AZA0y1HhYlRmT4gqbU=;
+	s=k20201202; t=1689358258;
+	bh=bxTAZ0rCFm1dsqjLX5lA1j5rbtFHpQAZvI1adKlXSo0=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=RKQeX5dxvCCGQHXzqHhU19LZik+aQZE7pEZpcPOXKOHmH7N2TE3kGiUciP9me5S0D
-	 vZMSdHLNslH3xWr/iRDn4C84pBp78bAJcA/YTyG86e+AHVYjrQ06HD8F7h1qedu+15
-	 QCcunZPq57zIDmewUGTIrhcJu0daitKDYJ1w5xjKDMpPl+TPFD16sH7svKHgYThFdR
-	 e31pkypO5soEC99rc4Fw0lp6UO+n6z7Jf0c8ddoj2U44LsKB8Gphufq5PRPTHGMFdi
-	 UVT1Gv+uI6OmO4I9DKO78aV9dWapHv1e9IoHNXKqBAYuzBsxet7CEuv+PmR6hQ5xjn
-	 yQ7XcwEGUTMIg==
-Subject: [PATCH v2 3/4] SUNRPC: Convert svc_udp_sendto() to use the per-socket
- bio_vec array
+	b=ozgRLv466jxGoGME6dN6gOohalvCaZCxpcqp4/qBQfhgKuBUEM5zcgjdfbq1XQg5e
+	 NmsVM+37aQwGegDpvxIZWyMQbL7Djz6REMqNZcxi3XDPx1gVBYyVjzHi9VK91lugx0
+	 iDzhmg/M/pm2Q1XfIz2PTGcvrbktwtbsFcicZAIx8L2wneqOgmbcPOWNBGOUuW+/KX
+	 x7++FCib52tddkhe2iRa0ZU0MFL7ITLoIpEYOiStb69B/6Vrs9jb0nawn5iCPhY3RV
+	 pe0p5iKLCTdtkbI3OeP7SwgQ8N3ZpqpJnyn1G4rIHdqmm3q3X3MpaTn8+Q3Lj0IXYn
+	 5C4d7WZSOU+tg==
+Subject: [PATCH v2 4/4] SUNRPC: Use a per-transport receive bio_vec array
 From: Chuck Lever <cel@kernel.org>
 To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org
 Cc: Chuck Lever <chuck.lever@oracle.com>, dhowells@redhat.com
-Date: Fri, 14 Jul 2023 14:10:50 -0400
+Date: Fri, 14 Jul 2023 14:10:57 -0400
 Message-ID: 
- <168935825062.1984.15414767603272782406.stgit@manet.1015granger.net>
+ <168935825709.1984.4898358403212846149.stgit@manet.1015granger.net>
 In-Reply-To: 
  <168935791041.1984.13295336680505732841.stgit@manet.1015granger.net>
 References: 
@@ -54,72 +53,55 @@ Content-Transfer-Encoding: 7bit
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-Commit da1661b93bf4 ("SUNRPC: Teach server to use xprt_sock_sendmsg
-for socket sends") modified svc_udp_sendto() to use xprt_sock_sendmsg()
-because we originally believed xprt_sock_sendmsg() would be needed
-for TLS support. That does not actually appear to be the case.
-
-In addition, the linkage between the client and server send code has
-been a bit of a maintenance headache because of the distinct ways
-that the client and server handle memory allocation.
-
-Going forward, eventually the XDR layer will deal with its buffers
-in the form of bio_vec arrays, so convert this function accordingly.
-Once the use of bio_vecs is ubiquitous, the xdr_buf-to-bio_vec array
-code can be hoisted into a path that is common for all transports.
+TCP receives are serialized, so we need only one bio_vec array per
+socket. This shrinks the size of struct svc_rqst by 4144 bytes on
+x86_64.
 
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/sunrpc/svcsock.c |   23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ include/linux/sunrpc/svc.h     |    1 -
+ include/linux/sunrpc/svcsock.h |    2 ++
+ net/sunrpc/svcsock.c           |    2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
+index f8751118c122..36052188222d 100644
+--- a/include/linux/sunrpc/svc.h
++++ b/include/linux/sunrpc/svc.h
+@@ -224,7 +224,6 @@ struct svc_rqst {
+ 
+ 	struct folio_batch	rq_fbatch;
+ 	struct kvec		rq_vec[RPCSVC_MAXPAGES]; /* generally useful.. */
+-	struct bio_vec		rq_bvec[RPCSVC_MAXPAGES];
+ 
+ 	__be32			rq_xid;		/* transmission id */
+ 	u32			rq_prog;	/* program number */
+diff --git a/include/linux/sunrpc/svcsock.h b/include/linux/sunrpc/svcsock.h
+index baea012e3b04..55446136499f 100644
+--- a/include/linux/sunrpc/svcsock.h
++++ b/include/linux/sunrpc/svcsock.h
+@@ -42,6 +42,8 @@ struct svc_sock {
+ 
+ 	struct completion	sk_handshake_done;
+ 
++	struct bio_vec		sk_recv_bvec[RPCSVC_MAXPAGES]
++						____cacheline_aligned;
+ 	struct bio_vec		sk_send_bvec[RPCSVC_MAXPAGES]
+ 						____cacheline_aligned;
+ 
 diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index bb185c0bb57c..e164ea4d0e0a 100644
+index e164ea4d0e0a..5cbc35e23e4f 100644
 --- a/net/sunrpc/svcsock.c
 +++ b/net/sunrpc/svcsock.c
-@@ -695,7 +695,7 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 		.msg_control	= cmh,
- 		.msg_controllen	= sizeof(buffer),
- 	};
--	unsigned int sent;
-+	unsigned int count;
- 	int err;
- 
- 	svc_udp_release_ctxt(xprt, rqstp->rq_xprt_ctxt);
-@@ -708,22 +708,23 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 	if (svc_xprt_is_dead(xprt))
- 		goto out_notconn;
- 
--	err = xdr_alloc_bvec(xdr, GFP_KERNEL);
--	if (err < 0)
--		goto out_unlock;
-+	count = xdr_buf_to_bvec(svsk->sk_send_bvec,
-+				ARRAY_SIZE(svsk->sk_send_bvec), xdr);
- 
--	err = xprt_sock_sendmsg(svsk->sk_sock, &msg, xdr, 0, 0, &sent);
-+	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_send_bvec,
-+		      count, 0);
-+	err = sock_sendmsg(svsk->sk_sock, &msg);
- 	if (err == -ECONNREFUSED) {
- 		/* ICMP error on earlier request. */
--		err = xprt_sock_sendmsg(svsk->sk_sock, &msg, xdr, 0, 0, &sent);
-+		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_send_bvec,
-+			      count, 0);
-+		err = sock_sendmsg(svsk->sk_sock, &msg);
- 	}
--	xdr_free_bvec(xdr);
-+
- 	trace_svcsock_udp_send(xprt, err);
--out_unlock:
-+
- 	mutex_unlock(&xprt->xpt_mutex);
--	if (err < 0)
--		return err;
--	return sent;
-+	return err;
- 
- out_notconn:
- 	mutex_unlock(&xprt->xpt_mutex);
+@@ -299,7 +299,7 @@ static ssize_t svc_tcp_read_msg(struct svc_rqst *rqstp, size_t buflen,
+ {
+ 	struct svc_sock *svsk =
+ 		container_of(rqstp->rq_xprt, struct svc_sock, sk_xprt);
+-	struct bio_vec *bvec = rqstp->rq_bvec;
++	struct bio_vec *bvec = svsk->sk_recv_bvec;
+ 	struct msghdr msg = { NULL };
+ 	unsigned int i;
+ 	ssize_t len;
 
 
 
