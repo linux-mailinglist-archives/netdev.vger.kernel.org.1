@@ -1,209 +1,98 @@
-Return-Path: <netdev+bounces-17978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A684753ED6
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 17:28:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44ECB753EE6
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 17:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AF841C2141C
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 15:28:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A22280C20
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 15:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927CA14287;
-	Fri, 14 Jul 2023 15:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCADB14A8D;
+	Fri, 14 Jul 2023 15:31:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A8E14264
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 15:27:58 +0000 (UTC)
-Received: from aposti.net (aposti.net [89.234.176.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB7C269F;
-	Fri, 14 Jul 2023 08:27:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crapouillou.net;
-	s=mail; t=1689348473;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4pIC2EQa0W5UA2DBrmWwQ0ZJQKXPUNXc31P2C1+6Z48=;
-	b=HIY1fXnAna2ilYcIaCpn6E4mJP0saT6co1mxHMQVB7aPVAuNptK6OitT18L0gyQ0WZuYP2
-	iloDMDPV3v7X8djbH9/Jiw8GxvaaAtVoi/Nv5l7VGO/0UWMqPiIGE+1fRr2QOgJBmMxj1y
-	/tfXW8V7L1g3zjW6enMKEhOGt98uf6Q=
-Message-ID: <b5647c230e4e2c473dc0ed66390301fafa561911.camel@crapouillou.net>
-Subject: Re: [PATCH 3/3] dt-bindings: net: davicom,dm9000: convert to DT
- schema
-From: Paul Cercueil <paul@crapouillou.net>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Rob Herring
- <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Marek Vasut
- <marex@denx.de>,  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-Date: Fri, 14 Jul 2023 17:27:51 +0200
-In-Reply-To: <20230713152848.82752-4-krzysztof.kozlowski@linaro.org>
-References: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
-	 <20230713152848.82752-4-krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493BB13715;
+	Fri, 14 Jul 2023 15:31:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3456C433C8;
+	Fri, 14 Jul 2023 15:31:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689348715;
+	bh=BZibhodv9mYmaldbAkgC6exLTG1CjJoX1GGScEeSuPM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N91TO1CpOC+GYb1J5AVvBZ4SEETH5c6ITsflBdSVxRrRgN5royAaRkjJFJ5WLvSR1
+	 yWkBe6A+zdU1O3I48jNA8lyBing3UjX98V0DzZ5yUTFFIG1mopqeLRPTOOY0j5VhC3
+	 rJJb/aS9XZ0LIMEsqnRWLhpEDD1PVYaPyvhWjrjCvcGryh4gH0RpdCef8J37/LMH+h
+	 3jl4CdBClXEDmz8YEujAVdU3GmjOC+3rmFUCZq8iscRzaJC/gC9rUHkA/OPc7zln29
+	 1lH472s0k0wXWEXKI4+wsqrwihiStNk5DrLK6ChTZUkDI2AI2NXBFC3YL3YFeXIn6K
+	 IN+0RQXfsh6+g==
+Date: Fri, 14 Jul 2023 08:31:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>, brouer@redhat.com,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>, Paul Rosswurm
+ <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>, Long Li
+ <longli@microsoft.com>, "ssengar@linux.microsoft.com"
+ <ssengar@linux.microsoft.com>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "daniel@iogearbox.net"
+ <daniel@iogearbox.net>, "john.fastabend@gmail.com"
+ <john.fastabend@gmail.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "ast@kernel.org" <ast@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>,
+ "hawk@kernel.org" <hawk@kernel.org>, "tglx@linutronix.de"
+ <tglx@linutronix.de>, "shradhagupta@linux.microsoft.com"
+ <shradhagupta@linux.microsoft.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH net-next] net: mana: Add page pool for RX buffers
+Message-ID: <20230714083152.3f64d38a@kernel.org>
+In-Reply-To: <3b043a95-a4bc-bbaf-c8e0-240e8ddea62f@redhat.com>
+References: <1689259687-5231-1-git-send-email-haiyangz@microsoft.com>
+	<20230713205326.5f960907@kernel.org>
+	<85bfa818-6856-e3ea-ef4d-16646c57d1cc@redhat.com>
+	<PH7PR21MB31166EF9DB2F453999D2E92ECA34A@PH7PR21MB3116.namprd21.prod.outlook.com>
+	<3b043a95-a4bc-bbaf-c8e0-240e8ddea62f@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Krzysztof,
+On Fri, 14 Jul 2023 15:13:15 +0200 Jesper Dangaard Brouer wrote:
+> > Thank Jakub and Jesper for the reviews.
+> > I'm aware of the page_pool.rst doc, and actually tried it before this
+> > patch, but I got lower perf. If I understand correctly, we should call
+> > page_pool_release_page() before passing the SKB to napi_gro_receive().
+> > 
+> > I found the page_pool_dev_alloc_pages() goes through the slow path,
+> > because the page_pool_release_page() let the page leave the pool.
+> > 
+> > Do we have to call page_pool_release_page() before passing the SKB
+> > to napi_gro_receive()? Any better way to recycle the pages from the
+> > upper layer of non-XDP case?
+> >   
+> 
+> Today SKB "upper layers" can recycle page_pool backed packet data/page.
+> 
+> Just use skb_mark_for_recycle(skb), then you don't need 
+> page_pool_release_page().
+> 
+> I guess, we should update the documentation, mentioning this.
 
-Le jeudi 13 juillet 2023 =C3=A0 17:28 +0200, Krzysztof Kozlowski a =C3=A9cr=
-it=C2=A0:
-> Convert the Davicom DM9000 Fast Ethernet Controller bindings to DT
-> schema.
->=20
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
-> =C2=A0.../bindings/net/davicom,dm9000.yaml=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 59
-> +++++++++++++++++++
-> =C2=A0.../bindings/net/davicom-dm9000.txt=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 27 ---------
-> =C2=A02 files changed, 59 insertions(+), 27 deletions(-)
-> =C2=A0create mode 100644
-> Documentation/devicetree/bindings/net/davicom,dm9000.yaml
-> =C2=A0delete mode 100644 Documentation/devicetree/bindings/net/davicom-
-> dm9000.txt
->=20
-> diff --git
-> a/Documentation/devicetree/bindings/net/davicom,dm9000.yaml
-> b/Documentation/devicetree/bindings/net/davicom,dm9000.yaml
-> new file mode 100644
-> index 000000000000..66a7c6eec767
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/davicom,dm9000.yaml
-> @@ -0,0 +1,59 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/davicom,dm9000.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Davicom DM9000 Fast Ethernet Controller
-> +
-> +maintainers:
-> +=C2=A0 - Paul Cercueil <paul@crapouillou.net>
-
-Did you decide that by yourself? :)
-
-I do have one of these on my MIPS CI20 board, so I'm fine with
-maintaining it - but a head's up would have been nice.
-
-Cheers,
--Paul
-
-> +
-> +properties:
-> +=C2=A0 compatible:
-> +=C2=A0=C2=A0=C2=A0 const: davicom,dm9000
-> +
-> +=C2=A0 reg:
-> +=C2=A0=C2=A0=C2=A0 items:
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - description: Address registers
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - description: Data registers
-> +
-> +=C2=A0 interrupts:
-> +=C2=A0=C2=A0=C2=A0 maxItems: 1
-> +
-> +=C2=A0 davicom,no-eeprom:
-> +=C2=A0=C2=A0=C2=A0 type: boolean
-> +=C2=A0=C2=A0=C2=A0 description: Configuration EEPROM is not available
-> +
-> +=C2=A0 davicom,ext-phy:
-> +=C2=A0=C2=A0=C2=A0 type: boolean
-> +=C2=A0=C2=A0=C2=A0 description: Use external PHY
-> +
-> +=C2=A0 reset-gpios:
-> +=C2=A0=C2=A0=C2=A0 maxItems: 1
-> +
-> +=C2=A0 vcc-supply: true
-> +
-> +required:
-> +=C2=A0 - compatible
-> +=C2=A0 - reg
-> +=C2=A0 - interrupts
-> +
-> +allOf:
-> +=C2=A0 - $ref: /schemas/memory-controllers/mc-peripheral-props.yaml#
-> +=C2=A0 - $ref: /schemas/net/ethernet-controller.yaml#
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +=C2=A0 - |
-> +=C2=A0=C2=A0=C2=A0 #include <dt-bindings/interrupt-controller/irq.h>
-> +
-> +=C2=A0=C2=A0=C2=A0 ethernet@a8000000 {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible =3D "davicom,dm900=
-0";
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg =3D <0xa8000000 0x2>, <0x=
-a8000002 0x2>;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 interrupt-parent =3D <&gph1>;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 interrupts =3D <1 IRQ_TYPE_LE=
-VEL_HIGH>;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local-mac-address =3D [00 00 =
-de ad be ef];
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 davicom,no-eeprom;
-> +=C2=A0=C2=A0=C2=A0 };
-> diff --git a/Documentation/devicetree/bindings/net/davicom-dm9000.txt
-> b/Documentation/devicetree/bindings/net/davicom-dm9000.txt
-> deleted file mode 100644
-> index 64c159e9cbf7..000000000000
-> --- a/Documentation/devicetree/bindings/net/davicom-dm9000.txt
-> +++ /dev/null
-> @@ -1,27 +0,0 @@
-> -Davicom DM9000 Fast Ethernet controller
-> -
-> -Required properties:
-> -- compatible =3D "davicom,dm9000";
-> -- reg : physical addresses and sizes of registers, must contain 2
-> entries:
-> -=C2=A0=C2=A0=C2=A0 first entry : address register,
-> -=C2=A0=C2=A0=C2=A0 second entry : data register.
-> -- interrupts : interrupt specifier specific to interrupt controller
-> -
-> -Optional properties:
-> -- davicom,no-eeprom : Configuration EEPROM is not available
-> -- davicom,ext-phy : Use external PHY
-> -- reset-gpios : phandle of gpio that will be used to reset chip
-> during probe
-> -- vcc-supply : phandle of regulator that will be used to enable
-> power to chip
-> -
-> -Example:
-> -
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ethernet@18000000 {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0compatible =3D "davicom,dm9000";
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0reg =3D <0x18000000 0x2 0x18000004 0x2>;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0interrupt-parent =3D <&gpn>;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0interrupts =3D <7 4>;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0local-mac-address =3D [00 00 de ad be ef];
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0davicom,no-eeprom;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0reset-gpios =3D <&gpf 12 GPIO_ACTIVE_LOW>;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0vcc-supply =3D <&eth0_power>;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0};
-
+Ah, I should probably send in the few cleanups form the huge page
+series. It looks like all users of page_pool_release_page() can
+be converted to skb recycling, so we should hide it and remove 
+from docs?
 
