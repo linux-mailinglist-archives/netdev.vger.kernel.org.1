@@ -1,198 +1,106 @@
-Return-Path: <netdev+bounces-18030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0740A7543AF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:20:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CC7C7543C9
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B65302817FF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F02D02822B0
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE3F2416B;
-	Fri, 14 Jul 2023 20:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE995396;
+	Fri, 14 Jul 2023 20:33:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12D620F96
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:20:23 +0000 (UTC)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B005730E3
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 13:20:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689366019; x=1720902019;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=NDPaLdOJY101OU8vWUEpzg+kmqNoxhzLdZ1gJwb+We8=;
-  b=aJfcmkHMK9afKjYSv4xZyvcPX0XKCMWxY/yUcB/UV9OQUOACoB8kMtqR
-   SgtjTObFWzh6HtACpP7+4yAHOfuiiOzi329N0/j/xlZIFWV+zJJn1Q1LG
-   /FXtVnn9G04LyUdSiL4m1dQXVoK2rBxb9ItHPkQo8pvCFZWBHI9kB5td9
-   0PPCM6uqVUjLEJdAklp42lNMZPHuk+CQ8RXCgufKwcpR6ma2rK3eU44HF
-   yRDxI5nDd/jnrHY3RhapfEoDoDDxseB9aYFTNPH3WmthRAa0veODLAY2Q
-   31znz3LGfiWcmE/LBYNFScdoQXbN5MziWjY4V/yc05NCgBjT3Kn/ppEx1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="345880078"
-X-IronPort-AV: E=Sophos;i="6.01,206,1684825200"; 
-   d="scan'208";a="345880078"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 13:20:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="836165376"
-X-IronPort-AV: E=Sophos;i="6.01,206,1684825200"; 
-   d="scan'208";a="836165376"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga002.fm.intel.com with ESMTP; 14 Jul 2023 13:20:18 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
-	anthony.l.nguyen@intel.com,
-	sasha.neftin@intel.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net-next] igc: Add TransmissionOverrun counter
-Date: Fri, 14 Jul 2023 13:14:28 -0700
-Message-Id: <20230714201428.1718097-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A60D2C80
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:33:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D54EC433C7;
+	Fri, 14 Jul 2023 20:33:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689366783;
+	bh=9pGg3qyIGxatEvYm6yxtfAAd27EdipAQ1cH7dSmgeMM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ygq30yvC0f0SxWXbgbjuMKZb/8kotawzXKFrt9a0lI6H1XCoqehq0QMDqaFBcxWQG
+	 tmACzFSZS/EkCh1P88uYyPKIXcX1qoikj6h0/7mh/W41fBfWNyEAm/IKbPnLB0KzD3
+	 LHBPzSc1lwfC5GOaS7gWgb/QcxZqwl9dWUnuTxX/SQyBrmTeYtiXV0tNMgPjhKlZ3x
+	 ipDmH8S06SW+32sUDDwGNyAJYT1dk6EOTUh9PHj6ThpPsdDe2UBAN7OFIEjmFQUMW9
+	 yC46Tjom+ylYn32U5ckpWTSpTOWN5SUD5KykoT1nbJu7sVokF7eaVeqednFyfG1orC
+	 hSVJbC0KEl7Aw==
+Date: Fri, 14 Jul 2023 23:32:58 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
+ modify rule destination
+Message-ID: <20230714203258.GL41919@unreal>
+References: <5fd15672173653d6904333ef197b605b0644e205.1689064922.git.leonro@nvidia.com>
+ <20230712173259.4756fe08@kernel.org>
+ <20230713063345.GG41919@unreal>
+ <20230713100401.5fe0fa77@kernel.org>
+ <20230713174317.GH41919@unreal>
+ <20230713110556.682d21ba@kernel.org>
+ <20230713185833.GI41919@unreal>
+ <20230713201727.6dfe7549@kernel.org>
+ <20230714184013.GJ41919@unreal>
+ <20230714121633.18d19c4c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714121633.18d19c4c@kernel.org>
 
-From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+On Fri, Jul 14, 2023 at 12:16:33PM -0700, Jakub Kicinski wrote:
+> On Fri, 14 Jul 2023 21:40:13 +0300 Leon Romanovsky wrote:
+> > > > In theory, we support any order, but in real life I don't think that TC
+> > > > before IPsec is really valuable.  
+> > > 
+> > > I asked the question poorly. To clearer, you're saying that:
+> > > 
+> > > a)  host <-> TC <-> IPsec <-> "wire"/switch
+> > >   or
+> > > b)  host <-> IPsec <-> TC <-> "wire"/switch
+> > > 
+> > > ?  
+> > 
+> > It depends on configuration order, if user configures TC first, it will
+> > be a), if he/she configures IPsec first, it will be b).
+> > 
+> > I just think that option b) is really matters.
+> 
+> And only b) matches what happens in the kernel with policy based IPsec,
+> right? 
 
-Add TransmissionOverrun as per defined by IEEE 802.1Q Bridges.
-TransmissionOverrun counter shall be incremented if the implementation
-detects that a frame from a given queue is still being transmitted by
-the MAC when that gate-close event for that queue occurs.
+Can you please clarify what do you mean "policy based IPsec"?
 
-This counter is utilised by the Certification conformance test to
-inform the user application whether any packets are currently being
-transmitted on a particular queue during a gate-close event.
+> So can we reject a) from happening? 
 
-Intel Discrete I225/I226 have a mechanism to not transmit a packets if
-the gate open time is insufficient for the packet transmission by setting
-the Strict_End bit. Thus, it is expected for this counter to be always
-zero at this moment.
+Technically yes.
 
-Inspired from enetc_taprio_stats() and enetc_taprio_queue_stats(), now
-driver also report the tx_overruns counter per traffic class.
+> IIUC what you're saying -
+> the result depending on order of configuration may be a major source
+> of surprises / hard to debug problems for the user.
 
-User can get this counter by using below command:
-1) tc -s qdisc show dev <interface> root
-2) tc -s class show dev <interface>
+When I reviewed patches, I came exactly to an opposite conclusion :)
 
-Test Result (Before):
-class mq :1 root
- Sent 1289 bytes 20 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-class mq :2 root
- Sent 124 bytes 2 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-class mq :3 root
- Sent 46028 bytes 86 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-class mq :4 root
- Sent 2596 bytes 14 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
+My rationale was that users who configure IPsec and TC are advanced
+users who knows their data flow and if they find a) option valuable,
+they can do it.
 
-Test Result (After):
-class taprio 100:1 root
- Sent 8491 bytes 38 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
- Transmit overruns: 0
-class taprio 100:2 root
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
- Transmit overruns: 0
-class taprio 100:3 root
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
- Transmit overruns: 0
-class taprio 100:4 root
- Sent 994 bytes 11 pkt (dropped 0, overlimits 0 requeues 1)
- backlog 0b 0p requeues 1
- Transmit overruns: 0
+For example, a) allows to limit amount of data sent to IPsec engine.
 
-Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 35 +++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 3 deletions(-)
+I believe both a) and b) should be supported.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 9f93f0f4f752..ddb4386c00cc 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6115,6 +6115,26 @@ static int igc_tsn_clear_schedule(struct igc_adapter *adapter)
- 	return 0;
- }
- 
-+static void igc_taprio_stats(struct net_device *dev,
-+			     struct tc_taprio_qopt_stats *stats)
-+{
-+	/* When Strict_End is enabled, the tx_overruns counter
-+	 * will always be zero.
-+	 */
-+	stats->tx_overruns = 0;
-+}
-+
-+static void igc_taprio_queue_stats(struct net_device *dev,
-+				   struct tc_taprio_qopt_queue_stats *queue_stats)
-+{
-+	struct tc_taprio_qopt_stats *stats = &queue_stats->stats;
-+
-+	/* When Strict_End is enabled, the tx_overruns counter
-+	 * will always be zero.
-+	 */
-+	stats->tx_overruns = 0;
-+}
-+
- static int igc_save_qbv_schedule(struct igc_adapter *adapter,
- 				 struct tc_taprio_qopt_offload *qopt)
- {
-@@ -6125,11 +6145,20 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
- 	size_t n;
- 	int i;
- 
--	if (qopt->cmd == TAPRIO_CMD_DESTROY)
-+	switch (qopt->cmd) {
-+	case TAPRIO_CMD_REPLACE:
-+		break;
-+	case TAPRIO_CMD_DESTROY:
- 		return igc_tsn_clear_schedule(adapter);
--
--	if (qopt->cmd != TAPRIO_CMD_REPLACE)
-+	case TAPRIO_CMD_STATS:
-+		igc_taprio_stats(adapter->netdev, &qopt->stats);
-+		return 0;
-+	case TAPRIO_CMD_QUEUE_STATS:
-+		igc_taprio_queue_stats(adapter->netdev, &qopt->queue_stats);
-+		return 0;
-+	default:
- 		return -EOPNOTSUPP;
-+	}
- 
- 	if (qopt->base_time < 0)
- 		return -ERANGE;
--- 
-2.38.1
-
+Thanks
 
