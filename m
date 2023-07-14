@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-17773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA21C753046
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:00:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D71875304C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96038280354
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:00:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDA8228076A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E7046AB;
-	Fri, 14 Jul 2023 04:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0A15224;
+	Fri, 14 Jul 2023 04:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BCE4A11
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 04:00:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D7F63C433C9;
-	Fri, 14 Jul 2023 04:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C174A2C;
+	Fri, 14 Jul 2023 04:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 988B2C433D9;
+	Fri, 14 Jul 2023 04:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689307220;
-	bh=sEiLPb6g0aGjWGK0/UMQFIfMD96QRvgmebAcFFHQWbY=;
+	s=k20201202; t=1689307223;
+	bh=6bPJwDcuSz1rKBjG/24ejrCn4JBeXx8kMtEpTwCEv2U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JisSJ5yxoaLHl3M0MwghbeR6pZorQ+naYYddq1MVDLpe3kQMOCdoGb+xprJcuSZYb
-	 czsEbeyk2P/A48VscQjKv87Po9SuxjDxbsY0kYOnMi+ahiGMdKspDkOgPihxpwc6Mi
-	 WizyVgw95Tp/45MCJGnza4osXEc/QmVsBNs825LaCXONoiVKxC/UO9ENoj7G3Z/gaW
-	 4N8MfsP2pQOhmpoLMOInrVCJmYrR4XKc4zFAySqVmlUPrbM5AfFL40HbOaMqTVtj6m
-	 vdhsE/Nha7fuFhxHvK0MnztL4XUsA1LZDAJnWw7MK6xwFmaSqt7hUCNDB/A23AznOf
-	 kYn58+vY+8mSg==
+	b=AAU+8ZLPWahRElzfzmALzyJASlYHee9u0PGrejGSQIwx5fo25CRbvg4uxgfJ6rEqf
+	 RXL16BSxfG7kART5wIhq3dxChc2wTsmVl1yAfGiMPHb3codCrZYAX0ElN6vp+qwTlM
+	 O/vWd7nokniqxUVN2Ve9HbEZl610bfjNAMMvnbqt2xq+i5O76kpNZjvj4blQKgYT4z
+	 xiCmnj/LiVwqBddhhniXy5srW7jbbEpN2AvTNNC3bXILfPUCFP+EJAqvSCiergccsW
+	 YS5ywkC9aI11si9SNweKTYwHKYWoz4FVlUcu8tkTNN1QQy1gCJ2Y42r2IpQiHzb2Wk
+	 Bu54B8qkv5xRg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C00E2E29F45;
-	Fri, 14 Jul 2023 04:00:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7FF81E29F45;
+	Fri, 14 Jul 2023 04:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,57 +41,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: usbnet: Fix WARNING in
- usbnet_start_xmit/usb_submit_urb
+Subject: Re: [PATCH net-next v3 00/12] net: stmmac: replace boolean fields in
+ plat_stmmacenet_data with flags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168930722078.11211.17894680146501945080.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Jul 2023 04:00:20 +0000
-References: <ea152b6d-44df-4f8a-95c6-4db51143dcc1@rowland.harvard.edu>
-In-Reply-To: <ea152b6d-44df-4f8a-95c6-4db51143dcc1@rowland.harvard.edu>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: davem@davemloft.net, kuba@kernel.org, oneukum@suse.com,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org
+ <168930722351.11211.15860000420900768155.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Jul 2023 04:00:23 +0000
+References: <20230710090001.303225-1-brgl@bgdev.pl>
+In-Reply-To: <20230710090001.303225-1-brgl@bgdev.pl>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ vkoul@kernel.org, bhupesh.sharma@linaro.org, wens@csie.org,
+ jernej.skrabec@gmail.com, samuel@sholland.org, thierry.reding@gmail.com,
+ jonathanh@nvidia.com, richardcochran@gmail.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, bartosz.golaszewski@linaro.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 12 Jul 2023 10:15:10 -0400 you wrote:
-> The syzbot fuzzer identified a problem in the usbnet driver:
+On Mon, 10 Jul 2023 10:59:49 +0200 you wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> usb 1-1: BOGUS urb xfer, pipe 3 != type 1
-> WARNING: CPU: 0 PID: 754 at drivers/usb/core/urb.c:504 usb_submit_urb+0xed6/0x1880 drivers/usb/core/urb.c:504
-> Modules linked in:
-> CPU: 0 PID: 754 Comm: kworker/0:2 Not tainted 6.4.0-rc7-syzkaller-00014-g692b7dc87ca6 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-> Workqueue: mld mld_ifc_work
-> RIP: 0010:usb_submit_urb+0xed6/0x1880 drivers/usb/core/urb.c:504
-> Code: 7c 24 18 e8 2c b4 5b fb 48 8b 7c 24 18 e8 42 07 f0 fe 41 89 d8 44 89 e1 4c 89 ea 48 89 c6 48 c7 c7 a0 c9 fc 8a e8 5a 6f 23 fb <0f> 0b e9 58 f8 ff ff e8 fe b3 5b fb 48 81 c5 c0 05 00 00 e9 84 f7
-> RSP: 0018:ffffc9000463f568 EFLAGS: 00010086
-> RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-> RDX: ffff88801eb28000 RSI: ffffffff814c03b7 RDI: 0000000000000001
-> RBP: ffff8881443b7190 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000003
-> R13: ffff88802a77cb18 R14: 0000000000000003 R15: ffff888018262500
-> FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000556a99c15a18 CR3: 0000000028c71000 CR4: 0000000000350ef0
-> Call Trace:
->  <TASK>
->  usbnet_start_xmit+0xfe5/0x2190 drivers/net/usb/usbnet.c:1453
->  __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4932 [inline]
->  xmit_one net/core/dev.c:3578 [inline]
->  dev_hard_start_xmit+0x187/0x700 net/core/dev.c:3594
-> ...
+> As suggested by Jose Abreu: let's drop all 12 boolean fields in
+> plat_stmmacenet_data and replace them with a common bitfield.
+> 
+> v2 -> v3:
+> - fix build on intel platforms even more
+> - collect review tags from Andrew
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] net: usbnet: Fix WARNING in usbnet_start_xmit/usb_submit_urb
-    https://git.kernel.org/netdev/net/c/5e1627cb43dd
+  - [net-next,v3,01/12] net: stmmac: replace the has_integrated_pcs field with a flag
+    https://git.kernel.org/netdev/net-next/c/d26979f1cef7
+  - [net-next,v3,02/12] net: stmmac: replace the sph_disable field with a flag
+    https://git.kernel.org/netdev/net-next/c/309efe6eb499
+  - [net-next,v3,03/12] net: stmmac: replace the use_phy_wol field with a flag
+    https://git.kernel.org/netdev/net-next/c/fd1d62d80ebc
+  - [net-next,v3,04/12] net: stmmac: replace the has_sun8i field with a flag
+    https://git.kernel.org/netdev/net-next/c/d8daff284e30
+  - [net-next,v3,05/12] net: stmmac: replace the tso_en field with a flag
+    https://git.kernel.org/netdev/net-next/c/68861a3bcc1c
+  - [net-next,v3,06/12] net: stmmac: replace the serdes_up_after_phy_linkup field with a flag
+    https://git.kernel.org/netdev/net-next/c/efe92571bfc3
+  - [net-next,v3,07/12] net: stmmac: replace the vlan_fail_q_en field with a flag
+    https://git.kernel.org/netdev/net-next/c/fc02152bdbb2
+  - [net-next,v3,08/12] net: stmmac: replace the multi_msi_en field with a flag
+    https://git.kernel.org/netdev/net-next/c/956c3f09b9c4
+  - [net-next,v3,09/12] net: stmmac: replace the ext_snapshot_en field with a flag
+    https://git.kernel.org/netdev/net-next/c/aa5513f5d95f
+  - [net-next,v3,10/12] net: stmmac: replace the int_snapshot_en field with a flag
+    https://git.kernel.org/netdev/net-next/c/621ba7ad7891
+  - [net-next,v3,11/12] net: stmmac: replace the rx_clk_runs_in_lpi field with a flag
+    https://git.kernel.org/netdev/net-next/c/743dd1db85f4
+  - [net-next,v3,12/12] net: stmmac: replace the en_tx_lpi_clockgating field with a flag
+    https://git.kernel.org/netdev/net-next/c/9d0c0d5ebd63
 
 You are awesome, thank you!
 -- 
