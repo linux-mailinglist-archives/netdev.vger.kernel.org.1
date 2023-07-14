@@ -1,105 +1,81 @@
-Return-Path: <netdev+bounces-17743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DC8752F49
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:16:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D849D752F4C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 506A2281E68
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:16:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3161C214C2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B5D81C;
-	Fri, 14 Jul 2023 02:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6669381D;
+	Fri, 14 Jul 2023 02:21:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA6F809
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:16:34 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D40B72707
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:16:32 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b69e6d324aso21518771fa.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:16:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689300990; x=1691892990;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E4cbxLvx9uukqwC3ST3XVi//0HD0ikRNdUx1Ub10ekE=;
-        b=jMTvlQrsZDr6AKA/H9kXnJZ4BZD3H+pxm0xSo2oNJPXj+DmDtBWEQqgFcvrN6UH+as
-         nOIuPnE5typjxKOAy4rfJ7i/aFzSbHXltTW5kqef+gf3XlZ3m7PCbtCPu68SAK443BbR
-         UjXb9J031SvOKGPzM3vEkcDKTR2iQxEhLuQRsYwJeTgkXCiCMTxSCoR0EBrahnJsvUMR
-         FM+IA3iL+l40v0qU6EVDibVKJKc8KoL1i8FARTdHTt91Tm++M3cEji3eSmE298h95P96
-         MgKDkAPytf4A3HiZIIDoRcrpHkrhPUSWjehWYnRJn89gcTOT5YqM8uHvpIp028bNFl+h
-         wgxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689300990; x=1691892990;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E4cbxLvx9uukqwC3ST3XVi//0HD0ikRNdUx1Ub10ekE=;
-        b=h9k4x8XpGaqqrsgiWgLKkaHQF2kf1RGI3aXbNtWmi7gHMh0bMuNyyWAJGAEgiGmgi4
-         TLbfPM2opHnNDndUM3EAVM65HQBavhQQTTcga7JMcoLsTipFi4LZCIcrkMpcGKGz/OXV
-         iZGwYjaLBC3gEXDTy3twd/VnllhLTXzaaHTlE/JGLL41y3gjdTSgpIo6XGLjA30iQ/GR
-         mx64fHOzxNci//qpw3i24InAzCVSJqT2Axle6Ygljl8Q90E3S/Ftlath82fI4gKLomtN
-         3biQMH0z7d3TC9NLiShDKsNXJ3d0SdFYqkw7AzW95DTvaX0GKB+xdeT2GaYjoRQ2X+61
-         m8sQ==
-X-Gm-Message-State: ABy/qLaBuDHyRGz0UmBjJSLCKstPp6N6OlgTWEd5wVNoZsllZEAY07n8
-	+FssgW/a7OsHQPK6bYNDs8Put8VG7cDubt4Iaqs=
-X-Google-Smtp-Source: APBJJlHIpHlJOcS+oulRd+xIOlCCQm1kL+13HmXP2W6vLtW443zx5o6D0wzT5oPeRQA9am54WYO7dv9mE72JhlFi3UU=
-X-Received: by 2002:a2e:9691:0:b0:2b6:3651:f12f with SMTP id
- q17-20020a2e9691000000b002b63651f12fmr2884902lji.3.1689300990481; Thu, 13 Jul
- 2023 19:16:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA18806;
+	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B598C433CA;
+	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689301265;
+	bh=gcOWOcoU3m4AKQgrhUcZd930T6NkJk8Bd3Kg/KylIxs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Kj5zj6Esoz/jR1eGzxf8CYW6Ow5b+CCJOk7iIRDUjEhn95F8Q1fDBXu5oulNs7TRB
+	 eacaMu/TyarIzRmNn/NV9K8YwEb1d5ciT4DJkj1gFq8O0mnf5VnIzhoLatilmzYA+X
+	 KPT7diCwmHkd1HOTrY/M3FXba8afua2ZB1Tz6lJHQ7tTxtpfFS/5PixAzrUFOTJCF3
+	 3H23V/seTnfllnaATztTO4mYlphLS5PUZpUQGhEjs7VpQ3twmWGCPbOZFjctKvUQwI
+	 j8fsL8Zp7X9vYMyaBq9623XF4pVsBYuxSpY5J023+je49lJAKvmFX3CTp3PzghtnPw
+	 AuZUaZ6S/8DVw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 609D7E4D006;
+	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1689215889.git.chenfeiyang@loongson.cn> <a200a15b1178dd8f6b80a925b927d30d4e841c3c.1689215889.git.chenfeiyang@loongson.cn>
- <0ed12e00-4ca8-43dd-a383-ba6380f21418@lunn.ch>
-In-Reply-To: <0ed12e00-4ca8-43dd-a383-ba6380f21418@lunn.ch>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 14 Jul 2023 10:16:17 +0800
-Message-ID: <CACWXhKnZcY+hA-QQco911G5E5Zs4MJPN+xA8iRX6BfhfgSDr+A@mail.gmail.com>
-Subject: Re: [RFC PATCH 02/10] net: stmmac: Pass stmmac_priv and chan in some callbacks
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
-	linux@armlinux.org.uk, dongbiao@loongson.cn, 
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2023-07-13
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168930126539.23383.7014345364901035760.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Jul 2023 02:21:05 +0000
+References: <20230714020910.80794-1-alexei.starovoitov@gmail.com>
+In-Reply-To: <20230714020910.80794-1-alexei.starovoitov@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, daniel@iogearbox.net, andrii@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, kernel-team@fb.com
 
-On Thu, Jul 13, 2023 at 12:02=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> On Thu, Jul 13, 2023 at 10:46:54AM +0800, Feiyang Chen wrote:
-> > Like commit 1d84b487bc2d90 ("net: stmmac: Pass stmmac_priv in some
-> > callbacks"), passing stmmac_priv and chan to more callbacks and
-> > adjust the callbacks accordingly.
->
-> Commit messages don't say what a patch does, you can see that from
-> reading the patch. The commit message should explain why it is doing
-> something.
->
+Hello:
 
-Hi, Andrew,
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Alright, I will make improvements in the next version.
+On Thu, 13 Jul 2023 19:09:10 -0700 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 67 non-merge commits during the last 15 day(s) which contain
+> a total of 106 files changed, 4444 insertions(+), 619 deletions(-).
+> 
+> [...]
 
-Thanks,
-Feiyang
+Here is the summary with links:
+  - pull-request: bpf-next 2023-07-13
+    https://git.kernel.org/netdev/net-next/c/b0b0ab6f0131
 
->         Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
