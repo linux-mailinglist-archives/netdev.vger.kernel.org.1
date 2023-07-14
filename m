@@ -1,182 +1,127 @@
-Return-Path: <netdev+bounces-17801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F180275310B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:19:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9946753152
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:34:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACC712820CA
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:19:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4E321C214F7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8B663DC;
-	Fri, 14 Jul 2023 05:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C275C6AAC;
+	Fri, 14 Jul 2023 05:34:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019DB6AB2
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 05:19:00 +0000 (UTC)
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD151BFA
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:18:58 -0700 (PDT)
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 0E0A43F71E
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 05:18:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1689311937;
-	bh=4RwCmrifjQAszMSdyafC6AItguqTd3yShrJPY3GuzKo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=QQ3gBCdpdBSQygt0xnQGzNjc3esGtiEn5Dz4L/ojvbVzFQIBoOVIXcAaLqzSdXjhO
-	 P/JzhH7RcYPksfPpoa5PQ5yx+K0RJ8OLThkEodqZndS0Rdjc4Q7UajM8anZg4jx6r7
-	 IhbQy1HgR5JJjIACCRq48cKLoUEe12U+QuTE5gCgDumxwuWTWNK9OgvUaK0nbPnFga
-	 EGks8trJzDzp7+Kkr2tlATWCLXZ03Kss0rsb6couo3cBfEOfGTpgsKS6FV/g5Rsa5+
-	 3cSQsWwY3jV/ztKAzZzjI8y0/pbu9LPM2La/B8FmYjWvU2c297aclS5FFaxoarV6ul
-	 OoPNrIa0KE8rA==
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-265826eef7fso1659451a91.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:18:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689311936; x=1691903936;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59AC5224
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 05:34:17 +0000 (UTC)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042DB3A9A
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:34:13 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3128fcd58f3so1636220f8f.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 22:34:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689312851; x=1691904851;
+        h=content-transfer-encoding:in-reply-to:subject:from:content-language
+         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4RwCmrifjQAszMSdyafC6AItguqTd3yShrJPY3GuzKo=;
-        b=GmwSUUyPPHcQ0nQJ5HgiJNd9luRo831F8bpk59cLMG2CGphQPaPEmiYNkKqsq0SYlR
-         D0bhyHqb5K3srRNUvPt3MVasLzoQRb4g9RtXFuRx6jz9ZihYZMaj7fFSGwdnGvw0YcOZ
-         MM9jbEGLvsSeJ5U4CskyTP2GljjxRNJKkBEq12QZzXWBGRTnFsgXZgWq8wt9zsM4tYmx
-         SZune38xzujBVTpWbx5BjUOHpHtlihlyxglh0SjdhlyrkimolNZc5FrXQlQ2JjRwoqE3
-         KUc5Pw6TxyvgMJHy27lCslzenWc5IgbTHgsD1mhbBtotysqrk52FmjUtGiimCAMdgATv
-         1WJg==
-X-Gm-Message-State: ABy/qLayy2hLFM62u+ygpQQXJyyoD+OcNHdeX7ZspQbGAN7qrFjWoqbg
-	tcISOmC3sLulY4aYZVg5Cm5na4IOV2TJwf0/Q6TcQ0pP62cEVodq0AJZVbsvzgk1vLavQ9Fk6m/
-	+p9hbY3ogRuizoTs9isrYOA8gLEJBz4AdjtOK2KnAdKPdLNtVuA==
-X-Received: by 2002:a17:90b:1643:b0:261:110e:30c1 with SMTP id il3-20020a17090b164300b00261110e30c1mr2428908pjb.4.1689311935773;
-        Thu, 13 Jul 2023 22:18:55 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFPTMsnX8dr5FIZHQ03Hx09Ztz5Lxo0FqHU0UBxtvQNOQK3SfMNeJz5gWDCMTOZ2rKIk09TKJd+otiXntG6fG0=
-X-Received: by 2002:a17:90b:1643:b0:261:110e:30c1 with SMTP id
- il3-20020a17090b164300b00261110e30c1mr2428889pjb.4.1689311935452; Thu, 13 Jul
- 2023 22:18:55 -0700 (PDT)
+        bh=lCJcQQRjJzkT1ggDM5s4p8DYt7wLE79ib2sV+EARwLY=;
+        b=Yg0n+zzIT9qKZsIaCu07rsyJZPVX3RXyzsypkYyLI5Y7FPy5KLds7h0b784wYy4ssm
+         j0OMiCuqteuJaWTyv5pNNFsnP1D2n/KcqhrSQsi9xPYJ3BEH6XcGcN5RSxuXhiNNK9sV
+         sZXtohccDQksVTk0FIJGygoT45UXVskHt27kuXCGWOdTNubA9rM3mVBRATkZCfA3KN/N
+         2YmWdZWCvvkQhi9OZh2mmu6wtjiHVEi0g8ZYDNiZOEHA/tRdSnVhYzpAhf9Vff/NtP7i
+         StFiYhyjbca4XKrcZuMvYQEPWxwGHEQGnhb/c1OTksY5zvLYt2ku2TlSw7HYgXMelD9v
+         /Zag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689312851; x=1691904851;
+        h=content-transfer-encoding:in-reply-to:subject:from:content-language
+         :references:cc:to:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lCJcQQRjJzkT1ggDM5s4p8DYt7wLE79ib2sV+EARwLY=;
+        b=VxUY0+++iJIXGHjouEn0wnfe50DsAVpQON2Cs/pg5EbrLPrq1HbD6BYfvG41uufJwQ
+         V5MOXD/j/4Kl14f68AuJHyDTIToVNsuPFvWGoTEb950cjLUlQx3IwLQgR8EJzpfer8mt
+         FJ3eB850W84sDWoW5NR5xM4S81SFAqfy52lA5+tn7fNgW2Flg4w0E9SBPMcL8EhaIg2I
+         mox3iXIyGcfLKm+5Lw4ukvbCXmFowYKaDwgxKBeQ353Ww8I26UoOML2jBeJvr0FHVGSH
+         1rPB8LSDGAAoY45wqjtm3QEHNnkTag2fPhUgPRLUjV62PVShGj2vdFzCkyEbEX5fq7Uj
+         njtQ==
+X-Gm-Message-State: ABy/qLYYlgPxL/ZA1bKBPBarIkECPZaJAzU3h6ABdYAYTOgLcONf/QFh
+	Lcc3AEY/xLOsN0Rtx8AFDd8=
+X-Google-Smtp-Source: APBJJlGsqZ5ACxOSK/aLTKCHCudeIIZansK4LMnxtb1cffEIF4w9jCqg+lDOtEoDopbqAw6yfUAaog==
+X-Received: by 2002:a5d:6792:0:b0:316:efb9:ffd with SMTP id v18-20020a5d6792000000b00316efb90ffdmr417754wru.1.1689312851242;
+        Thu, 13 Jul 2023 22:34:11 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:72e8:a200:99ec:cf51:6f55:b3af? (dynamic-2a01-0c22-72e8-a200-99ec-cf51-6f55-b3af.c22.pool.telefonica.de. [2a01:c22:72e8:a200:99ec:cf51:6f55:b3af])
+        by smtp.googlemail.com with ESMTPSA id cr13-20020a05600004ed00b003143ba62cf4sm9876224wrb.86.2023.07.13.22.34.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 22:34:10 -0700 (PDT)
+Message-ID: <17c638ca-5343-75e0-7f52-abf86026f75d@gmail.com>
+Date: Fri, 14 Jul 2023 07:34:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230526163001.67626-1-aaron.ma@canonical.com> <20230607015646.558534-1-aaron.ma@canonical.com>
-In-Reply-To: <20230607015646.558534-1-aaron.ma@canonical.com>
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
-Date: Fri, 14 Jul 2023 13:18:44 +0800
-Message-ID: <CAAd53p4V36qjyL1fMF20pY9wD4sLXWLQyJVib5Zt4NGOgnF5yg@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH net v2] igb: fix hang issue of AER error
- during resume
-To: Aaron Ma <aaron.ma@canonical.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jeff Garzik <jgarzik@redhat.com>, 
-	Auke Kok <auke-jan.h.kok@intel.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, joey.joey586@gmail.com
+References: <82ea9e63-d8c8-0b86-cd88-913cc249fa9a@gmail.com>
+ <d644f048-970c-71fe-a556-a2c80444dae2@leemhuis.info>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net] r8169: fix ASPM-related problem for chip version 42
+ and 43
+In-Reply-To: <d644f048-970c-71fe-a556-a2c80444dae2@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Aaron,
+On 14.07.2023 05:31, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 13.07.23 21:46, Heiner Kallweit wrote:
+>> Referenced commit missed that for chip versions 42 and 43 ASPM
+> 
+> Thanks again for taking care of this.
+> 
+>> [0] https://bugzilla.kernel.org/show_bug.cgi?id=217635
+> 
+> That line should be a proper Link: or Closes: tag, as explained by
+> Documentation/process/submitting-patches.rst
 
-On Wed, Jun 7, 2023 at 9:56=E2=80=AFAM Aaron Ma <aaron.ma@canonical.com> wr=
-ote:
->
-> PCIe AER error_detected caused a race issue with igb_resume.
-> Protect error_detected when igb is in down state.
->
-> Error logs:
-> kernel: igb 0000:02:00.0: disabling already-disabled device
-> kernel: WARNING: CPU: 0 PID: 277 at drivers/pci/pci.c:2248 pci_disable_de=
-vice+0xc4/0xf0
-> kernel: RIP: 0010:pci_disable_device+0xc4/0xf0
-> kernel: Call Trace:
-> kernel:  <TASK>
-> kernel:  igb_io_error_detected+0x3e/0x60
-> kernel:  report_error_detected+0xd6/0x1c0
-> kernel:  ? __pfx_report_normal_detected+0x10/0x10
-> kernel:  report_normal_detected+0x16/0x30
-> kernel:  pci_walk_bus+0x74/0xa0
-> kernel:  pcie_do_recovery+0xb9/0x340
-> kernel:  ? __pfx_aer_root_reset+0x10/0x10
-> kernel:  aer_process_err_devices+0x168/0x220
-> kernel:  aer_isr+0x1b5/0x1e0
-> kernel:  ? __pfx_irq_thread_fn+0x10/0x10
-> kernel:  irq_thread_fn+0x21/0x70
-> kernel:  irq_thread+0xf8/0x1c0
-> kernel:  ? __pfx_irq_thread_dtor+0x10/0x10
-> kernel:  ? __pfx_irq_thread+0x10/0x10
-> kernel:  kthread+0xef/0x120
-> kernel:  ? __pfx_kthread+0x10/0x10
-> kernel:  ret_from_fork+0x29/0x50
-> kernel:  </TASK>
-> kernel: ---[ end trace 0000000000000000 ]---
->
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D217446
-> Fixes: 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet driver")
-> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
-> Reviewed-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
+OK
 
-Can you please give [1] a try?
-I think avoid using rtnl_lock() is more ideal.
+> (http://docs.kernel.org/process/submitting-patches.html) and
+> Documentation/process/5.Posting.rst
+> (https://docs.kernel.org/process/5.Posting.html) and thus be in the
+> signed-off-by area, for example like this (without the space upfront):
+> 
+>> Fixes: 5fc3f6c90cca ("r8169: consolidate disabling ASPM before EPHY access")
+>  Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217635 # [0]
+> 
+> A "Cc: stable@vger.kernel.org" would be nice, too, to get this fixed in
+> 6.4, where this surfaced (reminder: no, a Fixes: tag is not enough to
+> ensure the backport there).
+> 
 
-[1] https://lore.kernel.org/intel-wired-lan/20230714050541.2765246-1-kai.he=
-ng.feng@canonical.com/
+That's different in the net subsystem. The net (vs. net-next) annotation
+ensures the backport.
 
-Kai-Heng
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> […]
+> 
+> #regzbot ^backmonitor: https://bugzilla.kernel.org/show_bug.cgi?id=217635
+> 
+> Ciao, Thorsten
 
-> ---
-> V1->V2: Add target tree tag net and Fixes tag.
->
->  drivers/net/ethernet/intel/igb/igb_main.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethe=
-rnet/intel/igb/igb_main.c
-> index 58872a4c2540..8333d4ac8169 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -9581,14 +9581,21 @@ static pci_ers_result_t igb_io_error_detected(str=
-uct pci_dev *pdev,
->         struct net_device *netdev =3D pci_get_drvdata(pdev);
->         struct igb_adapter *adapter =3D netdev_priv(netdev);
->
-> +       if (test_bit(__IGB_DOWN, &adapter->state))
-> +               return PCI_ERS_RESULT_DISCONNECT;
-> +
-> +       rtnl_lock();
->         netif_device_detach(netdev);
->
-> -       if (state =3D=3D pci_channel_io_perm_failure)
-> +       if (state =3D=3D pci_channel_io_perm_failure) {
-> +               rtnl_unlock();
->                 return PCI_ERS_RESULT_DISCONNECT;
-> +       }
->
->         if (netif_running(netdev))
->                 igb_down(adapter);
->         pci_disable_device(pdev);
-> +       rtnl_unlock();
->
->         /* Request a slot reset. */
->         return PCI_ERS_RESULT_NEED_RESET;
-> --
-> 2.34.1
->
-> _______________________________________________
-> Intel-wired-lan mailing list
-> Intel-wired-lan@osuosl.org
-> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
