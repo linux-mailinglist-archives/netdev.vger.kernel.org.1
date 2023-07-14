@@ -1,152 +1,159 @@
-Return-Path: <netdev+bounces-17854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD123753478
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:01:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8DAA75347B
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FDA42821A7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 405CE282189
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29273748E;
-	Fri, 14 Jul 2023 08:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9317979EC;
+	Fri, 14 Jul 2023 08:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD468486
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:00:58 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5FE3C02
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 01:00:52 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-986d8332f50so213026466b.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 01:00:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689321651; x=1691913651;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TrnCz7Hfa4sPSf5kg/sc1xt8fKauTd641qFFpeMSqVw=;
-        b=5S7EK8awIjLEzgP9Gn9bymlk7alkjE8hfmrAQJwffEyZmYHYb0LtdrYdly5Jqx27Ra
-         /EmEZAf7EGtlXrpTMVfS4sAdBVSFq2/8IEcqb3KleCqHpTDgqvpFIKrXTyDIEeX9U/7I
-         X0Z1Uc5QqcFXziH/VKFa1xVLpBe0lxrwm5pXoLyQlqY/UY+CJ11CnDDs5vkYIqShnwgG
-         i3F3otwWz4QtiadTpvgKJCUMjGU7pqmg9QEbmtvM8Zm+3Jes4/1OzR2O7ymTKmZ91cxj
-         5yBWBycETnbf8C1eiZk47vEkgRvQMGz9NU/c7wNB6t6QLO9Vk4n+m4pXs3HdMMZJ0JiB
-         YtOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689321651; x=1691913651;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TrnCz7Hfa4sPSf5kg/sc1xt8fKauTd641qFFpeMSqVw=;
-        b=Ag21VBJpzXW6NuD29NyGgM1wJ6nGBptTkFAry/9q/xbFGuBOFpIC4KA4oQeI+cRYQ6
-         0lFP8OrdJ8RH2qsXwJEnXnvqBQexR8Ju+PHDembwzuZzexcBTXXXYQS59QMKzB2Hw3qI
-         dX2DgJR1/sDnQ8XUaMBSwExIdJzzc5Ul7rYy0XtjYd1RQA9ZczT83ibD8GACvS28K0CO
-         989FP2OAi9fHc5lI3uU7LfRRMIAMn9gpReoE8P98NzfwYehxQ4V3d7VWLDxlwK9ofkEg
-         amYe/whj4BzzYPyIW0hoDx4pxINkoNUF4i+fNnJ9e4t1Etw3Bw/Eqz6NSrJZHnENzl+C
-         nPog==
-X-Gm-Message-State: ABy/qLZYaSVNbuH9N6pgrLgYRVJJP5Hg50qP3i72x4b6BxSPBWDJcrp+
-	oCWIjT95CS+cWaY2ka3kk7F4FQ==
-X-Google-Smtp-Source: APBJJlFwon6C/Lhq8iTmXP+SeHRj0Uw1dcqS6fqyACGMQ9EKMiNbvq5k8UPGdSNDkn1fl2Czz+/LQw==
-X-Received: by 2002:a17:907:9541:b0:978:b94e:83dd with SMTP id ex1-20020a170907954100b00978b94e83ddmr3157602ejc.75.1689321650871;
-        Fri, 14 Jul 2023 01:00:50 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id l24-20020a1709065a9800b00991bba473e1sm4999149ejq.3.2023.07.14.01.00.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 01:00:50 -0700 (PDT)
-Date: Fri, 14 Jul 2023 10:00:49 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, moshe@nvidia.com
-Subject: Re: [patch net-next] devlink: introduce dump selector attr and
- implement it for port dumps
-Message-ID: <ZLEAsaKj+eKYlceM@nanopsycho>
-References: <20230713151528.2546909-1-jiri@resnulli.us>
- <20230713205141.781b3759@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B5E79EA
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:01:05 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020B5358E;
+	Fri, 14 Jul 2023 01:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1689321664; x=1720857664;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=q8DnN+vN6HLM/CQ+sjssH8Tpe/mfiwzez3UV3BaEKdc=;
+  b=rgfuYzitiUSCrbvl7umOnH0d6rDySFNBZv4Yiyznw4Ug5t4k+3Ah4zr0
+   H8Zpk/BZMp0JgWtVjSq1NygxvH2//q/ghqjuWqfYh2JFeLDXc1/JOMAgH
+   SrowG+HuwK43h1ANpSgo03yargvRwcxp6H65VODF/zqCkXp7ouapLjUY2
+   Pex2KNw/js4BqH86AilWW6DBFO8rpRKuZXuoNQa+wXJWg4+YZp0HYnJAC
+   W2Ru0b3TlFmH11IrWJUYVEIu+4j9mpv27FRjfDwLFeCM8QslQpAbnI+0f
+   JDMUl5KKSosThkxrZJBSpoGFl0X+U4yZIQRDeEOFfhaMa49cWVc2R8pG8
+   A==;
+X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
+   d="scan'208";a="223770369"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 14 Jul 2023 01:01:03 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Fri, 14 Jul 2023 01:00:59 -0700
+Received: from localhost (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
+ Transport; Fri, 14 Jul 2023 01:00:59 -0700
+Date: Fri, 14 Jul 2023 10:00:59 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+	<f.fainelli@gmail.com>, Maxim Georgiev <glipus@gmail.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, Richard Cochran <richardcochran@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Gerhard Engleder
+	<gerhard@engleder-embedded.com>, Hangbin Liu <liuhangbin@gmail.com>, "Russell
+ King" <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, "Jacob
+ Keller" <jacob.e.keller@intel.com>, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"Andy Gospodarek" <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>, Shenwei
+ Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux
+ Team <linux-imx@nxp.com>, <UNGLinuxDriver@microchip.com>, Lars Povlsen
+	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>, Simon Horman
+	<simon.horman@corigine.com>, Casper Andersson <casper.casan@gmail.com>,
+	Sergey Organov <sorganov@gmail.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v7 net-next 00/10] Introduce ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+Message-ID: <20230714080059.vig72wh34d7x5t7n@soft-dev3-1>
+References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20230713205141.781b3759@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Jul 14, 2023 at 05:51:41AM CEST, kuba@kernel.org wrote:
->On Thu, 13 Jul 2023 17:15:28 +0200 Jiri Pirko wrote:
->> +	/* If the user provided selector attribute with devlink handle, dump only
->> +	 * objects that belong under this instance.
->> +	 */
->> +	if (cmd->dump_selector_nla_policy &&
->> +	    attrs[DEVLINK_ATTR_DUMP_SELECTOR]) {
->> +		struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
->> +
->> +		err = nla_parse_nested(tb, DEVLINK_ATTR_MAX,
->> +				       attrs[DEVLINK_ATTR_DUMP_SELECTOR],
->> +				       cmd->dump_selector_nla_policy,
->> +				       cb->extack);
->> +		if (err)
->> +			return err;
->> +		if (tb[DEVLINK_ATTR_BUS_NAME] && tb[DEVLINK_ATTR_DEV_NAME]) {
->> +			devlink = devlink_get_from_attrs_lock(sock_net(msg->sk), tb);
->> +			if (IS_ERR(devlink))
->> +				return PTR_ERR(devlink);
->> +			err = cmd->dump_one(msg, devlink, cb);
->> +			devl_unlock(devlink);
->> +			devlink_put(devlink);
->> +			goto out;
->> +		}
->
->This implicitly depends on the fact that cmd->dump_one() will set and
->pay attention to state->idx. If it doesn't kernel will infinitely dump
->the same instance. I think we should explicitly check state->idx and
->set it to 1 after calling ->dump_one.
+The 07/13/2023 15:18, Vladimir Oltean wrote:
 
-Nothing changes, only instead of iterating over multiple devlinks, we
-just work with one.
+Hi Vladimir,
 
-So, the state->idx is in-devlink-instance index. That means, after
-iterating to next devlink instance it is reset to 0 below (state->idx = 0;).
-Here however, as we stay only within a single devlink instance,
-the reset is not needed.
+> 
+> Based on previous RFCs from Maxim Georgiev:
+> https://lore.kernel.org/netdev/20230502043150.17097-1-glipus@gmail.com/
+> 
+> this series attempts to introduce new API for the hardware timestamping
+> control path (SIOCGHWTSTAMP and SIOCSHWTSTAMP handling).
+> 
+> I don't have any board with phylib hardware timestamping, so I would
+> appreciate testing (especially on lan966x, the most intricate
+> conversion). I was, however, able to test netdev level timestamping,
+> because I also have some more unsubmitted conversions in progress:
+> 
+> https://github.com/vladimiroltean/linux/commits/ndo-hwtstamp-v7
 
-Am I missing something?
+I have tested this patch series on lan966x. In both cases, when there is
+a PHY that supports HW timestamping and when the isn't a PHY that
+supports HW timestamping. In both cases it behaves as expected. Thanks!
+Tested-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
+> 
+> I hope that the concerns expressed in the comments of previous series
+> were addressed, and that Köry Maincent's series:
+> https://lore.kernel.org/netdev/20230406173308.401924-1-kory.maincent@bootlin.com/
+> can make progress in parallel with the conversion of the rest of drivers.
+> 
+> Maxim Georgiev (5):
+>   net: add NDOs for configuring hardware timestamping
+>   net: add hwtstamping helpers for stackable net devices
+>   net: vlan: convert to ndo_hwtstamp_get() / ndo_hwtstamp_set()
+>   net: macvlan: convert to ndo_hwtstamp_get() / ndo_hwtstamp_set()
+>   net: bonding: convert to ndo_hwtstamp_get() / ndo_hwtstamp_set()
+> 
+> Vladimir Oltean (5):
+>   net: fec: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+>   net: fec: delete fec_ptp_disable_hwts()
+>   net: sparx5: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+>   net: lan966x: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+>   net: remove phy_has_hwtstamp() -> phy_mii_ioctl() decision from
+>     converted drivers
+> 
+>  drivers/net/bonding/bond_main.c               | 105 ++++++----
+>  drivers/net/ethernet/freescale/fec.h          |   6 +-
+>  drivers/net/ethernet/freescale/fec_main.c     |  41 ++--
+>  drivers/net/ethernet/freescale/fec_ptp.c      |  43 ++--
+>  .../ethernet/microchip/lan966x/lan966x_main.c |  61 ++++--
+>  .../ethernet/microchip/lan966x/lan966x_main.h |  12 +-
+>  .../ethernet/microchip/lan966x/lan966x_ptp.c  |  34 ++--
+>  .../ethernet/microchip/sparx5/sparx5_main.h   |   9 +-
+>  .../ethernet/microchip/sparx5/sparx5_netdev.c |  35 +++-
+>  .../ethernet/microchip/sparx5/sparx5_ptp.c    |  24 ++-
+>  drivers/net/macvlan.c                         |  34 ++--
+>  include/linux/net_tstamp.h                    |  28 +++
+>  include/linux/netdevice.h                     |  25 +++
+>  net/8021q/vlan_dev.c                          |  27 ++-
+>  net/core/dev_ioctl.c                          | 183 +++++++++++++++++-
+>  15 files changed, 480 insertions(+), 187 deletions(-)
+> 
+> --
+> 2.34.1
+> 
 
->
->Could you also move the filtered dump to a separate function which
->either does this or calls devlink_nl_instance_iter_dumpit()?
->I like the concise beauty that devlink_nl_instance_iter_dumpit()
->currently is, it'd be a shame to side load it with other logic :]
-
-No problem. I put the code here as if in future the selector attr nest
-would be passed down to dump_one(), there is one DEVLINK_ATTR_DUMP_SELECTOR
-processing here. But could be resolved later on.
-
-Will do.
-
->
->> +	}
->> +
->>  	while ((devlink = devlinks_xa_find_get(sock_net(msg->sk),
->>  					       &state->instance))) {
->>  		devl_lock(devlink);
->> @@ -228,6 +259,7 @@ int devlink_nl_instance_iter_dumpit(struct sk_buff *msg,
->>  		state->idx = 0;
->>  	}
->>  
->> +out:
->>  	if (err != -EMSGSIZE)
->>  		return err;
->>  	return msg->len;
->-- 
->pw-bot: cr
+-- 
+/Horatiu
 
