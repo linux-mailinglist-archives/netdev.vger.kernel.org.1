@@ -1,392 +1,166 @@
-Return-Path: <netdev+bounces-17738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4127B752F2A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8701D752F2D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E07C1C213E7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:09:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88061C21477
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85794807;
-	Fri, 14 Jul 2023 02:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B598E811;
+	Fri, 14 Jul 2023 02:10:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C5FA29;
-	Fri, 14 Jul 2023 02:09:20 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0525726BC;
-	Thu, 13 Jul 2023 19:09:15 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-666eba6f3d6so911496b3a.3;
-        Thu, 13 Jul 2023 19:09:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3166809
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:10:41 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 991A126AE;
+	Thu, 13 Jul 2023 19:10:40 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b8b318c5cfso10577655ad.1;
+        Thu, 13 Jul 2023 19:10:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689300554; x=1691892554;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=U8Mbo8tXkF4+cDEdtDUhjQy9rceUrv1pc3/MPqDzHsc=;
-        b=HrEKY2+xR42zUO9dr3idOpFTvj53dUpb3cQ7n9Ar+yweNB9DioEQEuhcGJih1IuM/i
-         luo9mjCoa7jHJ5alprpiUwE9NuyI+PI6Wn9wJgGZkvbLnwzcx+SZWy9kwIBqtcAaKfdB
-         N+XZNoHOEsoarQ9x2GNEWZQL7YFCCVJNJlgWfBYN3+COpL6uve493ptPBbw0dMyXmIMr
-         ZBL/EYgSr1SDioDnsJ77i2xO4b2XRr/QkZEHF+dH5pDvuuz0ib1LitNwTCm6WewxU6f7
-         ed/tnpNrm86EN6SOldAbHIuZlTPsmIFV+RU3aPQXCMp2/NfY4znszfSOYLsgeXi4HDQD
-         TZ9A==
+        d=gmail.com; s=20221208; t=1689300640; x=1691892640;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QPGMulbK/a/rKvX1GI7gs5doujr0+mvZklDpvLLKFU8=;
+        b=o9SgcuWAj7F2evkgku61FwpY5FIN0Ep2UMIodKe1dZ6S8BDtxqclc4X/6jVHyctw6k
+         dcgmVCcJZ3FWpJ8qZmeQYrJx7u3E0jR0jMBEQu4agoYwVpLeSH1x2PcYr2Y6rLmr+5qv
+         0j9njedh15shbRVTBzE79Dgg9vHZUbzpiUajRV2EbAZz3kcdFpDB8jy2RrAthbHHK0Mc
+         QK4J8aWgOmsLtNYKnNuzdUMCUOz5TZzZ25S4J5EzlJtGLR0dEoeS8R5puiVAGThvHL/N
+         OLmoOEX5ojz/DUV5kZAtN4MW8WLlRnNwIIRAp3tgj4G+BKAfyeR9FpLzB3wGWY45y3jG
+         X9rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689300554; x=1691892554;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U8Mbo8tXkF4+cDEdtDUhjQy9rceUrv1pc3/MPqDzHsc=;
-        b=WabtnTf516fx+VenQcFtM1JIOE4jZxaf0nPIwrCbFU8jc9NpCFYYOSDYr9JHC5D8yF
-         f8ztCyPWiUSGc9Xj1bqeiFOLLBDg3iuGJ8AhT/g/IzSuw3e+/gJ2fRjda02FSlPudd2R
-         v5Z+7cx6n0S2txbcHxjPzKEmyOamfRIKzssOp3e5j6TjFQb9ea9aFAvZoiLLqyczfcVU
-         UJUB8+m0Al+AFcNS1tN0CaAfqAPr8nopt89/UxVshvLpxqRlEBEAv6WDedx/B5kWIumU
-         EM8kZ59Wm8h6DTAEgAW3dRNDfovJPueGfdgmtcc/jtnrv9iI8+8957ExDvJJnSC6xUHE
-         MStQ==
-X-Gm-Message-State: ABy/qLbvAzj1Bj6mz8/WckBWHUWlTytRRjN2qk7AX5oGaVQk491HZT5n
-	3EYfnpImczkBFxZ2BUHQFdg=
-X-Google-Smtp-Source: APBJJlElH009mCDKBlRGIjptH2v2/sZXSGdoGcU9/4DxNrgmuJk7ouUm1WNurihzJSiraYKi4btTww==
-X-Received: by 2002:a05:6a20:9712:b0:132:9d0:1492 with SMTP id hr18-20020a056a20971200b0013209d01492mr2292924pzc.35.1689300554108;
-        Thu, 13 Jul 2023 19:09:14 -0700 (PDT)
-Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:400::5:2ff4])
-        by smtp.gmail.com with ESMTPSA id d2-20020a170902aa8200b001ac40488620sm6544073plr.92.2023.07.13.19.09.12
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 13 Jul 2023 19:09:13 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	kernel-team@fb.com
-Subject: pull-request: bpf-next 2023-07-13
-Date: Thu, 13 Jul 2023 19:09:10 -0700
-Message-Id: <20230714020910.80794-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
+        d=1e100.net; s=20221208; t=1689300640; x=1691892640;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QPGMulbK/a/rKvX1GI7gs5doujr0+mvZklDpvLLKFU8=;
+        b=dmr+E4R7mM5JXzdqlmdarc5lYSevmbaKJEbBsvSvCGR/ncmI3qHQrYnD7Li/J8l4hR
+         5jISOVDF7YwBFPrLWLC+k1CjYwv+U3rVsNPaaCO/pxWyQp8S3Lj0CmZcC/vG2pwasEiz
+         XmMSBvLu/LtdE+iNpH/vx43malHU2H1GJDqghs7mXCUVAo69oOnZQ2f7gQFbNbsDPnpk
+         JWKmPoem5Lf0gSlfSUr9m2gTy5H5lN1n9jFeqto6/21k+RAosRvfuUHh/pMSoAr4bwfH
+         kcPg1QnN1GxZPT0SEHaWYe3yst5JSjrHmtwivSY0VHmSjEuRCwD/kOQ+ovV+zfNF4Fmp
+         efcg==
+X-Gm-Message-State: ABy/qLY/lE4Bdzv7312LT+fFWKzZWfpKzD81NXZOO3Wu6MiFpLizxFaf
+	fAH0ovaUeOAJlm0/9F8Baq7oMY7P35P+KZgV
+X-Google-Smtp-Source: APBJJlHnzBhxfLpSwyycts4R+2MtTMuMSUEURNWPlAJPkT7puz3mUvuIGSn5V2dLbn+hS8uHuVi86g==
+X-Received: by 2002:a17:902:c410:b0:1b6:9551:e2b8 with SMTP id k16-20020a170902c41000b001b69551e2b8mr4078027plk.34.1689300639924;
+        Thu, 13 Jul 2023 19:10:39 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id d13-20020a170902cecd00b001b9cd9d7ce4sm6527496plg.219.2023.07.13.19.10.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 19:10:39 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id A26BB80618F7; Fri, 14 Jul 2023 09:10:35 +0700 (WIB)
+Date: Fri, 14 Jul 2023 09:10:35 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	regressions@lists.linux.dev,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Another regression in the af_alg series (s390x-specific)
+Message-ID: <ZLCumw4oY5QGL8Wi@debian.me>
+References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="8RhcC9HrFkuMH7pS"
+Content-Disposition: inline
+In-Reply-To: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
 
-The following pull-request contains BPF updates for your *net-next* tree.
+--8RhcC9HrFkuMH7pS
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We've added 67 non-merge commits during the last 15 day(s) which contain
-a total of 106 files changed, 4444 insertions(+), 619 deletions(-).
+On Thu, Jul 13, 2023 at 10:03:45AM +0200, Ondrej Mosn=C3=A1=C4=8Dek wrote:
+> Hi,
+>=20
+> It turns out that beneath the first bug [1] there was another one
+> hiding. It seems to happen only on the s390x architecture when running
+> the following libkcapi [2] reproducer:
+>=20
+> kcapi -x 2 -s -c "gcm(aes)" -i 0d92aa861746b324f20ee6b7 \
+>     -k f4a6a5e5f2066f6dd9ec6fc5169c29043560ef595c9e81e76f42d29212cc581c \
+>     -a "" -t 5f24c68cbe6f32c29652442bf5d483ad -q ""
+>=20
+> Frequently (but not always) it triggers an oops like this one:
+>=20
+> [ 3986.766763] Unable to handle kernel pointer dereference in virtual
+> kernel address space
+> [ 3986.766774] Failing address: 0000000a00000000 TEID: 0000000a00000803
+> [ 3986.766776] Fault in home space mode while using kernel ASCE.
+> [ 3986.766778] AS:00000000a43a0007 R3:0000000000000024
+> [ 3986.766825] Oops: 003b ilc:2 [#1] SMP
+> <snip>
+> [ 3986.766877] CPU: 0 PID: 271064 Comm: kcapi Tainted: G        W
+>     6.5.0-rc1 #1
+> [ 3986.767070] Hardware name: IBM 8561 LT1 400 (z/VM 7.2.0)
+> <snip>
+> [ 3986.767151] Call Trace:
+> [ 3986.767153]  [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
+> [ 3986.767160]  [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
+> [ 3986.767166]  [<00000000a2a60888>] aead_recvmsg+0x478/0x698
+> [ 3986.767169]  [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
+> [ 3986.767175]  [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
+> [ 3986.767177]  [<00000000a273e066>] vfs_read+0x26e/0x2a8
+> [ 3986.767182]  [<00000000a273e8c4>] ksys_read+0xbc/0x100
+> [ 3986.767184]  [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
+> [ 3986.767189]  [<00000000a312ff30>] system_call+0x70/0x98
+> [ 3986.767193] Last Breaking-Event-Address:
+> [ 3986.767193]  [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
+> [ 3986.767198] Kernel panic - not syncing: Fatal exception: panic_on_oops
+>=20
+> This time the regression was bisected to:
+>=20
+> commit c1abe6f570aff4b6d396dc551e60570d2f50bd79
+> Author: David Howells <dhowells@redhat.com>
+> Date:   Tue Jun 6 14:08:52 2023 +0100
+>=20
+>    crypto: af_alg: Use extract_iter_to_sg() to create scatterlists
+>=20
+> I can't see what the problem is with the commit, so I'm reporting here
+> hoping that David or someone else can pick it up from here.
+>=20
 
-The main changes are:
+Thanks for the regression report. I'm adding it to regzbot:
 
-1) Fix bpftool build in presence of stale vmlinux.h, from Alexander Lobakin.
+#regzbot ^introduced: c1abe6f570aff4b
+#regzbot title: kernel pointer dereference regression due to extract_iter_t=
+o_sg()
 
-2) Introduce bpf_me_mcache_free_rcu() and fix OOM under stress, from Alexei Starovoitov.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-3) Teach verifier actual bounds of bpf_get_smp_processor_id() and fix perf+libbpf issue
-   related to custom section handling, from Andrii Nakryiko.
+--8RhcC9HrFkuMH7pS
+Content-Type: application/pgp-signature; name="signature.asc"
 
-4) Introduce bpf map element count, from Anton Protopopov.
+-----BEGIN PGP SIGNATURE-----
 
-5) Check skb ownership against full socket, from Kui-Feng Lee.
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZLCulgAKCRD2uYlJVVFO
+o4LVAP4kVT6SdcE/KVVP722UHRtHwWu2fafTlhILPIAcai6CxgEA94XCkNYU2sa+
+hrNlDgjv0m1noaEIFbImGjD0UkkHJgY=
+=3nSU
+-----END PGP SIGNATURE-----
 
-6) Support for up to 12 arguments in BPF trampoline, from Menglong Dong.
-
-7) Export rcu_request_urgent_qs_task, from Paul E. McKenney.
-
-8) Fix BTF walking of unions, from Yafang Shao.
-
-9) Extend link_info for kprobe_multi and perf_event links, from Yafang Shao.
-
-There should be no merge conflicts.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Alexei Starovoitov, Andrii Nakryiko, Dan Carpenter, Daniel Xu, David 
-Vernet, Fabio M. De Francesco, Hou Tao, Ira Weiny, Jiri Olsa, John 
-Fastabend, kernel test robot, Quentin Monnet, Ravi Bangoria, Stanislav 
-Fomichev, Toke Høiland-Jørgensen, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 3a8a670eeeaa40d87bd38a587438952741980c18:
-
-  Merge tag 'net-next-6.5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-06-28 16:43:10 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to 1cd0e7715cad848017e48033772791e8b9ee2932:
-
-  selftests/bpf: Add selftest for PTR_UNTRUSTED (2023-07-13 16:24:29 -0700)
-
-----------------------------------------------------------------
-for-netdev
-
-----------------------------------------------------------------
-Alexander Lobakin (3):
-      bpftool: use a local copy of perf_event to fix accessing :: Bpf_cookie
-      bpftool: Define a local bpf_perf_link to fix accessing its fields
-      bpftool: Use a local bpf_perf_event_value to fix accessing its fields
-
-Alexei Starovoitov (15):
-      Merge branch 'bpf: add percpu stats for bpf_map'
-      Merge branch 'bpf: Support ->fill_link_info for kprobe_multi and perf_event links'
-      bpf: Rename few bpf_mem_alloc fields.
-      bpf: Simplify code of destroy_mem_alloc() with kmemdup().
-      bpf: Let free_all() return the number of freed elements.
-      bpf: Refactor alloc_bulk().
-      bpf: Factor out inc/dec of active flag into helpers.
-      bpf: Further refactor alloc_bulk().
-      bpf: Change bpf_mem_cache draining process.
-      bpf: Add a hint to allocated objects.
-      bpf: Allow reuse from waiting_for_gp_ttrace list.
-      selftests/bpf: Improve test coverage of bpf_mem_alloc.
-      bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().
-      bpf: Convert bpf_cpumask to bpf_mem_cache_free_rcu.
-      Merge branch 'bpf-x86-allow-function-arguments-up-to-12-for-tracing'
-
-Andrea Terzolo (1):
-      libbpf: Skip modules BTF loading when CAP_SYS_ADMIN is missing
-
-Andrii Nakryiko (6):
-      Merge branch 'libbpf: add netfilter link attach helper'
-      libbpf: only reset sec_def handler when necessary
-      Merge branch 'bpftool: Fix skeletons compilation for older kernels'
-      libbpf: Fix realloc API handling in zero-sized edge cases
-      bpf: teach verifier actual bounds of bpf_get_smp_processor_id() result
-      selftests/bpf: extend existing map resize tests for per-cpu use case
-
-Anton Protopopov (5):
-      bpf: add percpu stats for bpf_map elements insertions/deletions
-      bpf: add a new kfunc to return current bpf_map elements count
-      bpf: populate the per-cpu insertions/deletions counters for hashmaps
-      bpf: make preloaded map iterators to display map elements count
-      selftests/bpf: test map percpu stats
-
-Björn Töpel (3):
-      selftests/bpf: Add F_NEEDS_EFFICIENT_UNALIGNED_ACCESS to some tests
-      selftests/bpf: Honor $(O) when figuring out paths
-      selftests/bpf: Bump and validate MAX_SYMS
-
-Daniel Borkmann (2):
-      selftests/bpf: Fix bpf_nf failure upon test rerun
-      Merge branch 'bpf-mem-cache-free-rcu'
-
-Dave Thaler (1):
-      bpf, docs: Fix definition of BPF_NEG operation
-
-David Vernet (1):
-      bpf,docs: Create new standardization subdirectory
-
-Fangrui Song (1):
-      bpf: Replace deprecated -target with --target= for Clang
-
-Florian Westphal (2):
-      libbpf: Add netfilter link attach helper
-      selftests/bpf: Add bpf_program__attach_netfilter helper test
-
-Hou Tao (3):
-      bpf: Remove unnecessary ring buffer size check
-      selftests/bpf: Add benchmark for bpf memory allocator
-      bpf: Add object leak check.
-
-Jackie Liu (2):
-      libbpf: Cross-join available_filter_functions and kallsyms for multi-kprobes
-      libbpf: Use available_filter_functions_addrs with multi-kprobes
-
-John Sanpe (1):
-      libbpf: Remove HASHMAP_INIT static initialization helper
-
-Kui-Feng Lee (2):
-      bpf, net: Check skb ownership against full socket.
-      selftests/bpf: Verify that the cgroup_skb filters receive expected packets.
-
-Lu Hongfei (1):
-      selftests/bpf: Correct two typos
-
-Menglong Dong (3):
-      bpf, x86: save/restore regs with BPF_DW size
-      bpf, x86: allow function arguments up to 12 for TRACING
-      selftests/bpf: add testcase for TRACING with 6+ arguments
-
-Paul E. McKenney (1):
-      rcu: Export rcu_request_urgent_qs_task()
-
-Quentin Monnet (2):
-      bpftool: Use a local copy of BPF_LINK_TYPE_PERF_EVENT in pid_iter.bpf.c
-      bpftool: Use "fallthrough;" keyword instead of comments
-
-Rong Tao (1):
-      samples/bpf: syscall_tp: Aarch64 no open syscall
-
-Stanislav Fomichev (2):
-      bpf: Resolve modifiers when walking structs
-      selftests/bpf: Add test to exercise typedef walking
-
-Sumitra Sharma (1):
-      lib/test_bpf: Call page_address() on page acquired with GFP_KERNEL flag
-
-Yafang Shao (14):
-      bpf: Support ->fill_link_info for kprobe_multi
-      bpftool: Dump the kernel symbol's module name
-      bpftool: Show kprobe_multi link info
-      bpf: Protect probed address based on kptr_restrict setting
-      bpf: Clear the probe_addr for uprobe
-      bpf: Expose symbol's respective address
-      bpf: Add a common helper bpf_copy_to_user()
-      bpf: Support ->fill_link_info for perf_event
-      bpftool: Add perf event names
-      bpftool: Show perf link info
-      bpf: Fix an error around PTR_UNTRUSTED
-      selftests/bpf: Add selftests for nested_trust
-      bpf: Fix an error in verifying a field in a union
-      selftests/bpf: Add selftest for PTR_UNTRUSTED
-
- Documentation/bpf/bpf_devel_QA.rst                 |  10 +-
- Documentation/bpf/btf.rst                          |   4 +-
- Documentation/bpf/index.rst                        |   3 +-
- Documentation/bpf/llvm_reloc.rst                   |   6 +-
- Documentation/bpf/standardization/index.rst        |  18 +
- .../bpf/{ => standardization}/instruction-set.rst  |   2 +-
- .../bpf/{ => standardization}/linux-notes.rst      |   3 +-
- MAINTAINERS                                        |   2 +-
- arch/x86/net/bpf_jit_comp.c                        | 246 ++++++++--
- drivers/hid/bpf/entrypoints/Makefile               |   2 +-
- include/linux/bpf-cgroup.h                         |   4 +-
- include/linux/bpf.h                                |  30 ++
- include/linux/bpf_mem_alloc.h                      |   2 +
- include/linux/rcutiny.h                            |   2 +
- include/linux/rcutree.h                            |   1 +
- include/linux/trace_events.h                       |   3 +-
- include/uapi/linux/bpf.h                           |  40 ++
- kernel/bpf/btf.c                                   |  24 +-
- kernel/bpf/cpumask.c                               |  20 +-
- kernel/bpf/hashtab.c                               |  22 +-
- kernel/bpf/map_iter.c                              |  39 +-
- kernel/bpf/memalloc.c                              | 378 +++++++++++----
- kernel/bpf/preload/iterators/Makefile              |   2 +-
- kernel/bpf/preload/iterators/iterators.bpf.c       |   9 +-
- .../iterators/iterators.lskel-little-endian.h      | 526 +++++++++++----------
- kernel/bpf/ringbuf.c                               |  26 +-
- kernel/bpf/syscall.c                               | 180 ++++++-
- kernel/bpf/verifier.c                              |  42 +-
- kernel/rcu/rcu.h                                   |   2 -
- kernel/trace/bpf_trace.c                           |  49 +-
- kernel/trace/trace_kprobe.c                        |  13 +-
- kernel/trace/trace_uprobe.c                        |   3 +-
- lib/test_bpf.c                                     |  12 +-
- net/bpf/test_run.c                                 |  18 +-
- samples/bpf/Makefile                               |   6 +-
- samples/bpf/gnu/stubs.h                            |   2 +-
- samples/bpf/syscall_tp_kern.c                      |   4 +
- samples/bpf/test_lwt_bpf.sh                        |   2 +-
- samples/hid/Makefile                               |   6 +-
- tools/bpf/bpftool/Documentation/bpftool-gen.rst    |   4 +-
- tools/bpf/bpftool/Makefile                         |   2 +-
- tools/bpf/bpftool/btf_dumper.c                     |   2 +-
- tools/bpf/bpftool/feature.c                        |   2 +-
- tools/bpf/bpftool/link.c                           | 432 ++++++++++++++++-
- tools/bpf/bpftool/skeleton/pid_iter.bpf.c          |  26 +-
- tools/bpf/bpftool/skeleton/profiler.bpf.c          |  27 +-
- tools/bpf/bpftool/xlated_dumper.c                  |   6 +-
- tools/bpf/bpftool/xlated_dumper.h                  |   2 +
- tools/bpf/runqslower/Makefile                      |   2 +-
- tools/build/feature/Makefile                       |   2 +-
- tools/include/uapi/linux/bpf.h                     |  40 ++
- tools/lib/bpf/bpf.c                                |   8 +
- tools/lib/bpf/bpf.h                                |   6 +
- tools/lib/bpf/hashmap.h                            |  10 -
- tools/lib/bpf/libbpf.c                             | 258 +++++++++-
- tools/lib/bpf/libbpf.h                             |  15 +
- tools/lib/bpf/libbpf.map                           |   1 +
- tools/lib/bpf/usdt.c                               |   5 +-
- tools/testing/selftests/bpf/DENYLIST.aarch64       |   2 +
- tools/testing/selftests/bpf/Makefile               |  13 +-
- tools/testing/selftests/bpf/bench.c                |   4 +
- .../testing/selftests/bpf/benchs/bench_htab_mem.c  | 350 ++++++++++++++
- .../testing/selftests/bpf/benchs/bench_ringbufs.c  |   2 +-
- .../selftests/bpf/benchs/run_bench_htab_mem.sh     |  40 ++
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  49 +-
- tools/testing/selftests/bpf/cgroup_helpers.c       |  12 +
- tools/testing/selftests/bpf/cgroup_helpers.h       |   1 +
- tools/testing/selftests/bpf/cgroup_tcp_skb.h       |  35 ++
- tools/testing/selftests/bpf/gnu/stubs.h            |   2 +-
- .../selftests/bpf/map_tests/map_percpu_stats.c     | 447 +++++++++++++++++
- tools/testing/selftests/bpf/prog_tests/bpf_nf.c    |   5 +-
- .../selftests/bpf/prog_tests/cgroup_tcp_skb.c      | 402 ++++++++++++++++
- .../testing/selftests/bpf/prog_tests/fentry_test.c |  43 +-
- .../testing/selftests/bpf/prog_tests/fexit_test.c  |  43 +-
- .../selftests/bpf/prog_tests/get_func_args_test.c  |   4 +-
- .../selftests/bpf/prog_tests/global_map_resize.c   |  14 +-
- .../selftests/bpf/prog_tests/modify_return.c       |  10 +-
- .../bpf/prog_tests/netfilter_link_attach.c         |  86 ++++
- .../selftests/bpf/prog_tests/ptr_untrusted.c       |  36 ++
- .../selftests/bpf/prog_tests/tcp_hdr_options.c     |   2 +-
- .../selftests/bpf/prog_tests/tracing_struct.c      |  19 +
- .../selftests/bpf/prog_tests/trampoline_count.c    |   4 +-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
- tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c | 382 +++++++++++++++
- .../testing/selftests/bpf/progs/fentry_many_args.c |  39 ++
- .../testing/selftests/bpf/progs/fexit_many_args.c  |  40 ++
- tools/testing/selftests/bpf/progs/htab_mem_bench.c | 105 ++++
- tools/testing/selftests/bpf/progs/linked_list.c    |   2 +-
- .../testing/selftests/bpf/progs/map_percpu_stats.c |  24 +
- tools/testing/selftests/bpf/progs/modify_return.c  |  40 ++
- .../selftests/bpf/progs/nested_trust_failure.c     |  16 +
- .../selftests/bpf/progs/nested_trust_success.c     |  15 +
- .../selftests/bpf/progs/test_global_map_resize.c   |   8 +-
- .../bpf/progs/test_netfilter_link_attach.c         |  14 +
- .../selftests/bpf/progs/test_ptr_untrusted.c       |  29 ++
- tools/testing/selftests/bpf/progs/tracing_struct.c |  54 +++
- .../testing/selftests/bpf/progs/verifier_typedef.c |  23 +
- tools/testing/selftests/bpf/trace_helpers.c        |   5 +-
- .../selftests/bpf/verifier/atomic_cmpxchg.c        |   1 +
- tools/testing/selftests/bpf/verifier/ctx_skb.c     |   2 +
- tools/testing/selftests/bpf/verifier/jmp32.c       |   8 +
- tools/testing/selftests/bpf/verifier/map_kptr.c    |   2 +
- tools/testing/selftests/bpf/verifier/precise.c     |   2 +-
- tools/testing/selftests/hid/Makefile               |   6 +-
- tools/testing/selftests/net/Makefile               |   4 +-
- tools/testing/selftests/tc-testing/Makefile        |   2 +-
- 106 files changed, 4444 insertions(+), 619 deletions(-)
- create mode 100644 Documentation/bpf/standardization/index.rst
- rename Documentation/bpf/{ => standardization}/instruction-set.rst (99%)
- rename Documentation/bpf/{ => standardization}/linux-notes.rst (96%)
- create mode 100644 tools/testing/selftests/bpf/benchs/bench_htab_mem.c
- create mode 100755 tools/testing/selftests/bpf/benchs/run_bench_htab_mem.sh
- create mode 100644 tools/testing/selftests/bpf/cgroup_tcp_skb.h
- create mode 100644 tools/testing/selftests/bpf/map_tests/map_percpu_stats.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_tcp_skb.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/netfilter_link_attach.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/ptr_untrusted.c
- create mode 100644 tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c
- create mode 100644 tools/testing/selftests/bpf/progs/fentry_many_args.c
- create mode 100644 tools/testing/selftests/bpf/progs/fexit_many_args.c
- create mode 100644 tools/testing/selftests/bpf/progs/htab_mem_bench.c
- create mode 100644 tools/testing/selftests/bpf/progs/map_percpu_stats.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_netfilter_link_attach.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_ptr_untrusted.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_typedef.c
+--8RhcC9HrFkuMH7pS--
 
