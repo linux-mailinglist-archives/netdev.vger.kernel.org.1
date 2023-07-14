@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-18026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC4F7543A5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:17:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AAE17543A1
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 22:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754CA2809A8
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:17:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CEF1C21614
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 20:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBFF2772C;
-	Fri, 14 Jul 2023 20:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99F820F96;
+	Fri, 14 Jul 2023 20:16:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803E62419D
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A399E134CB
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:16:35 +0000 (UTC)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326DC3AA9
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 13:16:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD3D93AB1
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 13:16:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689365795; x=1720901795;
+  t=1689365784; x=1720901784;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3JZyyHriPa+HbvgiB4o8p/9rR3Z+RGPwPz4lMcIqn/w=;
-  b=T6AbfVSBcWkDE8OOBh5Gkiz7UW9BYWKfEP7aaRUlKQxzbX+R/df0av1u
-   DEvT0yEifpLMiLqCbqAQLk0rFdegSE2jxcG139JpYSLE/dUwvKyP8FNwq
-   0qC4mLjYlIArZlx6UXbyEXFzjDqNfk3iixQBM1Cj6FcKmBgEkTB4PdxeD
-   xJvvrD10Sy3oe1B6H+soX7aYw0E1b6zCIf09a4mouqJ5cA9TNsC0mCSJv
-   CFKl20FQhPpFOqh2JKsG8z9u3nmWnAyhCccHvSBb57gX0ZBj1Zv9k3h03
-   t+kVRXAFKvt7tlPIDDF4p6AnNP9xpIwxPRpHM3lSjLf1RIUXouKzq1GhO
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="431744612"
+  bh=gx3Ark/CDNPqPFWYGmvigBv3HBWmV1qxAretQWxrlqE=;
+  b=bgNj0ssHmxWmVpuyO5XeZHq93BPtVDf7wFu2FNBel7SrT5yByFD5pBdm
+   bKD0gGtN4MXvk2enebJi65jsVOsdE36e9sCCiiFa8Kc4ox9Jw08AXpwle
+   MEK99quayKiL/vUxZdN5ly9L+9dnw1zastJspKQactRgCbiSU/L3197If
+   ZCs6YNbVp6ElEihmVH1khvxbETtGf7Ao2uRH5zX+9yXF1V3m2mByXXvIv
+   1JyNIfSgb3cokU9f/yOJkrRQrIoDEIVS+4pzzpPhs6OoYjCvKwQqJHxK/
+   e5IQlCrVtES/GmACOQdCSTMEAmHyqeEdYTp/isOn1xOopGundeKrcy4Qt
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="431744613"
 X-IronPort-AV: E=Sophos;i="6.01,206,1684825200"; 
-   d="scan'208";a="431744612"
+   d="scan'208";a="431744613"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 13:16:23 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="752168798"
+X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="752168802"
 X-IronPort-AV: E=Sophos;i="6.01,206,1684825200"; 
-   d="scan'208";a="752168798"
+   d="scan'208";a="752168802"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga008.jf.intel.com with ESMTP; 14 Jul 2023 13:16:23 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -51,13 +51,14 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	anthony.l.nguyen@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <simon.horman@corigine.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net 1/2] ice: Unregister netdev and devlink_port only once
-Date: Fri, 14 Jul 2023 13:10:40 -0700
-Message-Id: <20230714201041.1717834-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 2/2] ice: prevent NULL pointer deref during reload
+Date: Fri, 14 Jul 2023 13:10:41 -0700
+Message-Id: <20230714201041.1717834-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230714201041.1717834-1-anthony.l.nguyen@intel.com>
 References: <20230714201041.1717834-1-anthony.l.nguyen@intel.com>
@@ -75,85 +76,182 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Petr Oros <poros@redhat.com>
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Since commit 6624e780a577fc ("ice: split ice_vsi_setup into smaller
-functions") ice_vsi_release does things twice. There is unregister
-netdev which is unregistered in ice_deinit_eth also.
+Calling ethtool during reload can lead to call trace, because VSI isn't
+configured for some time, but netdev is alive.
 
-It also unregisters the devlink_port twice which is also unregistered
-in ice_deinit_eth(). This double deregistration is hidden because
-devl_port_unregister ignores the return value of xa_erase.
+To fix it add rtnl lock for VSI deconfig and config. Set ::num_q_vectors
+to 0 after freeing and add a check for ::tx/rx_rings in ring related
+ethtool ops.
 
-[   68.642167] Call Trace:
-[   68.650385]  ice_devlink_destroy_pf_port+0xe/0x20 [ice]
-[   68.655656]  ice_vsi_release+0x445/0x690 [ice]
-[   68.660147]  ice_deinit+0x99/0x280 [ice]
-[   68.664117]  ice_remove+0x1b6/0x5c0 [ice]
+Add proper unroll of filters in ice_start_eth().
 
-[  171.103841] Call Trace:
-[  171.109607]  ice_devlink_destroy_pf_port+0xf/0x20 [ice]
-[  171.114841]  ice_remove+0x158/0x270 [ice]
-[  171.118854]  pci_device_remove+0x3b/0xc0
-[  171.122779]  device_release_driver_internal+0xc7/0x170
-[  171.127912]  driver_detach+0x54/0x8c
-[  171.131491]  bus_remove_driver+0x77/0xd1
-[  171.135406]  pci_unregister_driver+0x2d/0xb0
-[  171.139670]  ice_module_exit+0xc/0x55f [ice]
+Reproduction:
+$watch -n 0.1 -d 'ethtool -g enp24s0f0np0'
+$devlink dev reload pci/0000:18:00.0 action driver_reinit
 
-Fixes: 6624e780a577 ("ice: split ice_vsi_setup into smaller functions")
-Signed-off-by: Petr Oros <poros@redhat.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Call trace before fix:
+[66303.926205] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[66303.926259] #PF: supervisor read access in kernel mode
+[66303.926286] #PF: error_code(0x0000) - not-present page
+[66303.926311] PGD 0 P4D 0
+[66303.926332] Oops: 0000 [#1] PREEMPT SMP PTI
+[66303.926358] CPU: 4 PID: 933821 Comm: ethtool Kdump: loaded Tainted: G           OE      6.4.0-rc5+ #1
+[66303.926400] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.00.01.0014.070920180847 07/09/2018
+[66303.926446] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
+[66303.926649] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
+[66303.926722] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
+[66303.926749] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
+[66303.926781] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
+[66303.926811] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
+[66303.926843] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
+[66303.926874] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
+[66303.926906] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
+[66303.926941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[66303.926967] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
+[66303.926999] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[66303.927029] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[66303.927060] PKRU: 55555554
+[66303.927075] Call Trace:
+[66303.927094]  <TASK>
+[66303.927111]  ? __die+0x23/0x70
+[66303.927140]  ? page_fault_oops+0x171/0x4e0
+[66303.927176]  ? exc_page_fault+0x7f/0x180
+[66303.927209]  ? asm_exc_page_fault+0x26/0x30
+[66303.927244]  ? ice_get_ringparam+0x22/0x50 [ice]
+[66303.927433]  rings_prepare_data+0x62/0x80
+[66303.927469]  ethnl_default_doit+0xe2/0x350
+[66303.927501]  genl_family_rcv_msg_doit.isra.0+0xe3/0x140
+[66303.927538]  genl_rcv_msg+0x1b1/0x2c0
+[66303.927561]  ? __pfx_ethnl_default_doit+0x10/0x10
+[66303.927590]  ? __pfx_genl_rcv_msg+0x10/0x10
+[66303.927615]  netlink_rcv_skb+0x58/0x110
+[66303.927644]  genl_rcv+0x28/0x40
+[66303.927665]  netlink_unicast+0x19e/0x290
+[66303.927691]  netlink_sendmsg+0x254/0x4d0
+[66303.927717]  sock_sendmsg+0x93/0xa0
+[66303.927743]  __sys_sendto+0x126/0x170
+[66303.927780]  __x64_sys_sendto+0x24/0x30
+[66303.928593]  do_syscall_64+0x5d/0x90
+[66303.929370]  ? __count_memcg_events+0x60/0xa0
+[66303.930146]  ? count_memcg_events.constprop.0+0x1a/0x30
+[66303.930920]  ? handle_mm_fault+0x9e/0x350
+[66303.931688]  ? do_user_addr_fault+0x258/0x740
+[66303.932452]  ? exc_page_fault+0x7f/0x180
+[66303.933193]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lib.c | 27 ------------------------
- 1 file changed, 27 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_base.c    |  2 ++
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 13 +++++++++++--
+ drivers/net/ethernet/intel/ice/ice_main.c    | 10 ++++++++--
+ 3 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 00e3afd507a4..0054d7e64ec3 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2972,39 +2972,12 @@ int ice_vsi_release(struct ice_vsi *vsi)
- 		return -ENODEV;
- 	pf = vsi->back;
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 4a12316f7b46..b678bdf96f3a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -800,6 +800,8 @@ void ice_vsi_free_q_vectors(struct ice_vsi *vsi)
  
--	/* do not unregister while driver is in the reset recovery pending
--	 * state. Since reset/rebuild happens through PF service task workqueue,
--	 * it's not a good idea to unregister netdev that is associated to the
--	 * PF that is running the work queue items currently. This is done to
--	 * avoid check_flush_dependency() warning on this wq
--	 */
--	if (vsi->netdev && !ice_is_reset_in_progress(pf->state) &&
--	    (test_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state))) {
--		unregister_netdev(vsi->netdev);
--		clear_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state);
--	}
--
--	if (vsi->type == ICE_VSI_PF)
--		ice_devlink_destroy_pf_port(pf);
--
- 	if (test_bit(ICE_FLAG_RSS_ENA, pf->flags))
- 		ice_rss_clean(vsi);
+ 	ice_for_each_q_vector(vsi, v_idx)
+ 		ice_free_q_vector(vsi, v_idx);
++
++	vsi->num_q_vectors = 0;
+ }
  
- 	ice_vsi_close(vsi);
- 	ice_vsi_decfg(vsi);
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 8d5cbbd0b3d5..ad4d4702129f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -2681,8 +2681,13 @@ ice_get_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
  
--	if (vsi->netdev) {
--		if (test_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state)) {
--			unregister_netdev(vsi->netdev);
--			clear_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state);
--		}
--		if (test_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state)) {
--			free_netdev(vsi->netdev);
--			vsi->netdev = NULL;
--			clear_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state);
--		}
--	}
--
- 	/* retain SW VSI data structure since it is needed to unregister and
- 	 * free VSI netdev when PF is not in reset recovery pending state,\
- 	 * for ex: during rmmod.
+ 	ring->rx_max_pending = ICE_MAX_NUM_DESC;
+ 	ring->tx_max_pending = ICE_MAX_NUM_DESC;
+-	ring->rx_pending = vsi->rx_rings[0]->count;
+-	ring->tx_pending = vsi->tx_rings[0]->count;
++	if (vsi->tx_rings && vsi->rx_rings) {
++		ring->rx_pending = vsi->rx_rings[0]->count;
++		ring->tx_pending = vsi->tx_rings[0]->count;
++	} else {
++		ring->rx_pending = 0;
++		ring->tx_pending = 0;
++	}
+ 
+ 	/* Rx mini and jumbo rings are not supported */
+ 	ring->rx_mini_max_pending = 0;
+@@ -2716,6 +2721,10 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
+ 		return -EINVAL;
+ 	}
+ 
++	/* Return if there is no rings (device is reloading) */
++	if (!vsi->tx_rings || !vsi->rx_rings)
++		return -EBUSY;
++
+ 	new_tx_cnt = ALIGN(ring->tx_pending, ICE_REQ_DESC_MULTIPLE);
+ 	if (new_tx_cnt != ring->tx_pending)
+ 		netdev_info(netdev, "Requested Tx descriptor count rounded up to %d\n",
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 19a5e7f3a075..f02d44455772 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4430,9 +4430,9 @@ static int ice_start_eth(struct ice_vsi *vsi)
+ 	if (err)
+ 		return err;
+ 
+-	rtnl_lock();
+ 	err = ice_vsi_open(vsi);
+-	rtnl_unlock();
++	if (err)
++		ice_fltr_remove_all(vsi);
+ 
+ 	return err;
+ }
+@@ -4895,6 +4895,7 @@ int ice_load(struct ice_pf *pf)
+ 	params = ice_vsi_to_params(vsi);
+ 	params.flags = ICE_VSI_FLAG_INIT;
+ 
++	rtnl_lock();
+ 	err = ice_vsi_cfg(vsi, &params);
+ 	if (err)
+ 		goto err_vsi_cfg;
+@@ -4902,6 +4903,7 @@ int ice_load(struct ice_pf *pf)
+ 	err = ice_start_eth(ice_get_main_vsi(pf));
+ 	if (err)
+ 		goto err_start_eth;
++	rtnl_unlock();
+ 
+ 	err = ice_init_rdma(pf);
+ 	if (err)
+@@ -4916,9 +4918,11 @@ int ice_load(struct ice_pf *pf)
+ 
+ err_init_rdma:
+ 	ice_vsi_close(ice_get_main_vsi(pf));
++	rtnl_lock();
+ err_start_eth:
+ 	ice_vsi_decfg(ice_get_main_vsi(pf));
+ err_vsi_cfg:
++	rtnl_unlock();
+ 	ice_deinit_dev(pf);
+ 	return err;
+ }
+@@ -4931,8 +4935,10 @@ void ice_unload(struct ice_pf *pf)
+ {
+ 	ice_deinit_features(pf);
+ 	ice_deinit_rdma(pf);
++	rtnl_lock();
+ 	ice_stop_eth(ice_get_main_vsi(pf));
+ 	ice_vsi_decfg(ice_get_main_vsi(pf));
++	rtnl_unlock();
+ 	ice_deinit_dev(pf);
+ }
+ 
 -- 
 2.38.1
 
