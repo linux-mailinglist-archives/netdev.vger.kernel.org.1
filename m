@@ -1,156 +1,157 @@
-Return-Path: <netdev+bounces-17877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03CB7753611
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:07:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A24753621
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 11:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E85F1C215E4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:07:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F251C215E1
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55926D512;
-	Fri, 14 Jul 2023 09:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C011BD515;
+	Fri, 14 Jul 2023 09:09:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437CED507
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:07:41 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644922D50
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:07:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689325648;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r2mY0JyNnTxZdvnP8IpnyvgEIsSEBhM9AyoS3cpTtDM=;
-	b=QxtUE1FW/Uf6iufok1muR/xrDF61hx9LhLBo6A2GokBAKnxZXF4GtXI8N8sqc3atV6oy9w
-	IA5xpgj6yL5TtIy1BGEN/6pbH5XzXuW4TTrwNP4Kcu7OdMmr5s4a20RZ0e9kLZ/yDEvNIe
-	nKp0k9IhTZ91tl1tZG+/oWtf4sIoQeE=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-9xWYNd5ZPsK7K6e5Y43K9A-1; Fri, 14 Jul 2023 05:07:27 -0400
-X-MC-Unique: 9xWYNd5ZPsK7K6e5Y43K9A-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4fab61bb53bso1536839e87.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:07:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689325646; x=1691917646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r2mY0JyNnTxZdvnP8IpnyvgEIsSEBhM9AyoS3cpTtDM=;
-        b=BgUFSVYdpGnN5cjCJ148ybOY59/p15EDcAI2BQdwSxwIKAou08TYwDApJd7SfPl/0x
-         2zVamGBQOlas8MhYvqbgD0dg1osO6Zlih1vMiqRMfm5keC8ItonVtnaI3QiqtqbUhA+A
-         pDOSGjKbg6t4zNPtqsREdmqtKjiU+lopjH3eTAnXN0PunG5AQ47xhNLGamJnkl8t+mmC
-         p/fNp1BXv1FbsLD8qJUoRXPJJv4uDwE97KFCTP0ZeH0XTx9bhr4p96fS21nv0RPPscqb
-         ucycB7I4oO3vkiCaKsfrUJmLDDwdmlVdUH7rBD76yMI/L8Pw2j0RTCdSfcvUIeHsPUDp
-         KoiQ==
-X-Gm-Message-State: ABy/qLY7wBj4Ja4AVEYb/FbYbo1AWvQ4mv4kDc2T876mGnqvbGWcr+xH
-	pA5riTwJi/Iug2AosecPZmUn3e9rEi2CS6MhUKfmGPoD0rGygWONLbHJGBMMvQf4emxs+an3YZb
-	D7+mK4zbGqKMlm0JV
-X-Received: by 2002:a05:6512:39d4:b0:4fb:cab9:ddf with SMTP id k20-20020a05651239d400b004fbcab90ddfmr4243840lfu.57.1689325645723;
-        Fri, 14 Jul 2023 02:07:25 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHrHRiCN5I9pXBjlPpDa1v4y/hbI5KQALwNl1SeMwVsF6yueBPg/QexbDXA94mOfWXdeFCURw==
-X-Received: by 2002:a05:6512:39d4:b0:4fb:cab9:ddf with SMTP id k20-20020a05651239d400b004fbcab90ddfmr4243830lfu.57.1689325645424;
-        Fri, 14 Jul 2023 02:07:25 -0700 (PDT)
-Received: from debian ([2001:4649:fcb8:0:d1e3:8951:b0b4:8608])
-        by smtp.gmail.com with ESMTPSA id u20-20020ac248b4000000b004fb757bd429sm1419011lfg.96.2023.07.14.02.07.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 02:07:24 -0700 (PDT)
-Date: Fri, 14 Jul 2023 11:07:22 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Su Hui <suhui@nfschina.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, xeb@mail.ru, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	wuych <yunchuan@nfschina.com>
-Subject: Re: [PATCH net-next v2 03/10] net: ppp: Remove unnecessary (void*)
- conversions
-Message-ID: <ZLEQSivEvfpWXrdr@debian>
-References: <20230710064027.173298-1-suhui@nfschina.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC13ED507
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 09:09:47 +0000 (UTC)
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2118.outbound.protection.outlook.com [40.107.215.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354601734;
+	Fri, 14 Jul 2023 02:09:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lYLnypC3JpxIu/BAM+KS88VwF3BkRrxv9u17rPTzj+g6wktDWf0uysXFPHmFn5zJ40gL7xIzf44mQSkUuPHZM9OQ9yiODeWfUgvU/r9DNUqpXTZTimuF4677ferDRdzMAEh6Gyf0tNh1AN1TbX2857PDq1LrtZl83662rr/DmZnr6G2XnNqWgtiF+2sIZkTYiAsJVqg5uzGM/shYrG2yp+AFuQPjuxPlJ4PI80RxaFPQ4GFhx4Id8rxNV91Q1R+lGJh79X8eWNB7idlBbU28CvBGq+oLC5zUIO/rIndoVIxgJH42vlFbtkPKxO/RvAWTSM17Zx2jK+/iokNbL8OrzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YavZlFexwyfkEeEFTyUKxSku7WdThenRSVON8LfG7cE=;
+ b=hZhkf+JoXnnHKzQhd6c1SFtcFR2vbDlwz+1cY5CPueXgK/xaUL+RFnMcmztzxfJuRUlpkjM/WtfezixUHUgCjkle+CKPJtoXUNw4iQZgMa8p2p9aK+3BLj9VtpVTR3RWGQal7/H/BFe6v0p3lKQNenwR5g5B6Z7GJ+Dl6IKfT3Lb6gok/YpxLDo+aobotTTl5qS0eLLd46xrq7kKOq30MrgDd/7hZuWBr8p3eCn5R+tCb49r9nacnLxxZGaKhBgdpClkRYaX5/HhdEWQoW9pOTAM0PwhE9kRw1J7OGETAGYxYnYk6wgybS2WKOE4p4zR7BFtMsBGxQX6+8+5rctnag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YavZlFexwyfkEeEFTyUKxSku7WdThenRSVON8LfG7cE=;
+ b=jGnXIUPoDDYHpmUlhTHuH6RfhQZXOFr624ILJTNdVzlqsbITbOZpn/YF9eof2rBi/tAURnzNYXi91o4um7f9URTyPu5z6/cGnOaQN6qWhVvAitGtydrINtj2apznt//mN3DZr3cuB9pEy8L9yKaClJbLV+43TWzUH5rtc+t88fOFZjJ9ftogHdeWjjpPbODOvyLRknv/5Mamj85Z1KIOkAqFEXw+e5xhgROKI5wVKhT5d7ce5waCqdeROE+tAvS7SqOc40XJwzFprCmynza+VwLWdwSpnJW4A5Zrsnxl0INLVFzOH4yzs0O7CimA12jF4cyVGeWyG1pN9lUTrWc2CA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ SI2PR06MB5241.apcprd06.prod.outlook.com (2603:1096:4:1e1::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.27; Fri, 14 Jul 2023 09:09:40 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6588.027; Fri, 14 Jul 2023
+ 09:09:40 +0000
+From: Wang Ming <machel@vivo.com>
+To: Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	jay.vosburgh@canonical.com,
+	Wang Ming <machel@vivo.com>
+Subject: [PATCH net v2] net: bonding: Remove error checking for debugfs_create_dir()
+Date: Fri, 14 Jul 2023 17:08:42 +0800
+Message-Id: <20230714090856.11571-1-machel@vivo.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TY2PR01CA0014.jpnprd01.prod.outlook.com
+ (2603:1096:404:a::26) To SG2PR06MB3743.apcprd06.prod.outlook.com
+ (2603:1096:4:d0::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710064027.173298-1-suhui@nfschina.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|SI2PR06MB5241:EE_
+X-MS-Office365-Filtering-Correlation-Id: f277a695-4fb6-4fe0-6de8-08db844a0d7c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CGVR3BftkKjTJFti+fxsLjM3Pi3Dzb8rpowdLNJyayMrRVPmu5ZQThuTIFw0BgLstJ/qA+5vVt5QXsP1Bow9+UG5JFfqhUwjoN5GbhHm7alJSLJZ+8TIoukV8l3MqJoZ+PmDCEH3Ju9Lo8L6oDDQNHa9Dq+yHwdgvj7xalkYRd3PMx8j/tSOFVtUUUp1mokNh29n2SsmWhpNB6pVs5ZLW+8qXF2upSjWWX5oi+oD7L38NnZgcFAr/V3M3W4gwI30WlSnFhsCqzSCt3PdcK2G6Q07AjrVkIKOeMHCalm78YzHTb3DYQYtdtB8jfiSHXmQkrUCc7r3ghnMT65hmrCjTCef0dazRHXmXgpqZ1fjsOFR06FXI7pqnRhYty84qA6X6Yy6M5lI1vf4cuc2OG/cIKRhLLl8a3hbekZiUO3sEIqUWuh7bVVGNFc5VRp/JSYykgb0Xq8rAkYMpO8cmL1BlkYf6V5XGh7vaz0NAVsnibtu04nCpXCmysi3lHpHHPkLeBBOcfyV/aKDL3mmpxSGrz46k9vRSef7+hze+jqyOv7D0D6iGjjwmejlAoLNRb+TqnzjIzUH2y1IQ8wPgIpQ9nlE08Nn0sQu0Srs17/4/Ag=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(451199021)(478600001)(52116002)(6486002)(110136005)(186003)(6506007)(1076003)(6512007)(26005)(107886003)(2906002)(4744005)(316002)(41300700001)(66946007)(66556008)(66476007)(4326008)(5660300002)(8936002)(8676002)(38350700002)(38100700002)(86362001)(36756003)(83380400001)(2616005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QQbFruykQCUnmg6VYa0K36lh0uPpvYsBVYQhx8EEXlFbLtjtmzhZWLJfibM9?=
+ =?us-ascii?Q?xIe+gv/pdrqwfAfbul0+Grr2turSabK8Q8KWooJaMgDlLzUczewNnhN9zodp?=
+ =?us-ascii?Q?x20afSLImRrxJe7BJK3mo5NDR08zbb14ifTT/FW7JMk92N0Rbh4Knn7UqHcc?=
+ =?us-ascii?Q?nmlPvYrs/CZcZ4MX/sgsAR7NQBJhZHTAIp7KX7+khGKHlhekTSEGJ3/Z7Qpy?=
+ =?us-ascii?Q?K1HyX67yHEPlpf/UIiQRvGoeVO63gwXne2TNPq6W29zGDsfvuC7XKWstvFDQ?=
+ =?us-ascii?Q?pmLhgzPoF5+eUgsvYdBVIoQxzZS9zoy9Djtr6/74ObEfoZenMqH9neiVSJF4?=
+ =?us-ascii?Q?iVGJ6EHkIRdnBmJ/+TbAxIWoMpHTt6q6NGCye1tXb+8a40bRyzDTZC7uM9tf?=
+ =?us-ascii?Q?YXqu865+Tnm+olbp2CjsfqyMuGE+9AFUQdTOBbY8jUqQ5X7gQLga9Thjw+9e?=
+ =?us-ascii?Q?x73t2bgX13duJCiGBF3dC6t6LdBVCcomWXqlhEfqa8igK3lCD8uMDSz1v26x?=
+ =?us-ascii?Q?/fltc3rXH0FiPX13P2NOgpzOwSTfMmWSvj3BgUYJOgGQQQUlHjNVSgzEMGiW?=
+ =?us-ascii?Q?CB+jPswvaCffr4a8yRruPCc3HI+jLt6FCtvWXrQxwCubIqRu5N8JH5nTh+t7?=
+ =?us-ascii?Q?7gyJbXN915894eXjcnYyVJCS2U2JaVy6uOiepVLpg/qhnrShZsHIv6TVKj3z?=
+ =?us-ascii?Q?pLTFzzZiGZEPALQQ9fy9/CM0LfaKaxEDV7/6WSpWatWzqJi5WeK092ZUUby0?=
+ =?us-ascii?Q?P7Cfqcw/hUku97/LAgLcs8oI7tjeD8q5RAJeTyINEF/Z0wSLGLpHPy2tBxPy?=
+ =?us-ascii?Q?ttCqBukncfUwCcLluZ0N3KgqvFfpjpH51rxcYmQ/NaqUwtk0y8VmQY8ELg3g?=
+ =?us-ascii?Q?vtJKon9k1WLgwiHiA/G/2EGAcSU47dq28egarekgTZ7o4K5chn4cpquE2nFK?=
+ =?us-ascii?Q?9I2jsoXOq6H2J8k434yvqfVxpqgvNAWRfWcxyHZRpUAYX0SIZA2Chc00zwCT?=
+ =?us-ascii?Q?H5r/r0hHpYG3+BbYQu16Z9RfC9YwLhZvcFyRgvAfUKJrh3Wd8eYwHOiaokU2?=
+ =?us-ascii?Q?Qu5VyaL9JL3HmHhVBxe3O1MnQ3kX+OzKUsbEgenHER6gP12yIayh09O6o4OK?=
+ =?us-ascii?Q?qXNxl3WP5SMnuQom0XKCMBg9TkeCnAtidZSiKOfrKJp21KsBox5uY1YQvgDa?=
+ =?us-ascii?Q?nDMvxKtwkPKt2JxRVQAS2eE53vMuZeeNxmUwyLsHY6UGPT8FrJ6uIqlK0u7E?=
+ =?us-ascii?Q?Qqd9rdqb8dkCo2hFJGQKyQAJVjq1m/2ORLZSkyiS7hwkHduf9bwkC6ykfUTK?=
+ =?us-ascii?Q?9M/L8W4IjCpE3RoNtzEvkymFNzj1BA+xlIWoAywQQ63WO0y6EE1OtS5SHbNk?=
+ =?us-ascii?Q?q29NOqKY358K2Y1jo3u7mnKoOyXWyaJEN31gbGIxzT3CQ+12oi/VojN/J0Vq?=
+ =?us-ascii?Q?Li0KCKGqcw5LAOZSOR9Gx7ApciTXek+LzqciBJwR5A5faUYxX4skzHmCY4Da?=
+ =?us-ascii?Q?VmmoCjPz2ZQXtLLXXDYXuDpEVOwy7a2o6GRqgb8EsI5ZKima5rFMPI0jnr11?=
+ =?us-ascii?Q?5w4Eb5aY06H7YkQW8kc5drT/Sl0k8cJCW2xcA0Iv?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f277a695-4fb6-4fe0-6de8-08db844a0d7c
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2023 09:09:40.0642
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hzr32lUQVUzVBz3QCDhBzSqqhh/OPoyNM6XtRX5aYdSPjFYtcft41deKVq2GjEnWwcyFr6g3eatgJq04D5LuvA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2PR06MB5241
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 10, 2023 at 02:40:27PM +0800, Su Hui wrote:
-> From: wuych <yunchuan@nfschina.com>
-> 
-> Pointer variables of void * type do not require type cast.
-> 
-> Signed-off-by: wuych <yunchuan@nfschina.com>
-> ---
->  drivers/net/ppp/pppoe.c | 4 ++--
->  drivers/net/ppp/pptp.c  | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
+It is expected that most callers should _ignore_ the errors
+return by debugfs_create_dir() in bond_debug_reregister().
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+Signed-off-by: Wang Ming <machel@vivo.com>
+---
+ drivers/net/bonding/bond_debugfs.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-While there, you might want to also remove the useless casts in
-net/l2tp/l2tp_ppp.c and net/atm/pppoatm.c.
-
-> diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-> index 3b79c603b936..ba8b6bd8233c 100644
-> --- a/drivers/net/ppp/pppoe.c
-> +++ b/drivers/net/ppp/pppoe.c
-> @@ -968,7 +968,7 @@ static int __pppoe_xmit(struct sock *sk, struct sk_buff *skb)
->   ***********************************************************************/
->  static int pppoe_xmit(struct ppp_channel *chan, struct sk_buff *skb)
->  {
-> -	struct sock *sk = (struct sock *)chan->private;
-> +	struct sock *sk = chan->private;
->  	return __pppoe_xmit(sk, skb);
->  }
->  
-> @@ -976,7 +976,7 @@ static int pppoe_fill_forward_path(struct net_device_path_ctx *ctx,
->  				   struct net_device_path *path,
->  				   const struct ppp_channel *chan)
->  {
-> -	struct sock *sk = (struct sock *)chan->private;
-> +	struct sock *sk = chan->private;
->  	struct pppox_sock *po = pppox_sk(sk);
->  	struct net_device *dev = po->pppoe_dev;
->  
-> diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
-> index 32183f24e63f..6b3d3df99549 100644
-> --- a/drivers/net/ppp/pptp.c
-> +++ b/drivers/net/ppp/pptp.c
-> @@ -148,7 +148,7 @@ static struct rtable *pptp_route_output(struct pppox_sock *po,
->  
->  static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
->  {
-> -	struct sock *sk = (struct sock *) chan->private;
-> +	struct sock *sk = chan->private;
->  	struct pppox_sock *po = pppox_sk(sk);
->  	struct net *net = sock_net(sk);
->  	struct pptp_opt *opt = &po->proto.pptp;
-> @@ -575,7 +575,7 @@ static int pptp_create(struct net *net, struct socket *sock, int kern)
->  static int pptp_ppp_ioctl(struct ppp_channel *chan, unsigned int cmd,
->  	unsigned long arg)
->  {
-> -	struct sock *sk = (struct sock *) chan->private;
-> +	struct sock *sk = chan->private;
->  	struct pppox_sock *po = pppox_sk(sk);
->  	struct pptp_opt *opt = &po->proto.pptp;
->  	void __user *argp = (void __user *)arg;
-> -- 
-> 2.30.2
-> 
-> 
+diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bond_debugfs.c
+index 594094526648..a41f765420dc 100644
+--- a/drivers/net/bonding/bond_debugfs.c
++++ b/drivers/net/bonding/bond_debugfs.c
+@@ -87,9 +87,6 @@ void bond_debug_reregister(struct bonding *bond)
+ void bond_create_debugfs(void)
+ {
+ 	bonding_debug_root = debugfs_create_dir("bonding", NULL);
+-
+-	if (!bonding_debug_root)
+-		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
+ }
+ 
+ void bond_destroy_debugfs(void)
+-- 
+2.25.1
 
 
