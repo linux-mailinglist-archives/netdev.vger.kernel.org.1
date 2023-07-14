@@ -1,121 +1,129 @@
-Return-Path: <netdev+bounces-17865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570B67534E0
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:17:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C6F7534E8
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119EC2821B6
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:16:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D175C2821A0
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6587DC8F1;
-	Fri, 14 Jul 2023 08:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC222C8F1;
+	Fri, 14 Jul 2023 08:18:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FFC79F0
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:16:57 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B179F12D
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 01:16:43 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qKDyd-00067h-KK; Fri, 14 Jul 2023 10:16:35 +0200
-Message-ID: <ee7172c0-b5f1-c5e2-55d8-2b712ceb6ea6@leemhuis.info>
-Date: Fri, 14 Jul 2023 10:16:35 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00D2D2E7
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:18:17 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420F31B6;
+	Fri, 14 Jul 2023 01:18:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1689322696; x=1720858696;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=O/X2f8LTxeBpseEWtQTCQinmCmN6v3Zs9Ep5/+MhYq4=;
+  b=XOaYrlPdqV5d2WMhEualoMjFswG+FnXYxyagjXNlbqgU1TLzQwITpagf
+   2tUy4zVWo/sloWvMkYtarlLfF2wbKEO3g6HMFy7xQiB4PTILtLNZYobYL
+   Poci9KiAd4kjwE1XYEd6G3YHm0mzVDXh1y8Mh/WIwJoLjE8X1V62D34iY
+   QQjcHOd5omnZH41NqXygX0/YuOBgcnpMEt3+hsAWi48zi/D0qQ0cZD7Qx
+   t3yKrsRdPtRhVFqXbCIvoH26n7EZf61j8Pdzb5mD4nUe7iWOuN2AZCzWu
+   ztB9D/no4bU+/Jv3szHQucsY/i/vhioCua9MBM8GJ2c4K+T+yYiFaQfaF
+   A==;
+X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
+   d="scan'208";a="161331392"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 14 Jul 2023 01:18:15 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Fri, 14 Jul 2023 01:18:14 -0700
+Received: from localhost (10.10.115.15) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
+ Transport; Fri, 14 Jul 2023 01:18:14 -0700
+Date: Fri, 14 Jul 2023 10:18:14 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Minjie Du <duminjie@vivo.com>
+CC: <dkirjanov@suse.de>, "maintainer:MICROCHIP LAN966X ETHERNET DRIVER"
+	<UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "open
+ list:MICROCHIP LAN966X ETHERNET DRIVER" <netdev@vger.kernel.org>, open list
+	<linux-kernel@vger.kernel.org>, <opensource.kernel@vivo.com>
+Subject: Re: [PATCH v2] net: lan966x: fix parameter check in two functions
+Message-ID: <20230714081814.3jltswaui6gbgkhc@soft-dev3-1>
+References: <20230714012220.891-1-duminjie@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net] r8169: fix ASPM-related problem for chip version 42
- and 43
-Content-Language: en-US, de-DE
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- joey.joey586@gmail.com, Greg KH <gregkh@linuxfoundation.org>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-References: <82ea9e63-d8c8-0b86-cd88-913cc249fa9a@gmail.com>
- <d644f048-970c-71fe-a556-a2c80444dae2@leemhuis.info>
- <17c638ca-5343-75e0-7f52-abf86026f75d@gmail.com>
- <fff3067d-5a7f-b328-ef65-fa68138f8b0f@leemhuis.info>
- <a42f129b-d64b-2d86-0758-143e99a534a0@gmail.com>
- <6b2513b0-f57c-73ff-5181-489ba43a01e3@leemhuis.info>
-In-Reply-To: <6b2513b0-f57c-73ff-5181-489ba43a01e3@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1689322603;2bd13449;
-X-HE-SMSGID: 1qKDyd-00067h-KK
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20230714012220.891-1-duminjie@vivo.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-[Short version: sorry for the noise, a stale file sent us sideways.]
+The 07/14/2023 09:22, Minjie Du wrote:
 
-On 14.07.23 08:58, Linux regression tracking (Thorsten Leemhuis) wrote:
-> [ccing greg]
+Hi Minjie,
+
 > 
-> On 14.07.23 08:34, Heiner Kallweit wrote:
->> On 14.07.2023 08:30, Linux regression tracking (Thorsten Leemhuis) wrote:
->>> On 14.07.23 07:34, Heiner Kallweit wrote:
->>>> On 14.07.2023 05:31, Linux regression tracking (Thorsten Leemhuis) wrote:
->>>>> On 13.07.23 21:46, Heiner Kallweit wrote:
->>>>
->>>>>> Fixes: 5fc3f6c90cca ("r8169: consolidate disabling ASPM before EPHY access")
->>>>>  Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217635 # [0]
->>>>> A "Cc: stable@vger.kernel.org" would be nice, too, to get this fixed in
->>>>> 6.4, where this surfaced (reminder: no, a Fixes: tag is not enough to
->>>>> ensure the backport there).
->>>> That's different in the net subsystem. The net (vs. net-next) annotation
->>>> ensures the backport.
->>>
->>> Huh, how does that work? I thought "net" currently means "for 6.5" while
->>> "net-next" implies 6.6?
->>
->> https://www.kernel.org/doc/Documentation/networking/netdev-FAQ.txt
+> Make IS_ERR_OR_NULL() judge the vcap_get_rule() function return.
+> in lan966x_ptp_add_trap() and lan966x_ptp_del_trap().
+> 
+> Fixes: 72df3489fb10 ("net: lan966x: Add ptp trap rules")
+> Signed-off-by: Minjie Du <duminjie@vivo.com>
 
-I just learned on social media that's a stale file that doesn't exist
-anymore in mainline (I'll talk to Konstantin, maybe he can remove it to
-avoid similar problems in the future). That document was converted to
-rst and later...
+You forgot to set the target tree in the subject. You can do that when
+you create the patch using the command:
+git format-patch ... --subject-prefix "PATCH net" ...
 
->> See question:
->> I see a network patch and I think it should be backported to stable.
->> Should I request it via "stable@vger.kernel.org" like the references in
->> the kernel's Documentation/process/stable-kernel-rules.rst file say?
+Other than that, it looks OK:
+Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
-...this section was actually removed in dbbe7c962c3 ("docs: networking:
-drop special stable handling") [v5.12-rc3]; later that document moved here:
+> ---
+>  drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+> index 266a21a2d..59dd14247 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+> @@ -59,7 +59,7 @@ static int lan966x_ptp_add_trap(struct lan966x_port *port,
+>         int err;
+> 
+>         vrule = vcap_get_rule(lan966x->vcap_ctrl, rule_id);
+> -       if (vrule) {
+> +       if (!IS_ERR_OR_NULL(vrule)) {
+>                 u32 value, mask;
+> 
+>                 /* Just modify the ingress port mask and exit */
+> @@ -106,7 +106,7 @@ static int lan966x_ptp_del_trap(struct lan966x_port *port,
+>         int err;
+> 
+>         vrule = vcap_get_rule(lan966x->vcap_ctrl, rule_id);
+> -       if (!vrule)
+> +       if (IS_ERR_OR_NULL(vrule))
+>                 return -EEXIST;
+> 
+>         vcap_rule_get_key_u32(vrule, VCAP_KF_IF_IGR_PORT_MASK, &value, &mask);
+> --
+> 2.39.0
+> 
+> 
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-To quote:
-
-```
-
-1.5.7. Stable tree
-
-While it used to be the case that netdev submissions were not supposed
-to carry explicit CC: stable@vger.kernel.org tags that is no longer the
-case today. Please follow the standard stable rules in
-Documentation/process/stable-kernel-rules.rst, and make sure you include
-appropriate Fixes tags!
-```
-
-That clears things up. Ciao, Thorsten
+-- 
+/Horatiu
 
