@@ -1,89 +1,138 @@
-Return-Path: <netdev+bounces-17745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B52752F4D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:21:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DCE752F54
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 04:24:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A267E281F7D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 625E0281F7B
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 02:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D243A4D;
-	Fri, 14 Jul 2023 02:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D350A4D;
+	Fri, 14 Jul 2023 02:24:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E900809
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 72FCFC433C7;
-	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689301265;
-	bh=Z+YyNKft/yNO6HkbCw8ttg+W0kytJcV940yRY0t2Ph8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hEvBNn55OuTTo6ozQ5WHPulQtyagnEBq9ws80QGSgGL/LXtKp8MTmnJ9Es7ys2eJq
-	 KZIL3Co4VxUOBy6h2SpNdU/K0Lp6jNviyUOaTbi3SwsB+wZiA1spCxC2c5pxKBBDSJ
-	 11tsxxTJq+QTDbTxLLQ+XlBoZHEF/c3nM+K5RYAd1VPtfOMCICDR3rDYk4S73UI5ls
-	 NM+Du30y9hRLmP6+IHQ3MwJVMWUVhaT79b9KrMdL54qulZ54P4toJiphmoN/CbrEU4
-	 /cX4LVPi5YNo7uCBykskNl53MdhkDS4MqeuHcjFzCdL+qQcCXWUdEyxmIVIPkwYoA7
-	 Zz38BdVxEgckQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58EAEE29F46;
-	Fri, 14 Jul 2023 02:21:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C41809
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 02:24:53 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240D4270B
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:24:51 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b6f52e1c5cso21367201fa.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 19:24:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689301489; x=1691893489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M9/7mfBIOMb+0hsVybGzj7u7Q1iyZTD8c3lirpC/46Y=;
+        b=U4ODQg+ob9z9R6ODl9EA8LoTWZcugc30CyNuggR1KwgPeyo/UkuYiejlm5rWtfRdJR
+         t4c9g6DPxyaqkhVBxjy0y+Zr6VvnrTvQEMH4iuELrAh1rY0UwWKjY0RPFUA5DVS2HM38
+         jht4I5BYurb/wp9dbAR7N9/j0fe5uB6XD3MMo1mhZbu1bWD6fNjRd4k0ojSjwUESU5zv
+         zzswnWL3VKDmRRtSFnINzv4cyBv6Ryy7WJ0AizhyJuzAtHLLw5ey4YS+3TFia5T2Cbay
+         pkfHV7OEw8ZlvR+gPjCSPj1Q4FJXJCGyHc5t5YJCuXV+PIBF0QB+8DvhusMz1UjMhRkl
+         ZeJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689301489; x=1691893489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M9/7mfBIOMb+0hsVybGzj7u7Q1iyZTD8c3lirpC/46Y=;
+        b=Q+rPO7HULSeQ89xMJsSdkDDBV0nnPcTRC/9jnGrFk+I9yT2vmlwHn5GChWMYnhosIu
+         TAfHWF6w3xKFxUTO+ZuSMOLQ00SV8L1YD2ktw49gBan9h8BDGicWkwdAbypHLFsaEatM
+         kUTSyLWVNlEGPbJba3empqm+fb9nqon2Z4YsQmDHJBPjg8hvo/YVRsmBPaAEIXj0oOes
+         A3HonzBhIZ/236OTW4vsYVmUB6Eg2UYEP4oDSQS3ap8cJNBxPg4KvenKBHjOEvH1Ka+3
+         wQ8CSewLtGXxeQr0nvB9mMQNTTb0U8v3ETYnU/nSzOqoKGzgYW6ypV90t8W9llBR8AN3
+         rTUg==
+X-Gm-Message-State: ABy/qLZ0fZ7W58lMOQRGVENQBvDhs93ASC75NMnIjb5StUtzBDcXyT4A
+	WvhdeeFMpNy5iTeY95wldFp4fjaBN3AH3pec4co=
+X-Google-Smtp-Source: APBJJlH3CrRs4nvBhPDbsLVdh5lnDzW0lZ0uvsiYM0vGsb5/s+afJZBSYr5uQrKos+aMl17VAoQMFiViwJhYoDEa0fc=
+X-Received: by 2002:a2e:8693:0:b0:2b6:dac0:affe with SMTP id
+ l19-20020a2e8693000000b002b6dac0affemr3244830lji.31.1689301488784; Thu, 13
+ Jul 2023 19:24:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 0/5] ionic: add FLR support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168930126535.23383.301042946156500503.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Jul 2023 02:21:05 +0000
-References: <20230713192936.45152-1-shannon.nelson@amd.com>
-In-Reply-To: <20230713192936.45152-1-shannon.nelson@amd.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- idosch@idosch.org, brett.creeley@amd.com, drivers@pensando.io
+References: <cover.1689215889.git.chenfeiyang@loongson.cn> <98b53d15bb983c309f79acf9619b88ea4fbb8f14.1689215889.git.chenfeiyang@loongson.cn>
+ <e491227b-81a1-4363-b810-501511939f1b@lunn.ch>
+In-Reply-To: <e491227b-81a1-4363-b810-501511939f1b@lunn.ch>
+From: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Date: Fri, 14 Jul 2023 10:24:37 +0800
+Message-ID: <CACWXhKmLRK5aGNwDyt5uc0TK8ZXZKuDQuSXW6jku+Ofh73GUvw@mail.gmail.com>
+Subject: Re: [RFC PATCH 10/10] net: stmmac: dwmac-loongson: Add GNET support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
+	linux@armlinux.org.uk, dongbiao@loongson.cn, 
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
+	loongarch@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Thu, Jul 13, 2023 at 12:07=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> On Thu, Jul 13, 2023 at 10:49:38AM +0800, Feiyang Chen wrote:
+> > Add GNET support. Use the fix_mac_speed() callback to workaround
+> > issues with the Loongson PHY.
+>
+> What are the issues?
+>
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Hi, Andrew,
 
-On Thu, 13 Jul 2023 12:29:31 -0700 you wrote:
-> Add support for handing and recovering from a PCI FLR event.
-> This patchset first moves some code around to make it usable
-> from multiple paths, then adds the PCI error handler callbacks
-> for reset_prepare and reset_done.
-> 
-> Example test:
->     echo 1 > /sys/bus/pci/devices/0000:2a:00.0/reset
-> 
-> [...]
+There is an issue with the synchronization between the network card
+and the PHY. In the case of gigabit operation, if the PHY's speed
+changes, the network card's speed remains unaffected. Hence, it is
+necessary to initiate a re-negotiation process with the PHY to align
+the link speeds properly.
 
-Here is the summary with links:
-  - [v2,net-next,1/5] ionic: remove dead device fail path
-    https://git.kernel.org/netdev/net-next/c/3a7af34fb6ec
-  - [v2,net-next,2/5] ionic: extract common bits from ionic_remove
-    (no matching commit)
-  - [v2,net-next,3/5] ionic: extract common bits from ionic_probe
-    (no matching commit)
-  - [v2,net-next,4/5] ionic: pull out common bits from fw_up
-    (no matching commit)
-  - [v2,net-next,5/5] ionic: add FLR recovery support
-    (no matching commit)
+> > +static void loongson_gnet_fix_speed(void *priv, unsigned int speed)
+> > +{
+> > +     struct net_device *ndev =3D (struct net_device *)(*(unsigned long=
+ *)priv);
+> > +     struct stmmac_priv *ptr =3D netdev_priv(ndev);
+> > +
+> > +     if (speed =3D=3D SPEED_1000)
+> > +             if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS *=
+/)
+> > +                     phy_restart_aneg(ndev->phydev);
+>
+> This needs a comment at least, but if you explain what is actually
+> FUBAR in this PHY, we might be able to tell you a better way to work
+> around its problems.
+>
+> > +static int loongson_gnet_data(struct pci_dev *pdev,
+> > +                           struct plat_stmmacenet_data *plat)
+> > +{
+> > +     common_default_data(pdev, plat);
+> > +
+> > +     plat->mdio_bus_data->phy_mask =3D 0xfffffffb;
+> > +
+> > +     plat->phy_addr =3D 2;
+> > +     plat->phy_interface =3D PHY_INTERFACE_MODE_GMII;
+>
+> You would normally get this from DT. Is the PHY integrated? Is it
+> really using GMII, or would PHY_INTERFACE_MODE_INTERNAL be better?
+>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Yes, the PHY is integrated. I'll try to use PHY_INTERFACE_MODE_INTERNAL
+later.
 
+Thanks,
+Feiyang
 
+>        Andrew
 
