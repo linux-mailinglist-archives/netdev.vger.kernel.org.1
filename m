@@ -1,109 +1,109 @@
-Return-Path: <netdev+bounces-17869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16CA67534FF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:24:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CFCD753524
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 10:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486C31C215BF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:24:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38D572821E2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31C0D30E;
-	Fri, 14 Jul 2023 08:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4270610F0;
+	Fri, 14 Jul 2023 08:39:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41B5C8ED
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:24:18 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9B09B;
-	Fri, 14 Jul 2023 01:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=s29768273; t=1689323027; x=1689927827; i=markus.elfring@web.de;
- bh=FylxkALCTFDYr1HsBsd2FrsiRXKuDOvJ87qiVgsYLpw=;
- h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
- b=KYZs8Fr1aXXC7s+NHaXN9VZDwIiOhP3YQYpRtO7iHA8eFbK7L9hPeasFJ471bLB2F5VsSsu
- GJot6IBsRF2P1uQrfYOiKuaz+H02SZWT2KYKzONX3gcDl9SalK9CrA2xx5jZNae2WhBli+tHB
- xCG3AG7k5yF8T/fOD6qJOIjreNz/dt7RoiENwbw08peCOoxG+v3VTCFyIaVZR5aGPR/On2SoW
- BC/788JJRbWuXt+KdE5UEtNHpaM7nGt6VrMIFGgw89n2XvXfUmTf5tgpzi3eHUHWyimEjPbdu
- vEOWqMsIDIiNfConaEPgmNLQ4QEIn9IQvSAfHkSOVK+E146oWhdA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MgzaT-1pjoXX42iD-00gzgs; Fri, 14
- Jul 2023 10:23:47 +0200
-Message-ID: <96729cb7-a06c-dc1f-6f91-22314e72b7ed@web.de>
-Date: Fri, 14 Jul 2023 10:23:44 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347006AB2
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 08:39:33 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169D21BF9
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 01:39:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tgeW2jStuSWXSnHecKS+Wr+nGK64USUz9Vn9EpmKdpo=; b=LmKyvJpZBEet9pbzfiN2BDlkPP
+	EE4OZHpOojwIbTZ7/sX5ifmMTjAN+nU94VxAInLz2O66TxHo08pvcoQtuTltXZjlNtFVbkH4C96Xe
+	gkqYhY3hsb0ajzWdej76QBSsgHcW5izhnQ75cq4v32VpCKwNFyxryLbhsypc0pOG9tZO4h5a+gTPD
+	8sHrBWaIqf9dERGfjI/GGW7ulgjTApqLq8m8qjxdDngbbEiBRF/c0H/yQl+rmInZiND/5aKQKxuVD
+	yh8UKvWvy8Lmrt9xer7/Tu/uKc56Jduh6dmmvtQ4jjO9gpkBWc/0cP5ZZPr7CLXfwISKJaUtPZwWm
+	UqTdtHcg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45454)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qKEKW-0000Hf-2m;
+	Fri, 14 Jul 2023 09:39:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qKEKS-00073F-10; Fri, 14 Jul 2023 09:39:08 +0100
+Date: Fri, 14 Jul 2023 09:39:07 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Feiyang Chen <chenfeiyang@loongson.cn>,
+	hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev
+Subject: Re: [RFC PATCH 00/10] net: phy/stmmac: Add Loongson platform support
+Message-ID: <ZLEJq1G5+7I+FsPo@shell.armlinux.org.uk>
+References: <cover.1689215889.git.chenfeiyang@loongson.cn>
+ <2e10d9d1-e963-41fe-b55b-8c19c9c88bd5@lunn.ch>
+ <CACWXhKkUJCFV8DKeAOGPQCfkn8mBhZvBJBMM8SYVgVKY8JEyRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-To: Wang Ming <machel@vivo.com>, opensource.kernel@vivo.com,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Guangbin Huang <huangguangbin2@huawei.com>, Jakub Kicinski
- <kuba@kernel.org>, Jay Vosburgh <j.vosburgh@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, Yufeng Mo <moyufeng@huawei.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Minjie Du <duminjie@vivo.com>,
- Jay Vosburgh <jay.vosburgh@canonical.com>
-References: <20230713033607.12804-1-machel@vivo.com>
-Subject: Re: [PATCH] net: bonding: Fix error checking for debugfs_create_dir()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20230713033607.12804-1-machel@vivo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:rvaDSOd38k40vDrfrRqCAdzFSCKQsL9SR6q9cVkFxw068Oc6xB3
- /fPQKDROKfue5E69s2if8X7ioHmO3JPTebhfrVF/6t1Wg4QqxbGnR3Esbz1EojsyniEGGRB
- fwg9Mjpe49ebySGeZ1C0Odfpqi3CE3abuTSPp/FhoxV2vKIhNkL+gyvXjqc7cJyPhcMJB6j
- wYRjuZoOZf9k9ie7qjIPA==
-UI-OutboundReport: notjunk:1;M01:P0:D49xm2gm8wk=;A6MtDObYgwNnjfdGMSWlNZXEGNn
- xVVMaIUCQ9JgBilkU3G969uVjPLhGRiMvBaKpS1lqGpqCA41xtw1+9mBPtbDRscVaGUjH27sl
- k9jkydx/5aC7kGmKr9SHTDLQGQKUhWa42DisWvutWP8LOOq/5zm2aOXJ9gTVq6QxeR5NE5Nap
- qVEISqRgc52B44+ERiAZajBBLYe9IZ+/0rcgRce/Gs0oDZAyPGvi9TkgMCFVhPylN0S83zfzC
- kprGLqEvz6sivxTYKEG3d3ZBaKIwPL4XhsXd6K5KmmH/bPB9GM4prkQT4pBVWoPylgPXo8AhO
- cGEyypQrXXMLiQXXvM8yqX8rnGfLBIsN9zv1XWEVbb7ugp/bCQBStU+qyo6a0X7mQJ4a/2w/K
- F/PR72aYEkHLP1fcMfiG3vLxyXJEhrQY0A655GOflsPE/dGJ05YiRGX/NtY6MPbHL+dU2R3pI
- vSnql+lf741kDZuEDpfd0lpPuK9ZvKwT2KffreAwEa/7MwJqk+1G/XAsuBh1lOE6qeyRoPY0a
- aoR4OpJBz3Vtqk7QxSM8M9BcSWRr0HnfTkgS2HBTS21J9y42n1MBXoc0dtWGe/2PPY17y3Z3t
- CBeCAgjCPNnfqWRYY6PJlUKSK2mAJMxUOUEuUpXPj0+7a6AxA6bE6WcWfUHnhmAXcHeb0A4el
- flY8S2oiLJLGd6KSCKHHUYoCW+EIxg6Xf00ueGEmFl3FyLfRrnq6ha1vJvOam+bi7TQBubXv1
- 5utFAplJoLMfALUT2aiDPOepd0wHIVFg1tV05PjvNHAeCDVHxSCiIimrM8ZPw0ct+SrbrG+Cf
- HvIBSvzotHszl7T13JMyAupnWgdt8lzANYFpAvxUV51RyAkbcUsiow3eb1tIWZk3aVZG2URT5
- NW4J3zcD34J9UckPbMVfeZWg3gIuygTyl61p1tkJeckI3bCIGpsR1LnoSFtrJlnDKz6D2iYhk
- fw7DMQ==
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACWXhKkUJCFV8DKeAOGPQCfkn8mBhZvBJBMM8SYVgVKY8JEyRw@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The debugfs_create_dir() function returns error pointers,
-> it never returns NULL. Most incorrect error checks were fixed,
-> but the one in bond_create_debugfs() was forgotten.
->
-> Fix the remaining error check.
->
-> Signed-off-by: Wang Ming <machel@vivo.com>
->
-> Fixes: 52333512701b ("net: bonding: remove unnecessary braces")
+On Fri, Jul 14, 2023 at 10:16:07AM +0800, Feiyang Chen wrote:
+> On Thu, Jul 13, 2023 at 12:09 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > On Thu, Jul 13, 2023 at 10:46:52AM +0800, Feiyang Chen wrote:
+> > > Add driver for Loongson PHY. Extend stmmac functions and macros for
+> > > Loongson DWMAC. Add LS7A support for dwmac_loongson.
+> >
+> > Why is this RFC? What do you actually want comment on?
+> >
+> 
+> Hi, Andrew,
+> 
+> I marked this patch series as an RFC because I believe it involves
+> significant changes to the dwmac1000 driver. I want comments on the
+> design and any alternative suggestions.
 
-Would any other tag ordering be preferred?
+That is admirable, but in practice, I've found that posting RFCs is
+a waste of effort and time - basically, it seems people ignore
+patches posted as RFC.
 
+This turns the whole thing when posting patches into basically what
+I'd summarise as "reviewer blackmail" - post the patches non-RFC
+even when you want only comments, and reviewers _have_ to comment on
+the patches if there's something they don't like to prevent them
+being merged.
 
-How do you think about to use a subject like =E2=80=9C[PATCH v2] net: bond=
-ing:
-Fix an error check in bond_create_debugfs()=E2=80=9D?
+It's sad that it comes to that, but that is the reality of how things
+appear to work.
 
-Regards,
-Markus
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
