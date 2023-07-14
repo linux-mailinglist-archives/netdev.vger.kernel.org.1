@@ -1,89 +1,90 @@
-Return-Path: <netdev+bounces-17763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CFC752FFD
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:32:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F52753013
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 05:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A01B81C2102B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 03:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 392F7282006
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 03:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BAF1C16;
-	Fri, 14 Jul 2023 03:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E991C30;
+	Fri, 14 Jul 2023 03:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273DE1C15
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 03:32:09 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE02826B7
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 20:32:04 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qK9X6-0004gn-Nf; Fri, 14 Jul 2023 05:31:52 +0200
-Message-ID: <d644f048-970c-71fe-a556-a2c80444dae2@leemhuis.info>
-Date: Fri, 14 Jul 2023 05:31:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C1D1C16
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 03:40:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 208BBC433C8;
+	Fri, 14 Jul 2023 03:40:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689306022;
+	bh=fEVC1IDumQ6vtEVk8WRWYvfdOMoP9HkIJWzx7h2D/CY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rVe4TafjscV8CnUO2MH0x6+JNZg0Dst1Uh+HLC827LzthtVjCE6L7E245SkW4eLih
+	 hhUXM3li8KUB4ltykn6i0O+ZVUQwJytFYgzInrlxF2pUbgUyOLFAQeYo3tIFQhQpxm
+	 sLwNpRXyXC+fVz0NZOUT/DXkY3vmkHb5ORa2AxbmHRfLb07UnWPMIG4yimMFhDv0Nk
+	 UD8kHkg9rTdQXltHxHd4ChBVyVjZBgjDutK0F31O9mEk2bsVDTXodhlZrL3/Zibe82
+	 w4fw6gjsv5IZGdJ9cw7qsyumuYQxuO1TdCWDXcFmJY2bcR30kpAo5ZKe4cm4myNLzy
+	 RaAowm80DSRmQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC918E29F46;
+	Fri, 14 Jul 2023 03:40:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net] r8169: fix ASPM-related problem for chip version 42
- and 43
-To: Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- joey.joey586@gmail.com
-References: <82ea9e63-d8c8-0b86-cd88-913cc249fa9a@gmail.com>
-Content-Language: en-US, de-DE
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <82ea9e63-d8c8-0b86-cd88-913cc249fa9a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1689305524;3c4bbc93;
-X-HE-SMSGID: 1qK9X6-0004gn-Nf
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net v2] dsa: mv88e6xxx: Do a final check before timing out
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168930602195.1851.7666446846924104575.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Jul 2023 03:40:21 +0000
+References: <20230712223405.861899-1-linus.walleij@linaro.org>
+In-Reply-To: <20230712223405.861899-1-linus.walleij@linaro.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, tobias@waldekranz.com
 
-On 13.07.23 21:46, Heiner Kallweit wrote:
-> Referenced commit missed that for chip versions 42 and 43 ASPM
+Hello:
 
-Thanks again for taking care of this.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> [0] https://bugzilla.kernel.org/show_bug.cgi?id=217635
+On Thu, 13 Jul 2023 00:34:05 +0200 you wrote:
+> I get sporadic timeouts from the driver when using the
+> MV88E6352. Reading the status again after the loop fixes the
+> problem: the operation is successful but goes undetected.
+> 
+> Some added prints show things like this:
+> 
+> [   58.356209] mv88e6085 mdio_mux-0.1:00: Timeout while waiting
+>     for switch, addr 1b reg 0b, mask 8000, val 0000, data c000
+> [   58.367487] mv88e6085 mdio_mux-0.1:00: Timeout waiting for
+>     ATU op 4000, fid 0001
+> (...)
+> [   61.826293] mv88e6085 mdio_mux-0.1:00: Timeout while waiting
+>     for switch, addr 1c reg 18, mask 8000, val 0000, data 9860
+> [   61.837560] mv88e6085 mdio_mux-0.1:00: Timeout waiting
+>     for PHY command 1860 to complete
+> 
+> [...]
 
-That line should be a proper Link: or Closes: tag, as explained by
-Documentation/process/submitting-patches.rst
-(http://docs.kernel.org/process/submitting-patches.html) and
-Documentation/process/5.Posting.rst
-(https://docs.kernel.org/process/5.Posting.html) and thus be in the
-signed-off-by area, for example like this (without the space upfront):
+Here is the summary with links:
+  - [net,v2] dsa: mv88e6xxx: Do a final check before timing out
+    https://git.kernel.org/netdev/net/c/95ce158b6c93
 
-> Fixes: 5fc3f6c90cca ("r8169: consolidate disabling ASPM before EPHY access")
- Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217635 # [0]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-A "Cc: stable@vger.kernel.org" would be nice, too, to get this fixed in
-6.4, where this surfaced (reminder: no, a Fixes: tag is not enough to
-ensure the backport there).
 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> […]
-
-#regzbot ^backmonitor: https://bugzilla.kernel.org/show_bug.cgi?id=217635
-
-Ciao, Thorsten
 
