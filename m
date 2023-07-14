@@ -1,79 +1,119 @@
-Return-Path: <netdev+bounces-17815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF327531F4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:30:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D70277531F9
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FDFF2820F1
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:30:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D0D91C21594
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D8D3FC2;
-	Fri, 14 Jul 2023 06:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC1A111E;
+	Fri, 14 Jul 2023 06:32:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BCD6FD2
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:30:12 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A728310D4
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:30:11 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qKCJY-0005eS-8P; Fri, 14 Jul 2023 08:30:04 +0200
-Message-ID: <fff3067d-5a7f-b328-ef65-fa68138f8b0f@leemhuis.info>
-Date: Fri, 14 Jul 2023 08:30:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232486FBB
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:32:12 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCED2713;
+	Thu, 13 Jul 2023 23:32:10 -0700 (PDT)
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36E4qfQr021009;
+	Fri, 14 Jul 2023 06:31:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=MmGhu+/5RRPzkPlPjLdjT//+w2f0Pcq5VDgdzCBOCD8=;
+ b=p8dkjBC2Kb2Q9EheQlxaeGtZpqxRRsk7TzixZoAu/lxzphz7qY2Wo4M4m6TNdXYqbdSp
+ ro/jwyNBUWNlGLUAUYjJpdtpnI3jdWI8/G7lmPZAWkgpDtmhDifQ94Nsnm7Of/oPR7yT
+ lnkSP5QGpE8t8wJk0r74TaD8gHcFuGhuTO+KG752WsVRPrq+ifnA4X/K3SjRSqU6XH5i
+ MkhLR5kFzt5NgenCVIeVPOB0pFlBuKFpDEhzm8WIpN7TqwITwH3pjbkf37zSl44TmqEX
+ x6obnMbiSq/zNKsn+GHJHZvtgkaD2jsewjfPvdZ5iLdpdDCmPfv1jZkDsyyeHvOrKMpV Bw== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rtpujs0r2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Jul 2023 06:31:58 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36E6VvKB009296
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Jul 2023 06:31:57 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 13 Jul 2023 23:31:54 -0700
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Luo Jie
+	<quic_luoj@quicinc.com>
+Subject: [PATCH v2 0/6] net: phy: at803x: support qca8081 1G version chip
+Date: Fri, 14 Jul 2023 14:31:30 +0800
+Message-ID: <20230714063136.21368-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net] r8169: fix ASPM-related problem for chip version 42
- and 43
-Content-Language: en-US, de-DE
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, joey.joey586@gmail.com
-References: <82ea9e63-d8c8-0b86-cd88-913cc249fa9a@gmail.com>
- <d644f048-970c-71fe-a556-a2c80444dae2@leemhuis.info>
- <17c638ca-5343-75e0-7f52-abf86026f75d@gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <17c638ca-5343-75e0-7f52-abf86026f75d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1689316211;37d37d2b;
-X-HE-SMSGID: 1qKCJY-0005eS-8P
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: rx322_bbutwS5fDwNb16U2Z2tPWIasM1
+X-Proofpoint-ORIG-GUID: rx322_bbutwS5fDwNb16U2Z2tPWIasM1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-14_03,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0
+ lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=680 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307140059
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 14.07.23 07:34, Heiner Kallweit wrote:
-> On 14.07.2023 05:31, Linux regression tracking (Thorsten Leemhuis) wrote:
->> On 13.07.23 21:46, Heiner Kallweit wrote:
->
->>> Fixes: 5fc3f6c90cca ("r8169: consolidate disabling ASPM before EPHY access")
->>  Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217635 # [0]
->> A "Cc: stable@vger.kernel.org" would be nice, too, to get this fixed in
->> 6.4, where this surfaced (reminder: no, a Fixes: tag is not enough to
->> ensure the backport there).
-> That's different in the net subsystem. The net (vs. net-next) annotation
-> ensures the backport.
+This patch series add supporting qca8081 1G version chip, the 1G version
+chip can be identified by the register mmd7.0x901d bit0.
 
-Huh, how does that work? I thought "net" currently means "for 6.5" while
-"net-next" implies 6.6?
+In addition, qca8081 does not support 1000BaseX mode and the sgmii fifo
+reset is added on the link changed, which assert the fifo on the link
+down, deassert the fifo on the link up.
 
-Ciao, Thorsten
+Changes in v1:
+	* switch to use genphy_c45_pma_read_abilities.
+	* remove the patch [remove 1000BaseX mode of qca8081].
+	* move the sgmii fifo reset to link_change_notify.
+
+Changes in v2:
+	* split the qca8081 1G chip support patch.
+	* improve the slave seed config, disable it if master preferred.
+
+Luo Jie (6):
+  net: phy: at803x: support qca8081 genphy_c45_pma_read_abilities
+  net: phy: at803x: merge qca8081 salve seed function
+  net: phy: at803x: enable qca8081 slave seed conditionally
+  net: phy: at803x: support qca8081 1G chip type
+  net: phy: at803x: remove qca8081 1G fast retrain and slave seed config
+  net: phy: at803x: add qca8081 fifo reset on the link changed
+
+ drivers/net/phy/at803x.c | 132 +++++++++++++++++++++++++++------------
+ 1 file changed, 91 insertions(+), 41 deletions(-)
+
+
+base-commit: def3833fc6022c7f23bd4fd66ba5ed65c6b23272
+-- 
+2.17.1
+
 
