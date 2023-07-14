@@ -1,179 +1,206 @@
-Return-Path: <netdev+bounces-17836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BB8A7532B4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:12:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350DD7532DB
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C2C31C2158E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:12:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D8791C21558
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149BD6FD3;
-	Fri, 14 Jul 2023 07:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74946FDA;
+	Fri, 14 Jul 2023 07:16:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3883746C
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 07:12:20 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F30A30D0;
-	Fri, 14 Jul 2023 00:12:11 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36DLUPrF029957;
-	Fri, 14 Jul 2023 00:12:05 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=KtQ2DusuHWM+v6Ohvrsv+L0wkXSMe1qiUkwM+fmfqi4=;
- b=HlJDo6S6xTolGgVfhrvcviOS5ZBOiBEDqbKPwYMv8XphbRMXaQ4/LLkng7C1mr4P0fFZ
- Dy8AG9f69fGjJA0N7iK31Q3E5mu3GcBQTN/3wsI7PFX43gSCpRgjyFhdRirz4qQPLbsY
- Fb0I9a61S1eHJdUthvelr9AtIiCwo+NnFBYO62HorlF158fo+KteUeyA3RrCGjMqec6N
- gEO6PikdECh94ElJr1ZNv/n+65j86eGXgtpuELHS7aBHGnfhF5Zs4tCzQJbcIuFxx1p/
- OVlN2azXGw3bUjeB+Abf6ZMMVnlg+fbyuzBnm1C6g4WD1TP4X/4o6YtlOe5ZdzUUuG4Q 8A== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rtptx9sws-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jul 2023 00:12:05 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 14 Jul
- 2023 00:12:02 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 14 Jul 2023 00:12:02 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 978E33F7064;
-	Fri, 14 Jul 2023 00:11:59 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH V2 3/3] octeontx2-af: Fix hash configuration for both source and destination IPv6
-Date: Fri, 14 Jul 2023 12:41:41 +0530
-Message-ID: <20230714071141.2428144-4-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230714071141.2428144-1-sumang@marvell.com>
-References: <20230714071141.2428144-1-sumang@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83AC6FD4
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 07:16:06 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7836F26B1
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 00:16:04 -0700 (PDT)
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1689318961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hUAHTRd8c3CSu7cXSAALH6Qn7qntx8W9EcrdN/wA98k=;
+	b=Z/RajePAIPnSQVa3vCjcBglOC723Hu3WgzrC1OzDPXNdulC8MuK0kQixHhtjivaCu9/J9U
+	tV7LrcH8Zl2zoP8nNiALtE/FS1c7XvKod3Q1del8xHoEpIBn8lDXgXRfxn3AePE8YSSR5Z
+	9B0E/7x+vfgbBTbHxuJhCYsHzn9XhvfLqNZD4AT5rzjZcISqrQDd4pAlbGX+vUFNoHsIqC
+	U96YB97nrPemcSmgwOr71O1WVMdnkWA8uq6vknEIADGmpd0d81SOQH0MXfWdfeUEr0UEMI
+	NMUYaSm3LmrayDI0zsPR1OQL+wiujna/khn7mbObMVGogS3tiu3ic1X0Fj+XgQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1689318961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hUAHTRd8c3CSu7cXSAALH6Qn7qntx8W9EcrdN/wA98k=;
+	b=94hq5OtFYpb2h/PEpEyrRp7gNwWtlKKobqJUtT15kKg+Wbc1fupFhLs4TpezGIeiuKJhE/
+	xJDfSyajddaAfhDw==
+To: Heiner Kallweit <hkallweit1@gmail.com>, Tobias Klausmann
+ <tobias.klausmann@freenet.de>, Linux regressions mailing list
+ <regressions@lists.linux.dev>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ netdev@vger.kernel.org
+Subject: Re: r8169: transmit transmit queue timed out - v6.4 cycle
+In-Reply-To: <04dc4bbb-6bfd-4074-6d32-007dc8d213e5@gmail.com>
+References: <c3465166-f04d-fcf5-d284-57357abb3f99@freenet.de>
+ <CAFSsGVtiXSK_0M_TQm_38LabiRX7E5vR26x=cKags4ZQBqfXPQ@mail.gmail.com>
+ <e47bac0d-e802-65e1-b311-6acb26d5cf10@freenet.de>
+ <f7ca15e8-2cf2-1372-e29a-d7f2a2cc09f1@leemhuis.info>
+ <CAFSsGVuDLnW_7iwSUNebx8Lku3CGZhcym3uXfMFnotA=OYJJjQ@mail.gmail.com>
+ <A69A7D66-A73A-4C4D-913B-8C2D4CF03CE2@freenet.de>
+ <842ae1f6-e3fe-f4d1-8d4f-f19627a52665@gmail.com> <87a5w0cn18.fsf@kurt>
+ <04dc4bbb-6bfd-4074-6d32-007dc8d213e5@gmail.com>
+Date: Fri, 14 Jul 2023 09:16:00 +0200
+Message-ID: <87wmz3ezf3.fsf@kurt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: uLBX0LUQdTF32zJdNs5Mtv5NcmRJlE0Y
-X-Proofpoint-ORIG-GUID: uLBX0LUQdTF32zJdNs5Mtv5NcmRJlE0Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-14_04,2023-07-13_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As of today, hash reduction was supported only for source IPv6 address
-and that calculation also was not correct. This patch fixes that and adds
-supports for both source and destination IPv6 address.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: a95ab93550d3 ("octeontx2-af: Use hashed field in MCAM key")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
- .../marvell/octeontx2/af/rvu_npc_hash.c       | 37 +++++++++----------
- 1 file changed, 18 insertions(+), 19 deletions(-)
+On Thu Jul 13 2023, Heiner Kallweit wrote:
+> On 13.07.2023 09:01, Kurt Kanzenbach wrote:
+>> Hello Heiner,
+>>=20
+>> On Mon Jul 10 2023, Heiner Kallweit wrote:
+>>> On 05.07.2023 00:25, Tobias Klausmann wrote:
+>>>> Hi, top posting as well, as im on vacation, too. The system does not
+>>>> allow disabling ASPM, it is a very constrained notebook BIOS, thus
+>>>> the suggestion is nit feasible. All in all the sugesstion seems not
+>>>> favorable for me, as it is unknown how many systems are broken the
+>>>> same way. Having a workaround adviced as default seems oretty wrong
+>>>> to me.
+>>>>
+>>>
+>>> To get a better understanding of the affected system:
+>>> Could you please provide a full dmesg log and the lspci -vv output?
+>>=20
+>> I'm having the same problem as described by Tobias on a desktop
+>> machine. v6.3 works; v6.4 results in transmit queue timeouts
+>> occasionally. Reverting 2ab19de62d67 ("r8169: remove ASPM restrictions
+>> now that ASPM is disabled during NAPI poll") "solves" the issue.
+>>=20
+>> From dmesg:
+>>=20
+>> |~ % dmesg | grep -i ASPM
+>> |[    0.152746] ACPI FADT declares the system doesn't support PCIe ASPM,=
+ so disable it
+>> |[    0.905100] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM =
+ClockPM Segments MSI HPX-Type3]
+>> |[    0.906508] acpi PNP0A08:00: FADT indicates ASPM is unsupported, usi=
+ng BIOS configuration
+>> |[    1.156585] pci 10000:e1:00.0: can't override BIOS ASPM; OS doesn't =
+have ASPM control
+>> |[    1.300059] r8169 0000:03:00.0: can't disable ASPM; OS doesn't have =
+ASPM control
+>>=20
+>> In addition, with commit 2ab19de62d67 in kernel regular messages like
+>> this show up:
+>>=20
+>> |[ 7487.214593] pcieport 0000:00:1c.2: AER: Corrected error received: 00=
+00:03:00.0
+>>=20
+>> I'm happy to test any patches or provide more info if needed.
+>>=20
+> Thanks for the report. It's interesting that the issue seems to occur onl=
+y on systems
+> where BIOS doesn't allow OS to control ASPM. Maybe this results in the PC=
+I subsystem
+> not properly initializing something.
+> Kurt/Klaus: Could you please boot with cmd line parameter pcie_aspm=3Dfor=
+ce and see
+> whether this changes something?
+> This parameter lets Linux ignore the BIOS setting. You should see a messa=
+ge
+> "PCIe ASPM is forcibly enabled" in the dmesg log with this parameter.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-index 76553e0c216f..e7b71f2f3ad3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-@@ -100,20 +100,20 @@ u32 npc_field_hash_calc(u64 *ldata, struct npc_get_field_hash_info_rsp rsp,
- 	return field_hash;
- }
- 
--static u64 npc_update_use_hash(int lt, int ld)
-+static u64 npc_update_use_hash(struct rvu *rvu, int blkaddr,
-+			       u8 intf, int lid, int lt, int ld)
- {
--	u64 cfg = 0;
--
--	switch (lt) {
--	case NPC_LT_LC_IP6:
--		/* Update use_hash(bit-20) and bytesm1 (bit-16:19)
--		 * in KEX_LD_CFG
--		 */
--		cfg = KEX_LD_CFG_USE_HASH(0x1, 0x03,
--					  ld ? 0x8 : 0x18,
--					  0x1, 0x0, 0x10);
--		break;
--	}
-+	u8 hdr, key;
-+	u64 cfg;
-+
-+	cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_LIDX_LTX_LDX_CFG(intf, lid, lt, ld));
-+	hdr = FIELD_GET(NPC_HDR_OFFSET, cfg);
-+	key = FIELD_GET(NPC_KEY_OFFSET, cfg);
-+
-+	/* Update use_hash(bit-20) to 'true' and
-+	 * bytesm1(bit-16:19) to '0x3' in KEX_LD_CFG
-+	 */
-+	cfg = KEX_LD_CFG_USE_HASH(0x1, 0x03, hdr, 0x1, 0x0, key);
- 
- 	return cfg;
- }
-@@ -132,12 +132,12 @@ static void npc_program_mkex_hash_rx(struct rvu *rvu, int blkaddr,
- 		for (lt = 0; lt < NPC_MAX_LT; lt++) {
- 			for (ld = 0; ld < NPC_MAX_LD; ld++) {
- 				if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][ld]) {
--					u64 cfg = npc_update_use_hash(lt, ld);
-+					u64 cfg;
- 
--					hash_cnt++;
- 					if (hash_cnt == NPC_MAX_HASH)
- 						return;
- 
-+					cfg = npc_update_use_hash(rvu, blkaddr, intf, lid, lt, ld);
- 					/* Set updated KEX configuration */
- 					SET_KEX_LD(intf, lid, lt, ld, cfg);
- 					/* Set HASH configuration */
-@@ -149,6 +149,7 @@ static void npc_program_mkex_hash_rx(struct rvu *rvu, int blkaddr,
- 							     mkex_hash->hash_mask[intf][ld][1]);
- 					SET_KEX_LD_HASH_CTRL(intf, ld,
- 							     mkex_hash->hash_ctrl[intf][ld]);
-+					hash_cnt++;
- 				}
- 			}
- 		}
-@@ -169,12 +170,12 @@ static void npc_program_mkex_hash_tx(struct rvu *rvu, int blkaddr,
- 		for (lt = 0; lt < NPC_MAX_LT; lt++) {
- 			for (ld = 0; ld < NPC_MAX_LD; ld++)
- 				if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][ld]) {
--					u64 cfg = npc_update_use_hash(lt, ld);
-+					u64 cfg;
- 
--					hash_cnt++;
- 					if (hash_cnt == NPC_MAX_HASH)
- 						return;
- 
-+					cfg = npc_update_use_hash(rvu, blkaddr, intf, lid, lt, ld);
- 					/* Set updated KEX configuration */
- 					SET_KEX_LD(intf, lid, lt, ld, cfg);
- 					/* Set HASH configuration */
-@@ -187,8 +188,6 @@ static void npc_program_mkex_hash_tx(struct rvu *rvu, int blkaddr,
- 					SET_KEX_LD_HASH_CTRL(intf, ld,
- 							     mkex_hash->hash_ctrl[intf][ld]);
- 					hash_cnt++;
--					if (hash_cnt == NPC_MAX_HASH)
--						return;
- 				}
- 		}
- 	}
--- 
-2.25.1
+Seems like this does not help. There are still PCIe errors:
 
+|~ # dmesg | grep -i ASPM
+|[    0.000000] Command line: BOOT_IMAGE=3D/vmlinuz-6.4.2-gentoo-kurtOS roo=
+t=3D/dev/nvme0n1p3 ro kvm-intel.nested=3D1 vga=3D794 pcie_aspm=3Dforce
+|[    0.044016] Kernel command line: BOOT_IMAGE=3D/vmlinuz-6.4.2-gentoo-kur=
+tOS root=3D/dev/nvme0n1p3 ro kvm-intel.nested=3D1 vga=3D794 pcie_aspm=3Dfor=
+ce
+|[    0.044048] PCIe ASPM is forcibly enabled
+|[    0.153011] ACPI FADT declares the system doesn't support PCIe ASPM, so=
+ disable it
+|[    0.916341] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM Clo=
+ckPM Segments MSI HPX-Type3]
+|[    0.917719] acpi PNP0A08:00: FADT indicates ASPM is unsupported, using =
+BIOS configuration
+|~ # dmesg | grep -i r8169
+|[    1.337417] r8169 0000:03:00.0 eth0: RTL8168h/8111h, 6c:3c:8c:2c:bd:de,=
+ XID 541, IRQ 164
+|[    1.337422] r8169 0000:03:00.0 eth0: jumbo features [frames: 9194 bytes=
+, tx checksumming: ko]
+|[    2.833876] r8169 0000:03:00.0 enp3s0: renamed from eth0
+|[   20.886564] Generic FE-GE Realtek PHY r8169-0-300:00: attached PHY driv=
+er (mii_bus:phy_addr=3Dr8169-0-300:00, irq=3DMAC)
+|[   21.168373] r8169 0000:03:00.0 enp3s0: Link is Down
+|[   24.006543] r8169 0000:03:00.0 enp3s0: Link is Up - 1Gbps/Full - flow c=
+ontrol off
+|~ # dmesg | tail
+|[   20.886564] Generic FE-GE Realtek PHY r8169-0-300:00: attached PHY driv=
+er (mii_bus:phy_addr=3Dr8169-0-300:00, irq=3DMAC)
+|[   21.168373] r8169 0000:03:00.0 enp3s0: Link is Down
+|[   24.006543] r8169 0000:03:00.0 enp3s0: Link is Up - 1Gbps/Full - flow c=
+ontrol off
+|[   24.006568] IPv6: ADDRCONF(NETDEV_CHANGE): enp3s0: link becomes ready
+|[   24.567803] ACPI Warning: \_SB.PC00.PEG1.PEGP._DSM: Argument #4 type mi=
+smatch - Found [Buffer], ACPI requires [Package] (20230331/nsarguments-61)
+|[   41.563396] pcieport 0000:00:1c.2: AER: Corrected error received: 0000:=
+03:00.0
+|[   47.065441] pcieport 0000:00:1c.2: AER: Multiple Corrected error receiv=
+ed: 0000:03:00.0
+|[   54.264285] pcieport 0000:00:1c.2: AER: Corrected error received: 0000:=
+03:00.0
+|[   54.424210] pcieport 0000:00:1c.2: AER: Corrected error received: 0000:=
+03:00.0
+|[   55.443439] pcieport 0000:00:1c.2: AER: Corrected error received: 0000:=
+03:00.0
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmSw9jATHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzguq+D/9WZWeb8/Ob9zj1Cf8VcxJrYKOH8nu+
+LOmTElsTh3sflkXpyQSPWixgEbNxdSducxQUbQPaRKU+WCVXEzQwQunasIqaItZc
+GX/rJWsdESkQQdohPJUQGDf+6K+6dS+mw105pbXIIjN6TSrxINqlh7wXlmP3lY9l
+WQHu8BAeikiRyjpHbEYdkV5mKRCNUiTW5NxCnb3v/opIXrROz+QeNzqMiQoP5i7Y
+DTjeSrU45SmT7BeYic/ebDZXs/eLscasgD5Ax/mqeD3DSf2oz3MbcAglNJSWTM9b
+rhZYQ0KH27UfOuEmEJRveAgkkj1oYTM18qmcqKcPRjE4IwSY46uRTqOpc/LKbHEF
+/+ltfOKu3HQCXwsUf6JsGz0fp7NN+/jTondn6aPDpamMhN/toM71OMvIfh+KVzHH
+gIPObVdkT/i29efJEkhyq171MBNPO88Nf0Xh8e+A27nAkpndhJf0ZmEcEfjpbi5O
+sYYN6qVq1gjHscYaoPmKh+XlwLmP6NZxpT90IeI1o0AkN+tFxWl3ywPQWlbs8r9Z
+n7h+RPyC9UAdMfcQJ+rozDK0KGhz9OghOq1Zrh+AJQo6ryrIcenl8fPLqjOPfk98
+5uMpPN6ShgfCgwXmUO/NSKEXHKUb/Dp7yhaLafAT5HNN/P51JSUcldKfzenJXUfo
+ddqoQyoIaZgz2g==
+=7uwp
+-----END PGP SIGNATURE-----
+--=-=-=--
 
