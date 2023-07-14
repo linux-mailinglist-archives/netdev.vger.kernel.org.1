@@ -1,109 +1,106 @@
-Return-Path: <netdev+bounces-17812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3627531B5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:04:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1817531C3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B26C2820CF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:04:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C827B1C214E5
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05536D18;
-	Fri, 14 Jul 2023 06:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3436D38;
+	Fri, 14 Jul 2023 06:09:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85DF6AD9
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:04:26 +0000 (UTC)
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43EE9271F;
-	Thu, 13 Jul 2023 23:04:25 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b8392076c9so9956771fa.1;
-        Thu, 13 Jul 2023 23:04:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAE66AC2
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:09:29 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22213271F
+	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:09:27 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b703cbfaf5so22605251fa.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:09:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689314663; x=1691906663;
+        d=shruggie-ro.20221208.gappssmtp.com; s=20221208; t=1689314965; x=1691906965;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gjmA4vOTkGwFP6byVeuNX5GJuZ4Uxjvbd1dybkUi9gI=;
-        b=gPhvisrPuH0rQjgD5Hi9MFnrsv910eO34eUc1RGHcccB844nvWd9hml7pRuR4djqUU
-         cG8EI/0uXHzF7oSZ3I0YZ9PNlXVXi9kTLPaSVVr4cqC6EpouWqnYfMLMKdTPiMrbhpws
-         zm8W9vljDAm+eVQF41e+vjsPJb8p2YBW9Vy8kM7V0ISRzb4imcwL/S+VTSk8LwTa/105
-         SGaCs4aHpTIXbgw00XXKhhdzSVEhfTrY+LAetqiCDF8LhZNnHmIMq9xDcca7fEejLE+g
-         M0Hwx+8zPik68+9+YPJMQk3O1ZDOEV+FJ9glwThDS+6IEwiBx048z2+bYRbF7cp74ZNX
-         9GTg==
+        bh=orndSSj2UwJllcFmURUAszpsDxToWW+bTCSrpDuMB50=;
+        b=rSEucAgbUYeHVSTSXbX4h9GDYS7AeA8YfypaK3t0f6sWPqzBWQ/QvuRZTL8H2O6J1X
+         zaZ2wmQb0KGIHIikVtnGAD1g4DfHldSNxbhWr1jKDz1mauD7+5RnWspMa4fLwtvagkMK
+         wRPzB99gpXTCYAWWelL1AcWzOUjnPSspm6YWQhRlL9KARAvHdzc3c+bjQxEL7q/L52cq
+         EFU9PekimSQVQl5N0LgDJ1Sdsh+D3Yr39lZpEq+etM8KnUCAHoKLdW8QGrTMFcQc13/3
+         TO1Mw4QglCtfnsDEfqJ7KGed8AxkbcPl129VsMSxvmn84pht1j7uG9ZJW9Z5Xat/cyoR
+         N7tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689314663; x=1691906663;
+        d=1e100.net; s=20221208; t=1689314965; x=1691906965;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gjmA4vOTkGwFP6byVeuNX5GJuZ4Uxjvbd1dybkUi9gI=;
-        b=OzUiesCbLh0aNbMa2S578LzP2NB0IOTQKYbmDYoDYYAij/kCpBpBHKNyUaVhvirSY7
-         wuj8Z7DiAyWn/E0EaJf3+qTT7yTOy8HG7ZOElNBpYS3q+Jl0BaU8WsxrU1NmRKsOUdha
-         COfv/MDI8mTly8illbiLM3lJmLuqdtfrmxBcvjReK/aD5ct4xZXjdeyPSQbqMvnbSm8b
-         r8I5dqSyHGD/D+y7J9NDWmNfbcnpfNNzByp7DbOD9o1blFR83sDtkeobOgG3Lpn7YR3+
-         mfmLrDS1SbCZ1HzYdzEbebzCgcpTLHFDm4ACjVTvCPUGIUe6OUPxoB/2bxtZ1L07aBBF
-         ig8w==
-X-Gm-Message-State: ABy/qLYP8cmzWaQ/Wx5Hy7KSMeWAveWIQjtV7UKiZIT8t7Ji6Eeuez8T
-	7hIivsvf6to/midq01TbC/W3h6TaKJtf4EYXYwsnm1DJ
-X-Google-Smtp-Source: APBJJlEyzFmZTxDSLZlKXTyqY5UP1cP5IIpdqO6/ly8Nf2PhalxOwEhK/FxafwqY0Azgc1rBday0xBVHfmmMuvLx1L8=
-X-Received: by 2002:a2e:9b8b:0:b0:2b7:3b73:2589 with SMTP id
- z11-20020a2e9b8b000000b002b73b732589mr3103159lji.32.1689314663201; Thu, 13
- Jul 2023 23:04:23 -0700 (PDT)
+        bh=orndSSj2UwJllcFmURUAszpsDxToWW+bTCSrpDuMB50=;
+        b=S/r6S2uh1PWsbmfE0Tf+0cVKOCFv79CzwYLzPEQNueXlM4yLZIa3adTXhGW10yVrOM
+         weQFovJ27WEvt6B0G0VcEts82gbTG7ES0m8Mqlta0qAUG3aEAOJkitExancZbPs51+0B
+         hKFQfeqi0nm1CSzGMdIabgUxe94T8sotlbih4s5m35s4PR0Vx5ZBDDGbS+9xnEAFPCMj
+         FOGD+IrMKl1C2CF34y03QQeZyzluSwg+bsCHqc7gxRTicgppgp4srj0ycFS0MV/+uCf0
+         zyu0Z2IiUdJ0FKzpfVWyGjiHFhp+Ip8z0mHm7qmbioHe+N0m4tJo5WE4roExjKVUkQ8+
+         TF1Q==
+X-Gm-Message-State: ABy/qLZ23Hxtj1ggOpBdGn27iDylfDbM+kFyioPWghZ4hLW6aio7kp3e
+	4/YDWSonZAm1FWFUQMg7RIAXws8NAvKODNfc6lZZsg==
+X-Google-Smtp-Source: APBJJlFjLd9SWBhGndhtxU1nyRlXyT203Tkpfb7Enzl8TGvLVxH8C8IUB34raRw1SX1qPqj8h/XE/oW4vWlS8LF/62A=
+X-Received: by 2002:a2e:9284:0:b0:2b5:8a21:5627 with SMTP id
+ d4-20020a2e9284000000b002b58a215627mr3394159ljh.51.1689314965292; Thu, 13 Jul
+ 2023 23:09:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230714144330.3c0a4074@canb.auug.org.au> <6f655ef5-b236-4683-92b0-da8b19e79eca@paulmck-laptop>
-In-Reply-To: <6f655ef5-b236-4683-92b0-da8b19e79eca@paulmck-laptop>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 13 Jul 2023 23:04:11 -0700
-Message-ID: <CAADnVQLF0BP-_Fjxi1S-0Shus38vAVdNbB2JHsBd6_RudYWF0A@mail.gmail.com>
-Subject: Re: linux-next: duplicate patch in the rcu tree
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20230713202123.231445-1-alex@shruggie.ro> <cad1d05d-acdd-454b-a9f8-06262cf8495b@lunn.ch>
+In-Reply-To: <cad1d05d-acdd-454b-a9f8-06262cf8495b@lunn.ch>
+From: Alexandru Ardelean <alex@shruggie.ro>
+Date: Fri, 14 Jul 2023 09:09:14 +0300
+Message-ID: <CAH3L5QrtFwTqqFKjPrMFCz4JgUWOFWFUJXpN71Gyprcd33A7hg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2 net-next] net: phy: mscc: add support for CLKOUT
+ ctrl reg for VSC8531 and similar
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, hkallweit1@gmail.com, 
+	linux@armlinux.org.uk, olteanv@gmail.com, marius.muresan@mxt.ro
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 9:50=E2=80=AFPM Paul E. McKenney <paulmck@kernel.or=
-g> wrote:
+On Thu, Jul 13, 2023 at 11:35=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
 >
-> On Fri, Jul 14, 2023 at 02:43:30PM +1000, Stephen Rothwell wrote:
-> > Hi all,
-> >
-> > The following commit is also in net-next tree as a different commit
-> > (but the same patch):
-> >
-> >   a2b38823280d ("rcu: Export rcu_request_urgent_qs_task()")
-> >
-> > This is commit
-> >
-> >   43a89baecfe2 ("rcu: Export rcu_request_urgent_qs_task()")
-> >
-> > in the net-next tree.
+> > +set_reg:
+> > +     mutex_lock(&phydev->lock);
+> > +     rc =3D phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_GPIO,
+> > +                           VSC8531_CLKOUT_CNTL, mask, set);
+> > +     mutex_unlock(&phydev->lock);
 >
-> The net-next tree needs it for BPF, correct?
+> What is this mutex protecting?
 
-yes.
+This was inspired by vsc85xx_edge_rate_cntl_set().
+Which has the same format.
 
-> So if you guys intend to
-> push it to mainline, I will be happy to drop if from -rcu.
+I'll re-test with this lock removed.
+I may be misremembering (or maybe I did something silly at some
+point), but there was a weird stack-trace warning before adding this
+lock there.
+This was with a 5.10.116 kernel version.
 
-That's the intent. Please drop it from -rcu.
-Thank you!
+>
+>      Andrew
 
