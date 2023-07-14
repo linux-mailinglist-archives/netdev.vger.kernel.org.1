@@ -1,101 +1,142 @@
-Return-Path: <netdev+bounces-17828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-17829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C0D75325F
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 08:58:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD6A753280
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 09:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5233F282054
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 06:58:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AC531C2150C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 07:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54526FA4;
-	Fri, 14 Jul 2023 06:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262B46FC2;
+	Fri, 14 Jul 2023 07:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9996FA1
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 06:58:50 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7E4C2709
-	for <netdev@vger.kernel.org>; Thu, 13 Jul 2023 23:58:48 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qKClG-0007kD-7z; Fri, 14 Jul 2023 08:58:42 +0200
-Message-ID: <6b2513b0-f57c-73ff-5181-489ba43a01e3@leemhuis.info>
-Date: Fri, 14 Jul 2023 08:58:41 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B755A6FA1
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 07:05:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72352C433C8;
+	Fri, 14 Jul 2023 07:05:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689318339;
+	bh=jyWvUrZcUvjNBBSZOzXCNGPPxcxV/q9OYHwe4H3B3Lw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=ukDx1eRh8ZivXqHNYBn5Q0ezu7jPxA8DBkgLn6Yr4ieEasOnILafdrjyXNGEm446B
+	 vdoY8r4oSZIdNajc3UECepRL8sXl8WF1aY3nsBTYeT1jETstZ0f8AhW7bTRQc/52Qq
+	 P+stCjuut9rZUb/FtZq2RC8GkYNcmH18gWUjcC/YVZwiCNSkJoOeVjb4/L8KcmM6xP
+	 IeKh3hfbNuWYqjO1NcV70XYwdDRmrE9otI0QO8uXvZ2x+z2rjsCQR5r+pIi8kHOFqH
+	 yUig3DyDnWCSEK1kxr9YLeu9ZSrBGXd6ZPFhVoSKNhVLjgUv6X+4bGRfk/gzLXxZ3w
+	 K4WbhoY8kPy2A==
+Date: Fri, 14 Jul 2023 09:05:21 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+	linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+	Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, dri-devel@lists.freedesktop.org,
+	Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Diana Craciun <diana.craciun@oss.nxp.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Shakeel Butt <shakeelb@google.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Fei Li <fei1.li@intel.com>, x86@kernel.org,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Halil Pasic <pasic@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Ingo Molnar <mingo@redhat.com>, intel-gfx@lists.freedesktop.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	linux-fpga@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
+	Wu Hao <hao.wu@intel.com>, Jason Herne <jjherne@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Johannes Weiner <hannes@cmpxchg.org>, linuxppc-dev@lists.ozlabs.org,
+	Eric Auger <eric.auger@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	kvm@vger.kernel.org, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	cgroups@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	virtualization@lists.linux-foundation.org,
+	intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
+	netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Benjamin LaHaise <bcrl@kvack.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Frederic Barrat <fbarrat@linux.ibm.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Xu Yilun <yilun.xu@intel.com>, jaz@semihalf.com
+Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
+Message-ID: <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net] r8169: fix ASPM-related problem for chip version 42
- and 43
-Content-Language: en-US, de-DE
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- joey.joey586@gmail.com, Greg KH <gregkh@linuxfoundation.org>
-References: <82ea9e63-d8c8-0b86-cd88-913cc249fa9a@gmail.com>
- <d644f048-970c-71fe-a556-a2c80444dae2@leemhuis.info>
- <17c638ca-5343-75e0-7f52-abf86026f75d@gmail.com>
- <fff3067d-5a7f-b328-ef65-fa68138f8b0f@leemhuis.info>
- <a42f129b-d64b-2d86-0758-143e99a534a0@gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <a42f129b-d64b-2d86-0758-143e99a534a0@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1689317929;1969e896;
-X-HE-SMSGID: 1qKClG-0007kD-7z
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230630155936.3015595-1-jaz@semihalf.com>
 
-[ccing greg]
-
-On 14.07.23 08:34, Heiner Kallweit wrote:
-> On 14.07.2023 08:30, Linux regression tracking (Thorsten Leemhuis) wrote:
->> On 14.07.23 07:34, Heiner Kallweit wrote:
->>> On 14.07.2023 05:31, Linux regression tracking (Thorsten Leemhuis) wrote:
->>>> On 13.07.23 21:46, Heiner Kallweit wrote:
->>>
->>>>> Fixes: 5fc3f6c90cca ("r8169: consolidate disabling ASPM before EPHY access")
->>>>  Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217635 # [0]
->>>> A "Cc: stable@vger.kernel.org" would be nice, too, to get this fixed in
->>>> 6.4, where this surfaced (reminder: no, a Fixes: tag is not enough to
->>>> ensure the backport there).
->>> That's different in the net subsystem. The net (vs. net-next) annotation
->>> ensures the backport.
->>
->> Huh, how does that work? I thought "net" currently means "for 6.5" while
->> "net-next" implies 6.6?
+On Thu, Jul 13, 2023 at 11:10:54AM -0600, Alex Williamson wrote:
+> On Thu, 13 Jul 2023 12:05:36 +0200
+> Christian Brauner <brauner@kernel.org> wrote:
 > 
-> https://www.kernel.org/doc/Documentation/networking/netdev-FAQ.txt
+> > Hey everyone,
+> > 
+> > This simplifies the eventfd_signal() and eventfd_signal_mask() helpers
+> > by removing the count argument which is effectively unused.
 > 
-> See question:
-> I see a network patch and I think it should be backported to stable.
-> Should I request it via "stable@vger.kernel.org" like the references in
-> the kernel's Documentation/process/stable-kernel-rules.rst file say?
+> We have a patch under review which does in fact make use of the
+> signaling value:
+> 
+> https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
 
-Ahh, thx. Hmm, the patchworks queue mentioned a bit higher (
-http://patchwork.ozlabs.org/bundle/davem/stable/?state=* ) seems to be
-mostly unused since Oct 2020. Is there a newer one?
+Huh, thanks for the link.
 
-Also a "git log --oneline --no-merges v6.0.. --grep 'stable@vger'
-drivers/net/ net/  | wc -l" returns "196", but I assume all those where
-mistakes?
+Quoting from
+https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-jaz@semihalf.com/#25266856
 
-Ciao, Thorsten
+> Reading an eventfd returns an 8-byte value, we generally only use it
+> as a counter, but it's been discussed previously and IIRC, it's possible
+> to use that value as a notification value.
+
+So the goal is to pipe a specific value through eventfd? But it is
+explicitly a counter. The whole thing is written around a counter and
+each write and signal adds to the counter.
+
+The consequences are pretty well described in the cover letter of
+v6 https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
+
+> Since the eventfd counter is used as ACPI notification value
+> placeholder, the eventfd signaling needs to be serialized in order to
+> not end up with notification values being coalesced. Therefore ACPI
+> notification values are buffered and signalized one by one, when the
+> previous notification value has been consumed.
+
+But isn't this a good indication that you really don't want an eventfd
+but something that's explicitly designed to associate specific data with
+a notification? Using eventfd in that manner requires serialization,
+buffering, and enforces ordering.
+
+I have no skin in the game aside from having to drop this conversion
+which I'm fine to do if there are actually users for this btu really,
+that looks a lot like abusing an api that really wasn't designed for
+this.
 
