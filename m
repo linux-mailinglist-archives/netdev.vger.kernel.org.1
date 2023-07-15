@@ -1,57 +1,45 @@
-Return-Path: <netdev+bounces-18053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6181C75468A
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 05:30:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA0E754694
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 05:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66F4A2821B0
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 03:30:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A69E1C21679
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 03:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F45EA6;
-	Sat, 15 Jul 2023 03:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18F2EA9;
+	Sat, 15 Jul 2023 03:36:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E868939D
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:30:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F22F8C433C7;
-	Sat, 15 Jul 2023 03:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B157EA6
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:36:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F285C433C8;
+	Sat, 15 Jul 2023 03:36:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689391834;
-	bh=DWsqbFGqlQkWiN3wTuwoj3FiFB1c6adxvrlx+u0V9z8=;
+	s=k20201202; t=1689392179;
+	bh=c3tslDX7l0mK6db/sbQQSGrMSv0gZmxNU8aa2qw8Exw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mNx4QujSl1BRlFLz86XYN+lZFZ1RJfm3CJ4qdWhjyD0wdExI0133VxDyDpYeU9MY6
-	 aCmaf9rYvtHd5ChAXGA1ED6l460ByFQLX6HRPVYJmQrNSM84mTebXzAtmzP0y/Qmps
-	 jGpjnfaNI9qAqHq++HQDVJN3uDyrbAeCpE6I/LGl2eZdLFKqjGe5FsjiH8vIduQB6S
-	 3SeTL1RFM8HTLZxUzHUztp4yf06EdYbqCfmfG3ArSlnlW37xwqnAMtTD2hWD7btu2H
-	 2AudLBYoRiXGTo2diKAkh9ktrBqSH9+5koEIxqV8XYgdSMt8Lhz0/6ToTAzi5Y4rsv
-	 jWkauD3Ez6Khg==
-Date: Fri, 14 Jul 2023 20:30:32 -0700
+	b=lH8cEjJgrHWp90asOlEIXOLgBx+AxBeW+J0hbuFVxUmlG78xQor+z1BUWToZ1CA7r
+	 cn1o8Jc7NKEbU1HT7ArlrBCCfJYvwNQupFLPc4kgws4ypai1Ypr4XzLhaJ2bZLeOdH
+	 Gg7AeK3fBXDF8T9k+rOop6SM+4keVwFP0w24t2f3IwyYkzMr/kjo9HOKUrA/LSO7i9
+	 m6OLEWszrWqQXhVnZ0UlXEG00ej1IXteKgMST95UOGVjtD5EJavIfZWvnAinP7GaeA
+	 KEdJvTMUTYbsXFgo6nGgGYmBp7W+4pCLtJPLWUTtAU3ZIv/sNyQ0AVTwpH2CWVbVOr
+	 VoE1+eFU5IyIA==
+Date: Fri, 14 Jul 2023 20:36:18 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
- Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, "David S . Miller"
- <davem@davemloft.net>, Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
- modify rule destination
-Message-ID: <20230714203032.7f1bf5f7@kernel.org>
-In-Reply-To: <20230714203258.GL41919@unreal>
-References: <5fd15672173653d6904333ef197b605b0644e205.1689064922.git.leonro@nvidia.com>
-	<20230712173259.4756fe08@kernel.org>
-	<20230713063345.GG41919@unreal>
-	<20230713100401.5fe0fa77@kernel.org>
-	<20230713174317.GH41919@unreal>
-	<20230713110556.682d21ba@kernel.org>
-	<20230713185833.GI41919@unreal>
-	<20230713201727.6dfe7549@kernel.org>
-	<20230714184013.GJ41919@unreal>
-	<20230714121633.18d19c4c@kernel.org>
-	<20230714203258.GL41919@unreal>
+To: hanyu001@208suo.com
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers/net/slip: Add space after that ','
+Message-ID: <20230714203618.2e19e8ed@kernel.org>
+In-Reply-To: <4b922e9203381b3411696feae9ee02da@208suo.com>
+References: <tencent_C824D439C8CE96AD83779E068967114FF105@qq.com>
+	<4b922e9203381b3411696feae9ee02da@208suo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,38 +49,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 14 Jul 2023 23:32:58 +0300 Leon Romanovsky wrote:
-> On Fri, Jul 14, 2023 at 12:16:33PM -0700, Jakub Kicinski wrote:
-> > On Fri, 14 Jul 2023 21:40:13 +0300 Leon Romanovsky wrote:  
-> > > It depends on configuration order, if user configures TC first, it will
-> > > be a), if he/she configures IPsec first, it will be b).
-> > > 
-> > > I just think that option b) is really matters.  
-> > 
-> > And only b) matches what happens in the kernel with policy based IPsec,
-> > right?   
+On Fri, 14 Jul 2023 16:02:13 +0800 hanyu001@208suo.com wrote:
+> Fix Error reported by checkpatch.pl
 > 
-> Can you please clarify what do you mean "policy based IPsec"?
+> ./drivers/net/slip/slhc.c:381: ERROR: space required after that ',' 
+> (ctx:VxV)
 
-I mean without a separate xfrm netdev on which you can install TC
-rules of its own.
-
-> > IIUC what you're saying -
-> > the result depending on order of configuration may be a major source
-> > of surprises / hard to debug problems for the user.  
-> 
-> When I reviewed patches, I came exactly to an opposite conclusion :)
-> 
-> My rationale was that users who configure IPsec and TC are advanced
-> users who knows their data flow and if they find a) option valuable,
-> they can do it.
-> 
-> For example, a) allows to limit amount of data sent to IPsec engine.
-> 
-> I believe both a) and b) should be supported.
-
-What does it take to switch between the modes?
-Even if we want both modes we should have an explicit switch, I reckon.
-Or at least a way to read back what mode we ended up in.
-
+Don't send checkpatch fixes to networking, thanks.
 
