@@ -1,116 +1,125 @@
-Return-Path: <netdev+bounces-18090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2C57754BA8
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 21:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F28F6754C0C
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 22:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B2431C209B5
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 19:12:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD4F81C209D8
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 20:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DA28826;
-	Sat, 15 Jul 2023 19:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AF28C02;
+	Sat, 15 Jul 2023 20:48:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD9E186B
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 19:12:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BBC2C433C7;
-	Sat, 15 Jul 2023 19:12:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689448338;
-	bh=fvmfkQe7xASbExr7Qwq+ClgfzOJeaaWctwssh0Qdv+8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=im7jN0iZ/HRLgRjG+EeJrLdmJvNlRgFDMRvOqZAU0ZPt6OOkF4uZb4DgQCQMr89Ia
-	 jB06hdxpZ3qR7hA/h/jw/LqAkB2TEeV5+NqmOWRW0VCJjLwMR7rwuojB2+uyFR3Siz
-	 3AnYrkBRpLPrKH981T/0y/gxKbPsAvmZSfhZXKJ+RKH0PDlrEMCcyH/1UTAr0/0vAI
-	 MmTaLHSf5XA6AJXtbqZkuSMjdASy9zOAQWMSiL1hXI3fwjpRzkwF83UOmII4+E/Ud+
-	 OHzMYrrwIrXfyeYD6XqUw1pwrVroR5yLqRuhFuIljO3Znbq3QW8zFExDvZU05YwBKA
-	 AWNtBdeJlqA7w==
-Date: Sat, 15 Jul 2023 14:12:16 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Tony Luck <tony.luck@intel.com>, Kees Cook <keescook@chromium.org>,
-	linux-pci@vger.kernel.org, jesse.brandeburg@intel.com,
-	linux-kernel@vger.kernel.org,
-	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, linux-hardening@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [Intel-wired-lan] [PATCH v2] igc: Ignore AER reset when device
- is suspended
-Message-ID: <20230715191216.GA364070@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A502592
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 20:48:41 +0000 (UTC)
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC2113E;
+	Sat, 15 Jul 2023 13:48:39 -0700 (PDT)
+Received: from [192.168.1.103] (178.176.79.56) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 15 Jul
+ 2023 23:48:29 +0300
+Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
+To: Zheng Hacker <hackerzheng666@gmail.com>, Lee Jones <lee@kernel.org>
+CC: Jakub Kicinski <kuba@kernel.org>, Zheng Wang <zyytlz.wz@163.com>,
+	<davem@davemloft.net>, <linyunsheng@huawei.com>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <1395428693sheep@gmail.com>,
+	<alex000young@gmail.com>
+References: <20230311180630.4011201-1-zyytlz.wz@163.com>
+ <20230710114253.GA132195@google.com> <20230710091545.5df553fc@kernel.org>
+ <20230712115633.GB10768@google.com>
+ <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a116e972-dfcf-6923-1ad3-a40870e02f6a@omp.ru>
+Date: Sat, 15 Jul 2023 23:48:25 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874jm6nsd0.fsf@intel.com>
+In-Reply-To: <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [178.176.79.56]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 07/15/2023 20:21:48
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 178635 [Jul 15 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 523 523 523027ce26ed1d9067f7a52a4756a876e54db27c
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_arrow_text}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.56 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.56 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;178.176.79.56:7.1.2
+X-KSE-AntiSpam-Info: {Track_Chinese_Simplified, text}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.79.56
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/15/2023 20:29:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/15/2023 5:20:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 01:35:55PM -0700, Vinicius Costa Gomes wrote:
-> Bjorn Helgaas <helgaas@kernel.org> writes:
-> > On Fri, Jul 14, 2023 at 01:05:41PM +0800, Kai-Heng Feng wrote:
-> >> When a system that connects to a Thunderbolt dock equipped with I225,
-> >> like HP Thunderbolt Dock G4, I225 stops working after S3 resume:
-> >> ...
-> >
-> >> The issue is that the PTM requests are sending before driver resumes the
-> >> device. Since the issue can also be observed on Windows, it's quite
-> >> likely a firmware/hardware limitation.
-> >
-> > Does this mean we didn't disable PTM correctly on suspend?  Or is the
-> > device defective and sending PTM requests even though PTM is disabled?
-> 
-> The way I understand the hardware bug, the device is defective, as you
-> said, the device sends PTM messages when "busmastering" is disabled.
+On 7/15/23 7:07 PM, Zheng Hacker wrote:
 
-Bus Master Enable controls the ability of a Function to issue Memory
-and I/O Read/Write Requests (PCIe r6.0, sec 7.5.1.1.3).  PTM uses
-Messages, and I don't think they should be affected by Bus Master
-Enable.
+> Sorry for my late reply. I'll see what I can do later.
 
-I also don't understand the I225 connection.  We have these
-Uncorrected Non-Fatal errors:
+   That's good to hear!
+   Because I'm now only able to look at it during weekends...
 
-> >> [  606.527931] pcieport 0000:00:1d.0: AER: Multiple Uncorrected (Non-Fatal) error received: 0000:00:1d.0
-> >> [  606.528064] pcieport 0000:00:1d.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
-> >> [  606.528068] pcieport 0000:00:1d.0:   device [8086:7ab0] error status/mask=00100000/00004000
-> >> [  606.528072] pcieport 0000:00:1d.0:    [20] UnsupReq               (First)
-> >> [  606.528075] pcieport 0000:00:1d.0: AER:   TLP Header: 34000000 0a000052 00000000 00000000
-> >> [  606.528079] pcieport 0000:00:1d.0: AER:   Error of this Agent is reported first
-> >> [  606.528098] pcieport 0000:04:01.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
-> >> [  606.528101] pcieport 0000:04:01.0:   device [8086:1136] error status/mask=00300000/00000000
-> >> [  606.528105] pcieport 0000:04:01.0:    [20] UnsupReq               (First)
-> >> [  606.528107] pcieport 0000:04:01.0:    [21] ACSViol
-> >> [  606.528110] pcieport 0000:04:01.0: AER:   TLP Header: 34000000 04000052 00000000 00000000
+> Lee Jones <lee@kernel.org> 于2023年7月12日周三 19:56写道：
+>>
+>> On Mon, 10 Jul 2023, Jakub Kicinski wrote:
+>>
+>>> On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
+>>>> For better or worse, it looks like this issue was assigned a CVE.
+>>>
+>>> Ugh, what a joke.
+>>
+>> I think that's putting it politely. :)
+>>
+>> --
+>> Lee Jones [李琼斯]
 
-They are clearly Unsupported Request errors caused by PTM Requests
-(decoding at https://bugzilla.kernel.org/show_bug.cgi?id=216850#c9),
-but they were logged by 00:1d.0 and 04:01.0.
-
-The hierarchy is this:
-
-  00:1d.0 Root Port to [bus 03-6c]
-  03:00.0 Switch Upstream Port to [bus 04-6c]
-  04:01.0 Switch Downstream Port to [bus 06-38]
-  06:00.0 Switch Upstream Port to [bus 07-38]
-  07:04.0 Switch Downstream Port to [bus 38]
-  38:00.0 igc I225 NIC
-
-If I225 sent a PTM request when it shouldn't have, i.e., when 07:04.0
-didn't have PTM enabled, the error would have been logged by 07:04.0.
-
-The fact that the errors were logged by 00:1d.0 and 04:01.0 means that
-they were caused by PTM requests from 03:00.0 and 06:00.0.
-
-Bjorn
+MBR, Sergey
 
