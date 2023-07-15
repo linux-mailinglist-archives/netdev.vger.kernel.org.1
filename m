@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-18044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07736754630
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 04:15:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8143754631
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 04:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82FBA282345
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 02:14:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 930721C208D4
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 02:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7497EC;
-	Sat, 15 Jul 2023 02:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6D7A47;
+	Sat, 15 Jul 2023 02:15:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D703EA2
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 02:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDB97EC
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 02:15:14 +0000 (UTC)
 Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0201930DF
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 19:14:54 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5702D68
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 19:15:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689387296; x=1720923296;
+  t=1689387314; x=1720923314;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DNt+5JRSbWJkY6lT33ijDfknouzQExId0TPQQDCKROw=;
-  b=cASqkxe/3+tiQ6ZVK/+nHhtHO1g1BLiaaQyUANYJHlJtABJBKMCDZsvB
-   5QHMswUBcSKIH7czsb2ZCITqmCmSE4PfVF9Yz2rhdbEjT7MRiJGxDaqc8
-   hpbzIdtxTJvd9pcSDplOxT7nYFhWmCaH3GkfLBYdCdf9mJgxBgOCR8AaQ
-   Y=;
+  bh=b5e2fQW3Y9E7fqRLX+xgDDUEUogWV6uhg2kDWvxW0d0=;
+  b=PkRABj0MelnA8uYilWb+LlSU3xeOV68KAuN9sZWaA5mTuEosxewVfxZH
+   0s6BC3fAWNb/1755dt8y5ObjWCy0C3akaD2s50XT14CafIh9gw5hVkOuH
+   Fr/ZigAKzPUCcVgAjK9y73l1dapKwr9dLS8vpkZij24TOCJZGrEMVwdj7
+   8=;
 X-IronPort-AV: E=Sophos;i="6.01,207,1684800000"; 
-   d="scan'208";a="339831214"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2023 02:14:53 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com (Postfix) with ESMTPS id 68AC380497;
-	Sat, 15 Jul 2023 02:14:49 +0000 (UTC)
+   d="scan'208";a="339831226"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2023 02:15:12 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com (Postfix) with ESMTPS id CA21BA9315;
+	Sat, 15 Jul 2023 02:15:05 +0000 (UTC)
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 15 Jul 2023 02:14:40 +0000
+ 15.2.1118.30; Sat, 15 Jul 2023 02:15:05 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.171.14) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 15 Jul 2023 02:14:38 +0000
+ 15.2.1118.30; Sat, 15 Jul 2023 02:15:02 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -54,9 +54,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: "Eric W. Biederman" <ebiederm@xmission.com>, Harry Coin
 	<hcoin@quietfountain.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, "Kuniyuki
  Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net 2/4] llc: Check netns in llc_estab_match() and llc_listener_match().
-Date: Fri, 14 Jul 2023 19:13:36 -0700
-Message-ID: <20230715021338.34747-3-kuniyu@amazon.com>
+Subject: [PATCH v1 net 3/4] llc: Don't drop packet from non-root netns.
+Date: Fri, 14 Jul 2023 19:13:37 -0700
+Message-ID: <20230715021338.34747-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230715021338.34747-1-kuniyu@amazon.com>
 References: <20230715021338.34747-1-kuniyu@amazon.com>
@@ -69,7 +69,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.187.171.14]
-X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
+X-ClientProxiedBy: EX19D042UWA004.ant.amazon.com (10.13.139.16) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -80,220 +80,42 @@ X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-We will remove this restriction in llc_rcv() in the following patch,
-which means that the protocol handler must be aware of netns.
+Now these upper layer protocol handlers can be called from llc_rcv()
+as sap->rcv_func(), which is registered by llc_sap_open().
 
-        if (!net_eq(dev_net(dev), &init_net))
-                goto drop;
+  * function which is passed to register_8022_client()
+    -> no in-kernel user calls register_8022_client().
 
-llc_rcv() fetches llc_type_handlers[llc_pdu_type(skb) - 1] and calls it
-if not NULL.
+  * snap_rcv()
+    `- proto->rcvfunc() : registered by register_snap_client()
+       -> aarp_rcv() and atalk_rcv() drop packets from non-root netns
 
-If the PDU type is LLC_DEST_CONN, llc_conn_handler() is called to pass
-skb to corresponding sockets.  Then, we must look up a proper socket in
-the same netns with skb->dev.
+  * stp_pdu_rcv()
+    `- garp_protos[]->rcv() : registered by stp_proto_register()
+       -> garp_pdu_rcv() and br_stp_rcv() are netns-aware
 
-llc_conn_handler() calls __llc_lookup() to look up a established or
-litening socket by __llc_lookup_established() and llc_lookup_listener().
+So, we can safely remove the netns restriction in llc_rcv().
 
-Both functions iterate on a list and call llc_estab_match() or
-llc_listener_match() to check if the socket is the correct destination.
-However, these functions do not check netns.
-
-Also, bind() and connect() call llc_establish_connection(), which
-finally calls __llc_lookup_established(), to check if there is a
-conflicting socket.
-
-Let's test netns in llc_estab_match() and llc_listener_match().
-
+Fixes: e730c15519d0 ("[NET]: Make packet reception network namespace safe")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/llc_conn.h |  2 +-
- net/llc/af_llc.c       |  2 +-
- net/llc/llc_conn.c     | 47 +++++++++++++++++++++++++-----------------
- net/llc/llc_if.c       |  2 +-
- 4 files changed, 31 insertions(+), 22 deletions(-)
+ net/llc/llc_input.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/include/net/llc_conn.h b/include/net/llc_conn.h
-index 2c1ea3414640..374411b3066c 100644
---- a/include/net/llc_conn.h
-+++ b/include/net/llc_conn.h
-@@ -111,7 +111,7 @@ void llc_conn_resend_i_pdu_as_cmd(struct sock *sk, u8 nr, u8 first_p_bit);
- void llc_conn_resend_i_pdu_as_rsp(struct sock *sk, u8 nr, u8 first_f_bit);
- int llc_conn_remove_acked_pdus(struct sock *conn, u8 nr, u16 *how_many_unacked);
- struct sock *llc_lookup_established(struct llc_sap *sap, struct llc_addr *daddr,
--				    struct llc_addr *laddr);
-+				    struct llc_addr *laddr, const struct net *net);
- void llc_sap_add_socket(struct llc_sap *sap, struct sock *sk);
- void llc_sap_remove_socket(struct llc_sap *sap, struct sock *sk);
+diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
+index c309b72a5877..7cac441862e2 100644
+--- a/net/llc/llc_input.c
++++ b/net/llc/llc_input.c
+@@ -163,9 +163,6 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	void (*sta_handler)(struct sk_buff *skb);
+ 	void (*sap_handler)(struct llc_sap *sap, struct sk_buff *skb);
  
-diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-index 57c35c960b2c..9b06c380866b 100644
---- a/net/llc/af_llc.c
-+++ b/net/llc/af_llc.c
-@@ -402,7 +402,7 @@ static int llc_ui_bind(struct socket *sock, struct sockaddr *uaddr, int addrlen)
- 		memcpy(laddr.mac, addr->sllc_mac, IFHWADDRLEN);
- 		laddr.lsap = addr->sllc_sap;
- 		rc = -EADDRINUSE; /* mac + sap clash. */
--		ask = llc_lookup_established(sap, &daddr, &laddr);
-+		ask = llc_lookup_established(sap, &daddr, &laddr, &init_net);
- 		if (ask) {
- 			sock_put(ask);
- 			goto out_put;
-diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
-index 912aa9bd5e29..6371c1b903d4 100644
---- a/net/llc/llc_conn.c
-+++ b/net/llc/llc_conn.c
-@@ -453,11 +453,13 @@ static int llc_exec_conn_trans_actions(struct sock *sk,
- static inline bool llc_estab_match(const struct llc_sap *sap,
- 				   const struct llc_addr *daddr,
- 				   const struct llc_addr *laddr,
--				   const struct sock *sk)
-+				   const struct sock *sk,
-+				   const struct net *net)
- {
- 	struct llc_sock *llc = llc_sk(sk);
- 
--	return llc->laddr.lsap == laddr->lsap &&
-+	return net_eq(sock_net(sk), net) &&
-+		llc->laddr.lsap == laddr->lsap &&
- 		llc->daddr.lsap == daddr->lsap &&
- 		ether_addr_equal(llc->laddr.mac, laddr->mac) &&
- 		ether_addr_equal(llc->daddr.mac, daddr->mac);
-@@ -476,7 +478,8 @@ static inline bool llc_estab_match(const struct llc_sap *sap,
-  */
- static struct sock *__llc_lookup_established(struct llc_sap *sap,
- 					     struct llc_addr *daddr,
--					     struct llc_addr *laddr)
-+					     struct llc_addr *laddr,
-+					     const struct net *net)
- {
- 	struct sock *rc;
- 	struct hlist_nulls_node *node;
-@@ -486,12 +489,12 @@ static struct sock *__llc_lookup_established(struct llc_sap *sap,
- 	rcu_read_lock();
- again:
- 	sk_nulls_for_each_rcu(rc, node, laddr_hb) {
--		if (llc_estab_match(sap, daddr, laddr, rc)) {
-+		if (llc_estab_match(sap, daddr, laddr, rc, net)) {
- 			/* Extra checks required by SLAB_TYPESAFE_BY_RCU */
- 			if (unlikely(!refcount_inc_not_zero(&rc->sk_refcnt)))
- 				goto again;
- 			if (unlikely(llc_sk(rc)->sap != sap ||
--				     !llc_estab_match(sap, daddr, laddr, rc))) {
-+				     !llc_estab_match(sap, daddr, laddr, rc, net))) {
- 				sock_put(rc);
- 				continue;
- 			}
-@@ -513,29 +516,33 @@ static struct sock *__llc_lookup_established(struct llc_sap *sap,
- 
- struct sock *llc_lookup_established(struct llc_sap *sap,
- 				    struct llc_addr *daddr,
--				    struct llc_addr *laddr)
-+				    struct llc_addr *laddr,
-+				    const struct net *net)
- {
- 	struct sock *sk;
- 
- 	local_bh_disable();
--	sk = __llc_lookup_established(sap, daddr, laddr);
-+	sk = __llc_lookup_established(sap, daddr, laddr, net);
- 	local_bh_enable();
- 	return sk;
- }
- 
- static inline bool llc_listener_match(const struct llc_sap *sap,
- 				      const struct llc_addr *laddr,
--				      const struct sock *sk)
-+				      const struct sock *sk,
-+				      const struct net *net)
- {
- 	struct llc_sock *llc = llc_sk(sk);
- 
--	return sk->sk_type == SOCK_STREAM && sk->sk_state == TCP_LISTEN &&
-+	return net_eq(sock_net(sk), net) &&
-+		sk->sk_type == SOCK_STREAM && sk->sk_state == TCP_LISTEN &&
- 		llc->laddr.lsap == laddr->lsap &&
- 		ether_addr_equal(llc->laddr.mac, laddr->mac);
- }
- 
- static struct sock *__llc_lookup_listener(struct llc_sap *sap,
--					  struct llc_addr *laddr)
-+					  struct llc_addr *laddr,
-+					  const struct net *net)
- {
- 	struct sock *rc;
- 	struct hlist_nulls_node *node;
-@@ -545,12 +552,12 @@ static struct sock *__llc_lookup_listener(struct llc_sap *sap,
- 	rcu_read_lock();
- again:
- 	sk_nulls_for_each_rcu(rc, node, laddr_hb) {
--		if (llc_listener_match(sap, laddr, rc)) {
-+		if (llc_listener_match(sap, laddr, rc, net)) {
- 			/* Extra checks required by SLAB_TYPESAFE_BY_RCU */
- 			if (unlikely(!refcount_inc_not_zero(&rc->sk_refcnt)))
- 				goto again;
- 			if (unlikely(llc_sk(rc)->sap != sap ||
--				     !llc_listener_match(sap, laddr, rc))) {
-+				     !llc_listener_match(sap, laddr, rc, net))) {
- 				sock_put(rc);
- 				continue;
- 			}
-@@ -581,24 +588,26 @@ static struct sock *__llc_lookup_listener(struct llc_sap *sap,
-  *	Caller has to make sure local_bh is disabled.
-  */
- static struct sock *llc_lookup_listener(struct llc_sap *sap,
--					struct llc_addr *laddr)
-+					struct llc_addr *laddr,
-+					const struct net *net)
- {
-+	struct sock *rc = __llc_lookup_listener(sap, laddr, net);
- 	static struct llc_addr null_addr;
--	struct sock *rc = __llc_lookup_listener(sap, laddr);
- 
- 	if (!rc)
--		rc = __llc_lookup_listener(sap, &null_addr);
-+		rc = __llc_lookup_listener(sap, &null_addr, net);
- 
- 	return rc;
- }
- 
- static struct sock *__llc_lookup(struct llc_sap *sap,
- 				 struct llc_addr *daddr,
--				 struct llc_addr *laddr)
-+				 struct llc_addr *laddr,
-+				 const struct net *net)
- {
--	struct sock *sk = __llc_lookup_established(sap, daddr, laddr);
-+	struct sock *sk = __llc_lookup_established(sap, daddr, laddr, net);
- 
--	return sk ? : llc_lookup_listener(sap, laddr);
-+	return sk ? : llc_lookup_listener(sap, laddr, net);
- }
- 
- /**
-@@ -776,7 +785,7 @@ void llc_conn_handler(struct llc_sap *sap, struct sk_buff *skb)
- 	llc_pdu_decode_da(skb, daddr.mac);
- 	llc_pdu_decode_dsap(skb, &daddr.lsap);
- 
--	sk = __llc_lookup(sap, &saddr, &daddr);
-+	sk = __llc_lookup(sap, &saddr, &daddr, dev_net(skb->dev));
- 	if (!sk)
- 		goto drop;
- 
-diff --git a/net/llc/llc_if.c b/net/llc/llc_if.c
-index dde9bf08a593..58a5f419adc6 100644
---- a/net/llc/llc_if.c
-+++ b/net/llc/llc_if.c
-@@ -92,7 +92,7 @@ int llc_establish_connection(struct sock *sk, const u8 *lmac, u8 *dmac, u8 dsap)
- 	daddr.lsap = dsap;
- 	memcpy(daddr.mac, dmac, sizeof(daddr.mac));
- 	memcpy(laddr.mac, lmac, sizeof(laddr.mac));
--	existing = llc_lookup_established(llc->sap, &daddr, &laddr);
-+	existing = llc_lookup_established(llc->sap, &daddr, &laddr, sock_net(sk));
- 	if (existing) {
- 		if (existing->sk_state == TCP_ESTABLISHED) {
- 			sk = existing;
+-	if (!net_eq(dev_net(dev), &init_net))
+-		goto drop;
+-
+ 	/*
+ 	 * When the interface is in promisc. mode, drop all the crap that it
+ 	 * receives, do not try to analyse it.
 -- 
 2.30.2
 
