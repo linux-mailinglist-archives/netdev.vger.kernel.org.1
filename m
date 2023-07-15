@@ -1,156 +1,106 @@
-Return-Path: <netdev+bounces-18059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC21F75478B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 10:50:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F274E754791
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 10:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B94211C20A21
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 08:50:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC4F1C20DFC
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 08:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794551117;
-	Sat, 15 Jul 2023 08:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D3B15B9;
+	Sat, 15 Jul 2023 08:57:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E857FA
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 08:50:19 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2106.outbound.protection.outlook.com [40.107.95.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 683EE30DE
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 01:50:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NrdRCdM4yYF85oIxdBwfKF/R9ME0pxB6UexEV2yL9mZZsbnA0i4X0FZzgMDun/zP8y6rKWnZ13XBk633dwcKz8/E4a6qQmbwmK0Wbu1UEhKPH8nFG0ijdbY/NGFlu1cmSqegMTmLWu6c3TXGIuX0+2x9IMcqlNQXqrt8acpQBConHRUoOwGCT2ctkdWjuVtLZedmwfx8Q7viUVM0IhH76rcy4mb68ouqfCOymHK6EvUqJZ7Uk3yluPVtRUMC0ZtktAqh+Z9KG3pLrHKICWygDaR+ItfoKzsJ/LrFH5R5V4WoZ0J+SeX/CzGmRr62exXj95LiLNxR92zAW68U4M1Kxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PG7yB4ZEvO9TP+Gqg/r4sSZFdeKbum3Ew0tmUEwHnx0=;
- b=LBj/rP02ij91cM1QZCOWXwvt1WSyhDt+rAOtKpUTqy3N8BkPuvL1GUUsCm2H1a00ZXgY5gFqaMEv3FfRJ9ce8g6IaIo5pCS0w10VMDmkdpsTBvMlc2VwDA1gcoMVCsZW6/dAH5R721dCfhx+7dKYUeV8OZx4AedJlfAL9m6VfR4GWZVxHTzQLqHccwYjJ6xFp/IayoYhz0vnfZkczwmt6VWMoHv69Wy1jQWsadYwjH/TTX/CDv2EgqLVoOqmBKsX/TYeBZnQJ04T1pqtKtItCLVsYj6xCJ5DUSYT9CaUTsU1mx0t+n5Q8dwpCPhsMpW6qXDph7stYtBO2AUa8Hv6oQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PG7yB4ZEvO9TP+Gqg/r4sSZFdeKbum3Ew0tmUEwHnx0=;
- b=cbK4XbvtRWxEAkn6u6lsWPf+n4VWGP8mQD4lGQdCGihNZBDL5c7vdkIc+q//vxto94LwKDnQjby/RQKsxBW7B7GItoMmVIoieMlZ7PyoN4ZxjuKSq5L5OxFDQEoZwzVHsNWLXFy3zWHhKoDUvjOdfuLmsIP5yqmBsYeEekhuHPs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by DM8PR13MB5143.namprd13.prod.outlook.com (2603:10b6:8:3::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.28; Sat, 15 Jul 2023 08:50:12 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.028; Sat, 15 Jul 2023
- 08:50:12 +0000
-Date: Sat, 15 Jul 2023 09:50:06 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	mlxsw@nvidia.com
-Subject: Re: [PATCH net-next 00/10] mlxsw: Add port range matching support
-Message-ID: <ZLJdvjzDU+DvIQah@corigine.com>
-References: <cover.1689092769.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1689092769.git.petrm@nvidia.com>
-X-ClientProxiedBy: LO4P123CA0582.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:276::17) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1C7FA;
+	Sat, 15 Jul 2023 08:57:57 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BB62D66;
+	Sat, 15 Jul 2023 01:57:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=s29768273; t=1689411439; x=1690016239; i=markus.elfring@web.de;
+ bh=+sOiwBbw8n2XX5b30W6O8rVVhZs/3noaZW9jkV0s7Ls=;
+ h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
+ b=qzCKQjoU7WaHh95jCOcjeiorX+1MY1D5IVyHso1ZMS00+ogDfAEAOQgmxH/kPXQDvXjkXot
+ clvWW8bsr7DodmZvFXuxRJxNSy7P4CNTPRrQ+U2osMFFLs6ZfPYd7lHbHK8d5jpJzJwQsWKnh
+ SwM0GyyD5sSLRrlEfHNwlBaJYYnwbealVUt+aeWyeujA/9EZiMqNtNrUxt1ewQPwFsdV/84eX
+ AMZQa9OPdxmsNhWTOzYeQglgVrwMnU6ucSP+g1NzadbtcRA8X08qiRpp3Dc1bepGprX0N24gn
+ dur5zdRalMMAP5HgRc///cSF4N6Hi/b7K7pxEtrZOmGy7qrpZ1KA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MT7aP-1qWN2820IZ-00UQPn; Sat, 15
+ Jul 2023 10:57:19 +0200
+Message-ID: <c659c7e5-f9ba-ca77-5ec4-10b6d664f4a5@web.de>
+Date: Sat, 15 Jul 2023 10:57:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|DM8PR13MB5143:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80beaa26-5693-408b-a81a-08db85108059
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	GojxbhIU8iR8SkKHzvm8b7c/XbfKX51mrf0/Pnh0XL/I/NYT7Epw2NjfEXMj4cxXz91ZMmAbQE/r/Q5mYAXyj/epTWTy50YWUHjV1BuqoKOBTIAOTIeCZNU4gtW2MGKgedfeQERueX/fOvEDAigZWOj+v4iiQ6oWFnE3ZzYhg1xZS6UuVkK1eGMYJ+ruliZj0XhV2pbiFLb5P/2PJ8Jh3+dxb9PBwnYmKC8U0rKbEi5XndVpZUR2elvdjWOiiO0yqtUGoCWj4szFFlBIh/RUoEj+KUiBsyU5KU7Dy3VQtD9a3xcSan5O6oFgLveaY3/M+chKKFQbo+6rybFSWDoHYbFJg9GmvVOleEHjB5L2j/eBL0gA+rTLgpB5oNt4wXtji9RYsiliLvo2Skx21F948OlAKkYGAUlBxWLeZzbPIHRXYxDipUPz5rFccoblItbNGCpzaAH/32nbdzVIDrjoq9RPD89BjSeVCnywyrsIAmJQ3frS80l7m+xDGV6VyMbALw79PxwiDcoGGik9o3q0aSviG6aGCJyJNGaiALUYDpWuTYfHuiS+tPgUAfHkI5xRml1gqAD/jGy5cLvxsjP+4u4ILvDXpynd09mP0+8fevqAN6W92Z+YxE18A2E3bg7SVnfhJZHgnUB9oqeDsDFkngEyoBz0Gx2QzzOoGxXPm+0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(376002)(396003)(39830400003)(451199021)(26005)(6506007)(38100700002)(478600001)(54906003)(5660300002)(44832011)(8936002)(8676002)(4326008)(66946007)(66556008)(66476007)(6916009)(6512007)(86362001)(6666004)(41300700001)(316002)(6486002)(2616005)(186003)(36756003)(2906002)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sZbf8thsdcB8H0N0eO8Q29WrQX8C68vBvAI9/tDIiJeJ6tSCPvuKCEhg8ao6?=
- =?us-ascii?Q?k9ETQCBr/bmJ8HIjOiV0U2futlP/A93YyYikwxcO+eCchbWko1Yqx1XPKgOr?=
- =?us-ascii?Q?OhFTUILLkvLo68owP+OrOSpV9EBPjvK+21U9pCdTE6ZejKw8s+Nwg7dioEaJ?=
- =?us-ascii?Q?rB0pv7c7+XZnr0VieII5XHrSPxlrvqMecM/l273KkwMt8dWxh/3lAmbxYCsV?=
- =?us-ascii?Q?Jg7zt/sEY/mSSuYdW7vCV6pPf27m8KqeSgfMbipId2vKyHRVws6ZGDY7F8+n?=
- =?us-ascii?Q?NKX3syN0+hHBMQraGPRqZnGZ5SWZoL1bU3In3Vt5ZOXr6Skyx7M0RnZ4ya4v?=
- =?us-ascii?Q?Y1Y74PAUBLECdCIFgI+MsiXwL2VqjXJYWfpqLvuXBjTZVIs6dyTsnyhq4BL8?=
- =?us-ascii?Q?XvRlNh3yPS7BWu27hSEOClo8Y2yqSQ25xrgDh+2GmoSu6inYHf4aD9UIYzFD?=
- =?us-ascii?Q?VKPVRC/ite7zAnCU27K8ycgDG9Qtp10o/PeLHZIUB8P+O49OV0Dec3wJf/lH?=
- =?us-ascii?Q?7dgZhjAvkfY/B5epUhGaFmauNQkc4MeSgGhQ3xeFBB7Pg6T9ZPJg7yHGa8jT?=
- =?us-ascii?Q?vc384FAtOatDG27u1KXcnE/KKv/FvOeIBgfpSZFy2eK+QYhu36qWphSOqRLS?=
- =?us-ascii?Q?8wHjsSJQB7D9pBEHB5S/EOIHCO6knCv6Q8krL1L50NnJ3sptSLIvP7ZgOPU8?=
- =?us-ascii?Q?ZyTnRTWNguIG4VDMU0RBqpM1ic2emlBt6u/UI60RuB74PwIhVlnhuSNISHXe?=
- =?us-ascii?Q?vtSw5BZK7nHLSKLbXNZofK31GilzCeEij5tmT+yA8GQKrqzMv8Ul0EBt7ML7?=
- =?us-ascii?Q?Dq7DIxBCzJTjdGAabylzMIXG/n8ME4ZVVg+bMMdMrEfueQ6KZ3W/fHXy3UlN?=
- =?us-ascii?Q?cGqroSz/lhUOkeZUE55EV2gmPNKZePXbW4Jlfqf/cBRW2aU6Pi0GKfu8x+Tl?=
- =?us-ascii?Q?B0I1tHhZRdsKz30T3L8ydLnMa8PYkDyRgoVE96siJ82t7k1eUc+nLh59E/a8?=
- =?us-ascii?Q?Z5zQeIR0tE3Qd0xB3O2rIStW76KqzBcx96X2gg2Gfgj8yoblI4eMyBVL0rrt?=
- =?us-ascii?Q?AskQCMMBjEw3cPfHa1Vw9bDip/4vnRW4Djg5A27h+aLTxY1esuWYg1uA+W4Q?=
- =?us-ascii?Q?PDDr2ySsOII1f9AgGSAFpPSrTCIWtTHLRIabVJUBMWtMJiDRjEVCaQq1kygj?=
- =?us-ascii?Q?SdyMQp8F2WcBHdh2+v5GsR4UAm9nZHJaUhj+S6uhgBV9TEFb9oHhtBXFhAFB?=
- =?us-ascii?Q?SxMNNXUkQcrFZOtEI31NqsfZdgtbXC3ei/kQsBzd0/5UaAzvdZeb1SrJAUh3?=
- =?us-ascii?Q?c0y3+8mKYH7VIXQOkHpKY4JU8cnri2Zor0yk8WV0I+G8GeeOAN5dNitO25QW?=
- =?us-ascii?Q?Gr7+sAl7FtslTiun6dqEx1mJnmcPn4uYNsiVr/DzQpHNjbMHbnB8roJc+UnS?=
- =?us-ascii?Q?jD1+Ac4Ww7BWz1iIO0eHQx0obDt4yZFgX0vcq1cehdJJ2/gU/0lCUA9dOrJR?=
- =?us-ascii?Q?WsAhTVQKw+GBS243swEq1CX+GXgT0sxAQxGp6Nq1KPTCUY8Xn7NENiHklst1?=
- =?us-ascii?Q?g0pe5hYjq4B4CKiRbHGGwfl5xljBmor1gG2Su93a2h+lD49hzHDQ0m/Q1srL?=
- =?us-ascii?Q?hA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80beaa26-5693-408b-a81a-08db85108059
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2023 08:50:12.4286
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JjZGoxNv9Qr9KkqLO4v7kBFqHV8NWIn7BIS+xGaZtjuDeZGWQFj83fbgYkdF8mOUKFjE+PSGznuIl9P5nlWeuDtipeGkyNSwJIqLnSLVK9M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR13MB5143
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To: Leesoo Ahn <lsahn@ooseel.net>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jakub Kicinski
+ <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <simon.horman@corigine.com>
+References: <e75d2a42-4154-e469-bbd7-9409471ab724@ooseel.net>
+Subject: Re: [PATCH net-next] net: stmmac: call stmmac_finalize_xdp_rx() on a
+ condition
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <e75d2a42-4154-e469-bbd7-9409471ab724@ooseel.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:9pSdoaxreuVjT+rwlLPsZns9ytK0sUm3up92tGth8Lcyq7v5kdc
+ kWAJQ9hyl/QzvrHYg0T9waC3ecSHXdkCZsRahgP7j110qIu6f2H67SReOdH3zTxM6YD9yfE
+ vPIZIQYHELW3VrAM83LWm1ZUSSsCKdbaCBFvKljgcvmU/Dutp1zpOszTQUmHEoJWs89Xx3F
+ znnEzixhvLuCILwIm0pFQ==
+UI-OutboundReport: notjunk:1;M01:P0:5hkCjdxvU20=;h2m4glRhfzCGl/yIjYXTOu7hb/6
+ os5wwMBwFC7mvlMsX46Z9tEIcLLQrh8kKs5iAgfwjvrVx7iWBydyf6/N1AZYATqOo8o6BQW3S
+ RyQprZT5hb3hDVNp/JjHDySdiggi/mPaztB217zc1i8nP4AbW4FsFXP/jSBN7F0SOv/yYpODN
+ NChzvlfz5ZGHdVuAt8Cpmi7/HNWksITIybFSDzvS2rVKh/EGVZj7s5hM8FkL6NXzfkxZV8Gz1
+ 3n2thLeC1cUmMsjVPSPcVQ546k2Ot44GKRX25fQxZupk42ZcGPkszWTnKolKLKhIMgLV2Wn9P
+ gWoJvrPXyCffeR9W3Wb8Chly7CVBnjvRlETvMaih1+5ctW1LH+PIlEPpDS3lsbtSfgSXPCQ3K
+ z10JGrSKD4c8xdF0Ksmakb3Iar6GD+jQQUK4m/bhaGscq0uUj6Kq1jJ6rG810FYNjDu4l/6ab
+ levrguqTP9THD6ixDR8TQRApWwT8YjVPXq8ill0coUtHlWcAJqdqPuBXvmbDvWMnUMCVADeo3
+ xteJUt46kL6etHNZGslkVV+SmTNO02uGTlttSR7/DAPrm/VnndkRFmZz8j0w5nc2sveZmbim9
+ 3t4a0PixZ4SCIcJ4ajxgqQ+Ws3ukBvdRwwDtZqCzlOmMQnShEortaeKfkoC308HtekwA5NofO
+ 4SVtGqgdNNL1GUs1DU3nBmihovnW4ToZiqubN7V5yP2jXajWzN0GWK6N3DLq+qAeKE6deOpiz
+ X47FeSEUuckYFJIfLtFFC+kDy6YSrowgMPh/YQ4R6EwE3Tbgcy35r0u0QI0OikCTVes2TvWC8
+ EmHmJbdrCoYEbD8hrTIXs5qeBSPJ9gYJ5OxcW/qQYEo1wioq4HzjRtIzp6mzutBvjQJsc/bzp
+ aTPBKxoZplwUbtgdLQM6pAe/un+WsVPftGnmbUefSJcRLETYqJAJRVJr8LAcw7hO4e18EtBzp
+ w7nI+w==
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 11, 2023 at 06:43:53PM +0200, Petr Machata wrote:
-> Ido Schimmel writes:
-> 
-> Add port range matching support in mlxsw as part of tc-flower offload.
-> 
-> Patches #1-#7 gradually add port range matching support in mlxsw. See
-> patch #3 to understand how port range matching is implemented in the
-> device.
-> 
-> Patches #8-#10 add selftests.
-> 
-> Ido Schimmel (10):
->   mlxsw: reg: Add Policy-Engine Port Range Register
->   mlxsw: resource: Add resource identifier for port range registers
->   mlxsw: spectrum_port_range: Add port range core
->   mlxsw: spectrum_port_range: Add devlink resource support
->   mlxsw: spectrum_acl: Add port range key element
->   mlxsw: spectrum_acl: Pass main driver structure to
->     mlxsw_sp_acl_rulei_destroy()
->   mlxsw: spectrum_flower: Add ability to match on port ranges
->   selftests: mlxsw: Add scale test for port ranges
->   selftests: mlxsw: Test port range registers' occupancy
->   selftests: forwarding: Add test cases for flower port range matching
+> The function must be called for only XDP_TX or XDP_REDIRECT cases.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Which constraints should be taken better into account for the discussed function call?
 
+
+> I will edit the message and post v2 soon.
+
+Did the improvement idea evolve further in the meantime?
+
+Regards,
+Markus
 
