@@ -1,68 +1,79 @@
-Return-Path: <netdev+bounces-18062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37B047547A1
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 11:05:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22DCB7547DF
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 11:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBFBD28204B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 09:05:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E1031C20BD4
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 09:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D918215B9;
-	Sat, 15 Jul 2023 09:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D084B15CD;
+	Sat, 15 Jul 2023 09:23:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CC47FA
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:05:46 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2111.outbound.protection.outlook.com [40.107.93.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA650E65;
-	Sat, 15 Jul 2023 02:05:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB387FA;
+	Sat, 15 Jul 2023 09:23:39 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2099.outbound.protection.outlook.com [40.107.244.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68FC230E2;
+	Sat, 15 Jul 2023 02:23:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lJycLyb3XZYUyyrm48J//MV9jGyUWqECEB8xubI0Wxr0hujnW29WUdzKHcB39QF0ifKlAXeBWlgX/v8kOMAFka1QBcywU+B5+Zb9u+k3T9DLSD3DfZtmlIDodOZoHWwt+xk1ygtUaFYLaLN/jQPwjN52/1Ry3f6aI5FdY/upuWGu/QERQSp+JEG2SNaEa3RCslrP8msXDYQUe1HK4oIydM9ivmCLZaYQqulezy3N7WGEbSClESBfPBvVzeEKrqmJsXRDOTSXHQ7H0eQy1JcTvNMEaIT0f3NRsVFznrcmDnsdvn6sVMiWwbq208PVfnrHAhj+z5KKmwzs1OvO/mSyyQ==
+ b=OF9cBB/zY9f2iD1iJWUB2A78B85wXI3b2bvBjYaXTNB7DKPo0dXPgUeAA1TYcOlJylQfvLxAKLoP63duTCcdM4DUjekq3xRkeC7o9aLem0/7/iPOt8R9o2/KTZ+0Au/MimDM06Y8CE2pJh71tSD6V+fkhseNZY4pgv9JF6XMsVvPVLyetL5X3z/OLn/VEQYwXZv/8zGY1UIamKk81XvK4Vkz32J1QwrP0hkf7AP0xVRRXPwbaWlEAblYehLmJ227JPTSxBcNG1N1cqc+AMBML2EJgAQj1ivLXWsqu3OcuGpTmZdpdEG9quZ54cv96QJcF7BL8OXjzqpPn/uU27mdTg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yichUeLuSVCgsedkdVaFfnSSys5eeLYJrlW4xf09nlQ=;
- b=O8W+BkeswMfmb9+P0BfCZIxeaX2NwbARsMWBWrlVASB+kXB/AIIuWacpQ0KJCgUUS8kgCmNj85vSpeDG1I6PpD9uiYsgjFe60palwVfZwACjJ+Cfqx0v84WAElFLqRr42qmj/Xjpz/gaTpZpP8ES2pze8PMuKDpSNxvB8Kav8wQtgWDN4PQj5QAcyfDmMyr4r/JRnnXEMgxRLOrzzi9Ced3M2hICOO4Pgv68roI3TiaYXr4SPm0SQ6hiYU83upxBOGbvfhekNmbBQ5wy34XM3yOby97kNlYyHLVLyO7TjDaWza6x6rvHbYU4MMYundKjbRBXj24nsDj69V2j7R/tNw==
+ bh=tML3w4lQHK99aBqFhpR9hjq3M2/d25Qp44gde55MH+g=;
+ b=O0CmLfTx6Nz5+EtmN6Jj7ptY/xHbzaWvNg2S95CjuOcV1GJEopF6ygI9OySxm90tjjPiI6gr/UTus3uXofdGpuzxFx8qLl1phTqHLt/+NRiE4ZLDZgSTgkBhCwrsd8NwrTde9KzxA3hgv24gFDdySZ49u6xiu8AE/nv2fHmXXLqulzJsqFmK86lqE3y1jS7cC8tt75ry25GjYf24M6fQtIkC2aKOWJSXMCS9vQkeMZbYjikJ/eF0uLSrBSASVTA+CkYU6WjjtbBwi2XvkEX6b6bZlU/pwUm0iSW4TBtp/1E9HpSsxtkrEi2MDo0RUCrFLJxDhmeGHzUu+x81/Gtwjg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yichUeLuSVCgsedkdVaFfnSSys5eeLYJrlW4xf09nlQ=;
- b=ppNkQiVEJD/8OX8+FhcB1biBIeguVm7+bbAL+TKVRHrO+bhdkSTflV7W0uSn4LXOarMlQw73d+KWnHNbRbEBXc+xPRrp3G1OOI0V6eW3Xh876xt3zq0Jm3OANJbur+YiwIobgi9lFRhu2PjIFOaXWJBphXM2xS3usr/u+hOG7mM=
+ bh=tML3w4lQHK99aBqFhpR9hjq3M2/d25Qp44gde55MH+g=;
+ b=Gq9JT/MA/hjjXu1RsZtMuOfVtro8Yr0LqlhpaJHZUb/TpYmsm8yCA7ilVYB/IIbb5AViO7lyWILD+axT3/YA9o1CoAXtacUMNHeIKFZ7oobBBPlM1JS2LpH3h7BAhV/Q/kYraSuYLg57Csz3WGZpEM+R3mgQzkl6yak3xa3nQH8=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CO3PR13MB5733.namprd13.prod.outlook.com (2603:10b6:303:177::22) with
+ by CH0PR13MB5154.namprd13.prod.outlook.com (2603:10b6:610:ff::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Sat, 15 Jul
- 2023 09:05:40 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.28; Sat, 15 Jul
+ 2023 09:23:33 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.028; Sat, 15 Jul 2023
- 09:05:39 +0000
-Date: Sat, 15 Jul 2023 10:05:33 +0100
+ 09:23:32 +0000
+Date: Sat, 15 Jul 2023 10:23:25 +0100
 From: Simon Horman <simon.horman@corigine.com>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, alex.williamson@redhat.com,
-	jgg@nvidia.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-	shannon.nelson@amd.com
-Subject: Re: [PATCH v11 vfio 7/7] vfio/pds: Add Kconfig and documentation
-Message-ID: <ZLJhXRdA2a72Cb5/@corigine.com>
-References: <20230713003727.11226-1-brett.creeley@amd.com>
- <20230713003727.11226-8-brett.creeley@amd.com>
+To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+Cc: intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Subject: Re: [PATCH iwl-next v3 3/4] igb: add AF_XDP zero-copy Rx support
+Message-ID: <ZLJljUETnhH92kIV@corigine.com>
+References: <20230713104717.29475-1-sriram.yagnaraman@est.tech>
+ <20230713104717.29475-4-sriram.yagnaraman@est.tech>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230713003727.11226-8-brett.creeley@amd.com>
-X-ClientProxiedBy: LO4P123CA0540.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:319::6) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230713104717.29475-4-sriram.yagnaraman@est.tech>
+X-ClientProxiedBy: LO4P123CA0294.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:196::11) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,56 +82,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CO3PR13MB5733:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70d8da17-f77f-4cb6-8ba4-08db8512a8fb
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB5154:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2cfa5621-ea21-4768-2c0d-08db85152879
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	UUPMKoLsPByt0d0oAunNjhPJWEbZfixrr7ocUiKlIa5H+9AG3ojbxY7TmQccbu1KPSR9fvdzfBPHP+lwII54xxfOn51WHSz8QTPlo5WemynCwmG6p10rZw3vOzygmNSaJzyv4dkGZ0B96xeZsHaktv+Vi7VzXb0Mdn6A8vcIGJxWx5wIkF3FOvTsSGzSYBotjhYpKqLH0K6BEP/3eiC1Upz4GrbbsXvRQFaoHAX3/QvIWVB0qjJN0Eej4vpmm/pYcU/vJFq0RkoPRY9yRIdg4j7l2h38kJVY6Pvqiuq5rV4A5Dsf06PsKu8vK9YOTsyYPZEly62Wtyrn1nodo0qYmdPhZR03vq3nwbq1R2ltBaRIgpt95p2Rs7cAYZX1M+Xh+RsHj/LWuoPG9n2mSm2C3CbSjkToKUUP9Ziyx7sgujrBUxNWsnhSyNepGiQ4jXQUfRPzefZAa7/V+hE9kQu+2JH5lIZaAJfGqAAb47KRzTdYx5BLExOBFf2Z224vOhzWpvPQdnmJw9KFsL8/rOrCbjj+7t5QzjY1WJad7/JgMWOv3kztVyXKvUzknRrW5p6X9GwdfeevMP1puiTmUMYeZtnSCLQS0NqB9usvIkKmdW0=
+	K+si+sIePr02Xlb9jmtlOtf5gSnIbHvtarQmyZCfyvWS7LXsScP3vdBN/FKbpi9H2ccT0MXB//7msaZsfsT8iivMx57Xfkq9JQI/jgPQry+qA5B4K4klwTw+pvOAmm7BWqdIKA7QbRaUTgXEs0L+7v10jxf6g0Q/mw5Q9K6J9dAXUBenC8+iYs02uYB18tM7WTiPkbids17HcR5Axv3TQdNPbLhNJPpTZB7JrQzsGQloDYMY7Hcjw8ysUTT2ZMzFs1TjO18Jv3jjRRyz5xj9CSuFJbTYjFX6J2aak2QUT7kHEZVAQQk1oeexeRUeF20ay9rxCpk4YDmTzidNQheQ2jpf+/t6AwDRVcocv90r4X7W7KqK0d4MVVOUtvI9sY/5BLN1USS7Y+Zde/1q4I8OeOvxmaYX6z2X0jiYnah1PT95lap329SWDk4bxw6a/wv+4P+13QrgxQrWFwuCVTKoev483W0+2W69B5HTcqYmz3K0nQPm0/F733u/4qsgL7nTYGdITC/bh8MiLDJtyv3FfMWOWd8tqmaxoRs+JwsQPdIMEMm4QkbMIze0fW98F5tA1K4z3mvx2WDEANjYVEKDjWB4HbMeLfZUOe42J/mV9iQ=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(136003)(376002)(346002)(39830400003)(451199021)(2906002)(38100700002)(6512007)(186003)(83380400001)(2616005)(26005)(6506007)(5660300002)(86362001)(8676002)(8936002)(36756003)(44832011)(478600001)(6486002)(6666004)(316002)(41300700001)(4326008)(6916009)(66476007)(66556008)(66946007);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(39830400003)(366004)(451199021)(8676002)(5660300002)(8936002)(316002)(41300700001)(6916009)(4326008)(54906003)(44832011)(66946007)(2906002)(478600001)(6666004)(6486002)(6512007)(26005)(6506007)(186003)(7416002)(66556008)(66476007)(2616005)(38100700002)(36756003)(86362001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vA0cCqOCQ1K4Rhin4KbSq0YN8w9CHZ1Ky6zvhnrJgiG0UxBeE9LBaiWnlinq?=
- =?us-ascii?Q?TGhurgF9Gktoxm5+gu2uoqY1W6NQyhSsAzQQ/dgbU3o+vF8bdRVWK95wYWys?=
- =?us-ascii?Q?znp67XevtPOMBS3rDE4XYmSeXLOD/QSRM7yWwZ5kCXq5z5eiMHbmMc1BTLnp?=
- =?us-ascii?Q?8G40iaKQJ4u1ZKXvXI+qgY5vze6ypoyRjajBOosQIBKo9fIqoSPDHleIO5S9?=
- =?us-ascii?Q?ZWEADUNL4Uf+QZDQGQ1rNNtfg/EOBuICSargMPeJipUiSolUjQmsTjyyy0t8?=
- =?us-ascii?Q?bco+gwd7EDcRDxHMv8QUyHQzBLQPpWw8N13mJ1fOILUgacpjKXQ5zSbN+6Oh?=
- =?us-ascii?Q?d3+mko+T1nxIoDvFI1yZrSXiBdiUSa/2YZOFR25QHoxtttuo3GGemLuaVd4M?=
- =?us-ascii?Q?8iYKLOmoZBX2UXx7Q7gIQv2983fdMbpZI8GB0OkF6IsACI+ORPFhaM3LAvKm?=
- =?us-ascii?Q?YL/0LppQvnAsH16xKo83qzP8LrKh+S1f6LpVjRJHxfb3xr2HQlWJESj3valT?=
- =?us-ascii?Q?zKqfMGORRThRlDLIx0Fh3CNZvMyWo0nn3OZPr1lVL284Z7XgtpTb2lbdEqTo?=
- =?us-ascii?Q?FKHi8+R4a1Jl/xsM0Nv3NZXqquSPivYWTGjBbus/Gpj5/9h78Eo7u6KJYuny?=
- =?us-ascii?Q?wLkcwWNqlwwUxgbodux5oGkREylp06efS7nHnCQv1Lkawn4eN42aWHnlD9mb?=
- =?us-ascii?Q?OiAz9AJpWY0UsFNf7y5gP7IDLl0EpimDQHZlwiE/Gx1ZN8ArkiqWtwptxQDo?=
- =?us-ascii?Q?oJvQW3hrxmRqK6v95OdNlF/mw74zAJcJJhewt4gnzq1rUbkznZNUht0dF3Kn?=
- =?us-ascii?Q?u4I3EBGhsxr264aPkBLUM3PoWBlv34zY8rycIv+Uhnjd0BafeqtxRs4/Uvn3?=
- =?us-ascii?Q?SYGPULGzLGQcAL2ZY/x+eJ0XOEWISnggLf5mRn7m5HL7NkV61lkSpjfvfXS7?=
- =?us-ascii?Q?FFnrDx3Mkn5tIgK6ue0Ih31/pEg6kNy+gHIxsyoBaaMM2NNRhGJiKwqCu90i?=
- =?us-ascii?Q?jdqhVuHGZ+F/lFl0RbZQDqdmKJgaeYO1ionkEaUqrkbsDtgaxWPX/x0bxhFj?=
- =?us-ascii?Q?J2OR0fVm5Bcxei0vQ+fPweAtcgdw0V6Uq1Ir7ng1ft/RWpcH8PHiTh6KXVAT?=
- =?us-ascii?Q?+VLT9E1xW4HOxgcsrTBuDMq7si89WpUghJRtsf3ZygmjaFS6Zyu9oA1S7mwh?=
- =?us-ascii?Q?xXtZvrZ3K6qN5a/RvFqnxnJjiFUSW0+kaBAwrekaz/WH16+DZrELL8BepLcN?=
- =?us-ascii?Q?BHs23sXKdN6ygZbf6Ld4FJ8PjtspcPKYJg8K6XKkDbL9YsvXtqYqdyRkAWeb?=
- =?us-ascii?Q?wsC45843hgYalQKanQOiI6RMxX0kawXiLx7TZvA107IlZvbXB54+IaN61ajC?=
- =?us-ascii?Q?rPd0CqS4xJHpA5uVtoJ5LSz3q2mY087kUcOHh/mjbIMN69NUK/EJ7gwIdLuq?=
- =?us-ascii?Q?Y6F2qfMBfXMNU7fJyDwAibPF4nJEW1Go1N7zx3qxP7B8bTH4m5CFWPPiJGc7?=
- =?us-ascii?Q?VY55mM176DjrwMyN8U0sHXJ08zKq4T8jAs311+Y7nrm6bxbfa9EsJiPo2Oqd?=
- =?us-ascii?Q?ByoHEqbSQxVghVuy+yWe6Km+RhHXjlLF3HsJCJfbHPujq8wwIdpKijGq62FG?=
- =?us-ascii?Q?kA=3D=3D?=
+	=?us-ascii?Q?42Dpm4jAPNHMaSe1eShn/hdUzcZ12QuthktoiZHdyMD2dLjUAEd65GmZN6hM?=
+ =?us-ascii?Q?MvBr0dxXZ9Iq2MEO/iTjhrrQh+PK7ZS1LjcJh4ais4EZvHCHPUoje8Q03DjK?=
+ =?us-ascii?Q?pPVlumrgxS8vOgkqfpt4mvrhEkiKl3NppF2s8cuX4x/9UyRbQ7C7NU8vkjwW?=
+ =?us-ascii?Q?CXg7B+aQhHFm2NPbGnguPvRyzKFksp105+xocbnQ2Lg/ygY505XZuUD+aiIg?=
+ =?us-ascii?Q?PkkT5ai2ubviN4i3yE+ihwOUtkI9pQsWKZpZwK9pYEurhJbpUnAW5eqeIKQD?=
+ =?us-ascii?Q?wB87wyiS1LP3o6TqyK79cZG3FwbjcXbnxsInevsz69mtWpPI1zmNu1//5MSo?=
+ =?us-ascii?Q?jH1Y+lfDTNbTG/NNwvk0i6tCARyXFeNtccCBe9iLfgKxPEpBYzK8/4MvaU6W?=
+ =?us-ascii?Q?Axb+eGZgnQ98jebP425EJRyNcSp4qInl6YSLbwJUujM5pUtsw8+mckOeMQjw?=
+ =?us-ascii?Q?9jG/ZNhpss1STWXn4qPzKfVWhrPENZjlNL7CGB6RBTzwikXbKkJjpVXx2naO?=
+ =?us-ascii?Q?Ub54qr0vZMDX7QvPBRkixyxvYVgQGUj3N/dvDAyLEJMcik9okNjY2vDLHJaC?=
+ =?us-ascii?Q?YSF/QiPvU6XWICFI2aCY2nENhyQF4EfiXSuDQL4mAzFm/WG7d2aJhD5IM4YL?=
+ =?us-ascii?Q?FvxmczccrI69YPXhbaAgdWa2uuPw1A8jDKpcG8U442Q9+grZPg8T7TgGlDjd?=
+ =?us-ascii?Q?8lFQlBRHBgElH7ooYipFyem7CFS+6+zYqefRmr1al+xsdE0sL16QkbI+jCYD?=
+ =?us-ascii?Q?7GXu3GfupirF402fr3sKfdEbEcDWfYuA6BmFDYQvibTFsAr2dOTseVncVuhC?=
+ =?us-ascii?Q?N6ZsKyJF5j54hsQ8BGl/oJdEXES9bWr1z+x4m4Meucdfeh5L3apqdxRGRE6J?=
+ =?us-ascii?Q?XJ6thJX8tatgpfNWHvcIKsBdKZ2D59Q6S7dZ+BxwWZmFIbRg3/X4+x7460Bz?=
+ =?us-ascii?Q?hzsXXWNPWHHh92RG487UbpF3pIttP5f2AD6qxcJ7VpKtPdLh+TV57R/GyDLP?=
+ =?us-ascii?Q?M9BwRvf2FUbK2FAytKWIwULN5jFGuWIjj+uBWOQuEiRs7a/lLWkOBASucHRS?=
+ =?us-ascii?Q?Vv4oa0fm9HwFUeUWvyqUsIWKcgAWyu3zyBdoYpjjoYFr0pY9LxfYR6eQQyCi?=
+ =?us-ascii?Q?XbqL03PbYbm/Ai8QjnbDk+q2ZFrb5GcVyO3snE1mJsbYDeulb1aPo8V6FmOy?=
+ =?us-ascii?Q?XI8jOV866i2jJ/0lL5KZRbfd32YTSg+7i5PqldNpIqKj7HivEAQX1to2ZZbw?=
+ =?us-ascii?Q?05yIaIfAsJoJ6+XLcm2Rr6u/RZliGzgaubm1TnPbCIJSQkW4kGQvJaLAmoD+?=
+ =?us-ascii?Q?uBiaxm1xrZz9TljX1KRVy0QuVEpCH9FwvqyzD9f5XxDpW4GjuTQjTYK0kEld?=
+ =?us-ascii?Q?wOCUqdLYGQWaTB5YedBoWEehti+HX1q1XDjwUQ7PH3d1nL8t/WtnEXrbAMi3?=
+ =?us-ascii?Q?IWjDUdyTy/ChOWjQ0m40JAjjkWhmBa09f9J2FN2YOAfopVE0wra46jIrkbUH?=
+ =?us-ascii?Q?whYflvAMIj/7Lkzl4yQdYUONMjDo+Uab9BDws118nlLVBXGjlwionvnhlRXd?=
+ =?us-ascii?Q?O9/7oDDC4/BnO4wCDkBQBrBhxW5irLgxYkNuyFydZGs0GRi5uPXKE0kKwPcc?=
+ =?us-ascii?Q?Bw=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70d8da17-f77f-4cb6-8ba4-08db8512a8fb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cfa5621-ea21-4768-2c0d-08db85152879
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2023 09:05:39.6822
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2023 09:23:32.6530
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y7K8dUUa3zHGP9GxCYPE7W2oK4BwfGX1NUleWqW8y3WtbQG/v/aC97LexHhoqgqqvhDhyTjh4GGcparz6zPKvPRgAftYvSf1FfcEnog3F0A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO3PR13MB5733
+X-MS-Exchange-CrossTenant-UserPrincipalName: n8epTenpRGs6mbs9Za8HlcG6DU/MliiWf/6TGdl4W4fnKtY0l7oUcnkwykD/X5aWPO6bukosYV5ug4HKrpuzPEQ+PDKyvlHp8IARf5pKjC0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5154
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
 	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -128,58 +139,57 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 05:37:27PM -0700, Brett Creeley wrote:
-> Add Kconfig entries and pds-vfio-pci.rst. Also, add an entry in the
-> MAINTAINERS file for this new driver.
+On Thu, Jul 13, 2023 at 12:47:16PM +0200, Sriram Yagnaraman wrote:
+> Add support for AF_XDP zero-copy receive path.
 > 
-> It's not clear where documentation for vendor specific VFIO
-> drivers should live, so just re-use the current amd
-> ethernet location.
+> When AF_XDP zero-copy is enabled, the rx buffers are allocated from the
+> xsk buff pool using igb_alloc_rx_buffers_zc.
 > 
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> ---
->  .../ethernet/amd/pds-vfio-pci.rst             | 79 +++++++++++++++++++
->  .../device_drivers/ethernet/index.rst         |  1 +
->  MAINTAINERS                                   |  7 ++
->  drivers/vfio/pci/Kconfig                      |  2 +
->  drivers/vfio/pci/pds/Kconfig                  | 19 +++++
->  5 files changed, 108 insertions(+)
->  create mode 100644 Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
->  create mode 100644 drivers/vfio/pci/pds/Kconfig
+> Use xsk_pool_get_rx_frame_size to set SRRCTL rx buf size when zero-copy
+> is enabled.
 > 
-> diff --git a/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst b/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
-> new file mode 100644
-> index 000000000000..7a6bc848a2b2
-> --- /dev/null
-> +++ b/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
-> @@ -0,0 +1,79 @@
+> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
 
 ...
 
-> diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-> index 94ecb67c0885..804e1f7c461c 100644
-> --- a/Documentation/networking/device_drivers/ethernet/index.rst
-> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
-> @@ -16,6 +16,7 @@ Contents:
->     altera/altera_tse
->     amd/pds_core
->     amd/pds_vdpa
-> +   amd/pds_vfio
->     aquantia/atlantic
->     chelsio/cxgb
->     cirrus/cs89x0
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 2c1e1d70bcf9..8eed3d0ab4fc 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -502,12 +502,14 @@ static void igb_dump(struct igb_adapter *adapter)
+>  
+>  		for (i = 0; i < rx_ring->count; i++) {
+>  			const char *next_desc;
+> -			struct igb_rx_buffer *buffer_info;
+> -			buffer_info = &rx_ring->rx_buffer_info[i];
+> +			struct igb_rx_buffer *buffer_info = NULL;
+>  			rx_desc = IGB_RX_DESC(rx_ring, i);
+>  			u0 = (struct my_u0 *)rx_desc;
+>  			staterr = le32_to_cpu(rx_desc->wb.upper.status_error);
+>  
+> +			if (!rx_ring->xsk_pool)
+> +				buffer_info = &rx_ring->rx_buffer_info[i];
+> +
+>  			if (i == rx_ring->next_to_use)
+>  				next_desc = " NTU";
+>  			else if (i == rx_ring->next_to_clean)
+> @@ -530,7 +532,7 @@ static void igb_dump(struct igb_adapter *adapter)
+>  					(u64)buffer_info->dma,
 
-Sorry for not noticing this, but there seems to be a missmatch
-between 'amd/pds_vfio' above, and the name of the file in
-question. Perhaps the file should be renamed pds_vfio.rst?
+Hi Sriram,
 
-'make htmldocs' reports:
+Here buffer_info is dereferenced...
 
- .../index.rst:10: WARNING: toctree contains reference to nonexisting document 'device_drivers/ethernet/amd/pds_vfio'
- .../amd/pds-vfio-pci.rst: WARNING: document isn't included in any toctree
+>  					next_desc);
+>  
+> -				if (netif_msg_pktdata(adapter) &&
+> +				if (netif_msg_pktdata(adapter) && buffer_info &&
 
+And here buffer_info is checked against NULL.
 
+This combination doesn't seem quite right.
 
+>  				    buffer_info->dma && buffer_info->page) {
+>  					print_hex_dump(KERN_INFO, "",
+>  					  DUMP_PREFIX_ADDRESS,
 
