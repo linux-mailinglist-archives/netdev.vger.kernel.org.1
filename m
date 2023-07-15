@@ -1,168 +1,128 @@
-Return-Path: <netdev+bounces-18038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47810754572
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 01:38:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B0F7545B1
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 02:47:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F238E282329
-	for <lists+netdev@lfdr.de>; Fri, 14 Jul 2023 23:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E4D1C21684
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 00:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B93A2AB30;
-	Fri, 14 Jul 2023 23:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5779C7E8;
+	Sat, 15 Jul 2023 00:47:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9E12C80
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 23:38:54 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC89A2D5D
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 16:38:52 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-307d58b3efbso2585914f8f.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 16:38:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B340628
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 00:47:56 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6690011C
+	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 17:47:54 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6831e80080dso1774062b3a.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 17:47:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1689377931; x=1691969931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zBT3rUjJGAxYbppKiA656uXoRrGlh1XdLp4eh9nDCrQ=;
-        b=p2J7w1ajpOdvwrAGvge0quNYmL6gv7jREgk3lB+pZPHG8ZNS/mdOZ80VZXHKw3CVR3
-         tNLxlc1PxlmwAQSpmcMhF1laQQZL8/quot+4wRhUysKnqpDGqM/QPeUIvhj6rWzttEwj
-         OBviYO6vvg7P6SS6qBZc3j2mh77sZTstHPKyI=
+        d=gmail.com; s=20221208; t=1689382073; x=1691974073;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=edKU6aO6Z0ch0HVD3T2f7ZKe2+eOX4XfIz2m0mOYlDs=;
+        b=MaKqwklNof5vUnea/5Fg4GS5iwAkQ+zJi7ALmA692dNEPLeRXlxZxN8hgH9RKzScaQ
+         tUzOzF0rZ9B1Y/fQS+BbYZrqEZTZ2r7SME467jX9gDgNX4N9DSKZ4zOsLHzKU23wdWXz
+         15fnnW9QroW7jG1Kjcwun2bzV2l/0+ehyW2SLIYuiNbN5bMGdt15hcPJUqtFI0kutZzG
+         QAK8bC0a8VPEGWhWNlKQ4H5tJ0RfKsw4rc7wub+4z6BWecQ3vdiRU7zzphlAfkiPgkwY
+         D9tgyrMFbR+0DL3OBeP0dP6v4XBgdO7J3/EhgkdNLsRmFyykZn/K+jzMV8Rf07Cm5ZiJ
+         +6Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689377931; x=1691969931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1689382073; x=1691974073;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zBT3rUjJGAxYbppKiA656uXoRrGlh1XdLp4eh9nDCrQ=;
-        b=CmpcnzOQFol6N6sX5aj2LTHLFCFN7D0oMhUExwUp9Q4QN4zQli+S9Oh+O276G93eex
-         ws5Zxjhu59oIKSJ/txfinbDqlQp2OWiQShmzHhXlopeZ+C0Hdei720nkdaiMY8fYjMOg
-         RO3rkq3lmNSH9PCmjG07mNSN6a37PXvLuHQY3Il/AVhQ3YWcd1YN6bFfTgDUYuw+sJLn
-         vUm8qL6xrxeq7dghAY2+Q0IuBsZJy1OZKdXw48ee6gslBem7iidbZu6DnCOWUwVGB1WC
-         LjIrjvV8z4yrm/oOAmW8Lz2dA+ieS4ZG1FMTcQCes7b1LEr+nK8c80Jb+X51gKngmzzR
-         L2Pg==
-X-Gm-Message-State: ABy/qLYViAL+k37JPn8i24UgYu5xkPzpi/b+u6HDyBT9QilPzFjYqfYn
-	s1yYiBUQHmuhYVsne5u5O40w8Xp+3diFXh89KKRitw==
-X-Google-Smtp-Source: APBJJlFI8UT7ttHWMWTChD+OoeAiz8TeEiUAizhofk5qBde1N/nlsvJ0HFW4KXpG76GQ43uNhHOFDgHRwjioOZyHVSY=
-X-Received: by 2002:a5d:5505:0:b0:313:f98a:1fd3 with SMTP id
- b5-20020a5d5505000000b00313f98a1fd3mr5794979wrv.27.1689377931105; Fri, 14 Jul
- 2023 16:38:51 -0700 (PDT)
+        bh=edKU6aO6Z0ch0HVD3T2f7ZKe2+eOX4XfIz2m0mOYlDs=;
+        b=LnHvlmtNWpuiGJu70L0gIz1PCtd9cc+S/GVsDWxJ6/edfE2zO3UAQwC7cTKR3eOz9p
+         Iw0ClxepN0nSYH1qwe/9NuHz81lnczUXPkTuy9oqFrk0pgBIjVM0brXVKHyimW5M64Dv
+         eBLqWO8n5M5qh2Lj7ujeWu/45uuIATz+D1NCxfmIe++Muih5w0PeLQ1KOMWqvsXFyqEg
+         qbAoYiVAPEVOazX3HvKKn1JcUDYsjDpUHk8Nstl0ZhJhN66xOWtKpyL62GSmFWHVoRkO
+         jMby4Yn2t9Yj5pmeH2RYNB0Yy3SNtVWMXEskCs/KNkJq6NWB4yd2jTNAPs2hhwklQrb1
+         VKMw==
+X-Gm-Message-State: ABy/qLZogzpNNw0WUFrJ6+mUvCpJ9AulVOaeF8vOj4nU0c6b+t7DcXfW
+	papXi8oiITdVM6M5Nw67pKqXtDv62GWYnQ==
+X-Google-Smtp-Source: APBJJlHlbvtQRvpn0jHHAxr/o6ZmvW+wONx/ZAHXLlt3I9VweeqkyiqvWLUVDel74xG5HMgcWa1Asw==
+X-Received: by 2002:a17:903:1109:b0:1b3:d6c8:7008 with SMTP id n9-20020a170903110900b001b3d6c87008mr5403141plh.57.1689382073443;
+        Fri, 14 Jul 2023 17:47:53 -0700 (PDT)
+Received: from smtpclient.apple (2603-8000-7f00-5ab0-89df-d7bc-9f80-76c5.res6.spectrum.com. [2603:8000:7f00:5ab0:89df:d7bc:9f80:76c5])
+        by smtp.gmail.com with ESMTPSA id y21-20020a1709027c9500b001b8a3729c23sm8335274pll.17.2023.07.14.17.47.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 17:47:52 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: SIMON BABY <simonkbaby@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230711043453.64095-1-ivan@cloudflare.com> <20230711193612.22c9bc04@kernel.org>
- <CAO3-PbrZHn1syvhb3V57oeXigE_roiHCbzYz5Mi4wiymogTg2A@mail.gmail.com>
- <20230712104210.3b86b779@kernel.org> <CABWYdi3VJU7HUxzKJBKgX9wF9GRvmA0TKVpjuHvJyz_EdpxZFA@mail.gmail.com>
- <c015fdb8-9ac1-b45e-89a2-70e8ababae17@kernel.org>
-In-Reply-To: <c015fdb8-9ac1-b45e-89a2-70e8ababae17@kernel.org>
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Fri, 14 Jul 2023 16:38:40 -0700
-Message-ID: <CABWYdi010VpHHi6-PLyBB3F_btFggm7XLxstboCRBvBLdoKdmA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] tcp: add a tracepoint for tcp_listen_queue_drop
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (1.0)
+Subject: Re: Query on acpi support for dsa driver
+Date: Fri, 14 Jul 2023 17:47:42 -0700
+Message-Id: <6FD3BB1E-153F-423D-A134-BFB18F4969D9@gmail.com>
+References: <af5a6be0-40e5-4c05-ac25-45b0e913d8aa@lunn.ch>
+Cc: netdev@vger.kernel.org
+In-Reply-To: <af5a6be0-40e5-4c05-ac25-45b0e913d8aa@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: iPhone Mail (20F75)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 8:09=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
-> > We can start a separate discussion to break it down by category if it
-> > would help. Let me know what kind of information you would like us to
-> > provide to help with that. I assume you're interested in kernel stacks
-> > leading to kfree_skb with NOT_SPECIFIED reason, but maybe there's
-> > something else.
->
-> stack traces would be helpful.
+Thank you Andrew for your inputs .=20
+Do I need ACPI tables ( similar to DT ) and changes in the device driver cod=
+e for invoking the correct probe function ?
 
-Here you go: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=3DZah28QwZ_5RU-=
-xcxLFUK2Zj08A8MrLk9jzg@mail.gmail.com/
+Regards
+Simon
 
-> > Even if I was only interested in one specific reason, I would still
-> > have to arm the whole tracepoint and route a ton of skbs I'm not
-> > interested in into my bpf code. This seems like a lot of overhead,
-> > especially if I'm dropping some attack packets.
->
-> you can add a filter on the tracepoint event to limit what is passed
-> (although I have not tried the filter with an ebpf program - e.g.,
-> reason !=3D NOT_SPECIFIED).
+Sent from my iPhone
 
-Absolutely, but isn't there overhead to even do just that for every freed s=
-kb?
-
-> > If you have an ebpf example that would help me extract the destination
-> > port from an skb in kfree_skb, I'd be interested in taking a look and
-> > trying to make it work.
->
-> This is from 2020 and I forget which kernel version (pre-BTF), but it
-> worked at that time and allowed userspace to summarize drop reasons by
-> various network data (mac, L3 address, n-tuple, etc):
->
-> https://github.com/dsahern/bpf-progs/blob/master/ksrc/pktdrop.c
-
-It doesn't seem to extract the L4 metadata (local port specifically),
-which is what I'm after.
-
-> > The need to extract the protocol level information in ebpf is only
-> > making kfree_skb more expensive for the needs of catching rare cases
-> > when we run out of buffer space (UDP) or listen queue (TCP). These two
-> > cases are very common failure scenarios that people are interested in
-> > catching with straightforward tracepoints that can give them the
-> > needed information easily and cheaply.
-> >
-> > I sympathize with the desire to keep the number of tracepoints in
-> > check, but I also feel like UDP buffer drops and TCP listen drops
-> > tracepoints are very much justified to exist.
->
-> sure, kfree_skb is like the raw_syscall tracepoint - it can be more than
-> what you need for a specific problem, but it is also give you way more
-> than you are thinking about today.
-
-I really like the comparison to raw_syscall tracepoint. There are two flavo=
-rs:
-
-1. Catch-all: raw_syscalls:sys_enter, which is similar to skb:kfree_skb.
-2. Specific tracepoints: syscalls:sys_enter_* for every syscall.
-
-If you are interested in one rare syscall, you wouldn't attach to a
-catch-all firehose and the filter for id in post. Understandably, we
-probably can't have a separate skb:kfree_skb for every reason.
-However, some of them are more useful than others and I believe that
-tcp listen drops fall into that category.
-
-We went through a similar exercise with audit subsystem, which in fact
-always arms all syscalls even if you audit one of them:
-
-* https://lore.kernel.org/audit/20230523181624.19932-1-ivan@cloudflare.com/=
-T/#u
-
-With pictures, if you're interested:
-
-* https://mastodon.ivan.computer/@mastodon/110426498281603668
-
-Nobody audits futex(), but if you audit execve(), all the rules run
-for both. Some rules will run faster, but all of them will run. It's a
-lot of overhead with millions of CPUs, which I'm trying to avoid (the
-planet is hot as it is).
-
-Ultimately my arguments for a separate tracepoint for tcp listen drops
-are at the bottom of my reply to Jakub:
-
-* https://lore.kernel.org/netdev/CABWYdi2BGi=3DiRCfLhmQCqO=3D1eaQ1WaCG7F9Ws=
-Jrz-7=3D=3DocZidg@mail.gmail.com/
+> On Jul 14, 2023, at 4:01 PM, Andrew Lunn <andrew@lunn.ch> wrote:
+>=20
+> =EF=BB=BFOn Fri, Jul 14, 2023 at 12:38:24PM -0700, SIMON BABY wrote:
+>> Hello Team ,
+>=20
+>> I am new to this group . I have a query on adding a switch device (
+>> microchip EVB-KSZ9897) to my Intel based x86 board which uses ACPI
+>> instead of device tree. The Intel x86 is running Linux Ubuntu 5.15
+>> kernel .
+>=20
+>> Do I need any changes in the drive code to get the acpi table and
+>> invoke the functions ? When I looked the code
+>> drivers/net/dsa/microchip/ksz9477_i2c.c it has support only for DSA.
+>=20
+>> Please provide your inputs .
+>=20
+> ACPI is generally not used for networking. Nobody who cares enough
+> about ACPI has taken the time to understand the DT concepts, find the
+> equivalent in ACPI, write a proposal to extend the ACPI standard, get
+> it accepted in, and then done the implementation work.
+>=20
+> What some people have tried in the past is just accept DT is the way
+> describe this sort of hardware, and stuff all the DT properties into
+> ACPI tables. But they often do it wrongly, including all the DT
+> legacy, deprecated properties etc.
+>=20
+> The mv88e6xxx driver can be instantiated via a platform driver. I have
+> a couple of x86 targets with drivers placed in drivers/platform/x86
+> which instantiate mv88e6xxx instances. For simple setups, using just
+> the internal PHYs that is sufficient.
+>=20
+> Take a look at drivers/platform/x86/asus-tf103c-dock.c and how it uses
+> i2c_new_client_device() to instantiate i2c devices. And
+> mv88e6xxx_probe() and its use of pdata.
+>=20
+>    Andrew
 
