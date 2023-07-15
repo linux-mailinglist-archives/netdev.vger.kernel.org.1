@@ -1,164 +1,99 @@
-Return-Path: <netdev+bounces-18088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6A93754A4B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 18:59:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12914754A6D
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 19:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AFD9281D80
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 16:59:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 383CA281E1E
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 17:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E2779F8;
-	Sat, 15 Jul 2023 16:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B16846A;
+	Sat, 15 Jul 2023 17:20:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384FE15B8
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 16:59:03 +0000 (UTC)
-Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F7526B1
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:59:01 -0700 (PDT)
-Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-1b471ee7059so4556651fac.2
-        for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:59:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689440340; x=1692032340;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VVggWaxW/y//zbxzMj5Up/8PG70H1D3JvD8YAt+BrH8=;
-        b=ejXaSN2oHydDeoXAkQcvY6GzKgN6oWc2Y2G5s3Xh0tGN0ih97RO9wH6Q62REAE8/Zf
-         df+79uEYaXBU0kp49fhQ5KtE8k7FXwupDuzIrGS2qbrUwcth8kOzX0wU3mPYcd2Rj+dt
-         a/MJQ1+gb3YkkHkrYoMF17exdpOb+sFRuX8JEVVeGfFcNNh7XabQCfPM/Y2f3x4e9KBG
-         /pax579ByeyqA9JlQMBHytCPn65K2ViCGLv69oweZoPKul0n7SnntcXK4VutmVNfMdzm
-         xp/x+kKAqMv7eeMiYUK7Gb/IPxK6J2JfERRF9rm+/WtCzgoN5isLIrSB1uSXc0lnv1j0
-         jjZA==
-X-Gm-Message-State: ABy/qLbkO4Gz7dF/n6ugF8hCAAiEWfdKEWtQI5p6kyn/5LoPIAhJxph6
-	zPiT4DFoRm43Jn9/+Bu9dQsr7zlQ/mczlz1GTjaBt3k+96Tp
-X-Google-Smtp-Source: APBJJlHiIE+UxfTCFUslPbf6t9y+2TdEnS71GrV0V7tk323+8NpCl1UrA6V7rN5jD9rPYQDzSuqQxp3UUDohHVfgDch0q2r+qg3N
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F6415B8
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 17:20:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D18C433C8;
+	Sat, 15 Jul 2023 17:20:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689441636;
+	bh=pUM/+E0mchtEL5aXVIDfQBGQoM2EdqzptGbYZLJmW4s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=f6xmu1FqCdNh56ViC1A0Tm5yTeoS1ug16m4cbrLFkLFQom3eQP+f85Qbprq6ZQ+4Z
+	 Ah1YlIT8RZYugUOnnP5b5Uxx/uPP9OxziUkQHwdJrfWa6eVwAOZ1j+G6rbyElBWL82
+	 o73vsvnabz4oB7BevSqnME8d5qtoimMB9RDdTHi4kxW6Q/johVSXf8ffYINb3dcSjv
+	 rFdY7CQyFyP1KlYfFAEWcOVc1ftnziBS/MbFeTWv4DHz2qkM/ouPi2wMB1WygDe9dQ
+	 9+vOdMIgid7vFVl8anTxDnZzURuHmgsOZMIV+ZnJsRD1TAVHK43a46eUr1mVhfNtli
+	 3MyODUH5MSkuA==
+Message-ID: <06164db3-e738-c39e-56e5-10372a87a09b@kernel.org>
+Date: Sat, 15 Jul 2023 11:20:34 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:5b35:b0:1b0:3f7f:673e with SMTP id
- ds53-20020a0568705b3500b001b03f7f673emr6699714oab.6.1689440340161; Sat, 15
- Jul 2023 09:59:00 -0700 (PDT)
-Date: Sat, 15 Jul 2023 09:59:00 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005839700600897be6@google.com>
-Subject: [syzbot] [wireless?] WARNING in sta_info_insert_rcu (3)
-From: syzbot <syzbot+2676771ed06a6df166ad@syzkaller.appspotmail.com>
-To: davem@davemloft.net, ebiederm@xmission.com, edumazet@google.com, 
-	hbh25y@gmail.com, johannes@sipsolutions.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH net] vrf: Fix lockdep splat in output path
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, naresh.kamboju@linaro.org
+References: <20230715153605.4068066-1-idosch@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230715153605.4068066-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 7/15/23 9:36 AM, Ido Schimmel wrote:
+> Cited commit converted the neighbour code to use the standard RCU
+> variant instead of the RCU-bh variant, but the VRF code still uses
+> rcu_read_lock_bh() / rcu_read_unlock_bh() around the neighbour lookup
+> code in its IPv4 and IPv6 output paths, resulting in lockdep splats
+> [1][2]. Can be reproduced using [3].
+> 
+> Fix by switching to rcu_read_lock() / rcu_read_unlock().
+> 
 
-syzbot found the following issue on:
+...
 
-HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=11089df2a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=150188feee7071a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=2676771ed06a6df166ad
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122f5682a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=158dbaeca80000
+> [3]
+> #!/bin/bash
+> 
+> ip link add name vrf-red up numtxqueues 2 type vrf table 10
+> ip link add name swp1 up master vrf-red type dummy
+> ip address add 192.0.2.1/24 dev swp1
+> ip address add 2001:db8:1::1/64 dev swp1
+> ip neigh add 192.0.2.2 lladdr 00:11:22:33:44:55 nud perm dev swp1
+> ip neigh add 2001:db8:1::2 lladdr 00:11:22:33:44:55 nud perm dev swp1
+> ip vrf exec vrf-red ping 192.0.2.2 -c 1 &> /dev/null
+> ip vrf exec vrf-red ping6 2001:db8:1::2 -c 1 &> /dev/null
+> 
+> Fixes: 09eed1192cec ("neighbour: switch to standard rcu, instead of rcu_bh")
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Link: https://lore.kernel.org/netdev/CA+G9fYtEr-=GbcXNDYo3XOkwR+uYgehVoDjsP0pFLUpZ_AZcyg@mail.gmail.com/
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+> Using the "Link" tag instead of "Closes" since there are two reports in
+> the link, but I can only reproduce the second.
+> 
+> I believe that the rcu_read_lock_bh() / rcu_read_unlock_bh() in
+> vrf_finish_direct() can be removed since dev_queue_xmit_nit() uses
+> rcu_read_lock() / rcu_read_unlock(). I will send a patch to net-next
+> after confirming it.
+> ---
+>  drivers/net/vrf.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/47d90db1f2d1/disk-3f01e9fe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/266e07b43566/vmlinux-3f01e9fe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/62efdb874ac7/bzImage-3f01e9fe.xz
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-The issue was bisected to:
+Thanks, Ido.
 
-commit c579d60f0d0cd87552f64fdebe68b5d941d20309
-Author: Hangyu Hua <hbh25y@gmail.com>
-Date:   Fri Jul 15 06:23:01 2022 +0000
-
-    ipc: mqueue: fix possible memory leak in init_mqueue_fs()
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14a40b58a80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16a40b58a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a40b58a80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2676771ed06a6df166ad@syzkaller.appspotmail.com
-Fixes: c579d60f0d0c ("ipc: mqueue: fix possible memory leak in init_mqueue_fs()")
-
-wlan1: authenticate with 08:02:11:00:00:01
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 1148 at net/mac80211/sta_info.c:728 sta_info_insert_check net/mac80211/sta_info.c:728 [inline]
-WARNING: CPU: 1 PID: 1148 at net/mac80211/sta_info.c:728 sta_info_insert_rcu+0x25e/0x1af0 net/mac80211/sta_info.c:940
-Modules linked in:
-CPU: 1 PID: 1148 Comm: kworker/1:2 Not tainted 6.5.0-rc1-syzkaller-00006-g3f01e9fed845 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
-Workqueue: events cfg80211_conn_work
-RIP: 0010:sta_info_insert_check net/mac80211/sta_info.c:728 [inline]
-RIP: 0010:sta_info_insert_rcu+0x25e/0x1af0 net/mac80211/sta_info.c:940
-Code: e8 a7 14 ef f7 44 89 e0 31 ff 83 e0 01 89 c6 88 44 24 08 e8 74 10 ef f7 0f b6 44 24 08 84 c0 0f 84 19 01 00 00 e8 82 14 ef f7 <0f> 0b c7 44 24 08 ea ff ff ff e8 73 14 ef f7 48 8b 7c 24 28 4c 89
-RSP: 0018:ffffc90005bff1f0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888027478c80 RCX: 0000000000000000
-RDX: ffff888021f78000 RSI: ffffffff8995cd3e RDI: 0000000000000005
-RBP: 0000000000000100 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 000000000000000f R12: 0000000000110208
-R13: ffff8880768fc048 R14: ffff88807d171730 R15: ffff8880768fc000
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8913442270 CR3: 000000000c775000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- sta_info_insert+0x17/0xd0 net/mac80211/sta_info.c:953
- ieee80211_prep_connection+0x5fd/0x14a0 net/mac80211/mlme.c:7047
- ieee80211_mgd_auth+0x891/0x1170 net/mac80211/mlme.c:7205
- rdev_auth net/wireless/rdev-ops.h:481 [inline]
- cfg80211_mlme_auth+0x3b3/0x8c0 net/wireless/mlme.c:284
- cfg80211_conn_do_work+0xd3c/0xff0 net/wireless/sme.c:181
- cfg80211_conn_work+0x27f/0x3d0 net/wireless/sme.c:273
- process_one_work+0xa34/0x16f0 kernel/workqueue.c:2597
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2748
- kthread+0x344/0x440 kernel/kthread.c:389
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
