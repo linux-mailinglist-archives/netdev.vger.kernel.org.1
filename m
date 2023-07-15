@@ -1,101 +1,98 @@
-Return-Path: <netdev+bounces-18052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C6BA75467A
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 05:17:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6181C75468A
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 05:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2277D1C2165E
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 03:17:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66F4A2821B0
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 03:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE02A5F;
-	Sat, 15 Jul 2023 03:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F45EA6;
+	Sat, 15 Jul 2023 03:30:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE24E39D
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:17:20 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620782D51
-	for <netdev@vger.kernel.org>; Fri, 14 Jul 2023 20:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=n8mEYUpWOZ0cq46fhOobU2EvPlRGc2vIQJQ5QSB0gTY=; b=pElNYHFaPRtZb9ymaFh6NOi4xS
-	TNfuILpiwvSN/80cucTqHGCMEwANzLj+gPg54WPTiv7BzNS9E9T9Eok0PX1Y9RJ7ZaQR5cRciXmHT
-	n36P6mTxtBN1Jurb8m9K92MMiD0bPgQS/+iXoLHX6KEQPlx3PygfCy6meIG77hBi+WSw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qKVmX-001POB-DH; Sat, 15 Jul 2023 05:17:17 +0200
-Date: Sat, 15 Jul 2023 05:17:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: SIMON BABY <simonkbaby@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Query on acpi support for dsa driver
-Message-ID: <4370398e-fe9b-44f6-bba5-c0bb2ead9d58@lunn.ch>
-References: <21809053-8295-427b-9aff-24b7f0612735@lunn.ch>
- <F756A296-DD08-4FCB-9585-8D65A3D8857B@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E868939D
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:30:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F22F8C433C7;
+	Sat, 15 Jul 2023 03:30:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689391834;
+	bh=DWsqbFGqlQkWiN3wTuwoj3FiFB1c6adxvrlx+u0V9z8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mNx4QujSl1BRlFLz86XYN+lZFZ1RJfm3CJ4qdWhjyD0wdExI0133VxDyDpYeU9MY6
+	 aCmaf9rYvtHd5ChAXGA1ED6l460ByFQLX6HRPVYJmQrNSM84mTebXzAtmzP0y/Qmps
+	 jGpjnfaNI9qAqHq++HQDVJN3uDyrbAeCpE6I/LGl2eZdLFKqjGe5FsjiH8vIduQB6S
+	 3SeTL1RFM8HTLZxUzHUztp4yf06EdYbqCfmfG3ArSlnlW37xwqnAMtTD2hWD7btu2H
+	 2AudLBYoRiXGTo2diKAkh9ktrBqSH9+5koEIxqV8XYgdSMt8Lhz0/6ToTAzi5Y4rsv
+	 jWkauD3Ez6Khg==
+Date: Fri, 14 Jul 2023 20:30:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+ Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, "David S . Miller"
+ <davem@davemloft.net>, Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
+ modify rule destination
+Message-ID: <20230714203032.7f1bf5f7@kernel.org>
+In-Reply-To: <20230714203258.GL41919@unreal>
+References: <5fd15672173653d6904333ef197b605b0644e205.1689064922.git.leonro@nvidia.com>
+	<20230712173259.4756fe08@kernel.org>
+	<20230713063345.GG41919@unreal>
+	<20230713100401.5fe0fa77@kernel.org>
+	<20230713174317.GH41919@unreal>
+	<20230713110556.682d21ba@kernel.org>
+	<20230713185833.GI41919@unreal>
+	<20230713201727.6dfe7549@kernel.org>
+	<20230714184013.GJ41919@unreal>
+	<20230714121633.18d19c4c@kernel.org>
+	<20230714203258.GL41919@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <F756A296-DD08-4FCB-9585-8D65A3D8857B@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 14, 2023 at 07:46:27PM -0700, SIMON BABY wrote:
+On Fri, 14 Jul 2023 23:32:58 +0300 Leon Romanovsky wrote:
+> On Fri, Jul 14, 2023 at 12:16:33PM -0700, Jakub Kicinski wrote:
+> > On Fri, 14 Jul 2023 21:40:13 +0300 Leon Romanovsky wrote:  
+> > > It depends on configuration order, if user configures TC first, it will
+> > > be a), if he/she configures IPsec first, it will be b).
+> > > 
+> > > I just think that option b) is really matters.  
+> > 
+> > And only b) matches what happens in the kernel with policy based IPsec,
+> > right?   
+> 
+> Can you please clarify what do you mean "policy based IPsec"?
 
-> Thanks Andrew . So if I add a platform driver, will it get triggered
-> by ACPI table or Device Tree or by some other mechanism?
+I mean without a separate xfrm netdev on which you can install TC
+rules of its own.
 
-There are a couple of options.
+> > IIUC what you're saying -
+> > the result depending on order of configuration may be a major source
+> > of surprises / hard to debug problems for the user.  
+> 
+> When I reviewed patches, I came exactly to an opposite conclusion :)
+> 
+> My rationale was that users who configure IPsec and TC are advanced
+> users who knows their data flow and if they find a) option valuable,
+> they can do it.
+> 
+> For example, a) allows to limit amount of data sent to IPsec engine.
+> 
+> I believe both a) and b) should be supported.
 
-You can just load the module, e.g. via /etc/modules. That is the
-simplest solution.
+What does it take to switch between the modes?
+Even if we want both modes we should have an explicit switch, I reckon.
+Or at least a way to read back what mode we ended up in.
 
-If your board has unique BIOS identity strings, you can use that to
-trigger loading. e.g. look at drivers/platform/x86/pcengines-apuv2.c.
-
-apu_gpio_dmi_table[] __initconst = {
-
-        /* APU2 w/ legacy BIOS < 4.0.8 */
-        {
-                .ident          = "apu2",
-                .matches        = {
-                        DMI_MATCH(DMI_SYS_VENDOR, "PC Engines"),
-                        DMI_MATCH(DMI_BOARD_NAME, "APU2")
-                },
-                .driver_data    = (void *)&board_apu2,
-        },
-
-But they BIOS strings need to be unique to your product. If you have a
-generic ComExpress module for example as the core of your product, you
-need to customise the BIOS strings. Otherwise this platform driver
-module will be loaded for any product which happens to have that
-ComExpress card, not just your product.
-
-> My goal is to see all the switch ports in Linux kernel . The switch
-> is connected via I2C bus .
-
-Yes, that is the idea of DSA. You can treat the switch ports as Linux
-interfaces. All you need is the control plain bus, i2c in your case,
-and a 'SoC' Ethernet interface connected to one of the ports of the
-switch. I say 'SoC' because such systems are typically ARM or MIPS
-systems with an integrated Ethernet controller, but i guess you have a
-PCIe NIC? i210 or something like that? That works equally as well.
-
-     Andrew
 
