@@ -1,459 +1,313 @@
-Return-Path: <netdev+bounces-18072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9D575482B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 12:19:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EEDD754835
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 12:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21C71C20A25
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 10:19:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C835282110
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 10:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92906184F;
-	Sat, 15 Jul 2023 10:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CB015BA;
+	Sat, 15 Jul 2023 10:33:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806E715CD
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 10:19:15 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1107F30CB
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:19:13 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fc02a92dcfso24928205e9.0
-        for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:19:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145E07F6
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 10:33:07 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2131.outbound.protection.outlook.com [40.107.94.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28ED35AA
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 03:33:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IlXNBiNr3DcU2WO+i4wPKw4lorWr+x3GfUgPBoZkAtX+9W2EfEPhqd7ZoU2/SowsvxPy4QpZr1jWiGvnOUBNHe4TI9e6jWt47c4NmVhElHxOuoQConYGjuL3Amwu7OEaW5DBb90i8dmB0UWffTiCYmi099DeQDvCpgWHLxHLCpkPZgEONZGwkcAjjQm7gQSrkXMpU6sEd6yH+PmtyEXZODSweO+B34pIZJ4m0kIEvleQD5rAyQYJUBo8u97TxE/FoSoM/SQTJLSJMRGtsns417pGYyLp/oXlPkS1Ee3s16Ak5N5099aocjB0QWPuaIt65Am4TiS9wzyFhiAcZbAYfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/ynqgXwlkdQwNIcUU8JVuSTVyrgNAbYaMBFTJeT4tvo=;
+ b=LA3kkCEYzm/ixmcRqC1yLpvW3Sbf35MrNY8qLNfI2b8mGgiI1+KZq/3ckbav5Jv++zBL8HfT9CaSuWa9gx1o6angdyQsVL3oJvnkiRYu2mq8dJaFBi3tpxBPc27uNXplcfdispeFiVKSCzQiG9VfQzRhFu1oKMGQ0FMrxcTeDwAysfab+amyZNle7JVikrqR3V7fiTHdyIz5ebpYlH1joXX9NRROptpfN4e5EO3JSQTKUcxPP/U/R0eNEfByalop20SRztm6JLeV5WSosJ1F6O5dHwebzR2jYfFzFL58S/Dbp56GjAGQ1JvrHmqncvZfVyelQblZlfwO5L6KDua4Sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689416351; x=1692008351;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0eBxcn27jU0dKuvE7ec+IctqyFfZQ4Yo4kxFRshmdeE=;
-        b=rnr5HZ8/JtODklLwz64pCO59LrIPYB/ePZLxwpi9yT4Nky4hhcyw8FheuIxq/iKqoJ
-         /gb102sMBV2/89yzyDLHJ4SnlEg5gV+7udMmrz+W3jGfdjTJp9EfjFuZ/urRibkFbFO6
-         DJM3nxXhW7TXKhnr0awi+l1eXHBnMRpHX+GL0vmjme59G7eIomWwOTHlt1hiMFT2Vi9h
-         7xlk4Sho0DH5lFlvRjJoKBT9aKDcYiJp6azPEt5mqOx9uCkfCnvGNlSjhN3+H+AdcXHE
-         cmqbFFW/oqQ+c+pe9CJSrYFSizemOGyTp+v+ZsPZSI7nZlXMflQphdxyMpa5r14QuhFV
-         9Btg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689416351; x=1692008351;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0eBxcn27jU0dKuvE7ec+IctqyFfZQ4Yo4kxFRshmdeE=;
-        b=bJTAlpPrZ7ytFJCDfMOppmMvtclT0v69jsePzMOfTDlhWyiIWt+t1OZ3jH+CgFrqV0
-         SP/e/O4qSJGjj6YFD2t2SLXIM63gfgNbdyL3+nEjezIF/QtM3opceQC1/NNPQ1hZDXdf
-         UIhkiFDNMxKwzlVG+HMt1LvVdZBR9Jtnlg7VPV+rATT4ip8BHKMeOpcMFKPwfUntDC8I
-         4Itfv1uEALCJqukp2fYPTkfcbhOGvkoKsebGxtZWQTPgLi+762RuEYmBFyPA72leKhLo
-         OblmzSldhB9H75dVW4/LrGG2/Gl+Pu6qmo+/SsRiMOzA4MeQ6WqHt337NGvCmQi0O62V
-         C3mQ==
-X-Gm-Message-State: ABy/qLYby99P1Ft8f/2sB2iyPZnLjk87DhW7SImgnxJGgTTTeG7e7CwX
-	Sr4aXLVW//eSWInkaQKgZw==
-X-Google-Smtp-Source: APBJJlEQRyh+4D+seGmPPYqTNBcuLPc0EsQebyzIM5c0+NBt8EpMpmG+XXaPPCIZVkobGTcLUoFlEQ==
-X-Received: by 2002:a5d:6452:0:b0:314:ac1:d12a with SMTP id d18-20020a5d6452000000b003140ac1d12amr6381697wrw.26.1689416351188;
-        Sat, 15 Jul 2023 03:19:11 -0700 (PDT)
-Received: from p183 ([46.53.254.179])
-        by smtp.gmail.com with ESMTPSA id q14-20020a05600000ce00b003062b2c5255sm13361604wrx.40.2023.07.15.03.19.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jul 2023 03:19:10 -0700 (PDT)
-Date: Sat, 15 Jul 2023 13:19:08 +0300
-From: Alexey Dobriyan <adobriyan@gmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-Subject: [PATCH] net: delete "<< 1U" cargo-culting
-Message-ID: <7b6fdc07-fd7c-48eb-ad17-cc5e436c065b@p183>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/ynqgXwlkdQwNIcUU8JVuSTVyrgNAbYaMBFTJeT4tvo=;
+ b=hJDY9FX+yO9ovBU6vouiYcN1lWO98YMkjy1HOCZn+7mq4o0ZCKJQN14QzSB6+6pdtk+XsX3EaF/u9JCW54gDsNe3GmB1RYdOyFM+O/JYHwLRpd/jyyWtzaPrBDTHLNeBKqVTIlo7IgDh3L+JqSCNAzZfXcZ5ib3b/0qg6gLto+w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH0PR13MB5130.namprd13.prod.outlook.com (2603:10b6:610:113::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.28; Sat, 15 Jul
+ 2023 10:33:00 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6588.028; Sat, 15 Jul 2023
+ 10:33:00 +0000
+Date: Sat, 15 Jul 2023 11:32:51 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+	sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+	chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
+	Yoray Zack <yorayz@nvidia.com>, aurelien.aptel@gmail.com,
+	smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+	borisp@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
+Subject: Re: [PATCH v12 13/26] Documentation: add ULP DDP offload
+ documentation
+Message-ID: <ZLJ109eXtIge6eJ9@corigine.com>
+References: <20230712161513.134860-1-aaptel@nvidia.com>
+ <20230712161513.134860-14-aaptel@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230712161513.134860-14-aaptel@nvidia.com>
+X-ClientProxiedBy: LO4P123CA0242.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a7::13) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB5130:EE_
+X-MS-Office365-Filtering-Correlation-Id: c9d0f325-e6e4-4026-1d2e-08db851edc6b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	YMpQLWYmuoNbxmem/3+Ut1zlEzJ0JRfK6/9cGsAoJriIkPV0p8+ebSGZHhTqsaEfO/neEc3Xe2vIJGdwrzcjMYEHCJpbWq/AebP9Na1LbW4DQ73etdjejVEj+gD5BshSQRSVG433p06pW64cIE4cobRbnBWRVy/+zL7DzR/o4m0feIUwM6yBvrHHT7cqwbP5CeDCn3A8bk3VO3d9zoy6OentjHBXmm65iz24IHu9aKzsoxhaptmSViNXJtH2IefrKGOC3LYdg/7TJTsUcF7ds08cAgS1OMrS0vV/NsQZG8MEsDWyyy0oEXoV8oHAuIL5dd1aqZ0ZhYQRTQ6JMU0PE1PcRPfxCWd8i//oWAteMMQ5gx1Yc9g+nEUgJlTAJLYqwTXqMkY4V4s/RzhHiSRvyK6HmtUyFtPVV9eSCIkC72dfr76sAIVHO9/R+mznUcV02ugt70bLtQ6JYoCSjnv2qgY3r4LrPSu1sWJy2IwCVR6ZwHNcbj/3r9QkrdKJ8u5w16nlkrIrrzVwP7VRYVv2DrM7zdSbtwr2eizFDcFtOIL+uqO6S6xrBTgMA024jZVx8IICTwSzBwzJjFBWw+0bkiCbDoR6xfluNhs7I94qtvo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(366004)(136003)(376002)(396003)(346002)(451199021)(26005)(6506007)(38100700002)(478600001)(7416002)(5660300002)(44832011)(8676002)(8936002)(4326008)(66946007)(66476007)(6916009)(66556008)(6486002)(6512007)(86362001)(6666004)(41300700001)(316002)(2616005)(186003)(36756003)(2906002)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?FurAxektySl60J4y9/TAjrhuLhXZ5O6xR0BDHpp/Y4FDcqEOVxaxMQ4wmDB0?=
+ =?us-ascii?Q?RTpDldTmkLnFqONhF51XcumqpYRnbmJLx92CYpIffQt7gKma7CwKOfJDj/fx?=
+ =?us-ascii?Q?SsA2LYg5GfjHMnI5tPrHWyO0qAxCFuDtF29/bFFRWn0neKdI5zxOFHZ1A3ah?=
+ =?us-ascii?Q?in8liIkVHQUAJ+MGQv8p3j9N4Pel9617pnUUeCA/d/ZuvBetUmeYR1BZZ4uG?=
+ =?us-ascii?Q?pIQ5qptcxWipAipIcf9M6SVNRreM5Fg0I32zJchNQZkj1/gWl9sl1SGFGrXi?=
+ =?us-ascii?Q?gnwlalPpns8JSt8BKpKaK5nFbCKscRW3MOX1V4NymrAvWaAe8a35Z+jHsGjv?=
+ =?us-ascii?Q?0f9YGCfekUcWiIpj2yCsk0ce6NGKNSG6eC8wTAdR/BXgxTSasrBbmMO057Mv?=
+ =?us-ascii?Q?1llcuENIz6nHY87yeEwTQ9KqqCrK90fxlAi9V24zNbypiHIAo/bKpNfOVZl3?=
+ =?us-ascii?Q?f+rPhS3bBG1NaHdweegzxLlAptyaA96hkbi5efx4FnVT+k3ANAfjEdgzBWqv?=
+ =?us-ascii?Q?0hOHy5Z2nOfHHF7qBXw1rZxLcLsNKBOntjCh/wUaVXLo70a77LP55OmRhnZT?=
+ =?us-ascii?Q?dHPfSWkU90lc0UtNEfP2b+1fXPULiDlfNMcTTdZwbHDi5CVaA0Za/x+82c9s?=
+ =?us-ascii?Q?Gbk5uodfx4SMqyRMBHAgnF4BXVBr8eYXrg7StsjNEjhkynmmVJL2qbK8eXiD?=
+ =?us-ascii?Q?1adirAzXABoaLGnBoa2nphVUDae02r3JHrkgEV7/vf894bWrXeEE6nvxVAMD?=
+ =?us-ascii?Q?hSkZ3E+i3i4boMLLKutBYJPPdt6bD+aFkHpzVZjQzlH8W+NJGYAf1C5b2tcf?=
+ =?us-ascii?Q?bDv5WNhG0eqYnVAakT2amUVyrZMA+f74/Yagd8oRUNSeh8/3kY4qT/f7a6qG?=
+ =?us-ascii?Q?B2L9iTCuZ1lkQeO0BBEuwgJcsSro+XiJiZFflpZEuXXIAvHW2Tio8sv4EdZd?=
+ =?us-ascii?Q?qgJt6x27xXLzH9Ilfwz8jMyUp7KOPbf1hnzWk511HHrYNb9KyX1vJoDh7YWi?=
+ =?us-ascii?Q?XM+Qs7yJwzWEqJHNkDC/CneLN49ID0+ZP/hdq3qvBSvwubGDrmdzwRZdoP6V?=
+ =?us-ascii?Q?xP45c5kcZ30h22j5w6ElDVa50gmaDMrEyybFALmWWcCjH/QeN4kG78QYTY9f?=
+ =?us-ascii?Q?nLlyOKCfFA+pReLHhPTAiGp2l6dLMlu+FDME7FvTTNZ4e/dNE+8G6Y5v4LHX?=
+ =?us-ascii?Q?I7R3/YG/gPSYDibgQqXKbQRqTvACB9KYAgil/ZmbD15x1gBLrSHN9wFG2DiX?=
+ =?us-ascii?Q?c9r0h6rbftrifRfdDm7DqOVsJBVs26i2YM3RTxBGxtyF10sBSrCR3zuTpmZt?=
+ =?us-ascii?Q?x0N9rDYX/vAo5ZbokyYH4cSD/BR6NkjBSkOCDfOms+Q0Rmd2CgMiG4r/ENR5?=
+ =?us-ascii?Q?q4JP/vErJQnJaSzQ0GD6WEwXgF+8QusUwjue1ZD0Kg7rGlAfc//0IEydZZ/9?=
+ =?us-ascii?Q?07Oo5LgHGynZOdlDGXMmIg7F4NM6crNV8JCduWkSPFHs4DgS3aFekqi7ZVPg?=
+ =?us-ascii?Q?gEzI+xtlbHFoQ34G31cN07FvFaIx6U3V3fhsC4QNSKBJwPzLX+tJ6lfoxI+S?=
+ =?us-ascii?Q?T9+k6d76V5ybNYQ0ryB2DTRcrphTLKdYVSJv3a0H4Q7RGgJXMd6wyh1J6BgM?=
+ =?us-ascii?Q?1w=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9d0f325-e6e4-4026-1d2e-08db851edc6b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2023 10:32:59.9418
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9FpL1hYUPtf5TEYScDhy3pf/r/VZzQZN3zK2FtLh/4hhAC6b5dLMeYBt4BB8qHJB4tl5FT2pMOgWmG/VCUujkrgknDr9oQFSdj4sjBhZmTI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5130
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-6.5.7 §3 "Bitwise shift operators" clearly states that
+On Wed, Jul 12, 2023 at 04:15:00PM +0000, Aurelien Aptel wrote:
+> From: Yoray Zack <yorayz@nvidia.com>
+> 
+> Document the new ULP DDP API and add it under "networking".
+> Use NVMe-TCP implementation as an example.
 
-        The type of the result is that of the promoted left operand
+...
 
-All those integer constant suffixes in the right operand are pointless,
-delete them.
+> diff --git a/Documentation/networking/ulp-ddp-offload.rst b/Documentation/networking/ulp-ddp-offload.rst
+> new file mode 100644
+> index 000000000000..b8d7c9c4d6b0
+> --- /dev/null
+> +++ b/Documentation/networking/ulp-ddp-offload.rst
 
-Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
----
+...
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 28444e5924f9..febfae05b8a4 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -520,7 +520,7 @@ static inline int ksz_write64(struct ksz_device *dev, u32 reg, u64 value)
- 	/* Ick! ToDo: Add 64bit R/W to regmap on 32bit systems */
- 	value = swab64(value);
- 	val[0] = swab32(value & 0xffffffffULL);
--	val[1] = swab32(value >> 32ULL);
-+	val[1] = swab32(value >> 32);
- 
- 	return regmap_bulk_write(ksz_regmap_32(dev), reg, val, 2);
- }
-diff --git a/drivers/net/ethernet/ibm/ehea/ehea_phyp.c b/drivers/net/ethernet/ibm/ehea/ehea_phyp.c
-index e63716e139f5..0fb54e5c3b4b 100644
---- a/drivers/net/ethernet/ibm/ehea/ehea_phyp.c
-+++ b/drivers/net/ethernet/ibm/ehea/ehea_phyp.c
-@@ -442,7 +442,7 @@ u64 ehea_h_register_smr(const u64 adapter_handle, const u64 orig_mr_handle,
- 				 adapter_handle	      ,		 /* R4 */
- 				 orig_mr_handle,		 /* R5 */
- 				 vaddr_in,			 /* R6 */
--				 (((u64)access_ctrl) << 32ULL),	 /* R7 */
-+				 (((u64)access_ctrl) << 32),	 /* R7 */
- 				 pd,				 /* R8 */
- 				 0, 0, 0, 0);			 /* R9-R12 */
- 
-@@ -487,7 +487,7 @@ u64 ehea_h_alloc_resource_mr(const u64 adapter_handle, const u64 vaddr,
- 				 5,				   /* R5 */
- 				 vaddr,				   /* R6 */
- 				 length,			   /* R7 */
--				 (((u64) access_ctrl) << 32ULL),   /* R8 */
-+				 (((u64) access_ctrl) << 32),	   /* R8 */
- 				 pd,				   /* R9 */
- 				 0, 0, 0);			   /* R10-R12 */
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-index a187582d2299..b60e8f1e656d 100644
---- a/drivers/net/ethernet/intel/e1000e/e1000.h
-+++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-@@ -389,7 +389,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca);
-  */
- #define E1000_SYSTIM_OVERFLOW_PERIOD	(HZ * 60 * 60 * 4)
- #define E1000_MAX_82574_SYSTIM_REREADS	50
--#define E1000_82574_SYSTIM_EPSILON	(1ULL << 35ULL)
-+#define E1000_82574_SYSTIM_EPSILON	(1ULL << 35)
- 
- /* hardware capability, feature, and workaround flags */
- #define FLAG_HAS_AMT                      BIT(0)
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_hw.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_hw.c
-index 4b8bc46f55c2..0494eebe2aca 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_hw.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_hw.c
-@@ -35,7 +35,7 @@ struct qlcnic_ms_reg_ctrl {
- #ifndef readq
- static inline u64 readq(void __iomem *addr)
- {
--	return readl(addr) | (((u64) readl(addr + 4)) << 32LL);
-+	return readl(addr) | (((u64) readl(addr + 4)) << 32);
- }
- #endif
- 
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index bb9ed971a97c..11e133e936b7 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -868,14 +868,14 @@ enum DIE_DT {
- #define INFO1_TXC		BIT(3)
- 
- /* For transmission */
--#define INFO1_TSUN(val)		((u64)(val) << 8ULL)
--#define INFO1_IPV(prio)		((u64)(prio) << 28ULL)
--#define INFO1_CSD0(index)	((u64)(index) << 32ULL)
--#define INFO1_CSD1(index)	((u64)(index) << 40ULL)
--#define INFO1_DV(port_vector)	((u64)(port_vector) << 48ULL)
-+#define INFO1_TSUN(val)		((u64)(val) << 8)
-+#define INFO1_IPV(prio)		((u64)(prio) << 28)
-+#define INFO1_CSD0(index)	((u64)(index) << 32)
-+#define INFO1_CSD1(index)	((u64)(index) << 40)
-+#define INFO1_DV(port_vector)	((u64)(port_vector) << 48)
- 
- /* For reception */
--#define INFO1_SPN(port)		((u64)(port) << 36ULL)
-+#define INFO1_SPN(port)		((u64)(port) << 36)
- 
- /* For timestamp descriptor in dptrl (Byte 4 to 7) */
- #define TS_DESC_TSUN(dptrl)	((dptrl) & GENMASK(7, 0))
-diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/ef10.c
-index 8c019f382a7f..0a657ab2f8c0 100644
---- a/drivers/net/ethernet/sfc/ef10.c
-+++ b/drivers/net/ethernet/sfc/ef10.c
-@@ -2279,7 +2279,7 @@ int efx_ef10_tx_tso_desc(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
- 	 */
- 	ip_tot_len = 0x10000 - EFX_TSO2_MAX_HDRLEN;
- 	EFX_WARN_ON_ONCE_PARANOID(mss + EFX_TSO2_MAX_HDRLEN +
--				  (tcp->doff << 2u) > ip_tot_len);
-+				  (tcp->doff << 2) > ip_tot_len);
- 
- 	if (ip->version == 4) {
- 		ip->tot_len = htons(ip_tot_len);
-diff --git a/drivers/net/ethernet/sfc/siena/tx_common.c b/drivers/net/ethernet/sfc/siena/tx_common.c
-index a7a9ab304e13..da2f539ab249 100644
---- a/drivers/net/ethernet/sfc/siena/tx_common.c
-+++ b/drivers/net/ethernet/sfc/siena/tx_common.c
-@@ -319,10 +319,10 @@ static int efx_tx_tso_header_length(struct sk_buff *skb)
- 	if (skb->encapsulation)
- 		header_len = skb_inner_transport_header(skb) -
- 				skb->data +
--				(inner_tcp_hdr(skb)->doff << 2u);
-+				(inner_tcp_hdr(skb)->doff << 2);
- 	else
- 		header_len = skb_transport_header(skb) - skb->data +
--				(tcp_hdr(skb)->doff << 2u);
-+				(tcp_hdr(skb)->doff << 2);
- 	return header_len;
- }
- 
-diff --git a/drivers/net/ethernet/sfc/tx_common.c b/drivers/net/ethernet/sfc/tx_common.c
-index 9f2393d34371..275c3b1a60f6 100644
---- a/drivers/net/ethernet/sfc/tx_common.c
-+++ b/drivers/net/ethernet/sfc/tx_common.c
-@@ -338,10 +338,10 @@ int efx_tx_tso_header_length(struct sk_buff *skb)
- 	if (skb->encapsulation)
- 		header_len = skb_inner_transport_header(skb) -
- 				skb->data +
--				(inner_tcp_hdr(skb)->doff << 2u);
-+				(inner_tcp_hdr(skb)->doff << 2);
- 	else
- 		header_len = skb_transport_header(skb) - skb->data +
--				(tcp_hdr(skb)->doff << 2u);
-+				(tcp_hdr(skb)->doff << 2);
- 	return header_len;
- }
- 
-diff --git a/drivers/net/ethernet/sfc/tx_tso.c b/drivers/net/ethernet/sfc/tx_tso.c
-index d381d8164f07..6f308a96f7b1 100644
---- a/drivers/net/ethernet/sfc/tx_tso.c
-+++ b/drivers/net/ethernet/sfc/tx_tso.c
-@@ -159,7 +159,7 @@ static __be16 efx_tso_check_protocol(struct sk_buff *skb)
- 		EFX_WARN_ON_ONCE_PARANOID(ipv6_hdr(skb)->nexthdr != NEXTHDR_TCP);
- 	}
- 	EFX_WARN_ON_ONCE_PARANOID((PTR_DIFF(tcp_hdr(skb), skb->data) +
--				   (tcp_hdr(skb)->doff << 2u)) >
-+				   (tcp_hdr(skb)->doff << 2)) >
- 				  skb_headlen(skb));
- 
- 	return protocol;
-@@ -176,7 +176,7 @@ static int tso_start(struct tso_state *st, struct efx_nic *efx,
- 
- 	st->ip_off = skb_network_header(skb) - skb->data;
- 	st->tcp_off = skb_transport_header(skb) - skb->data;
--	header_len = st->tcp_off + (tcp_hdr(skb)->doff << 2u);
-+	header_len = st->tcp_off + (tcp_hdr(skb)->doff << 2);
- 	in_len = skb_headlen(skb) - header_len;
- 	st->header_len = header_len;
- 	st->in_len = in_len;
-diff --git a/drivers/net/fddi/skfp/fplustm.c b/drivers/net/fddi/skfp/fplustm.c
-index 036062376c06..d94dedddc851 100644
---- a/drivers/net/fddi/skfp/fplustm.c
-+++ b/drivers/net/fddi/skfp/fplustm.c
-@@ -444,7 +444,7 @@ static void directed_beacon(struct s_smc *smc)
- 	 * enable FORMAC to send endless queue of directed beacon
- 	 * important: the UNA starts at byte 1 (not at byte 0)
- 	 */
--	* (char *) a = (char) ((long)DBEACON_INFO<<24L) ;
-+	* (char *) a = (char) ((long)DBEACON_INFO<<24) ;
- 	a[1] = 0 ;
- 	memcpy((char *)a+1, (char *) &smc->mib.m[MAC0].fddiMACUpstreamNbr, ETH_ALEN);
- 
-diff --git a/drivers/net/fddi/skfp/h/cmtdef.h b/drivers/net/fddi/skfp/h/cmtdef.h
-index 4dd590d65d76..8559a29bcf9b 100644
---- a/drivers/net/fddi/skfp/h/cmtdef.h
-+++ b/drivers/net/fddi/skfp/h/cmtdef.h
-@@ -176,7 +176,7 @@
-  * are used !
-  */
- 
--#define EV_TOKEN(class,event)	(((u_long)(class)<<16L)|((u_long)(event)))
-+#define EV_TOKEN(class,event)	(((u_long)(class)<<16)|((u_long)(event)))
- #define EV_T_CLASS(token)	((int)((token)>>16)&0xffff)
- #define EV_T_EVENT(token)	((int)(token)&0xffff)
- 
-diff --git a/drivers/net/fddi/skfp/h/fplustm.h b/drivers/net/fddi/skfp/h/fplustm.h
-index 6065b0799537..03ada2c8e9c8 100644
---- a/drivers/net/fddi/skfp/h/fplustm.h
-+++ b/drivers/net/fddi/skfp/h/fplustm.h
-@@ -246,10 +246,10 @@ struct s_smt_fp {
-  */
- #ifdef	AIX
- #define MDR_REV
--#define	AIX_REVERSE(x)		((((x)<<24L)&0xff000000L)	+	\
--				 (((x)<< 8L)&0x00ff0000L)	+	\
--				 (((x)>> 8L)&0x0000ff00L)	+	\
--				 (((x)>>24L)&0x000000ffL))
-+#define	AIX_REVERSE(x)		((((x)<<24)&0xff000000L)	+	\
-+				 (((x)<< 8)&0x00ff0000L)	+	\
-+				 (((x)>> 8)&0x0000ff00L)	+	\
-+				 (((x)>>24)&0x000000ffL))
- #else
- #ifndef AIX_REVERSE
- #define	AIX_REVERSE(x)	(x)
-@@ -257,10 +257,10 @@ struct s_smt_fp {
- #endif
- 
- #ifdef	MDR_REV	
--#define	MDR_REVERSE(x)		((((x)<<24L)&0xff000000L)	+	\
--				 (((x)<< 8L)&0x00ff0000L)	+	\
--				 (((x)>> 8L)&0x0000ff00L)	+	\
--				 (((x)>>24L)&0x000000ffL))
-+#define	MDR_REVERSE(x)		((((x)<<24)&0xff000000L)	+	\
-+				 (((x)<< 8)&0x00ff0000L)	+	\
-+				 (((x)>> 8)&0x0000ff00L)	+	\
-+				 (((x)>>24)&0x000000ffL))
- #else
- #ifndef MDR_REVERSE
- #define	MDR_REVERSE(x)	(x)
-diff --git a/drivers/net/fddi/skfp/smt.c b/drivers/net/fddi/skfp/smt.c
-index dd15af4e98c2..51d195632dd5 100644
---- a/drivers/net/fddi/skfp/smt.c
-+++ b/drivers/net/fddi/skfp/smt.c
-@@ -443,10 +443,10 @@ void smt_event(struct s_smc *smc, int event)
- 
- static int div_ratio(u_long upper, u_long lower)
- {
--	if ((upper<<16L) < upper)
-+	if ((upper<<16) < upper)
- 		upper = 0xffff0000L ;
- 	else
--		upper <<= 16L ;
-+		upper <<= 16 ;
- 	if (!lower)
- 		return 0;
- 	return (int)(upper/lower) ;
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index 43c1fb2d2c21..50719a3b9845 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -95,7 +95,7 @@ struct udp_sock {
- 	int		forward_threshold;
- };
- 
--#define UDP_MAX_SEGMENTS	(1 << 6UL)
-+#define UDP_MAX_SEGMENTS	(1 << 6)
- 
- #define udp_sk(ptr) container_of_const(ptr, struct udp_sock, inet.sk)
- 
-diff --git a/net/ipv4/tcp_bic.c b/net/ipv4/tcp_bic.c
-index 58358bf92e1b..356c7f7608a6 100644
---- a/net/ipv4/tcp_bic.c
-+++ b/net/ipv4/tcp_bic.c
-@@ -173,7 +173,7 @@ static u32 bictcp_recalc_ssthresh(struct sock *sk)
- 		ca->last_max_cwnd = tcp_snd_cwnd(tp);
- 
- 	if (tcp_snd_cwnd(tp) <= low_window)
--		return max(tcp_snd_cwnd(tp) >> 1U, 2U);
-+		return max(tcp_snd_cwnd(tp) >> 1, 2U);
- 	else
- 		return max((tcp_snd_cwnd(tp) * beta) / BICTCP_BETA_SCALE, 2U);
- }
-diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
-index 1b34050a7538..f955bdd685e2 100644
---- a/net/ipv4/tcp_cong.c
-+++ b/net/ipv4/tcp_cong.c
-@@ -518,7 +518,7 @@ __bpf_kfunc u32 tcp_reno_ssthresh(struct sock *sk)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
- 
--	return max(tcp_snd_cwnd(tp) >> 1U, 2U);
-+	return max(tcp_snd_cwnd(tp) >> 1, 2U);
- }
- EXPORT_SYMBOL_GPL(tcp_reno_ssthresh);
- 
-diff --git a/net/ipv4/tcp_dctcp.c b/net/ipv4/tcp_dctcp.c
-index bb23bb5b387a..ec33c5d21d05 100644
---- a/net/ipv4/tcp_dctcp.c
-+++ b/net/ipv4/tcp_dctcp.c
-@@ -110,7 +110,7 @@ __bpf_kfunc static u32 dctcp_ssthresh(struct sock *sk)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
- 	ca->loss_cwnd = tcp_snd_cwnd(tp);
--	return max(tcp_snd_cwnd(tp) - ((tcp_snd_cwnd(tp) * ca->dctcp_alpha) >> 11U), 2U);
-+	return max(tcp_snd_cwnd(tp) - ((tcp_snd_cwnd(tp) * ca->dctcp_alpha) >> 11), 2U);
- }
- 
- __bpf_kfunc static void dctcp_update_alpha(struct sock *sk, u32 flags)
-@@ -166,7 +166,7 @@ static void dctcp_react_to_loss(struct sock *sk)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
- 	ca->loss_cwnd = tcp_snd_cwnd(tp);
--	tp->snd_ssthresh = max(tcp_snd_cwnd(tp) >> 1U, 2U);
-+	tp->snd_ssthresh = max(tcp_snd_cwnd(tp) >> 1, 2U);
- }
- 
- __bpf_kfunc static void dctcp_state(struct sock *sk, u8 new_state)
-diff --git a/net/ipv4/tcp_lp.c b/net/ipv4/tcp_lp.c
-index ae36780977d2..af8b2a7cc25d 100644
---- a/net/ipv4/tcp_lp.c
-+++ b/net/ipv4/tcp_lp.c
-@@ -318,7 +318,7 @@ static void tcp_lp_pkts_acked(struct sock *sk, const struct ack_sample *sample)
- 	/* happened after inference
- 	 * cut snd_cwnd into half */
- 	else
--		tcp_snd_cwnd_set(tp, max(tcp_snd_cwnd(tp) >> 1U, 1U));
-+		tcp_snd_cwnd_set(tp, max(tcp_snd_cwnd(tp) >> 1, 1U));
- 
- 	/* record this drop time */
- 	lp->last_drop = now;
-diff --git a/net/ipv4/tcp_veno.c b/net/ipv4/tcp_veno.c
-index 366ff6f214b2..a405a0bd794e 100644
---- a/net/ipv4/tcp_veno.c
-+++ b/net/ipv4/tcp_veno.c
-@@ -202,7 +202,7 @@ static u32 tcp_veno_ssthresh(struct sock *sk)
- 		return max(tcp_snd_cwnd(tp) * 4 / 5, 2U);
- 	else
- 		/* in "congestive state", cut cwnd by 1/2 */
--		return max(tcp_snd_cwnd(tp) >> 1U, 2U);
-+		return max(tcp_snd_cwnd(tp) >> 1, 2U);
- }
- 
- static struct tcp_congestion_ops tcp_veno __read_mostly = {
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 63f7a09335c5..0c9e10ef9095 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -45,7 +45,7 @@ static u32 sockopt_seq_reset(const struct sock *sk)
- 	 * will fail.
- 	 */
- 
--	return (u32)sk->sk_state << 24u;
-+	return (u32)sk->sk_state << 24;
- }
- 
- static void sockopt_seq_inc(struct mptcp_sock *msk)
-diff --git a/tools/testing/selftests/bpf/progs/bpf_dctcp.c b/tools/testing/selftests/bpf/progs/bpf_dctcp.c
-index 460682759aed..eba580ec40e5 100644
---- a/tools/testing/selftests/bpf/progs/bpf_dctcp.c
-+++ b/tools/testing/selftests/bpf/progs/bpf_dctcp.c
-@@ -111,7 +111,7 @@ __u32 BPF_PROG(dctcp_ssthresh, struct sock *sk)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
- 	ca->loss_cwnd = tp->snd_cwnd;
--	return max(tp->snd_cwnd - ((tp->snd_cwnd * ca->dctcp_alpha) >> 11U), 2U);
-+	return max(tp->snd_cwnd - ((tp->snd_cwnd * ca->dctcp_alpha) >> 11), 2U);
- }
- 
- SEC("struct_ops/dctcp_update_alpha")
-@@ -150,7 +150,7 @@ static __always_inline void dctcp_react_to_loss(struct sock *sk)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
- 	ca->loss_cwnd = tp->snd_cwnd;
--	tp->snd_ssthresh = max(tp->snd_cwnd >> 1U, 2U);
-+	tp->snd_ssthresh = max(tp->snd_cwnd >> 1, 2U);
- }
- 
- SEC("struct_ops/dctcp_state")
-diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-index 7badaf215de2..2e4c9e54bb01 100644
---- a/tools/testing/selftests/net/udpgso.c
-+++ b/tools/testing/selftests/net/udpgso.c
-@@ -34,7 +34,7 @@
- #endif
- 
- #ifndef UDP_MAX_SEGMENTS
--#define UDP_MAX_SEGMENTS	(1 << 6UL)
-+#define UDP_MAX_SEGMENTS	(1 << 6)
- #endif
- 
- #define CONST_MTU_TEST	1500
+> +Device configuration
+> +====================
+> +
+> +During driver initialization the driver sets the following
+> +:c:type:`struct net_device <net_device>` properties:
+> +
+> +* The ULP DDP capabilities it supports
+> +  in :c:type:`struct ulp_ddp_netdev_caps <ulp_ddp_caps>`
+> +* The ULP DDP operations pointer in :c:type:`struct ulp_ddp_dev_ops`.
+
+'make htmldocs' seems a little unhappy about this for some reason:
+
+  .../ulp-ddp-offload.rst:74: WARNING: Unparseable C cross-reference: 'struct ulp_ddp_dev_ops'
+  Invalid C declaration: Expected identifier in nested name, got keyword: struct [error at 6]
+     struct ulp_ddp_dev_ops
+     ------^
+
+> +
+> +The current list of capabilities is represented as a bitset:
+> +
+> +.. code-block:: c
+> +
+> +  enum {
+> +	ULP_DDP_C_NVME_TCP_BIT,
+> +	ULP_DDP_C_NVME_TCP_DDGST_RX_BIT,
+> +	/* add capabilities above */
+> +	ULP_DDP_C_COUNT,
+> +  };
+> +
+> +The enablement of capabilities can be controlled from userspace via
+> +netlink. See Documentation/networking/ethtool-netlink.rst for more
+> +details.
+> +
+> +Later, after the L5P completes its handshake, the L5P queries the
+> +driver for its runtime limitations via the :c:member:`limits` operation:
+> +
+> +.. code-block:: c
+> +
+> + int (*limits)(struct net_device *netdev,
+> +	       struct ulp_ddp_limits *lim);
+> +
+> +
+> +All L5P share a common set of limits and parameters (:c:type:`struct ulp_ddp_limits`):
+
+Likewise, here:
+
+  .../ulp-ddp-offload.rst:100: WARNING: Unparseable C cross-reference: 'struct ulp_ddp_limits'
+  Invalid C declaration: Expected identifier in nested name, got keyword: struct [error at 6]
+    struct ulp_ddp_limits
+    ------^
+> +
+> +.. code-block:: c
+> +
+> + /**
+> +  * struct ulp_ddp_limits - Generic ulp ddp limits: tcp ddp
+> +  * protocol limits.
+> +  * Add new instances of ulp_ddp_limits in the union below (nvme-tcp, etc.).
+> +  *
+> +  * @type:		type of this limits struct
+> +  * @max_ddp_sgl_len:	maximum sgl size supported (zero means no limit)
+> +  * @io_threshold:	minimum payload size required to offload
+> +  * @tls:		support for ULP over TLS
+> +  * @nvmeotcp:		NVMe-TCP specific limits
+> +  */
+> + struct ulp_ddp_limits {
+> +	enum ulp_ddp_type	type;
+> +	int			max_ddp_sgl_len;
+> +	int			io_threshold;
+> +	bool			tls:1;
+> +	union {
+> +		/* ... protocol-specific limits ... */
+> +		struct nvme_tcp_ddp_limits nvmeotcp;
+> +	};
+> + };
+
+...
+
+> +Asynchronous teardown
+> +---------------------
+> +
+> +To teardown the association between tags and buffers and allow tag reuse NIC HW
+> +is called by the NIC driver during `teardown`. This operation may be
+> +performed either synchronously or asynchronously. In asynchronous teardown,
+> +`teardown` returns immediately without unmapping NIC HW buffers. Later,
+> +when the unmapping completes by NIC HW, the NIC driver will call up to L5P
+> +using :c:member:`ddp_teardown_done` of :c:type:`struct ulp_ddp_ulp_ops`:
+
+And here:
+
+  .../ulp-ddp-offload.rst:283: WARNING: Unparseable C cross-reference: 'struct ulp_ddp_ulp_ops'
+  Invalid C declaration: Expected identifier in nested name, got keyword: struct [error at 6]
+    struct ulp_ddp_ulp_ops
+    ------^
+
+> +
+> +.. code-block:: c
+> +
+> + void (*ddp_teardown_done)(void *ddp_ctx);
+> +
+> +The `ddp_ctx` parameter passed in `ddp_teardown_done` is the same on provided
+> +in `teardown` and it is used to carry some context about the buffers
+> +and tags that are released.
+> +
+> +Resync handling
+> +===============
+> +
+> +RX
+> +--
+> +In presence of packet drops or network packet reordering, the device may lose
+> +synchronization between the TCP stream and the L5P framing, and require a
+> +resync with the kernel's TCP stack. When the device is out of sync, no offload
+> +takes place, and packets are passed as-is to software. Resync is very similar
+> +to TLS offload (see documentation at Documentation/networking/tls-offload.rst)
+> +
+> +If only packets with L5P data are lost or reordered, then resynchronization may
+> +be avoided by NIC HW that keeps tracking PDU headers. If, however, PDU headers
+> +are reordered, then resynchronization is necessary.
+> +
+> +To resynchronize hardware during traffic, we use a handshake between hardware
+> +and software. The NIC HW searches for a sequence of bytes that identifies L5P
+> +headers (i.e., magic pattern).  For example, in NVMe-TCP, the PDU operation
+> +type can be used for this purpose.  Using the PDU header length field, the NIC
+> +HW will continue to find and match magic patterns in subsequent PDU headers. If
+> +the pattern is missing in an expected position, then searching for the pattern
+> +starts anew.
+> +
+> +The NIC will not resume offload when the magic pattern is first identified.
+> +Instead, it will request L5P software to confirm that indeed this is a PDU
+> +header. To request confirmation the NIC driver calls up to L5P using
+> +:c:member:`*resync_request` of :c:type:`struct ulp_ddp_ulp_ops`:
+
+And here:
+
+  .../ulp-ddp-offload.rst:321: WARNING: Unparseable C cross-reference: '*resync_request'
+  Invalid C declaration: Expected identifier in nested name. [error at 0]
+    *resync_request
+    ^
+  .../ulp-ddp-offload.rst:321: WARNING: Unparseable C cross-reference: 'struct ulp_ddp_ulp_ops'
+  Invalid C declaration: Expected identifier in nested name, got keyword: struct [error at 6]
+    struct ulp_ddp_ulp_ops
+    ------^
+
+> +
+> +.. code-block:: c
+> +
+> +  bool (*resync_request)(struct sock *sk, u32 seq, u32 flags);
+> +
+> +The `seq` parameter contains the TCP sequence of the last byte in the PDU header.
+> +The `flags` parameter contains a flag (`ULP_DDP_RESYNC_PENDING`) indicating whether
+> +a request is pending or not.
+> +L5P software will respond to this request after observing the packet containing
+> +TCP sequence `seq` in-order. If the PDU header is indeed there, then L5P
+> +software calls the NIC driver using the :c:member:`resync` function of
+> +the :c:type:`struct ulp_ddp_dev_ops <ulp_ddp_ops>` inside the :c:type:`struct
+> +net_device <net_device>` while passing the same `seq` to confirm it is a PDU
+> +header.
+> +
+> +.. code-block:: c
+> +
+> + void (*resync)(struct net_device *netdev,
+> +		struct sock *sk, u32 seq);
+
+...
 
