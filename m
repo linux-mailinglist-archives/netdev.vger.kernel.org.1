@@ -1,99 +1,152 @@
-Return-Path: <netdev+bounces-18085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397737549FC
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 18:08:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE10A754A09
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 18:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF963281EA1
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 16:07:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343DA281EB4
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 16:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158CE79F1;
-	Sat, 15 Jul 2023 16:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D82979F4;
+	Sat, 15 Jul 2023 16:11:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F0515C5
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 16:07:56 +0000 (UTC)
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1136A2D51;
-	Sat, 15 Jul 2023 09:07:52 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-55b0e7efb1cso1742126a12.1;
-        Sat, 15 Jul 2023 09:07:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689437271; x=1692029271;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9sUtg26Gpo7j59R3RzfFBIeeNFosdNr/GBdLzVrzsz0=;
-        b=RI2qvc7R3BbEv4hjXfJcGXAxJBeXfZ3AFoRuQA0Lt/eDCcBqmfcJ7OV+OBLQc8f65u
-         XmLHjep66FoGIL7XR77VZ4f2xjL3MnODsxnOd7YJhwgbHoWxJbr44fxpiMBAorReItNY
-         v4O/XIHS1o4bfnI5jdQPnecZ1458/DpIXav7n+wQgMsVKlILwhOlC/b6Ra0psdJTbfdF
-         VeAymfqJ6Prw9XYbX7Y68Yj8k3BU+NOL42hPFNB57A96qEHTWorYRrlk3+frW4kl4Hf9
-         DtNm2tN9G+S+XmkC3R6JV7cuEXNA80bgHSnm1r6JyK5rWuTRnUxdIIOKCcpatZxXC18o
-         CC7w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11ED515B8
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 16:11:54 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 992F5FA
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689437512;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Js70kE6M4tQuHcgETIy8XYzF63AeuA3GvQidoiOZKq8=;
+	b=dYYFt6s4e6CAacR7XyJfvaRROmPd+8UwddJ08I3yMXG3jJerPFNkDPlHYNQqAgbKuXedap
+	UzbZ9IHO+PcWp+M1TK5vhIY5ql2mIP7cMedTAyVVHyvUctGWIsY1Tzwpd3LJVKsz2Pu0u5
+	yBXb9p+8oCCveEYMj597cXrxn9FbiPw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-606-inQVdg4XPuaQoq8mooMe3w-1; Sat, 15 Jul 2023 12:11:49 -0400
+X-MC-Unique: inQVdg4XPuaQoq8mooMe3w-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fa8db49267so14994505e9.3
+        for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:11:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689437271; x=1692029271;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9sUtg26Gpo7j59R3RzfFBIeeNFosdNr/GBdLzVrzsz0=;
-        b=SYwMFHFZzAeyaabPP25wQ3OdMbl6pN1L+B4IPiUIsFLAaqAn4RXxcQBjVwfNteyYM9
-         orV/j9pgQM/IByYM1hHwXrOVjGEiCT0o8jedSqGayQJraFtohhYOfXX7Gb6YnXZYNJ5Y
-         CH2Lki3TyWgmODEvnSQnySClWXm0/EozTGg7UzrUB+Y0BiB1dlGCs/QmCUu/tlLjbpam
-         /EhY4bP3Op8bZreS0Vza0iaqdernhJgmA9cUTYPxWpBWDnVcodFCoHYNZsqSoLkj+QIw
-         J7xHVem/K4rrHE5Qvclh0BvC2tq4DJaz8zUEJh0WKhF0Wk1avNcFW2Mh3gu931BHbAmi
-         xdig==
-X-Gm-Message-State: ABy/qLZjHMq2AIodzekQ5e+sHxOw+lPqFgtNiza/Yg6GG15nAKHbVTNx
-	4RvrNGG/j6TnG1+nbiNqkcWd21hp8J96XbmbACk=
-X-Google-Smtp-Source: APBJJlHoO4n7r2ZSCBszhTAskN4fYnH459vF4qab03Yzozh+bPryh3YCt0mq5XU5p835MPCfzKD2rSjduW8810PK4Qo=
-X-Received: by 2002:a17:902:efd5:b0:1bb:25bd:d09c with SMTP id
- ja21-20020a170902efd500b001bb25bdd09cmr968719plb.1.1689437271455; Sat, 15 Jul
- 2023 09:07:51 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689437507; x=1692029507;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Js70kE6M4tQuHcgETIy8XYzF63AeuA3GvQidoiOZKq8=;
+        b=Exr2m0SUcco92mw0WZGKw5saV1f7UiL+/sQiS3nU0XJilyMgZVawViYXS0OA76HGWV
+         BX75tJDWg1GOfRtCcroBUPk5rf3qtX/Zlgs8Q92R5gxew+6F7J5n0Z9E7YFvQuIUtRmD
+         DUZOeKWdFiQngvYeyj6kyvGnbIl9DOkrNFG/tmOiWHohIKwA+HWcgIzCtnFQbU+issH0
+         mla4/vF01v4b933T99qodhZ6jIdhBwNWOBpz/M7FIf7JgIFfALcW+GjcWEekzvvCVKwd
+         hh9jJS6LIpE27OsxUmFAkt9MAMdZSwBlAU1BZkcht5cX1Larti4CIfpupx56T05S0ldV
+         xX2A==
+X-Gm-Message-State: ABy/qLZrVDBFjvuyNp3aYfRRMPZFirwzqhx3byix8JTzEtICSCdC2vQb
+	zIlu9dxPxZov8qPDlRF1sp1Y06/IccEbaZpnDUM7ds/bPLoNrhokPWYMOkyqvVLS284UbZdfmYu
+	vIpXdUYqpBreC4I21
+X-Received: by 2002:a7b:c40d:0:b0:3fc:1a6:7764 with SMTP id k13-20020a7bc40d000000b003fc01a67764mr6353250wmi.16.1689437507832;
+        Sat, 15 Jul 2023 09:11:47 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG69QqpP0KlK6PdSqxWvSyyuu5NRgXyRxSUWxITz0TGdie9WxsU5U+VqP/uxSgCoNT0EjL9WQ==
+X-Received: by 2002:a7b:c40d:0:b0:3fc:1a6:7764 with SMTP id k13-20020a7bc40d000000b003fc01a67764mr6353234wmi.16.1689437507258;
+        Sat, 15 Jul 2023 09:11:47 -0700 (PDT)
+Received: from localhost (net-130-25-106-149.cust.vodafonedsl.it. [130.25.106.149])
+        by smtp.gmail.com with ESMTPSA id y6-20020a1c4b06000000b003fc3b03e631sm3602905wma.1.2023.07.15.09.11.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Jul 2023 09:11:46 -0700 (PDT)
+Date: Sat, 15 Jul 2023 18:11:44 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Greg Ungerer <gerg@kernel.org>
+Subject: Re: [PATCH v2 net-next 6/9] net: ethernet: mtk_eth_soc: add
+ MTK_NETSYS_V3 capability bit
+Message-ID: <ZLLFQJ/CMvqQqRgN@lore-desk>
+References: <cover.1689012506.git.daniel@makrotopia.org>
+ <6dc1e0ad7e8138835c959fc83a6c1564e8488c59.1689012506.git.daniel@makrotopia.org>
+ <ZK+m+ayRW/uaxl6u@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230311180630.4011201-1-zyytlz.wz@163.com> <20230710114253.GA132195@google.com>
- <20230710091545.5df553fc@kernel.org> <20230712115633.GB10768@google.com>
-In-Reply-To: <20230712115633.GB10768@google.com>
-From: Zheng Hacker <hackerzheng666@gmail.com>
-Date: Sun, 16 Jul 2023 00:07:39 +0800
-Message-ID: <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
-To: Lee Jones <lee@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, s.shtylyov@omp.ru, Zheng Wang <zyytlz.wz@163.com>, 
-	davem@davemloft.net, linyunsheng@huawei.com, edumazet@google.com, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	1395428693sheep@gmail.com, alex000young@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Eh7tZsXyDFZVqJbt"
+Content-Disposition: inline
+In-Reply-To: <ZK+m+ayRW/uaxl6u@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sorry for my late reply. I'll see what I can do later.
 
-Lee Jones <lee@kernel.org> =E4=BA=8E2023=E5=B9=B47=E6=9C=8812=E6=97=A5=E5=
-=91=A8=E4=B8=89 19:56=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, 10 Jul 2023, Jakub Kicinski wrote:
->
-> > On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
-> > > For better or worse, it looks like this issue was assigned a CVE.
-> >
-> > Ugh, what a joke.
->
-> I think that's putting it politely. :)
->
-> --
-> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+--Eh7tZsXyDFZVqJbt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> on thu, jul 13, 2023 at 03:19:49am +0100, daniel golle wrote:
+> > +
+> > +		if (mtk_has_caps(eth->soc->caps, mtk_netsys_v3)) {
+>=20
+> this is a case in point for one of my previous comments...
+>=20
+> this code started out believing that testing for mtk_netsys_v2 for v2
+> features would be sufficient. your first patch ended up having to
+> change that to !v1. how long until this becomes !v1 && !v2 because
+> it gets used on v3 and v4 etc?
+>=20
+> this is why i think an integer version field would be a much saner
+> approach.
+
+ack, I will fix it.
+
+Regards,
+Lorenzo
+
+>=20
+> --=20
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>=20
+
+--Eh7tZsXyDFZVqJbt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZLLFQAAKCRA6cBh0uS2t
+rGs9AP49MdY//QxPjTry+O5HMEDUJz0xScmT7VFDAbt7wb7HwwEAn0Yz8q6MfSkC
+djHk8lPoM7OXLyH5gZ4UFWEqt305dgI=
+=nLva
+-----END PGP SIGNATURE-----
+
+--Eh7tZsXyDFZVqJbt--
+
 
