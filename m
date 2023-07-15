@@ -1,160 +1,164 @@
-Return-Path: <netdev+bounces-18087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA2E754A0B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 18:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A93754A4B
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 18:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FA33281431
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 16:12:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AFD9281D80
+	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 16:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820D279F5;
-	Sat, 15 Jul 2023 16:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E2779F8;
+	Sat, 15 Jul 2023 16:59:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D9F15B8
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 16:12:20 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16A710D9
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:12:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689437537;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dF7OtGXMRje1f7jke9Bs430OqzMpDW752u+Jth/n5k0=;
-	b=Ff2hFNfBeB9d3mdbB1FwC/CZ/bceqnlLGmuiTOjZIbG37ZvjxYzTI4gsxTo+Ib9F8yilyx
-	w0BUWtsKmbyMO1IFiKp117jc7QySbmubpTy0PT25bE/T2LL5Dzb/dhk8Lv9Y98ybTd/hmB
-	8z7UnIPBfOn3+OnFsXmHCijmdXuM5fM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-318-jtK9-1LGNPm5qAdYu0stPw-1; Sat, 15 Jul 2023 12:12:15 -0400
-X-MC-Unique: jtK9-1LGNPm5qAdYu0stPw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fb40ec952bso15653295e9.0
-        for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:12:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384FE15B8
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 16:59:03 +0000 (UTC)
+Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F7526B1
+	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:59:01 -0700 (PDT)
+Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-1b471ee7059so4556651fac.2
+        for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 09:59:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689437534; x=1692029534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dF7OtGXMRje1f7jke9Bs430OqzMpDW752u+Jth/n5k0=;
-        b=FbQDUXcoBXhce3iPWoiNafWZJGOBJb3oDxaBeix82c8w4DeLwvXzt+lfX/1k/0O7ex
-         yDRLNGO4uAnZboQfVCNBsrVZ/AkPnuWNp7+a++JuU1m7Hg6PtqjpccwN+hCG+GrpiLTn
-         6fCeUpVH79yc22bkh1Mb2DGGBTjPBuvbMFU3S45akGh9NnUmhbrN5we4+xCZIonX2q/s
-         aml9LiC53UORUBkATvG+t3Yp92f8SbcxuXFLJMz6nYKlPNOfSMOrkozeDBwX3aJZfktK
-         tfSHfjgk9FxzgD0oO+H4e2hp1DEqeNHdRrbSZF+bA6Hns2ZbVAlJJrvbmqYAbpofu8WJ
-         9Bzw==
-X-Gm-Message-State: ABy/qLZaJHSp0bY7eVVbes/TF6lLnru1oWq/VEVY8AXHJlGtpdg0jLgg
-	3ENKOGLY6BEMACygbkelG98g0ba5Tb7mNJHdNBhU5NR5vJD4mkI78SIJ6DLCxBNi2fM6pIBh0fy
-	uW2DYJGmRfi2WOzjl
-X-Received: by 2002:a7b:cd96:0:b0:3fc:10:b25b with SMTP id y22-20020a7bcd96000000b003fc0010b25bmr6623431wmj.21.1689437534442;
-        Sat, 15 Jul 2023 09:12:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFpxpfSQFWVxs5xId56kuqovmHBkCRVcENJq+und24xVDDj0feG9wpZsKiSMo/jJvMcazXpMg==
-X-Received: by 2002:a7b:cd96:0:b0:3fc:10:b25b with SMTP id y22-20020a7bcd96000000b003fc0010b25bmr6623408wmj.21.1689437534192;
-        Sat, 15 Jul 2023 09:12:14 -0700 (PDT)
-Received: from localhost (net-130-25-106-149.cust.vodafonedsl.it. [130.25.106.149])
-        by smtp.gmail.com with ESMTPSA id y17-20020a1c4b11000000b003fb739d27aesm3922717wma.35.2023.07.15.09.12.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jul 2023 09:12:13 -0700 (PDT)
-Date: Sat, 15 Jul 2023 18:12:11 +0200
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Greg Ungerer <gerg@kernel.org>
-Subject: Re: [PATCH v2 net-next 3/9] net: ethernet: mtk_eth_soc: add
- MTK_NETSYS_V1 capability bit
-Message-ID: <ZLLFWyr5LbeB/Px1@lore-desk>
-References: <cover.1689012506.git.daniel@makrotopia.org>
- <a2022fd2db0f7ed54ab07bb93b04aa9fc59033b5.1689012506.git.daniel@makrotopia.org>
- <ZK+ibBKWFRniQ8rK@shell.armlinux.org.uk>
+        d=1e100.net; s=20221208; t=1689440340; x=1692032340;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VVggWaxW/y//zbxzMj5Up/8PG70H1D3JvD8YAt+BrH8=;
+        b=ejXaSN2oHydDeoXAkQcvY6GzKgN6oWc2Y2G5s3Xh0tGN0ih97RO9wH6Q62REAE8/Zf
+         df+79uEYaXBU0kp49fhQ5KtE8k7FXwupDuzIrGS2qbrUwcth8kOzX0wU3mPYcd2Rj+dt
+         a/MJQ1+gb3YkkHkrYoMF17exdpOb+sFRuX8JEVVeGfFcNNh7XabQCfPM/Y2f3x4e9KBG
+         /pax579ByeyqA9JlQMBHytCPn65K2ViCGLv69oweZoPKul0n7SnntcXK4VutmVNfMdzm
+         xp/x+kKAqMv7eeMiYUK7Gb/IPxK6J2JfERRF9rm+/WtCzgoN5isLIrSB1uSXc0lnv1j0
+         jjZA==
+X-Gm-Message-State: ABy/qLbkO4Gz7dF/n6ugF8hCAAiEWfdKEWtQI5p6kyn/5LoPIAhJxph6
+	zPiT4DFoRm43Jn9/+Bu9dQsr7zlQ/mczlz1GTjaBt3k+96Tp
+X-Google-Smtp-Source: APBJJlHiIE+UxfTCFUslPbf6t9y+2TdEnS71GrV0V7tk323+8NpCl1UrA6V7rN5jD9rPYQDzSuqQxp3UUDohHVfgDch0q2r+qg3N
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yB+7pERcjQZkUudn"
-Content-Disposition: inline
-In-Reply-To: <ZK+ibBKWFRniQ8rK@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6870:5b35:b0:1b0:3f7f:673e with SMTP id
+ ds53-20020a0568705b3500b001b03f7f673emr6699714oab.6.1689440340161; Sat, 15
+ Jul 2023 09:59:00 -0700 (PDT)
+Date: Sat, 15 Jul 2023 09:59:00 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005839700600897be6@google.com>
+Subject: [syzbot] [wireless?] WARNING in sta_info_insert_rcu (3)
+From: syzbot <syzbot+2676771ed06a6df166ad@syzkaller.appspotmail.com>
+To: davem@davemloft.net, ebiederm@xmission.com, edumazet@google.com, 
+	hbh25y@gmail.com, johannes@sipsolutions.net, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello,
 
---yB+7pERcjQZkUudn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following issue on:
 
-> On Thu, Jul 13, 2023 at 03:18:23AM +0100, Daniel Golle wrote:
-> > From: Lorenzo Bianconi <lorenzo@kernel.org>
-> >=20
-> > Introduce MTK_NETSYS_V1 bit in the device capabilities for
-> > MT7621/MT7622/MT7623/MT7628/MT7629 SoCs.
-> > Use !MTK_NETSYS_V1 instead of MTK_NETSYS_V2 in the driver codebase.
-> > This is a preliminary patch to introduce support for MT7988 SoC.
->=20
-> Rather than using capability bits for versions, would it make more
-> sense to use an integer for this, so you can do:
->=20
-> 	if (eth->soc->netsys_version >=3D 2) {
-> 		version 2 and later stuff
-> 	} else {
-> 		previous version stuff
-> 	}
->=20
-> ?
->=20
-> I'm just thinking ahead to when we end up with stuff that v1 and v2
-> need but v3 and later don't.
+HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=11089df2a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=150188feee7071a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=2676771ed06a6df166ad
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122f5682a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=158dbaeca80000
 
-ack, I will fix it.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/47d90db1f2d1/disk-3f01e9fe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/266e07b43566/vmlinux-3f01e9fe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/62efdb874ac7/bzImage-3f01e9fe.xz
 
-Regards,
-Lorenzo
+The issue was bisected to:
 
->=20
-> --=20
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
->=20
+commit c579d60f0d0cd87552f64fdebe68b5d941d20309
+Author: Hangyu Hua <hbh25y@gmail.com>
+Date:   Fri Jul 15 06:23:01 2022 +0000
 
---yB+7pERcjQZkUudn
-Content-Type: application/pgp-signature; name="signature.asc"
+    ipc: mqueue: fix possible memory leak in init_mqueue_fs()
 
------BEGIN PGP SIGNATURE-----
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14a40b58a80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16a40b58a80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12a40b58a80000
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZLLFWwAKCRA6cBh0uS2t
-rBvlAQDy03bEQ4loaAkQrbJsOLuS7fpBgSkRYBHq+v1STiH+dwEAhaatBwH6Dv5n
-6nKwAO3GR06rfY1eFCm7uJkttIs/XwM=
-=TLpK
------END PGP SIGNATURE-----
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2676771ed06a6df166ad@syzkaller.appspotmail.com
+Fixes: c579d60f0d0c ("ipc: mqueue: fix possible memory leak in init_mqueue_fs()")
 
---yB+7pERcjQZkUudn--
+wlan1: authenticate with 08:02:11:00:00:01
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 1148 at net/mac80211/sta_info.c:728 sta_info_insert_check net/mac80211/sta_info.c:728 [inline]
+WARNING: CPU: 1 PID: 1148 at net/mac80211/sta_info.c:728 sta_info_insert_rcu+0x25e/0x1af0 net/mac80211/sta_info.c:940
+Modules linked in:
+CPU: 1 PID: 1148 Comm: kworker/1:2 Not tainted 6.5.0-rc1-syzkaller-00006-g3f01e9fed845 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
+Workqueue: events cfg80211_conn_work
+RIP: 0010:sta_info_insert_check net/mac80211/sta_info.c:728 [inline]
+RIP: 0010:sta_info_insert_rcu+0x25e/0x1af0 net/mac80211/sta_info.c:940
+Code: e8 a7 14 ef f7 44 89 e0 31 ff 83 e0 01 89 c6 88 44 24 08 e8 74 10 ef f7 0f b6 44 24 08 84 c0 0f 84 19 01 00 00 e8 82 14 ef f7 <0f> 0b c7 44 24 08 ea ff ff ff e8 73 14 ef f7 48 8b 7c 24 28 4c 89
+RSP: 0018:ffffc90005bff1f0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff888027478c80 RCX: 0000000000000000
+RDX: ffff888021f78000 RSI: ffffffff8995cd3e RDI: 0000000000000005
+RBP: 0000000000000100 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 000000000000000f R12: 0000000000110208
+R13: ffff8880768fc048 R14: ffff88807d171730 R15: ffff8880768fc000
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8913442270 CR3: 000000000c775000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ sta_info_insert+0x17/0xd0 net/mac80211/sta_info.c:953
+ ieee80211_prep_connection+0x5fd/0x14a0 net/mac80211/mlme.c:7047
+ ieee80211_mgd_auth+0x891/0x1170 net/mac80211/mlme.c:7205
+ rdev_auth net/wireless/rdev-ops.h:481 [inline]
+ cfg80211_mlme_auth+0x3b3/0x8c0 net/wireless/mlme.c:284
+ cfg80211_conn_do_work+0xd3c/0xff0 net/wireless/sme.c:181
+ cfg80211_conn_work+0x27f/0x3d0 net/wireless/sme.c:273
+ process_one_work+0xa34/0x16f0 kernel/workqueue.c:2597
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2748
+ kthread+0x344/0x440 kernel/kthread.c:389
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
