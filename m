@@ -1,107 +1,110 @@
-Return-Path: <netdev+bounces-18107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6634754E1C
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 11:37:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04FD1754E5E
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 12:39:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52127281403
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 09:37:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017B81C20964
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 10:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614BA3C2C;
-	Sun, 16 Jul 2023 09:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB8B23D3;
+	Sun, 16 Jul 2023 10:39:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D942914
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 09:37:55 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE74E45;
-	Sun, 16 Jul 2023 02:37:54 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36G71xRc019606;
-	Sun, 16 Jul 2023 02:37:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=u3UVgM7x4wqx72JKmwETgwQbtQ4974KGNu1bjFcRfuw=;
- b=i6ZB06yQ3/eZu/aTesEH+z7Br5RPXApFMSVOzjrmLfi5Ixf8isksBGogYLhjbXDPzRBM
- T96AZVlU03ySiQgU9ZKL6fvlEKx6kts0Bz0R+Gy//1z4BRVm0yRobVeKuCsI5Blf14SJ
- 9XPWw2y5hQgH7w+BCQBMO+r6UIr4iFQKV8ejQ0RxBDV1Q6uDT2Wje0tx66oXibHQF4qy
- Fl2BoMAk7kfBUG11amjceoTvmpeA9swsIejRhnNig6BPiOI0rjHACONFOnL6T+aTIwBm
- Ef3mwR0d0Yaf3+wXBUcwnO1dmfUKra2dOEkhi0vDj1W0ZbnA3/IdkzjJkDxohpKjUgfG lw== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rutygsmgv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 16 Jul 2023 02:37:47 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 16 Jul
- 2023 02:37:45 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 16 Jul 2023 02:37:45 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 91A275E686A;
-	Sun, 16 Jul 2023 02:37:42 -0700 (PDT)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net PATCH] octeontx2-pf: Dont allocate BPIDs for LBK interfaces
-Date: Sun, 16 Jul 2023 15:07:41 +0530
-Message-ID: <20230716093741.28063-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC541854
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 10:39:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D27BC433C7;
+	Sun, 16 Jul 2023 10:39:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689503991;
+	bh=9jtUWxQYiBFV2MFeXaOw/zVh4iC4TPR3WZN1TK18XQs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CCnbgt0hkEa/c+Z1QnNsYdbSdtCWHpkFEV1JZgN7hrBmmdf2JddlKJXz1WiDLF+gG
+	 vYksuX9e5wxmLsRcpcK5VCGaj4KodJEipBGuCjmL8wC9xKf7jdXH1eMjsEqm39IVxC
+	 sNlfTUyiXqdbz0MNcLVzREOoIQXtrVXCUbAdpOheZODtKmNKtlr3kmyuvGgm8qa3HE
+	 oKIWsQg47Fi1rZ7J1/Kt7htP6UyYs4Z10cN1UyXpVju5+vCLhE0Llr6+J4vMz+oQzE
+	 et/SJyvsLm2YAfbBeSwlMGNv4elPX/kml/a7QSAI2PzddO0aHaLyz3xfDMMoAgX7ar
+	 FkHSjDAY7viUw==
+Date: Sun, 16 Jul 2023 13:39:47 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
+ modify rule destination
+Message-ID: <20230716103947.GA27947@unreal>
+References: <20230713063345.GG41919@unreal>
+ <20230713100401.5fe0fa77@kernel.org>
+ <20230713174317.GH41919@unreal>
+ <20230713110556.682d21ba@kernel.org>
+ <20230713185833.GI41919@unreal>
+ <20230713201727.6dfe7549@kernel.org>
+ <20230714184013.GJ41919@unreal>
+ <20230714121633.18d19c4c@kernel.org>
+ <20230714203258.GL41919@unreal>
+ <20230714203032.7f1bf5f7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: 7ShzuYIFd5bswaevYpk2JoVeC0DorjhH
-X-Proofpoint-ORIG-GUID: 7ShzuYIFd5bswaevYpk2JoVeC0DorjhH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-15_14,2023-07-13_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714203032.7f1bf5f7@kernel.org>
 
-Current driver enables backpressure for LBK interfaces.
-But these interfaces do not support this feature.
-Hence, this patch fixes the issue by skipping the
-backpressure configuration for these interfaces.
+On Fri, Jul 14, 2023 at 08:30:32PM -0700, Jakub Kicinski wrote:
+> On Fri, 14 Jul 2023 23:32:58 +0300 Leon Romanovsky wrote:
+> > On Fri, Jul 14, 2023 at 12:16:33PM -0700, Jakub Kicinski wrote:
+> > > On Fri, 14 Jul 2023 21:40:13 +0300 Leon Romanovsky wrote:  
+> > > > It depends on configuration order, if user configures TC first, it will
+> > > > be a), if he/she configures IPsec first, it will be b).
+> > > > 
+> > > > I just think that option b) is really matters.  
+> > > 
+> > > And only b) matches what happens in the kernel with policy based IPsec,
+> > > right?   
+> > 
+> > Can you please clarify what do you mean "policy based IPsec"?
+> 
+> I mean without a separate xfrm netdev on which you can install TC
+> rules of its own.
 
-Fixes: 75f36270990c ("octeontx2-pf: Support to enable/disable pause frames via ethtool").
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+I call it software IPsec.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index fe8ea4e531b7..9551b422622a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1454,8 +1454,9 @@ static int otx2_init_hw_resources(struct otx2_nic *pf)
- 	if (err)
- 		goto err_free_npa_lf;
- 
--	/* Enable backpressure */
--	otx2_nix_config_bp(pf, true);
-+	/* Enable backpressure for CGX mapped PF/VFs */
-+	if (!is_otx2_lbkvf(pf->pdev))
-+		otx2_nix_config_bp(pf, true);
- 
- 	/* Init Auras and pools used by NIX RQ, for free buffer ptrs */
- 	err = otx2_rq_aura_pool_init(pf);
--- 
-2.25.1
+> 
+> > > IIUC what you're saying -
+> > > the result depending on order of configuration may be a major source
+> > > of surprises / hard to debug problems for the user.  
+> > 
+> > When I reviewed patches, I came exactly to an opposite conclusion :)
+> > 
+> > My rationale was that users who configure IPsec and TC are advanced
+> > users who knows their data flow and if they find a) option valuable,
+> > they can do it.
+> > 
+> > For example, a) allows to limit amount of data sent to IPsec engine.
+> > 
+> > I believe both a) and b) should be supported.
+> 
+> What does it take to switch between the modes?
+> Even if we want both modes we should have an explicit switch, I reckon.
+> Or at least a way to read back what mode we ended up in.
 
+I had several internal discussions about how TC and IPsec should work
+together, and will need some time to think about proper implementation.
+
+For now I'll add patch which makes TC and IPsec mutually exclusive.
+
+Thanks
+
+> 
 
