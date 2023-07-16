@@ -1,60 +1,75 @@
-Return-Path: <netdev+bounces-18122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62955755054
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 20:27:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67776755094
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 20:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F6AC281103
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 18:27:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99FAB1C20321
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 18:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC9E8F56;
-	Sun, 16 Jul 2023 18:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466138C17;
+	Sun, 16 Jul 2023 18:44:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF17379C4
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 18:27:06 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27563E5D;
-	Sun, 16 Jul 2023 11:27:04 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36GIHWLm032465;
-	Sun, 16 Jul 2023 11:26:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=SoB2sI7LlSvmbnOCRZlyQ90tlYCHs2IMIDMrqPyyHhM=;
- b=UWA30rZBzTSBi9MtXKk4ZDq0Psa0hJkiF/ARZ1HxHFrH1TiheQI037OvX8J9Is0VfpnK
- 3+/T8Lgl+zr99TiXnmE5E681T8HVW3dOPEMU40/urG5QrzGTreybgnZoc0dnwS1Jp0mK
- guDN57pOCA4k7zm9HuLq5LBLUgnCIpl9ctli+Yhf/lmYbrd1uf2ftePRguFXI02ZQU5/
- C0GwzBUl6M7+XV8pCUrmnUCVoWPsrxSpqeYJ2YP7OLJ0qbm66CQViEpWNE46RUwaU9+S
- L71ZqpTWIr6A0UGSwdacG5JpaWv1+I3I5D4R2itREVeAcP4WxhZFTH8Z5GvOi9Mxmvom 4g== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rus6dau0y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 16 Jul 2023 11:26:57 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 16 Jul
- 2023 11:26:55 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 16 Jul 2023 11:26:55 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 359D95E6869;
-	Sun, 16 Jul 2023 11:26:51 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net-next PATCH V2] octeontx2-af: Install TC filter rules in hardware based on priority
-Date: Sun, 16 Jul 2023 23:56:49 +0530
-Message-ID: <20230716182649.2467419-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31344290B
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 18:44:12 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EF71B5;
+	Sun, 16 Jul 2023 11:44:11 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fb4146e8deso38690245e9.0;
+        Sun, 16 Jul 2023 11:44:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689533050; x=1692125050;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Iw9rxMmy489xUbQwxOXNVFRR34rAPTUVmC3dh4HsQWw=;
+        b=HeTYsvujwYrQwwXDp0WMfX5PfsFlIaj6iOyQIXfhYDOXQFOXAymdjg45DuXKHpZVdJ
+         T0aeNJd7Ukr89zC6YK00llwOXwwMwhYEvmhru6R/6shzkJ+Ukd7y+DIIZvnwnJX/J3I3
+         lzlwAHp1rxIOasiaWGaNKZtkhzOFqAEO4USZ5UpVmpIrBKJ++StYna4dQjao6RT3DY3z
+         jZ030yFpCTFSV/R5E2TwYhm4lrnd2utaZEcbhOPlI0c0I6IGQyGLT7QllT2zMfiqmACc
+         W8IWNxCpZmfjezbzCziIQLwUl1CWTwNc0IUxRR7LEYPdb+MZJkH+B+Unu+t4e3s6mEOc
+         FsAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689533050; x=1692125050;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Iw9rxMmy489xUbQwxOXNVFRR34rAPTUVmC3dh4HsQWw=;
+        b=dYx3bkzh0He/Nt1xlb851vDcjmjD+2ibHbUYKtTTjT+OgDneBuyRS7b2oUvWqDSmuv
+         X1t/8JvR6FwECphjfMwpdtnXlqfUcmBAULGD9MVvnLt8YR0RLAn8O9NilbFWUAj8A7fL
+         BoKf8rAHdO0ioh/gg6k/PQInHcYCJqO+jWXz7HfLfohr5vgwo3pDs8qw6hDsaUDoM9P/
+         tuKPyUvjm63kr/Qohf4zQ3nWnDNsBzBbFRjkHAXIoHbl9sby9JJuYHpx4bRgEkh/uQ/x
+         h8yYyx9oOS6Key8BFLA+oVa4RtTw8Sje4AIQtSL/Ad/948ANRK2emKM7jfGMowu9Jq3v
+         cCYQ==
+X-Gm-Message-State: ABy/qLavzldO1bpCq1NIZa9Qm8K67pfU9NQzMox7pLNe8QbawMhZpfLN
+	oN8Ay/wH9h6SAgQezPM6iy3oKoVGUJaJedrD
+X-Google-Smtp-Source: APBJJlGqrk4/ImODOjlE2fM0n8aEqgTPPtq8oeBjobvCf+cVue7GW3rAT7MupfI6Rwb2vIto6QFSbw==
+X-Received: by 2002:adf:ffd2:0:b0:313:eb81:d2f6 with SMTP id x18-20020adfffd2000000b00313eb81d2f6mr11309115wrs.4.1689533049498;
+        Sun, 16 Jul 2023 11:44:09 -0700 (PDT)
+Received: from mmaatuq-HP-Laptop-15-dy2xxx.. ([2001:8f8:1163:535c:e1af:2d96:1960:a57d])
+        by smtp.gmail.com with ESMTPSA id v7-20020a05600c214700b003fbc681c8d1sm6212956wml.36.2023.07.16.11.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Jul 2023 11:44:08 -0700 (PDT)
+From: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: linux-kernel-mentees@lists.linuxfoundation.org,
+	Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
+Subject: [PATCH v4] selftests/net: replace manual array size calc with ARRAYSIZE macro.
+Date: Sun, 16 Jul 2023 22:43:49 +0400
+Message-Id: <20230716184349.2124858-1-mahmoudmatook.mm@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,701 +77,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 5Yw8iaAGPvAZmjxzuYgddnys9u-vwWDC
-X-Proofpoint-ORIG-GUID: 5Yw8iaAGPvAZmjxzuYgddnys9u-vwWDC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-16_05,2023-07-13_01,2023-05-22_02
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As of today, hardware does not support installing tc filter
-rules based on priority. This patch adds support to install
-the hardware rules based on priority. The final hardware rules
-will not be dependent on rule installation order, it will be strictly
-priority based, same as software.
+fixes coccinelle WARNING: Use ARRAY_SIZE
 
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
+Signed-off-by: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
 ---
-Changes since v1:
-- Rebased the patch on top of current 'main' branch
+changelog since v3:
+ - move changelog outside commit message.
 
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |   9 +-
- .../marvell/octeontx2/af/rvu_npc_fs.c         |   9 +-
- .../marvell/octeontx2/af/rvu_switch.c         |   6 +-
- .../marvell/octeontx2/nic/otx2_common.h       |  11 +-
- .../marvell/octeontx2/nic/otx2_devlink.c      |   1 -
- .../marvell/octeontx2/nic/otx2_ethtool.c      |   1 +
- .../marvell/octeontx2/nic/otx2_flows.c        |   2 +
- .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 313 +++++++++++++-----
- 8 files changed, 248 insertions(+), 104 deletions(-)
+changelog since v2:
+ - integrat a commit that contains actual replacement for ARRAY_SIZE.
+ - use ARRAY_SIZE for net/psock_lib.h
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index eba307eee2b2..ed66c5989102 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -235,7 +235,7 @@ M(NPC_GET_KEX_CFG,	  0x600c, npc_get_kex_cfg,			\
- M(NPC_INSTALL_FLOW,	  0x600d, npc_install_flow,			       \
- 				  npc_install_flow_req, npc_install_flow_rsp)  \
- M(NPC_DELETE_FLOW,	  0x600e, npc_delete_flow,			\
--				  npc_delete_flow_req, msg_rsp)		\
-+				  npc_delete_flow_req, npc_delete_flow_rsp)		\
- M(NPC_MCAM_READ_ENTRY,	  0x600f, npc_mcam_read_entry,			\
- 				  npc_mcam_read_entry_req,		\
- 				  npc_mcam_read_entry_rsp)		\
-@@ -1491,6 +1491,8 @@ struct npc_install_flow_req {
- 	u8  vtag0_op;
- 	u16 vtag1_def;
- 	u8  vtag1_op;
-+	/* old counter value */
-+	u16 cntr_val;
+changelog since v1:
+ - remove unnecessary extra new line
+
+changelog since v0:
+ - update net/Makefile to include kselftest.h
+ - remove redefinition of ARRAYSIZE.
+---
+ tools/testing/selftests/net/Makefile          | 2 ++
+ tools/testing/selftests/net/csum.c            | 6 ++++--
+ tools/testing/selftests/net/hwtstamp_config.c | 6 ++++--
+ tools/testing/selftests/net/psock_lib.h       | 4 +++-
+ 4 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 7f3ab2a93ed6..a06cc25489f9 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -3,6 +3,8 @@
+ 
+ CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
+ CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
++# Additional include paths needed by kselftest.h
++CFLAGS += -I../
+ 
+ TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh netdevice.sh \
+ 	      rtnetlink.sh xfrm_policy.sh test_blackhole_dev.sh
+diff --git a/tools/testing/selftests/net/csum.c b/tools/testing/selftests/net/csum.c
+index 82a1c1839da6..90eb06fefa59 100644
+--- a/tools/testing/selftests/net/csum.c
++++ b/tools/testing/selftests/net/csum.c
+@@ -91,6 +91,8 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
++#include "kselftest.h"
++
+ static bool cfg_bad_csum;
+ static int cfg_family = PF_INET6;
+ static int cfg_num_pkt = 4;
+@@ -450,7 +452,7 @@ static void send_packet(int fd, const char *buf, int len)
+ 	iov[2].iov_len = len;
+ 
+ 	msg.msg_iov = iov;
+-	msg.msg_iovlen = sizeof(iov) / sizeof(iov[0]);
++	msg.msg_iovlen = ARRAY_SIZE(iov);
+ 
+ 	msg.msg_name = &addr;
+ 	msg.msg_namelen = sizeof(addr);
+@@ -505,7 +507,7 @@ static void __recv_prepare_packet_filter(int fd, int off_nexthdr, int off_dport)
+ 	struct sock_fprog prog = {};
+ 
+ 	prog.filter = filter;
+-	prog.len = sizeof(filter) / sizeof(struct sock_filter);
++	prog.len = ARRAY_SIZE(filter);
+ 	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &prog, sizeof(prog)))
+ 		error(1, errno, "setsockopt filter");
+ }
+diff --git a/tools/testing/selftests/net/hwtstamp_config.c b/tools/testing/selftests/net/hwtstamp_config.c
+index e1fdee841021..170728c96c46 100644
+--- a/tools/testing/selftests/net/hwtstamp_config.c
++++ b/tools/testing/selftests/net/hwtstamp_config.c
+@@ -16,6 +16,8 @@
+ #include <linux/net_tstamp.h>
+ #include <linux/sockios.h>
+ 
++#include "kselftest.h"
++
+ static int
+ lookup_value(const char **names, int size, const char *name)
+ {
+@@ -50,7 +52,7 @@ static const char *tx_types[] = {
+ 	TX_TYPE(ONESTEP_SYNC)
+ #undef TX_TYPE
  };
+-#define N_TX_TYPES ((int)(sizeof(tx_types) / sizeof(tx_types[0])))
++#define N_TX_TYPES ((int)(ARRAY_SIZE(tx_types)))
  
- struct npc_install_flow_rsp {
-@@ -1506,6 +1508,11 @@ struct npc_delete_flow_req {
- 	u8 all; /* PF + VFs */
+ static const char *rx_filters[] = {
+ #define RX_FILTER(name) [HWTSTAMP_FILTER_ ## name] = #name
+@@ -71,7 +73,7 @@ static const char *rx_filters[] = {
+ 	RX_FILTER(PTP_V2_DELAY_REQ),
+ #undef RX_FILTER
  };
+-#define N_RX_FILTERS ((int)(sizeof(rx_filters) / sizeof(rx_filters[0])))
++#define N_RX_FILTERS ((int)(ARRAY_SIZE(rx_filters)))
  
-+struct npc_delete_flow_rsp {
-+	struct mbox_msghdr hdr;
-+	u16 cntr_val;
-+};
-+
- struct npc_mcam_read_entry_req {
- 	struct mbox_msghdr hdr;
- 	u16 entry;	 /* MCAM entry to read */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index 952319453701..9c365cc3e736 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -1192,7 +1192,7 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
- 	write_req.enable_entry = (u8)enable;
- 	/* if counter is available then clear and use it */
- 	if (req->set_cntr && rule->has_cntr) {
--		rvu_write64(rvu, blkaddr, NPC_AF_MATCH_STATX(rule->cntr), 0x00);
-+		rvu_write64(rvu, blkaddr, NPC_AF_MATCH_STATX(rule->cntr), req->cntr_val);
- 		write_req.set_cntr = 1;
- 		write_req.cntr = rule->cntr;
- 	}
-@@ -1407,12 +1407,13 @@ static int npc_delete_flow(struct rvu *rvu, struct rvu_npc_mcam_rule *rule,
- 
- int rvu_mbox_handler_npc_delete_flow(struct rvu *rvu,
- 				     struct npc_delete_flow_req *req,
--				     struct msg_rsp *rsp)
-+				     struct npc_delete_flow_rsp *rsp)
+ static void usage(void)
  {
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
- 	struct rvu_npc_mcam_rule *iter, *tmp;
- 	u16 pcifunc = req->hdr.pcifunc;
- 	struct list_head del_list;
-+	int blkaddr;
+diff --git a/tools/testing/selftests/net/psock_lib.h b/tools/testing/selftests/net/psock_lib.h
+index faa884385c45..6e4fef560873 100644
+--- a/tools/testing/selftests/net/psock_lib.h
++++ b/tools/testing/selftests/net/psock_lib.h
+@@ -14,6 +14,8 @@
+ #include <arpa/inet.h>
+ #include <unistd.h>
  
- 	INIT_LIST_HEAD(&del_list);
- 
-@@ -1428,6 +1429,10 @@ int rvu_mbox_handler_npc_delete_flow(struct rvu *rvu,
- 				list_move_tail(&iter->list, &del_list);
- 			/* single rule */
- 			} else if (req->entry == iter->entry) {
-+				blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
-+				if (blkaddr)
-+					rsp->cntr_val = rvu_read64(rvu, blkaddr,
-+								   NPC_AF_MATCH_STATX(iter->cntr));
- 				list_move_tail(&iter->list, &del_list);
- 				break;
- 			}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
-index 592b317f4637..854045ed3b06 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
-@@ -158,6 +158,7 @@ void rvu_switch_enable(struct rvu *rvu)
- 	struct npc_mcam_alloc_entry_req alloc_req = { 0 };
- 	struct npc_mcam_alloc_entry_rsp alloc_rsp = { 0 };
- 	struct npc_delete_flow_req uninstall_req = { 0 };
-+	struct npc_delete_flow_rsp uninstall_rsp = { 0 };
- 	struct npc_mcam_free_entry_req free_req = { 0 };
- 	struct rvu_switch *rswitch = &rvu->rswitch;
- 	struct msg_rsp rsp;
-@@ -197,7 +198,7 @@ void rvu_switch_enable(struct rvu *rvu)
- uninstall_rules:
- 	uninstall_req.start = rswitch->start_entry;
- 	uninstall_req.end =  rswitch->start_entry + rswitch->used_entries - 1;
--	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &rsp);
-+	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &uninstall_rsp);
- 	kfree(rswitch->entry2pcifunc);
- free_entries:
- 	free_req.all = 1;
-@@ -209,6 +210,7 @@ void rvu_switch_enable(struct rvu *rvu)
- void rvu_switch_disable(struct rvu *rvu)
- {
- 	struct npc_delete_flow_req uninstall_req = { 0 };
-+	struct npc_delete_flow_rsp uninstall_rsp = { 0 };
- 	struct npc_mcam_free_entry_req free_req = { 0 };
- 	struct rvu_switch *rswitch = &rvu->rswitch;
- 	struct rvu_hwinfo *hw = rvu->hw;
-@@ -250,7 +252,7 @@ void rvu_switch_disable(struct rvu *rvu)
- 	uninstall_req.start = rswitch->start_entry;
- 	uninstall_req.end =  rswitch->start_entry + rswitch->used_entries - 1;
- 	free_req.all = 1;
--	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &rsp);
-+	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &uninstall_rsp);
- 	rvu_mbox_handler_npc_mcam_free_entry(rvu, &free_req, &rsp);
- 	rswitch->used_entries = 0;
- 	kfree(rswitch->entry2pcifunc);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index ba8091131ec0..67715fc906b5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -360,13 +360,8 @@ struct otx2_flow_config {
- 	struct list_head	flow_list;
- 	u32			dmacflt_max_flows;
- 	u16                     max_flows;
--};
--
--struct otx2_tc_info {
--	/* hash table to store TC offloaded flows */
--	struct rhashtable		flow_table;
--	struct rhashtable_params	flow_ht_params;
--	unsigned long			*tc_entries_bitmap;
-+	struct list_head	flow_list_tc;
-+	bool			ntuple;
- };
- 
- struct dev_hw_ops {
-@@ -491,7 +486,6 @@ struct otx2_nic {
- 	/* NPC MCAM */
- 	struct otx2_flow_config	*flow_cfg;
- 	struct otx2_mac_table	*mac_table;
--	struct otx2_tc_info	tc_info;
- 
- 	u64			reset_count;
- 	struct work_struct	reset_task;
-@@ -1063,7 +1057,6 @@ int otx2_init_tc(struct otx2_nic *nic);
- void otx2_shutdown_tc(struct otx2_nic *nic);
- int otx2_setup_tc(struct net_device *netdev, enum tc_setup_type type,
- 		  void *type_data);
--int otx2_tc_alloc_ent_bitmap(struct otx2_nic *nic);
- /* CGX/RPM DMAC filters support */
- int otx2_dmacflt_get_max_cnt(struct otx2_nic *pf);
- int otx2_dmacflt_add(struct otx2_nic *pf, const u8 *mac, u32 bit_pos);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-index 63ef7c41d18d..4e1130496573 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-@@ -41,7 +41,6 @@ static int otx2_dl_mcam_count_set(struct devlink *devlink, u32 id,
- 		return 0;
- 
- 	otx2_alloc_mcam_entries(pfvf, ctx->val.vu16);
--	otx2_tc_alloc_ent_bitmap(pfvf);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index c47d91da32dc..9efcec549834 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -764,6 +764,7 @@ static int otx2_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *nfc)
- 	struct otx2_nic *pfvf = netdev_priv(dev);
- 	int ret = -EOPNOTSUPP;
- 
-+	pfvf->flow_cfg->ntuple = ntuple;
- 	switch (nfc->cmd) {
- 	case ETHTOOL_SRXFH:
- 		ret = otx2_set_rss_hash_opts(pfvf, nfc);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 2d7713a1a153..4762dbea64a1 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -276,6 +276,7 @@ int otx2vf_mcam_flow_init(struct otx2_nic *pfvf)
- 
- 	flow_cfg = pfvf->flow_cfg;
- 	INIT_LIST_HEAD(&flow_cfg->flow_list);
-+	INIT_LIST_HEAD(&flow_cfg->flow_list_tc);
- 	flow_cfg->max_flows = 0;
- 
- 	return 0;
-@@ -298,6 +299,7 @@ int otx2_mcam_flow_init(struct otx2_nic *pf)
- 		return -ENOMEM;
- 
- 	INIT_LIST_HEAD(&pf->flow_cfg->flow_list);
-+	INIT_LIST_HEAD(&pf->flow_cfg->flow_list_tc);
- 
- 	/* Allocate bare minimum number of MCAM entries needed for
- 	 * unicast and ntuple filters.
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 5e56b6c3e60a..32d59d6a1256 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -34,9 +34,8 @@ struct otx2_tc_flow_stats {
- };
- 
- struct otx2_tc_flow {
--	struct rhash_head		node;
-+	struct list_head		list;
- 	unsigned long			cookie;
--	unsigned int			bitpos;
- 	struct rcu_head			rcu;
- 	struct otx2_tc_flow_stats	stats;
- 	spinlock_t			lock; /* lock for stats */
-@@ -44,31 +43,10 @@ struct otx2_tc_flow {
- 	u16				entry;
- 	u16				leaf_profile;
- 	bool				is_act_police;
-+	u32				prio;
-+	struct npc_install_flow_req	req;
- };
- 
--int otx2_tc_alloc_ent_bitmap(struct otx2_nic *nic)
--{
--	struct otx2_tc_info *tc = &nic->tc_info;
--
--	if (!nic->flow_cfg->max_flows)
--		return 0;
--
--	/* Max flows changed, free the existing bitmap */
--	kfree(tc->tc_entries_bitmap);
--
--	tc->tc_entries_bitmap =
--			kcalloc(BITS_TO_LONGS(nic->flow_cfg->max_flows),
--				sizeof(long), GFP_KERNEL);
--	if (!tc->tc_entries_bitmap) {
--		netdev_err(nic->netdev,
--			   "Unable to alloc TC flow entries bitmap\n");
--		return -ENOMEM;
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(otx2_tc_alloc_ent_bitmap);
--
- static void otx2_get_egress_burst_cfg(struct otx2_nic *nic, u32 burst,
- 				      u32 *burst_exp, u32 *burst_mantissa)
- {
-@@ -707,8 +685,117 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 	return otx2_tc_parse_actions(nic, &rule->action, req, f, node);
- }
- 
--static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry)
-+static void otx2_destroy_tc_flow_list(struct otx2_nic *pfvf)
-+{
-+	struct otx2_flow_config *flow_cfg = pfvf->flow_cfg;
-+	struct otx2_tc_flow *iter, *tmp;
++#include "kselftest.h"
 +
-+	if (!(pfvf->flags & OTX2_FLAG_MCAM_ENTRIES_ALLOC))
-+		return;
-+
-+	list_for_each_entry_safe(iter, tmp, &flow_cfg->flow_list_tc, list) {
-+		list_del(&iter->list);
-+		kfree(iter);
-+		flow_cfg->nr_flows--;
-+	}
-+}
-+
-+static struct otx2_tc_flow *otx2_tc_get_entry_by_cookie(struct otx2_flow_config *flow_cfg,
-+							unsigned long cookie)
-+{
-+	struct otx2_tc_flow *tmp;
-+
-+	list_for_each_entry(tmp, &flow_cfg->flow_list_tc, list) {
-+		if (tmp->cookie == cookie)
-+			return tmp;
-+	}
-+
-+	return NULL;
-+}
-+
-+static struct otx2_tc_flow *otx2_tc_get_entry_by_index(struct otx2_flow_config *flow_cfg,
-+						       int index)
-+{
-+	struct otx2_tc_flow *tmp;
-+	int i = 0;
-+
-+	list_for_each_entry(tmp, &flow_cfg->flow_list_tc, list) {
-+		if (i == index)
-+			return tmp;
-+		i++;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void otx2_tc_del_from_flow_list(struct otx2_flow_config *flow_cfg,
-+				       struct otx2_tc_flow *node)
- {
-+	struct otx2_tc_flow *tmp;
-+	struct list_head *pos, *n;
-+
-+	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
-+		tmp = list_entry(pos, struct otx2_tc_flow, list);
-+		if (node == tmp) {
-+			list_del(&node->list);
-+			return;
-+		}
-+	}
-+}
-+
-+static int otx2_tc_add_to_flow_list(struct otx2_flow_config *flow_cfg,
-+				    struct otx2_tc_flow *node)
-+{
-+	struct otx2_tc_flow *tmp;
-+	struct list_head *pos, *n;
-+	int index = 0;
-+
-+	/* If the flow list is empty then add the new node */
-+	if (list_empty(&flow_cfg->flow_list_tc)) {
-+		list_add(&node->list, &flow_cfg->flow_list_tc);
-+		return index;
-+	}
-+
-+	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
-+		tmp = list_entry(pos, struct otx2_tc_flow, list);
-+		if (node->prio < tmp->prio)
-+			break;
-+		index++;
-+	}
-+
-+	list_add(&node->list, pos->prev);
-+	return index;
-+}
-+
-+static int otx2_add_mcam_flow_entry(struct otx2_nic *nic, struct npc_install_flow_req *req)
-+{
-+	struct npc_install_flow_req *tmp_req;
-+	int err;
-+
-+	mutex_lock(&nic->mbox.lock);
-+	tmp_req = otx2_mbox_alloc_msg_npc_install_flow(&nic->mbox);
-+	if (!tmp_req) {
-+		mutex_unlock(&nic->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	memcpy(tmp_req, req, sizeof(struct npc_install_flow_req));
-+	/* Send message to AF */
-+	err = otx2_sync_mbox_msg(&nic->mbox);
-+	if (err) {
-+		netdev_err(nic->netdev, "Failed to install MCAM flow entry %d\n",
-+			   req->entry);
-+		mutex_unlock(&nic->mbox.lock);
-+		return -EFAULT;
-+	}
-+
-+	mutex_unlock(&nic->mbox.lock);
-+	return 0;
-+}
-+
-+static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry, u16 *cntr_val)
-+{
-+	struct npc_delete_flow_rsp __maybe_unused *rsp;
- 	struct npc_delete_flow_req *req;
- 	int err;
+ #define DATA_LEN			100
+ #define DATA_CHAR			'a'
+ #define DATA_CHAR_1			'b'
+@@ -63,7 +65,7 @@ static __maybe_unused void pair_udp_setfilter(int fd)
+ 	struct sock_fprog bpf_prog;
  
-@@ -729,22 +816,106 @@ static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry)
- 		mutex_unlock(&nic->mbox.lock);
- 		return -EFAULT;
- 	}
-+
-+	if (cntr_val) {
-+		rsp = (struct npc_delete_flow_rsp *)otx2_mbox_get_rsp(&nic->mbox.mbox,
-+								      0, &req->hdr);
-+		*cntr_val = rsp->cntr_val;
-+	}
-+
- 	mutex_unlock(&nic->mbox.lock);
-+	return 0;
-+}
-+
-+static int otx2_tc_update_mcam_table_del_req(struct otx2_nic *nic,
-+					     struct otx2_flow_config *flow_cfg,
-+					     struct otx2_tc_flow *node)
-+{
-+	struct list_head *pos, *n;
-+	struct otx2_tc_flow *tmp;
-+	int i = 0, index = 0;
-+	u16 cntr_val;
-+
-+	/* Find and delete the entry from the list and re-install
-+	 * all the entries from beginning to the index of the
-+	 * deleted entry to higher mcam indexes.
-+	 */
-+	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
-+		tmp = list_entry(pos, struct otx2_tc_flow, list);
-+		if (node == tmp) {
-+			list_del(&tmp->list);
-+			break;
-+		}
-+
-+		otx2_del_mcam_flow_entry(nic, tmp->entry, &cntr_val);
-+		tmp->entry++;
-+		tmp->req.entry = tmp->entry;
-+		tmp->req.cntr_val = cntr_val;
-+		index++;
-+	}
-+
-+	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
-+		if (i == index)
-+			break;
-+
-+		tmp = list_entry(pos, struct otx2_tc_flow, list);
-+		otx2_add_mcam_flow_entry(nic, &tmp->req);
-+		i++;
-+	}
+ 	bpf_prog.filter = bpf_filter;
+-	bpf_prog.len = sizeof(bpf_filter) / sizeof(struct sock_filter);
++	bpf_prog.len = ARRAY_SIZE(bpf_filter);
  
- 	return 0;
- }
- 
-+static int otx2_tc_update_mcam_table_add_req(struct otx2_nic *nic,
-+					     struct otx2_flow_config *flow_cfg,
-+					     struct otx2_tc_flow *node)
-+{
-+	int mcam_idx = flow_cfg->max_flows - flow_cfg->nr_flows - 1;
-+	struct otx2_tc_flow *tmp;
-+	int list_idx, i;
-+	u16 cntr_val;
-+
-+	/* Find the index of the entry(list_idx) whose priority
-+	 * is greater than the new entry and re-install all
-+	 * the entries from beginning to list_idx to higher
-+	 * mcam indexes.
-+	 */
-+	list_idx = otx2_tc_add_to_flow_list(flow_cfg, node);
-+	for (i = 0; i < list_idx; i++) {
-+		tmp = otx2_tc_get_entry_by_index(flow_cfg, i);
-+		if (!tmp)
-+			return -ENOMEM;
-+
-+		otx2_del_mcam_flow_entry(nic, tmp->entry, &cntr_val);
-+		tmp->entry = flow_cfg->flow_ent[mcam_idx];
-+		tmp->req.entry = tmp->entry;
-+		tmp->req.cntr_val = cntr_val;
-+		otx2_add_mcam_flow_entry(nic, &tmp->req);
-+		mcam_idx++;
-+	}
-+
-+	return mcam_idx;
-+}
-+
-+static int otx2_tc_update_mcam_table(struct otx2_nic *nic,
-+				     struct otx2_flow_config *flow_cfg,
-+				     struct otx2_tc_flow *node,
-+				     bool add_req)
-+{
-+	if (add_req)
-+		return otx2_tc_update_mcam_table_add_req(nic, flow_cfg, node);
-+
-+	return otx2_tc_update_mcam_table_del_req(nic, flow_cfg, node);
-+}
-+
- static int otx2_tc_del_flow(struct otx2_nic *nic,
- 			    struct flow_cls_offload *tc_flow_cmd)
- {
- 	struct otx2_flow_config *flow_cfg = nic->flow_cfg;
--	struct otx2_tc_info *tc_info = &nic->tc_info;
- 	struct otx2_tc_flow *flow_node;
- 	int err;
- 
--	flow_node = rhashtable_lookup_fast(&tc_info->flow_table,
--					   &tc_flow_cmd->cookie,
--					   tc_info->flow_ht_params);
-+	flow_node = otx2_tc_get_entry_by_cookie(flow_cfg, tc_flow_cmd->cookie);
- 	if (!flow_node) {
- 		netdev_err(nic->netdev, "tc flow not found for cookie 0x%lx\n",
- 			   tc_flow_cmd->cookie);
-@@ -772,16 +943,10 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
- 		mutex_unlock(&nic->mbox.lock);
- 	}
- 
--	otx2_del_mcam_flow_entry(nic, flow_node->entry);
--
--	WARN_ON(rhashtable_remove_fast(&nic->tc_info.flow_table,
--				       &flow_node->node,
--				       nic->tc_info.flow_ht_params));
-+	otx2_del_mcam_flow_entry(nic, flow_node->entry, NULL);
-+	otx2_tc_update_mcam_table(nic, flow_cfg, flow_node, false);
- 	kfree_rcu(flow_node, rcu);
--
--	clear_bit(flow_node->bitpos, tc_info->tc_entries_bitmap);
- 	flow_cfg->nr_flows--;
--
- 	return 0;
- }
- 
-@@ -790,15 +955,14 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- {
- 	struct netlink_ext_ack *extack = tc_flow_cmd->common.extack;
- 	struct otx2_flow_config *flow_cfg = nic->flow_cfg;
--	struct otx2_tc_info *tc_info = &nic->tc_info;
- 	struct otx2_tc_flow *new_node, *old_node;
- 	struct npc_install_flow_req *req, dummy;
--	int rc, err;
-+	int rc, err, mcam_idx;
- 
- 	if (!(nic->flags & OTX2_FLAG_TC_FLOWER_SUPPORT))
- 		return -ENOMEM;
- 
--	if (bitmap_full(tc_info->tc_entries_bitmap, flow_cfg->max_flows)) {
-+	if (flow_cfg->nr_flows == flow_cfg->max_flows) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Free MCAM entry not available to add the flow");
- 		return -ENOMEM;
-@@ -810,6 +974,7 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- 		return -ENOMEM;
- 	spin_lock_init(&new_node->lock);
- 	new_node->cookie = tc_flow_cmd->cookie;
-+	new_node->prio = tc_flow_cmd->common.prio;
- 
- 	memset(&dummy, 0, sizeof(struct npc_install_flow_req));
- 
-@@ -820,12 +985,11 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- 	}
- 
- 	/* If a flow exists with the same cookie, delete it */
--	old_node = rhashtable_lookup_fast(&tc_info->flow_table,
--					  &tc_flow_cmd->cookie,
--					  tc_info->flow_ht_params);
-+	old_node = otx2_tc_get_entry_by_cookie(flow_cfg, tc_flow_cmd->cookie);
- 	if (old_node)
- 		otx2_tc_del_flow(nic, tc_flow_cmd);
- 
-+	mcam_idx = otx2_tc_update_mcam_table(nic, flow_cfg, new_node, true);
- 	mutex_lock(&nic->mbox.lock);
- 	req = otx2_mbox_alloc_msg_npc_install_flow(&nic->mbox);
- 	if (!req) {
-@@ -836,11 +1000,8 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- 
- 	memcpy(&dummy.hdr, &req->hdr, sizeof(struct mbox_msghdr));
- 	memcpy(req, &dummy, sizeof(struct npc_install_flow_req));
--
--	new_node->bitpos = find_first_zero_bit(tc_info->tc_entries_bitmap,
--					       flow_cfg->max_flows);
- 	req->channel = nic->hw.rx_chan_base;
--	req->entry = flow_cfg->flow_ent[flow_cfg->max_flows - new_node->bitpos - 1];
-+	req->entry = flow_cfg->flow_ent[mcam_idx];
- 	req->intf = NIX_INTF_RX;
- 	req->set_cntr = 1;
- 	new_node->entry = req->entry;
-@@ -850,26 +1011,18 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- 	if (rc) {
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to install MCAM flow entry");
- 		mutex_unlock(&nic->mbox.lock);
--		kfree_rcu(new_node, rcu);
- 		goto free_leaf;
- 	}
--	mutex_unlock(&nic->mbox.lock);
- 
--	/* add new flow to flow-table */
--	rc = rhashtable_insert_fast(&nic->tc_info.flow_table, &new_node->node,
--				    nic->tc_info.flow_ht_params);
--	if (rc) {
--		otx2_del_mcam_flow_entry(nic, req->entry);
--		kfree_rcu(new_node, rcu);
--		goto free_leaf;
--	}
-+	mutex_unlock(&nic->mbox.lock);
-+	memcpy(&new_node->req, req, sizeof(struct npc_install_flow_req));
- 
--	set_bit(new_node->bitpos, tc_info->tc_entries_bitmap);
- 	flow_cfg->nr_flows++;
--
- 	return 0;
- 
- free_leaf:
-+	otx2_tc_del_from_flow_list(flow_cfg, new_node);
-+	kfree_rcu(new_node, rcu);
- 	if (new_node->is_act_police) {
- 		mutex_lock(&nic->mbox.lock);
- 
-@@ -896,16 +1049,13 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- static int otx2_tc_get_flow_stats(struct otx2_nic *nic,
- 				  struct flow_cls_offload *tc_flow_cmd)
- {
--	struct otx2_tc_info *tc_info = &nic->tc_info;
- 	struct npc_mcam_get_stats_req *req;
- 	struct npc_mcam_get_stats_rsp *rsp;
- 	struct otx2_tc_flow_stats *stats;
- 	struct otx2_tc_flow *flow_node;
- 	int err;
- 
--	flow_node = rhashtable_lookup_fast(&tc_info->flow_table,
--					   &tc_flow_cmd->cookie,
--					   tc_info->flow_ht_params);
-+	flow_node = otx2_tc_get_entry_by_cookie(nic->flow_cfg, tc_flow_cmd->cookie);
- 	if (!flow_node) {
- 		netdev_info(nic->netdev, "tc flow not found for cookie %lx",
- 			    tc_flow_cmd->cookie);
-@@ -1053,12 +1203,20 @@ static int otx2_setup_tc_block_ingress_cb(enum tc_setup_type type,
- 					  void *type_data, void *cb_priv)
- {
- 	struct otx2_nic *nic = cb_priv;
-+	bool ntuple;
- 
- 	if (!tc_cls_can_offload_and_chain0(nic->netdev, type_data))
- 		return -EOPNOTSUPP;
- 
-+	ntuple = !!(nic->netdev->features & NETIF_F_NTUPLE);
- 	switch (type) {
- 	case TC_SETUP_CLSFLOWER:
-+		if (ntuple) {
-+			netdev_warn(nic->netdev,
-+				    "Can't install TC flower offload rule when NTUPLE is active");
-+			return -EOPNOTSUPP;
-+		}
-+
- 		return otx2_setup_tc_cls_flower(nic, type_data);
- 	case TC_SETUP_CLSMATCHALL:
- 		return otx2_setup_tc_ingress_matchall(nic, type_data);
-@@ -1143,18 +1301,8 @@ int otx2_setup_tc(struct net_device *netdev, enum tc_setup_type type,
- }
- EXPORT_SYMBOL(otx2_setup_tc);
- 
--static const struct rhashtable_params tc_flow_ht_params = {
--	.head_offset = offsetof(struct otx2_tc_flow, node),
--	.key_offset = offsetof(struct otx2_tc_flow, cookie),
--	.key_len = sizeof(((struct otx2_tc_flow *)0)->cookie),
--	.automatic_shrinking = true,
--};
--
- int otx2_init_tc(struct otx2_nic *nic)
- {
--	struct otx2_tc_info *tc = &nic->tc_info;
--	int err;
--
- 	/* Exclude receive queue 0 being used for police action */
- 	set_bit(0, &nic->rq_bmap);
- 
-@@ -1164,25 +1312,12 @@ int otx2_init_tc(struct otx2_nic *nic)
- 		return -EINVAL;
- 	}
- 
--	err = otx2_tc_alloc_ent_bitmap(nic);
--	if (err)
--		return err;
--
--	tc->flow_ht_params = tc_flow_ht_params;
--	err = rhashtable_init(&tc->flow_table, &tc->flow_ht_params);
--	if (err) {
--		kfree(tc->tc_entries_bitmap);
--		tc->tc_entries_bitmap = NULL;
--	}
--	return err;
-+	return 0;
- }
- EXPORT_SYMBOL(otx2_init_tc);
- 
- void otx2_shutdown_tc(struct otx2_nic *nic)
- {
--	struct otx2_tc_info *tc = &nic->tc_info;
--
--	kfree(tc->tc_entries_bitmap);
--	rhashtable_destroy(&tc->flow_table);
-+	otx2_destroy_tc_flow_list(nic);
- }
- EXPORT_SYMBOL(otx2_shutdown_tc);
+ 	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &bpf_prog,
+ 		       sizeof(bpf_prog))) {
 -- 
-2.25.1
+2.34.1
 
 
