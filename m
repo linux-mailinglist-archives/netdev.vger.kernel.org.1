@@ -1,158 +1,211 @@
-Return-Path: <netdev+bounces-18105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2C1754DF0
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 11:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1FCB754E03
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 11:16:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0B01C20963
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 09:02:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 035EC1C20974
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 09:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2852585;
-	Sun, 16 Jul 2023 09:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696992592;
+	Sun, 16 Jul 2023 09:16:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAE6EA1
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 09:02:34 +0000 (UTC)
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470FADF;
-	Sun, 16 Jul 2023 02:02:32 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-314417861b9so3160930f8f.0;
-        Sun, 16 Jul 2023 02:02:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689498151; x=1692090151;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HrdUA5P1+t589TrebUiC2lW0ShZ+14JLZPgMTM8GsxI=;
-        b=ng97L1ohCssjPItL/rKiYp78ZqIw9DjJ1sdRnkJTHr2reexTr8D1dHEe9W20BQFud7
-         uxBSdNQza/+6TrQNphfP33jMKfXs/yc9X5D1KaVfnPKXQGii4NE/iLzpWnHxdCxg+PfR
-         kcfqmrEmge7McjzQcnJCoNKYm/SCKiSs0l4h4zR2QrYn8IfMMmZ+/Zzc3J8tMmcy8/R2
-         FHRVsOoTHPioaC9+y8VDxI/vV5NKQazeQYrwd+kdIHGMEMBjO9GKILfMlmzjmvRIelR6
-         cmtOlbHqfkGwBtYu+u4HsWpM9MakVVGg0eLTnnrfmlVKyP15PQj7CWqwL4TRetqGWGB7
-         TOLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689498151; x=1692090151;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HrdUA5P1+t589TrebUiC2lW0ShZ+14JLZPgMTM8GsxI=;
-        b=KmXN/BxticgMVkdnHC815VyJ352ajLn2O4txtr7cu7QQcJz/cFm047uua8mPj6ke3e
-         p/papOJBtZy61zAiGpJxN07cab3QR8uDrOztOFhNQfLXcALlgxKYUIWijkGUqXZv1DmY
-         aDq6B+SWQOgFc8ejuAljNgvuLsolK5uDPUeUZs4XWEc1ElA5mCmzKCXU3tANqEo8U5mW
-         M8w209tXOCnjGfSuNcPgkD4oKJJLx64Lofmd5Y+p9m0o9gfY5WX0SgLy46L5YG6jmYpO
-         toDfqNggQgQQqiyLEY7z2jBTgKiv8Dzpd2XMlWuRxrFeX99r8gDz7s409BV4xfO1lF8r
-         5PtQ==
-X-Gm-Message-State: ABy/qLZGP5qtfpoVC8Ab/OupeaDh2Ht0J77hpq6NTx0HEEGwAXDXMJid
-	Tz8bEoIpqI1SWuJifQTc4OU=
-X-Google-Smtp-Source: APBJJlH61HQQgQ7O2iGO+dkeIj69YMi8lsSkjoffaLhYC9aeEgCD+XO9MLow3vD3oPbNJr1ENrgrnQ==
-X-Received: by 2002:a5d:4d8c:0:b0:314:91d:58b5 with SMTP id b12-20020a5d4d8c000000b00314091d58b5mr7858184wru.65.1689498150405;
-        Sun, 16 Jul 2023 02:02:30 -0700 (PDT)
-Received: from mmaatuq-HP-Laptop-15-dy2xxx.. ([2001:8f8:1163:535c:e1af:2d96:1960:a57d])
-        by smtp.gmail.com with ESMTPSA id y3-20020a056000108300b003141f96ed36sm15935903wrw.0.2023.07.16.02.02.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jul 2023 02:02:29 -0700 (PDT)
-From: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
-	Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
-Subject: [PATCH v2] selftests/net: replace manual array size calc with ARRAYSIZE macro.
-Date: Sun, 16 Jul 2023 13:02:00 +0400
-Message-Id: <20230716090200.1947107-1-mahmoudmatook.mm@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EBAEA1
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 09:16:43 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48175B3;
+	Sun, 16 Jul 2023 02:16:41 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36G72Ow8021300;
+	Sun, 16 Jul 2023 02:16:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=JMjcmj3GAtg0PbK9U+OmxFqsRl972SPwaIqe4QJyic8=;
+ b=Q0uhTG7LG8VFZOAdSXCOT4EFjKqv600oU4oUcOTSk4uBqIP+L07QLNd+iyYC/791DUxM
+ +uXspEZd/Xv98zPmswR/77cItg9V5Rt3BzPPDacYKAf70+h7EWiKAsbPJ2BjmEW+uOmF
+ ENPnpyg78hmi/k45A+b2gG0Ai436I1N+B4OB6ID2jSbZPlQwORY0XxY0lTO4kHEOgByS
+ gpF1pR2vX/gsCDIsN2JHllOXDg+RwEv03hu9COGN8SMJkqEr8AxVshfDPyFAM8DkFWOh
+ I0ThI9zCQ7q0JQrFjD5ch343nrHdEzV0uXPit1wF/C7VFKkcSeh3zhyLBvTnr/YBrhfM Zg== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rutygskkn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 16 Jul 2023 02:16:28 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 16 Jul
+ 2023 02:16:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 16 Jul 2023 02:16:26 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id F22F93F7040;
+	Sun, 16 Jul 2023 02:16:22 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <ndabilpuram@marvell.com>
+Subject: [net PATCH] octeontx2-af: Adjust Tx credits when MCS external bypass is disabled
+Date: Sun, 16 Jul 2023 14:46:21 +0530
+Message-ID: <20230716091621.27844-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Proofpoint-GUID: r6OVoxcOUsMtZbvD4hAYCdNH2ZdBmP8B
+X-Proofpoint-ORIG-GUID: r6OVoxcOUsMtZbvD4hAYCdNH2ZdBmP8B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-15_14,2023-07-13_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-fixes coccinelle WARNING: Use ARRAY_SIZE
+From: Nithin Dabilpuram <ndabilpuram@marvell.com>
 
-changelog since v1:
- - remove unnecessary extra new line
+When MCS external bypass is disabled, MCS returns additional
+2 credits(32B) for every packet Tx'ed on LMAC. To account for
+these extra credits, NIX_AF_TX_LINKX_NORM_CREDIT.CC_MCS_CNT
+needs to be configured as otherwise NIX Tx credits would overflow
+and will never be returned to idle state credit count
+causing issues with credit control and MTU change.
 
-changelog since v0:
- - update net/Makefile to include kselftest.h
- - remove redefinition of ARRAYSIZE.
+This patch fixes the same by configuring CC_MCS_CNT at probe
+time for MCS enabled SoC's
 
-Signed-off-by: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
+Fixes: bd69476e86fc ("octeontx2-af: cn10k: mcs: Install a default TCAM for normal traffic")
+Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
 ---
- tools/testing/selftests/net/Makefile          | 2 ++
- tools/testing/selftests/net/csum.c            | 6 ++----
- tools/testing/selftests/net/hwtstamp_config.c | 4 +---
- 3 files changed, 5 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h    |  2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mcs.c     | 12 ++++++++++++
+ drivers/net/ethernet/marvell/octeontx2/af/mcs.h     |  2 ++
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h     |  1 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c |  8 ++++++++
+ 5 files changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 7f3ab2a93ed6..a06cc25489f9 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -3,6 +3,8 @@
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index eba307eee2b2..d78d72c0ca18 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -1914,7 +1914,7 @@ struct mcs_hw_info {
+ 	u8 tcam_entries;	/* RX/TX Tcam entries per mcs block */
+ 	u8 secy_entries;	/* RX/TX SECY entries per mcs block */
+ 	u8 sc_entries;		/* RX/TX SC CAM entries per mcs block */
+-	u8 sa_entries;		/* PN table entries = SA entries */
++	u16 sa_entries;		/* PN table entries = SA entries */
+ 	u64 rsvd[16];
+ };
  
- CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
- CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
-+# Additional include paths needed by kselftest.h
-+CFLAGS += -I../
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
+index c43f19dfbd74..d6effbe46208 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
+@@ -1219,6 +1219,17 @@ struct mcs *mcs_get_pdata(int mcs_id)
+ 	return NULL;
+ }
  
- TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh netdevice.sh \
- 	      rtnetlink.sh xfrm_policy.sh test_blackhole_dev.sh
-diff --git a/tools/testing/selftests/net/csum.c b/tools/testing/selftests/net/csum.c
-index 702f34a9d506..90eb06fefa59 100644
---- a/tools/testing/selftests/net/csum.c
-+++ b/tools/testing/selftests/net/csum.c
-@@ -91,6 +91,8 @@
- #include <sys/types.h>
- #include <unistd.h>
- 
-+#include "kselftest.h"
++bool is_mcs_bypass(int mcs_id)
++{
++	struct mcs *mcs_dev;
 +
- static bool cfg_bad_csum;
- static int cfg_family = PF_INET6;
- static int cfg_num_pkt = 4;
-@@ -123,10 +125,6 @@ static struct sockaddr_in6 cfg_saddr6 = {.sin6_family = AF_INET6};
- #define MAX_HEADER_LEN	(sizeof(struct ipv6hdr) + ENC_HEADER_LEN + sizeof(struct tcphdr))
- #define MAX_PAYLOAD_LEN 1024
++	list_for_each_entry(mcs_dev, &mcs_list, mcs_list) {
++		if (mcs_dev->mcs_id == mcs_id)
++			return mcs_dev->bypass;
++	}
++	return true;
++}
++
+ void mcs_set_port_cfg(struct mcs *mcs, struct mcs_port_cfg_set_req *req)
+ {
+ 	u64 val = 0;
+@@ -1447,6 +1458,7 @@ static void mcs_set_external_bypass(struct mcs *mcs, u8 bypass)
+ 	else
+ 		val &= ~BIT_ULL(6);
+ 	mcs_reg_write(mcs, MCSX_MIL_GLOBAL, val);
++	mcs->bypass = bypass;
+ }
  
--#ifndef ARRAY_SIZE
--#define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
--#endif
--
- /* Trivial demo encap. Stand-in for transport layer protocols like ESP or PSP */
- struct udp_encap_hdr {
- 	uint8_t nexthdr;
-diff --git a/tools/testing/selftests/net/hwtstamp_config.c b/tools/testing/selftests/net/hwtstamp_config.c
-index 263cc1c34165..60970d98eb9b 100644
---- a/tools/testing/selftests/net/hwtstamp_config.c
-+++ b/tools/testing/selftests/net/hwtstamp_config.c
-@@ -16,9 +16,7 @@
- #include <linux/net_tstamp.h>
- #include <linux/sockios.h>
+ static void mcs_global_cfg(struct mcs *mcs)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs.h b/drivers/net/ethernet/marvell/octeontx2/af/mcs.h
+index 0f89dcb76465..ccd43c3f3460 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mcs.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs.h
+@@ -149,6 +149,7 @@ struct mcs {
+ 	u16			num_vec;
+ 	void			*rvu;
+ 	u16			*tx_sa_active;
++	u8                      bypass;
+ };
  
--#ifndef ARRAY_SIZE
--#define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
--#endif
-+#include "kselftest.h"
+ struct mcs_ops {
+@@ -206,6 +207,7 @@ void mcs_get_custom_tag_cfg(struct mcs *mcs, struct mcs_custom_tag_cfg_get_req *
+ int mcs_alloc_ctrlpktrule(struct rsrc_bmap *rsrc, u16 *pf_map, u16 offset, u16 pcifunc);
+ int mcs_free_ctrlpktrule(struct mcs *mcs, struct mcs_free_ctrl_pkt_rule_req *req);
+ int mcs_ctrlpktrule_write(struct mcs *mcs, struct mcs_ctrl_pkt_rule_write_req *req);
++bool is_mcs_bypass(int mcs_id);
  
- static int
- lookup_value(const char **names, int size, const char *name)
+ /* CN10K-B APIs */
+ void cn10kb_mcs_set_hw_capabilities(struct mcs *mcs);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index e8e65fd7888d..1efa77a368ee 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -343,6 +343,7 @@ struct nix_hw {
+ 	struct nix_txvlan txvlan;
+ 	struct nix_ipolicer *ipolicer;
+ 	u64    *tx_credits;
++	u64 cc_mcs_cnt;
+ };
+ 
+ /* RVU block's capabilities or functionality,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 04b0e885f9d2..63d6b6dbd8e6 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -12,6 +12,7 @@
+ #include "rvu_reg.h"
+ #include "rvu.h"
+ #include "npc.h"
++#include "mcs.h"
+ #include "cgx.h"
+ #include "lmac_common.h"
+ #include "rvu_npc_hash.h"
+@@ -4371,6 +4372,12 @@ static void nix_link_config(struct rvu *rvu, int blkaddr,
+ 			    SDP_HW_MAX_FRS << 16 | NIC_HW_MIN_FRS);
+ 	}
+ 
++	/* Get MCS external bypass status for CN10K-B */
++	if (mcs_get_blkcnt() == 1) {
++		/* Adjust for 2 credits when external bypass is disabled */
++		nix_hw->cc_mcs_cnt = is_mcs_bypass(0) ? 0 : 2;
++	}
++
+ 	/* Set credits for Tx links assuming max packet length allowed.
+ 	 * This will be reconfigured based on MTU set for PF/VF.
+ 	 */
+@@ -4394,6 +4401,7 @@ static void nix_link_config(struct rvu *rvu, int blkaddr,
+ 			tx_credits = (lmac_fifo_len - lmac_max_frs) / 16;
+ 			/* Enable credits and set credit pkt count to max allowed */
+ 			cfg =  (tx_credits << 12) | (0x1FF << 2) | BIT_ULL(1);
++			cfg |= (nix_hw->cc_mcs_cnt << 32);
+ 
+ 			link = iter + slink;
+ 			nix_hw->tx_credits[link] = tx_credits;
 -- 
-2.34.1
+2.25.1
 
 
