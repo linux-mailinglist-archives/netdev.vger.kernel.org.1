@@ -1,208 +1,109 @@
-Return-Path: <netdev+bounces-18113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31BA754E6E
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 13:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D15754E73
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 13:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B129A1C2094B
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 11:14:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7652F1C20946
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 11:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB3063DD;
-	Sun, 16 Jul 2023 11:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1106D24;
+	Sun, 16 Jul 2023 11:29:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9068828FE
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 11:14:14 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B2810DC;
-	Sun, 16 Jul 2023 04:14:12 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-31297125334so2075422f8f.0;
-        Sun, 16 Jul 2023 04:14:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689506051; x=1692098051;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fJQklSgRDtjW4Ode2wf7c9W28AbDdJShuTTGI9JAU1c=;
-        b=UpZN0iccvhUd7rjms9gLP2XYOL5s4+cwGUDBk+LwLhrTSOKstpHjtnRcgRNJwvdlSV
-         CQQNby0pCTD5sWkeN6vmCurMZaofunPd/NrhIX7gRHLyXNJVAx3kGtPUEHx9YLD8A4nK
-         h1sXg4TAkC8+oSpAbi92LhD0Dp9E061EsD9HQJUORe1DDvBBriid48mE2C965g/ebQ5V
-         RtPvvd7Fq/hLkLe5zpJDwVT3yrrhix1b7zQztvH0kwFNQwlU7c1Rf4wysl71ar5Y2Fqq
-         ZRNtwFlg+gP9Bl7AF2V5CKwwMGxjVyGf1vxNpQ74o9R/oAXKYVTyHMhheZNmcDRMnHuB
-         hxLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689506051; x=1692098051;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fJQklSgRDtjW4Ode2wf7c9W28AbDdJShuTTGI9JAU1c=;
-        b=id+GQXDnnKQcRNIAHw8oHPQ8awNvktF/zhuoWikAXrZvt1rUlKlvX160+V9uMAX6xg
-         5YRZkbvqcqINIArtIf2IAXBuaqlh/bhXgd8aO7729D9e3BrBIsDJdmsXQGSHtffEj54k
-         /fsffOYwKWBGAHPhicPxk6f4bLvs0ueyhWtiq3QeaNrp2AZs39Vuv5xXHdlLaCYd+XFf
-         AIyGpzoA6SMFPmB8c6VO1CHAWnDdoFLg7i2hXHiAip3xb0BOLagqfmSSc+wscuuad+bX
-         kWIBgKAlrTDd8hPkBJqi+XADDMrB7H/MG04LOhXFWTxL4cNw5w7jtO3oqhmGafUvlK1l
-         uLJw==
-X-Gm-Message-State: ABy/qLaiVOZM4Ij4nHdStzenJyi2Zv7ESKf0K58JTHwEcyitFjSI34Xg
-	6A+vRxGLen7y6gCsu9FqG2Q=
-X-Google-Smtp-Source: APBJJlH9e4hEEhLa09qFfmmnpo60zTix0naiAqzdGgAcqId8zWt2qeTcgtDRu/Kn/RCpSm9I2H/7Vg==
-X-Received: by 2002:a5d:6505:0:b0:314:98f:2495 with SMTP id x5-20020a5d6505000000b00314098f2495mr6397493wru.12.1689506050569;
-        Sun, 16 Jul 2023 04:14:10 -0700 (PDT)
-Received: from mmaatuq-HP-Laptop-15-dy2xxx.. ([2001:8f8:1163:535c:e1af:2d96:1960:a57d])
-        by smtp.gmail.com with ESMTPSA id k8-20020a5d5188000000b00314172ba213sm16028975wrv.108.2023.07.16.04.14.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jul 2023 04:14:10 -0700 (PDT)
-From: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
-	Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
-Subject: [PATCH v3] selftests/net: replace manual array size calc with ARRAYSIZE macro.
-Date: Sun, 16 Jul 2023 15:13:48 +0400
-Message-Id: <20230716111348.2036930-1-mahmoudmatook.mm@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB4F28F5
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 11:29:02 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7BBE52;
+	Sun, 16 Jul 2023 04:29:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=GOnYVx5YAK+ziErge/1x9HGyqYnguAw6jCerx1KHHb4=; b=lHQYkapWUxpmBZVezHRrXRy+HR
+	pn1BNgG2r6jVTEqLOhK18KRo/D9WG3nPHWJJUhuaHWR1UEdc+maI+AavFMkzfcxfxQQjaZBUxHuLq
+	GLCOKkIR1vYeBxwttP8yMFvjmqeRUnycRgiTXtIqdfVPVdAR+EdHxfk9md6cuwjM5SwdcOKGtan+I
+	+dtzOgPYIRQyjwKNoehOszgu8B8yAz+KV2UdNTjQJFaKw7/ok3MBVm3/e/32AId35uBuoAf/IplkL
+	RVKkjbrrSKBeBjdvhra+giB+TlkPxIf3AbrPi8VgM+Tob9QXq1K7BLnJytzo64UmqyLLwCcFnzPil
+	mIKAGnQw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1qKzvS-0032Ta-B6; Sun, 16 Jul 2023 11:28:30 +0000
+Date: Sun, 16 Jul 2023 12:28:30 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@linux.com>,
+	Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Rudi Heitbaum <rudi@heitbaum.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Wireless <linux-wireless@vger.kernel.org>
+Subject: Re: Fwd: mm/page_alloc.c:4453 with cfg80211_wiphy_work [cfg80211]
+Message-ID: <ZLPUXlR30DjNaWqO@casper.infradead.org>
+References: <51e53417-cfad-542c-54ee-0fb9e26c4a38@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51e53417-cfad-542c-54ee-0fb9e26c4a38@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-fixes coccinelle WARNING: Use ARRAY_SIZE
+On Sun, Jul 16, 2023 at 06:10:44PM +0700, Bagas Sanjaya wrote:
+> Hi,
+> 
+> I notice a regression report on Bugzilla [1]. Quoting from it:
 
-changelog since v2:
- - integrat a commit that contains actual replacement for ARRAY_SIZE.
- - use ARRAY_SIZE for net/psock_lib.h
+Maybe you could try doing some work on this bug before just spamming
+people with it?
 
-changelog since v1:
- - remove unnecessary extra new line
+        if (WARN_ON_ONCE_GFP(order > MAX_ORDER, gfp))
+                return NULL;
 
-changelog since v0:
- - update net/Makefile to include kselftest.h
- - remove redefinition of ARRAYSIZE.
+This is the page allocator telling the caller that they've asked for an
+unreasonably large allocation.
 
-Signed-off-by: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
----
- tools/testing/selftests/net/Makefile          | 2 ++
- tools/testing/selftests/net/csum.c            | 6 ++++--
- tools/testing/selftests/net/hwtstamp_config.c | 6 ++++--
- tools/testing/selftests/net/psock_lib.h       | 4 +++-
- 4 files changed, 13 insertions(+), 5 deletions(-)
+Now, this bug is actually interesting to the MM because the caller
+called kmalloc() with a ridiculous size.  Arguable kmalloc should
+protect callers from themselves (alloc_pages() is more low level
+and can presume its users know what they're doing).
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 7f3ab2a93ed6..a06cc25489f9 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -3,6 +3,8 @@
- 
- CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
- CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
-+# Additional include paths needed by kselftest.h
-+CFLAGS += -I../
- 
- TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh netdevice.sh \
- 	      rtnetlink.sh xfrm_policy.sh test_blackhole_dev.sh
-diff --git a/tools/testing/selftests/net/csum.c b/tools/testing/selftests/net/csum.c
-index 82a1c1839da6..90eb06fefa59 100644
---- a/tools/testing/selftests/net/csum.c
-+++ b/tools/testing/selftests/net/csum.c
-@@ -91,6 +91,8 @@
- #include <sys/types.h>
- #include <unistd.h>
- 
-+#include "kselftest.h"
-+
- static bool cfg_bad_csum;
- static int cfg_family = PF_INET6;
- static int cfg_num_pkt = 4;
-@@ -450,7 +452,7 @@ static void send_packet(int fd, const char *buf, int len)
- 	iov[2].iov_len = len;
- 
- 	msg.msg_iov = iov;
--	msg.msg_iovlen = sizeof(iov) / sizeof(iov[0]);
-+	msg.msg_iovlen = ARRAY_SIZE(iov);
- 
- 	msg.msg_name = &addr;
- 	msg.msg_namelen = sizeof(addr);
-@@ -505,7 +507,7 @@ static void __recv_prepare_packet_filter(int fd, int off_nexthdr, int off_dport)
- 	struct sock_fprog prog = {};
- 
- 	prog.filter = filter;
--	prog.len = sizeof(filter) / sizeof(struct sock_filter);
-+	prog.len = ARRAY_SIZE(filter);
- 	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &prog, sizeof(prog)))
- 		error(1, errno, "setsockopt filter");
- }
-diff --git a/tools/testing/selftests/net/hwtstamp_config.c b/tools/testing/selftests/net/hwtstamp_config.c
-index e1fdee841021..170728c96c46 100644
---- a/tools/testing/selftests/net/hwtstamp_config.c
-+++ b/tools/testing/selftests/net/hwtstamp_config.c
-@@ -16,6 +16,8 @@
- #include <linux/net_tstamp.h>
- #include <linux/sockios.h>
- 
-+#include "kselftest.h"
-+
- static int
- lookup_value(const char **names, int size, const char *name)
- {
-@@ -50,7 +52,7 @@ static const char *tx_types[] = {
- 	TX_TYPE(ONESTEP_SYNC)
- #undef TX_TYPE
- };
--#define N_TX_TYPES ((int)(sizeof(tx_types) / sizeof(tx_types[0])))
-+#define N_TX_TYPES ((int)(ARRAY_SIZE(tx_types)))
- 
- static const char *rx_filters[] = {
- #define RX_FILTER(name) [HWTSTAMP_FILTER_ ## name] = #name
-@@ -71,7 +73,7 @@ static const char *rx_filters[] = {
- 	RX_FILTER(PTP_V2_DELAY_REQ),
- #undef RX_FILTER
- };
--#define N_RX_FILTERS ((int)(sizeof(rx_filters) / sizeof(rx_filters[0])))
-+#define N_RX_FILTERS ((int)(ARRAY_SIZE(rx_filters)))
- 
- static void usage(void)
- {
-diff --git a/tools/testing/selftests/net/psock_lib.h b/tools/testing/selftests/net/psock_lib.h
-index faa884385c45..6e4fef560873 100644
---- a/tools/testing/selftests/net/psock_lib.h
-+++ b/tools/testing/selftests/net/psock_lib.h
-@@ -14,6 +14,8 @@
- #include <arpa/inet.h>
- #include <unistd.h>
- 
-+#include "kselftest.h"
-+
- #define DATA_LEN			100
- #define DATA_CHAR			'a'
- #define DATA_CHAR_1			'b'
-@@ -63,7 +65,7 @@ static __maybe_unused void pair_udp_setfilter(int fd)
- 	struct sock_fprog bpf_prog;
- 
- 	bpf_prog.filter = bpf_filter;
--	bpf_prog.len = sizeof(bpf_filter) / sizeof(struct sock_filter);
-+	bpf_prog.len = ARRAY_SIZE(bpf_filter);
- 
- 	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &bpf_prog,
- 		       sizeof(bpf_prog))) {
--- 
-2.34.1
+Vlastimil, what do you think?  Something like ...
+
++++ b/mm/slab_common.c
+@@ -1119,6 +1119,8 @@ static void *__kmalloc_large_node(size_t size, gfp_t flags, int node)
+        void *ptr = NULL;
+        unsigned int order = get_order(size);
+
++       if (order > MAX_ORDER)
++               return NULL;
+        if (unlikely(flags & GFP_SLAB_BUG_MASK))
+                flags = kmalloc_fix_flags(flags);
+
 
 
