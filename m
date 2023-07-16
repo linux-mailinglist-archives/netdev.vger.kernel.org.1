@@ -1,77 +1,87 @@
-Return-Path: <netdev+bounces-18131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A6A755464
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 22:29:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8DAD75574B
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 23:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C28B32812E1
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 20:29:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2C3E1C209B0
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 21:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9498F74;
-	Sun, 16 Jul 2023 20:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9348F7C;
+	Sun, 16 Jul 2023 21:09:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09A18F5B
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 20:29:53 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98432BC;
-	Sun, 16 Jul 2023 13:29:52 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-676cc97ca74so1090962b3a.1;
-        Sun, 16 Jul 2023 13:29:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBDB79C1
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 21:09:24 +0000 (UTC)
+Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF18DE56
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 14:09:22 -0700 (PDT)
+Received: by mail-vs1-xe29.google.com with SMTP id ada2fe7eead31-440d1ba5662so894079137.2
+        for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 14:09:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689539392; x=1690144192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iK9RtZ9Rm9JaCO7gLtL/lZtWWMLp1ISIMI/Ww2ye3bw=;
-        b=TBuKdBnQkQ0aj2HCakTY/yUXgSvInqs56ZVseMoTGdAwSVZhCAS7GM1Avc+bjipram
-         8I6wNUs9cvdEczfVJex4V2nqZWruHG0dEMlcw7uFKSIsD2uwC3RX+k2j5vykhnb3XwOL
-         QyG6PxMLYv2aPe7nH8vuUTpN7zLAx/cNINPF12MOh1kXiZVa2QrfU4tKsHEeIpceeneJ
-         +/H96UfOMtMSLCV6efDyKiUDLlgt+CN/IZc9ZOTiQ5lZb+VwodPblqpvOWQzRacgzB9m
-         1J0sWm7w2cpVoVD6EVGHSqFhQ5D305iEqEKtMbyMdj2b5S+7B9yh5iDCXd1P5tLDbiYR
-         V5xQ==
+        d=gmail.com; s=20221208; t=1689541761; x=1692133761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kPmeh74mbfvjyqs3+8cn756OjNU9G3nDoqAIifmkRso=;
+        b=QZkSHL8G2ZRtw5XdSQbQrOTLODnMrF4X9ITT5mS/aaZb3nST19V6VPQE9xtbr5BQYV
+         Bj7jYkofewrrZlkBhPJu69W3Y829aWSPOgRAqnVC36xqZoJP2yjJnezeZQy05y4215a2
+         +aw/WqWAtV0kIy1tGx2q6tOrAbO8LlOjGeJpizkqMIgnBIVwevioLKcw00/gUl0qHBa5
+         BWDozK4nebqBalefN/2OQKwQK9L/WNlFkHnoJRGjEOU2oh4tJa772CKZ61etP6VYI96Y
+         O0D0TPvvtGtQDJAXKY5izBM/lhBQS78megNE7/mCUWrFTJ20rYPKsFtKjV6KklXtUGOM
+         I5rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689539392; x=1690144192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iK9RtZ9Rm9JaCO7gLtL/lZtWWMLp1ISIMI/Ww2ye3bw=;
-        b=XDqtKoZtQO+Fx/4AZ5y9HS8rZo+7ya536Tx0nW7JJltQjN9cMQhAxcvrsnC7kYafQK
-         aSdXtcJ37R4SsOzdvPmN9TOqEn06unYQz6Y6LQFbx0r6+w5LbojgHKW16S/s3PaZ7t01
-         gZAHdQcm7AMY2pc+3YghG2UbQ4oB2+KeIGsI45jeUJ4l3kMHGepKG8nqPtfbcPsFHYL/
-         hqDZczrEBsrZmhTNcdn1hyomCG1LcKR99OlNBhR4HAndurE1hl0SmAF15eFDpTUscL6a
-         J+1WZVjh/Bc/t0g50bu/SqNuRcOS2tHwhTWLxsIue8pptobglCTd5mU+EzkYoiUdf+0+
-         0MiQ==
-X-Gm-Message-State: ABy/qLbGNExacO1RPgASybNjq5xLAMNXJOvk66PpfE5bjAK6qmHIIr9k
-	Km3jSoCocO73HvSoudp/iQDpeuV7AmE=
-X-Google-Smtp-Source: APBJJlGo4QWhLMdwkTNRGBxINBy9kxJFUsfhrAuSpGu+obMZNnwVdUWRGnFdUXrgMz4vvCBTbHhqrg==
-X-Received: by 2002:a17:903:32cf:b0:1b8:a469:53d8 with SMTP id i15-20020a17090332cf00b001b8a46953d8mr13833632plr.0.1689539391898;
-        Sun, 16 Jul 2023 13:29:51 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id a18-20020a1709027d9200b001ac7f583f72sm11307440plm.209.2023.07.16.13.29.50
+        d=1e100.net; s=20221208; t=1689541761; x=1692133761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kPmeh74mbfvjyqs3+8cn756OjNU9G3nDoqAIifmkRso=;
+        b=U6lGDYp07YNamh2BRf/lDKUil2CsdaqhnIVILruMLrOgFJsZEa/w8cC8FKd+Azin6h
+         KpxRLs1bzo5ZnThlrFmReYzXZz9nfHlelGCLg7NcmR5tsYb9nzMJUsgvH+ZO+E7VYPMo
+         suwbcVciAL/NbMfIdSgtUCbfZYHAjZpOjcCr9NU7F3aDgceza+aKfIDyPrbtP7iM3zy8
+         r2G+a9rAP4Xp5z124Zk/3K0RcMNIlCOYunpS4VULMhPaMck/VnOux8AtyTc48Cu2u0eZ
+         N7t2dVSVOuS5QqqlCSVdBWrFE2FBilKamM0lx7D2bzjmxbUAML+wVQzowdzMwzQlhfTW
+         wAXA==
+X-Gm-Message-State: ABy/qLZlxMTxkCcPDKYLnZRELbwKzyL494mjYr296aVm4t7VXOMpsXy4
+	L+ERTXXOrh/hASECuD2Z3CepbyYZdjxRLA==
+X-Google-Smtp-Source: APBJJlHrEqUkgb6GOcOLCIfTQy5XMVcnhvq6cr1wQN/LvObNoD9w6JVR//yE7rwxLXoMM/c/SI0J8Q==
+X-Received: by 2002:a67:bb04:0:b0:443:621e:d138 with SMTP id m4-20020a67bb04000000b00443621ed138mr3799081vsn.5.1689541761378;
+        Sun, 16 Jul 2023 14:09:21 -0700 (PDT)
+Received: from wsfd-netdev15.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id g5-20020a0cdf05000000b0062635bd22aesm4654745qvl.109.2023.07.16.14.09.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jul 2023 13:29:51 -0700 (PDT)
-Date: Sun, 16 Jul 2023 13:29:49 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Yangbo Lu <yangbo.lu@nxp.com>, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ptp: Explicitly include correct DT includes
-Message-ID: <ZLRTPcgYscAQgyRL@hoboy.vegasvil.org>
-References: <20230714174922.4063153-1-robh@kernel.org>
+        Sun, 16 Jul 2023 14:09:20 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	dev@openvswitch.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	Aaron Conole <aconole@redhat.com>
+Subject: [PATCH net-next 0/3] net: handle the exp removal problem with ovs upcall properly
+Date: Sun, 16 Jul 2023 17:09:16 -0400
+Message-Id: <cover.1689541664.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714174922.4063153-1-robh@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -79,17 +89,47 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 11:49:22AM -0600, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
+With the OVS upcall, the original ct in the skb will be dropped, and when
+the skb comes back from userspace it has to create a new ct again through
+nf_conntrack_in() in either OVS __ovs_ct_lookup() or TC tcf_ct_act().
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+However, the new ct will not be able to have the exp as the original ct
+has taken it away from the hash table in nf_ct_find_expectation(). This
+will cause some flow never to be matched, like:
+
+  'ip,ct_state=-trk,in_port=1 actions=ct(zone=1)'
+  'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=1)'
+  'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=2),normal'
+
+if the 2nd flow triggers the OVS upcall, the 3rd flow will never get
+matched.
+
+OVS conntrack works around this by adding its own exp lookup function to
+not remove the exp from the hash table and saving the exp and its master
+info to the flow keys instead of create a real ct. But this way doesn't
+work for TC act_ct.
+
+The patch 1/3 allows nf_ct_find_expectation() not to remove the exp from
+the hash table if tmpl is set with IPS_CONFIRMED when doing lookup. This
+allows both OVS conntrack and TC act_ct to have a simple and clear fix
+for this problem in the patch 2/3 and 3/3.
+
+Xin Long (3):
+  netfilter: allow exp not to be removed in nf_ct_find_expectation
+  net: sched: set IPS_CONFIRMED in tmpl status only when commit is set
+    in act_ct
+  openvswitch: set IPS_CONFIRMED in tmpl status only when commit is set
+    in conntrack
+
+ include/net/netfilter/nf_conntrack_expect.h |  2 +-
+ net/netfilter/nf_conntrack_core.c           |  2 +-
+ net/netfilter/nf_conntrack_expect.c         |  4 +-
+ net/netfilter/nft_ct.c                      |  2 +
+ net/openvswitch/conntrack.c                 | 78 +++------------------
+ net/sched/act_ct.c                          |  3 +-
+ 6 files changed, 18 insertions(+), 73 deletions(-)
+
+-- 
+2.39.1
+
 
