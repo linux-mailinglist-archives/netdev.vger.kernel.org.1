@@ -1,197 +1,152 @@
-Return-Path: <netdev+bounces-18128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53FC275510A
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 21:32:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29D97551C0
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 21:59:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F688280FDC
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 19:32:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 288911C209A1
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 19:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B861B8F6A;
-	Sun, 16 Jul 2023 19:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347EF8F74;
+	Sun, 16 Jul 2023 19:59:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC446748C
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 19:31:44 +0000 (UTC)
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A94A10DC;
-	Sun, 16 Jul 2023 12:31:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1689535899; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=bCHJXAWqFrlCz+zWKyqSzG341vQQAp7pBK/qvFxyE20HNC7LZ85wW8ZGCvYoDsdICH
-    tNquy81baeGXheSPbAY7WQqtjX0w8e642vbtewjm0cN909qaQ9715OnA7pyEVSFJzDA2
-    9GneudrGcTNd8pUUHJjgiNqqAzEQJyw7zjtfWKQ4BoN3vEKs26wFQ9VVdkfOemdJrzRw
-    UMka7YU9V1/cmbmlU9TN8lP9+eySErn3U7cOxwMojBwmK+i8CeSx3ni1OpbJsaUu8bZ7
-    UrW/L0UxiKDEHQWcZfLaZIwOiKwvfF4pjlmLq477iLp/gtVfG5iQ9CtjDM/U/9ThB7fn
-    XhCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1689535899;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=4qg+hm9Oc0pZlsRg2Xzy++2zgRMcEaGBSMIJv8sGLjE=;
-    b=T/s76tRn6iLKpCXn/8cVzTRjUZbRuR3wuZoqCE2O5fyMasNfTXRn1z/WIMUQ2AmfrL
-    Ilg/PqL6fNCy8OuABFKDSV9PaQS5HPklRUwEkLIgx2u8lQ27z+OSEKK1iVRXUT/eunc2
-    h4hxh9019LChG8qzjTmKeHqvqu8df7yGsWKgPwFf1csOLfAZlfexMaO8QWg10zzkwYRJ
-    TSYIT7p1qh/n8Epv32QDC+UVr8ils/P+Pr8RyWAFsjaHb0R6Be7Ksi5+R65qfjBJ9Cxc
-    ZSCOEeARy5L/EAp0+TdtIvn2VWv8IGPPJNRZZ+kSC+H6bOHtZx7pb1km8DZp9zowcFjX
-    xYcg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1689535899;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=4qg+hm9Oc0pZlsRg2Xzy++2zgRMcEaGBSMIJv8sGLjE=;
-    b=st4hjwgr8mlL/Tlt1lWz703eRv8JadvLC3JFGrBH2aHtTt96fU9NabSLaltVKPqd78
-    V+auYbhEye6vuRud7CTtQi5DuDjFwJPHGrrLDfVm2wIb42QXm+VvzHhpPA9yhU4uOpze
-    //bHJw3UqNE2CZMy8TKvcIl43DM2UQ3rDXVlxQWC6CArKyLL0R5w5p6CrdaBnkxQsPqf
-    vs8NNTPkwzfzW3vRcQD23Iv34/zgl/FAoS9s3UjWWlBVYroSH4+ganxtygmP1etVh7bZ
-    JWg4cA2VbnCCWIACecRB62PdHLW62POG1lpzjbmNY8S2h1nGs+zic5L7vdvD5OnU4cXM
-    gIrg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1689535899;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=4qg+hm9Oc0pZlsRg2Xzy++2zgRMcEaGBSMIJv8sGLjE=;
-    b=Jmo9YwFC8HXKdIVtm8fjWlwVqBL/7ierbp81dflpfGzP+Lhhn7CDl+EQGqxe0HWO8t
-    G3b8lmDtUW0TUAnmm1DA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USMYf18Ur0Ek+pO2hQdvn7YdKBgBg=="
-Received: from [IPV6:2a00:6020:4a8e:5000:24a3:79d0:f837:508e]
-    by smtp.strato.de (RZmta 49.6.0 AUTH)
-    with ESMTPSA id J16f43z6GJVcawm
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sun, 16 Jul 2023 21:31:38 +0200 (CEST)
-Message-ID: <c229e4ec-83f5-e720-80cf-2f880afb4d2d@hartkopp.net>
-Date: Sun, 16 Jul 2023 21:31:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48C38F70;
+	Sun, 16 Jul 2023 19:59:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A8D5C433C7;
+	Sun, 16 Jul 2023 19:59:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1689537585;
+	bh=CfvX07BV0hbFAZLUURjGpPig0lkEpFxstEfCfTwUF1Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=g7K3WX019gqubbnwpTe5iDaUNp9uzbIzuuBreihLfzMxUgGMDSkXInuHH2Z3qmKyn
+	 TN2Qj241XFnJDylz2zk+Ckd5LCT7PrOg0bq78/S1GlRxd94V1UVGmuuGwvm1umWHyn
+	 UvLavhBREuJg/HVOO3ZKZwP/n0CLIkwg6bncvBZs=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Christian Brauner <brauner@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	linux-sctp@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.4 119/800] sctp: add bpf_bypass_getsockopt proto callback
+Date: Sun, 16 Jul 2023 21:39:32 +0200
+Message-ID: <20230716194951.871294090@linuxfoundation.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230716194949.099592437@linuxfoundation.org>
+References: <20230716194949.099592437@linuxfoundation.org>
+User-Agent: quilt/0.67
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] can: bcm: Fix UAF in bcm_proc_show()
-To: YueHaibing <yuehaibing@huawei.com>, mkl@pengutronix.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, urs.thuermann@volkswagen.de
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230715092543.15548-1-yuehaibing@huawei.com>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20230715092543.15548-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello YueHaibing,
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
-thanks for the patch!
+[ Upstream commit 2598619e012cee5273a2821441b9a051ad931249 ]
 
-Indeed the proc entry can be removed as first action after lock_sock(). 
-Good catch!
+Implement ->bpf_bypass_getsockopt proto callback and filter out
+SCTP_SOCKOPT_PEELOFF, SCTP_SOCKOPT_PEELOFF_FLAGS and SCTP_SOCKOPT_CONNECTX3
+socket options from running eBPF hook on them.
 
-On 2023-07-15 11:25, YueHaibing wrote:
-> BUG: KASAN: slab-use-after-free in bcm_proc_show+0x969/0xa80
-> Read of size 8 at addr ffff888155846230 by task cat/7862
-> 
-> CPU: 1 PID: 7862 Comm: cat Not tainted 6.5.0-rc1-00153-gc8746099c197 #230
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> Call Trace:
->   <TASK>
->   dump_stack_lvl+0xd5/0x150
->   print_report+0xc1/0x5e0
->   kasan_report+0xba/0xf0
->   bcm_proc_show+0x969/0xa80
->   seq_read_iter+0x4f6/0x1260
->   seq_read+0x165/0x210
->   proc_reg_read+0x227/0x300
->   vfs_read+0x1d5/0x8d0
->   ksys_read+0x11e/0x240
->   do_syscall_64+0x35/0xb0
->   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> Allocated by task 7846:
->   kasan_save_stack+0x1e/0x40
->   kasan_set_track+0x21/0x30
->   __kasan_kmalloc+0x9e/0xa0
->   bcm_sendmsg+0x264b/0x44e0
->   sock_sendmsg+0xda/0x180
->   ____sys_sendmsg+0x735/0x920
->   ___sys_sendmsg+0x11d/0x1b0
->   __sys_sendmsg+0xfa/0x1d0
->   do_syscall_64+0x35/0xb0
->   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> Freed by task 7846:
->   kasan_save_stack+0x1e/0x40
->   kasan_set_track+0x21/0x30
->   kasan_save_free_info+0x27/0x40
->   ____kasan_slab_free+0x161/0x1c0
->   slab_free_freelist_hook+0x119/0x220
->   __kmem_cache_free+0xb4/0x2e0
->   rcu_core+0x809/0x1bd0
-> 
-> bcm_op is freed before procfs entry be removed in bcm_release(),
-> this lead to bcm_proc_show() may read the freed bcm_op.
-> 
-> Fixes: ffd980f976e7 ("[CAN]: Add broadcast manager (bcm) protocol")
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+SCTP_SOCKOPT_PEELOFF and SCTP_SOCKOPT_PEELOFF_FLAGS options do fd_install(),
+and if BPF_CGROUP_RUN_PROG_GETSOCKOPT hook returns an error after success of
+the original handler sctp_getsockopt(...), userspace will receive an error
+from getsockopt syscall and will be not aware that fd was successfully
+installed into a fdtable.
 
-Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
-Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
+As pointed by Marcelo Ricardo Leitner it seems reasonable to skip
+bpf getsockopt hook for SCTP_SOCKOPT_CONNECTX3 sockopt too.
+Because internaly, it triggers connect() and if error is masked
+then userspace will be confused.
 
-Many thanks!
+This patch was born as a result of discussion around a new SCM_PIDFD interface:
+https://lore.kernel.org/all/20230413133355.350571-3-aleksandr.mikhalitsyn@canonical.com/
 
-Oliver
+Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Stanislav Fomichev <sdf@google.com>
+Cc: Neil Horman <nhorman@tuxdriver.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: linux-sctp@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Suggested-by: Stanislav Fomichev <sdf@google.com>
+Acked-by: Stanislav Fomichev <sdf@google.com>
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Acked-by: Xin Long <lucien.xin@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/sctp/socket.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-> ---
->   net/can/bcm.c | 12 ++++++------
->   1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/can/bcm.c b/net/can/bcm.c
-> index 9ba35685b043..9168114fc87f 100644
-> --- a/net/can/bcm.c
-> +++ b/net/can/bcm.c
-> @@ -1526,6 +1526,12 @@ static int bcm_release(struct socket *sock)
->   
->   	lock_sock(sk);
->   
-> +#if IS_ENABLED(CONFIG_PROC_FS)
-> +	/* remove procfs entry */
-> +	if (net->can.bcmproc_dir && bo->bcm_proc_read)
-> +		remove_proc_entry(bo->procname, net->can.bcmproc_dir);
-> +#endif /* CONFIG_PROC_FS */
-> +
->   	list_for_each_entry_safe(op, next, &bo->tx_ops, list)
->   		bcm_remove_op(op);
->   
-> @@ -1561,12 +1567,6 @@ static int bcm_release(struct socket *sock)
->   	list_for_each_entry_safe(op, next, &bo->rx_ops, list)
->   		bcm_remove_op(op);
->   
-> -#if IS_ENABLED(CONFIG_PROC_FS)
-> -	/* remove procfs entry */
-> -	if (net->can.bcmproc_dir && bo->bcm_proc_read)
-> -		remove_proc_entry(bo->procname, net->can.bcmproc_dir);
-> -#endif /* CONFIG_PROC_FS */
-> -
->   	/* remove device reference */
->   	if (bo->bound) {
->   		bo->bound   = 0;
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index cda8c2874691d..a68e1d541b128 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -8281,6 +8281,22 @@ static int sctp_getsockopt(struct sock *sk, int level, int optname,
+ 	return retval;
+ }
+ 
++static bool sctp_bpf_bypass_getsockopt(int level, int optname)
++{
++	if (level == SOL_SCTP) {
++		switch (optname) {
++		case SCTP_SOCKOPT_PEELOFF:
++		case SCTP_SOCKOPT_PEELOFF_FLAGS:
++		case SCTP_SOCKOPT_CONNECTX3:
++			return true;
++		default:
++			return false;
++		}
++	}
++
++	return false;
++}
++
+ static int sctp_hash(struct sock *sk)
+ {
+ 	/* STUB */
+@@ -9650,6 +9666,7 @@ struct proto sctp_prot = {
+ 	.shutdown    =	sctp_shutdown,
+ 	.setsockopt  =	sctp_setsockopt,
+ 	.getsockopt  =	sctp_getsockopt,
++	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
+ 	.sendmsg     =	sctp_sendmsg,
+ 	.recvmsg     =	sctp_recvmsg,
+ 	.bind        =	sctp_bind,
+@@ -9705,6 +9722,7 @@ struct proto sctpv6_prot = {
+ 	.shutdown	= sctp_shutdown,
+ 	.setsockopt	= sctp_setsockopt,
+ 	.getsockopt	= sctp_getsockopt,
++	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
+ 	.sendmsg	= sctp_sendmsg,
+ 	.recvmsg	= sctp_recvmsg,
+ 	.bind		= sctp_bind,
+-- 
+2.39.2
+
+
+
 
