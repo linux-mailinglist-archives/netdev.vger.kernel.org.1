@@ -1,181 +1,152 @@
-Return-Path: <netdev+bounces-18110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C58D754E60
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 12:55:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A82E5754E67
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 12:58:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF4B1C2093A
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 10:55:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6537C281373
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 10:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0441763AD;
-	Sun, 16 Jul 2023 10:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816F063BB;
+	Sun, 16 Jul 2023 10:58:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED495EA1
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 10:55:32 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92403E6B
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 03:55:30 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fb8574a3a1so5441759e87.1
-        for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 03:55:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738D1EA1
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 10:58:29 +0000 (UTC)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C6010FE
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 03:58:27 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b703cbfaf5so49952461fa.1
+        for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 03:58:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shruggie-ro.20221208.gappssmtp.com; s=20221208; t=1689504929; x=1692096929;
+        d=shruggie-ro.20221208.gappssmtp.com; s=20221208; t=1689505105; x=1692097105;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QRj53D+WEUxtTgjHcIaXf65gwyPY5iEFP7btFKZGgIc=;
-        b=4pHEL2Xx5puQ4s3Dkya4+HhyaxO5Tyv6Wd6IYWZhc+1YQ7yrMmWyQCtlgIusCUtQUL
-         0R+qP/XqfIt5dE/xpd9CNLjO1MzxhAWkqDB0/tMmoSBbDsxDKIqHVDmyZMOeebF47xWc
-         7rUm4vh5mcqQ8LlxxflJknwLp/4tgh0X2QYAQbnKP0BvXfXdHety4EBJZvC3+EXoVwJs
-         /n2s7f6ayjaIU4fbvntRGnye/ztsP20/VgtYLbqjN2FeYOgnn2ZZkp+eDRBB2C4c0wuN
-         cy1irghnE7YTUe7H1a+HSkbNHPGNxDP3JoyvArPc4lBjAw+tx15WbZNsLFEb48gUUDhn
-         rDLQ==
+        bh=CCbanyjPWw7wg8GH0dN5PyTlb5CiuUWTxnicJQNXHbM=;
+        b=aLW6VFWlrPWXxOJUYy3beiUVjpzMtIgYfqwQ9bp7pv72xkICLAzYV6/caCMKC/WXYW
+         Gpkgz9MMTSQ9iBjhTh0EgTgx92vPVcytU5DSdxeqwqPnOzzbxvlQPXQJ8E/Zdcw2zIgH
+         GwPwc51VpsziJigC+OGt9fzWmimAnEUpKp/qvUz6bu/TMsd03pOZ7isQS335fawiHsK2
+         lTKUBwZP7WEDQwIhgUK0t/VOiTDC6TfOIFcDrb86METzeAFuhqOOMUY5zpG3Zk3hh6Q4
+         2vDHRo/kac+paLlvrEWrMw2XT4qFmT4Op0oCfBjaEUXU0wVAcEhWANl2SZ7JkbfDuwS0
+         2WDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689504929; x=1692096929;
+        d=1e100.net; s=20221208; t=1689505105; x=1692097105;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QRj53D+WEUxtTgjHcIaXf65gwyPY5iEFP7btFKZGgIc=;
-        b=F9zZZNypStPLmTJe4lp8hsaFjaYnDjbztQQBgVb1j4XuGfOWRNbDjsSwwi3s1DjTe+
-         F2fwUh7A1rdV5gihDNO5omzFKkCYMPgC3I0KcG1V8lEU1SEF1tijtrRiamHPMwW789dU
-         +I96SwH7tDtPH/sRzOAd3e6RH9R5iGyJF0vKnTnnWDSzGLnDuNyJYRBb2ZwjXk8yETA8
-         RG+AEphTUIigoblb2pI2fLckUYfWTCjh0Pmvx2y/PZWEOuq8awgvPhf1mrB5jhsl3D52
-         oI4PCDxnZLxXYGJhh6gAY1d3cS3ARlMBSuNMOEWvSxwebVQfvWzpQRdgsjylIL7arBFx
-         1UKg==
-X-Gm-Message-State: ABy/qLbwHCtNLKKM+ev7te6AwrLpB+K60Bv+1oO9gdGSc3cUfgyMR40r
-	9ru74q18njPa/NiLjL8s7LTXfgyr1/8unvmEfRZgsA==
-X-Google-Smtp-Source: APBJJlEtKjyj1HRwslkInMcIb9BW4D5pjbaZP9j2e2vxft1FXh+0BE1rn9hvBIYPbbIfCZzWwNvBs+A0GGFQ2QgjC8Q=
-X-Received: by 2002:a05:6512:3995:b0:4fb:c881:be5b with SMTP id
- j21-20020a056512399500b004fbc881be5bmr6793976lfu.2.1689504928722; Sun, 16 Jul
- 2023 03:55:28 -0700 (PDT)
+        bh=CCbanyjPWw7wg8GH0dN5PyTlb5CiuUWTxnicJQNXHbM=;
+        b=a/CLVGaJ6HTMCcznUxJvr/HfJZwWkcmVRK3O3tqf9F8qynRcUwG17Oxre/TJn1dqGf
+         Q3cYqTL+gOnN1bT4SWnvL4iog8q7MonBvxxL5Y5aTAahYHxoAvpM9DuxcZZaf3xJ/vjM
+         HzqvpSWO0GBeGnOapCl1evyAiwNb95RJbxpKjBMPAkgPlYr0bOvQk5Z706RpeBOkc4Es
+         aWpzVC/+fgOTwh1u5WTURTGFvIir2kha31TkIbH9+dUdeUzOaCYLFchEPAMlvNw8PjEq
+         sgkCLirn69cq2IuaSP/SR7DYNlnwb71yQbspbKj3PUaTkWwYGpdLGE+6unIsciNPbZS7
+         rChA==
+X-Gm-Message-State: ABy/qLaM1ZT+E9aUokcFhYv8m0Q9SafPkhyVrTa77gwKPLvVxG83CJXF
+	YpggVKFiIADSYAdpagnDNpVMDbj6TpKxufGbf1eaPA==
+X-Google-Smtp-Source: APBJJlG9KY0nqgKStS8Cj/QJYv2YnwextwQh6Qp0TTrsVN7UOiV7VRzjd+KhTjuBY7aqgmuxUOzxihVATqd0G4robx4=
+X-Received: by 2002:a2e:868a:0:b0:2b6:9ab8:9031 with SMTP id
+ l10-20020a2e868a000000b002b69ab89031mr6640280lji.16.1689505105319; Sun, 16
+ Jul 2023 03:58:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230713202123.231445-1-alex@shruggie.ro> <20230713202123.231445-2-alex@shruggie.ro>
- <20230714172444.GA4003281-robh@kernel.org>
-In-Reply-To: <20230714172444.GA4003281-robh@kernel.org>
+References: <20230713202123.231445-1-alex@shruggie.ro> <cad1d05d-acdd-454b-a9f8-06262cf8495b@lunn.ch>
+ <CAH3L5QrtFwTqqFKjPrMFCz4JgUWOFWFUJXpN71Gyprcd33A7hg@mail.gmail.com> <ab0ca942-5e84-4663-a0ed-689f023624b6@lunn.ch>
+In-Reply-To: <ab0ca942-5e84-4663-a0ed-689f023624b6@lunn.ch>
 From: Alexandru Ardelean <alex@shruggie.ro>
-Date: Sun, 16 Jul 2023 13:55:17 +0300
-Message-ID: <CAH3L5Qoj+sue=QnR2Lp12x3Hz2t2BNnarZHJiqxL3Gtf6M=bsA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: phy: vsc8531: document
- 'vsc8531,clkout-freq-mhz' property
-To: Rob Herring <robh@kernel.org>
+Date: Sun, 16 Jul 2023 13:58:14 +0300
+Message-ID: <CAH3L5QoyOnbLG=pegiAFj0kPkp-mC9edCewxq3OBdGE75+1Jhg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2 net-next] net: phy: mscc: add support for CLKOUT
+ ctrl reg for VSC8531 and similar
+To: Andrew Lunn <andrew@lunn.ch>
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, 
-	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, hkallweit1@gmail.com, 
 	linux@armlinux.org.uk, olteanv@gmail.com, marius.muresan@mxt.ro
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 8:24=E2=80=AFPM Rob Herring <robh@kernel.org> wrote=
-:
+On Sat, Jul 15, 2023 at 1:27=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Thu, Jul 13, 2023 at 11:21:23PM +0300, Alexandru Ardelean wrote:
-> > For VSC8351 and similar PHYs, a new property was added to generate a cl=
-ock
-> > signal on the CLKOUT pin.
->
-> Sorry, didn't think about it on v1, but I would imagine other vendors'
-> PHYs have similar functionality. We should have something common. We
-> have the clock binding for clocks already, so we should consider if
-> that should be used here. It may look like an overkill for what you
-> need, but things always start out that way. What if you want to turn the
-> clock on and off as well?
+> On Fri, Jul 14, 2023 at 09:09:14AM +0300, Alexandru Ardelean wrote:
+> > On Thu, Jul 13, 2023 at 11:35=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> w=
+rote:
+> > >
+> > > > +set_reg:
+> > > > +     mutex_lock(&phydev->lock);
+> > > > +     rc =3D phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_GPIO,
+> > > > +                           VSC8531_CLKOUT_CNTL, mask, set);
+> > > > +     mutex_unlock(&phydev->lock);
+> > >
+> > > What is this mutex protecting?
+> >
+> > This was inspired by vsc85xx_edge_rate_cntl_set().
+> > Which has the same format.
 
-So, there's the adin.c PHY driver which has a similar functionality
-with the adin_config_clk_out().
-Something in the micrel.c PHY driver (with
-micrel,rmii-reference-clock-select-25-mhz); hopefully I did not
-misread the code about that one.
-And the at803x.c PHY driver has a 'qca,clk-out-frequency' property too.
-
-Now with the mscc.c driver, there is a common-ality that could use a framew=
-ork.
-
-@Rob are you suggesting something like registering a clock provider
-(somewhere in the PHY framework) and let the PHY drivers use it?
-Usually, these clock signals (once enabled on startup), don't get
-turned off; but I've worked mostly on reference designs; somewhere
-down the line some people get different requirements.
-These clocks get connected back to the MAC (usually), and are usually
-like a "fixed-clock" driver.
-In our case, turning off the clock would be needed if the PHY
-negotiates a non-gigabit link; i.e 100 or 10 Mbps; in that case, the
-CLKOUT signal is not needed and it can be turned off.
-
-Maybe start out with a hook in 'struct phy_driver'?
-Like "int (*config_clk_out)(struct phy_device *dev);" or something?
-And underneath, this delegates to the CLK framework?
-
-I'd let Andrew (or someone in netdev) have a final feedback here.
-
-I can (probably) try to allocate some time to do this change based on
-the MSCC driver in the next weeks, if there's a consensus.
-
-Thanks
-Alex
+Good news.
+Removing this mutex works on a 5.10 kernel, with no issues.
 
 >
-> > This change documents the change in the device-tree bindings doc.
+> phy_modify_paged() locks the MDIO bus while it swaps the page, so
+> nothing else can use it. That also protects the read/modify/write.
 >
-> That's obvious.
+> Nothing is modifying phydev, so the lock is not needed for that
+> either.
+
+I remembered what I was doing wrong in that version that had issues
+with the lock.
+I was doing some manual page changes, with
+phy_base_read/()phy_base_write() functions, which are in this file.
+
+These functions have a warning + dump_stack() for when the
+"phydev->mdio.bus->mdio_lock" is not held).
+That threw me off initially.
+
 >
-> >
-> > Signed-off-by: Alexandru Ardelean <alex@shruggie.ro>
-> > ---
-> >
-> > Changelog v1 -> v2:
-> > * https://lore.kernel.org/netdev/20230706081554.1616839-2-alex@shruggie=
-.ro/
-> > * changed property name 'vsc8531,clkout-freq-mhz' -> 'mscc,clkout-freq-=
-mhz'
-> >   as requested by Rob
-> > * added 'net-next' tag as requested by Andrew
-> >
-> >  Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt=
- b/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
-> > index 0a3647fe331b..085d0e8a834e 100644
-> > --- a/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
-> > +++ b/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
-> > @@ -31,6 +31,10 @@ Optional properties:
-> >                         VSC8531_LINK_100_ACTIVITY (2),
-> >                         VSC8531_LINK_ACTIVITY (0) and
-> >                         VSC8531_DUPLEX_COLLISION (8).
-> > +- mscc,clkout-freq-mhz       : For VSC8531 and similar PHYs, this will=
- output
-> > +                       a clock signal on the CLKOUT pin of the chip.
-> > +                       The supported values are 25, 50 & 125 Mhz.
-> > +                       Default value is no clock signal on the CLKOUT =
-pin.
-> >  - load-save-gpios    : GPIO used for the load/save operation of the PT=
-P
-> >                         hardware clock (PHC).
-> >
-> > @@ -69,5 +73,6 @@ Example:
-> >                  vsc8531,edge-slowdown        =3D <7>;
-> >                  vsc8531,led-0-mode   =3D <VSC8531_LINK_1000_ACTIVITY>;
-> >                  vsc8531,led-1-mode   =3D <VSC8531_LINK_100_ACTIVITY>;
-> > +                mscc,clkout-freq-mhz =3D <50>;
-> >               load-save-gpios         =3D <&gpio 10 GPIO_ACTIVE_HIGH>;
-> >          };
-> > --
-> > 2.41.0
-> >
+> > I'll re-test with this lock removed.
+> > I may be misremembering (or maybe I did something silly at some
+> > point), but there was a weird stack-trace warning before adding this
+> > lock there.
+> > This was with a 5.10.116 kernel version.
+>
+> This patch is for net-next, please test there.
+
+I've been testing on a Renesas board CIP project.
+Kernel version (on our board is actually 5.10.83 ; I get them confused
+since 5.10.xxx seems to be used here-n-there).
+
+The kernel is here:
+https://github.com/renesas-rz/rz_linux-cip/tree/rz-5.10-cip3
+
+I'm trying to backport some ARCH patches, so that the board boots up.
+I "think" I'm half way there; now the kernel prints something to
+console and then stops (that's progress from no prints).
+
+Let's see if we get a different consensus on Rob't suggestion; this
+patch may require a different V3 :)
+
+
+
+>
+> When testing for locking issues, and when doing development in
+> general, it is a good idea to turn on CONFIG_PROVE_LOCKING and
+> CONFIG_DEBUG_ATOMIC_SLEEP.
+>
+>         Andrew
 
