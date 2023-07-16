@@ -1,53 +1,48 @@
-Return-Path: <netdev+bounces-18115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A4D754F0E
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 16:44:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47E38754F16
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 16:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9EBB281446
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 14:44:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E60492813E5
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 14:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F217483;
-	Sun, 16 Jul 2023 14:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F847483;
+	Sun, 16 Jul 2023 14:48:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFEF747F
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 14:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1FDEA1
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 14:48:58 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A2CFA;
-	Sun, 16 Jul 2023 07:44:51 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BFE1B4;
+	Sun, 16 Jul 2023 07:48:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SVZM4PFndxxCcq66T7tUspDKRLmLt+kbA9O41zp70/o=; b=oGDUJcA4aEU6/rxu5VxEYiuq4Z
-	QeF7R8Cy24XDCcxbvD+5MahvthcCdw0eFFVBWBjalgoZ03jiQr4QKLyicPSb6jk4TWOMR2nUrgh8H
-	r01JYDQ2KDY53FH1ldTxyeHoc+N6gnMxp6iPiNNyjNILD5F0CZNTKeLjyFGqT22w6RiY=;
+	bh=CbkBfBpRSVPwxZYI1N0yM4KwsV8EQ6xyHl2iM6/2ntI=; b=TMLieLbhW0t0Z1awveZlk+5D7I
+	1RtPurTJ7fjdBrDbH6oHnWblypFpg/IffzJEPdlsqhcQhC7vFu5uCLO4eLaRrMu9xEPrRXSYPrPNV
+	xQ9Bo1DRWz6r7u5l4hcBSBrvnzNVK2kPaC2VTDCzqW8D31w11xJQmCC9nR3mlhgR+BpU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qL2zI-001U0x-2c; Sun, 16 Jul 2023 16:44:40 +0200
-Date: Sun, 16 Jul 2023 16:44:40 +0200
+	id 1qL33F-001U24-TI; Sun, 16 Jul 2023 16:48:45 +0200
+Date: Sun, 16 Jul 2023 16:48:45 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Alexandru Ardelean <alex@shruggie.ro>
-Cc: Rob Herring <robh@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	olteanv@gmail.com, marius.muresan@mxt.ro
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: phy: vsc8531: document
- 'vsc8531,clkout-freq-mhz' property
-Message-ID: <7fa2d457-4ae9-42f5-be73-80549aae558c@lunn.ch>
-References: <20230713202123.231445-1-alex@shruggie.ro>
- <20230713202123.231445-2-alex@shruggie.ro>
- <20230714172444.GA4003281-robh@kernel.org>
- <CAH3L5Qoj+sue=QnR2Lp12x3Hz2t2BNnarZHJiqxL3Gtf6M=bsA@mail.gmail.com>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/6] net: phy: at803x: remove qca8081 1G fast retrain
+ and slave seed config
+Message-ID: <8d2dd95b-13f7-41d8-997f-d5c2953dcb06@lunn.ch>
+References: <20230716084924.9714-1-quic_luoj@quicinc.com>
+ <20230716084924.9714-6-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +51,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAH3L5Qoj+sue=QnR2Lp12x3Hz2t2BNnarZHJiqxL3Gtf6M=bsA@mail.gmail.com>
+In-Reply-To: <20230716084924.9714-6-quic_luoj@quicinc.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -64,51 +59,16 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> So, there's the adin.c PHY driver which has a similar functionality
-> with the adin_config_clk_out().
-> Something in the micrel.c PHY driver (with
-> micrel,rmii-reference-clock-select-25-mhz); hopefully I did not
-> misread the code about that one.
-> And the at803x.c PHY driver has a 'qca,clk-out-frequency' property too.
+On Sun, Jul 16, 2023 at 04:49:23PM +0800, Luo Jie wrote:
+> The fast retrain and slave seed configs are only applicable when the 2.5G
+> ability is supported.
 > 
-> Now with the mscc.c driver, there is a common-ality that could use a framework.
-> 
-> @Rob are you suggesting something like registering a clock provider
-> (somewhere in the PHY framework) and let the PHY drivers use it?
-> Usually, these clock signals (once enabled on startup), don't get
-> turned off; but I've worked mostly on reference designs; somewhere
-> down the line some people get different requirements.
-> These clocks get connected back to the MAC (usually), and are usually
-> like a "fixed-clock" driver.
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 
-They are not necessarily fixed clocks. The clock you are adding here
-has three frequencies. Two frequencies is common for PHY devices. So
-you need to use something more than clk-fixed-rate.c. Also, mostly
-PHYs allows the clock to be gated.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> In our case, turning off the clock would be needed if the PHY
-> negotiates a non-gigabit link; i.e 100 or 10 Mbps; in that case, the
-> CLKOUT signal is not needed and it can be turned off.
+FYI: You normally have Signed-off-by: last. No need to resend, but
+please keep this in mind for the next patchset.
 
-Who does not need it? The PHY, or the MAC? If it is the MAC, it should
-really be the MAC driver which uses the common clock API to turn it
-off. Just watch out for deadlocks with phydev->lock.
-
-> Maybe start out with a hook in 'struct phy_driver'?
-> Like "int (*config_clk_out)(struct phy_device *dev);" or something?
-> And underneath, this delegates to the CLK framework?
-
-Yes, have phy_device.c implement that registration/unregister of the
-clock, deal with locking, and call into the PHY driver to actually
-manipulate the clock. You missed the requested frequency in the
-function prototype. I would also call it refclk. Three is sometimes
-confusion about the different clocks.
-
-Traditionally, clk_enable() can be called in atomic context, but that
-is not allowed with phylib, it always assume thread context. I don't
-know if the clock framework has some helpers for that, but i also
-don't see there being a real need for MAC to enable the clock in
-atomic context.
-
-	Andrew
+    Andrew
 
