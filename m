@@ -1,108 +1,234 @@
-Return-Path: <netdev+bounces-18117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3840754F22
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 16:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE27754FFA
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 19:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20CEB1C2094B
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 14:59:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C9271C209AD
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 17:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E467848C;
-	Sun, 16 Jul 2023 14:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03E78C0A;
+	Sun, 16 Jul 2023 17:03:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238BB63D1
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 14:59:32 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC691B7
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 07:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=hDT0AFQ9RwSzks8zRpKekZUactN+gmOF61fTYC5WvDs=; b=Yg
-	sYhpACB0H+vyD7abljklBbI/G/UoU5cxoUVSsxfyYlqeXZYMsv0sdkdQ9yPrmoumCv3SnWGV9dpIq
-	jBiQ3cqCjnk85InU+AQzflrRfHhVJRHX9TNX/7RXN4ZPCKQPJFseo8JnuTYDd8AMrc1Vz+3qgfH3D
-	0OUPZWRhvRQSB7k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qL3DK-001UEz-Gl; Sun, 16 Jul 2023 16:59:10 +0200
-Date: Sun, 16 Jul 2023 16:59:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Feiyang Chen <chris.chenfeiyang@gmail.com>,
-	Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com,
-	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, chenhuacai@loongson.cn, dongbiao@loongson.cn,
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev
-Subject: Re: [RFC PATCH 00/10] net: phy/stmmac: Add Loongson platform support
-Message-ID: <bf0299ea-93d2-43e0-be9f-2d8786678b9a@lunn.ch>
-References: <cover.1689215889.git.chenfeiyang@loongson.cn>
- <2e10d9d1-e963-41fe-b55b-8c19c9c88bd5@lunn.ch>
- <CACWXhKkUJCFV8DKeAOGPQCfkn8mBhZvBJBMM8SYVgVKY8JEyRw@mail.gmail.com>
- <ZLEJq1G5+7I+FsPo@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E227AEA0
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 17:03:29 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82CDB10C1
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 10:03:26 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qL58u-0006CV-5l; Sun, 16 Jul 2023 19:02:44 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 1B66C1F1E34;
+	Sun, 16 Jul 2023 17:02:35 +0000 (UTC)
+Date: Sun, 16 Jul 2023 19:02:33 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Rob Herring <robh@kernel.org>
+Cc: Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Cla udiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	George McCollister <george.mccollister@gmail.com>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+	Li Yang <leoyang.li@nxp.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Douglas Miller <dougmill@linux.ibm.com>,
+	Marcin Wojtas <mw@semihalf.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Tara s Chornyi <taras.chornyi@plvision.eu>,
+	Mirko Lindner <mlindner@marvell.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Timur Tabi <timur@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Steve Glendinning <steve.glendinning@shawell.net>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Vinod Ko ul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Kevin Brace <kevinbrace@bracecomputerlab.com>,
+	Francois Romieu <romieu@fr.zoreil.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Alex Elder <elder@kernel.org>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Pouille r <jerome.pouiller@silabs.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	devicetree@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-amlogic@lists.infradead.org, linux-oxnas@groups.io,
+	linux-tegra@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-wpan@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+	wcn36xx@lists.infradead.org
+Subject: Re: [PATCH] net: Explicitly include correct DT includes
+Message-ID: <20230716-stout-grudging-1f91d771de85-mkl@pengutronix.de>
+References: <20230714174809.4060885-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="g5fw27woy7qbit6d"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZLEJq1G5+7I+FsPo@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230714174809.4060885-1-robh@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 09:39:07AM +0100, Russell King (Oracle) wrote:
-> On Fri, Jul 14, 2023 at 10:16:07AM +0800, Feiyang Chen wrote:
-> > On Thu, Jul 13, 2023 at 12:09 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> > >
-> > > On Thu, Jul 13, 2023 at 10:46:52AM +0800, Feiyang Chen wrote:
-> > > > Add driver for Loongson PHY. Extend stmmac functions and macros for
-> > > > Loongson DWMAC. Add LS7A support for dwmac_loongson.
-> > >
-> > > Why is this RFC? What do you actually want comment on?
-> > >
-> > 
-> > Hi, Andrew,
-> > 
-> > I marked this patch series as an RFC because I believe it involves
-> > significant changes to the dwmac1000 driver. I want comments on the
-> > design and any alternative suggestions.
-> 
-> That is admirable, but in practice, I've found that posting RFCs is
-> a waste of effort and time - basically, it seems people ignore
-> patches posted as RFC.
-> 
-> This turns the whole thing when posting patches into basically what
-> I'd summarise as "reviewer blackmail" - post the patches non-RFC
-> even when you want only comments, and reviewers _have_ to comment on
-> the patches if there's something they don't like to prevent them
-> being merged.
-> 
-> It's sad that it comes to that, but that is the reality of how things
-> appear to work.
 
-I have to agree with Russell. You wanted comments on the dwmac1000
-patches, but all you received where comments on the PHY parts. Maybe
-if you had requested comments on the MAC driver changes, somebody
-might of commented, but i doubt it.
+--g5fw27woy7qbit6d
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vxeub4efr4nku2wd"
+Content-Disposition: inline
 
-RFC seems best used during the merge window, and when you know the
-target audience well enough to know they will look at the patches even
-when it does have RFC.
 
-     Andrew
+--vxeub4efr4nku2wd
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2mmyiduer253ii4f"
+Content-Disposition: inline
+
+
+--2mmyiduer253ii4f
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 14.07.2023 11:48:00, Rob Herring wrote:
+> The DT of_device.h and of_platform.h date back to the separate
+> of_platform_bus_type before it as merged into the regular platform bus.
+> As part of that merge prepping Arm DT support 13 years ago, they
+> "temporarily" include each other. They also include platform_device.h
+> and of.h. As a result, there's a pretty much random mix of those include
+> files used throughout the tree. In order to detangle these headers and
+> replace the implicit includes with struct declarations, users need to
+> explicitly include the correct includes.
+>=20
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>  drivers/net/can/bxcan.c                                 | 1 -
+>  drivers/net/can/ifi_canfd/ifi_canfd.c                   | 1 -
+>  drivers/net/can/m_can/m_can.c                           | 1 -
+>  drivers/net/can/m_can/m_can.h                           | 1 -
+>  drivers/net/can/rcar/rcar_canfd.c                       | 1 -
+>  drivers/net/can/sja1000/sja1000_platform.c              | 1 -
+>  drivers/net/can/sun4i_can.c                             | 1 -
+>  drivers/net/can/ti_hecc.c                               | 1 -
+
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for drivers/net/can
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--2mmyiduer253ii4f--
+
+--vxeub4efr4nku2wd--
+
+--g5fw27woy7qbit6d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS0IqYACgkQvlAcSiqK
+BOhfLQgAnOPxJiYWHd0YYYBr6D5Xvaa7YD/llBx5YeP2Eol6zKlE5NW1xdwBoHP/
+oxs3PENqI/mVuAtWhs6sNCSEtOEssWtUWrx23I9bxRa2AE/DUWfpg/NP/sy3ZVsV
+sYgzGHOJqf+S+OMzalvZ9hIDu+a6xxhA9rUTaK2lNn0nBeWxEf92JhPV+nGREldR
+CHY3WW/trL1qHxxtn7ZWhI2IVounTWpkXZnJz9DRocIQrm1mPmNz5lcwkr+ST1th
+C92e2GJEahuxXdOMXfuuGMUSGzFqGZRtKT3WAx9/8l/lUsyKZ9Jhn1Rv7NE9zNPG
+R640Tfvr5cFRQIVusYrKVMlQ8URlUg==
+=ICgU
+-----END PGP SIGNATURE-----
+
+--g5fw27woy7qbit6d--
 
