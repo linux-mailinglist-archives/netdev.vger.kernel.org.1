@@ -1,119 +1,108 @@
-Return-Path: <netdev+bounces-18092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5318A754C2B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 23:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0704E754CE8
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 02:36:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AE2F1C209C6
-	for <lists+netdev@lfdr.de>; Sat, 15 Jul 2023 21:43:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B41371C209D1
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 00:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551188C13;
-	Sat, 15 Jul 2023 21:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707917E5;
+	Sun, 16 Jul 2023 00:35:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467622592
-	for <netdev@vger.kernel.org>; Sat, 15 Jul 2023 21:43:09 +0000 (UTC)
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ABA3213F;
-	Sat, 15 Jul 2023 14:43:06 -0700 (PDT)
-Received: from i53875a6a.versanet.de ([83.135.90.106] helo=phil.localnet)
-	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <heiko@sntech.de>)
-	id 1qKn1b-00035T-PU; Sat, 15 Jul 2023 23:41:59 +0200
-From: Heiko Stuebner <heiko@sntech.de>
-To: Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Justin Chen <justin.chen@broadcom.com>, Al Cooper <alcooperx@gmail.com>,
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Yu Chen <chenyu56@huawei.com>,
- Binghui Wang <wangbinghui@hisilicon.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>, Lubomir Rintel <lkundrak@v3.sk>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Chun-Kuang Hu <chunkuang.hu@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Wolfgang Grandegger <wg@grandegger.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>, Alban Bedel <albeu@free.fr>,
- Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Robert Marko <robert.marko@sartura.hr>, Luka Perkov <luka.perkov@sartura.hr>,
- Sergio Paracuellos <sergio.paracuellos@gmail.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Alim Akhtar <alim.akhtar@samsung.com>,
- Sylwester Nawrocki <s.nawrocki@samsung.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Vincent Shih <vincent.sunplus@gmail.com>,
- Thierry Reding <thierry.reding@gmail.com>,
- Jonathan Hunter <jonathanh@nvidia.com>, JC Kuo <jckuo@nvidia.com>,
- Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-amlogic@lists.infradead.org,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
- linux-can@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org,
- linux-samsung-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-tegra@vger.kernel.org
-Subject: Re: [PATCH] phy: Explicitly include correct DT includes
-Date: Sat, 15 Jul 2023 23:41:56 +0200
-Message-ID: <4021989.Mh6RI2rZIc@phil>
-In-Reply-To: <20230714174841.4061919-1-robh@kernel.org>
-References: <20230714174841.4061919-1-robh@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63847161
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 00:35:55 +0000 (UTC)
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CF72715;
+	Sat, 15 Jul 2023 17:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=mE9+71SpcGsafbLERUBD51p4fXq4pCC+GFqB11xSv5M=; b=Ug+2GIzIZbSN72q9ekRkGYBv94
+	hTsJx9IlKFxSw+d93vnKSKnQ5VBjD1EiE0M15cB01ZiAAxKhAbcxsO2KOkeTNESLS4b7fiVXyxf6+
+	bvagVEvfUW1VvU7wM5thK/fZ3bEXnHMQTm+ztTZzVSkfXWTjnvJN+NZpUlzIb1V2A1Gr9T+a8ZEZl
+	1EifUYjP3j2OtCVxVnM/pxRgdv1nGcNkS6nnMhNf8lCkpOuJiBJQxbDkBA2Vd3G+CzOXr5cqSFjPO
+	86i39noH1h5v6nHq30iGX0ncNMKMvWQDoLQKaTMexHqqEoR2s9UIPSkfJdB4/oa4ylBuRhiR3++Pq
+	+m5Z2mrQ==;
+Received: from 50-198-160-193-static.hfc.comcastbusiness.net ([50.198.160.193] helo=[10.150.81.113])
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qKpji-0078Xu-2P;
+	Sun, 16 Jul 2023 00:35:43 +0000
+Message-ID: <5e5ee5f1-6391-dea3-77eb-c55dd7bff0a3@infradead.org>
+Date: Sat, 15 Jul 2023 17:35:30 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH docs] scripts: kernel-doc: support private / public
+ marking for enums
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+To: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-doc@vger.kernel.org, arkadiusz.kubalewski@intel.com,
+ netdev@vger.kernel.org
+References: <20230621223525.2722703-1-kuba@kernel.org>
+ <399c98c8-fbf5-8b90-d343-e25697b2e6fa@infradead.org>
+ <d5727371-e580-a956-7846-b529f17048ca@infradead.org>
+ <875y6m39ll.fsf@meer.lwn.net>
+ <f5c04cf1-c6ca-70d6-1903-4603acc30df4@infradead.org>
+In-Reply-To: <f5c04cf1-c6ca-70d6-1903-4603acc30df4@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Am Freitag, 14. Juli 2023, 19:48:35 CEST schrieb Rob Herring:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
+
+
+On 7/14/23 08:15, Randy Dunlap wrote:
 > 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
+> 
+> On 7/14/23 06:29, Jonathan Corbet wrote:
+>> Randy Dunlap <rdunlap@infradead.org> writes:
+>>
+>>> Hi Jon,
+>>>
+>>> On 6/21/23 20:10, Randy Dunlap wrote:
+>>>>
+>>>>
+>>>> On 6/21/23 15:35, Jakub Kicinski wrote:
+>>>>> Enums benefit from private markings, too. For netlink attribute
+>>>>> name enums always end with a pair of __$n_MAX and $n_MAX members.
+>>>>> Documenting them feels a bit tedious.
+>>>>>
+>>>>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>>>>
+>>>> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+>>>> Tested-by: Randy Dunlap <rdunlap@infradead.org>
+>>>>
+>>>> Thanks.
+>>>
+>>> I have a need for this patch. Are you planning to merge it?
+>>
+>> It's commit e27cb89a22ad in 6.5-rc1 ...
+> 
+> Oops, my bad, sorry about that.
+> 
+> I'm testing with linux-next. Something is rotten here /methinks.
+> 
+> I will check it out.
 
->  drivers/phy/rockchip/phy-rockchip-dphy-rx0.c          | 1 -
->  drivers/phy/rockchip/phy-rockchip-inno-dsidphy.c      | 2 +-
->  drivers/phy/rockchip/phy-rockchip-inno-hdmi.c         | 1 -
->  drivers/phy/rockchip/phy-rockchip-naneng-combphy.c    | 3 ++-
->  drivers/phy/rockchip/phy-rockchip-snps-pcie3.c        | 3 ++-
-
-Acked-by: Heiko Stuebner <heiko@sntech.de>
-
-
+Apparently this was due to user error -- it works today.
+Sorry about the noise.
 
 
