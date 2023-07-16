@@ -1,152 +1,95 @@
-Return-Path: <netdev+bounces-18132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CB67554E4
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 22:35:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A6A755464
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 22:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82F9B1C20928
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 20:35:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C28B32812E1
+	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 20:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A05A8F5D;
-	Sun, 16 Jul 2023 20:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9498F74;
+	Sun, 16 Jul 2023 20:29:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9738F40;
-	Sun, 16 Jul 2023 20:35:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74E11C433C8;
-	Sun, 16 Jul 2023 20:35:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1689539706;
-	bh=O6TUdrDHfsVRCsKUxF9WP7MXPTpUIpz/o6QOt+IMsoY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uheWh4KgtbYvUhKlOF1CuIVDbpTkzcFdMb4sNiVisjv9A03fsYJKtUNjAg9mnBqfL
-	 9WXQbN3dYskEPYP7GqsVM78do9ZJnMOpx7Wzo2VVqA5glmF6Bw8N+HrhJuyhozGw8t
-	 ImMdlfmPFRfCORVwzAgL6Ge28KpNhyLyWdvuBrcI=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Christian Brauner <brauner@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Neil Horman <nhorman@tuxdriver.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	linux-sctp@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 075/591] sctp: add bpf_bypass_getsockopt proto callback
-Date: Sun, 16 Jul 2023 21:43:34 +0200
-Message-ID: <20230716194925.824615271@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230716194923.861634455@linuxfoundation.org>
-References: <20230716194923.861634455@linuxfoundation.org>
-User-Agent: quilt/0.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09A18F5B
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 20:29:53 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98432BC;
+	Sun, 16 Jul 2023 13:29:52 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-676cc97ca74so1090962b3a.1;
+        Sun, 16 Jul 2023 13:29:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689539392; x=1690144192;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iK9RtZ9Rm9JaCO7gLtL/lZtWWMLp1ISIMI/Ww2ye3bw=;
+        b=TBuKdBnQkQ0aj2HCakTY/yUXgSvInqs56ZVseMoTGdAwSVZhCAS7GM1Avc+bjipram
+         8I6wNUs9cvdEczfVJex4V2nqZWruHG0dEMlcw7uFKSIsD2uwC3RX+k2j5vykhnb3XwOL
+         QyG6PxMLYv2aPe7nH8vuUTpN7zLAx/cNINPF12MOh1kXiZVa2QrfU4tKsHEeIpceeneJ
+         +/H96UfOMtMSLCV6efDyKiUDLlgt+CN/IZc9ZOTiQ5lZb+VwodPblqpvOWQzRacgzB9m
+         1J0sWm7w2cpVoVD6EVGHSqFhQ5D305iEqEKtMbyMdj2b5S+7B9yh5iDCXd1P5tLDbiYR
+         V5xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689539392; x=1690144192;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iK9RtZ9Rm9JaCO7gLtL/lZtWWMLp1ISIMI/Ww2ye3bw=;
+        b=XDqtKoZtQO+Fx/4AZ5y9HS8rZo+7ya536Tx0nW7JJltQjN9cMQhAxcvrsnC7kYafQK
+         aSdXtcJ37R4SsOzdvPmN9TOqEn06unYQz6Y6LQFbx0r6+w5LbojgHKW16S/s3PaZ7t01
+         gZAHdQcm7AMY2pc+3YghG2UbQ4oB2+KeIGsI45jeUJ4l3kMHGepKG8nqPtfbcPsFHYL/
+         hqDZczrEBsrZmhTNcdn1hyomCG1LcKR99OlNBhR4HAndurE1hl0SmAF15eFDpTUscL6a
+         J+1WZVjh/Bc/t0g50bu/SqNuRcOS2tHwhTWLxsIue8pptobglCTd5mU+EzkYoiUdf+0+
+         0MiQ==
+X-Gm-Message-State: ABy/qLbGNExacO1RPgASybNjq5xLAMNXJOvk66PpfE5bjAK6qmHIIr9k
+	Km3jSoCocO73HvSoudp/iQDpeuV7AmE=
+X-Google-Smtp-Source: APBJJlGo4QWhLMdwkTNRGBxINBy9kxJFUsfhrAuSpGu+obMZNnwVdUWRGnFdUXrgMz4vvCBTbHhqrg==
+X-Received: by 2002:a17:903:32cf:b0:1b8:a469:53d8 with SMTP id i15-20020a17090332cf00b001b8a46953d8mr13833632plr.0.1689539391898;
+        Sun, 16 Jul 2023 13:29:51 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id a18-20020a1709027d9200b001ac7f583f72sm11307440plm.209.2023.07.16.13.29.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Jul 2023 13:29:51 -0700 (PDT)
+Date: Sun, 16 Jul 2023 13:29:49 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Yangbo Lu <yangbo.lu@nxp.com>, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ptp: Explicitly include correct DT includes
+Message-ID: <ZLRTPcgYscAQgyRL@hoboy.vegasvil.org>
+References: <20230714174922.4063153-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714174922.4063153-1-robh@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+On Fri, Jul 14, 2023 at 11:49:22AM -0600, Rob Herring wrote:
+> The DT of_device.h and of_platform.h date back to the separate
+> of_platform_bus_type before it as merged into the regular platform bus.
+> As part of that merge prepping Arm DT support 13 years ago, they
+> "temporarily" include each other. They also include platform_device.h
+> and of.h. As a result, there's a pretty much random mix of those include
+> files used throughout the tree. In order to detangle these headers and
+> replace the implicit includes with struct declarations, users need to
+> explicitly include the correct includes.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
 
-[ Upstream commit 2598619e012cee5273a2821441b9a051ad931249 ]
-
-Implement ->bpf_bypass_getsockopt proto callback and filter out
-SCTP_SOCKOPT_PEELOFF, SCTP_SOCKOPT_PEELOFF_FLAGS and SCTP_SOCKOPT_CONNECTX3
-socket options from running eBPF hook on them.
-
-SCTP_SOCKOPT_PEELOFF and SCTP_SOCKOPT_PEELOFF_FLAGS options do fd_install(),
-and if BPF_CGROUP_RUN_PROG_GETSOCKOPT hook returns an error after success of
-the original handler sctp_getsockopt(...), userspace will receive an error
-from getsockopt syscall and will be not aware that fd was successfully
-installed into a fdtable.
-
-As pointed by Marcelo Ricardo Leitner it seems reasonable to skip
-bpf getsockopt hook for SCTP_SOCKOPT_CONNECTX3 sockopt too.
-Because internaly, it triggers connect() and if error is masked
-then userspace will be confused.
-
-This patch was born as a result of discussion around a new SCM_PIDFD interface:
-https://lore.kernel.org/all/20230413133355.350571-3-aleksandr.mikhalitsyn@canonical.com/
-
-Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Stanislav Fomichev <sdf@google.com>
-Cc: Neil Horman <nhorman@tuxdriver.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: linux-sctp@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Suggested-by: Stanislav Fomichev <sdf@google.com>
-Acked-by: Stanislav Fomichev <sdf@google.com>
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Acked-by: Xin Long <lucien.xin@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/sctp/socket.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index bc3d08bd7cef3..e1011311bc877 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -8279,6 +8279,22 @@ static int sctp_getsockopt(struct sock *sk, int level, int optname,
- 	return retval;
- }
- 
-+static bool sctp_bpf_bypass_getsockopt(int level, int optname)
-+{
-+	if (level == SOL_SCTP) {
-+		switch (optname) {
-+		case SCTP_SOCKOPT_PEELOFF:
-+		case SCTP_SOCKOPT_PEELOFF_FLAGS:
-+		case SCTP_SOCKOPT_CONNECTX3:
-+			return true;
-+		default:
-+			return false;
-+		}
-+	}
-+
-+	return false;
-+}
-+
- static int sctp_hash(struct sock *sk)
- {
- 	/* STUB */
-@@ -9643,6 +9659,7 @@ struct proto sctp_prot = {
- 	.shutdown    =	sctp_shutdown,
- 	.setsockopt  =	sctp_setsockopt,
- 	.getsockopt  =	sctp_getsockopt,
-+	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
- 	.sendmsg     =	sctp_sendmsg,
- 	.recvmsg     =	sctp_recvmsg,
- 	.bind        =	sctp_bind,
-@@ -9698,6 +9715,7 @@ struct proto sctpv6_prot = {
- 	.shutdown	= sctp_shutdown,
- 	.setsockopt	= sctp_setsockopt,
- 	.getsockopt	= sctp_getsockopt,
-+	.bpf_bypass_getsockopt	= sctp_bpf_bypass_getsockopt,
- 	.sendmsg	= sctp_sendmsg,
- 	.recvmsg	= sctp_recvmsg,
- 	.bind		= sctp_bind,
--- 
-2.39.2
-
-
-
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
