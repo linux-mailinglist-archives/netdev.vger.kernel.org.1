@@ -1,316 +1,208 @@
-Return-Path: <netdev+bounces-18362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05E47569AC
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E057569B3
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:56:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7394D2811F7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9097280E7D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CCD1855;
-	Mon, 17 Jul 2023 16:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A451878;
+	Mon, 17 Jul 2023 16:56:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8656A10E7
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 16:53:12 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A07710C0
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:52:46 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f86840c45dso5891e87.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:52:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689612764; x=1692204764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w0oEurlGe3+Mk7OGAM2ybaaJ/Egck4h3rfyEcCp4qpc=;
-        b=V5UXVGvDAiwYMQIXQwBCrP/IpnlT4++CKsKoEsn74v8gKpHy2YvO/tR71AT1VMS0HD
-         giT+VXsm7mWSJCcMMnsdnzjaVZae2pqfY7hiESIQYQ12AIMyXzH7Dcg1/4OLDTBrNOBb
-         Rqqf8RPg0EAbwY1AADmliv3kOEYkfxNXcnFZmACo9pvyh2nPry1Eq/viV+j6laTNIV3X
-         5fk7PTAnNBJLACTuAmVx17beCqsIv9oR6Cb1+Qm7tifxwFKixXZMWIYCeIMV2IsMUIH6
-         DgxbevyMU/7UG7miNmqUttLvZxBOelYy2W8QcFuyBXj/8j3h3SS47A86hysOmHPlIWz8
-         wbGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689612764; x=1692204764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w0oEurlGe3+Mk7OGAM2ybaaJ/Egck4h3rfyEcCp4qpc=;
-        b=GfCu1MqICk8qC8EmJFMpOSrv0WqygHHvj6iLB1hbaflKzALj1a3ZvrcuBcI943af25
-         JmffHUeUVL/wyi6PabjGGTLdP5xjUdQtLVQx83JvSHTcGkqUrWaGhYKanfooJ7LxIMwY
-         3tKiEKzeaYBltCaExfRR64bKP8wov2+ygddMFnxVtTQDmnF5wsCbi76P+4CQsUl9EdGe
-         HamK1xnVF8EAmBSzJE3mx70ybsiZxY3zF+4xG50Ri82RnQbTy2gzzhogwhu+mVALDiyT
-         mLUJuBcfhIzYHOcDqnuivLw7A82LKUo0+UGLjrFkdxW5DLk+X2GU7ptWX6KBTKl14yns
-         oKnQ==
-X-Gm-Message-State: ABy/qLZ7Pc6T22edNjij8zkyzx4g+zFptwi1E0iaAWPO2qoKXAeq6hCg
-	e8o6kO3Y1V0OcCJG+gZ9ZZwbgkp1wD/pUN3X0CgTYg==
-X-Google-Smtp-Source: APBJJlGVFMy90Uzalsb2ZzwN4fa2va3UDr3xjY+xvN0ImZRLtI0ZatlFM922758CCjqhYOHz5ZrEi5kydPikhgu6rRE=
-X-Received: by 2002:ac2:47f9:0:b0:4f3:a7c6:590e with SMTP id
- b25-20020ac247f9000000b004f3a7c6590emr370431lfp.7.1689612763539; Mon, 17 Jul
- 2023 09:52:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04D010E7
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 16:56:07 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061.outbound.protection.outlook.com [40.107.94.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C1410C;
+	Mon, 17 Jul 2023 09:56:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AjIItiLwoWZE3t53zzqyDm4YeEHwKMJ0aaaUDibNEE2qXOahzIiYZuytMzSTPN5GPStKuKXswOWmTdY+WVdMceCxR+ea2OwEdNEnSGZoe+0KS7knUDuD/c/17eK7MzEq62Fd3LN7NAEzNKI62PA64MHqwq01RDKRr7U+5qlQYj+gyPTfe+pxB7rx4eLbptqXZ4NHWGkI6cRYx4BYlZcV2WYTfIlp6kjjo2UriGUnZfDHE/ytTn5lbNsT6Ilt2yPaqe4NZ4qi7KEqy1kTXjyX/oPviI5mWwLRg3Yk578RyB07zK/Js2dDaOXI5F/w51Ty/p5PF5BJzyNwEjkZhKQ/rQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2p0AkZhLKYruRO4d0FUnIkMg9Gku/Tg9qnSh+vX8zUs=;
+ b=U7ZzYNm3OdMLF53+A4VLA3ggxo6BLCi2ILvGOrOmSPkOyILET/nhROv4fIDbWIe/KAsgiukLK7sdJ0o06+S3nWNBHP1nSpj1o8vmWczmrdrxcmXIptZM1LS945PG0FczzI60pvM+So17zSzwiU/5FbrW1dBh1H2K8g4PGV5RVIR4FYNhibS0J6fjLzy8mSv14Drb2q7FJu0TBiYQWZpsmsypfYvzjECDW2ys+LgrAsT58Og1Jmvvcodkd79SrONaVMULkwsLjTnMHgYbFEx8BtL+nNFDE7VWcdgXkwtSEeWRoSmn9VViYAJIizejR+aIeDL9DE3PYphoId5ZTb/Dhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2p0AkZhLKYruRO4d0FUnIkMg9Gku/Tg9qnSh+vX8zUs=;
+ b=D7wHH6E70GRBQulseb9i/XHWCnxvjsCmRPRzyg0UuYdYFoE1vKUgOJX9ttV9QLw25bo7xTYbOmu9GpPkaEAfWVb+Sr4qgKiabV1y/sbZOzMz9u4tQiG1ar1j5TjVnUlTlQ6koeSFJX7m1lVBObf9Q58Y7xfUcl1xhw9BIdsdw0w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by DM4PR12MB6279.namprd12.prod.outlook.com (2603:10b6:8:a3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Mon, 17 Jul
+ 2023 16:56:02 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
+ 16:56:01 +0000
+Message-ID: <c8978b1c-2e45-6557-47fd-6f57dda8e433@amd.com>
+Date: Mon, 17 Jul 2023 09:55:59 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v11 vfio 7/7] vfio/pds: Add Kconfig and documentation
+To: Simon Horman <simon.horman@corigine.com>,
+ Brett Creeley <brett.creeley@amd.com>
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, alex.williamson@redhat.com,
+ jgg@nvidia.com, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+ kevin.tian@intel.com, shannon.nelson@amd.com
+References: <20230713003727.11226-1-brett.creeley@amd.com>
+ <20230713003727.11226-8-brett.creeley@amd.com>
+ <ZLJhXRdA2a72Cb5/@corigine.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <ZLJhXRdA2a72Cb5/@corigine.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0001.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b::6) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230717152917.751987-1-edumazet@google.com>
-In-Reply-To: <20230717152917.751987-1-edumazet@google.com>
-From: Soheil Hassas Yeganeh <soheil@google.com>
-Date: Mon, 17 Jul 2023 12:52:06 -0400
-Message-ID: <CACSApvYwQah8Lxs_6ogBGigTSo=eK4YAVPahdU8oWmGjrujw3w@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: get rid of sysctl_tcp_adv_win_scale
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DM4PR12MB6279:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8188ff71-c57a-4a65-6110-08db86e6b394
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	e4KtC2pyH8+C8zik2WdwkrZJNs0rHRb2h6BVHno5TPU+b9dEuZ+lRP82Uc43tiL9J+1DxBa/nQIyoXgyCYY1vqmvEuWg6nuNYXiLdt7sYx+IMgnLq8v8dlUsZEZXka7Kuew+JKWVLFyWgNsmcpmfzWsZdKvrGNvEVq2BWrJnIRJ5LflWj7vhWqdRCaVWsFNZ9PDdrk0HjQsGsQf0MfxNpWpxKCnqWcLuu6e6w9TPzoUB2OlD10f8pj5DsWUkz915+X8/QYLVCRNz9bn83/NRWSmvh75AFkHK5JUA3CwzCIg2Fz654nmx2hwVzcrTWXdg1N78T3NBnqvhXanpwQztq5puS0uYkv06GI1kCggOm1VBTdkZfuPv7J7Bqj6GIcrW9AHvcVzMQnp4D+zBQ1Z2ibId9Ol3VpgURazsD1PkOfdTE7UdWueLfAqYOY8ay0DZDLeqAGycgZrKFwsszBUiqh/kCM9JTX/GTOOWkSIebmSp/jTHQMYxBjN2+TdmncNuxImzFkqIXiEzZTmsRoBihsRDVJDMjPDtWDG/Myj7k8Zs2A0NDRu3uagrMCp38SlTE2pwvDnTqqA4Gal5lKErwL6ZUhs+u8ACUv321bfpSvJRiNRfaF3rMw0CiuVVwpYHhcShXwI8kiZYliTvppgGEQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(376002)(136003)(396003)(346002)(451199021)(31686004)(31696002)(2906002)(36756003)(6636002)(6512007)(2616005)(186003)(83380400001)(26005)(6506007)(53546011)(38100700002)(6486002)(110136005)(316002)(4326008)(66946007)(66476007)(66556008)(8936002)(478600001)(5660300002)(41300700001)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ank5aDYwRUhJOWdsdlFZTkRxODhXZ0dqc01zSUk4cEFpZlhlZWpFL3NkVGVK?=
+ =?utf-8?B?T3c0cW40ZkZBQmJGMExEb0E5WUI4MlVnRFdtclc0UkFGM0RqNlJrMXpidWdw?=
+ =?utf-8?B?bXFzNGZadW8vcmZoYjMvOWpWUkRvVWRSYnpPVlg1aXpDd2N3NVpTQVZKMjJY?=
+ =?utf-8?B?ejBGNE9rYklmdDR5bFlKNi9GdkNvaHdrM3VlOWtWbVBmNEtPeE1FRHUya0t2?=
+ =?utf-8?B?cS80cWVnK29udVI3SmlRallZaHFQcmxWYmswZTlDUFoxZXBKcG9CSHRBK0xL?=
+ =?utf-8?B?ZUwwM3ZQZjdKaXhvS1lRN0NOZ3loK3cxYS9DbUdDbFU1bVIyVkdYakJreHZm?=
+ =?utf-8?B?U1pTN1NoUFVmdS9vU3dSV0drV2NoeTFHTjdYUGFXcE90ZWxTT3A3R1lRd0tC?=
+ =?utf-8?B?Nk11allyc2NaTkZQQm43S3lXWVU0RUMzVmdVZDhGblR5cjE4M1BNQ0NkV1RX?=
+ =?utf-8?B?ejlOVkJDUDdGWHIxZHIxWVZXYisvbW93NERDKzc2bWl1ODI5SHN2ZWoxYWo4?=
+ =?utf-8?B?VkRqNENOR2c3Yy9LYzNPY09uVDFVdDlsZTgrcWhRL0JON2F6QkFYTG5hV2FO?=
+ =?utf-8?B?cTZXRzk3WWU2bkdVbWNrc3ExZnluSTYxK1RmWVVUZjJHQklOeHU0MmxzeVZn?=
+ =?utf-8?B?ZmlnNzVUYTluL2ptSDhETWlTWmplS0s0TVkzNnFDM1QyRDFTRFVWYlZkVFN3?=
+ =?utf-8?B?aEFaQnk3K1hKU1d4SlRhRlFIMzBycStjdXVtK3FsZ1YzYU4rTXk5LzNHY2dl?=
+ =?utf-8?B?cCtlblo1eGtGZUJFWnhkcVY2NUduSXh1RXJlSG1xTTNFZGJmUVZmc2pIQ0lx?=
+ =?utf-8?B?Z09wZnFheFJVT21EcjFraWdycFByRWZicEt6V2pNRGJhcDg2K25KUGlsYlQr?=
+ =?utf-8?B?ck1XQ1E3TGh4cUJKbkdjc05RM0dGRThWK1MxYjNsVjUvL2NzMVNDZkp5T21D?=
+ =?utf-8?B?cEZGcGRVK3phZVYrbi9TRXpFTi9qb281UnY3SzludjNjWjYwVStISnRpVWly?=
+ =?utf-8?B?ckJhK015eWV2aEdJQnJhb0JwS09HeEFuZzNicFpmL2ZvcFNKcExhQ3JsS0h6?=
+ =?utf-8?B?SCtLWVF1bm5PdVhTUTdCRGhSZWRxYmVaODJtSFU1dkVwMlJXTllac2JqSmVX?=
+ =?utf-8?B?TTBuZUpkZlczMXlhb1I4b05razNJSWNONDJXeDQwU2V4YkVZbmNsaklqUERk?=
+ =?utf-8?B?L2VkQjgrUXZOM1VzMWFRR0JXNHBOb041cytnTTdQa1hpeVY3ZzcrcWxjRHh0?=
+ =?utf-8?B?Y3ZGMDJUajdHWmx1TUN4anZsQXU2WW1RZmg1Q3pJRS9iRURJTkxEcUNNT1FR?=
+ =?utf-8?B?SWNNckhVWFgxN0N4VVZZMHBqRC85dC8xdGNIK3pGcTJKYk9nOGlqdlhwd1NJ?=
+ =?utf-8?B?NzZYUmJ2dDNudEI0Tk45UEp2ZG4wWnhPZi9HZ0VIc2JGRG9GZkFMV3U0K2Ey?=
+ =?utf-8?B?RnVGV3h1dmgzK3ZJNFRuZTV2UVpjUkVoK3JQM1cwR2VKc3VqSi9mSEc2TUpH?=
+ =?utf-8?B?dW14TGgvQmp2VkhUNTdKUUdmTXh6M3JKSHUvbFBOMFJzUGV4VnhIMGJMR3RR?=
+ =?utf-8?B?WWdMQWhGMWFhNDZPbTlMdkxMWHl1aW9qR1hmTW5VbFl2OWZpWEx2TXZOYTU1?=
+ =?utf-8?B?bm01STRvSTI0SFd2UFhtdWZCV3Q4T05JelYvanFxMTFOc1BsK0c2WG9QNE90?=
+ =?utf-8?B?YTZiZGxEcDlyZ0s0T1NNS0lpRUdvL0NmMzVRMXlIMmtScFE1RkpOTk9qaEJk?=
+ =?utf-8?B?VVh5R0tOT2lRTU9POG5DYVh2d1BEODhQQnVUOGJzT0VZY3BWenhwRmhKUjBv?=
+ =?utf-8?B?bFhYSVVVTUtQZ2JMVG13Ym5sZlc5OXViWVMreTJMNkRjYk5vaG9xNnhERjZB?=
+ =?utf-8?B?YkVLaHNOTVBkYUw0dlpNOWVPeVlxcmFIeFJKS2lrWEo2djNud0NGa0diM0M1?=
+ =?utf-8?B?S2Yxb0VJeVJ6NitWVzY0SFV4UnhDWnRpa1hjTXBTOVF4Zm9YTmtyMDJUUUlv?=
+ =?utf-8?B?emhUNnRtZGVKV3owV0ZtZFUzdlhINWVyOTlyeTFvbHdpNlcyS3l6b2Mrbi9D?=
+ =?utf-8?B?UU40aTJsb2xMdnAzTUtmRXI5SVVyb0RsMWdKcEpmZ0hidnNNYjV0NnVWVGlF?=
+ =?utf-8?Q?wcG5oZD0EvLdkIAJ/+Yuh+5HG?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8188ff71-c57a-4a65-6110-08db86e6b394
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 16:56:01.8037
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7nyLndooszJvFqeqgJXFxHPmb5dTatbi+SX/3P0Pqa0LDhv7Bt730kFAXDVg3v6+sU27/hz3JbA/I4AG29klhA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6279
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 17, 2023 at 11:29=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> With modern NIC drivers shifting to full page allocations per
-> received frame, we face the following issue:
->
-> TCP has one per-netns sysctl used to tweak how to translate
-> a memory use into an expected payload (RWIN), in RX path.
->
-> tcp_win_from_space() implementation is limited to few cases.
->
-> For hosts dealing with various MSS, we either under estimate
-> or over estimate the RWIN we send to the remote peers.
->
-> For instance with the default sysctl_tcp_adv_win_scale value,
-> we expect to store 50% of payload per allocated chunk of memory.
->
-> For the typical use of MTU=3D1500 traffic, and order-0 pages allocations
-> by NIC drivers, we are sending too big RWIN, leading to potential
-> tcp collapse operations, which are extremely expensive and source
-> of latency spikes.
->
-> This patch makes sysctl_tcp_adv_win_scale obsolete, and instead
-> uses a per socket scaling factor, so that we can precisely
-> adjust the RWIN based on effective skb->len/skb->truesize ratio.
->
-> This patch alone can double TCP receive performance when receivers
-> are too slow to drain their receive queue, or by allowing
-> a bigger RWIN when MSS is close to PAGE_SIZE.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On 7/15/2023 2:05 AM, Simon Horman wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> On Wed, Jul 12, 2023 at 05:37:27PM -0700, Brett Creeley wrote:
+>> Add Kconfig entries and pds-vfio-pci.rst. Also, add an entry in the
+>> MAINTAINERS file for this new driver.
+>>
+>> It's not clear where documentation for vendor specific VFIO
+>> drivers should live, so just re-use the current amd
+>> ethernet location.
+>>
+>> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+>> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+>> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>> ---
+>>   .../ethernet/amd/pds-vfio-pci.rst             | 79 +++++++++++++++++++
+>>   .../device_drivers/ethernet/index.rst         |  1 +
+>>   MAINTAINERS                                   |  7 ++
+>>   drivers/vfio/pci/Kconfig                      |  2 +
+>>   drivers/vfio/pci/pds/Kconfig                  | 19 +++++
+>>   5 files changed, 108 insertions(+)
+>>   create mode 100644 Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
+>>   create mode 100644 drivers/vfio/pci/pds/Kconfig
+>>
+>> diff --git a/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst b/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
+>> new file mode 100644
+>> index 000000000000..7a6bc848a2b2
+>> --- /dev/null
+>> +++ b/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
+>> @@ -0,0 +1,79 @@
+> 
+> ...
+> 
+>> diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
+>> index 94ecb67c0885..804e1f7c461c 100644
+>> --- a/Documentation/networking/device_drivers/ethernet/index.rst
+>> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
+>> @@ -16,6 +16,7 @@ Contents:
+>>      altera/altera_tse
+>>      amd/pds_core
+>>      amd/pds_vdpa
+>> +   amd/pds_vfio
+>>      aquantia/atlantic
+>>      chelsio/cxgb
+>>      cirrus/cs89x0
+> 
+> Sorry for not noticing this, but there seems to be a missmatch
+> between 'amd/pds_vfio' above, and the name of the file in
+> question. Perhaps the file should be renamed pds_vfio.rst?
 
-Great idea!
+I will take a look at this. I renamed comments/files based on renaming 
+the driver to pds-vfio-pci, but missed this.
 
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+Thanks for taking another look. I will get this fixed on v12.
 
-> ---
->  Documentation/networking/ip-sysctl.rst |  1 +
->  include/linux/tcp.h                    |  4 +++-
->  include/net/netns/ipv4.h               |  2 +-
->  include/net/tcp.h                      | 24 ++++++++++++++++++++----
->  net/ipv4/tcp.c                         | 11 ++++++-----
->  net/ipv4/tcp_input.c                   | 19 ++++++++++++-------
->  6 files changed, 43 insertions(+), 18 deletions(-)
->
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
-rking/ip-sysctl.rst
-> index 4a010a7cde7f8085db5ba6f1b9af53e9e5223cd5..82f2117cf2b36a834e5e391fe=
-da0210d916bff8b 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -321,6 +321,7 @@ tcp_abort_on_overflow - BOOLEAN
->         option can harm clients of your server.
->
->  tcp_adv_win_scale - INTEGER
-> +       Obsolete since linux-6.6
->         Count buffering overhead as bytes/2^tcp_adv_win_scale
->         (if tcp_adv_win_scale > 0) or bytes-bytes/2^(-tcp_adv_win_scale),
->         if it is <=3D 0.
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index b4c08ac86983568a9511258708724da15d0b999e..fbcb0ce13171d46aa3697abcd=
-48482b08e78e5e0 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -172,6 +172,8 @@ static inline struct tcp_request_sock *tcp_rsk(const =
-struct request_sock *req)
->         return (struct tcp_request_sock *)req;
->  }
->
-> +#define TCP_RMEM_TO_WIN_SCALE 8
-> +
->  struct tcp_sock {
->         /* inet_connection_sock has to be the first member of tcp_sock */
->         struct inet_connection_sock     inet_conn;
-> @@ -238,7 +240,7 @@ struct tcp_sock {
->
->         u32     window_clamp;   /* Maximal window to advertise          *=
-/
->         u32     rcv_ssthresh;   /* Current window clamp                 *=
-/
-> -
-> +       u8      scaling_ratio;  /* see tcp_win_from_space() */
->         /* Information of the most recently (s)acked skb */
->         struct tcp_rack {
->                 u64 mstamp; /* (Re)sent time of the skb */
-> diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-> index f003747181593559a4efe1838be719d445417041..7a41c4791536732005cedbb80=
-c223b86aa43249e 100644
-> --- a/include/net/netns/ipv4.h
-> +++ b/include/net/netns/ipv4.h
-> @@ -152,7 +152,7 @@ struct netns_ipv4 {
->         u8 sysctl_tcp_abort_on_overflow;
->         u8 sysctl_tcp_fack; /* obsolete */
->         int sysctl_tcp_max_reordering;
-> -       int sysctl_tcp_adv_win_scale;
-> +       int sysctl_tcp_adv_win_scale; /* obsolete */
->         u8 sysctl_tcp_dsack;
->         u8 sysctl_tcp_app_win;
->         u8 sysctl_tcp_frto;
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 226bce6d1e8c30185260baadec449b67323db91c..2104a71c75ba7eee40612395b=
-e4103ae370b3c03 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -1434,11 +1434,27 @@ void tcp_select_initial_window(const struct sock =
-*sk, int __space,
->
->  static inline int tcp_win_from_space(const struct sock *sk, int space)
->  {
-> -       int tcp_adv_win_scale =3D READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp=
-_adv_win_scale);
-> +       s64 scaled_space =3D (s64)space * tcp_sk(sk)->scaling_ratio;
->
-> -       return tcp_adv_win_scale <=3D 0 ?
-> -               (space>>(-tcp_adv_win_scale)) :
-> -               space - (space>>tcp_adv_win_scale);
-> +       return scaled_space >> TCP_RMEM_TO_WIN_SCALE;
-> +}
-> +
-> +/* inverse of tcp_win_from_space() */
-> +static inline int tcp_space_from_win(const struct sock *sk, int win)
-> +{
-> +       u64 val =3D (u64)win << TCP_RMEM_TO_WIN_SCALE;
-> +
-> +       do_div(val, tcp_sk(sk)->scaling_ratio);
-> +       return val;
-> +}
-> +
-> +static inline void tcp_scaling_ratio_init(struct sock *sk)
-> +{
-> +       /* Assume a conservative default of 1200 bytes of payload per 4K =
-page.
-> +        * This may be adjusted later in tcp_measure_rcv_mss().
-> +        */
-> +       tcp_sk(sk)->scaling_ratio =3D (1200 << TCP_RMEM_TO_WIN_SCALE) /
-> +                                   SKB_TRUESIZE(4096);
+Brett
 
-Should we use PAGE_SIZE instead of 4096?
-
->  }
->
->  /* Note: caller must be prepared to deal with negative returns */
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index e03e08745308189c9d64509c2cff94da56c86a0c..88f4ebab12acc11d5f3feb6b1=
-3974a0b8e565671 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -457,6 +457,7 @@ void tcp_init_sock(struct sock *sk)
->
->         WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp=
-_wmem[1]));
->         WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp=
-_rmem[1]));
-> +       tcp_scaling_ratio_init(sk);
->
->         set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
->         sk_sockets_allocated_inc(sk);
-> @@ -1700,7 +1701,7 @@ EXPORT_SYMBOL(tcp_peek_len);
->  /* Make sure sk_rcvbuf is big enough to satisfy SO_RCVLOWAT hint */
->  int tcp_set_rcvlowat(struct sock *sk, int val)
->  {
-> -       int cap;
-> +       int space, cap;
->
->         if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
->                 cap =3D sk->sk_rcvbuf >> 1;
-> @@ -1715,10 +1716,10 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
->         if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
->                 return 0;
->
-> -       val <<=3D 1;
-> -       if (val > sk->sk_rcvbuf) {
-> -               WRITE_ONCE(sk->sk_rcvbuf, val);
-> -               tcp_sk(sk)->window_clamp =3D tcp_win_from_space(sk, val);
-> +       space =3D tcp_space_from_win(sk, val);
-> +       if (space > sk->sk_rcvbuf) {
-> +               WRITE_ONCE(sk->sk_rcvbuf, space);
-> +               tcp_sk(sk)->window_clamp =3D val;
->         }
->         return 0;
->  }
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 57c8af1859c16eba5e952a23ea959b628006f9c1..3cd92035e0902298baa8afd89=
-ae5edcbfce300e5 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -237,6 +237,16 @@ static void tcp_measure_rcv_mss(struct sock *sk, con=
-st struct sk_buff *skb)
->          */
->         len =3D skb_shinfo(skb)->gso_size ? : skb->len;
->         if (len >=3D icsk->icsk_ack.rcv_mss) {
-> +               /* Note: divides are still a bit expensive.
-> +                * For the moment, only adjust scaling_ratio
-> +                * when we update icsk_ack.rcv_mss.
-> +                */
-> +               if (unlikely(len !=3D icsk->icsk_ack.rcv_mss)) {
-> +                       u64 val =3D (u64)skb->len << TCP_RMEM_TO_WIN_SCAL=
-E;
-> +
-> +                       do_div(val, skb->truesize);
-> +                       tcp_sk(sk)->scaling_ratio =3D val ? val : 1;
-> +               }
->                 icsk->icsk_ack.rcv_mss =3D min_t(unsigned int, len,
->                                                tcp_sk(sk)->advmss);
->                 /* Account for possibly-removed options */
-> @@ -727,8 +737,8 @@ void tcp_rcv_space_adjust(struct sock *sk)
->
->         if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
->             !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-> -               int rcvmem, rcvbuf;
->                 u64 rcvwin, grow;
-> +               int rcvbuf;
->
->                 /* minimal window to cope with packet losses, assuming
->                  * steady state. Add some cushion because of small variat=
-ions.
-> @@ -740,12 +750,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
->                 do_div(grow, tp->rcvq_space.space);
->                 rcvwin +=3D (grow << 1);
->
-> -               rcvmem =3D SKB_TRUESIZE(tp->advmss + MAX_TCP_HEADER);
-> -               while (tcp_win_from_space(sk, rcvmem) < tp->advmss)
-> -                       rcvmem +=3D 128;
-> -
-> -               do_div(rcvwin, tp->advmss);
-> -               rcvbuf =3D min_t(u64, rcvwin * rcvmem,
-> +               rcvbuf =3D min_t(u64, tcp_space_from_win(sk, rcvwin),
->                                READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rm=
-em[2]));
->                 if (rcvbuf > sk->sk_rcvbuf) {
->                         WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
-> --
-> 2.41.0.255.g8b1d071c50-goog
->
+> 
+> 'make htmldocs' reports:
+> 
+>   .../index.rst:10: WARNING: toctree contains reference to nonexisting document 'device_drivers/ethernet/amd/pds_vfio'
+>   .../amd/pds-vfio-pci.rst: WARNING: document isn't included in any toctree
+> 
+> 
+> 
 
