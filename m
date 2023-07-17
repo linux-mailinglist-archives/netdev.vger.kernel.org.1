@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-18280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4901E756483
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:22:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D567564A4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 799071C20991
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:22:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD00A1C20A4A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6D8BA40;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788AEBA4D;
 	Mon, 17 Jul 2023 13:21:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E25BA23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D40BBA23
 	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:40 +0000 (UTC)
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A00B173F
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:37 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3163eb69487so3215388f8f.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:37 -0700 (PDT)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662D11986
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:38 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31434226a2eso4595553f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=tessares.net; s=google; t=1689600096; x=1692192096;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Kr2AzBRfYACYia6y2Av8CufiUUfBunWf8ETFzPluqvU=;
-        b=H5/mwHbEYNveDOqdlUX0cUL3i7qHKpCwbOpxgZ46I6qOOVZW4XwSHyM4RDeGw98EHJ
-         Oajx6JR8P9VD4UzjFVYulv2jt6Htvgwk64G/87emrTSOGQMny0npddW+23IUCj2EZj/X
-         aH1cKjEuDeN1gCAs1IglD4zTAAHknSr0NGrbyz2FGP06FWmv6/+4xKo5Eth23SIhdqLG
-         ku7RpqG90Oobqtu7/6xHUoTKCtyTD/0TNvU/ROz48FqBNPSyuHqBKvKVq2rVCcLI4U04
-         UGvny/RZ84Aip8e3ui5hkWKpuceILHf3KPZO2c3mnT6bXDjPAfdj5/RtRneZbsTC3Xvh
-         4kRg==
+        bh=C19OOQjys4g0HZbyxfn1tMfB0ZlUmaAeplCvwpV4yU8=;
+        b=kV3uMPCmfenfR9XYgoBJYMtkwY8ae2Sutqmrw4sXe3sPEP8pTMFjy7PI7baLLsfvgc
+         dXTXoxmIpYMlr2reVA1Qrvgk0f5QSWbLj2Sm4BpCE59Dxz+TDRQgVFWOKvB4wg38oZ5Q
+         sDCBgG0J4Q3zHhffNPUcQF/idNBhKv+D5/oLeZqCgD/baMgZEIrWSLrR3QMuDdvr1wp2
+         M+B/Q1Ve8LvnFq7zBfDH84TCDi5gRixEbHKY/VdZk6mTdq4Kf1CKK477mopgA4w9Ga1o
+         pU4zieiE9n5DtoJ2MzZLCKkb/lCb3YOFQ/kT3ar70cWRAVp9r1HgZa3H4aghcEUgVgA/
+         XXiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1689600096; x=1692192096;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Kr2AzBRfYACYia6y2Av8CufiUUfBunWf8ETFzPluqvU=;
-        b=GNWfH7zahWSMMCXgxTyud4FokMIvCtcUL+hvle8vZR08pfZCafWov+d84Xcj9y6xbq
-         uY7sD549m/xklJA1LrzyjCocLfLWVH7mZLeGtrPGOYXWY9YIhUkPpLspN/ob612szPl3
-         ZhvcdTAVlf5THXF7QsNiCvNnvO1W3iaO+EQZN01siucAVGgIoZfhkD31prTgQwUsCvwP
-         yMDVHRHmf1pcGF57MNGhawgpRnMBVMMsYLtmqniDevzlsOshtQWRs/VIYkKWalJEEqas
-         XJaZqfIedWZ1xrjwI/jWaxwIoyywoc+ykhiUAGqj2nAG4yR7/IRiSzVPe3ZLfTL5RlSs
-         Mw4Q==
-X-Gm-Message-State: ABy/qLbCO2fqIxwI/Gr31qNEyoHa2dzwRUZZ7bCOaFw0B65yWYSdYYv2
-	Hbfh6osxOKkcOPmzA1sbU+H0VCBU822fuKozL6jHHg==
-X-Google-Smtp-Source: APBJJlFYICsMft+WcGkxINI+SI/Oi7NTF3hfmg6XpnY8a3HX2GNoV1DIs6tJYPZB94/e2Nrt2b1Z3g==
-X-Received: by 2002:adf:df88:0:b0:30a:e70d:8022 with SMTP id z8-20020adfdf88000000b0030ae70d8022mr8114781wrl.26.1689600095802;
-        Mon, 17 Jul 2023 06:21:35 -0700 (PDT)
+        bh=C19OOQjys4g0HZbyxfn1tMfB0ZlUmaAeplCvwpV4yU8=;
+        b=LJWeReurdEES1Lg6Sykur2lANExdwVyobelERoWfkVNLC47gQbQW6XeNIZxK9UKjEr
+         UGgjy80tjiCO86HuxNm9j8Iuk65PghcO63X1UMJ6+q4P7GOq4AoZIeXmIOF0nojRRJRP
+         De8pqEuW4x4KanHi9DU/oOUrZehpk4a71K4sfiHKlcocEoYMW4y51owZiS3ViSlzzH9J
+         7VB3ga3kTIpIV/1dbuqo3enf0NKe7xOTck2ojwFE8+CYo74A6Hv37V4uOpf45UVTrda+
+         +LGazYW4pVixG5cux2YQBBBPDm293NbU/8fbaNUEFtnhup84ynofVliS70VCRhX6YqJT
+         1xNg==
+X-Gm-Message-State: ABy/qLb6SqCJiEyUQDKDwXM9hHRoy09sGJjarE5qLqIHosXcatNXZeQv
+	IcxcsJiLgqVZstWIW3PnUkDuvYW2lNi4s3CxAsBE4g==
+X-Google-Smtp-Source: APBJJlEHEKtYBQlHrAmHpe7KvaH3pOGz7GH9IagvGAJVNabSEEePcghaij24VGRT0fUDgYtLfNnO0A==
+X-Received: by 2002:adf:fd4a:0:b0:30f:c012:b529 with SMTP id h10-20020adffd4a000000b0030fc012b529mr12388036wrs.56.1689600096776;
+        Mon, 17 Jul 2023 06:21:36 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
         by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 06:21:35 -0700 (PDT)
+        Mon, 17 Jul 2023 06:21:36 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Mon, 17 Jul 2023 15:21:21 +0200
-Subject: [PATCH net-next 01/13] selftests: mptcp: connect: don't stop if
- error
+Date: Mon, 17 Jul 2023 15:21:22 +0200
+Subject: [PATCH net-next 02/13] selftests: mptcp: userspace pm: don't stop
+ if error
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-1-695127e0ad83@tessares.net>
+Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-2-695127e0ad83@tessares.net>
 References: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 In-Reply-To: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -79,21 +79,21 @@ Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2399;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2583;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=BZbHJ3Y6ueyONCNTSrZvU0X5fH4lC2FRHHi4A5I/Hx0=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdaLCz2MpRc8eRh4gcle2c3UnBb8uCuhf2z
- VDiX1GNkkeJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
- c790D/wKpOoEy/0ACxy4+pHyNhiv2mFoHysOXWvMUxHm10XxfUHDaZSC/9uYH4KTTdOTFChu1Rc
- 2ACe7/Avf8Uy8uPk3vlHgC14T5lXIm0ksebCy03pPqJop4UpSbbcpG090XS9hY30BrFrXb2fbuK
- 43DSvauxBrZjlCCdPt+8m90t5s/XUa5HnuIwgAXrYL640WfCcFuzeeL5wmX/sQnjYuD7TUfVkeA
- TYU+8Wu8nPglOItk3gURt1irR2rs9+CZKtWm+iAb9ZpNICXCQWrh6tRrhHMkgWr0pJI0/2Yt8R6
- uYtmVd6NRHbc/xjOfet7VyfMqGfKkc0vlrf73gaWKYtCbnjTQnVI8qPIY9nGeUDmPtfabiNBu6F
- +ix6KPKAdi5rPQV65qkdCTRMRKAXu87VRFBHHn8sgjxMgiGpnfT005httgGcSBAh55/4g6qeekI
- kllCvKgWCRbnJpAY6TYGZnXvRmenV+9kvhbJQRJbFVIJj5zbPgfEjs8uNBVSz5XliginWrpjqo0
- nDNVrzeH/Fl1UrGQJ/IjSZHK6I0sGJjvObikI+oLeS2IGVXk2jxiS5+hbVJE1edSu/D8E7bvUPT
- uBf+BuzPP2AM7qtl4roS8Q5Clph2NmBRSNrC7vOOTLT2rHnEfE6AlB2y2TFsTjwh9hTcfgzrBwe
- YBV0+1tFUudMjcQ==
+ bh=qss0q7bvLOJAvB4X0z+6G5X/nAHFAPMEdRnJxgxYDi0=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdufpDnSGqM9fSwPxtyCcCBIzkSdpT4xGDp
+ XwYzeG8l7yJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
+ c9fzD/oDC4yV0L9hFbGiam/FWu7nxOXtN2xdtkmY+MNIPQYe3BtWmpYD6y03J2zZ4z5WzQhViOp
+ x9Il8IxPjm2XVWBcGkAOO+h4lAsDcUGNv1sLK1tLykizSAEWZvbjASAVE0dYy9pDWdgcb2AT7BL
+ Fz4xADpq0O2ex6NMkR1RLVJmBhJ5vBeOrbsViqPtXR+RdwUgA88nWFHIjTmnyNYvMSJUa5j/aXb
+ OLk2YKq5QSNI1OrBjbET8n7OVEQ7BVYmQJZiGYNH6i2d1eYy9CfnOaC9I041wY0LQtIm49y+oje
+ iy1f0sE8JUoDG/x3Dd4f3NG3YKTf9C3QMx2dNBJPrg4e1k7peDIW8RwGGFLagF1PSwhv0Uu44Fk
+ /kWcfN04R8DtWwe2TIDftL/IkM5fjXS3N+d7aPJikIiFKi7o6jRx2ZrukO9gHLdhPIqfjNXcNxV
+ +8JoMBlDRBtLq0rx944pZ0GQmH7UfrvjuKg0VDOMlSooP6AUE8Aqww4p0s4sIeI9/K8MfeWTo7G
+ nHw/JSRtHj7IbJL7OWipVnFQkm1IisbBmF6buS3Qb6h+R9ATb5qUeu5OsHNzASX7jsvo20dQKGd
+ fnFyWABiXb0v88frMjC4BLtwSedc6kgOZ/sRDVYsPmmsO0IQ7Sk01ICT9ZcpikZod+9HfqESPxC
+ GViUa3FGaVlxcng==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -107,85 +107,103 @@ No more tests were executed after a failure but it is still interesting
 to get results for all the tests to better understand what's still OK
 and what's not after a modification.
 
-Now we only exit earlier if the basic tests are failing: no ping going
-through namespaces or unable to transfer data on the loopback interface.
+Now we only exit earlier if the two connections cannot be established.
 
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
- tools/testing/selftests/net/mptcp/mptcp_connect.sh | 27 ++++++++++++++++------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ tools/testing/selftests/net/mptcp/userspace_pm.sh | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index bbae40882bfa..0f060af01a84 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -7,6 +7,7 @@ time_start=$(date +%s)
+diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
+index b180133a30af..c57ce4df4973 100755
+--- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
++++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
+@@ -52,6 +52,7 @@ sec=$(date +%s)
+ rndh=$(printf %x "$sec")-$(mktemp -u XXXXXX)
+ ns1="ns1-$rndh"
+ ns2="ns2-$rndh"
++ret=0
  
- optstring="S:R:d:e:l:r:h4cm:f:tC"
- ret=0
-+final_ret=0
- sin=""
- sout=""
- cin_disconnect=""
-@@ -837,14 +838,25 @@ display_time()
- 	echo "Time: ${time_run} seconds"
- }
- 
--stop_if_error()
-+log_if_error()
+ print_title()
  {
- 	local msg="$1"
+@@ -257,21 +258,21 @@ check_expected_one()
+ # $@: all var names to check
+ check_expected()
+ {
+-	local ret=0
++	local rc=0
+ 	local var
  
- 	if [ ${ret} -ne 0 ]; then
- 		echo "FAIL: ${msg}" 1>&2
-+
-+		final_ret=${ret}
-+		ret=0
-+
-+		return ${final_ret}
-+	fi
-+}
-+
-+stop_if_error()
-+{
-+	if ! log_if_error "${@}"; then
- 		display_time
--		exit ${ret}
-+		exit ${final_ret}
+ 	for var in "${@}"
+ 	do
+-		check_expected_one "${var}" "${ret}" || ret=1
++		check_expected_one "${var}" "${rc}" || rc=1
+ 	done
+ 
+-	if [ ${ret} -eq 0 ]
++	if [ ${rc} -eq 0 ]
+ 	then
+ 		stdbuf -o0 -e0 printf "[OK]\n"
+ 		return 0
  	fi
+ 
+-	exit 1
++	ret=1
  }
  
-@@ -934,23 +946,24 @@ for sender in $ns1 $ns2 $ns3 $ns4;do
- 	run_tests "$ns4" $sender 10.0.3.1
- 	run_tests "$ns4" $sender dead:beef:3::1
+ verify_announce_event()
+@@ -323,7 +324,7 @@ test_announce()
+ 		stdbuf -o0 -e0 printf "[OK]\n"
+ 	else
+ 		stdbuf -o0 -e0 printf "[FAIL]\n\ttype defined: %s\n" "${type}"
+-		exit 1
++		ret=1
+ 	fi
  
--	stop_if_error "Tests with $sender as a sender have failed"
-+	log_if_error "Tests with $sender as a sender have failed"
- done
+ 	# ADD_ADDR from the client to server machine reusing the subflow port
+@@ -423,7 +424,7 @@ test_remove()
+ 		stdbuf -o0 -e0 printf "[OK]\n"
+ 	else
+ 		stdbuf -o0 -e0 printf "[FAIL]\n"
+-		exit 1
++		ret=1
+ 	fi
  
- run_tests_peekmode "saveWithPeek"
- run_tests_peekmode "saveAfterPeek"
--stop_if_error "Tests with peek mode have failed"
-+log_if_error "Tests with peek mode have failed"
+ 	# RM_ADDR using an invalid addr id should result in no action
+@@ -438,7 +439,7 @@ test_remove()
+ 		stdbuf -o0 -e0 printf "[OK]\n"
+ 	else
+ 		stdbuf -o0 -e0 printf "[FAIL]\n"
+-		exit 1
++		ret=1
+ 	fi
  
- # MPTFO (MultiPath TCP Fatopen tests)
- run_tests_mptfo
--stop_if_error "Tests with MPTFO have failed"
-+log_if_error "Tests with MPTFO have failed"
+ 	# RM_ADDR from the client to server machine
+@@ -859,7 +860,7 @@ test_prio()
+ 	[ -z "$count" ] && count=0
+ 	if [ $count != 1 ]; then
+ 		stdbuf -o0 -e0 printf "[FAIL]\n\tCount != 1: %d\n" "${count}"
+-		exit 1
++		ret=1
+ 	else
+ 		stdbuf -o0 -e0 printf "[OK]\n"
+ 	fi
+@@ -870,7 +871,7 @@ test_prio()
+ 	[ -z "$count" ] && count=0
+ 	if [ $count != 1 ]; then
+ 		stdbuf -o0 -e0 printf "[FAIL]\n\tCount != 1: %d\n" "${count}"
+-		exit 1
++		ret=1
+ 	else
+ 		stdbuf -o0 -e0 printf "[OK]\n"
+ 	fi
+@@ -961,4 +962,4 @@ test_subflows_v4_v6_mix
+ test_prio
+ test_listener
  
- # connect to ns4 ip address, ns2 should intercept/proxy
- run_test_transparent 10.0.3.1 "tproxy ipv4"
- run_test_transparent dead:beef:3::1 "tproxy ipv6"
--stop_if_error "Tests with tproxy have failed"
-+log_if_error "Tests with tproxy have failed"
- 
- run_tests_disconnect
-+log_if_error "Tests of the full disconnection have failed"
- 
- display_time
--exit $ret
-+exit ${final_ret}
+-exit 0
++exit ${ret}
 
 -- 
 2.40.1
