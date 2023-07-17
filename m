@@ -1,120 +1,171 @@
-Return-Path: <netdev+bounces-18226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0E0755E69
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 10:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A376F755E70
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 10:29:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6651C20970
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:29:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D53561C20A56
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:29:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FEF9476;
-	Mon, 17 Jul 2023 08:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FA89477;
+	Mon, 17 Jul 2023 08:29:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A21D8493
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 08:29:02 +0000 (UTC)
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FE3136;
-	Mon, 17 Jul 2023 01:29:00 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-	by fd01.gateway.ufhost.com (Postfix) with ESMTP id 31F6724E1A6;
-	Mon, 17 Jul 2023 16:28:58 +0800 (CST)
-Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 17 Jul
- 2023 16:28:58 +0800
-Received: from [192.168.120.43] (171.223.208.138) by EXMBX062.cuchost.com
- (172.16.6.62) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 17 Jul
- 2023 16:28:56 +0800
-Message-ID: <6ed58545-c10a-d789-04d5-4eb715f4906d@starfivetech.com>
-Date: Mon, 17 Jul 2023 16:28:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8458F8493
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 08:29:50 +0000 (UTC)
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54E8E1B9
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 01:29:47 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-3457a3ada84so22440725ab.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 01:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google; t=1689582586; x=1692174586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KrEcIar0BkfpmBL+8BCmNKqe2TUSK3LL+WBdNYsOjsM=;
+        b=e52IJgo7nORao0Gl4I5dRpwwbrYRCXZTSuwaC/thRVodGrQS/Ih+iZx/Zsqn89WU3w
+         pQgXUWQS+Vk59/Fh6rrIEqzCQJkEny2i0gy7zEPOvxwj9yUxhnNvrizRbt8YsZpplHpx
+         RjVLFZyrzR9wafddakUgpMo5lLKlNumHP6uiacp/wGVyLbBbCgrHIUP/7snpf7XV2sof
+         jlaeLm95LpwgAuzcjO7UCvT+e3bh2UJ0I6TbCUpKBOZvGLRTw6wJXY5zbY52dacz1/1P
+         iPPOvh8ArwyYCroEOLn3Y8OJKVgd78PUACDF8tTPiPB+Om3hyy+66x8dhT2yU/74h83y
+         v2JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689582586; x=1692174586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KrEcIar0BkfpmBL+8BCmNKqe2TUSK3LL+WBdNYsOjsM=;
+        b=dX8+wxcde2SYdsko6MhqzMAt3eFjQT/TgSZ52pz4NicMyjMF5HraznKltzQD3VWxSi
+         FGv3D3n/pRoyzQ/vWejmmiHueGrSEjcvdg+O/cjFZNhUtosCLh5f6bucGDmrcBILjwe4
+         0X/xqP/E8ruDiBe90uP4MHBrHt/XjsMN1JvNTcynW6B8Dl14x57zOg8AMiuF/bJtsjKV
+         0ew2Z7YTvU0eRqebJJ131VCsVcq179qKdeUNBL8naPYRe+NgT6x79q9fsIb/39f7lcD/
+         quwuYg8dNTcDVxy77v6pi9C2XYvquciTpkIboBh2Ql/51SABWukgZqsL8V/CBPYjQgfP
+         eOqA==
+X-Gm-Message-State: ABy/qLb1WXZBAglP6ActJwxuqnGhaNTHsm4lDuXvWQaB7j4ydN6BBQF+
+	JkAaNFQwDTjgbvJKKGH2NLg/SKXYV4WLXISymvdaPQ==
+X-Google-Smtp-Source: APBJJlGE7jn73weZAb7Q+GH4ouydfCd9ILtA9ynYfWdyB1I4k5TGE6qNhhrOJBaOwSkah9YrBoRDKcKZ9t95G975sJc=
+X-Received: by 2002:a92:d4d2:0:b0:345:d470:baa6 with SMTP id
+ o18-20020a92d4d2000000b00345d470baa6mr9664500ilm.29.1689582586220; Mon, 17
+ Jul 2023 01:29:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v4 1/2] dt-bindings: net: motorcomm: Add pad driver
- strength cfg
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Peter Geis <pgwipeout@gmail.com>, Frank
-	<Frank.Sae@motor-comm.com>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Conor Dooley
-	<conor@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	Yanhong Wang <yanhong.wang@starfivetech.com>
-References: <20230714101406.17686-1-samin.guo@starfivetech.com>
- <20230714101406.17686-2-samin.guo@starfivetech.com>
- <4efd8643-455e-4f7f-b031-a0a02dd65210@lunn.ch>
-From: Guo Samin <samin.guo@starfivetech.com>
-In-Reply-To: <4efd8643-455e-4f7f-b031-a0a02dd65210@lunn.ch>
+References: <20230630155936.3015595-1-jaz@semihalf.com> <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
+In-Reply-To: <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
+From: Grzegorz Jaszczyk <jaz@semihalf.com>
+Date: Mon, 17 Jul 2023 10:29:34 +0200
+Message-ID: <CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
+To: Christian Brauner <brauner@kernel.org>, Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-aio@kvack.org, 
+	linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>, 
+	Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, 
+	Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Vineeth Vijayan <vneethv@linux.ibm.com>, Diana Craciun <diana.craciun@oss.nxp.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shakeel Butt <shakeelb@google.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Leon Romanovsky <leon@kernel.org>, Harald Freudenberger <freude@linux.ibm.com>, Fei Li <fei1.li@intel.com>, 
+	x86@kernel.org, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Halil Pasic <pasic@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Ingo Molnar <mingo@redhat.com>, 
+	intel-gfx@lists.freedesktop.org, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, linux-fpga@vger.kernel.org, 
+	Zhi Wang <zhi.a.wang@intel.com>, Wu Hao <hao.wu@intel.com>, 
+	Jason Herne <jjherne@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Andrew Donnellan <ajd@linux.ibm.com>, 
+	Arnd Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org, 
+	Heiko Carstens <hca@linux.ibm.com>, Johannes Weiner <hannes@cmpxchg.org>, linuxppc-dev@lists.ozlabs.org, 
+	Eric Auger <eric.auger@redhat.com>, Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org, 
+	Thomas Gleixner <tglx@linutronix.de>, virtualization@lists.linux-foundation.org, 
+	intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org, 
+	netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>, 
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Sean Christopherson <seanjc@google.com>, Oded Gabbay <ogabbay@kernel.org>, 
+	Muchun Song <muchun.song@linux.dev>, Peter Oberparleiter <oberpar@linux.ibm.com>, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Benjamin LaHaise <bcrl@kvack.org>, "Michael S. Tsirkin" <mst@redhat.com>, Sven Schnelle <svens@linux.ibm.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Frederic Barrat <fbarrat@linux.ibm.com>, 
+	Moritz Fischer <mdf@kernel.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Xu Yilun <yilun.xu@intel.com>, 
+	Dominik Behr <dbehr@chromium.org>, Marcin Wojtas <mw@semihalf.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [171.223.208.138]
-X-ClientProxiedBy: EXCAS061.cuchost.com (172.16.6.21) To EXMBX062.cuchost.com
- (172.16.6.62)
-X-YovoleRuleAgent: yovoleflag
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+pt., 14 lip 2023 o 09:05 Christian Brauner <brauner@kernel.org> napisa=C5=
+=82(a):
+>
+> On Thu, Jul 13, 2023 at 11:10:54AM -0600, Alex Williamson wrote:
+> > On Thu, 13 Jul 2023 12:05:36 +0200
+> > Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > > Hey everyone,
+> > >
+> > > This simplifies the eventfd_signal() and eventfd_signal_mask() helper=
+s
+> > > by removing the count argument which is effectively unused.
+> >
+> > We have a patch under review which does in fact make use of the
+> > signaling value:
+> >
+> > https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
+>
+> Huh, thanks for the link.
+>
+> Quoting from
+> https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-ja=
+z@semihalf.com/#25266856
+>
+> > Reading an eventfd returns an 8-byte value, we generally only use it
+> > as a counter, but it's been discussed previously and IIRC, it's possibl=
+e
+> > to use that value as a notification value.
+>
+> So the goal is to pipe a specific value through eventfd? But it is
+> explicitly a counter. The whole thing is written around a counter and
+> each write and signal adds to the counter.
+>
+> The consequences are pretty well described in the cover letter of
+> v6 https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
+>
+> > Since the eventfd counter is used as ACPI notification value
+> > placeholder, the eventfd signaling needs to be serialized in order to
+> > not end up with notification values being coalesced. Therefore ACPI
+> > notification values are buffered and signalized one by one, when the
+> > previous notification value has been consumed.
+>
+> But isn't this a good indication that you really don't want an eventfd
+> but something that's explicitly designed to associate specific data with
+> a notification? Using eventfd in that manner requires serialization,
+> buffering, and enforces ordering.
+>
+> I have no skin in the game aside from having to drop this conversion
+> which I'm fine to do if there are actually users for this btu really,
+> that looks a lot like abusing an api that really wasn't designed for
+> this.
 
-
--------- =E5=8E=9F=E5=A7=8B=E4=BF=A1=E6=81=AF --------
-=E4=B8=BB=E9=A2=98: Re: [PATCH v4 1/2] dt-bindings: net: motorcomm: Add p=
-ad driver strength cfg
-From: Andrew Lunn <andrew@lunn.ch>
-=E6=94=B6=E4=BB=B6=E4=BA=BA: Samin Guo <samin.guo@starfivetech.com>
-=E6=97=A5=E6=9C=9F: 2023/7/15
-
->> +  motorcomm,rx-clk-driver-strength:
->> +    $ref: /schemas/types.yaml#/definitions/uint32
->> +    description: |
->> +      drive strength of rx_clk rgmii pad.
->> +      |----------------------------------|
->> +      |        rx_clk ds map table       |
->> +      |----------------------------------|
->> +      | DS(3b) |  wol@1.8v  |  wol@3.3v  |
->> +      |________|_________________________|
->> +      |        | current(uA)| current(uA)|
->> +      |   000  |     1200   |    3070    |
->> +      |   001  |     2100   |    4080    |
->> +      |   010  |     2700   |    4370    |
->> +      |   011  |     2910   |    4680    |
->> +      |   100  |     3110   |    5020    |
->> +      |   101  |     3600   |    5450    |
->> +      |   110  |     3970   |    5740    |
->> +      |   111  |     4350   |    6140    |
->> +      |--------|------------|------------|
->> +    enum: [ 1200, 2100, 2700, 2910, 3070, 3110, 3600, 3970,
->> +            4080, 4350, 4370, 4680, 5020, 5450, 5740, 6140 ]
->> +    default: 2910
->=20
-> The DS(3b) value is not relevant to the binding. It is a driver
-> detail. So i would not bother listing it.
->=20
-ok=EF=BC=8C will remove it.
-
-> Please add a comment explaining what wol is.=20
->=20
->        Andrew
-
-Sorry=EF=BC=8Cit should be vol (voltage), not wol.
-
-=20
-Best regards,
-Samin
+https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-jaz@=
+semihalf.com/
+was posted at the beginig of March and one of the main things we've
+discussed was the mechanism for propagating acpi notification value.
+We've endup with eventfd as the best mechanism and have actually been
+using it from v2. I really do not want to waste this effort, I think
+we are quite advanced with v6 now. Additionally we didn't actually
+modify any part of eventfd support that was in place, we only used it
+in a specific (and discussed beforehand) way.
 
