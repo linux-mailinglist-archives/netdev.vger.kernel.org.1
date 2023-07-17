@@ -1,121 +1,93 @@
-Return-Path: <netdev+bounces-18311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04E47566AF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:42:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31DB7566B3
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:44:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52F9E280ECF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:42:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB67E1C20A2E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7A9253A8;
-	Mon, 17 Jul 2023 14:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0DF253AA;
+	Mon, 17 Jul 2023 14:44:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204DE253A0;
-	Mon, 17 Jul 2023 14:42:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19CBCC433C7;
-	Mon, 17 Jul 2023 14:42:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1689604922;
-	bh=iRMCergF9pY20Qqnb4LRH1cqLhY+eRjsE2jBE0hrSiA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=2Qz9tux1d0SS+rYA6B1yNzl3P83qh1aFW58cAjzKCFqvmk1yiYjLxlIxd3UUozmkq
-	 PguBmyUk7oZb2vFCbHA4Xv1gmH/7AsNwzUJEZ2ocRqSrIGqAQWIrgvLVyun9foqpVH
-	 dO+XQjk0jk1lysTvlkN/ClqQ/yeBP8eU9i3IEhrY=
-Date: Mon, 17 Jul 2023 16:42:00 +0200
-From: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "jbrouer@redhat.com" <jbrouer@redhat.com>,
-	"atzin@redhat.com" <atzin@redhat.com>,
-	"linyunsheng@huawei.com" <linyunsheng@huawei.com>,
-	"saeed@kernel.org" <saeed@kernel.org>,
-	"ttoukan.linux@gmail.com" <ttoukan.linux@gmail.com>,
-	"maxtram95@gmail.com" <maxtram95@gmail.com>,
-	"kheib@redhat.com" <kheib@redhat.com>,
-	"brouer@redhat.com" <brouer@redhat.com>,
-	"jbenc@redhat.com" <jbenc@redhat.com>,
-	"alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"fmaurer@redhat.com" <fmaurer@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"mkabat@redhat.com" <mkabat@redhat.com>,
-	"lorenzo@kernel.org" <lorenzo@kernel.org>
-Subject: Re: mlx5 XDP redirect leaking memory on kernel 6.3
-Message-ID: <2023071705-senorita-unafraid-25b8@gregkh>
-References: <d862a131-5e31-bd26-84f7-fd8764ca9d48@redhat.com>
- <00ca7beb7fe054a3ba1a36c61c1e3b1314369f11.camel@nvidia.com>
- <6d47e22e-f128-ec8f-bbdc-c030483a8783@redhat.com>
- <cc918a244723bffe17f528fc1b9a82c0808a22be.camel@nvidia.com>
- <324a5a08-3053-6ab6-d47e-7413d9f2f443@redhat.com>
- <2023071357-unscrew-customary-fbae@gregkh>
- <32726772de5996305d0cfd4b6948933c47cb7927.camel@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F74D253A1
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 14:44:49 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B5DB2
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:44:48 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c361777c7f7so8890556276.0
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689605087; x=1692197087;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BPMo0HlhyFyTA8FO5Al8xNPjluuBmMacNlBRx6aTqjE=;
+        b=ni0O46vBBt2ZGNUoCCEtSz/YwFK7eLJGG/EQtXoc+4S1thO1aUNWiktmYsDCtrDtG5
+         kP3S+g7oc9Hzb/jKtRoiYO//sxpVdH+ogYh21pQzckcJRITT+/9vr5WfgXh4c1642FF1
+         nP6AroyrptBp2Oikl7+rgaTNiMnlDUz1MSsXif8GwLlblESzdmQra1up1zkiQA1Xtfp6
+         1pXVGtE9Kj7nqdyYYp48tLKQ1Zln5RuR2qWfas0CwVqmgz0cIalAJebhIakBj8XBcNDz
+         5hOBgIgmynuTVdU9hv1WQt47xwwg95o+MhjKYHRwUyhqjNI3/euSH1nTAlD4IkL3gOYq
+         vWAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689605087; x=1692197087;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BPMo0HlhyFyTA8FO5Al8xNPjluuBmMacNlBRx6aTqjE=;
+        b=Vk4+mbeFIBALXAY+3r85qf6yxdDtAQTVasiucK2wVhZoimkgLhpolUv0Qkak+RaaMG
+         r2sYeS7rFyZAtA7CNZnu41ZLaK3zQmzU8srB/P4s74WV8DYWoDGNzjWXz/iUR8VJxHhs
+         YHOicfdXWDrLQJMQILsMMlnYGHSXkiZqgm4BDId+IpbHIlkZXgNev8NxG5VBp+TVhmjg
+         dmmvZe3FjDgkDxUk3n5EEYus9zafhLHKJtClS5HGunWzd8gTBbpowSG7R5WYYwFif4r4
+         bPBaEPu94J8luqxwLJe/h3HG5DIQ6RkH8wFYaojnVsYpOt6ZJHgofo2XHr5Be7ZSyHVE
+         U05Q==
+X-Gm-Message-State: ABy/qLajIkxlAth+dez1A6kFkuQM2Hxdnjbf6lIlcPgP9Zkar2mN3dMw
+	KLQKWx0pBtPy2Fkg9TtLmC2R/0mL1Vrxpg==
+X-Google-Smtp-Source: APBJJlG+vPbin/TVoaVY93LYcBFOe03Y/n6SKW8D2r7xutcJGeIczXDzZ7Er/sKtG2fwwQR6iTpzHeJXhtRSDA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:11c9:b0:c2c:1b68:99b0 with SMTP
+ id n9-20020a05690211c900b00c2c1b6899b0mr191401ybu.5.1689605087514; Mon, 17
+ Jul 2023 07:44:47 -0700 (PDT)
+Date: Mon, 17 Jul 2023 14:44:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <32726772de5996305d0cfd4b6948933c47cb7927.camel@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230717144445.653164-1-edumazet@google.com>
+Subject: [PATCH net 0/2] tcp: annotate data-races in tcp_rsk(req)
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Jul 17, 2023 at 02:37:44PM +0000, Dragos Tatulea wrote:
-> On Thu, 2023-07-13 at 17:31 +0200, Greg KH wrote:
-> > On Thu, Jul 13, 2023 at 04:58:04PM +0200, Jesper Dangaard Brouer wrote:
-> > > 
-> > > 
-> > > On 13/07/2023 12.11, Dragos Tatulea wrote:
-> > > > Gi Jesper,
-> > > > On Thu, 2023-07-13 at 11:20 +0200, Jesper Dangaard Brouer wrote:
-> > > > > Hi Dragos,
-> > > > > 
-> > > > > Below you promised to work on a fix for XDP redirect memory leak...
-> > > > > What is the status?
-> > > > > 
-> > > > The fix got merged into net a week ago:
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/drivers/net/ethernet/mellanox/mlx5/core?id=7abd955a58fb0fcd4e756fa2065c03ae488fcfa7
-> > > > 
-> > > > Just forgot to follow up on this thread. Sorry about that...
-> > > > 
-> > > 
-> > > Good to see it being fixed in net.git commit:
-> > >  7abd955a58fb ("net/mlx5e: RX, Fix page_pool page fragment tracking for
-> > > XDP")
-> > > 
-> > > This need to be backported into stable tree 6.3, but I can see 6.3.13 is
-> > > marked EOL (End-of-Life).
-> > > Can we still get this fix applied? (Cc. GregKH)
-> > 
-> > <formletter>
-> > 
-> > This is not the correct way to submit patches for inclusion in the
-> > stable kernel tree.  Please read:
-> >     https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-> > for how to do this properly.
-> > 
-> > </formletter>
-> So...I am a bit confused: should I send the patch to stable for 6.13 according
-> to the stable submission rules or is it too late?
+Small series addressing two syzbot reports around tcp_rsk(req)
 
-There is no "6.13" kernel version yet, that should not happen for
-another year or so.
+Eric Dumazet (2):
+  tcp: annotate data-races around tcp_rsk(req)->txhash
+  tcp: annotate data-races around tcp_rsk(req)->ts_recent
 
-If you mean the "6.3.y" tree, yes, there is nothing to do here as that
-tree is end-of-life and you should have moved to the 6.4.y kernel tree
-at this point in time.
+ net/ipv4/tcp_ipv4.c      |  5 +++--
+ net/ipv4/tcp_minisocks.c | 11 +++++++----
+ net/ipv4/tcp_output.c    |  6 +++---
+ net/ipv6/tcp_ipv6.c      |  4 ++--
+ 4 files changed, 15 insertions(+), 11 deletions(-)
 
-What is preventing you from moving?
+-- 
+2.41.0.255.g8b1d071c50-goog
 
-thanks,
-
-greg k-h
 
