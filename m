@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-18216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A7E755D63
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:48:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33095755D70
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C08B3281134
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:48:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E20502810A4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E7C9456;
-	Mon, 17 Jul 2023 07:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3068D9463;
+	Mon, 17 Jul 2023 07:49:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE189453
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248A05CB8
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:49:58 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55921E4E
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:48:06 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E162DE
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:49:57 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qLIxK-0006Le-0u; Mon, 17 Jul 2023 09:47:42 +0200
+	id 1qLIzA-0006dj-I5; Mon, 17 Jul 2023 09:49:36 +0200
 Received: from pengutronix.de (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B6C8C1F3103;
-	Mon, 17 Jul 2023 07:47:36 +0000 (UTC)
-Date: Mon, 17 Jul 2023 09:47:36 +0200
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 7CB481F310E;
+	Mon, 17 Jul 2023 07:49:30 +0000 (UTC)
+Date: Mon, 17 Jul 2023 09:49:29 +0200
 From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: YueHaibing <yuehaibing@huawei.com>
-Cc: socketcan@hartkopp.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, urs.thuermann@volkswagen.de,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] can: bcm: Fix UAF in bcm_proc_show()
-Message-ID: <20230717-uplifted-external-b00b04bbc903-mkl@pengutronix.de>
-References: <20230715092543.15548-1-yuehaibing@huawei.com>
+To: Michal Sojka <michal.sojka@cvut.cz>
+Cc: Maxime Jayat <maxime.jayat@mobile-devices.fr>,
+	Oliver Hartkopp <socketcan@hartkopp.net>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Dae R. Jeong" <threeearcat@gmail.com>,
+	Hillf Danton <hdanton@sina.com>
+Subject: Re: can: isotp: epoll breaks isotp_sendmsg
+Message-ID: <20230717-disbelief-catalyst-bcff471e0433-mkl@pengutronix.de>
+References: <11328958-453f-447f-9af8-3b5824dfb041@munic.io>
+ <87cz1czihl.fsf@steelpick.2x.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,9 +52,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="g6pb5lgpv7xgaiok"
+	protocol="application/pgp-signature"; boundary="mfssbwpjvgohqem3"
 Content-Disposition: inline
-In-Reply-To: <20230715092543.15548-1-yuehaibing@huawei.com>
+In-Reply-To: <87cz1czihl.fsf@steelpick.2x.cz>
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
@@ -64,62 +66,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
---g6pb5lgpv7xgaiok
+--mfssbwpjvgohqem3
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 15.07.2023 17:25:43, YueHaibing wrote:
-> BUG: KASAN: slab-use-after-free in bcm_proc_show+0x969/0xa80
-> Read of size 8 at addr ffff888155846230 by task cat/7862
+On 01.07.2023 00:35:18, Michal Sojka wrote:
+> Hi Maxime,
 >=20
-> CPU: 1 PID: 7862 Comm: cat Not tainted 6.5.0-rc1-00153-gc8746099c197 #230
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0xd5/0x150
->  print_report+0xc1/0x5e0
->  kasan_report+0xba/0xf0
->  bcm_proc_show+0x969/0xa80
->  seq_read_iter+0x4f6/0x1260
->  seq_read+0x165/0x210
->  proc_reg_read+0x227/0x300
->  vfs_read+0x1d5/0x8d0
->  ksys_read+0x11e/0x240
->  do_syscall_64+0x35/0xb0
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> On Fri, Jun 30 2023, Maxime Jayat wrote:
+> > Hi,
+> >
+> > There is something not clear happening with the non-blocking behavior
+> > of ISO-TP sockets in the TX path, but more importantly, using epoll now
+> > completely breaks isotp_sendmsg.
+> > I believe it is related to
+> > 79e19fa79c ("can: isotp: isotp_ops: fix poll() to not report false=20
+> > EPOLLOUT events"),
+> > but actually is probably deeper than that.
+> >
+> > I don't completely understand what is exactly going on, so I am sharing
+> > the problem I face:
+> >
+> > With an ISO-TP socket in non-blocking mode, using epoll seems to make
+> > isotp_sendmsg always return -EAGAIN.
 >=20
-> Allocated by task 7846:
->  kasan_save_stack+0x1e/0x40
->  kasan_set_track+0x21/0x30
->  __kasan_kmalloc+0x9e/0xa0
->  bcm_sendmsg+0x264b/0x44e0
->  sock_sendmsg+0xda/0x180
->  ____sys_sendmsg+0x735/0x920
->  ___sys_sendmsg+0x11d/0x1b0
->  __sys_sendmsg+0xfa/0x1d0
->  do_syscall_64+0x35/0xb0
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> That's definitely not expected behavior. I tested the patch only with
+> poll, hoping that epoll would behave the same.
 >=20
-> Freed by task 7846:
->  kasan_save_stack+0x1e/0x40
->  kasan_set_track+0x21/0x30
->  kasan_save_free_info+0x27/0x40
->  ____kasan_slab_free+0x161/0x1c0
->  slab_free_freelist_hook+0x119/0x220
->  __kmem_cache_free+0xb4/0x2e0
->  rcu_core+0x809/0x1bd0
+> [...]
 >=20
-> bcm_op is freed before procfs entry be removed in bcm_release(),
-> this lead to bcm_proc_show() may read the freed bcm_op.
+> >
+> > By reverting 79e19fa79c, I get better results but still incorrect:
 >=20
-> Fixes: ffd980f976e7 ("[CAN]: Add broadcast manager (bcm) protocol")
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> [...]
+>=20
+> > It is then possible to write on the socket but the write is blocking,
+> > which is not the expected behavior for a non-blocking socket.
+>=20
+> Yes, incorrect behavior was why we made the commit in question, however
+> we saw write() returning -EAGAIN when it shouldn't.
+>=20
+> > I don't know how to solve the problem. To me, using wq_has_sleeper seem=
+s=20
+> > weird.
+>=20
+> Agreed. I've never tried to understand how synchronization works here.
+> Hopefully, Oliver knows more.
+>=20
+> > The implementation of isotp_poll feels weird too (calling both=20
+> > datagram_poll and
+> > poll_wait?). But I am not sure what would be the correct
+> > implementation.
+>=20
+> I understand it as follows (which might be wrong - someone, please
+> correct me), isotp_poll() should register the file with all waitqueues
+> it can wait on. so->wait is one and sock->sq.wait (used by
+> datagram_poll) is another. The former is definitely used for TX, the
+> latter is probably used because skb_recv_datagram() is called for RX.
+> But so->wait is also used for RX and there might proabbly be be some
+> inconsistency between those.
+>=20
+> > My actual use-case is in Async Rust using tokio.
+>=20
+> Our initial motivation was also Rust and tokio however than I did
+> testing only with simple C programs. I'm definitely interested in having
+> this working.
+>=20
+> I'll try to look at this in more detail during the weekend. It's too
+> late for me today.
 
-Added to linux-can/testing.
+Any progress on this issue?
 
-Thanks,
 Marc
 
 --=20
@@ -128,20 +146,20 @@ Embedded Linux                   | https://www.pengutronix.de |
 Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
 Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
---g6pb5lgpv7xgaiok
+--mfssbwpjvgohqem3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS08hAACgkQvlAcSiqK
-BOgFfggAojcEQr4p6wI4mldHtmOX14t0aqIERyhQpbvkzhb64+YzcZNxtLwM4eQn
-UBl7jachYSRvkfspDqNZZSV12RoTyR/pKual6tiYu3T/dHIgEGoVBPIMp8LIn/8G
-wc7e9pAD55gAqvFiwZvc/U7Gqh29hRMvJT/6ufbNXQKfhZUEIlxQ89CzG5Nyunzr
-I8PKVOaeewcHyuQW6OmF7VifvxduBR5QFxUj6Fvjg2WwmH7hzvvccdIK5UOZluwX
-CCLxR73C5OfCIVkhTQFHHe9NW3JZkY+vVKCdOZWuroZwc+JfHUf0764+w7o4+PTn
-m6ZO/UjtObBvvj1BDl9opGx2DkrlHA==
-=I2KL
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS08oYACgkQvlAcSiqK
+BOhHswf/SZj4m2DVNOkl8OLWL+ZJXTBoXd/S2pg2MLr7/+pO98wd8wbmGN5Kn6T9
+cToBbnCaa6TEHzCROw0uQDM8BwoWxwPlcfaKpEFKdze1grV+lMYcSVI1nlaM19xR
+es+jWh45mQnxhPjjDDNHowucfA7z+ivXYo46yf3LJsYVSfznf+/LIwlvKU4PMz0d
+Vzwxar8/aStqGF1+i3vLNDnP99JwG2U3EqmjLGer80tP+n0qetxbuHkdShq05GpJ
+4e5KS8/yXxvXgEJM1LNlhNh4W5oig+qivhE1pPIDAOt6fv4iptWjF3FEEMHsHdzC
+x6fxKMIscbIL+6KmBwSt+7kz9iMoTA==
+=uF3O
 -----END PGP SIGNATURE-----
 
---g6pb5lgpv7xgaiok--
+--mfssbwpjvgohqem3--
 
