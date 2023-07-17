@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-18288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE1E7564CD
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:25:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C02517564CE
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC35D281237
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:25:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB75A1C20949
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2ABC133;
-	Mon, 17 Jul 2023 13:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B90C13F;
+	Mon, 17 Jul 2023 13:21:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFD7BE72
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D56C13D
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:48 +0000 (UTC)
 Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF9EE48
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:44 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3143798f542so4811292f8f.2
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:44 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC4291993
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:45 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-314313f127fso4267570f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689600103; x=1692192103;
+        d=tessares.net; s=google; t=1689600104; x=1692192104;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ffO4W4EQWHxo8KIqV6iOyAqVl124f23PZCphXPbte4k=;
-        b=GZ6kbwSRmtwJ9H8oQAfoPajp7rwgWWQXDMXZ0EgKAT5DXLgd7jeKshMFBHyU7onFnj
-         bF95vFhkWt8KZfwF5cmKnaboYllwi30bWC0K6KC7fSDekhk1cs/66QFRX7KWfImzaNGK
-         Wm7JlUsO91gbrZD7mx6t2tSUwxwe5+/24dIFkz4qS16jgoVCI4/w9viGnQCSoZWMbyIw
-         dwFcykHacoB5zLZfTGbdGxlm07WsMqnkbrG5Ss4fFuEn+mco0QskNGspfsH2ibYxdw/I
-         eoBzZfHYREYd138/jg+L9vHjsAXHE96XTo1xLzLDPRAXQgXZ+7bn0/3rj5hoBbfHEXOR
-         NrJg==
+        bh=qBOqH44Vz4R+VcpMvI7khUyXQTww1r694G16N8Cq238=;
+        b=sUY5WVmByVVpYN5Bor9mcnHVbvxaNOnkv7BRXRX+CZnJaXaSy+BKpmbQCIHqQwukxk
+         nMKm4FB/4RypxGUzqeNM+hRzYbCmKkszed5mRsBPBtQd/PxYsJCWFxGzsxXF3Lt1TcnG
+         TrIDu3CovERBy/ZZ0ClicBzRkBM0vRVkLOnmuAjo3rZySJqCdn/aFDL6xq+NpXlsHrU3
+         Dx7EGvUmU4D3oFOukSAiM6/7fWAJZl/CWd7P50M/ZTDMTanW9Jfw7q6pQohzejt4mGYv
+         PSMVA1wGYrKZQrvA35RHZ6LcwrX8c7n/BJltIxgdFoGoPtcQJarJPCd0gOgptQeZkFSl
+         CpLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689600103; x=1692192103;
+        d=1e100.net; s=20221208; t=1689600104; x=1692192104;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ffO4W4EQWHxo8KIqV6iOyAqVl124f23PZCphXPbte4k=;
-        b=Nd8NMauw5u/5hHwZDkZawZwMSBwebBaYghOp/Ohvq61Pjd32NlbhlUAUXLRO9ik54V
-         tzpHueDWQIxgUk61zWoabEMHdJs+jo2ILXGJxYnX1w3i70lEdHfYOV7xYV8zfeaeqGH2
-         LycMwVARASC6A7aR5n7gFP9wI0P3vUeM8S3bQ29/HDDd7kbeAO+Qsb/zC8L4rRM49rBl
-         uwbdqPO0i5FJN3oxvkAEMD2heCx6Am1NJm7ArKqEo3qA77/dEdXq8aFMzpaeu1v1gshO
-         12Qwo2LisIRbtj5rVNdn6DkbfVNBCGWm9GBARp7xIRWvD2MX6Anx2N7r122IX/ulihNC
-         39jQ==
-X-Gm-Message-State: ABy/qLaOcV13vaKCGeV2xgt9uv70uuVmtRe5RHx+xsEIlp8j6Yhg/803
-	RI6uvkgtI5wjsMGSjAqaxAJiEgHAih9p9zy5SUwK1A==
-X-Google-Smtp-Source: APBJJlE+swCqfwfWW8CZu6GIMx6TAqPUztdyPMl1HVwqJeXUp83LK01rJCNTLJey19jQh/EKMXv7Bw==
-X-Received: by 2002:adf:f802:0:b0:314:3503:15ac with SMTP id s2-20020adff802000000b00314350315acmr10661582wrp.10.1689600103187;
-        Mon, 17 Jul 2023 06:21:43 -0700 (PDT)
+        bh=qBOqH44Vz4R+VcpMvI7khUyXQTww1r694G16N8Cq238=;
+        b=OthkFjOchUQEEqk1pp8xRjTmmDdTrja3FC29dcVzp3WRVxTFJTnsL2d5Sas7w3tidq
+         aWKKl4fhDSQtHR/8i+ZdRAKpmh3kiAtVaFqVbAcA5s7MOKJri8zhKCy7yoo3Qxhenbib
+         xw9yHPdsgzprl5IOAt7YnoILezEjnvK5saRVXTpqwuUqap3UyMbUmI/M2w1IjwLhgBwF
+         qIhXqGM08QQlpWKmsnNpJSnwAfxVx2DNo/t9sAf0bOBLSxdhM4m4U6gmqw4V7IXDacGa
+         96YjegCZol4VWBgtHWYiBLRqH+U4Y0L+9mElwcrXaMvujbboIfQ4Tyu9uCPUrsRjWzIC
+         h1Uw==
+X-Gm-Message-State: ABy/qLbLqHGY+wC2Q+UkPham96MefTL8SjhjlIv8yFvRTupw23yVzXA8
+	vd8ovPsRULLOQ9rORs2Vxu8L5EaLnnx+p4R1L7bI5g==
+X-Google-Smtp-Source: APBJJlHFvIl2bGE22utOGrNAY+DBENOz3VfdMSQ2pPhkpL/vhT4cjaugwz1aUqRITvRFTiNEDFnv/Q==
+X-Received: by 2002:a5d:4090:0:b0:314:16db:537d with SMTP id o16-20020a5d4090000000b0031416db537dmr9496395wrp.2.1689600104038;
+        Mon, 17 Jul 2023 06:21:44 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.42
+        by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 06:21:42 -0700 (PDT)
+        Mon, 17 Jul 2023 06:21:43 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Mon, 17 Jul 2023 15:21:29 +0200
-Subject: [PATCH net-next 09/13] selftests: mptcp: join: format subtests
+Date: Mon, 17 Jul 2023 15:21:30 +0200
+Subject: [PATCH net-next 10/13] selftests: mptcp: diag: format subtests
  results in TAP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-9-695127e0ad83@tessares.net>
+Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-10-695127e0ad83@tessares.net>
 References: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 In-Reply-To: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -79,21 +79,21 @@ Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3349;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2543;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=NF5CIKc8WYRjOdcI7eA+jp7LCxbfGJNcFz42dEbqk4w=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdJAXydFet2+2QoGL+wn0r5wPmaTMV1qF4Q
- AQbX/TVvoOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
- c/Z+EACqbNbameFCixDbpc8StNWaeuTfwLcbViHXjPAaAKPKVeN/FdmR+pkQSP7ZlY8RQpcfqYS
- miGYRn9NP7zEsb/D2FizCOvE213sVA3OIGNlAcDX4nGz6aqGAJM1XIg5H9ZTcd4jwCzAW6ewR9q
- bV6wQuVD+9aLiDHyQOrS6IwgxezBafNF8nTk+2aKVAL/aDoNwqTjnp7T+V+JGeymQphbZAto6OD
- 6J5KknYHdNm+2fmNGJ9VIJVJpd1YYTb/16hdzgHTZ8P1nZmxjhrrqW3IRVG4wM0gdaQw8xg7YPo
- TFzx7FJPsjG0KGnVY//YetjfeLT71KEnf7cg78Ee1v2bYNAYBAdpnaSPATGTOUaJ37AnE1klOmP
- suY/Vu/ASEKmX//j6IMV1LRe8tMd4gbErO38iGL2RhSkRKh+ksFvTyj4M1umCGStF+A76zj3yOq
- GT3CDpwt7D26ZPAXQxGZzXctkwBns3/HYonQ6xJCKYPQdAjgFPwT9vowwtUfIUEMhvk7jZrRM7U
- Zob2NQU58uPId4X3zrjpbVSWADBUmTM9F1PkUBP1/GYFmk+7dmiWYQGUHOOL5sjwy+b4omi/i9p
- Ii4L3yZlZ6Dh2cXLjv6K1d/TmJilJBmIhLvWNh/uR06c4uXf/FPH+t6XgllE1XPXz0OD0S19gPv
- Hynf1ni+73tru5Q==
+ bh=/X8yB/Q/5H0ck3AYzdwQCCKzR1Ceke12Ddz4qww4J1I=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdzgBG7tpd6VcdACIJrZ2iQEKTlQl3ern2Z
+ WB8oKksKOmJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
+ cxDyEACC6/KvRWepq+/zSNBHHv8PQkU6bD/VTAjqvH8N81+mXe2C5HmaNV/G5xe9vVkjZJC+Ng3
+ 8ld3zbeSIYR4zPHnp9Cwt4p/tBO7nAfRoIFrfawl6X4qjGx53a5aUv66+UKiYQS6ahYmeldd0hS
+ O1Px9HEoe79lAUdRg3JClU5LFbvT7N94Buk/58BoZaA7ac78/uxxg0iBSfVLVn9qGQKax2bjVoO
+ jlyAWFXCr3BSHAOFAMg7c5ma/cSJfdms07Ix5RkS6USVXIUBvvT38lE0T5dcMKzCA+GhFoiTUX1
+ C3qGVcS07t6M44SHYDtx63Wz6ZkAJ++In7mNNzHnHFxz0Iyb2kG6fjzZTyCaz25d62oG9Zs+Z/E
+ 0ZnxPgHbJfF1hjHX0Z+HAujBMcYo5GZIHWr0UcHEwoy2Du+OfCHB18rHBF0SRYnGtIpaOk2e4t4
+ 2N/xrAGAt25ImimG/ZjWz11XZiTc4ErOtgL2lHYq/3YDq9YeT6LwzZOdodi7UEwcdjPEysFXELP
+ quxJV3PmT/v/E8cbES1s/8waz7U/HlJqpaUu6jd5UsdBIG5u8IotRftT+ZsHZrbBTW4R9iDDsGf
+ cVAr7r6ZO6oBcaD05G9c1slSF9A3H5KjCMbETtcDbpRF7f1PQjPDmz0MeBhpVCRasZMNEvgMWwa
+ pzcrtGFXiktjEDw==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -120,108 +120,56 @@ case, if subtests are not tracked, the whole selftest will be marked as
 failed making the other subtests useless because their results are
 ignored.
 
-This patch formats subtests results in TAP in mptcp_join.sh selftest.
-
-In this selftest and before starting each subtest, the 'reset' function
-is called. We can then check if the previous test has passed, failed or
-has been skipped from there.
+This patch formats subtests results in TAP in diag.sh selftest.
 
 Link: https://github.com/multipath-tcp/mptcp_net-next/issues/368
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 37 +++++++++++++++++++++----
- 1 file changed, 32 insertions(+), 5 deletions(-)
+ tools/testing/selftests/net/mptcp/diag.sh | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index b5eeea4c3efa..f336f86d652e 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -39,7 +39,9 @@ evts_ns1=""
- evts_ns2=""
- evts_ns1_pid=0
- evts_ns2_pid=0
--stats_dumped=0
-+last_test_failed=0
-+last_test_skipped=0
-+last_test_ignored=1
- 
- declare -A all_tests
- declare -a only_tests_ids
-@@ -101,7 +103,6 @@ init_partial()
+diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
+index fa9e09ad97d9..85a8ee9395b3 100755
+--- a/tools/testing/selftests/net/mptcp/diag.sh
++++ b/tools/testing/selftests/net/mptcp/diag.sh
+@@ -65,12 +65,15 @@ __chk_nr()
+ 	if [ $nr != $expected ]; then
+ 		if [ $nr = "$skip" ] && ! mptcp_lib_expect_all_features; then
+ 			echo "[ skip ] Feature probably not supported"
++			mptcp_lib_result_skip "${msg}"
+ 		else
+ 			echo "[ fail ] expected $expected found $nr"
++			mptcp_lib_result_fail "${msg}"
+ 			ret=$test_cnt
  		fi
- 	done
- 
--	stats_dumped=0
- 	check_invert=0
- 	validate_checksum=$checksum
- 
-@@ -216,6 +217,8 @@ mark_as_skipped()
- 
- 	print_title "[ skip ] ${msg}"
- 	printf "\n"
-+
-+	last_test_skipped=1
- }
- 
- # $@: condition
-@@ -248,14 +251,32 @@ skip_test()
- 	return 0
- }
- 
-+append_prev_results()
-+{
-+	if [ ${last_test_failed} -eq 1 ]; then
-+		mptcp_lib_result_fail "${TEST_NAME}"
-+	elif [ ${last_test_skipped} -eq 1 ]; then
-+		mptcp_lib_result_skip "${TEST_NAME}"
-+	elif [ ${last_test_ignored} -ne 1 ]; then
-+		mptcp_lib_result_pass "${TEST_NAME}"
-+	fi
-+
-+	last_test_failed=0
-+	last_test_skipped=0
-+	last_test_ignored=0
-+}
-+
- # $1: test name
- reset()
- {
-+	append_prev_results
-+
- 	TEST_NAME="${1}"
- 
- 	TEST_COUNT=$((TEST_COUNT+1))
- 
- 	if skip_test; then
-+		last_test_ignored=1
- 		return 1
+ 	else
+ 		echo "[  ok  ]"
++		mptcp_lib_result_pass "${msg}"
  	fi
- 
-@@ -442,10 +463,13 @@ reset_with_tcp_filter()
- fail_test()
- {
- 	ret=1
--	failed_tests[${TEST_COUNT}]="${TEST_NAME}"
- 
--	[ "${stats_dumped}" = 0 ] && dump_stats
--	stats_dumped=1
-+	# just in case a test is marked twice as failed
-+	if [ ${last_test_failed} -eq 0 ]; then
-+		failed_tests[${TEST_COUNT}]="${TEST_NAME}"
-+		dump_stats
-+		last_test_failed=1
-+	fi
+ 	test_cnt=$((test_cnt+1))
  }
+@@ -111,12 +114,15 @@ wait_msk_nr()
+ 	printf "%-50s" "$msg"
+ 	if [ $i -ge $timeout ]; then
+ 		echo "[ fail ] timeout while expecting $expected max $max last $nr"
++		mptcp_lib_result_fail "${msg} # timeout"
+ 		ret=$test_cnt
+ 	elif [ $nr != $expected ]; then
+ 		echo "[ fail ] expected $expected found $nr"
++		mptcp_lib_result_fail "${msg} # unexpected result"
+ 		ret=$test_cnt
+ 	else
+ 		echo "[  ok  ]"
++		mptcp_lib_result_pass "${msg}"
+ 	fi
+ 	test_cnt=$((test_cnt+1))
+ }
+@@ -276,4 +282,5 @@ flush_pids
  
- get_failed_tests_ids()
-@@ -3599,4 +3623,7 @@ if [ ${ret} -ne 0 ]; then
- 	echo
- fi
+ chk_msk_inuse 0 "....chk 0 msk in use after flush"
  
-+append_prev_results
 +mptcp_lib_result_print_all_tap
-+
  exit $ret
 
 -- 
