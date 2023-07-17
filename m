@@ -1,111 +1,106 @@
-Return-Path: <netdev+bounces-18274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B5775634E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:53:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5026E7563C0
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A8591C209EC
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 12:53:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3A19281213
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E02CAD3C;
-	Mon, 17 Jul 2023 12:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D750DAD50;
+	Mon, 17 Jul 2023 13:04:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C11883A
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 12:53:23 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D36173B
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 05:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=FghBvVCdoIzcPT/sKoGIbyEbSBPC09v/P52guL1mFJ4=; b=3K
-	u85qIJxz5f5Nr6Zg893rEyhgOJ/vt68dlw0ouCrv2H+qDbbFi9u7w5oWeyI9CI0xR+dhb61MWUFn4
-	8xwO5dYIPz6TW80ob6RGvsrc+Fq4e8i/XAAdUhJMLsdnx9kZbz7CX+BY6xVUzVBlvyB2cl6/o9Rmo
-	voXypyWvFqlxiW8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qLNiw-001Xq7-No; Mon, 17 Jul 2023 14:53:10 +0200
-Date: Mon, 17 Jul 2023 14:53:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Riccardo Laiolo <laiolo@leaff.it>
-Cc: netdev@vger.kernel.org
-Subject: Re: Question on IGMP snooping on switch managment port
-Message-ID: <793efa88-2a97-4cc3-9f84-101eef51962d@lunn.ch>
-References: <a9d86e8e-2e7e-fe03-731c-ad4c372d4048@leaff.it>
- <db7508ce-6e92-a199-584b-0a729cd767b9@leaff.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42011883A
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:04:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CF16C433C8;
+	Mon, 17 Jul 2023 13:04:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689599054;
+	bh=ze2MlGoasoOaP8JdKIbXQC5TEDKOOs+yneRfEWByn5o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EkaRIIzA3aAEDj9NrQ5MDbHNz063EwSrpyfSv9pG4wotRVhFLclI0Obr0MY7Pgdq1
+	 Wt5wCFtB9Ao8UbM4sVh0pSNHIfbMIl5WtLE92l3dGhHIGC3V3M2YsYEMO2WrJ0e5h+
+	 xM3CFFWl354Gc5UXDE+O+sGKTWofVXmaXcRGBdW2C/uZAGTqIBRhy1wcCkzVM467IT
+	 d/L79wy8olbzvFALkQS3+0j7imErqc2pNCIdxrdCONcJf+fySryHGb5dmcV9BzjSYS
+	 Hng/UL086GSNEQjTEyfyS+CeCz+4bJqkraSB5JUPcw3MqIo4RV7lZQd9LkOXgg8OGg
+	 wabFVAZN19nqw==
+Date: Mon, 17 Jul 2023 14:04:08 +0100
+From: Lee Jones <lee@kernel.org>
+To: Zheng Hacker <hackerzheng666@gmail.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, Jakub Kicinski <kuba@kernel.org>,
+	Zheng Wang <zyytlz.wz@163.com>, davem@davemloft.net,
+	linyunsheng@huawei.com, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	1395428693sheep@gmail.com, alex000young@gmail.com
+Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
+Message-ID: <20230717130408.GC1082701@google.com>
+References: <20230311180630.4011201-1-zyytlz.wz@163.com>
+ <20230710114253.GA132195@google.com>
+ <20230710091545.5df553fc@kernel.org>
+ <20230712115633.GB10768@google.com>
+ <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
+ <a116e972-dfcf-6923-1ad3-a40870e02f6a@omp.ru>
+ <CAJedcCz1ynutATi9qev1t3-moXti_19ZJSzgC2t-5q4JAYG3dw@mail.gmail.com>
+ <CAJedcCydqmVBrNq_RCDF2gRds39XqWORFi32MV+9LGa5p28dPQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <db7508ce-6e92-a199-584b-0a729cd767b9@leaff.it>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <CAJedcCydqmVBrNq_RCDF2gRds39XqWORFi32MV+9LGa5p28dPQ@mail.gmail.com>
 
-On Mon, Jul 17, 2023 at 09:32:35AM +0200, Riccardo Laiolo wrote:
-> Hi,
-> 
-> I'm working on a NXP-based embedded board (imx8mp) with a Marvell mv88e6390 switch.
-> I'm running Linux 5.15.71 from the NXP downstream git repository (which is a year behind
-> the upstream 5.15.y LTS release, I think). I've applied all the commits related to the Marvell
-> driver from the 5.15LTS upstream that I was missing into my codebase.
-> 
-> I can't get the IGMP snooping to works properly. On front facing ports, it appears to work fine:
-> MDB rules get correctly updated and multicast packets get blocked or routed accordingly. But when
-> the subscribed is my embedded device (so the subscribed device is the switch
-> management port) it doesn't work. The first IGMP packet get correctly routed and
-> propagated through te network and all the interested node update their MDB entry list.
-> 
-> From now on all the outgoing IGMP packets get dropped.
-> 
-> 
-> Adding and removing MDB rules by hand I found the offending rule appears to be
-> 	dev br0 port br0 grp 224.0.1.185 temp
-> 
-> this rule gets correctly appended when I open a multicast rx socket,
-> but my device fails to answer to any IMGP membership query until I remove said rule.
-> 
-> What am I missing? Is it possible for a linux network switch to be a multicast recipient device?
+On Sun, 16 Jul 2023, Zheng Hacker wrote:
+> Zheng Hacker <hackerzheng666@gmail.com> 于2023年7月16日周日 10:11写道：
+> >
+> > Hello,
+> >
+> > This bug is found by static analysis. I'm sorry that my friends apply
+> > for a CVE number before we really fix it. We made a list about the
+> > bugs we have submitted and wouldn't disclose them before the fix. But
+> > we had a inconsistent situation last month. And we applied it by
+> > mistake foe we thought we had fixed it. And so sorry about my late
+> > reply, I'll see the patch right now.
+> >
+> > Best regards,
+> > Zheng Wang
+> >
+> > Sergey Shtylyov <s.shtylyov@omp.ru> 于2023年7月16日周日 04:48写道：
+> > >
+> > > On 7/15/23 7:07 PM, Zheng Hacker wrote:
+> > >
+> > > > Sorry for my late reply. I'll see what I can do later.
+> > >
+> > >    That's good to hear!
+> > >    Because I'm now only able to look at it during weekends...
+> > >
+> > > > Lee Jones <lee@kernel.org> 于2023年7月12日周三 19:56写道：
+> > > >>
+> > > >> On Mon, 10 Jul 2023, Jakub Kicinski wrote:
+> > > >>
+> > > >>> On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
+> > > >>>> For better or worse, it looks like this issue was assigned a CVE.
+> > > >>>
+> > > >>> Ugh, what a joke.
+> > > >>
+> > > >> I think that's putting it politely. :)
+>
+> After reviewing the code, I think it's better to put the code in
+> ravb_remove. For the ravb_remove is bound with the device and
+> ravb_close is bound with the file. We may not call ravb_close if
+> there's no file opened.
 
-Hi Riccardo
+When you do submit this, would you be kind enough to Cc me please?
 
-It is a good idea to test the latest kernel before reporting problems
-to mainline. You can then determine if its a known and fixed issue,
-and the back port is missing, or it is something new. Any fix will be
-applied to the latest kernel, and will then need back porting.
-
-I would be interested in knowing if:
-
-commit 7bcad0f0e6fbc1d613e49e0ee35c8e5f2e685bb0
-Author: Steffen B�tz <steffen@innosonix.de>
-Date:   Wed Mar 29 12:01:40 2023 -0300
-
-    net: dsa: mv88e6xxx: Enable IGMP snooping on user ports only
-    
-    Do not set the MV88E6XXX_PORT_CTL0_IGMP_MLD_SNOOP bit on CPU or DSA ports.
-    
-    This allows the host CPU port to be a regular IGMP listener by sending out
-    IGMP Membership Reports, which would otherwise not be forwarded by the
-    mv88exxx chip, but directly looped back to the CPU port itself.
-
-
-helps.
-
-	Andrew
+-- 
+Lee Jones [李琼斯]
 
