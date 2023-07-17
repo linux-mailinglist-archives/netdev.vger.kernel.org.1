@@ -1,120 +1,187 @@
-Return-Path: <netdev+bounces-18403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66E6756C6D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:48:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BE33756C89
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3EBC1C208EA
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:48:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 569CD1C20B78
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A856BA50;
-	Mon, 17 Jul 2023 18:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1976CBE4A;
+	Mon, 17 Jul 2023 18:53:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D19B253B8
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 18:48:16 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A679D
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:48:15 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-98df3dea907so634942066b.3
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:48:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D54823C8
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 18:53:56 +0000 (UTC)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB49DAF
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:53:54 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1b9c368f4b5so38068995ad.0
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:53:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689619693; x=1692211693;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ii06RB0ES+DRMclud4V3+/xZnaxwoU1WbsDW6EiAY7U=;
-        b=XlmbEUfVE963tAZD7uX3suEA9JH2LmAscz3ppOt2Mn1M1M7Mx113Wl/ll7SBcOkv4o
-         r0R8bMlYmPe7XTA1iDODJ1nx5xhzS8f0lpZ5J4CWxy2zenK+PJRgRBIUe1YibSFzmJxM
-         HiaiWPRB2XmHJAwJ8G3ylGkyP2JP7bHIFo/s7dJF/21dKzBcv4pGX7r2PJQ8EPz6nZmT
-         p+1WQpiDIfZCKVFzQSO1oDyTgS0n6jeSqQSRd0LV2svRr6NYN6GyMzlPzWTT3tMYtHyn
-         fZbPphpLET56rrtlHVh/tD4VD1S3/NT/IUZt+6W/n8fOq8JWt9heGjKeaBObQAkVb3ki
-         WxrA==
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1689620034; x=1692212034;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=92cG1k59+YM20Ni2fBSwRgRziULSCJmF7NbZO50ZJPg=;
+        b=iqweFRK60ELeBty6vLU6PVkUm8licLY49vjxBYAWrEOOjvnw1ffq1KpdjalIXzwZ06
+         FvFK3kJeGYO79BotSDuo4MclHn0go/qvRgw7Z2otBdBLprFOyRE22Ey/ZgRG5f8h/SD8
+         +i5YIO6INA8QnvogepvU9aucrXY6ImxyLfI4hQoydQn1LIZ5rheoypv0R1XTkqWzl/zk
+         CNalNrRnyZeboJhzx3ClXPzvRHlfQS2r8LZH12MvPEX2h2CrEy26Iu0jLHqcu33Lb8lZ
+         a+5LPjcT6NSl1P7p5B+95EKhD6Tu8Zz0i034rh5Hm2/554W17XQ134Uimg0v+nCHsA6b
+         X+dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689619693; x=1692211693;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ii06RB0ES+DRMclud4V3+/xZnaxwoU1WbsDW6EiAY7U=;
-        b=iCO6ZS6KZrL+WxSzjvu6CGKfU/uwOHhdFJ5y4DKdt5diCitHEjQxloD2MFp/Kln0bC
-         QjPd7xJMRJjxzMP7fPPxe4/5D/nMZi4NYx1bfT58PLqMZRL5HFABDDofkdbDTTrE2Rig
-         P+eFdhBwlBJWurh2krRyEZU6IKhpDtpODfO7rxSvQc+lUJVQFpIBKPoAc+DdUkTa4jsI
-         eu3jT7kHSBXxTnPE1iDDow24Jd0cQr7DPAXsqesP0HxZKST9TObvL5DPsjlo9W7i/Xx4
-         Uo0wg1hyj5m9tX+kLSOe0KInK95+52LuRNr26OYcCaiAKqBCTcG62Ve6Lflrzhj/JRVx
-         S0Ew==
-X-Gm-Message-State: ABy/qLbOjdp7CiBv5xzY5bU7VRgm3MXvWz8R8NuLud5QVWWkJcD72jmw
-	epO7XsVSM8EG/6CkRPeHYhA=
-X-Google-Smtp-Source: APBJJlHtvOC0TqDZxgal8B4dR3k8FBldDQBjIkZm5Uul9QRKpJkEQpxb3TOOL1L3u2CvXZSr2rf2SA==
-X-Received: by 2002:a17:907:58d:b0:992:ab3a:f0d4 with SMTP id vw13-20020a170907058d00b00992ab3af0d4mr8458606ejb.17.1689619693292;
-        Mon, 17 Jul 2023 11:48:13 -0700 (PDT)
-Received: from [192.168.0.110] ([77.124.20.250])
-        by smtp.gmail.com with ESMTPSA id gh5-20020a170906e08500b00992bea2e9d2sm39549ejb.62.2023.07.17.11.48.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 11:48:12 -0700 (PDT)
-Message-ID: <bcf79bb0-00e2-5e4b-807f-ba43d4c122a9@gmail.com>
-Date: Mon, 17 Jul 2023 21:48:10 +0300
+        d=1e100.net; s=20221208; t=1689620034; x=1692212034;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=92cG1k59+YM20Ni2fBSwRgRziULSCJmF7NbZO50ZJPg=;
+        b=bSx+jJS16+BCt0uik6lTXDPzpb2zlHClSoTOqHCNb0DhUoPc2WkJ6gffJACRYbrvnG
+         cwejK8KOQxjK0EUewLClNnmRClzGLIySob4jEhYCptrUtb1/eUIQdP9jFomNig2sN3sG
+         6dpnxrfAuAKpqn8MAtA4PU9+YIcUB2LpcSo2PpUjFNm6KSkBbOvakZFW6dc+gob+W1ne
+         JE8Yvv+4uSgBMc8HxgOKKUjrn/DmeetZT9qb4OR7nxmEsnewikOTLiV8TEbG3Aogf9t0
+         /OZV3p47p5wWPAzFGFPXKEMvfLsBXMK4ZEQg8I64CMqfIDOhLpoHDTK88naBHGhAAQQf
+         H+/w==
+X-Gm-Message-State: ABy/qLb3g73KVBso5GlEqEeFdqr7YcoVaX/vdopZLGes64GyLMncB9SU
+	z+uYgFfzF4PBLpWcyCeJRH6fvdCubf+kQ3n1fwHScw==
+X-Google-Smtp-Source: APBJJlHc4elCqlsmQyPq6HCXBIdrD6GQRCXB0gGj/5dny2qO7E/nmyZ4qdmrdkoA1QcWKIoYqzoqWQ==
+X-Received: by 2002:a17:902:ce90:b0:1b8:417d:d042 with SMTP id f16-20020a170902ce9000b001b8417dd042mr13964468plg.20.1689620034176;
+        Mon, 17 Jul 2023 11:53:54 -0700 (PDT)
+Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
+        by smtp.gmail.com with ESMTPSA id jc6-20020a17090325c600b001b54dcd84e2sm199887plb.240.2023.07.17.11.53.53
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jul 2023 11:53:54 -0700 (PDT)
+Date: Mon, 17 Jul 2023 11:53:52 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Fw: [Bug 217678] New: Unexplainable packet drop starting at v6.4
+Message-ID: <20230717115352.79aecc71@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 1/1] drivers:net: fix return value check in
- mlx5e_ipsec_remove_trailer
-Content-Language: en-US
-To: Yuanjun Gong <ruc_gongyuanjun@163.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20230717144640.23166-1-ruc_gongyuanjun@163.com>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20230717144640.23166-1-ruc_gongyuanjun@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 17/07/2023 17:46, Yuanjun Gong wrote:
-> mlx5e_ipsec_remove_trailer should return an error code if function
-> pskb_trim returns an unexpected value.
-> 
+Begin forwarded message:
 
-It's a fix, please add a Fixes tag.
+Date: Mon, 17 Jul 2023 17:44:27 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 217678] New: Unexplainable packet drop starting at v6.4
 
-> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
-> index eab5bc718771..8d995e304869 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
-> @@ -58,7 +58,9 @@ static int mlx5e_ipsec_remove_trailer(struct sk_buff *skb, struct xfrm_state *x)
->   
->   	trailer_len = alen + plen + 2;
->   
-> -	pskb_trim(skb, skb->len - trailer_len);
-> +	ret = pskb_trim(skb, skb->len - trailer_len);
-> +	if (unlikely(ret))
-> +		return ret;
->   	if (skb->protocol == htons(ETH_P_IP)) {
->   		ipv4hdr->tot_len = htons(ntohs(ipv4hdr->tot_len) - trailer_len);
->   		ip_send_check(ipv4hdr);
 
-Other than that:
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217678
+
+            Bug ID: 217678
+           Summary: Unexplainable packet drop starting at v6.4
+           Product: Networking
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Other
+          Assignee: stephen@networkplumber.org
+          Reporter: hq.dev+kernel@msdfc.xyz
+        Regression: No
+
+Hi,
+
+After I updated to 6.4 through Archlinux kernel update, suddenly I noticed
+random packet losses on my routers like nodes. I have these networking rele=
+vant
+config on my nodes
+
+1. Using archlinux
+2. Network config through systemd-networkd
+3. Using bird2 for BGP routing, but not relevant to this bug.
+4. Using nftables for traffic control, but seems not relevant to this bug.=
+=20
+5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 level
+
+After I ruled out systemd-networkd, nftables related issues. I tracked down
+issues to kernel.
+
+Here's the tcpdump I'm seeing on one side of my node ""
+
+```
+sudo tcpdump -i fios_wan port 38851
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on fios_wan, link-type EN10MB (Ethernet), snapshot length 262144
+bytes
+10:33:06.073236 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP,
+length 148
+10:33:11.406607 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP,
+length 148
+10:33:16.739969 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP,
+length 148
+10:33:21.859856 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP,
+length 148
+10:33:27.193176 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP,
+length 148
+5 packets captured
+5 packets received by filter
+0 packets dropped by kernel
+```
+
+But on the other side "[REDACTED_PUBLIC_IPv4_1]", tcpdump is replying packe=
+ts
+in this wireguard stream. So packet is lost somewhere in the link.
+
+=46rom the otherside, I can do "mtr" to "[BOS1_NODE]"'s public IP and found t=
+he
+moment the link got lost is right at "[BOS1_NODE]", that means "[BOS1_NODE]=
+"'s
+networking stack completely drop the inbound packets from specific ip
+addresses.
+
+Some more digging
+
+1. This situation began after booting in different delays. Sometimes can
+trigger after 30 seconds after booting, and sometimes will be after 18 hour=
+s or
+more.
+2. It can envolve into worse case that when I do "ip neigh show", the ipv4 =
+ARP
+table and ipv6 neighbor discovery start to appear as "invalid", meaning the
+internet is completely loss.
+3. When this happened to wan facing interface, it seems OK with lan facing
+interfaces. WAN interface was using Intel X710-T4L using i40e and lan side =
+was
+using virtio
+4. I tried to bisect in between 6.3 and 6.4, and the first bad commit it
+reports was "a3efabee5878b8d7b1863debb78cb7129d07a346". But this is not
+relevant to networking at all, maybe it's the wrong commit to look at. At t=
+he
+meantime, because I haven't found a reproducible way of 100% trigger the is=
+sue,
+it may be the case during bisect some "good" commits are actually bad.=20
+5. I also tried to look at "dmesg", nothing interesting pop up. But I'll ma=
+ke
+it available upon request.
+
+This is my first bug reports. Sorry for any confusion it may lead to and th=
+anks
+for reading.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.
 
