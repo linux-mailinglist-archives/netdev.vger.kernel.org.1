@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-18195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E22755BBE
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:32:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6BB5755BD7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D698828141E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:32:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE8AF1C20A5D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4A55250;
-	Mon, 17 Jul 2023 06:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3315257;
+	Mon, 17 Jul 2023 06:37:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEECF1FCC
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:32:43 +0000 (UTC)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE2CD9;
-	Sun, 16 Jul 2023 23:32:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689575562; x=1721111562;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=UIvScjBMq2tJ7obc7FO/ZTmBFLS/+sEbi6AjYJ3oqcc=;
-  b=BT/9+IXhbgKgcCBzQy6mYEkMXdirLWUm5Ya6iv46LOb7zqr7u/8Ow33c
-   k3Fu3ZGWAV0R+uFE5IcNxzKiORB9hXy/40hkOPotLGlb0sZAbnLtUxU9P
-   uVpklhfVZkVfbsgfBIN8srS7by6ZZL50whXKWeNGrfL/FAV+Z6kn/OQTr
-   OzbezQAfpc7A3OFquHML5ZyQt04GqzHOMun7PQ3X3ZWTJcJPMJdrUsU9S
-   BaXYtewzNhqRSyIERskt6VYh3alCGMXSMbTXrBTT4UwOFhZ0iabj/dwof
-   VQiace8CR+dHfvhHo1bm8z+I8dOMCIKZSDWw6nM2al1suKn1UBFPTN9bk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="350721120"
-X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="350721120"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2023 23:32:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="788532240"
-X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="788532240"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.13.12.54]) ([10.13.12.54])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2023 23:32:36 -0700
-Message-ID: <68dcdf3c-226c-9a94-0860-68c6d4b8ca0e@linux.intel.com>
-Date: Mon, 17 Jul 2023 09:32:33 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6136115A8
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:37:16 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D8593;
+	Sun, 16 Jul 2023 23:37:14 -0700 (PDT)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H5pcVl028723;
+	Mon, 17 Jul 2023 06:36:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=DgQvj7P9SKd+4vVK23Z5kicrESGlyfKetsdyqYrWP4Y=;
+ b=b8rr18dkArFi7/ETMxqT7NPoGdT+zplC+bCgdTHt6cDy0drRRFo2WQkwZqng6CtUYYM0
+ w3T8EFpMbiiISJUecaqAlBYNbKuuyL7upDDI/RHlkEXUYzD0SDwrLRpLpYRgbZHG5h4N
+ pJ9M8exepJKDuwTikXOemA1z+VnxvUL1UYCO+U3Lt5hns91TKMxCFuhyZY5vpYccfy06
+ Kk8UAUvqd+SW1n+9BY3toWTA+z7adw6vhprGHrido+hEPcQ6m69vH9NHjz7kZrSY82z4
+ leEcaMjHjXj0+wDg2TmRRAsbL+hgbG8fzKJrGXLONMpGARYKJfo3dyN0QlrujAX76eNc 8w== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3run0cak6r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jul 2023 06:36:45 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36H6ahvk004461
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jul 2023 06:36:43 GMT
+Received: from [10.216.50.105] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Sun, 16 Jul
+ 2023 23:36:36 -0700
+Message-ID: <52156f94-5bb0-93af-52ed-7cbb14492393@quicinc.com>
+Date: Mon, 17 Jul 2023 12:06:32 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,81 +54,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [Intel-wired-lan] [PATCH net v3] igc: Prevent garbled TX queue
- with XDP ZEROCOPY
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 4/6] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
 Content-Language: en-US
-To: Florian Kauer <florian.kauer@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vedang Patel <vedang.patel@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jithu Joseph <jithu.joseph@intel.com>, Andre Guedes
- <andre.guedes@intel.com>, Simon Horman <simon.horman@corigine.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org
-References: <20230630120306.8534-1-florian.kauer@linutronix.de>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20230630120306.8534-1-florian.kauer@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+To: Simon Horman <simon.horman@corigine.com>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
+        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
+        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <netdev@vger.kernel.org>, <quic_saahtoma@quicinc.com>
+References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
+ <20230711093529.18355-5-quic_devipriy@quicinc.com>
+ <ZK+NnWadQcmUDp0A@corigine.com>
+From: Devi Priya <quic_devipriy@quicinc.com>
+In-Reply-To: <ZK+NnWadQcmUDp0A@corigine.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: kQYvtwfe5s0BgfS4IKtY760RPTpIrRUJ
+X-Proofpoint-ORIG-GUID: kQYvtwfe5s0BgfS4IKtY760RPTpIrRUJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-17_05,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=909 spamscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 suspectscore=0 bulkscore=0
+ clxscore=1011 lowpriorityscore=0 impostorscore=0 mlxscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307170059
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/30/2023 15:03, Florian Kauer wrote:
-> In normal operation, each populated queue item has
-> next_to_watch pointing to the last TX desc of the packet,
-> while each cleaned item has it set to 0. In particular,
-> next_to_use that points to the next (necessarily clean)
-> item to use has next_to_watch set to 0.
-> 
-> When the TX queue is used both by an application using
-> AF_XDP with ZEROCOPY as well as a second non-XDP application
-> generating high traffic, the queue pointers can get in
-> an invalid state where next_to_use points to an item
-> where next_to_watch is NOT set to 0.
-> 
-> However, the implementation assumes at several places
-> that this is never the case, so if it does hold,
-> bad things happen. In particular, within the loop inside
-> of igc_clean_tx_irq(), next_to_clean can overtake next_to_use.
-> Finally, this prevents any further transmission via
-> this queue and it never gets unblocked or signaled.
-> Secondly, if the queue is in this garbled state,
-> the inner loop of igc_clean_tx_ring() will never terminate,
-> completely hogging a CPU core.
-> 
-> The reason is that igc_xdp_xmit_zc() reads next_to_use
-> before acquiring the lock, and writing it back
-> (potentially unmodified) later. If it got modified
-> before locking, the outdated next_to_use is written
-> pointing to an item that was already used elsewhere
-> (and thus next_to_watch got written).
-> 
-> Fixes: 9acf59a752d4 ("igc: Enable TX via AF_XDP zero-copy")
-> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Tested-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> ---
-> 
-> v2 -> v3:
-> Resolve merge conflict
-> 
-> v1 -> v2:
-> I added some more context for further clarification,
-> but it is also just how I interpret the code.
-> Also the typo is fixed and it is reverse christmas again 😉
-> 
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+
+On 7/13/2023 11:07 AM, Simon Horman wrote:
+> On Tue, Jul 11, 2023 at 03:05:27PM +0530, Devi Priya wrote:
+>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+>> devices.
+>>
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> 
+> ...
+> 
+>> +static const struct qcom_reset_map nss_cc_ipq9574_resets[] = {
+>> +	[NSS_CC_CE_BCR] = { 0x28400, 0 },
+>> +	[NSS_CC_CLC_BCR] = { 0x28600, 0 },
+>> +	[NSS_CC_EIP197_BCR] = { 0x16004, 0 },
+>> +	[NSS_CC_HAQ_BCR] = { 0x28300, 0 },
+>> +	[NSS_CC_IMEM_BCR] = { 0xe004, 0 },
+>> +	[NSS_CC_MAC_BCR] = { 0x28100, 0 },
+>> +	[NSS_CC_PPE_BCR] = { 0x28200, 0 },
+>> +	[NSS_CC_UBI_BCR] = { 0x28700, 0 },
+>> +	[NSS_CC_UNIPHY_BCR] = { 0x28900, 0 },
+>> +	[UBI3_CLKRST_CLAMP_ENABLE] = { 0x28A04, 9 },
+>> +	[UBI3_CORE_CLAMP_ENABLE] = { 0x28A04, 8 },
+>> +	[UBI2_CLKRST_CLAMP_ENABLE] = { 0x28A04, 7 },
+>> +	[UBI2_CORE_CLAMP_ENABLE] = { 0x28A04, 6 },
+>> +	[UBI1_CLKRST_CLAMP_ENABLE] = { 0x28A04, 5 },
+>> +	[UBI1_CORE_CLAMP_ENABLE] = { 0x28A04, 4 },
+>> +	[UBI0_CLKRST_CLAMP_ENABLE] = { 0x28A04, 3 },
+>> +	[UBI0_CORE_CLAMP_ENABLE] = { 0x28A04, 2 },
+>> +	[NSSNOC_NSS_CSR_ARES] = { 0x28A04, 1 },
+>> +	[NSS_CSR_ARES]  { 0x28A04, 0 },
+> 
+> Hi Devi,
+> 
+> There appears to be an '=' missing in the line above.
+
+Hi Simon,
+Thanks for catching it! will update it in V2.
+
+Regards,
+Devi Priya
+> 
+> ...
 
