@@ -1,524 +1,283 @@
-Return-Path: <netdev+bounces-18338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AAD57567F5
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 17:29:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCC9756810
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 17:32:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A581C20ACD
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:28:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D97A1C20B2A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC52A749C;
-	Mon, 17 Jul 2023 15:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E70253DD;
+	Mon, 17 Jul 2023 15:30:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991BDBA56
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 15:28:02 +0000 (UTC)
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2068.outbound.protection.outlook.com [40.107.6.68])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24891704;
-	Mon, 17 Jul 2023 08:27:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MizlmyA6xQx1ai2ajNNjKSCHaU6eWXcu/fXD6sOg3Hw7OVcDZzr/6OwKl8gfbPEgs/rabo2QKtqQz3/GIQ7oEfaE9FxNWAccUNFwUC/A02cC2mBXfAR0dgSIid0xrWo1B/pTBVeOuziGpwG4tlp2rP5P+WnSIHDwgVVQN3KhEp4CoiudsmbxPfZZXTSEtrq1HTIZ0ddSyyuNMhPTFMC2e3KePBcevlmLc6V5au1imqAlQY5TcKuGwWsYb28oTJV3qOIm14a/kSrRVHkwJeyIuw9uI8Ig8/zRscMaYdmLm8ZoTmcSAdDBi1LrryEt4yk/qgH4CYPHY7fVOvmewUrPag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o47KaUMkf2K17437PM92Lmueuo24U0vLwPfJrAXZu3k=;
- b=b2heMhbTvy1A1+ft147f31WfC+ZWsD4LZ0e5R2xGX0YrUhylWnZrkTknREi2n6DBFA7QiDJwMYpu1nzkT79cOPFtkm67N1uu4VBsEO7hg4bKhXiJ+QbM5HNO8yVvl+suDUTIpyzEiRzDxY10lZA3P71kolkfBKZhWlEPDiedz3gjjlbNLRvuK2KzVdSfz2R5FHxYcu9AChFcUl6Fq6IBRkTvUe65I/WHOV21H1jjnmM4iG3QysWunPXtStlzfXLdSnXIyH+QzWmsviq5iKi1UssfIOkFEE0lV/cMLQzGat0WTVJfzbOdHSDuUUqPbmXyIDR1EgHB/Ym1069Hhu5xZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o47KaUMkf2K17437PM92Lmueuo24U0vLwPfJrAXZu3k=;
- b=oIRE3KdihC7JgBt9jLbAst5RDuCea41C7NRZhfZ4H5DABr1JZm/Z/ECiQZAzcR9AI1sezbAeMozrtiwTHzO3eWNAXPHdYXPHg8jRKLhIFBXm7PXB70awB+KtCvHCI+mWy1rQZSlTVzvXh10FKSbQ4Tp7rNqqlc0J0zQ9xKW6uhw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by PAXPR04MB8846.eurprd04.prod.outlook.com (2603:10a6:102:20d::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Mon, 17 Jul
- 2023 15:27:48 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c680:1128:9d53:24ae]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c680:1128:9d53:24ae%4]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
- 15:27:47 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v8 net-next 12/12] net: remove phy_has_hwtstamp() -> phy_mii_ioctl() decision from converted drivers
-Date: Mon, 17 Jul 2023 18:27:09 +0300
-Message-Id: <20230717152709.574773-13-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230717152709.574773-1-vladimir.oltean@nxp.com>
-References: <20230717152709.574773-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VE1PR03CA0035.eurprd03.prod.outlook.com
- (2603:10a6:803:118::24) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8A8253B4
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 15:30:16 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957C6173A
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 08:29:55 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c850943cf9aso4018347276.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 08:29:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689607760; x=1692199760;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sOQ63MUwlm+HNiDBvKJBOAGddTpodh5b+JAzdkbgA54=;
+        b=GixLuwIJfNgzDOrvrrW4V1rr9pEld2ePP7nhLqs3MH0W16/1evvqtXnaHAadAXbmco
+         GFbnew36ih3SQzNJm0NBAl0a5OGDt5ScV1YSxTpNgqfuv32GTwkwzr0sjWJnhDpnH469
+         6QUX0Zk66azyJlco5gJk6q2a+gCiM8eg2Rpib6Y3ekqgAKORtg84w8J0vhU7DAwx60SF
+         CziLtpkOCvU55IYPtBESNEhFCminLVOcPrduPvBD8j3oIX5+C5BSX/pzLjkmZ7c3HMLS
+         is1oWxwE0Lb8iuFUPP9TYV/LECU0o0uaW3GZ8/Laz2gDL3w9KRiB9BPaXqeiW9O/D3UD
+         B8Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689607760; x=1692199760;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sOQ63MUwlm+HNiDBvKJBOAGddTpodh5b+JAzdkbgA54=;
+        b=SIHH/VFwENPyvTiBfOABG7ZR9PBBTtGWWCZjSRrE89nXhjqcbDVd5Ly/fwQiAtsrA5
+         /ub1OKPL51oZvalRKJeaDcajKJHDLwFVL2jC104qoaNOuBBJUncDRVbzo1tVqU8o66L5
+         2EkpYErw6U5Ikm3gmdv4a0juxQxyRTyyw1bZJ6Pa3MPRTmwIdVjaZxN/2fweC2iFlcAD
+         7Gu59Owbx42zhuROqJktgcOjCXbsSURsT2knrv8aisGLYuT+0Nr7iQDd6qORxPs4p/x2
+         ptIykOuFUc9Z8kdkDohciESzpLChWbXqvY9Ecx9ip3OgoWoFvh/3U7aIJgl5SzCKGfxj
+         tu4g==
+X-Gm-Message-State: ABy/qLZn4MDanZpIBII1YsF6Z4h3IKnJ4RZO/s5V75tGHQu8C4rKWUUr
+	UHY2ZEuvQA8Qs9W9nkfvD9++E8sTRztz7Q==
+X-Google-Smtp-Source: APBJJlHKVSzJPDQ8e109VmhV63RRHiFR8S7RA+hw7djDuObOHAPVv2x1nAXIKn4+5KurWuqadtnimxk+nQLryg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:8550:0:b0:c73:9cb6:3cb4 with SMTP id
+ f16-20020a258550000000b00c739cb63cb4mr106862ybn.10.1689607760220; Mon, 17 Jul
+ 2023 08:29:20 -0700 (PDT)
+Date: Mon, 17 Jul 2023 15:29:17 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PAXPR04MB8846:EE_
-X-MS-Office365-Filtering-Correlation-Id: b8a7bed6-d3a6-4f44-933a-08db86da6013
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	H3Ou4e7AUfuBqfYlhykos3XyhL1iWGjsX4Ld8oFf+kK6p2IPJENu5uorB/EQn/HHj6Pp3oE26YJWE7k3zOirzpvYQjNk5XsIpLLPE6u0BDZqNnqfZst2oIiEyzC7cQvQw+DFQGolrZv6165YTylGn5qOvAXUznrHq93wZ84vokMGeowdrAw/m9fDYv/I4xxLoJzR3UM0Owhj3d+XYciVXY25+CA0VEU0dyEB4pOvqGW33kPGxvDompi0zZo4/0MbggKbR4+hnGyZWgL8alygtYA//rLqqPdC7S0zx/aAqWbBClF0XmV6kR4RhsBfSULZBa8gAziQm6tJd6z2iuP9TGzPAtZ9zBzIfmUQsL8SUSlCgapY6Cfcxiiwu8HZ3W1++RdFZrp7sSEFxE5gDTrB8yLNn1GJe2pGjLc98iqv3QcS1PUdLAmvhfar5xvelIwH67peG8L6o/kssiM3FC5VgmYnJfMhIVktgfbSCRRSYmWRpg3xuqhigxU84RWLtNEmMrif4MtpD/20Ya1M7xEDRPk9aGRLKkI0veDZ+Vq5BXYCVVl7tnyqIW9z1iBqlM0L4X+08EjWNTL+kRdcbCwuPHEk2p1tv5FgxTAf6DfOkZ8TExQzD4+fIXSQwyTcxBuN
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(366004)(136003)(396003)(39860400002)(451199021)(316002)(6916009)(66946007)(86362001)(4326008)(38350700002)(38100700002)(6666004)(6512007)(6486002)(26005)(478600001)(8936002)(44832011)(8676002)(7416002)(2616005)(7406005)(41300700001)(66556008)(1076003)(66476007)(186003)(52116002)(6506007)(5660300002)(54906003)(83380400001)(2906002)(36756003)(30864003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?++TndgQloDDO+VZvXDe4WDj8lzPfDa9WvR9Pzi9gqu+Q6nQtvO03iOL/wOEp?=
- =?us-ascii?Q?DsxTdLOPnK8dn5iBRQOr5PTi5tijAiSabS4t65bKHsgLAw0XMssD//p4p7LO?=
- =?us-ascii?Q?33CyR9Q76kh1FQYO53A+BRY0HxqktI/FbBGTG4vvvVA7faFOY5RemCymSVVg?=
- =?us-ascii?Q?KaZY5oPGoFI1yUF8SsuA+xUbuq//TiX0Qxy2NmvtS/hDp7hussxxt3WtxaEM?=
- =?us-ascii?Q?rEO3uWIVJMipb/HmPJXGGko5MQ2lWiLqC87lDE82fXrmvdQdZhgGoKKJGSR4?=
- =?us-ascii?Q?h8/vv/5UzgLXLelV/htFhqTF3X2Hg7uI4y0gM8eMzHKIM4rbO68coXzEVJGz?=
- =?us-ascii?Q?loYBCg0qLpcZfuU753BRA5zShHfMW4CWVd3RDujdliOiAmORhzI7h3vLnlP/?=
- =?us-ascii?Q?sFKVQB47T4en4v2/O5uvwj23WJLC52NdwyNNddSG7b/bi22Q7y4yAjEonw1N?=
- =?us-ascii?Q?zTVoB0IziANCZEQoRvFgZkH0QS4PvMT2shqjbuzhAY7H+OYO0BFeYj2ORBR2?=
- =?us-ascii?Q?107IIe7A0pPEzLwDOUIYbFIilavq6+tCLTSbxFGTV7uiczxXMHkgVIhi9ZSH?=
- =?us-ascii?Q?ENY51dk9vDaTYparL/NUuPECgPMRKRghsHl5MTcNuQiyVRTo5QDCXz0DB63p?=
- =?us-ascii?Q?WXmtQSA+ALr74227onwJTy3tJqHWxMxLu2fXAqZnitjAkg8eUIsC69HdFpUR?=
- =?us-ascii?Q?xE7cr9RMxy5xCECM43XUEdRsjnOe4KXf4mzPRqyK9vPLIT/d4rjpkP2bdMjj?=
- =?us-ascii?Q?jUd5yEhZW2TMNBC+hWwzEhd0H5yFIcgoZiqle1uWM97FxWE3V7ttAjrO2ErV?=
- =?us-ascii?Q?khhBny79z9hLJEy6o4hky4gxtHKX1pbKzx/+XcspXUfsT95j60m4A8lyFG4P?=
- =?us-ascii?Q?DgGQtJMuBDkC6Ae2PDAsPY9DQSxg710MWVymUH6FpJFkns3tJfjMrV2tWyva?=
- =?us-ascii?Q?dPPHIYkAdUvo4DmVOTJye+c1G278g9MUeG46raBBbzLBV/ONhmVQlpwxoQts?=
- =?us-ascii?Q?P89RU02RfPZP/AST6Nywv+vcw7MNLPI0ttEQY3hnbmkBv5s70HvKnO73nKkR?=
- =?us-ascii?Q?kP+RShHW4v7yeWabh57uhvqbuoRSnassYJ6Sp+UcKIcvvzu5M76hzpQZy+Fv?=
- =?us-ascii?Q?TUKuX1k0Efdjj3XK71Uh/Vjyp7rhwNLmGr5hHdAQ43u2Wfhtxd4FSXui3JiN?=
- =?us-ascii?Q?Hf5KeF5iAoP1jjA7lzTy2AJDt9JKU2daYHLnviPSxJkFBYvcMAIVyrwBKYEo?=
- =?us-ascii?Q?s4l5pTV+SFuo4Bv1XgNQeNB8iPs0AJQhEV8kDr59ZagOKxKffqM0JBa5qIfc?=
- =?us-ascii?Q?sg7vye/ijEuEHqyotpiXs0VVyt1fFB0z8iogsyLZyutm+zEsRQGnfFisdn4T?=
- =?us-ascii?Q?d3diKRXRM5H+rpYtPT/CmnJNXPneanF33gZWHqWzW/jqUp2Kk7we0O05owE/?=
- =?us-ascii?Q?nJzsQIgnSZWZ/HD9HdJYM6tXVsbreXxR0K0xZReR0I3nApE9r3Jd8NeIHExo?=
- =?us-ascii?Q?NkIUsuY1nwTiQCLIJJed7mNbuZlfeNOCOfEM1LxlSVGhjNdldnsIAEbGROlQ?=
- =?us-ascii?Q?zM3o4Qj4VvLNP6rarawxcTBEzhDEMnKrFQkpER+UqAtFKLrEqP3QZAqnjvj5?=
- =?us-ascii?Q?gQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8a7bed6-d3a6-4f44-933a-08db86da6013
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 15:27:47.8075
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yzHL8muEAA0Hr9AM1kJDg3jV8DYo8oz3LtE+onjPn3k+hGQI979jImOsJwtaNGJsxNznlwdYi4jZv/4j9U3L5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8846
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230717152917.751987-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: get rid of sysctl_tcp_adv_win_scale
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Soheil Hassas Yeganeh <soheil@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-It is desirable that the new .ndo_hwtstamp_set() API gives more
-uniformity, less overhead and future flexibility w.r.t. the PHY
-timestamping behavior.
+With modern NIC drivers shifting to full page allocations per
+received frame, we face the following issue:
 
-Currently there are some drivers which allow PHY timestamping through
-the procedure mentioned in Documentation/networking/timestamping.rst.
-They don't do anything locally if phy_has_hwtstamp() is set, except for
-lan966x which installs PTP packet traps.
+TCP has one per-netns sysctl used to tweak how to translate
+a memory use into an expected payload (RWIN), in RX path.
 
-Centralize that behavior in a new dev_set_hwtstamp_phylib() code
-function, which calls either phy_mii_ioctl() for the phylib PHY,
-or .ndo_hwtstamp_set() of the netdev, based on a single policy
-(currently simplistic: phy_has_hwtstamp()).
+tcp_win_from_space() implementation is limited to few cases.
 
-Any driver converted to .ndo_hwtstamp_set() will automatically opt into
-the centralized phylib timestamping policy. Unconverted drivers still
-get to choose whether they let the PHY handle timestamping or not.
+For hosts dealing with various MSS, we either under estimate
+or over estimate the RWIN we send to the remote peers.
 
-Netdev drivers with integrated PHY drivers that don't use phylib
-presumably don't set dev->phydev, and those will always see
-HWTSTAMP_SOURCE_NETDEV requests even when converted. The timestamping
-policy will remain 100% up to them.
+For instance with the default sysctl_tcp_adv_win_scale value,
+we expect to store 50% of payload per allocated chunk of memory.
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+For the typical use of MTU=1500 traffic, and order-0 pages allocations
+by NIC drivers, we are sending too big RWIN, leading to potential
+tcp collapse operations, which are extremely expensive and source
+of latency spikes.
+
+This patch makes sysctl_tcp_adv_win_scale obsolete, and instead
+uses a per socket scaling factor, so that we can precisely
+adjust the RWIN based on effective skb->len/skb->truesize ratio.
+
+This patch alone can double TCP receive performance when receivers
+are too slow to drain their receive queue, or by allowing
+a bigger RWIN when MSS is close to PAGE_SIZE.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-Changes in v8:
-- Replace direct phy_mii_ioctl() calls with indirect phy_hwtstamp_get()
-  and phy_hwtstamp_set() stubs.
-- Add missing kerneldoc for kernel_hwtstamp_config :: source.
-Changes in v7:
-- Patch is new
+ Documentation/networking/ip-sysctl.rst |  1 +
+ include/linux/tcp.h                    |  4 +++-
+ include/net/netns/ipv4.h               |  2 +-
+ include/net/tcp.h                      | 24 ++++++++++++++++++++----
+ net/ipv4/tcp.c                         | 11 ++++++-----
+ net/ipv4/tcp_input.c                   | 19 ++++++++++++-------
+ 6 files changed, 43 insertions(+), 18 deletions(-)
 
- drivers/net/ethernet/freescale/fec_main.c     |  8 --
- .../ethernet/microchip/lan966x/lan966x_main.c | 25 ++---
- .../ethernet/microchip/sparx5/sparx5_netdev.c |  6 --
- include/linux/net_tstamp.h                    | 16 ++++
- include/linux/netdevice.h                     |  4 +
- net/core/dev_ioctl.c                          | 91 +++++++++++++++++--
- 6 files changed, 117 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 28c5f8f8106d..c66864f9d9ee 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -3904,10 +3904,6 @@ static int fec_hwtstamp_get(struct net_device *ndev,
- 			    struct kernel_hwtstamp_config *config)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct phy_device *phydev = ndev->phydev;
--
--	if (phy_has_hwtstamp(phydev))
--		return phy_mii_ioctl(phydev, config->ifr, SIOCGHWTSTAMP);
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 4a010a7cde7f8085db5ba6f1b9af53e9e5223cd5..82f2117cf2b36a834e5e391feda0210d916bff8b 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -321,6 +321,7 @@ tcp_abort_on_overflow - BOOLEAN
+ 	option can harm clients of your server.
  
- 	if (!fep->bufdesc_ex)
- 		return -EOPNOTSUPP;
-@@ -3922,10 +3918,6 @@ static int fec_hwtstamp_set(struct net_device *ndev,
- 			    struct netlink_ext_ack *extack)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct phy_device *phydev = ndev->phydev;
--
--	if (phy_has_hwtstamp(phydev))
--		return phy_mii_ioctl(phydev, config->ifr, SIOCSHWTSTAMP);
+ tcp_adv_win_scale - INTEGER
++	Obsolete since linux-6.6
+ 	Count buffering overhead as bytes/2^tcp_adv_win_scale
+ 	(if tcp_adv_win_scale > 0) or bytes-bytes/2^(-tcp_adv_win_scale),
+ 	if it is <= 0.
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index b4c08ac86983568a9511258708724da15d0b999e..fbcb0ce13171d46aa3697abcd48482b08e78e5e0 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -172,6 +172,8 @@ static inline struct tcp_request_sock *tcp_rsk(const struct request_sock *req)
+ 	return (struct tcp_request_sock *)req;
+ }
  
- 	if (!fep->bufdesc_ex)
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-index b0f614fbc5db..ef23153a48f1 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-@@ -454,9 +454,6 @@ static int lan966x_port_hwtstamp_get(struct net_device *dev,
- {
- 	struct lan966x_port *port = netdev_priv(dev);
- 
--	if (phy_has_hwtstamp(dev->phydev))
--		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCGHWTSTAMP);
--
- 	if (!port->lan966x->ptp)
- 		return -EOPNOTSUPP;
- 
-@@ -472,21 +469,26 @@ static int lan966x_port_hwtstamp_set(struct net_device *dev,
- 	struct lan966x_port *port = netdev_priv(dev);
- 	int err;
- 
-+	if (cfg->source != HWTSTAMP_SOURCE_NETDEV &&
-+	    cfg->source != HWTSTAMP_SOURCE_PHYLIB)
-+		return -EOPNOTSUPP;
++#define TCP_RMEM_TO_WIN_SCALE 8
 +
- 	err = lan966x_ptp_setup_traps(port, cfg);
- 	if (err)
- 		return err;
+ struct tcp_sock {
+ 	/* inet_connection_sock has to be the first member of tcp_sock */
+ 	struct inet_connection_sock	inet_conn;
+@@ -238,7 +240,7 @@ struct tcp_sock {
  
--	if (phy_has_hwtstamp(dev->phydev)) {
--		err = phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCSHWTSTAMP);
--		if (err)
-+	if (cfg->source == HWTSTAMP_SOURCE_NETDEV) {
-+		if (!port->lan966x->ptp)
-+			return -EOPNOTSUPP;
+ 	u32	window_clamp;	/* Maximal window to advertise		*/
+ 	u32	rcv_ssthresh;	/* Current window clamp			*/
+-
++	u8	scaling_ratio;	/* see tcp_win_from_space() */
+ 	/* Information of the most recently (s)acked skb */
+ 	struct tcp_rack {
+ 		u64 mstamp; /* (Re)sent time of the skb */
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index f003747181593559a4efe1838be719d445417041..7a41c4791536732005cedbb80c223b86aa43249e 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -152,7 +152,7 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_abort_on_overflow;
+ 	u8 sysctl_tcp_fack; /* obsolete */
+ 	int sysctl_tcp_max_reordering;
+-	int sysctl_tcp_adv_win_scale;
++	int sysctl_tcp_adv_win_scale; /* obsolete */
+ 	u8 sysctl_tcp_dsack;
+ 	u8 sysctl_tcp_app_win;
+ 	u8 sysctl_tcp_frto;
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 226bce6d1e8c30185260baadec449b67323db91c..2104a71c75ba7eee40612395be4103ae370b3c03 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1434,11 +1434,27 @@ void tcp_select_initial_window(const struct sock *sk, int __space,
+ 
+ static inline int tcp_win_from_space(const struct sock *sk, int space)
+ {
+-	int tcp_adv_win_scale = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_adv_win_scale);
++	s64 scaled_space = (s64)space * tcp_sk(sk)->scaling_ratio;
+ 
+-	return tcp_adv_win_scale <= 0 ?
+-		(space>>(-tcp_adv_win_scale)) :
+-		space - (space>>tcp_adv_win_scale);
++	return scaled_space >> TCP_RMEM_TO_WIN_SCALE;
++}
 +
-+		err = lan966x_ptp_hwtstamp_set(port, cfg, extack);
-+		if (err) {
- 			lan966x_ptp_del_traps(port);
--		return err;
-+			return err;
-+		}
++/* inverse of tcp_win_from_space() */
++static inline int tcp_space_from_win(const struct sock *sk, int win)
++{
++	u64 val = (u64)win << TCP_RMEM_TO_WIN_SCALE;
++
++	do_div(val, tcp_sk(sk)->scaling_ratio);
++	return val;
++}
++
++static inline void tcp_scaling_ratio_init(struct sock *sk)
++{
++	/* Assume a conservative default of 1200 bytes of payload per 4K page.
++	 * This may be adjusted later in tcp_measure_rcv_mss().
++	 */
++	tcp_sk(sk)->scaling_ratio = (1200 << TCP_RMEM_TO_WIN_SCALE) /
++				    SKB_TRUESIZE(4096);
+ }
+ 
+ /* Note: caller must be prepared to deal with negative returns */
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e03e08745308189c9d64509c2cff94da56c86a0c..88f4ebab12acc11d5f3feb6b13974a0b8e565671 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -457,6 +457,7 @@ void tcp_init_sock(struct sock *sk)
+ 
+ 	WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_wmem[1]));
+ 	WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[1]));
++	tcp_scaling_ratio_init(sk);
+ 
+ 	set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
+ 	sk_sockets_allocated_inc(sk);
+@@ -1700,7 +1701,7 @@ EXPORT_SYMBOL(tcp_peek_len);
+ /* Make sure sk_rcvbuf is big enough to satisfy SO_RCVLOWAT hint */
+ int tcp_set_rcvlowat(struct sock *sk, int val)
+ {
+-	int cap;
++	int space, cap;
+ 
+ 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
+ 		cap = sk->sk_rcvbuf >> 1;
+@@ -1715,10 +1716,10 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
+ 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
+ 		return 0;
+ 
+-	val <<= 1;
+-	if (val > sk->sk_rcvbuf) {
+-		WRITE_ONCE(sk->sk_rcvbuf, val);
+-		tcp_sk(sk)->window_clamp = tcp_win_from_space(sk, val);
++	space = tcp_space_from_win(sk, val);
++	if (space > sk->sk_rcvbuf) {
++		WRITE_ONCE(sk->sk_rcvbuf, space);
++		tcp_sk(sk)->window_clamp = val;
  	}
- 
--	if (!port->lan966x->ptp)
--		return -EOPNOTSUPP;
--
--	return lan966x_ptp_hwtstamp_set(port, cfg, extack);
-+	return 0;
- }
- 
- static const struct net_device_ops lan966x_port_netdev_ops = {
-@@ -814,6 +816,7 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
- 			 NETIF_F_HW_VLAN_STAG_TX |
- 			 NETIF_F_HW_TC;
- 	dev->hw_features |= NETIF_F_HW_TC;
-+	dev->priv_flags |= IFF_SEE_ALL_HWTSTAMP_REQUESTS;
- 	dev->needed_headroom = IFH_LEN_BYTES;
- 
- 	eth_hw_addr_gen(dev, lan966x->base_mac, p + 1);
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c b/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
-index e01d3b1e17e0..705a004b324f 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
-@@ -216,9 +216,6 @@ static int sparx5_port_hwtstamp_get(struct net_device *dev,
- 	struct sparx5_port *sparx5_port = netdev_priv(dev);
- 	struct sparx5 *sparx5 = sparx5_port->sparx5;
- 
--	if (phy_has_hwtstamp(dev->phydev))
--		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCGHWTSTAMP);
--
- 	if (!sparx5->ptp)
- 		return -EOPNOTSUPP;
- 
-@@ -234,9 +231,6 @@ static int sparx5_port_hwtstamp_set(struct net_device *dev,
- 	struct sparx5_port *sparx5_port = netdev_priv(dev);
- 	struct sparx5 *sparx5 = sparx5_port->sparx5;
- 
--	if (phy_has_hwtstamp(dev->phydev))
--		return phy_mii_ioctl(dev->phydev, cfg->ifr, SIOCSHWTSTAMP);
--
- 	if (!sparx5->ptp)
- 		return -EOPNOTSUPP;
- 
-diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
-index 03e922814851..eb01c37e71e0 100644
---- a/include/linux/net_tstamp.h
-+++ b/include/linux/net_tstamp.h
-@@ -5,6 +5,11 @@
- 
- #include <uapi/linux/net_tstamp.h>
- 
-+enum hwtstamp_source {
-+	HWTSTAMP_SOURCE_NETDEV,
-+	HWTSTAMP_SOURCE_PHYLIB,
-+};
-+
- /**
-  * struct kernel_hwtstamp_config - Kernel copy of struct hwtstamp_config
-  *
-@@ -15,6 +20,8 @@
-  *	a legacy implementation of a lower driver
-  * @copied_to_user: request was passed to a legacy implementation which already
-  *	copied the ioctl request back to user space
-+ * @source: indication whether timestamps should come from the netdev or from
-+ *	an attached phylib PHY
-  *
-  * Prefer using this structure for in-kernel processing of hardware
-  * timestamping configuration, over the inextensible struct hwtstamp_config
-@@ -26,6 +33,7 @@ struct kernel_hwtstamp_config {
- 	int rx_filter;
- 	struct ifreq *ifr;
- 	bool copied_to_user;
-+	enum hwtstamp_source source;
- };
- 
- static inline void hwtstamp_config_to_kernel(struct kernel_hwtstamp_config *kernel_cfg,
-@@ -44,4 +52,12 @@ static inline void hwtstamp_config_from_kernel(struct hwtstamp_config *cfg,
- 	cfg->rx_filter = kernel_cfg->rx_filter;
- }
- 
-+static inline bool kernel_hwtstamp_config_changed(const struct kernel_hwtstamp_config *a,
-+						  const struct kernel_hwtstamp_config *b)
-+{
-+	return a->flags != b->flags ||
-+	       a->tx_type != b->tx_type ||
-+	       a->rx_filter != b->rx_filter;
-+}
-+
- #endif /* _LINUX_NET_TIMESTAMPING_H_ */
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index ca3bcf2257c0..0d8a7ac67cf1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1724,6 +1724,9 @@ struct xdp_metadata_ops {
-  * @IFF_TX_SKB_NO_LINEAR: device/driver is capable of xmitting frames with
-  *	skb_headlen(skb) == 0 (data starts from frag0)
-  * @IFF_CHANGE_PROTO_DOWN: device supports setting carrier via IFLA_PROTO_DOWN
-+ * @IFF_SEE_ALL_HWTSTAMP_REQUESTS: device wants to see calls to
-+ *	ndo_hwtstamp_set() for all timestamp requests regardless of source,
-+ *	even if those aren't HWTSTAMP_SOURCE_NETDEV.
-  */
- enum netdev_priv_flags {
- 	IFF_802_1Q_VLAN			= 1<<0,
-@@ -1759,6 +1762,7 @@ enum netdev_priv_flags {
- 	IFF_NO_ADDRCONF			= BIT_ULL(30),
- 	IFF_TX_SKB_NO_LINEAR		= BIT_ULL(31),
- 	IFF_CHANGE_PROTO_DOWN		= BIT_ULL(32),
-+	IFF_SEE_ALL_HWTSTAMP_REQUESTS	= BIT_ULL(33),
- };
- 
- #define IFF_802_1Q_VLAN			IFF_802_1Q_VLAN
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index d0223ecd6f6f..72e077022348 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -5,6 +5,7 @@
- #include <linux/etherdevice.h>
- #include <linux/rtnetlink.h>
- #include <linux/net_tstamp.h>
-+#include <linux/phylib_stubs.h>
- #include <linux/wireless.h>
- #include <linux/if_bridge.h>
- #include <net/dsa_stubs.h>
-@@ -252,6 +253,30 @@ static int dev_eth_ioctl(struct net_device *dev,
- 	return ops->ndo_eth_ioctl(dev, ifr, cmd);
- }
- 
-+/**
-+ * dev_get_hwtstamp_phylib() - Get hardware timestamping settings of NIC
-+ *	or of attached phylib PHY
-+ * @dev: Network device
-+ * @cfg: Timestamping configuration structure
-+ *
-+ * Helper for enforcing a common policy that phylib timestamping, if available,
-+ * should take precedence in front of hardware timestamping provided by the
-+ * netdev.
-+ *
-+ * Note: phy_mii_ioctl() only handles SIOCSHWTSTAMP (not SIOCGHWTSTAMP), and
-+ * there only exists a phydev->mii_ts->hwtstamp() method. So this will return
-+ * -EOPNOTSUPP for phylib for now, which is still more accurate than letting
-+ * the netdev handle the GET request.
-+ */
-+static int dev_get_hwtstamp_phylib(struct net_device *dev,
-+				   struct kernel_hwtstamp_config *cfg)
-+{
-+	if (phy_has_hwtstamp(dev->phydev))
-+		return phy_hwtstamp_get(dev->phydev, cfg);
-+
-+	return dev->netdev_ops->ndo_hwtstamp_get(dev, cfg);
-+}
-+
- static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
-@@ -266,7 +291,7 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 		return -ENODEV;
- 
- 	kernel_cfg.ifr = ifr;
--	err = ops->ndo_hwtstamp_get(dev, &kernel_cfg);
-+	err = dev_get_hwtstamp_phylib(dev, &kernel_cfg);
- 	if (err)
- 		return err;
- 
-@@ -283,6 +308,59 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
  	return 0;
  }
- 
-+/**
-+ * dev_set_hwtstamp_phylib() - Change hardware timestamping of NIC
-+ *	or of attached phylib PHY
-+ * @dev: Network device
-+ * @cfg: Timestamping configuration structure
-+ * @extack: Netlink extended ack message structure, for error reporting
-+ *
-+ * Helper for enforcing a common policy that phylib timestamping, if available,
-+ * should take precedence in front of hardware timestamping provided by the
-+ * netdev. If the netdev driver needs to perform specific actions even for PHY
-+ * timestamping to work properly (a switch port must trap the timestamped
-+ * frames and not forward them), it must set IFF_SEE_ALL_HWTSTAMP_REQUESTS in
-+ * dev->priv_flags.
-+ */
-+static int dev_set_hwtstamp_phylib(struct net_device *dev,
-+				   struct kernel_hwtstamp_config *cfg,
-+				   struct netlink_ext_ack *extack)
-+{
-+	const struct net_device_ops *ops = dev->netdev_ops;
-+	bool phy_ts = phy_has_hwtstamp(dev->phydev);
-+	struct kernel_hwtstamp_config old_cfg = {};
-+	bool changed = false;
-+	int err;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 57c8af1859c16eba5e952a23ea959b628006f9c1..3cd92035e0902298baa8afd89ae5edcbfce300e5 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -237,6 +237,16 @@ static void tcp_measure_rcv_mss(struct sock *sk, const struct sk_buff *skb)
+ 	 */
+ 	len = skb_shinfo(skb)->gso_size ? : skb->len;
+ 	if (len >= icsk->icsk_ack.rcv_mss) {
++		/* Note: divides are still a bit expensive.
++		 * For the moment, only adjust scaling_ratio
++		 * when we update icsk_ack.rcv_mss.
++		 */
++		if (unlikely(len != icsk->icsk_ack.rcv_mss)) {
++			u64 val = (u64)skb->len << TCP_RMEM_TO_WIN_SCALE;
 +
-+	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
-+
-+	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
-+		err = ops->ndo_hwtstamp_get(dev, &old_cfg);
-+		if (err)
-+			return err;
-+
-+		err = ops->ndo_hwtstamp_set(dev, cfg, extack);
-+		if (err) {
-+			if (extack->_msg)
-+				netdev_err(dev, "%s\n", extack->_msg);
-+			return err;
++			do_div(val, skb->truesize);
++			tcp_sk(sk)->scaling_ratio = val ? val : 1;
 +		}
-+
-+		changed = kernel_hwtstamp_config_changed(&old_cfg, cfg);
-+	}
-+
-+	if (phy_ts) {
-+		err = phy_hwtstamp_set(dev->phydev, cfg, extack);
-+		if (err) {
-+			if (changed)
-+				ops->ndo_hwtstamp_set(dev, &old_cfg, NULL);
-+			return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
-@@ -314,12 +392,9 @@ static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
+ 		icsk->icsk_ack.rcv_mss = min_t(unsigned int, len,
+ 					       tcp_sk(sk)->advmss);
+ 		/* Account for possibly-removed options */
+@@ -727,8 +737,8 @@ void tcp_rcv_space_adjust(struct sock *sk)
  
--	err = ops->ndo_hwtstamp_set(dev, &kernel_cfg, &extack);
--	if (err) {
--		if (extack._msg)
--			netdev_err(dev, "%s\n", extack._msg);
-+	err = dev_set_hwtstamp_phylib(dev, &kernel_cfg, &extack);
-+	if (err)
- 		return err;
--	}
+ 	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
+ 	    !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
+-		int rcvmem, rcvbuf;
+ 		u64 rcvwin, grow;
++		int rcvbuf;
  
- 	/* The driver may have modified the configuration, so copy the
- 	 * updated version of it back to user space
-@@ -362,7 +437,7 @@ int generic_hwtstamp_get_lower(struct net_device *dev,
- 		return -ENODEV;
+ 		/* minimal window to cope with packet losses, assuming
+ 		 * steady state. Add some cushion because of small variations.
+@@ -740,12 +750,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
+ 		do_div(grow, tp->rcvq_space.space);
+ 		rcvwin += (grow << 1);
  
- 	if (ops->ndo_hwtstamp_get)
--		return ops->ndo_hwtstamp_get(dev, kernel_cfg);
-+		return dev_get_hwtstamp_phylib(dev, kernel_cfg);
- 
- 	/* Legacy path: unconverted lower driver */
- 	return generic_hwtstamp_ioctl_lower(dev, SIOCGHWTSTAMP, kernel_cfg);
-@@ -379,7 +454,7 @@ int generic_hwtstamp_set_lower(struct net_device *dev,
- 		return -ENODEV;
- 
- 	if (ops->ndo_hwtstamp_set)
--		return ops->ndo_hwtstamp_set(dev, kernel_cfg, extack);
-+		return dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
- 
- 	/* Legacy path: unconverted lower driver */
- 	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
+-		rcvmem = SKB_TRUESIZE(tp->advmss + MAX_TCP_HEADER);
+-		while (tcp_win_from_space(sk, rcvmem) < tp->advmss)
+-			rcvmem += 128;
+-
+-		do_div(rcvwin, tp->advmss);
+-		rcvbuf = min_t(u64, rcvwin * rcvmem,
++		rcvbuf = min_t(u64, tcp_space_from_win(sk, rcvwin),
+ 			       READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
+ 		if (rcvbuf > sk->sk_rcvbuf) {
+ 			WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
 -- 
-2.34.1
+2.41.0.255.g8b1d071c50-goog
 
 
