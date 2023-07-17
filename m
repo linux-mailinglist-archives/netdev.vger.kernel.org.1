@@ -1,144 +1,90 @@
-Return-Path: <netdev+bounces-18196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6BB5755BD7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:37:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9B8755BE6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE8AF1C20A5D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:37:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A4281C20A56
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3315257;
-	Mon, 17 Jul 2023 06:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CFE63AC;
+	Mon, 17 Jul 2023 06:40:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6136115A8
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:37:16 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D8593;
-	Sun, 16 Jul 2023 23:37:14 -0700 (PDT)
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H5pcVl028723;
-	Mon, 17 Jul 2023 06:36:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=DgQvj7P9SKd+4vVK23Z5kicrESGlyfKetsdyqYrWP4Y=;
- b=b8rr18dkArFi7/ETMxqT7NPoGdT+zplC+bCgdTHt6cDy0drRRFo2WQkwZqng6CtUYYM0
- w3T8EFpMbiiISJUecaqAlBYNbKuuyL7upDDI/RHlkEXUYzD0SDwrLRpLpYRgbZHG5h4N
- pJ9M8exepJKDuwTikXOemA1z+VnxvUL1UYCO+U3Lt5hns91TKMxCFuhyZY5vpYccfy06
- Kk8UAUvqd+SW1n+9BY3toWTA+z7adw6vhprGHrido+hEPcQ6m69vH9NHjz7kZrSY82z4
- leEcaMjHjXj0+wDg2TmRRAsbL+hgbG8fzKJrGXLONMpGARYKJfo3dyN0QlrujAX76eNc 8w== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3run0cak6r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jul 2023 06:36:45 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36H6ahvk004461
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jul 2023 06:36:43 GMT
-Received: from [10.216.50.105] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Sun, 16 Jul
- 2023 23:36:36 -0700
-Message-ID: <52156f94-5bb0-93af-52ed-7cbb14492393@quicinc.com>
-Date: Mon, 17 Jul 2023 12:06:32 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118B35257
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:40:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 79D5AC433CD;
+	Mon, 17 Jul 2023 06:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689576020;
+	bh=PFrUgUnOrIdL8aGCtJE946FVuH7oU37XkSgCcuK3bXg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Yh8yXPcb3+7Q03U92Woss0tmdKnHh7pLx0UXEgtSMKuzEB22bCjq1RMH1JIVPNEOP
+	 T7HkzLgFYuAfN7JGBEpcaJZeMaYatennLsyTzkUBim/8jU5rTJ1m2NaW75Yrs6RQdx
+	 /QBLWTdeIu1jWUEeZNVSZB2w6kzAWsdfIP/DQbkCm04hKw1A25KMyZgHcQuA8o5AXK
+	 VRjJS3I9HSYtrNDSXwy6o51x/1EFTcCtICGqu+69CUbF04v7oeUU8mMKBtojul5Otw
+	 NYhCLA9cK5DY1AIkw6fu8zTbNXj1Lpp8cLXZ5KYHsu7vlOJxtBqAjxmCavp+31zfrB
+	 LnyBi3Zdltgjw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5FC66E270F6;
+	Mon, 17 Jul 2023 06:40:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 4/6] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
-        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <netdev@vger.kernel.org>, <quic_saahtoma@quicinc.com>
-References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
- <20230711093529.18355-5-quic_devipriy@quicinc.com>
- <ZK+NnWadQcmUDp0A@corigine.com>
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <ZK+NnWadQcmUDp0A@corigine.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: kQYvtwfe5s0BgfS4IKtY760RPTpIrRUJ
-X-Proofpoint-ORIG-GUID: kQYvtwfe5s0BgfS4IKtY760RPTpIrRUJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-17_05,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=909 spamscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 suspectscore=0 bulkscore=0
- clxscore=1011 lowpriorityscore=0 impostorscore=0 mlxscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2307170059
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v5 0/5] net: sched: Fixes for classifiers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168957602038.23010.16088414283465350985.git-patchwork-notify@kernel.org>
+Date: Mon, 17 Jul 2023 06:40:20 +0000
+References: <20230713180514.592812-1-victor@mojatatu.com>
+In-Reply-To: <20230713180514.592812-1-victor@mojatatu.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, pctammela@mojatatu.com, simon.horman@corigine.com,
+ kernel@mojatatu.com
+
+Hello:
+
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 13 Jul 2023 15:05:09 -0300 you wrote:
+> Four different classifiers (bpf, u32, matchall, and flower) are
+> calling tcf_bind_filter in their callbacks, but arent't undoing it by
+> calling tcf_unbind_filter if their was an error after binding.
+> 
+> This patch set fixes all this by calling tcf_unbind_filter in such
+> cases.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v5,1/5] net: sched: cls_matchall: Undo tcf_bind_filter in case of failure after mall_set_parms
+    https://git.kernel.org/netdev/net/c/b3d0e0489430
+  - [net,v5,2/5] net: sched: cls_u32: Undo tcf_bind_filter if u32_replace_hw_knode
+    https://git.kernel.org/netdev/net/c/9cb36faedeaf
+  - [net,v5,3/5] net: sched: cls_u32: Undo refcount decrement in case update failed
+    https://git.kernel.org/netdev/net/c/e8d3d78c19be
+  - [net,v5,4/5] net: sched: cls_bpf: Undo tcf_bind_filter in case of an error
+    https://git.kernel.org/netdev/net/c/26a22194927e
+  - [net,v5,5/5] net: sched: cls_flower: Undo tcf_bind_filter in case of an error
+    https://git.kernel.org/netdev/net/c/ac177a330077
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-On 7/13/2023 11:07 AM, Simon Horman wrote:
-> On Tue, Jul 11, 2023 at 03:05:27PM +0530, Devi Priya wrote:
->> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
->> devices.
->>
->> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> 
-> ...
-> 
->> +static const struct qcom_reset_map nss_cc_ipq9574_resets[] = {
->> +	[NSS_CC_CE_BCR] = { 0x28400, 0 },
->> +	[NSS_CC_CLC_BCR] = { 0x28600, 0 },
->> +	[NSS_CC_EIP197_BCR] = { 0x16004, 0 },
->> +	[NSS_CC_HAQ_BCR] = { 0x28300, 0 },
->> +	[NSS_CC_IMEM_BCR] = { 0xe004, 0 },
->> +	[NSS_CC_MAC_BCR] = { 0x28100, 0 },
->> +	[NSS_CC_PPE_BCR] = { 0x28200, 0 },
->> +	[NSS_CC_UBI_BCR] = { 0x28700, 0 },
->> +	[NSS_CC_UNIPHY_BCR] = { 0x28900, 0 },
->> +	[UBI3_CLKRST_CLAMP_ENABLE] = { 0x28A04, 9 },
->> +	[UBI3_CORE_CLAMP_ENABLE] = { 0x28A04, 8 },
->> +	[UBI2_CLKRST_CLAMP_ENABLE] = { 0x28A04, 7 },
->> +	[UBI2_CORE_CLAMP_ENABLE] = { 0x28A04, 6 },
->> +	[UBI1_CLKRST_CLAMP_ENABLE] = { 0x28A04, 5 },
->> +	[UBI1_CORE_CLAMP_ENABLE] = { 0x28A04, 4 },
->> +	[UBI0_CLKRST_CLAMP_ENABLE] = { 0x28A04, 3 },
->> +	[UBI0_CORE_CLAMP_ENABLE] = { 0x28A04, 2 },
->> +	[NSSNOC_NSS_CSR_ARES] = { 0x28A04, 1 },
->> +	[NSS_CSR_ARES]  { 0x28A04, 0 },
-> 
-> Hi Devi,
-> 
-> There appears to be an '=' missing in the line above.
-
-Hi Simon,
-Thanks for catching it! will update it in V2.
-
-Regards,
-Devi Priya
-> 
-> ...
 
