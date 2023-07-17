@@ -1,119 +1,157 @@
-Return-Path: <netdev+bounces-18249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7FBD755FDA
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:52:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07DF7755FEA
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0012814AE
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:52:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195A628148E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DEDA945;
-	Mon, 17 Jul 2023 09:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C398A946;
+	Mon, 17 Jul 2023 09:59:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36924A927
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:52:50 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA437A4
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:52:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689587569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MR1j/VvelwrpB5IPicBmY+wKbGijazz49VyCLTDIVso=;
-	b=dIQmh2Wx867n2mlxEBYvxaxdMqu0u8Qbq9e+LICv8udLqgPRqivVgNMz9JuSifx697FRGH
-	qJi3YaHP1XFYPJaTm/vmEdzBtoS5bb1JaSUc0BrfDaVEdohQRBZBKaz91eC0rmk3PT9S2A
-	faqE0J8C6+buDjsfp+q/lk0RMUfSdYI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-593-nFf5qjLaPyaISjvXP5U-6g-1; Mon, 17 Jul 2023 05:52:40 -0400
-X-MC-Unique: nFf5qjLaPyaISjvXP5U-6g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DDCB8564EF;
-	Mon, 17 Jul 2023 09:52:40 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.129])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0CCACC2C862;
-	Mon, 17 Jul 2023 09:52:38 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0014CA927
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:59:50 +0000 (UTC)
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2112.outbound.protection.outlook.com [40.107.215.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD07186;
+	Mon, 17 Jul 2023 02:59:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IhgfKXD9/0ACWxzHvKRsKRhIKa660cpUW5Uy8ECJztD8WDd3eoJcHiQBhEgYdzH+t5IW02vSO9UYFBQeTqQi9RIeLfVAtnTq1PP6rat68a8j+pEyyVVRP6dnDOB9tZYTLq5QRXxA4yDMwL9ruw1J7U77vuZb4cMt74Lscbfr4OC9FShBcK0/LqfngA+g9CgZCSKXws+QcJLtuswe2whjMttjCjMxj4EEFob0+vvBQuOaXmPxPefiGil6EHFApeJbOIOWBvgwCbrS63xWojJMit9tjoexuHbRA0wq7q6qz6bqkvpyrSBkRj7M+7oD7TkHeKtT2iYh9Q5l/blKuB33iQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aW72oikfy6WLi3q3W/J0rJZArfwsMvuH2MqrU42/2Xc=;
+ b=IB5CehlZ/QwuI2fOtajNJUY7jgw+x3ecQb2o4rot7D3ajVrkdonphxciOUqKa721A3icJbddGKBNnfPBTnffXJLas9YUCZZSK1I0jfW9NyiE7tVN9469PuECm1ALxn5oCEE8pxzQsTiNEaQ3hWUjF0iR/XQy4TvIBgHaycdQlQ3Ikrvuw5YHIDqPq/43tR5x4vPaJA38B8e/UPVOkKKyKOGP31/yRlpYWHf3Q+0MEVopM6v9KSbBCZM0JIt8+kPruxnZxhDKohlYfDjC9zcD2OVY6Pm5sbnU9FzeDAzq8WyRldIV6rbAFCNdtIpU/ctRz7gKkabEu4MDs/uwzUPZPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aW72oikfy6WLi3q3W/J0rJZArfwsMvuH2MqrU42/2Xc=;
+ b=fPO/m8EoposyiMwHy5fJTh162eVQ+soA9BihixIAujxWW5P5+B5PV+3zCnDY6c+h2j93qUmNk/ZggDorMU98RlzhvC11/HBbiR9FP5vNyudy6hrBReuf52UpukvdbZ/deNaG8lTLMY/G9c4By0h/vEZ+LmPhFN1JbBGiQEfXJLUweQMZOmONbbwl26zToykD/gE1jqb5y0gwesny4iGzXsmgl8fGvojng2wYNnIpCB7eulff6FWL14yYx0QOHj09YQ+zIT+dMLpt33Ia+bYvH/7mUgFavO7z6ieOXcAj7X8dxpukY5R4D3CITF2aZVFz51jGossfgiYkiUmXpNOngg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ PUZPR06MB5825.apcprd06.prod.outlook.com (2603:1096:301:e9::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.31; Mon, 17 Jul 2023 09:59:42 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
+ 09:59:42 +0000
+From: Wang Ming <machel@vivo.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH net-next] udp: introduce and use indirect call wrapper for data ready()
-Date: Mon, 17 Jul 2023 11:52:29 +0200
-Message-ID: <8834aadd89c1ebcbad32f591ea4d29c9f2684497.1689587539.git.pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	Wang Ming <machel@vivo.com>
+Subject: [PATCH net v1] net: ipv4: Use kfree_sensitive instead of kfree
+Date: Mon, 17 Jul 2023 17:59:19 +0800
+Message-Id: <20230717095932.18677-1-machel@vivo.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCPR01CA0043.jpnprd01.prod.outlook.com
+ (2603:1096:405:1::31) To SG2PR06MB3743.apcprd06.prod.outlook.com
+ (2603:1096:4:d0::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|PUZPR06MB5825:EE_
+X-MS-Office365-Filtering-Correlation-Id: df48cdb4-e192-4822-21e5-08db86ac8a69
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	yaxWLiu5MHyo/KC8bInUJPyCVyDRHgviOp+ACl9fNoMF5B52tfmrKYZ0pkCURWpQmoWri7vhfawjA9UxSuIAi58Mbc/5NKMUomT1xwqLufxp5F7g/F/Cog/8ep0UPA9HEAJ0C+yRKTZ1jAD/GS6PBj7svRKdsCflnPhozpcwy1F71QfnzIdmGzZf8eXXkGVWDmq4muhxUH7cYDeBrwQVN1wABotf/+TClubOydFIjTrEl9kNGY7Lf3+Pzd81L8MVSZfhZ8QJEueCT136y9WWCJ1kyXXLRv30Non9W66gGCBbSqPZXMuTcFObMXLbt+jsI4imD6Vx0RfiWk2rZsWGfElcQnGDX2pUIQkadehsmxaDpdn54hlYM++T81Tu1QRPD4OGQJ4Mm5+nAyQma+mxaroLJwtJlnYkW66rif6W5zfaMxHAsPU/8Z74OKdN5a32AxglF6xkwTe7q8erKIQo0B+dsm8uWJ/Zfm/Vf7yiBe++vbyYWnYugBp7yxPQpUtfDyoDppjw8H5t4Er0a689+30Sxduggq/CrOFPFvnzuy8Z611Eh0aW7KC400HHmDoBTrFWk8MKsmZvu5UsuQk8DukMXZiEpXWpQZmHQHS0FlnsCFRuCpH6g/YzdMD92p5Z
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(346002)(136003)(396003)(366004)(451199021)(2906002)(38100700002)(86362001)(38350700002)(6512007)(83380400001)(107886003)(2616005)(186003)(1076003)(26005)(6506007)(5660300002)(36756003)(4744005)(8676002)(8936002)(478600001)(6486002)(110136005)(52116002)(6666004)(316002)(41300700001)(66476007)(66556008)(4326008)(66946007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Qy9y8lZEVI1Qm1D5StDmMqqQgIUDHGw+19sAJMvuD2SiUhamCoJqOAthLyYr?=
+ =?us-ascii?Q?2IGjrQxfX7QEoSszXSokpALjukxhPRYkV2ANg0f2tDtD1YhfmHu7+tZH9YYA?=
+ =?us-ascii?Q?eZQhpMsQgVyWunoOz0TNgedeyjXWYWJgZpPGxE0vOVau/HUqpxBkfU4T645b?=
+ =?us-ascii?Q?fG4SLFvHb/UOkSn4zqBj57Y1uy6qiHG2ohcaUiPUAeCdNc655PZLjRZBu3AL?=
+ =?us-ascii?Q?fsNfsO1YajfM0Tuz8+4b9mg7s4aHjOSPjpN0eSKOeuVEMeFL6Jv1mnm0Ojql?=
+ =?us-ascii?Q?zpKM1a3uWVAw9vtJJZB7FjxDK+TsAhvAW5tL2SplHvYCLuR34zt5qXXE5GzP?=
+ =?us-ascii?Q?vNg9BpqEuFsx0CtGdEaxXUxkenJDYkwDvX+6gnr12A0kPF4n33fRYMcA55ad?=
+ =?us-ascii?Q?G7cn4BAE1ZSeSsX5XcTXMcET9GyNK2nyorluYZpwv6InWo6JNxl6yDVzVLtQ?=
+ =?us-ascii?Q?2FWOC3fse40/W80IXmGDuSNEb8sjxE7p9iM56M7UWDwmW/7B6z9+djxrC/6h?=
+ =?us-ascii?Q?YGrS4m64Ng6a2KKRdw7drdKvOc68G9LHxqCPi8ke/NSt35gOLJlGqqDWppGQ?=
+ =?us-ascii?Q?OXu+KwmdVe1BbGlTLUq8CfzQvhOfJoguX5IlnBfMcuFtB3vs04z8PanUbrnb?=
+ =?us-ascii?Q?8FvgH946xkNnIHsNasX1OAFvZw56OVw3civ96NlOQ/MIYFR4W3coQD9KedjG?=
+ =?us-ascii?Q?MxiA0U0rq/2eEs+TirV+2xLnIYmpboUnWJRgBo46SlNtdLq96hl94JaxW1pB?=
+ =?us-ascii?Q?qnvRwXrprQ/dimLQbrTK+4tq5O31N8ff0MB/UefQMSbb6FXNZAMo6s/KXz24?=
+ =?us-ascii?Q?M4SuzCLUu9op1XLtr6hF3JiLhjS63UJxXvXX4KfZZKDaZ+Sa+J0LPeHL22cf?=
+ =?us-ascii?Q?1xst4b99X1b7FBRt9PukOiKX76CtSWHu5Ie0ET+eMmXOqjI06hAbrRjGZeso?=
+ =?us-ascii?Q?3LfdMUsy+DKIGt/IAngihPPzOFQZfxfykIatsHfa2cJCaI7CC18aZXwcKkld?=
+ =?us-ascii?Q?DV4R9p6PMcG4L9tQ4gWMYgTnLRjXgCFs7prkAouknXRJrVgYLoG8i1fH6PLl?=
+ =?us-ascii?Q?ZZPWiHTm8xvjUZfVaCdp5jO87QSdymLepn8/sI0rEF9KEXdoqgojZVqfvjvj?=
+ =?us-ascii?Q?j5jkKzTisytPdxnAmIvV6nBeIXDpvhZtpH8oRIP9KT57XZI+JSvThXDyl/2g?=
+ =?us-ascii?Q?PTNFUbTp8GkAyAo6CtBYiPDct91GZcMQ8mP9XmNNm9r0iiqtynlSgC6xPXFB?=
+ =?us-ascii?Q?TFoZwbSY+/MfUZZ/S+m2+h4ZTB4nEp9h8n4xEsBc06PsJljELhZG9CgzUbUp?=
+ =?us-ascii?Q?5bsct7HcaL50smwTPh1aTeAuJrV3iDr1kiuFjyh1wIQUu3rttlUJTDwEdt44?=
+ =?us-ascii?Q?nZDMCiB3/PxituznF5Cx7k0SRfKhyq6y2kQQgyqxVDTQfUCl3JCSSGi8dWiX?=
+ =?us-ascii?Q?H6N4LTXPT3jkA9Zxf8tEt7yivCS8a8uK7vj1Q2DKGpHSZTyAmVgbyzH7Dw51?=
+ =?us-ascii?Q?HupjznhWJppuhiuwBys+yrlA7UYNoTbCGBMRow1UJHfZmh6lEiMOv6qhyfv9?=
+ =?us-ascii?Q?4S8KJ3MsYUVPDpCz1aAAfXmmTab8N82Z5WCNtMmF?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: df48cdb4-e192-4822-21e5-08db86ac8a69
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 09:59:41.9902
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tlLmlClhFMvY3IrXlwIXw+BqecYrkk55kVDn0PUWiKGGZ2b9cc5OoSemPQeXB9KuTQa9EkCmPtpxfyIPp8G0hQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5825
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In most cases UDP sockets use the default data ready callback.
-This patch Introduces and uses a specific indirect call wrapper for
-such callback to avoid an indirect call in fastpath.
+key might contain private part of the key, so better use
+kfree_sensitive to free it.
 
-The above gives small but measurable performance gain under UDP flood.
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Fixes: 38320c70d282 ("[IPSEC]: Use crypto_aead and authenc in ESP")
+Signed-off-by: Wang Ming <machel@vivo.com>
 ---
-Note that this helper could be used for TCP, too. I did not send such
-patch right away because in my tests the perf delta there is below the
-noise level even in RR scenarios and the patch would be a little more
-invasive - there are more sk_data_ready() invocation places.
----
- include/net/sock.h | 4 ++++
- net/ipv4/udp.c     | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ net/ipv4/esp4.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 2eb916d1ff64..1b26dbecdcca 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2947,6 +2947,10 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
- }
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index ba06ed42e428..2be2d4922557 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -1132,7 +1132,7 @@ static int esp_init_authenc(struct xfrm_state *x,
+ 	err = crypto_aead_setkey(aead, key, keylen);
  
- void sock_def_readable(struct sock *sk);
-+static inline void sk_data_ready(struct sock *sk)
-+{
-+	INDIRECT_CALL_1(sk->sk_data_ready, sock_def_readable, sk);
-+}
+ free_key:
+-	kfree(key);
++	kfree_sensitive(key);
  
- int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_sk);
- void sock_set_timestamp(struct sock *sk, int optname, bool valbool);
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 42a96b3547c9..5aec1854b711 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1553,7 +1553,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	spin_unlock(&list->lock);
- 
- 	if (!sock_flag(sk, SOCK_DEAD))
--		sk->sk_data_ready(sk);
-+		sk_data_ready(sk);
- 
- 	busylock_release(busy);
- 	return 0;
+ error:
+ 	return err;
 -- 
-2.41.0
+2.25.1
 
 
