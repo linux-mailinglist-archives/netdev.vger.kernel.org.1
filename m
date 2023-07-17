@@ -1,140 +1,156 @@
-Return-Path: <netdev+bounces-18156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36257559CF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 05:03:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D91187559D5
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 05:08:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F804281142
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 03:03:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA4581C20946
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 03:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0271365;
-	Mon, 17 Jul 2023 03:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BB915A4;
+	Mon, 17 Jul 2023 03:08:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00CA15A4
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 03:03:44 +0000 (UTC)
-Received: from mail.208.org (unknown [183.242.55.162])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6941E46
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 20:03:42 -0700 (PDT)
-Received: from mail.208.org (email.208.org [127.0.0.1])
-	by mail.208.org (Postfix) with ESMTP id 4R46NX3QqYzBHYMH
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:03:40 +0800 (CST)
-Authentication-Results: mail.208.org (amavisd-new); dkim=pass
-	reason="pass (just generated, assumed good)" header.d=208.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
-	content-transfer-encoding:content-type:message-id:user-agent
-	:references:in-reply-to:subject:to:from:date:mime-version; s=
-	dkim; t=1689563020; x=1692155021; bh=sektMFR2B16JV9kFS/KKigXez+4
-	7W8fBLNUaaSF32yU=; b=BSxn30iiM349D2OFRqXBrVlXTYNMDsSeqnSm8M5HQNS
-	IScHKLfcmxto1Fej9x6GFGeJztnswnlvHHi50/8ymXuCpfoOOFBO2Fc8vMdKrJzX
-	4xmthiuTYBkn01TLIlIAxTrnCReJ3aAmvIb07uW5tC/DIQIw8IHIvofdw4iwhN0a
-	3wpiqNuPKCj1xvQ4y4PPqJGuTG627C9i8Rrc1q/m7OYBU1d4+5HPdgfvJo3TkazN
-	jo61t8b+OR9eaEo0G3Rh3y0I4L9OKbd6/e6jTzQA1C5qqBOFfZP4D+c/NdL+ZuJS
-	fVkXpw5mFxSMXLmgMgnAYddyz9njiu8N0fKl6XKnExA==
-X-Virus-Scanned: amavisd-new at mail.208.org
-Received: from mail.208.org ([127.0.0.1])
-	by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Lsjmsj4DK6ml for <netdev@vger.kernel.org>;
-	Mon, 17 Jul 2023 11:03:40 +0800 (CST)
-Received: from localhost (email.208.org [127.0.0.1])
-	by mail.208.org (Postfix) with ESMTPSA id 4R46NX1fV1zBHYMC;
-	Mon, 17 Jul 2023 11:03:40 +0800 (CST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A4E1365
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 03:08:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E49F7C433C7;
+	Mon, 17 Jul 2023 03:08:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689563298;
+	bh=DSxcgd+h1hGjsDVfLvnriZE2CKrET78BMSu4MXjeR7M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YTijYacIaCLpeCIu4hFMEWWLRsZeU8gUwVXMB8UgLTTK3K17+3iipTywexQpUR9Rf
+	 mSDpXwyCUxhaIqhc/oduUcFTSQQFbcBIW/MYnZ26RwP2997OCHeT5mu7AKXsO8ZZyJ
+	 FFBEDJFA38Gv5aZdq7T21ljBzICWz3BJbje8hndefWaDVVUTtqRR6zgFYbSOd7qbcj
+	 ne7HNlTnPpCH6jgV8g90LL+dOM4ctEikTxj8SWixcIIEHfHphoJ6JiOm3tN5aRyJPA
+	 pYQ2F1nGLNmxSeNGyDOH+xhkrH/BDP4j/aog++4OlifwqDe9PvAGS+QFKhXDLqwD2U
+	 xBtctmPa6qW/w==
+Message-ID: <765b02a5-2f09-e744-f441-c082fa3987ff@kernel.org>
+Date: Sun, 16 Jul 2023 21:08:16 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 17 Jul 2023 11:03:40 +0800
-From: hanyu001@208suo.com
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] ethernet: 3com: 3c574_cs: Add space around '='
-In-Reply-To: <tencent_847E8BEE8A0DA19841D2B6801D09F3E44808@qq.com>
-References: <tencent_847E8BEE8A0DA19841D2B6801D09F3E44808@qq.com>
-User-Agent: Roundcube Webmail
-Message-ID: <61ea29204b81265e05ee48f513c39653@208suo.com>
-X-Sender: hanyu001@208suo.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>
+Cc: =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ Hari Ramakrishnan <rharix@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Samiullah Khawaja <skhawaja@google.com>,
+ Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, John Hubbard <jhubbard@nvidia.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang
+ <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Eric Dumazet <edumazet@google.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>, Ryder Lee <ryder.lee@mediatek.com>,
+ Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-rdma@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, logang@deltatee.com,
+ Bjorn Helgaas <bhelgaas@google.com>
+References: <20230710215906.49514550@kernel.org>
+ <20230711050445.GA19323@lst.de> <ZK1FbjG+VP/zxfO1@ziepe.ca>
+ <20230711090047.37d7fe06@kernel.org>
+ <04187826-8dad-d17b-2469-2837bafd3cd5@kernel.org>
+ <20230711093224.1bf30ed5@kernel.org>
+ <CAHS8izNHkLF0OowU=p=mSNZss700HKAzv1Oxqu2bvvfX_HxttA@mail.gmail.com>
+ <20230711133915.03482fdc@kernel.org>
+ <2263ae79-690e-8a4d-fca2-31aacc5c9bc6@kernel.org>
+ <CAHS8izP=k8CqUZk7bGUx4ctm4m2kRC2MyEJv+N4+b0cHVkTQmA@mail.gmail.com>
+ <ZK6kOBl4EgyYPtaD@ziepe.ca>
+ <CAHS8izNuda2DXKTFAov64F7J2_BbMPaqJg1NuMpWpqGA20+S_Q@mail.gmail.com>
+ <143a7ca4-e695-db98-9488-84cf8b78cf86@amd.com>
+ <CAHS8izPm6XRS54LdCDZVd0C75tA1zHSu6jLVO8nzTLXCc=H7Nw@mail.gmail.com>
+ <9cf3ce79-2d5e-090d-c83e-0c359ace1cb9@kernel.org>
+ <CAHS8izOL593X7=9pGaeC1JJ_5hYookZDn7O=fike=e48+myvxA@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAHS8izOL593X7=9pGaeC1JJ_5hYookZDn7O=fike=e48+myvxA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Fix checkpatch warnings:
+On 7/16/23 8:05 PM, Mina Almasry wrote:
+>>
+>> For the driver and hardware queue: don't you need a dedicated queue for
+>> the flow(s) in question?
+> 
+> In the RFC and the implementation I'm thinking of, the queue is
+> 'dedicated' in that each queue will be a devmem TCP queue or a regular
+> queue. devmem queues generate devmem skbs and non-devmem queues
+> generate non-devmem skbs. We support switching queues between devmem
+> mode and non-devmem mode via a uapi.
 
-./drivers/net/ethernet/3com/3c574_cs.c:171: ERROR: spaces required 
-around that '=' (ctx:VxV)
-./drivers/net/ethernet/3com/3c574_cs.c:177: ERROR: spaces required 
-around that '=' (ctx:VxV)
-./drivers/net/ethernet/3com/3c574_cs.c:177: ERROR: spaces required 
-around that '=' (ctx:VxV)
-./drivers/net/ethernet/3com/3c574_cs.c:177: ERROR: spaces required 
-around that '=' (ctx:VxV)
-./drivers/net/ethernet/3com/3c574_cs.c:192: ERROR: spaces required 
-around that '=' (ctx:VxV)
+ethtool APIs or something else?
 
-Signed-off-by: maqimei <2433033762@qq.com>
----
-  drivers/net/ethernet/3com/3c574_cs.c             | 6 +++---
-  drivers/net/ethernet/myricom/myri10ge/myri10ge.c | 2 +-
-  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+>> If not, how can you properly handle the
+>> teardown case (e.g., app crashes and you need to ensure all references
+>> to GPU memory are removed from NIC descriptors)?
+> 
+> Jason and Christian will correct me if I'm wrong, but AFAICT the
+> dma-buf API requires the dma-buf provider to keep the attachment
+> mapping alive as long as the importer requires it. The dma-buf API
+> gives the importer dma_buf_map_attachment() and
+> dma_buf_unmap_attachment() APIs, but there is no callback for the
+> exporter to inform the importer that it has to take the mapping away.
 
-diff --git a/drivers/net/ethernet/3com/3c574_cs.c 
-b/drivers/net/ethernet/3com/3c574_cs.c
-index dc3b7c9..287af1d 100644
---- a/drivers/net/ethernet/3com/3c574_cs.c
-+++ b/drivers/net/ethernet/3com/3c574_cs.c
-@@ -168,13 +168,13 @@ enum Win0_EEPROM_cmds {
-     Except for TxFree, which is overlapped by RunnerWrCtrl. */
-  enum Window1 {
-      TX_FIFO = 0x10,  RX_FIFO = 0x10,  RxErrors = 0x14,
--    RxStatus = 0x18,  Timer=0x1A, TxStatus = 0x1B,
-+    RxStatus = 0x18,  Timer = 0x1A, TxStatus = 0x1B,
-      TxFree = 0x0C, /* Remaining free bytes in Tx buffer. */
-      RunnerRdCtrl = 0x16, RunnerWrCtrl = 0x1c,
-  };
+Isn't the importer that application that terminated (cleanly or other)?
+That was my thinking but I guess there are other designs that can cross
+a single application.
 
-  enum Window3 {            /* Window 3: MAC/config bits. */
--    Wn3_Config=0, Wn3_MAC_Ctrl=6, Wn3_Options=8,
-+    Wn3_Config = 0, Wn3_MAC_Ctrl = 6, Wn3_Options = 8,
-  };
-  enum wn3_config {
-      Ram_size = 7,
-@@ -189,7 +189,7 @@ enum wn3_config {
-  };
+> The closest thing I saw was the move_notify() callback, but that is
+> optional.
+> 
+> In my mind the way it works is that there will be some uapi that binds
+> a dma-buf to an RX queue, that will create the attachment and the
+> mapping. If the user crashes or closes the dma-buf handle then that
+> will unbind the dma-buf from the RX queue, but the mapping will remain
+> alive (via some refcounting) until all the NIC descriptors are freed
+> and the mapping is not under use anymore. Usually this will happen
+> next driver reset which destroys and recreates rx queues thereby
+> freeing all the NIC descriptors (but could be a new API so that we
+> don't rely on a driver reset).
+> 
+>> If you agree on this
+>> point, then you can require the dedicated queue management in the driver
+>> to use and expect only the alternative frag addressing scheme. ie., it
+>> knows the address is not struct page (validates by checking skb flag or
+>> frag flag or address magic), but a reference to say a page_pool entry
+>> (if you are using page_pool for management of the dmabuf slices) which
+>> contains the metadata needed for the use case.
+> 
+> Honestly if my understanding above doesn't match what you want, I
+> could implement 'dedicated queues' instead, just let me know what you
+> want at some future iteration. Now, I'm more worried about this memory
+> format issue and I'm working on an RX prototype without struct pages.
+> So far purely technically speaking it seems possible.
+> 
+> 
 
-  enum Window4 {        /* Window 4: Xcvr/media bits. */
--    Wn4_FIFODiag = 4, Wn4_NetDiag = 6, Wn4_PhysicalMgmt=8, Wn4_Media = 
-10,
-+    Wn4_FIFODiag = 4, Wn4_NetDiag = 6, Wn4_PhysicalMgmt = 8, Wn4_Media 
-= 10,
-  };
-
-  #define MEDIA_TP    0x00C0    /* Enable link beat and jabber for 
-10baseT. */
-diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c 
-b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-index 4a9cbb0..1c50e3e 100644
---- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-+++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-@@ -1237,7 +1237,7 @@ static int myri10ge_notify_dca_device(struct 
-device *dev, void *data)
-  #if MYRI10GE_ALLOC_SIZE > 4096
-          /* don't cross a 4KB boundary */
-          end_offset = rx->page_offset + bytes - 1;
--        if ((unsigned int )(rx->page_offset ^ end_offset) > 4095)
-+        if ((unsigned int)(rx->page_offset ^ end_offset) > 4095)
-              rx->page_offset = end_offset & ~4095;
-  #endif
-          rx->fill_cnt++;
+My comment was only a suggestion on how to simplify driver changes. ie.,
+a queue is either pages (based on standard page_pool or alloc_pages) or
+some "special" page_pool (ie., new abstraction) but not mixed. In that
+case it knows how to handle the overloaded 'address' in skb_frag in a
+clean manner.
 
