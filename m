@@ -1,73 +1,81 @@
-Return-Path: <netdev+bounces-18178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED2B755A96
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:12:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E87A755AA7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C873D1C20A41
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 04:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CCEF281463
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 04:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CFB524B;
-	Mon, 17 Jul 2023 04:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C4015C9;
+	Mon, 17 Jul 2023 04:37:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9BE5236
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 04:12:17 +0000 (UTC)
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAF1E43
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 21:11:59 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-666e97fcc60so2509376b3a.3
-        for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 21:11:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F40C1380;
+	Mon, 17 Jul 2023 04:37:35 +0000 (UTC)
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B669E48;
+	Sun, 16 Jul 2023 21:37:32 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6b9d562f776so264815a34.2;
+        Sun, 16 Jul 2023 21:37:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689567119; x=1692159119;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5hHdzxwtEliVXSVZnVF24kTqq+snac10wbxH1dPQWAY=;
-        b=EO/ql6X5tMl9hTDVTOLkUyp8ziyYaLlCH0jdiPCHmB6yMhnKzVAEna09QEATyOABFB
-         Z3aq3aNDczKTVfboEzBFTgrPc42dRnqNFJY+KBini+/t37p/Aet5mw7aIrFG9/m9211f
-         SWhe8EwxDupwcDBazCgNpUaRG4hSuUgmAlty+fMaTEWmmuZRiCeOKMWyIzCOB69OMJzi
-         +Uh8cA7yc1aTHV4JocZ+3jTDdZmF2nz4v/hxnF6brbnbPTg4HXOVIeUuOzQJEstCTtnz
-         O7ChLV7tpEwESqCp+OAdB+EZ9HAjlvelbo+Jw2xnCF80eNLvXpbgGquOn4CcgITx3qn0
-         21/Q==
+        d=gmail.com; s=20221208; t=1689568652; x=1692160652;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A2chrSz8FPLD5T84OtSz+zScqalUZiR8JbB8TgFbdpQ=;
+        b=IrtS8sCasTQPHwhYZdq4xAmG4XIPWGYwGPd7ZRzwo9PhdKEl4YmQFi0khCj/YTwWgt
+         nqHXPrY7DzUd1yoGOu6mZ2xJirygjqPXiyn3giQaSpkBJaLh0lu7c1wi3zsX+PA2mTsb
+         yasKrVRRdNvqxFADzV+KbH/xV7aXTkrod2ZRV++XaGjhHkE77m9UhVRpWPjJjXrGEe5y
+         3gnJhDTnJh8FqJ2i6WDWMzDJ/stOH9Ik07IEjhhWprnmmkKCOQZFDChRgNIUc5b6nyQm
+         pLPAQFsQmJYip6X2r88LnUHmfVnPsCAQnkZPFzWFBa5nb9qc+RwnzLGRn2d64RH+5N4p
+         b3Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689567119; x=1692159119;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5hHdzxwtEliVXSVZnVF24kTqq+snac10wbxH1dPQWAY=;
-        b=Rvta5mDXrcLDctE9Tt9R1kCByprHao5+vhlsLPYLFmw9NJn8p1M4oA5PCJb5udNa66
-         d8Qgbrp9CfwNJieLtgvYEplyqGw2uSojzfPYaBKM3yiMgoPipcdda55+frwAs6rZ4JvG
-         CHv37Ipl1XpbEfWVdBjcnlJmICs0b9PuiywYI7PClmQL0brCy+B78QlrIKD1nnQjrxdg
-         +H0VM4nDI8Iq9uM1TDVTp+6ZX3Sz5AFDSAC2xYI6nZ7datAJx6g4RrKig8Nx+chATioJ
-         1Ci34SzZnK29MXXE7dHmwA32LUsAjV30FA1glCh8FDcvE9AvgDuaAoQKFL2mwpPXpPMP
-         dcfQ==
-X-Gm-Message-State: ABy/qLYCDNT4ZvHuPL/eEUCvJD8kGPhMNsoFIWfFguOxTTrOhbTsqFaA
-	ZyqOG906uaCrafK13+yR/r9lAbejwbt6pA==
-X-Google-Smtp-Source: APBJJlFEFQG6/V3T0EFrcnJsZwviAfdiCZYTPCf/OBejhnIC7WpA/ArLSD7srUsI3bWzBqlQB39yMQ==
-X-Received: by 2002:aa7:8891:0:b0:62d:8376:3712 with SMTP id z17-20020aa78891000000b0062d83763712mr11440971pfe.28.1689567118771;
-        Sun, 16 Jul 2023 21:11:58 -0700 (PDT)
-Received: from Laptop-X1 ([103.235.230.148])
-        by smtp.gmail.com with ESMTPSA id a28-20020a63705c000000b00528513c6bbcsm11705137pgn.28.2023.07.16.21.11.56
+        d=1e100.net; s=20221208; t=1689568652; x=1692160652;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=A2chrSz8FPLD5T84OtSz+zScqalUZiR8JbB8TgFbdpQ=;
+        b=CepzVJxOASH79BME/uRvbGTnod/wkPepvJ+aLeg+NyHF12S2w8cL7BbVlkx7cDEAO8
+         mJRkwax+u75RkdES/0JgS+DCMdMvfVXwqsknfXiFysJDEEomMf/T4pO11gedEk1OlU5B
+         TXyOriFsN6iiT4ZUScX9BzCO/gM2hW/Igdr2lz7gzxYKbCGKC+wlD98BGyOXFqNI/Db3
+         Z7H2uf0L+7Co7pEHxtyWOu/bHFlBCLMIpQUGaIKm+asPiFmc1AM7Q1BhCjfHMOG9VRsL
+         qV9scXacdq957+pOgm8K+wqybS4WdA14rdpqpRSx5ybq8NLap4fwxBlAAnDVEBEsRGm4
+         YWaw==
+X-Gm-Message-State: ABy/qLYc30UFIdmJo7PGvTP+4ktziKrgbaxvyIsIdgjZ9b7273py9hmF
+	VyTspxcVkNhcylhGzHmcWlY=
+X-Google-Smtp-Source: APBJJlGhfbvJdSH9mK+U+1WGuHNqvKMRICwzSWRvyRJU9doa5qcE5OCJJYVW5rmqoR1HQPyrd7ekRQ==
+X-Received: by 2002:a05:6358:4196:b0:135:ae78:56c9 with SMTP id w22-20020a056358419600b00135ae7856c9mr177588rwc.6.1689568651523;
+        Sun, 16 Jul 2023 21:37:31 -0700 (PDT)
+Received: from localhost ([2605:59c8:148:ba10:74ce:be18:a39c:74])
+        by smtp.gmail.com with ESMTPSA id n2-20020aa79042000000b0067eb174cb9asm10938761pfo.136.2023.07.16.21.37.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jul 2023 21:11:57 -0700 (PDT)
-Date: Mon, 17 Jul 2023 12:11:53 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: selftest io_uring_zerocopy_tx.sh failed on VM
-Message-ID: <ZLS/iWz+gF0/PGyR@Laptop-X1>
+        Sun, 16 Jul 2023 21:37:30 -0700 (PDT)
+Date: Sun, 16 Jul 2023 21:37:29 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
+ john fastabend <john.fastabend@gmail.com>, 
+ bpf <bpf@vger.kernel.org>, 
+ Networking <netdev@vger.kernel.org>
+Cc: "davidhwei@meta.com" <davidhwei@meta.com>
+Message-ID: <64b4c5891096b_2b67208f@john.notmuch>
+In-Reply-To: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
+References: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
+Subject: RE: Sockmap's parser/verdict programs and epoll notifications
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -75,19 +83,85 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Pavel,
+Andrii Nakryiko wrote:
+> Hey John,
 
-I tried to run test selftest io_uring_zerocopy_tx.sh on VM, but it failed
-with error like
+Sorry missed this while I was on PTO that week.
 
-+ ip netns exec ns-45iLeE2 ./msg_zerocopy -4 -t 2 -C 2 -S 192.168.1.1 -D 192.168.1.2 -r udp
-cpu: unable to pin, may increase variance.
-+ ip netns exec ns-45iLeE1 ./io_uring_zerocopy_tx -4 -t 1 -D 192.168.1.2 -m 1 -t 1 -n 32 udp
-./io_uring_zerocopy_tx: io_uring: queue init: Unknown error -13
+> 
+> We've been recently experimenting with using BPF_SK_SKB_STREAM_PARSER
+> and BPF_SK_SKB_STREAM_VERDICT with sockmap/sockhash to perform
+> in-kernel parsing of RSocket frames. A very simple format ([0]) where
+> the first 3 bytes specify the size of the frame payload. The idea was
+> to collect the entire frame in the kernel before notifying user-space
+> that data is available. This is meant to minimize unnecessary wakeups
+> due to incomplete logical frames, saving CPU.
 
-Do you know what's the reason? Should we update the test script to return
-SKIP if io_uring init failed?
+Nice.
 
-Thanks
-Hangbin
+> 
+> You can find the BPF source code I've used at [1], it has lots of
+> extra logging and stuff, but the idea is to read the first 3 bytes of
+> each logical frame, and return the expected full frame size from the
+> parser program. The verdict program always just returns SK_PASS.
+> 
+> This seems to work exactly as expected in manual simulations of
+> various packet size distributions, and even for a bunch of
+> ping/pong-like benchmark (which are very sensitive to correct frame
+> length determination, so I'm reasonably confident we don't screw that
+> up much). And yet, when benchmarking sending multiple logical RPC
+> streams over the same single socket (so many interleaving RSocket
+> frames on single socket, but in terms of logical frames nothing should
+> change), we often see that while full frame hasn't been accumulated in
+> socket receive buffer yet, epoll_wait() for that socket would return
+> with success notifying user space that there is data on socket.
+> Subsequent recvfrom() call would immediately return -EAGAIN and no
+> data, and our benchmark would go on this loop of useless
+> epoll_wait()+recvfrom() calls back to back, many times over.
+
+Aha yes this sounds bad.
+
+> 
+> So I have a few questions:
+>   - is the above use case something that was meant to be handled by
+> sockmap+parser/verdict?
+
+We shouldn't wake up user space if there is nothing to read. So
+yes this seems like a valid use case to me.
+
+>   - is it correct to assume that epoll won't wake up until amount of
+> bytes requested by parser program is accumulated (this seems to be the
+> case from manually experimenting with various "packet delays");
+
+Seems there is some bug that races and causes it to wake up
+user space. I'm aware of a couple bugs in the stream parser
+that I wanted to fix. Not sure I can get to them this week
+but should have time next week. We have a couple more fixes
+to resolve a few HTTPS server compliance tests as well.
+
+>   - is there some known bug or race in how sockmap and strparser
+> framework interacts with epoll subsystem that could cause this weird
+> epoll_wait() behavior?
+
+Yes I know of some races in strparser. I'll elaborate later
+probably with patches as I don't recall them readily at the
+moment.
+
+> 
+> It does seem like some sort of timing issue, but I couldn't pin down
+> exactly what are the conditions that this happens in. But it's quite
+> reproducible with a pretty high frequency using our internal benchmark
+> when multiple logical streams are involved.
+> 
+> Any thoughts or suggestions?
+
+Seems like a bug we should fix it. I'm aware of a couple
+issues with the stream parser that we plan to fix so could
+be one of those or a new one I'm not aware of. I'll take
+a look more closely next week.
+
+>   [0] https://rsocket.io/about/protocol/#framing-format
+>   [1] https://github.com/anakryiko/libbpf-bootstrap/blob/thrift-coalesce-rcvlowat/examples/c/bootstrap.bpf.c
+> 
+> -- Andrii
 
