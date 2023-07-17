@@ -1,113 +1,80 @@
-Return-Path: <netdev+bounces-18256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D38075611F
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:04:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6651756199
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBD0F1C20963
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:04:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60CAE2812E7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6754AD24;
-	Mon, 17 Jul 2023 11:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2810AD2E;
+	Mon, 17 Jul 2023 11:30:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6BEAD23
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:03:53 +0000 (UTC)
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426EFE5A
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 04:03:52 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b71ae5fa2fso62842561fa.0
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 04:03:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689591830; x=1692183830;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KKghZ8QNoXQs8xa/hgGcDNF3Z0ichWHWuDS0ZkXZaf0=;
-        b=OFvAfniFDy+IPhA+2zkRJnlkS9ZIRgU/gPAzxv5H1txSL0gHdLuOt6CSRbzBVSIFsr
-         YHm4yWg0qdIpQmKtUSY5JBGBIwuAzlrIMzryBYdKPBHapZAjH8F37WiMspoJIIzhQ9ov
-         FQwX2nDkUJeJbvJE4PIN2CHvGKPBDLrjtTjESADoFttff+P/c8PvDDF9L6NTQEaScEQ/
-         KvtunJ5bKDK0m5fwM7Ex7QJ0RGvuWmhXBPu+f/tNW8Y1N7CD+O5a+kmvIdtvbY1ZAWfS
-         1N/Eubm1QIeHRDkx2THCxfYb93M+jtFvqcemQWREAUGjxbMS2dF/wdiWCb0VrtiVyJiG
-         974Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689591830; x=1692183830;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KKghZ8QNoXQs8xa/hgGcDNF3Z0ichWHWuDS0ZkXZaf0=;
-        b=cmCy+HcItPCKhqI7vWcSHQv6rmSSBMr7xNym4BrxjTbgxLQQraZDq9BsRXGHEhaL0D
-         uHvf9171NFvt21ABOkmdtedAcyH/kspVLH+AMCYDra9kLdLnsg3T84MpvnXiG0JWXPwg
-         /B4ARjIy0CjYAFDyKomHmzOAcAIaybPPCthSosXn6dbxLtdo/Mfu9EbM6HrgtkJaCMVs
-         VFjz2AgaoKVQR+YMStLyLJkPvfLDqDeOYodUx0akaBlgHiDq0A7s242WRNaLOm6nwCfV
-         SAP1CaPXf5PbHFEXQYsHB5nl6HSbA8L5ZsJirZPe2pUWIRUgrH3j579bVx6ikMH36diJ
-         L4dQ==
-X-Gm-Message-State: ABy/qLbHM27mQmuRfRs2oLB6DtdlGEqDNcx0PVweMOXAGFpbrnGVlKgo
-	m4riy5HkHMvyXkkNJnCAWco=
-X-Google-Smtp-Source: APBJJlEE5jB9UME67AFsptRmyJXgbqYGv6G8ohroOwBf0MilqJaV9sXCL1XPAlMoTefxgo4ORLWrkw==
-X-Received: by 2002:a2e:3603:0:b0:2b6:d536:1bba with SMTP id d3-20020a2e3603000000b002b6d5361bbamr8458933lja.18.1689591830164;
-        Mon, 17 Jul 2023 04:03:50 -0700 (PDT)
-Received: from skbuf ([188.25.175.105])
-        by smtp.gmail.com with ESMTPSA id b14-20020a17090636ce00b0098d486d2bdfsm9187482ejc.177.2023.07.17.04.03.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 04:03:49 -0700 (PDT)
-Date: Mon, 17 Jul 2023 14:03:46 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Ar__n__ __NAL <arinc.unal@arinc9.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
-	UNGLinuxDriver@microchip.com,
-	Woojung Huh <woojung.huh@microchip.com>
-Subject: Re: [PATCH net-next 2/3] net: dsa: remove legacy_pre_march2020 from
- drivers
-Message-ID: <20230717110346.cpnoahwau6o7ss5f@skbuf>
-References: <ZLERQ2OBrv44Ppyc@shell.armlinux.org.uk>
- <ZLERQ2OBrv44Ppyc@shell.armlinux.org.uk>
- <E1qKEqS-00H0xb-G1@rmk-PC.armlinux.org.uk>
- <E1qKEqS-00H0xb-G1@rmk-PC.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976B8AD2D
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:30:19 +0000 (UTC)
+X-Greylist: delayed 493 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 17 Jul 2023 04:30:18 PDT
+Received: from mail.aperture-lab.de (mail.aperture-lab.de [IPv6:2a01:4f8:c2c:665b::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A4AE4E
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 04:30:18 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E19084199E;
+	Mon, 17 Jul 2023 13:22:03 +0200 (CEST)
+Date: Mon, 17 Jul 2023 13:22:03 +0200
+From: Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, netfilter@vger.kernel.org
+Subject: skb->mark not cleared for MLDv2 Reports? (skb->mark == 212 / 0xd4)
+Message-ID: <ZLUkWyFiwEqi721V@sellars>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <E1qKEqS-00H0xb-G1@rmk-PC.armlinux.org.uk>
- <E1qKEqS-00H0xb-G1@rmk-PC.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 10:12:12AM +0100, Russell King (Oracle) wrote:
-> Since DSA no longer marks anything as phylink-legacy, there is now no
-> need for DSA drivers to set this member to false. Remove all instances
-> of this.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
+Hi,
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+I noticed that MLDv2 Reports don't seem to have a default
+skb->mark of 0. Instead it is 212 / 0xd4 for me:
+
+```
+$ ip link add dummy0 type dummy
+$ ip link set up dummy0 arp on
+$ ip6tables -I INPUT -i dummy0 -j LOG --log-ip-options
+[ send an MLDv2 Query, for instance via the ipv6toolkit
+  https://github.com/T-X/ipv6toolkit/tree/pr-mldq6-mldv2
+]
+$ dmesg
+...
+[38336.524879] IN= OUT=dummy0 SRC=fe80:0000:0000:0000:1c01:1cff:fec1:5669 DST=ff02:0000:0000:0000:0000:0000:0000:0016 LEN=76 TC=0 HOPLIMIT=1 FLOWLBL=0 OPT ( ) PROTO=ICMPv6 TYPE=143 CODE=0 MARK=0xd4
+...
+```
+
+For MLDv1 Reports I don't see this issue, there it's always
+0 by default.
+
+I'm wondering if this 212 value comes from the
+skb->reserved_tailroom (formerly avail_size) which the skb->mark
+is unioned with? Am I reading
+a21d45726a ("tcp: avoid order-1 allocations on wifi and tx path")
+correctly that the IPv6 stack should have reset skb->mark to 0
+before transmission?
+
+Initially observed on a Linux 5.10.184. But I can reproduce
+this on a Linux 6.3.7, too.
+
+Regards, Linus
 
