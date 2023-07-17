@@ -1,133 +1,224 @@
-Return-Path: <netdev+bounces-18151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A245E7559B2
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 04:41:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B0AE7559B8
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 04:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58EDD28135C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 02:41:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3830128137D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 02:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D1710ED;
-	Mon, 17 Jul 2023 02:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653B2139B;
+	Mon, 17 Jul 2023 02:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8261365
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:41:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 048DCC433C7;
-	Mon, 17 Jul 2023 02:41:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689561695;
-	bh=BMRFKeXZlpIRSbPMYrVconDlclfefxaU6mHhh2wyjZ0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tC0pXdzAqzWC61pPDdl/Dly3pRxNGL9fN4BDm+nuS7/odvvaFkj3p+PHEJfH4KrjC
-	 ivN6UF0bRGN3CSU0hlku6KpewVkw3N+ketF6UkIG8T5zgk46mrUAwJluS182IhS1FS
-	 evtOZBgtvXSoKbg+V1ocHWiMxb8Iw1bJcQCByj2a+gEBiJ+nIRHCRT2+OfhxHniPnP
-	 pvdKPUrRAZ9CT9efe2h1Ly+duTllVj8Cla61AWVPYtBFmfTjYesnWxHimYktLFmr0T
-	 PwBpxm93RFEFiT7tMUIS4/zHBBH7BPN1HrTe8L9PoOJiL6rZr+vnsWTEMhycsqx6br
-	 D3V282i3tMWeA==
-Message-ID: <12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
-Date: Sun, 16 Jul 2023 19:41:28 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF931365
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:43:30 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C7B9187
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 19:43:28 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4fbaef9871cso6192323e87.0
+        for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 19:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689561806; x=1692153806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y/rbaFBr1o1WpkBGUX8CuyV0YuFTgeUPikyuIhf+EvE=;
+        b=K3Mb/t0FO1qVOX7kd3PzPv9ouKCPOirSTurifUS3hp0XAUNv4+5SfQKPDuJuqyE/cT
+         9rdeQF3bv2zPYKA9d5ROWefv2U7I7ZBMnYYBvoO5KJnoxqZ8IpG0SwNpiNryFXuqZy2M
+         //c7WxNHauCj1fqbxZPjFip4EoGhWxz3yoTenbPD1xZYeZ5w/y7vXPKUW9ibWncMdU8y
+         7nQ6zR/Px1GXOhWExwQymtzU8LPu5Tex3i6BnE7RoOZX+ltbGU5/12AZqONsgDkRNNqR
+         xkSiqfwlw0MXih5dapPBb2XoQtEs5lh0VB/j0gqxbq7aI5kTBha/2SzwC1O30GxRHNjB
+         lcWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689561806; x=1692153806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y/rbaFBr1o1WpkBGUX8CuyV0YuFTgeUPikyuIhf+EvE=;
+        b=SAJiMTn637X7WNU8Unyk8F/oH0wzGZYwBwga6YMWlxMpMnjufZQOpbMGQ8I7n/8Uuq
+         T9dutrrMxR8a09FwskjqG0NM0apVaQKJj49/ocyp5pWh2ugBmuZcbUe8/aYsh/RI39mq
+         gWm296JJw5qRD4hlaL4zbRQA+/YGYbHyqdDoyfZ7D1UYeHZOJurxgP4DVFi1Eyn9hwJv
+         2Lm6R9jAv6nDmNP56Q6AR0b55gWSAqjJPeNVaHa2vvdYebC4WHemCr68IYB2iwyk0aJZ
+         jRWu4NQtdwoWQV/Veny1/uPtuO+Jj+aKewwbw0xARc3Flo+IhtvQPd0k6EWE4Ju4mJjJ
+         aKUw==
+X-Gm-Message-State: ABy/qLbDaW1vqZ+7APmhac8cSEt1R5rsnESK17P7M4Hzw8Qk7x0+Y3lN
+	qZLQ/mxXnQh0rEOclg4RoxUpqVXv0IKvaVW0Rmo=
+X-Google-Smtp-Source: APBJJlEZwMnaiTG95a3lbYA/EQ/ugxl+LiVHyTtkU1lBXW7IyUkjmLK0UnEdBRvoSdpmQOEjyU+lnRm60uohNtFUFi0=
+X-Received: by 2002:a05:6512:2243:b0:4fb:9da2:6cec with SMTP id
+ i3-20020a056512224300b004fb9da26cecmr7097000lfu.7.1689561806084; Sun, 16 Jul
+ 2023 19:43:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH 00/10] Device Memory TCP
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, jgg@ziepe.ca
-References: <20230710223304.1174642-1-almasrymina@google.com>
-From: Andy Lutomirski <luto@kernel.org>
-In-Reply-To: <20230710223304.1174642-1-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1689215889.git.chenfeiyang@loongson.cn> <be1874e517f4f4cc50906f18689a0add3594c2e0.1689215889.git.chenfeiyang@loongson.cn>
+ <9e0b3466-10e1-4267-ab9b-d9f8149b6b6b@lunn.ch> <CACWXhKkX-syR01opOky=t-b8C3nhV5f_WNfCQ-kOE+4o0xh4tA@mail.gmail.com>
+ <3cff46b0-5621-4881-8e70-362bb7a70ed1@lunn.ch>
+In-Reply-To: <3cff46b0-5621-4881-8e70-362bb7a70ed1@lunn.ch>
+From: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Date: Mon, 17 Jul 2023 10:43:14 +0800
+Message-ID: <CACWXhKk23muXROj6OrmeFna88ViJHA_7QpQZoWiFgzEPb4pLWQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 01/10] net: phy: Add driver for Loongson PHY
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
+	linux@armlinux.org.uk, dongbiao@loongson.cn, 
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
+	loongarch@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/10/23 15:32, Mina Almasry wrote:
-> * TL;DR:
-> 
-> Device memory TCP (devmem TCP) is a proposal for transferring data to and/or
-> from device memory efficiently, without bouncing the data to a host memory
-> buffer.
+On Fri, Jul 14, 2023 at 12:20=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> > > > +#include <linux/mii.h>
+> > > > +#include <linux/module.h>
+> > > > +#include <linux/netdevice.h>
+> > > > +#include <linux/pci.h>
+> > > > +#include <linux/phy.h>
+> > > > +
+> > > > +#define PHY_ID_LS7A2000              0x00061ce0
+> > >
+> > > What is Loongson OUI?
+> > >
+> >
+> > Currently, we do not have an OUI for Loongson, but we are in the
+> > process of applying for one.
+>
+> Is the value 0x00061ce0 baked into the silicon? Or can it be changed
+> once you have an OUI?
+>
 
-(I'm writing this as someone who might plausibly use this mechanism, but 
-I don't think I'm very likely to end up working on the kernel side, 
-unless I somehow feel extremely inspired to implement it for i40e.)
+Hi, Andrew,
 
-I looked at these patches and the GVE tree, and I'm trying to wrap my 
-head around the data path.  As I understand it, for RX:
+The value is baked into the silicon.
 
-1. The GVE driver notices that the queue is programmed to use devmem, 
-and it programs the NIC to copy packet payloads to the devmem that has 
-been programmed.
-2. The NIC receives the packet and copies the header to kernel memory 
-and the payload to dma-buf memory.
-3. The kernel tells userspace where in the dma-buf the data is.
-4. Userspace does something with the data.
-5. Userspace does DONTNEED to recycle the memory and make it available 
-for new received packets.
+> > > > +#define GNET_REV_LS7A2000    0x00
+> > > > +
+> > > > +static int ls7a2000_config_aneg(struct phy_device *phydev)
+> > > > +{
+> > > > +     if (phydev->speed =3D=3D SPEED_1000)
+> > > > +             phydev->autoneg =3D AUTONEG_ENABLE;
+> > >
+> > > Please explain.
+> > >
+> >
+> > The PHY itself supports half-duplex, but there are issues with the
+> > controller used in the 7A2000 chip. Moreover, the controller only
+> > supports auto-negotiation for gigabit speeds.
+>
+> So you can force 10/100/1000, but auto neg only succeeds for 1G?
+>
+> Are the LP autoneg values available for genphy_read_lpa() to read? If
+> the LP values are available, maybe the PHY driver can resolve the
+> autoneg for 10 an 100.
+>
 
-Did I get this right?
+I apologize for the confusion caused by my previous description. To
+clarify, the PHY supports auto-negotiation and non-auto-negotiation
+for 10/100, but non-auto-negotiation for 1000 does not work correctly.
 
-This seems a bit awkward if there's any chance that packets not intended 
-for the target device end up in the rxq.
+> > > > +     if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> > > > +         phydev->advertising) ||
+> > > > +         linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> > > > +         phydev->advertising) ||
+> > > > +         linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> > > > +         phydev->advertising))
+> > > > +         return genphy_config_aneg(phydev);
+> > > > +
+> > > > +     netdev_info(phydev->attached_dev, "Parameter Setting Error\n"=
+);
+> > >
+> > > This also needs explaining. How can it be asked to do something it
+> > > does not support?
+> > >
+> >
+> > Perhaps I missed something, but I think that if someone uses ethtool,
+> > they can request it to perform actions or configurations that the
+> > tool does not support.
+>
+> No. The PHY should indicate what it can do, via the .get_abilities()
+> etc. The MAC can also remove some of those link modes if it is more
+> limited than the PHY. phylib will then not allow ksetting_set() to
+> enable things which are not supported. So this should not happen.  It
+> would actually be a bad design, since it would force every driver to
+> do such checks, rather than implement it once in the core.
+>
 
-I'm wondering if a more capable if somewhat higher latency model could 
-work where the NIC stores received packets in its own device memory. 
-Then userspace (or the kernel or a driver or whatever) could initiate a 
-separate DMA from the NIC to the final target *after* reading the 
-headers.  Can the hardware support this?
+I see.
 
-Another way of putting this is: steering received data to a specific 
-device based on the *receive queue* forces the logic selecting a 
-destination device to be the same as the logic selecting the queue.  RX 
-steering logic is pretty limited on most hardware (as far as I know -- 
-certainly I've never had much luck doing anything especially intelligent 
-with RX flow steering, and I've tried on a couple of different brands of 
-supposedly fancy NICs).  But Linux has very nice capabilities to direct 
-packets, in software, to where they are supposed to go, and it would be 
-nice if all that logic could just work, scalably, with device memory. 
-If Linux could examine headers *before* the payload gets DMAed to 
-wherever it goes, I think this could plausibly work quite nicely.  One 
-could even have an easy-to-use interface in which one directs a *socket* 
-to a PCIe device.  I expect, although I've never looked at the 
-datasheets, that the kernel could even efficiently make rx decisions 
-based on data in device memory on upcoming CXL NICs where device memory 
-could participate in the host cache hierarchy.
+> > > > +int ls7a2000_match_phy_device(struct phy_device *phydev)
+> > > > +{
+> > > > +     struct net_device *ndev;
+> > > > +     struct pci_dev *pdev;
+> > > > +
+> > > > +     if ((phydev->phy_id & 0xfffffff0) !=3D PHY_ID_LS7A2000)
+> > > > +             return 0;
+> > > > +
+> > > > +     ndev =3D phydev->mdio.bus->priv;
+> > > > +     pdev =3D to_pci_dev(ndev->dev.parent);
+> > > > +
+> > > > +     return pdev->revision =3D=3D GNET_REV_LS7A2000;
+> > >
+> > > That is very unusual. Why is the PHY ID not sufficient?
+> > >
+> >
+> > To work around the controller's issues, we enable the usage of this
+> > driver specifically for a certain version of the 7A2000 chip.
+> >
+> > > > +}
+> > > > +
+> > > > +static struct phy_driver loongson_phy_driver[] =3D {
+> > > > +     {
+> > > > +             PHY_ID_MATCH_MODEL(PHY_ID_LS7A2000),
+> > > > +             .name                   =3D "LS7A2000 PHY",
+> > > > +             .features               =3D PHY_LOONGSON_FEATURES,
+> > >
+> > > So what are the capabilities of this PHY? You seem to have some very
+> > > odd hacks here, and no explanation of why they are needed. If you do
+> > > something which no other device does, you need to explain it.
+> > >
+> > > Does the PHY itself only support full duplex? No half duplex? Does th=
+e
+> > > PHY support autoneg? Does it support fixed settings? What does
+> > > genphy_read_abilities() return for this PHY?
+> > >
+> >
+> > As mentioned earlier, this driver is specifically designed for the PHY
+> > on the problematic 7A2000 chip. Therefore, we assume that this PHY only
+> > supports full- duplex mode and performs auto-negotiation exclusively fo=
+r
+> > gigabit speeds.
+>
+> So what does genphy_read_abilities() return?
+>
+> Nobody else going to use PHY_LOONGSON_FEATURES, so i would prefer not
+> to add it to the core. If your PHY is designed correctly,
+> genphy_read_abilities() should determine what the PHY can do from its
+> registers. If the registers are wrong, it is better to add a
+> .get_features function.
+>
 
-My real ulterior motive is that I think it would be great to use an 
-ability like this for DPDK-like uses.  Wouldn't it be nifty if I could 
-open a normal TCP socket, then, after it's open, ask the kernel to 
-kindly DMA the results directly to my application memory (via udmabuf, 
-perhaps)?  Or have a whole VLAN or macvlan get directed to a userspace 
-queue, etc?
+genphy_read_abilities() returns 0, and it seems to be working fine.
+The registers are incorrect, so I will use the .get_features function
+to clear some of the half-duplex bits.
 
+Thanks,
+Feiyang
 
-It also seems a bit odd to me that the binding from rxq to dma-buf is 
-established by programming the dma-buf.  This makes the security model 
-(and the mental model) awkward -- this binding is a setting on the 
-*queue*, not the dma-buf, and in a containerized or privilege-separated 
-system, a process could have enough privilege to make a dma-buf 
-somewhere but not have any privileges on the NIC.  (And may not even 
-have the NIC present in its network namespace!)
-
---Andy
+>         Andrew
 
