@@ -1,112 +1,120 @@
-Return-Path: <netdev+bounces-18404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 052E6756C71
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:48:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D66E6756C6D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CDC61C20B64
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:48:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3EBC1C208EA
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C72BA52;
-	Mon, 17 Jul 2023 18:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A856BA50;
+	Mon, 17 Jul 2023 18:48:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E570828FA
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 18:48:37 +0000 (UTC)
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 348BB194;
-	Mon, 17 Jul 2023 11:48:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D19B253B8
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 18:48:16 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A679D
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:48:15 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-98df3dea907so634942066b.3
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689619716; x=1721155716;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0PUlNaNv9O3xvuqwtDHQn2YDFm0ynnYJhGHxpAdRM6s=;
-  b=iDPGJIqVtvWeSRkwTTGggSGP2v8HrG+cg03jARh4iAnqktzDllTQjHgs
-   GsFd4FMx7Glq7KA2lcfRSqYT2KfP6WOWbf9oX5tYslWXyNkEXka79IFfM
-   3tBdhqXYYN1pDYKv4QXiu3wjnmWxwvFFwtsHMtvCQCEVYQI5r1NgYuXXV
-   E=;
-X-IronPort-AV: E=Sophos;i="6.01,211,1684800000"; 
-   d="scan'208";a="661052970"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 18:48:30 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com (Postfix) with ESMTPS id 9783D8049A;
-	Mon, 17 Jul 2023 18:48:26 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 17 Jul 2023 18:48:25 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.21) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
- Mon, 17 Jul 2023 18:48:22 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <machel@vivo.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<herbert@gondor.apana.org.au>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<opensource.kernel@vivo.com>, <pabeni@redhat.com>,
-	<steffen.klassert@secunet.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net v1] net: ipv4: Use kfree_sensitive instead of kfree
-Date: Mon, 17 Jul 2023 11:48:03 -0700
-Message-ID: <20230717184803.92104-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230717095932.18677-1-machel@vivo.com>
-References: <20230717095932.18677-1-machel@vivo.com>
+        d=gmail.com; s=20221208; t=1689619693; x=1692211693;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ii06RB0ES+DRMclud4V3+/xZnaxwoU1WbsDW6EiAY7U=;
+        b=XlmbEUfVE963tAZD7uX3suEA9JH2LmAscz3ppOt2Mn1M1M7Mx113Wl/ll7SBcOkv4o
+         r0R8bMlYmPe7XTA1iDODJ1nx5xhzS8f0lpZ5J4CWxy2zenK+PJRgRBIUe1YibSFzmJxM
+         HiaiWPRB2XmHJAwJ8G3ylGkyP2JP7bHIFo/s7dJF/21dKzBcv4pGX7r2PJQ8EPz6nZmT
+         p+1WQpiDIfZCKVFzQSO1oDyTgS0n6jeSqQSRd0LV2svRr6NYN6GyMzlPzWTT3tMYtHyn
+         fZbPphpLET56rrtlHVh/tD4VD1S3/NT/IUZt+6W/n8fOq8JWt9heGjKeaBObQAkVb3ki
+         WxrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689619693; x=1692211693;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ii06RB0ES+DRMclud4V3+/xZnaxwoU1WbsDW6EiAY7U=;
+        b=iCO6ZS6KZrL+WxSzjvu6CGKfU/uwOHhdFJ5y4DKdt5diCitHEjQxloD2MFp/Kln0bC
+         QjPd7xJMRJjxzMP7fPPxe4/5D/nMZi4NYx1bfT58PLqMZRL5HFABDDofkdbDTTrE2Rig
+         P+eFdhBwlBJWurh2krRyEZU6IKhpDtpODfO7rxSvQc+lUJVQFpIBKPoAc+DdUkTa4jsI
+         eu3jT7kHSBXxTnPE1iDDow24Jd0cQr7DPAXsqesP0HxZKST9TObvL5DPsjlo9W7i/Xx4
+         Uo0wg1hyj5m9tX+kLSOe0KInK95+52LuRNr26OYcCaiAKqBCTcG62Ve6Lflrzhj/JRVx
+         S0Ew==
+X-Gm-Message-State: ABy/qLbOjdp7CiBv5xzY5bU7VRgm3MXvWz8R8NuLud5QVWWkJcD72jmw
+	epO7XsVSM8EG/6CkRPeHYhA=
+X-Google-Smtp-Source: APBJJlHtvOC0TqDZxgal8B4dR3k8FBldDQBjIkZm5Uul9QRKpJkEQpxb3TOOL1L3u2CvXZSr2rf2SA==
+X-Received: by 2002:a17:907:58d:b0:992:ab3a:f0d4 with SMTP id vw13-20020a170907058d00b00992ab3af0d4mr8458606ejb.17.1689619693292;
+        Mon, 17 Jul 2023 11:48:13 -0700 (PDT)
+Received: from [192.168.0.110] ([77.124.20.250])
+        by smtp.gmail.com with ESMTPSA id gh5-20020a170906e08500b00992bea2e9d2sm39549ejb.62.2023.07.17.11.48.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jul 2023 11:48:12 -0700 (PDT)
+Message-ID: <bcf79bb0-00e2-5e4b-807f-ba43d4c122a9@gmail.com>
+Date: Mon, 17 Jul 2023 21:48:10 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.100.21]
-X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 1/1] drivers:net: fix return value check in
+ mlx5e_ipsec_remove_trailer
+Content-Language: en-US
+To: Yuanjun Gong <ruc_gongyuanjun@163.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20230717144640.23166-1-ruc_gongyuanjun@163.com>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20230717144640.23166-1-ruc_gongyuanjun@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Wang Ming <machel@vivo.com>
-Date: Mon, 17 Jul 2023 17:59:19 +0800
-> key might contain private part of the key, so better use
-> kfree_sensitive to free it.
+
+
+On 17/07/2023 17:46, Yuanjun Gong wrote:
+> mlx5e_ipsec_remove_trailer should return an error code if function
+> pskb_trim returns an unexpected value.
 > 
-> Fixes: 38320c70d282 ("[IPSEC]: Use crypto_aead and authenc in ESP")
-> Signed-off-by: Wang Ming <machel@vivo.com>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+It's a fix, please add a Fixes tag.
 
-
+> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 > ---
->  net/ipv4/esp4.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> index ba06ed42e428..2be2d4922557 100644
-> --- a/net/ipv4/esp4.c
-> +++ b/net/ipv4/esp4.c
-> @@ -1132,7 +1132,7 @@ static int esp_init_authenc(struct xfrm_state *x,
->  	err = crypto_aead_setkey(aead, key, keylen);
->  
->  free_key:
-> -	kfree(key);
-> +	kfree_sensitive(key);
->  
->  error:
->  	return err;
-> -- 
-> 2.25.1
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
+> index eab5bc718771..8d995e304869 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
+> @@ -58,7 +58,9 @@ static int mlx5e_ipsec_remove_trailer(struct sk_buff *skb, struct xfrm_state *x)
+>   
+>   	trailer_len = alen + plen + 2;
+>   
+> -	pskb_trim(skb, skb->len - trailer_len);
+> +	ret = pskb_trim(skb, skb->len - trailer_len);
+> +	if (unlikely(ret))
+> +		return ret;
+>   	if (skb->protocol == htons(ETH_P_IP)) {
+>   		ipv4hdr->tot_len = htons(ntohs(ipv4hdr->tot_len) - trailer_len);
+>   		ip_send_check(ipv4hdr);
+
+Other than that:
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
