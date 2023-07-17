@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-18292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8336E7564DA
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:26:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F0067564DD
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B49821C20B01
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:26:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE0E2812E2
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC09C2C9;
-	Mon, 17 Jul 2023 13:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC83BA2B;
+	Mon, 17 Jul 2023 13:21:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE7CBA29
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:50 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1EF319AA
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:47 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3fbf1b82de7so27663815e9.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5D3C2D4
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:52 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF1ED1
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:48 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-31434226a2eso4595683f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689600106; x=1692192106;
+        d=tessares.net; s=google; t=1689600107; x=1692192107;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tR/LJB40BUwADc/pwwmcTzztR5wwy/3EmzcIcXvVX4c=;
-        b=RVq6ECuQK75XPg625PuyZk/vuwCZtgV4CDD86UVQWoQaMxR96HIOTqdKCt2y6nshgv
-         JNrXIsYc55RWgOJaAZAvNmgEreLAPVOrw/e5H36lUBQf1Lda6oxp/rbU10Q8pFb+M8wl
-         wpXu4IknE+Mj1kM0cs5Ze9dht4JV42kCJKrypfdbZRQT1S0HyPBBqu+8UdJZqd//Q2RP
-         jGKCo54LrqRk4kTRHkfKuj3Oi5JqCWfhUtK1twdwIdXkuCsRM+J1K1mrw+eI/cwjugbT
-         dhu0UQDD5GTcvvt+/lUfwDze3H1zd1VCGQ2nguHkkylSZ69zoHlPGMzmxHSgxxv8hgRX
-         rODA==
+        bh=3swvJblXFY7hepLBKVBwcTERoJ/lBHHAZ93IzbSTQjY=;
+        b=B1LieMi6ssPJ6jk46giSdZsI6Tg+Pu6AhOJX7PpJakn5AlzLtdlEZc2DShoKW5tBga
+         uw33oR0TTXnriONrH16jPtdmF/wpkd9ckyMpa2X+RXTyd2qD6VJOuqPsNdHV/Lbz6a02
+         8vNKICuKsEO90ny1gYraZttYqPiUL+r++lYuCQUZIX06gMiheUzqFuGL7hC7bJ3ldu0i
+         43Lj049E1wKRJV1G23AWRRQCb1mlEadrhdfqPtNzAnKySudVSa6vmW2T4bTPI1Po1xwt
+         LkDBbYAtgjSCPHJNunupxAw7+eMmspJv3AAM1a/K54YFv/EAwY7ThbyaUAMYpUy7qOBy
+         F3sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689600106; x=1692192106;
+        d=1e100.net; s=20221208; t=1689600107; x=1692192107;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tR/LJB40BUwADc/pwwmcTzztR5wwy/3EmzcIcXvVX4c=;
-        b=lXs9laYxBi5IeTIAkQ32nihI/mXXdVDlKcuYLEgiQ2UDdFWmlA5jbBYL7dpfdY75t1
-         fy4oJGI337+Y7rOp1e268AGBqOv5wrScsUS34L7FVEsPfzVukMdZicHfqJzbluZJR42P
-         hiDbKbUliBc4EQi04+cBpdODlH5JL0SIuFHbqC44QM3jr5aF7+r+wf6A05aeHw0+nGdR
-         8Qn9XQSf/WqI616lRhFjm2LJy7Qh2Qqypr3Xo82iDx0w6p42LfYqANNgN+k38E77d7fn
-         sHyu636NeS6fQrkSN03gzlww8r9skac25JS+5Ix92a51v+qshpzS0JxnRLtdmlOSeut/
-         iojg==
-X-Gm-Message-State: ABy/qLZ3n6AatR3+QEs2fLMUmWhZmi1izYyrVE7Z0HqUkxAjc1gm8sny
-	2cUHnsToNs6VR3CqElEHRx95P1badiEqjOMQMKMe5g==
-X-Google-Smtp-Source: APBJJlEAjEIkZzFg1xpSGORc1Ma3+MxqV3kCTR9x9DdhZvLcNmHRC9oJxls2CM51sbXcCBViC1oqZw==
-X-Received: by 2002:a05:600c:1c85:b0:3fb:b18a:f32d with SMTP id k5-20020a05600c1c8500b003fbb18af32dmr8639841wms.17.1689600106007;
+        bh=3swvJblXFY7hepLBKVBwcTERoJ/lBHHAZ93IzbSTQjY=;
+        b=BeejNEQ1o+0mHkBtybLEjcPZmjkdaLZzo8PXnW+WM0H7ooEEbJZz975M2NdjKS/nC+
+         G1CRCFNtqCf4uPTnLE3jTktDOl/HaA3TeiSbTy+COb4PeE/sYxxF9c4KZdhFAE5r3Bzh
+         A9iSWxotbMVYdcdfrMVhPoWg4j6+rpsVuxPcvnuTsoouh+MolalvPOWgVIN1oT7etRrg
+         iRDb23rw1BiqnzEVP1wIuGHj0SdrDtVCU7JKxJtl9KkkuEbAbOouzzq9H+qP7OxBZK7Q
+         YVFvO+3miihWPakdXk2PLjB/RPDD0QCRycwYarwxCrCV8qT3VgiSxaZfbyT+sM4Lc/6B
+         z+FQ==
+X-Gm-Message-State: ABy/qLbVYwHURWxgYFKiw5Qx3dyL3BOLSoSJpYvJvjbctmd4oNX93U6h
+	iMxHuNm4+C7oqrBD6PODy+3ZGQbL/e6wV51JOWysgA==
+X-Google-Smtp-Source: APBJJlHgqSF5fcJ+5E/hmltr5E2vBzYHvG+Fihohvt0b/KBDtXxiDjKfH2dC7wrqbk71uzAjm4UPsw==
+X-Received: by 2002:a5d:5107:0:b0:313:fbd0:9811 with SMTP id s7-20020a5d5107000000b00313fbd09811mr14268710wrt.3.1689600106919;
         Mon, 17 Jul 2023 06:21:46 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.45
+        by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 06:21:45 -0700 (PDT)
+        Mon, 17 Jul 2023 06:21:46 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Mon, 17 Jul 2023 15:21:32 +0200
-Subject: [PATCH net-next 12/13] selftests: mptcp: sockopt: format subtests
- results in TAP
+Date: Mon, 17 Jul 2023 15:21:33 +0200
+Subject: [PATCH net-next 13/13] selftests: mptcp: userspace_pm: format
+ subtests results in TAP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-12-695127e0ad83@tessares.net>
+Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-13-695127e0ad83@tessares.net>
 References: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 In-Reply-To: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -79,21 +79,21 @@ Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3690;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2658;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=9nR8A93d0e86OQ/7UoAc/x6Y3435nw7FvvrFqKMr2dU=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdxhnH73KyrLNYwW8aivzd0fWnwiEXYwsJH
- OmfraFujx+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
- c9iuEADjRHncRcQ/ZQ8Ww/stxWnLd6tuQdX35msua88nbGfhEIoaldifeH7VhfXq/A5PyrUVRrh
- w/dmuiMf/spiFcfAI4ZS98FLC+0fH65c8t3nzyxEcF66IJ1sv9muup+1erA0y+IPehGSgphC7QC
- OZkp3xIGTJ8JhBC2ALQNDL8TweeaSCeCEnRVsqPPtiiSlcws/Zkr/oo5GcZfO4EJfjFuS8n/0Lw
- Rj7q7dGLWF/hVMzsi7ZASX3iACK2Mdlzs69oNwqAQhBWlSuZKYlAnrzFoA+zCJMqhxOtQrx8Sr7
- euP/ra6+JvoKTYhg04SCxp2Aw3Um7sve+4cRHZc8bmczzrhj6iFVPLMrq8MizFfg89KPvJs7RC5
- zLiDxIbjCsVkUlN2r7Mzi+xWs7T2KIrHOzS0NocYHrEcIef5cKLkyih1v1P2jEO3rDTCWjzwTsu
- d6tMK20SIPqiOMpmGADir1SgQN3SzBh5ahIc9kLm+aXrsjK9C8EN8j98vqNHDd6FUnMLjaYQq9j
- GGnKRcbZDAp5AhHJRcpOet7yYd80dPyvUoNCAZakeOTuQh6UGO4Tv9h0zMSdY6QhAgxrmo2u6Z/
- CtWMTv4FH/EP+s2witZWFfwkz2vVHQzzg7E3DXpGHJ2R5No6spWtPFgXCuazBC/c5fyH75eDFtY
- Ad5qrGkpTYF5pkg==
+ bh=O6m1LM84cxrhhzI8uWlZLQYgX+bS7UA+N6Jx+FLdCoQ=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdvgkqpMjTpRYU+Ynhi6pWe5f+5yr3Y8IC5
+ ZB2gwG12gaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
+ cwvjD/913+F5NjBK/NaWa6bzohUakXQmYfy5cnrNVwS1lbjMgcVY/nMkyhC504v3AodOd2+cx+D
+ QKPBYsWhHcWruoVc6/xBqVJP0etAq07k+DD3TDeBZ3oN6APa+X7iMre55R7I+82QZvhiwV6ITs+
+ vLl++8X7rcsEzD4sdeMlT7b6AvlDpKRxzrvYacamSlYl741L9pNFBHI+/iXPQvfID9mww+mCVZE
+ oABkUyObyyWB2a34yQcS2ItCP+Aex08iUWuRb45wk/X7X16tpdOmp9//FkUI7PdzJKGaixl5GVD
+ Ecx8/hxzkCA3z1NsLmYoMf0v2l1sgxtHda1yH9UbTt4CIa3ZfP6GgDFhKnL9QiWH3LJ21COVBqW
+ xpGtITHMaxJCQzDaTfx60bY8HNKFXBYmr9MVXJEl7XsP+JjpiewL+bloHhOyuwSsmoLnAyBeOXX
+ uW7pSO4kElxj2KpGMwdjvrM5EmWPcVskMddbgyqu/GijABePDGr08JUO40OcWMiLN2nJwYHAHCE
+ ebWAzOcZRvpnoRfcci3M6cuJNkJ4myykCWy1U5kJZx3wgdEXn/GlZFTyuJacP+Dc8R0AlKThhr3
+ onHe3OORLV6YxAoDg5cISzeC2TLZdZYsKIrO8Egpq6p+NJdOCcZB5BPFprrxXOSGN+HK/WBS7Uc
+ HijGL6iTslgB+Ig==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -120,115 +120,76 @@ case, if subtests are not tracked, the whole selftest will be marked as
 failed making the other subtests useless because their results are
 ignored.
 
-This patch formats subtests results in TAP in mptcp_sockopt.sh selftest.
+This patch formats subtests results in TAP in userspace_pm.sh selftest.
 
 Link: https://github.com/multipath-tcp/mptcp_net-next/issues/368
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
- tools/testing/selftests/net/mptcp/mptcp_sockopt.sh | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/mptcp/userspace_pm.sh | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-index dc8d473fc82c..8c8694f21e7d 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-@@ -183,11 +183,13 @@ do_transfer()
+diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
+index 568ddee1d102..23f8959a8ea8 100755
+--- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
++++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
+@@ -59,6 +59,8 @@ rndh=$(printf %x "$sec")-$(mktemp -u XXXXXX)
+ ns1="ns1-$rndh"
+ ns2="ns2-$rndh"
+ ret=0
++test_name=""
++
+ _printf() {
+ 	stdbuf -o0 -e0 printf "${@}"
+ }
+@@ -71,7 +73,9 @@ print_title()
+ # $1: test name
+ print_test()
+ {
+-	_printf "%-63s" "${1}"
++	test_name="${1}"
++
++	_printf "%-63s" "${test_name}"
+ }
  
- 	local mptcp_connect="./mptcp_connect -r 20"
+ print_results()
+@@ -82,11 +86,13 @@ print_results()
+ test_pass()
+ {
+ 	print_results " OK "
++	mptcp_lib_result_pass "${test_name}"
+ }
  
--	local local_addr
-+	local local_addr ip
- 	if is_v6 "${connect_addr}"; then
- 		local_addr="::"
-+		ip=ipv6
+ test_skip()
+ {
+ 	print_results "SKIP"
++	mptcp_lib_result_skip "${test_name}"
+ }
+ 
+ # $1: msg
+@@ -98,6 +104,8 @@ test_fail()
+ 	if [ -n "${1}" ]; then
+ 		_printf "\t%s\n" "${1}"
+ 	fi
++
++	mptcp_lib_result_fail "${test_name}"
+ }
+ 
+ kill_wait()
+@@ -255,6 +263,7 @@ make_connection()
+ 		test_pass
  	else
- 		local_addr="0.0.0.0"
-+		ip=ipv4
+ 		test_fail "Expected tokens (c:${client_token} - s:${server_token}) and server (c:${client_serverside} - s:${server_serverside})"
++		mptcp_lib_result_print_all_tap
+ 		exit 1
  	fi
  
- 	cmsg="TIMESTAMPNS"
-@@ -223,6 +225,8 @@ do_transfer()
- 		echo -e "\nnetns ${connector_ns} socket stat for ${port}:" 1>&2
- 		ip netns exec ${connector_ns} ss -Menita 1>&2 -o "dport = :$port"
+@@ -990,4 +999,5 @@ test_subflows_v4_v6_mix
+ test_prio
+ test_listener
  
-+		mptcp_lib_result_fail "transfer ${ip}"
-+
- 		ret=1
- 		return 1
- 	fi
-@@ -236,9 +240,11 @@ do_transfer()
- 	fi
- 
- 	check_transfer $cin $sout "file received by server"
--
- 	rets=$?
- 
-+	mptcp_lib_result_code "${retc}" "mark ${ip}"
-+	mptcp_lib_result_code "${rets}" "transfer ${ip}"
-+
- 	if [ $retc -eq 0 ] && [ $rets -eq 0 ];then
- 		return 0
- 	fi
-@@ -264,6 +270,7 @@ do_mptcp_sockopt_tests()
- 
- 	if ! mptcp_lib_kallsyms_has "mptcp_diag_fill_info$"; then
- 		echo "INFO: MPTCP sockopt not supported: SKIP"
-+		mptcp_lib_result_skip "sockopt"
- 		return
- 	fi
- 
-@@ -272,18 +279,22 @@ do_mptcp_sockopt_tests()
- 
- 	if [ $lret -ne 0 ]; then
- 		echo "FAIL: SOL_MPTCP getsockopt" 1>&2
-+		mptcp_lib_result_fail "sockopt v4"
- 		ret=$lret
- 		return
- 	fi
-+	mptcp_lib_result_pass "sockopt v4"
- 
- 	ip netns exec "$ns_sbox" ./mptcp_sockopt -6
- 	lret=$?
- 
- 	if [ $lret -ne 0 ]; then
- 		echo "FAIL: SOL_MPTCP getsockopt (ipv6)" 1>&2
-+		mptcp_lib_result_fail "sockopt v6"
- 		ret=$lret
- 		return
- 	fi
-+	mptcp_lib_result_pass "sockopt v6"
- }
- 
- run_tests()
-@@ -310,10 +321,12 @@ do_tcpinq_test()
- 	if [ $lret -ne 0 ];then
- 		ret=$lret
- 		echo "FAIL: mptcp_inq $@" 1>&2
-+		mptcp_lib_result_fail "TCP_INQ: $*"
- 		return $lret
- 	fi
- 
- 	echo "PASS: TCP_INQ cmsg/ioctl $@"
-+	mptcp_lib_result_pass "TCP_INQ: $*"
- 	return $lret
- }
- 
-@@ -323,6 +336,7 @@ do_tcpinq_tests()
- 
- 	if ! mptcp_lib_kallsyms_has "mptcp_ioctl$"; then
- 		echo "INFO: TCP_INQ not supported: SKIP"
-+		mptcp_lib_result_skip "TCP_INQ"
- 		return
- 	fi
- 
-@@ -367,4 +381,6 @@ if [ $ret -eq 0 ];then
- fi
- 
- do_tcpinq_tests
-+
 +mptcp_lib_result_print_all_tap
- exit $ret
+ exit ${ret}
 
 -- 
 2.40.1
