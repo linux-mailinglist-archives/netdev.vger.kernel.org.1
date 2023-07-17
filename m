@@ -1,249 +1,225 @@
-Return-Path: <netdev+bounces-18398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83283756BF5
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:25:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2A9756BFD
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADFDF1C20BA1
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:25:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B119D1C20AB6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945F1C8CA;
-	Mon, 17 Jul 2023 18:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBC2C13C;
+	Mon, 17 Jul 2023 18:28:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8416DC8C6
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 18:22:52 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C551725
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:22:37 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qLSrj-0001d1-TA
-	for netdev@vger.kernel.org; Mon, 17 Jul 2023 20:22:35 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id D498C1F3A02
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 18:22:34 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id E3AD91F39C9;
-	Mon, 17 Jul 2023 18:22:31 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 95ee68e5;
-	Mon, 17 Jul 2023 18:22:30 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Jimmy Assarsson <extja@kvaser.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 8/8] can: kvaser_pciefd: Add support for new Kvaser pciefd devices
-Date: Mon, 17 Jul 2023 20:22:29 +0200
-Message-Id: <20230717182229.250565-9-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230717182229.250565-1-mkl@pengutronix.de>
-References: <20230717182229.250565-1-mkl@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523C1BE57;
+	Mon, 17 Jul 2023 18:28:00 +0000 (UTC)
+Received: from BN6PR00CU002.outbound.protection.outlook.com (mail-eastus2azon11021018.outbound.protection.outlook.com [52.101.57.18])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F40A2113;
+	Mon, 17 Jul 2023 11:27:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HNLxzrSliU+Oq5yxOzPlh6WhYMTe9TxxvIAJKW6ev0NaMNGVx0lLYQUTFuMBOPyA7Oh3JY08As+Hvv93yJJJNjshfG2BboTpJKCJ1aVsMXOh6hrZjCCraTy9HM/xGQr4eBL3zL1gsCiQTF0BgdN0Ecn5+qi9Hb67KNE0Je/axiXH3rHzY8DwZeMaLYlooQybytYFXyWxpIwVAY0Tk4GbHqYiaJYWm06DL16lYN/SuhPQuwhALllBx6YI2fbu7W+3lpz1HPJ82iUW1lBAAq0pdiuampv3H/6dDE1sdcMnUVlb5d+l4qpkP+1gTd6wyjQEIk3XRDv8keLwLf3OJaS//g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xECg2fdFybFeUo6Syly6J+PHeoJu2YjCl2vbEQ6tcxo=;
+ b=RHeU3Nj4sVN+GCyD2tUW7HihvpWb3C8SbLiS0iuiTs81/Wf0KFcqaCfHSF6+y0JwBD8DAmtncC5TfG9uvVWCwNLZXBotXlz1LOXXi+4IF738Za7X9hohLe8Byn+aW+CVZau2JwP0rUdSWuasy+Ai/b2PGll+Aeg6UhKkh7swrOYzrMNfNdT0ObSO/A4YDXz7ehxIuiYXsrCzIuGGHwNyNMyiGgrlG3thwmMRAWolmahP1as5kmyz0FovhFUgcV+ocU5n8q1YeVuBPXgEw3+JAMTAE8CtHMKHoI/qlH1Q2Nio6/x7kL7VWtEf3rPcgL1FIVTyw9J9bwV+X1Z2Z9GaEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xECg2fdFybFeUo6Syly6J+PHeoJu2YjCl2vbEQ6tcxo=;
+ b=UFO2IXJk16hHG/Bauj5hlludBMcKNiIPu2z6nH2UGkfHnynvSekXm0HMt1KP0X4X/KQ8KqmIwdtbXa3sEDHRyYWwcwpx1bmqhyvw85X30CKo9/I8cQn/j9ixic/M5FTPeatmWlDQuoJPofZ5k7cDS8ZKawPI4rC7k+5bTU9WzQk=
+Received: from PH7PR21MB3116.namprd21.prod.outlook.com (2603:10b6:510:1d0::10)
+ by BYAPR21MB1320.namprd21.prod.outlook.com (2603:10b6:a03:115::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.7; Mon, 17 Jul
+ 2023 18:26:05 +0000
+Received: from PH7PR21MB3116.namprd21.prod.outlook.com
+ ([fe80::1cd5:4b0e:d53d:3089]) by PH7PR21MB3116.namprd21.prod.outlook.com
+ ([fe80::1cd5:4b0e:d53d:3089%6]) with mapi id 15.20.6609.020; Mon, 17 Jul 2023
+ 18:26:05 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>
+CC: "brouer@redhat.com" <brouer@redhat.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Dexuan Cui <decui@microsoft.com>, KY Srinivasan
+	<kys@microsoft.com>, Paul Rosswurm <paulros@microsoft.com>, "olaf@aepfle.de"
+	<olaf@aepfle.de>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "wei.liu@kernel.org"
+	<wei.liu@kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>,
+	Long Li <longli@microsoft.com>, "ssengar@linux.microsoft.com"
+	<ssengar@linux.microsoft.com>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>, Ajay Sharma
+	<sharmaajay@microsoft.com>, "hawk@kernel.org" <hawk@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "shradhagupta@linux.microsoft.com"
+	<shradhagupta@linux.microsoft.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>
+Subject: RE: [PATCH net-next] net: mana: Add page pool for RX buffers
+Thread-Topic: [PATCH net-next] net: mana: Add page pool for RX buffers
+Thread-Index: Adm1mSA+i88N/DCwBUak7+uxb6tVIwAbZ3gAAAgFFQAAClU74AABMteAAKG2e1A=
+Date: Mon, 17 Jul 2023 18:26:05 +0000
+Message-ID:
+ <PH7PR21MB3116A5F9D82745EF174B4AD5CA3BA@PH7PR21MB3116.namprd21.prod.outlook.com>
+References: <1689259687-5231-1-git-send-email-haiyangz@microsoft.com>
+ <20230713205326.5f960907@kernel.org>
+ <85bfa818-6856-e3ea-ef4d-16646c57d1cc@redhat.com>
+ <PH7PR21MB31166EF9DB2F453999D2E92ECA34A@PH7PR21MB3116.namprd21.prod.outlook.com>
+ <3b043a95-a4bc-bbaf-c8e0-240e8ddea62f@redhat.com>
+In-Reply-To: <3b043a95-a4bc-bbaf-c8e0-240e8ddea62f@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d2dcd3ba-2179-47d4-97b2-b07df7ca8193;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-07-17T18:23:35Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR21MB3116:EE_|BYAPR21MB1320:EE_
+x-ms-office365-filtering-correlation-id: 6ca0c1a9-3c69-43a8-480b-08db86f348b0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ KiZseGPOoTcJ3LmgCO+QAcsgoDSPQNwNDdaOPGcSg6w4jTVtY52nM7S0FaDLlXJ8+jJqokZxP+yXuLFnVej82WXqmGiDWonhEVRw04Tu1XUIOIQBS3puibtbIEA2tzo2Mgj1iUpRCHOncSEEa87ZBaDxx/x82cTAmwzaTZzJCfMA0d8w2+jYaICHJSNncUaRG4ME1sCroxuiiQWwFryZcDCHc0lXuBervSD8C+N4R250IaLWTN8p2TfWJ9THsgg8/f1ZnUC/KOOCDyMAGyVvYbVDhPfOLm1doUWhOI7j87GMJPYeVeKONC+NMhc7hQEMePCqWobLS8s9gqrbJynmLamYo9RVxuy99toMV4sDYpsdtKwLNt9/ogdSW652HirNoDFqWFg9KhfLc/Bew0dI98kPFE6dD5dyI//DGmC/imORH0eIkngzcHIqPSkxwzZGRZ2U8CKhwM+L4zLo48SEKqlT5iOwR30dP72sLvaJRm351ZNvfCVAO2jieTjlvvgissIyekuYDTsNL5MVDgMN+VKySn3DJMg4GwavmjegeIeoeTPIqtJg0cDI2tQM6+QhWIb+i6qMvgYtzcf4kTE7W4TXaMwR5Jnsv8N+4Bjg867Wt76PNOqBAd3QzKJad2jdeIwNt2bH1WpZ3NWoxh1HWiGW2EYOKcwH9V+hcZYoRx4=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3116.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(396003)(136003)(366004)(451199021)(2906002)(8676002)(8936002)(82950400001)(82960400001)(316002)(41300700001)(5660300002)(38100700002)(7416002)(122000001)(52536014)(86362001)(33656002)(8990500004)(55016003)(38070700005)(7696005)(478600001)(10290500003)(71200400001)(9686003)(966005)(83380400001)(186003)(26005)(53546011)(6506007)(76116006)(64756008)(66556008)(4326008)(66446008)(66476007)(66946007)(54906003)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Oqtzz4A6e+s8dQDn1IirBS1ostJx0tkUkbk9aBTLHLC8LGIgSbSCBzHK6UoP?=
+ =?us-ascii?Q?MOC9JnLO+TlP9KRlTRSiJDg+HsP30OG8gfim9kicKr9lZR+0MxUnM04vIf4r?=
+ =?us-ascii?Q?qE1fmEDhIvo5BWqI8r0qPCbv8vFYv3s6hTTYr9vxjmq1b8yEB+jx1k7HyCsd?=
+ =?us-ascii?Q?lc2h0swJ9+iyTfjhsKyMEKp2zSOFqnZB/ozGud9o+V+Zv+ol1RqipH79WWPv?=
+ =?us-ascii?Q?+O1y9zyMTIgR7Ab0qsw3rLJ3A6erKP6S2GmpCm5SL7QKTSyaBI7kasMxQF/f?=
+ =?us-ascii?Q?SrcO+bfUMQBlWJpcrIetAUp1mVk3Ei+jSgWgkEW3GkP4GOiJBQk1VU9SJ7RE?=
+ =?us-ascii?Q?3Iiz3WqMtYWcNP446C2rSLcaoBGcGUJXR72ozdBB4Yw1AzAnvWkUTv5eAGMz?=
+ =?us-ascii?Q?0/ubIPjdtmeZAXXDo+BWJk8+YpgLAvuLr3AUAGEyww805nenygEe6G6GizVG?=
+ =?us-ascii?Q?NKhY0u7JBwj7F327mJyWPg7Wu0HwLQtbDpCPpey4Spl6tJr3r75S9BBjeR/k?=
+ =?us-ascii?Q?VhDCODWQ/6Y43Df7LRTnrB5lMVRUJ8TsAFtrtEbnX6zm3g/Zv8wihVzRVIUa?=
+ =?us-ascii?Q?bTipr6F+mTYABBVQ8ZInfKIIPxBFMgnQXL89+cEm48m52v3YX+9xUxjT17El?=
+ =?us-ascii?Q?DFechBr2FTcYyc0HrDhj4/8uYF+TpQQ9LL1BGpl6wBD3Sfwx3SMO2XIXET9F?=
+ =?us-ascii?Q?kce9gfJe0rbl7o4FGiFkpF6RFMrUvqa/CjMetnu9N1VVhVoykEmOIKQoQepJ?=
+ =?us-ascii?Q?MjaPfFxUKwp4MeCt+9S7SxhrwTUTZ58DoW2RzEOLIIv0qMWYtKlo3/wNREWz?=
+ =?us-ascii?Q?Kf3Hc+ICxHZBCeOficlEJKtY1AKco2FqgESn7Tfz3khaxWTdyawsNnn2tTeD?=
+ =?us-ascii?Q?XyOmOSHOrUcinBjbbHN7r3YtDCjNgO1guP0oE17ZGaKdzP9qIrWOCl4ZaijI?=
+ =?us-ascii?Q?XoN3FEdTaltVTgs0sTh9batHfbwALEux/y5Uqx2Vn9Uu4W3XbN8rE5trK2GT?=
+ =?us-ascii?Q?BbD7UNf85HpaCXExF8lX3RSBZKuSuuSwYLiXi7R0AOYOxWK1U3M+bOPTWiM4?=
+ =?us-ascii?Q?awD/RDWquhsOGCv/T6lqHlY+ZEaDv4+lxJubTAiFH106MHaYIaUKfMpiIObS?=
+ =?us-ascii?Q?p5uiJM73v7flTgZPDA/XldGbCu4+2xPb8n1B+eWUYLFPTfyDpZ2ge2xB3al4?=
+ =?us-ascii?Q?lIVWaFrQggYlicc8G3Wh5O1XFeU/wfzmlvM8HRheazMlWoUR1u8skN9D+t9V?=
+ =?us-ascii?Q?+Hd230I138RTvz9eW0DCTzebBEUW85x/q8UOR5H5E8YMX/Afb3rinBeZXL4s?=
+ =?us-ascii?Q?0d2Z3cXWYJoclDBwqnSw3rL4N7qWzTN2+DKpDJhU+hlVvj2PgfVZ+cBNq2NP?=
+ =?us-ascii?Q?VgUNxFjdiqwQa+DEBsUP/OpPvGhL1sqxGGcYhy28lj1P1o8nmF2E3KYM4M/g?=
+ =?us-ascii?Q?S1y3M5RHwbuHsSq1OeN12Ua7aDlNPgrZOn+9H8eRmORBMKxv6cOCSm3amYq5?=
+ =?us-ascii?Q?UN0WTT0SlHA5U0MZfur2lGGpTUNuBHkPsgVmo9aTAVGIlY0rDJdgocz2XxJB?=
+ =?us-ascii?Q?rdZ15ULG3/eeSIn4JbfhOor6jYoqENz/59PwafzU?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3116.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ca0c1a9-3c69-43a8-480b-08db86f348b0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2023 18:26:05.7630
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vnsjoZ8YEnPu860U8/I2uNnv3UQT/yfpbCLaFXZhDVV0LNx9p/veMOprpRlv+ytnUZh5b7ZfC1P9rt+liENWBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR21MB1320
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jimmy Assarsson <extja@kvaser.com>
 
-Add support for new Kvaser pciefd devices, based on SmartFusion2 SoC.
 
-Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-Link: https://lore.kernel.org/all/20230622151153.294844-3-extja@kvaser.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/Kconfig         |  5 +++
- drivers/net/can/kvaser_pciefd.c | 77 ++++++++++++++++++++++++++++++++-
- 2 files changed, 81 insertions(+), 1 deletion(-)
+> -----Original Message-----
+> From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+> Sent: Friday, July 14, 2023 9:13 AM
+> To: Haiyang Zhang <haiyangz@microsoft.com>; Jesper Dangaard Brouer
+> <jbrouer@redhat.com>; Jakub Kicinski <kuba@kernel.org>
+> Cc: brouer@redhat.com; linux-hyperv@vger.kernel.org; netdev@vger.kernel.o=
+rg;
+> Dexuan Cui <decui@microsoft.com>; KY Srinivasan <kys@microsoft.com>; Paul
+> Rosswurm <paulros@microsoft.com>; olaf@aepfle.de; vkuznets@redhat.com;
+> davem@davemloft.net; wei.liu@kernel.org; edumazet@google.com;
+> pabeni@redhat.com; leon@kernel.org; Long Li <longli@microsoft.com>;
+> ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
+> daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
+> ast@kernel.org; Ajay Sharma <sharmaajay@microsoft.com>; hawk@kernel.org;
+> tglx@linutronix.de; shradhagupta@linux.microsoft.com; linux-
+> kernel@vger.kernel.org; Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Subject: Re: [PATCH net-next] net: mana: Add page pool for RX buffers
+>=20
+> [You don't often get email from jbrouer@redhat.com. Learn why this is
+> important at https://aka.ms/LearnAboutSenderIdentification ]
+>=20
+> On 14/07/2023 14.51, Haiyang Zhang wrote:
+> >
+> >
+> >> -----Original Message-----
+> >> From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+> >> On 14/07/2023 05.53, Jakub Kicinski wrote:
+> >>> On Thu, 13 Jul 2023 14:48:45 +0000 Haiyang Zhang wrote:
+> >>>> Add page pool for RX buffers for faster buffer cycle and reduce CPU
+> >>>> usage.
+> >>>>
+> >>>> Get an extra ref count of a page after allocation, so after upper
+> >>>> layers put the page, it's still referenced by the pool. We can reuse
+> >>>> it as RX buffer without alloc a new page.
+> >>>
+> >>> Please use the real page_pool API from include/net/page_pool.h
+> >>> We've moved past every driver reinventing the wheel, sorry.
+> >>
+> >> +1
+> >>
+> >> Quoting[1]: Documentation/networking/page_pool.rst
+> >>
+> >>    Basic use involves replacing alloc_pages() calls with the
+> >> page_pool_alloc_pages() call.
+> >>    Drivers should use page_pool_dev_alloc_pages() replacing
+> >> dev_alloc_pages().
+> >
+> > Thank Jakub and Jesper for the reviews.
+> > I'm aware of the page_pool.rst doc, and actually tried it before this
+> > patch, but I got lower perf. If I understand correctly, we should call
+> > page_pool_release_page() before passing the SKB to napi_gro_receive().
+> >
+> > I found the page_pool_dev_alloc_pages() goes through the slow path,
+> > because the page_pool_release_page() let the page leave the pool.
+> >
+> > Do we have to call page_pool_release_page() before passing the SKB
+> > to napi_gro_receive()? Any better way to recycle the pages from the
+> > upper layer of non-XDP case?
+> >
+>=20
+> Today SKB "upper layers" can recycle page_pool backed packet data/page.
+>=20
+> Just use skb_mark_for_recycle(skb), then you don't need
+> page_pool_release_page().
 
-diff --git a/drivers/net/can/Kconfig b/drivers/net/can/Kconfig
-index a5c5036dfb94..18e4a6e94ba9 100644
---- a/drivers/net/can/Kconfig
-+++ b/drivers/net/can/Kconfig
-@@ -160,8 +160,13 @@ config CAN_KVASER_PCIEFD
- 	    Kvaser PCIEcan 4xHS
- 	    Kvaser PCIEcan 2xHS v2
- 	    Kvaser PCIEcan HS v2
-+	    Kvaser PCIEcan 1xCAN v3
-+	    Kvaser PCIEcan 2xCAN v3
-+	    Kvaser PCIEcan 4xCAN v2
- 	    Kvaser Mini PCI Express HS v2
- 	    Kvaser Mini PCI Express 2xHS v2
-+	    Kvaser Mini PCI Express 1xCAN v3
-+	    Kvaser Mini PCI Express 2xCAN v3
- 
- config CAN_SLCAN
- 	tristate "Serial / USB serial CAN Adaptors (slcan)"
-diff --git a/drivers/net/can/kvaser_pciefd.c b/drivers/net/can/kvaser_pciefd.c
-index 539f97390761..57f60b87198f 100644
---- a/drivers/net/can/kvaser_pciefd.c
-+++ b/drivers/net/can/kvaser_pciefd.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
- /* Copyright (C) 2018 KVASER AB, Sweden. All rights reserved.
-  * Parts of this driver are based on the following:
-- *  - Kvaser linux pciefd driver (version 5.25)
-+ *  - Kvaser linux pciefd driver (version 5.42)
-  *  - PEAK linux canfd driver
-  */
- 
-@@ -40,9 +40,19 @@ MODULE_DESCRIPTION("CAN driver for Kvaser CAN/PCIe devices");
- #define KVASER_PCIEFD_MINIPCIE_HS_V2_DEVICE_ID 0x0010
- #define KVASER_PCIEFD_MINIPCIE_2HS_V2_DEVICE_ID 0x0011
- 
-+/* SmartFusion2 based devices */
-+#define KVASER_PCIEFD_2CAN_V3_DEVICE_ID 0x0012
-+#define KVASER_PCIEFD_1CAN_V3_DEVICE_ID 0x0013
-+#define KVASER_PCIEFD_4CAN_V2_DEVICE_ID 0x0014
-+#define KVASER_PCIEFD_MINIPCIE_2CAN_V3_DEVICE_ID 0x0015
-+#define KVASER_PCIEFD_MINIPCIE_1CAN_V3_DEVICE_ID 0x0016
-+
- /* Altera SerDes Enable 64-bit DMA address translation */
- #define KVASER_PCIEFD_ALTERA_DMA_64BIT BIT(0)
- 
-+/* SmartFusion2 SerDes LSB address translation mask */
-+#define KVASER_PCIEFD_SF2_DMA_LSB_MASK GENMASK(31, 12)
-+
- /* Kvaser KCAN CAN controller registers */
- #define KVASER_PCIEFD_KCAN_FIFO_REG 0x100
- #define KVASER_PCIEFD_KCAN_FIFO_LAST_REG 0x180
-@@ -269,6 +279,8 @@ MODULE_DESCRIPTION("CAN driver for Kvaser CAN/PCIe devices");
- struct kvaser_pciefd;
- static void kvaser_pciefd_write_dma_map_altera(struct kvaser_pciefd *pcie,
- 					       dma_addr_t addr, int index);
-+static void kvaser_pciefd_write_dma_map_sf2(struct kvaser_pciefd *pcie,
-+					    dma_addr_t addr, int index);
- 
- struct kvaser_pciefd_address_offset {
- 	u32 serdes;
-@@ -311,22 +323,50 @@ const struct kvaser_pciefd_address_offset kvaser_pciefd_altera_address_offset =
- 	.kcan_ch1 = 0x11000,
- };
- 
-+const struct kvaser_pciefd_address_offset kvaser_pciefd_sf2_address_offset = {
-+	.serdes = 0x280c8,
-+	.pci_ien = 0x102004,
-+	.pci_irq = 0x102008,
-+	.sysid = 0x100000,
-+	.loopback = 0x103000,
-+	.kcan_srb_fifo = 0x120000,
-+	.kcan_srb = 0x121000,
-+	.kcan_ch0 = 0x140000,
-+	.kcan_ch1 = 0x142000,
-+};
-+
- const struct kvaser_pciefd_irq_mask kvaser_pciefd_altera_irq_mask = {
- 	.kcan_rx0 = BIT(4),
- 	.kcan_tx = { BIT(0), BIT(1), BIT(2), BIT(3) },
- 	.all = GENMASK(4, 0),
- };
- 
-+const struct kvaser_pciefd_irq_mask kvaser_pciefd_sf2_irq_mask = {
-+	.kcan_rx0 = BIT(4),
-+	.kcan_tx = { BIT(16), BIT(17), BIT(18), BIT(19) },
-+	.all = GENMASK(19, 16) | BIT(4),
-+};
-+
- const struct kvaser_pciefd_dev_ops kvaser_pciefd_altera_dev_ops = {
- 	.kvaser_pciefd_write_dma_map = kvaser_pciefd_write_dma_map_altera,
- };
- 
-+const struct kvaser_pciefd_dev_ops kvaser_pciefd_sf2_dev_ops = {
-+	.kvaser_pciefd_write_dma_map = kvaser_pciefd_write_dma_map_sf2,
-+};
-+
- const struct kvaser_pciefd_driver_data kvaser_pciefd_altera_driver_data = {
- 	.address_offset = &kvaser_pciefd_altera_address_offset,
- 	.irq_mask = &kvaser_pciefd_altera_irq_mask,
- 	.ops = &kvaser_pciefd_altera_dev_ops,
- };
- 
-+const struct kvaser_pciefd_driver_data kvaser_pciefd_sf2_driver_data = {
-+	.address_offset = &kvaser_pciefd_sf2_address_offset,
-+	.irq_mask = &kvaser_pciefd_sf2_irq_mask,
-+	.ops = &kvaser_pciefd_sf2_dev_ops,
-+};
-+
- struct kvaser_pciefd_can {
- 	struct can_priv can;
- 	struct kvaser_pciefd *kv_pcie;
-@@ -396,6 +436,26 @@ static struct pci_device_id kvaser_pciefd_id_table[] = {
- 		PCI_DEVICE(KVASER_PCIEFD_VENDOR, KVASER_PCIEFD_MINIPCIE_2HS_V2_DEVICE_ID),
- 		.driver_data = (kernel_ulong_t)&kvaser_pciefd_altera_driver_data,
- 	},
-+	{
-+		PCI_DEVICE(KVASER_PCIEFD_VENDOR, KVASER_PCIEFD_2CAN_V3_DEVICE_ID),
-+		.driver_data = (kernel_ulong_t)&kvaser_pciefd_sf2_driver_data,
-+	},
-+	{
-+		PCI_DEVICE(KVASER_PCIEFD_VENDOR, KVASER_PCIEFD_1CAN_V3_DEVICE_ID),
-+		.driver_data = (kernel_ulong_t)&kvaser_pciefd_sf2_driver_data,
-+	},
-+	{
-+		PCI_DEVICE(KVASER_PCIEFD_VENDOR, KVASER_PCIEFD_4CAN_V2_DEVICE_ID),
-+		.driver_data = (kernel_ulong_t)&kvaser_pciefd_sf2_driver_data,
-+	},
-+	{
-+		PCI_DEVICE(KVASER_PCIEFD_VENDOR, KVASER_PCIEFD_MINIPCIE_2CAN_V3_DEVICE_ID),
-+		.driver_data = (kernel_ulong_t)&kvaser_pciefd_sf2_driver_data,
-+	},
-+	{
-+		PCI_DEVICE(KVASER_PCIEFD_VENDOR, KVASER_PCIEFD_MINIPCIE_1CAN_V3_DEVICE_ID),
-+		.driver_data = (kernel_ulong_t)&kvaser_pciefd_sf2_driver_data,
-+	},
- 	{
- 		0,
- 	},
-@@ -960,6 +1020,21 @@ static void kvaser_pciefd_write_dma_map_altera(struct kvaser_pciefd *pcie,
- 	iowrite32(word2, serdes_base + 0x4);
- }
- 
-+static void kvaser_pciefd_write_dma_map_sf2(struct kvaser_pciefd *pcie,
-+					    dma_addr_t addr, int index)
-+{
-+	void __iomem *serdes_base;
-+	u32 lsb = addr & KVASER_PCIEFD_SF2_DMA_LSB_MASK;
-+	u32 msb = 0x0;
-+
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-+	msb = addr >> 32;
-+#endif
-+	serdes_base = KVASER_PCIEFD_SERDES_ADDR(pcie) + 0x10 * index;
-+	iowrite32(lsb, serdes_base);
-+	iowrite32(msb, serdes_base + 0x4);
-+}
-+
- static int kvaser_pciefd_setup_dma(struct kvaser_pciefd *pcie)
- {
- 	int i;
--- 
-2.40.1
+Will do. Thanks a lot!
 
+- Haiyang
 
 
