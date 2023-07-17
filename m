@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-18281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D567564A4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:22:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF017564A7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:22:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD00A1C20A4A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:22:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A11D28132D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788AEBA4D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B5EBA52;
 	Mon, 17 Jul 2023 13:21:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D40BBA23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843A2BA4F
 	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:40 +0000 (UTC)
 Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662D11986
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:38 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31434226a2eso4595553f8f.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:38 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44A0D198C
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:39 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31590e4e27aso4059642f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:21:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689600096; x=1692192096;
+        d=tessares.net; s=google; t=1689600097; x=1692192097;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=C19OOQjys4g0HZbyxfn1tMfB0ZlUmaAeplCvwpV4yU8=;
-        b=kV3uMPCmfenfR9XYgoBJYMtkwY8ae2Sutqmrw4sXe3sPEP8pTMFjy7PI7baLLsfvgc
-         dXTXoxmIpYMlr2reVA1Qrvgk0f5QSWbLj2Sm4BpCE59Dxz+TDRQgVFWOKvB4wg38oZ5Q
-         sDCBgG0J4Q3zHhffNPUcQF/idNBhKv+D5/oLeZqCgD/baMgZEIrWSLrR3QMuDdvr1wp2
-         M+B/Q1Ve8LvnFq7zBfDH84TCDi5gRixEbHKY/VdZk6mTdq4Kf1CKK477mopgA4w9Ga1o
-         pU4zieiE9n5DtoJ2MzZLCKkb/lCb3YOFQ/kT3ar70cWRAVp9r1HgZa3H4aghcEUgVgA/
-         XXiA==
+        bh=2O90CD0u0WgrycTGhb5eGCR0q+HgrQYH4TPNauX1lK8=;
+        b=FLgxa6CTqV5EDAd4NWtRxVZJtd9BzOkM4YnYrZxhRoyfwszQ6PIZw4d7MzhaVBm+I7
+         aygLSbuH2U0fxWmjjFuOrugcKGElgW8HUxYj5Te2ECyY7GYkGAOqX+wwOqdWz5oFInOQ
+         deWqCMCJTe/54KLXU7wKjW+ZJhZFWNdERAsZcGSpRv6QqzuLjNpsIEwqR5A8GPWBnIjl
+         CSlSRtfd9ZXf5ZrLVQmGuUcAIrcp+q0vOd4HcmUP5Xxf4cYMhsGgAy4mGSSY9kfDwwZ4
+         ZLoSrvwMqHKj+qTksPRLcjwvPJ5S7FCLE4DoDHMn7+sHOX9m+4RdKShmlPy+oWvB9osi
+         y6qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689600096; x=1692192096;
+        d=1e100.net; s=20221208; t=1689600097; x=1692192097;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C19OOQjys4g0HZbyxfn1tMfB0ZlUmaAeplCvwpV4yU8=;
-        b=LJWeReurdEES1Lg6Sykur2lANExdwVyobelERoWfkVNLC47gQbQW6XeNIZxK9UKjEr
-         UGgjy80tjiCO86HuxNm9j8Iuk65PghcO63X1UMJ6+q4P7GOq4AoZIeXmIOF0nojRRJRP
-         De8pqEuW4x4KanHi9DU/oOUrZehpk4a71K4sfiHKlcocEoYMW4y51owZiS3ViSlzzH9J
-         7VB3ga3kTIpIV/1dbuqo3enf0NKe7xOTck2ojwFE8+CYo74A6Hv37V4uOpf45UVTrda+
-         +LGazYW4pVixG5cux2YQBBBPDm293NbU/8fbaNUEFtnhup84ynofVliS70VCRhX6YqJT
-         1xNg==
-X-Gm-Message-State: ABy/qLb6SqCJiEyUQDKDwXM9hHRoy09sGJjarE5qLqIHosXcatNXZeQv
-	IcxcsJiLgqVZstWIW3PnUkDuvYW2lNi4s3CxAsBE4g==
-X-Google-Smtp-Source: APBJJlEHEKtYBQlHrAmHpe7KvaH3pOGz7GH9IagvGAJVNabSEEePcghaij24VGRT0fUDgYtLfNnO0A==
-X-Received: by 2002:adf:fd4a:0:b0:30f:c012:b529 with SMTP id h10-20020adffd4a000000b0030fc012b529mr12388036wrs.56.1689600096776;
-        Mon, 17 Jul 2023 06:21:36 -0700 (PDT)
+        bh=2O90CD0u0WgrycTGhb5eGCR0q+HgrQYH4TPNauX1lK8=;
+        b=hNv4CARR6VaTOaY/EJ9zJHpq3DYLnYma8xC3E580NOSLjTADU0th5M9VwQw6zQ5tx7
+         D4+RC+rWz6ttYwtFnkxVPs317MqKhM0RxmacMNbD/akuRrZzYCinxG0qh4Gy2l+KHb7+
+         I5H6soDNmWyYxCtfXBKvxF2k52Z3q+EuKv6PXQflxo/6Z5KR7fPgBT1UNAI+CEviB3xj
+         KjGIZiu2P0b8GU3TN8MUwsDnkmFHKcfQssF/qG8uxukVjD1e3FyNeHeDXHU1UHp6asdf
+         l1jFLEiR5aH90EuZhzPunALOxcUqfHDYL1yHAJxsJpqHzbqNjqTH3lmtCK6/OK13LhaQ
+         6Vyw==
+X-Gm-Message-State: ABy/qLbZnVjiLdoNWPJthxymVHxeEO/ngpsfPkJEQ/gOCzZnlJr7NqqN
+	4Gjj57C8EnAEgQV1Yj0/mZzPL/y9bSfjJSE8xomLUg==
+X-Google-Smtp-Source: APBJJlFHS98pnKg4uOyPDka5xuhIXBpMKhRe/tLeNajBbpky+jwUvz+Axd5eSOGSHLsc6xR3nJUwkQ==
+X-Received: by 2002:a05:6000:1a53:b0:314:172b:a7d5 with SMTP id t19-20020a0560001a5300b00314172ba7d5mr9263581wry.27.1689600097647;
+        Mon, 17 Jul 2023 06:21:37 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.35
+        by smtp.gmail.com with ESMTPSA id r8-20020a056000014800b0030fa3567541sm19249836wrx.48.2023.07.17.06.21.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 06:21:36 -0700 (PDT)
+        Mon, 17 Jul 2023 06:21:37 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Mon, 17 Jul 2023 15:21:22 +0200
-Subject: [PATCH net-next 02/13] selftests: mptcp: userspace pm: don't stop
- if error
+Date: Mon, 17 Jul 2023 15:21:23 +0200
+Subject: [PATCH net-next 03/13] selftests: mptcp: userspace_pm: fix
+ shellcheck warnings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-2-695127e0ad83@tessares.net>
+Message-Id: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-3-695127e0ad83@tessares.net>
 References: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 In-Reply-To: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -79,21 +79,21 @@ Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2583;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2190;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=qss0q7bvLOJAvB4X0z+6G5X/nAHFAPMEdRnJxgxYDi0=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdufpDnSGqM9fSwPxtyCcCBIzkSdpT4xGDp
- XwYzeG8l7yJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
- c9fzD/oDC4yV0L9hFbGiam/FWu7nxOXtN2xdtkmY+MNIPQYe3BtWmpYD6y03J2zZ4z5WzQhViOp
- x9Il8IxPjm2XVWBcGkAOO+h4lAsDcUGNv1sLK1tLykizSAEWZvbjASAVE0dYy9pDWdgcb2AT7BL
- Fz4xADpq0O2ex6NMkR1RLVJmBhJ5vBeOrbsViqPtXR+RdwUgA88nWFHIjTmnyNYvMSJUa5j/aXb
- OLk2YKq5QSNI1OrBjbET8n7OVEQ7BVYmQJZiGYNH6i2d1eYy9CfnOaC9I041wY0LQtIm49y+oje
- iy1f0sE8JUoDG/x3Dd4f3NG3YKTf9C3QMx2dNBJPrg4e1k7peDIW8RwGGFLagF1PSwhv0Uu44Fk
- /kWcfN04R8DtWwe2TIDftL/IkM5fjXS3N+d7aPJikIiFKi7o6jRx2ZrukO9gHLdhPIqfjNXcNxV
- +8JoMBlDRBtLq0rx944pZ0GQmH7UfrvjuKg0VDOMlSooP6AUE8Aqww4p0s4sIeI9/K8MfeWTo7G
- nHw/JSRtHj7IbJL7OWipVnFQkm1IisbBmF6buS3Qb6h+R9ATb5qUeu5OsHNzASX7jsvo20dQKGd
- fnFyWABiXb0v88frMjC4BLtwSedc6kgOZ/sRDVYsPmmsO0IQ7Sk01ICT9ZcpikZod+9HfqESPxC
- GViUa3FGaVlxcng==
+ bh=bRVvDDCCzFhpBiTbSaoJIqZXEcTk48OV9KA36DbkqKw=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBktUBdahLD7yrn9oFfciPouPuC6DdRAES+TV/ZP
+ 4Lq5sl1qpSJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZLVAXQAKCRD2t4JPQmmg
+ czzXD/9lmpQ+Z5ZEGiD/dYP+vbonTU1ONs/RQaajB3GWSEvnla16GfY7zBGu4nYLO2IAt+VCqZ4
+ sLaVUfrpfOlzrsaQ3pcSoIcH0EaemcM3Br/cEECbmLG2Fv973Ucg6U+W7IXehv4Gb2iVWLu8uQ0
+ 72rfpA6yyYCSboJ0osBAzrMph4XO8fChJz8OW4QseWHR/JbFWNRBpKZKcbEzMhu1cTgOh+2yrwu
+ Uzxy8tnb/D/UhgmiWu/EqN0qLJfNOsKijbK26Srfwdhqu0t2+QzMc6eX0Lc5Xet8xaoq5lQp56C
+ Sg67AikUUPkDNP42cUg+y8P6YHDy7q90nYmAPFwQOOyV3pvilXPcpRloz0BibWau5MVR0J+003+
+ XAWUolBGdBTkWEId0mh5QzXwxXd6XC9Jqo8LAIpc4cnc4c74R7JW5keGYk9BNxSpEYY1qXWlfHS
+ OEmNyAHAYpVr1UaX1MdWgMe9g+lHmxBENEGSbu3xnku0jw9BPwBe9KXFm03hx553lno0EE0kfYp
+ Gw6q/as9A/e85I4HwpRjV+v65Q5ZGHw8ztEy/IaKcjvZt5aP1USl8JiP0ufBBWx9xqX325WTFnw
+ r2cl7TNMOmEokKnYRpD2l2ifJS4HJF4twLw+7U/lEuZhLa9fTq+kiRcTvw7z6/2tuNP3PKLjYxN
+ vqnyizlTynKFY6A==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -103,107 +103,69 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-No more tests were executed after a failure but it is still interesting
-to get results for all the tests to better understand what's still OK
-and what's not after a modification.
+shellcheck recently helped to find an issue where a wrong variable name
+was used. It is then good to fix the other harmless issues in order to
+spot "real" ones later.
 
-Now we only exit earlier if the two connections cannot be established.
+Here, three categories of warnings are ignored:
+
+- SC2317: Command appears to be unreachable. The cleanup() function is
+  invoke indirectly via the EXIT trap.
+
+- SC2034: Variable appears unused. The check_expected_one() function
+  takes the name of the variable in argument but it ends up reading the
+  content: indirect usage.
+
+- SC2086: Double quote to prevent globbing and word splitting. This is
+  recommended but the current usage is correct and there is no need to
+  do all these modifications to be compliant with this rule.
+
+One error has been fixed with SC2181: Check exit code directly with e.g.
+'if ! mycmd;', not indirectly with $?.
 
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
- tools/testing/selftests/net/mptcp/userspace_pm.sh | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ tools/testing/selftests/net/mptcp/userspace_pm.sh | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index b180133a30af..c57ce4df4973 100755
+index c57ce4df4973..63d348693e98 100755
 --- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
 +++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -52,6 +52,7 @@ sec=$(date +%s)
- rndh=$(printf %x "$sec")-$(mktemp -u XXXXXX)
- ns1="ns1-$rndh"
- ns2="ns2-$rndh"
-+ret=0
+@@ -1,6 +1,13 @@
+ #!/bin/bash
+ # SPDX-License-Identifier: GPL-2.0
  
- print_title()
- {
-@@ -257,21 +258,21 @@ check_expected_one()
- # $@: all var names to check
- check_expected()
- {
--	local ret=0
-+	local rc=0
- 	local var
++# Double quotes to prevent globbing and word splitting is recommended in new
++# code but we accept it.
++#shellcheck disable=SC2086
++
++# Some variables are used below but indirectly, see check_expected_one()
++#shellcheck disable=SC2034
++
+ . "$(dirname "${0}")/mptcp_lib.sh"
  
- 	for var in "${@}"
- 	do
--		check_expected_one "${var}" "${ret}" || ret=1
-+		check_expected_one "${var}" "${rc}" || rc=1
- 	done
+ mptcp_lib_check_mptcp
+@@ -11,8 +18,7 @@ if ! mptcp_lib_has_file '/proc/sys/net/mptcp/pm_type'; then
+ 	exit ${KSFT_SKIP}
+ fi
  
--	if [ ${ret} -eq 0 ]
-+	if [ ${rc} -eq 0 ]
- 	then
- 		stdbuf -o0 -e0 printf "[OK]\n"
- 		return 0
- 	fi
- 
--	exit 1
-+	ret=1
+-ip -Version > /dev/null 2>&1
+-if [ $? -ne 0 ];then
++if ! ip -Version &> /dev/null; then
+ 	echo "SKIP: Cannot not run test without ip tool"
+ 	exit ${KSFT_SKIP}
+ fi
+@@ -68,6 +74,8 @@ kill_wait()
+ 	wait $1 2>/dev/null
  }
  
- verify_announce_event()
-@@ -323,7 +324,7 @@ test_announce()
- 		stdbuf -o0 -e0 printf "[OK]\n"
- 	else
- 		stdbuf -o0 -e0 printf "[FAIL]\n\ttype defined: %s\n" "${type}"
--		exit 1
-+		ret=1
- 	fi
- 
- 	# ADD_ADDR from the client to server machine reusing the subflow port
-@@ -423,7 +424,7 @@ test_remove()
- 		stdbuf -o0 -e0 printf "[OK]\n"
- 	else
- 		stdbuf -o0 -e0 printf "[FAIL]\n"
--		exit 1
-+		ret=1
- 	fi
- 
- 	# RM_ADDR using an invalid addr id should result in no action
-@@ -438,7 +439,7 @@ test_remove()
- 		stdbuf -o0 -e0 printf "[OK]\n"
- 	else
- 		stdbuf -o0 -e0 printf "[FAIL]\n"
--		exit 1
-+		ret=1
- 	fi
- 
- 	# RM_ADDR from the client to server machine
-@@ -859,7 +860,7 @@ test_prio()
- 	[ -z "$count" ] && count=0
- 	if [ $count != 1 ]; then
- 		stdbuf -o0 -e0 printf "[FAIL]\n\tCount != 1: %d\n" "${count}"
--		exit 1
-+		ret=1
- 	else
- 		stdbuf -o0 -e0 printf "[OK]\n"
- 	fi
-@@ -870,7 +871,7 @@ test_prio()
- 	[ -z "$count" ] && count=0
- 	if [ $count != 1 ]; then
- 		stdbuf -o0 -e0 printf "[FAIL]\n\tCount != 1: %d\n" "${count}"
--		exit 1
-+		ret=1
- 	else
- 		stdbuf -o0 -e0 printf "[OK]\n"
- 	fi
-@@ -961,4 +962,4 @@ test_subflows_v4_v6_mix
- test_prio
- test_listener
- 
--exit 0
-+exit ${ret}
++# This function is used in the cleanup trap
++#shellcheck disable=SC2317
+ cleanup()
+ {
+ 	print_title "Cleanup"
 
 -- 
 2.40.1
