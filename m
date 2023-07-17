@@ -1,157 +1,227 @@
-Return-Path: <netdev+bounces-18445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E955757008
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:52:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AF23757037
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 01:05:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 491C01C20BD1
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 22:52:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC71C2812AB
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 23:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BAD1118E;
-	Mon, 17 Jul 2023 22:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26F51119C;
+	Mon, 17 Jul 2023 23:05:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A304BE46
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 22:52:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA200133
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 15:52:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689634329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8wy84DSSq8n2YYiK0mWellsvoswCFp/2kMAmdZ+UHHc=;
-	b=WSU35uqKWX5qXsL9Eqi4qqS9SCAvtRdUoP1pqlX2O/1cZK2gLwhVZqB5eExNH9bGJCaIvz
-	BDObKB9Pjgy9nnNWI0Mg64rgQFu1m48ni/wL21sFRtdMbxZw6ZsGTbH7RccOeY6fV1KDLB
-	hn5FNoggx6POG5Pi2hj0zNHisqxMXTQ=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-F8mCRwqONAm0x9MbIFeyjQ-1; Mon, 17 Jul 2023 18:52:07 -0400
-X-MC-Unique: F8mCRwqONAm0x9MbIFeyjQ-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-786fa88a6f0so317983539f.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 15:52:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9520C10977
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 23:05:35 +0000 (UTC)
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 563AA170A;
+	Mon, 17 Jul 2023 16:04:47 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-3459baa237bso32105315ab.3;
+        Mon, 17 Jul 2023 16:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689635007; x=1692227007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PjdXTr3dzdMnu6+stW9Y5PEi63LoYA7/O+Nyj8BgZrY=;
+        b=DXaD1vRPgFSnKmXn3XmG3556H/iN7AORkeSIiv52gtXqrSsva4y99v678W83plsKQd
+         Sb2RzUfAyqCwSAZXeTyPSTPVhft5cksYPgmlzFxPtaVsXr5qxjkvMhG/pbHf0f5Z50aS
+         h9GVaj7R2fjtsiyItodMYi2N+0lWvihW95Yh1xyg3f7uUHAUyazn/6vxom75h3hyS49M
+         aLO1zkjumLSNbljkXUZ1tYdZnJUSGtbH6lbZ/WdbgQyAalJGZBSmguuL4aRnR0VkTQfA
+         MypCw40Sse8dM7MJ11W8RLcgEnNMiagL13pXMPaU1M+MYaMVjRDZvWqM2XKdb/0HVNLA
+         OHpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689634327; x=1692226327;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8wy84DSSq8n2YYiK0mWellsvoswCFp/2kMAmdZ+UHHc=;
-        b=Q5C5dVnmfxIdIbWw6yMHus1Yy8VFsrMiM8vb6KVjD85rDU/K2Ieg9mRXRnILn5Nuui
-         1+7+ILzz95UXU8gRXA79R7q4LijT1l0PnzFXhlDHfajafQ8LpIRNmPkopBMQFmgw0qkX
-         uSy0GqkT/8zL9ayLd0kTIMabeFuhyVoOXI7BH96Tjuc89XTv3KkuhcdY0vrYeZvpzf0Z
-         LCIjI0ax2eqegDa9D2z/Bb58J8TKJoIChpnqmvpAUHwhbiqOyMlsgpUdbAHylThcrNf7
-         mJbUW5aQXwfiU9Hs8K2AV3crW1TOnyWsZCjjnqfvtQeBTjui9p51MDYcxYwQEmUnZmP0
-         x39Q==
-X-Gm-Message-State: ABy/qLYRy7yABSRdPCoxgU3EIl3rwMpFQjpYmX5RBGLVJ4ppdYgj4aDl
-	cCTdlMOuf5slY4wobtHrKdZyRdLYSz3/jVGiLhj9Y/l07mezp34Rt6WPoF7Q3CkymArX0DPlrvy
-	dkzYAYLX5a7zlIIxF
-X-Received: by 2002:a92:c651:0:b0:347:693a:7300 with SMTP id 17-20020a92c651000000b00347693a7300mr1012066ill.26.1689634327051;
-        Mon, 17 Jul 2023 15:52:07 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGlBYmCdY1EaUds5QDcX7E6PqePOm9wJTOwk2wgOBkeJp+9wxIVvWJlHjSTuTXhWw/m+atXtQ==
-X-Received: by 2002:a92:c651:0:b0:347:693a:7300 with SMTP id 17-20020a92c651000000b00347693a7300mr1012015ill.26.1689634326829;
-        Mon, 17 Jul 2023 15:52:06 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id d10-20020a92ddca000000b00341c0710169sm242627ilr.46.2023.07.17.15.52.04
+        d=1e100.net; s=20221208; t=1689635007; x=1692227007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PjdXTr3dzdMnu6+stW9Y5PEi63LoYA7/O+Nyj8BgZrY=;
+        b=Z7n7lzoXYvBT8hCuzrQASx0hG8HTGb9DGHccm88ehjGh06T9Bu69MviUaVyk16M4sc
+         vu4IyW8tW5UmrGumqrN8KAdiWqEvGe8F2885N8/Q8YmH+KNMYTxDuJO3Q1D4s2PRR26o
+         1ly73thmitkNId63hcStYYHWaIqg/LLradphCKaLWXpH40WLVJRg/01wN0j1syRV3rxv
+         O9EWRprGV939k9wtnF4LH5KtQjehuyDjUeCat3xvvfjKBVZUOqmMx6YrAcyUdsFdCgLo
+         h+qHCOW20sHg9vnxroV8W+4fGoRH2FMoMt/L1jhS7f7dC2/vyxXYKJJgUX0eh0QB0Gqe
+         YpmQ==
+X-Gm-Message-State: ABy/qLY08tPpSixf7wqxm5/UlPcb50dIt7iLDivYpMaTsp37rOnwi3kV
+	LPkWLStK4lgUom5I4g2Ztqg=
+X-Google-Smtp-Source: APBJJlFC6SX/VCeG/MeX057j4EOjP0lF4J3jcfQ3edgXjMjcygGdQA4pJA+cbFryNUtJs9NdzCdVQg==
+X-Received: by 2002:a05:6e02:1b07:b0:346:189a:1b74 with SMTP id i7-20020a056e021b0700b00346189a1b74mr1436604ilv.0.1689635007204;
+        Mon, 17 Jul 2023 16:03:27 -0700 (PDT)
+Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
+        by smtp.gmail.com with ESMTPSA id w5-20020a92d605000000b0034628814e66sm254216ilm.40.2023.07.17.16.03.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 15:52:06 -0700 (PDT)
-Date: Mon, 17 Jul 2023 16:52:03 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Grzegorz Jaszczyk <jaz@semihalf.com>, Christian Brauner
- <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
- linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>, Paul
- Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>, Jason Wang
- <jasowang@redhat.com>, dri-devel@lists.freedesktop.org, Michal Hocko
- <mhocko@kernel.org>, linux-mm@kvack.org, Kirti Wankhede
- <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>, Jens Axboe
- <axboe@kernel.dk>, Vineeth Vijayan <vneethv@linux.ibm.com>, Diana Craciun
- <diana.craciun@oss.nxp.com>, Alexander Gordeev <agordeev@linux.ibm.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shakeel Butt <shakeelb@google.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Leon Romanovsky <leon@kernel.org>,
- Harald Freudenberger <freude@linux.ibm.com>, Fei Li <fei1.li@intel.com>,
- x86@kernel.org, Roman Gushchin <roman.gushchin@linux.dev>, Halil Pasic
- <pasic@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
- intel-gfx@lists.freedesktop.org, Christian Borntraeger
- <borntraeger@linux.ibm.com>, linux-fpga@vger.kernel.org, Zhi Wang
- <zhi.a.wang@intel.com>, Wu Hao <hao.wu@intel.com>, Jason Herne
- <jjherne@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, Andrew Donnellan <ajd@linux.ibm.com>, Arnd
- Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org, Heiko Carstens
- <hca@linux.ibm.com>, Johannes Weiner <hannes@cmpxchg.org>,
- linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>, Borislav
- Petkov <bp@alien8.de>, kvm@vger.kernel.org, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org, Thomas Gleixner
- <tglx@linutronix.de>, virtualization@lists.linux-foundation.org,
- intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>, Tvrtko
- Ursulin <tvrtko.ursulin@linux.intel.com>, Pavel Begunkov
- <asml.silence@gmail.com>, Sean Christopherson <seanjc@google.com>, Oded
- Gabbay <ogabbay@kernel.org>, Muchun Song <muchun.song@linux.dev>, Peter
- Oberparleiter <oberpar@linux.ibm.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Benjamin LaHaise <bcrl@kvack.org>, "Michael S.
- Tsirkin" <mst@redhat.com>, Sven Schnelle <svens@linux.ibm.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Frederic Barrat
- <fbarrat@linux.ibm.com>, Moritz Fischer <mdf@kernel.org>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, David Woodhouse <dwmw2@infradead.org>, Xu Yilun
- <yilun.xu@intel.com>, Dominik Behr <dbehr@chromium.org>, Marcin Wojtas
- <mw@semihalf.com>
-Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
-Message-ID: <20230717165203.4ee6b1e6.alex.williamson@redhat.com>
-In-Reply-To: <ZLW8wEzkhBxd0O0L@ziepe.ca>
-References: <20230630155936.3015595-1-jaz@semihalf.com>
-	<20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
-	<CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
-	<20230717130831.0f18381a.alex.williamson@redhat.com>
-	<ZLW8wEzkhBxd0O0L@ziepe.ca>
-Organization: Red Hat
+        Mon, 17 Jul 2023 16:03:26 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 17 Jul 2023 13:03:25 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
+	DRI Development <dri-devel@lists.freedesktop.org>,
+	linux-rtc@vger.kernel.org,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	netdev <netdev@vger.kernel.org>,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+	Linux MMC List <linux-mmc@vger.kernel.org>,
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
+ 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
+ mechanism)
+Message-ID: <ZLXIvXBvhsnL-ik_@slm.duckdns.org>
+References: <20230511181931.869812-1-tj@kernel.org>
+ <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
+ <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+ <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
+ <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
+ <ZK30CR196rs-OWLq@slm.duckdns.org>
+ <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 17 Jul 2023 19:12:16 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+Hello, Geert.
 
-> On Mon, Jul 17, 2023 at 01:08:31PM -0600, Alex Williamson wrote:
-> 
-> > What would that mechanism be?  We've been iterating on getting the
-> > serialization and buffering correct, but I don't know of another means
-> > that combines the notification with a value, so we'd likely end up with
-> > an eventfd only for notification and a separate ring buffer for
-> > notification values.  
-> 
-> All FDs do this. You just have to make a FD with custom
-> file_operations that does what this wants. The uAPI shouldn't be able
-> to tell if the FD is backing it with an eventfd or otherwise. Have the
-> kernel return the FD instead of accepting it. Follow the basic design
-> of eg mlx5vf_save_fops
+Can you please the following patch and see how many reports you get? Looking
+back at your reports, I think some of them probably should be converted to
+UNBOUND but we should have a better idea with the adjusted threshold.
 
-Sure, userspace could poll on any fd and read a value from it, but at
-that point we're essentially duplicating a lot of what eventfd provides
-for a minor(?) semantic difference over how the counter value is
-interpreted.  Using an actual eventfd allows the ACPI notification to
-work as just another interrupt index within the existing vfio IRQ uAPI.
-Thanks,
+Thanks.
 
-Alex
+From 8555cbd4b22e5f85eb2bdcb84fd1d1f519a0a0d3 Mon Sep 17 00:00:00 2001
+From: Tejun Heo <tj@kernel.org>
+Date: Mon, 17 Jul 2023 12:50:02 -1000
+Subject: [PATCH] workqueue: Scale up wq_cpu_intensive_thresh_us if BogoMIPS is
+ below 1000
+
+wq_cpu_intensive_thresh_us is used to detect CPU-hogging per-cpu work items.
+Once detected, they're excluded from concurrency management to prevent them
+from blocking other per-cpu work items. If CONFIG_WQ_CPU_INTENSIVE_REPORT is
+enabled, repeat offenders are also reported so that the code can be updated.
+
+The default threshold is 10ms which is long enough to do fair bit of work on
+modern CPUs while short enough to be usually not noticeable. This
+unfortunately leads to a lot of, arguable spurious, detections on very slow
+CPUs. Using the same threshold across CPUs whose performance levels may be
+apart by multiple levels of magnitude doesn't make whole lot of sense.
+
+This patch scales up wq_cpu_intensive_thresh_us upto 1 second when BogoMIPS
+is below 1000. This is obviously very inaccurate but it doesn't have to be
+accurate to be useful. The mechanism is still useful when the threshold is
+fully scaled up and the benefits of reports are usually shared with everyone
+regardless of who's reporting, so as long as there are sufficient number of
+fast machines reporting, we don't lose much.
+
+Some (or is it all?) ARM CPUs systemtically report significantly lower
+BogoMIPS. While this doesn't break anything, given how widespread ARM CPUs
+are, it's at least a missed opportunity and it probably would be a good idea
+to teach workqueue about it.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ kernel/workqueue.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 02a8f402eeb5..0d7a3d29762f 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -52,6 +52,7 @@
+ #include <linux/sched/debug.h>
+ #include <linux/nmi.h>
+ #include <linux/kvm_para.h>
++#include <linux/delay.h>
+ 
+ #include "workqueue_internal.h"
+ 
+@@ -338,8 +339,10 @@ static cpumask_var_t *wq_numa_possible_cpumask;
+  * Per-cpu work items which run for longer than the following threshold are
+  * automatically considered CPU intensive and excluded from concurrency
+  * management to prevent them from noticeably delaying other per-cpu work items.
++ * ULONG_MAX indicates that the user hasn't overridden it with a boot parameter.
++ * The actual value is initialized in wq_cpu_intensive_thresh_init().
+  */
+-static unsigned long wq_cpu_intensive_thresh_us = 10000;
++static unsigned long wq_cpu_intensive_thresh_us = ULONG_MAX;
+ module_param_named(cpu_intensive_thresh_us, wq_cpu_intensive_thresh_us, ulong, 0644);
+ 
+ static bool wq_disable_numa;
+@@ -6513,6 +6516,42 @@ void __init workqueue_init_early(void)
+ 	       !system_freezable_power_efficient_wq);
+ }
+ 
++static void __init wq_cpu_intensive_thresh_init(void)
++{
++	unsigned long thresh;
++	unsigned long mips;
++
++	/* if the user set it to a specific value, keep it */
++	if (wq_cpu_intensive_thresh_us != ULONG_MAX)
++		return;
++
++	/*
++	 * The default of 10ms is derived from the fact that most modern (as of
++	 * 2023) processors can do a lot in 10ms and that it's just below what
++	 * most consider human-perceivable. However, the kernel also runs on a
++	 * lot slower CPUs including microcontrollers where the threshold is way
++	 * too low.
++	 *
++	 * Let's scale up the threshold upto 1 second if BogoMips is below 1000.
++	 * This is by no means accurate but it doesn't have to be. The mechanism
++	 * is still useful even when the threshold is fully scaled up. Also, as
++	 * the reports would usually be applicable to everyone, some machines
++	 * operating on longer thresholds won't significantly diminish their
++	 * usefulness.
++	 */
++	thresh = 10 * USEC_PER_MSEC;
++
++	/* see init/calibrate.c for lpj -> BogoMIPS calculation */
++	mips = max_t(unsigned long, loops_per_jiffy / 500000 * HZ, 1);
++	if (mips < 1000)
++		thresh = min_t(unsigned long, thresh * 1000 / mips, USEC_PER_SEC);
++
++	pr_debug("wq_cpu_intensive_thresh: lpj=%lu mips=%lu thresh_us=%lu\n",
++		 loops_per_jiffy, mips, thresh);
++
++	wq_cpu_intensive_thresh_us = thresh;
++}
++
+ /**
+  * workqueue_init - bring workqueue subsystem fully online
+  *
+@@ -6528,6 +6567,8 @@ void __init workqueue_init(void)
+ 	struct worker_pool *pool;
+ 	int cpu, bkt;
+ 
++	wq_cpu_intensive_thresh_init();
++
+ 	/*
+ 	 * It'd be simpler to initialize NUMA in workqueue_init_early() but
+ 	 * CPU to node mapping may not be available that early on some
+-- 
+2.41.0
 
 
