@@ -1,224 +1,220 @@
-Return-Path: <netdev+bounces-18152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0AE7559B8
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 04:43:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086E6755A0A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 05:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3830128137D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 02:43:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F9E1C20A4D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 03:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653B2139B;
-	Mon, 17 Jul 2023 02:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008D715BF;
+	Mon, 17 Jul 2023 03:17:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF931365
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:43:30 +0000 (UTC)
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C7B9187
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 19:43:28 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4fbaef9871cso6192323e87.0
-        for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 19:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689561806; x=1692153806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y/rbaFBr1o1WpkBGUX8CuyV0YuFTgeUPikyuIhf+EvE=;
-        b=K3Mb/t0FO1qVOX7kd3PzPv9ouKCPOirSTurifUS3hp0XAUNv4+5SfQKPDuJuqyE/cT
-         9rdeQF3bv2zPYKA9d5ROWefv2U7I7ZBMnYYBvoO5KJnoxqZ8IpG0SwNpiNryFXuqZy2M
-         //c7WxNHauCj1fqbxZPjFip4EoGhWxz3yoTenbPD1xZYeZ5w/y7vXPKUW9ibWncMdU8y
-         7nQ6zR/Px1GXOhWExwQymtzU8LPu5Tex3i6BnE7RoOZX+ltbGU5/12AZqONsgDkRNNqR
-         xkSiqfwlw0MXih5dapPBb2XoQtEs5lh0VB/j0gqxbq7aI5kTBha/2SzwC1O30GxRHNjB
-         lcWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689561806; x=1692153806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y/rbaFBr1o1WpkBGUX8CuyV0YuFTgeUPikyuIhf+EvE=;
-        b=SAJiMTn637X7WNU8Unyk8F/oH0wzGZYwBwga6YMWlxMpMnjufZQOpbMGQ8I7n/8Uuq
-         T9dutrrMxR8a09FwskjqG0NM0apVaQKJj49/ocyp5pWh2ugBmuZcbUe8/aYsh/RI39mq
-         gWm296JJw5qRD4hlaL4zbRQA+/YGYbHyqdDoyfZ7D1UYeHZOJurxgP4DVFi1Eyn9hwJv
-         2Lm6R9jAv6nDmNP56Q6AR0b55gWSAqjJPeNVaHa2vvdYebC4WHemCr68IYB2iwyk0aJZ
-         jRWu4NQtdwoWQV/Veny1/uPtuO+Jj+aKewwbw0xARc3Flo+IhtvQPd0k6EWE4Ju4mJjJ
-         aKUw==
-X-Gm-Message-State: ABy/qLbDaW1vqZ+7APmhac8cSEt1R5rsnESK17P7M4Hzw8Qk7x0+Y3lN
-	qZLQ/mxXnQh0rEOclg4RoxUpqVXv0IKvaVW0Rmo=
-X-Google-Smtp-Source: APBJJlEZwMnaiTG95a3lbYA/EQ/ugxl+LiVHyTtkU1lBXW7IyUkjmLK0UnEdBRvoSdpmQOEjyU+lnRm60uohNtFUFi0=
-X-Received: by 2002:a05:6512:2243:b0:4fb:9da2:6cec with SMTP id
- i3-20020a056512224300b004fb9da26cecmr7097000lfu.7.1689561806084; Sun, 16 Jul
- 2023 19:43:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A6315B4
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 03:17:30 +0000 (UTC)
+X-Greylist: delayed 881 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 16 Jul 2023 20:17:29 PDT
+Received: from bjmdavn62.tildwue-xau (nicu8.passagensaereascomprar.com [134.209.123.193])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D732113
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 20:17:29 -0700 (PDT)
+Received: by bjmdavn62.tildwue-xau (Postfix, from userid 0)
+	id E1D6E7CBA4; Mon, 17 Jul 2023 02:46:47 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1689215889.git.chenfeiyang@loongson.cn> <be1874e517f4f4cc50906f18689a0add3594c2e0.1689215889.git.chenfeiyang@loongson.cn>
- <9e0b3466-10e1-4267-ab9b-d9f8149b6b6b@lunn.ch> <CACWXhKkX-syR01opOky=t-b8C3nhV5f_WNfCQ-kOE+4o0xh4tA@mail.gmail.com>
- <3cff46b0-5621-4881-8e70-362bb7a70ed1@lunn.ch>
-In-Reply-To: <3cff46b0-5621-4881-8e70-362bb7a70ed1@lunn.ch>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Mon, 17 Jul 2023 10:43:14 +0800
-Message-ID: <CACWXhKk23muXROj6OrmeFna88ViJHA_7QpQZoWiFgzEPb4pLWQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/10] net: phy: Add driver for Loongson PHY
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
-	linux@armlinux.org.uk, dongbiao@loongson.cn, 
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-type:  text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Subject: Ate 50% de desconto para todos os destinos!
+From: 123Milhas <123Milhas@nicu8.passagensaereascomprar.com>
+To: netdev@vger.kernel.org
+Message-Id: <20230717025056.E1D6E7CBA4@bjmdavn62.tildwue-xau>
+Date: Mon, 17 Jul 2023 02:46:47 +0000 (UTC)
+X-Spam-Status: No, score=3.7 required=5.0 tests=BAYES_50,FROM_STARTS_WITH_NUMS,
+	GOOG_REDIR_HTML_ONLY,HTML_FONT_LOW_CONTRAST,HTML_MESSAGE,
+	HTTPS_HTTP_MISMATCH,MIME_HTML_ONLY,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_NONE,T_KAM_HTML_FONT_INVALID,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 12:20=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> > > > +#include <linux/mii.h>
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/netdevice.h>
-> > > > +#include <linux/pci.h>
-> > > > +#include <linux/phy.h>
-> > > > +
-> > > > +#define PHY_ID_LS7A2000              0x00061ce0
-> > >
-> > > What is Loongson OUI?
-> > >
-> >
-> > Currently, we do not have an OUI for Loongson, but we are in the
-> > process of applying for one.
->
-> Is the value 0x00061ce0 baked into the silicon? Or can it be changed
-> once you have an OUI?
->
+PCFET0NUWVBFIGh0bWw+DQoKPGh0bWw+DQoKCTxoZWFkPg0KCgkJPHRpdGxlPjwvdGl0bGU+DQoK
+CTwvaGVhZD4NCgoJPGJvZHk+DQoKCQk8ZGl2IGNsYXNzPSJlcy13cmFwcGVyLWNvbG9yIiBzdHls
+ZT0iYmFja2dyb3VuZC1jb2xvcjogIzAwYWQwMDsiPg0KCgkJCTx0YWJsZSBjZWxscGFkZGluZz0i
+MCIgY2VsbHNwYWNpbmc9IjAiIGNsYXNzPSJlcy13cmFwcGVyIiBzdHlsZT0ibWFyZ2luOiAwcHQ7
+IHBhZGRpbmc6IDBwdDsgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsgd2lkdGg6IDEwMCU7IGhl
+aWdodDogMTAwJTsgYmFja2dyb3VuZC1yZXBlYXQ6IHJlcGVhdDsgYmFja2dyb3VuZC1wb3NpdGlv
+bjogY2VudGVyIHRvcDsgYmFja2dyb3VuZC1jb2xvcjogI2ZmZmFmYTsiIHdpZHRoPSIxMDAlIj4N
+CgoJCQkJPHRib2R5Pg0KCgkJCQkJPHRyPg0KCgkJCQkJCTx0ZCBzdHlsZT0ibWFyZ2luOiAwcHQ7
+IHBhZGRpbmc6IDBwdDsiIHZhbGlnbj0idG9wIj4NCgoJCQkJCQkJPHRhYmxlIGFsaWduPSJjZW50
+ZXIiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgY2xhc3M9ImVzLWhlYWRlciIgc3R5
+bGU9ImJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7IHRhYmxlLWxheW91dDogZml4ZWQgISBpbXBv
+cnRhbnQ7IHdpZHRoOiAxMDAlOyBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudDsgYmFja2dy
+b3VuZC1yZXBlYXQ6IHJlcGVhdDsgYmFja2dyb3VuZC1wb3NpdGlvbjogY2VudGVyIHRvcDsiPg0K
+CgkJCQkJCQkJPHRib2R5Pg0KCgkJCQkJCQkJCTx0cj4NCgoJCQkJCQkJCQkJPHRkIGFsaWduPSJj
+ZW50ZXIiIHN0eWxlPSJtYXJnaW46IDBwdDsgcGFkZGluZzogMHB0OyI+DQoKCQkJCQkJCQkJCQk8
+dGFibGUgYWxpZ249ImNlbnRlciIgYmdjb2xvcj0iI2NjMDkyZiIgY2VsbHBhZGRpbmc9IjAiIGNl
+bGxzcGFjaW5nPSIwIiBjbGFzcz0iZXMtaGVhZGVyLWJvZHkiIHN0eWxlPSJib3JkZXItY29sbGFw
+c2U6IGNvbGxhcHNlOyBiYWNrZ3JvdW5kLWNvbG9yOiAjMDBhZDAwOyB3aWR0aDogNjAwcHg7Ij4N
+CgoJCQkJCQkJCQkJCQk8dGJvZHk+DQoKCQkJCQkJCQkJCQkJCTx0cj4NCgoJCQkJCQkJCQkJCQkJ
+CTx0ZCBhbGlnbj0ibGVmdCIgc3R5bGU9Im1hcmdpbjogMHB0OyBwYWRkaW5nOiAxMHB4IDIwcHg7
+Ij4NCgoJCQkJCQkJCQkJCQkJCQk8dGFibGUgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIw
+IiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsiIHdpZHRoPSIxMDAlIj4NCgoJCQkJ
+CQkJCQkJCQkJCQkJPHRib2R5Pg0KCgkJCQkJCQkJCQkJCQkJCQkJPHRyPg0KCgkJCQkJCQkJCQkJ
+CQkJCQkJCTx0ZCBhbGlnbj0iY2VudGVyIiBjbGFzcz0iZXMtbS1wMHIiIHN0eWxlPSJtYXJnaW46
+IDBwdDsgcGFkZGluZzogMHB0OyB3aWR0aDogNTYwcHg7IiB2YWxpZ249InRvcCI+DQoKCQkJCQkJ
+CQkJCQkJCQkJCQkJCTx0YWJsZSBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIHN0eWxl
+PSJib3JkZXItY29sbGFwc2U6IGNvbGxhcHNlOyIgd2lkdGg9IjEwMCUiPg0KCgkJCQkJCQkJCQkJ
+CQkJCQkJCQkJPHRib2R5Pg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJCTx0cj4NCgoJCQkJCQkJCQkJ
+CQkJCQkJCQkJCQkJPHRkIGFsaWduPSJjZW50ZXIiIHN0eWxlPSJtYXJnaW46IDBwdDsgcGFkZGlu
+ZzogMHB0OyBmb250LXNpemU6IDMycHg7Ij4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCSZuYnNw
+OzwvdGQ+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTx0ZCBhbGlnbj0iY2VudGVyIiBzdHlsZT0i
+bWFyZ2luOiAwcHQ7IHBhZGRpbmc6IDBwdDsiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJPHNw
+YW4gY2xhc3M9ImVzLWJ1dHRvbi1ib3JkZXIiIHN0eWxlPSJib3JkZXI6IDBweCBzb2xpZCAjNWM2
+OGUyOyBiYWNrZ3JvdW5kOiAjMDBhZDAwIG5vbmUgcmVwZWF0IHNjcm9sbCAwJSA1MCU7IC1tb3ot
+YmFja2dyb3VuZC1jbGlwOiBpbml0aWFsOyAtbW96LWJhY2tncm91bmQtb3JpZ2luOiBpbml0aWFs
+OyAtbW96LWJhY2tncm91bmQtaW5saW5lLXBvbGljeTogaW5pdGlhbDsgZGlzcGxheTogYmxvY2s7
+IHdpZHRoOiBhdXRvOyI+PHN0cm9uZz48c3BhbiBzdHlsZT0iZm9udC1zaXplOiA1MHB4OyI+PGEg
+ZGF0YS1zYWZlcmVkaXJlY3R1cmw9Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vdXJsP3E9aHR0cHM6
+Ly9jbGljay5tZXJjYWRvcGFnby5lbnRyZWdhZW1haWwuY29tL2xxcXN2bi9YbWl1aVJMciZhbXA7
+c291cmNlPWdtYWlsJmFtcDt1c3Q9MTY4NTAzMTM3MjMyNDAwMCZhbXA7dXNnPUFPdlZhdzF5N3Ju
+V1Fab09fUTRUdlNqMEVUQm8iIGhyZWY9Imh0dHBzOi8vdXMtd2VzdDEtYWx2ZXJhLmNsb3VkZnVu
+Y3Rpb25zLm5ldC9taWxoYWFlcmVhIiByZWw9Im5vb3BlbmVyIiBzdHlsZT0iZm9udC1mYW1pbHk6
+ICdQcm94aW1hIE5vdmEnLCBfYXBwbGVfc3lzdGVtLCAnSGVsdmV0aWNhIE5ldWUnLCBIZWx2ZXRp
+Y2EsIFJvYm90bywgQXJpYWwsIHNhbnMtc2VyaWY7IGNvbG9yOiAjZmYwMDAwOyB0ZXh0LWRlY29y
+YXRpb24tbGluZTogbm9uZTsiIHRhcmdldD0iX2JsYW5rIiB0aXRsZT0iaHR0cHM6Ly93d3cuMTIz
+bWlsaGFzLmNvbS81MG9mZiI+PHNwYW4gc3R5bGU9ImNvbG9yOiAjZmYwMDAwOyI+MTwvc3Bhbj48
+c3BhbiBzdHlsZT0iY29sb3I6ICNmZjhjMDA7Ij4yPC9zcGFuPjxzcGFuIHN0eWxlPSJjb2xvcjog
+IzAwZmYwMDsiPjM8L3NwYW4+IDxzcGFuIHN0eWxlPSJjb2xvcjogIzAwMDAwMDsiPm1pbGhhcyE8
+L3NwYW4+PC9hPjwvc3Bhbj48L3N0cm9uZz48L3NwYW4+PC90ZD4NCgoJCQkJCQkJCQkJCQkJCQkJ
+CQkJCQk8L3RyPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJPC90Ym9keT4NCgoJCQkJCQkJCQkJCQkJ
+CQkJCQkJPC90YWJsZT4NCgoJCQkJCQkJCQkJCQkJCQkJCQk8L3RkPg0KCgkJCQkJCQkJCQkJCQkJ
+CQkJPC90cj4NCgoJCQkJCQkJCQkJCQkJCQkJPC90Ym9keT4NCgoJCQkJCQkJCQkJCQkJCQk8L3Rh
+YmxlPg0KCgkJCQkJCQkJCQkJCQkJPC90ZD4NCgoJCQkJCQkJCQkJCQkJPC90cj4NCgoJCQkJCQkJ
+CQkJCQk8L3Rib2R5Pg0KCgkJCQkJCQkJCQkJPC90YWJsZT4NCgoJCQkJCQkJCQkJPC90ZD4NCgoJ
+CQkJCQkJCQk8L3RyPg0KCgkJCQkJCQkJPC90Ym9keT4NCgoJCQkJCQkJPC90YWJsZT4NCgoJCQkJ
+CQkJPHRhYmxlIGFsaWduPSJjZW50ZXIiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIg
+Y2xhc3M9ImVzLWNvbnRlbnQiIHN0eWxlPSJib3JkZXItY29sbGFwc2U6IGNvbGxhcHNlOyB0YWJs
+ZS1sYXlvdXQ6IGZpeGVkICEgaW1wb3J0YW50OyB3aWR0aDogMTAwJTsiPg0KCgkJCQkJCQkJPHRi
+b2R5Pg0KCgkJCQkJCQkJCTx0cj4NCgoJCQkJCQkJCQkJPHRkIGFsaWduPSJjZW50ZXIiIHN0eWxl
+PSJtYXJnaW46IDBwdDsgcGFkZGluZzogMHB0OyI+DQoKCQkJCQkJCQkJCQk8dGFibGUgYWxpZ249
+ImNlbnRlciIgYmdjb2xvcj0iI2ZmZmZmZiIgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIw
+IiBjbGFzcz0iZXMtY29udGVudC1ib2R5IiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBz
+ZTsgYmFja2dyb3VuZC1jb2xvcjogI2ZmZmZmZjsgd2lkdGg6IDYwMHB4OyI+DQoKCQkJCQkJCQkJ
+CQkJPHRib2R5Pg0KCgkJCQkJCQkJCQkJCQk8dHI+DQoKCQkJCQkJCQkJCQkJCQk8dGQgYWxpZ249
+ImxlZnQiIHN0eWxlPSJtYXJnaW46IDBwdDsgcGFkZGluZzogMzBweCAyMHB4IDEwcHg7Ij4NCgoJ
+CQkJCQkJCQkJCQkJCQk8dGFibGUgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBzdHls
+ZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsiIHdpZHRoPSIxMDAlIj4NCgoJCQkJCQkJCQkJ
+CQkJCQkJPHRib2R5Pg0KCgkJCQkJCQkJCQkJCQkJCQkJPHRyPg0KCgkJCQkJCQkJCQkJCQkJCQkJ
+CTx0ZCBhbGlnbj0iY2VudGVyIiBzdHlsZT0ibWFyZ2luOiAwcHQ7IHBhZGRpbmc6IDBwdDsgd2lk
+dGg6IDU2MHB4OyIgdmFsaWduPSJ0b3AiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQk8dGFibGUgY2Vs
+bHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xs
+YXBzZTsiIHdpZHRoPSIxMDAlIj4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCTx0Ym9keT4NCgoJCQkJ
+CQkJCQkJCQkJCQkJCQkJCQk8dHI+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTx0ZCBhbGlnbj0i
+Y2VudGVyIiBjbGFzcz0iZXMtbS10eHQtYyIgc3R5bGU9Im1hcmdpbjogMHB0OyBwYWRkaW5nOiAw
+cHQgMHB0IDEwcHg7Ij4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTxoMiBzdHlsZT0ibWFyZ2lu
+OiAwcHQ7IGxpbmUtaGVpZ2h0OiAyNnB4OyBmb250LWZhbWlseTogYXJpYWwsJ2hlbHZldGljYW5l
+dWUnLGhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXNpemU6IDI2cHg7IGZvbnQtc3R5bGU6IG5v
+cm1hbDsgZm9udC13ZWlnaHQ6IGJvbGQ7IGNvbG9yOiAjMzMzMzMzOyI+DQoKCQkJCQkJCQkJCQkJ
+CQkJCQkJCQkJCQkJPHN0cm9uZz5WT09TIENPTSBBVCZFYWN1dGU7IDUwJSBERSBERVNDT05UTyZu
+YnNwOzwvc3Ryb25nPuKciO+4jzwvaDI+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTwvdGQ+DQoK
+CQkJCQkJCQkJCQkJCQkJCQkJCQkJPC90cj4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQk8dHI+DQoK
+CQkJCQkJCQkJCQkJCQkJCQkJCQkJCTx0ZCBhbGlnbj0ibGVmdCIgc3R5bGU9Im1hcmdpbjogMHB0
+OyBwYWRkaW5nOiAxMHB4IDBwdDsiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJPHAgc3R5bGU9
+Im1hcmdpbjogMHB0OyBmb250LWZhbWlseTogYXJpYWwsIGhlbHZldGljYW5ldWUsIGhlbHZldGlj
+YSwgc2Fucy1zZXJpZjsgbGluZS1oZWlnaHQ6IDIxcHg7IGNvbG9yOiAjMzMzMzMzOyBmb250LXNp
+emU6IDE0cHg7IHRleHQtYWxpZ246IGNlbnRlcjsiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJ
+CVRvZG9zIG9zIGRlc3Rpbm9zIGNvbSBhdCZlYWN1dGU7Jm5ic3A7PHN0cm9uZz41MCUgZGUgZGVz
+Y29udG8gPC9zdHJvbmc+bm8gPHN0cm9uZz48c3BhbiBzdHlsZT0iY29sb3I6ICNmZjAwMDA7Ij4x
+PC9zcGFuPjxzcGFuIHN0eWxlPSJjb2xvcjogI2ZmOGMwMDsiPjI8L3NwYW4+PHNwYW4gc3R5bGU9
+ImNvbG9yOiAjMDBhZDAwOyI+Mzwvc3Bhbj48L3N0cm9uZz48c3BhbiBzdHlsZT0iY29sb3I6ICMw
+MDAwMDA7Ij48c3Ryb25nPm1pbGhhczwvc3Ryb25nPiE8L3NwYW4+PC9wPg0KCgkJCQkJCQkJCQkJ
+CQkJCQkJCQkJCQkJPHAgc3R5bGU9Im1hcmdpbjogMHB0OyB0ZXh0LWFsaWduOiBjZW50ZXI7Ij4N
+CgoJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk8YnIgLz4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQkJ
+CQlObyBwcmF6byBkZSA8c3Ryb25nPjcyIGhvcmFzPC9zdHJvbmc+IGEgcGFydGlyIGRlIGhvamUh
+PGJyIC8+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJPGJyIC8+DQoKCQkJCQkJCQkJCQkJCQkJ
+CQkJCQkJCQkJQXByb3ZlaXRlIGUgZmEmY2NlZGlsO2EgYSB2aWFnZW0gZG9zIHNldXMgc29uaG9z
+LCBuJmF0aWxkZTtvIHBlcmNhIGVzdGEgb3BvcnR1bmlkYWRlICZ1YWN1dGU7bmljYS48L3A+DQoK
+CQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk8cCBzdHlsZT0ibWFyZ2luOiAwcHQ7IHRleHQtYWxpZ246
+IGNlbnRlcjsiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCSZuYnNwOzwvcD4NCgoJCQkJCQkJ
+CQkJCQkJCQkJCQkJCQkJPC90ZD4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQk8L3RyPg0KCgkJCQkJ
+CQkJCQkJCQkJCQkJCQkJCTx0cj4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQkJPHRkIGFsaWduPSJs
+ZWZ0IiBjbGFzcz0iZXMtbS1wMHIiIHN0eWxlPSJtYXJnaW46IDBwdDsgcGFkZGluZzogNXB4IDVw
+eCA1cHggMHB0OyI+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk8cCBzdHlsZT0ibWFyZ2luOiAw
+cHQ7IHRleHQtYWxpZ246IGNlbnRlcjsiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTxhIGRh
+dGEtYXV0aD0iTm90QXBwbGljYWJsZSIgZGF0YS1saW5raW5kZXg9IjEiIGhyZWY9Imh0dHBzOi8v
+dXMtd2VzdDEtYWx2ZXJhLmNsb3VkZnVuY3Rpb25zLm5ldC9taWxoYWFlcmVhIiByZWw9Im5vb3Bl
+bmVyIG5vcmVmZXJyZXIiIHN0eWxlPSJmb250OiBpbmhlcml0OyB0ZXh0LWFsaWduOiBjZW50ZXI7
+IGJvcmRlcjogMHB4OyBtYXJnaW46IDBweDsgcGFkZGluZzogMHB4OyB2ZXJ0aWNhbC1hbGlnbjog
+YmFzZWxpbmU7IHRleHQtZGVjb3JhdGlvbi1saW5lOiBub25lOyBjb2xvcjogIzNlOTkyMCAhaW1w
+b3J0YW50OyIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJodHRwczovLzEyM21pbGhhcy5jb20vY29u
+c3VsdGFyLWRlc3Rpbm9zIj48c3Ryb25nPmh0dHBzOi8vd3d3LjEyM21pbGhhcy5jb20vY29uc3Vs
+dGFyLWRlc3Rpbm9zPC9zdHJvbmc+PC9hPjwvcD4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQkJPC90
+ZD4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQk8L3RyPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQkJPC90
+Ym9keT4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJPC90YWJsZT4NCgoJCQkJCQkJCQkJCQkJCQkJCQk8
+L3RkPg0KCgkJCQkJCQkJCQkJCQkJCQkJPC90cj4NCgoJCQkJCQkJCQkJCQkJCQkJPC90Ym9keT4N
+CgoJCQkJCQkJCQkJCQkJCQk8L3RhYmxlPg0KCgkJCQkJCQkJCQkJCQkJPC90ZD4NCgoJCQkJCQkJ
+CQkJCQkJPC90cj4NCgoJCQkJCQkJCQkJCQkJPHRyPg0KCgkJCQkJCQkJCQkJCQkJPHRkIGFsaWdu
+PSJsZWZ0IiBzdHlsZT0ibWFyZ2luOiAwcHQ7IHBhZGRpbmc6IDMwcHggMjBweCAwcHQ7Ij4NCgoJ
+CQkJCQkJCQkJCQkJCQk8dGFibGUgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBzdHls
+ZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsiIHdpZHRoPSIxMDAlIj4NCgoJCQkJCQkJCQkJ
+CQkJCQkJPHRib2R5Pg0KCgkJCQkJCQkJCQkJCQkJCQkJPHRyPg0KCgkJCQkJCQkJCQkJCQkJCQkJ
+CTx0ZCBhbGlnbj0iY2VudGVyIiBzdHlsZT0ibWFyZ2luOiAwcHQ7IHBhZGRpbmc6IDBwdDsgd2lk
+dGg6IDU2MHB4OyIgdmFsaWduPSJ0b3AiPg0KCgkJCQkJCQkJCQkJCQkJCQkJCQk8dGFibGUgY2Vs
+bHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xs
+YXBzZTsiIHdpZHRoPSIxMDAlIj4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCTx0Ym9keT4NCgoJCQkJ
+CQkJCQkJCQkJCQkJCQkJCQk8dHI+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTx0ZCBhbGlnbj0i
+Y2VudGVyIiBzdHlsZT0ibWFyZ2luOiAwcHQ7IHBhZGRpbmc6IDBwdDsiPg0KCgkJCQkJCQkJCQkJ
+CQkJCQkJCQkJCQkJPHNwYW4gY2xhc3M9ImVzLWJ1dHRvbi1ib3JkZXIiIHN0eWxlPSJib3JkZXI6
+IDJweCBzb2xpZCAjNWM2OGUyOyBiYWNrZ3JvdW5kOiAjMDBhZDAwIG5vbmUgcmVwZWF0IHNjcm9s
+bCAwJSA1MCU7IC1tb3otYmFja2dyb3VuZC1jbGlwOiBpbml0aWFsOyAtbW96LWJhY2tncm91bmQt
+b3JpZ2luOiBpbml0aWFsOyAtbW96LWJhY2tncm91bmQtaW5saW5lLXBvbGljeTogaW5pdGlhbDsg
+ZGlzcGxheTogYmxvY2s7IHdpZHRoOiBhdXRvOyI+PGEgaHJlZj0iaHR0cHM6Ly91cy13ZXN0MS1h
+bHZlcmEuY2xvdWRmdW5jdGlvbnMubmV0L21pbGhhYWVyZWEiIHN0eWxlPSJib3JkZXItc3R5bGU6
+IHNvbGlkOyBib3JkZXItY29sb3I6ICMwMGFkMDA7IGJvcmRlci13aWR0aDogMTVweCAzMHB4OyBi
+YWNrZ3JvdW5kOiAjMDBhZDAwIG5vbmUgcmVwZWF0c2Nyb2xsIDAlIDUwJTsgLW1vei1iYWNrZ3Jv
+dW5kLWNsaXA6IGluaXRpYWw7IC1tb3otYmFja2dyb3VuZC1vcmlnaW46IGluaXRpYWw7IC1tb3ot
+YmFja2dyb3VuZC1pbmxpbmUtcG9saWN5OiBpbml0aWFsOyB0ZXh0LWRlY29yYXRpb246IG5vbmU7
+IGNvbG9yOiAjZmZmZmZmOyBmb250LXNpemU6IDIwcHg7IGRpc3BsYXk6IGJsb2NrOyBmb250LWZh
+bWlseTogYXJpYWwsJ2hlbHZldGljYSBuZXVlJyxoZWx2ZXRpY2Esc2Fucy1zZXJpZjsgZm9udC13
+ZWlnaHQ6IG5vcm1hbDsgZm9udC1zdHlsZTogbm9ybWFsOyBsaW5lLWhlaWdodDogMjRweDsgd2lk
+dGg6IGF1dG87IHRleHQtYWxpZ246IGNlbnRlcjsiIHRpdGxlPSJodHRwczovLzEyM21pbGhhcy5j
+b20vY29uc3VsdGFyLWRlc3Rpbm9zIj5DT05TVUxUQVIgREVTVElOT1M8L2E+PC9zcGFuPjwvdGQ+
+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJPC90cj4NCgoJCQkJCQkJCQkJCQkJCQkJCQkJCQk8dHI+
+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQkJCTx0ZCBhbGlnbj0iY2VudGVyIiBzdHlsZT0ibWFyZ2lu
+OiAwcHQ7IHBhZGRpbmc6IDIwcHg7IGZvbnQtc2l6ZTogMHB0OyI+DQoKCQkJCQkJCQkJCQkJCQkJ
+CQkJCQkJCQluZXRkZXZAdmdlci5rZXJuZWwub3JnDQo8L3RkPg0KCgkJCQkJCQkJCQkJCQkJCQkJ
+CQkJCTwvdHI+DQoKCQkJCQkJCQkJCQkJCQkJCQkJCQk8L3Rib2R5Pg0KCgkJCQkJCQkJCQkJCQkJ
+CQkJCQk8L3RhYmxlPg0KCgkJCQkJCQkJCQkJCQkJCQkJCTwvdGQ+DQoKCQkJCQkJCQkJCQkJCQkJ
+CQk8L3RyPg0KCgkJCQkJCQkJCQkJCQkJCQk8L3Rib2R5Pg0KCgkJCQkJCQkJCQkJCQkJCTwvdGFi
+bGU+DQoKCQkJCQkJCQkJCQkJCQk8L3RkPg0KCgkJCQkJCQkJCQkJCQk8L3RyPg0KCgkJCQkJCQkJ
+CQkJCTwvdGJvZHk+DQoKCQkJCQkJCQkJCQk8L3RhYmxlPg0KCgkJCQkJCQkJCQk8L3RkPg0KCgkJ
+CQkJCQkJCTwvdHI+DQoKCQkJCQkJCQk8L3Rib2R5Pg0KCgkJCQkJCQk8L3RhYmxlPg0KCgkJCQkJ
+CQk8dGFibGUgYWxpZ249ImNlbnRlciIgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBj
+bGFzcz0iZXMtZm9vdGVyIiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsgdGFibGUt
+bGF5b3V0OiBmaXhlZCAhIGltcG9ydGFudDsgd2lkdGg6IDEwMCU7IGJhY2tncm91bmQtY29sb3I6
+IHRyYW5zcGFyZW50OyBiYWNrZ3JvdW5kLXJlcGVhdDogcmVwZWF0OyBiYWNrZ3JvdW5kLXBvc2l0
+aW9uOiBjZW50ZXIgdG9wOyI+DQoKCQkJCQkJCQk8dGJvZHk+DQoKCQkJCQkJCQkJPHRyPg0KCgkJ
+CQkJCQkJCQk8dGQgc3R5bGU9Im1hcmdpbjogMHB0OyBwYWRkaW5nOiAwcHQ7IHRleHQtYWxpZ246
+IGNlbnRlcjsiPg0KCgkJCQkJCQkJCQkJPHN0cm9uZz48c21hbGwgc3R5bGU9ImNvbG9yOiAjYzBj
+MGMwOyI+ZW1haWwgZW52aWFkbyBkYSZuYnNwOzxzdHJvbmcgc3R5bGU9ImJhY2tncm91bmQtY29s
+b3I6ICNmZmZmZmY7Ij48c3BhbiBzdHlsZT0iY29sb3I6ICNmZjAwMDA7Ij4xPC9zcGFuPjxzcGFu
+IHN0eWxlPSJjb2xvcjogI2ZmOGMwMDsiPjI8L3NwYW4+PHNwYW4gc3R5bGU9ImNvbG9yOiAjMDBh
+ZDAwOyI+Mzwvc3Bhbj48L3N0cm9uZz48c3BhbiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogI2Zm
+ZmZmZjsiPjxzcGFuIHN0eWxlPSJjb2xvcjogIzAwMDAwMDsiPm1pbGhhczwvc3Bhbj4gcGFyYTwv
+c3Bhbj4mbmJzcDtuZXRkZXZAdmdlci5rZXJuZWwub3JnDQo8L3NtYWxsPjwvc3Ryb25nPjwvdGQ+
+DQoKCQkJCQkJCQkJPC90cj4NCgoJCQkJCQkJCTwvdGJvZHk+DQoKCQkJCQkJCTwvdGFibGU+DQoK
+CQkJCQkJPC90ZD4NCgoJCQkJCTwvdHI+DQoKCQkJCTwvdGJvZHk+DQoKCQkJPC90YWJsZT4NCgoJ
+CTwvZGl2Pg0KCgkJPGRpdiBzdHlsZT0iY2xlYXI6IGJvdGg7IGRpc3BsYXk6IGJsb2NrOyBoZWln
+aHQ6IDBweDsiPg0KCgkJCSZuYnNwOzwvZGl2Pg0KCgk8L2JvZHk+DQoKPC9odG1sPg0K
 
-Hi, Andrew,
 
-The value is baked into the silicon.
-
-> > > > +#define GNET_REV_LS7A2000    0x00
-> > > > +
-> > > > +static int ls7a2000_config_aneg(struct phy_device *phydev)
-> > > > +{
-> > > > +     if (phydev->speed =3D=3D SPEED_1000)
-> > > > +             phydev->autoneg =3D AUTONEG_ENABLE;
-> > >
-> > > Please explain.
-> > >
-> >
-> > The PHY itself supports half-duplex, but there are issues with the
-> > controller used in the 7A2000 chip. Moreover, the controller only
-> > supports auto-negotiation for gigabit speeds.
->
-> So you can force 10/100/1000, but auto neg only succeeds for 1G?
->
-> Are the LP autoneg values available for genphy_read_lpa() to read? If
-> the LP values are available, maybe the PHY driver can resolve the
-> autoneg for 10 an 100.
->
-
-I apologize for the confusion caused by my previous description. To
-clarify, the PHY supports auto-negotiation and non-auto-negotiation
-for 10/100, but non-auto-negotiation for 1000 does not work correctly.
-
-> > > > +     if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
-> > > > +         phydev->advertising) ||
-> > > > +         linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-> > > > +         phydev->advertising) ||
-> > > > +         linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-> > > > +         phydev->advertising))
-> > > > +         return genphy_config_aneg(phydev);
-> > > > +
-> > > > +     netdev_info(phydev->attached_dev, "Parameter Setting Error\n"=
-);
-> > >
-> > > This also needs explaining. How can it be asked to do something it
-> > > does not support?
-> > >
-> >
-> > Perhaps I missed something, but I think that if someone uses ethtool,
-> > they can request it to perform actions or configurations that the
-> > tool does not support.
->
-> No. The PHY should indicate what it can do, via the .get_abilities()
-> etc. The MAC can also remove some of those link modes if it is more
-> limited than the PHY. phylib will then not allow ksetting_set() to
-> enable things which are not supported. So this should not happen.  It
-> would actually be a bad design, since it would force every driver to
-> do such checks, rather than implement it once in the core.
->
-
-I see.
-
-> > > > +int ls7a2000_match_phy_device(struct phy_device *phydev)
-> > > > +{
-> > > > +     struct net_device *ndev;
-> > > > +     struct pci_dev *pdev;
-> > > > +
-> > > > +     if ((phydev->phy_id & 0xfffffff0) !=3D PHY_ID_LS7A2000)
-> > > > +             return 0;
-> > > > +
-> > > > +     ndev =3D phydev->mdio.bus->priv;
-> > > > +     pdev =3D to_pci_dev(ndev->dev.parent);
-> > > > +
-> > > > +     return pdev->revision =3D=3D GNET_REV_LS7A2000;
-> > >
-> > > That is very unusual. Why is the PHY ID not sufficient?
-> > >
-> >
-> > To work around the controller's issues, we enable the usage of this
-> > driver specifically for a certain version of the 7A2000 chip.
-> >
-> > > > +}
-> > > > +
-> > > > +static struct phy_driver loongson_phy_driver[] =3D {
-> > > > +     {
-> > > > +             PHY_ID_MATCH_MODEL(PHY_ID_LS7A2000),
-> > > > +             .name                   =3D "LS7A2000 PHY",
-> > > > +             .features               =3D PHY_LOONGSON_FEATURES,
-> > >
-> > > So what are the capabilities of this PHY? You seem to have some very
-> > > odd hacks here, and no explanation of why they are needed. If you do
-> > > something which no other device does, you need to explain it.
-> > >
-> > > Does the PHY itself only support full duplex? No half duplex? Does th=
-e
-> > > PHY support autoneg? Does it support fixed settings? What does
-> > > genphy_read_abilities() return for this PHY?
-> > >
-> >
-> > As mentioned earlier, this driver is specifically designed for the PHY
-> > on the problematic 7A2000 chip. Therefore, we assume that this PHY only
-> > supports full- duplex mode and performs auto-negotiation exclusively fo=
-r
-> > gigabit speeds.
->
-> So what does genphy_read_abilities() return?
->
-> Nobody else going to use PHY_LOONGSON_FEATURES, so i would prefer not
-> to add it to the core. If your PHY is designed correctly,
-> genphy_read_abilities() should determine what the PHY can do from its
-> registers. If the registers are wrong, it is better to add a
-> .get_features function.
->
-
-genphy_read_abilities() returns 0, and it seems to be working fine.
-The registers are incorrect, so I will use the .get_features function
-to clear some of the half-duplex bits.
-
-Thanks,
-Feiyang
-
->         Andrew
 
