@@ -1,70 +1,143 @@
-Return-Path: <netdev+bounces-18277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01307563DD
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:10:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FFDE756464
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 15:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086F82811B3
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:10:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AAA328124E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 13:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB574AD5D;
-	Mon, 17 Jul 2023 13:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2185EBA20;
+	Mon, 17 Jul 2023 13:21:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E6AAD50
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:10:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0BC6C433C8;
-	Mon, 17 Jul 2023 13:10:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689599409;
-	bh=bbIvg+6N9/Fwez4K2lqCRQuVEWn56jz9r7IzmBSXJlE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tdcq1f4qS70rQgHAJgZ9j2AXUnOXfWAmrrhl1QgMkw9GV+R5Y5bZA/OnuLjVkC5ez
-	 hjVsRurVXkMYLSZvDiKY7xZ7YIjbO4BJhygezynysBArrhXNdddA/Q9RaRHqG6xRtO
-	 m1mX1gxp+7UBkfByV8BqUR2e228d0GfCgRkcgTiCzOO3Qubp3PR1ioTpOFNajpVMFt
-	 XFKdmGOgPwWa/KBsIyLZMjzPWxU4/hN/cd780SJXvJ3vEAWEl85phKbytAr7FmkfiK
-	 0D9HdiuFl2I2e7Cn9UzmfUlRPBpO0JKaoSDboYpUqFhMUaqJx/s87zFJZlzlMvwfwv
-	 TjUkYnJaO6EWQ==
-Date: Mon, 17 Jul 2023 16:10:06 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Ganesh G R <ganeshgr@linux.ibm.com>, Moshe Shemesh <moshe@nvidia.com>
-Cc: saeedm@nvidia.com, netdev@vger.kernel.org, oohall@gmail.com,
-	Mahesh Salgaonkar <mahesh@linux.ibm.com>
-Subject: Re: EEH recovery failing on mlx5 card
-Message-ID: <20230717131006.GA346905@unreal>
-References: <c13fa245-64ed-f87c-fd1e-e618fe017359@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168E1AD3C
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 13:21:33 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1EB111C;
+	Mon, 17 Jul 2023 06:21:32 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b8bd586086so36098505ad.2;
+        Mon, 17 Jul 2023 06:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689600092; x=1692192092;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c2+TqzzMMJ8tIs0YiQkQJBe8T5oRWHDzcE3x8WKO+0g=;
+        b=LGoroM2Fs7bytsFkuU9SMW7CiFdWXh0kCW7DfmzMVRcTyX6jK4jjiqM1U8AhvXXFgH
+         mCUEvEJJghTOAw5YLrY8JCR0VdI8n69FbnpXcCbEddBNV4NK8w6lZmDauCMi4Xqw0LJ8
+         I+yo2+ek91pwDd0B2Z8oLD19VW32bKkk+3Yzie0/KW8x8mMT5gP0S8Ywcmc1djn4RsOD
+         lONvcL7XHWgu93rksXiQ2GYRTdfXujpCemWLon+eNttNOzS1vfzivPDJkzXycS66JzWz
+         ldFq3LSL+iDcZOOd5FRv1RZkuUGrAVSJSDEQBat3eCdHx8xycHY0GaQWlvxZI64TipYN
+         8/Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689600092; x=1692192092;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c2+TqzzMMJ8tIs0YiQkQJBe8T5oRWHDzcE3x8WKO+0g=;
+        b=IsJmWE+sDyix+h7ujXGeC/WjnKNP+sNZj8FC3Bb6Rxk8vasVnW5KmtpbLmSmqMEtQm
+         7oEEOMnj3w72701AAMSjw4I7JT25HrHsiqe3zSGEcQhpz5/zW5Xv7/SJoZqE16OPz1Tv
+         ObRAVa5f9xCUEzXYhRCg2Uj0zreKqy8gfQ/A9Fpf+pRprGZDMh6y7CuPmVk9cjgTCRhb
+         sD/1A8/5MQ2a6GzZc1sOHNPbdpUqxOiPNFjX3FDUWfnnIueMXgUMqUm/MKUw5s/pl5z6
+         BqfZQQzjlfTOphy1XDOCrXDISYTDwpBe4LMfrBr3tlilxa8dSzldUS/QAiBwzjlObtQi
+         NCrw==
+X-Gm-Message-State: ABy/qLbdRytOeBwGHPTdvt+WgeisqshZtjEzjI1y2YgDXMzy2PfFM+58
+	JFxXh50Gs1pbuaZiAP4lR3uxmD/FehtVu4KlmSk=
+X-Google-Smtp-Source: APBJJlHqjpsNqE2MbqN0SJFcETqZDMlqUnoOdBLQnh76NNmR/LEL3VNeuq+aK3qLOMmXmme0QKsEao4F7OYcG5BJ+OY=
+X-Received: by 2002:a17:902:d507:b0:1b8:5bd0:fe12 with SMTP id
+ b7-20020a170902d50700b001b85bd0fe12mr14958744plg.16.1689600091991; Mon, 17
+ Jul 2023 06:21:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c13fa245-64ed-f87c-fd1e-e618fe017359@linux.ibm.com>
+References: <20230311180630.4011201-1-zyytlz.wz@163.com> <20230710114253.GA132195@google.com>
+ <20230710091545.5df553fc@kernel.org> <20230712115633.GB10768@google.com>
+ <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
+ <a116e972-dfcf-6923-1ad3-a40870e02f6a@omp.ru> <CAJedcCz1ynutATi9qev1t3-moXti_19ZJSzgC2t-5q4JAYG3dw@mail.gmail.com>
+ <CAJedcCydqmVBrNq_RCDF2gRds39XqWORFi32MV+9LGa5p28dPQ@mail.gmail.com> <20230717130408.GC1082701@google.com>
+In-Reply-To: <20230717130408.GC1082701@google.com>
+From: Zheng Hacker <hackerzheng666@gmail.com>
+Date: Mon, 17 Jul 2023 21:21:17 +0800
+Message-ID: <CAJedcCw4oLmc3PgOjo-wf92KoPv0hDFvgT7ZFxXtcrS+QoEgTg@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
+To: Lee Jones <lee@kernel.org>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, Jakub Kicinski <kuba@kernel.org>, Zheng Wang <zyytlz.wz@163.com>, 
+	davem@davemloft.net, linyunsheng@huawei.com, edumazet@google.com, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	1395428693sheep@gmail.com, alex000young@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-+ Moshe
+Lee Jones <lee@kernel.org> =E4=BA=8E2023=E5=B9=B47=E6=9C=8817=E6=97=A5=E5=
+=91=A8=E4=B8=80 21:04=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Sun, 16 Jul 2023, Zheng Hacker wrote:
+> > Zheng Hacker <hackerzheng666@gmail.com> =E4=BA=8E2023=E5=B9=B47=E6=9C=
+=8816=E6=97=A5=E5=91=A8=E6=97=A5 10:11=E5=86=99=E9=81=93=EF=BC=9A
+> > >
+> > > Hello,
+> > >
+> > > This bug is found by static analysis. I'm sorry that my friends apply
+> > > for a CVE number before we really fix it. We made a list about the
+> > > bugs we have submitted and wouldn't disclose them before the fix. But
+> > > we had a inconsistent situation last month. And we applied it by
+> > > mistake foe we thought we had fixed it. And so sorry about my late
+> > > reply, I'll see the patch right now.
+> > >
+> > > Best regards,
+> > > Zheng Wang
+> > >
+> > > Sergey Shtylyov <s.shtylyov@omp.ru> =E4=BA=8E2023=E5=B9=B47=E6=9C=881=
+6=E6=97=A5=E5=91=A8=E6=97=A5 04:48=E5=86=99=E9=81=93=EF=BC=9A
+> > > >
+> > > > On 7/15/23 7:07 PM, Zheng Hacker wrote:
+> > > >
+> > > > > Sorry for my late reply. I'll see what I can do later.
+> > > >
+> > > >    That's good to hear!
+> > > >    Because I'm now only able to look at it during weekends...
+> > > >
+> > > > > Lee Jones <lee@kernel.org> =E4=BA=8E2023=E5=B9=B47=E6=9C=8812=E6=
+=97=A5=E5=91=A8=E4=B8=89 19:56=E5=86=99=E9=81=93=EF=BC=9A
+> > > > >>
+> > > > >> On Mon, 10 Jul 2023, Jakub Kicinski wrote:
+> > > > >>
+> > > > >>> On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
+> > > > >>>> For better or worse, it looks like this issue was assigned a C=
+VE.
+> > > > >>>
+> > > > >>> Ugh, what a joke.
+> > > > >>
+> > > > >> I think that's putting it politely. :)
+> >
+> > After reviewing the code, I think it's better to put the code in
+> > ravb_remove. For the ravb_remove is bound with the device and
+> > ravb_close is bound with the file. We may not call ravb_close if
+> > there's no file opened.
+>
+> When you do submit this, would you be kind enough to Cc me please?
+>
 
-On Mon, Jul 17, 2023 at 12:48:37PM +0530, Ganesh G R wrote:
-> Hi,
-> 
-> mlx5 cards are failing to recover from PCI errors, Upon investigation we found that the
-> driver is trying to do MMIO in the middle of EEH error handling.
-> The following fix in mlx5_pci_err_detected() is fixing the issue, Do you think its the right fix?
-> 
-> @@ -1847,6 +1847,7 @@ static pci_ers_result_t mlx5_pci_err_detected(struct pci_dev *pdev,
->         mlx5_unload_one(dev, true);
->         mlx5_drain_health_wq(dev);
->         mlx5_pci_disable_device(dev);
-> +       cancel_delayed_work_sync(&clock->timer.overflow_work);
->         res = state == pci_channel_io_perm_failure ?
->                 PCI_ERS_RESULT_DISCONNECT : PCI_ERS_RESULT_NEED_RESET;
-> 
-> Regards
-> Ganesh
+Oh sorry for my rudeness. I use reply to all in gmail and it didn't
+add new people from conversation.
+
+MBR,
+Zheng
+> --
+> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
 
