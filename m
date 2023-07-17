@@ -1,128 +1,113 @@
-Return-Path: <netdev+bounces-18168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F157755A03
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 05:14:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A7B755A13
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 05:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AAA728110D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 03:14:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FF672811FB
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 03:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73C1FAD;
-	Mon, 17 Jul 2023 03:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A444C98;
+	Mon, 17 Jul 2023 03:27:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656B71FA2
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 03:12:46 +0000 (UTC)
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 37CCB172C;
-	Sun, 16 Jul 2023 20:12:39 -0700 (PDT)
-Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 2987A601858F3;
-	Mon, 17 Jul 2023 11:12:30 +0800 (CST)
-X-MD-Sfrom: yunchuan@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Wu Yunchuan <yunchuan@nfschina.com>
-To: rmody@marvell.com,
-	skalluru@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Wu Yunchuan <yunchuan@nfschina.com>
-Subject: [PATCH net-next v3 9/9] net: bna: Remove unnecessary (void*) conversions
-Date: Mon, 17 Jul 2023 11:12:29 +0800
-Message-Id: <20230717031229.55169-1-yunchuan@nfschina.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843BA15B4
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 03:27:15 +0000 (UTC)
+Received: from mail.208.org (unknown [183.242.55.162])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC5DD18D
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 20:27:13 -0700 (PDT)
+Received: from mail.208.org (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTP id 4R46vf6fcXzBHXhg
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 11:27:10 +0800 (CST)
+Authentication-Results: mail.208.org (amavisd-new); dkim=pass
+	reason="pass (just generated, assumed good)" header.d=208.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
+	content-transfer-encoding:content-type:message-id:user-agent
+	:references:in-reply-to:subject:to:from:date:mime-version; s=
+	dkim; t=1689564430; x=1692156431; bh=Oyj+TYnFM2nBhAsEqO9sGZFdi1T
+	41zSnIhBu9yxAGig=; b=ceI4ja6mW2skrEWD0o2pcg+KUCD/H0WA9GfGx+bcsEL
+	uvNfgn10YaPtOjeWgzS0m9V4b/j6ZrZKaEZafMlOhmI8k1eCvUKDUNgLJMDeG/9U
+	p/6uDHVH/qWT3l1DDYtCdEtpiWsIWzSqYPNMduQPMuiJgCwctTkqs9Omb54wYGeL
+	44z5rBWCbFmZxGGhKOC1VlwnLQEe81kbCguVaXQWy1Y6ypNTDSbXvCBQri4iEK0f
+	8IOwiV1G4cb0qKsdBxFxxVRSC3jEdsC7pHNGAt+NXLD/jGDvnFO73la4W/xtoPv3
+	qYaBU2BCOCWn7PeLmK68HLaBiXQqxFHw97Uwca1cLPw==
+X-Virus-Scanned: amavisd-new at mail.208.org
+Received: from mail.208.org ([127.0.0.1])
+	by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id cHJD7h0nocig for <netdev@vger.kernel.org>;
+	Mon, 17 Jul 2023 11:27:10 +0800 (CST)
+Received: from localhost (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTPSA id 4R46vf1jWLzBHXR9;
+	Mon, 17 Jul 2023 11:27:10 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Date: Mon, 17 Jul 2023 11:27:10 +0800
+From: hanyu001@208suo.com
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] 3c59x: Add space around '='
+In-Reply-To: <tencent_7B6F5BD00E87F90524CC452645A9D0DB2007@qq.com>
+References: <tencent_7B6F5BD00E87F90524CC452645A9D0DB2007@qq.com>
+User-Agent: Roundcube Webmail
+Message-ID: <304ca645a55aa0affe830bd36edaf24d@208suo.com>
+X-Sender: hanyu001@208suo.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-No need cast (void*) to (struct bnad_tx_info *) or
-(struct bnad_rx_info *).
+Fix checkpatch warnings:
 
-Signed-off-by: Wu Yunchuan <yunchuan@nfschina.com>
+./drivers/net/ethernet/3com/3c59x.c:716: ERROR: spaces required around 
+that '=' (ctx:VxV)
+./drivers/net/ethernet/3com/3c59x.c:717: ERROR: spaces required around 
+that '=' (ctx:VxV)
+./drivers/net/ethernet/3com/3c59x.c:717: ERROR: spaces required around 
+that '=' (ctx:VxV)
+./drivers/net/ethernet/3com/3c59x.c:717: ERROR: spaces required around 
+that '=' (ctx:VxV)
+./drivers/net/ethernet/3com/3c59x.c:717: ERROR: spaces required around 
+that '=' (ctx:VxV)
+
+Signed-off-by: maqimei <2433033762@qq.com>
 ---
- drivers/net/ethernet/brocade/bna/bnad.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+  drivers/net/ethernet/3com/3c59x.c | 4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/brocade/bna/bnad.c b/drivers/net/ethernet/brocade/bna/bnad.c
-index d6d90f9722a7..31191b520b58 100644
---- a/drivers/net/ethernet/brocade/bna/bnad.c
-+++ b/drivers/net/ethernet/brocade/bna/bnad.c
-@@ -1037,8 +1037,7 @@ bnad_cb_ccb_destroy(struct bnad *bnad, struct bna_ccb *ccb)
- static void
- bnad_cb_tx_stall(struct bnad *bnad, struct bna_tx *tx)
- {
--	struct bnad_tx_info *tx_info =
--			(struct bnad_tx_info *)tx->priv;
-+	struct bnad_tx_info *tx_info = tx->priv;
- 	struct bna_tcb *tcb;
- 	u32 txq_id;
- 	int i;
-@@ -1056,7 +1055,7 @@ bnad_cb_tx_stall(struct bnad *bnad, struct bna_tx *tx)
- static void
- bnad_cb_tx_resume(struct bnad *bnad, struct bna_tx *tx)
- {
--	struct bnad_tx_info *tx_info = (struct bnad_tx_info *)tx->priv;
-+	struct bnad_tx_info *tx_info = tx->priv;
- 	struct bna_tcb *tcb;
- 	u32 txq_id;
- 	int i;
-@@ -1133,7 +1132,7 @@ bnad_tx_cleanup(struct delayed_work *work)
- static void
- bnad_cb_tx_cleanup(struct bnad *bnad, struct bna_tx *tx)
- {
--	struct bnad_tx_info *tx_info = (struct bnad_tx_info *)tx->priv;
-+	struct bnad_tx_info *tx_info = tx->priv;
- 	struct bna_tcb *tcb;
- 	int i;
- 
-@@ -1149,7 +1148,7 @@ bnad_cb_tx_cleanup(struct bnad *bnad, struct bna_tx *tx)
- static void
- bnad_cb_rx_stall(struct bnad *bnad, struct bna_rx *rx)
- {
--	struct bnad_rx_info *rx_info = (struct bnad_rx_info *)rx->priv;
-+	struct bnad_rx_info *rx_info = rx->priv;
- 	struct bna_ccb *ccb;
- 	struct bnad_rx_ctrl *rx_ctrl;
- 	int i;
-@@ -1208,7 +1207,7 @@ bnad_rx_cleanup(void *work)
- static void
- bnad_cb_rx_cleanup(struct bnad *bnad, struct bna_rx *rx)
- {
--	struct bnad_rx_info *rx_info = (struct bnad_rx_info *)rx->priv;
-+	struct bnad_rx_info *rx_info = rx->priv;
- 	struct bna_ccb *ccb;
- 	struct bnad_rx_ctrl *rx_ctrl;
- 	int i;
-@@ -1231,7 +1230,7 @@ bnad_cb_rx_cleanup(struct bnad *bnad, struct bna_rx *rx)
- static void
- bnad_cb_rx_post(struct bnad *bnad, struct bna_rx *rx)
- {
--	struct bnad_rx_info *rx_info = (struct bnad_rx_info *)rx->priv;
-+	struct bnad_rx_info *rx_info = rx->priv;
- 	struct bna_ccb *ccb;
- 	struct bna_rcb *rcb;
- 	struct bnad_rx_ctrl *rx_ctrl;
--- 
-2.30.2
+diff --git a/drivers/net/ethernet/3com/3c59x.c 
+b/drivers/net/ethernet/3com/3c59x.c
+index 082388b..9aa3244 100644
+--- a/drivers/net/ethernet/3com/3c59x.c
++++ b/drivers/net/ethernet/3com/3c59x.c
+@@ -713,8 +713,8 @@ static void window_set(struct vortex_private *vp, 
+int window)
+     Note that we deviate from the 3Com order by checking 10base2 before 
+AUI.
+   */
+  enum xcvr_types {
+-    XCVR_10baseT=0, XCVR_AUI, XCVR_10baseTOnly, XCVR_10base2, 
+XCVR_100baseTx,
+-    XCVR_100baseFx, XCVR_MII=6, XCVR_NWAY=8, XCVR_ExtMII=9, 
+XCVR_Default=10,
++    XCVR_10baseT = 0, XCVR_AUI, XCVR_10baseTOnly, XCVR_10base2, 
+XCVR_100baseTx,
++    XCVR_100baseFx, XCVR_MII = 6, XCVR_NWAY = 8, XCVR_ExtMII = 9, 
+XCVR_Default = 10,
+  };
 
+  static const struct media_table {
 
