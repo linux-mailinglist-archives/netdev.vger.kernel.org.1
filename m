@@ -1,290 +1,380 @@
-Return-Path: <netdev+bounces-18239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83762755F4C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:33:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9DD755F5B
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37DE7281435
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:33:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDA8D1C20A15
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98797A92D;
-	Mon, 17 Jul 2023 09:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A3DA94A;
+	Mon, 17 Jul 2023 09:33:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2E39474
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:33:29 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF911BE
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:33:27 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-668709767b1so2999115b3a.2
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:33:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689586407; x=1692178407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/u80+EdvVEefTiJRJQTQb1DBYM+msReiCOPys+1qsOY=;
-        b=EIDnh0qDUX3I/uyeHQT+yigdei0v/HVnUlmxKbX3+x64043MEW1NvYStijVW+GuPdd
-         JZBz7kj7e02v+omH7qT9Vp6gbcWgsvEXzRkgnSEMEozYyB7yI4wWDojjlcOcNRKYyeJT
-         D7Dbr6+fVwHUh3LB5VTdSgIMJYlfkhBPDsMbXno/FbY8z/XKy+8cE5nIDwXdAy5ixqK0
-         i5iytPQkZ1qbp1+k+0Ncawjw7bkWheR1jOEeC0Ct1Wf/7l+UYmhIgyVUukqXizEEQXgU
-         b85Xi9RLXHxMSRHBVAHuQbsh0SGgPBU5RkgybY6PVBmF+WoxYsPjCTYZ8QYkBuqTBrZN
-         G8bQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689586407; x=1692178407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/u80+EdvVEefTiJRJQTQb1DBYM+msReiCOPys+1qsOY=;
-        b=UuIhvwbq0M/JoChnU5P2b16F2nKmEO384YWPGFBRf0USMdSZ0Xs13jselhHuuqudoS
-         JSwd9VD/7fkNhSD/S4CsmC5jcBwMjsS2LKiL5HajYCS4WadCB43Fvt67BdHCES8XqZeW
-         LZ/glIOj+22O3VC4zVxWZmYcspBjMymmJZAdcdCjk/YRyk2MKab8V6hXUwwFzxo+Kgjl
-         oZ0aP0XNIY16O1X/+6YdHKEnIRSd7jJimkyUye6VomSiz59WNH7o9LmcmPx4JHWysesr
-         hC1UkPHG49QTHy84vRHhJbs9D4FRvRckFkYLn83o+0Vbmp3QIPlvvICXdPP+sAYiUPjj
-         Qh7A==
-X-Gm-Message-State: ABy/qLZeDKMPTH8JewJUksFV5bN8++2KwakGb70qCbcIIzDe9v7NKTdl
-	zXCkiTYyncdeNm4eV8ohFhjPbw1awVdV2Q==
-X-Google-Smtp-Source: APBJJlHg/iwioXRoQ2fg/uKyqxFjepg2eCxWGpZmp7Tgmu9Oft7RT6c9gnI+rhGtVX/PPim58qBoew==
-X-Received: by 2002:a05:6a20:3ca0:b0:134:80b3:896 with SMTP id b32-20020a056a203ca000b0013480b30896mr4823548pzj.17.1689586406616;
-        Mon, 17 Jul 2023 02:33:26 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a10-20020a62bd0a000000b00682ad3613eesm11569890pff.51.2023.07.17.02.33.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 02:33:25 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Beniamino Galvani <bgalvani@redhat.com>
-Subject: [PATCH net-next] IPv6: add extack info for inet6_addr_add/del
-Date: Mon, 17 Jul 2023 17:33:16 +0800
-Message-Id: <20230717093316.2428813-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176A6A929
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:33:54 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A691410E6;
+	Mon, 17 Jul 2023 02:33:52 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H8V0Yj026383;
+	Mon, 17 Jul 2023 02:33:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=pfpt0220; bh=jcnoKj+3A+kq+bkfNVHg92JPmySG7/OrLEHs8Pz541M=;
+ b=CqoPUGZwmczqG9syZZklqsvBj97G83izY2BaZlvGJbShgS1rcwtSQwFMebfhG+KGwDjv
+ Olgqd8micGgc0tgIdnUBdksS4TFttcY987AHKx8ltIu7jw5EN+YBaWeb5Nk6JD2kbeni
+ zf73sGnAfyMhgxP7fQ0WUUT44IaoUbrMjc/Pg5EyA/ERhi8izJos091S3NZKlY3PL2xo
+ W+UHNKQEXxg2gmv8Fs7xShptul9hGcX8HiPv0JKOGLgQeVaClszl59CbodBMv4XiFxqb
+ 1zgFKhR7qLJRMQ+URjVgYdm6SsSyI2KHs0H18XTsoDepCUAf/v60BGd2TNagfiYSh/ep rA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rutyguygk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jul 2023 02:33:34 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 17 Jul
+ 2023 02:33:32 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 17 Jul 2023 02:33:32 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.134])
+	by maili.marvell.com (Postfix) with ESMTP id B7BD43F70A5;
+	Mon, 17 Jul 2023 02:33:26 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>,
+        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
+        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
+Subject: [net-next Patch v3 1/4] octeontx2-pf: implement transmit schedular allocation algorithm
+Date: Mon, 17 Jul 2023 15:03:16 +0530
+Message-ID: <20230717093319.26618-2-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230717093319.26618-1-hkelam@marvell.com>
+References: <20230717093319.26618-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Proofpoint-GUID: Mb_iFGsNSMT102kUtFSJpwVXrxO2FVbH
+X-Proofpoint-ORIG-GUID: Mb_iFGsNSMT102kUtFSJpwVXrxO2FVbH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-17_07,2023-07-13_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add extack info for inet6_addr_add(), ipv6_add_addr() and
-inet6_addr_del(), which would be useful for users to understand the
-problem without having to read kernel code.
+From: Naveen Mamindlapalli <naveenm@marvell.com>
 
-Suggested-by: Beniamino Galvani <bgalvani@redhat.com>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+unlike strict priority, where number of classes are limited to max
+8, there is no restriction on the number of dwrr child nodes unless
+the count increases the max number of child nodes supported.
+
+Hardware expects strict priority transmit schedular indexes mapped
+to their priority. This patch adds defines transmit schedular allocation
+algorithm such that the above requirement is honored.
+
+Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 ---
- net/ipv6/addrconf.c | 66 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 48 insertions(+), 18 deletions(-)
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  | 136 +++++++++++++++++-
+ .../net/ethernet/marvell/octeontx2/nic/qos.h  |   6 +
+ 2 files changed, 136 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index e5213e598a04..199de4b37f24 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -1066,15 +1066,19 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
- 	     !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) ||
- 	    (!(idev->dev->flags & IFF_LOOPBACK) &&
- 	     !netif_is_l3_master(idev->dev) &&
--	     addr_type & IPV6_ADDR_LOOPBACK))
-+	     addr_type & IPV6_ADDR_LOOPBACK)) {
-+		NL_SET_ERR_MSG(extack, "Cannot assign requested address");
- 		return ERR_PTR(-EADDRNOTAVAIL);
-+	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+index d3a76c5ccda8..919cd01b7f02 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+@@ -19,6 +19,7 @@
+ #define OTX2_QOS_CLASS_NONE		0
+ #define OTX2_QOS_DEFAULT_PRIO		0xF
+ #define OTX2_QOS_INVALID_SQ		0xFFFF
++#define OTX2_QOS_INVALID_TXSCHQ_IDX	0xFFFF
  
- 	if (idev->dead) {
--		err = -ENODEV;			/*XXX*/
-+		NL_SET_ERR_MSG(extack, "No such device");
-+		err = -ENODEV;
- 		goto out;
+ static void otx2_qos_update_tx_netdev_queues(struct otx2_nic *pfvf)
+ {
+@@ -315,9 +316,14 @@ static void otx2_qos_fill_cfg_tl(struct otx2_qos_node *parent,
+ 
+ 	list_for_each_entry(node, &parent->child_list, list) {
+ 		otx2_qos_fill_cfg_tl(node, cfg);
+-		cfg->schq_contig[node->level]++;
+ 		otx2_qos_fill_cfg_schq(node, cfg);
  	}
- 
- 	if (idev->cnf.disable_ipv6) {
-+		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
- 		err = -EACCES;
- 		goto out;
- 	}
-@@ -1097,12 +1101,14 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
- 
- 	ifa = kzalloc(sizeof(*ifa), gfp_flags | __GFP_ACCOUNT);
- 	if (!ifa) {
-+		NL_SET_ERR_MSG(extack, "No buffer space available");
- 		err = -ENOBUFS;
- 		goto out;
- 	}
- 
- 	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags);
- 	if (IS_ERR(f6i)) {
-+		NL_SET_ERR_MSG(extack, "Dest allocate failed");
- 		err = PTR_ERR(f6i);
- 		f6i = NULL;
- 		goto out;
-@@ -1142,6 +1148,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
- 
- 	err = ipv6_add_addr_hash(idev->dev, ifa);
- 	if (err < 0) {
-+		NL_SET_ERR_MSG(extack, "IPv6 address add failed");
- 		rcu_read_unlock();
- 		goto out;
- 	}
-@@ -2488,18 +2495,22 @@ static void addrconf_add_mroute(struct net_device *dev)
- 	ip6_route_add(&cfg, GFP_KERNEL, NULL);
++
++	/* Assign the required number of transmit schedular queues under the
++	 * given class
++	 */
++	cfg->schq_contig[parent->level - 1] += parent->child_dwrr_cnt +
++					       parent->max_static_prio + 1;
  }
  
--static struct inet6_dev *addrconf_add_dev(struct net_device *dev)
-+static struct inet6_dev *addrconf_add_dev(struct net_device *dev, struct netlink_ext_ack *extack)
- {
- 	struct inet6_dev *idev;
+ static void otx2_qos_prepare_txschq_cfg(struct otx2_nic *pfvf,
+@@ -401,9 +407,13 @@ static int otx2_qos_add_child_node(struct otx2_qos_node *parent,
+ 	struct otx2_qos_node *tmp_node;
+ 	struct list_head *tmp;
  
- 	ASSERT_RTNL();
++	if (node->prio > parent->max_static_prio)
++		parent->max_static_prio = node->prio;
++
+ 	for (tmp = head->next; tmp != head; tmp = tmp->next) {
+ 		tmp_node = list_entry(tmp, struct otx2_qos_node, list);
+-		if (tmp_node->prio == node->prio)
++		if (tmp_node->prio == node->prio &&
++		    tmp_node->is_static)
+ 			return -EEXIST;
+ 		if (tmp_node->prio > node->prio) {
+ 			list_add_tail(&node->list, tmp);
+@@ -476,6 +486,7 @@ otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
+ 	node->rate = otx2_convert_rate(rate);
+ 	node->ceil = otx2_convert_rate(ceil);
+ 	node->prio = prio;
++	node->is_static = true;
  
- 	idev = ipv6_find_idev(dev);
--	if (IS_ERR(idev))
-+	if (IS_ERR(idev)) {
-+		NL_SET_ERR_MSG(extack, "No such device");
- 		return idev;
-+	}
+ 	__set_bit(qid, pfvf->qos.qos_sq_bmap);
  
--	if (idev->cnf.disable_ipv6)
-+	if (idev->cnf.disable_ipv6) {
-+		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
- 		return ERR_PTR(-EACCES);
-+	}
+@@ -628,6 +639,21 @@ static int otx2_qos_txschq_alloc(struct otx2_nic *pfvf,
+ 	return rc;
+ }
  
- 	/* Add default multicast route */
- 	if (!(dev->flags & IFF_LOOPBACK) && !netif_is_l3_master(dev))
-@@ -2919,21 +2930,29 @@ static int inet6_addr_add(struct net *net, int ifindex,
- 
- 	ASSERT_RTNL();
- 
--	if (cfg->plen > 128)
-+	if (cfg->plen > 128) {
-+		NL_SET_ERR_MSG(extack, "IPv6 address prefix length larger than 128");
- 		return -EINVAL;
-+	}
- 
- 	/* check the lifetime */
--	if (!cfg->valid_lft || cfg->preferred_lft > cfg->valid_lft)
-+	if (!cfg->valid_lft || cfg->preferred_lft > cfg->valid_lft) {
-+		NL_SET_ERR_MSG(extack, "IPv6 address lifetime invalid");
- 		return -EINVAL;
-+	}
- 
--	if (cfg->ifa_flags & IFA_F_MANAGETEMPADDR && cfg->plen != 64)
-+	if (cfg->ifa_flags & IFA_F_MANAGETEMPADDR && cfg->plen != 64) {
-+		NL_SET_ERR_MSG(extack, "IPv6 address with mngtmpaddr flag must have prefix length 64");
- 		return -EINVAL;
-+	}
- 
- 	dev = __dev_get_by_index(net, ifindex);
--	if (!dev)
-+	if (!dev) {
-+		NL_SET_ERR_MSG(extack, "Unable to find the interface");
- 		return -ENODEV;
-+	}
- 
--	idev = addrconf_add_dev(dev);
-+	idev = addrconf_add_dev(dev, extack);
- 	if (IS_ERR(idev))
- 		return PTR_ERR(idev);
- 
-@@ -2941,8 +2960,10 @@ static int inet6_addr_add(struct net *net, int ifindex,
- 		int ret = ipv6_mc_config(net->ipv6.mc_autojoin_sk,
- 					 true, cfg->pfx, ifindex);
- 
--		if (ret < 0)
-+		if (ret < 0) {
-+			NL_SET_ERR_MSG(extack, "Multicast auto join failed");
- 			return ret;
++static void otx2_qos_free_unused_txschq(struct otx2_nic *pfvf,
++					struct otx2_qos_cfg *cfg)
++{
++	int lvl, idx, schq;
++
++	for (lvl = 0; lvl < NIX_TXSCH_LVL_CNT; lvl++) {
++		for (idx = 0; idx < cfg->schq_contig[lvl]; idx++) {
++			if (!cfg->schq_index_used[lvl][idx]) {
++				schq = cfg->schq_contig_list[lvl][idx];
++				otx2_txschq_free_one(pfvf, lvl, schq);
++			}
 +		}
++	}
++}
++
+ static void otx2_qos_txschq_fill_cfg_schq(struct otx2_nic *pfvf,
+ 					  struct otx2_qos_node *node,
+ 					  struct otx2_qos_cfg *cfg)
+@@ -652,9 +678,11 @@ static void otx2_qos_txschq_fill_cfg_tl(struct otx2_nic *pfvf,
+ 	list_for_each_entry(tmp, &node->child_list, list) {
+ 		otx2_qos_txschq_fill_cfg_tl(pfvf, tmp, cfg);
+ 		cnt = cfg->static_node_pos[tmp->level];
+-		tmp->schq = cfg->schq_contig_list[tmp->level][cnt];
++		tmp->schq = cfg->schq_contig_list[tmp->level][tmp->txschq_idx];
++		cfg->schq_index_used[tmp->level][tmp->txschq_idx] = true;
+ 		if (cnt == 0)
+-			node->prio_anchor = tmp->schq;
++			node->prio_anchor =
++				cfg->schq_contig_list[tmp->level][0];
+ 		cfg->static_node_pos[tmp->level]++;
+ 		otx2_qos_txschq_fill_cfg_schq(pfvf, tmp, cfg);
  	}
- 
- 	cfg->scope = ipv6_addr_scope(cfg->pfx);
-@@ -2999,22 +3020,29 @@ static int inet6_addr_add(struct net *net, int ifindex,
+@@ -667,9 +695,87 @@ static void otx2_qos_txschq_fill_cfg(struct otx2_nic *pfvf,
+ 	mutex_lock(&pfvf->qos.qos_lock);
+ 	otx2_qos_txschq_fill_cfg_tl(pfvf, node, cfg);
+ 	otx2_qos_txschq_fill_cfg_schq(pfvf, node, cfg);
++	otx2_qos_free_unused_txschq(pfvf, cfg);
+ 	mutex_unlock(&pfvf->qos.qos_lock);
  }
  
- static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
--			  const struct in6_addr *pfx, unsigned int plen)
-+			  const struct in6_addr *pfx, unsigned int plen,
-+			  struct netlink_ext_ack *extack)
- {
- 	struct inet6_ifaddr *ifp;
- 	struct inet6_dev *idev;
- 	struct net_device *dev;
- 
--	if (plen > 128)
-+	if (plen > 128) {
-+		NL_SET_ERR_MSG(extack, "IPv6 address prefix length larger than 128");
- 		return -EINVAL;
++static void __otx2_qos_assign_base_idx_tl(struct otx2_nic *pfvf,
++					  struct otx2_qos_node *tmp,
++					  unsigned long *child_idx_bmap,
++					  int child_cnt)
++{
++	int idx;
++
++	if (tmp->txschq_idx != OTX2_QOS_INVALID_TXSCHQ_IDX)
++		return;
++
++	/* assign static nodes 1:1 prio mapping first, then remaining nodes */
++	for (idx = 0; idx < child_cnt; idx++) {
++		if (tmp->is_static && tmp->prio == idx &&
++		    !test_bit(idx, child_idx_bmap)) {
++			tmp->txschq_idx = idx;
++			set_bit(idx, child_idx_bmap);
++			return;
++		} else if (!tmp->is_static && idx >= tmp->prio &&
++			   !test_bit(idx, child_idx_bmap)) {
++			tmp->txschq_idx = idx;
++			set_bit(idx, child_idx_bmap);
++			return;
++		}
 +	}
- 
- 	dev = __dev_get_by_index(net, ifindex);
--	if (!dev)
-+	if (!dev) {
-+		NL_SET_ERR_MSG(extack, "Unable to find the interface");
- 		return -ENODEV;
++}
++
++static int otx2_qos_assign_base_idx_tl(struct otx2_nic *pfvf,
++				       struct otx2_qos_node *node)
++{
++	unsigned long *child_idx_bmap;
++	struct otx2_qos_node *tmp;
++	int child_cnt;
++
++	list_for_each_entry(tmp, &node->child_list, list)
++		tmp->txschq_idx = OTX2_QOS_INVALID_TXSCHQ_IDX;
++
++	/* allocate child index array */
++	child_cnt = node->child_dwrr_cnt + node->max_static_prio + 1;
++	child_idx_bmap = kcalloc(BITS_TO_LONGS(child_cnt),
++				 sizeof(unsigned long),
++				 GFP_KERNEL);
++	if (!child_idx_bmap)
++		return -ENOMEM;
++
++	list_for_each_entry(tmp, &node->child_list, list)
++		otx2_qos_assign_base_idx_tl(pfvf, tmp);
++
++	/* assign base index of static priority children first */
++	list_for_each_entry(tmp, &node->child_list, list) {
++		if (!tmp->is_static)
++			continue;
++		__otx2_qos_assign_base_idx_tl(pfvf, tmp, child_idx_bmap,
++					      child_cnt);
 +	}
++
++	/* assign base index of dwrr priority children */
++	list_for_each_entry(tmp, &node->child_list, list)
++		__otx2_qos_assign_base_idx_tl(pfvf, tmp, child_idx_bmap,
++					      child_cnt);
++
++	kfree(child_idx_bmap);
++
++	return 0;
++}
++
++static int otx2_qos_assign_base_idx(struct otx2_nic *pfvf,
++				    struct otx2_qos_node *node)
++{
++	int ret = 0;
++
++	mutex_lock(&pfvf->qos.qos_lock);
++	ret = otx2_qos_assign_base_idx_tl(pfvf, node);
++	mutex_unlock(&pfvf->qos.qos_lock);
++
++	return ret;
++}
++
+ static int otx2_qos_txschq_push_cfg_schq(struct otx2_nic *pfvf,
+ 					 struct otx2_qos_node *node,
+ 					 struct otx2_qos_cfg *cfg)
+@@ -761,8 +867,10 @@ static void otx2_qos_free_cfg(struct otx2_nic *pfvf, struct otx2_qos_cfg *cfg)
  
- 	idev = __in6_dev_get(dev);
--	if (!idev)
-+	if (!idev) {
-+		NL_SET_ERR_MSG(extack, "No such address on the device");
- 		return -ENXIO;
-+	}
- 
- 	read_lock_bh(&idev->lock);
- 	list_for_each_entry(ifp, &idev->addr_list, if_list) {
-@@ -3037,6 +3065,8 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+ 	for (lvl = 0; lvl < NIX_TXSCH_LVL_CNT; lvl++) {
+ 		for (idx = 0; idx < cfg->schq_contig[lvl]; idx++) {
+-			schq = cfg->schq_contig_list[lvl][idx];
+-			otx2_txschq_free_one(pfvf, lvl, schq);
++			if (cfg->schq_index_used[lvl][idx]) {
++				schq = cfg->schq_contig_list[lvl][idx];
++				otx2_txschq_free_one(pfvf, lvl, schq);
++			}
  		}
  	}
- 	read_unlock_bh(&idev->lock);
+ }
+@@ -838,6 +946,10 @@ static int otx2_qos_push_txschq_cfg(struct otx2_nic *pfvf,
+ 	if (ret)
+ 		return -ENOSPC;
+ 
++	ret = otx2_qos_assign_base_idx(pfvf, node);
++	if (ret)
++		return -ENOMEM;
 +
-+	NL_SET_ERR_MSG(extack, "IPv6 address not found");
- 	return -EADDRNOTAVAIL;
- }
+ 	if (!(pfvf->netdev->flags & IFF_UP)) {
+ 		otx2_qos_txschq_fill_cfg(pfvf, node, cfg);
+ 		return 0;
+@@ -995,6 +1107,7 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
+ 	if (ret)
+ 		goto out;
  
-@@ -3079,7 +3109,7 @@ int addrconf_del_ifaddr(struct net *net, void __user *arg)
++	parent->child_static_cnt++;
+ 	set_bit(prio, parent->prio_bmap);
  
- 	rtnl_lock();
- 	err = inet6_addr_del(net, ireq.ifr6_ifindex, 0, &ireq.ifr6_addr,
--			     ireq.ifr6_prefixlen);
-+			     ireq.ifr6_prefixlen, NULL);
- 	rtnl_unlock();
- 	return err;
- }
-@@ -3378,7 +3408,7 @@ static void addrconf_dev_config(struct net_device *dev)
- 		return;
+ 	/* read current txschq configuration */
+@@ -1067,6 +1180,7 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
+ free_old_cfg:
+ 	kfree(old_cfg);
+ reset_prio:
++	parent->child_static_cnt--;
+ 	clear_bit(prio, parent->prio_bmap);
+ out:
+ 	return ret;
+@@ -1105,6 +1219,7 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
+ 		goto out;
  	}
  
--	idev = addrconf_add_dev(dev);
-+	idev = addrconf_add_dev(dev, NULL);
- 	if (IS_ERR(idev))
- 		return;
++	node->child_static_cnt++;
+ 	set_bit(prio, node->prio_bmap);
  
-@@ -4692,7 +4722,7 @@ inet6_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	ifa_flags &= IFA_F_MANAGETEMPADDR;
+ 	/* store the qid to assign to leaf node */
+@@ -1178,6 +1293,7 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
+ free_old_cfg:
+ 	kfree(old_cfg);
+ reset_prio:
++	node->child_static_cnt--;
+ 	clear_bit(prio, node->prio_bmap);
+ out:
+ 	return ret;
+@@ -1207,6 +1323,10 @@ static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
+ 	otx2_qos_destroy_node(pfvf, node);
+ 	pfvf->qos.qid_to_sqmap[qid] = OTX2_QOS_INVALID_SQ;
  
- 	return inet6_addr_del(net, ifm->ifa_index, ifa_flags, pfx,
--			      ifm->ifa_prefixlen);
-+			      ifm->ifa_prefixlen, extack);
- }
++	parent->child_static_cnt--;
++	if (!parent->child_static_cnt)
++		parent->max_static_prio = 0;
++
+ 	clear_bit(prio, parent->prio_bmap);
  
- static int modify_prefix_route(struct inet6_ifaddr *ifp,
+ 	return 0;
+@@ -1245,6 +1365,10 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
+ 	otx2_qos_destroy_node(pfvf, node);
+ 	pfvf->qos.qid_to_sqmap[qid] = OTX2_QOS_INVALID_SQ;
+ 
++	parent->child_static_cnt--;
++	if (!parent->child_static_cnt)
++		parent->max_static_prio = 0;
++
+ 	clear_bit(prio, parent->prio_bmap);
+ 
+ 	/* create downstream txschq entries to parent */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.h b/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
+index 19773284be27..faa7c24675d1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
+@@ -35,6 +35,7 @@ struct otx2_qos_cfg {
+ 	int dwrr_node_pos[NIX_TXSCH_LVL_CNT];
+ 	u16 schq_contig_list[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
+ 	u16 schq_list[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
++	bool schq_index_used[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
+ };
+ 
+ struct otx2_qos {
+@@ -62,7 +63,12 @@ struct otx2_qos_node {
+ 	u16 schq; /* hw txschq */
+ 	u16 qid;
+ 	u16 prio_anchor;
++	u16 max_static_prio;
++	u16 child_dwrr_cnt;
++	u16 child_static_cnt;
++	u16 txschq_idx;			/* txschq allocation index */
+ 	u8 level;
++	bool is_static;
+ };
+ 
+ 
 -- 
-2.38.1
+2.17.1
 
 
