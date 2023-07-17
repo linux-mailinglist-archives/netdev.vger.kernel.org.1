@@ -1,156 +1,295 @@
-Return-Path: <netdev+bounces-18189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C425755B3C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:11:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF105755B62
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E9561C20A8F
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:11:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CFBA280CA5
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A303749C;
-	Mon, 17 Jul 2023 06:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D18C79D0;
+	Mon, 17 Jul 2023 06:17:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E4D7468
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:11:47 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E1791A2;
-	Sun, 16 Jul 2023 23:11:45 -0700 (PDT)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H5q85a022843;
-	Mon, 17 Jul 2023 06:11:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=QAX9M/71yumqClxYIhzg8mRJCRKATa2Q0XV9RfYS86o=;
- b=klO7d7aYVqSaBOYqPZdQ6k+MY9YXtSIn5NzuxPyFjx4pSMN5gMZ5ONlSZ0cF0ta3Smn1
- xk+6Wgsqy/1G2ZR7PdM8UB2RzX/6E8iysjXdbe0zcT81bPBzYI2pxG3CHdpmWyq2GTcO
- B7cqGbEMJXzkLOW87GEhyM+ZWW0sxzWEI+xndu+9r9j+UItTYXuPewhyUJRWTJ/OVd8/
- UmXoDyFQ+N4JhHzd7aa7gpI9i3Dv9LlxB9ovtb3urJCVSDlYGWlrdS698AKqLMVibnLs
- pNqbScnvSpnKDn9YCJxcefwyVBLSWN57FskmaOkxQH1rhZ5rBUClzr+JGtgNn8XS0HVO Zw== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3run1jjj05-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jul 2023 06:11:12 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36H6BADH014572
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jul 2023 06:11:10 GMT
-Received: from [10.216.50.105] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Sun, 16 Jul
- 2023 23:11:03 -0700
-Message-ID: <d05dc42c-1d22-6d95-0b59-501c085945e8@quicinc.com>
-Date: Mon, 17 Jul 2023 11:40:55 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913DF79C3
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:17:00 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13312E6C;
+	Sun, 16 Jul 2023 23:16:57 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H5Tr3s020470;
+	Sun, 16 Jul 2023 23:16:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=YYE3l/chdEUu4J3VJCtdXbycyYH/ZJyk5hWf8+d4CkI=;
+ b=M2KAh5YNZr8WNWjw19oVy+qTxNtgr4IoRyvsSM6eanxYIEn/hQsxpb8LpN4FcxSuaqlB
+ zLgtf2WHhpIis9rqe0G4xSMVw+gCRteLl/LSsUCHcAFMsIEFcn380pohevlegA1MPI+Z
+ rB1I+8QJLasPZScgUPqfF602eiQloVb4nonJfDwIlglHDhoy9ydaCSfLm/DbTm7u1fhx
+ 9BXLj/dhalXQFv2CnEbp7iDOfJJg0APUSD66zElgXMG18OprVzYDqeeSvZ2iRB2WmoW/
+ 63RHgGNEOjvAyDRYwAJReSsUTeAEYm5SWSzqonidAmfz5NogxfWdY/mISnsfqPdtrHUW bA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rvyhx0448-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 16 Jul 2023 23:16:50 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 16 Jul
+ 2023 23:16:49 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 16 Jul 2023 23:16:49 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id E80A33F709F;
+	Sun, 16 Jul 2023 23:16:45 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <naveenm@marvell.com>,
+        Subbaraya Sundeep
+	<sbhatta@marvell.com>
+Subject: [net PATCH v2] octeontx2-pf: mcs: Generate hash key using ecb(aes)
+Date: Mon, 17 Jul 2023 11:46:43 +0530
+Message-ID: <1689574603-28093-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 3/6] dt-bindings: clock: Add ipq9574 NSSCC clock and reset
- definitions
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
-        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <netdev@vger.kernel.org>
-CC: <quic_saahtoma@quicinc.com>
-References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
- <20230711093529.18355-4-quic_devipriy@quicinc.com>
- <5f16f5c0-c63e-9e16-b55d-ac90977bc863@linaro.org>
-Content-Language: en-US
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <5f16f5c0-c63e-9e16-b55d-ac90977bc863@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: icqKtH9C1UZNOkdmo7tbgXEfsf8ovgrH
-X-Proofpoint-GUID: icqKtH9C1UZNOkdmo7tbgXEfsf8ovgrH
+Content-Type: text/plain
+X-Proofpoint-GUID: vS5mXqN34Ndgmw2DlYoZkpbblb_m1ZTZ
+X-Proofpoint-ORIG-GUID: vS5mXqN34Ndgmw2DlYoZkpbblb_m1ZTZ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-17_05,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- bulkscore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 spamscore=0
- phishscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307170055
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hardware generated encryption and ICV tags are found to
+be wrong when tested with IEEE MACSEC test vectors.
+This is because as per the HRM, the hash key (derived by
+AES-ECB block encryption of an all 0s block with the SAK)
+has to be programmed by the software in
+MCSX_RS_MCS_CPM_TX_SLAVE_SA_PLCY_MEM_4X register.
+Hence fix this by generating hash key in software and
+configuring in hardware.
 
+Fixes: c54ffc73601c ("octeontx2-pf: mcs: Introduce MACSEC hardware offloading")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
 
-On 7/11/2023 3:24 PM, Krzysztof Kozlowski wrote:
-> On 11/07/2023 11:35, Devi Priya wrote:
->> Add NSSCC clock and reset definitions for ipq9574.
->>
->> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->> ---
->>   .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  76 +++++++++
->>   .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
->>   .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
->>   3 files changed, 362 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
->>   create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
->>   create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
->>
->> diff --git a/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
->> new file mode 100644
->> index 000000000000..1e8754760785
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
->> @@ -0,0 +1,76 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/clock/qcom,ipq9574-nsscc.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Qualcomm Networking Sub System Clock & Reset Controller on IPQ9574
->> +
->> +maintainers:
->> +  - Bjorn Andersson <andersson@kernel.org>
->> +  - Anusha Rao <quic_anusha@quicinc.com>
->> +
->> +description: |
->> +  Qualcomm networking sub system clock control module provides the clocks,
->> +  resets and power domains on IPQ9574
->> +
->> +  See also::
->> +    include/dt-bindings/clock/qcom,ipq9574-nsscc.h
->> +    include/dt-bindings/reset/qcom,ipq9574-nsscc.h
->> +
-> 
-> Reference gcc.yaml and drop all duplicated properties.
+v2 changes:
+ Check for return value of crypto_skcipher_setkey function
+ Removed unnecessary zero inits of variables
+ Added seperate labels
 
-Sure, okay
+ .../ethernet/marvell/octeontx2/nic/cn10k_macsec.c  | 137 +++++++++++++++------
+ 1 file changed, 100 insertions(+), 37 deletions(-)
 
-Thanks,
-Devi Priya
-> 
-> 
-> Best regards,
-> Krzysztof
-> 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+index 6e2fb24..59b1382 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+@@ -4,6 +4,7 @@
+  * Copyright (C) 2022 Marvell.
+  */
+ 
++#include <crypto/skcipher.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/bitfield.h>
+ #include "otx2_common.h"
+@@ -42,6 +43,56 @@
+ #define MCS_TCI_E			0x08 /* encryption */
+ #define MCS_TCI_C			0x04 /* changed text */
+ 
++#define CN10K_MAX_HASH_LEN		16
++#define CN10K_MAX_SAK_LEN		32
++
++static int cn10k_ecb_aes_encrypt(struct otx2_nic *pfvf, u8 *sak,
++				 u16 sak_len, u8 *hash)
++{
++	u8 data[CN10K_MAX_HASH_LEN] = { 0 };
++	struct skcipher_request *req = NULL;
++	struct scatterlist sg_src, sg_dst;
++	struct crypto_skcipher *tfm;
++	DECLARE_CRYPTO_WAIT(wait);
++	int err;
++
++	tfm = crypto_alloc_skcipher("ecb(aes)", 0, 0);
++	if (IS_ERR(tfm)) {
++		dev_err(pfvf->dev, "failed to allocate transform for ecb-aes\n");
++		return PTR_ERR(tfm);
++	}
++
++	req = skcipher_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		dev_err(pfvf->dev, "failed to allocate request for skcipher\n");
++		err = -ENOMEM;
++		goto free_tfm;
++	}
++
++	err = crypto_skcipher_setkey(tfm, sak, sak_len);
++	if (err) {
++		dev_err(pfvf->dev, "failed to set key for skcipher\n");
++		goto free_req;
++	}
++
++	/* build sg list */
++	sg_init_one(&sg_src, data, CN10K_MAX_HASH_LEN);
++	sg_init_one(&sg_dst, hash, CN10K_MAX_HASH_LEN);
++
++	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
++	skcipher_request_set_crypt(req, &sg_src, &sg_dst,
++				   CN10K_MAX_HASH_LEN, NULL);
++
++	err = crypto_skcipher_encrypt(req);
++	err = crypto_wait_req(err, &wait);
++
++free_req:
++	skcipher_request_free(req);
++free_tfm:
++	crypto_free_skcipher(tfm);
++	return err;
++}
++
+ static struct cn10k_mcs_txsc *cn10k_mcs_get_txsc(struct cn10k_mcs_cfg *cfg,
+ 						 struct macsec_secy *secy)
+ {
+@@ -330,19 +381,53 @@ static int cn10k_mcs_write_sc_cam(struct otx2_nic *pfvf,
+ 	return ret;
+ }
+ 
++static int cn10k_mcs_write_keys(struct otx2_nic *pfvf,
++				struct macsec_secy *secy,
++				struct mcs_sa_plcy_write_req *req,
++				u8 *sak, u8 *salt, ssci_t ssci)
++{
++	u8 hash_rev[CN10K_MAX_HASH_LEN];
++	u8 sak_rev[CN10K_MAX_SAK_LEN];
++	u8 salt_rev[MACSEC_SALT_LEN];
++	u8 hash[CN10K_MAX_HASH_LEN];
++	u32 ssci_63_32;
++	int err, i;
++
++	err = cn10k_ecb_aes_encrypt(pfvf, sak, secy->key_len, hash);
++	if (err) {
++		dev_err(pfvf->dev, "Generating hash using ECB(AES) failed\n");
++		return err;
++	}
++
++	for (i = 0; i < secy->key_len; i++)
++		sak_rev[i] = sak[secy->key_len - 1 - i];
++
++	for (i = 0; i < CN10K_MAX_HASH_LEN; i++)
++		hash_rev[i] = hash[CN10K_MAX_HASH_LEN - 1 - i];
++
++	for (i = 0; i < MACSEC_SALT_LEN; i++)
++		salt_rev[i] = salt[MACSEC_SALT_LEN - 1 - i];
++
++	ssci_63_32 = (__force u32)cpu_to_be32((__force u32)ssci);
++
++	memcpy(&req->plcy[0][0], sak_rev, secy->key_len);
++	memcpy(&req->plcy[0][4], hash_rev, CN10K_MAX_HASH_LEN);
++	memcpy(&req->plcy[0][6], salt_rev, MACSEC_SALT_LEN);
++	req->plcy[0][7] |= (u64)ssci_63_32 << 32;
++
++	return 0;
++}
++
+ static int cn10k_mcs_write_rx_sa_plcy(struct otx2_nic *pfvf,
+ 				      struct macsec_secy *secy,
+ 				      struct cn10k_mcs_rxsc *rxsc,
+ 				      u8 assoc_num, bool sa_in_use)
+ {
+-	unsigned char *src = rxsc->sa_key[assoc_num];
+ 	struct mcs_sa_plcy_write_req *plcy_req;
+-	u8 *salt_p = rxsc->salt[assoc_num];
++	u8 *sak = rxsc->sa_key[assoc_num];
++	u8 *salt = rxsc->salt[assoc_num];
+ 	struct mcs_rx_sc_sa_map *map_req;
+ 	struct mbox *mbox = &pfvf->mbox;
+-	u64 ssci_salt_95_64 = 0;
+-	u8 reg, key_len;
+-	u64 salt_63_0;
+ 	int ret;
+ 
+ 	mutex_lock(&mbox->lock);
+@@ -360,20 +445,10 @@ static int cn10k_mcs_write_rx_sa_plcy(struct otx2_nic *pfvf,
+ 		goto fail;
+ 	}
+ 
+-	for (reg = 0, key_len = 0; key_len < secy->key_len; key_len += 8) {
+-		memcpy((u8 *)&plcy_req->plcy[0][reg],
+-		       (src + reg * 8), 8);
+-		reg++;
+-	}
+-
+-	if (secy->xpn) {
+-		memcpy((u8 *)&salt_63_0, salt_p, 8);
+-		memcpy((u8 *)&ssci_salt_95_64, salt_p + 8, 4);
+-		ssci_salt_95_64 |= (__force u64)rxsc->ssci[assoc_num] << 32;
+-
+-		plcy_req->plcy[0][6] = salt_63_0;
+-		plcy_req->plcy[0][7] = ssci_salt_95_64;
+-	}
++	ret = cn10k_mcs_write_keys(pfvf, secy, plcy_req, sak,
++				   salt, rxsc->ssci[assoc_num]);
++	if (ret)
++		goto fail;
+ 
+ 	plcy_req->sa_index[0] = rxsc->hw_sa_id[assoc_num];
+ 	plcy_req->sa_cnt = 1;
+@@ -586,13 +661,10 @@ static int cn10k_mcs_write_tx_sa_plcy(struct otx2_nic *pfvf,
+ 				      struct cn10k_mcs_txsc *txsc,
+ 				      u8 assoc_num)
+ {
+-	unsigned char *src = txsc->sa_key[assoc_num];
+ 	struct mcs_sa_plcy_write_req *plcy_req;
+-	u8 *salt_p = txsc->salt[assoc_num];
++	u8 *sak = txsc->sa_key[assoc_num];
++	u8 *salt = txsc->salt[assoc_num];
+ 	struct mbox *mbox = &pfvf->mbox;
+-	u64 ssci_salt_95_64 = 0;
+-	u8 reg, key_len;
+-	u64 salt_63_0;
+ 	int ret;
+ 
+ 	mutex_lock(&mbox->lock);
+@@ -603,19 +675,10 @@ static int cn10k_mcs_write_tx_sa_plcy(struct otx2_nic *pfvf,
+ 		goto fail;
+ 	}
+ 
+-	for (reg = 0, key_len = 0; key_len < secy->key_len; key_len += 8) {
+-		memcpy((u8 *)&plcy_req->plcy[0][reg], (src + reg * 8), 8);
+-		reg++;
+-	}
+-
+-	if (secy->xpn) {
+-		memcpy((u8 *)&salt_63_0, salt_p, 8);
+-		memcpy((u8 *)&ssci_salt_95_64, salt_p + 8, 4);
+-		ssci_salt_95_64 |= (__force u64)txsc->ssci[assoc_num] << 32;
+-
+-		plcy_req->plcy[0][6] = salt_63_0;
+-		plcy_req->plcy[0][7] = ssci_salt_95_64;
+-	}
++	ret = cn10k_mcs_write_keys(pfvf, secy, plcy_req, sak,
++				   salt, txsc->ssci[assoc_num]);
++	if (ret)
++		goto fail;
+ 
+ 	plcy_req->plcy[0][8] = assoc_num;
+ 	plcy_req->sa_index[0] = txsc->hw_sa_id[assoc_num];
+-- 
+2.7.4
+
 
