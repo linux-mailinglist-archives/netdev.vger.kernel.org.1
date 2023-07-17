@@ -1,52 +1,51 @@
-Return-Path: <netdev+bounces-18325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB0247566D0
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:51:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B4B37566D2
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74DD32811D4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:51:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 130832813F6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471BE253C3;
-	Mon, 17 Jul 2023 14:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58617253CA;
+	Mon, 17 Jul 2023 14:51:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF75253BA
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 14:50:57 +0000 (UTC)
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.216])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E049E4C
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:50:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D92B253BB
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 14:51:03 +0000 (UTC)
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9D965B2
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=dj4U30xF+0JTV9W8PP
-	GYwgBUlnynRBs4kwtLJluCopk=; b=MEuDSPPruhi2Ok/R1KtBeTnwt6v3+cIm7j
-	R6UgVnnR2eN3fL+dk2DFbGY+8Ma//+k/p3of+x54Pa7XEZpI+6n94QmZb7q5OEIV
-	Tr/igwOEueDxeqhh0DztibpyM0g2J7T5kU314rQcPwWJVxl2gfLbA3hsYjKQmKZT
-	X33Xm8KjM=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=Jy3ZiZtqQdwy+l4bnE
+	M5Hd8reUGe43hZFmNw0iE2Hrw=; b=lhr81nlrUXvdks49TqOfJZ1v8muWV2cyaA
+	4ZZjM62ndvGYyOYjsFpL1V1kWaX4S9ogsP2M4q8YjlisTvMPV1+kdy+z9NgauQ/A
+	VzohuAmMjUcLMI3XXNAlB2tIMqEJyqX7Xoc7x/DPplG0LqHuDXym0l3zUlJjGnRy
+	VTVFRYCjA=
 Received: from localhost.localdomain (unknown [202.112.113.212])
-	by zwqz-smtp-mta-g3-1 (Coremail) with SMTP id _____wBnbysyVbVkwrwyAg--.57325S4;
-	Mon, 17 Jul 2023 22:50:29 +0800 (CST)
+	by zwqz-smtp-mta-g2-1 (Coremail) with SMTP id _____wBHIrBKVbVkPFg1Ag--.37240S4;
+	Mon, 17 Jul 2023 22:50:53 +0800 (CST)
 From: Yuanjun Gong <ruc_gongyuanjun@163.com>
 To: Yuanjun Gong <ruc_gongyuanjun@163.com>,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH 1/1] net:openvswitch: check return value of pskb_trim()
-Date: Mon, 17 Jul 2023 22:50:24 +0800
-Message-Id: <20230717145024.27274-1-ruc_gongyuanjun@163.com>
+Subject: [PATCH 1/1] net:tipc: check return value of pskb_trim()
+Date: Mon, 17 Jul 2023 22:50:49 +0800
+Message-Id: <20230717145049.27642-1-ruc_gongyuanjun@163.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:_____wBnbysyVbVkwrwyAg--.57325S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7JFWxurW5JF18Cw4xtrykuFg_yoWfGwcEkw
-	4ft3WkGw47GwsYyr40kr45tr4kZw4IkFyrZ3WSqFW5C3s0q395WrW8CFs7Cr13Way7Wr98
-	Xan8CrWxKF1fGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRKrWrPUUUUU==
+X-CM-TRANSID:_____wBHIrBKVbVkPFg1Ag--.37240S4
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JFWxurWxCw4ftr1xuFW5trb_yoWDtFX_uF
+	yFgr18Ww4UGwn5ur4UZanFqr95Ww4kuFWkC3ySyFWUWa4DJa1kZFZ5urnxC348uFsrW3Zx
+	Gws8GF1jgwnrujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRMZ2aPUUUUU==
 X-Originating-IP: [202.112.113.212]
-X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/xtbBiBmv5VaEFzdftwAAsB
+X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/xtbBSRKv5VaEH4VL4gAAsw
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,RCVD_IN_MSPIKE_L4,
@@ -60,32 +59,37 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-do kfree_skb() if an unexpected result is returned by pskb_tirm()
-in do_output().
+goto free_skb if an unexpected result is returned by pskb_tirm()
+in tipc_crypto_rcv_complete().
 
 Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 ---
- net/openvswitch/actions.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/tipc/crypto.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index cab1e02b63e0..6b3456bdff1c 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -920,9 +920,11 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index 577fa5af33ec..1b86cea261a5 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -1894,6 +1894,7 @@ static void tipc_crypto_rcv_complete(struct net *net, struct tipc_aead *aead,
+ 	struct tipc_aead *tmp = NULL;
+ 	struct tipc_ehdr *ehdr;
+ 	struct tipc_node *n;
++	int ret;
  
- 		if (unlikely(cutlen > 0)) {
- 			if (skb->len - cutlen > ovs_mac_header_len(key))
--				pskb_trim(skb, skb->len - cutlen);
-+				if (pskb_trim(skb, skb->len - cutlen))
-+					kfree_skb(skb);
- 			else
--				pskb_trim(skb, ovs_mac_header_len(key));
-+				if (pskb_trim(skb, ovs_mac_header_len(key)))
-+					kfree_skb(skb);
- 		}
+ 	/* Is this completed by TX? */
+ 	if (unlikely(is_tx(aead->crypto))) {
+@@ -1960,7 +1961,9 @@ static void tipc_crypto_rcv_complete(struct net *net, struct tipc_aead *aead,
  
- 		if (likely(!mru ||
+ 	skb_reset_network_header(*skb);
+ 	skb_pull(*skb, tipc_ehdr_size(ehdr));
+-	pskb_trim(*skb, (*skb)->len - aead->authsize);
++	ret = pskb_trim(*skb, (*skb)->len - aead->authsize);
++	if (ret)
++		goto free_skb;
+ 
+ 	/* Validate TIPCv2 message */
+ 	if (unlikely(!tipc_msg_validate(skb))) {
 -- 
 2.17.1
 
