@@ -1,137 +1,152 @@
-Return-Path: <netdev+bounces-18218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F17755D94
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:54:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21105755D95
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89F1A1C20AA7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:54:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F5FA1C20A1E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:56:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7167B9467;
-	Mon, 17 Jul 2023 07:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1009467;
+	Mon, 17 Jul 2023 07:56:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6244E9466
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:54:33 +0000 (UTC)
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC8CC7
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:54:30 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b8413671b9so31856481fa.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:54:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12188493
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:56:39 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC5893;
+	Mon, 17 Jul 2023 00:56:37 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4fdb3f66fd6so2361589e87.3;
+        Mon, 17 Jul 2023 00:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689580469; x=1692172469;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZSBd91l9FNsoBWVb9MzxA3Uq4ofSW5cSlRh40pUiQk=;
-        b=IW94wvQ5HIaX+HQfYIRd395f9Jz97urs+aA4EiV0ktMZLxdkEDlD+PldNzTG9JNiny
-         RtHygeaWia6NLjdICYkJBjYMzDlHR4ar+HWFJgCFqq/obGuWJr8Lj5XKzDLJ7xB8/FCS
-         1a2vhEQD9LrxbxMYeEI0NvZfEk2dY+OaKqyl8FX6cvCkhAX47GKbSS6iqO7XYwWz1sz5
-         2D48miHERFsp2djM7UA/bUsYNM9x+PWQQ0rzcx9+aQOHfjn5Aikj18xYpD08Xc2y42Wb
-         NH4N5W3lyb/9NpD4yvy79ta6uPJwQBV7VAWu56Z2raWd1YQ/fP/b83oiSDDHGt+YDGgu
-         R8bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689580469; x=1692172469;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20221208; t=1689580596; x=1692172596;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sZSBd91l9FNsoBWVb9MzxA3Uq4ofSW5cSlRh40pUiQk=;
-        b=JFHJcbLMPrifN/T200lq+NiCoLS9yjM0zdmVjwaedrDTtgRy/xDI9WMUTu2MptuOrw
-         RwMYcYbE1RTygPWJ/khZEd/XngH5fR4o+YbFmCnM4TdngQIGS1oWQjV62PIMwLATtVv6
-         pHHsv6vsvF6w6xpaPiycc0Xx3/KuyeCjeibEbEg52MGGDgjGzhv/0EHMVz7N2LoPdI5Q
-         7KcKv3LKVDgUXm2E4gqjcx25+PenVzlv/SpQMcyzynkLn4jELydbHDpU93kYXGDWpC6p
-         mHIXlJeA01aZvsQtsNIM11XHLWwly/X/BteBHAM4SwwPIyrSNkaNxT0ohPdvs2YSoOqH
-         a3yQ==
-X-Gm-Message-State: ABy/qLYm6FMDXsW+EcJy22H1t2p8u2b0jXndwHVRk0FcZIcTfeBKHRjZ
-	xr+20L5bjmOwDJw4I4NdP0B9p2iM2DwSX4asSuKR6e7UpV5SJQ==
-X-Google-Smtp-Source: APBJJlHkWSMUXS4UBL74h9kbGuWgo5PkhE7BDL9rPNe9ixI+NMu6TeZ/CeSZFhe8qMy1rMCCluWE2GbEY685B/4KUAo=
-X-Received: by 2002:a05:651c:3c1:b0:2b6:ef8a:d98d with SMTP id
- f1-20020a05651c03c100b002b6ef8ad98dmr3171003ljp.20.1689580468883; Mon, 17 Jul
- 2023 00:54:28 -0700 (PDT)
+        bh=uzcBHck4XeBHsv947H53e4eFghSZzaJsuiWxGP5iqxw=;
+        b=aK1icLPXTDR0xU45DBZUT5kFzZp+x7tjRpCAIZi/4/7gItfaY6xk8awYtW6SuS3AgK
+         eOS8lt8Fl2y0lBeQOTLb2fWcCuqajJ4KEhWIQ0FO1dntZF1RN7GG8cOZO4U4u4zTTxby
+         bN9Jda/tET2f4M9RnnbkTRhimJCssAMDJCbAFm1HbrNenuU5AsCIoEuZ4zyYr2fX0mST
+         CdiABZdN94edkvKOSvNNVaDToYSlyeNLpO2NoIZQXzUyEIp753USAPsSHx9K7J9QDYBf
+         S+Ml/Xq4wZ0Av9V6Mz36BwQSje86L6CMEZtAhl85YDC7bTYRBsyUVcQEfLvMt8qJQJ1N
+         QgtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689580596; x=1692172596;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uzcBHck4XeBHsv947H53e4eFghSZzaJsuiWxGP5iqxw=;
+        b=NJ/CvB4XS3SSkfKo7W2HIrYqeF6AShxAT2UyGYWAJh1LQuiVr+yVtzt1xlQ2R9ATYE
+         zit/FQIk3gm0bau9LOjH1dDAC/E+E7vGJ841lyQOAJgHLss7DHnMW2UjkOgw8oK+3Qww
+         AbPp4HK1v8xdmk8mQpvXyLPKXrCL5+/13g2B6hLPssyLP/Q3eQ8UD9FDflVE4vG2DVEh
+         GRjbUc3cUWOX+6OCS0y798XbfaxUUko+lUPpSmkLHvWpo2WSDHGjLwwuJwiwHCAFcmmI
+         2pboeW4bMCl2pryhPVYVpGxygYc7eVffJlxSOdxzVBKKCvnVkiG4T6pLjIOjg30VUljZ
+         jU8w==
+X-Gm-Message-State: ABy/qLZDz7QbCJBpH1HIyhuRgt0noRk3eeRW/jhfyjCkR9/6TRnZp5S0
+	Ca4C4Vr+bsysTwg/Zc9uEAcwowvh0/w=
+X-Google-Smtp-Source: APBJJlF/d2LcLXm4aCAC3voDYWq2PYKTB8s9SeU39Eo8j6FYpcSeV/LHlzvm/BdU54Xs8ntQPKpVcg==
+X-Received: by 2002:a2e:9c93:0:b0:2b6:e618:b593 with SMTP id x19-20020a2e9c93000000b002b6e618b593mr7671821lji.31.1689580595285;
+        Mon, 17 Jul 2023 00:56:35 -0700 (PDT)
+Received: from gmail.com ([81.168.73.77])
+        by smtp.gmail.com with ESMTPSA id u1-20020a05600c00c100b003fbb1a9586esm7384812wmm.15.2023.07.17.00.56.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jul 2023 00:56:34 -0700 (PDT)
+Date: Mon, 17 Jul 2023 08:56:32 +0100
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: hanyu001@208suo.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org
+Subject: Re: sfc: falcon: Prefer unsigned int to bare use of unsigned
+Message-ID: <ZLT0MLWQ5Y+7tBC2@gmail.com>
+Mail-Followup-To: hanyu001@208suo.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org
+References: <tencent_EE1674B8CDD721F12D12287A857E04C5DB0A@qq.com>
+ <ab907800461dadf95c332a097f58e6f0@208suo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1689215889.git.chenfeiyang@loongson.cn> <98b53d15bb983c309f79acf9619b88ea4fbb8f14.1689215889.git.chenfeiyang@loongson.cn>
- <e491227b-81a1-4363-b810-501511939f1b@lunn.ch> <CACWXhKmLRK5aGNwDyt5uc0TK8ZXZKuDQuSXW6jku+Ofh73GUvw@mail.gmail.com>
- <ZLELE5ysytsynpjr@shell.armlinux.org.uk>
-In-Reply-To: <ZLELE5ysytsynpjr@shell.armlinux.org.uk>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Mon, 17 Jul 2023 15:54:17 +0800
-Message-ID: <CACWXhKn6Tv+Fk9Nxc-kQKkF847+ZAO1uVxSYkMoaiCaeGYCXzg@mail.gmail.com>
-Subject: Re: [RFC PATCH 10/10] net: stmmac: dwmac-loongson: Add GNET support
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
-	dongbiao@loongson.cn, loongson-kernel@lists.loongnix.cn, 
-	netdev@vger.kernel.org, loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab907800461dadf95c332a097f58e6f0@208suo.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FSL_HELO_FAKE,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 14, 2023 at 4:45=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Fri, Jul 14, 2023 at 10:24:37AM +0800, Feiyang Chen wrote:
-> > On Thu, Jul 13, 2023 at 12:07=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> w=
-rote:
-> > >
-> > > On Thu, Jul 13, 2023 at 10:49:38AM +0800, Feiyang Chen wrote:
-> > > > Add GNET support. Use the fix_mac_speed() callback to workaround
-> > > > issues with the Loongson PHY.
-> > >
-> > > What are the issues?
-> > >
-> >
-> > Hi, Andrew,
-> >
-> > There is an issue with the synchronization between the network card
-> > and the PHY. In the case of gigabit operation, if the PHY's speed
-> > changes, the network card's speed remains unaffected. Hence, it is
-> > necessary to initiate a re-negotiation process with the PHY to align
-> > the link speeds properly.
->
-> Please could you explain a bit more what happens when "the PHY's speed
-> changes". Are you suggesting that:
->
-> You have a connection where the media side has negotiated 1G speed.
-> The gigabit partner is disconnected, so the link goes down, and is then
-> replaced by a partner only capable of 100M. The link comes back up at
-> 100M, but the network card continues trying to operate at 1G?
->
+The subject should start with "[PATCH net-next]".
+Please use ./scripts/get_maintainer.pl to find the correct people
+to send this to.
 
-Hi, Russell, Andrew,
+On Mon, Jul 17, 2023 at 11:43:00AM +0800, hanyu001@208suo.com wrote:
+> Fix checkpatch warnings:
+> 
+> ./drivers/net/ethernet/sfc/falcon/net_driver.h:1167: WARNING: Prefer
+> 'unsigned int' to bare use of 'unsigned'
+> ./drivers/net/ethernet/sfc/falcon/net_driver.h:1188: WARNING: Prefer
+> 'unsigned int' to bare use of 'unsigned'
+> ./drivers/net/ethernet/sfc/falcon/net_driver.h:1188: WARNING: Prefer
+> 'unsigned int' to bare use of 'unsigned'
+> ./drivers/net/ethernet/sfc/falcon/net_driver.h:1202: WARNING: Prefer
+> 'unsigned int' to bare use of 'unsigned'
+> 
+> Signed-off-by: maqimei <2433033762@qq.com>
 
-This bug shows up in the following way: when the speed is set to 1000M,
-PHY is set up correctly and its status is normal. However, the controller
-and PHY don't work well together, causing the controller to fail in
-establishing a gigabit connection, which leads to a network disruption.
-So, we need to use this bit to check if the controller's status is correct
-and reset PHY if necessary.
+This does not match with the From line in your email.
 
-if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
+> ---
+>  drivers/net/ethernet/sfc/falcon/net_driver.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/sfc/falcon/net_driver.h
+> b/drivers/net/ethernet/sfc/falcon/net_driver.h
+> index a2c7139..d2d8f9b 100644
+> --- a/drivers/net/ethernet/sfc/falcon/net_driver.h
+> +++ b/drivers/net/ethernet/sfc/falcon/net_driver.h
+> @@ -1164,7 +1164,7 @@ struct ef4_nic_type {
+> *************************************************************************/
+> 
+>  static inline struct ef4_channel *
+> -ef4_get_channel(struct ef4_nic *efx, unsigned index)
+> +ef4_get_channel(struct ef4_nic *efx, unsigned int  index)
 
-The troublesome issue is that we have to check this bit in stmmac.
-As a result, we are forced to place phy_restart_aneg() there.
+You've added an extra space here after int. Don't do that.
 
-Thanks,
-Feiyang
+Martin
 
-> Thanks.
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  {
+>      EF4_BUG_ON_PARANOID(index >= efx->n_channels);
+>      return efx->channel[index];
+> @@ -1185,7 +1185,7 @@ struct ef4_nic_type {
+>               (_efx)->channel[_channel->channel - 1] : NULL)
+> 
+>  static inline struct ef4_tx_queue *
+> -ef4_get_tx_queue(struct ef4_nic *efx, unsigned index, unsigned type)
+> +ef4_get_tx_queue(struct ef4_nic *efx, unsigned int index, unsigned int
+> type)
+>  {
+>      EF4_BUG_ON_PARANOID(index >= efx->n_tx_channels ||
+>                  type >= EF4_TXQ_TYPES);
+> @@ -1199,7 +1199,7 @@ static inline bool ef4_channel_has_tx_queues(struct
+> ef4_channel *channel)
+>  }
+> 
+>  static inline struct ef4_tx_queue *
+> -ef4_channel_get_tx_queue(struct ef4_channel *channel, unsigned type)
+> +ef4_channel_get_tx_queue(struct ef4_channel *channel, unsigned int type)
+>  {
+>      EF4_BUG_ON_PARANOID(!ef4_channel_has_tx_queues(channel) ||
+>                  type >= EF4_TXQ_TYPES);
 
