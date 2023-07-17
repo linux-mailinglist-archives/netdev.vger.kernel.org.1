@@ -1,216 +1,120 @@
-Return-Path: <netdev+bounces-18410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B849756CC8
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 21:08:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC745756D18
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 21:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB2CF281208
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 19:08:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C3CD28134D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 19:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D45C135;
-	Mon, 17 Jul 2023 19:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B46C14A;
+	Mon, 17 Jul 2023 19:24:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3219F253B8
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 19:08:39 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E171E186
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 12:08:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689620916;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ir1J/k3wLKNYp7LI2ijvFBF6ZKrDfOA6Drq2a2Jon50=;
-	b=B4DThB0Lv+ETPz9tIxnhsTUh5Kp+TOxJvpk8PPAEd97110jklxpxktgtbNDlizQhQoSAvQ
-	HZjPR1G3S0xmT0JBFNTa6k2Ue4F6y+TxzVQiHf3wepfXw4yccXvaXlHhA2gjW3b7dumZS5
-	7UT2PTW3mg/Yi9wPoBAcjZyKoDqE3H8=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-ZhoH9Ms8PL6t7rysHSnzjA-1; Mon, 17 Jul 2023 15:08:35 -0400
-X-MC-Unique: ZhoH9Ms8PL6t7rysHSnzjA-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3487b412e41so17281895ab.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 12:08:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689620914; x=1692212914;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ir1J/k3wLKNYp7LI2ijvFBF6ZKrDfOA6Drq2a2Jon50=;
-        b=FV9OzlNLI7fSzeSdMg5xPiDEqBuaroU92fEPHjfNaIhj7eydZ6OzZRh48SuyQdO+4Y
-         jNsV90O6gmmyBb0Ce6QplhoHyaTf52DIRjtMBaeDc12mrhq96iXU2CD/MdLxE7H7kLZy
-         qHrk7dPW4459JXOFkOL8tD2NfOBxV9ne9+R0EKZA20xA9tuOOnYZaxsE4lJ3az2QV0PB
-         gqgyvcvg364qk37+arOhq07+u6EONbByUAI1ODJ7SQvKtaXQaSA4DDXL7lcuV0Gqo1jH
-         S7HR/lkW4ceuKue1MMtdqYfl5SbHdwMvRTWGHw7zxPFB217Yc3eS9WyeEp2RHNC0WjB5
-         F7CA==
-X-Gm-Message-State: ABy/qLbM5KcWxeVLZae7DXcv/4TAKIXadrlSr6BgTx6dRQAk8MRW9DA8
-	nhnN9vzm44O0+74Ad+U6v+LwWuQYQCBKnqhPY9UvEF7lPlxqbBBAIbSizZuHVj7/7YLpLErkghv
-	eXxwwEPmwp6Pfrthp
-X-Received: by 2002:a05:6e02:1a8b:b0:348:8542:a673 with SMTP id k11-20020a056e021a8b00b003488542a673mr578097ilv.22.1689620914143;
-        Mon, 17 Jul 2023 12:08:34 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlH8IAKDk/Qq0r0DbEq84CfbH5y70uroq/83Nyu0gFtjM6u4GlatJgupAE/Bg/5ujaAlXs4PMg==
-X-Received: by 2002:a05:6e02:1a8b:b0:348:8542:a673 with SMTP id k11-20020a056e021a8b00b003488542a673mr578040ilv.22.1689620913830;
-        Mon, 17 Jul 2023 12:08:33 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id o9-20020a92dac9000000b003460b456030sm129837ilq.60.2023.07.17.12.08.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 12:08:33 -0700 (PDT)
-Date: Mon, 17 Jul 2023 13:08:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Grzegorz Jaszczyk <jaz@semihalf.com>
-Cc: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org,
- linux-aio@kvack.org, linux-usb@vger.kernel.org, Matthew Rosato
- <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>, Tom Rix
- <trix@redhat.com>, Jason Wang <jasowang@redhat.com>,
- dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>,
- linux-mm@kvack.org, Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Jens Axboe <axboe@kernel.dk>, Vineeth Vijayan
- <vneethv@linux.ibm.com>, Diana Craciun <diana.craciun@oss.nxp.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shakeel Butt <shakeelb@google.com>, Vasily
- Gorbik <gor@linux.ibm.com>, Leon Romanovsky <leon@kernel.org>, Harald
- Freudenberger <freude@linux.ibm.com>, Fei Li <fei1.li@intel.com>,
- x86@kernel.org, Roman Gushchin <roman.gushchin@linux.dev>, Halil Pasic
- <pasic@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Ingo Molnar
- <mingo@redhat.com>, intel-gfx@lists.freedesktop.org, Christian Borntraeger
- <borntraeger@linux.ibm.com>, linux-fpga@vger.kernel.org, Zhi Wang
- <zhi.a.wang@intel.com>, Wu Hao <hao.wu@intel.com>, Jason Herne
- <jjherne@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, Andrew Donnellan <ajd@linux.ibm.com>, Arnd
- Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org, Heiko Carstens
- <hca@linux.ibm.com>, Johannes Weiner <hannes@cmpxchg.org>,
- linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>, Borislav
- Petkov <bp@alien8.de>, kvm@vger.kernel.org, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org, Thomas Gleixner
- <tglx@linutronix.de>, virtualization@lists.linux-foundation.org,
- intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>, Tvrtko
- Ursulin <tvrtko.ursulin@linux.intel.com>, Pavel Begunkov
- <asml.silence@gmail.com>, Sean Christopherson <seanjc@google.com>, Oded
- Gabbay <ogabbay@kernel.org>, Muchun Song <muchun.song@linux.dev>, Peter
- Oberparleiter <oberpar@linux.ibm.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Benjamin LaHaise <bcrl@kvack.org>, "Michael S.
- Tsirkin" <mst@redhat.com>, Sven Schnelle <svens@linux.ibm.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Frederic Barrat
- <fbarrat@linux.ibm.com>, Moritz Fischer <mdf@kernel.org>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, David Woodhouse <dwmw2@infradead.org>, Xu Yilun
- <yilun.xu@intel.com>, Dominik Behr <dbehr@chromium.org>, Marcin Wojtas
- <mw@semihalf.com>
-Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
-Message-ID: <20230717130831.0f18381a.alex.williamson@redhat.com>
-In-Reply-To: <CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
-References: <20230630155936.3015595-1-jaz@semihalf.com>
-	<20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
-	<CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F20253CD
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 19:24:22 +0000 (UTC)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD70D1B1;
+	Mon, 17 Jul 2023 12:24:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689621861; x=1721157861;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=K6aw8rLb0s3YE99yLXMvpaVZdlNBdVE1LKgt1NcjRvE=;
+  b=vM42vVNrVNWzaafvohQuxYBcH+a6li5DAL7o5LiBtTp98fgcazB7d+cI
+   uPyjZqWRYqgxy8Vm+j/8LOaRDBMcwdjnMyC/CB6GNkfdO6vYwCFafYSSu
+   Q1i8lu5qilBnTbN5OY9k1Sp5aIjA6cd7wxIvK9PkDN+LfDX4M13x2F0B7
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.01,211,1684800000"; 
+   d="scan'208";a="345055172"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 19:24:18 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com (Postfix) with ESMTPS id 1E69060F73;
+	Mon, 17 Jul 2023 19:24:16 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 17 Jul 2023 19:24:15 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.100.21) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 17 Jul 2023 19:24:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <carlos.bilbao@amd.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <mchan@broadcom.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <prashant@broadcom.com>,
+	<siva.kallam@broadcom.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH] tg3: fix array subscript out of bounds compilation error
+Date: Mon, 17 Jul 2023 12:24:03 -0700
+Message-ID: <20230717192403.96187-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230717143443.163732-1-carlos.bilbao@amd.com>
+References: <20230717143443.163732-1-carlos.bilbao@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.100.21]
+X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 17 Jul 2023 10:29:34 +0200
-Grzegorz Jaszczyk <jaz@semihalf.com> wrote:
+From: Carlos Bilbao <carlos.bilbao@amd.com>
+Date: Mon, 17 Jul 2023 09:34:43 -0500
+> Fix encountered compilation error in tg3.c where an array subscript was
 
-> pt., 14 lip 2023 o 09:05 Christian Brauner <brauner@kernel.org> napisa=C5=
-=82(a):
-> >
-> > On Thu, Jul 13, 2023 at 11:10:54AM -0600, Alex Williamson wrote: =20
-> > > On Thu, 13 Jul 2023 12:05:36 +0200
-> > > Christian Brauner <brauner@kernel.org> wrote:
-> > > =20
-> > > > Hey everyone,
-> > > >
-> > > > This simplifies the eventfd_signal() and eventfd_signal_mask() help=
-ers
-> > > > by removing the count argument which is effectively unused. =20
-> > >
-> > > We have a patch under review which does in fact make use of the
-> > > signaling value:
-> > >
-> > > https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com=
-/ =20
-> >
-> > Huh, thanks for the link.
-> >
-> > Quoting from
-> > https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-=
-jaz@semihalf.com/#25266856
-> > =20
-> > > Reading an eventfd returns an 8-byte value, we generally only use it
-> > > as a counter, but it's been discussed previously and IIRC, it's possi=
-ble
-> > > to use that value as a notification value. =20
-> >
-> > So the goal is to pipe a specific value through eventfd? But it is
-> > explicitly a counter. The whole thing is written around a counter and
-> > each write and signal adds to the counter.
-> >
-> > The consequences are pretty well described in the cover letter of
-> > v6 https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.co=
-m/
-> > =20
-> > > Since the eventfd counter is used as ACPI notification value
-> > > placeholder, the eventfd signaling needs to be serialized in order to
-> > > not end up with notification values being coalesced. Therefore ACPI
-> > > notification values are buffered and signalized one by one, when the
-> > > previous notification value has been consumed. =20
-> >
-> > But isn't this a good indication that you really don't want an eventfd
-> > but something that's explicitly designed to associate specific data with
-> > a notification? Using eventfd in that manner requires serialization,
-> > buffering, and enforces ordering.
+What is the error ?
 
-What would that mechanism be?  We've been iterating on getting the
-serialization and buffering correct, but I don't know of another means
-that combines the notification with a value, so we'd likely end up with
-an eventfd only for notification and a separate ring buffer for
-notification values.
 
-As this series demonstrates, the current in-kernel users only increment
-the counter and most userspace likely discards the counter value, which
-makes the counter largely a waste.  While perhaps unconventional,
-there's no requirement that the counter may only be incremented by one,
-nor any restriction that I see in how userspace must interpret the
-counter value.
+> above the array bounds of 'struct tg3_napi[5]'. Add an additional check in
+> the for loop to ensure that it does not exceed the bounds of
+> 'struct tg3_napi' (defined by TG3_IRQ_MAX_VECS).
+> 
+> Reviewed-By: Carlos Bilbao <carlos.bilbao@amd.com>
+> ---
+>  drivers/net/ethernet/broadcom/tg3.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+> index 4179a12fc881..33ad75b7ed91 100644
+> --- a/drivers/net/ethernet/broadcom/tg3.c
+> +++ b/drivers/net/ethernet/broadcom/tg3.c
+> @@ -17791,7 +17791,7 @@ static int tg3_init_one(struct pci_dev *pdev,
+>  	intmbx = MAILBOX_INTERRUPT_0 + TG3_64BIT_REG_LOW;
+>  	rcvmbx = MAILBOX_RCVRET_CON_IDX_0 + TG3_64BIT_REG_LOW;
+>  	sndmbx = MAILBOX_SNDHOST_PROD_IDX_0 + TG3_64BIT_REG_LOW;
+> -	for (i = 0; i < tp->irq_max; i++) {
+> +	for (i = 0; i < tp->irq_max && i < TG3_IRQ_MAX_VECS; i++) {
 
-As I understand the ACPI notification proposal that Grzegorz links
-below, a notification with an interpreted value allows for a more
-direct userspace implementation when dealing with a series of discrete
-notification with value events.  Thanks,
+I'm not familiar with this driver, but it seem tg3_init_one() calls
+tg3_get_invariants() before the loop and initialises irq_max as 1
+or TG3_IRQ_MAX_VECS.
 
-Alex
+Where does tp->irq_max go over TG3_IRQ_MAX_VECS ?
 
-> > I have no skin in the game aside from having to drop this conversion
-> > which I'm fine to do if there are actually users for this btu really,
-> > that looks a lot like abusing an api that really wasn't designed for
-> > this. =20
->=20
-> https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-ja=
-z@semihalf.com/
-> was posted at the beginig of March and one of the main things we've
-> discussed was the mechanism for propagating acpi notification value.
-> We've endup with eventfd as the best mechanism and have actually been
-> using it from v2. I really do not want to waste this effort, I think
-> we are quite advanced with v6 now. Additionally we didn't actually
-> modify any part of eventfd support that was in place, we only used it
-> in a specific (and discussed beforehand) way.
 
+>  		struct tg3_napi *tnapi = &tp->napi[i];
+>  
+>  		tnapi->tp = tp;
+> -- 
+> 2.41.0
 
