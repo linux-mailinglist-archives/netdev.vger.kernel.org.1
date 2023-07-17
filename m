@@ -1,96 +1,158 @@
-Return-Path: <netdev+bounces-18138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 523E47558AF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 01:57:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4718B755906
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 03:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 252451C2095D
-	for <lists+netdev@lfdr.de>; Sun, 16 Jul 2023 23:57:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E178F281322
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 01:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D9C945A;
-	Sun, 16 Jul 2023 23:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD16B1108;
+	Mon, 17 Jul 2023 01:22:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1848F7D
-	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 23:57:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78F19C433C7;
-	Sun, 16 Jul 2023 23:57:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689551833;
-	bh=+2BhqY9zrhKuYyQ9etJS5H8r5edL7fVLVmdomTcsJy0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TBFRNmShB+QtUymfhfsuzlj3mrAUiU+5Hg+ldphDuktGwVKO+KxXQagpUkGBQJbWl
-	 hXyeF+Rfg6ewUcNhDMsuBvqcdWqvqawpVMD6yWImZiyxQtdvTYWzL+kMpw5xzqpRhG
-	 zeXaT0cOS+lRpVDZ6s045vluNNr6NG8cNDQ0AcffxOFmBiEOaCwDgVYYnRJ3T4sqWQ
-	 wzLuT7zwBFRFCBLF6Pt82BWVaS82xTXICHEGNuTljfml0iqwe6rpTBHVuINaJ0uP2a
-	 1u6ABa3DonIrUNt5odDi+lmA05AzQN6US36BEfW0zBjuLP3/0xlzgySFmJCGVXiatb
-	 uc5uAgsCg/N8w==
-Message-ID: <73971895-6fa7-a5e1-542d-3faccbc4a830@kernel.org>
-Date: Sun, 16 Jul 2023 16:57:07 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AE4A49
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 01:22:36 +0000 (UTC)
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D6D8198;
+	Sun, 16 Jul 2023 18:22:35 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-55be1ce1669so2461493a12.1;
+        Sun, 16 Jul 2023 18:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689556954; x=1692148954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/xsec41khvstwojfKKnVijK7VZDVczRFwtjYPna4+YI=;
+        b=m8bLTGJauMxUKVyDpIlaNkk99Hkb+YrGDvRf063B3eaNisyPDM8bt6nLngAqrdQW/a
+         H6rH90DitEebLR89aw3P0xUCS48+ZsoDiVbhp6qGW6m3rKskw3hPXlZrt9wXeKYDQuDE
+         BWLuQBMxMRANjydYyzmV0JZhatFgmidRIqZ98uZkaKVxXGqUTGFZh/VNQxzmkEj5pkxp
+         qU9wvNtbGaDeiMLQMkyUpbRqjfj+gAJ9VT4sRERXhbqG5hzGrj/ASHtamDQDRS0P+ZVO
+         93d33GWxNzrdl34anhtasl2t0lwjTYRFW/VYtdWqwIeoPsMEqLyHbZbcbLJzmuUCz6iG
+         mAxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689556954; x=1692148954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/xsec41khvstwojfKKnVijK7VZDVczRFwtjYPna4+YI=;
+        b=HXqpI9lFKGGKjgqx/fhAbLZASlSzZ6iEAkftCGxfEsXK6NgSbMgJO6zqXoboVUruX5
+         ly2f/Z+EuaurNpb5kl2RM5/2+7z1N4VfBqbBly1sMUzMHYlc+M7lDeNhCBWlxSi4+OVI
+         S/2nQDVoHU8VATFWMUOYv23nTnEdZwOMeY7Mt6sMFikZjOyQo1N+WrNHwOqfvbW1ZN0Y
+         qZksMT0tm91AeLJhvPtfdbWDNub48j3ZhpDWd1TbxFNdPlKMYgoW3UKATZqjhQQm6GPD
+         QAiyqoh3HyqJ3MKcUola7nJYbZjxCF4DkxbyV5rz+nLGybGyqTg//GAFQK8/GRxFlIXu
+         tEdA==
+X-Gm-Message-State: ABy/qLbPDJ/6Y/CG5ARg5xOc21AFHhzO4dwxqE5u7L8Tkwl7saA2y7HQ
+	VEXD53ZJEtw8/jV8Snn2Dmlb8PytMttPnSwOJWs=
+X-Google-Smtp-Source: APBJJlFBLBkMzZlok4fsVOd1z8wIHlUwkUujopGLFLaW/brvPbCpRt3b/nI8OIcQ4vuAxSexPbDmnZo7X3+ViZnYZf4=
+X-Received: by 2002:a17:90a:fa16:b0:263:1af0:5541 with SMTP id
+ cm22-20020a17090afa1600b002631af05541mr9985566pjb.32.1689556954509; Sun, 16
+ Jul 2023 18:22:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH 06/10] net: add SO_DEVMEM_DONTNEED setsockopt to
- release RX pages
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, jgg@ziepe.ca
-References: <20230710223304.1174642-1-almasrymina@google.com>
- <20230710223304.1174642-7-almasrymina@google.com>
-From: Andy Lutomirski <luto@kernel.org>
-In-Reply-To: <20230710223304.1174642-7-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
+From: Max Georgiev <glipus@gmail.com>
+Date: Sun, 16 Jul 2023 19:22:23 -0600
+Message-ID: <CAP5jrPFbt7vc77wVi5buYM88gDQ-OCHzm3Hg=EzRxJiha7Ur5A@mail.gmail.com>
+Subject: Re: [PATCH v7 net-next 00/10] Introduce ndo_hwtstamp_get() and ndo_hwtstamp_set()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Gerhard Engleder <gerhard@engleder-embedded.com>, Hangbin Liu <liuhangbin@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com, 
+	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
+	Daniel Machon <daniel.machon@microchip.com>, Simon Horman <simon.horman@corigine.com>, 
+	Casper Andersson <casper.casan@gmail.com>, Sergey Organov <sorganov@gmail.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/10/23 15:32, Mina Almasry wrote:
-> Add an interface for the user to notify the kernel that it is done reading
-> the NET_RX dmabuf pages returned as cmsg. The kernel will drop the
-> reference on the NET_RX pages to make them available for re-use.
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> ---
+On Thu, Jul 13, 2023 at 6:19=E2=80=AFAM Vladimir Oltean <vladimir.oltean@nx=
+p.com> wrote:
+>
+> Based on previous RFCs from Maxim Georgiev:
+> https://lore.kernel.org/netdev/20230502043150.17097-1-glipus@gmail.com/
+>
+> this series attempts to introduce new API for the hardware timestamping
+> control path (SIOCGHWTSTAMP and SIOCSHWTSTAMP handling).
+>
+> I don't have any board with phylib hardware timestamping, so I would
+> appreciate testing (especially on lan966x, the most intricate
+> conversion). I was, however, able to test netdev level timestamping,
+> because I also have some more unsubmitted conversions in progress:
+>
+> https://github.com/vladimiroltean/linux/commits/ndo-hwtstamp-v7
+>
+> I hope that the concerns expressed in the comments of previous series
+> were addressed, and that K=C3=B6ry Maincent's series:
+> https://lore.kernel.org/netdev/20230406173308.401924-1-kory.maincent@boot=
+lin.com/
+> can make progress in parallel with the conversion of the rest of drivers.
+>
+> Maxim Georgiev (5):
+>   net: add NDOs for configuring hardware timestamping
+>   net: add hwtstamping helpers for stackable net devices
+>   net: vlan: convert to ndo_hwtstamp_get() / ndo_hwtstamp_set()
+>   net: macvlan: convert to ndo_hwtstamp_get() / ndo_hwtstamp_set()
+>   net: bonding: convert to ndo_hwtstamp_get() / ndo_hwtstamp_set()
+>
+> Vladimir Oltean (5):
+>   net: fec: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+>   net: fec: delete fec_ptp_disable_hwts()
+>   net: sparx5: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+>   net: lan966x: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+>   net: remove phy_has_hwtstamp() -> phy_mii_ioctl() decision from
+>     converted drivers
+>
+>  drivers/net/bonding/bond_main.c               | 105 ++++++----
+>  drivers/net/ethernet/freescale/fec.h          |   6 +-
+>  drivers/net/ethernet/freescale/fec_main.c     |  41 ++--
+>  drivers/net/ethernet/freescale/fec_ptp.c      |  43 ++--
+>  .../ethernet/microchip/lan966x/lan966x_main.c |  61 ++++--
+>  .../ethernet/microchip/lan966x/lan966x_main.h |  12 +-
+>  .../ethernet/microchip/lan966x/lan966x_ptp.c  |  34 ++--
+>  .../ethernet/microchip/sparx5/sparx5_main.h   |   9 +-
+>  .../ethernet/microchip/sparx5/sparx5_netdev.c |  35 +++-
+>  .../ethernet/microchip/sparx5/sparx5_ptp.c    |  24 ++-
+>  drivers/net/macvlan.c                         |  34 ++--
+>  include/linux/net_tstamp.h                    |  28 +++
+>  include/linux/netdevice.h                     |  25 +++
+>  net/8021q/vlan_dev.c                          |  27 ++-
+>  net/core/dev_ioctl.c                          | 183 +++++++++++++++++-
+>  15 files changed, 480 insertions(+), 187 deletions(-)
+>
+> --
+> 2.34.1
+>
 
-> +		for (i = 0; i < num_tokens; i++) {
-> +			for (j = 0; j < tokens[i].token_count; j++) {
-> +				struct page *pg = xa_erase(&sk->sk_pagepool,
-> +							   tokens[i].token_start + j);
-> +
-> +				if (pg)
-> +					put_page(pg);
-> +				else
-> +					/* -EINTR here notifies the userspace
-> +					 * that not all tokens passed to it have
-> +					 * been freed.
-> +					 */
-> +					ret = -EINTR;
+Vladimir, thank you for taking over and improving this patch stack!
 
-Unless I'm missing something, this type of error reporting is 
-unrecoverable -- userspace doesn't know how many tokens have been freed.
-
-I think you should either make it explicitly unrecoverable (somehow shut 
-down dmabuf handling entirely) or tell userspace how many tokens were 
-successfully freed.
-
---Andy
+I see you dropped the netdevsim patch:
+https://www.spinics.net/lists/netdev/msg901378.html
+Do you believe it's not useful any more since the rest of the
+patches in the stack were tested through other means?
 
