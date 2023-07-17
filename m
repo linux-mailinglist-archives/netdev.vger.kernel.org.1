@@ -1,116 +1,119 @@
-Return-Path: <netdev+bounces-18360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4FA756982
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA08756986
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E9C51C20B4B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:47:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96DA01C204DA
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C174615D0;
-	Mon, 17 Jul 2023 16:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B8C15D0;
+	Mon, 17 Jul 2023 16:47:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B664C10E7
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 16:47:10 +0000 (UTC)
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FAF18F
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:47:09 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-401d1d967beso7771cf.0
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:47:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEF610E7
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 16:47:41 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C752AD1
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:47:39 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-991da766865so667554166b.0
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:47:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689612428; x=1692204428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3+e3D526DKZcQ2/LAze/ywkjnh9HvcdhsT43CIzyhYY=;
-        b=7e7AHSmKQjlPgGKaHQMt+n0aS+VVfmzs90QReaDQ30pWE3QbgvP4dlI/Eq6qWlom3Q
-         tgsW7dq6VqsVnuMLzpC8HXpF6wS+Il45ekw6QnKdbZGn73Q7eC8/Yh5eD4nvIwav25k0
-         YwOK6reB2bI0Y0MYUtSJ/3wNBcYbxZjtYl77R6rmYbgESIxXVNYbIJp4/9xZco/ph3Z3
-         1xDkRJ7QPr6Fa+6zMY8s8mkIcRogUQTKMcJ07Y8d5d7u/ReENB0jfz9bAFol9ZrdAaHu
-         0buWWeiD1Cvhwv2tcdjUP+4ZnYf/SgoRf9Rv7C8mTDJ9tYZGgzFtOaxKX7CzP9FWFygB
-         24gw==
+        d=linaro.org; s=google; t=1689612458; x=1692204458;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JK6TkOQBHFr4q96srFPr4OjrpsieTptoErK+rdA0Pjs=;
+        b=gSVw5wcPbsf/QbpAH0hRSagM9a9kzssQWbI6taOsnZI7l2LvzXCps64xOZn4gkhSU0
+         VOg60k5Q+3/LglcekmxcrdMyHmB5OJxtspd+ZWW1eqD5Cu84C8zFkh4q2G3RYCv4T+ur
+         WobKpSvcRu+vALFSu0nNRRtNiSXKlxdSPDycdiuYam+noheKXbGRr104HAojgjhKTLki
+         hzdezggTjMF40whEQPEVlWXLKeAD5A8t7EQzRTHc/a4rRu3V0bpHI3gi2ZP1NYW3UIhE
+         bcnfghSfTbDRJIRAdUcCAUwc8dXgXakX4mgmDb5N5ECFGIKeJxvpScEr3fFYpVInMzn/
+         CqeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689612428; x=1692204428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3+e3D526DKZcQ2/LAze/ywkjnh9HvcdhsT43CIzyhYY=;
-        b=EBG6jKcFuG87DscS/R8XZWOlCE7P33MsKmz2HYGyk2eNngGjFMxZiUlk5oqhLKYic8
-         huQ3nB3KBGC7LlxHqKdeFHJR3DWpNWqY76kXqDhIF87xoGJPYIWwlFbJxK2Nbtkn401+
-         2r7gxQ9c4BBtha5ffcrO/951ziqgEfuS+Bxr/M4mi5EnHi/DUZFBjR+QIN1XNY8QaVNp
-         IAAJl5KfVhQdFIKQudx5FSh4++WUmGU23kLqIHdMMv3LdHlvHdr8Z6gsI4ET19uBSTqW
-         vm/+7hfA3GjAh/EJJ6u+9OZ9Zx98EDYdX2+nEabuIGSQ+UG75dkhMfSQdr8w9rGOx+/f
-         SvTQ==
-X-Gm-Message-State: ABy/qLZLEmjX3q3QBjazHefT9sMpgpzushMHbp19KW32tSQ4RgMEjKkz
-	rzw4IAwwBqpGijKHk7gKtWM+fo5VRWukJDci+pjNww==
-X-Google-Smtp-Source: APBJJlGQHhjBTJOyR4ALML7m1VsuAIj3b+ZyvPRhX6Gs6PxHm6xVz7ix159HwbDQ9XiLkj/CyDwHvjJeQtoFD0rzAw0=
-X-Received: by 2002:ac8:5b44:0:b0:403:96e3:4745 with SMTP id
- n4-20020ac85b44000000b0040396e34745mr1459522qtw.20.1689612428412; Mon, 17 Jul
- 2023 09:47:08 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689612458; x=1692204458;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JK6TkOQBHFr4q96srFPr4OjrpsieTptoErK+rdA0Pjs=;
+        b=OzVsrDTCrlD0Fw9Rt+Le9jPavN6TM32vO0ulqm/mgPBUfvHoZtC+L7YRszQhPyRHiO
+         6CsqhMrfnh3ywNAj3aRmnmeCbumosrzRrse68J97DPmyo2DD1SSO+kxL5wgfwKJOyIm0
+         fOBI3K1KFA5Fwn37ShwZGGsvoO7taLM4RkZqo4M7h6WA8MSm4WVIr8dFKU5Jxw7ype1X
+         WV8F1hflEnuzB8ONgEUpWseBsZd+5Z63BA4qQLOF3bgUiDgWeZdBcAhdyW/dgp1BCZWK
+         8PvqF4X80Z1cAGtHyEfVVgx+xTrzRwGFMTcsuRhMo+l2YZAapha8TCD6j/91E7zgzllq
+         Q6NA==
+X-Gm-Message-State: ABy/qLZkRpQW+0PfXu93UbSpQoH8GMZTKdZ3jk1X7SN7v/jUVIo3t8x+
+	dhZnPJTg+js8Q/fYI6HZX1JOaQ==
+X-Google-Smtp-Source: APBJJlH0qMy8XozwM95e5By8BV0d4jRKCPbiiNYUEYx+N2c06vencG+JUCyJcZsjwFwwdoHev4v5Bg==
+X-Received: by 2002:a17:906:3109:b0:994:54ff:10f6 with SMTP id 9-20020a170906310900b0099454ff10f6mr6962190ejx.30.1689612458219;
+        Mon, 17 Jul 2023 09:47:38 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id n7-20020a1709062bc700b00992e14af9c3sm4616559ejg.143.2023.07.17.09.47.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jul 2023 09:47:37 -0700 (PDT)
+Message-ID: <a34ef1ed-e204-77ba-a4b1-1a4bbabdac7a@linaro.org>
+Date: Mon, 17 Jul 2023 18:47:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230713112404.2022373-1-imagedong@tencent.com>
-In-Reply-To: <20230713112404.2022373-1-imagedong@tencent.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 17 Jul 2023 18:46:57 +0200
-Message-ID: <CANn89iJMzChaDsB+bPAuCEDUHVApsYs8KtD3oEC+oU_Qvi1KvQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: tcp: support to probe tcp receiver OOM
-To: menglong8.dong@gmail.com
-Cc: ncardwell@google.com, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, corbet@lwn.net, dsahern@kernel.org, kuniyu@amazon.com, 
-	morleyd@google.com, imagedong@tencent.com, mfreemon@cloudflare.com, 
-	mubashirq@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: snps,dwmac: add phy-supply
+ support
+To: Marco Felsch <m.felsch@pengutronix.de>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@pengutronix.de
+References: <20230717164307.2868264-1-m.felsch@pengutronix.de>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230717164307.2868264-1-m.felsch@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 13, 2023 at 1:24=E2=80=AFPM <menglong8.dong@gmail.com> wrote:
->
-> From: Menglong Dong <imagedong@tencent.com>
->
-> For now, skb will be dropped directly if rmem schedule fails, which means
-> tcp_try_rmem_schedule() returns an error. This can happen on following
-> cases:
->
-> 1. The total memory allocated for TCP protocol is up to tcp_mem[2], and
->    the receive queue of the tcp socket is not empty.
-> 2. The receive buffer of the tcp socket is full, which can happen on smal=
-l
->    packet cases.
->
-> If the user hangs and doesn't take away the packet in the receive queue
-> with recv() or read() for a long time, the sender will keep
-> retransmitting until timeout, and the tcp connection will break.
->
-> In order to handle such case, we introduce the tcp protocol OOM detection
-> in following steps, as Neal Cardwell suggested:
->
+On 17/07/2023 18:43, Marco Felsch wrote:
+> Document the common phy-supply property to be able to specify a phy
+> regulator.
+> 
+> Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 363b3e3ea3a60..f66d1839cf561 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -159,6 +159,9 @@ properties:
+>        can be passive (no SW requirement), and requires that the MAC operate
+>        in a different mode than the PHY in order to function.
+>  
+> +  phy-supply:
+> +    description: PHY regulator
+> +
 
-For the record, I dislike this patch. I am not sure what Neal had in mind.
+Isn't this property of the PHY? Why would the Ethernet controller play
+with a supply of a phy?
 
-I suggested instead to send an ACK RWIN 0, whenever we were under
-extreme memory pressure,
-and we only could queue one skb in the receive queue.
+Best regards,
+Krzysztof
 
-For details, look at the points we call sk_forced_mem_schedule().
-This would be a matter of refactoring code around it, in tcp_data_queue()
-
-The patch would be much simpler. Nothing changed at the sender side :/
 
