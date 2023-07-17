@@ -1,165 +1,137 @@
-Return-Path: <netdev+bounces-18217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33095755D70
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:50:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F17755D94
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:54:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E20502810A4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:50:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89F1A1C20AA7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3068D9463;
-	Mon, 17 Jul 2023 07:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7167B9467;
+	Mon, 17 Jul 2023 07:54:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248A05CB8
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:49:58 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E162DE
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:49:57 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qLIzA-0006dj-I5; Mon, 17 Jul 2023 09:49:36 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 7CB481F310E;
-	Mon, 17 Jul 2023 07:49:30 +0000 (UTC)
-Date: Mon, 17 Jul 2023 09:49:29 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Michal Sojka <michal.sojka@cvut.cz>
-Cc: Maxime Jayat <maxime.jayat@mobile-devices.fr>,
-	Oliver Hartkopp <socketcan@hartkopp.net>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Dae R. Jeong" <threeearcat@gmail.com>,
-	Hillf Danton <hdanton@sina.com>
-Subject: Re: can: isotp: epoll breaks isotp_sendmsg
-Message-ID: <20230717-disbelief-catalyst-bcff471e0433-mkl@pengutronix.de>
-References: <11328958-453f-447f-9af8-3b5824dfb041@munic.io>
- <87cz1czihl.fsf@steelpick.2x.cz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6244E9466
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:54:33 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC8CC7
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:54:30 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b8413671b9so31856481fa.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:54:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689580469; x=1692172469;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sZSBd91l9FNsoBWVb9MzxA3Uq4ofSW5cSlRh40pUiQk=;
+        b=IW94wvQ5HIaX+HQfYIRd395f9Jz97urs+aA4EiV0ktMZLxdkEDlD+PldNzTG9JNiny
+         RtHygeaWia6NLjdICYkJBjYMzDlHR4ar+HWFJgCFqq/obGuWJr8Lj5XKzDLJ7xB8/FCS
+         1a2vhEQD9LrxbxMYeEI0NvZfEk2dY+OaKqyl8FX6cvCkhAX47GKbSS6iqO7XYwWz1sz5
+         2D48miHERFsp2djM7UA/bUsYNM9x+PWQQ0rzcx9+aQOHfjn5Aikj18xYpD08Xc2y42Wb
+         NH4N5W3lyb/9NpD4yvy79ta6uPJwQBV7VAWu56Z2raWd1YQ/fP/b83oiSDDHGt+YDGgu
+         R8bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689580469; x=1692172469;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sZSBd91l9FNsoBWVb9MzxA3Uq4ofSW5cSlRh40pUiQk=;
+        b=JFHJcbLMPrifN/T200lq+NiCoLS9yjM0zdmVjwaedrDTtgRy/xDI9WMUTu2MptuOrw
+         RwMYcYbE1RTygPWJ/khZEd/XngH5fR4o+YbFmCnM4TdngQIGS1oWQjV62PIMwLATtVv6
+         pHHsv6vsvF6w6xpaPiycc0Xx3/KuyeCjeibEbEg52MGGDgjGzhv/0EHMVz7N2LoPdI5Q
+         7KcKv3LKVDgUXm2E4gqjcx25+PenVzlv/SpQMcyzynkLn4jELydbHDpU93kYXGDWpC6p
+         mHIXlJeA01aZvsQtsNIM11XHLWwly/X/BteBHAM4SwwPIyrSNkaNxT0ohPdvs2YSoOqH
+         a3yQ==
+X-Gm-Message-State: ABy/qLYm6FMDXsW+EcJy22H1t2p8u2b0jXndwHVRk0FcZIcTfeBKHRjZ
+	xr+20L5bjmOwDJw4I4NdP0B9p2iM2DwSX4asSuKR6e7UpV5SJQ==
+X-Google-Smtp-Source: APBJJlHkWSMUXS4UBL74h9kbGuWgo5PkhE7BDL9rPNe9ixI+NMu6TeZ/CeSZFhe8qMy1rMCCluWE2GbEY685B/4KUAo=
+X-Received: by 2002:a05:651c:3c1:b0:2b6:ef8a:d98d with SMTP id
+ f1-20020a05651c03c100b002b6ef8ad98dmr3171003ljp.20.1689580468883; Mon, 17 Jul
+ 2023 00:54:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mfssbwpjvgohqem3"
-Content-Disposition: inline
-In-Reply-To: <87cz1czihl.fsf@steelpick.2x.cz>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+References: <cover.1689215889.git.chenfeiyang@loongson.cn> <98b53d15bb983c309f79acf9619b88ea4fbb8f14.1689215889.git.chenfeiyang@loongson.cn>
+ <e491227b-81a1-4363-b810-501511939f1b@lunn.ch> <CACWXhKmLRK5aGNwDyt5uc0TK8ZXZKuDQuSXW6jku+Ofh73GUvw@mail.gmail.com>
+ <ZLELE5ysytsynpjr@shell.armlinux.org.uk>
+In-Reply-To: <ZLELE5ysytsynpjr@shell.armlinux.org.uk>
+From: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Date: Mon, 17 Jul 2023 15:54:17 +0800
+Message-ID: <CACWXhKn6Tv+Fk9Nxc-kQKkF847+ZAO1uVxSYkMoaiCaeGYCXzg@mail.gmail.com>
+Subject: Re: [RFC PATCH 10/10] net: stmmac: dwmac-loongson: Add GNET support
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
+	dongbiao@loongson.cn, loongson-kernel@lists.loongnix.cn, 
+	netdev@vger.kernel.org, loongarch@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
---mfssbwpjvgohqem3
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 01.07.2023 00:35:18, Michal Sojka wrote:
-> Hi Maxime,
->=20
-> On Fri, Jun 30 2023, Maxime Jayat wrote:
-> > Hi,
+On Fri, Jul 14, 2023 at 4:45=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Fri, Jul 14, 2023 at 10:24:37AM +0800, Feiyang Chen wrote:
+> > On Thu, Jul 13, 2023 at 12:07=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> w=
+rote:
+> > >
+> > > On Thu, Jul 13, 2023 at 10:49:38AM +0800, Feiyang Chen wrote:
+> > > > Add GNET support. Use the fix_mac_speed() callback to workaround
+> > > > issues with the Loongson PHY.
+> > >
+> > > What are the issues?
+> > >
 > >
-> > There is something not clear happening with the non-blocking behavior
-> > of ISO-TP sockets in the TX path, but more importantly, using epoll now
-> > completely breaks isotp_sendmsg.
-> > I believe it is related to
-> > 79e19fa79c ("can: isotp: isotp_ops: fix poll() to not report false=20
-> > EPOLLOUT events"),
-> > but actually is probably deeper than that.
+> > Hi, Andrew,
 > >
-> > I don't completely understand what is exactly going on, so I am sharing
-> > the problem I face:
-> >
-> > With an ISO-TP socket in non-blocking mode, using epoll seems to make
-> > isotp_sendmsg always return -EAGAIN.
->=20
-> That's definitely not expected behavior. I tested the patch only with
-> poll, hoping that epoll would behave the same.
->=20
-> [...]
->=20
-> >
-> > By reverting 79e19fa79c, I get better results but still incorrect:
->=20
-> [...]
->=20
-> > It is then possible to write on the socket but the write is blocking,
-> > which is not the expected behavior for a non-blocking socket.
->=20
-> Yes, incorrect behavior was why we made the commit in question, however
-> we saw write() returning -EAGAIN when it shouldn't.
->=20
-> > I don't know how to solve the problem. To me, using wq_has_sleeper seem=
-s=20
-> > weird.
->=20
-> Agreed. I've never tried to understand how synchronization works here.
-> Hopefully, Oliver knows more.
->=20
-> > The implementation of isotp_poll feels weird too (calling both=20
-> > datagram_poll and
-> > poll_wait?). But I am not sure what would be the correct
-> > implementation.
->=20
-> I understand it as follows (which might be wrong - someone, please
-> correct me), isotp_poll() should register the file with all waitqueues
-> it can wait on. so->wait is one and sock->sq.wait (used by
-> datagram_poll) is another. The former is definitely used for TX, the
-> latter is probably used because skb_recv_datagram() is called for RX.
-> But so->wait is also used for RX and there might proabbly be be some
-> inconsistency between those.
->=20
-> > My actual use-case is in Async Rust using tokio.
->=20
-> Our initial motivation was also Rust and tokio however than I did
-> testing only with simple C programs. I'm definitely interested in having
-> this working.
->=20
-> I'll try to look at this in more detail during the weekend. It's too
-> late for me today.
+> > There is an issue with the synchronization between the network card
+> > and the PHY. In the case of gigabit operation, if the PHY's speed
+> > changes, the network card's speed remains unaffected. Hence, it is
+> > necessary to initiate a re-negotiation process with the PHY to align
+> > the link speeds properly.
+>
+> Please could you explain a bit more what happens when "the PHY's speed
+> changes". Are you suggesting that:
+>
+> You have a connection where the media side has negotiated 1G speed.
+> The gigabit partner is disconnected, so the link goes down, and is then
+> replaced by a partner only capable of 100M. The link comes back up at
+> 100M, but the network card continues trying to operate at 1G?
+>
 
-Any progress on this issue?
+Hi, Russell, Andrew,
 
-Marc
+This bug shows up in the following way: when the speed is set to 1000M,
+PHY is set up correctly and its status is normal. However, the controller
+and PHY don't work well together, causing the controller to fail in
+establishing a gigabit connection, which leads to a network disruption.
+So, we need to use this bit to check if the controller's status is correct
+and reset PHY if necessary.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
 
---mfssbwpjvgohqem3
-Content-Type: application/pgp-signature; name="signature.asc"
+The troublesome issue is that we have to check this bit in stmmac.
+As a result, we are forced to place phy_restart_aneg() there.
 
------BEGIN PGP SIGNATURE-----
+Thanks,
+Feiyang
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS08oYACgkQvlAcSiqK
-BOhHswf/SZj4m2DVNOkl8OLWL+ZJXTBoXd/S2pg2MLr7/+pO98wd8wbmGN5Kn6T9
-cToBbnCaa6TEHzCROw0uQDM8BwoWxwPlcfaKpEFKdze1grV+lMYcSVI1nlaM19xR
-es+jWh45mQnxhPjjDDNHowucfA7z+ivXYo46yf3LJsYVSfznf+/LIwlvKU4PMz0d
-Vzwxar8/aStqGF1+i3vLNDnP99JwG2U3EqmjLGer80tP+n0qetxbuHkdShq05GpJ
-4e5KS8/yXxvXgEJM1LNlhNh4W5oig+qivhE1pPIDAOt6fv4iptWjF3FEEMHsHdzC
-x6fxKMIscbIL+6KmBwSt+7kz9iMoTA==
-=uF3O
------END PGP SIGNATURE-----
-
---mfssbwpjvgohqem3--
+> Thanks.
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
