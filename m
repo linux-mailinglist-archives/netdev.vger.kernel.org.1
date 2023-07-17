@@ -1,90 +1,112 @@
-Return-Path: <netdev+bounces-18199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9A9E755C17
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:50:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57F4D755C3B
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ADDF2811CB
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:50:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E122280CB0
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1DE8464;
-	Mon, 17 Jul 2023 06:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C398472;
+	Mon, 17 Jul 2023 06:57:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000EE1FCC
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:50:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5CB6AC433C9;
-	Mon, 17 Jul 2023 06:50:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689576619;
-	bh=xxR4b48SYorrV6cf6YRJcpNX4D/WfbVD+dQx1ktaGk0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RYd2oxHk/b/qhhUu7JqwrkPuxeTbEQxlrDhpkww3kwvnrIbMJnIEICYUFrGQeBpVA
-	 d7b4JD32U/XgMOqLUgmXrBsKtIsQkg/ZVehm2Yg/vmX2Y7h/fW2V4AlUyQaVhaDtB3
-	 eI661a2ranMhiakPOc9NL0iuCM3mImBIvjSlptV22GwiYarXSKgzwGkOMdqS6NGwJe
-	 mlJ/Fx8CSqmGWJYK1KXQccZMMWo428fK/T0tcezO81HUt6paC6wpvl3ir8jZbAB9qz
-	 zdDpf7ix/BiKAXCrhJ0yEoqyxT8vu2L2vUg9884hdYkVvILxG5ytYMsS8bt3Eq7MVH
-	 Zdtxr098emB/A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 423A2C561EE;
-	Mon, 17 Jul 2023 06:50:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA731FCC
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:57:01 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13996172E
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 23:56:40 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qLI8r-0008Cg-5s; Mon, 17 Jul 2023 08:55:33 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 4DF321F304F;
+	Mon, 17 Jul 2023 06:52:43 +0000 (UTC)
+Date: Mon, 17 Jul 2023 08:52:42 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Wu Yunchuan <yunchuan@nfschina.com>
+Cc: wg@grandegger.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, uttenthaler@ems-wuensche.com,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next v3 8/9] can: ems_pci: Remove unnecessary (void*)
+ conversions
+Message-ID: <20230717-staple-uninjured-26bfd8cde5e0-mkl@pengutronix.de>
+References: <20230717031221.55073-1-yunchuan@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] net: dsa: microchip: correct KSZ8795 static MAC table
- access
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168957661926.28493.6331448129276612171.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Jul 2023 06:50:19 +0000
-References: <1689295582-2726-1-git-send-email-Tristram.Ha@microchip.com>
-In-Reply-To: <1689295582-2726-1-git-send-email-Tristram.Ha@microchip.com>
-To:  <Tristram.Ha@microchip.com>
-Cc: m.grzeschik@pengutronix.de, o.rempel@pengutronix.de,
- woojung.huh@microchip.com, andrew@lunn.ch, f.fainelli@gmail.com,
- olteanv@gmail.com, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 13 Jul 2023 17:46:22 -0700 you wrote:
-> From: Tristram Ha <Tristram.Ha@microchip.com>
-> 
-> The KSZ8795 driver code was modified to use on KSZ8863/73, which has
-> different register definitions.  Some of the new KSZ8795 register
-> information are wrong compared to previous code.
-> 
-> KSZ8795 also behaves differently in that the STATIC_MAC_TABLE_USE_FID
-> and STATIC_MAC_TABLE_FID bits are off by 1 when doing MAC table reading
-> than writing.  To compensate that a special code was added to shift the
-> register value by 1 before applying those bits.  This is wrong when the
-> code is running on KSZ8863, so this special code is only executed when
-> KSZ8795 is detected.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2,net] net: dsa: microchip: correct KSZ8795 static MAC table access
-    https://git.kernel.org/netdev/net/c/4bdf79d686b4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="exgeui6fqooldnrg"
+Content-Disposition: inline
+In-Reply-To: <20230717031221.55073-1-yunchuan@nfschina.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
+--exgeui6fqooldnrg
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 17.07.2023 11:12:21, Wu Yunchuan wrote:
+> No need cast (void*) to (struct ems_pci_card *).
+>=20
+> Signed-off-by: Wu Yunchuan <yunchuan@nfschina.com>
+> Acked-by: Marc Kleine-Budde<mkl@pengutronix.de>
+
+Please add a space between my name and my e-mail address, so that it
+reads:
+
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+nitpick:
+You should add your S-o-b as the last trailer.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--exgeui6fqooldnrg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS05TcACgkQvlAcSiqK
+BOjxXgf/fNhyeUfgj8a3UOgD2T2AhNRSX5zoNVMqZeFacwtVKuGO4IB+9oZ/0cUC
+1v5ogKr088Bw5tFggQ1Yu0y32lUgh+/kci6S+EkjNKwiVJPGoF/7z0uPDOvBkBzT
+fY6rRKe9+XTNHBDFka/6yKelQlfbrZmoDUdZuyINKlKeuzCctPhhOzR+ZNL8N4mP
+UNGVEmKO57EuCzmSXPN9oP+FeqeP+Jqs67eP/1JggmTXQIjOMB75Sikg9afc2brw
+gBgE/PlF3gl0b4OF6Y/bAFXxjwkTaOjE4nzgvLN0ncWz0IcnhzdC7H09+6ID7Xam
+RBYDVMaKrXMeUI9Nj6/yGNhgi0QWzA==
+=uzn3
+-----END PGP SIGNATURE-----
+
+--exgeui6fqooldnrg--
 
