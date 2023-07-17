@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-18324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D48F7566CE
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:51:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0247566D0
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 16:51:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC01C1C20777
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:51:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74DD32811D4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 14:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F043253BD;
-	Mon, 17 Jul 2023 14:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471BE253C3;
+	Mon, 17 Jul 2023 14:50:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DDB253B4
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 14:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF75253BA
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 14:50:57 +0000 (UTC)
 Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.216])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02758E52
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:50:41 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E049E4C
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:50:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=UoL8DS8grtQcLwZexb
-	x4yev9al5bRajKNzv+5HEjRe4=; b=njaLiN+0sJ5yAsKV0aGeYRbcQX/SNVn/8P
-	KLYg+X2rOWR/Bng3VTFkQMMtW7Z4Xw0tCa63X4EmWLfpcrAsTaS8V1CKQ3vdvC4l
-	NiSp8oItqKi5c8YwL1mJz8yfhPUkGdUsWuwxY3jYj8Ct0iOps8P20R7y2ETKG0FU
-	pefOmOlAg=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=dj4U30xF+0JTV9W8PP
+	GYwgBUlnynRBs4kwtLJluCopk=; b=MEuDSPPruhi2Ok/R1KtBeTnwt6v3+cIm7j
+	R6UgVnnR2eN3fL+dk2DFbGY+8Ma//+k/p3of+x54Pa7XEZpI+6n94QmZb7q5OEIV
+	Tr/igwOEueDxeqhh0DztibpyM0g2J7T5kU314rQcPwWJVxl2gfLbA3hsYjKQmKZT
+	X33Xm8KjM=
 Received: from localhost.localdomain (unknown [202.112.113.212])
-	by zwqz-smtp-mta-g2-2 (Coremail) with SMTP id _____wBXX5MMVbVk3OdBAg--.20868S4;
-	Mon, 17 Jul 2023 22:49:52 +0800 (CST)
+	by zwqz-smtp-mta-g3-1 (Coremail) with SMTP id _____wBnbysyVbVkwrwyAg--.57325S4;
+	Mon, 17 Jul 2023 22:50:29 +0800 (CST)
 From: Yuanjun Gong <ruc_gongyuanjun@163.com>
 To: Yuanjun Gong <ruc_gongyuanjun@163.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH 1/1] net: ipv6: check the return value of pskb_trim()
-Date: Mon, 17 Jul 2023 22:49:46 +0800
-Message-Id: <20230717144946.26495-1-ruc_gongyuanjun@163.com>
+Subject: [PATCH 1/1] net:openvswitch: check return value of pskb_trim()
+Date: Mon, 17 Jul 2023 22:50:24 +0800
+Message-Id: <20230717145024.27274-1-ruc_gongyuanjun@163.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:_____wBXX5MMVbVk3OdBAg--.20868S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7JFWxurWrtFWktFyxKr47twb_yoWxZwc_Ga
-	n7Xr4kWr1UWF1kA3yfZr4ayryrtrWxXFyfZr93ta4fXw17Aw1rJrs7CrZ8Z3y3GFZrCry5
-	uFsxCrW8ta42vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+X-CM-TRANSID:_____wBnbysyVbVkwrwyAg--.57325S4
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JFWxurW5JF18Cw4xtrykuFg_yoWfGwcEkw
+	4ft3WkGw47GwsYyr40kr45tr4kZw4IkFyrZ3WSqFW5C3s0q395WrW8CFs7Cr13Way7Wr98
+	Xan8CrWxKF1fGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
 	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRKrWrPUUUUU==
 X-Originating-IP: [202.112.113.212]
-X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/xtbBiBKv5VaEFzddYwAAsc
+X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/xtbBiBmv5VaEFzdftwAAsB
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,RCVD_IN_MSPIKE_L4,
@@ -60,30 +60,32 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-return an error number if an unexpected result is returned by
-pskb_tirm() in esp_remove_trailer().
+do kfree_skb() if an unexpected result is returned by pskb_tirm()
+in do_output().
 
 Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 ---
- net/ipv6/esp6.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/openvswitch/actions.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index fddd0cbdede1..81111ccadf34 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -770,7 +770,10 @@ static inline int esp_remove_trailer(struct sk_buff *skb)
- 		skb->csum = csum_block_sub(skb->csum, csumdiff,
- 					   skb->len - trimlen);
- 	}
--	pskb_trim(skb, skb->len - trimlen);
-+	if (pskb_trim(skb, skb->len - trimlen)) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
+diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+index cab1e02b63e0..6b3456bdff1c 100644
+--- a/net/openvswitch/actions.c
++++ b/net/openvswitch/actions.c
+@@ -920,9 +920,11 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
  
- 	ret = nexthdr[1];
+ 		if (unlikely(cutlen > 0)) {
+ 			if (skb->len - cutlen > ovs_mac_header_len(key))
+-				pskb_trim(skb, skb->len - cutlen);
++				if (pskb_trim(skb, skb->len - cutlen))
++					kfree_skb(skb);
+ 			else
+-				pskb_trim(skb, ovs_mac_header_len(key));
++				if (pskb_trim(skb, ovs_mac_header_len(key)))
++					kfree_skb(skb);
+ 		}
  
+ 		if (likely(!mru ||
 -- 
 2.17.1
 
