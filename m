@@ -1,68 +1,74 @@
-Return-Path: <netdev+bounces-18382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DEA4756B20
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:00:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56DC8756B26
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 20:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE7E91C20854
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:00:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DA861C20B47
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 18:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12823C15F;
-	Mon, 17 Jul 2023 17:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988ABBE46;
+	Mon, 17 Jul 2023 18:00:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08445C13A
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 17:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898211878;
+	Mon, 17 Jul 2023 18:00:56 +0000 (UTC)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D8599
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 10:58:19 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E50115;
+	Mon, 17 Jul 2023 11:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689616699; x=1721152699;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=QfSOshIC7RabHDTzn9nC3vNN+3yDbpg9Brlqmxtuli8=;
-  b=FBC9C2GkK3912BdjEUw7AtZ8n/8BcZLRiA3Ea+udNcJZK61LzRSVRsGb
-   2JvEdDVM6MzeCnh+sISeiiFu1bl2bRUA0c1ngjUSX93D94wpe+LQp3jgA
-   J/ox3KNfhpmP5BD+FWOXXVifGxHr7PV5mOPYMLRKNUTujn5u/kzod7vpV
-   M6nZMcRKp0l21dfu88Q3mH7i2a1+xPUQqqzYqFgzJOubhCdUHO3jvVEZE
-   0vLLKMqC1YCMT4UAZvGaEKumOFLGBB5Oc6870k/8SxCacVL2GCW1+wIqv
-   E+EG8iTktdW101hdWm9lmPeQHWD9Tcl+Ylc4XEulHhMYE8pt61yiUg5At
+  t=1689616855; x=1721152855;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RjQve+ajtq6zDTbE381g1mmA3qfKB2Tvgtd16TWYHZ0=;
+  b=mH+gW55SP8imbiRu03MbvrY1WYfkDl0bskU20CcStSnHB2RDr8Qd6kdq
+   gjeE00dd9P0UZQvS1YYAKVcCx72k06cLi0wXxTRlQA/ySYaA3+TFErGAM
+   QXrFJ7L/F7/+kzQRrziqrMjw56nDeLRPx5335UeLMqv7z8rex3/3fdIKz
+   mHl+iCuo85Ylh50tP4P6IIJ6mTtQ+7R6GsBR/VeU+rxUnodP9NsUB5jrP
+   pZTGLngJBZ9zc783f/jSaWwTYgPfsKsiXNgBNDexPT42GbPIzPjdoUTIp
+   4+KSICAoNWZLcICQOUSARZQLVdw6EeTs5w9SJhyJQAZnW2mfSGxt9i/Fh
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="432172707"
+X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="432173503"
 X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="432172707"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 10:58:01 -0700
+   d="scan'208";a="432173503"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 11:00:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="723294589"
+X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="793329326"
 X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="723294589"
+   d="scan'208";a="793329326"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga002.jf.intel.com with ESMTP; 17 Jul 2023 10:58:00 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 17 Jul 2023 11:00:52 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
+Cc: Florian Kauer <florian.kauer@linutronix.de>,
 	anthony.l.nguyen@intel.com,
-	ivecera@redhat.com,
-	sassmann@kpanic.de,
-	Mateusz Palczewski <mateusz.palczewski@intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 8/8] iavf: fix reset task race with iavf_remove()
-Date: Mon, 17 Jul 2023 10:52:05 -0700
-Message-Id: <20230717175205.3217774-9-anthony.l.nguyen@intel.com>
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	sasha.neftin@intel.com,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: [PATCH net] igc: Prevent garbled TX queue with XDP ZEROCOPY
+Date: Mon, 17 Jul 2023 10:54:44 -0700
+Message-Id: <20230717175444.3217831-1-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230717175205.3217774-1-anthony.l.nguyen@intel.com>
-References: <20230717175205.3217774-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,185 +83,72 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Ahmed Zaki <ahmed.zaki@intel.com>
+From: Florian Kauer <florian.kauer@linutronix.de>
 
-The reset task is currently scheduled from the watchdog or adminq tasks.
-First, all direct calls to schedule the reset task are replaced with the
-iavf_schedule_reset(), which is modified to accept the flag showing the
-type of reset.
+In normal operation, each populated queue item has
+next_to_watch pointing to the last TX desc of the packet,
+while each cleaned item has it set to 0. In particular,
+next_to_use that points to the next (necessarily clean)
+item to use has next_to_watch set to 0.
 
-To prevent the reset task from starting once iavf_remove() starts, we need
-to check the __IAVF_IN_REMOVE_TASK bit before we schedule it. This is now
-easily added to iavf_schedule_reset().
+When the TX queue is used both by an application using
+AF_XDP with ZEROCOPY as well as a second non-XDP application
+generating high traffic, the queue pointers can get in
+an invalid state where next_to_use points to an item
+where next_to_watch is NOT set to 0.
 
-Finally, remove the check for IAVF_FLAG_RESET_NEEDED in the watchdog task.
-It is redundant since all callers who set the flag immediately schedules
-the reset task.
+However, the implementation assumes at several places
+that this is never the case, so if it does hold,
+bad things happen. In particular, within the loop inside
+of igc_clean_tx_irq(), next_to_clean can overtake next_to_use.
+Finally, this prevents any further transmission via
+this queue and it never gets unblocked or signaled.
+Secondly, if the queue is in this garbled state,
+the inner loop of igc_clean_tx_ring() will never terminate,
+completely hogging a CPU core.
 
-Fixes: 3ccd54ef44eb ("iavf: Fix init state closure on remove")
-Fixes: 14756b2ae265 ("iavf: Fix __IAVF_RESETTING state usage")
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Signed-off-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+The reason is that igc_xdp_xmit_zc() reads next_to_use
+before acquiring the lock, and writing it back
+(potentially unmodified) later. If it got modified
+before locking, the outdated next_to_use is written
+pointing to an item that was already used elsewhere
+(and thus next_to_watch got written).
+
+Fixes: 9acf59a752d4 ("igc: Enable TX via AF_XDP zero-copy")
+Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Tested-by: Kurt Kanzenbach <kurt@linutronix.de>
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/iavf/iavf.h        |  2 +-
- .../net/ethernet/intel/iavf/iavf_ethtool.c    |  8 ++---
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 32 +++++++------------
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  3 +-
- 4 files changed, 16 insertions(+), 29 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index bf5e3c8e97e0..8cbdebc5b698 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -520,7 +520,7 @@ int iavf_up(struct iavf_adapter *adapter);
- void iavf_down(struct iavf_adapter *adapter);
- int iavf_process_config(struct iavf_adapter *adapter);
- int iavf_parse_vf_resource_msg(struct iavf_adapter *adapter);
--void iavf_schedule_reset(struct iavf_adapter *adapter);
-+void iavf_schedule_reset(struct iavf_adapter *adapter, u64 flags);
- void iavf_schedule_request_stats(struct iavf_adapter *adapter);
- void iavf_schedule_finish_config(struct iavf_adapter *adapter);
- void iavf_reset(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index b7141c2a941d..2f47cfa7f06e 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -532,8 +532,7 @@ static int iavf_set_priv_flags(struct net_device *netdev, u32 flags)
- 	/* issue a reset to force legacy-rx change to take effect */
- 	if (changed_flags & IAVF_FLAG_LEGACY_RX) {
- 		if (netif_running(netdev)) {
--			adapter->flags |= IAVF_FLAG_RESET_NEEDED;
--			queue_work(adapter->wq, &adapter->reset_task);
-+			iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
- 			ret = iavf_wait_for_reset(adapter);
- 			if (ret)
- 				netdev_warn(netdev, "Changing private flags timeout or interrupted waiting for reset");
-@@ -676,8 +675,7 @@ static int iavf_set_ringparam(struct net_device *netdev,
- 	}
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 9f93f0f4f752..f36bc2a1849a 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -2828,9 +2828,8 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
+ 	struct netdev_queue *nq = txring_txq(ring);
+ 	union igc_adv_tx_desc *tx_desc = NULL;
+ 	int cpu = smp_processor_id();
+-	u16 ntu = ring->next_to_use;
+ 	struct xdp_desc xdp_desc;
+-	u16 budget;
++	u16 budget, ntu;
  
- 	if (netif_running(netdev)) {
--		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
--		queue_work(adapter->wq, &adapter->reset_task);
-+		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
- 		ret = iavf_wait_for_reset(adapter);
- 		if (ret)
- 			netdev_warn(netdev, "Changing ring parameters timeout or interrupted waiting for reset");
-@@ -1860,7 +1858,7 @@ static int iavf_set_channels(struct net_device *netdev,
+ 	if (!netif_carrier_ok(ring->netdev))
+ 		return;
+@@ -2840,6 +2839,7 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
+ 	/* Avoid transmit queue timeout since we share it with the slow path */
+ 	txq_trans_cond_update(nq);
  
- 	adapter->num_req_queues = num_req;
- 	adapter->flags |= IAVF_FLAG_REINIT_ITR_NEEDED;
--	iavf_schedule_reset(adapter);
-+	iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
++	ntu = ring->next_to_use;
+ 	budget = igc_desc_unused(ring);
  
- 	ret = iavf_wait_for_reset(adapter);
- 	if (ret)
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 2a2ae3c4337b..3a88d413ddee 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -301,12 +301,14 @@ static int iavf_lock_timeout(struct mutex *lock, unsigned int msecs)
- /**
-  * iavf_schedule_reset - Set the flags and schedule a reset event
-  * @adapter: board private structure
-+ * @flags: IAVF_FLAG_RESET_PENDING or IAVF_FLAG_RESET_NEEDED
-  **/
--void iavf_schedule_reset(struct iavf_adapter *adapter)
-+void iavf_schedule_reset(struct iavf_adapter *adapter, u64 flags)
- {
--	if (!(adapter->flags &
--	      (IAVF_FLAG_RESET_PENDING | IAVF_FLAG_RESET_NEEDED))) {
--		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
-+	if (!test_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section) &&
-+	    !(adapter->flags &
-+	    (IAVF_FLAG_RESET_PENDING | IAVF_FLAG_RESET_NEEDED))) {
-+		adapter->flags |= flags;
- 		queue_work(adapter->wq, &adapter->reset_task);
- 	}
- }
-@@ -334,7 +336,7 @@ static void iavf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
- 
- 	adapter->tx_timeout_count++;
--	iavf_schedule_reset(adapter);
-+	iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
- }
- 
- /**
-@@ -2478,7 +2480,7 @@ int iavf_parse_vf_resource_msg(struct iavf_adapter *adapter)
- 			adapter->vsi_res->num_queue_pairs);
- 		adapter->flags |= IAVF_FLAG_REINIT_MSIX_NEEDED;
- 		adapter->num_req_queues = adapter->vsi_res->num_queue_pairs;
--		iavf_schedule_reset(adapter);
-+		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
- 
- 		return -EAGAIN;
- 	}
-@@ -2775,14 +2777,6 @@ static void iavf_watchdog_task(struct work_struct *work)
- 	if (adapter->flags & IAVF_FLAG_PF_COMMS_FAILED)
- 		iavf_change_state(adapter, __IAVF_COMM_FAILED);
- 
--	if (adapter->flags & IAVF_FLAG_RESET_NEEDED) {
--		adapter->aq_required = 0;
--		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
--		mutex_unlock(&adapter->crit_lock);
--		queue_work(adapter->wq, &adapter->reset_task);
--		return;
--	}
--
- 	switch (adapter->state) {
- 	case __IAVF_STARTUP:
- 		iavf_startup(adapter);
-@@ -2910,11 +2904,10 @@ static void iavf_watchdog_task(struct work_struct *work)
- 	/* check for hw reset */
- 	reg_val = rd32(hw, IAVF_VF_ARQLEN1) & IAVF_VF_ARQLEN1_ARQENABLE_MASK;
- 	if (!reg_val) {
--		adapter->flags |= IAVF_FLAG_RESET_PENDING;
- 		adapter->aq_required = 0;
- 		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
- 		dev_err(&adapter->pdev->dev, "Hardware reset detected\n");
--		queue_work(adapter->wq, &adapter->reset_task);
-+		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_PENDING);
- 		mutex_unlock(&adapter->crit_lock);
- 		queue_delayed_work(adapter->wq,
- 				   &adapter->watchdog_task, HZ * 2);
-@@ -3288,9 +3281,7 @@ static void iavf_adminq_task(struct work_struct *work)
- 	} while (pending);
- 	mutex_unlock(&adapter->crit_lock);
- 
--	if ((adapter->flags &
--	     (IAVF_FLAG_RESET_PENDING | IAVF_FLAG_RESET_NEEDED)) ||
--	    adapter->state == __IAVF_RESETTING)
-+	if (iavf_is_reset_in_progress(adapter))
- 		goto freedom;
- 
- 	/* check for error indications */
-@@ -4387,8 +4378,7 @@ static int iavf_change_mtu(struct net_device *netdev, int new_mtu)
- 	}
- 
- 	if (netif_running(netdev)) {
--		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
--		queue_work(adapter->wq, &adapter->reset_task);
-+		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
- 		ret = iavf_wait_for_reset(adapter);
- 		if (ret < 0)
- 			netdev_warn(netdev, "MTU change interrupted waiting for reset");
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 073ac29ed84c..be3c007ce90a 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -1961,9 +1961,8 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		case VIRTCHNL_EVENT_RESET_IMPENDING:
- 			dev_info(&adapter->pdev->dev, "Reset indication received from the PF\n");
- 			if (!(adapter->flags & IAVF_FLAG_RESET_PENDING)) {
--				adapter->flags |= IAVF_FLAG_RESET_PENDING;
- 				dev_info(&adapter->pdev->dev, "Scheduling reset task\n");
--				queue_work(adapter->wq, &adapter->reset_task);
-+				iavf_schedule_reset(adapter, IAVF_FLAG_RESET_PENDING);
- 			}
- 			break;
- 		default:
+ 	while (xsk_tx_peek_desc(pool, &xdp_desc) && budget--) {
 -- 
 2.38.1
 
