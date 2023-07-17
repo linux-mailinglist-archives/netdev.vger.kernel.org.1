@@ -1,143 +1,120 @@
-Return-Path: <netdev+bounces-18225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA11C755E53
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 10:20:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0E0755E69
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 10:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3160228146B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:20:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6651C20970
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF819472;
-	Mon, 17 Jul 2023 08:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FEF9476;
+	Mon, 17 Jul 2023 08:29:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA07C4414
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 08:20:06 +0000 (UTC)
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD5312D
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 01:20:04 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4fbaef9871cso6513395e87.0
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 01:20:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689582003; x=1692174003;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IRb3R4HhWlnnZ5Vbw44opAtuTE0tiaN9iHoMLE+HdJQ=;
-        b=T5EInwOpV9/qioku+l5ZjxE9G1VGEgVMKFfDBEazeLlB4HEQlByQgoW7byvwcxXJvq
-         fOZo+8zdHNSW+NBpfkSUg7TKQLM8FqTBIpqctiYLzimBZmoReN/xGfHxTuSviAs1MiJu
-         9S4F+q31gk888rYz0b7OX2KcCnLpFel9wQyF4X1nC+dFrmkhCK0Ff8r1G6iCeWZnrkre
-         N14HsWO+8wkUOk2ORakkPNXpSwPoPk3A+vjdfwblNf0RKF0elN7NRjMsXR1uZC0PC3nP
-         U9gcYYns9qOhj4j+KbSzPyj0vB7DW1nlG/9uHeBCkibbW/gcCeMqdu7N1hAe7qkKzKia
-         BVPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689582003; x=1692174003;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IRb3R4HhWlnnZ5Vbw44opAtuTE0tiaN9iHoMLE+HdJQ=;
-        b=TyJR6gtnFSTqSQGGFKpylssI4rehzChydsffKzT8ZVxGgGPgemklQBWF+eHHR4riVI
-         6OylaYVlMKZwrq10hfwpsUROksrKLv0najg4WpIoPgbrpRzEliLDYnxV/XsKd4yr8viK
-         zKzjTCaVRvK1xReDbL0eGlyguHa3bq7KL/49G4R4tFcxOwtalhQ68hd7v2rAtwM65AFk
-         y6ngsZNlxPrPlMUbe+o16bjyivEmMI9Bnnkzgq71A9XaMBQtWdD7k8l/U4kuRPVSKZMH
-         UpRnzZKI3qM2c+F54VENZ1M6tYJBftkA8UcJQG3inl6BL/QV3ZlT6ekwYsv/FZWWHEb7
-         mYKA==
-X-Gm-Message-State: ABy/qLaqn2CubDQ/99cw04juqvCsG2QVGCOwfqZ3fOIUstnPg/ezE7Rj
-	H0/e3BbzYeopQ+MFfifs1Tvm3A==
-X-Google-Smtp-Source: APBJJlFElTkpqsfru0ZEuQACH1Yg9XPhKMAvzdKhjI8Ik7jEMprhhCAhOIg9Riu3Okf15yieclfTcA==
-X-Received: by 2002:a05:6512:4018:b0:4fd:ba81:9d43 with SMTP id br24-20020a056512401800b004fdba819d43mr1711468lfb.56.1689582002575;
-        Mon, 17 Jul 2023 01:20:02 -0700 (PDT)
-Received: from [10.44.2.5] ([81.246.10.41])
-        by smtp.gmail.com with ESMTPSA id s8-20020a7bc388000000b003fb41491670sm7320992wmj.24.2023.07.17.01.20.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 01:20:02 -0700 (PDT)
-Message-ID: <8fa6e3fc-56db-b19d-19c5-250fc5ba92e2@tessares.net>
-Date: Mon, 17 Jul 2023 10:19:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A21D8493
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 08:29:02 +0000 (UTC)
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FE3136;
+	Mon, 17 Jul 2023 01:29:00 -0700 (PDT)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+	by fd01.gateway.ufhost.com (Postfix) with ESMTP id 31F6724E1A6;
+	Mon, 17 Jul 2023 16:28:58 +0800 (CST)
+Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 17 Jul
+ 2023 16:28:58 +0800
+Received: from [192.168.120.43] (171.223.208.138) by EXMBX062.cuchost.com
+ (172.16.6.62) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 17 Jul
+ 2023 16:28:56 +0800
+Message-ID: <6ed58545-c10a-d789-04d5-4eb715f4906d@starfivetech.com>
+Date: Mon, 17 Jul 2023 16:28:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: TC: selftests: current timeout (45s) is too low
-To: David Laight <David.Laight@ACULAB.COM>,
- Pedro Tammela <pctammela@mojatatu.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev <netdev@vger.kernel.org>, Anders Roxell
- <anders.roxell@linaro.org>, Davide Caratti <dcaratti@redhat.com>
-References: <0e061d4a-9a23-9f58-3b35-d8919de332d7@tessares.net>
- <2cf3499b-03dc-4680-91f6-507ba7047b96@mojatatu.com>
- <3acc88b6-a42d-c054-9dae-8aae22348a3e@tessares.net>
- <ca8565fbbd614c8489c38761db2959de@AcuMS.aculab.com>
-Content-Language: en-GB
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <ca8565fbbd614c8489c38761db2959de@AcuMS.aculab.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: motorcomm: Add pad driver
+ strength cfg
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Peter Geis <pgwipeout@gmail.com>, Frank
+	<Frank.Sae@motor-comm.com>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Conor Dooley
+	<conor@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	Yanhong Wang <yanhong.wang@starfivetech.com>
+References: <20230714101406.17686-1-samin.guo@starfivetech.com>
+ <20230714101406.17686-2-samin.guo@starfivetech.com>
+ <4efd8643-455e-4f7f-b031-a0a02dd65210@lunn.ch>
+From: Guo Samin <samin.guo@starfivetech.com>
+In-Reply-To: <4efd8643-455e-4f7f-b031-a0a02dd65210@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+X-Originating-IP: [171.223.208.138]
+X-ClientProxiedBy: EXCAS061.cuchost.com (172.16.6.21) To EXMBX062.cuchost.com
+ (172.16.6.62)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David,
 
-On 14/07/2023 17:15, David Laight wrote:
-> From: Matthieu Baerts
->> Sent: 12 July 2023 15:43
->>
->> Hi Pedro,
->>
->> On 12/07/2023 15:43, Pedro Tammela wrote:
->>> I have been involved in tdc for a while now, here are my comments.
->>
->> Thank you for your reply!
->>
->>> On 12/07/2023 06:47, Matthieu Baerts wrote:
->>>> Hi Jamal, Cong, Jiri,
->>>>
->>>> When looking for something else [1] in LKFT reports [2], I noticed that
->>>> the TC selftest ended with a timeout error:
->>>>
->>>>    not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
-> ...
->>>> I'm sending this email instead of a patch because I don't know which
->>>> value makes sense. I guess you know how long the tests can take in a
->>>> (very) slow environment and you might want to avoid this timeout error.
->>>
->>> I believe a timeout between 5-10 to minutes should cover the entire suite
->>
->> Thank you for your feedback.
->> If we want to be on the safe side, I guess it is better to put 10
->> minutes or even 15, no?
-> 
-> Is it possible to use the time taken for an initial test
-> to scale the timeout for all the tests?
-> 
-> Then you could have a 45second timeout on a fast system and
-> a much longer timeout on a slow one.
 
-For the selftests global timeout, that would be great but with the
-current architecture, it is not possible to do that because the value of
-this global timeout is used when starting the different selftests, e.g.
+-------- =E5=8E=9F=E5=A7=8B=E4=BF=A1=E6=81=AF --------
+=E4=B8=BB=E9=A2=98: Re: [PATCH v4 1/2] dt-bindings: net: motorcomm: Add p=
+ad driver strength cfg
+From: Andrew Lunn <andrew@lunn.ch>
+=E6=94=B6=E4=BB=B6=E4=BA=BA: Samin Guo <samin.guo@starfivetech.com>
+=E6=97=A5=E6=9C=9F: 2023/7/15
 
-  /usr/bin/timeout --foreground 45 ./tdc.sh
+>> +  motorcomm,rx-clk-driver-strength:
+>> +    $ref: /schemas/types.yaml#/definitions/uint32
+>> +    description: |
+>> +      drive strength of rx_clk rgmii pad.
+>> +      |----------------------------------|
+>> +      |        rx_clk ds map table       |
+>> +      |----------------------------------|
+>> +      | DS(3b) |  wol@1.8v  |  wol@3.3v  |
+>> +      |________|_________________________|
+>> +      |        | current(uA)| current(uA)|
+>> +      |   000  |     1200   |    3070    |
+>> +      |   001  |     2100   |    4080    |
+>> +      |   010  |     2700   |    4370    |
+>> +      |   011  |     2910   |    4680    |
+>> +      |   100  |     3110   |    5020    |
+>> +      |   101  |     3600   |    5450    |
+>> +      |   110  |     3970   |    5740    |
+>> +      |   111  |     4350   |    6140    |
+>> +      |--------|------------|------------|
+>> +    enum: [ 1200, 2100, 2700, 2910, 3070, 3110, 3600, 3970,
+>> +            4080, 4350, 4370, 4680, 5020, 5450, 5740, 6140 ]
+>> +    default: 2910
+>=20
+> The DS(3b) value is not relevant to the binding. It is a driver
+> detail. So i would not bother listing it.
+>=20
+ok=EF=BC=8C will remove it.
 
-For the per-test timeout used in TC test environment -- currently at 24
-seconds -- I guess it could be adapted like that but that's a different
-topic.
+> Please add a comment explaining what wol is.=20
+>=20
+>        Andrew
 
-Cheers,
-Matt
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+Sorry=EF=BC=8Cit should be vol (voltage), not wol.
+
+=20
+Best regards,
+Samin
 
