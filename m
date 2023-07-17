@@ -1,97 +1,123 @@
-Return-Path: <netdev+bounces-18238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18DB5755F4A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:33:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37473755F50
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 11:33:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5541C20AB8
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:33:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E292828145A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0A6A92C;
-	Mon, 17 Jul 2023 09:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F757A92E;
+	Mon, 17 Jul 2023 09:33:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EDD947E
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:32:57 +0000 (UTC)
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA04610FF
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 02:32:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1689586371; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=b6HSklPQPs1XDa2TLe/ltGenY8q4pumpd4wWgEsTrAI0CgLpnYDfPloEr9MJAmPWlu7m2CBFoPIUmjfMse5e48QH0RD5gOz9e0Zf4puuxtet0Bg4m1HXv8srID3uRUDz6WXRItwF5tTiGwrgsoYIWOcMDtLWq5wlfrfkyRJREW4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1689586371; h=Content-Type:Content-Transfer-Encoding:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-	bh=9hc++BVjqtMQewgmPkHKgA5xW5K8WEGIIJOcx/Wc4x4=; 
-	b=BXWkAC+Wpv3/uM4xlVlBzbnIK9nWW9A5sAhjv4kJgLpIM+s+Zzg2KvbsZsmw5lAl/iUffOXBDPO5Wa9kUAoaQ5glwlWjbY6dgScn4WAlDkdw4bqOjJf2CEd69QKR8cWjPx/z8g3OMfcCJqjtLRrW+NCZkP+B1rpIpRCdNE4fpjw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=chandergovind.org;
-	spf=pass  smtp.mailfrom=mail@chandergovind.org;
-	dmarc=pass header.from=<mail@chandergovind.org>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1689586371;
-	s=zoho; d=chandergovind.org; i=mail@chandergovind.org;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:From:From:To:To:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=9hc++BVjqtMQewgmPkHKgA5xW5K8WEGIIJOcx/Wc4x4=;
-	b=pbYCXPWUT0UMM5ZkVYs23rCvGzq+Zo7jmnenj8BNhtWrhuLL0KaaFNxpfgyT4vWU
-	OCx+qyf2fsOgx9L/p5ftbqYDRORZmci2SiF+S5L2/MItKLwrKLHHfXuNqmXoAmfrY9s
-	q446YcXmmgnRhqg/lsSZgLjWBoNKdknSMRon81OE=
-Received: from [192.168.1.43] (101.0.62.66 [101.0.62.66]) by mx.zohomail.com
-	with SMTPS id 1689586369710539.7091966608089; Mon, 17 Jul 2023 02:32:49 -0700 (PDT)
-Message-ID: <04c8e339-1811-b069-c833-99c7ab7060e3@chandergovind.org>
-Date: Mon, 17 Jul 2023 15:02:46 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DF8A92D
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 09:33:43 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECD5FBE;
+	Mon, 17 Jul 2023 02:33:41 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H5Tp1v020422;
+	Mon, 17 Jul 2023 02:33:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=y6hp+s+hQsfK+6/k8ufarcCUrnxJf/cZ5C+kliYfWUk=;
+ b=QEXlSB5hB/u7k84bjv0GEIkf3LJ1t5B/wjc8R50EMEuy0lOJHyQ0RUIICQRbJpNSE0No
+ 90nUGYjiNqeF0S8khT0+DuS4vFtpDXUa9Trowa/Ovew3QB0QZMwdkB36IjLxBbVQ6Csp
+ PlGZq/Z8A7+W1x7IFEyi7PC0DBmggJ8ZyLGRY4ZaWzEsdvxMV22uDC4JPZnvNx2T0oDr
+ F5zkESGYgr2RS9DO/gVS90glVqFGj+Rm3Kgx5pYiW/EfjfmQxUiCOdZ6im26f3N9RgYj
+ 737j+Lctt05uGpnpMS3N6EIap8re+bzoh6B4PqK/l+ayG1n3aSyDhyGtP5X5cLl8tVgS 2A== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rvyhx0p1a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jul 2023 02:33:28 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 17 Jul
+ 2023 02:33:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 17 Jul 2023 02:33:26 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.134])
+	by maili.marvell.com (Postfix) with ESMTP id 745553F70A4;
+	Mon, 17 Jul 2023 02:33:20 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>,
+        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
+        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
+Subject: [net-next Patch v3 0/4] octeontx2-pf: support Round Robin scheduling
+Date: Mon, 17 Jul 2023 15:03:15 +0530
+Message-ID: <20230717093319.26618-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH iproute2 v2] misc/ifstat: fix incorrect output data in
- json mode
-Content-Language: en-US
-From: Chander Govindarajan <mail@chandergovind.org>
-To: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>
-References: <ce6074bd-2e72-25ef-5827-6336c081b66c@chandergovind.org>
-In-Reply-To: <ce6074bd-2e72-25ef-5827-6336c081b66c@chandergovind.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
-X-Spam-Status: No, score=1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain
+X-Proofpoint-GUID: MULHA1Yrpye_ZfrE7_tJhdx5wjurB7E2
+X-Proofpoint-ORIG-GUID: MULHA1Yrpye_ZfrE7_tJhdx5wjurB7E2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-17_07,2023-07-13_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Due to this bug, in json mode (with the -j flag), the output was
-always in absolute mode (as if passing in the -a flag) and not in
-relative mode.
+octeontx2 and CN10K silicons support Round Robin scheduling. When multiple
+traffic flows reach transmit level with the same priority, with Round Robin
+scheduling traffic flow with the highest quantum value is picked. With this
+support, the user can add multiple classes with the same priority and
+different quantum in htb offload.
 
-Signed-off-by: Chander Govindarajan <mail@chandergovind.org>
+This series of patches adds support for the same.
+
+Patch1: implement transmit schedular allocation algorithm as preparation
+        for support round robin scheduling.
+
+Patch2: Allow quantum parameter in HTB offload mode.
+
+Patch3: extends octeontx2 htb offload support for Round Robin scheduling
+
+Patch4: extend QOS documentation for Round Robin scheduling
+
+Hariprasad Kelam (1):
+  docs: octeontx2: extend documentation for Round Robin scheduling
+
+Naveen Mamindlapalli (3):
+  octeontx2-pf: implement transmit schedular allocation algorithm
+  sch_htb: Allow HTB quantum parameter in offload mode
+  octeontx2-pf: htb offload support for Round Robin scheduling
 ---
- misc/ifstat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v3 * update QOS documentation for round robin scheduling
+     added out of bound checks for quantum parameter
 
-diff --git a/misc/ifstat.c b/misc/ifstat.c
-index f6f9ba50..6c76fa15 100644
---- a/misc/ifstat.c
-+++ b/misc/ifstat.c
-@@ -569,7 +569,7 @@ static void dump_incr_db(FILE *fp)
- 			continue;
- 
- 		if (jw)
--			print_one_json(jw, n, n->val);
-+			print_one_json(jw, n, vals);
- 		else
- 			print_one_if(fp, n, vals);
- 	}
--- 
-2.36.1.299.gab336e8f1c
+v2 * change data type of otx2_index_used to reduce size of structure
+     otx2_qos_cfg
+
+ .../ethernet/marvell/octeontx2.rst            |   8 +
+ .../marvell/octeontx2/nic/otx2_common.c       |   1 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   1 +
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  | 398 ++++++++++++++++--
+ .../net/ethernet/marvell/octeontx2/nic/qos.h  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |   4 +-
+ include/net/pkt_cls.h                         |   1 +
+ net/sched/sch_htb.c                           |   7 +-
+ 8 files changed, 388 insertions(+), 43 deletions(-)
+
+--
+2.17.1
 
