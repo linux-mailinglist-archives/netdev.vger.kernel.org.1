@@ -1,121 +1,108 @@
-Return-Path: <netdev+bounces-18192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C720E755B74
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:24:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 972B9755BAE
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 08:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00EA4281445
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:24:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52ED128145A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 06:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743258465;
-	Mon, 17 Jul 2023 06:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A0A8466;
+	Mon, 17 Jul 2023 06:29:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0430D79D0;
-	Mon, 17 Jul 2023 06:24:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A093FC433C7;
-	Mon, 17 Jul 2023 06:23:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689575045;
-	bh=mzBDvBJqqLyJpJlXdHHc50ky7DqFeoJEZrmNjEwRYw4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=cSmXkQBMdVKYM2skEir1bV6wfmjtrQbqO1IJGKuBIhaVowNQUTrTgCxjHIGLjQxrf
-	 aC/Mqe8ThUtGNnjeclaKm5yYvx+1VkzQA8Mr9utTM3ZL+DpRjNnGms0i8Owh/zz47+
-	 h23rcDa+qzK1c9z1FR8QVJBepzxuuB2xEgqOuOIqx4jooERucg0rTondYvdBHeVIOz
-	 bL1wNk7h7Adc3SmCkPC256BY6lJOEvwXhhD9BG3119i3AtN9OvJn0PEErA3fywzUPz
-	 Uelr5Xmo7pEGEjZ7k3ZowAQcz2l0sAxbf5yJcE3PDjGEbPdkw3ro5etSrrJpG2MR4S
-	 U/6x9udfwh94A==
-From: Vinod Koul <vkoul@kernel.org>
-To: Kishon Vijay Abraham I <kishon@kernel.org>, 
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
- Samuel Holland <samuel@sholland.org>, 
- Neil Armstrong <neil.armstrong@linaro.org>, 
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
- Justin Chen <justin.chen@broadcom.com>, Al Cooper <alcooperx@gmail.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
- Ioana Ciornei <ioana.ciornei@nxp.com>, Yu Chen <chenyu56@huawei.com>, 
- Binghui Wang <wangbinghui@hisilicon.com>, 
- Mauro Carvalho Chehab <mchehab@kernel.org>, Lubomir Rintel <lkundrak@v3.sk>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Chun-Kuang Hu <chunkuang.hu@kernel.org>, 
- Philipp Zabel <p.zabel@pengutronix.de>, 
- Chunfeng Yun <chunfeng.yun@mediatek.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Wolfgang Grandegger <wg@grandegger.com>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, Alban Bedel <albeu@free.fr>, 
- Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>, 
- Robert Marko <robert.marko@sartura.hr>, 
- Luka Perkov <luka.perkov@sartura.hr>, 
- Sergio Paracuellos <sergio.paracuellos@gmail.com>, 
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
- Heiko Stuebner <heiko@sntech.de>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Alim Akhtar <alim.akhtar@samsung.com>, 
- Sylwester Nawrocki <s.nawrocki@samsung.com>, 
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Vincent Shih <vincent.sunplus@gmail.com>, 
- Thierry Reding <thierry.reding@gmail.com>, 
- Jonathan Hunter <jonathanh@nvidia.com>, JC Kuo <jckuo@nvidia.com>, 
- Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-phy@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
- linux-kernel@vger.kernel.org, linux-amlogic@lists.infradead.org, 
- netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org, 
- linux-can@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
- linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
- linux-samsung-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-tegra@vger.kernel.org
-In-Reply-To: <20230714174841.4061919-1-robh@kernel.org>
-References: <20230714174841.4061919-1-robh@kernel.org>
-Subject: Re: [PATCH] phy: Explicitly include correct DT includes
-Message-Id: <168957502626.294691.2933301083453115851.b4-ty@kernel.org>
-Date: Mon, 17 Jul 2023 11:53:46 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9F26D19
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 06:29:24 +0000 (UTC)
+Received: from mail.208.org (unknown [183.242.55.162])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D8410F8
+	for <netdev@vger.kernel.org>; Sun, 16 Jul 2023 23:29:03 -0700 (PDT)
+Received: from mail.208.org (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTP id 4R4BxJ6tYvzBHXgp
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 14:28:52 +0800 (CST)
+Authentication-Results: mail.208.org (amavisd-new); dkim=pass
+	reason="pass (just generated, assumed good)" header.d=208.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
+	content-transfer-encoding:content-type:message-id:user-agent
+	:references:in-reply-to:subject:to:from:date:mime-version; s=
+	dkim; t=1689575332; x=1692167333; bh=gYfLRyY+eBS7ELomGMNo4u0qwZ+
+	q7EitNu0BbhLxNN0=; b=kuit9gHhjoxniS43GPa4tZuiKakP7Pbe/PQB4Z4dKie
+	TtgWMsRgG5pJlUZ2ISKvXL8yIKDvak3srA0jzE9G2ZF/cd7IiG19IheQTbFmGn9Z
+	tuQ49ralXs/NzpjvG6ruopqt0u7Ebc05HwSHvsLE9KkaMkpFqGbZ9nVd8TTDFAMz
+	gM1SJCdSFaYifovW7KOJGCeVE5uDOCO0zMc6bndU1BcFa8rzuxSgw1/4y8CFgYzA
+	tpqOli+VPgsmNQGPSYALw+tuBcF6/3+EbAE3j5NX3zM9Dn9RZUgKxpMU4uWOaY+v
+	SQwK/N+nLmIG5UQgh7zB2rxW5u+ZGCka3zxau2Ede4A==
+X-Virus-Scanned: amavisd-new at mail.208.org
+Received: from mail.208.org ([127.0.0.1])
+	by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 28aD7KA-lMoV for <netdev@vger.kernel.org>;
+	Mon, 17 Jul 2023 14:28:52 +0800 (CST)
+Received: from localhost (email.208.org [127.0.0.1])
+	by mail.208.org (Postfix) with ESMTPSA id 4R4BxJ45dGzBHXgf;
+	Mon, 17 Jul 2023 14:28:52 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 17 Jul 2023 14:28:52 +0800
+From: hanyu001@208suo.com
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] drivers/net: space required after that ','
+In-Reply-To: <tencent_42BF9168164914C9431B82386C853B9EE609@qq.com>
+References: <tencent_42BF9168164914C9431B82386C853B9EE609@qq.com>
+User-Agent: Roundcube Webmail
+Message-ID: <e0580876db3dbe6f9fedd2eb210bfe07@208suo.com>
+X-Sender: hanyu001@208suo.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.2
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Fixes the following checkpatch errors:
 
-On Fri, 14 Jul 2023 11:48:35 -0600, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
-> 
-> [...]
+./drivers/net/ethernet/realtek/8139cp.c:1141: ERROR: space required 
+after that ',' (ctx:VxV)
+./drivers/net/ethernet/realtek/8139cp.c:1152: ERROR: space required 
+after that ',' (ctx:VxV)
 
-Applied, thanks!
+Signed-off-by: maqimei <2433033762@qq.com>
+---
+  drivers/net/ethernet/realtek/8139cp.c | 4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 
-[1/1] phy: Explicitly include correct DT includes
-      commit: 7559e7572c03e433efec7734af6a674fdd83dd68
+diff --git a/drivers/net/ethernet/realtek/8139cp.c 
+b/drivers/net/ethernet/realtek/8139cp.c
+index f5786d7..6c828b4 100644
+--- a/drivers/net/ethernet/realtek/8139cp.c
++++ b/drivers/net/ethernet/realtek/8139cp.c
+@@ -1138,7 +1138,7 @@ static void cp_clean_rings (struct cp_private *cp)
+      for (i = 0; i < CP_RX_RING_SIZE; i++) {
+          if (cp->rx_skb[i]) {
+              desc = cp->rx_ring + i;
+-            dma_unmap_single(&cp->pdev->dev,le64_to_cpu(desc->addr),
++            dma_unmap_single(&cp->pdev->dev, le64_to_cpu(desc->addr),
+                       cp->rx_buf_sz, DMA_FROM_DEVICE);
+              dev_kfree_skb_any(cp->rx_skb[i]);
+          }
+@@ -1149,7 +1149,7 @@ static void cp_clean_rings (struct cp_private *cp)
+              struct sk_buff *skb = cp->tx_skb[i];
 
-Best regards,
--- 
-~Vinod
-
-
+              desc = cp->tx_ring + i;
+-            dma_unmap_single(&cp->pdev->dev,le64_to_cpu(desc->addr),
++            dma_unmap_single(&cp->pdev->dev, le64_to_cpu(desc->addr),
+                       le32_to_cpu(desc->opts1) & 0xffff,
+                       DMA_TO_DEVICE);
+              if (le32_to_cpu(desc->opts1) & LastFrag)
 
