@@ -1,736 +1,173 @@
-Return-Path: <netdev+bounces-18214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB668755D55
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:47:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15EBE755D5E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 09:47:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20A1C2810A4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:47:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC595280E90
+	for <lists+netdev@lfdr.de>; Mon, 17 Jul 2023 07:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1145B9453;
-	Mon, 17 Jul 2023 07:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC969455;
+	Mon, 17 Jul 2023 07:47:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4167848A
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:47:08 +0000 (UTC)
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F83B170B
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:46:43 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b701e1c80fso59616381fa.2
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1689579998; x=1692171998;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iV3hVLF25+n3gbd6mYFGn1UuxJ1cAMbUM5IXkqIJ1m8=;
-        b=BNjjITDk1RiMGbJcSQvvg8+k9svQ6RsT6ywWKNhZ3qUttUwd1p/zaxgFecQHiwgi/a
-         y8pKvwFBECAEyTpXb9KQKPAbZlWaQg9LDa6HBNviL1ytbGiZ/UYzxmbXswH7l/BdT+96
-         VVNpMtvUM/mpa1dTDJ8IkbU17qmtYqGUtAix4=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB75B5CB8
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:47:43 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4D219A8
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:47:21 -0700 (PDT)
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 587203F71B
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 07:47:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1689580038;
+	bh=3gAfaAKrcJgIAcFAT2kE7R0UfBXH+B9pPbdV57Y5Wuk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=iy8tUaMF6mIyILPq+D7VR6/9yi8oC90Tc/h3Sdtbzj1xqvkCOPNdxM6Gi813fviW5
+	 5kpPeMWKtzFK0AiznlpbUIqxyY5TVfTijcJWuAUS9rl+hyel+QXwMPl+qZqqN2tt+f
+	 Iey7Fqj9/x8F6CVRiL2Secgz5/298PL3yHEb6guRfkAUIl1vfokSbuIS5RsRpvYH2e
+	 j1oYYP2Rodp7F48B3MmtZN4utUKtT8fHmvqzlVjFC87eHqomUr6tnycpTqG/JMSfAa
+	 DKrVNlkSykyHYv6DVAg9QLQY2JV5IbJxWOLd5X2f/Ay35dxm5+DTcb1vJh9qce3C8S
+	 x04SCXhU3cGow==
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-560ce5f7646so5520472eaf.3
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 00:47:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689579998; x=1692171998;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iV3hVLF25+n3gbd6mYFGn1UuxJ1cAMbUM5IXkqIJ1m8=;
-        b=Yb/vEUJOT/hp34FBS4MjS4nVNcV4ftKn/nnqoZFX68EQBKr+mI+qZxkcIx2xLHBU21
-         Qmw8AyC2cSsoOfe8tq04CG/MJoB+iNSuGkQo9j2SDnTStbgMaUn2xtpymTWKUr4tw9Xt
-         z1MUcg9XqR8Y5kuUQC0lpTJvuuMYKKnyVr+RJCBeX7hlafj32NEFyNTqnxb+tsO1WKbo
-         Oiaa4R91t6wUEEHEJtxYWqV6qq6/fQTtH5gSlH8HhVQAUjKY3Z8aYdkxqCUmh5aBjuc7
-         NcutjGbwFEoXVCbmNyCbxt9C1tYzzrjv+Su3d/ZzdBdGXiV6y/ufMUaHRmssPcSrn1A3
-         oVSw==
-X-Gm-Message-State: ABy/qLaVzh3PkgHS9fjlygOHH4kf8bzwc7TXis9T32g4D16VOdUncOoP
-	m9jZsIqQWNk37Hz3ov8sREQE2/DhH6nj8lL6NJ0+9w==
-X-Google-Smtp-Source: APBJJlGRF1lMm1UzKgbWQ9FsCpTv0bWRNkrFJsL8GJXihLgLfW57n5qNqLSI65vAhbHGbGYr67cvxDcjQJk2tnN2iiM=
-X-Received: by 2002:a2e:92c3:0:b0:2b7:14d4:ce6d with SMTP id
- k3-20020a2e92c3000000b002b714d4ce6dmr7768876ljh.48.1689579998085; Mon, 17 Jul
- 2023 00:46:38 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689580035; x=1692172035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3gAfaAKrcJgIAcFAT2kE7R0UfBXH+B9pPbdV57Y5Wuk=;
+        b=Ft4/Wuc0CBmtSJp/EiQ4L0Jvr/dJkxq3l5MdvUyvzsUwBHsQsyKAvLIxxeA5H4Am93
+         zmI2khL9Hlq5ZiW8+zEjZoI/5NPst5TYaOzyUWYfBy48cJl2+4wzKqIH+5Z2SKnL7LfY
+         um0gjeSZruPTfTP+wdQ9cNo1R0QcrmQFLFIyfJRBLjrQNUqbS136mUiyOgEcPKGRwivr
+         ssPvXbSBiSnU7JwtxukMB95jPr8C8wsn2wHYt1QTmq1Z5neoKXYHZR+2aJYnLhU3+YIh
+         kGCEMqQM6ZRGgzWc/Vk8c+hnSlO1I+Yk4kqK0yrZaJZFU68jMY4F/f46f8wacBAyoE3c
+         CvRw==
+X-Gm-Message-State: ABy/qLZam/Yz0bR6BACp6GaZldOWmf6i0RPUN3OROppXIIGdpqmoyZWO
+	iIWWl+9zpiLX0T0AUMhAcfAbCBrx2Fbtu1viNxIokLvlBMMUBPy9c8iUsvrrPM1MntubXwgKU1E
+	MGkjcyMu80HQDgwD/4fVabiySpaUYX9LW3c0LVLpLH8GXKa0svw==
+X-Received: by 2002:a05:6358:4291:b0:133:291:f9ac with SMTP id s17-20020a056358429100b001330291f9acmr8421576rwc.25.1689580035721;
+        Mon, 17 Jul 2023 00:47:15 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG9DoONFKdmsKqUh/LuGSuwifc1GAuZNV44ZqW0/u5tIfGEjz1hRCf3IVbFGKMGLXWKhFrokqQ0Xv8dAN/JWlM=
+X-Received: by 2002:a05:6358:4291:b0:133:291:f9ac with SMTP id
+ s17-20020a056358429100b001330291f9acmr8421558rwc.25.1689580035356; Mon, 17
+ Jul 2023 00:47:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1689574603-28093-1-git-send-email-sbhatta@marvell.com>
-In-Reply-To: <1689574603-28093-1-git-send-email-sbhatta@marvell.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 17 Jul 2023 13:16:26 +0530
-Message-ID: <CAH-L+nPVC=7J1ejtzRzaHm8yB2QtdRKuSerDqLfy3k1_8RzBrQ@mail.gmail.com>
-Subject: Re: [net PATCH v2] octeontx2-pf: mcs: Generate hash key using ecb(aes)
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	sgoutham@marvell.com, gakula@marvell.com, hkelam@marvell.com, 
-	naveenm@marvell.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a249fa0600a9ff5d"
+References: <874jm6nsd0.fsf@intel.com> <20230715191216.GA364070@bhelgaas>
+In-Reply-To: <20230715191216.GA364070@bhelgaas>
+From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Date: Mon, 17 Jul 2023 15:47:04 +0800
+Message-ID: <CAAd53p6SiQrmjWA3=4CE0tw15-ZfmkcqTNoheXzkkkargfGtCw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2] igc: Ignore AER reset when device is suspended
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Tony Luck <tony.luck@intel.com>, 
+	Kees Cook <keescook@chromium.org>, linux-pci@vger.kernel.org, 
+	jesse.brandeburg@intel.com, linux-kernel@vger.kernel.org, 
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	anthony.l.nguyen@intel.com, linux-hardening@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HTML_MESSAGE,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000a249fa0600a9ff5d
-Content-Type: multipart/alternative; boundary="0000000000009b5a2f0600a9ffa3"
-
---0000000000009b5a2f0600a9ffa3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 17, 2023 at 11:47=E2=80=AFAM Subbaraya Sundeep <sbhatta@marvell=
-.com>
+On Sun, Jul 16, 2023 at 3:12=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org> =
 wrote:
+>
+> On Fri, Jul 14, 2023 at 01:35:55PM -0700, Vinicius Costa Gomes wrote:
+> > Bjorn Helgaas <helgaas@kernel.org> writes:
+> > > On Fri, Jul 14, 2023 at 01:05:41PM +0800, Kai-Heng Feng wrote:
+> > >> When a system that connects to a Thunderbolt dock equipped with I225=
+,
+> > >> like HP Thunderbolt Dock G4, I225 stops working after S3 resume:
+> > >> ...
+> > >
+> > >> The issue is that the PTM requests are sending before driver resumes=
+ the
+> > >> device. Since the issue can also be observed on Windows, it's quite
+> > >> likely a firmware/hardware limitation.
+> > >
+> > > Does this mean we didn't disable PTM correctly on suspend?  Or is the
+> > > device defective and sending PTM requests even though PTM is disabled=
+?
+> >
+> > The way I understand the hardware bug, the device is defective, as you
+> > said, the device sends PTM messages when "busmastering" is disabled.
+>
+> Bus Master Enable controls the ability of a Function to issue Memory
+> and I/O Read/Write Requests (PCIe r6.0, sec 7.5.1.1.3).  PTM uses
+> Messages, and I don't think they should be affected by Bus Master
+> Enable.
+>
+> I also don't understand the I225 connection.  We have these
+> Uncorrected Non-Fatal errors:
+>
+> > >> [  606.527931] pcieport 0000:00:1d.0: AER: Multiple Uncorrected (Non=
+-Fatal) error received: 0000:00:1d.0
+> > >> [  606.528064] pcieport 0000:00:1d.0: PCIe Bus Error: severity=3DUnc=
+orrected (Non-Fatal), type=3DTransaction Layer, (Requester ID)
+> > >> [  606.528068] pcieport 0000:00:1d.0:   device [8086:7ab0] error sta=
+tus/mask=3D00100000/00004000
+> > >> [  606.528072] pcieport 0000:00:1d.0:    [20] UnsupReq              =
+ (First)
+> > >> [  606.528075] pcieport 0000:00:1d.0: AER:   TLP Header: 34000000 0a=
+000052 00000000 00000000
+> > >> [  606.528079] pcieport 0000:00:1d.0: AER:   Error of this Agent is =
+reported first
+> > >> [  606.528098] pcieport 0000:04:01.0: PCIe Bus Error: severity=3DUnc=
+orrected (Non-Fatal), type=3DTransaction Layer, (Requester ID)
+> > >> [  606.528101] pcieport 0000:04:01.0:   device [8086:1136] error sta=
+tus/mask=3D00300000/00000000
+> > >> [  606.528105] pcieport 0000:04:01.0:    [20] UnsupReq              =
+ (First)
+> > >> [  606.528107] pcieport 0000:04:01.0:    [21] ACSViol
+> > >> [  606.528110] pcieport 0000:04:01.0: AER:   TLP Header: 34000000 04=
+000052 00000000 00000000
+>
+> They are clearly Unsupported Request errors caused by PTM Requests
+> (decoding at https://bugzilla.kernel.org/show_bug.cgi?id=3D216850#c9),
+> but they were logged by 00:1d.0 and 04:01.0.
+>
+> The hierarchy is this:
+>
+>   00:1d.0 Root Port to [bus 03-6c]
+>   03:00.0 Switch Upstream Port to [bus 04-6c]
+>   04:01.0 Switch Downstream Port to [bus 06-38]
+>   06:00.0 Switch Upstream Port to [bus 07-38]
+>   07:04.0 Switch Downstream Port to [bus 38]
+>   38:00.0 igc I225 NIC
+>
+> If I225 sent a PTM request when it shouldn't have, i.e., when 07:04.0
+> didn't have PTM enabled, the error would have been logged by 07:04.0.
+>
+> The fact that the errors were logged by 00:1d.0 and 04:01.0 means that
+> they were caused by PTM requests from 03:00.0 and 06:00.0.
 
-> Hardware generated encryption and ICV tags are found to
-> be wrong when tested with IEEE MACSEC test vectors.
-> This is because as per the HRM, the hash key (derived by
-> AES-ECB block encryption of an all 0s block with the SAK)
-> has to be programmed by the software in
-> MCSX_RS_MCS_CPM_TX_SLAVE_SA_PLCY_MEM_4X register.
-> Hence fix this by generating hash key in software and
-> configuring in hardware.
->
-> Fixes: c54ffc73601c ("octeontx2-pf: mcs: Introduce MACSEC hardware
-> offloading")
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> ---
->
-> v2 changes:
->  Check for return value of crypto_skcipher_setkey function
->  Removed unnecessary zero inits of variables
->  Added seperate labels
->
->  .../ethernet/marvell/octeontx2/nic/cn10k_macsec.c  | 137
-> +++++++++++++++------
->  1 file changed, 100 insertions(+), 37 deletions(-)
->
+OK, so the PTM is actually fired by the Thunderbolt switch.
+That means the I225 reset is collateral damage.
+Let me see if I can reproduce the UR PTM with other devices.
 
-Thanks,
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Kai-Heng
 
 >
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> index 6e2fb24..59b1382 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> @@ -4,6 +4,7 @@
->   * Copyright (C) 2022 Marvell.
->   */
->
-> +#include <crypto/skcipher.h>
->  #include <linux/rtnetlink.h>
->  #include <linux/bitfield.h>
->  #include "otx2_common.h"
-> @@ -42,6 +43,56 @@
->  #define MCS_TCI_E                      0x08 /* encryption */
->  #define MCS_TCI_C                      0x04 /* changed text */
->
-> +#define CN10K_MAX_HASH_LEN             16
-> +#define CN10K_MAX_SAK_LEN              32
-> +
-> +static int cn10k_ecb_aes_encrypt(struct otx2_nic *pfvf, u8 *sak,
-> +                                u16 sak_len, u8 *hash)
-> +{
-> +       u8 data[CN10K_MAX_HASH_LEN] =3D { 0 };
-> +       struct skcipher_request *req =3D NULL;
-> +       struct scatterlist sg_src, sg_dst;
-> +       struct crypto_skcipher *tfm;
-> +       DECLARE_CRYPTO_WAIT(wait);
-> +       int err;
-> +
-> +       tfm =3D crypto_alloc_skcipher("ecb(aes)", 0, 0);
-> +       if (IS_ERR(tfm)) {
-> +               dev_err(pfvf->dev, "failed to allocate transform for
-> ecb-aes\n");
-> +               return PTR_ERR(tfm);
-> +       }
-> +
-> +       req =3D skcipher_request_alloc(tfm, GFP_KERNEL);
-> +       if (!req) {
-> +               dev_err(pfvf->dev, "failed to allocate request for
-> skcipher\n");
-> +               err =3D -ENOMEM;
-> +               goto free_tfm;
-> +       }
-> +
-> +       err =3D crypto_skcipher_setkey(tfm, sak, sak_len);
-> +       if (err) {
-> +               dev_err(pfvf->dev, "failed to set key for skcipher\n");
-> +               goto free_req;
-> +       }
-> +
-> +       /* build sg list */
-> +       sg_init_one(&sg_src, data, CN10K_MAX_HASH_LEN);
-> +       sg_init_one(&sg_dst, hash, CN10K_MAX_HASH_LEN);
-> +
-> +       skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
-> +       skcipher_request_set_crypt(req, &sg_src, &sg_dst,
-> +                                  CN10K_MAX_HASH_LEN, NULL);
-> +
-> +       err =3D crypto_skcipher_encrypt(req);
-> +       err =3D crypto_wait_req(err, &wait);
-> +
-> +free_req:
-> +       skcipher_request_free(req);
-> +free_tfm:
-> +       crypto_free_skcipher(tfm);
-> +       return err;
-> +}
-> +
->  static struct cn10k_mcs_txsc *cn10k_mcs_get_txsc(struct cn10k_mcs_cfg
-> *cfg,
->                                                  struct macsec_secy *secy=
-)
->  {
-> @@ -330,19 +381,53 @@ static int cn10k_mcs_write_sc_cam(struct otx2_nic
-> *pfvf,
->         return ret;
->  }
->
-> +static int cn10k_mcs_write_keys(struct otx2_nic *pfvf,
-> +                               struct macsec_secy *secy,
-> +                               struct mcs_sa_plcy_write_req *req,
-> +                               u8 *sak, u8 *salt, ssci_t ssci)
-> +{
-> +       u8 hash_rev[CN10K_MAX_HASH_LEN];
-> +       u8 sak_rev[CN10K_MAX_SAK_LEN];
-> +       u8 salt_rev[MACSEC_SALT_LEN];
-> +       u8 hash[CN10K_MAX_HASH_LEN];
-> +       u32 ssci_63_32;
-> +       int err, i;
-> +
-> +       err =3D cn10k_ecb_aes_encrypt(pfvf, sak, secy->key_len, hash);
-> +       if (err) {
-> +               dev_err(pfvf->dev, "Generating hash using ECB(AES)
-> failed\n");
-> +               return err;
-> +       }
-> +
-> +       for (i =3D 0; i < secy->key_len; i++)
-> +               sak_rev[i] =3D sak[secy->key_len - 1 - i];
-> +
-> +       for (i =3D 0; i < CN10K_MAX_HASH_LEN; i++)
-> +               hash_rev[i] =3D hash[CN10K_MAX_HASH_LEN - 1 - i];
-> +
-> +       for (i =3D 0; i < MACSEC_SALT_LEN; i++)
-> +               salt_rev[i] =3D salt[MACSEC_SALT_LEN - 1 - i];
-> +
-> +       ssci_63_32 =3D (__force u32)cpu_to_be32((__force u32)ssci);
-> +
-> +       memcpy(&req->plcy[0][0], sak_rev, secy->key_len);
-> +       memcpy(&req->plcy[0][4], hash_rev, CN10K_MAX_HASH_LEN);
-> +       memcpy(&req->plcy[0][6], salt_rev, MACSEC_SALT_LEN);
-> +       req->plcy[0][7] |=3D (u64)ssci_63_32 << 32;
-> +
-> +       return 0;
-> +}
-> +
->  static int cn10k_mcs_write_rx_sa_plcy(struct otx2_nic *pfvf,
->                                       struct macsec_secy *secy,
->                                       struct cn10k_mcs_rxsc *rxsc,
->                                       u8 assoc_num, bool sa_in_use)
->  {
-> -       unsigned char *src =3D rxsc->sa_key[assoc_num];
->         struct mcs_sa_plcy_write_req *plcy_req;
-> -       u8 *salt_p =3D rxsc->salt[assoc_num];
-> +       u8 *sak =3D rxsc->sa_key[assoc_num];
-> +       u8 *salt =3D rxsc->salt[assoc_num];
->         struct mcs_rx_sc_sa_map *map_req;
->         struct mbox *mbox =3D &pfvf->mbox;
-> -       u64 ssci_salt_95_64 =3D 0;
-> -       u8 reg, key_len;
-> -       u64 salt_63_0;
->         int ret;
->
->         mutex_lock(&mbox->lock);
-> @@ -360,20 +445,10 @@ static int cn10k_mcs_write_rx_sa_plcy(struct
-> otx2_nic *pfvf,
->                 goto fail;
->         }
->
-> -       for (reg =3D 0, key_len =3D 0; key_len < secy->key_len; key_len +=
-=3D 8) {
-> -               memcpy((u8 *)&plcy_req->plcy[0][reg],
-> -                      (src + reg * 8), 8);
-> -               reg++;
-> -       }
-> -
-> -       if (secy->xpn) {
-> -               memcpy((u8 *)&salt_63_0, salt_p, 8);
-> -               memcpy((u8 *)&ssci_salt_95_64, salt_p + 8, 4);
-> -               ssci_salt_95_64 |=3D (__force u64)rxsc->ssci[assoc_num] <=
-<
-> 32;
-> -
-> -               plcy_req->plcy[0][6] =3D salt_63_0;
-> -               plcy_req->plcy[0][7] =3D ssci_salt_95_64;
-> -       }
-> +       ret =3D cn10k_mcs_write_keys(pfvf, secy, plcy_req, sak,
-> +                                  salt, rxsc->ssci[assoc_num]);
-> +       if (ret)
-> +               goto fail;
->
->         plcy_req->sa_index[0] =3D rxsc->hw_sa_id[assoc_num];
->         plcy_req->sa_cnt =3D 1;
-> @@ -586,13 +661,10 @@ static int cn10k_mcs_write_tx_sa_plcy(struct
-> otx2_nic *pfvf,
->                                       struct cn10k_mcs_txsc *txsc,
->                                       u8 assoc_num)
->  {
-> -       unsigned char *src =3D txsc->sa_key[assoc_num];
->         struct mcs_sa_plcy_write_req *plcy_req;
-> -       u8 *salt_p =3D txsc->salt[assoc_num];
-> +       u8 *sak =3D txsc->sa_key[assoc_num];
-> +       u8 *salt =3D txsc->salt[assoc_num];
->         struct mbox *mbox =3D &pfvf->mbox;
-> -       u64 ssci_salt_95_64 =3D 0;
-> -       u8 reg, key_len;
-> -       u64 salt_63_0;
->         int ret;
->
->         mutex_lock(&mbox->lock);
-> @@ -603,19 +675,10 @@ static int cn10k_mcs_write_tx_sa_plcy(struct
-> otx2_nic *pfvf,
->                 goto fail;
->         }
->
-> -       for (reg =3D 0, key_len =3D 0; key_len < secy->key_len; key_len +=
-=3D 8) {
-> -               memcpy((u8 *)&plcy_req->plcy[0][reg], (src + reg * 8), 8)=
-;
-> -               reg++;
-> -       }
-> -
-> -       if (secy->xpn) {
-> -               memcpy((u8 *)&salt_63_0, salt_p, 8);
-> -               memcpy((u8 *)&ssci_salt_95_64, salt_p + 8, 4);
-> -               ssci_salt_95_64 |=3D (__force u64)txsc->ssci[assoc_num] <=
-<
-> 32;
-> -
-> -               plcy_req->plcy[0][6] =3D salt_63_0;
-> -               plcy_req->plcy[0][7] =3D ssci_salt_95_64;
-> -       }
-> +       ret =3D cn10k_mcs_write_keys(pfvf, secy, plcy_req, sak,
-> +                                  salt, txsc->ssci[assoc_num]);
-> +       if (ret)
-> +               goto fail;
->
->         plcy_req->plcy[0][8] =3D assoc_num;
->         plcy_req->sa_index[0] =3D txsc->hw_sa_id[assoc_num];
-> --
-> 2.7.4
->
->
->
-
---=20
-Regards,
-Kalesh A P
-
---0000000000009b5a2f0600a9ffa3
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jul 17, 2023 at 11:47=E2=80=
-=AFAM Subbaraya Sundeep &lt;<a href=3D"mailto:sbhatta@marvell.com">sbhatta@=
-marvell.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">Hardware generated encryption and ICV tags are found to<br>
-be wrong when tested with IEEE MACSEC test vectors.<br>
-This is because as per the HRM, the hash key (derived by<br>
-AES-ECB block encryption of an all 0s block with the SAK)<br>
-has to be programmed by the software in<br>
-MCSX_RS_MCS_CPM_TX_SLAVE_SA_PLCY_MEM_4X register.<br>
-Hence fix this by generating hash key in software and<br>
-configuring in hardware.<br>
-<br>
-Fixes: c54ffc73601c (&quot;octeontx2-pf: mcs: Introduce MACSEC hardware off=
-loading&quot;)<br>
-Signed-off-by: Subbaraya Sundeep &lt;<a href=3D"mailto:sbhatta@marvell.com"=
- target=3D"_blank">sbhatta@marvell.com</a>&gt;<br>
----<br>
-<br>
-v2 changes:<br>
-=C2=A0Check for return value of crypto_skcipher_setkey function<br>
-=C2=A0Removed unnecessary zero inits of variables<br>
-=C2=A0Added seperate labels<br>
-<br>
-=C2=A0.../ethernet/marvell/octeontx2/nic/cn10k_macsec.c=C2=A0 | 137 +++++++=
-++++++++------<br>
-=C2=A01 file changed, 100 insertions(+), 37 deletions(-)<br></blockquote><d=
-iv><br></div><div>Thanks,</div><div>Reviewed-by: Kalesh AP &lt;<a href=3D"m=
-ailto:kalesh-anakkur.purayil@broadcom.com">kalesh-anakkur.purayil@broadcom.=
-com</a>&gt;=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/dr=
-ivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c<br>
-index 6e2fb24..59b1382 100644<br>
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c<br>
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c<br>
-@@ -4,6 +4,7 @@<br>
-=C2=A0 * Copyright (C) 2022 Marvell.<br>
-=C2=A0 */<br>
-<br>
-+#include &lt;crypto/skcipher.h&gt;<br>
-=C2=A0#include &lt;linux/rtnetlink.h&gt;<br>
-=C2=A0#include &lt;linux/bitfield.h&gt;<br>
-=C2=A0#include &quot;otx2_common.h&quot;<br>
-@@ -42,6 +43,56 @@<br>
-=C2=A0#define MCS_TCI_E=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 0x08 /* encryption */<br>
-=C2=A0#define MCS_TCI_C=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 0x04 /* changed text */<br>
-<br>
-+#define CN10K_MAX_HASH_LEN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-16<br>
-+#define CN10K_MAX_SAK_LEN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-32<br>
-+<br>
-+static int cn10k_ecb_aes_encrypt(struct otx2_nic *pfvf, u8 *sak,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 u16 sak_len, u8 *hash)<br>
-+{<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 data[CN10K_MAX_HASH_LEN] =3D { 0 };<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0struct skcipher_request *req =3D NULL;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0struct scatterlist sg_src, sg_dst;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0struct crypto_skcipher *tfm;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0DECLARE_CRYPTO_WAIT(wait);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0int err;<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0tfm =3D crypto_alloc_skcipher(&quot;ecb(aes)&qu=
-ot;, 0, 0);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (IS_ERR(tfm)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dev_err(pfvf-&gt;de=
-v, &quot;failed to allocate transform for ecb-aes\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return PTR_ERR(tfm)=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0req =3D skcipher_request_alloc(tfm, GFP_KERNEL)=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!req) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dev_err(pfvf-&gt;de=
-v, &quot;failed to allocate request for skcipher\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D -ENOMEM;<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto free_tfm;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D crypto_skcipher_setkey(tfm, sak, sak_le=
-n);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (err) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dev_err(pfvf-&gt;de=
-v, &quot;failed to set key for skcipher\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto free_req;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0/* build sg list */<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0sg_init_one(&amp;sg_src, data, CN10K_MAX_HASH_L=
-EN);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0sg_init_one(&amp;sg_dst, hash, CN10K_MAX_HASH_L=
-EN);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0skcipher_request_set_callback(req, 0, crypto_re=
-q_done, &amp;wait);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0skcipher_request_set_crypt(req, &amp;sg_src, &a=
-mp;sg_dst,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CN10K_MAX_HASH_LEN, NULL);<br=
->
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D crypto_skcipher_encrypt(req);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D crypto_wait_req(err, &amp;wait);<br>
-+<br>
-+free_req:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0skcipher_request_free(req);<br>
-+free_tfm:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0crypto_free_skcipher(tfm);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0return err;<br>
-+}<br>
-+<br>
-=C2=A0static struct cn10k_mcs_txsc *cn10k_mcs_get_txsc(struct cn10k_mcs_cfg=
- *cfg,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0struct macsec_secy *secy)<br>
-=C2=A0{<br>
-@@ -330,19 +381,53 @@ static int cn10k_mcs_write_sc_cam(struct otx2_nic *pf=
-vf,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<br>
-=C2=A0}<br>
-<br>
-+static int cn10k_mcs_write_keys(struct otx2_nic *pfvf,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct macsec_secy *secy,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct mcs_sa_plcy_write_req *req,<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *sak, u8 *salt, ssci_t ssci)<br>
-+{<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 hash_rev[CN10K_MAX_HASH_LEN];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 sak_rev[CN10K_MAX_SAK_LEN];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 salt_rev[MACSEC_SALT_LEN];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 hash[CN10K_MAX_HASH_LEN];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 ssci_63_32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0int err, i;<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D cn10k_ecb_aes_encrypt(pfvf, sak, secy-&=
-gt;key_len, hash);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (err) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dev_err(pfvf-&gt;de=
-v, &quot;Generating hash using ECB(AES) failed\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return err;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; secy-&gt;key_len; i++)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sak_rev[i] =3D sak[=
-secy-&gt;key_len - 1 - i];<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; CN10K_MAX_HASH_LEN; i++)<b=
-r>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hash_rev[i] =3D has=
-h[CN10K_MAX_HASH_LEN - 1 - i];<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; MACSEC_SALT_LEN; i++)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0salt_rev[i] =3D sal=
-t[MACSEC_SALT_LEN - 1 - i];<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0ssci_63_32 =3D (__force u32)cpu_to_be32((__forc=
-e u32)ssci);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy(&amp;req-&gt;plcy[0][0], sak_rev, secy-&=
-gt;key_len);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy(&amp;req-&gt;plcy[0][4], hash_rev, CN10K=
-_MAX_HASH_LEN);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy(&amp;req-&gt;plcy[0][6], salt_rev, MACSE=
-C_SALT_LEN);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0req-&gt;plcy[0][7] |=3D (u64)ssci_63_32 &lt;&lt=
-; 32;<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
-+}<br>
-+<br>
-=C2=A0static int cn10k_mcs_write_rx_sa_plcy(struct otx2_nic *pfvf,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct macsec_s=
-ecy *secy,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct cn10k_mc=
-s_rxsc *rxsc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 assoc_num, b=
-ool sa_in_use)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned char *src =3D rxsc-&gt;sa_key[assoc_nu=
-m];<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mcs_sa_plcy_write_req *plcy_req;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *salt_p =3D rxsc-&gt;salt[assoc_num];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *sak =3D rxsc-&gt;sa_key[assoc_num];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *salt =3D rxsc-&gt;salt[assoc_num];<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mcs_rx_sc_sa_map *map_req;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mbox *mbox =3D &amp;pfvf-&gt;mbox;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u64 ssci_salt_95_64 =3D 0;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 reg, key_len;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u64 salt_63_0;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 int ret;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 mutex_lock(&amp;mbox-&gt;lock);<br>
-@@ -360,20 +445,10 @@ static int cn10k_mcs_write_rx_sa_plcy(struct otx2_nic=
- *pfvf,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto fail;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0for (reg =3D 0, key_len =3D 0; key_len &lt; sec=
-y-&gt;key_len; key_len +=3D 8) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy((u8 *)&amp;p=
-lcy_req-&gt;plcy[0][reg],<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 (src + reg * 8), 8);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0reg++;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
--<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0if (secy-&gt;xpn) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy((u8 *)&amp;s=
-alt_63_0, salt_p, 8);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy((u8 *)&amp;s=
-sci_salt_95_64, salt_p + 8, 4);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ssci_salt_95_64 |=
-=3D (__force u64)rxsc-&gt;ssci[assoc_num] &lt;&lt; 32;<br>
--<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0plcy_req-&gt;plcy[0=
-][6] =3D salt_63_0;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0plcy_req-&gt;plcy[0=
-][7] =3D ssci_salt_95_64;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D cn10k_mcs_write_keys(pfvf, secy, plcy_r=
-eq, sak,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 salt, rxsc-&gt;ssci[assoc_num=
-]);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (ret)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 plcy_req-&gt;sa_index[0] =3D rxsc-&gt;hw_sa_id[=
-assoc_num];<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 plcy_req-&gt;sa_cnt =3D 1;<br>
-@@ -586,13 +661,10 @@ static int cn10k_mcs_write_tx_sa_plcy(struct otx2_nic=
- *pfvf,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct cn10k_mc=
-s_txsc *txsc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 assoc_num)<b=
-r>
-=C2=A0{<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned char *src =3D txsc-&gt;sa_key[assoc_nu=
-m];<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mcs_sa_plcy_write_req *plcy_req;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *salt_p =3D txsc-&gt;salt[assoc_num];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *sak =3D txsc-&gt;sa_key[assoc_num];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 *salt =3D txsc-&gt;salt[assoc_num];<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mbox *mbox =3D &amp;pfvf-&gt;mbox;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u64 ssci_salt_95_64 =3D 0;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 reg, key_len;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0u64 salt_63_0;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 int ret;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 mutex_lock(&amp;mbox-&gt;lock);<br>
-@@ -603,19 +675,10 @@ static int cn10k_mcs_write_tx_sa_plcy(struct otx2_nic=
- *pfvf,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto fail;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0for (reg =3D 0, key_len =3D 0; key_len &lt; sec=
-y-&gt;key_len; key_len +=3D 8) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy((u8 *)&amp;p=
-lcy_req-&gt;plcy[0][reg], (src + reg * 8), 8);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0reg++;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
--<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0if (secy-&gt;xpn) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy((u8 *)&amp;s=
-alt_63_0, salt_p, 8);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy((u8 *)&amp;s=
-sci_salt_95_64, salt_p + 8, 4);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ssci_salt_95_64 |=
-=3D (__force u64)txsc-&gt;ssci[assoc_num] &lt;&lt; 32;<br>
--<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0plcy_req-&gt;plcy[0=
-][6] =3D salt_63_0;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0plcy_req-&gt;plcy[0=
-][7] =3D ssci_salt_95_64;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D cn10k_mcs_write_keys(pfvf, secy, plcy_r=
-eq, sak,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 salt, txsc-&gt;ssci[assoc_num=
-]);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (ret)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 plcy_req-&gt;plcy[0][8] =3D assoc_num;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 plcy_req-&gt;sa_index[0] =3D txsc-&gt;hw_sa_id[=
-assoc_num];<br>
--- <br>
-2.7.4<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div><span class=3D"gmail_si=
-gnature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gmail_signature"><d=
-iv dir=3D"ltr">Regards,<div>Kalesh A P</div></div></div></div>
-
---0000000000009b5a2f0600a9ffa3--
-
---000000000000a249fa0600a9ff5d
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIJk+RO8OLGfSO028kcXcLdeeeWkUPjq2Xldcq5nnLWpvMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcxNzA3NDYzOFowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC7/3G6fuYE
-V1reREoOJjC3pMvKtmbtSaCVksK8ewYjO6LTUZMokjShAOvlCblqwSuztYsUVMKrhdnwiNNkZOov
-52OW9qA6zmsXRna9RNn8qjsELA5Qol88CJr9g6zM1Z4tMP/SdhkrpZt/spnRCxf+QjTwu8F61VmQ
-kndIV8jRj7GenGOqywo+tI23cu8IuQc6ywb4ZDIzzuJxZtNAc3bdOFMbR50K7JYfgfs9MNLwNNEY
-Jh05BWhewMmVeWq8rCxKVwLuvHs4SyVuH8U0OQmMvpYGo2q6E5V+Epct8Bgu2qTAmLDGdulBF+0U
-/ZVnGiMLBWvRPttf1t5KY1ft1HCP
---000000000000a249fa0600a9ff5d--
+> Bjorn
 
