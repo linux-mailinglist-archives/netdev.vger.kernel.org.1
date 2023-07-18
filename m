@@ -1,108 +1,110 @@
-Return-Path: <netdev+bounces-18667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD917583E5
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:52:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 766B17583E2
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CDB51C20DB6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:52:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9363E1C20D9D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7436B15AF2;
-	Tue, 18 Jul 2023 17:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391CA15AE5;
+	Tue, 18 Jul 2023 17:52:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6907715AF1
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 17:52:40 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700F310FF;
-	Tue, 18 Jul 2023 10:52:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SCBD+bOSTEeGkdZCGWkAKOLDC11TKIL0A23dIH+ezPY=; b=S6DzZxfsek6/yacG88P5tSsgnq
-	s1Fj1B8w8SVRwZt6+Y/h4BkBY/D0fCmV7X9++JdDr0hRh9VW5pKhTum0y9i8epegwlLTTm8i8NSu4
-	3Wmjn2yPSKPjXrak2GIPsuRw3CBIWBce9U77dlbP1nnxE1Fedm6f1DpkGAjlO0kjTDIeHZw3R/rSZ
-	fKvI3w4oetLGZ7wssZrq+b4idAkGQmCaun+QQwinPpKRsZd4qTCbnmvgPB5DsRUyFnxxSg8nNH6hf
-	8Y61Eb+1In7dHxirAIZMXsFghwNLEFrVQarVZfMWJjaCR+ZFD3vHvXNgMgmMpU/5ONgZiCau0NXMU
-	hmLqrmqw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59974)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qLorw-0005w2-2J;
-	Tue, 18 Jul 2023 18:52:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qLors-0003Eb-1q; Tue, 18 Jul 2023 18:52:12 +0100
-Date: Tue, 18 Jul 2023 18:52:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Michael Walle <mwalle@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next v3 03/11] net: phy: replace is_c45 with
- phy_accces_mode
-Message-ID: <ZLbRTLRbHW/Xt2hL@shell.armlinux.org.uk>
-References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
- <20230620-feature-c45-over-c22-v3-3-9eb37edf7be0@kernel.org>
- <509889a3-f633-40b0-8349-9ef378818cc7@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C673134D6
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 17:52:36 +0000 (UTC)
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7FD10FF
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:52:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689702755; x=1721238755;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+FNIa0CXgAvRu4jBRrb8Q4d12DS1miM81elFvB8NTzY=;
+  b=FjxsmQWfjaqtyN0c8mg0BxI9fRGJmjEvMS+e8/3cdFNTpqq6t7diKdgb
+   62DuZ8BJvAOnsHTx3DJEp5p7RzPbWEJ9iNTeL6oVyjNdw3vinkBjY/rHo
+   kdxElitu+Zk7zpvFHQdRk4dUBnoWdizsOiVz0qhiMww3HPTJtrc6KGxhv
+   g=;
+X-IronPort-AV: E=Sophos;i="6.01,214,1684800000"; 
+   d="scan'208";a="661261482"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 17:52:29 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com (Postfix) with ESMTPS id 28C7980463;
+	Tue, 18 Jul 2023 17:52:26 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 18 Jul 2023 17:52:24 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.18) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Tue, 18 Jul 2023 17:52:22 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ruc_gongyuanjun@163.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<netdev@vger.kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH 1/1] ipv4: ip_gre: fix return value check in erspan_xmit()
+Date: Tue, 18 Jul 2023 10:52:13 -0700
+Message-ID: <20230718175213.58653-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230717144918.25961-1-ruc_gongyuanjun@163.com>
+References: <20230717144918.25961-1-ruc_gongyuanjun@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <509889a3-f633-40b0-8349-9ef378818cc7@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.18]
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 07:40:49PM +0200, Andrew Lunn wrote:
-> >  static inline bool phy_has_c45_registers(struct phy_device *phydev)
-> >  {
-> > -	return phydev->is_c45;
-> > +	return phydev->access_mode != PHY_ACCESS_C22;
-> >  }
+From: Yuanjun Gong <ruc_gongyuanjun@163.com>
+Date: Mon, 17 Jul 2023 22:49:18 +0800
+> goto free_skb if an unexpected result is returned by pskb_tirm()
+> in erspan_xmit().
 > 
-> So this is making me wounder if we have a clean separation between
-> register spaces and access methods.
+> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
+
+Fixes: 84e54fe0a5ea ("gre: introduce native tunnel support for ERSPAN")
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+> ---
+>  net/ipv4/ip_gre.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> Should there be a phy_has_c22_registers() ?
-
-Yes, I've been wondering that. I've recently heard about a Realtek PHY
-which is supported by our realtek driver, but appears on a SFP that
-can only do C45 accesses. However, the realtek driver is written to
-use C22 accesses to this PHY - and the PHY supports both. So currently
-it doesn't work.
-
-That's just an additional data point for thinking about this, I haven't
-formulated a solution to it yet.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+> index 81a1cce1a7d1..cb2182144dd5 100644
+> --- a/net/ipv4/ip_gre.c
+> +++ b/net/ipv4/ip_gre.c
+> @@ -689,7 +689,8 @@ static netdev_tx_t erspan_xmit(struct sk_buff *skb,
+>  		goto free_skb;
+>  
+>  	if (skb->len > dev->mtu + dev->hard_header_len) {
+> -		pskb_trim(skb, dev->mtu + dev->hard_header_len);
+> +		if (pskb_trim(skb, dev->mtu + dev->hard_header_len))
+> +			goto free_skb;
+>  		truncate = true;
+>  	}
+>  
+> -- 
+> 2.17.1
 
