@@ -1,130 +1,83 @@
-Return-Path: <netdev+bounces-18598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A032B757D10
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:16:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62004757D2F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA4A91C20CE6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF241C20C4C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40C9C8FF;
-	Tue, 18 Jul 2023 13:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CE6D2EF;
+	Tue, 18 Jul 2023 13:20:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CC6D50B
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:16:14 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F1FBB
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:16:13 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1qLkYW-0005P3-T3; Tue, 18 Jul 2023 15:15:56 +0200
-Received: from mfe by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1qLkYW-0002nJ-1f; Tue, 18 Jul 2023 15:15:56 +0200
-Date: Tue, 18 Jul 2023 15:15:56 +0200
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 2/2] net: stmmac: platform: add support for
- phy-supply
-Message-ID: <20230718131556.bdp3sykrkkylp4pb@pengutronix.de>
-References: <20230717164307.2868264-1-m.felsch@pengutronix.de>
- <20230717164307.2868264-2-m.felsch@pengutronix.de>
- <accc8d89-7565-460e-a874-a491b755bbb8@lunn.ch>
- <20230718083504.r3znx6iixtq7vkjt@pengutronix.de>
- <427214fb-6206-47b3-bf5b-8b1cfc8b7677@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A86CC2F3
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:20:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8DD6EC433C8;
+	Tue, 18 Jul 2023 13:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689686419;
+	bh=esPAIdLijgrpckijkuN7a0s8e5HfXIfXq/YXmb2ssMs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LzC7J1UsKlB84p2dB3juxMvyatRNE+OoxqNhUZwNY+PY1IyzxDXC9ve8aTm6QcSMe
+	 hV0lUy0UJMV66SHF9xH8Ujz4m5wZRaK3LNFuhLyYSci7EYzCrQ4cF3aWC2KA7qNiU+
+	 x8n1wHFbfCkPHPYqzjVM5OHhz36pGHItlEZ3CFsenPaVlotxaFVFg+J9qWld30h+cG
+	 D0qLRHW9nMywPqir7hPy4WRyuvohhhaHU+XJSDNgM6nMkctuOZaB/CokF9pXB8mLhP
+	 nvdgW+Hl2I+ZjJzCE1oM7QZw6jDqvMKmCtW9CuOnxhOX23pmhA3QNAn1gmYbdaz1Xn
+	 CPe3xvHyJyTKw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6698AE22AE4;
+	Tue, 18 Jul 2023 13:20:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <427214fb-6206-47b3-bf5b-8b1cfc8b7677@lunn.ch>
-User-Agent: NeoMutt/20180716
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] rtnetlink: Move nesting cancellation rollback to
+ proper function
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168968641941.29657.11670688122269581626.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Jul 2023 13:20:19 +0000
+References: <20230716072440.2372567-1-gal@nvidia.com>
+In-Reply-To: <20230716072440.2372567-1-gal@nvidia.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, edumazet@google.com, simon.horman@corigine.com
 
-On 23-07-18, Andrew Lunn wrote:
-> On Tue, Jul 18, 2023 at 10:35:04AM +0200, Marco Felsch wrote:
-> > On 23-07-18, Andrew Lunn wrote:
-> > > On Mon, Jul 17, 2023 at 06:43:07PM +0200, Marco Felsch wrote:
-> > > > Add generic phy-supply handling support to control the phy regulator.
-> > > > Use the common stmmac_platform code path so all drivers using
-> > > > stmmac_probe_config_dt() and stmmac_pltfr_pm_ops can use it.
-> > > > 
-> > > > Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
-> > > > ---
-> > > >  .../ethernet/stmicro/stmmac/stmmac_platform.c | 51 +++++++++++++++++++
-> > > >  include/linux/stmmac.h                        |  1 +
-> > > >  2 files changed, 52 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > > index eb0b2898daa3d..6193d42b53fb7 100644
-> > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > > @@ -10,6 +10,7 @@
-> > > >  
-> > > >  #include <linux/platform_device.h>
-> > > >  #include <linux/pm_runtime.h>
-> > > > +#include <linux/regulator/consumer.h>
-> > > >  #include <linux/module.h>
-> > > >  #include <linux/io.h>
-> > > >  #include <linux/of.h>
-> > > > @@ -423,6 +424,15 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
-> > > >  	if (plat->interface < 0)
-> > > >  		plat->interface = plat->phy_interface;
-> > > >  
-> > > > +	/* Optional regulator for PHY */
-> > > > +	plat->phy_regulator = devm_regulator_get_optional(&pdev->dev, "phy");
-> > > > +	if (IS_ERR(plat->phy_regulator)) {
-> > > > +		if (PTR_ERR(plat->phy_regulator) == -EPROBE_DEFER)
-> > > > +			return ERR_CAST(plat->phy_regulator);
-> > > > +		dev_info(&pdev->dev, "No regulator found\n");
-> > > > +		plat->phy_regulator = NULL;
-> > > > +	}
-> > > > +
-> > > 
-> > > So this gets the regulator. When do you actually turn it on?
-> > 
-> > During the suspend/resume logic like the rockchip, sun8i platform
-> > integrations did.
-> 
-> So you are assuming the boot loader has turned it on?
-> 
-> You also might have a difference between the actual state, and what
-> kernel thinks the state is, depending on how the regulator is
-> implemented.
-> 
-> It would be better to explicitly turn it on before registering the
-> MDIO bus.
+Hello:
 
-You're right, I changed this. Thanks for the hint.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Regards,
-  Marco
+On Sun, 16 Jul 2023 10:24:40 +0300 you wrote:
+> Make rtnl_fill_vf() cancel the vfinfo attribute on error instead of the
+> inner rtnl_fill_vfinfo(), as it is the function that starts it.
+> 
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> ---
+> Changelog -
+> v1->v2: https://lore.kernel.org/all/20230713141652.2288309-1-gal@nvidia.com/
+> * Remove unused vfinfo parameter (Simon)
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2] rtnetlink: Move nesting cancellation rollback to proper function
+    https://git.kernel.org/netdev/net-next/c/4a59cdfd6699
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
