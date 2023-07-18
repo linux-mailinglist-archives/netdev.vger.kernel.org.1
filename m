@@ -1,129 +1,169 @@
-Return-Path: <netdev+bounces-18631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0778C758142
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:47:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A114758150
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:50:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C1DC1C20D52
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:47:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E58C1C20D4D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B315710952;
-	Tue, 18 Jul 2023 15:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5EBD518;
+	Tue, 18 Jul 2023 15:49:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7891D518
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:47:17 +0000 (UTC)
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F33BE42
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:47:16 -0700 (PDT)
-Received: by mail-vs1-xe2a.google.com with SMTP id ada2fe7eead31-440db8e60c8so1907730137.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:47:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689695235; x=1692287235;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=co130geh6carjDOQ8KRzxQQvIXL4bEumjdoZgS67TXU=;
-        b=YPhxBhntttQ2++OHbEnNwLcur3WuUYZB8ftMidduSy/Yy+K+/IlJVN+SGdXZMfHHGl
-         73/V1VHxUX4kxNbw+33S0d8wKpjr6UglQMVg04LmsIf3j4WRUcZ9noTAqJoFBzSkCMbN
-         ShMLPICwyZl7vboKthKHvxbhCXaOatw73sKfz8h2bfZtK0ttob3eew9SlI0aYKhpIod4
-         EQGDCca2a2fLtT9sfpsZxvia7LQD2u5AQRW5JCyaTITKx1AT5KfzYxCFn0CcQ4X/o7i+
-         H2evlFBa3wBQgCujYoYUIOFWzPNlvh/1kgSiXj31c4aLrMk527hJf6lFNczFn5wQbzTW
-         wyvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689695235; x=1692287235;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=co130geh6carjDOQ8KRzxQQvIXL4bEumjdoZgS67TXU=;
-        b=MrnWKE/C5lds1OZ2hROlfWHx9pSAKbnEXP2P9MHt24P6Pf3bl0AI1nYNLwj2Uam/zf
-         sCmVcWQhA45wsHRU5am8KIDC4uyx67UP391qveBeGMBn0PQ2MuAeNdM1dUMu+MszpgY8
-         4XtNw+ORD1ZSWwnzaNBafBOHtMjn/KeLKgC+1aO78uXwGt7tZImZRYeOkGBekYz9UZ5P
-         rn0sQlaBqqTWEdEXfoN8TEUUUn9wtIkD7sgV1NYvc33uC+EOpgPO+mM7JJQ3sTwVCKOr
-         Pd3B8ws3biLaTvWItch1dmSedpV3TNnchyX9UejwYU692/GFkHavl8iyf8fS/JVAxtyM
-         fb2A==
-X-Gm-Message-State: ABy/qLbQdBt7BqAbUslGWBADN40hPj+3rKrVZ05wvVUtqPAbQSLbeDFY
-	YcndMIyal1aGXmvAco4ZGmg=
-X-Google-Smtp-Source: APBJJlFHl3iGfME4aG1tS2EWhGcqatAoP3FezD9unUw6YrsAelF2DxjYAcYUCAgzngAY9ZlLlsW1Lw==
-X-Received: by 2002:a67:ea0b:0:b0:443:4f72:fd35 with SMTP id g11-20020a67ea0b000000b004434f72fd35mr7401446vso.1.1689695235487;
-        Tue, 18 Jul 2023 08:47:15 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id x18-20020a0ca892000000b0062ffbf23c22sm803394qva.131.2023.07.18.08.47.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 08:47:15 -0700 (PDT)
-Date: Tue, 18 Jul 2023 11:47:14 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <64b6b402c1357_223204294d0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <d47d53e6f8ee7a11228ca2f025d6243cc04b77f3.1689691004.git.pabeni@redhat.com>
-References: <d47d53e6f8ee7a11228ca2f025d6243cc04b77f3.1689691004.git.pabeni@redhat.com>
-Subject: RE: [PATCH v2 net-next] udp: use indirect call wrapper for data
- ready()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBB4FC04
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:49:57 +0000 (UTC)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CB0A9
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689695394; x=1721231394;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=roTiCvvuFKAPBpzyoCq/UIz7xmR5pzukedIxFqEQOJc=;
+  b=RlATzxrIfVA/hAaVNnSFX5G2zw+gfQ2gTtN4A4JSgWYqBrfy4OBApsWl
+   jW8oJ7nFZtojgRV7T3smezFXyy9oSTEFC62SyyHdymx20sYYOud4baHwS
+   TNF4/j65YjeL2F1we9A3J8p4Vv69UcWwzHus4yPc9/sZd2z2YzS0xRDCd
+   TNqkIEfZfadxkHGZgxzslDIk6fCFuWwypR8oJyCBihYI9sWixxu6frTOp
+   S3LEoWx8n+pS5m4GQqxKuL9oQjZzGrqbqiLHU42x4L8Z1TooDH/JDpxaq
+   Y1cyJTlUqt6Oc9StE3fWpDS21lqXkC2jmvH/5Qg5Fqhs9f/GzwTRL3KbJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346540432"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="346540432"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 08:49:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="673975352"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="673975352"
+Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 18 Jul 2023 08:49:46 -0700
+Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qLmxN-0000h7-2z;
+	Tue, 18 Jul 2023 15:49:45 +0000
+Date: Tue, 18 Jul 2023 23:49:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxim Georgiev <glipus@gmail.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Casper Andersson <casper.casan@gmail.com>,
+	Sergey Organov <sorganov@gmail.com>
+Subject: Re: [PATCH v8 net-next 11/12] net: phy: provide phylib stubs for
+ hardware timestamping operations
+Message-ID: <202307182336.h83DeGwR-lkp@intel.com>
+References: <20230717152709.574773-12-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230717152709.574773-12-vladimir.oltean@nxp.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Paolo Abeni wrote:
-> In most cases UDP sockets use the default data ready callback.
-> Leverage the indirect call wrapper for such callback to avoid an
-> indirect call in fastpath.
-> 
-> The above gives small but measurable performance gain under UDP flood.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Hi Vladimir,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+kernel test robot noticed the following build errors:
 
-> ---
-> v1 -> v2:
->  - do not introduce the specific helper (Willem)
+[auto build test ERROR on net-next/main]
 
-I was just about to Ack v1. Did not mean to request a respin if
-no one else spoke up. But thanks for humoring me :)
+url:    https://github.com/intel-lab-lkp/linux/commits/Vladimir-Oltean/net-add-NDOs-for-configuring-hardware-timestamping/20230718-174836
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230717152709.574773-12-vladimir.oltean%40nxp.com
+patch subject: [PATCH v8 net-next 11/12] net: phy: provide phylib stubs for hardware timestamping operations
+config: arm-randconfig-r046-20230718 (https://download.01.org/0day-ci/archive/20230718/202307182336.h83DeGwR-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230718/202307182336.h83DeGwR-lkp@intel.com/reproduce)
 
-> ---
->  net/ipv4/udp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 42a96b3547c9..8c3ebd95f5b9 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1553,7 +1553,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
->  	spin_unlock(&list->lock);
->  
->  	if (!sock_flag(sk, SOCK_DEAD))
-> -		sk->sk_data_ready(sk);
-> +		INDIRECT_CALL_1(sk->sk_data_ready, sock_def_readable, sk);
->  
->  	busylock_release(busy);
->  	return 0;
-> -- 
-> 2.41.0
-> 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307182336.h83DeGwR-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/phy/phy_device.c:30:10: fatal error: linux/phylib_stubs.h: No such file or directory
+      30 | #include <linux/phylib_stubs.h>
+         |          ^~~~~~~~~~~~~~~~~~~~~~
+   compilation terminated.
+--
+>> make[6]: *** No rule to make target 'drivers/net/phy/stubs.o', needed by 'drivers/net/phy/built-in.a'.
+   make[6]: *** [scripts/Makefile.build:243: drivers/net/phy/phy_device.o] Error 1 shuffle=2354727191
+   make[6]: Target 'drivers/net/phy/' not remade because of errors.
 
 
+vim +30 drivers/net/phy/phy_device.c
+
+    11	
+    12	#include <linux/acpi.h>
+    13	#include <linux/bitmap.h>
+    14	#include <linux/delay.h>
+    15	#include <linux/errno.h>
+    16	#include <linux/etherdevice.h>
+    17	#include <linux/ethtool.h>
+    18	#include <linux/init.h>
+    19	#include <linux/interrupt.h>
+    20	#include <linux/io.h>
+    21	#include <linux/kernel.h>
+    22	#include <linux/list.h>
+    23	#include <linux/mdio.h>
+    24	#include <linux/mii.h>
+    25	#include <linux/mm.h>
+    26	#include <linux/module.h>
+    27	#include <linux/of.h>
+    28	#include <linux/netdevice.h>
+    29	#include <linux/phy.h>
+  > 30	#include <linux/phylib_stubs.h>
+    31	#include <linux/phy_led_triggers.h>
+    32	#include <linux/pse-pd/pse.h>
+    33	#include <linux/property.h>
+    34	#include <linux/rtnetlink.h>
+    35	#include <linux/sfp.h>
+    36	#include <linux/skbuff.h>
+    37	#include <linux/slab.h>
+    38	#include <linux/string.h>
+    39	#include <linux/uaccess.h>
+    40	#include <linux/unistd.h>
+    41	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
