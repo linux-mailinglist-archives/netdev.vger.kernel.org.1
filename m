@@ -1,198 +1,106 @@
-Return-Path: <netdev+bounces-18623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A70D757FFA
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:47:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D8C75804C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EABD7281562
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:47:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B6F41C20CFA
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E00FBF9;
-	Tue, 18 Jul 2023 14:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B553EFC0E;
+	Tue, 18 Jul 2023 15:01:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF98ED532
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:47:03 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2040.outbound.protection.outlook.com [40.107.20.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A6F2170B;
-	Tue, 18 Jul 2023 07:47:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oCYVC9Vjsp96o5qeOWWgAvtQzNYxN7hPr+JAiCZUUO5pz6yk8cKZBOcTYWRH5/E/6MQlh+IOYkYIA/XXawmhdDYlkINJ5859maZYCuoB9/CWKFb/AD+vXY1WSF1TQpvbeP7dCy8B8rZu9qSRIPIywDY/5NXidPwdOi4UknnWdQlcIjcgQaX4i9/DcWnLpoEl1hb/1ectZAzXfJtJqVcL7LRSLHlUl6509tRSyiqrPLAljsOiOSP+Z46CEqFHTjdImyARwpCUc1qvFPDAnHG/K2VIfT06EVAlOwpGdPD+S7APi2woagObiB1mluvOCZ7qwU6XjPuVYkuEmFeOQ2P79g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ngYAdg6zBGCXo4U2Rqo2qqWePueOPmOkq/tLTVD8iJI=;
- b=YSpEwImbnEeX+50YEaqPfq4NXIe5+iQ6JJebQ/JftiA3hlK2AlP6kfpq3+44DxDpVkxrCi1CS2ANQQcWtW0eaFXvkVWmmVHAEvPnqWUJZwut77WBM4lA6VADb2hyHyDy4cGG06Ha3KpQsUg/fRJeX9p6zSf9fhmNED3z83wFdLg6pzbgD+/5lFtyEIfj30Qrhx0x8ifNvk3PSZRpxcBISr/xc892lXSda+icdKNeve5SpLVdbfJwnrLqBSsWJefCJy9swL3CJOh/0JxCei27G/sxVsFIaIqgaegp7IAR7xqc+9hjCpLEE/S9zf4fvOoqaOERqlI4uz8joCZ3X8dmdg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ngYAdg6zBGCXo4U2Rqo2qqWePueOPmOkq/tLTVD8iJI=;
- b=OrQhzEagMaECQJl/pzW+CFcMulbXDu+SKEHiN5xClTFDPnPrYNjro3c321NSNxwCi+LcwZhmIwpe+MeV2pw0e3DT+ZsQge6XFX0FwTC4XeesLR75YMe8ZFZThT19kjRcggOe++tYLkfOpjhyFtHu8dFyLYCw9GCPn0sPrUdkIgM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by VE1PR04MB7310.eurprd04.prod.outlook.com (2603:10a6:800:1a2::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
- 2023 14:46:57 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c680:1128:9d53:24ae]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c680:1128:9d53:24ae%4]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
- 14:46:56 +0000
-Date: Tue, 18 Jul 2023 17:46:52 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 net-next 12/12] net: remove phy_has_hwtstamp() ->
- phy_mii_ioctl() decision from converted drivers
-Message-ID: <20230718144652.ihhimqn3bw3t3xhi@skbuf>
-References: <20230717152709.574773-1-vladimir.oltean@nxp.com>
- <20230717152709.574773-13-vladimir.oltean@nxp.com>
- <ZLaj40L3s+FssNHq@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZLaj40L3s+FssNHq@shell.armlinux.org.uk>
-X-ClientProxiedBy: AM0PR05CA0084.eurprd05.prod.outlook.com
- (2603:10a6:208:136::24) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8290C2C4
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:01:41 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F347FFC;
+	Tue, 18 Jul 2023 08:01:37 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-992dcae74e0so800711766b.3;
+        Tue, 18 Jul 2023 08:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689692496; x=1692284496;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mqWEL4gA+1//2T1ckqDIBEn8jdYuaWNUVSaFCkbjTy4=;
+        b=UIlJfa9WgyAeucS0mrkbJNHs69E40J7mc9nvpDE6mIWq6XaHDh3CNiWxkOEQQHHpx4
+         mh+LT/ZeNjziLzNHxQLrwWaPAX4f7QQ5ZAEfzDOO7vdz7zHCJzM6m3PQ1MbuM53jZSx7
+         QwoNo5ASRMaPZBt2/gccjQnocx8yDcGs96JXm0giZe4XsCWTQlAflYFrImcBXMNGB+uC
+         +YBj6anl0tEdrz3YfqU44Ipo+mQVhIY1dD2/Zmexhqi2S/kLB3+oMdt0P7M1SNEonJmG
+         7OIHR5HtnniFBWb9ZAmvUg3ctUfhWDy3ecKmE50kZJqbXFonKt2h/QSI7U4cKpwQmAQi
+         5CZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689692496; x=1692284496;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mqWEL4gA+1//2T1ckqDIBEn8jdYuaWNUVSaFCkbjTy4=;
+        b=V0oDZHPNX4rBFA2xldGQix1gdkFrgrHs3hfteAK3tvg9hJI99yWfKqXo/OhdWOcLBa
+         vo0qcYFOi4CHLIR4XwItmaKByMM/wm/AXs3ceWkB+QrMPGt4u6Oki1KVolYOGwG8CIEe
+         abG3jmWY5dh6028b7SBFu2M0DpZo6lDbdtD3+ifW9xLpKVrTeH/k8PS+GjuZTMIW5vQb
+         OJKNTSYqjzrLS9Vdwg/0pSMjdMCKRoIEjhtxvUA/LciJ/1NRw0ct+UgIKL8TBdlOu8Gu
+         bkMNuSVhQ60ME6cQwqlKTTqjbv64+3QoAQFRQ6WIMjNzJDs2DwHrD7O6d9Vo66TOAUXV
+         ScSA==
+X-Gm-Message-State: ABy/qLZpaDGYyKhAg7LvvYHZiq8jDGoYcJ1WHrJ87EvXBs1u7BJNnFwR
+	2fDrrZtxd4pP3z3LpjtzA0k=
+X-Google-Smtp-Source: APBJJlGK/wVcWLMHMzyNtH3SfBTKgPWrbopg5cdW4tjynCluTYcMUcGQ8nDCMizMDsbl2RGsIf/GCA==
+X-Received: by 2002:a17:907:7805:b0:994:5303:a1ec with SMTP id la5-20020a170907780500b009945303a1ecmr108385ejc.43.1689692496031;
+        Tue, 18 Jul 2023 08:01:36 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id lj1-20020a170906f9c100b00992ed412c74sm1129950ejb.88.2023.07.18.08.01.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 08:01:35 -0700 (PDT)
+Date: Tue, 18 Jul 2023 18:01:33 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: pabeni@redhat.com, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for
+ 88E6390X and 88E6190X
+Message-ID: <20230718150133.4wpnmtks46yxg5lz@skbuf>
+References: <164e816460523a9b54b06b1586f89b3bd2d09fc9.camel@redhat.com>
+ <20230718144310.4887-1-ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VE1PR04MB7310:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3173af73-fb42-4f03-ba63-08db879dd578
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	QMq2ACeaT9/hW9MMUBfTLTFkVO4L6MpPEeO7q7k0RC6UvuEHAuu+fWYLYEORQAWu9QdYVVD091x4zmmZboql7w0MAgs8p//w3ck1MImt6PR73ySg6PPzJ2u5bZGyV6uPoPL+a58Um5lx727Z4Ywkc6lZs8H6APLy39QOYHCDcyE6KtYo0aQ1E1lPXAqHg2ebuFVwM3qsUT6uGN9JnDZ1qgTFEB5tty/nqJnbIA5PzG6AHBixwsJ7x1ZP+ZLznb6MGVaqRnv4DUkIY+ANJIx8J69RhstvJ6GYLgDzG5wz8Nj0p9cnngTBRDV79NdYSybEzOkFRkWIxPPoPUuX2dZ8qs2nPsgeGSdF8LQAe9LxQUaxKFk6jCVoaTzsUqhxMs75v4PYB9yVa0J+Gbp3DprZ0mHdkb8S4API35zxw1YxYxMCQJKW2NduzUsr72JKiT0pzOfTM8IwI/Ai6V5Ne7R6siGqJJkADWixqEbNqqKeMRU9DFGjAZPJUhX1VJTselYX3Q/r28jrzgoNQolTzucdzpLYBJdYeQlDbZJEMQF+8XfB6qcdCxMGj4o8PIBZp/Lu
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(39860400002)(346002)(376002)(396003)(136003)(366004)(451199021)(2906002)(33716001)(478600001)(86362001)(38100700002)(6512007)(9686003)(83380400001)(26005)(186003)(1076003)(6506007)(5660300002)(8676002)(8936002)(44832011)(7406005)(66556008)(7416002)(6486002)(54906003)(6666004)(66476007)(316002)(41300700001)(4326008)(66946007)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?JF7llVj1EbWHxkfF0z04ZPWC+37woB+qDB4TuxJpd0sE05yOPcxTKyjhqE?=
- =?iso-8859-1?Q?2rl1zkD/9fUd6hlPKkwLnaE4VakzE2NnMgxe7NFspr59GNEzx14oY0QAhz?=
- =?iso-8859-1?Q?oYMWfadJs5Xkcrc7UkfHzs2SwGpC3NLc11cWd/dHrZa+OIiL/bOwkiCC65?=
- =?iso-8859-1?Q?NIPtprDaGXkx6QS+8SER79Dl0Dqe56oUXAqnxeStw2fHBYl8s+OIpB3E2+?=
- =?iso-8859-1?Q?DLhtIk1S6RBW586Ow1NybfhPIG/g+qol/ExFWuUZcRzRD0dZ6Z0jm2YxiB?=
- =?iso-8859-1?Q?bv1RWvn9UHGPCo1uzECtvfQ09Cp5VxmkKlC8VTWGHMUHPYoD8e8xripqMF?=
- =?iso-8859-1?Q?uKAaq9ERrRndB1u4SLQSos34xeS0P2yWzpsLKmP7EjrAq97r2G2/ktHJEM?=
- =?iso-8859-1?Q?CwH7s9HRrvMz0chevM3iRS6gRuhweEWGAUns/SJ4xKve1efhUubUeAXrLs?=
- =?iso-8859-1?Q?Um1n4UI0MNwU/2eOp5prGVM2fb6cyA+oT5ZEmM15cc8OF7y5kCLpd+t80H?=
- =?iso-8859-1?Q?79ZnGjzKXR57r/LfzPoFoPn0GWwUCgMB7CexPMWcMbnsvT1qQCiyusXMRU?=
- =?iso-8859-1?Q?mnCKY8EE9RdtJK3LKwRVUbE/2arwLiNRFXVB6ILXDvB6VM85qEQZmwklIa?=
- =?iso-8859-1?Q?zmm2ercm6cGPKCoEUkFWB+Y9axYVM+EJlWirGBUPhajvLAmVAqdY7RcNN0?=
- =?iso-8859-1?Q?Mqx/ZDb8kMW38eOyQVRpI1CnQYgi9OI0P9myUGTq99lFkn+MsZfTq8TDa6?=
- =?iso-8859-1?Q?3/DQxb+xFwymR+dLbqVZytwFGSnyMnEpCjPKMEACKDoQpBZeXeFKrtoZe8?=
- =?iso-8859-1?Q?q6ZkLBNlhNehL+CSG96oRKUwQlfZHFVh8cqBv/ndw+FF/s1kml9OgmL/2H?=
- =?iso-8859-1?Q?do7II2u8OJelaC5PYPOI7mQiBq13oZD6lZqiNhThVRBadyaERyNt3Pgbhi?=
- =?iso-8859-1?Q?+Lob004tjXmoMeIiL3Vp7SAdZVy4tTMcCcKgViFJRHk4t+Sw0UGaZWRlPu?=
- =?iso-8859-1?Q?jMiZVRCeyce4eBE26E3A2/2o6RNUSUKWrupFKELCG+bafFIo4rtMvQoDPi?=
- =?iso-8859-1?Q?yTifFE2VrpFsSjCSnzcjADpXMPmuBg3BwI53QESLWuq3GTebPQY/d2n2bF?=
- =?iso-8859-1?Q?V1GiDfTKMG0Cmm+rNv+01xTrzZwgLopwBDinVwxrF+u8e3TZQQs9Nq56ln?=
- =?iso-8859-1?Q?+CyhNxPhUotjPvyculT7e4dteJOcgnmoC4Erjv2mDdLdzPYjcc3YT+moQj?=
- =?iso-8859-1?Q?fQlM+ZPrPxbLQynItA6lzFqLRy7HRblpg9GwZvfz2YBz/hq+9YdEndBUat?=
- =?iso-8859-1?Q?/yxK7Jwugy2BMTYqwYp3OcGyy2oljYF+/f4Ju4WEPdQnoW7GBWRNkKBz+B?=
- =?iso-8859-1?Q?0qFVCmBWOmumkRiJ4A9WWwcRSFPA3TczWfIgcHGi7TKNBQubt9na0HVNbH?=
- =?iso-8859-1?Q?UMgCNVQa5Zd7EmhBuui3xiQclwl9T1j/pOr4vtIP1IEaG3oY0mtrZt5CJl?=
- =?iso-8859-1?Q?q5fbnCtRVwxErau12AHkYunA87doLMIo4Cb0gfozW6qCwN2Vykv6UXfouw?=
- =?iso-8859-1?Q?LuqDGht7E2bLzmQWd8T+wbCFd89H9P3E9dAFXDRRGS777HY0R+6UKGYo5D?=
- =?iso-8859-1?Q?+pCCr3WD8bfycvBQHxB5sNOe89/slF7doYIyr5rMj4JimYW3TAl/hQJg?=
- =?iso-8859-1?Q?=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3173af73-fb42-4f03-ba63-08db879dd578
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 14:46:56.6191
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ed0KXqdu/ZsLU/r9zbm2MS5DTP3GJYnnCnABVYZAMRKMPWiLLCkMWBA1M3FJ8JR/fQS+RFIXVPHNtI6kUsnH7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7310
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718144310.4887-1-ante.knezic@helmholz.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 03:38:27PM +0100, Russell King (Oracle) wrote:
-> On Mon, Jul 17, 2023 at 06:27:09PM +0300, Vladimir Oltean wrote:
-> > +static int dev_set_hwtstamp_phylib(struct net_device *dev,
-> > +				   struct kernel_hwtstamp_config *cfg,
-> > +				   struct netlink_ext_ack *extack)
-> > +{
-> > +	const struct net_device_ops *ops = dev->netdev_ops;
-> > +	bool phy_ts = phy_has_hwtstamp(dev->phydev);
-> > +	struct kernel_hwtstamp_config old_cfg = {};
-> > +	bool changed = false;
-> > +	int err;
-> > +
-> > +	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
-> > +
-> > +	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
+On Tue, Jul 18, 2023 at 04:43:10PM +0200, Ante Knezic wrote:
+> > It does not apply cleanly to net-next. Please respin. You can retain
+> > Andrew's Reviewed-by tag.
 > 
-> I suppose the idea here is that for something like mvpp2, which when we
-> have PTP support for Marvell PHYs in general will want to prefer to use
-> the MAC-based PTP rather than PHY-based, that driver needs to set
-> IFF_SEE_ALL_HWTSTAMP_REQUESTS so that the ndo timestamp ops always get
-> called? I didn't see this discussed in the commit message for this
-> patch.
+> Respin might need a complete rework of the patch as with the
+> conversion of 88e639x to phylink_pcs (introduced with commit
+> e5b732a275f5fae0f1342fb8cf76de654cd51e50) the original code flow
+> has completely changed so it will not be as simple as finding a new
+> place to stick the patch. 
+> The new phylink mostly hides away mv88e6xxx_chip struct which is needed 
+> to identify the correct device and writing to relevant registers has also
+> changed in favor of mv88e639x_pcs struct etc.
+> I think you can see where I am going with this. In this sense I am not sure 
+> about keeping the Reviewed-by tag, more likely a complete rewrite 
+> should be done.
+> I will repost V3 once I figure out how to make it work with the new
+> framework.
+> 
 
-No; the plan for mvpp2-like situations is for Köry to:
-
-- add UAPI to allow specifying the timestamping source (based on PHC ID,
-  aka /dev/ptpN, probably)
-
-- change the core policy (effectively this function) to prefer:
-  - netdev-based timestamping by default (this reverses the current policy,
-    to prevent future regressions when more phylib drivers gain
-    timestamping support)
-  - phylib-based timestamping for a selection of whitelisted phylib PHYs
-    (this avoids regressions with existing phylib-based systems)
-  - the user choice
-
-The only thing that IFF_SEE_ALL_HWTSTAMP_REQUESTS does is to give the
-netdev a hook for phylib timestamping operations, for completely
-unrelated purposes (switch ports that become PTP-aware must stop
-flooding PTP packets).
+Can't you simply replicate the positioning of mv88e6393x_erratum_4_6()
+from mv88e6393x_pcs_init()?
 
