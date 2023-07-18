@@ -1,43 +1,44 @@
-Return-Path: <netdev+bounces-18701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B514F75853C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:00:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389E7758541
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5A61C20E3E
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:00:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E86D7281711
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC4415ADD;
-	Tue, 18 Jul 2023 18:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA541641E;
+	Tue, 18 Jul 2023 19:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D33156E1;
-	Tue, 18 Jul 2023 18:59:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE6C3C433C8;
-	Tue, 18 Jul 2023 18:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA22168A1;
+	Tue, 18 Jul 2023 19:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5692FC433CB;
+	Tue, 18 Jul 2023 19:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689706796;
-	bh=z+g/oVpRmEOi63hgglQdij3DuOAoXiKlzw8WfvHlrOk=;
+	s=k20201202; t=1689706822;
+	bh=5Z4MyDFUtEzWmt34fIJSIvDZo8OujjfdrPl9oOrPwHs=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=I+xbnFontjF54GjG7JXpXn2VaNyjyRsm+3qkU6GwgUewxSs1zOqSXdhXx7EsZsieD
-	 TV56G8La5UKM/Yvm/MZOB0Lxe5T9UHZp3gKCmOQZkSlTJZTIi1sMSC+g1Y6EMNnpwZ
-	 wW20sMuwxdVTC62Z/iumzz8HLAFx1V7koV/5edgezJQGITHaYtvsUlIcy5YDNwHLFB
-	 2oN8Nxc4S62Ye0f57wl7ZnXRKGBeJ2O1WzfoKYImkgqwLu5BkEbBapFo3Z+EKFZR0T
-	 KnUyPeGCpywQ5V4vRtgeTYgS9Y1DvYspf/KekRIPkOwt2x4jY9yHgRuWxIZfNghal5
-	 Ydun9QBr+3aeg==
-Subject: [PATCH net-next v1 2/7] net/tls: Add TLS Alert definitions
+	b=alpBt6gp6ahFjkizr4QwAmqls9FmIXDub3IODGC3HRO3dJfUhsp/v0XBaRo3BMlY9
+	 LpubNZ0duHcuAw0ayAHX6IuY0TK92GDL9DFDL/Ibc5kEzwxg+VqRVvB9RVoduf+1KE
+	 dNGrC3lWMORsDN6QxSE7Wnyq79DfIBhHxpWqs386m+nInvz81PL9zdtsyaKuVe/MQ/
+	 e+L2F4+rcvBSY42gp6Hi6Cp3LB28pIDRltBb4Aqn5U02U6Cxgk+nUcJ8XdsbXusbDp
+	 TB5Wfkqewsm1wYcgsGfMNXuqZpzS7Jl1Sm50pczz6KemOiQFZG0JdC+GC3aXR0Ro9p
+	 JNVPRYemSt3Aw==
+Subject: [PATCH net-next v1 3/7] net/handshake: Add API for sending TLS
+ Closure alerts
 From: Chuck Lever <cel@kernel.org>
 To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com
 Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
-Date: Tue, 18 Jul 2023 14:59:44 -0400
+Date: Tue, 18 Jul 2023 15:00:11 -0400
 Message-ID: 
- <168970677480.5330.16194452237553219882.stgit@oracle-102.nfsv4bat.org>
+ <168970680139.5330.16891764300979182957.stgit@oracle-102.nfsv4bat.org>
 In-Reply-To: 
  <168970659111.5330.9206348580241518146.stgit@oracle-102.nfsv4bat.org>
 References: 
@@ -54,70 +55,176 @@ Content-Transfer-Encoding: 7bit
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-I'm about to add support for kernel handshake API consumers to send
-TLS Alerts, so introduce the needed protocol definitions in the new
-header tls_prot.h.
-
-This presages support for Closure alerts. Also, support for alerts
-is a pre-requite for handling session re-keying, where one peer will
-signal the need for a re-key by sending a TLS Alert.
+This helper sends an alert only if a TLS session was established.
 
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- include/net/tls_prot.h |   42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ include/net/handshake.h   |    1 +
+ net/handshake/Makefile    |    2 +
+ net/handshake/alert.c     |   62 +++++++++++++++++++++++++++++++++++++++++++++
+ net/handshake/handshake.h |    4 +++
+ net/handshake/tlshd.c     |   23 +++++++++++++++++
+ 5 files changed, 91 insertions(+), 1 deletion(-)
+ create mode 100644 net/handshake/alert.c
 
-diff --git a/include/net/tls_prot.h b/include/net/tls_prot.h
-index 47d6cfd1619e..68a40756440b 100644
---- a/include/net/tls_prot.h
-+++ b/include/net/tls_prot.h
-@@ -23,4 +23,46 @@ enum {
- 	TLS_RECORD_TYPE_ACK = 26,
+diff --git a/include/net/handshake.h b/include/net/handshake.h
+index 2e26e436e85f..bb88dfa6e3c9 100644
+--- a/include/net/handshake.h
++++ b/include/net/handshake.h
+@@ -40,5 +40,6 @@ int tls_server_hello_x509(const struct tls_handshake_args *args, gfp_t flags);
+ int tls_server_hello_psk(const struct tls_handshake_args *args, gfp_t flags);
+ 
+ bool tls_handshake_cancel(struct sock *sk);
++void tls_handshake_close(struct socket *sock);
+ 
+ #endif /* _NET_HANDSHAKE_H */
+diff --git a/net/handshake/Makefile b/net/handshake/Makefile
+index 247d73c6ff6e..ef4d9a2112bd 100644
+--- a/net/handshake/Makefile
++++ b/net/handshake/Makefile
+@@ -8,6 +8,6 @@
+ #
+ 
+ obj-y += handshake.o
+-handshake-y := genl.o netlink.o request.o tlshd.o trace.o
++handshake-y := alert.o genl.o netlink.o request.o tlshd.o trace.o
+ 
+ obj-$(CONFIG_NET_HANDSHAKE_KUNIT_TEST) += handshake-test.o
+diff --git a/net/handshake/alert.c b/net/handshake/alert.c
+new file mode 100644
+index 000000000000..999d3ffaf3e3
+--- /dev/null
++++ b/net/handshake/alert.c
+@@ -0,0 +1,62 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Handle the TLS Alert protocol
++ *
++ * Author: Chuck Lever <chuck.lever@oracle.com>
++ *
++ * Copyright (c) 2023, Oracle and/or its affiliates.
++ */
++
++#include <linux/types.h>
++#include <linux/socket.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/skbuff.h>
++#include <linux/inet.h>
++
++#include <net/sock.h>
++#include <net/handshake.h>
++#include <net/genetlink.h>
++#include <net/tls.h>
++#include <net/tls_prot.h>
++
++#include "handshake.h"
++
++/**
++ * tls_alert_send - send a TLS Alert on a kTLS socket
++ * @sock: open kTLS socket to send on
++ * @level: TLS Alert level
++ * @description: TLS Alert description
++ *
++ * Returns zero on success or a negative errno.
++ */
++int tls_alert_send(struct socket *sock, u8 level, u8 description)
++{
++	u8 record_type = TLS_RECORD_TYPE_ALERT;
++	u8 buf[CMSG_SPACE(sizeof(record_type))];
++	struct msghdr msg = { 0 };
++	struct cmsghdr *cmsg;
++	struct kvec iov;
++	u8 alert[2];
++	int ret;
++
++	alert[0] = level;
++	alert[1] = description;
++	iov.iov_base = alert;
++	iov.iov_len = sizeof(alert);
++
++	memset(buf, 0, sizeof(buf));
++	msg.msg_control = buf;
++	msg.msg_controllen = sizeof(buf);
++	msg.msg_flags = MSG_DONTWAIT;
++
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_TLS;
++	cmsg->cmsg_type = TLS_SET_RECORD_TYPE;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(record_type));
++	memcpy(CMSG_DATA(cmsg), &record_type, sizeof(record_type));
++
++	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, iov.iov_len);
++	ret = sock_sendmsg(sock, &msg);
++	return ret < 0 ? ret : 0;
++}
+diff --git a/net/handshake/handshake.h b/net/handshake/handshake.h
+index 4dac965c99df..af1633d5ad73 100644
+--- a/net/handshake/handshake.h
++++ b/net/handshake/handshake.h
+@@ -41,6 +41,7 @@ struct handshake_req {
+ 
+ enum hr_flags_bits {
+ 	HANDSHAKE_F_REQ_COMPLETED,
++	HANDSHAKE_F_REQ_SESSION,
  };
  
-+/*
-+ * TLS Alert protocol: AlertLevel
-+ */
-+enum {
-+	TLS_ALERT_LEVEL_WARNING = 1,
-+	TLS_ALERT_LEVEL_FATAL = 2,
-+};
+ /* Invariants for all handshake requests for one transport layer
+@@ -63,6 +64,9 @@ enum hp_flags_bits {
+ 	HANDSHAKE_F_PROTO_NOTIFY,
+ };
+ 
++/* alert.c */
++int tls_alert_send(struct socket *sock, u8 level, u8 description);
 +
-+/*
-+ * TLS Alert protocol: AlertDescription
-+ */
-+enum {
-+	TLS_ALERT_DESC_CLOSE_NOTIFY = 0,
-+	TLS_ALERT_DESC_UNEXPECTED_MESSAGE = 10,
-+	TLS_ALERT_DESC_BAD_RECORD_MAC = 20,
-+	TLS_ALERT_DESC_RECORD_OVERFLOW = 22,
-+	TLS_ALERT_DESC_HANDSHAKE_FAILURE = 40,
-+	TLS_ALERT_DESC_BAD_CERTIFICATE = 42,
-+	TLS_ALERT_DESC_UNSUPPORTED_CERTIFICATE = 43,
-+	TLS_ALERT_DESC_CERTIFICATE_REVOKED = 44,
-+	TLS_ALERT_DESC_CERTIFICATE_EXPIRED = 45,
-+	TLS_ALERT_DESC_CERTIFICATE_UNKNOWN = 46,
-+	TLS_ALERT_DESC_ILLEGAL_PARAMETER = 47,
-+	TLS_ALERT_DESC_UNKNOWN_CA = 48,
-+	TLS_ALERT_DESC_ACCESS_DENIED = 49,
-+	TLS_ALERT_DESC_DECODE_ERROR = 50,
-+	TLS_ALERT_DESC_DECRYPT_ERROR = 51,
-+	TLS_ALERT_DESC_TOO_MANY_CIDS_REQUESTED	= 52,
-+	TLS_ALERT_DESC_PROTOCOL_VERSION = 70,
-+	TLS_ALERT_DESC_INSUFFICIENT_SECURITY = 71,
-+	TLS_ALERT_DESC_INTERNAL_ERROR = 80,
-+	TLS_ALERT_DESC_INAPPROPRIATE_FALLBACK = 86,
-+	TLS_ALERT_DESC_USER_CANCELED = 90,
-+	TLS_ALERT_DESC_MISSING_EXTENSION = 109,
-+	TLS_ALERT_DESC_UNSUPPORTED_EXTENSION = 110,
-+	TLS_ALERT_DESC_UNRECOGNIZED_NAME = 112,
-+	TLS_ALERT_DESC_BAD_CERTIFICATE_STATUS_RESPONSE = 113,
-+	TLS_ALERT_DESC_UNKNOWN_PSK_IDENTITY = 115,
-+	TLS_ALERT_DESC_CERTIFICATE_REQUIRED = 116,
-+	TLS_ALERT_DESC_NO_APPLICATION_PROTOCOL = 120,
-+};
+ /* netlink.c */
+ int handshake_genl_notify(struct net *net, const struct handshake_proto *proto,
+ 			  gfp_t flags);
+diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
+index b735f5cced2f..aad3c5b06b03 100644
+--- a/net/handshake/tlshd.c
++++ b/net/handshake/tlshd.c
+@@ -18,6 +18,7 @@
+ #include <net/sock.h>
+ #include <net/handshake.h>
+ #include <net/genetlink.h>
++#include <net/tls_prot.h>
+ 
+ #include <uapi/linux/keyctl.h>
+ #include <uapi/linux/handshake.h>
+@@ -100,6 +101,9 @@ static void tls_handshake_done(struct handshake_req *req,
+ 	if (info)
+ 		tls_handshake_remote_peerids(treq, info);
+ 
++	if (!status)
++		set_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags);
 +
- #endif /* _TLS_PROT_H */
+ 	treq->th_consumer_done(treq->th_consumer_data, -status,
+ 			       treq->th_peerid[0]);
+ }
+@@ -424,3 +428,22 @@ bool tls_handshake_cancel(struct sock *sk)
+ 	return handshake_req_cancel(sk);
+ }
+ EXPORT_SYMBOL(tls_handshake_cancel);
++
++/**
++ * tls_handshake_close - send a Closure alert
++ * @sock: an open socket
++ *
++ */
++void tls_handshake_close(struct socket *sock)
++{
++	struct handshake_req *req;
++
++	req = handshake_req_hash_lookup(sock->sk);
++	if (!req)
++		return;
++	if (!test_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags))
++		return;
++	tls_alert_send(sock, TLS_ALERT_LEVEL_WARNING,
++		       TLS_ALERT_DESC_CLOSE_NOTIFY);
++}
++EXPORT_SYMBOL(tls_handshake_close);
 
 
 
