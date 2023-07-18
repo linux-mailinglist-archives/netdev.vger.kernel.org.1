@@ -1,263 +1,207 @@
-Return-Path: <netdev+bounces-18740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8055A758756
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:39:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB63475876A
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B199B1C20E1A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:39:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0E3928159A
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FACC174FF;
-	Tue, 18 Jul 2023 21:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099931772E;
+	Tue, 18 Jul 2023 21:45:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09A7174CB
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 21:39:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 987DCC433C8;
-	Tue, 18 Jul 2023 21:39:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689716353;
-	bh=2EaS9hb1FXX9OJHDbvK6squyFB5ZfxFtByX8KIvw0CQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dLSQxVEEl6J4Ye1wgzJ/jKWvR/e1SMqfn5OrfpXiCB+s1AL4wvrcm6Dk85vuhbdSs
-	 GJaOjPJcps093lqgpFJQJ5MEBhX9mIXxPpB17r9ZOHLU0lROFgk9ex4pndVHOonTi2
-	 ljbN/oOCIcXLYobYRdGFjV8SfyIggA90WHwtAaWFvoOvQILiLTRWRdU6Yj5orUVoJt
-	 BzdPNp+A5mMuZxBH8zPnoJ29H0qrj8V7ccF/HZw80BFSLXpJJlgszyE3A+ywe2v+A2
-	 UeaMA6yGihL6V6ke9VffKGB9rpjml0Aha9Yn9K65Nc9NiOINFIGtM6i1Kc5N/QFFA6
-	 LnzrXFYxMbqCQ==
-Message-ID: <96515710-f82f-cd2a-8366-7fff84f28d82@kernel.org>
-Date: Tue, 18 Jul 2023 23:39:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC511174CB;
+	Tue, 18 Jul 2023 21:45:40 +0000 (UTC)
+Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ED6198C;
+	Tue, 18 Jul 2023 14:45:39 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailnew.nyi.internal (Postfix) with ESMTP id 1E5B95802F2;
+	Tue, 18 Jul 2023 17:45:36 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Tue, 18 Jul 2023 17:45:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1689716736; x=1689723936; bh=uD
+	sDK041yg1GWCX+vHUCiSTd/14RpAua7/p4WDM2U2w=; b=l4pUQHhBDbItq74CZI
+	hsQjElDCxkVCXPR0g7HAnQ6+3focB2iVFovFuzCHwe0Y02OECbUXx7s86cgtVQW/
+	RzhE7Rhd9RdRA24SewI3hUuzsot8s09va6iHBR4FzHAs25jdOnNZpiqtK/Zxs2xQ
+	MjWtJd2c1/dZUGXNHxlBZCfjs2OK1iXAUjWBJFBWFyCThD/83M2Q4x3R+MD9ie+o
+	JndwLIECP+YSWqmrLTnQojgRwAzo7eDDesWYQBYlX49iOoqDzEwkReGer05sOG/6
+	sFfo6WeUYQ29tPVF4VS2bCrrn12fzDLpDushXhupoad4zZaUjYmsB1p4Iu52c9Pl
+	LdEw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1689716736; x=1689723936; bh=uDsDK041yg1GW
+	CX+vHUCiSTd/14RpAua7/p4WDM2U2w=; b=KUWb1QenPKil0C6Cw9Jo1EMwp+N0C
+	dF1qytWLyNgSAd5Jx2HgrgeIg1wcWkCP95e8nC1pCHwV1kYTjZQE4Kbcw68aWbuD
+	iB3pCvjIUyJrosBMYL6p4z+HNwv6egp/dVWyaORDZ7ROZnMI/iEvaKoiRc3zRzSy
+	sPw57IBZ93h1Nq8fby+HCTyqLXSqRTGrSj3h3YeY3/UzehBOYplfLOE2d/GbyfLi
+	zyZSpVXGdBINYLFyAO4JLJ0aWGOy7N/vN/KoTSZ9vlGH1HesLIXmUUrl+6+h9X08
+	gqMGDD75rx2J1Ab1kPUtGz9reBhfsVl6wmlzjy1w7YGWGsqKlz5rW788Q==
+X-ME-Sender: <xms:_we3ZPHVR7lCTvVgpag5PAhv8YqG9pgJJSFndeJ6pVudjpFPTXAXvQ>
+    <xme:_we3ZMW57u0KODVlsn8ifsYWyJM4QaSHuZpL1PSEUyPhHILn-HGNzTcR8oKR0bflp
+    412_ZtGbaw-k55Cog>
+X-ME-Received: <xmr:_we3ZBJviNjEyIcnnd87HfdU_dMDfh61e7PyTJ61qTZflTaRX71onH2EYxsbRYwPzjhq5sGaWUA7dkjhH2iOXHRMDrUBsDzXkfrG>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeehgddtvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
+    hrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
+    vdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenuc
+    ggtffrrghtthgvrhhnpedvfeekteduudefieegtdehfeffkeeuudekheduffduffffgfeg
+    iedttefgvdfhvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
+    hrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:_we3ZNHiXAu_pXYHrB4e9sWxdijdluirm7JTTVqinPexzOtfp0wzMw>
+    <xmx:_we3ZFUdRN2bIsClY4oI0HhqKg6rWlmDmr_fVRHBdQIfH0E5A1K3vQ>
+    <xmx:_we3ZIN3nakgap87xh5VJsM1314_SAQGaayjCkDXp6jrr9GTcfEFoA>
+    <xmx:AAi3ZD3w9P0TUi9niFO7ONGlvj_n9te545u08NhHn091q8v_CIj6ug>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 18 Jul 2023 17:45:33 -0400 (EDT)
+Date: Tue, 18 Jul 2023 15:45:32 -0600
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Florian Westphal <fw@strlen.de>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
+	Network Development <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH bpf-next v4 2/6] netfilter: bpf: Support
+ BPF_F_NETFILTER_IP_DEFRAG in netfilter link
+Message-ID: <6av46ydgbufp5x23lempwmutcsjuy6efpysbvnqxjoirng43tr@gcyqxhln2x6f>
+References: <cover.1689203090.git.dxu@dxuuu.xyz>
+ <d3b0ff95c58356192ea3b50824f8cdbf02c354e3.1689203090.git.dxu@dxuuu.xyz>
+ <CAADnVQKKfEtZYZxihxvG3aQ34E1m95qTZ=jTD7yd0qvOASpAjQ@mail.gmail.com>
+ <kwiwaeaijj6sxwz5fhtxyoquhz2kpujbsbeajysufgmdjgyx5c@f6lqrd23xr5f>
+ <CAADnVQLcAoN5z+HD_44UKgJJc6t5TPW8+Ai9We0qJpau4NtEzA@mail.gmail.com>
+ <wltfmammaf5g4gumsbna4kmwo6dtd24g472o7kgkug42dhwcy2@32fmd7q6kvg4>
+ <CAADnVQJQZ2jQSWByVvi3N2ZOoL0XDSJzx5biSVvq=inS7OSW7A@mail.gmail.com>
+ <t6wypww537golmoosbikfuombrqq555fh5mbycwl4whto6joo4@hcqlospkgqyr>
+ <20230714094741.GA7912@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3] recv.2: Document MSG_CMSG_CLOEXEC as returned in
- msg_flags
-Content-Language: en-US
-To: Matthew House <mattlloydhouse@gmail.com>
-Cc: linux-man@vger.kernel.org, linux-api@vger.kernel.org,
- netdev@vger.kernel.org, Ulrich Drepper <drepper@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Andrew Morton <akpm@linux-foundation.org>
-References: <20230709213358.389871-1-mattlloydhouse@gmail.com>
- <363c0f82-969d-1927-1bd5-b664cfc83a87@kernel.org>
- <20230716234803.851580-1-mattlloydhouse@gmail.com>
- <47e21a59-f74a-4a63-0f13-237c015ae6bb@kernel.org>
- <20230718060121.934187-1-mattlloydhouse@gmail.com>
- <05f6395d-4ee2-ce87-253a-9dcbfe227d42@kernel.org>
- <20230718172648.943269-1-mattlloydhouse@gmail.com>
-From: Alejandro Colomar <alx@kernel.org>
-Organization: Linux
-In-Reply-To: <20230718172648.943269-1-mattlloydhouse@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------1UKNO0Xc1FdY7aK6BnYWF4J6"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714094741.GA7912@breakpoint.cc>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------1UKNO0Xc1FdY7aK6BnYWF4J6
-Content-Type: multipart/mixed; boundary="------------Wgi8bN2d3gaLi7ZzCrRRu4Kv";
- protected-headers="v1"
-From: Alejandro Colomar <alx@kernel.org>
-To: Matthew House <mattlloydhouse@gmail.com>
-Cc: linux-man@vger.kernel.org, linux-api@vger.kernel.org,
- netdev@vger.kernel.org, Ulrich Drepper <drepper@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Andrew Morton <akpm@linux-foundation.org>
-Message-ID: <96515710-f82f-cd2a-8366-7fff84f28d82@kernel.org>
-Subject: Re: [PATCH v3] recv.2: Document MSG_CMSG_CLOEXEC as returned in
- msg_flags
-References: <20230709213358.389871-1-mattlloydhouse@gmail.com>
- <363c0f82-969d-1927-1bd5-b664cfc83a87@kernel.org>
- <20230716234803.851580-1-mattlloydhouse@gmail.com>
- <47e21a59-f74a-4a63-0f13-237c015ae6bb@kernel.org>
- <20230718060121.934187-1-mattlloydhouse@gmail.com>
- <05f6395d-4ee2-ce87-253a-9dcbfe227d42@kernel.org>
- <20230718172648.943269-1-mattlloydhouse@gmail.com>
-In-Reply-To: <20230718172648.943269-1-mattlloydhouse@gmail.com>
+Hi Florian,
 
---------------Wgi8bN2d3gaLi7ZzCrRRu4Kv
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 14, 2023 at 11:47:41AM +0200, Florian Westphal wrote:
+> Daniel Xu <dxu@dxuuu.xyz> wrote:
+> > On Thu, Jul 13, 2023 at 04:10:03PM -0700, Alexei Starovoitov wrote:
+> > > Why is rcu_assign_pointer() used?
+> > > If it's not RCU protected, what is the point of rcu_*() accessors
+> > > and rcu_read_lock() ?
+> > > 
+> > > In general, the pattern:
+> > > rcu_read_lock();
+> > > ptr = rcu_dereference(...);
+> > > rcu_read_unlock();
+> > > ptr->..
+> > > is a bug. 100%.
+> 
+> FWIW, I agree with Alexei, it does look... dodgy.
+> 
+> > The reason I left it like this is b/c otherwise I think there is a race
+> > with module unload and taking a refcnt. For example:
+> > 
+> > ptr = READ_ONCE(global_var)
+> >                                              <module unload on other cpu>
+> > // ptr invalid
+> > try_module_get(ptr->owner) 
+> >
+> 
+> Yes, I agree.
+> 
+> > I think the the synchronize_rcu() call in
+> > kernel/module/main.c:free_module() protects against that race based on
+> > my reading.
+> > 
+> > Maybe the ->enable() path can store a copy of the hook ptr in
+> > struct bpf_nf_link to get rid of the odd rcu_dereference()?
+> > 
+> > Open to other ideas too -- would appreciate any hints.
+> 
+> I would suggest the following:
+> 
+> - Switch ordering of patches 2 and 3.
+>   What is currently patch 3 would add the .owner fields only.
+> 
+> Then, what is currently patch #2 would document the rcu/modref
+> interaction like this (omitting error checking for brevity):
+> 
+> rcu_read_lock();
+> v6_hook = rcu_dereference(nf_defrag_v6_hook);
+> if (!v6_hook) {
+>         rcu_read_unlock();
+>         err = request_module("nf_defrag_ipv6");
+>         if (err)
+>                  return err < 0 ? err : -EINVAL;
+>         rcu_read_lock();
+> 	v6_hook = rcu_dereference(nf_defrag_v6_hook);
+> }
+> 
+> if (v6_hook && try_module_get(v6_hook->owner))
+> 	v6_hook = rcu_pointer_handoff(v6_hook);
+> else
+> 	v6_hook = NULL;
+> 
+> rcu_read_unlock();
+> 
+> if (!v6_hook)
+> 	err();
+> v6_hook->enable();
+> 
+> 
+> I'd store the v4/6_hook pointer in the nf bpf link struct, its probably more
+> self-explanatory for the disable side in that we did pick up a module reference
+> that we still own at delete time, without need for any rcu involvement.
+> 
+> Because above handoff is repetitive for ipv4 and ipv6,
+> I suggest to add an agnostic helper for this.
+> 
+> I know you added distinct structures for ipv4 and ipv6 but if they would use
+>  the same one you could add
+> 
+> static const struct nf_defrag_hook *get_proto_frag_hook(const struct nf_defrag_hook __rcu *hook,
+> 							const char *modulename);
+> 
+> And then use it like:
+> 
+> v4_hook = get_proto_frag_hook(nf_defrag_v4_hook, "nf_defrag_ipv4");
+> 
+> Without a need to copy the modprobe and handoff part.
+> 
+> What do you think?
 
-Hi Matthew, Ulrich,
+That sounds reasonable to me. I'll give it a shot. Thanks for the input!
 
-On 2023-07-18 19:26, Matthew House wrote:
-> Ever since commit 4a19542e5f69 ("O_CLOEXEC for SCM_RIGHTS") added the
-> MSG_CMSG_CLOEXEC flag to recvmsg(2), the flag has also been copied into=
- the
-> returned msg->msg_flags when specified, regardless of whether any file
-> descriptors were actually received, or whether the protocol supports
-> receiving file descriptors at all. This behavior was primarily an
-> implementation artifact: by copying MSG_CMSG_CLOEXEC into the msg_flags=
-,
-> scm_detach_fds() in net/core/scm.c (and its _compat() counterpart in
-> net/compat.c) could determine whether it was set without having to rece=
-ive
-> a copy of the recvmsg(2) flags.
->=20
-> This mechanism was closely modeled after the internal MSG_CMSG_COMPAT f=
-lag,
-> which is passed by the compat versions of the send[m]msg(2) and
-> recv[m]msg(2) syscalls to inform various functions that user space expe=
-cts
-> a compat layout. When the flag was first implemented by commits
-> 3225fc8a85f4 ("[NET]: Simplify scm handling and sendmsg/recvmsg invocat=
-ion,
-> consolidate net compat syscalls.") and 7e8d06bc1d90 ("[COMPAT]: Fix
-> MSG_CMSG_COMPAT flag passing, kill cmsg_compat_recvmsg_fixup.") (in
-> history/history.git), the behavior was very similar: recvmsg(2) would a=
-dd
-> MSG_CMSG_COMPAT to the msg_flags, and put_cmsg() and scm_detach_fds() i=
-n
-> net/core/scm.c would read the flag to determine whether to delegate to
-> their _compat() counterparts.
->=20
-> However, after the initial implementation, more work was done to hide
-> MSG_CMSG_COMPAT from user space. First, commit 37f7f421cce1 ("[NET]: Do=
- not
-> leak MSG_CMSG_COMPAT into userspace.") started scrubbing the bit from
-> msg_flags right before copying it back into user space. Then, since pas=
-sing
-> the MSG_CMSG_COMPAT flag into the syscalls from non-compat code could
-> confuse the kernel, commits 1be374a0518a ("net: Block MSG_CMSG_COMPAT i=
-n
-> send(m)msg and recv(m)msg") and a7526eb5d06b ("net: Unbreak
-> compat_sys_{send,recv}msg") made them return -EINVAL if user space
-> attempted to pass the flag. But to reduce breakage, commit d720d8cec563=
-
-> ("net: compat: Ignore MSG_CMSG_COMPAT in compat_sys_{send, recv}msg")
-> rolled that back somewhat, making MSG_CMSG_COMPAT an error for the
-> non-compat syscalls and a no-op for the compat syscalls, which is the
-> current status quo.
->=20
-> Even though MSG_CMSG_CLOEXEC was implemented after the kernel started
-> scrubbing MSG_CMSG_COMPAT from the returned msg_flags, the newer flag n=
-ever
-> received the same treatment. At this point, this behavior has effective=
-ly
-> become part of the user-space API, to the extent that io_uring has been=
-
-> careful in commit 9bb66906f23e ("io_uring: support multishot in recvmsg=
-")
-> to replicate the behavior in its multishot IORING_OP_RECVMSG operation.=
-
->=20
-> Therefore, document this behavior to avoid confusion when user space se=
-es
-> MSG_CMSG_CLOEXEC returned in msg->msg_flags.
->=20
-> Cc: linux-api@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: Ulrich Drepper <drepper@redhat.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Signed-off-by: Matthew House <mattlloydhouse@gmail.com>
-> ---
-> Alright, I've summarized the history in the commit message, and I've ad=
-ded
-> the CCs you requested.
->=20
-> Also, for future reference, Drepper gave a reply to the last email, whi=
-ch
-> did not make it onto the list:
->=20
-> On Tue, Jul 18, 2023 at 9:24 AM Ulrich Drepper <drepper@redhat.com> wro=
-te:
->> On Tue, Jul 18, 2023 at 2:10=E2=80=AFPM Alejandro Colomar <alx@kernel.=
-org> wrote:
->>
->>>> As for the original
->>>> purpose of the behavior, it's not really clear, and it may well have=
- been
->>>> an implementation artifact that got enshrined in the user space ABI.=
-
->>> (Even
->>>> io_uring is careful to replicate this behavior!)
->>>
->>> This is what worries me.  I've CCd a bunch of people to see if they c=
-an
->>> bring some light.
->>>
->>
->> It definitely was an artifact of the implementation.  I haven't tested=
-
->> getting the close-on-exec flag information for all interfaces.  The
->> assumption was that the information about the close-on-exec flag is
->> received with the universal fcntl() call.
-
-Patch applied.  I've included Drepper's quote in the commit message too.
-Thank you both!
-
-Cheers,
-Alex
-
->=20
-> Thank you,
-> Matthew House
->=20
->  man2/recv.2 | 9 +++++++++
->  1 file changed, 9 insertions(+)
->=20
-> diff --git a/man2/recv.2 b/man2/recv.2
-> index 660c103fb..1cd9f3e1b 100644
-> --- a/man2/recv.2
-> +++ b/man2/recv.2
-> @@ -412,6 +412,15 @@ is returned to indicate that expedited or out-of-b=
-and data was received.
->  .B MSG_ERRQUEUE
->  indicates that no data was received but an extended error from the soc=
-ket
->  error queue.
-> +.TP
-> +.BR MSG_CMSG_CLOEXEC " (since Linux 2.6.23)"
-> +.\" commit 4a19542e5f694cd408a32c3d9dc593ba9366e2d7
-> +indicates that
-> +.B MSG_CMSG_CLOEXEC
-> +was specified in the
-> +.I flags
-> +argument of
-> +.BR recvmsg ().
->  .SH RETURN VALUE
->  These calls return the number of bytes received, or \-1
->  if an error occurred.
-
---=20
-<http://www.alejandro-colomar.es/>
-GPG key fingerprint: A9348594CE31283A826FBDD8D57633D441E25BB5
-
-
---------------Wgi8bN2d3gaLi7ZzCrRRu4Kv--
-
---------------1UKNO0Xc1FdY7aK6BnYWF4J6
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmS3Bn0ACgkQnowa+77/
-2zJ/eg/+KZ4z2UJuINFBb+ruxyfYN+dBsa+wc1p8AkMsCSLzzyzMDFa8NStb+qu7
-MQwZiAuSDeZMeatfU6HrEtHOAzdmofSxbTpkT6jBkVSRGsNmOY7+bTnGhurVZ2O7
-Tw9S2JPnyTYZc7yeCXMpAF81wQyQHCgpSKg7P1OYVHz0lk4N0XNh9C3oESRc6pqf
-dk9/o8zA6pgmfuzYXJVN6ZH3HZ3vi+r63LLNq/rps9k9GWgjdsiLIAwR5DP7gnnN
-PlaqNIfgpxoTArYfoOozvSkb7UFFid6/2yOpSL5zoFmDlP3xMlyg+rfSrFEVzjT6
-3Q1aAWk4vc4qhILB4SJp34t4C0joJ5+CITQJOFsJwMtBidLTNjHw4wVq/o6hxj1r
-8JIs9tHAu7VTkPaoAQj01uAnjsrcOCscHSi+8vLulzaj3UyCM4GD0QHhlbtXpYQO
-6Jkuk3HQWUohMwfUJW2EVwATyO9d8iCX/J4wRuLq/mC/HV1IQgZuQpTabV9jXFPc
-lk5wRFsPwUTYus8hItE5Nb+zV1Hoq3JPYwMz0WeHohGSwwnf2tNsaTxbdp9lvgng
-5NTqbKjWY+NZBBWjUw5GTCV3R1k4y15ldGNk01i0/mUSq/4flLIy5VB2QoDttqPd
-jMx3Jl4sDiQawRUP1RmjaLzJForNwVdP3q58b/8Z808U0yzwgQU=
-=jlgC
------END PGP SIGNATURE-----
-
---------------1UKNO0Xc1FdY7aK6BnYWF4J6--
+Daniel
 
