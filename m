@@ -1,197 +1,99 @@
-Return-Path: <netdev+bounces-18657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAFDB758398
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:37:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 031337583A7
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:41:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 838D928119C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:37:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AABC2815AC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55361156CE;
-	Tue, 18 Jul 2023 17:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0B0156E0;
+	Tue, 18 Jul 2023 17:41:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF68134BD
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 17:37:08 +0000 (UTC)
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A31139
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:37:04 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-440ad576d87so1886947137.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:37:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689701824; x=1692293824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OF7u0tkhZuJp+iYGmAnUNlyXY8n4e2wtaxsLwo/TJ0U=;
-        b=GvhF9so1mjJXiE/TvurKZcRANx4xoduJ12AI7tyQuLMZKhF+GAimJJ6+jOxa5DbOxx
-         ZkKgtoehuKyPuCc90EiNAJ7pAoNst0vuc7x1Og0cjyuGCU9w9PV4qgvI/S0aUPiFGuJN
-         mD9GvO3+AxzbtHsvl3FCd6C1r9kxBvaANizWpS6BgtwFPbXsGnY4AxbcWpXVCkfMIi+y
-         vk6k/qLV/s43NfR1l7h6bopJ1DTN9YfxIMYUn8Q74BKBmDVKGcFTYtfFK1Mp2c3EpZK/
-         sQWDMvHJls5znmpTUiPK/gD2WQSSwyZ2dzp5+poQJH75Bvsz9D3Yg4w7yp8IzQL6IPsD
-         j/2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689701824; x=1692293824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OF7u0tkhZuJp+iYGmAnUNlyXY8n4e2wtaxsLwo/TJ0U=;
-        b=ZwUv5oDZxpk2aaue5ELTdsnoiyga1lIVpsBYDjiOf5oKaCgKK5vGxAeQdj+QCMkqNQ
-         c/uLVXR8nKV0uiObA57Rb/Qg4bUIed51I/qjcYU5buEWMnA/hYW97xVaw2Z8mUgI7WZ+
-         3Og/nPXkq+mjiGGTLWMLDq2LQsYBKUpk0DPt8wdmL5dd+4/AbZPAggwW/ttDJ6LaoUuS
-         csIPLL06kDc3F9KS/kTagZHr+Tofa79SDxGMu2iPooliDcFpIb29Mv9zqIECxHNFDCoh
-         ZTNtR8cD7GKizU53Y9stk0pjJ4McY+kEOgn9fCzkkj12fYw76++F69QG2OtLZB159QF6
-         SXBw==
-X-Gm-Message-State: ABy/qLal7Meu/Srwh/F8zYKhuQtFa8DgT9lpEkSoZH2gSVJIJZO0t0En
-	1C4GzEd35ARnNNyI4GJuFR42RjYuolDW6jtR+1H4Nw==
-X-Google-Smtp-Source: APBJJlGybULcU+7z4JGO9VYtEkqhuSOGFBtDCY9RmNEp4loR/4Bx729tLJCCF1e3TIymnhgxCELYGS33nBdmUH493Xw=
-X-Received: by 2002:a05:6102:391:b0:443:6052:43ae with SMTP id
- m17-20020a056102039100b00443605243aemr9163796vsq.24.1689701823762; Tue, 18
- Jul 2023 10:37:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1991549E
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 17:41:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5F0CB3;
+	Tue, 18 Jul 2023 10:41:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3918YmLdUBB4GYWEtCfYavXvLujdLfhM5ZbLxQDFZQM=; b=6PthlviAF6BZw3Gc3+bpp1LHuo
+	ovOJnWYb7m6KQLesheBYu7lSQkXk/GtNR+iuzAqmUSsPQWewzk9eQvgW37grCvSmlR63xW0n0DPlO
+	RryE0v45L6mGEiQBdv8vMLNEXGlP7MwUmrt0Wj1YsNz26eb1kcM67Al7owsahHfoKRsI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qLogr-001drs-MB; Tue, 18 Jul 2023 19:40:49 +0200
+Date: Tue, 18 Jul 2023 19:40:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michael Walle <mwalle@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next v3 03/11] net: phy: replace is_c45 with
+ phy_accces_mode
+Message-ID: <509889a3-f633-40b0-8349-9ef378818cc7@lunn.ch>
+References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
+ <20230620-feature-c45-over-c22-v3-3-9eb37edf7be0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230710223304.1174642-1-almasrymina@google.com> <12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
-In-Reply-To: <12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 18 Jul 2023 10:36:52 -0700
-Message-ID: <CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/10] Device Memory TCP
-To: Andy Lutomirski <luto@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
-	netdev@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, jgg@ziepe.ca
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620-feature-c45-over-c22-v3-3-9eb37edf7be0@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 16, 2023 at 7:41=E2=80=AFPM Andy Lutomirski <luto@kernel.org> w=
-rote:
->
-> On 7/10/23 15:32, Mina Almasry wrote:
-> > * TL;DR:
-> >
-> > Device memory TCP (devmem TCP) is a proposal for transferring data to a=
-nd/or
-> > from device memory efficiently, without bouncing the data to a host mem=
-ory
-> > buffer.
->
-> (I'm writing this as someone who might plausibly use this mechanism, but
-> I don't think I'm very likely to end up working on the kernel side,
-> unless I somehow feel extremely inspired to implement it for i40e.)
->
-> I looked at these patches and the GVE tree, and I'm trying to wrap my
-> head around the data path.  As I understand it, for RX:
->
-> 1. The GVE driver notices that the queue is programmed to use devmem,
-> and it programs the NIC to copy packet payloads to the devmem that has
-> been programmed.
-> 2. The NIC receives the packet and copies the header to kernel memory
-> and the payload to dma-buf memory.
-> 3. The kernel tells userspace where in the dma-buf the data is.
-> 4. Userspace does something with the data.
-> 5. Userspace does DONTNEED to recycle the memory and make it available
-> for new received packets.
->
-> Did I get this right?
->
+>  static inline bool phy_has_c45_registers(struct phy_device *phydev)
+>  {
+> -	return phydev->is_c45;
+> +	return phydev->access_mode != PHY_ACCESS_C22;
+>  }
 
-Sorry for the late reply. I'm a bit buried working on the follow up to
-this proposal: exploring using dma-bufs without pages.
+So this is making me wounder if we have a clean separation between
+register spaces and access methods.
 
-Yes, this is completely correct.
+Should there be a phy_has_c22_registers() ?
 
-> This seems a bit awkward if there's any chance that packets not intended
-> for the target device end up in the rxq.
->
+A PHY can have both C22 registers and C45 registers. It is up to the
+driver to decide which it wants to access when.
 
-It does a bit. What happens in practice is that we use RSS to steer
-general traffic away from the devmem queues, and we use flow steering
-to steer specific flows to devem queues.
+Should phydev->access_mode really be phydev->access_mode_c45_registers
+to indicate how to access the C45 registers if phy_has_c45_registers()
+is true?
 
-In the case where the RSS/flow steering configuration is done
-incorrectly, the user would call recvmsg() on a devmem skb and if they
-haven't specified the MSG_SOCK_DEVMEM flag they'd get an error.
+Has there been a review of all uses of phydev->is_c45 to determine if
+the user wants to know if C45 registers exist,
+a.k.a. phy_has_c45_registers(), or if C45 bus transactions can be
+performed, and then later in this series, additionally if C45 over C22
+can be performed. These are different things.
 
-> I'm wondering if a more capable if somewhat higher latency model could
-> work where the NIC stores received packets in its own device memory.
-> Then userspace (or the kernel or a driver or whatever) could initiate a
-> separate DMA from the NIC to the final target *after* reading the
-> headers.  Can the hardware support this?
->
+I need to keep reading the patches...
 
-Not that I know of. I guess Jakub also responded with the same.
-
-> Another way of putting this is: steering received data to a specific
-> device based on the *receive queue* forces the logic selecting a
-> destination device to be the same as the logic selecting the queue.  RX
-> steering logic is pretty limited on most hardware (as far as I know --
-> certainly I've never had much luck doing anything especially intelligent
-> with RX flow steering, and I've tried on a couple of different brands of
-> supposedly fancy NICs).  But Linux has very nice capabilities to direct
-> packets, in software, to where they are supposed to go, and it would be
-> nice if all that logic could just work, scalably, with device memory.
-> If Linux could examine headers *before* the payload gets DMAed to
-> wherever it goes, I think this could plausibly work quite nicely.  One
-> could even have an easy-to-use interface in which one directs a *socket*
-> to a PCIe device.  I expect, although I've never looked at the
-> datasheets, that the kernel could even efficiently make rx decisions
-> based on data in device memory on upcoming CXL NICs where device memory
-> could participate in the host cache hierarchy.
->
-> My real ulterior motive is that I think it would be great to use an
-> ability like this for DPDK-like uses.  Wouldn't it be nifty if I could
-> open a normal TCP socket, then, after it's open, ask the kernel to
-> kindly DMA the results directly to my application memory (via udmabuf,
-> perhaps)?  Or have a whole VLAN or macvlan get directed to a userspace
-> queue, etc?
->
->
-> It also seems a bit odd to me that the binding from rxq to dma-buf is
-> established by programming the dma-buf.
-
-That is specific to this proposal, and will likely be very different
-in future ones. I thought the dma-buf pages approach was extensible
-and the uapi belonged somewhere in dma-buf. Clearly not. The next
-proposal, I think, will program the rxq via some net uapi and will
-take the dma-buf as input. Probably some netlink api (not sure if
-ethtool family or otherwise). I'm working out details of this
-non-paged networking first.
-
-> This makes the security model
-> (and the mental model) awkward -- this binding is a setting on the
-> *queue*, not the dma-buf, and in a containerized or privilege-separated
-> system, a process could have enough privilege to make a dma-buf
-> somewhere but not have any privileges on the NIC.  (And may not even
-> have the NIC present in its network namespace!)
->
-> --Andy
-
-
-
---
-Thanks,
-Mina
+  Andrew
 
