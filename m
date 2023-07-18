@@ -1,145 +1,109 @@
-Return-Path: <netdev+bounces-18526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB8E7577A7
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:17:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 925A4757783
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94B111C20C9C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:17:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFDA1C20C85
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924CCE550;
-	Tue, 18 Jul 2023 09:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24900D52C;
+	Tue, 18 Jul 2023 09:13:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86682FBEE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:16:35 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423DD1989;
-	Tue, 18 Jul 2023 02:16:26 -0700 (PDT)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36I7tBVO006337;
-	Tue, 18 Jul 2023 09:13:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=6UY3mA8JU1z+rMDnfpEi65NaBIbbqhF+wr23GQYgRvE=;
- b=F37Aa/yDIb56ETzuILLhkrVUHUsMiuBb1Wj0ZS5ReBW0dka2sLZkQ/gxcjE93C3yIxQt
- tr6qBOcN3KeQ0VhsmbRoyoGM9pEFeKcTibTWn3YCD/uW+66if67w2COLiT333hdaIppS
- +VMefakEApzx2EY9PiSV1A3iCeLP/lcEJcFgQm/R55cB6+tG5FYYP4spUf8MaCXqLKGs
- M6Z/DD8r/hQdwj0jeToBXEf2acJTmvyLGwx/czJKXxUFMt8eQRE5NfvIJJ6EU5/dC8/c
- QzYCQXKM1Chu2GCwGNFJKGD8Hy3PoISsb5o57ICHt1IcuMd+Wna5fPMipOL8mH2uLYn4 hQ== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rwps585mm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Jul 2023 09:13:01 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36I9CxEL021663
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Jul 2023 09:12:59 GMT
-Received: from [10.216.57.55] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Tue, 18 Jul
- 2023 02:12:51 -0700
-Message-ID: <e32b7dff-8735-e5a2-a782-e5fd6ca79934@quicinc.com>
-Date: Tue, 18 Jul 2023 14:42:44 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BE8A941
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:13:46 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23EF186
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:13:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689671625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+xQVi+1cDmFmde3CAW+nWXYiT+uL7nvMDhCcLeOQ/Lc=;
+	b=F40+tGgIPx0ZeIQlufut2VXOKC9/jJD1O4S1kT8ooMtWB/MB9yFmpAQzYms2XKRnHq+pxN
+	tMjTSRgMXMZ8c+mEOmTeEqorwNmwySLCbHGGW6fEdlJK6IFhCD+h/jOjUo7ugZh+J5EH83
+	Fz1K4lah1ssngbWjm0ZrMFVZtJ/linU=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-389-y5IRylriOxy9RjJQrjJdOQ-1; Tue, 18 Jul 2023 05:13:40 -0400
+X-MC-Unique: y5IRylriOxy9RjJQrjJdOQ-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-40234d83032so8368071cf.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:13:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689671620; x=1690276420;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+xQVi+1cDmFmde3CAW+nWXYiT+uL7nvMDhCcLeOQ/Lc=;
+        b=je3TqcNlTeAAXd6gzlPKv7SjT3exmqL+FSc5QFFsgK2X3pYnVrZuCUXnrLfuxl9nvd
+         6eogmb8JHYH3i1HKbUmc/fdNm4X/yGPbZRfFfGH+hDdYdTFsWjwGnj5rBPs/LPDTbCma
+         xAjyGfkT5YFX6SliNRvmC58KTbaxUAACYnmetknoHMmW6UHro+6BdQJ28aufIzmHpKuB
+         AS3g72Ogodcxmj0Mj2fAU1yFP6Zru2wuPkvEz8C5vUCWW+R3FzPAWqPy1dT/jAV6/PrB
+         q2dSyPXTvVA1bgxaWZpeIRkQDf4n8kd2oxRy2IQ0Z/1LFL9/vgMb5Jv0ia+L3JW/VyLC
+         wEDg==
+X-Gm-Message-State: ABy/qLbprFNiM3sTvcPVwUKPiYIezwXU6MBn8Mc6f1PEwFhuMkbm9dDj
+	TzEkNRBVH7LPH93l6FSKVS3eWZ0A+Ff3dsFPgaLyqzmlOzLGwhxe78Ja3ANiFTqj5T91YH1XT2C
+	8QSopFjSvTiwGJooV
+X-Received: by 2002:ac8:5e51:0:b0:400:9ed9:7267 with SMTP id i17-20020ac85e51000000b004009ed97267mr18486001qtx.3.1689671620365;
+        Tue, 18 Jul 2023 02:13:40 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH0jzXpTnM/0x9IlIDIkxfyPZicW+zEoqycjC6QNj3AX2IVOjMMKoY90EFmlcoV29fqvdjw8g==
+X-Received: by 2002:ac8:5e51:0:b0:400:9ed9:7267 with SMTP id i17-20020ac85e51000000b004009ed97267mr18485980qtx.3.1689671619973;
+        Tue, 18 Jul 2023 02:13:39 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id hf10-20020a05622a608a00b003e4d9c91106sm513473qtb.57.2023.07.18.02.13.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 02:13:39 -0700 (PDT)
+Message-ID: <164e816460523a9b54b06b1586f89b3bd2d09fc9.camel@redhat.com>
+Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for
+ 88E6390X and 88E6190X
+From: Paolo Abeni <pabeni@redhat.com>
+To: Ante Knezic <ante.knezic@helmholz.de>, netdev@vger.kernel.org
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Tue, 18 Jul 2023 11:13:36 +0200
+In-Reply-To: <20230714160612.11701-1-ante.knezic@helmholz.de>
+References: <20230714160612.11701-1-ante.knezic@helmholz.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 4/6] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
-        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <netdev@vger.kernel.org>
-CC: <quic_saahtoma@quicinc.com>
-References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
- <20230711093529.18355-5-quic_devipriy@quicinc.com>
- <fa2fae05-7ff3-ec6b-45a9-b256b9d5d92c@linaro.org>
-Content-Language: en-US
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <fa2fae05-7ff3-ec6b-45a9-b256b9d5d92c@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YMfWCmMZUbJdsLl2ySMjhQPQxQ1VjxRI
-X-Proofpoint-ORIG-GUID: YMfWCmMZUbJdsLl2ySMjhQPQxQ1VjxRI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-17_15,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- mlxlogscore=896 lowpriorityscore=0 suspectscore=0 bulkscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 phishscore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307180083
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Fri, 2023-07-14 at 18:06 +0200, Ante Knezic wrote:
+> Fixes XAUI/RXAUI lane alignment errors.
+> Issue causes dropped packets when trying to communicate over
+> fiber via SERDES lanes of port 9 and 10.
+> Errata document applies only to 88E6190X and 88E6390X devices.
+> Requires poking in undocumented registers.
+>=20
+> Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
 
+It does not apply cleanly to net-next. Please respin. You can retain
+Andrew's Reviewed-by tag.
 
-On 7/11/2023 3:26 PM, Krzysztof Kozlowski wrote:
-> On 11/07/2023 11:35, Devi Priya wrote:
->> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
->> devices.
->>
->> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->> ---
->>   drivers/clk/qcom/Kconfig         |    6 +
->>   drivers/clk/qcom/Makefile        |    1 +
->>   drivers/clk/qcom/nsscc-ipq9574.c | 3080 ++++++++++++++++++++++++++++++
->>   3 files changed, 3087 insertions(+)
->>   create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
->>
->> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
->> index 263e55d75e3f..5556063d204f 100644
->> --- a/drivers/clk/qcom/Kconfig
->> +++ b/drivers/clk/qcom/Kconfig
->> @@ -195,6 +195,12 @@ config IPQ_GCC_9574
->>   	  i2c, USB, SD/eMMC, etc. Select this for the root clock
->>   	  of ipq9574.
->>   
->> +config IPQ_NSSCC_9574
->> +	tristate "IPQ9574 NSS Clock Controller"
-> 
-> I think you do not run arm32 there, so missing depends on ARM64 ||
-> COMPILE_TEST
+Thanks!
 
-Okay, will update this in V2
+Paolo
 
-Thanks,
-Devi Priya
-> 
->> +	depends on IPQ_GCC_9574
->> +	help
->> +	  Support for NSS clock controller on ipq9574 devices.
->> +
-> 
-> 
-> Best regards,
-> Krzysztof
-> 
 
