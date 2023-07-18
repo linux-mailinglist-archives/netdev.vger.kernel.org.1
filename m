@@ -1,77 +1,83 @@
-Return-Path: <netdev+bounces-18611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 177D6757F3C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:17:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56E5D757F4C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 484D81C20D05
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:17:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7D6C281586
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0422EF9D4;
-	Tue, 18 Jul 2023 14:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F5AF9EA;
+	Tue, 18 Jul 2023 14:20:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEDCD532
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:17:04 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6E58188;
-	Tue, 18 Jul 2023 07:17:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=foGX3qPz8g1mE0AjGZ0RURTetuvRz0ZaIIFsjuTQ33o=; b=JBWA+Dva8h/kZCHzxx0beMUCVO
-	DBM9NutUs8keY3cK4qSE6pjYwC5UbxQ9p8BI2hjbn36sLUsJjXa4y569DibqyziXWk0dXdIQ/ymwt
-	OrHeqJt0QmXf5YAkADGAfUAJ3xrX0I1mXokQ96A+GrImP/aazfRTj/U6IF8GcT4CGHYo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qLlUl-001dCP-Ng; Tue, 18 Jul 2023 16:16:07 +0200
-Date: Tue, 18 Jul 2023 16:16:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Quan, Evan" <Evan.Quan@amd.com>
-Cc: "rafael@kernel.org" <rafael@kernel.org>,
-	"lenb@kernel.org" <lenb@kernel.org>,
-	"Deucher, Alexander" <Alexander.Deucher@amd.com>,
-	"Koenig, Christian" <Christian.Koenig@amd.com>,
-	"Pan, Xinhui" <Xinhui.Pan@amd.com>,
-	"airlied@gmail.com" <airlied@gmail.com>,
-	"daniel@ffwll.ch" <daniel@ffwll.ch>,
-	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"Limonciello, Mario" <Mario.Limonciello@amd.com>,
-	"mdaenzer@redhat.com" <mdaenzer@redhat.com>,
-	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"hdegoede@redhat.com" <hdegoede@redhat.com>,
-	"jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
-	"Lazar, Lijo" <Lijo.Lazar@amd.com>,
-	"jim.cromie@gmail.com" <jim.cromie@gmail.com>,
-	"bellosilicio@gmail.com" <bellosilicio@gmail.com>,
-	"andrealmeid@igalia.com" <andrealmeid@igalia.com>,
-	"trix@redhat.com" <trix@redhat.com>,
-	"jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de" <arnd@arndb.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH V6 1/9] drivers core: Add support for Wifi band RF
- mitigations
-Message-ID: <642e3f4d-976b-4ee1-8f63-844b9568462e@lunn.ch>
-References: <20230710083641.2132264-1-evan.quan@amd.com>
- <20230710083641.2132264-2-evan.quan@amd.com>
- <5439dd61-7b5f-4fc9-8ccd-f7df43a791dd@lunn.ch>
- <DM6PR12MB2619CF4D4601864FF251A1FAE438A@DM6PR12MB2619.namprd12.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C35AD4B
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:20:31 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD10E7E;
+	Tue, 18 Jul 2023 07:20:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CCWgwOpFRQ5XqsiPbGDMwwFojNqf8ujX2CR9i45zWzI=; b=cUaiaLEwT86VbsrvDDtd3lmfsc
+	6P6lhJsp4LilqQUvzPzwBsNp/DT7K/cdlQlz8og1QXVqJLswf0xjZyJ9/+toh4MpakkQmZ/N2Lb3Y
+	ssgfpIgQ3+5SM22Z9tKYZq7nBk421B0656m1oY50TVHXmMA3p7D8o4sulipB/HHVuvX2qLKRpasfG
+	j9wbyjuQi9djwAN2mZ4NV2ivYzvwk2EGP88VJxPLC09zvDEItY+mXRP22IcOr80xwymzv137lHfnN
+	YOshTBsvJxiTlhnYYzMQWkNxdhIrid39KCCJZ2yfByL+s2dbnv05mSwrqCpUIc9FLz6dOJL1UKLsd
+	wxxLM7MQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51756)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qLlYp-0005nb-1w;
+	Tue, 18 Jul 2023 15:20:19 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qLlYj-00036j-CY; Tue, 18 Jul 2023 15:20:13 +0100
+Date: Tue, 18 Jul 2023 15:20:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxim Georgiev <glipus@gmail.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Casper Andersson <casper.casan@gmail.com>,
+	Sergey Organov <sorganov@gmail.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 net-next 06/12] net: fec: convert to
+ ndo_hwtstamp_get() and ndo_hwtstamp_set()
+Message-ID: <ZLafnWuAlytSN7B+@shell.armlinux.org.uk>
+References: <20230717152709.574773-1-vladimir.oltean@nxp.com>
+ <20230717152709.574773-7-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,22 +86,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM6PR12MB2619CF4D4601864FF251A1FAE438A@DM6PR12MB2619.namprd12.prod.outlook.com>
+In-Reply-To: <20230717152709.574773-7-vladimir.oltean@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The wbrf_supported_producer and wbrf_supported_consumer APIs seem
-> unnecessary for the generic implementation.
+On Mon, Jul 17, 2023 at 06:27:03PM +0300, Vladimir Oltean wrote:
+> -static int fec_enet_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
+> -{
+> -	struct fec_enet_private *fep = netdev_priv(ndev);
+> -	struct phy_device *phydev = ndev->phydev;
+> -
+> -	if (!netif_running(ndev))
+> -		return -EINVAL;
+> -
+> -	if (!phydev)
+> -		return -ENODEV;
+> -
+... process hwtstamp calls
 
-I'm happy with these, once the description is corrected. As i said in
-another comment, 'can' should be replaced with 'should'. The device
-itself knows if it can, only the core knows if it should, based on the
-policy of if actions need to be taken, and there are both providers
-and consumers registered with the core.
+So if the network device is not running, ioctl() returns -EINVAL. From
+what I can see in fec_enet_mii_probe() called from fec_enet_open(), we
+guarantee that phydev will not be NULL once the first open has
+succeeded, so I don't think the second if() statement has any effect.
 
-   Andrew
+> +static int fec_hwtstamp_get(struct net_device *ndev,
+> +			    struct kernel_hwtstamp_config *config)
+> +{
+> +	struct fec_enet_private *fep = netdev_priv(ndev);
+> +	struct phy_device *phydev = ndev->phydev;
+> +
+> +	if (phy_has_hwtstamp(phydev))
+> +		return phy_mii_ioctl(phydev, config->ifr, SIOCGHWTSTAMP);
+> +
+> +	if (!fep->bufdesc_ex)
+> +		return -EOPNOTSUPP;
+
+If the interface hasn't been brought up at least once, then phydev
+here will be NULL, and we'll drop through to this test. If the FEC
+doesn't support extended buffer descriptors, userspace will see
+-EOPNOTSUPP rather than -EINVAL. This could be misleading to userspace.
+
+Does this need something like:
+
+	if (!netif_running(ndev))
+		return -EINVAL;
+
+before, or maybe just after phy_has_hwtstamp() to give equivalent
+behaviour?
+
+> +static int fec_hwtstamp_set(struct net_device *ndev,
+> +			    struct kernel_hwtstamp_config *config,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	struct fec_enet_private *fep = netdev_priv(ndev);
+> +	struct phy_device *phydev = ndev->phydev;
+> +
+> +	if (phy_has_hwtstamp(phydev)) {
+> +		fec_ptp_disable_hwts(ndev);
+> +
+> +		return phy_mii_ioctl(phydev, config->ifr, SIOCSHWTSTAMP);
+> +	}
+> +
+> +	if (!fep->bufdesc_ex)
+> +		return -EOPNOTSUPP;
+
+Same comment here.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
