@@ -1,51 +1,48 @@
-Return-Path: <netdev+bounces-18714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD367585B4
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:42:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B8307585B8
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 962D41C20DE4
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBF152816D0
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C934171C3;
-	Tue, 18 Jul 2023 19:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5382171BE;
+	Tue, 18 Jul 2023 19:45:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6AB171BE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:41:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471F5C433C7;
-	Tue, 18 Jul 2023 19:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954EB10946
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:45:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7F86C433C7;
+	Tue, 18 Jul 2023 19:45:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689709317;
-	bh=e5TeCW4dLFqhF4I7vtXPeuXyiF89ZhZmbGGaNJLtsuU=;
+	s=k20201202; t=1689709550;
+	bh=94qN7IxSeuyb7pEQYiFkSuDjUouVRsu/gsID7UmjLsE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XZmUyhUNdt4h2uDTeo1tZEPe79idS0yJjGLCyV0L1I75XRoF45kTFlvgfJKdsfY0O
-	 70bXQtCxFmA4fF/FJTi4i/L8GduaT4jhAhh31ouYhwVq2J6ZH47MBxujs0/OM3jsf4
-	 SzzL+AMPmvnlFTemY9NkB9Es3O4N3a1XWDzskMDmXClqKcK5i2CIkHMqu2SMmhBCNo
-	 T8ZP7R59dEajX3QnT997W5kol1+DSOIa43iEIzSXQDeaRHgdK7Ptf2Bd3wpn5QQ4ed
-	 KPBtxOUPXv2i9NDKdTfgwS+7QHSoo5r1qg8zHtRt/ASTaTtPkG3HD5IS9SyRsHaDU2
-	 VbQwK9ivcklGA==
-Date: Tue, 18 Jul 2023 12:41:56 -0700
+	b=rPsOyVA7/PABWabDCwLsaJiEIzold1feSFOLd21VdtYtOmwg1+MgFTrfFdEahbjYJ
+	 cLKYT3VnO/S1zyb/kSuQCOrfEj2+TTkZraKhOCmqOz7SxvgkZZzCg2T4I+ZIGglZE6
+	 iOvWaFfax7yREr2Rb5KVySLopQr7jEoSEy1VQ4eFwSjfwpEEyMlQdP0oJP1v2nbMuP
+	 PMASQvA5uda3+QGF34YE0F+/yIkDGstbhXLzItw5KzpJag7oKSCFuKWjaFzuIDeJ+y
+	 LRweB2pzUFC+Eps48Ag9TS9taTyfjFXIp8FF9/1pwP8msO0bl3MrgYsSLor9GoBIko
+	 a+o/frAWTgHeA==
+Date: Tue, 18 Jul 2023 12:45:48 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kees Cook <kees@kernel.org>, justinstitt@google.com, Florian Fainelli
- <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nick
- Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] net: dsa: remove deprecated strncpy
-Message-ID: <20230718124156.07632716@kernel.org>
-In-Reply-To: <dbfb40d7-502e-40c0-bdaf-1616834b64e4@lunn.ch>
-References: <20230718-net-dsa-strncpy-v1-1-e84664747713@google.com>
-	<316E4325-6845-4EFC-AAF8-160622C42144@kernel.org>
-	<20230718121116.72267fff@kernel.org>
-	<dbfb40d7-502e-40c0-bdaf-1616834b64e4@lunn.ch>
+To: syzbot <syzbot+c19afa60d78984711078@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, hdanton@sina.com, jiri@nvidia.com,
+ johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [bluetooth?] general protection fault in
+ hci_uart_tty_ioctl
+Message-ID: <20230718124548.7b1d3196@kernel.org>
+In-Reply-To: <00000000000077b5650600b48ed0@google.com>
+References: <00000000000049baa505e65e3939@google.com>
+	<00000000000077b5650600b48ed0@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,33 +52,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Jul 2023 21:31:04 +0200 Andrew Lunn wrote:
-> On Tue, Jul 18, 2023 at 12:11:16PM -0700, Jakub Kicinski wrote:
-> > On Tue, 18 Jul 2023 11:05:23 -0700 Kees Cook wrote:  
-> > > Honestly I find the entire get_strings API to be very fragile given
-> > > the lack of passing the length of the buffer, instead depending on
-> > > the string set length lookups in each callback, but refactoring that
-> > > looks like a ton of work for an uncertain benefit.  
-> > 
-> > We have been adding better APIs for long term, and a print helper short
-> > term - ethtool_sprintf(). Should we use ethtool_sprintf() here?  
+On Mon, 17 Jul 2023 13:22:24 -0700 syzbot wrote:
+> syzbot suspects this issue was fixed by commit:
 > 
-> I was wondering about that as well. There is no variable expansion in
-> most cases, so the vsnprintf() is a waste of time.
+> commit d772781964415c63759572b917e21c4f7ec08d9f
+> Author: Jakub Kicinski <kuba@kernel.org>
+> Date:   Fri Jan 6 06:33:54 2023 +0000
 > 
-> Maybe we should actually add another helper:
-> 
-> ethtool_name_cpy(u8 **data, unsigned int index, const char *name);
+>     devlink: bump the instance index directly when iterating
 
-I wasn't sure if vsnprintf() is costly enough to bother, but SG.
-
-Probably without the "unsigned int index", since the ethtool_sprintf()
-API updates the first argument for the caller.
-
-> Then over the next decade, slowly convert all drivers to it. And then
-> eventually replace the u8 with a struct including the length.
-> 
-> The netlink API is a bit better. It is one kAPI call which does
-> everything, and it holds RTNL. So it is less likely the number of
-> statistics will change between the calls into the driver.
+Hm, don't think so. It's not the first issue where syzbot decided
+this commit was the resolution. I wonder what makes it special.
 
