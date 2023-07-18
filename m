@@ -1,103 +1,149 @@
-Return-Path: <netdev+bounces-18628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E98C67580D6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:25:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 515497580DF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EE7E2810A2
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 831611C20ABF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB42101C5;
-	Tue, 18 Jul 2023 15:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE25101FA;
+	Tue, 18 Jul 2023 15:29:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F79E57B
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:25:24 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E1D92
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:25:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=n3TXPBwWYpjaMEPqiiBxrC2aXEsIfs6qnSe2tMEctyo=; b=ZgdiYjuUelciD1mzmRbUQz0O99
-	EBeFSf+5Kzd3CysNjOJhReSb6a3frqkqLRPBV4JRz5OC8FpaIOg7jpC3UcjCL+zqyZiln5R+FnPU5
-	FftVTyGsbN3Vgl1QMG4XuWJaaJ6sEFxJcuSp/Cr2lTUs3Ix0afkzRv48ke9oNwHs/dvGs2X8W14Cf
-	h4JSNjDZlLx0ujcl2diNsB6fw5YKawC1TJTxCeDvNKJa8QeurXVOSzqbksPr+b1PJ0Z1OmO8fHuad
-	BIWWh0emzAo4H3MJ8mF2lIU7NCG3h9R/HCGeKjurTP+haytsOqh/Aj47Ci76J7PaWw2wA3CTNa+Qx
-	kibk3ETQ==;
-Received: from [192.168.1.4] (port=60931 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qLmZf-0007f3-3D;
-	Tue, 18 Jul 2023 17:25:16 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 18 Jul 2023 17:25:15 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <olteanv@gmail.com>
-CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <davem@davemloft.net>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Tue, 18 Jul 2023 17:25:12 +0200
-Message-ID: <20230718152512.6848-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20230718150133.4wpnmtks46yxg5lz@skbuf>
-References: <20230718150133.4wpnmtks46yxg5lz@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0348CD518
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:29:24 +0000 (UTC)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1C1F4
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689694159; x=1721230159;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Zy/H3JZMwzAUiHQgKlq/umt/vbRR4DWIK5EHCg8XUmU=;
+  b=b2//RAh5CwpnkMA6JxAJxw/ludYXUWe8xBg7wJywILQn+0r+j8jenLWX
+   1eXmdZF4sIL5wgnJy19tPQbCjWRdcs588SDXpumEJzoW2rYjOxBb5Z4Pk
+   ZGrpp7eq1PhPbnd7ZVAQjORanDEGhRZqLWaOsZ/YKbxGC21aYCqzy+YbN
+   7popCzgmkZmPcgTPc13+teHvtwJgnRtElVG4jd8JdsnBI2U398l4sR3SW
+   i5LMXLRYEK3Ija66/mUyjyoXjaz8eeMNgMteWcYAwbiriNMR7oNKdzc4e
+   m3z0UC/h3X24A9hr0iTih2aw8yYtWTiBMcHGihx236BNu2KLMvN3ShCFn
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="366278786"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="366278786"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 08:29:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="753362455"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="753362455"
+Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 18 Jul 2023 08:29:15 -0700
+Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qLmdW-0000gB-31;
+	Tue, 18 Jul 2023 15:29:14 +0000
+Date: Tue, 18 Jul 2023 23:28:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yuanjun Gong <ruc_gongyuanjun@163.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH 1/1] net:openvswitch: check return value of pskb_trim()
+Message-ID: <202307182349.2ivzwQk9-lkp@intel.com>
+References: <20230717145024.27274-1-ruc_gongyuanjun@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230717145024.27274-1-ruc_gongyuanjun@163.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > > It does not apply cleanly to net-next. Please respin. You can retain
-> > > Andrew's Reviewed-by tag.
-> > 
-> > Respin might need a complete rework of the patch as with the
-> > conversion of 88e639x to phylink_pcs (introduced with commit
-> > e5b732a275f5fae0f1342fb8cf76de654cd51e50) the original code flow
-> > has completely changed so it will not be as simple as finding a new
-> > place to stick the patch. 
-> > The new phylink mostly hides away mv88e6xxx_chip struct which is needed 
-> > to identify the correct device and writing to relevant registers has also
-> > changed in favor of mv88e639x_pcs struct etc.
-> > I think you can see where I am going with this. In this sense I am not sure 
-> > about keeping the Reviewed-by tag, more likely a complete rewrite 
-> > should be done.
-> > I will repost V3 once I figure out how to make it work with the new
-> > framework.
-> > 
-> 
-> Can't you simply replicate the positioning of mv88e6393x_erratum_4_6()
-> from mv88e6393x_pcs_init()?
+Hi Yuanjun,
 
-I don't think so. The erratum from the patch needs to be applied on each
-SERDES reconfiguration or reset. For example, when replugging different 
-SFPs (sgmii - 10g - sgmii interface). Erratum 4_6 is done only once? 
-My guess is to put it in mv88e639x_sgmii_pcs_post_config but still I 
-need the device product number - maybe embedding a pointer to the 
-mv88e6xxx_chip chip inside the mv88e639x_pcs struct would be the cleanest way.
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.5-rc2 next-20230718]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yuanjun-Gong/net-openvswitch-check-return-value-of-pskb_trim/20230718-190417
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20230717145024.27274-1-ruc_gongyuanjun%40163.com
+patch subject: [PATCH 1/1] net:openvswitch: check return value of pskb_trim()
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20230718/202307182349.2ivzwQk9-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230718/202307182349.2ivzwQk9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307182349.2ivzwQk9-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/openvswitch/actions.c: In function 'do_output':
+>> net/openvswitch/actions.c:922:28: warning: suggest explicit braces to avoid ambiguous 'else' [-Wdangling-else]
+     922 |                         if (skb->len - cutlen > ovs_mac_header_len(key))
+         |                            ^
 
 
+vim +/else +922 net/openvswitch/actions.c
+
+7f8a436eaa2c3d Joe Stringer      2015-08-26  911  
+7f8a436eaa2c3d Joe Stringer      2015-08-26  912  static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+7f8a436eaa2c3d Joe Stringer      2015-08-26  913  		      struct sw_flow_key *key)
+ccb1352e76cff0 Jesse Gross       2011-10-25  914  {
+738967b8bf57e5 Andy Zhou         2014-09-08  915  	struct vport *vport = ovs_vport_rcu(dp, out_port);
+ccb1352e76cff0 Jesse Gross       2011-10-25  916  
+066b86787fa3d9 Felix Huettner    2023-04-05  917  	if (likely(vport && netif_carrier_ok(vport->dev))) {
+7f8a436eaa2c3d Joe Stringer      2015-08-26  918  		u16 mru = OVS_CB(skb)->mru;
+f2a4d086ed4c58 William Tu        2016-06-10  919  		u32 cutlen = OVS_CB(skb)->cutlen;
+f2a4d086ed4c58 William Tu        2016-06-10  920  
+f2a4d086ed4c58 William Tu        2016-06-10  921  		if (unlikely(cutlen > 0)) {
+e2d9d8358cb961 Jiri Benc         2016-11-10 @922  			if (skb->len - cutlen > ovs_mac_header_len(key))
+ec8358d8ed17bf Yuanjun Gong      2023-07-17  923  				if (pskb_trim(skb, skb->len - cutlen))
+ec8358d8ed17bf Yuanjun Gong      2023-07-17  924  					kfree_skb(skb);
+f2a4d086ed4c58 William Tu        2016-06-10  925  			else
+ec8358d8ed17bf Yuanjun Gong      2023-07-17  926  				if (pskb_trim(skb, ovs_mac_header_len(key)))
+ec8358d8ed17bf Yuanjun Gong      2023-07-17  927  					kfree_skb(skb);
+f2a4d086ed4c58 William Tu        2016-06-10  928  		}
+7f8a436eaa2c3d Joe Stringer      2015-08-26  929  
+738314a084aae5 Jiri Benc         2016-11-10  930  		if (likely(!mru ||
+738314a084aae5 Jiri Benc         2016-11-10  931  		           (skb->len <= mru + vport->dev->hard_header_len))) {
+e2d9d8358cb961 Jiri Benc         2016-11-10  932  			ovs_vport_send(vport, skb, ovs_key_mac_proto(key));
+7f8a436eaa2c3d Joe Stringer      2015-08-26  933  		} else if (mru <= vport->dev->mtu) {
+c559cd3ad32ba7 Eric W. Biederman 2015-09-14  934  			struct net *net = read_pnet(&dp->net);
+7f8a436eaa2c3d Joe Stringer      2015-08-26  935  
+e2d9d8358cb961 Jiri Benc         2016-11-10  936  			ovs_fragment(net, vport, skb, mru, key);
+7f8a436eaa2c3d Joe Stringer      2015-08-26  937  		} else {
+7f8a436eaa2c3d Joe Stringer      2015-08-26  938  			kfree_skb(skb);
+7f8a436eaa2c3d Joe Stringer      2015-08-26  939  		}
+7f8a436eaa2c3d Joe Stringer      2015-08-26  940  	} else {
+738967b8bf57e5 Andy Zhou         2014-09-08  941  		kfree_skb(skb);
+ccb1352e76cff0 Jesse Gross       2011-10-25  942  	}
+7f8a436eaa2c3d Joe Stringer      2015-08-26  943  }
+ccb1352e76cff0 Jesse Gross       2011-10-25  944  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
