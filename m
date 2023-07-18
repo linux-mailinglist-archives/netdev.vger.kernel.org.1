@@ -1,126 +1,116 @@
-Return-Path: <netdev+bounces-18513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BDD87576FC
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:46:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7A6757710
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744C9280C85
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 08:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 187DB281171
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 08:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6227AAD27;
-	Tue, 18 Jul 2023 08:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384DCC125;
+	Tue, 18 Jul 2023 08:52:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BC810EA
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:46:48 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0FFC103
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:46:45 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b73564e98dso81954531fa.3
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1689670004; x=1692262004;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MnzbPmWnAb7CwK/wuL7NwhmauQ1USOEwbft8Y2BSGCM=;
-        b=xFdnhv87iBmtbmlGnWDlh1oZp0jr7givZF0Y03tGaYDXLXHfLQRM1jxMz4vadvFO6o
-         g56z4n5UpDVimwbrTK2Mu7zyHsI6j6j4ZeQkt1NjsN4W+MuTZrVytfwcdtXLTkr7qQJb
-         5VK1++Fm/fTIvYL1gZkWUOJSQCPkOc3he1+0xTWMiZiUR/TDYCXj5z9/SCiU7duwHmSD
-         NZ3BU7CnkUx5xXO3z9pdND5u8lcMzSmHMDTFKdCVFQl6AA6hTW7gCsNEOWR7c8b6DyWo
-         xhWajKIjf3IOcXTYhkZAcUwMQUGVSWxVEfjkz0AOXoW3CwYXVdrECu8uuAXEzu0TIFAy
-         +sFg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1BA10EA
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:52:06 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2797B9
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689670324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5KOR8rz1HcIaKvEfrXa81rmXVE1uZtoJjHifNrWIaLY=;
+	b=VO+mU3uv0EaA6zXGtBwn69BrK3atslcjn4LP63WEP9gH68H2Hc1qrpuRaKS2n5080fz9td
+	jams7WfiqtijFlirGgp2qpQToGgMPSf5PwOxhrL4x/b1zgeQ78lJ3k15iB8AYHW281I8fV
+	/VGL4DXgtPSJDRV6XlCFpoSm+1iKd8w=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-138-z87LkQKmMK65kk79F2Z7-g-1; Tue, 18 Jul 2023 04:52:03 -0400
+X-MC-Unique: z87LkQKmMK65kk79F2Z7-g-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-40234d83032so8324911cf.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:52:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689670004; x=1692262004;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MnzbPmWnAb7CwK/wuL7NwhmauQ1USOEwbft8Y2BSGCM=;
-        b=MzwJ6jAlbzacDaDgCx4PjfYRh3BUSJ6nP+VL06xA3vLbd0Wn3oo3na1dKGiIKeKrWN
-         tFCYCJ9MOAlQVSCoaeVza8aphSP02l3TKS+it7gT6eC+SYQe5KPfhgoQOQhqbC2Fc2yQ
-         hzxBpSNBJl8YkyngyP3gIBr+KBSepagLpqeRDuC48GxVpUs0Io76i0cKbr4Ru0BITcqb
-         ibcpT0OyLizxsWUMr/I/fZOg7nCD+HuX1WPSleIjTmQ50eMKTDD6Kl9iYmnU8UxCzIE0
-         LELOwhjjpEu7G0aoYdE2i9rbFCHpaPJbBKrdcvQ3DaaJRax6nzQK+pHvxaaWvGzLx6wY
-         jn2A==
-X-Gm-Message-State: ABy/qLbqArg7K5h09id1WdNaMlRGVuNWl4CXwIvh/+nHOEY+S6dd4PQh
-	DTsHro5ErpWp0ly+6/FYbfoGJQ==
-X-Google-Smtp-Source: APBJJlHGS5e+EIT4+lLGogH32cz9OUkRmuKxYFTJZlnclFA8TUxt1xm8U6DxEGTNjKRkxoAC6+Ih3g==
-X-Received: by 2002:a2e:908b:0:b0:2b6:d9da:3d7e with SMTP id l11-20020a2e908b000000b002b6d9da3d7emr9649920ljg.45.1689670003830;
-        Tue, 18 Jul 2023 01:46:43 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:73f8:f6b0:6460:6f2e? ([2a02:578:8593:1200:73f8:f6b0:6460:6f2e])
-        by smtp.gmail.com with ESMTPSA id l6-20020a7bc446000000b003fc07e1908csm1552628wmi.43.2023.07.18.01.46.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jul 2023 01:46:43 -0700 (PDT)
-Message-ID: <06b4d3a2-7629-310f-fea5-4c21429dc2f8@tessares.net>
-Date: Tue, 18 Jul 2023 10:46:42 +0200
+        d=1e100.net; s=20221208; t=1689670322; x=1690275122;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5KOR8rz1HcIaKvEfrXa81rmXVE1uZtoJjHifNrWIaLY=;
+        b=evp7GQICLtOcs1QvDmYtlI+05r6Og3ShfB39pKtsYBr6zyx1cVA3yC0uta7sfy+YMm
+         UPG7IaTYVSxLRf/GIW8xLbjiCrGLhBNjmzRPOA5nZRabn4VZr12vwH1/BajONWMiXIu9
+         cBtEhNjXP03ZAP+4+ikdJ4ck1hJocMBEcZA2F8IuWdhrA0J6WJ6euPbkT2pgx9uiNBRt
+         hokcW34kQAsUSFjGRxO99RZ+wLLu8KO5rfnzE988S4pT1IYZSy5sndY3MIslr300nZWZ
+         UPnCwcK0fyeuLTrBdEg0cEk4lyyYg9UxxZUwGX4sIEowkg4GasI5m7yRGvsK2DHqAx1d
+         +ivw==
+X-Gm-Message-State: ABy/qLYlNAXWTbJQJg7zUzI0s2wyfFeej++gpPnAxSfbatyzDIJsj+Lz
+	3MX2EPuz9lNeofYDQXjEqvcaJ3NSU9lAGIxbPZua3G44lTNbywLSeMTAC3OuyHTRHoTjpyShzO4
+	G8DKEcAKs/xv0VZW2
+X-Received: by 2002:a05:6214:29ca:b0:625:77a1:2a5f with SMTP id gh10-20020a05621429ca00b0062577a12a5fmr15751318qvb.5.1689670322547;
+        Tue, 18 Jul 2023 01:52:02 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGyNfUCGibD1hyFQuxDmLGTOedRmloVQAyvYLT0e0Z7YsxX73m1Q+O8jquOzWtrmPF93zyMiA==
+X-Received: by 2002:a05:6214:29ca:b0:625:77a1:2a5f with SMTP id gh10-20020a05621429ca00b0062577a12a5fmr15751310qvb.5.1689670322278;
+        Tue, 18 Jul 2023 01:52:02 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id a24-20020a0cb358000000b0062dfdafa0b7sm564703qvf.136.2023.07.18.01.51.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 01:52:01 -0700 (PDT)
+Message-ID: <befe05762b714948ad1f71a5d038334100f84cd0.camel@redhat.com>
+Subject: Re: [PATCH net v3] net: thunder: bgx: Fix resource leaks in
+ device_for_each_child_node() loops
+From: Paolo Abeni <pabeni@redhat.com>
+To: Markus Elfring <Markus.Elfring@web.de>, Wang Ming <machel@vivo.com>, 
+ opensource.kernel@vivo.com, netdev@vger.kernel.org, 
+ kernel-janitors@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ David Daney <david.daney@cavium.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Sunil Goutham <sgoutham@marvell.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Minjie Du <duminjie@vivo.com>
+Date: Tue, 18 Jul 2023 10:51:58 +0200
+In-Reply-To: <be87c113-f975-9607-1f9d-5db304e0b1b9@web.de>
+References: <20230714100010.12035-1-machel@vivo.com>
+	 <be87c113-f975-9607-1f9d-5db304e0b1b9@web.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net 0/3] selftests: tc: increase timeout and add missing
- kconfig
-Content-Language: en-GB
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Paul Blakey <paulb@mellanox.com>, Kees Cook <keescook@chromium.org>,
- Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
- Cong Wang <xiyou.wangcong@gmail.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Shuah Khan <skhan@linuxfoundation.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org
-References: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, Jakub, Paolo,
+On Fri, 2023-07-14 at 15:06 +0200, Markus Elfring wrote:
+> > The device_for_each_child_node() loop in bgx_init_of_phy()
+> > function should have fwnode_handle_put() before break which could
+> > avoid resource leaks. This patch could fix this bug.
+>=20
+> Are imperative change descriptions still preferred?
 
-On 13/07/2023 23:16, Matthieu Baerts wrote:
-> When looking for something else in LKFT reports [1], I noticed that the
-> TC selftest ended with a timeout error:
-> 
->   not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
-> 
-> I also noticed most of the tests were skipped because the "teardown
-> stage" did not complete successfully. It was due to missing kconfig.
-> 
-> These patches fix these two errors plus an extra one because this
-> selftest reads info from "/proc/net/nf_conntrack". Thank you Pedro for
-> having helped me fixing these issues [2].
+Yes. The commit message should be re-phrased.
 
-It looks like this series is marked as "Changes Requested" on Patchwork
-[1] but I think that's a mistake. There was one discussion on-going on
-the first patch but it looks like the proposed version is OK.
+More importantly, it looks like the relevant reference is already
+released by of_node_put() and the additional fwnode_handle_put() will
+cause a reference underflow.
 
-I didn't see any instructions to pw-bot and nothing on the website [2].
-
-Do you prefer if I re-send it?
+This patch does not look correct to me.
 
 Cheers,
-Matt
 
-[1]
-https://patchwork.kernel.org/project/netdevbpf/list/?series=765455&state=*
-[2] https://patchwork.hopto.org/pw-bot.html
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+Paolo
+
 
