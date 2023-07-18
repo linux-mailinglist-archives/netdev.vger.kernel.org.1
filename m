@@ -1,421 +1,766 @@
-Return-Path: <netdev+bounces-18460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE847572D0
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 06:32:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD21D7572E1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 06:41:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36B362812AF
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 04:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AA962811AB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 04:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1907F19C;
-	Tue, 18 Jul 2023 04:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E83815A9;
+	Tue, 18 Jul 2023 04:41:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41C717EC
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 04:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8943E19C
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 04:41:07 +0000 (UTC)
 Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833341B5;
-	Mon, 17 Jul 2023 21:32:42 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3421E55;
+	Mon, 17 Jul 2023 21:41:04 -0700 (PDT)
 Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36HJ0D0g005306;
-	Mon, 17 Jul 2023 21:32:28 -0700
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2170.outbound.protection.outlook.com [104.47.56.170])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rvyhx4c7u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jul 2023 21:32:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bOJsR8eGHJHMUNVP9BebxumVijsoqmCTXxpXWjbLU5wtkDeQ4gSS+cW9FRcMjIGoHQB8jD9lNiQYqn3vDXdJKq7OzWm1s/IwWRjtGaG0mDOfB1t7/RD5yQnOz/dgoIzCQ15nbjD+UuTxaeDT22Ki+n+tc1kyUj2HtyCxypWdiSj1cBe0pBnaOlcENU75wyo4XI9/kRkgO7BFYrVGrr+KAu/48vLQ51wbIPdwJjgFBOd/E2J2dQilHiXS74C5cvsi0WuGzwHlQp5O9ygsZlb6LlCoF3sCc1GxtYbdcbKtqkcdv4Hje9Vp/sYLU+L5tM1eFYo4hfuXm/E9HdyYHuH5SQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IFiWJ3VblVQBOldx1zSdPlae6KUF3Q8vkkn1ibNo96k=;
- b=gYdN0sqvCo2K6ksHFBjEmJuTmaZXSqprk/Rloz2uO3+VnAJDEnGwQ5VbFxr5HxfFWekYkkcrCQYWq6+7OUNdkrNL1fDl82nusEhG4miwxtLI1OnhP9Jd52ob8gmdpBFnWtT3/xJ8kX/2xwzACIT//sfvyI0s8cS28sMH2qXUif2HUjM5Ml0lB4KIVCyojd5yNiVIFRYT7GFffe3/+GCJRGl2dCdeR67MYOISy6OS9rzVmu/bgUrzLVQxBVtW4F75vdXnesdeunBA3I88Q5/0dHJqjC6rPaFLwnli8hr1fjxau+mWEk5LhOxvF/xjepIYmbzuRRMZ7rI9dhk6/D4vcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IFiWJ3VblVQBOldx1zSdPlae6KUF3Q8vkkn1ibNo96k=;
- b=dCu+f9Q/Tc4unQzFXcTOifCGvZ0bwCYI8MKK/z3gOZR477hMweYUdg+6Rviu1ALjcEwwb8wwPPj85fEbERzQajQoC9yTtKRQe8JWhLLZaHEkJpSlSY0mffiQEIT1Qy1zMFvsL+w5W915kZeeAABgdJqiBo14RyaeFdNfDT01Y5k=
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com (2603:10b6:a03:430::6)
- by BN9PR18MB4252.namprd18.prod.outlook.com (2603:10b6:408:11d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
- 2023 04:32:26 +0000
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::d194:dd3d:5ef:83ec]) by SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::d194:dd3d:5ef:83ec%4]) with mapi id 15.20.6588.030; Tue, 18 Jul 2023
- 04:32:26 +0000
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36HJ0BGR005200;
+	Mon, 17 Jul 2023 21:40:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=9rG9yUFRbvDIUne3eGiJL+3vzt+x6/iHku62Qy0PvCA=;
+ b=FxU3Jxser49gFMZDv/PrtWCLHGNO0RbrfArVDKlS6sJd5P1LrtwhlM9X4Cui59mFGQdn
+ G/sTdjwai8k10CqFOcYuzFgq1RjCtSNm6Tdj7YI6J0oQBl2j9IdF/eb7wIpHFRDIg1MR
+ j1Pl1ILvt7TWGFKGOV1KYadQ1BfQt5u1qqWc56qs4fLKvGqMoxjZ03VL1n9xoTzmzuTG
+ fYJySyzf0HIFTJihWARWoeYgTVokAFpkjRzhJEB2jKeR7c+cMDfH1S+gq+ullLQ0gFZu
+ FZgXTM2xSBMza0gqeANnqETBNq+8AG7j2WnCtPnSRZv3FhnTSu317NV5WbaR0FmGxwqv Ww== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rvyhx4ctp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jul 2023 21:40:57 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 17 Jul
+ 2023 21:40:55 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 17 Jul 2023 21:40:55 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 259C93F70A1;
+	Mon, 17 Jul 2023 21:40:51 -0700 (PDT)
 From: Suman Ghosh <sumang@marvell.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula
-	<gakula@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Hariprasad Kelam <hkelam@marvell.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [EXT] Re: [net-next PATCH V2] octeontx2-af: Install TC filter
- rules in hardware based on priority
-Thread-Topic: [EXT] Re: [net-next PATCH V2] octeontx2-af: Install TC filter
- rules in hardware based on priority
-Thread-Index: AQHZuBLReDSByAA8QUue4atz53QeTq+9dC2AgAF8r4A=
-Date: Tue, 18 Jul 2023 04:32:25 +0000
-Message-ID: 
- <SJ0PR18MB5216555C87CD36768503D923DB38A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20230716182442.2467328-1-sumang@marvell.com>
- <20230717054725.GB9461@unreal>
-In-Reply-To: <20230717054725.GB9461@unreal>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: 
- =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcc3VtYW5nXGFw?=
- =?us-ascii?Q?cGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0YmEy?=
- =?us-ascii?Q?OWUzNWJcbXNnc1xtc2ctMTZkM2U4NTMtMjUyNC0xMWVlLWI2ZGYtODQxNDRk?=
- =?us-ascii?Q?ZWVhNTRjXGFtZS10ZXN0XDE2ZDNlODU1LTI1MjQtMTFlZS1iNmRmLTg0MTQ0?=
- =?us-ascii?Q?ZGVlYTU0Y2JvZHkudHh0IiBzej0iMjYwNSIgdD0iMTMzMzQxMjgzNDM3MjE4?=
- =?us-ascii?Q?Mzg4IiBoPSJHTFJDejdqM2lOamZCUjM1WHNveHpsc1V4NEU9IiBpZD0iIiBi?=
- =?us-ascii?Q?bD0iMCIgYm89IjEiIGNpPSJjQUFBQUVSSFUxUlNSVUZOQ2dVQUFHSVdBQUJV?=
- =?us-ascii?Q?aWl2Wk1MblpBWGs0d0JocnVIbUJlVGpBR0d1NGVZRVpBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBSEFBQUFCdUR3QUEzZzhBQUlRR0FBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?RUFBUUVCQUFBQUk3cVRwQUNBQVFBQUFBQUFBQUFBQUo0QUFBQmhBR1FBWkFC?=
- =?us-ascii?Q?eUFHVUFjd0J6QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFF?=
- =?us-ascii?Q?QUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdNQWRRQnpBSFFBYndCdEFGOEFjQUJs?=
- =?us-ascii?Q?QUhJQWN3QnZBRzRBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFB?=
- =?us-ascii?Q?QUFDZUFBQUFZd0IxQUhNQWRBQnZBRzBBWHdCd0FHZ0Fid0J1QUdVQWJnQjFB?=
- =?us-ascii?Q?RzBBWWdCbEFISUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCakFIVUFj?=
- =?us-ascii?Q?d0IwQUc4QWJRQmZBSE1BY3dCdUFGOEFaQUJoQUhNQWFBQmZBSFlBTUFBeUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-refone: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFBR01B?=
- =?us-ascii?Q?ZFFCekFIUUFid0J0QUY4QWN3QnpBRzRBWHdCckFHVUFlUUIzQUc4QWNnQmtB?=
- =?us-ascii?Q?SE1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNlQUFBQVl3QjFBSE1BZEFCdkFHMEFY?=
- =?us-ascii?Q?d0J6QUhNQWJnQmZBRzRBYndCa0FHVUFiQUJwQUcwQWFRQjBBR1VBY2dCZkFI?=
- =?us-ascii?Q?WUFNQUF5QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFB?=
- =?us-ascii?Q?QUlBQUFBQUFKNEFBQUJqQUhVQWN3QjBBRzhBYlFCZkFITUFjd0J1QUY4QWN3?=
- =?us-ascii?Q?QndBR0VBWXdCbEFGOEFkZ0F3QURJQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFH?=
- =?us-ascii?Q?UUFiQUJ3QUY4QWN3QnJBSGtBY0FCbEFGOEFZd0JvQUdFQWRBQmZBRzBBWlFC?=
- =?us-ascii?Q?ekFITUFZUUJuQUdVQVh3QjJBREFBTWdBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBWkFCc0FIQUFYd0J6QUd3?=
- =?us-ascii?Q?QVlRQmpBR3NBWHdCakFHZ0FZUUIwQUY4QWJRQmxBSE1BY3dCaEFHY0FaUUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reftwo: 
- =?us-ascii?Q?QUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFBQUFBQUo0QUFBQmtBR3dBY0FCZkFI?=
- =?us-ascii?Q?UUFaUUJoQUcwQWN3QmZBRzhBYmdCbEFHUUFjZ0JwQUhZQVpRQmZBR1lBYVFC?=
- =?us-ascii?Q?c0FHVUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFB?=
- =?us-ascii?Q?QUFBQUFBQWdBQUFBQUFuZ0FBQUdVQWJRQmhBR2tBYkFCZkFHRUFaQUJrQUhJ?=
- =?us-ascii?Q?QVpRQnpBSE1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFRQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFD?=
- =?us-ascii?Q?ZUFBQUFiUUJoQUhJQWRnQmxBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhB?=
- =?us-ascii?Q?YmdCaEFHMEFaUUJ6QUY4QVl3QnZBRzRBWmdCcEFHUUFaUUJ1QUhRQWFRQmhB?=
- =?us-ascii?Q?R3dBWHdCaEFHd0Fid0J1QUdVQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCdEFHRUFjZ0Iy?=
- =?us-ascii?Q?QUdVQWJBQmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QnVBR0VBYlFCbEFITUFY?=
- =?us-ascii?Q?d0J5QUdVQWN3QjBBSElBYVFCakFIUUFaUUJrQUY4QVlRQnNBRzhBYmdCbEFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVB?=
- =?us-ascii?Q?QUFBQUFBQUFBZ0FBQUFBQW5nQUFBRzBBWVFCeUFIWUFaUUJzQUY4QWNBQnlB?=
- =?us-ascii?Q?RzhBYWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFISUFaUUJ6QUhRQWNn?=
- =?us-ascii?Q?QnBBR01BZEFCbEFHUUFYd0JvQUdVQWVBQmpBRzhBWkFCbEFITUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFB?=
- =?us-ascii?Q?QUNlQUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUdFQWNnQnRBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-rorf: true
-x-dg-refthree: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlB?=
- =?us-ascii?Q?QUFBQUFKNEFBQUJ0QUdFQWNnQjJBR1VBYkFCc0FGOEFad0J2QUc4QVp3QnNB?=
- =?us-ascii?Q?R1VBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFHMEFZ?=
- =?us-ascii?Q?UUJ5QUhZQVpRQnNBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhBWXdCdkFH?=
- =?us-ascii?Q?UUFaUUJ6QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBYlFCaEFISUFkZ0JsQUd3QWJB?=
- =?us-ascii?Q?QmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QmpBRzhBWkFCbEFITUFYd0JrQUdr?=
- =?us-ascii?Q?QVl3QjBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFB?=
- =?us-ascii?Q?SUFBQUFBQUo0QUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWNBQnlBRzhBYWdC?=
- =?us-ascii?Q?bEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFHTUFid0J1QUdZQWFRQmtBR1VB?=
- =?us-ascii?Q?YmdCMEFHa0FZUUJzQUY4QWJRQmhBSElBZGdCbEFHd0FiQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUcw?=
- =?us-ascii?Q?QVlRQnlBSFlBWlFCc0FHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFiZ0Jo?=
- =?us-ascii?Q?QUcwQVpRQnpBRjhBWXdCdkFHNEFaZ0JwQUdRQVpRQnVBSFFBYVFCaEFHd0FY?=
- =?us-ascii?Q?d0J0QUdFQWNnQjJBR1VBYkFCc0FGOEFid0J5QUY4QVlRQnlBRzBBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reffour: 
- =?us-ascii?Q?QUFBQUFBQUFRQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFDZUFB?=
- =?us-ascii?Q?QUFiUUJoQUhJQWRnQmxBR3dBYkFCZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdC?=
- =?us-ascii?Q?dUFHRUFiUUJsQUhNQVh3QmpBRzhBYmdCbUFHa0FaQUJsQUc0QWRBQnBBR0VB?=
- =?us-ascii?Q?YkFCZkFHMEFZUUJ5QUhZQVpRQnNBR3dBWHdCdkFISUFYd0JuQUc4QWJ3Qm5B?=
- =?us-ascii?Q?R3dBWlFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCdEFHRUFjZ0IyQUdV?=
- =?us-ascii?Q?QWJBQnNBRjhBY0FCeUFHOEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFjd0Jm?=
- =?us-ascii?Q?QUhJQVpRQnpBSFFBY2dCcEFHTUFkQUJsQUdRQVh3QnRBR0VBY2dCMkFHVUFi?=
- =?us-ascii?Q?QUJzQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFB?=
- =?us-ascii?Q?QUFBQUFBZ0FBQUFBQW5nQUFBRzBBWVFCeUFIWUFaUUJzQUd3QVh3QndBSElB?=
- =?us-ascii?Q?YndCcUFHVUFZd0IwQUY4QWJnQmhBRzBBWlFCekFGOEFjZ0JsQUhNQWRBQnlB?=
- =?us-ascii?Q?R2tBWXdCMEFHVUFaQUJmQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J2QUhJQVh3?=
- =?us-ascii?Q?QmhBSElBYlFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNl?=
- =?us-ascii?Q?QUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUhRQVpRQnlBRzBBYVFCdUFIVUFj?=
- =?us-ascii?Q?d0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJB?=
- =?us-ascii?Q?R1VBYkFCc0FGOEFkd0J2QUhJQVpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFnQUFBQUFBQUFBQUFBQUFBRUFB?=
- =?us-ascii?Q?QUFBQUFBQUFnQUFBQUFBaEFZQUFBQUFBQUFjQUFBQUFRQUFBQUFBQUFDbE5G?=
- =?us-ascii?Q?Q3U3dHRTU3F1Rm51QUpPZTVESEFBQUFBRUFB?=
-x-dg-reffive: 
- =?us-ascii?Q?QUFBQUFBQTEwZ2ZjYjFMc2tlUE9yNUh2UEUxcXlvQUFBQUJBQUFBSWdBQUFB?=
- =?us-ascii?Q?QUFBQUJqQUc4QWJnQm1BR2tBWkFCbEFHNEFkQUJwQUdFQWJBQUFBQm9HQUFB?=
- =?us-ascii?Q?WkFBQUFHQUFBQUFBQUFBQmhBR1FBWkFCeUFHVUFjd0J6QUFBQUpBQUFBQUFB?=
- =?us-ascii?Q?QUFCakFIVUFjd0IwQUc4QWJRQmZBSEFBWlFCeUFITUFid0J1QUFBQUxnQUFB?=
- =?us-ascii?Q?QUFBQUFCakFIVUFjd0IwQUc4QWJRQmZBSEFBYUFCdkFHNEFaUUJ1QUhVQWJR?=
- =?us-ascii?Q?QmlBR1VBY2dBQUFEQUFBQUFBQUFBQVl3QjFBSE1BZEFCdkFHMEFYd0J6QUhN?=
- =?us-ascii?Q?QWJnQmZBR1FBWVFCekFHZ0FYd0IyQURBQU1nQUFBREFBQUFBQUFBQUFZd0Ix?=
- =?us-ascii?Q?QUhNQWRBQnZBRzBBWHdCekFITUFiZ0JmQUdzQVpRQjVBSGNBYndCeUFHUUFj?=
- =?us-ascii?Q?d0FBQUQ0QUFBQUFBQUFBWXdCMUFITUFkQUJ2QUcwQVh3QnpBSE1BYmdCZkFH?=
- =?us-ascii?Q?NEFid0JrQUdVQWJBQnBBRzBBYVFCMEFHVUFjZ0JmQUhZQU1BQXlBQUFBTWdB?=
- =?us-ascii?Q?QUFBQUFBQUJqQUhVQWN3QjBBRzhBYlFCZkFITUFjd0J1QUY4QWN3QndBR0VB?=
- =?us-ascii?Q?WXdCbEFGOEFkZ0F3QURJQUFBQStBQUFBQUFBQUFHUUFiQUJ3QUY4QWN3QnJB?=
- =?us-ascii?Q?SGtBY0FCbEFGOEFZd0JvQUdFQWRBQmZBRzBBWlFCekFITUFZUUJuQUdVQVh3?=
- =?us-ascii?Q?QjJBREFBTWdBQUFEWUFBQUFBQUFBQVpBQnNBSEFBWHdCekFHd0FZUUJqQUdz?=
- =?us-ascii?Q?QVh3QmpBR2dBWVFCMEFGOEFiUUJsQUhNQWN3QmhBR2NBWlFBQUFEZ0FBQUFB?=
- =?us-ascii?Q?QUFBQVpBQnNBSEFBWHdCMEFHVUFZUUJ0QUhNQVh3QnZBRzRBWlFCa0FISUFh?=
- =?us-ascii?Q?UUIyQUdVQVh3Qm1BR2tBYkFCbEFBQUFKQUFBQUFFQUFBQmxBRzBBWVFCcEFH?=
- =?us-ascii?Q?d0FYd0JoQUdRQVpBQnlBR1VBY3dCekFBQUFXQUFBQUFBQUFBQnRBR0VBY2dC?=
- =?us-ascii?Q?MkFHVUFiQUJmQUhBQWNnQnZBR29BWlFCakFIUUFYd0J1QUdFQWJRQmxBSE1B?=
- =?us-ascii?Q?WHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRBZEFCcEFHRUFiQUJmQUdFQWJBQnZB?=
- =?us-ascii?Q?RzRBWlFBQUFGUUFBQUFBQUFBQWJRQmhBSElBZGdCbEFHd0FYd0J3QUhJQWJ3?=
- =?us-ascii?Q?QnFBR1VBWXdCMEFGOEFiZ0JoQUcwQVpRQnpBRjhBY2dCbEFITUFkQUJ5QUdr?=
- =?us-ascii?Q?QVl3QjBBR1VBWkFCZkFHRUFiQUJ2QUc0QVpRQUFBRm9BQUFBQUFBQUFiUUJo?=
- =?us-ascii?Q?QUhJQWRnQmxBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhBYmdCaEFHMEFa?=
- =?us-ascii?Q?UUJ6QUY4QWNnQmxBSE1BZEFCeUFHa0FZd0IwQUdVQVpBQmZBR2dBWlFCNEFH?=
- =?us-ascii?Q?TUFid0JrQUdVQWN3QUFBQ0FBQUFBQUFBQUFi?=
-x-dg-refsix: 
- =?us-ascii?Q?UUJoQUhJQWRnQmxBR3dBYkFCZkFHRUFjZ0J0QUFBQUpnQUFBQUFBQUFCdEFH?=
- =?us-ascii?Q?RUFjZ0IyQUdVQWJBQnNBRjhBWndCdkFHOEFad0JzQUdVQUFBQTBBQUFBQUFB?=
- =?us-ascii?Q?QUFHMEFZUUJ5QUhZQVpRQnNBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhB?=
- =?us-ascii?Q?WXdCdkFHUUFaUUJ6QUFBQVBnQUFBQUFBQUFCdEFHRUFjZ0IyQUdVQWJBQnNB?=
- =?us-ascii?Q?RjhBY0FCeUFHOEFhZ0JsQUdNQWRBQmZBR01BYndCa0FHVUFjd0JmQUdRQWFR?=
- =?us-ascii?Q?QmpBSFFBQUFCZUFBQUFBQUFBQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J3QUhJ?=
- =?us-ascii?Q?QWJ3QnFBR1VBWXdCMEFGOEFiZ0JoQUcwQVpRQnpBRjhBWXdCdkFHNEFaZ0Jw?=
- =?us-ascii?Q?QUdRQVpRQnVBSFFBYVFCaEFHd0FYd0J0QUdFQWNnQjJBR1VBYkFCc0FBQUFi?=
- =?us-ascii?Q?QUFBQUFFQUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWNBQnlBRzhBYWdCbEFH?=
- =?us-ascii?Q?TUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFHTUFid0J1QUdZQWFRQmtBR1VBYmdC?=
- =?us-ascii?Q?MEFHa0FZUUJzQUY4QWJRQmhBSElBZGdCbEFHd0FiQUJmQUc4QWNnQmZBR0VB?=
- =?us-ascii?Q?Y2dCdEFBQUFjZ0FBQUFBQUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWNBQnlB?=
- =?us-ascii?Q?RzhBYWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFHTUFid0J1QUdZQWFR?=
- =?us-ascii?Q?QmtBR1VBYmdCMEFHa0FZUUJzQUY4QWJRQmhBSElBZGdCbEFHd0FiQUJmQUc4?=
- =?us-ascii?Q?QWNnQmZBR2NBYndCdkFHY0FiQUJsQUFBQVdnQUFBQUFBQUFCdEFHRUFjZ0Iy?=
- =?us-ascii?Q?QUdVQWJBQnNBRjhBY0FCeUFHOEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFj?=
- =?us-ascii?Q?d0JmQUhJQVpRQnpBSFFBY2dCcEFHTUFkQUJsQUdRQVh3QnRBR0VBY2dCMkFH?=
- =?us-ascii?Q?VUFiQUJzQUFBQWFBQUFBQUFBQUFCdEFHRUFjZ0IyQUdVQWJBQnNBRjhBY0FC?=
- =?us-ascii?Q?eUFHOEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFjd0JmQUhJQVpRQnpBSFFB?=
- =?us-ascii?Q?Y2dCcEFHTUFkQUJsQUdRQVh3QnRBR0VBY2dCMkFHVUFiQUJzQUY4QWJ3QnlB?=
- =?us-ascii?Q?RjhBWVFCeUFHMEFBQUFxQUFBQUFBQUFBRzBBWVFCeUFIWUFaUUJzQUd3QVh3?=
- =?us-ascii?Q?QjBBR1VBY2dCdEFHa0FiZ0IxQUhNQUFBQWlBQUFBQ0FBQUFHMEFZUUJ5QUhZ?=
- =?us-ascii?Q?QVpRQnNBR3dBWHdCM0FHOEFjZ0JrQUFBQSIvPjwvbWV0YT4=3D?=
-x-dg-tag-bcast: {BB38C8B4-BBDA-40C5-8168-0013E523D1A2}
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR18MB5216:EE_|BN9PR18MB4252:EE_
-x-ms-office365-filtering-correlation-id: 6e2baeab-b8f9-4725-f0b8-08db8747fcff
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- GJFybYnY1yzVqF1ZuVq/iqqlmWogeP5X5wP69mHi1YISRfuoQbcNErUSGQJB4ZQooSfbK4KDjzA47xIQiGHYa7Or1GTD0wHFFasaA1iMMWSaUc5ox4wDmBF23Ofz+tWvZhY7tygTWceXf1QZHdZZvTkc3mQwCGcPIfAHVWU8ka/KR6P+IgIK86FHie75lgZHOcf8LMVJepOnNBOtJbn9ouMOhS9E3SMtZ+ds23r/ywxH6MzJSyQcdl8R864e2DiQUVw86vWRpIS4Fg4tsHTEYK+62SNNFsm1TpbZIm8it0kHI+TjMwWfgiTCnC/yeo/qYe/gM4bjxECDrEzUfsK7dXhmoNpvU3DVbwBSunZkP53sdrYp4+/eqBBywxwWxKx9PfetTgV5XyqL20fwxezo1ETr1DCjG0qY1a8w30oafF9JARhdGwA1BUwM+7vfuxAWHxx8e6FWggLJMco1MzT2VRtMHqZe4IuPRFPsLX6HyRnXcYjYEigI5IypDIlHGylGV3Ymp9y2vYgD4HVQjhtiUSJQ5H5DLqxZL/ioBwhdGy6AZKf+icU6GNUTJsTAm/7vAs2rwECBsKv5V8erQGFDjtZD0KVjS9V1h3cbHGcXzylwUGKF3hKjrP7EEsWPqKHn
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR18MB5216.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(396003)(346002)(376002)(366004)(451199021)(83380400001)(86362001)(71200400001)(7696005)(38070700005)(38100700002)(2906002)(186003)(52536014)(5660300002)(6506007)(33656002)(26005)(41300700001)(8676002)(8936002)(478600001)(55016003)(9686003)(64756008)(66556008)(76116006)(66446008)(66476007)(66946007)(6916009)(316002)(4326008)(122000001)(54906003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?Q0tUr3rkyeogcKVoCP4160OPYpT7GtpRXWuyedjUSLE6N4n7cuulYJ5wOqXb?=
- =?us-ascii?Q?7jvWGw11oyugybB3wunnFiCXx/Uar4Q+d7XQQ/Zh8IuHflLXQAX+p9Wp2RjT?=
- =?us-ascii?Q?cwk4uxNF19KzAdKvJXNsdKfrSp5bIF4ucZ6Gy40DrBnY0YGyKypzYyWe/GWb?=
- =?us-ascii?Q?K2rEpAk/Sad3Zvcd1LhQf9jNOQEj88HF8Sjx1yi8sm3y+cly+VK+Iz/Tt99/?=
- =?us-ascii?Q?PRkeEA62M5c6ke3DBQazv3i8pg+XZdDBJu9t7iwh4bWijGNawKxcyZYdHzj7?=
- =?us-ascii?Q?VdNo7nWigSlB1Rq9m0szdijzPUbcsXG67svQtu98Ty3P2vXMB4YIxRkHq4u+?=
- =?us-ascii?Q?zzOMOtk+SsziCcAmI7p3pBgTUz1M6wBkGhA0kPpmOUGFt7wRibRY6WTfhn9y?=
- =?us-ascii?Q?Ca9DLvGugWakUOKQ3Ksck0QOZqW7DUcc2hSbh+maweJfa3vlANxXyaVmEqm5?=
- =?us-ascii?Q?DTnSTPOIXdFQMvepwgU4gABi0CopI5I7Tpg6TDfUo8g4/Nrnh4DEhpYr24Ig?=
- =?us-ascii?Q?8DSmdhkU82HGkKMCrNZbgAvDCifg1SX5O66CgeG9Egx5Vh7hSaGTAHLpKLXM?=
- =?us-ascii?Q?L6nSmK30kdcIPf3N0CDuNITnCGEVslkITcMTA5XZC1ZMtwhwvlDbG18mgVJo?=
- =?us-ascii?Q?H0N/R36cyb4slxzYwmC1+bnJOr8wvsR2jL7Bi9ef1UXYNVQ9FOZnyx76Y6Dg?=
- =?us-ascii?Q?Pn+njf/uqHUUnYoensPXjGPrzZ0QZ/GiMomwXdRC6ntY9HAc7qxXYLSpovdX?=
- =?us-ascii?Q?DoOHXkDtA1U/b6O9o3PipXFB/UqE+lJMmNICeSf5bkgq5igDjPXu2Nsj4UUu?=
- =?us-ascii?Q?TxHLZwJXdieExypbJRNF33ct66Awa10u1WGWJGdD5lY/RgvHCQ1m2m27PZ02?=
- =?us-ascii?Q?qrIRtgLH5SjUP/AcgDvpKGvbgC+QbeqS+E7dg0gjt1ZGSBNwjuZFjnxSn8kk?=
- =?us-ascii?Q?VkQl6o5CpQ0exbCd81PlCMov4LCEh7NbPd5vRz7cXiv1+wbValVMmca0s0lH?=
- =?us-ascii?Q?a8hs8/x4n2Ksew0UcEwM8/BVvjg1F8F1uSGJHKDNTOzJYf+bRDYgcDorQ+qk?=
- =?us-ascii?Q?/zW1INqo9TD/h+5ImOML/SKovOXQPDD8DWd+VUX24iKKixAG20sdUnQY/4DT?=
- =?us-ascii?Q?iF2jyUCg3T92HjAspTm4nXsgrGUSljUcVzDCFO9ww4+eg2aVNyG6n4P7ay0h?=
- =?us-ascii?Q?HzcCR3qYK5UdCcvHr1jqwh9my9IcNXJHm/tpVayRLpiMo/pOEoZFctcc/ooA?=
- =?us-ascii?Q?eMsOsVwIsLIyX2jrr4IdtbfEsqx2G2hj8dj7b156ro+zmJAw002kEKqzXBMx?=
- =?us-ascii?Q?lYwfMk/Yf6xvlXQTjkz2FVIOX2ai00eZ3uRB6u/gqDlUTTtLxYsbTPmJ0RvJ?=
- =?us-ascii?Q?vs2l2ZPy+XSqsFF1LFToH44ECi+GlIvh3g7c4dqwuK/v31T+I0jscAhOOfYB?=
- =?us-ascii?Q?1Eic8bETFVFh4D59SkO3TnS2d5q5xhOfNfTAcL4Y/Z69HD878pdGgYB0N5TO?=
- =?us-ascii?Q?5cF0ATcvuzLufuX62MelOfRq5eYOs92k9mgdosesT5JHp/eqSXvRUsqk/25H?=
- =?us-ascii?Q?BwqSjAVRtzVT5PMtCvk=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH V3] octeontx2-af: Install TC filter rules in hardware based on priority
+Date: Tue, 18 Jul 2023 10:10:49 +0530
+Message-ID: <20230718044049.2546328-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR18MB5216.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e2baeab-b8f9-4725-f0b8-08db8747fcff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2023 04:32:25.9985
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: j3vtWv4zHlEY3dRpFWYytTxsLFNvSmsvoiFZ/bMnJwVCXx/lronpgeJBMxQ+57SJzSAeL0T67LYUrEDKLazWlA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR18MB4252
-X-Proofpoint-GUID: _Nx5BVenB-3jrkmMqYdSFyP57lSzlMkd
-X-Proofpoint-ORIG-GUID: _Nx5BVenB-3jrkmMqYdSFyP57lSzlMkd
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 3CWOTmX2mSNM8UuU24KK27iBb4a_kDMW
+X-Proofpoint-ORIG-GUID: 3CWOTmX2mSNM8UuU24KK27iBb4a_kDMW
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-17_15,2023-07-13_01,2023-05-22_02
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->On Sun, Jul 16, 2023 at 11:54:42PM +0530, Suman Ghosh wrote:
->> As of today, hardware does not support installing tc filter rules
->> based on priority. This patch fixes the issue and install the hardware
->> rules based on priority. The final hardware rules will not be
->> dependent on rule installation order, it will be strictly priority
->> based, same as software.
->>
->> Signed-off-by: Suman Ghosh <sumang@marvell.com>
->> ---
->> Changes since v1:
->> - Rebased the patch on top of current 'main' branch
->>
->>  .../net/ethernet/marvell/octeontx2/af/mbox.h  |   9 +-
->>  .../marvell/octeontx2/af/rvu_npc_fs.c         |   9 +-
->>  .../marvell/octeontx2/af/rvu_switch.c         |   6 +-
->>  .../marvell/octeontx2/nic/otx2_common.h       |  11 +-
->>  .../marvell/octeontx2/nic/otx2_devlink.c      |   1 -
->>  .../marvell/octeontx2/nic/otx2_ethtool.c      |   1 +
->>  .../marvell/octeontx2/nic/otx2_flows.c        |   2 +
->>  .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 313
->> +++++++++++++-----
->>  8 files changed, 248 insertions(+), 104 deletions(-)
->
-><...>
->
->> +static void otx2_tc_del_from_flow_list(struct otx2_flow_config
->*flow_cfg,
->> +				       struct otx2_tc_flow *node)
->>  {
->> +	struct otx2_tc_flow *tmp;
->> +	struct list_head *pos, *n;
->
->Please declared variables in rversed Christmas tree, in all places,
->thanks.
-[Suman] Ack, will update in v3 patch.
->
->> +
->> +	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
->> +		tmp =3D list_entry(pos, struct otx2_tc_flow, list);
->> +		if (node =3D=3D tmp) {
->> +			list_del(&node->list);
->> +			return;
->> +		}
->> +	}
->> +}
->> +
->> +static int otx2_tc_add_to_flow_list(struct otx2_flow_config
->*flow_cfg,
->> +				    struct otx2_tc_flow *node)
->> +{
->> +	struct otx2_tc_flow *tmp;
->> +	struct list_head *pos, *n;
->> +	int index =3D 0;
->
->Ditto.
-[Suman] Ack, will update in v3 patch.
->
->> +
->
-><...>
->
->> +static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry,
->> +u16 *cntr_val) {
->> +	struct npc_delete_flow_rsp __maybe_unused *rsp;
->
->Why __maybe_unused? This keyword is usually used when in some CONFIG_*
->option, it won't be used. It is not the case here.
-[Suman] Ack, not needed her. Will update in v3 patch
->
->>  	struct npc_delete_flow_req *req;
->>  	int err;
->
-><...>
->
->> +	ntuple =3D !!(nic->netdev->features & NETIF_F_NTUPLE);
->
->No need in !! for bool variables.
-[Suman] Ack, will update in v3 patch.
->
->Thanks
+As of today, hardware does not support installing tc filter
+rules based on priority. This patch adds support to install
+the hardware rules based on priority. The final hardware rules
+will not be dependent on rule installation order, it will be strictly
+priority based, same as software.
+
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+v3 changes:
+- Addressed minor review comments from Leon Romanovsky
+
+v2 changes:
+- Rebased the patch on top of current 'main' branch
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   9 +-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |   9 +-
+ .../marvell/octeontx2/af/rvu_switch.c         |   6 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |  11 +-
+ .../marvell/octeontx2/nic/otx2_devlink.c      |   1 -
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |   1 +
+ .../marvell/octeontx2/nic/otx2_flows.c        |   2 +
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 313 +++++++++++++-----
+ 8 files changed, 248 insertions(+), 104 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index eba307eee2b2..ed66c5989102 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -235,7 +235,7 @@ M(NPC_GET_KEX_CFG,	  0x600c, npc_get_kex_cfg,			\
+ M(NPC_INSTALL_FLOW,	  0x600d, npc_install_flow,			       \
+ 				  npc_install_flow_req, npc_install_flow_rsp)  \
+ M(NPC_DELETE_FLOW,	  0x600e, npc_delete_flow,			\
+-				  npc_delete_flow_req, msg_rsp)		\
++				  npc_delete_flow_req, npc_delete_flow_rsp)		\
+ M(NPC_MCAM_READ_ENTRY,	  0x600f, npc_mcam_read_entry,			\
+ 				  npc_mcam_read_entry_req,		\
+ 				  npc_mcam_read_entry_rsp)		\
+@@ -1491,6 +1491,8 @@ struct npc_install_flow_req {
+ 	u8  vtag0_op;
+ 	u16 vtag1_def;
+ 	u8  vtag1_op;
++	/* old counter value */
++	u16 cntr_val;
+ };
+ 
+ struct npc_install_flow_rsp {
+@@ -1506,6 +1508,11 @@ struct npc_delete_flow_req {
+ 	u8 all; /* PF + VFs */
+ };
+ 
++struct npc_delete_flow_rsp {
++	struct mbox_msghdr hdr;
++	u16 cntr_val;
++};
++
+ struct npc_mcam_read_entry_req {
+ 	struct mbox_msghdr hdr;
+ 	u16 entry;	 /* MCAM entry to read */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index 952319453701..9c365cc3e736 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -1192,7 +1192,7 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
+ 	write_req.enable_entry = (u8)enable;
+ 	/* if counter is available then clear and use it */
+ 	if (req->set_cntr && rule->has_cntr) {
+-		rvu_write64(rvu, blkaddr, NPC_AF_MATCH_STATX(rule->cntr), 0x00);
++		rvu_write64(rvu, blkaddr, NPC_AF_MATCH_STATX(rule->cntr), req->cntr_val);
+ 		write_req.set_cntr = 1;
+ 		write_req.cntr = rule->cntr;
+ 	}
+@@ -1407,12 +1407,13 @@ static int npc_delete_flow(struct rvu *rvu, struct rvu_npc_mcam_rule *rule,
+ 
+ int rvu_mbox_handler_npc_delete_flow(struct rvu *rvu,
+ 				     struct npc_delete_flow_req *req,
+-				     struct msg_rsp *rsp)
++				     struct npc_delete_flow_rsp *rsp)
+ {
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 	struct rvu_npc_mcam_rule *iter, *tmp;
+ 	u16 pcifunc = req->hdr.pcifunc;
+ 	struct list_head del_list;
++	int blkaddr;
+ 
+ 	INIT_LIST_HEAD(&del_list);
+ 
+@@ -1428,6 +1429,10 @@ int rvu_mbox_handler_npc_delete_flow(struct rvu *rvu,
+ 				list_move_tail(&iter->list, &del_list);
+ 			/* single rule */
+ 			} else if (req->entry == iter->entry) {
++				blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
++				if (blkaddr)
++					rsp->cntr_val = rvu_read64(rvu, blkaddr,
++								   NPC_AF_MATCH_STATX(iter->cntr));
+ 				list_move_tail(&iter->list, &del_list);
+ 				break;
+ 			}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
+index 592b317f4637..854045ed3b06 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
+@@ -158,6 +158,7 @@ void rvu_switch_enable(struct rvu *rvu)
+ 	struct npc_mcam_alloc_entry_req alloc_req = { 0 };
+ 	struct npc_mcam_alloc_entry_rsp alloc_rsp = { 0 };
+ 	struct npc_delete_flow_req uninstall_req = { 0 };
++	struct npc_delete_flow_rsp uninstall_rsp = { 0 };
+ 	struct npc_mcam_free_entry_req free_req = { 0 };
+ 	struct rvu_switch *rswitch = &rvu->rswitch;
+ 	struct msg_rsp rsp;
+@@ -197,7 +198,7 @@ void rvu_switch_enable(struct rvu *rvu)
+ uninstall_rules:
+ 	uninstall_req.start = rswitch->start_entry;
+ 	uninstall_req.end =  rswitch->start_entry + rswitch->used_entries - 1;
+-	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &rsp);
++	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &uninstall_rsp);
+ 	kfree(rswitch->entry2pcifunc);
+ free_entries:
+ 	free_req.all = 1;
+@@ -209,6 +210,7 @@ void rvu_switch_enable(struct rvu *rvu)
+ void rvu_switch_disable(struct rvu *rvu)
+ {
+ 	struct npc_delete_flow_req uninstall_req = { 0 };
++	struct npc_delete_flow_rsp uninstall_rsp = { 0 };
+ 	struct npc_mcam_free_entry_req free_req = { 0 };
+ 	struct rvu_switch *rswitch = &rvu->rswitch;
+ 	struct rvu_hwinfo *hw = rvu->hw;
+@@ -250,7 +252,7 @@ void rvu_switch_disable(struct rvu *rvu)
+ 	uninstall_req.start = rswitch->start_entry;
+ 	uninstall_req.end =  rswitch->start_entry + rswitch->used_entries - 1;
+ 	free_req.all = 1;
+-	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &rsp);
++	rvu_mbox_handler_npc_delete_flow(rvu, &uninstall_req, &uninstall_rsp);
+ 	rvu_mbox_handler_npc_mcam_free_entry(rvu, &free_req, &rsp);
+ 	rswitch->used_entries = 0;
+ 	kfree(rswitch->entry2pcifunc);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index ba8091131ec0..67715fc906b5 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -360,13 +360,8 @@ struct otx2_flow_config {
+ 	struct list_head	flow_list;
+ 	u32			dmacflt_max_flows;
+ 	u16                     max_flows;
+-};
+-
+-struct otx2_tc_info {
+-	/* hash table to store TC offloaded flows */
+-	struct rhashtable		flow_table;
+-	struct rhashtable_params	flow_ht_params;
+-	unsigned long			*tc_entries_bitmap;
++	struct list_head	flow_list_tc;
++	bool			ntuple;
+ };
+ 
+ struct dev_hw_ops {
+@@ -491,7 +486,6 @@ struct otx2_nic {
+ 	/* NPC MCAM */
+ 	struct otx2_flow_config	*flow_cfg;
+ 	struct otx2_mac_table	*mac_table;
+-	struct otx2_tc_info	tc_info;
+ 
+ 	u64			reset_count;
+ 	struct work_struct	reset_task;
+@@ -1063,7 +1057,6 @@ int otx2_init_tc(struct otx2_nic *nic);
+ void otx2_shutdown_tc(struct otx2_nic *nic);
+ int otx2_setup_tc(struct net_device *netdev, enum tc_setup_type type,
+ 		  void *type_data);
+-int otx2_tc_alloc_ent_bitmap(struct otx2_nic *nic);
+ /* CGX/RPM DMAC filters support */
+ int otx2_dmacflt_get_max_cnt(struct otx2_nic *pf);
+ int otx2_dmacflt_add(struct otx2_nic *pf, const u8 *mac, u32 bit_pos);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+index 63ef7c41d18d..4e1130496573 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+@@ -41,7 +41,6 @@ static int otx2_dl_mcam_count_set(struct devlink *devlink, u32 id,
+ 		return 0;
+ 
+ 	otx2_alloc_mcam_entries(pfvf, ctx->val.vu16);
+-	otx2_tc_alloc_ent_bitmap(pfvf);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+index c47d91da32dc..9efcec549834 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+@@ -764,6 +764,7 @@ static int otx2_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *nfc)
+ 	struct otx2_nic *pfvf = netdev_priv(dev);
+ 	int ret = -EOPNOTSUPP;
+ 
++	pfvf->flow_cfg->ntuple = ntuple;
+ 	switch (nfc->cmd) {
+ 	case ETHTOOL_SRXFH:
+ 		ret = otx2_set_rss_hash_opts(pfvf, nfc);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+index 2d7713a1a153..4762dbea64a1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+@@ -276,6 +276,7 @@ int otx2vf_mcam_flow_init(struct otx2_nic *pfvf)
+ 
+ 	flow_cfg = pfvf->flow_cfg;
+ 	INIT_LIST_HEAD(&flow_cfg->flow_list);
++	INIT_LIST_HEAD(&flow_cfg->flow_list_tc);
+ 	flow_cfg->max_flows = 0;
+ 
+ 	return 0;
+@@ -298,6 +299,7 @@ int otx2_mcam_flow_init(struct otx2_nic *pf)
+ 		return -ENOMEM;
+ 
+ 	INIT_LIST_HEAD(&pf->flow_cfg->flow_list);
++	INIT_LIST_HEAD(&pf->flow_cfg->flow_list_tc);
+ 
+ 	/* Allocate bare minimum number of MCAM entries needed for
+ 	 * unicast and ntuple filters.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 5e56b6c3e60a..ab775c36c958 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -34,9 +34,8 @@ struct otx2_tc_flow_stats {
+ };
+ 
+ struct otx2_tc_flow {
+-	struct rhash_head		node;
++	struct list_head		list;
+ 	unsigned long			cookie;
+-	unsigned int			bitpos;
+ 	struct rcu_head			rcu;
+ 	struct otx2_tc_flow_stats	stats;
+ 	spinlock_t			lock; /* lock for stats */
+@@ -44,31 +43,10 @@ struct otx2_tc_flow {
+ 	u16				entry;
+ 	u16				leaf_profile;
+ 	bool				is_act_police;
++	u32				prio;
++	struct npc_install_flow_req	req;
+ };
+ 
+-int otx2_tc_alloc_ent_bitmap(struct otx2_nic *nic)
+-{
+-	struct otx2_tc_info *tc = &nic->tc_info;
+-
+-	if (!nic->flow_cfg->max_flows)
+-		return 0;
+-
+-	/* Max flows changed, free the existing bitmap */
+-	kfree(tc->tc_entries_bitmap);
+-
+-	tc->tc_entries_bitmap =
+-			kcalloc(BITS_TO_LONGS(nic->flow_cfg->max_flows),
+-				sizeof(long), GFP_KERNEL);
+-	if (!tc->tc_entries_bitmap) {
+-		netdev_err(nic->netdev,
+-			   "Unable to alloc TC flow entries bitmap\n");
+-		return -ENOMEM;
+-	}
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(otx2_tc_alloc_ent_bitmap);
+-
+ static void otx2_get_egress_burst_cfg(struct otx2_nic *nic, u32 burst,
+ 				      u32 *burst_exp, u32 *burst_mantissa)
+ {
+@@ -707,8 +685,117 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 	return otx2_tc_parse_actions(nic, &rule->action, req, f, node);
+ }
+ 
+-static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry)
++static void otx2_destroy_tc_flow_list(struct otx2_nic *pfvf)
++{
++	struct otx2_flow_config *flow_cfg = pfvf->flow_cfg;
++	struct otx2_tc_flow *iter, *tmp;
++
++	if (!(pfvf->flags & OTX2_FLAG_MCAM_ENTRIES_ALLOC))
++		return;
++
++	list_for_each_entry_safe(iter, tmp, &flow_cfg->flow_list_tc, list) {
++		list_del(&iter->list);
++		kfree(iter);
++		flow_cfg->nr_flows--;
++	}
++}
++
++static struct otx2_tc_flow *otx2_tc_get_entry_by_cookie(struct otx2_flow_config *flow_cfg,
++							unsigned long cookie)
++{
++	struct otx2_tc_flow *tmp;
++
++	list_for_each_entry(tmp, &flow_cfg->flow_list_tc, list) {
++		if (tmp->cookie == cookie)
++			return tmp;
++	}
++
++	return NULL;
++}
++
++static struct otx2_tc_flow *otx2_tc_get_entry_by_index(struct otx2_flow_config *flow_cfg,
++						       int index)
++{
++	struct otx2_tc_flow *tmp;
++	int i = 0;
++
++	list_for_each_entry(tmp, &flow_cfg->flow_list_tc, list) {
++		if (i == index)
++			return tmp;
++		i++;
++	}
++
++	return NULL;
++}
++
++static void otx2_tc_del_from_flow_list(struct otx2_flow_config *flow_cfg,
++				       struct otx2_tc_flow *node)
+ {
++	struct list_head *pos, *n;
++	struct otx2_tc_flow *tmp;
++
++	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
++		tmp = list_entry(pos, struct otx2_tc_flow, list);
++		if (node == tmp) {
++			list_del(&node->list);
++			return;
++		}
++	}
++}
++
++static int otx2_tc_add_to_flow_list(struct otx2_flow_config *flow_cfg,
++				    struct otx2_tc_flow *node)
++{
++	struct list_head *pos, *n;
++	struct otx2_tc_flow *tmp;
++	int index = 0;
++
++	/* If the flow list is empty then add the new node */
++	if (list_empty(&flow_cfg->flow_list_tc)) {
++		list_add(&node->list, &flow_cfg->flow_list_tc);
++		return index;
++	}
++
++	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
++		tmp = list_entry(pos, struct otx2_tc_flow, list);
++		if (node->prio < tmp->prio)
++			break;
++		index++;
++	}
++
++	list_add(&node->list, pos->prev);
++	return index;
++}
++
++static int otx2_add_mcam_flow_entry(struct otx2_nic *nic, struct npc_install_flow_req *req)
++{
++	struct npc_install_flow_req *tmp_req;
++	int err;
++
++	mutex_lock(&nic->mbox.lock);
++	tmp_req = otx2_mbox_alloc_msg_npc_install_flow(&nic->mbox);
++	if (!tmp_req) {
++		mutex_unlock(&nic->mbox.lock);
++		return -ENOMEM;
++	}
++
++	memcpy(tmp_req, req, sizeof(struct npc_install_flow_req));
++	/* Send message to AF */
++	err = otx2_sync_mbox_msg(&nic->mbox);
++	if (err) {
++		netdev_err(nic->netdev, "Failed to install MCAM flow entry %d\n",
++			   req->entry);
++		mutex_unlock(&nic->mbox.lock);
++		return -EFAULT;
++	}
++
++	mutex_unlock(&nic->mbox.lock);
++	return 0;
++}
++
++static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry, u16 *cntr_val)
++{
++	struct npc_delete_flow_rsp *rsp;
+ 	struct npc_delete_flow_req *req;
+ 	int err;
+ 
+@@ -729,22 +816,106 @@ static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry)
+ 		mutex_unlock(&nic->mbox.lock);
+ 		return -EFAULT;
+ 	}
++
++	if (cntr_val) {
++		rsp = (struct npc_delete_flow_rsp *)otx2_mbox_get_rsp(&nic->mbox.mbox,
++								      0, &req->hdr);
++		*cntr_val = rsp->cntr_val;
++	}
++
+ 	mutex_unlock(&nic->mbox.lock);
++	return 0;
++}
++
++static int otx2_tc_update_mcam_table_del_req(struct otx2_nic *nic,
++					     struct otx2_flow_config *flow_cfg,
++					     struct otx2_tc_flow *node)
++{
++	struct list_head *pos, *n;
++	struct otx2_tc_flow *tmp;
++	int i = 0, index = 0;
++	u16 cntr_val;
++
++	/* Find and delete the entry from the list and re-install
++	 * all the entries from beginning to the index of the
++	 * deleted entry to higher mcam indexes.
++	 */
++	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
++		tmp = list_entry(pos, struct otx2_tc_flow, list);
++		if (node == tmp) {
++			list_del(&tmp->list);
++			break;
++		}
++
++		otx2_del_mcam_flow_entry(nic, tmp->entry, &cntr_val);
++		tmp->entry++;
++		tmp->req.entry = tmp->entry;
++		tmp->req.cntr_val = cntr_val;
++		index++;
++	}
++
++	list_for_each_safe(pos, n, &flow_cfg->flow_list_tc) {
++		if (i == index)
++			break;
++
++		tmp = list_entry(pos, struct otx2_tc_flow, list);
++		otx2_add_mcam_flow_entry(nic, &tmp->req);
++		i++;
++	}
+ 
+ 	return 0;
+ }
+ 
++static int otx2_tc_update_mcam_table_add_req(struct otx2_nic *nic,
++					     struct otx2_flow_config *flow_cfg,
++					     struct otx2_tc_flow *node)
++{
++	int mcam_idx = flow_cfg->max_flows - flow_cfg->nr_flows - 1;
++	struct otx2_tc_flow *tmp;
++	int list_idx, i;
++	u16 cntr_val;
++
++	/* Find the index of the entry(list_idx) whose priority
++	 * is greater than the new entry and re-install all
++	 * the entries from beginning to list_idx to higher
++	 * mcam indexes.
++	 */
++	list_idx = otx2_tc_add_to_flow_list(flow_cfg, node);
++	for (i = 0; i < list_idx; i++) {
++		tmp = otx2_tc_get_entry_by_index(flow_cfg, i);
++		if (!tmp)
++			return -ENOMEM;
++
++		otx2_del_mcam_flow_entry(nic, tmp->entry, &cntr_val);
++		tmp->entry = flow_cfg->flow_ent[mcam_idx];
++		tmp->req.entry = tmp->entry;
++		tmp->req.cntr_val = cntr_val;
++		otx2_add_mcam_flow_entry(nic, &tmp->req);
++		mcam_idx++;
++	}
++
++	return mcam_idx;
++}
++
++static int otx2_tc_update_mcam_table(struct otx2_nic *nic,
++				     struct otx2_flow_config *flow_cfg,
++				     struct otx2_tc_flow *node,
++				     bool add_req)
++{
++	if (add_req)
++		return otx2_tc_update_mcam_table_add_req(nic, flow_cfg, node);
++
++	return otx2_tc_update_mcam_table_del_req(nic, flow_cfg, node);
++}
++
+ static int otx2_tc_del_flow(struct otx2_nic *nic,
+ 			    struct flow_cls_offload *tc_flow_cmd)
+ {
+ 	struct otx2_flow_config *flow_cfg = nic->flow_cfg;
+-	struct otx2_tc_info *tc_info = &nic->tc_info;
+ 	struct otx2_tc_flow *flow_node;
+ 	int err;
+ 
+-	flow_node = rhashtable_lookup_fast(&tc_info->flow_table,
+-					   &tc_flow_cmd->cookie,
+-					   tc_info->flow_ht_params);
++	flow_node = otx2_tc_get_entry_by_cookie(flow_cfg, tc_flow_cmd->cookie);
+ 	if (!flow_node) {
+ 		netdev_err(nic->netdev, "tc flow not found for cookie 0x%lx\n",
+ 			   tc_flow_cmd->cookie);
+@@ -772,16 +943,10 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
+ 		mutex_unlock(&nic->mbox.lock);
+ 	}
+ 
+-	otx2_del_mcam_flow_entry(nic, flow_node->entry);
+-
+-	WARN_ON(rhashtable_remove_fast(&nic->tc_info.flow_table,
+-				       &flow_node->node,
+-				       nic->tc_info.flow_ht_params));
++	otx2_del_mcam_flow_entry(nic, flow_node->entry, NULL);
++	otx2_tc_update_mcam_table(nic, flow_cfg, flow_node, false);
+ 	kfree_rcu(flow_node, rcu);
+-
+-	clear_bit(flow_node->bitpos, tc_info->tc_entries_bitmap);
+ 	flow_cfg->nr_flows--;
+-
+ 	return 0;
+ }
+ 
+@@ -790,15 +955,14 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ {
+ 	struct netlink_ext_ack *extack = tc_flow_cmd->common.extack;
+ 	struct otx2_flow_config *flow_cfg = nic->flow_cfg;
+-	struct otx2_tc_info *tc_info = &nic->tc_info;
+ 	struct otx2_tc_flow *new_node, *old_node;
+ 	struct npc_install_flow_req *req, dummy;
+-	int rc, err;
++	int rc, err, mcam_idx;
+ 
+ 	if (!(nic->flags & OTX2_FLAG_TC_FLOWER_SUPPORT))
+ 		return -ENOMEM;
+ 
+-	if (bitmap_full(tc_info->tc_entries_bitmap, flow_cfg->max_flows)) {
++	if (flow_cfg->nr_flows == flow_cfg->max_flows) {
+ 		NL_SET_ERR_MSG_MOD(extack,
+ 				   "Free MCAM entry not available to add the flow");
+ 		return -ENOMEM;
+@@ -810,6 +974,7 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ 		return -ENOMEM;
+ 	spin_lock_init(&new_node->lock);
+ 	new_node->cookie = tc_flow_cmd->cookie;
++	new_node->prio = tc_flow_cmd->common.prio;
+ 
+ 	memset(&dummy, 0, sizeof(struct npc_install_flow_req));
+ 
+@@ -820,12 +985,11 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ 	}
+ 
+ 	/* If a flow exists with the same cookie, delete it */
+-	old_node = rhashtable_lookup_fast(&tc_info->flow_table,
+-					  &tc_flow_cmd->cookie,
+-					  tc_info->flow_ht_params);
++	old_node = otx2_tc_get_entry_by_cookie(flow_cfg, tc_flow_cmd->cookie);
+ 	if (old_node)
+ 		otx2_tc_del_flow(nic, tc_flow_cmd);
+ 
++	mcam_idx = otx2_tc_update_mcam_table(nic, flow_cfg, new_node, true);
+ 	mutex_lock(&nic->mbox.lock);
+ 	req = otx2_mbox_alloc_msg_npc_install_flow(&nic->mbox);
+ 	if (!req) {
+@@ -836,11 +1000,8 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ 
+ 	memcpy(&dummy.hdr, &req->hdr, sizeof(struct mbox_msghdr));
+ 	memcpy(req, &dummy, sizeof(struct npc_install_flow_req));
+-
+-	new_node->bitpos = find_first_zero_bit(tc_info->tc_entries_bitmap,
+-					       flow_cfg->max_flows);
+ 	req->channel = nic->hw.rx_chan_base;
+-	req->entry = flow_cfg->flow_ent[flow_cfg->max_flows - new_node->bitpos - 1];
++	req->entry = flow_cfg->flow_ent[mcam_idx];
+ 	req->intf = NIX_INTF_RX;
+ 	req->set_cntr = 1;
+ 	new_node->entry = req->entry;
+@@ -850,26 +1011,18 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ 	if (rc) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Failed to install MCAM flow entry");
+ 		mutex_unlock(&nic->mbox.lock);
+-		kfree_rcu(new_node, rcu);
+ 		goto free_leaf;
+ 	}
+-	mutex_unlock(&nic->mbox.lock);
+ 
+-	/* add new flow to flow-table */
+-	rc = rhashtable_insert_fast(&nic->tc_info.flow_table, &new_node->node,
+-				    nic->tc_info.flow_ht_params);
+-	if (rc) {
+-		otx2_del_mcam_flow_entry(nic, req->entry);
+-		kfree_rcu(new_node, rcu);
+-		goto free_leaf;
+-	}
++	mutex_unlock(&nic->mbox.lock);
++	memcpy(&new_node->req, req, sizeof(struct npc_install_flow_req));
+ 
+-	set_bit(new_node->bitpos, tc_info->tc_entries_bitmap);
+ 	flow_cfg->nr_flows++;
+-
+ 	return 0;
+ 
+ free_leaf:
++	otx2_tc_del_from_flow_list(flow_cfg, new_node);
++	kfree_rcu(new_node, rcu);
+ 	if (new_node->is_act_police) {
+ 		mutex_lock(&nic->mbox.lock);
+ 
+@@ -896,16 +1049,13 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ static int otx2_tc_get_flow_stats(struct otx2_nic *nic,
+ 				  struct flow_cls_offload *tc_flow_cmd)
+ {
+-	struct otx2_tc_info *tc_info = &nic->tc_info;
+ 	struct npc_mcam_get_stats_req *req;
+ 	struct npc_mcam_get_stats_rsp *rsp;
+ 	struct otx2_tc_flow_stats *stats;
+ 	struct otx2_tc_flow *flow_node;
+ 	int err;
+ 
+-	flow_node = rhashtable_lookup_fast(&tc_info->flow_table,
+-					   &tc_flow_cmd->cookie,
+-					   tc_info->flow_ht_params);
++	flow_node = otx2_tc_get_entry_by_cookie(nic->flow_cfg, tc_flow_cmd->cookie);
+ 	if (!flow_node) {
+ 		netdev_info(nic->netdev, "tc flow not found for cookie %lx",
+ 			    tc_flow_cmd->cookie);
+@@ -1053,12 +1203,20 @@ static int otx2_setup_tc_block_ingress_cb(enum tc_setup_type type,
+ 					  void *type_data, void *cb_priv)
+ {
+ 	struct otx2_nic *nic = cb_priv;
++	bool ntuple;
+ 
+ 	if (!tc_cls_can_offload_and_chain0(nic->netdev, type_data))
+ 		return -EOPNOTSUPP;
+ 
++	ntuple = nic->netdev->features & NETIF_F_NTUPLE;
+ 	switch (type) {
+ 	case TC_SETUP_CLSFLOWER:
++		if (ntuple) {
++			netdev_warn(nic->netdev,
++				    "Can't install TC flower offload rule when NTUPLE is active");
++			return -EOPNOTSUPP;
++		}
++
+ 		return otx2_setup_tc_cls_flower(nic, type_data);
+ 	case TC_SETUP_CLSMATCHALL:
+ 		return otx2_setup_tc_ingress_matchall(nic, type_data);
+@@ -1143,18 +1301,8 @@ int otx2_setup_tc(struct net_device *netdev, enum tc_setup_type type,
+ }
+ EXPORT_SYMBOL(otx2_setup_tc);
+ 
+-static const struct rhashtable_params tc_flow_ht_params = {
+-	.head_offset = offsetof(struct otx2_tc_flow, node),
+-	.key_offset = offsetof(struct otx2_tc_flow, cookie),
+-	.key_len = sizeof(((struct otx2_tc_flow *)0)->cookie),
+-	.automatic_shrinking = true,
+-};
+-
+ int otx2_init_tc(struct otx2_nic *nic)
+ {
+-	struct otx2_tc_info *tc = &nic->tc_info;
+-	int err;
+-
+ 	/* Exclude receive queue 0 being used for police action */
+ 	set_bit(0, &nic->rq_bmap);
+ 
+@@ -1164,25 +1312,12 @@ int otx2_init_tc(struct otx2_nic *nic)
+ 		return -EINVAL;
+ 	}
+ 
+-	err = otx2_tc_alloc_ent_bitmap(nic);
+-	if (err)
+-		return err;
+-
+-	tc->flow_ht_params = tc_flow_ht_params;
+-	err = rhashtable_init(&tc->flow_table, &tc->flow_ht_params);
+-	if (err) {
+-		kfree(tc->tc_entries_bitmap);
+-		tc->tc_entries_bitmap = NULL;
+-	}
+-	return err;
++	return 0;
+ }
+ EXPORT_SYMBOL(otx2_init_tc);
+ 
+ void otx2_shutdown_tc(struct otx2_nic *nic)
+ {
+-	struct otx2_tc_info *tc = &nic->tc_info;
+-
+-	kfree(tc->tc_entries_bitmap);
+-	rhashtable_destroy(&tc->flow_table);
++	otx2_destroy_tc_flow_list(nic);
+ }
+ EXPORT_SYMBOL(otx2_shutdown_tc);
+-- 
+2.25.1
+
 
