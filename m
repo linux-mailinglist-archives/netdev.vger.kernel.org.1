@@ -1,146 +1,76 @@
-Return-Path: <netdev+bounces-18724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D68C758610
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 22:29:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D085758617
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 22:32:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 487B01C20E3F
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:29:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E5FD1C20E23
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33359174DF;
-	Tue, 18 Jul 2023 20:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23636154B3;
+	Tue, 18 Jul 2023 20:32:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8C1174CE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 20:29:09 +0000 (UTC)
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5B81998
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:29:02 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-263036d54b9so4245602a91.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:29:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689712141; x=1692304141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=deZ6/MphDLbE3b6/WAb1wk5PSC/mFgjmOYT8mAVc0cs=;
-        b=dJzYkf6oBwKs5q7adrr0Rogf0Jdj4MhtsOveJaxzWOgKkZTJvVSZYo0ycLFknMfojH
-         KSW00cbrsGgMmL4AfjFQEoHwQLSZjOH3HdGYgTSW2iLhvn+YvztBK0F8Ju9QrXZq0ooG
-         zpA/sx1h+WGZ/GpdvmgLsAgOh6V0iApcv0iUGsL4yoblgHFantFH8RqhVTibKiE6omK2
-         KBzYiFu5OokHgDzSUz2yAUUqnOdJ+KowQYFMqwiMLS6HvGJe//FUG/R07OcbTbOo1vqp
-         OTUWFeQLtThSTCgkWd5ecj4ca+VjSo3MmV4zqjdassdWYr+xLcTfc9hdvf9PknqCCDO7
-         hhoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689712141; x=1692304141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=deZ6/MphDLbE3b6/WAb1wk5PSC/mFgjmOYT8mAVc0cs=;
-        b=WQuN2B6aeFbuseYoKoUbog691lqfw5HKOmVok1RRuZWRwO+jW9dO650IYWEkBIIuK3
-         Zq8LZ5DazfzlntWDEeF3ynJh2hUo56fW5dvJz7pfo+T1tfq2ZpA85ASGA5/r80d56w4O
-         0fqxWVMU0Vv6pXSJC0XIrzxPyBpnjAXuTcRoNj8iIpatxSz/ZuCT31ajDC4FdZeyuTXY
-         6P9At0+837eLO/h42tzD+NN1wS2MRRx84TNBsJxBYOzM96+tuYzUxDRygPL6nEpHbTCI
-         a7RgPDyBGAVjvyUMuVrdN7RN5Hd2iPLtKwfUbJfyIp8XukIfWeC5PPOCClViw84EmYjJ
-         xrHg==
-X-Gm-Message-State: ABy/qLbZqHHYCQXErmUed4+0zUx4Linore8bn1V3GiTomaozZogdPi/N
-	SnmcY1Zsbc/zpuNu31HKWsdUMo8L8USGpBmbRlcBWA==
-X-Google-Smtp-Source: APBJJlEJrixphIFDrx3BZ1Bc05t/6tjoIoX3sCRCf1S64A+HNuLyrFbFua63sUi0wrFA818kiCyV6E16Z1RrXPp6RpU=
-X-Received: by 2002:a17:90a:4d8e:b0:263:4815:cb9a with SMTP id
- m14-20020a17090a4d8e00b002634815cb9amr197219pjh.41.1689712141202; Tue, 18 Jul
- 2023 13:29:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02726D2F5
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 20:32:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8393FC433C8;
+	Tue, 18 Jul 2023 20:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689712353;
+	bh=FLSmACyrVItJxGL2yS/j6SnE6NSUcX7aKrzHK7k9U3E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QyklfGbtk3VN1ylhAY7Qw8wPNB49l2zLLLb2XZTsD7k+TbHniEmA69uxamN67xBTd
+	 AsZK/PkMW/bL0ZH7T1EaR899r0Q0GGqxkArQnuzKvPcyZDFx52gtzE7jnYRkQ6vSXz
+	 IIy5u4GQY5SqlucvIQizDc3sCEYEldKGa+so2wBr9PpLEOGWaizlR3DMsttrZZorwH
+	 mnzxFudb6Pr27N5Ol90+AEDir5xFUQ+eoeJVCrNmo+GXg9iM/chPilca1MdApzURS4
+	 s+HHIE4BO/P/UDn+dfcqGajLjpcqM5SwGu11LJgbJFNqKSMfWrMSVOfEEz/YLmi4hp
+	 Zm+x1fVwMUC/Q==
+Received: (nullmailer pid 1761854 invoked by uid 1000);
+	Tue, 18 Jul 2023 20:32:31 -0000
+From: Rob Herring <robh@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] dt-bindings: net: dsa: Fix JSON pointer references
+Date: Tue, 18 Jul 2023 14:32:03 -0600
+Message-Id: <20230718203202.1761304-1-robh@kernel.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZLbYdpWC8zt9EJtq@debian.debian>
-In-Reply-To: <ZLbYdpWC8zt9EJtq@debian.debian>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Tue, 18 Jul 2023 13:28:49 -0700
-Message-ID: <CAKH8qBsZeqchfcYm-pNKjafYwFzGnwzcXDgHfj3Omkm0yWd31A@mail.gmail.com>
-Subject: Re: [PATCH] bpf: lwt: do not return NET_XMIT_xxx values on bpf_redirect
-To: Yan Zhai <yan@cloudflare.com>
-Cc: "open list:BPF [NETWORKING] (tc BPF, sock_addr)" <bpf@vger.kernel.org>, kernel-team@cloudflare.com, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:BPF [NETWORKING] (tc BPF, sock_addr)" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	Jordan Griege <jgriege@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 18, 2023 at 11:22=E2=80=AFAM Yan Zhai <yan@cloudflare.com> wrot=
-e:
->
-> skb_do_redirect handles returns error code from both rx and tx path.
-> The tx path codes are special, e.g. NET_XMIT_CN: they are
-> non-negative, and can conflict with LWTUNNEL_XMIT_xxx values. Directly
-> returning such code can cause unexpected behavior. We found at least
-> one bug that will panic the kernel through KASAN report when we
-> accidentally redirect packets to a down or carrier-down device at lwt
-> xmit hook:
->
-> https://gist.github.com/zhaiyan920/8fbac245b261fe316a7ef04c9b1eba48
->
-> Above bug is hit because NET_XMIT_CN is returned by noop_qdisc of the
-> down device, and it propagates from dev_queue_xmit all way to the lwt
-> logic. Although skb has been freed by the qdisc, it still continues to
-> neighbor subsystem and triggers the bug.
->
-> This change converts the tx code to proper errors that lwt can consume.
->
-> Reported-by: Jordan Griege <jgriege@cloudflare.com>
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
->  net/core/filter.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 06ba0e56e369..c9cc501ecdc0 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -2129,6 +2129,11 @@ static inline int __bpf_tx_skb(struct net_device *=
-dev, struct sk_buff *skb)
->         ret =3D dev_queue_xmit(skb);
->         dev_xmit_recursion_dec();
->
-> +       // We should not return NET_XMIT_xxx here since it will conflict =
-with
-> +       // LWTUNNEL_XMIT_xxx values. Convert the return value to errno in=
-stead.
+A JSON pointer reference to the entire document must not have a trailing
+"/" and should be just a "#". The existing jsonschema package allows
+these, but changes in 4.18 make allowed "$ref" URIs stricter and throw
+errors on these references.
 
-C++ comments; should be /* */. But, also, maybe they are not really needed?
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ Documentation/devicetree/bindings/net/dsa/dsa.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-ret =3D dev_queue_xmit(skb);
-if (ret)
-        ret =3D net_xmit_errno(ret);
+diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+index 8d971813bab6..ec74a660beda 100644
+--- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+@@ -36,7 +36,7 @@ additionalProperties: true
+ $defs:
+   ethernet-ports:
+     description: A DSA switch without any extra port properties
+-    $ref: '#/'
++    $ref: '#'
+ 
+     patternProperties:
+       "^(ethernet-)?ports$":
+-- 
+2.40.1
 
-We have a bunch of places with the pattern like this, so probably can
-do the same here?
-
-> +       if (unlikely(ret !=3D NET_XMIT_SUCCESS))
-> +               ret =3D net_xmit_errno(ret);
-> +
->         return ret;
->  }
->
-> --
-> 2.30.2
->
 
