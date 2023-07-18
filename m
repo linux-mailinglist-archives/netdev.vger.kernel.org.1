@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-18457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D4B75724A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 05:29:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9190757261
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 05:37:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EF242812E9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 03:29:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2B5A1C20C14
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 03:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA191842;
-	Tue, 18 Jul 2023 03:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C501851;
+	Tue, 18 Jul 2023 03:37:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860BA17CE;
-	Tue, 18 Jul 2023 03:29:39 +0000 (UTC)
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A701705;
-	Mon, 17 Jul 2023 20:29:36 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0VnfxlTn_1689650971;
-Received: from 30.221.158.122(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VnfxlTn_1689650971)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A0317CE;
+	Tue, 18 Jul 2023 03:37:51 +0000 (UTC)
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B74F1;
+	Mon, 17 Jul 2023 20:37:48 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0Vng22vg_1689651463;
+Received: from 30.221.158.122(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vng22vg_1689651463)
           by smtp.aliyun-inc.com;
-          Tue, 18 Jul 2023 11:29:32 +0800
-Message-ID: <47e3e22b-73a6-e2e4-05da-1a1138042d73@linux.alibaba.com>
-Date: Tue, 18 Jul 2023 11:29:26 +0800
+          Tue, 18 Jul 2023 11:37:45 +0800
+Message-ID: <f88ad438-fb63-beeb-b999-94fb3a75d93d@linux.alibaba.com>
+Date: Tue, 18 Jul 2023 11:37:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,10 +40,10 @@ Subject: Re: [PATCH net-next V2 3/4] virtio_net: support per queue interrupt
 To: Gavin Li <gavinl@nvidia.com>
 Cc: gavi@nvidia.com, virtualization@lists.linux-foundation.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, jiri@nvidia.com
+ mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, jiri@nvidia.com, dtatulea@nvidia.com
 References: <20230717143037.21858-1-gavinl@nvidia.com>
  <20230717143037.21858-4-gavinl@nvidia.com>
 From: Heng Qi <hengqi@linux.alibaba.com>
@@ -109,13 +109,6 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 > +	struct scatterlist sgs;
 > +
 > +	coal_vq = kzalloc(sizeof(*coal_vq), GFP_KERNEL);
-
-I think this should go in the structure control_buf, which serves two 
-purposes, and that's on the heap in init_vqs():
-1. We can have the same form as other control types, such as 
-virtio_net_ctrl_coal_{tx, rx};
-2. Avoid using heap memory here to cause the following memory leaks
-
 > +	if (!coal_vq)
 > +		return -ENOMEM;
 > +	coal_vq->vqn = cpu_to_le16(vqn);
@@ -127,11 +120,6 @@ virtio_net_ctrl_coal_{tx, rx};
 > +				  VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET,
 > +				  &sgs))
 > +		return -EINVAL;
-
-If this fails, we should free coal_vq, so pls move coal_vq into control_buf.
-
-Thanks.
-
 > +
 > +	return 0;
 > +}
@@ -270,6 +258,16 @@ Thanks.
 > +static int virtnet_set_per_queue_coalesce(struct net_device *dev,
 > +					  u32 queue,
 > +					  struct ethtool_coalesce *ec)
+
+When \field{max_virtqueue_pairs} is the maximum value, and the user does 
+not carry the queue_mask for 'ethtool -Q',
+we will send same command for all vqs, and the device will receive a 
+large number of the same VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET commands at 
+this time.
+Do we want to alleviate this situation?
+
+Thanks.
+
 > +{
 > +	return virtnet_set_coalesce_one(dev, ec, true, queue);
 > +}
