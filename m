@@ -1,182 +1,136 @@
-Return-Path: <netdev+bounces-18511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620C37576CA
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:39:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2805F7576DE
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:42:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 937C91C20C39
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 08:39:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7917281566
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 08:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D0E5671;
-	Tue, 18 Jul 2023 08:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741FD8820;
+	Tue, 18 Jul 2023 08:42:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40040538C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:39:42 +0000 (UTC)
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2044.outbound.protection.outlook.com [40.107.7.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0073135;
-	Tue, 18 Jul 2023 01:39:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NlvxBvmfdRysOZw6+fL/jLvlrih7SaKqM3qWK6EMqtpojwhravQXmbk0kA2dAy2+FjP8eydXY2P1x6aEiWYERRzw2KpmMXUD0tERg1nGUYMWNlv94rK0CHBSN50V2nBeDG4v9kCmTCNSiaFgxawxkvO+JsR/ieHQxZIxSy8LDSYPGanPxgFPjdIMi9Ks4CgQ1T8UKQtBp1+TLt7rUGiK5RJrJaTsXjSP5P3cAYeks1OoW2XFMqljkLoq/PKbhb4YWDyk5vdxdZMRlYMPQozYjhjzssERA4GSOVMWiEkFjKrwIgWWWEcxisopSk3Pn2SS23Dyr6AAod6DCLN3ehna3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9vCi1kiGWOSyI4U9bD9u1AOwLmrfFuzm5ju0HYk5XYQ=;
- b=N25XSdTt0OjItpuaOGxJJeHpWHVdX5RwpEvXKlYwcaZDZhv1z9/K1ePiJbAuvByT6qwGjcjK9YJ6NS78LpsMehVynlLF2NVoiP2BkpLLqf6YOWBfmeEJ70CL2LPo/IFjEAYlenQYQp53fXmzyeJEXgd/hUQSk91kBzTXT5F9oYLreCCNlhPhLh7B5hFz02pj0V+iYVVaZZOGd7Vk0ts/eTxoolGYFaWzThX5Ik/x0Ztb5YfHuYwjDfTzWv5YJsSvdsITrOeQq/QWLd7PcwsNi2kNGUgDwal8L7ip7voyXJN2EkxbtOsv3KqJUsgKe9zD6b99Coy+Xn9h7ScoXRs6sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9vCi1kiGWOSyI4U9bD9u1AOwLmrfFuzm5ju0HYk5XYQ=;
- b=XoiCEld8Y/uhdMel/uLPVyQerQFaUNsEKp3MJ25Ery/qzq8qb4zEaHmMCLnmr03s+hZru9YXHbismT5lnnrE6sEVE8OgTj0NYGR8ebTGloowkL47QDLvzHWo9OpDUfX8SbBvsNJqsRJgvXEgkqvYObCK1nj0D/8Ti5FIul1Dqo4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBBPR04MB7946.eurprd04.prod.outlook.com (2603:10a6:10:1ec::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
- 2023 08:39:35 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c680:1128:9d53:24ae]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c680:1128:9d53:24ae%4]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
- 08:39:35 +0000
-Date: Tue, 18 Jul 2023 11:39:30 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 net-next 00/12] Introduce ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-Message-ID: <20230718083930.t5amtcbeypd4t4v3@skbuf>
-References: <20230717152709.574773-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230717152709.574773-1-vladimir.oltean@nxp.com>
-X-ClientProxiedBy: VI1PR07CA0247.eurprd07.prod.outlook.com
- (2603:10a6:803:b4::14) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672A210EA
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:42:11 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE76A6;
+	Tue, 18 Jul 2023 01:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PUFHK/0lkljVDIbxvCvY/jgMbVxQaKpPjRRBnR2abHA=; b=WVdMWGPc/cqXGwQzk2aV/7TJPo
+	8Eevg/IQq9+aDbDRk2L2XIL4yAWSpa4wWorm1rMZAIN6Z7NpUps8HMLAJNnUJWgqsapRs1FJ+Emq7
+	Rz9cbbIYhvVFcoFFPMcKYLcr84+svfcE5KpBYcYTIIHhrxqpgNiwNovPj++/Zasa/iBOWZHmwsMZS
+	EGOgbkbBlu1GRWftmyc+djhXIJN0xy1x0n3mrRTDPn58hkWr03iMnoOlZFjnrsm7rGyIF7NvFENoD
+	C9CJEpyX1VB+qg+UAY5iRlyqBiNIaf9SIF3VprsskFMMUJvw4e2mOhSt1BJoKJiynAKtDtsDLF0Ly
+	q056U4Ow==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52264)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qLgHW-0005ay-1G;
+	Tue, 18 Jul 2023 09:42:06 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qLgHV-0002u4-FG; Tue, 18 Jul 2023 09:42:05 +0100
+Date: Tue, 18 Jul 2023 09:42:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+Cc: "Haener, Michael" <michael.haener@siemens.com>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"olteanv@gmail.com" <olteanv@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH v3 3/3] net: dsa: mv88e632x: Add SERDES ops
+Message-ID: <ZLZQXYvJXl44v7MN@shell.armlinux.org.uk>
+References: <20230718065937.10713-1-michael.haener@siemens.com>
+ <20230718065937.10713-4-michael.haener@siemens.com>
+ <ZLZDi22lqZfHKFUZ@shell.armlinux.org.uk>
+ <ZLZDzXQN3MKfOSwk@shell.armlinux.org.uk>
+ <bd7215b802b114b75de4568cc1642f791b233338.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB7946:EE_
-X-MS-Office365-Filtering-Correlation-Id: a02382b3-1c37-4f64-3f96-08db876a8386
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	caXI4vOYIcTWBvnJNTVVi6jmtiUazpwwDfNZVN/wOTwpNtXjDa4vevO+gqUXDk+e399Oiuyr6Dln1ztag+6yoBnwOE+mXzQ+a0/MZM6NeJxrCqlM1FiKw7KYtnz+F5fYnvJdpv0fLDzzT0lGmV5TL20GgwlebJt9nzyjnhIVF9FnOSql8QkxNHhHxvT6DdlB+McQU/7WiHmtQ4XyHYy30Ts/1+V80pXHV5ZSFU88SlwAQyfWW4UeNSaridTdrPP0ze/JEv+/losowc1ct50PbYSsMQvvvkGoQcM+tUwzBFXkfwlzYkfcty3fQ+VYL6HJnvSJ1TUvm+KYeuh0QebkCAUMqjIwmB9AE246IS+hl61pr69ou23DLvqNhECTqn88dpc6Ohpn7ATm4vdrsI5he+hi2yqURb6KX6zHX7FVzvYqg1yJzUC1yVL7ODzocSZmagZLCy6h8AbibGXK58EGKetUr2ff1dOHO2sc88fAnfi0optdzdC9yWy4/T7UzKjlT4/gn0eRcG6akmZubxBf95cEuLhquu3e2WWtfCAAmK+yNwcFheBSaMILR8dpmpGKOjtRubfGJNkD18CiadsKOQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(366004)(396003)(346002)(39860400002)(376002)(136003)(451199021)(7406005)(44832011)(478600001)(5660300002)(66556008)(66946007)(66476007)(54906003)(4326008)(7416002)(316002)(6916009)(8936002)(2906002)(8676002)(41300700001)(6666004)(6512007)(966005)(1076003)(26005)(9686003)(6486002)(6506007)(38100700002)(186003)(33716001)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?SITq0AU1ErJORWgkFggJ74CX6NEn27iy3heq3dpyAvFZwqWKxcypFef5f4?=
- =?iso-8859-1?Q?/TMPIsAFBZ3XlDjvIxENfJGFTS0gbHxcCfat+7GTxlKzjwb5Cy+nmYQ9EE?=
- =?iso-8859-1?Q?203TV794tv4K5AAS3jYIggjyj4/dXGT/c6NB/JcmNag2oEKYgdJRkLAdtI?=
- =?iso-8859-1?Q?sdDOm8u5oQl9VAKm9IQrJOlaPXxSVISQY3C+dpcFUx73zALQALM868+bMJ?=
- =?iso-8859-1?Q?x1WSesR/m2oFh7nogX820ZDHOWM0CnAnp6uNLt69B/lbeWxI/K/Y1SHO7H?=
- =?iso-8859-1?Q?7Us/nkfXSWwJo7NChKLQ7Cu81Kb6Ohy6PLVL8jdEzeJqjw6IrXI0y42iul?=
- =?iso-8859-1?Q?AQIsyVLJkuq8b9zc5KZ+pT95o2PIKnmzdrAkdRt1ZzRX4oMdp5GPeP1kbv?=
- =?iso-8859-1?Q?yhp9ZHlGug08iZzyjI4I6X4t2KpKvr4RBdVWMDXjlyd3vZEPt4FhIDmJDD?=
- =?iso-8859-1?Q?ROC9kyApW+FTzR69WuYi3ZdQnI8mrHiRbHnrtS5tKPKStWTW64/7YwT2jU?=
- =?iso-8859-1?Q?tbDLflFXZMmtPQucimZNb6SVglfK5HKW0sRANozZacK0RZQTNxaZ6aeWsx?=
- =?iso-8859-1?Q?wPWQ2Z7WVD6Z/J59nC8hcmNmh2wxml1pyhN4AbnXvUqDHgVg00J5A1Zt7t?=
- =?iso-8859-1?Q?7PRGQkl/DsLlMfI33lYRLx94PJFC3v86rVbqXfQtQcaKasRFYBW7Xpt2MM?=
- =?iso-8859-1?Q?AcC5dyHaVZPQKps8nIfOq1jJMezGCt/6buTJCX19gWDZpCb+F+43qz7zpN?=
- =?iso-8859-1?Q?PhH3O7+dwQq+28gRfak1viYfVElG590e4eAG5/un25gTPIkmVjrx/U/LpT?=
- =?iso-8859-1?Q?x0Fma4BACPCqoPQFTdmamAs5cCzg3uG0SpktWi+dFhJXZ1v9DirsQSxcNO?=
- =?iso-8859-1?Q?vlkpUGQBTURF5lPeZsCPZ/b1OTEe/m+IahtlKTnhV3rfmMpbJ5d2WWX2sr?=
- =?iso-8859-1?Q?K1BQqhEVBuoUHM2emsIhZhsAZgzcEb5EhICPci/Ozp7bSfKH8M7yCXo28R?=
- =?iso-8859-1?Q?pFSVlRDTNJoJEq1bhGWH1etQp1AYacTT3ao2eXMC+hjwOJqXUW+h1O4A8s?=
- =?iso-8859-1?Q?8/IwSC7B4UOp9bcn04k8VVx465AP3jube4Mz0zvGnZmNdzTPhxZs2KY/c0?=
- =?iso-8859-1?Q?ZtUiNgSm3J2Kek1C3oAdS87Swiko7WVGFTDqwoc9xRiCMOFxx2zVkTp2hT?=
- =?iso-8859-1?Q?OPhIht/PuBTGvRHU/hCJcYJrDu+JJ0IRfnmt/pZRtkF83JZ7N+jms2oziL?=
- =?iso-8859-1?Q?H13os4QDZZ+35GvLCE44F+YxFAMB5f5CQqYAex7h+ljGa42pICN1RDEvfv?=
- =?iso-8859-1?Q?ZZykCZHXdn7N8Qv9dhSW7Sap1ifFmMoYx63p4oD4x5N1R/QvN+5gNHkGWF?=
- =?iso-8859-1?Q?K3SOevrV0PLN18WJryCWGhHumEWPkHVW+sZLL4COfRP21raz7WFvpDhfhl?=
- =?iso-8859-1?Q?GT2TbBoQIWUjCAOaiTl6uu6qzOJHRefhsz6i2oCwC5U8FwrXewGxTZZ8jL?=
- =?iso-8859-1?Q?eX/SdCi2I1Nd0A9MyIPWJcJ1Ok3y9hzNwaS1GcTzLVHdebvRVKCllzqNLr?=
- =?iso-8859-1?Q?CUntf21QKOhcQhMJT4ONTkkP3bu1LipPu3u7xzO1Zx3rcSZTy0QiTo5XO9?=
- =?iso-8859-1?Q?oMNtCGKlgrFHIDoX+BjlT7gpX5ohka+CsgQHZKddmih+VYC0EOhbizFQ?=
- =?iso-8859-1?Q?=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a02382b3-1c37-4f64-3f96-08db876a8386
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 08:39:34.8956
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e5q4ZQ7wEhRKSRD71PsVwpMdDuwWePleZ0r+1Vx5wBkBkjqCQNPovfVRAG9DwLwy9hSP6NBqhaL7QiRYQJ22MQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7946
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bd7215b802b114b75de4568cc1642f791b233338.camel@siemens.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 17, 2023 at 06:26:57PM +0300, Vladimir Oltean wrote:
-> Based on previous RFCs from Maxim Georgiev:
-> https://lore.kernel.org/netdev/20230502043150.17097-1-glipus@gmail.com/
+On Tue, Jul 18, 2023 at 08:24:47AM +0000, Sverdlin, Alexander wrote:
+> Hello Russell,
 > 
-> this series attempts to introduce new API for the hardware timestamping
-> control path (SIOCGHWTSTAMP and SIOCSHWTSTAMP handling).
+> On Tue, 2023-07-18 at 08:48 +0100, Russell King (Oracle) wrote:
+> > On Tue, Jul 18, 2023 at 08:47:23AM +0100, Russell King (Oracle) wrote:
+> > > On Tue, Jul 18, 2023 at 08:59:31AM +0200, M. Haener wrote:
+> > > > From: Michael Haener <michael.haener@siemens.com>
+> > > > 
+> > > > The 88e632x family has several SERDES 100/1000 blocks. By adding these
+> > > > operations, these functionalities can be used.
+> > > > 
+> > > > Signed-off-by: Michael Haener <michael.haener@siemens.com>
+> > > > ---
+> > > > Changelog:
+> > > > v3: rebased onto main branch
+> > > > v2: rebased onto Russell Kings series dsa/88e6xxx/phylink
+> > > 
+> > > I think you're missing something - you seem to be adding support to read
+> > > the statistics from these blocks, but you're not actually driving them
+> > > at all in terms of reading their status or configuring them.
+> > > 
+> > > You need to modify drivers/net/dsa/mv88e6xxx/pcs-6352.c for that.
+> > 
+> > ... and this is why you need to be able to test on recent kernels!
 > 
-> I don't have any board with phylib hardware timestamping, so I would
-> appreciate testing (especially on lan966x, the most intricate
-> conversion). I was, however, able to test netdev level timestamping,
-> because I also have some more unsubmitted conversions in progress:
-> 
-> https://github.com/vladimiroltean/linux/commits/ndo-hwtstamp-v7
-> 
-> I hope that the concerns expressed in the comments of previous series
-> were addressed, and that Köry Maincent's series:
-> https://lore.kernel.org/netdev/20230406173308.401924-1-kory.maincent@bootlin.com/
-> can make progress in parallel with the conversion of the rest of drivers.
+> are you absolutely sure about it?
 
-I'll be waiting until the end of today for more feedback, then I'll
-resend this with all the pieces actually added to the commit (and with
-include/linux/phylib_stubs.h part of the ETHERNET PHY LIBRARY entry in
-MAINTAINERS).
+Yes.
 
-pw-bot: cr
+> mv88e6352_serdes_get_stats() remained in serdes.c after your rework and
+> as I see it, your rework is about link status, but you didn't touch
+> registers and statistics.
+
+What I said was:
+
+"but you're not actually driving them at all in terms of reading their
+status or configuring them"
+
+I was not commenting on obtaining statistics, but the status/control
+of the blocks, which is now in the PCS drivers.
+
+So, right now it looks to me that _all_ this series is doing is
+providing support to read statistics from the PCS blocks and nothing
+more, so the cover message for this series is misleading. It is not
+adding support for the serdes blocks. It is only adding support for
+reading statistics from the serdes blocks.
+
+Either correct the patch series to do what the cover message says it's
+doing, or change the cover message to properly describe what the series
+is doing. It needs to be consistent.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
