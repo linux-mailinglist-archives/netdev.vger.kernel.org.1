@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-18729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70BA5758728
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:30:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7D2775872B
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB2C1C20E07
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:30:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 246B51C20E58
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADE1174E7;
-	Tue, 18 Jul 2023 21:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8394174FF;
+	Tue, 18 Jul 2023 21:30:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C680154B3
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 21:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE376174FC
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 21:30:29 +0000 (UTC)
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA8FBC0;
-	Tue, 18 Jul 2023 14:30:24 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3312C0;
+	Tue, 18 Jul 2023 14:30:28 -0700 (PDT)
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1qLsGe-0001Jh-1v;
-	Tue, 18 Jul 2023 21:30:00 +0000
-Date: Tue, 18 Jul 2023 22:29:48 +0100
+	id 1qLsGw-0001Jr-1c;
+	Tue, 18 Jul 2023 21:30:18 +0000
+Date: Tue, 18 Jul 2023 22:30:10 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -47,9 +47,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v3 0/9] net: ethernet: mtk_eth_soc: add basic
- support for MT7988 SoC
-Message-ID: <cover.1689714290.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v3 1/9] dt-bindings: net: mediatek,net: add missing
+ mediatek,mt7621-eth
+Message-ID: <38831ee59390aae8e65b1bfa7641ed542d9981b3.1689714291.git.daniel@makrotopia.org>
+References: <cover.1689714290.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,69 +59,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1689714290.git.daniel@makrotopia.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The MediaTek MT7988 SoC introduces a new version (3) of the NETSYS
-block and comes with three instead of two MACs.
+Document the Ethernet controller found in the MediaTek MT7621 MIPS SoC
+family which is supported by the mtk_eth_soc driver.
 
-The first MAC can be internally connected to a built-in Gigabit
-Ethernet switch with four 1000M/100M/10M twisted pair user ports.
+Fixes: 889bcbdeee57 ("net: ethernet: mediatek: support MT7621 SoC ethernet hardware")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../devicetree/bindings/net/mediatek,net.yaml | 27 ++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-The second MAC can be internally connected to a built-in 2500Base-T
-Ethernet PHY.
-
-There are two SerDes units which can be operated in USXGMII, 10GBase-(K)R,
-5GBase-R, 2500Base-X, 1000Base-X or SGMII interface mode.
-
-This series adds initial support for NETSYS v3 and the first MAC of the
-MT7988 SoC connecting the built-in DSA switch.
-
-The switch is supported since commit 110c18bfed414 ("net: dsa: mt7530:
-introduce driver for MT7988 built-in switch").
-
-Basic support for the 1000M/100M/10M built-in PHYs connected to the
-switch ports is present since commit ("98c485eaf509b net: phy: add
-driver for MediaTek SoC built-in GE PHYs").
-
-Changes since v2:
-  * Use version number instead of feature bits for NETSYS version
-  * Remove unneeded check for NULL when calling mtk_pcs_lynxi_destroy
-  * Reduce dt-bindings to what is actually needed at this point for
-    the driver to work.
-
-Changes since v1:
-  * Set MTK_MAX_DEVS to 3 instead of converting to dynamic number of
-    Ethernet MACs.
-  * use mtk_m32 when ever possible
-  * more small improvements and minor comments addressed
-
-Daniel Golle (3):
-  dt-bindings: net: mediatek,net: add missing mediatek,mt7621-eth
-  dt-bindings: net: mediatek,net: add mt7988-eth binding
-  net: ethernet: mtk_eth_soc: convert clock bitmap to u64
-
-Lorenzo Bianconi (6):
-  net: ethernet: mtk_eth_soc: add version in mtk_soc_data
-  net: ethernet: mtk_eth_soc: increase MAX_DEVS to 3
-  net: ethernet: mtk_eth_soc: rely on MTK_MAX_DEVS and remove
-    MTK_MAC_COUNT
-  net: ethernet: mtk_eth_soc: add NETSYS_V3 version support
-  net: ethernet: mtk_eth_soc: convert caps in mtk_soc_data struct to u64
-  net: ethernet: mtk_eth_soc: add basic support for MT7988 SoC
-
- .../devicetree/bindings/net/mediatek,net.yaml | 101 ++++-
- drivers/net/ethernet/mediatek/mtk_eth_path.c  |  36 +-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 398 ++++++++++++++----
- drivers/net/ethernet/mediatek/mtk_eth_soc.h   | 327 +++++++++-----
- drivers/net/ethernet/mediatek/mtk_ppe.c       |  18 +-
- .../net/ethernet/mediatek/mtk_ppe_offload.c   |   2 +-
- drivers/net/ethernet/mediatek/mtk_wed.c       |   4 +-
- 7 files changed, 661 insertions(+), 225 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+index acb2b2ac4fe1e..38aa3d97ee234 100644
+--- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
++++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+@@ -19,6 +19,7 @@ properties:
+     enum:
+       - mediatek,mt2701-eth
+       - mediatek,mt7623-eth
++      - mediatek,mt7621-eth
+       - mediatek,mt7622-eth
+       - mediatek,mt7629-eth
+       - mediatek,mt7981-eth
+@@ -32,7 +33,7 @@ properties:
+   clock-names: true
+ 
+   interrupts:
+-    minItems: 3
++    minItems: 1
+     maxItems: 4
+ 
+   power-domains:
+@@ -131,6 +132,30 @@ allOf:
+ 
+         mediatek,wed-pcie: false
+ 
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - mediatek,mt7621-eth
++    then:
++      properties:
++        interrupts:
++          maxItems: 1
++
++        clocks:
++          minItems: 2
++          maxItems: 2
++
++        clock-names:
++          items:
++            - const: ethif
++            - const: fe
++
++        mediatek,wed: false
++
++        mediatek,wed-pcie: false
++
+   - if:
+       properties:
+         compatible:
 -- 
 2.41.0
 
