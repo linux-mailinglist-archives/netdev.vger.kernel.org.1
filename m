@@ -1,129 +1,72 @@
-Return-Path: <netdev+bounces-18700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C9375853A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:59:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89414758539
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 414CB281659
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:59:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43F022816AB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5578A156E1;
-	Tue, 18 Jul 2023 18:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFC3156C8;
+	Tue, 18 Jul 2023 18:59:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDB5168A1;
-	Tue, 18 Jul 2023 18:59:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A1CEC433C8;
-	Tue, 18 Jul 2023 18:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFB9168A1
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:59:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 157DBC433C7;
+	Tue, 18 Jul 2023 18:59:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689706769;
-	bh=ShNrhZ1aA+WGsXQTsxGvUWT5T/IpYDxfVtLObK7+6kc=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=Zw8+ZtEmkdJMS2cSZXtLOmmLx9wro0TUtcKc22SdwYJOK8SDTXuvAWv1hyFn1ppQi
-	 TFlI9pOxYRvV7yj9e5fhhAYFlrMgmObOxbfFrfVxo8yiSfvUFtoBo1aSbw92okBQH3
-	 /ucedCyEooY6kQlBYN+UIuUQArgAbx1tS6zwsn5DoJVFcQ4yT/C1iS1Y0hB+Hr3PvM
-	 N/H8mMslrpNVcBNdf+FABh7BlRGXTW2Nkkrfv1ZNYaVSfPIRmubq051Rz1u74HQvO3
-	 pD+etMGzNjmc2bdgDn5M+Au2AqxmNXCFBfQSp9uk3LW55/3O0vgj56xEilBdh98QGX
-	 zCA/9SpXwrDeg==
-Subject: [PATCH net-next v1 1/7] net/tls: Move TLS protocol elements to a
- separate header
-From: Chuck Lever <cel@kernel.org>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
-Date: Tue, 18 Jul 2023 14:59:18 -0400
-Message-ID: 
- <168970674791.5330.17127606927415243712.stgit@oracle-102.nfsv4bat.org>
-In-Reply-To: 
- <168970659111.5330.9206348580241518146.stgit@oracle-102.nfsv4bat.org>
-References: 
- <168970659111.5330.9206348580241518146.stgit@oracle-102.nfsv4bat.org>
-User-Agent: StGit/1.5
+	s=k20201202; t=1689706762;
+	bh=XfUR3bmNgBsO2KU4d/1fcEto6Y85MNBj5coGiduXoU0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dkuqskzXE9YKa74nfeH/NR/dAjv1VqwlS1rfVXTMwEmvAHO1cF22gL4B8hWvroXsP
+	 UHrzjTgsOcS7HLnvJ2TXDZ8Z3O3Eok2A2zlfs5slvbmFPVhoYO7qF5FOdLLPErU++4
+	 rWxzPdXS6O7dAcJ81ZP6akY6akWujiOOkU55r6ZA8cqC0pwDfogHyQz9F+TTRRNE0X
+	 A5jONEYdPoLqJL23k0fR43IZUguLaZquhNh9nY3QV+0d5bGFVYceDg8EV4zyg2Wi+N
+	 t7wmpEzSRUmf6VzVXMn8Nl3BYU3bP5KQMV6LPYrrG8s6MytTu5X/UprAb6ELxczHnR
+	 msNjnRjlvjlEQ==
+Date: Tue, 18 Jul 2023 11:59:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>, "linux-nvme@lists.infradead.org"
+ <linux-nvme@lists.infradead.org>, "open list:NETWORKING [GENERAL]"
+ <netdev@vger.kernel.org>
+Subject: Re: nvme-tls and TCP window full
+Message-ID: <20230718115921.4de52fd6@kernel.org>
+In-Reply-To: <a77cd4ee-fb4d-aa7e-f0b0-8795534f2acd@suse.de>
+References: <f10a9e4a-b545-429d-803e-c1d63a084afe@suse.de>
+	<49422387-5ea3-af84-3f94-076c94748fff@grimberg.me>
+	<ed5b22c6-d862-8706-fc2e-5306ed1eaad2@grimberg.me>
+	<a50ee71b-8ee9-7636-917d-694eb2a482b4@suse.de>
+	<6a9e0fbf-ca1a-aadd-e79a-c70ecd14bc28@grimberg.me>
+	<1496b59a-10b1-bb49-2d04-5552e002c960@suse.de>
+	<9da64307-c52d-bdf7-bb60-02ed00f44a61@grimberg.me>
+	<a77cd4ee-fb4d-aa7e-f0b0-8795534f2acd@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Thu, 13 Jul 2023 12:16:13 +0200 Hannes Reinecke wrote:
+> >> And my reading seems that the current in-kernel TLS implementation 
+> >> assumes TCP as the underlying transport anyway, so no harm done.
+> >> Jakub?  
+> > 
+> > While it is correct that the assumption for tcp only, I think the
+> > right thing to do would be to store the original read_sock and call
+> > that...  
+> 
+> Ah, sure. Or that.
 
-Kernel TLS consumers will need definitions of various parts of the
-TLS protocol, but often do not need the function declarations and
-other infrastructure provided in <net/tls.h>.
-
-Break out existing standardized protocol elements into a separate
-header, and make room for a few more elements in subsequent patches.
-
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- include/net/tls.h      |    5 +----
- include/net/tls_prot.h |   26 ++++++++++++++++++++++++++
- 2 files changed, 27 insertions(+), 4 deletions(-)
- create mode 100644 include/net/tls_prot.h
-
-diff --git a/include/net/tls.h b/include/net/tls.h
-index 5e71dd3df8ca..10141be02b5e 100644
---- a/include/net/tls.h
-+++ b/include/net/tls.h
-@@ -45,6 +45,7 @@
- 
- #include <net/net_namespace.h>
- #include <net/tcp.h>
-+#include <net/tls_prot.h>
- #include <net/strparser.h>
- #include <crypto/aead.h>
- #include <uapi/linux/tls.h>
-@@ -69,10 +70,6 @@ extern const struct tls_cipher_size_desc tls_cipher_size_desc[];
- 
- #define TLS_CRYPTO_INFO_READY(info)	((info)->cipher_type)
- 
--#define TLS_RECORD_TYPE_ALERT		0x15
--#define TLS_RECORD_TYPE_HANDSHAKE	0x16
--#define TLS_RECORD_TYPE_DATA		0x17
--
- #define TLS_AAD_SPACE_SIZE		13
- 
- #define MAX_IV_SIZE			16
-diff --git a/include/net/tls_prot.h b/include/net/tls_prot.h
-new file mode 100644
-index 000000000000..47d6cfd1619e
---- /dev/null
-+++ b/include/net/tls_prot.h
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-+/*
-+ * Copyright (c) 2023, Oracle and/or its affiliates.
-+ *
-+ * TLS Protocol definitions
-+ *
-+ * From https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml
-+ */
-+
-+#ifndef _TLS_PROT_H
-+#define _TLS_PROT_H
-+
-+/*
-+ * TLS Record protocol: ContentType
-+ */
-+enum {
-+	TLS_RECORD_TYPE_CHANGE_CIPHER_SPEC = 20,
-+	TLS_RECORD_TYPE_ALERT = 21,
-+	TLS_RECORD_TYPE_HANDSHAKE = 22,
-+	TLS_RECORD_TYPE_DATA = 23,
-+	TLS_RECORD_TYPE_HEARTBEAT = 24,
-+	TLS_RECORD_TYPE_TLS12_CID = 25,
-+	TLS_RECORD_TYPE_ACK = 26,
-+};
-+
-+#endif /* _TLS_PROT_H */
-
-
+Yup, sorry for late reply, read_sock could also be replaced by BPF 
+or some other thing, even if it's always TCP "at the bottom".
 
