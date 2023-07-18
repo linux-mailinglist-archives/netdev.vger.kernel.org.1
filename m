@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-18600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA9C757D3D
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:21:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7466E757D40
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:21:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D5AB1C20CEF
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:21:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF4B281408
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59B4D303;
-	Tue, 18 Jul 2023 13:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7434AD521;
+	Tue, 18 Jul 2023 13:21:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98A6C2F3
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492AED513
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:21:18 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFB7126
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:21:07 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9935B186
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:21:08 -0700 (PDT)
 Received: from dude02.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::28])
 	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
 	(envelope-from <m.felsch@pengutronix.de>)
-	id 1qLkdK-00062z-18; Tue, 18 Jul 2023 15:20:54 +0200
+	id 1qLkdK-00062z-Og; Tue, 18 Jul 2023 15:20:54 +0200
 From: Marco Felsch <m.felsch@pengutronix.de>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -43,10 +43,12 @@ Cc: devicetree@vger.kernel.org,
 	kernel@pengutronix.de,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v2 1/2] dt-bindings: net: snps,dwmac: add phy-supply support
-Date: Tue, 18 Jul 2023 15:20:48 +0200
-Message-Id: <20230718132049.3028341-1-m.felsch@pengutronix.de>
+Subject: [PATCH net-next v2 2/2] net: stmmac: add support for phy-supply
+Date: Tue, 18 Jul 2023 15:20:49 +0200
+Message-Id: <20230718132049.3028341-2-m.felsch@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230718132049.3028341-1-m.felsch@pengutronix.de>
+References: <20230718132049.3028341-1-m.felsch@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,29 +66,170 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Document the common phy-supply property to be able to specify a phy
-regulator.
+Add generic phy-supply handling support to control the phy regulator to
+avoid handling it within the glue code. Use the generic stmmac_platform
+code to register a possible phy-supply and the stmmac_main code to
+handle the power on/off.
+
+Changelog
+---
+
+v2:
+- adapt stmmac_phy_power
+- move power-on/off into stmmac_main to handle WOL
+- adapt commit message
 
 Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
- 1 file changed, 3 insertions(+)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 58 ++++++++++++++++++-
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 10 ++++
+ include/linux/stmmac.h                        |  1 +
+ 3 files changed, 68 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-index 363b3e3ea3a60..f66d1839cf561 100644
---- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-@@ -159,6 +159,9 @@ properties:
-       can be passive (no SW requirement), and requires that the MAC operate
-       in a different mode than the PHY in order to function.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 0fca81507a779..c3700316fed6c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -31,6 +31,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/prefetch.h>
+ #include <linux/pinctrl/consumer.h>
++#include <linux/regulator/consumer.h>
+ #ifdef CONFIG_DEBUG_FS
+ #include <linux/debugfs.h>
+ #include <linux/seq_file.h>
+@@ -1123,6 +1124,55 @@ static void stmmac_check_pcs_mode(struct stmmac_priv *priv)
+ 	}
+ }
  
-+  phy-supply:
-+    description: PHY regulator
++/**
++ * stmmac_phy_power - PHY regulator on/off
++ * @priv: driver private structure
++ * @enable: turn on the regulator if true else turn it off
++ * Enable or disable the regulator powering the PHY.
++ */
++static int stmmac_phy_power(struct stmmac_priv *priv, bool enable)
++{
++	struct regulator *regulator = priv->plat->phy_regulator;
++	struct device *dev = priv->device;
 +
-   snps,axi-config:
-     $ref: /schemas/types.yaml#/definitions/phandle
-     description:
++	if (!regulator)
++		return 0;
++
++	if (enable) {
++		int ret;
++
++		ret = regulator_enable(regulator);
++		if (ret)
++			dev_err(dev, "Fail to enable regulator\n");
++
++		return ret;
++	}
++
++	regulator_disable(regulator);
++
++	return 0;
++}
++
++/**
++ * stmmac_phy_power_on - PHY regulator on
++ * @priv: driver private structure
++ * Enable the PHY regulator
++ */
++static int stmmac_phy_power_on(struct stmmac_priv *priv)
++{
++	return stmmac_phy_power(priv, true);
++}
++
++/**
++ * stmmac_phy_power_off - PHY regulator off
++ * @priv: driver private structure
++ * Disable the PHY regulator
++ */
++static void stmmac_phy_power_off(struct stmmac_priv *priv)
++{
++	stmmac_phy_power(priv, false);
++}
++
+ /**
+  * stmmac_init_phy - PHY initialization
+  * @dev: net device structure
+@@ -1248,7 +1298,8 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+ 		return PTR_ERR(phylink);
+ 
+ 	priv->phylink = phylink;
+-	return 0;
++
++	return stmmac_phy_power_on(priv);
+ }
+ 
+ static void stmmac_display_rx_rings(struct stmmac_priv *priv,
+@@ -7469,6 +7520,7 @@ void stmmac_dvr_remove(struct device *dev)
+ 	if (priv->hw->pcs != STMMAC_PCS_TBI &&
+ 	    priv->hw->pcs != STMMAC_PCS_RTBI)
+ 		stmmac_mdio_unregister(ndev);
++	stmmac_phy_power_off(priv);
+ 	destroy_workqueue(priv->wq);
+ 	mutex_destroy(&priv->lock);
+ 	bitmap_free(priv->af_xdp_zc_qps);
+@@ -7532,6 +7584,8 @@ int stmmac_suspend(struct device *dev)
+ 		if (device_may_wakeup(priv->device))
+ 			phylink_speed_down(priv->phylink, false);
+ 		phylink_suspend(priv->phylink, false);
++		if (!priv->plat->use_phy_wol)
++			stmmac_phy_power_off(priv);
+ 	}
+ 	rtnl_unlock();
+ 
+@@ -7614,6 +7668,8 @@ int stmmac_resume(struct device *dev)
+ 		priv->irq_wake = 0;
+ 	} else {
+ 		pinctrl_pm_select_default_state(priv->device);
++		if (!priv->plat->use_phy_wol)
++			stmmac_phy_power_on(priv);
+ 		/* reset the phy so that it's ready */
+ 		if (priv->mii)
+ 			stmmac_mdio_reset(priv->mii);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index eb0b2898daa3d..fb160633ef347 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -10,6 +10,7 @@
+ 
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#include <linux/regulator/consumer.h>
+ #include <linux/module.h>
+ #include <linux/io.h>
+ #include <linux/of.h>
+@@ -423,6 +424,15 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	if (plat->interface < 0)
+ 		plat->interface = plat->phy_interface;
+ 
++	/* Optional regulator for PHY */
++	plat->phy_regulator = devm_regulator_get_optional(&pdev->dev, "phy");
++	if (IS_ERR(plat->phy_regulator)) {
++		if (PTR_ERR(plat->phy_regulator) == -EPROBE_DEFER)
++			return ERR_CAST(plat->phy_regulator);
++		dev_info(&pdev->dev, "No regulator found\n");
++		plat->phy_regulator = NULL;
++	}
++
+ 	/* Some wrapper drivers still rely on phy_node. Let's save it while
+ 	 * they are not converted to phylink. */
+ 	plat->phy_node = of_parse_phandle(np, "phy-handle", 0);
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 225751a8fd8e3..456bab4a3b362 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -209,6 +209,7 @@ struct plat_stmmacenet_data {
+ 	int phy_addr;
+ 	int interface;
+ 	phy_interface_t phy_interface;
++	struct regulator *phy_regulator;
+ 	struct stmmac_mdio_bus_data *mdio_bus_data;
+ 	struct device_node *phy_node;
+ 	struct device_node *phylink_node;
 -- 
 2.39.2
 
