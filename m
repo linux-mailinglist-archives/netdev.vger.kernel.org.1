@@ -1,102 +1,386 @@
-Return-Path: <netdev+bounces-18718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 249997585DE
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:55:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A75E37585EC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 22:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8632810BD
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:55:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2B91C20E41
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF013171CB;
-	Tue, 18 Jul 2023 19:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF15171DB;
+	Tue, 18 Jul 2023 20:06:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52D210946
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:55:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D68C433C7;
-	Tue, 18 Jul 2023 19:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8A910946;
+	Tue, 18 Jul 2023 20:06:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABC02C433C8;
+	Tue, 18 Jul 2023 20:06:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689710142;
-	bh=gshhwkunm0Nkznr6q9yEkdRdIiyNHnhVMZurRxoSIOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lgSBOvWQdpxF3liRy3mjW5e2MFL87uVxkeVJ1V2wPudywexzVM18dF3ko8cfRL/EH
-	 +VwKa8cr4Kojk/tBS5K9Qgl/+UXz39EWbpO3NmAtzd6k3bK6WcfCseH6RjE4b9UEcm
-	 mXH6ANOp6IJ5J4HdWrjaWQ2bH7ueTtEr2KM+8PHf40GJni1e8zVZaR9s5f7b4rCTZv
-	 jWVCDticxRP5dKAu4n0O0N+dSF/tm9SBR1ORKXtt5NZBYCmt29WxD09jfTvNVNotFL
-	 HRTWsdMlFS+2DBMXp81oqy6bufzJUfwty4TFn9hCwiv1zt0UbDxJBxcaLPon+du3S8
-	 Cdw8dFvA/BYxQ==
-Date: Tue, 18 Jul 2023 20:55:37 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: corbet@lwn.net, workflows@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	gregkh@linuxfoundation.org, linux@leemhuis.info, krzk@kernel.org
-Subject: Re: [PATCH docs v2] docs: maintainer: document expectations of small
- time maintainers
-Message-ID: <71224ff9-98d0-4148-afb8-d35b45519c79@sirena.org.uk>
-References: <20230718155814.1674087-1-kuba@kernel.org>
+	s=k20201202; t=1689710800;
+	bh=qfpmhLMrS6QORXM3Xjd7lWMjzf7nk3c04e5lJQkrGhI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=pn2R1kqWXQrwBfO+NqPq/oSI8rte6bD9B+KHJdk3LYkgd2pCuMZfhIScI5tloPlhi
+	 jpai6yXGQn9PEAEamXHdX+BUYyich/cOpnBhzc3uSgapk6V5wk2cAAOsKUSfcbq6nW
+	 YuPnEA8+F7qwH6r0yT408RojtEJFHs4iJ4gVJlI63zLJtMjjjKO2aYG7kEYJT5fFxD
+	 X+JTgv5pkSEer07J108tSYJJ7rwqbvHpGZCVrB6SwLK9ocv70osLbYxn9uXkfLgcDT
+	 E1EOjPOpmWZCoE6WSn0rGvTj1I7NgEGSZ2zF0s+FubxK/qK6WEe8XimCRJPQN6HiSa
+	 KDjxRzcKGOYCg==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Guo Ren <guoren@kernel.org>, Song Shuai
+ <suagrfillet@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
+ <pulehui@huaweicloud.com>
+Subject: Re: [PATCH bpf] riscv, bpf: Adapt bpf trampoline to optimized riscv
+ ftrace framework
+In-Reply-To: <20230715090137.2141358-1-pulehui@huaweicloud.com>
+References: <20230715090137.2141358-1-pulehui@huaweicloud.com>
+Date: Tue, 18 Jul 2023 22:06:37 +0200
+Message-ID: <87lefdougi.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LSdGOUQcgKsH6g7g"
-Content-Disposition: inline
-In-Reply-To: <20230718155814.1674087-1-kuba@kernel.org>
-X-Cookie: You are as I am with You.
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Pu Lehui <pulehui@huaweicloud.com> writes:
+
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> Commit 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to
+> half") optimizes the detour code size of kernel functions to half with
+> T0 register and the upcoming DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv
+> is based on this optimization, we need to adapt riscv bpf trampoline
+> based on this. One thing to do is to reduce detour code size of bpf
+> programs, and the second is to deal with the return address after the
+> execution of bpf trampoline. Meanwhile, add more comments and rename
+> some variables to make more sense. The related tests have passed.
+>
+> This adaptation needs to be merged before the upcoming
+> DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv, otherwise it will crash due
+> to a mismatch in the return address. So we target this modification to
+> bpf tree and add fixes tag for locating.
+
+Thank you for working on this!
+
+> Fixes: 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to half")
+
+This is not a fix. Nothing is broken. Only that this patch much come
+before or as part of the ftrace series.
+
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> ---
+>  arch/riscv/net/bpf_jit_comp64.c | 110 ++++++++++++++------------------
+>  1 file changed, 47 insertions(+), 63 deletions(-)
+>
+> diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_com=
+p64.c
+> index c648864c8cd1..ffc9aa42f918 100644
+> --- a/arch/riscv/net/bpf_jit_comp64.c
+> +++ b/arch/riscv/net/bpf_jit_comp64.c
+> @@ -241,7 +241,7 @@ static void __build_epilogue(bool is_tail_call, struc=
+t rv_jit_context *ctx)
+>  	if (!is_tail_call)
+>  		emit_mv(RV_REG_A0, RV_REG_A5, ctx);
+>  	emit_jalr(RV_REG_ZERO, is_tail_call ? RV_REG_T3 : RV_REG_RA,
+> -		  is_tail_call ? 20 : 0, /* skip reserved nops and TCC init */
+> +		  is_tail_call ? 12 : 0, /* skip reserved nops and TCC init */
+
+Maybe be explicit, and use the "DETOUR_INSNS" from below (and convert to
+bytes)?
+
+>  		  ctx);
+>  }
+>=20=20
+> @@ -618,32 +618,7 @@ static int add_exception_handler(const struct bpf_in=
+sn *insn,
+>  	return 0;
+>  }
+>=20=20
+> -static int gen_call_or_nops(void *target, void *ip, u32 *insns)
+> -{
+> -	s64 rvoff;
+> -	int i, ret;
+> -	struct rv_jit_context ctx;
+> -
+> -	ctx.ninsns =3D 0;
+> -	ctx.insns =3D (u16 *)insns;
+> -
+> -	if (!target) {
+> -		for (i =3D 0; i < 4; i++)
+> -			emit(rv_nop(), &ctx);
+> -		return 0;
+> -	}
+> -
+> -	rvoff =3D (s64)(target - (ip + 4));
+> -	emit(rv_sd(RV_REG_SP, -8, RV_REG_RA), &ctx);
+> -	ret =3D emit_jump_and_link(RV_REG_RA, rvoff, false, &ctx);
+> -	if (ret)
+> -		return ret;
+> -	emit(rv_ld(RV_REG_RA, -8, RV_REG_SP), &ctx);
+> -
+> -	return 0;
+> -}
+> -
+> -static int gen_jump_or_nops(void *target, void *ip, u32 *insns)
+> +static int gen_jump_or_nops(void *target, void *ip, u32 *insns, bool is_=
+call)
+>  {
+>  	s64 rvoff;
+>  	struct rv_jit_context ctx;
+> @@ -658,38 +633,38 @@ static int gen_jump_or_nops(void *target, void *ip,=
+ u32 *insns)
+>  	}
+>=20=20
+>  	rvoff =3D (s64)(target - ip);
+> -	return emit_jump_and_link(RV_REG_ZERO, rvoff, false, &ctx);
+> +	return emit_jump_and_link(is_call ? RV_REG_T0 : RV_REG_ZERO,
+> +				  rvoff, false, &ctx);
+
+Nit: Please use the full 100 char width.
+
+>  }
+>=20=20
+> +#define DETOUR_NINSNS	2
+
+Better name? Maybe call this patchable function entry something? Also,
+to catch future breaks like this -- would it make sense to have a
+static_assert() combined with something tied to
+-fpatchable-function-entry=3D from arch/riscv/Makefile?
+
+> +
+>  int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
+>  		       void *old_addr, void *new_addr)
+>  {
+> -	u32 old_insns[4], new_insns[4];
+> +	u32 old_insns[DETOUR_NINSNS], new_insns[DETOUR_NINSNS];
+>  	bool is_call =3D poke_type =3D=3D BPF_MOD_CALL;
+> -	int (*gen_insns)(void *target, void *ip, u32 *insns);
+> -	int ninsns =3D is_call ? 4 : 2;
+>  	int ret;
+>=20=20
+> -	if (!is_bpf_text_address((unsigned long)ip))
+> +	if (!is_kernel_text((unsigned long)ip) &&
+> +	    !is_bpf_text_address((unsigned long)ip))
+>  		return -ENOTSUPP;
+>=20=20
+> -	gen_insns =3D is_call ? gen_call_or_nops : gen_jump_or_nops;
+> -
+> -	ret =3D gen_insns(old_addr, ip, old_insns);
+> +	ret =3D gen_jump_or_nops(old_addr, ip, old_insns, is_call);
+>  	if (ret)
+>  		return ret;
+>=20=20
+> -	if (memcmp(ip, old_insns, ninsns * 4))
+> +	if (memcmp(ip, old_insns, DETOUR_NINSNS * 4))
+>  		return -EFAULT;
+>=20=20
+> -	ret =3D gen_insns(new_addr, ip, new_insns);
+> +	ret =3D gen_jump_or_nops(new_addr, ip, new_insns, is_call);
+>  	if (ret)
+>  		return ret;
+>=20=20
+>  	cpus_read_lock();
+>  	mutex_lock(&text_mutex);
+> -	if (memcmp(ip, new_insns, ninsns * 4))
+> -		ret =3D patch_text(ip, new_insns, ninsns);
+> +	if (memcmp(ip, new_insns, DETOUR_NINSNS * 4))
+> +		ret =3D patch_text(ip, new_insns, DETOUR_NINSNS);
+>  	mutex_unlock(&text_mutex);
+>  	cpus_read_unlock();
+>=20=20
+> @@ -717,7 +692,7 @@ static void restore_args(int nregs, int args_off, str=
+uct rv_jit_context *ctx)
+>  }
+>=20=20
+>  static int invoke_bpf_prog(struct bpf_tramp_link *l, int args_off, int r=
+etval_off,
+> -			   int run_ctx_off, bool save_ret, struct rv_jit_context *ctx)
+> +			   int run_ctx_off, bool save_retval, struct rv_jit_context *ctx)
+
+Why the save_retval name change? This churn is not needed IMO
+(especially since you keep using the _ret name below). Please keep the
+old name.
+
+>  {
+>  	int ret, branch_off;
+>  	struct bpf_prog *p =3D l->link.prog;
+> @@ -757,7 +732,7 @@ static int invoke_bpf_prog(struct bpf_tramp_link *l, =
+int args_off, int retval_of
+>  	if (ret)
+>  		return ret;
+>=20=20
+> -	if (save_ret)
+> +	if (save_retval)
+>  		emit_sd(RV_REG_FP, -retval_off, regmap[BPF_REG_0], ctx);
+>=20=20
+>  	/* update branch with beqz */
+> @@ -787,20 +762,19 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
+_tramp_image *im,
+>  	int i, ret, offset;
+>  	int *branches_off =3D NULL;
+>  	int stack_size =3D 0, nregs =3D m->nr_args;
+> -	int retaddr_off, fp_off, retval_off, args_off;
+> -	int nregs_off, ip_off, run_ctx_off, sreg_off;
+> +	int fp_off, retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_=
+off;
+>  	struct bpf_tramp_links *fentry =3D &tlinks[BPF_TRAMP_FENTRY];
+>  	struct bpf_tramp_links *fexit =3D &tlinks[BPF_TRAMP_FEXIT];
+>  	struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY_RETURN];
+>  	void *orig_call =3D func_addr;
+> -	bool save_ret;
+> +	bool save_retval, traced_ret;
+>  	u32 insn;
+>=20=20
+>  	/* Generated trampoline stack layout:
+>  	 *
+>  	 * FP - 8	    [ RA of parent func	] return address of parent
+>  	 *					  function
+> -	 * FP - retaddr_off [ RA of traced func	] return address of traced
+> +	 * FP - 16	    [ RA of traced func	] return address of
+>  	traced
+
+BPF code uses frame pointers. Shouldn't the trampoline frame look like a
+regular frame [1], i.e. start with return address followed by previous
+frame pointer?
+
+>  	 *					  function
+>  	 * FP - fp_off	    [ FP of parent func ]
+>  	 *
+> @@ -833,17 +807,20 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
+_tramp_image *im,
+>  	if (nregs > 8)
+>  		return -ENOTSUPP;
+>=20=20
+> -	/* room for parent function return address */
+> +	/* room for return address of parent function */
+>  	stack_size +=3D 8;
+>=20=20
+> -	stack_size +=3D 8;
+> -	retaddr_off =3D stack_size;
+> +	/* whether return to return address of traced function after bpf trampo=
+line */
+> +	traced_ret =3D func_addr && !(flags & BPF_TRAMP_F_SKIP_FRAME);
+> +	/* room for return address of traced function */
+> +	if (traced_ret)
+> +		stack_size +=3D 8;
+>=20=20
+>  	stack_size +=3D 8;
+>  	fp_off =3D stack_size;
+>=20=20
+> -	save_ret =3D flags & (BPF_TRAMP_F_CALL_ORIG | BPF_TRAMP_F_RET_FENTRY_RE=
+T);
+> -	if (save_ret) {
+> +	save_retval =3D flags & (BPF_TRAMP_F_CALL_ORIG | BPF_TRAMP_F_RET_FENTRY=
+_RET);
+> +	if (save_retval) {
+>  		stack_size +=3D 8;
+>  		retval_off =3D stack_size;
+>  	}
+> @@ -869,7 +846,11 @@ static int __arch_prepare_bpf_trampoline(struct bpf_=
+tramp_image *im,
+>=20=20
+>  	emit_addi(RV_REG_SP, RV_REG_SP, -stack_size, ctx);
+>=20=20
+> -	emit_sd(RV_REG_SP, stack_size - retaddr_off, RV_REG_RA, ctx);
+> +	/* store return address of parent function */
+> +	emit_sd(RV_REG_SP, stack_size - 8, RV_REG_RA, ctx);
+> +	/* store return address of traced function */
+> +	if (traced_ret)
+> +		emit_sd(RV_REG_SP, stack_size - 16, RV_REG_T0, ctx);
+>  	emit_sd(RV_REG_SP, stack_size - fp_off, RV_REG_FP, ctx);
+>=20=20
+>  	emit_addi(RV_REG_FP, RV_REG_SP, stack_size, ctx);
+> @@ -890,7 +871,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
+ramp_image *im,
+>=20=20
+>  	/* skip to actual body of traced function */
+>  	if (flags & BPF_TRAMP_F_SKIP_FRAME)
+> -		orig_call +=3D 16;
+> +		orig_call +=3D 8;
+
+Use the define above so it's obvious what you're skipping.
+
+>=20=20
+>  	if (flags & BPF_TRAMP_F_CALL_ORIG) {
+>  		emit_imm(RV_REG_A0, (const s64)im, ctx);
+> @@ -962,22 +943,25 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
+_tramp_image *im,
+>  	if (flags & BPF_TRAMP_F_RESTORE_REGS)
+>  		restore_args(nregs, args_off, ctx);
+>=20=20
+> -	if (save_ret)
+> +	if (save_retval)
+>  		emit_ld(RV_REG_A0, -retval_off, RV_REG_FP, ctx);
+>=20=20
+>  	emit_ld(RV_REG_S1, -sreg_off, RV_REG_FP, ctx);
+>=20=20
+> -	if (flags & BPF_TRAMP_F_SKIP_FRAME)
+> -		/* return address of parent function */
+> +	if (traced_ret) {
+> +		/* restore return address of parent function */
+>  		emit_ld(RV_REG_RA, stack_size - 8, RV_REG_SP, ctx);
+> -	else
+> -		/* return address of traced function */
+> -		emit_ld(RV_REG_RA, stack_size - retaddr_off, RV_REG_SP, ctx);
+> +		/* restore return address of traced function */
+> +		emit_ld(RV_REG_T0, stack_size - 16, RV_REG_SP, ctx);
+> +	} else {
+> +		/* restore return address of parent function */
+> +		emit_ld(RV_REG_T0, stack_size - 8, RV_REG_SP, ctx);
+> +	}
+>=20=20
+>  	emit_ld(RV_REG_FP, stack_size - fp_off, RV_REG_SP, ctx);
+>  	emit_addi(RV_REG_SP, RV_REG_SP, stack_size, ctx);
+>=20=20
+> -	emit_jalr(RV_REG_ZERO, RV_REG_RA, 0, ctx);
+> +	emit_jalr(RV_REG_ZERO, RV_REG_T0, 0, ctx);
+>=20=20
+>  	ret =3D ctx->ninsns;
+>  out:
+> @@ -1664,7 +1648,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, =
+struct rv_jit_context *ctx,
+>=20=20
+>  void bpf_jit_build_prologue(struct rv_jit_context *ctx)
+>  {
+> -	int i, stack_adjust =3D 0, store_offset, bpf_stack_adjust;
+> +	int stack_adjust =3D 0, store_offset, bpf_stack_adjust;
+>=20=20
+>  	bpf_stack_adjust =3D round_up(ctx->prog->aux->stack_depth, 16);
+>  	if (bpf_stack_adjust)
+> @@ -1691,9 +1675,9 @@ void bpf_jit_build_prologue(struct rv_jit_context *=
+ctx)
+>=20=20
+>  	store_offset =3D stack_adjust - 8;
+>=20=20
+> -	/* reserve 4 nop insns */
+> -	for (i =3D 0; i < 4; i++)
+> -		emit(rv_nop(), ctx);
+> +	/* 2 nops reserved for auipc+jalr pair */
+> +	emit(rv_nop(), ctx);
+> +	emit(rv_nop(), ctx);
+
+Use the define above, instead of hardcoding two nops.
 
 
---LSdGOUQcgKsH6g7g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks,
+Bj=C3=B6rn
 
-On Tue, Jul 18, 2023 at 08:58:14AM -0700, Jakub Kicinski wrote:
-
-> We appear to have a gap in our process docs. We go into detail
-> on how to contribute code to the kernel, and how to be a subsystem
-> maintainer. I can't find any docs directed towards the thousands
-> of small scale maintainers, like folks maintaining a single driver
-> or a single network protocol.
-
-I'm not super comfortable with all of the musts here but this is
-probably fine so
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
-One note:
-
-> +Maintainers must be human, however, it is not acceptable to add a mailing
-> +list or a group email as a maintainer. Trust and understanding are the
-> +foundation of kernel maintenance and one cannot build trust with a mailing
-> +list.
-
-If you're revising this I'd add a note about the L: tag in MAINTAINERS
-here, or possibly just adding a list in addition to humans.  It is
-sensible and often helpful for companies to want to get mail copied to a
-wider distribution list internally but they're not really what we mean
-by list since external people typically can't join them.
-
---LSdGOUQcgKsH6g7g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmS27jgACgkQJNaLcl1U
-h9CIIgf+LLz2FFY+gdDkyU+XJv8nVYZJr7tmYVzdbjT94MAsKgVXjd/DcXrUdISB
-gItU3VHXnC2vXX+rgEUOSZwEBQ2HXi/Grj4As79eV6n29QwE4yMDZ2GIOhcDKqvH
-2GZGDLYaShzkKQNzin2eyCkjVd9ZCquoNCpU8trTaUz56uX3DmuyD2JwqDWnqX1v
-OkPdZHhfAF1jy9XPo1CNXMjgnhP3yNawqptigD7c/bVGY76VjwJ0pphpPij93BQl
-eHMTeQceIZGAPnDtxJAcxFHojjZ9UoHPcit1hMLuIn4xSIIMMOJDVS2fyrcLTynJ
-qg2xILiUbAc4zJlKhCe2eLYe8eM4sg==
-=guc9
------END PGP SIGNATURE-----
-
---LSdGOUQcgKsH6g7g--
+[1] https://github.com/riscv-non-isa/riscv-elf-psabi-doc/blob/master/riscv-=
+cc.adoc#frame-pointer-convention
 
