@@ -1,166 +1,206 @@
-Return-Path: <netdev+bounces-18633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 165B8758151
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:50:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14E1C75815F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:52:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3F62815ED
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:50:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3C46281586
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6193B12B7B;
-	Tue, 18 Jul 2023 15:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEAD11185;
+	Tue, 18 Jul 2023 15:52:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5625511184
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:49:59 +0000 (UTC)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA1E2E4C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689695396; x=1721231396;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2+g8D6K4yOf3EbBU7xVCv4e+8/CcQMogoNMiwwmkgZ8=;
-  b=ZK8lxbO4MCxqlvUac2ZM0lW8Gjep3BuNSFy+dQ1+TGU21mHzMY2aJW0j
-   tuH2Y4lqDtnMOFf5nyPVG820vjJCDN3EjVZX2sgmLwo2AvRNA81rKAQPx
-   LwyeHww7wG3qLmw0VW53FEVLS/gEnlkpdrfqAhJQbY1ayZonuJyJA+ftj
-   31SKoMPOjROxWxfWEWGokVXStZp7tPt08LNrOtCuajYU/ye/KQLcG+IaP
-   4f4wBi3fHT+A3IlK4pc8v1l1Bhp4fUVLi0Lm5FEz58ZOVqufWLfR1uam7
-   52X4e1qkS6DBuiU/Ahgmye6D5ZgRQTKGyzLwgGjCNX0C4QoSMI4LeFP06
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346540447"
-X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="346540447"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 08:49:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="673975356"
-X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="673975356"
-Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 18 Jul 2023 08:49:46 -0700
-Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qLmxO-0000hB-00;
-	Tue, 18 Jul 2023 15:49:46 +0000
-Date: Tue, 18 Jul 2023 23:49:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Casper Andersson <casper.casan@gmail.com>,
-	Sergey Organov <sorganov@gmail.com>
-Subject: Re: [PATCH v8 net-next 11/12] net: phy: provide phylib stubs for
- hardware timestamping operations
-Message-ID: <202307182345.NOnFjOm2-lkp@intel.com>
-References: <20230717152709.574773-12-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90DF10799
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:52:46 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2078.outbound.protection.outlook.com [40.107.220.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA91AA9;
+	Tue, 18 Jul 2023 08:52:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eQvbySimm4ozrLa2Ap54F4HKPbhL0QXbfMQAHhS2LDQ/eg0liiD+hrccDAL4fc+rqa7wEWmQJOr17GF10iuKYrbJR3cPb07hub2juibczHHkKkAD7JewzRhmkkuoyKEYvogMlLqbQfsB3ZwRCvCBSdFHlBxfND1Vss9O68mewfrJiqY7NeWMnyErKDik4uHipX+1m6D+SAl6x5kPxnQ6ipYlp5Ksbc475rkH4Dy5XLbHIrhW0gZUMpTOFvI8XUtuV07k156XXyMAZB0n6Omr09iiZxt1m9xqzKyG/VHn9HDH7Ys8M5CuwM73JaAVV36Ndn354YiPXJLmZ8zg91R6DA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DOuOI5gEimn2gqRyh2Fwahv9AFDv6OiknE53UTUXkUA=;
+ b=mw6BcVo3kMzfjEX881w4dm+eR7xkqPE0dXV0SCOd1sh4SM223ntSD1kwFovP6JFz8hlQx747WtznyjWnCuAz3JYy0lTblan2Mcyfuwj0AX/GPaqWde1TgrejjIaX6NhPkwOS5bbqkjwgpr5kzTnEkbz37ovgx5DHmfnou5np4yxuNPP9jERE18MeeFB2o2GvGieJVDJccklfl9xDrLIxlLDylBlGKSp1HLqr0iueB46YgWdS4ecg7cn2wu9XAcQvAyuWW6KF1ovFbjCCPUt3YHEbkZOExOBJJe8RhLCDMQG/aGQCO7yqyqp19XuWAcCugq4iXCfp5NN6Hm6ou6ttjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DOuOI5gEimn2gqRyh2Fwahv9AFDv6OiknE53UTUXkUA=;
+ b=ACwv4mKvBbktdNgDyJkO6LnHDdDv9ccTphGGJFmHy+5N/mshMek1unXcBBFwMa8xBzD0opV8azB4kmj827cHfQr3o5uWL/j1SLQM2Px9LPC9VtXwK0zH2GpSar0gd8WZstlyCHCBKlG2Ihtj/UnMNByFAQj2VYymMn6Hll7sLao=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5874.namprd12.prod.outlook.com (2603:10b6:208:396::17)
+ by CYXPR12MB9442.namprd12.prod.outlook.com (2603:10b6:930:e3::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.32; Tue, 18 Jul
+ 2023 15:52:42 +0000
+Received: from BL1PR12MB5874.namprd12.prod.outlook.com
+ ([fe80::b7a4:9183:7942:5936]) by BL1PR12MB5874.namprd12.prod.outlook.com
+ ([fe80::b7a4:9183:7942:5936%4]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
+ 15:52:42 +0000
+Message-ID: <c196f8f9-3d2c-27c6-6807-75a6e6e4d5a5@amd.com>
+Date: Tue, 18 Jul 2023 10:52:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] tg3: fix array subscript out of bounds compilation error
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, mchan@broadcom.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, prashant@broadcom.com, siva.kallam@broadcom.com
+References: <20230717143443.163732-1-carlos.bilbao@amd.com>
+ <20230717192403.96187-1-kuniyu@amazon.com>
+From: Carlos Bilbao <carlos.bilbao@amd.com>
+In-Reply-To: <20230717192403.96187-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DS7PR03CA0192.namprd03.prod.outlook.com
+ (2603:10b6:5:3b6::17) To BL1PR12MB5874.namprd12.prod.outlook.com
+ (2603:10b6:208:396::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230717152709.574773-12-vladimir.oltean@nxp.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5874:EE_|CYXPR12MB9442:EE_
+X-MS-Office365-Filtering-Correlation-Id: 993ca2f6-0739-49df-68a1-08db87a70566
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	MJcrdXoWoihq0M6MnVC9iZJVCiucmaKDF8wfC7fDBcq6BRQfA7ulu4lWFhM77kTXV2qMGBaFdMkOTlunxOPaRpJMU57rRVKVwr5XOAaOhrtuNSO02zqYuq4w8KYgPvWeCLhMvD48QyXVkrojLaqash3km2+kXsLe55638aWOaWgnp/QD8k5yNwwgt/DbNR0SNJesLgnj2kpcJePxNu5j2WCS4cxSYmtbvgQPh0xaMiOI+k3ZWURrO5ZVTLW0kZ7/glKiKDD8qiSFQHco6E9n2uQN63nfXkKiAakbp708t75ZAdjUOy7yLeNwJoju1bd4uUGS2XPgMz6JI9ZvIeZA2xjlOEGg5bDZidqbHlSo2G0Al4DKUzdU/if7C43W4DJlPgfTMVW15gLR0zIUr25OHZZ0tcyYs6YgXFc6OE2bZj29co6H7UTOM0M3kXWD8UlN1vtGHglBRsCUVfjaJ9YwDVqr5p8/trs8Eg26opZRCQSdDFCkTiJsSqN11Yb5KEjrZsRh2exmpMvpQWppmMqRENz3nwjNXtTpBHSIY9kCXcOo5Zb10vAOHmLvB/fqaSatzkzkOQ5yvahdTDGlCwNAgNcwPrd4c/+4/rxF+ma5JipF2ZVKOz9Pznn/761AlCcf+AErVLlmjmLk6jl4SawykQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5874.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(39860400002)(136003)(376002)(396003)(451199021)(38100700002)(31696002)(83380400001)(36756003)(2906002)(8936002)(478600001)(6512007)(26005)(6486002)(186003)(53546011)(5660300002)(6506007)(7416002)(41300700001)(2616005)(66476007)(44832011)(8676002)(66556008)(6666004)(6916009)(66946007)(316002)(86362001)(31686004)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eHhPQllnaHpDT0VkTlVYNG5qV0w2WlM4SXczcmd4ck1jUit0dFc0RC9JUVFG?=
+ =?utf-8?B?OFhMQlRxdUowSW1Xb0RyNGJZWnpQTDR0SVh5NDZkMzhXbEI1SXpHUDJUcHZl?=
+ =?utf-8?B?N1BFSlZaOWpKbEM3K1lJenh4dzR1WmRoYnRXa3lyT0ZqMnVTSmhRQUQrVm04?=
+ =?utf-8?B?K2F5SkxoaTFFcTlpUVdsRmYwcTFxbm5YU0R0eEZtQkhuQzhJR2NJRWx4WjZ5?=
+ =?utf-8?B?cVllVDRyM3JiNHRERzg0dHFUeEErbTNTeXdrY2lYcHczYmxnaDI2eUVxZmth?=
+ =?utf-8?B?UUEzZkIrQ1V5OUkyeGFENEVDV1cwblhZTk5VQjFpQU52Mm1GblorTU11OWkz?=
+ =?utf-8?B?UVA0cjdseU9yV2ozWGVQUEx2dDJ1WWJ6NzR2M3hHRFhxRGdIY0dBRFRWem93?=
+ =?utf-8?B?Z0xPWnZyMTBzMzgycG94MkFJUTB5VjZkWDBnSmg0RWxiNEZqVDlrZ0pyWUNh?=
+ =?utf-8?B?enRORkhMME1IdXBGQjNvc1dEOTVCcmI3WmtCL0dpR1dJWTBOV0l5TmVUckxZ?=
+ =?utf-8?B?SjdhNEdYenZmeXJtOENrYkxaSlUzNkdoWU01QU5YamdnVHAyL2VjeGEySkhy?=
+ =?utf-8?B?MUZQTVd2eXdOcWp4blRWSGhVMkgyN1g0NDNTdUVaRFY3UVVLRTBRemJmeWNT?=
+ =?utf-8?B?QmVZcE1NQTZ0NmQ3SUhtNHh5eit6cSt6NFJwVE1CV2VNdnhObVkzM2FHeCth?=
+ =?utf-8?B?Z0loRDl0YnAwSlBpLzYrOFBLek1yeHpBbVEvV01saEU1QUJ4Qm5mNTNDVXFC?=
+ =?utf-8?B?NUc2d2pyazFkS0hsSm1VcXlnZXExdTdZWlpTM3hzajlDT2RuRDhia3NhVThE?=
+ =?utf-8?B?WWhBK0p4VURoMnNpUkk5SURMVG51OTVDZVIzVWczUkpmMHVPck5jN2w3Umt5?=
+ =?utf-8?B?ckdQL2E2NXBXWVB1aTB1TE01d1BaaExIZEVqN2pwMkUxWDBmL0h5cXFWNEV5?=
+ =?utf-8?B?Q251ckF4VEYyS1dmRXRuamZlVGM4bXhLUjZKOUkzNkhvYTNoa3VwelZHd09o?=
+ =?utf-8?B?Ty9ob2w5ZGwxVXY5NDIva1gzVnBBOURFOTlUM3RZallvRURmNTFlS0wyTVIy?=
+ =?utf-8?B?UEIyNkJmQzJFc21VODE1aStTK3I4Y1Q5MzNxRUxhblJVNWFjQ0RCKzduSU9p?=
+ =?utf-8?B?YXNaUlJENm1va0x3ZW5OZUtLQkQ4N0UxTjhkdURCMlFkakswMEx1bC9IQ0J5?=
+ =?utf-8?B?NjR6NXhLdENlNmplTXMvSEQrcUw5b1g4N1pHWXZaSUcxVW1hZGt0RTA1SWhO?=
+ =?utf-8?B?MkZEMUhyVkZ6VHNLcWtNek00czhCWmtwcUphd1hhNlcvOXI0akMyc2NoS3NN?=
+ =?utf-8?B?SGNCdTFpVThmemU3MUF2MERIYkQ5RjVwNFRwV3hnUCtYR0J5NWNqeExKTVhV?=
+ =?utf-8?B?bEJndlNSb3Y3TWFCc1Viekp0aGZ5S1c5RytUTzdwQ28zcWNNWWFDcWlSdjNo?=
+ =?utf-8?B?VXJwdUpOQXQ2T2NCbGNBb3lkNXJhQTBmUnVlbjNNcjVFeEZhVWhrQlhGWUda?=
+ =?utf-8?B?UnJHcVp6Yk1ZVUFxVnEvdHNhZGs1Q3VIZWlUUXBpM1JmVlFJU3Q5eG5yNEcz?=
+ =?utf-8?B?SUpKYVd0dzZINTh0ZXQ1UWFIVklzUEl5VHlXeDNVT091RVB6N1RKVms1TmN6?=
+ =?utf-8?B?SFo4OWtvZmdJMVpaT0VSMHRSRGZ6M1g3YzZIOE5iQWVrSkJxQm82YlpwU1Zt?=
+ =?utf-8?B?bGcvd1NxakRQOFF1Vk1meW5sdzh1K0xMaTlMYURDamxEY1h6L0tXbW9idVhQ?=
+ =?utf-8?B?R0dHY1EyOWxDTi9zOUpNVmhSQjV1K2d1Zk9PdDBHM0E4R0lPd0M5ZkE0OXl1?=
+ =?utf-8?B?a2RjRjcxeXZsWHRrSXl4dm5VQWxNc0paQTR0ZHZsWExBTlV4eXVlQlh6dkJS?=
+ =?utf-8?B?cTFzUlN4V0hITlNXMWs0MmtBMWZQV1ZXUVc2WTFrRGM0OEcrU2VCM2EwZ1Yw?=
+ =?utf-8?B?Rjh5U3NuZk9RSkJweXBBVHFxdmtvVnFRbytmZy9JbVhENXBLZGJkTGlGNFEr?=
+ =?utf-8?B?TldiakF4YU1sa0VCeXp0NS9maklFeUY2U1NLQ3AyeTB1YzlWQ2lPQmdRS3lE?=
+ =?utf-8?B?S2xTZUNnaXgzWVRpRzdTSmRyL1dEalgyQk0wS2RuVUlXR2RjUzZIWWtLeFNk?=
+ =?utf-8?Q?kKpX0UqGwTFdM/hpB6pnTyExb?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 993ca2f6-0739-49df-68a1-08db87a70566
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5874.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 15:52:42.4666
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MBNBJH+/2p13/ftFQeS/95MwqAlZdceVitOi9Yq6a66Cpe6XBfgddker5ParCyfPkKomCKZCSgNplvVnytEzCg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9442
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Vladimir,
+On 7/17/23 14:24, Kuniyuki Iwashima wrote:
+> From: Carlos Bilbao <carlos.bilbao@amd.com>
+> Date: Mon, 17 Jul 2023 09:34:43 -0500
+>> Fix encountered compilation error in tg3.c where an array subscript was
+> 
+> What is the error ?
 
-kernel test robot noticed the following build errors:
+drivers/net/ethernet/broadcom/tg3.c: In function ‘tg3_init_one’:
+drivers/net/ethernet/broadcom/tg3.c:17795:51: error: array subscript 5 is 
+above array bounds of ‘struct tg3_napi[5]’ [-Werror=array-bounds=]
+17795 |                 struct tg3_napi *tnapi = &tp->napi[i];
+       |                                           ~~~~~~~~^~~
+In file included from drivers/net/ethernet/broadcom/tg3.c:72:
+drivers/net/ethernet/broadcom/tg3.h:3203:41: note: while referencing ‘napi’
+  3203 |         struct tg3_napi                 napi[TG3_IRQ_MAX_VECS];
+       |                                         ^~~~
+drivers/net/ethernet/broadcom/tg3.c:17795:51: error: array subscript 5 is 
+above array bounds of ‘struct tg3_napi[5]’ [-Werror=array-bounds=]
+17795 |                 struct tg3_napi *tnapi = &tp->napi[i];
+       |                                           ~~~~~~~~^~~
+drivers/net/ethernet/broadcom/tg3.h:3203:41: note: while referencing ‘napi’
+  3203 |         struct tg3_napi                 napi[TG3_IRQ_MAX_VECS];
 
-[auto build test ERROR on net-next/main]
+> 
+> 
+>> above the array bounds of 'struct tg3_napi[5]'. Add an additional check in
+>> the for loop to ensure that it does not exceed the bounds of
+>> 'struct tg3_napi' (defined by TG3_IRQ_MAX_VECS).
+>>
+>> Reviewed-By: Carlos Bilbao <carlos.bilbao@amd.com>
+>> ---
+>>   drivers/net/ethernet/broadcom/tg3.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+>> index 4179a12fc881..33ad75b7ed91 100644
+>> --- a/drivers/net/ethernet/broadcom/tg3.c
+>> +++ b/drivers/net/ethernet/broadcom/tg3.c
+>> @@ -17791,7 +17791,7 @@ static int tg3_init_one(struct pci_dev *pdev,
+>>   	intmbx = MAILBOX_INTERRUPT_0 + TG3_64BIT_REG_LOW;
+>>   	rcvmbx = MAILBOX_RCVRET_CON_IDX_0 + TG3_64BIT_REG_LOW;
+>>   	sndmbx = MAILBOX_SNDHOST_PROD_IDX_0 + TG3_64BIT_REG_LOW;
+>> -	for (i = 0; i < tp->irq_max; i++) {
+>> +	for (i = 0; i < tp->irq_max && i < TG3_IRQ_MAX_VECS; i++) {
+> 
+> I'm not familiar with this driver, but it seem tg3_init_one() calls
+> tg3_get_invariants() before the loop and initialises irq_max as 1
+> or TG3_IRQ_MAX_VECS.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vladimir-Oltean/net-add-NDOs-for-configuring-hardware-timestamping/20230718-174836
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230717152709.574773-12-vladimir.oltean%40nxp.com
-patch subject: [PATCH v8 net-next 11/12] net: phy: provide phylib stubs for hardware timestamping operations
-config: x86_64-randconfig-r023-20230718 (https://download.01.org/0day-ci/archive/20230718/202307182345.NOnFjOm2-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce: (https://download.01.org/0day-ci/archive/20230718/202307182345.NOnFjOm2-lkp@intel.com/reproduce)
+I'm also not familiar with this driver, but what you mention seems to be
+the case, and also tp->irq_max is used for loop boundaries elsewhere just
+fine. I don't know why was the compiler complaining, maybe a false positive.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307182345.NOnFjOm2-lkp@intel.com/
+> 
+> Where does tp->irq_max go over TG3_IRQ_MAX_VECS ?
+> 
+> 
+>>   		struct tg3_napi *tnapi = &tp->napi[i];
+>>   
+>>   		tnapi->tp = tp;
+>> -- 
+>> 2.41.0
 
-All errors (new ones prefixed by >>):
-
->> drivers/net/phy/phy_device.c:30:10: fatal error: 'linux/phylib_stubs.h' file not found
-   #include <linux/phylib_stubs.h>
-            ^~~~~~~~~~~~~~~~~~~~~~
-   1 error generated.
-
-
-vim +30 drivers/net/phy/phy_device.c
-
-    11	
-    12	#include <linux/acpi.h>
-    13	#include <linux/bitmap.h>
-    14	#include <linux/delay.h>
-    15	#include <linux/errno.h>
-    16	#include <linux/etherdevice.h>
-    17	#include <linux/ethtool.h>
-    18	#include <linux/init.h>
-    19	#include <linux/interrupt.h>
-    20	#include <linux/io.h>
-    21	#include <linux/kernel.h>
-    22	#include <linux/list.h>
-    23	#include <linux/mdio.h>
-    24	#include <linux/mii.h>
-    25	#include <linux/mm.h>
-    26	#include <linux/module.h>
-    27	#include <linux/of.h>
-    28	#include <linux/netdevice.h>
-    29	#include <linux/phy.h>
-  > 30	#include <linux/phylib_stubs.h>
-    31	#include <linux/phy_led_triggers.h>
-    32	#include <linux/pse-pd/pse.h>
-    33	#include <linux/property.h>
-    34	#include <linux/rtnetlink.h>
-    35	#include <linux/sfp.h>
-    36	#include <linux/skbuff.h>
-    37	#include <linux/slab.h>
-    38	#include <linux/string.h>
-    39	#include <linux/uaccess.h>
-    40	#include <linux/unistd.h>
-    41	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Carlos
 
