@@ -1,155 +1,134 @@
-Return-Path: <netdev+bounces-18499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8A475761A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 372E375761F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:02:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39444281082
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 08:02:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6575280F07
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 08:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A94AD2E;
-	Tue, 18 Jul 2023 08:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7ADC13C;
+	Tue, 18 Jul 2023 08:01:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854B5AD2C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:00:35 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21A161BC8
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:00:09 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qLfao-0005y5-CC; Tue, 18 Jul 2023 09:57:58 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 51F291F3ED5;
-	Tue, 18 Jul 2023 07:57:50 +0000 (UTC)
-Date: Tue, 18 Jul 2023 09:57:49 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Markus Schneider-Pargmann <msp@baylibre.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Vivek Yadav <vivek.2311@samsung.com>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH v2 5/6] can: tcan4x5x: Add support for tcan4552/4553
-Message-ID: <20230718-marigold-violation-8d40e9d264c2-mkl@pengutronix.de>
-References: <20230621093103.3134655-1-msp@baylibre.com>
- <20230621093103.3134655-6-msp@baylibre.com>
- <32557326-650c-192d-9a82-ca5451b01f70@linaro.org>
- <20230621123158.fd3pd6i7aefawobf@blmsp>
- <21f12495-ffa9-a0bf-190a-11b6ae30ca45@linaro.org>
- <20230622122339.6tkajdcenj5r3vdm@blmsp>
- <e2cc150b-49e3-7f2f-ce7f-a5982d129346@linaro.org>
- <20230627142300.heju4qccian5hsjk@blmsp>
- <e5bd4f01-0b00-4d70-c642-4fdfc0a139fc@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29248F41
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:01:17 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E1C268E
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:00:50 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9924ac01f98so747910166b.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 01:00:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689667186; x=1692259186;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FxG/dgx1lJpw0Lc0GgA2hZzfp5EFCNWKYdqUEuovTVQ=;
+        b=uwq1Bj9uJBZn+EMfsjTHtGo4gtCkN+HhVTk9FiB/tXndUT+0b/ZXAUsZNPjCdWHQMo
+         CW+I3s7pNSJF0kQnvcKnRX0Eh7pTnJLZm6ZIHcDR8IZbUlNBJ5/GIoZIgtSUU7uSWm95
+         7lpkEHTdVhBB+pLCtZfjKsGfUj8Hz474ZXpAkjZtArI6PxPqf+I4Pa8Fi3vHCJNTZLGi
+         k1Yb+bPPnxN+GrfNuM+dMxHo+fiup7W+uOKOpZA/1IvqhSbwZ97CYXN7Vsg5ZLnQ7L2t
+         LhIIDc3bgHhSF7w2ztNB/nLOc7aX9aRei0/J/AJqzaX3n9sWiWyiSgRKu4nk2EQc2z6K
+         5B5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689667186; x=1692259186;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FxG/dgx1lJpw0Lc0GgA2hZzfp5EFCNWKYdqUEuovTVQ=;
+        b=SE/8sPRQUa3i8Tl5Tk9bz/0KdEws6oN8y/tfvWdh0YiEOcbXsvTcBVMKPCLNGMijFc
+         cF4aTQ7M1MzdIq5AwZby9wZCdVRQQ5v42STudEGlB0ATdM4GSzBXC0yduHfxBr4Y8mDT
+         eP3gUnzsgDT+Iaxpc0gn4DXWHSZGs0fHV/LLMgXJ5b9WlETlcNzMPV8SfrpYCrZEmPM1
+         S+0EO+vzy/9B2ijcIdgYTy7s6ysyhhQj+p12NwyTrILCjgHTw/ADQ2wocqm/PpjNYcfA
+         gpgKiR7O8xdqp3PogBKXAO/gDyz+gtmBdYIrfoh5g0tAyLnTXoAmsFgk0V6SolL3dU9f
+         0ruQ==
+X-Gm-Message-State: ABy/qLb2oVhRzeMDT4MvJhIYrgFBKZbJD9HAfQfxEHN4DDFhEQrcvy1f
+	SQL1Id5FuVxwZBtYal/HFO9DJQ==
+X-Google-Smtp-Source: APBJJlGvyotpbpSMeNWfrlnOSBa8BIfuSDUuHdp+6qgXvn3jbTe33GGd40wYCJJDEOYua3tnBBqsvw==
+X-Received: by 2002:a17:907:310f:b0:991:e5a5:cd4b with SMTP id wl15-20020a170907310f00b00991e5a5cd4bmr11135118ejb.56.1689667186645;
+        Tue, 18 Jul 2023 00:59:46 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id e21-20020a170906045500b0098cf565d98asm682840eja.22.2023.07.18.00.59.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jul 2023 00:59:46 -0700 (PDT)
+Message-ID: <4287a5b2-698d-4c2d-46a1-4cdeb2ac28e6@linaro.org>
+Date: Tue, 18 Jul 2023 09:59:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="74iwm2jmiacg2jdx"
-Content-Disposition: inline
-In-Reply-To: <e5bd4f01-0b00-4d70-c642-4fdfc0a139fc@linaro.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: snps,dwmac: add phy-supply
+ support
+Content-Language: en-US
+To: Marco Felsch <m.felsch@pengutronix.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@pengutronix.de
+References: <20230717164307.2868264-1-m.felsch@pengutronix.de>
+ <a34ef1ed-e204-77ba-a4b1-1a4bbabdac7a@linaro.org>
+ <20230717165724.juh77dr4nmoxoehq@pengutronix.de>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230717165724.juh77dr4nmoxoehq@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 17/07/2023 18:57, Marco Felsch wrote:
+> On 23-07-17, Krzysztof Kozlowski wrote:
+>> On 17/07/2023 18:43, Marco Felsch wrote:
+>>> Document the common phy-supply property to be able to specify a phy
+>>> regulator.
+>>>
+>>> Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
+>>> ---
+>>>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> index 363b3e3ea3a60..f66d1839cf561 100644
+>>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> @@ -159,6 +159,9 @@ properties:
+>>>        can be passive (no SW requirement), and requires that the MAC operate
+>>>        in a different mode than the PHY in order to function.
+>>>  
+>>> +  phy-supply:
+>>> +    description: PHY regulator
+>>> +
+>>
+>> Isn't this property of the PHY? Why would the Ethernet controller play
+>> with a supply of a phy?
+> 
+> Because this is the current state. Please check the all other MACs
+> handling the phy-supply (if supported). Some of them handling it under
+> the mdio-node (not the phy-node) but most bindings do specify this on
+> MAC level (e.g. FEC, DWMAC (suni, rk)).
+> 
+> I agree that the phy sould handle this but this would be a lot more
+> effort and since the dwmac-sun8i/rk bindings do support this on MAC
+> level I would keep it that way.
 
---74iwm2jmiacg2jdx
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Indeed phy bindings do not allow a supply.
 
-On 01.07.2023 10:34:00, Krzysztof Kozlowski wrote:
-> On 27/06/2023 16:23, Markus Schneider-Pargmann wrote:
->=20
-> >>> The version information is always readable for that chip, regardless =
-of
-> >>> state and wake GPIOs as far as I know. So yes it is possible to setup
-> >>> the GPIOs based on the content of the ID register.
-> >>>
-> >>> I personally would prefer separate compatibles. The binding
-> >>> documentation needs to address that wake and state GPIOs are not
-> >>> available for tcan4552/4553. I think having compatibles that are for
-> >>> these chips would make sense then. However this is my opinion, you are
-> >>> the maintainer.
-> >>
-> >> We do not talk about compatibles in the bindings here. This is
-> >> discussion about your driver. The entire logic of validating DTB is
-> >> flawed and not needed. Detect the variant and act based on this.
-> >=20
-> > I thought it was about the bindings, sorry.
-> >=20
-> > So to summarize the compatibles ti,tcan4552 and ti,tcan4553 are fine.
-> > But the driver should use the ID register for detection and not compare
-> > the detected variant with the given compatible?
-> >=20
-> > In my opinion it is useful to have an error messages that says there is
-> > something wrong with the devicetree as this can be very helpful for the
-> > developers who bringup new devices. This helps to quickly find issues
-> > with the devicetree.
->=20
-> That's not a current policy for other drivers, so this shouldn't be
-> really special. Kernel is poor in validating DTS. It's not its job. It's
-> the job of the DT schema.
+Best regards,
+Krzysztof
 
-Fine with me.
-
-I decided to have a check of the auto-detected chip variant against the
-specified one in the mcp251xfd driver, as it widely used with raspi
-boards, where commonly DT overlays are used. It also helps remote
-diagnostics of people, who don't focus on kernel development.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---74iwm2jmiacg2jdx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS2RfoACgkQvlAcSiqK
-BOj47Af7B3Hdzd2/p1G8Qprj/lvOLWeZU5GsBj4CDxEtl62ZGZUusqFDMpPC0lTS
-TrrEcTZBT9Uozu1YdUTXzLWds6qD8vR9XoK5bq1PpXuF/0pcxFeOVodE14FhPYYu
-plLFed2tRYmQkcksXLgNQh8UPhVC44O7BOHlvHgTl+9ew27r1MKG2Aeb3BsPDDXq
-o0mck7GdJ7mTejPZDktkBhhyLbzYMSyn5PgdZMPgMR/5SGcCX38JiXUxWrSjD2jt
-7Tg7NiYyj3dyzaqzWFRUJgyJkifirMS+8rNRPUq8vZFvQGq80TdENuzsKibCS0xu
-+PQFb7a+suiwV9hwL9FvrfsOlY4Gsw==
-=HGF4
------END PGP SIGNATURE-----
-
---74iwm2jmiacg2jdx--
 
