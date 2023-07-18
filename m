@@ -1,292 +1,140 @@
-Return-Path: <netdev+bounces-18671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB848758403
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB9E758439
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:08:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 041B41C20DC6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:01:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C8AA1C20DE2
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CE815AF1;
-	Tue, 18 Jul 2023 18:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C471640A;
+	Tue, 18 Jul 2023 18:08:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B0915AED
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:00:56 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04A581722;
-	Tue, 18 Jul 2023 11:00:55 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 5902621C4506; Tue, 18 Jul 2023 11:00:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5902621C4506
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1689703254;
-	bh=2EtqkbDML7oSfMbtE2vBfMQ9qbiYn/gMi6DTcnH66S0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UU0wJTw3xTZzKiLiCButWWRHugpqky6Kf/2OKf1FlXlFsud8OWv5zLQQiQQQJswGD
-	 fs2+v7peejuwH9kzecdyv1hfXFVUtf5S4qco0xdVL5Ls3sQYqDZG1xlqNBjC6cb6ZQ
-	 JUvd1TBxur75PEUPwXmqZwI20w6rENkp9rCNqwUI=
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	sharmaajay@microsoft.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: schakrabarti@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH V4 net-next] net: mana: Configure hwc timeout from hardware
-Date: Tue, 18 Jul 2023 11:00:32 -0700
-Message-Id: <1689703232-24858-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D1416403
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:08:22 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482BA1733;
+	Tue, 18 Jul 2023 11:08:19 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 749C912003B;
+	Tue, 18 Jul 2023 21:08:16 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 749C912003B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1689703696;
+	bh=AP2RkCg8oLWIuJk69zdwx+Vd67QvE+Lk+BhlnuORtp4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=b/BaR9QMsz5py2M7oVj2FgvUZ7eXZ4Xe2mbywYvhVyXMqCvYESPkxVH8pQn2wO16t
+	 TWq4nmq9eq+W8+NXWZjBMuLVLYDM6XDYpK8FWp/NZeOduusFJRX6xPoxwiSEcPhI2W
+	 69nof87XVH5nZzSlpEjPR5AfojN5XOO1FEYtDXXtystphMggxFOldFs0pQLfXsFZKd
+	 EGodKUvs9jtPJS1rN72YqjCKHuobSLQQM0rYLfkwv1VYBLoRtEPFaxHeOqVt4KNNDI
+	 lO9eqm7j4YcrYiMcZSvbaj1Au7ptSvFUEnUxFD5IlegpTEbOoGP/1g2qCEinQ3dFFw
+	 mVGlCdqV2eZDw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 18 Jul 2023 21:08:16 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 18 Jul 2023 21:08:15 +0300
+From: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@sberdevices.ru>,
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [PATCH net-next v2 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
+Date: Tue, 18 Jul 2023 21:02:33 +0300
+Message-ID: <20230718180237.3248179-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178700 [Jul 18 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;sberdevices.ru:7.1.1,5.0.1;lore.kernel.org:7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/18 06:43:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/18 06:43:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/18 13:44:00 #21634370
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-At present hwc timeout value is a fixed value. This patch sets the hwc
-timeout from the hardware. It now uses a new hardware capability
-GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG to query and set the value
-in hwc_timeout.
+Hello,
 
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
----
-V3 -> V4:
-* Changing branch to net-next.
-* Changed the commit message to 75 chars per line.
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 30 ++++++++++++++++++-
- .../net/ethernet/microsoft/mana/hw_channel.c  | 25 +++++++++++++++-
- include/net/mana/gdma.h                       | 20 ++++++++++++-
- include/net/mana/hw_channel.h                 |  5 ++++
- 4 files changed, 77 insertions(+), 3 deletions(-)
+this patchset is first of three parts of another big patchset for
+MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 8f3f78b68592..4537a70e30d4 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -106,6 +106,25 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
- 	return 0;
- }
- 
-+static int mana_gd_query_hwc_timeout(struct pci_dev *pdev, u32 *timeout_val)
-+{
-+	struct gdma_context *gc = pci_get_drvdata(pdev);
-+	struct gdma_query_hwc_timeout_resp resp = {};
-+	struct gdma_query_hwc_timeout_req req = {};
-+	int err;
-+
-+	mana_gd_init_req_hdr(&req.hdr, GDMA_QUERY_HWC_TIMEOUT,
-+			     sizeof(req), sizeof(resp));
-+	req.timeout_ms = *timeout_val;
-+	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
-+	if (err || resp.hdr.status)
-+		return err ? err : -EPROTO;
-+
-+	*timeout_val = resp.timeout_ms;
-+
-+	return 0;
-+}
-+
- static int mana_gd_detect_devices(struct pci_dev *pdev)
- {
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
-@@ -879,8 +898,11 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 	struct gdma_verify_ver_resp resp = {};
- 	struct gdma_verify_ver_req req = {};
-+	struct hw_channel_context *hwc;
- 	int err;
- 
-+	hwc = gc->hwc.driver_data;
-+
- 	mana_gd_init_req_hdr(&req.hdr, GDMA_VERIFY_VF_DRIVER_VERSION,
- 			     sizeof(req), sizeof(resp));
- 
-@@ -907,7 +929,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 			err, resp.hdr.status);
- 		return err ? err : -EPROTO;
- 	}
--
-+	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
-+		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
-+		if (err) {
-+			dev_err(gc->dev, "Failed to set the hwc timeout %d\n", err);
-+			return err;
-+		}
-+	}
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 2bd1d74021f7..db433501e5e6 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -174,7 +174,25 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
- 		complete(&hwc->hwc_init_eqe_comp);
- 		break;
- 
-+	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
-+		type_data.as_uint32 = event->details[0];
-+		type = type_data.type;
-+		val = type_data.value;
-+
-+		switch (type) {
-+		case HWC_DATA_CFG_HWC_TIMEOUT:
-+			hwc->hwc_timeout = val;
-+			break;
-+
-+		default:
-+			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
-+			break;
-+		}
-+
-+		break;
-+
- 	default:
-+		dev_warn(hwc->dev, "Received unknown gdma event %u\n", event->type);
- 		/* Ignore unknown events, which should never happen. */
- 		break;
- 	}
-@@ -704,6 +722,7 @@ int mana_hwc_create_channel(struct gdma_context *gc)
- 	gd->pdid = INVALID_PDID;
- 	gd->doorbell = INVALID_DOORBELL;
- 
-+	hwc->hwc_timeout = HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS;
- 	/* mana_hwc_init_queues() only creates the required data structures,
- 	 * and doesn't touch the HWC device.
- 	 */
-@@ -770,6 +789,8 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
- 	hwc->gdma_dev->doorbell = INVALID_DOORBELL;
- 	hwc->gdma_dev->pdid = INVALID_PDID;
- 
-+	hwc->hwc_timeout = 0;
-+
- 	kfree(hwc);
- 	gc->hwc.driver_data = NULL;
- 	gc->hwc.gdma_context = NULL;
-@@ -818,6 +839,7 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 		dest_vrq = hwc->pf_dest_vrq_id;
- 		dest_vrcq = hwc->pf_dest_vrcq_id;
- 	}
-+	dev_err(hwc->dev, "HWC: timeout %u ms\n", hwc->hwc_timeout);
- 
- 	err = mana_hwc_post_tx_wqe(txq, tx_wr, dest_vrq, dest_vrcq, false);
- 	if (err) {
-@@ -825,7 +847,8 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 		goto out;
- 	}
- 
--	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
-+	if (!wait_for_completion_timeout(&ctx->comp_event,
-+					 (hwc->hwc_timeout / 1000) * HZ)) {
- 		dev_err(hwc->dev, "HWC: Request timed out!\n");
- 		err = -ETIMEDOUT;
- 		goto out;
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 96c120160f15..88b6ef7ce1a6 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -33,6 +33,7 @@ enum gdma_request_type {
- 	GDMA_DESTROY_PD			= 30,
- 	GDMA_CREATE_MR			= 31,
- 	GDMA_DESTROY_MR			= 32,
-+	GDMA_QUERY_HWC_TIMEOUT		= 84, /* 0x54 */
- };
- 
- #define GDMA_RESOURCE_DOORBELL_PAGE	27
-@@ -57,6 +58,8 @@ enum gdma_eqe_type {
- 	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
- 	GDMA_EQE_HWC_INIT_DATA		= 130,
- 	GDMA_EQE_HWC_INIT_DONE		= 131,
-+	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
-+	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
- };
- 
- enum {
-@@ -531,10 +534,12 @@ enum {
-  * so the driver is able to reliably support features like busy_poll.
-  */
- #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
-+#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- 
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
--	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX)
-+	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-@@ -664,6 +669,19 @@ struct gdma_disable_queue_req {
- 	u32 alloc_res_id_on_creation;
- }; /* HW DATA */
- 
-+/* GDMA_QUERY_HWC_TIMEOUT */
-+struct gdma_query_hwc_timeout_req {
-+	struct gdma_req_hdr hdr;
-+	u32 timeout_ms;
-+	u32 reserved;
-+};
-+
-+struct gdma_query_hwc_timeout_resp {
-+	struct gdma_resp_hdr hdr;
-+	u32 timeout_ms;
-+	u32 reserved;
-+};
-+
- enum atb_page_size {
- 	ATB_PAGE_SIZE_4K,
- 	ATB_PAGE_SIZE_8K,
-diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
-index 6a757a6e2732..3d3b5c881bc1 100644
---- a/include/net/mana/hw_channel.h
-+++ b/include/net/mana/hw_channel.h
-@@ -23,6 +23,10 @@
- #define HWC_INIT_DATA_PF_DEST_RQ_ID	10
- #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
- 
-+#define HWC_DATA_CFG_HWC_TIMEOUT 1
-+
-+#define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
-+
- /* Structures labeled with "HW DATA" are exchanged with the hardware. All of
-  * them are naturally aligned and hence don't need __packed.
-  */
-@@ -182,6 +186,7 @@ struct hw_channel_context {
- 
- 	u32 pf_dest_vrq_id;
- 	u32 pf_dest_vrcq_id;
-+	u32 hwc_timeout;
- 
- 	struct hwc_caller_ctx *caller_ctx;
- };
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
+
+1) virtio and vhost updates (for fragged skbs) <--- this patchset
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/.
+3) Updates for tests and utils.
+
+This series enables handling of fragged skbs in virtio and vhost parts.
+Newly logic won't be triggered, because SO_ZEROCOPY options is still
+impossible to enable at this moment (next bunch of patches from big
+set above will enable it).
+
+I've included changelog to some patches anyway, because there were some
+comments during review of last big patchset from the link above.
+
+Head for this patchset is 60cc1f7d0605598b47ee3c0c2b4b6fbd4da50a06
+
+Link to v1:
+https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+
+Changelog:
+ * see per-patch changelog after ---.
+
+Arseniy Krasnov (4):
+  vsock/virtio/vhost: read data from non-linear skb
+  vsock/virtio: support to send non-linear skb
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
+
+ drivers/vhost/vsock.c                   |  14 +-
+ include/linux/virtio_vsock.h            |   1 +
+ net/vmw_vsock/virtio_transport.c        |  40 +++-
+ net/vmw_vsock/virtio_transport_common.c | 300 ++++++++++++++++++------
+ 4 files changed, 278 insertions(+), 77 deletions(-)
+
 -- 
-2.34.1
+2.25.1
 
 
