@@ -1,124 +1,145 @@
-Return-Path: <netdev+bounces-18521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB309757784
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:14:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB8E7577A7
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B5D92814BA
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:14:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94B111C20C9C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BAE7D52D;
-	Tue, 18 Jul 2023 09:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924CCE550;
+	Tue, 18 Jul 2023 09:16:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AA3A941
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:14:10 +0000 (UTC)
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD32E186
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:14:04 -0700 (PDT)
-X-QQ-mid:Yeas43t1689671554t268t38505
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.243.13])
-X-QQ-SSF:00400000000000F0FPF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 4517399098538301220
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: "'Simon Horman'" <simon.horman@corigine.com>,
-	<kabel@kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-References: <20230712062634.21288-1-jiawenwu@trustnetic.com> <ZK/RYFBjI5OypfTB@corigine.com> <ZK/TWbG/SkXtbMkV@shell.armlinux.org.uk> <ZK/V57+pl36NhknG@corigine.com> <ZK/Xtg3df6n+Nj11@shell.armlinux.org.uk> <043401d9b57d$66441e60$32cc5b20$@trustnetic.com> <ZK/i3Ta2mcr7xVot@shell.armlinux.org.uk> <043501d9b580$31798870$946c9950$@trustnetic.com> <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com> <ZLUymspsQlJL1k8n@shell.armlinux.org.uk>
-In-Reply-To: <ZLUymspsQlJL1k8n@shell.armlinux.org.uk>
-Subject: RE: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Date: Tue, 18 Jul 2023 17:12:33 +0800
-Message-ID: <013701d9b957$fc66f740$f534e5c0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86682FBEE
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:16:35 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423DD1989;
+	Tue, 18 Jul 2023 02:16:26 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36I7tBVO006337;
+	Tue, 18 Jul 2023 09:13:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=6UY3mA8JU1z+rMDnfpEi65NaBIbbqhF+wr23GQYgRvE=;
+ b=F37Aa/yDIb56ETzuILLhkrVUHUsMiuBb1Wj0ZS5ReBW0dka2sLZkQ/gxcjE93C3yIxQt
+ tr6qBOcN3KeQ0VhsmbRoyoGM9pEFeKcTibTWn3YCD/uW+66if67w2COLiT333hdaIppS
+ +VMefakEApzx2EY9PiSV1A3iCeLP/lcEJcFgQm/R55cB6+tG5FYYP4spUf8MaCXqLKGs
+ M6Z/DD8r/hQdwj0jeToBXEf2acJTmvyLGwx/czJKXxUFMt8eQRE5NfvIJJ6EU5/dC8/c
+ QzYCQXKM1Chu2GCwGNFJKGD8Hy3PoISsb5o57ICHt1IcuMd+Wna5fPMipOL8mH2uLYn4 hQ== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rwps585mm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Jul 2023 09:13:01 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36I9CxEL021663
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Jul 2023 09:12:59 GMT
+Received: from [10.216.57.55] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Tue, 18 Jul
+ 2023 02:12:51 -0700
+Message-ID: <e32b7dff-8735-e5a2-a782-e5fd6ca79934@quicinc.com>
+Date: Tue, 18 Jul 2023 14:42:44 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 4/6] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
+        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
+        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <netdev@vger.kernel.org>
+CC: <quic_saahtoma@quicinc.com>
+References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
+ <20230711093529.18355-5-quic_devipriy@quicinc.com>
+ <fa2fae05-7ff3-ec6b-45a9-b256b9d5d92c@linaro.org>
+Content-Language: en-US
+From: Devi Priya <quic_devipriy@quicinc.com>
+In-Reply-To: <fa2fae05-7ff3-ec6b-45a9-b256b9d5d92c@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQDv4UssXc2PC2x1JpG280o39ls3NAJ8wJH4Abw1A/QB8Yoz0wHGL87AAtcZi7oCGUwJkAFMOiuVAWOFiqoCmQLVb7EBmwGg
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,T_SPF_HELO_TEMPERROR,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: YMfWCmMZUbJdsLl2ySMjhQPQxQ1VjxRI
+X-Proofpoint-ORIG-GUID: YMfWCmMZUbJdsLl2ySMjhQPQxQ1VjxRI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-17_15,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ mlxlogscore=896 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ priorityscore=1501 adultscore=0 impostorscore=0 phishscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307180083
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Monday, July 17, 2023 8:23 PM, Russell King (Oracle) wrote:
-> On Mon, Jul 17, 2023 at 06:51:38PM +0800, Jiawen Wu wrote:
-> > > > > > There are two places that mv3310_reset() is called, mv3310_config_mdix()
-> > > > > > and mv3310_set_edpd(). One of them is in the probe function, after we
-> > > > > > have powered up the PHY.
-> > > > > >
-> > > > > > I think we need much more information from the reporter before we can
-> > > > > > guess which commit is a problem, if any.
-> > > > > >
-> > > > > > When does the reset time out?
-> > > > > > What is the code path that we see mv3310_reset() timing out?
-> > > > > > Does the problem happen while resuming or probing?
-> > > > > > How soon after clearing the power down bit is mv3310_reset() called?
-> > > > >
-> > > > > I need to test it more times for more information.
-> > > > >
-> > > > > As far as I know, reset timeout appears in mv3310_set_edpd(), after mv3310_power_up()
-> > > > > in mv3310_config_init().
-> > > > >
-> > > > > Now what I'm confused about is, sometimes there was weird values while probing, just
-> > > > > to read out a weird firmware version, that caused the test to fail.
-> > > > >
-> > > > > And for this phy_read_mmd_poll_timeout(), it only succeeds when sleep_before_read = true.
-> > > > > Otherwise, it would never succeed to clear the power down bit. Currently it looks like clearing
-> > > > > the bit takes about 1ms.
-> > > >
-> > > > So, reading the bit before the first delay period results in the bit not
-> > > > clearing, despite having written it to be zero?
-> > >
-> > > Yes. So in the original code, there is no delay to read the register again for
-> > > setting software reset bit. I think the power down bit is not actually cleared
-> > > in my test.
-> >
-> > Hi Russell,
-> >
-> > I confirmed last week that this change is valid to make mv3310_reset() success.
-> > But now reset fails again, only on port 0. Reset timeout still appears in
-> > mv3310_config_init() -> mv3310_set_edpd() -> mv3310_reset(). I deleted this
-> > change to test again, and the result shows that this change is valid for port 1.
-> >
-> > So I'm a little confused. Since I don't have programming guidelines for this PHY,
-> > but only a datasheet. Could you please help to check for any possible problems
-> > with it?
+
+
+On 7/11/2023 3:26 PM, Krzysztof Kozlowski wrote:
+> On 11/07/2023 11:35, Devi Priya wrote:
+>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+>> devices.
+>>
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>> ---
+>>   drivers/clk/qcom/Kconfig         |    6 +
+>>   drivers/clk/qcom/Makefile        |    1 +
+>>   drivers/clk/qcom/nsscc-ipq9574.c | 3080 ++++++++++++++++++++++++++++++
+>>   3 files changed, 3087 insertions(+)
+>>   create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+>>
+>> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
+>> index 263e55d75e3f..5556063d204f 100644
+>> --- a/drivers/clk/qcom/Kconfig
+>> +++ b/drivers/clk/qcom/Kconfig
+>> @@ -195,6 +195,12 @@ config IPQ_GCC_9574
+>>   	  i2c, USB, SD/eMMC, etc. Select this for the root clock
+>>   	  of ipq9574.
+>>   
+>> +config IPQ_NSSCC_9574
+>> +	tristate "IPQ9574 NSS Clock Controller"
 > 
-> I think the question that's missing is... why do other 88x3310 users not
-> see this problem - what is special about your port 0?
+> I think you do not run arm32 there, so missing depends on ARM64 ||
+> COMPILE_TEST
+
+Okay, will update this in V2
+
+Thanks,
+Devi Priya
 > 
-> Maybe there's a clue with the hardware schematics? Do you have access to
-> those?
-
-This problem never happened again after I poweroff and restart the machine.
-However, this patch is still required to successfully probe the PHY.
-
-One thing I've noticed is that there is restriction in mv3310_power_up(), software
-reset not performed when priv->firmware_ver < 0x00030000. And my 88x3310's
-firmware version happens to 0x20200. Will this restriction cause subsequent reset
-timeout(without this patch)?
-
-
+>> +	depends on IPQ_GCC_9574
+>> +	help
+>> +	  Support for NSS clock controller on ipq9574 devices.
+>> +
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
