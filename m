@@ -1,253 +1,117 @@
-Return-Path: <netdev+bounces-18695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B6F7584F4
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:39:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A163D758521
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7538A1C20DF1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:39:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA0E11C20B1C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FE4101E9;
-	Tue, 18 Jul 2023 18:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDA115499;
+	Tue, 18 Jul 2023 18:54:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B201346A1
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:39:50 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAF1F9;
-	Tue, 18 Jul 2023 11:39:48 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id AAAD660173;
-	Tue, 18 Jul 2023 20:39:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689705586; bh=y8LKM/0CokKO2vVzIn2LDXeZ5ru9UAbuIkefHGPIjm4=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=0r83uC3SXNE1V7UD/Y2I2f/LbJkRGPCF9dyh+rMv8N192XY4z7NyuyFhCMnlT9PDI
-	 I23jHs3Q3FN0o6MPsUwh1Xva+cPSDOwoUABiZ508xYz6mzgEMBi8/y23WNm2MUIOSq
-	 nqEo/Ew/FHhHG+0KOt4NxtGIU7a5A0T0dnozud89jsy0a1PE9+MCgUJLkJiLdEsaJo
-	 VFUdwjvdiW6pkPBLEODeEbBT9wkaQQuu/z1N+8HIcr7qCrE7WpjfuVXxqInQ7hqA7J
-	 NsD3lHXKRzOciTNlEC48afYYO4qYM3AkvIdR+h3z/LUn7T0WjyOtprwSHtAu/xDhi/
-	 aUpe7vlVBe4Xg==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zhmTaWmv8Cp7; Tue, 18 Jul 2023 20:39:44 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 1E93F60171;
-	Tue, 18 Jul 2023 20:39:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689705583; bh=y8LKM/0CokKO2vVzIn2LDXeZ5ru9UAbuIkefHGPIjm4=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=diwIpzLCpPKaQey0gkERET0dKbleabhoImIHjU+FNwr5NnbDA/ezscEjrg6TseVlQ
-	 HuNvVTp0Da5fEALfq/AQZxdglu6VAfJrOTNEfAeBASiVKJnTWL2Pp9I+QaiJ+xc37+
-	 mf4NkuJDJFplHqnmEtJMdTXJhKaaSfNjKNibu+M+DlWg0A2d3CSR3dToa7OpKJgq+E
-	 hKEL77KvqkiNggtxDpPY5Lh/pgT3K1IfCB/wgXN7un49XexgmH9Cccp5l1qTZNxyEm
-	 OjTVkvaRlSj0Cjblo6PFnLUsyNSjE1UeF3bcjjRdDndyAw5e2GNm9ugSmTfNXMsT7O
-	 RHP5DtUcUFEUw==
-Message-ID: <1c2a2d56-95a0-72f8-23a0-1e186e6443a2@alu.unizg.hr>
-Date: Tue, 18 Jul 2023 20:39:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC35F46A1
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:54:21 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A899D132
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 11:54:07 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-52165886aa3so6884594a12.3
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 11:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689706446; x=1692298446;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u//A+GlhAlttSgwEt3gkumyAtdqzMVpBDzjR8GDGYAA=;
+        b=E1wLf8L6/nbq8aJQ//pWBjId0ztDeKMPvJHWR0fIfH1VudG2o0yfado1tfuN5ez38G
+         La8OCLd2zvzmH5Kny3W0JmyjVw81V1WTjRaKe2iGpBYjNH0kd6ui2JJESG1OeC4dUkAz
+         jtmdMFHeG33b8CxIKyfHcaObV0ECbnmaKi/VfZuj3g3+/vIKodcHsdF4iGvRlxEW0Oes
+         Yn0F1/kcO8+hTpM8wvi9FgmnWmz1mbjtmNhfboEAewnbn0jQsw0zQgIiHf2hpirB+DWW
+         W0JU0YpMbkeYpMBmxYDSTZean9Sl00XVSq5+Tuz3/L5aVS89MgzR35LCEY/ko0zEy2hL
+         BxSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689706446; x=1692298446;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u//A+GlhAlttSgwEt3gkumyAtdqzMVpBDzjR8GDGYAA=;
+        b=hIT6xcf/uDMk2HrtT6oP4VHaqcEFm47Bf2cO2bJzVGhVWBhexaKBv7T6LQYs0iJSyz
+         fYov4jiv+E2FQfffAgMJY8y91iKPsqBERr8pgxcJesY4eR0FcHeUhBt+HvWQgpT8NLwa
+         qofWXLdYRMKSkkj23pAps/IVN5+Ufh7fKzVT9UgCZcMztuOXyntgKmUaYgpYwsU7O8RZ
+         EpDS3VMEk2JkDp6EsUfFDlSt20FJc6pFVFwSC88T5bIZld62dPpWAevS6goaV2vn5ys5
+         hk9lCpMCZe/anL2iwHfrDPrUhDQzKpPiEgisuryWhVjwceoPElNCup6JHM/H9CaXGc8i
+         ds9Q==
+X-Gm-Message-State: ABy/qLYA1u05gN2x8sDh+JhGgySYcz5n5c6eaQHsPJb7AKot6L7uJM/k
+	fm7HetbT2zTc8TAdOZ9m+k2/Kw==
+X-Google-Smtp-Source: APBJJlGXFOM+q8PW+p7H7DQdXaQwtsgl2vlU/eN/+0hkask5hluI60Ev0R+CAPak/xBgH7zgN5YpYA==
+X-Received: by 2002:aa7:d991:0:b0:51d:e7b5:547d with SMTP id u17-20020aa7d991000000b0051de7b5547dmr655552eds.34.1689706446085;
+        Tue, 18 Jul 2023 11:54:06 -0700 (PDT)
+Received: from krzk-bin.. ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id z11-20020aa7cf8b000000b0051df13f1d8fsm1608611edx.71.2023.07.18.11.54.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 11:54:05 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Rob Herring <robh+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Paul Cercueil <paul@crapouillou.net>,
+	Marek Vasut <marex@denx.de>,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH 0/3] dt-bindings: net: davicom,dm9000: convert to DT schema
+Date: Tue, 18 Jul 2023 20:53:54 +0200
+Message-Id: <168970643389.118933.12401444775795846915.b4-ty@linaro.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
+References: <20230713152848.82752-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PROBLEM] selftests: net/forwarding/*.sh: 'Command line is not
- complete. Try option "help"'
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, petrm@nvidia.com
-References: <856d454e-f83c-20cf-e166-6dc06cbc1543@alu.unizg.hr>
- <ZLY9yiaVwCGy5H3R@shredder>
- <8d149f8c-818e-d141-a0ce-a6bae606bc22@alu.unizg.hr>
-Content-Language: en-US
-In-Reply-To: <8d149f8c-818e-d141-a0ce-a6bae606bc22@alu.unizg.hr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/18/23 20:19, Mirsad Todorovac wrote:
-> On 7/18/23 09:22, Ido Schimmel wrote:
->> On Mon, Jul 17, 2023 at 10:51:04PM +0200, Mirsad Todorovac wrote:
->>> Tests fail with error message:
->>>
->>> Command line is not complete. Try option "help"
->>> Failed to create netif
->>>
->>> The script
->>>
->>> # tools/testing/seltests/net/forwarding/bridge_igmp.sh
->>>
->>> bash `set -x` ends with an error:
->>>
->>> ++ create_netif_veth
->>> ++ local i
->>> ++ (( i = 1 ))
->>> ++ (( i <= NUM_NETIFS ))
->>> ++ local j=2
->>> ++ ip link show dev
->>> ++ [[ 255 -ne 0 ]]
->>> ++ ip link add type veth peer name
->>> Command line is not complete. Try option "help"
->>> ++ [[ 255 -ne 0 ]]
->>> ++ echo 'Failed to create netif'
->>> Failed to create netif
->>> ++ exit 1
->>>
->>> The problem seems to be linked with this piece of code of "lib.sh":
->>>
->>> create_netif_veth()
->>> {
->>>          local i
->>>
->>>          for ((i = 1; i <= NUM_NETIFS; ++i)); do
->>>                  local j=$((i+1))
->>>
->>>                  ip link show dev ${NETIFS[p$i]} &> /dev/null
->>>                  if [[ $? -ne 0 ]]; then
->>>                          ip link add ${NETIFS[p$i]} type veth \
->>>                                  peer name ${NETIFS[p$j]}
->>>                          if [[ $? -ne 0 ]]; then
->>>                                  echo "Failed to create netif"
->>>                                  exit 1
->>>                          fi
->>>                  fi
->>>                  i=$j
->>>          done
->>> }
->>>
->>> Somehow, ${NETIFS[p$i]} is evaluated to an empty string?
->>
->> You need to provide a configuration file in
->> tools/testing/selftests/net/forwarding/forwarding.config. See
->> tools/testing/selftests/net/forwarding/forwarding.config.sample for
->> example.
->>
->> Another option is to provide the interfaces on the command line.
->>
->> ./bridge_igmp.sh veth0 veth1 veth2 veth3
->>
->> If no configuration file is present, we can try to assume that the
->> tests are meant to be run with veth pairs and not with physical
->> loopbacks. Something like:
->>
->> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
->> index 71f7c0c49677..5b0183013017 100755
->> --- a/tools/testing/selftests/net/forwarding/lib.sh
->> +++ b/tools/testing/selftests/net/forwarding/lib.sh
->> @@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
->>   WAIT_TIME=${WAIT_TIME:=5}
->>   PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
->>   PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
->> -NETIF_TYPE=${NETIF_TYPE:=veth}
->> -NETIF_CREATE=${NETIF_CREATE:=yes}
->>   MCD=${MCD:=smcrouted}
->>   MC_CLI=${MC_CLI:=smcroutectl}
->>   PING_COUNT=${PING_COUNT:=10}
->> @@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
->>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
->>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
->>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
->> +NETIF_TYPE=${NETIF_TYPE:=veth}
->> +NETIF_CREATE=${NETIF_CREATE:=yes}
->> +declare -A NETIFS=(
->> +       [p1]=veth0
->> +       [p2]=veth1
->> +       [p3]=veth2
->> +       [p4]=veth3
->> +       [p5]=veth4
->> +       [p6]=veth5
->> +       [p7]=veth6
->> +       [p8]=veth7
->> +       [p9]=veth8
->> +       [p10]=veth9
->> +)
->>   relative_path="${BASH_SOURCE%/*}"
->>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
-> 
-> This patch appears to work for the first testing script
-> 
-> root@defiant:# ./bridge_igmp.sh
-> TEST: IGMPv2 report 239.10.10.10                                    [ OK ]
-> TEST: IGMPv2 leave 239.10.10.10                                     [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 is_include                         [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 include -> allow                   [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 include -> is_include              [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 include -> is_exclude              [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 include -> to_exclude              [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 exclude -> allow                   [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 exclude -> is_include              [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 exclude -> is_exclude              [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 exclude -> to_exclude              [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 include -> block                   [ OK ]
-> TEST: IGMPv3 report 239.10.10.10 exclude -> block                   [ OK ]
-> TEST: IGMPv3 group 239.10.10.10 exclude timeout                     [ OK ]
-> TEST: IGMPv3 S,G port entry automatic add to a *,G port             [ OK ]
-> root@defiant:#
-> 
-> However, I suggest setting tools/testing/selftest/net/forwarding/settings:timeout=150 at least,
-> because default 45 is premature on my box and it leaves the networking system in an undefined
-> state upon exit.
 
-There is also a gotcha here: you do not delete all veths:
+On Thu, 13 Jul 2023 17:28:45 +0200, Krzysztof Kozlowski wrote:
+> Memory controller bindings have to be updated before we can convert
+> davicom,dm9000 to DT schema.
+> 
+> Please take it via net-next.
+> 
+> Best regards,
+> Krzysztof
+> 
+> [...]
 
-root@defiant:# ip link show
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
-root@defiant:# ./bridge_igmp.sh
-TEST: IGMPv2 report 239.10.10.10                                    [ OK ]
-TEST: IGMPv2 leave 239.10.10.10                                     [ OK ]
-TEST: IGMPv3 report 239.10.10.10 is_include                         [ OK ]
-TEST: IGMPv3 report 239.10.10.10 include -> allow                   [ OK ]
-TEST: IGMPv3 report 239.10.10.10 include -> is_include              [ OK ]
-TEST: IGMPv3 report 239.10.10.10 include -> is_exclude              [ OK ]
-TEST: IGMPv3 report 239.10.10.10 include -> to_exclude              [ OK ]
-TEST: IGMPv3 report 239.10.10.10 exclude -> allow                   [ OK ]
-TEST: IGMPv3 report 239.10.10.10 exclude -> is_include              [ OK ]
-TEST: IGMPv3 report 239.10.10.10 exclude -> is_exclude              [ OK ]
-TEST: IGMPv3 report 239.10.10.10 exclude -> to_exclude              [ OK ]
-TEST: IGMPv3 report 239.10.10.10 include -> block                   [ OK ]
-TEST: IGMPv3 report 239.10.10.10 exclude -> block                   [ OK ]
-TEST: IGMPv3 group 239.10.10.10 exclude timeout                     [ OK ]
-TEST: IGMPv3 S,G port entry automatic add to a *,G port             [ OK ]
-root@defiant:# ip link show
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
-3: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
-     link/ether b6:46:e6:4c:e4:00 brd ff:ff:ff:ff:ff:ff
-4: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
-     link/ether 2e:ff:7f:8a:6b:d4 brd ff:ff:ff:ff:ff:ff
-5: veth3@veth2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
-     link/ether ba:33:37:81:dc:5b brd ff:ff:ff:ff:ff:ff
-6: veth2@veth3: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
-     link/ether f2:fd:0a:9b:94:17 brd ff:ff:ff:ff:ff:ff
-root@defiant:#
+Applied, thanks!
 
-Also, I ran into problems with some other tests, but for documentation sake
-I will address the issue in a separate thread.
+[1/3] dt-bindings: memory-controllers: ingenic,nemc: reference peripheral properties
+      https://git.kernel.org/krzk/linux-mem-ctrl/c/00e20f9ecde2c3131553de44ab832b486e8720a8
+[2/3] dt-bindings: memory-controllers: reference TI GPMC peripheral properties
+      https://git.kernel.org/krzk/linux-mem-ctrl/c/d9711707dc781ea6a397c5aa986ba3c05d1b875f
+[3/3] dt-bindings: net: davicom,dm9000: convert to DT schema
+      https://git.kernel.org/krzk/linux-mem-ctrl/c/b71da9105a81066f3a911beeb307751f904e00ce
 
 Best regards,
-Mirsad Todorovac
-
+-- 
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
