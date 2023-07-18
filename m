@@ -1,94 +1,146 @@
-Return-Path: <netdev+bounces-18765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38327758915
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 01:35:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA21C75891A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 01:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6959E1C20EDC
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:35:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BCED2817D0
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E0417AD5;
-	Tue, 18 Jul 2023 23:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C37917AD9;
+	Tue, 18 Jul 2023 23:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF7117AC6
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:35:09 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E69DED;
-	Tue, 18 Jul 2023 16:35:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=t4CzHGovSABTgIh64kLj32qzRe4v0lqRdgdSkdo+55A=; b=HSH6uQNRtCcC+SiW5zh6IRJLeo
-	5gyXUeST70K3ErK+LEZcy8hyd6ExUvl4oytnMW7RBT7uVoqZz6dac4b526g5g8WggDFmfQji6xQUK
-	W7IDcIPXqOlBzg/M3Hbn6/i3QkspCxeZMs4wiOg+JLxLTXbn31DiNxu2zQ63j9ZuLY3o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qLuDT-001fln-6f; Wed, 19 Jul 2023 01:34:51 +0200
-Date: Wed, 19 Jul 2023 01:34:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Walle <mwalle@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next v3 06/11] net: phy: add error checks in
- mmd_phy_indirect()
-Message-ID: <9820dc4b-5fb2-4432-9156-a6ac7e52557a@lunn.ch>
-References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
- <20230620-feature-c45-over-c22-v3-6-9eb37edf7be0@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641BA17AAD;
+	Tue, 18 Jul 2023 23:40:27 +0000 (UTC)
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4E7EC;
+	Tue, 18 Jul 2023 16:40:25 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6b9b427b4fcso4399252a34.3;
+        Tue, 18 Jul 2023 16:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689723625; x=1692315625;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=skEsIwBhAgXoALBlSSMqAp81nCwKF7Rh+zIuXQcHpVA=;
+        b=g9q1jFGnkyM8hyKVbh+8h7bHVZA2EQ7Ybkv3KrVuaue1fbWoGJjr8I2cE+OcOis9SM
+         hJVC9q6sPb9TsTpNLFkRnDByi9CcEcYcSycV03PXeE9c8WDmx6wXgOvB52DU8jYkm6Tz
+         GbxYQyS1hQlPhcNtqpYd5nbfgEBaCI9AxiN51Npw5A+FaUs5sv7Abdo0XivxCBSx5zos
+         OCg37BsTkXUgIG8yMUwRP5oxqZsuMN+nAwbpHR3RoHCO+nr415IV0gav9rydoPFzrBG3
+         cnSvB6yTVhXYBgliAQC4EpT6A1rmjjE2FTcUNwZNMk+SqklAVUxPf32ZtkUUCxH5rpF5
+         zc2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689723625; x=1692315625;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=skEsIwBhAgXoALBlSSMqAp81nCwKF7Rh+zIuXQcHpVA=;
+        b=YvrkBwqTXFqtdHtKfVnFzd7RMw2uBp8D9NN8A5n+EhCuNZpt5r0xuGPwI3nNOejAoU
+         vIuB8e2X4fPdUvrJy6l1TRipwNEal9OhZIHn7n7h5IwKu6YWH/1uZDICINN6teaXwgGQ
+         kCr30mTJZM/2z27O/zMbomt2fcqIFv02hDP0K8tYfh4/0NsHlXmGeDascnjMF+2ZIZ5t
+         HSKHeuKceQghNu9VzLCgZyW4jEDbsdGbs+aCV+qOmLdkSwiYKNia667ePFbGJBCqCbps
+         VIlxWuhALstSkaGJIZRl/CUUe2MQrwI+tEksA+az72Vepzn29woiH8BjER7NzTin+zWj
+         NYIw==
+X-Gm-Message-State: ABy/qLaReeutaRjeTLd0+NeqwDr8JBCqqxQHi9XGnTs1Nl3Pxb0ZZRk/
+	nWEu6h4+R9a61i6dIU0yM/zLmYdDn/4=
+X-Google-Smtp-Source: APBJJlFGpwFw+uZ+vMiib+sCW5y0EsncXSHxk4U7XExM37pJOP884RhmZhFLJs1KeRB3BOhvwzPsNQ==
+X-Received: by 2002:a05:6358:2904:b0:134:f28f:aa47 with SMTP id y4-20020a056358290400b00134f28faa47mr5198928rwb.23.1689723625038;
+        Tue, 18 Jul 2023 16:40:25 -0700 (PDT)
+Received: from localhost.localdomain ([2620:10d:c090:400::5:3b4d])
+        by smtp.gmail.com with ESMTPSA id l20-20020a639854000000b00553ad4ae5e5sm25285pgo.22.2023.07.18.16.40.23
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 18 Jul 2023 16:40:24 -0700 (PDT)
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH bpf-next] bpf, net: Introduce skb_pointer_if_linear().
+Date: Tue, 18 Jul 2023 16:40:21 -0700
+Message-Id: <20230718234021.43640-1-alexei.starovoitov@gmail.com>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230620-feature-c45-over-c22-v3-6-9eb37edf7be0@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 12, 2023 at 05:07:06PM +0200, Michael Walle wrote:
-> Add missing error checks in mmd_phy_indirect(). The error checks need to
-> be disabled to retain the current behavior in phy_read_mmd() and
-> phy_write_mmd(). Therefore, add a new parameter to enable the error
-> checks.
-> 
-> This is a preparation patch to introduce a new C45-over-C22 access
-> method which will make use of the new error checking.
-> 
-> Regarding the legacy handling, Russell states:
-> 
-> | The reason for that goes back to commit a59a4d192166 ("phy: add the
-> | EEE support and the way to access to the MMD registers.")
-> |
-> | and to maintain compatibility with that; if we start checking for
-> | errors now, we might trigger a kernel regression sadly.
-> 
-> Signed-off-by: Michael Walle <mwalle@kernel.org>
+From: Alexei Starovoitov <ast@kernel.org>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Network drivers always call skb_header_pointer() with non-null buffer.
+Remove !buffer check to prevent accidental misuse of skb_header_pointer().
+Introduce skb_pointer_if_linear() instead.
 
-    Andrew
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+---
+ include/linux/skbuff.h | 10 +++++++++-
+ kernel/bpf/helpers.c   |  5 ++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 91ed66952580..f276d0e9816f 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -4023,7 +4023,7 @@ __skb_header_pointer(const struct sk_buff *skb, int offset, int len,
+ 	if (likely(hlen - offset >= len))
+ 		return (void *)data + offset;
+ 
+-	if (!skb || !buffer || unlikely(skb_copy_bits(skb, offset, buffer, len) < 0))
++	if (!skb || unlikely(skb_copy_bits(skb, offset, buffer, len) < 0))
+ 		return NULL;
+ 
+ 	return buffer;
+@@ -4036,6 +4036,14 @@ skb_header_pointer(const struct sk_buff *skb, int offset, int len, void *buffer)
+ 				    skb_headlen(skb), buffer);
+ }
+ 
++static inline void * __must_check
++skb_pointer_if_linear(const struct sk_buff *skb, int offset, int len)
++{
++	if (likely(skb_headlen(skb) - offset >= len))
++		return skb->data + offset;
++	return NULL;
++}
++
+ /**
+  *	skb_needs_linearize - check if we need to linearize a given skb
+  *			      depending on the given device features.
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index 9e80efa59a5d..b8ab3bea71b7 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -2239,7 +2239,10 @@ __bpf_kfunc void *bpf_dynptr_slice(const struct bpf_dynptr_kern *ptr, u32 offset
+ 	case BPF_DYNPTR_TYPE_RINGBUF:
+ 		return ptr->data + ptr->offset + offset;
+ 	case BPF_DYNPTR_TYPE_SKB:
+-		return skb_header_pointer(ptr->data, ptr->offset + offset, len, buffer__opt);
++		if (buffer__opt)
++			return skb_header_pointer(ptr->data, ptr->offset + offset, len, buffer__opt);
++		else
++			return skb_pointer_if_linear(ptr->data, ptr->offset + offset, len);
+ 	case BPF_DYNPTR_TYPE_XDP:
+ 	{
+ 		void *xdp_ptr = bpf_xdp_pointer(ptr->data, ptr->offset + offset, len);
+-- 
+2.34.1
+
 
