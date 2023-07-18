@@ -1,82 +1,235 @@
-Return-Path: <netdev+bounces-18689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D9C7584C8
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:29:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ED557584D2
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11B01C20DB2
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:29:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5C992815CA
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FC4168B9;
-	Tue, 18 Jul 2023 18:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A815168BB;
+	Tue, 18 Jul 2023 18:30:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4580415AE6
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:29:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0789CC433C7;
-	Tue, 18 Jul 2023 18:29:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689704981;
-	bh=mZVev6Chb/FEkhGNNxmMJ4Z4XBKzCjBKm3JCVUTRO9w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W+I2qLxnV2nwCe87SLiOEw1Jweg0OeZD2j/yRxQDVNt+14Rkac1VIizQXx4i7k1N5
-	 JJdwT1mpdkgkgjv+Ir/3tfmttDP0b6kit9SFW571v7DByXjGPkrXy8Ykc2SVE+anJm
-	 3dswwmPZu1wb0OaUflN6gL8hAq2rntRM7gbj42WAHOUFfXQsunJ2AUzJr3XQJjpGZt
-	 DTC4uKP7RBUU6jrpn+QuQlkeRHQZ5oSsJ9PyggwH7aPORRAfp1blBskG12UY7BpibD
-	 RfIKKGf+dvfNZ5/X+eVvGF46ewYCWaMr/DK1htsGhNS0jcZe6MOxxl9FBOBiKVdvqK
-	 Kwj+Z7IDVEvXw==
-Date: Tue, 18 Jul 2023 11:29:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Mina Almasry <almasrymina@google.com>,
- Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, Sumit Semwal
- <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [RFC PATCH 00/10] Device Memory TCP
-Message-ID: <20230718112940.2c126677@kernel.org>
-In-Reply-To: <35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
-References: <20230710223304.1174642-1-almasrymina@google.com>
-	<12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
-	<CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
-	<ZLbUpdNYvyvkD27P@ziepe.ca>
-	<20230718111508.6f0b9a83@kernel.org>
-	<35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ABE168B9
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:30:00 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C46F0;
+	Tue, 18 Jul 2023 11:29:55 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 9F9C160173;
+	Tue, 18 Jul 2023 20:29:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689704993; bh=bKf3k2/RTiFBgasJXYefOyYbEo1QftCSqaKXXL+HykU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HnP58nuvgHbSJYtjH+wJmMVL5ucmPUPkSiyHqPZOUTrxItxvMDZSln2uAJJerJTsQ
+	 q0I79EMPDqQAO96a/SsS6Kwb1DZwZdcuWguomrgmpFSoIE8MVgLsQbfq8UaIRRdp6O
+	 CUCk1gcNdzdWNwVTT2b8MnhtAVWa8cWr1EWOzQRvV4rq7CJn8J5ojWqowoesp5viCU
+	 ba8BCDCjuBRK5sWjP0GSkwpRQ0xcPsPbI5HCIt+OcKGdv+xQK4URMGXStaKznGU8PJ
+	 2hcggu0qEeLJ//UYCn4BLF6kM9KFj+Ew3LZq+Bd53lmS/UZXpubyjOnORPeDFEb52b
+	 MWRJbE8PC3QDw==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id kqPzTlKKJVYQ; Tue, 18 Jul 2023 20:29:51 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 0BA4760171;
+	Tue, 18 Jul 2023 20:29:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689704991; bh=bKf3k2/RTiFBgasJXYefOyYbEo1QftCSqaKXXL+HykU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RvPlWcAxnK/fXWgADhdPhGvCYfrP8fURIqy5NIH9FCa6eCH0m1I7tU/G8q5Eyh4uo
+	 uL2rmDetScW8ebzXgrUMRGUqIUXNtrEoj+XHxMsYnBVgzNsousKLbxqP9qdglk1G/k
+	 cKz6QRWPcpWH5EIxhf96AitR9Z3gz6Ils8YBFE5UFAOUglnImKfSwjTFcmy95z7SpE
+	 RSSjSv2FbV/U3pNVMELC4yKX0Z7ErLouaokxDerJ3x4Av4439NvAWuy8aAYwGs0y6A
+	 zFHY3hGlA8yQX7K093W+VeSB7A75tFzcmsm/1S3+mmliqZZY8yvzbeX+f6kdPnkw27
+	 4igSi1sHQj7dA==
+Message-ID: <65bf9c7a-361a-7848-6667-a599187ddce7@alu.unizg.hr>
+Date: Tue, 18 Jul 2023 20:29:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PROBLEM] selftests: net/forwarding/*.sh: 'Command line is not
+ complete. Try option "help"'
+Content-Language: en-US
+To: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <856d454e-f83c-20cf-e166-6dc06cbc1543@alu.unizg.hr>
+ <ZLY9yiaVwCGy5H3R@shredder> <87edl5a4fm.fsf@nvidia.com>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <87edl5a4fm.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 18 Jul 2023 12:20:59 -0600 David Ahern wrote:
-> On 7/18/23 12:15 PM, Jakub Kicinski wrote:
-> > On Tue, 18 Jul 2023 15:06:29 -0300 Jason Gunthorpe wrote:  
-> >> netlink feels like a weird API choice for that, in particular it would
-> >> be really wrong to somehow bind the lifecycle of a netlink object to a
-> >> process.  
-> > 
-> > Netlink is the right API, life cycle of objects can be easily tied to
-> > a netlink socket.  
+On 7/18/23 12:35, Petr Machata wrote:
 > 
-> That is an untuitive connection -- memory references, h/w queues, flow
-> steering should be tied to the datapath socket, not a control plane socket.
+> Ido Schimmel <idosch@idosch.org> writes:
+> 
+>> On Mon, Jul 17, 2023 at 10:51:04PM +0200, Mirsad Todorovac wrote:
+>>> Tests fail with error message:
+>>>
+>>> Command line is not complete. Try option "help"
+>>> Failed to create netif
+>>>
+>>> The script
+>>>
+>>> # tools/testing/seltests/net/forwarding/bridge_igmp.sh
+>>>
+>>> bash `set -x` ends with an error:
+>>>
+>>> ++ create_netif_veth
+>>> ++ local i
+>>> ++ (( i = 1 ))
+>>> ++ (( i <= NUM_NETIFS ))
+>>> ++ local j=2
+>>> ++ ip link show dev
+>>> ++ [[ 255 -ne 0 ]]
+>>> ++ ip link add type veth peer name
+>>> Command line is not complete. Try option "help"
+>>> ++ [[ 255 -ne 0 ]]
+>>> ++ echo 'Failed to create netif'
+>>> Failed to create netif
+>>> ++ exit 1
+>>>
+>>> The problem seems to be linked with this piece of code of "lib.sh":
+>>>
+>>> create_netif_veth()
+>>> {
+>>>          local i
+>>>
+>>>          for ((i = 1; i <= NUM_NETIFS; ++i)); do
+>>>                  local j=$((i+1))
+>>>
+>>>                  ip link show dev ${NETIFS[p$i]} &> /dev/null
+>>>                  if [[ $? -ne 0 ]]; then
+>>>                          ip link add ${NETIFS[p$i]} type veth \
+>>>                                  peer name ${NETIFS[p$j]}
+>>>                          if [[ $? -ne 0 ]]; then
+>>>                                  echo "Failed to create netif"
+>>>                                  exit 1
+>>>                          fi
+>>>                  fi
+>>>                  i=$j
+>>>          done
+>>> }
+>>>
+>>> Somehow, ${NETIFS[p$i]} is evaluated to an empty string?
+>>
+>> You need to provide a configuration file in
+>> tools/testing/selftests/net/forwarding/forwarding.config. See
+>> tools/testing/selftests/net/forwarding/forwarding.config.sample for
+>> example.
+>>
+>> Another option is to provide the interfaces on the command line.
+>>
+>> ./bridge_igmp.sh veth0 veth1 veth2 veth3
+>>
+>> If no configuration file is present, we can try to assume that the
+>> tests are meant to be run with veth pairs and not with physical
+>> loopbacks. Something like:
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 71f7c0c49677..5b0183013017 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
+>>   WAIT_TIME=${WAIT_TIME:=5}
+>>   PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+>>   PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+>> -NETIF_TYPE=${NETIF_TYPE:=veth}
+>> -NETIF_CREATE=${NETIF_CREATE:=yes}
+>>   MCD=${MCD:=smcrouted}
+>>   MC_CLI=${MC_CLI:=smcroutectl}
+>>   PING_COUNT=${PING_COUNT:=10}
+>> @@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> +NETIF_TYPE=${NETIF_TYPE:=veth}
+>> +NETIF_CREATE=${NETIF_CREATE:=yes}
+>> +declare -A NETIFS=(
+>> +       [p1]=veth0
+>> +       [p2]=veth1
+>> +       [p3]=veth2
+>> +       [p4]=veth3
+>> +       [p5]=veth4
+>> +       [p6]=veth5
+>> +       [p7]=veth6
+>> +       [p8]=veth7
+>> +       [p9]=veth8
+>> +       [p10]=veth9
+>> +)
+>>   
+>>   relative_path="${BASH_SOURCE%/*}"
+>>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+> 
+> Or maybe this so that we get the exactly right number of interfaces?
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 8491c97475ab..4fefdf9716dc 100755
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -36,6 +36,16 @@ if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>   	relative_path="."
+>   fi
+>   
+> +if [[ ! -v NUM_NETIFS ]]; then
+> +	echo "SKIP: importer does not define \"NUM_NETIFS\""
+> +	exit $ksft_skip
+> +fi
+> +
+> +declare -A NETIFS
+> +for i in $(seq $NUM_NETIFS); do
+> +	NETIFS[p$i]=veth$i
+> +done
+> +
+>   if [[ -f $relative_path/forwarding.config ]]; then
+>   	source "$relative_path/forwarding.config"
+>   fi
+> @@ -195,11 +205,6 @@ if [[ "$REQUIRE_MTOOLS" = "yes" ]]; then
+>   	require_command mreceive
+>   fi
+>   
+> -if [[ ! -v NUM_NETIFS ]]; then
+> -	echo "SKIP: importer does not define \"NUM_NETIFS\""
+> -	exit $ksft_skip
+> -fi
+> -
+>   ##############################################################################
+>   # Command line options handling
+>   
 
-There's one RSS context for may datapath sockets. Plus a lot of the
-APIs already exist, and it's more of a question of packaging them up 
-at the user space level. For things which do not have an API, however,
-netlink, please.
+This leaves the user with the output:
+
+root@defiant:# ./bridge_igmp.sh
+SKIP: could not find all required interfaces
+root@defiant:#
+
+Arguably it might be prudent to offer some sensible defaults, as a novice developer
+running all selftests might not have the net stack insight required to modify those,
+but be lucky instead to get away with the `make kselftest` run ... :-)
+
+Best regards,
+Mirsad Todorovac
 
