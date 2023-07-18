@@ -1,236 +1,76 @@
-Return-Path: <netdev+bounces-18601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7466E757D40
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:21:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99CB4757D77
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:27:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF4B281408
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:21:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B8511C20CE6
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7434AD521;
-	Tue, 18 Jul 2023 13:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BF7D306;
+	Tue, 18 Jul 2023 13:27:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492AED513
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:21:18 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9935B186
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:21:08 -0700 (PDT)
-Received: from dude02.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::28])
-	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <m.felsch@pengutronix.de>)
-	id 1qLkdK-00062z-Og; Tue, 18 Jul 2023 15:20:54 +0200
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com
-Cc: devicetree@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v2 2/2] net: stmmac: add support for phy-supply
-Date: Tue, 18 Jul 2023 15:20:49 +0200
-Message-Id: <20230718132049.3028341-2-m.felsch@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230718132049.3028341-1-m.felsch@pengutronix.de>
-References: <20230718132049.3028341-1-m.felsch@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D4BC2F3
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:27:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEFBCC433C7;
+	Tue, 18 Jul 2023 13:27:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1689686870;
+	bh=OllI6hqwDmAP9/S7KjyQLxoCQsdlJakPqeGx3eqe7n8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DGcVLWbGC+0pwwepizlUfKJV2Ug+iwpitZdTNMNNIvD1MzWkEqHmjbPDbs2hno+UV
+	 bzktmaGosHPlGAloJPdBOOCNtCSOrkL7F2ZHVMOs48+IU+AsgBBfgoVgrhxrjUeew5
+	 J5d3ObW1bjqQUlLczqul6dC1DA/hdvPWMnxQuvHY=
+Date: Tue, 18 Jul 2023 15:27:45 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ross Maynard <bids.7405@bigpond.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+	kuba@kernel.org, Oliver Neukum <oneukum@suse.com>
+Subject: Re: [PATCH] USB: zaurus: 3 broken Zaurus devices
+Message-ID: <2023071811-dandy-jugular-b306@gregkh>
+References: <4963f4df-e36d-94e2-a045-48469ab2a892@bigpond.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::28
-X-SA-Exim-Mail-From: m.felsch@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4963f4df-e36d-94e2-a045-48469ab2a892@bigpond.com>
 
-Add generic phy-supply handling support to control the phy regulator to
-avoid handling it within the glue code. Use the generic stmmac_platform
-code to register a possible phy-supply and the stmmac_main code to
-handle the power on/off.
+On Tue, Jul 18, 2023 at 10:16:55AM +1000, Ross Maynard wrote:
+> Hi Greg,
+> 
+> This is related to Oliver Neukum's patch
+> 6605cc67ca18b9d583eb96e18a20f5f4e726103c (USB: zaurus: support another
+> broken Zaurus) which you committed in 2022 to fix broken support for the
+> Zaurus SL-6000.
+> 
+> Prior to that I had been able to track down the original offending patch
+> using git bisect as you had suggested to me:
+> 16adf5d07987d93675945f3cecf0e33706566005 (usbnet: Remove over-broad module
+> alias from zaurus).
+> 
+> It turns out that the offending patch also broke support for 3 other Zaurus
+> models: A300, C700 and B500/SL-5600. My patch adds the 3 device IDs to the
+> driver in the same way Oliver added the SL-6000 ID in his patch.
+> 
+> Could you please review the attached patch? I tested it on all 3 devices and
+> it fixed the problem. For your reference, the associated bug URL is
+> https://bugzilla.kernel.org/show_bug.cgi?id=217632.
 
-Changelog
----
+I'll be glad to accept it if you resend it in a format that I can apply
+it in.  I'll run my patch-bot on it to give you some hints on what needs
+to be done here.
 
-v2:
-- adapt stmmac_phy_power
-- move power-on/off into stmmac_main to handle WOL
-- adapt commit message
+thanks,
 
-Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 58 ++++++++++++++++++-
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 10 ++++
- include/linux/stmmac.h                        |  1 +
- 3 files changed, 68 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 0fca81507a779..c3700316fed6c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -31,6 +31,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/prefetch.h>
- #include <linux/pinctrl/consumer.h>
-+#include <linux/regulator/consumer.h>
- #ifdef CONFIG_DEBUG_FS
- #include <linux/debugfs.h>
- #include <linux/seq_file.h>
-@@ -1123,6 +1124,55 @@ static void stmmac_check_pcs_mode(struct stmmac_priv *priv)
- 	}
- }
- 
-+/**
-+ * stmmac_phy_power - PHY regulator on/off
-+ * @priv: driver private structure
-+ * @enable: turn on the regulator if true else turn it off
-+ * Enable or disable the regulator powering the PHY.
-+ */
-+static int stmmac_phy_power(struct stmmac_priv *priv, bool enable)
-+{
-+	struct regulator *regulator = priv->plat->phy_regulator;
-+	struct device *dev = priv->device;
-+
-+	if (!regulator)
-+		return 0;
-+
-+	if (enable) {
-+		int ret;
-+
-+		ret = regulator_enable(regulator);
-+		if (ret)
-+			dev_err(dev, "Fail to enable regulator\n");
-+
-+		return ret;
-+	}
-+
-+	regulator_disable(regulator);
-+
-+	return 0;
-+}
-+
-+/**
-+ * stmmac_phy_power_on - PHY regulator on
-+ * @priv: driver private structure
-+ * Enable the PHY regulator
-+ */
-+static int stmmac_phy_power_on(struct stmmac_priv *priv)
-+{
-+	return stmmac_phy_power(priv, true);
-+}
-+
-+/**
-+ * stmmac_phy_power_off - PHY regulator off
-+ * @priv: driver private structure
-+ * Disable the PHY regulator
-+ */
-+static void stmmac_phy_power_off(struct stmmac_priv *priv)
-+{
-+	stmmac_phy_power(priv, false);
-+}
-+
- /**
-  * stmmac_init_phy - PHY initialization
-  * @dev: net device structure
-@@ -1248,7 +1298,8 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 		return PTR_ERR(phylink);
- 
- 	priv->phylink = phylink;
--	return 0;
-+
-+	return stmmac_phy_power_on(priv);
- }
- 
- static void stmmac_display_rx_rings(struct stmmac_priv *priv,
-@@ -7469,6 +7520,7 @@ void stmmac_dvr_remove(struct device *dev)
- 	if (priv->hw->pcs != STMMAC_PCS_TBI &&
- 	    priv->hw->pcs != STMMAC_PCS_RTBI)
- 		stmmac_mdio_unregister(ndev);
-+	stmmac_phy_power_off(priv);
- 	destroy_workqueue(priv->wq);
- 	mutex_destroy(&priv->lock);
- 	bitmap_free(priv->af_xdp_zc_qps);
-@@ -7532,6 +7584,8 @@ int stmmac_suspend(struct device *dev)
- 		if (device_may_wakeup(priv->device))
- 			phylink_speed_down(priv->phylink, false);
- 		phylink_suspend(priv->phylink, false);
-+		if (!priv->plat->use_phy_wol)
-+			stmmac_phy_power_off(priv);
- 	}
- 	rtnl_unlock();
- 
-@@ -7614,6 +7668,8 @@ int stmmac_resume(struct device *dev)
- 		priv->irq_wake = 0;
- 	} else {
- 		pinctrl_pm_select_default_state(priv->device);
-+		if (!priv->plat->use_phy_wol)
-+			stmmac_phy_power_on(priv);
- 		/* reset the phy so that it's ready */
- 		if (priv->mii)
- 			stmmac_mdio_reset(priv->mii);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index eb0b2898daa3d..fb160633ef347 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -10,6 +10,7 @@
- 
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
-+#include <linux/regulator/consumer.h>
- #include <linux/module.h>
- #include <linux/io.h>
- #include <linux/of.h>
-@@ -423,6 +424,15 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	if (plat->interface < 0)
- 		plat->interface = plat->phy_interface;
- 
-+	/* Optional regulator for PHY */
-+	plat->phy_regulator = devm_regulator_get_optional(&pdev->dev, "phy");
-+	if (IS_ERR(plat->phy_regulator)) {
-+		if (PTR_ERR(plat->phy_regulator) == -EPROBE_DEFER)
-+			return ERR_CAST(plat->phy_regulator);
-+		dev_info(&pdev->dev, "No regulator found\n");
-+		plat->phy_regulator = NULL;
-+	}
-+
- 	/* Some wrapper drivers still rely on phy_node. Let's save it while
- 	 * they are not converted to phylink. */
- 	plat->phy_node = of_parse_phandle(np, "phy-handle", 0);
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 225751a8fd8e3..456bab4a3b362 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -209,6 +209,7 @@ struct plat_stmmacenet_data {
- 	int phy_addr;
- 	int interface;
- 	phy_interface_t phy_interface;
-+	struct regulator *phy_regulator;
- 	struct stmmac_mdio_bus_data *mdio_bus_data;
- 	struct device_node *phy_node;
- 	struct device_node *phylink_node;
--- 
-2.39.2
-
+greg k-h
 
