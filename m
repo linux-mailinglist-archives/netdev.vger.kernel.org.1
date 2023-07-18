@@ -1,110 +1,102 @@
-Return-Path: <netdev+bounces-18717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB8D47585D8
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:53:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 249997585DE
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:55:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F12D71C20D1A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:53:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8632810BD
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE5B171C9;
-	Tue, 18 Jul 2023 19:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF013171CB;
+	Tue, 18 Jul 2023 19:55:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E00110946
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:53:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5E0CC433C8;
-	Tue, 18 Jul 2023 19:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52D210946
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:55:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D68C433C7;
+	Tue, 18 Jul 2023 19:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689710010;
-	bh=iS8olXu4j8uUvayUIlwSeJUyNl508dh0P8150fs7BRU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=agag+Gscd6wX7IDzIqBzi1Td8r+5wRVep1vJYbhVCCNwdq7eUERxITKXmAznPuLjC
-	 Q9CsueWTJkjgLZNgENnGENdB65aKIQR3t+pX6x6bzsS0r5v/TqhfN80UoETNjYJvBl
-	 L9NLlaPvmfFIT9w1sCIKqNtK3VrqWYsA9zgt9xUIbFmmvMX1s/+Sy2YWnL1w6h4RhI
-	 JaN49/blYRgppryxR/SFyfl5LUdAo/JJNhzjhf3/0Q236Pw4hIPHe6t8lIEpcm/ZGI
-	 /3arPWc8kABMo0tFmDJ87cWSYExO75nEy0GlfEkFPObnJi3nwszvuQa7s66aKl9o+p
-	 fu4AD4wLNGwlg==
+	s=k20201202; t=1689710142;
+	bh=gshhwkunm0Nkznr6q9yEkdRdIiyNHnhVMZurRxoSIOQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lgSBOvWQdpxF3liRy3mjW5e2MFL87uVxkeVJ1V2wPudywexzVM18dF3ko8cfRL/EH
+	 +VwKa8cr4Kojk/tBS5K9Qgl/+UXz39EWbpO3NmAtzd6k3bK6WcfCseH6RjE4b9UEcm
+	 mXH6ANOp6IJ5J4HdWrjaWQ2bH7ueTtEr2KM+8PHf40GJni1e8zVZaR9s5f7b4rCTZv
+	 jWVCDticxRP5dKAu4n0O0N+dSF/tm9SBR1ORKXtt5NZBYCmt29WxD09jfTvNVNotFL
+	 HRTWsdMlFS+2DBMXp81oqy6bufzJUfwty4TFn9hCwiv1zt0UbDxJBxcaLPon+du3S8
+	 Cdw8dFvA/BYxQ==
+Date: Tue, 18 Jul 2023 20:55:37 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: corbet@lwn.net, workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	gregkh@linuxfoundation.org, linux@leemhuis.info, krzk@kernel.org
+Subject: Re: [PATCH docs v2] docs: maintainer: document expectations of small
+ time maintainers
+Message-ID: <71224ff9-98d0-4148-afb8-d35b45519c79@sirena.org.uk>
+References: <20230718155814.1674087-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 18 Jul 2023 21:53:25 +0200
-From: Michael Walle <mwalle@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next v3 03/11] net: phy: replace is_c45 with
- phy_accces_mode
-In-Reply-To: <509889a3-f633-40b0-8349-9ef378818cc7@lunn.ch>
-References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
- <20230620-feature-c45-over-c22-v3-3-9eb37edf7be0@kernel.org>
- <509889a3-f633-40b0-8349-9ef378818cc7@lunn.ch>
-Message-ID: <66d9daa106d7840e972dba35914e6983@kernel.org>
-X-Sender: mwalle@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LSdGOUQcgKsH6g7g"
+Content-Disposition: inline
+In-Reply-To: <20230718155814.1674087-1-kuba@kernel.org>
+X-Cookie: You are as I am with You.
 
-Am 2023-07-18 19:40, schrieb Andrew Lunn:
->>  static inline bool phy_has_c45_registers(struct phy_device *phydev)
->>  {
->> -	return phydev->is_c45;
->> +	return phydev->access_mode != PHY_ACCESS_C22;
->>  }
-> 
-> So this is making me wounder if we have a clean separation between
-> register spaces and access methods.
 
-The idea is to at least have it behind a helper which can be changed
-if we get that information from somewhere else.
+--LSdGOUQcgKsH6g7g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-But right now, a PHY is considered to have c45 registers if it is
-probed via c45 (accesses).
+On Tue, Jul 18, 2023 at 08:58:14AM -0700, Jakub Kicinski wrote:
 
-Instead of checking the access mode, I could also introduce a
-bitmask(?)/flags has_c22/has_c45_registers. But how would you tell
-if a PHY as c22 registers? Probe both c22 and c45? What if the bus
-can't do c45?
+> We appear to have a gap in our process docs. We go into detail
+> on how to contribute code to the kernel, and how to be a subsystem
+> maintainer. I can't find any docs directed towards the thousands
+> of small scale maintainers, like folks maintaining a single driver
+> or a single network protocol.
 
-> Should there be a phy_has_c22_registers() ?
-> 
-> A PHY can have both C22 registers and C45 registers. It is up to the
-> driver to decide which it wants to access when.
+I'm not super comfortable with all of the musts here but this is
+probably fine so
 
-But isn't it also the driver which has the ultimate information whether
-a PHY has c22 register space and/or c45 one?
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-Maybe we need to clarify what "has c22/c45 registers space" actually
-means. Responds to MII c22/c45 access?
+One note:
 
--michael
+> +Maintainers must be human, however, it is not acceptable to add a mailing
+> +list or a group email as a maintainer. Trust and understanding are the
+> +foundation of kernel maintenance and one cannot build trust with a mailing
+> +list.
 
-> Should phydev->access_mode really be phydev->access_mode_c45_registers
-> to indicate how to access the C45 registers if phy_has_c45_registers()
-> is true?
-> 
-> Has there been a review of all uses of phydev->is_c45 to determine if
-> the user wants to know if C45 registers exist,
-> a.k.a. phy_has_c45_registers(), or if C45 bus transactions can be
-> performed, and then later in this series, additionally if C45 over C22
-> can be performed. These are different things.
-> 
-> I need to keep reading the patches...
-> 
->   Andrew
+If you're revising this I'd add a note about the L: tag in MAINTAINERS
+here, or possibly just adding a list in addition to humans.  It is
+sensible and often helpful for companies to want to get mail copied to a
+wider distribution list internally but they're not really what we mean
+by list since external people typically can't join them.
+
+--LSdGOUQcgKsH6g7g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmS27jgACgkQJNaLcl1U
+h9CIIgf+LLz2FFY+gdDkyU+XJv8nVYZJr7tmYVzdbjT94MAsKgVXjd/DcXrUdISB
+gItU3VHXnC2vXX+rgEUOSZwEBQ2HXi/Grj4As79eV6n29QwE4yMDZ2GIOhcDKqvH
+2GZGDLYaShzkKQNzin2eyCkjVd9ZCquoNCpU8trTaUz56uX3DmuyD2JwqDWnqX1v
+OkPdZHhfAF1jy9XPo1CNXMjgnhP3yNawqptigD7c/bVGY76VjwJ0pphpPij93BQl
+eHMTeQceIZGAPnDtxJAcxFHojjZ9UoHPcit1hMLuIn4xSIIMMOJDVS2fyrcLTynJ
+qg2xILiUbAc4zJlKhCe2eLYe8eM4sg==
+=guc9
+-----END PGP SIGNATURE-----
+
+--LSdGOUQcgKsH6g7g--
 
