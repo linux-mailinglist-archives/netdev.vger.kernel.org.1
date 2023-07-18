@@ -1,180 +1,200 @@
-Return-Path: <netdev+bounces-18646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96679758210
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:25:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F5475821A
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD58F281653
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:25:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 303A0281396
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F32213AF7;
-	Tue, 18 Jul 2023 16:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893ACC8CD;
+	Tue, 18 Jul 2023 16:30:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6B1156DA
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 16:24:40 +0000 (UTC)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37875B5
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:24:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7625F15AC1
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 16:30:09 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14FF910E4;
+	Tue, 18 Jul 2023 09:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689697479; x=1721233479;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MU8wC3hsx/Y8pobDsNxIfsct/lJK9LdI7UyRTn80YQo=;
-  b=Z77kOduISj+uNEL8ykoMJtUYMC9WfPdb4czTy+CSqNwaRuRO/1p6lntc
-   YzM8UCgQ2sYx3gg7rmwK6rK6KFyKvRr/KTlQbtHS4D/teZ2h0ahdIiZ86
-   OrfMTON1TR5pedm7XD70+IwgfRUdpMeey4RpgRXksrlyWZgOHNqPyor1G
-   WuR1tEzRsMS1X0HXvFIc3bmF/c5mkADCPQ4XLCMCMdSZYbO3nw2NsiBKs
-   Sg6uLuW/jhGu8PcyOcuicpm5n/l2a20HPUkAYW1L1OjuSY5I5IO1ZzUkC
-   w5uhhMj8utny25lkDwFJFjXqxQYFLdHrUO4c4PODM9fWgn5xUT/e2QCMN
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="368894215"
+  t=1689697808; x=1721233808;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=1Eg+lmyxRr3kE5ceJPuZhEzpw4vvsLS/UBGwUk8Oygk=;
+  b=dMosPTw0zHnZ4qsrCbGhFpEcWUEc4uPeJUiyw3eHZx7Qe/jWLQ85Lkhb
+   9Pq1oMyTxfnR1Xne7/VdJf4DU34EqSdfVQe/hvV16f3a7wip7M18N6bPL
+   uyKyysy/5Osf1YEHsi5KfUxrbPCO68U3NUeWRe6cH1kInYDowrjWKX2ep
+   UU5ZUEtkL5i2w2rCDMhVjNIj0GrvFF+uIRgzazvtb/JCSD/zyBzg/i4Uq
+   qp0/dxfTPtypoaJ9nH7xvTMUVWFxj0Zm+fF6SCnPe5ghG1qtw7Iffi9w6
+   8wSZMR7KBiMp0clLt61jkiRCumScrJhOXW5mkfO50NBc/wgv403INkyKL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="430015019"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="368894215"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 09:24:37 -0700
+   d="scan'208";a="430015019"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 09:30:07 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="753388394"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="758851932"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="753388394"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orsmga008.jf.intel.com with ESMTP; 18 Jul 2023 09:24:32 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: kuba@kernel.org,
-	donald.hunter@gmail.com,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net-next v3 2/2] tools: ynl-gen: fix parse multi-attr enum attribute
-Date: Tue, 18 Jul 2023 18:22:25 +0200
-Message-Id: <20230718162225.231775-3-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230718162225.231775-1-arkadiusz.kubalewski@intel.com>
-References: <20230718162225.231775-1-arkadiusz.kubalewski@intel.com>
+   d="scan'208";a="758851932"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga001.jf.intel.com with ESMTP; 18 Jul 2023 09:30:07 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 18 Jul 2023 09:30:06 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 18 Jul 2023 09:30:06 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.44) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 18 Jul 2023 09:30:05 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L841z4RwKc5S8rG38CmsopcmvC4ZM+I9X5GjJG7ZV/mNCSO3x4SXaU0Sl/cZGHPGxymZXcoRMtTHGzdCMZQ8ol6FwIdaVQQRJa+2viSyrs1xNiVMMWv2x4sUhwekCh4BPTLpQD38eyxkIpq8H3wZXr+mbWH7f+6VKZpXZTkkoTXAlW8+oDOGo2NfwfQTKJQOGNkkxDgzm/ctBpaE8sGQmke1ZU+MOl2JXj6AlAIoW01V2TfCWP42VNrA4j08W911OYbWTaCsBUYhX3BnQDsALxCpkpKKQK6Hni9ugEoC0srgwJT7Ule/UsGks//AnEhgQQ4QhhRjqi7mrD6m8xaFfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eSShV50rk+yATltKl7lDhSTWOmbyo5soe3CnNsJ2LTg=;
+ b=i3W/fHaxnbVa4KTncekiW7oUOV/CfGkiq83qxx9y4e26U5hJVJLSLorlP7YhvoeGrkymouhtH5kiPka5Ho8akkfPxT9/K1GGzX3bCwF7vtKRKWO/DklYZtGFkxnGEbsZBNm5mYwQo5srt5DVtWoT11k8rzQ4trbzb6CfZTNcTe2XEigq9V4lTtqGB4edTG5hZC5bR/CN7X/gzdfodIMlqeLR+hwoeYoo0q0/+ivMooVSjl2HI6JjjWn7nSF6CPmDzPH5T/XQ2M0nEjy1E6IqNRukAD5dDp0VafrDYgu/3r9H8ufaiNaIdWQS/BJYB4lPOaGXGGeTyKM3NCqhNEsVag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ MW3PR11MB4649.namprd11.prod.outlook.com (2603:10b6:303:5b::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.32; Tue, 18 Jul 2023 16:30:03 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::c3cd:b8d0:5231:33a8]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::c3cd:b8d0:5231:33a8%5]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
+ 16:30:03 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>,
+	"chuck.lever@oracle.com" <chuck.lever@oracle.com>
+Subject: RE: [PATCH net-next 1/2 v2] tools: ynl-gen: fix enum index in
+ _decode_enum(..)
+Thread-Topic: [PATCH net-next 1/2 v2] tools: ynl-gen: fix enum index in
+ _decode_enum(..)
+Thread-Index: AQHZtWmJfuKrBYUvlkKIn1akadqWPq+33AwAgAfiO4A=
+Date: Tue, 18 Jul 2023 16:30:02 +0000
+Message-ID: <DM6PR11MB4657721B8CB36AEB67F1A8809B38A@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230713090550.132858-1-arkadiusz.kubalewski@intel.com>
+        <20230713090550.132858-2-arkadiusz.kubalewski@intel.com>
+ <20230713090234.28b04145@kernel.org>
+In-Reply-To: <20230713090234.28b04145@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|MW3PR11MB4649:EE_
+x-ms-office365-filtering-correlation-id: 8bfd8968-ff4f-4c5e-f870-08db87ac3cf6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5q5Kn2lcJBvgJuZ6gBLyqGec6HItDtQSSSfL9FW/V7fOSIx6KoNGHWjifHPkRAZd2hsvQPn6aFbnZFRjxZIWuDh39cb6OGfoFQTRnu/sPtH4uUTtK0cad9LLUNkAUk4oCKdjfUifg2wm448D4Qf1EGUcckm2J3JsLkXY24hya0EMzreFtXNoG9/2qdmdpvlVoxTRnJWRMDHafQucqYmz8hFoAYO0XpOmjQ4+hANw2HwypqpHdorKDjie1cy8Kuba1vSw+1EOlDT3LSmcu4JMYAAbvZEJTIL3VO8dIuR2Aqf88kQVGZlLl53FSx9Aqxy95Qhlh3pC4A7N9iPjPJjXbEFmk5Zg9NwxBiHghMExfpR9+eiYHtJTfyTrJ8tj14Ml91CufihI140cSFUN08fI6X7ADzD+QRxPzebWYHOE1Woa8Xj+Dsl/eD4GjLTLmh76l4ItXktLXJk3uQJ16meUdFt7Wz6T9L70RPHHyzU88lGA/ur0rpSR4xBzz5bTCFRt2knL299dlzyAlJR4NX3L2UVGT09TYVFgXjiIjkOaKo/FiQFA7aEUMYPtcBWVf+MDBoctSNPRABT8nGDt1BwyfiyMOg9IL4nVSOevtGEPk2UVniYduvEA6c/ZocY305Oy
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(366004)(346002)(376002)(396003)(136003)(451199021)(86362001)(4744005)(2906002)(33656002)(38070700005)(55016003)(186003)(9686003)(6506007)(26005)(38100700002)(82960400001)(7696005)(122000001)(66446008)(54906003)(71200400001)(64756008)(478600001)(316002)(66556008)(66946007)(66476007)(5660300002)(76116006)(4326008)(6916009)(41300700001)(8936002)(52536014)(8676002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tFGgzJlwBP7xisxqjalhbBnq4ErWOayagHRdVReRstNMcZp634a0TnL1yEeb?=
+ =?us-ascii?Q?jaoAJ+weXsPefjgDI3INCo9fNytFFiNEHdJrxGZgzY42xajGrHxudtcZYIgY?=
+ =?us-ascii?Q?z9biidmt0pNOQGz4329vJbW77Gap5+ulrMt+fe48h5u2G8ZDRlc7IgXKVXV8?=
+ =?us-ascii?Q?gQPFHpQ9LNsIc8aqo+Y9zjUBfMSqN6/Yy2CXoyGZi2S+OP0xMY5LKyo25ahC?=
+ =?us-ascii?Q?jJSxqWYTJ1X01ubQfMGoicmY13+sBzzRDKQWEmDp0y+A2pXF6jZWviCtT5OA?=
+ =?us-ascii?Q?sIAFXWXAypKLQZv52xBBCuDd6Qs3ppyQyDD5dEBn9uhTB9gdXnir4ckk34Y8?=
+ =?us-ascii?Q?CoJiGjQxG0lI8uzllCW4v2ifSpgtXri6Ay+p6lC0d7d7MzpiLbzHSqNu2iK3?=
+ =?us-ascii?Q?q4ENAbjbhye0oSnZ6Z17l6k/l/oBz6mR11oHKA2BorUTk41vH/jU0W0OgNJi?=
+ =?us-ascii?Q?vO5TOwIDr8pdc55tfQq/xDu9HbbLCSRJBZQGqYYlS9TautbLyiH+j+zrYoKY?=
+ =?us-ascii?Q?t+ECteRl1gjgVOm9OatM7qSTqhjWM+wQKgd3lw0fH2X9hPIlnNqAT8s99JEa?=
+ =?us-ascii?Q?skapbaHUT/J9Vte7xahdVYQTWPnF/kPVlN4uDKiGS015GY013q9POdXnVNmY?=
+ =?us-ascii?Q?iSn54Gc4PVTStkxe2VMvPjITxrFB2V6aVnfwJXjJWcUDBQYCGLl+wOGFBrQ/?=
+ =?us-ascii?Q?ma0pbIXdebaoSW1TeECCGBR+SiI9/yzEXKOmjYhltr/qocZg7QCO/wQ7pF15?=
+ =?us-ascii?Q?25aJ8OPrliCFFsQoGAWvNViXwKeCoS/LZpAQO9lAkViG9GB66kZz8O/UI+94?=
+ =?us-ascii?Q?5ybcJ/qL6/wQh7r0zRpJV2ZlQARDCt4TyEBHN6Mkhlm+hA8bpib4h0eQfSRA?=
+ =?us-ascii?Q?fENwKUDL7KNVFo9kCJwO1G3CV7fTNdKf90xZYxw4PhM9UarpEbvl/cY08M2+?=
+ =?us-ascii?Q?lHN2clU6Zm0jFfSylNyA+OXg1AGINmRTJqBPBiwqq8xUaFAOEDPZ2TDtIqqO?=
+ =?us-ascii?Q?zK1bx8w5oKIhjXvoB+B/wNqIt3hKtsE3Ca6O8WtZqPJfmZw+/nieR6uzp+lp?=
+ =?us-ascii?Q?kOfVKoK1mq8yfqrHu81mcrvBIm6QsAX1RT0hPk3AlZf7MjWhttKC6DVS4BwL?=
+ =?us-ascii?Q?oaEfJoaO0xOAVvYMJKCFOzTRAfRGHEgthJSZ67xk2fYsE4KadWtpAjx2Fb36?=
+ =?us-ascii?Q?6sI3fOfzjEA82Gpn6kX+uJYnztyKpIYj1upVTRCHIu3IhtrUjwGTPkusM4MF?=
+ =?us-ascii?Q?h60SDzEt1XCJEy/DYkx7dH7kZzDnIUPP4IVC+cvqponZtQ9mD/VPAB696g7n?=
+ =?us-ascii?Q?32Tc2aIekZ9jWW6rZRdTxqs6fkCe5FEgsZm2oD+jrQd8WzxWrPRbpjJyB91X?=
+ =?us-ascii?Q?cHsu6hImx9EMf+7L19bW+cOGnqmMuE4WFNZGWlptVqwlBeo+zlOXGw7wxQCw?=
+ =?us-ascii?Q?X3mO9ufQoNYsNpDcd+4VVoTP6yvE4LhMt8wx5FIyJ3LAg4AZ+cpk6M8aEEft?=
+ =?us-ascii?Q?6o9o4evStPRm5PtAyTZ+5e8DRG47UHt5kWvgAK1XzzUoS1p64smWVMN1lDHZ?=
+ =?us-ascii?Q?G+hwxcrMp7Z/7RG2s+Ml41kqqpn2NefZ/zpyYq/wZzKlF27xWyCzsHiSpOva?=
+ =?us-ascii?Q?RQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bfd8968-ff4f-4c5e-f870-08db87ac3cf6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2023 16:30:02.9875
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +L0JT3/5Nar4VTbR8Hn7LQY8/WBr2PBXcdRgjYvn/PN67JHLo/wAiGMAGe1zol5En881DYNktHY1atE7l8Nbi1nUQtALJLXa+u7hZlZZKO0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4649
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When attribute is enum type and marked as multi-attr, the netlink
-respond is not parsed, fails with stack trace:
-Traceback (most recent call last):
-  File "/net-next/tools/net/ynl/./test.py", line 520, in <module>
-    main()
-  File "/net-next/tools/net/ynl/./test.py", line 488, in main
-    dplls=dplls_get(282574471561216)
-  File "/net-next/tools/net/ynl/./test.py", line 48, in dplls_get
-    reply=act(args)
-  File "/net-next/tools/net/ynl/./test.py", line 41, in act
-    reply = ynl.dump(args.dump, attrs)
-  File "/net-next/tools/net/ynl/lib/ynl.py", line 598, in dump
-    return self._op(method, vals, dump=True)
-  File "/net-next/tools/net/ynl/lib/ynl.py", line 584, in _op
-    rsp_msg = self._decode(gm.raw_attrs, op.attr_set.name)
-  File "/net-next/tools/net/ynl/lib/ynl.py", line 451, in _decode
-    self._decode_enum(rsp, attr_spec)
-  File "/net-next/tools/net/ynl/lib/ynl.py", line 408, in _decode_enum
-    value = enum.entries_by_val[raw].name
-TypeError: unhashable type: 'list'
-error: 1
+>From: Jakub Kicinski <kuba@kernel.org>
+>Sent: Thursday, July 13, 2023 6:03 PM
+>
+>On Thu, 13 Jul 2023 11:05:49 +0200 Arkadiusz Kubalewski wrote:
+>> -        i =3D attr_spec.get('value-start', 0)
+>>          if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
+>>              value =3D set()
+>>              while raw:
+>>                  if raw & 1:
+>> -                    value.add(enum.entries_by_val[i].name)
+>> +                    value.add(enum.entries_by_val[raw & 1].name)
+>>                  raw >>=3D 1
+>> -                i +=3D 1
+>
+>This doesn't make sense, as I suggested you need to keep i for this
+>loop. Move it to the inside of the if 'enum-as-fla... and init to 0.
+>
+>i is tracking which bit number we are at as we consume / shift out
+>bits from raw.
+>
 
-Redesign _decode_enum(..) to take a enum int value and translate
-it to either a bitmask or enum name as expected.
+Yeah, you are right, I don't think I had clear mind when created those..
 
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
- tools/net/ynl/lib/ynl.py | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+>Have you ever used ChatGPT? No shame, just curious.
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 5db7d47067f9..671ef4b5eaa6 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -135,7 +135,7 @@ class NlAttr:
-         format = self.get_format(type)
-         return [ x[0] for x in format.iter_unpack(self.raw) ]
- 
--    def as_struct(self, members):
-+    def as_struct(self, members, attr_spec):
-         value = dict()
-         offset = 0
-         for m in members:
-@@ -147,6 +147,9 @@ class NlAttr:
-                 format = self.get_format(m.type, m.byte_order)
-                 [ decoded ] = format.unpack_from(self.raw, offset)
-                 offset += format.size
-+
-+            if m.enum:
-+                decoded = self._decode_enum(decoded, attr_spec)
-             if m.display_hint:
-                 decoded = self.formatted_string(decoded, m.display_hint)
-             value[m.name] = decoded
-@@ -417,8 +420,7 @@ class YnlFamily(SpecFamily):
-         pad = b'\x00' * ((4 - len(attr_payload) % 4) % 4)
-         return struct.pack('HH', len(attr_payload) + 4, nl_type) + attr_payload + pad
- 
--    def _decode_enum(self, rsp, attr_spec):
--        raw = rsp[attr_spec['name']]
-+    def _decode_enum(self, raw, attr_spec):
-         enum = self.consts[attr_spec['enum']]
-         if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
-             i = attr_spec.get('value-start', 0)
-@@ -430,15 +432,12 @@ class YnlFamily(SpecFamily):
-                 i += 1
-         else:
-             value = enum.entries_by_val[raw].name
--        rsp[attr_spec['name']] = value
-+        return value
- 
-     def _decode_binary(self, attr, attr_spec):
-         if attr_spec.struct_name:
-             members = self.consts[attr_spec.struct_name]
--            decoded = attr.as_struct(members)
--            for m in members:
--                if m.enum:
--                    self._decode_enum(decoded, m)
-+            decoded = attr.as_struct(members, attr_spec)
-         elif attr_spec.sub_type:
-             decoded = attr.as_c_array(attr_spec.sub_type)
-         else:
-@@ -466,6 +465,9 @@ class YnlFamily(SpecFamily):
-             else:
-                 raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
- 
-+            if 'enum' in attr_spec:
-+                decoded = self._decode_enum(int.from_bytes(attr.raw, "big"), attr_spec)
-+
-             if not attr_spec.is_multi:
-                 rsp[attr_spec['name']] = decoded
-             elif attr_spec.name in rsp:
-@@ -473,8 +475,6 @@ class YnlFamily(SpecFamily):
-             else:
-                 rsp[attr_spec.name] = [decoded]
- 
--            if 'enum' in attr_spec:
--                self._decode_enum(rsp, attr_spec)
-         return rsp
- 
-     def _decode_extack_path(self, attrs, attr_set, offset, target):
--- 
-2.38.1
+I have used it, but I am not using it to prepare code, this was my fault,
+chat would probably do better..
 
+Anyway just sent v3 with this part fixed.
+
+Thank you!
+Arkadiusz
+=20
+>--
+>pw-bot: cr
 
