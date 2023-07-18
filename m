@@ -1,39 +1,52 @@
-Return-Path: <netdev+bounces-18599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62004757D2F
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:20:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA9C757D3D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF241C20C4C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:20:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D5AB1C20CEF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CE6D2EF;
-	Tue, 18 Jul 2023 13:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59B4D303;
+	Tue, 18 Jul 2023 13:21:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A86CC2F3
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:20:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8DD6EC433C8;
-	Tue, 18 Jul 2023 13:20:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689686419;
-	bh=esPAIdLijgrpckijkuN7a0s8e5HfXIfXq/YXmb2ssMs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LzC7J1UsKlB84p2dB3juxMvyatRNE+OoxqNhUZwNY+PY1IyzxDXC9ve8aTm6QcSMe
-	 hV0lUy0UJMV66SHF9xH8Ujz4m5wZRaK3LNFuhLyYSci7EYzCrQ4cF3aWC2KA7qNiU+
-	 x8n1wHFbfCkPHPYqzjVM5OHhz36pGHItlEZ3CFsenPaVlotxaFVFg+J9qWld30h+cG
-	 D0qLRHW9nMywPqir7hPy4WRyuvohhhaHU+XJSDNgM6nMkctuOZaB/CokF9pXB8mLhP
-	 nvdgW+Hl2I+ZjJzCE1oM7QZw6jDqvMKmCtW9CuOnxhOX23pmhA3QNAn1gmYbdaz1Xn
-	 CPe3xvHyJyTKw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6698AE22AE4;
-	Tue, 18 Jul 2023 13:20:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98A6C2F3
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:21:17 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFB7126
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:21:07 -0700 (PDT)
+Received: from dude02.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::28])
+	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <m.felsch@pengutronix.de>)
+	id 1qLkdK-00062z-18; Tue, 18 Jul 2023 15:20:54 +0200
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com
+Cc: devicetree@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net-next v2 1/2] dt-bindings: net: snps,dwmac: add phy-supply support
+Date: Tue, 18 Jul 2023 15:20:48 +0200
+Message-Id: <20230718132049.3028341-1-m.felsch@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,43 +54,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] rtnetlink: Move nesting cancellation rollback to
- proper function
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168968641941.29657.11670688122269581626.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Jul 2023 13:20:19 +0000
-References: <20230716072440.2372567-1-gal@nvidia.com>
-In-Reply-To: <20230716072440.2372567-1-gal@nvidia.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com, edumazet@google.com, simon.horman@corigine.com
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::28
+X-SA-Exim-Mail-From: m.felsch@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Document the common phy-supply property to be able to specify a phy
+regulator.
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On Sun, 16 Jul 2023 10:24:40 +0300 you wrote:
-> Make rtnl_fill_vf() cancel the vfinfo attribute on error instead of the
-> inner rtnl_fill_vfinfo(), as it is the function that starts it.
-> 
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
-> Changelog -
-> v1->v2: https://lore.kernel.org/all/20230713141652.2288309-1-gal@nvidia.com/
-> * Remove unused vfinfo parameter (Simon)
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] rtnetlink: Move nesting cancellation rollback to proper function
-    https://git.kernel.org/netdev/net-next/c/4a59cdfd6699
-
-You are awesome, thank you!
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 363b3e3ea3a60..f66d1839cf561 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -159,6 +159,9 @@ properties:
+       can be passive (no SW requirement), and requires that the MAC operate
+       in a different mode than the PHY in order to function.
+ 
++  phy-supply:
++    description: PHY regulator
++
+   snps,axi-config:
+     $ref: /schemas/types.yaml#/definitions/phandle
+     description:
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.2
 
 
