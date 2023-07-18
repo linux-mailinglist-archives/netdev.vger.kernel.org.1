@@ -1,104 +1,88 @@
-Return-Path: <netdev+bounces-18754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C853E7588A5
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 00:43:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 793E77588A7
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 00:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 558AB28176F
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 22:43:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4F96281765
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 22:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EA61773A;
-	Tue, 18 Jul 2023 22:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC38B1773A;
+	Tue, 18 Jul 2023 22:45:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6D4168BE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 22:43:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B052C433C7;
-	Tue, 18 Jul 2023 22:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A770517AAA
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 22:45:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73956C433C9;
+	Tue, 18 Jul 2023 22:45:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689720185;
-	bh=cWNL6O5628brHitpY9ip2jK0Y10iW+HLam2xP54cGfM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NbfkVaq07AIeCltf6Qpu8mzsJ4kSc0obLC7PBkkfAZ6BAM+1z27W3ytcfdGYmUyUy
-	 4mA5stqUAqO0QVhYp5WLD6fGehiGCGeZ4xgFRQZXRZJucfumfIeXQDyvun72quoBAH
-	 PXScuNqnzzuiejVbEGU6dDC1mwQAMgyFv7p/wUizFpBpt3zJig3bWkXUn8BDBcVmEk
-	 d+xcXSUHQSwnqtG8V+pMpJOY7wnWcJXk95sBzqdYlFf6HV3SxDGgPXQmcLyvVzSZzi
-	 w9BodcjbW5GHWdGMhelKYdY0WKSM9sj5mQpFUot8aLhPQVDKhMRWTJ5NBF1QNz83tk
-	 4NMPMuKwHOjUw==
-Message-ID: <07e598bb-aebf-b169-425f-a6e8a84016d4@kernel.org>
-Date: Tue, 18 Jul 2023 16:43:04 -0600
+	s=k20201202; t=1689720305;
+	bh=QPRDZN417wjG3/qI9dDTrKSyuqoeFrA3S2sudllzHvw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=I7ocP0MTAirrwG4O3BO3sgJtAZf1AJsUW77twR7BAnv8XpKWfEiykdbxMVfJitMQz
+	 wsO9R5ARS30sZ610w8glfUqSp2ATk8XKuYDTOzbCrBdafDcnsXZAs1mURzqD6ROGQS
+	 oC/bzDXWaeXLzVz14Pz2NEZwox6r1Jq4t4LrfLeMLvi2XoFw7Fyi4DlO0VaF4qdICI
+	 BzPyOlM+XEviMn/WFmV6C00aKMV99Sqm/uyXjIqhbqAEJ8BLdzqi0fVaFTXzBJshI6
+	 Zs4+zXH8p0XWCVCAu77Oj41p/FZCoid5iSNxgf4LxA128Zmt79ALiEDRVuAms9Zzam
+	 lCnJHtFJp0Rqg==
+Date: Tue, 18 Jul 2023 15:45:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Mina Almasry <almasrymina@google.com>,
+ Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, Sumit Semwal
+ <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>
+Subject: Re: [RFC PATCH 00/10] Device Memory TCP
+Message-ID: <20230718154503.0421b4cd@kernel.org>
+In-Reply-To: <eb34f812-a866-a1a3-9f9b-7d5054d17609@kernel.org>
+References: <20230710223304.1174642-1-almasrymina@google.com>
+	<12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
+	<CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
+	<ZLbUpdNYvyvkD27P@ziepe.ca>
+	<20230718111508.6f0b9a83@kernel.org>
+	<35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
+	<20230718112940.2c126677@kernel.org>
+	<eb34f812-a866-a1a3-9f9b-7d5054d17609@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: Stacks leading into skb:kfree_skb
-Content-Language: en-US
-To: Ivan Babrou <ivan@cloudflare.com>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
- kernel-team <kernel-team@cloudflare.com>, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-References: <CABWYdi00L+O30Q=Zah28QwZ_5RU-xcxLFUK2Zj08A8MrLk9jzg@mail.gmail.com>
- <e64291ac-98e0-894f-12cb-d01347aef36c@kernel.org>
- <CABWYdi38H3umTEqTPbt8DftF2HXZ7ba6+jNphJdvubeh6PLP8w@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CABWYdi38H3umTEqTPbt8DftF2HXZ7ba6+jNphJdvubeh6PLP8w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 7/18/23 4:33 PM, Ivan Babrou wrote:
-> On Fri, Jul 14, 2023 at 5:54 PM David Ahern <dsahern@kernel.org> wrote:
->>
->> On 7/14/23 4:13 PM, Ivan Babrou wrote:
->>> As requested by Jakub Kicinski and David Ahern here:
->>>
->>> * https://lore.kernel.org/netdev/20230713201427.2c50fc7b@kernel.org/
->>>
->>> I made some aggregations for the stacks we see leading into
->>> skb:kfree_skb endpoint. There's a lot of data that is not easily
->>> digestible, so I lightly massaged the data and added flamegraphs in
->>> addition to raw stack counts. Here's the gist link:
->>>
->>> * https://gist.github.com/bobrik/0e57671c732d9b13ac49fed85a2b2290
->>
->> I see a lot of packet_rcv as the tip before kfree_skb. How many packet
->> sockets do you have running on that box? Can you accumulate the total
->> packet_rcv -> kfree_skb_reasons into 1 count -- regardless of remaining
->> stacktrace?
-> 
-> Yan will respond regarding the packet sockets later in the day, he
-> knows this stuff better than I do.
-> 
-> In the meantime, here are the aggregations you requested:
-> 
-> * Normal: https://gist.githubusercontent.com/bobrik/0e57671c732d9b13ac49fed85a2b2290/raw/ae8aa1bc3b22fad6cf541afeb51aa8049d122d02/flamegraph.normal.packet_rcv.aggregated.svg
-> * Spike: https://gist.githubusercontent.com/bobrik/0e57671c732d9b13ac49fed85a2b2290/raw/ae8aa1bc3b22fad6cf541afeb51aa8049d122d02/flamegraph.spike.packet_rcv.aggregated.svg
+On Tue, 18 Jul 2023 16:35:17 -0600 David Ahern wrote:
+> I do not see how 1 RSS context (or more specifically a h/w Rx queue) can
+> be used properly with memory from different processes (or dma-buf
+> references). When the process dies, that memory needs to be flushed from
+> the H/W queues. Queues with interlaced submissions make that more
+> complicated.
 
-For the spike, 97% are drops in packet_rcv. Each raw packet socket
-causes every packet to be cloned which makes an N-factor on the number
-of skbs to be freed. If this is tcpdump or lldp with a filter that would
-be what Jakub mentioned in his response.
+Agreed, one process, one control path socket.
 
-> 
-> I just realized that Github links make flamegraphs non-interactive. If
-> you download them and open a local copy, they should work better:
+FWIW the rtnetlink use of netlink is very basic. genetlink already has
+some infra which allows associate state with a user socket and cleaning
+it up when the socket gets closed. This needs some improvements. A bit
+of a chicken and egg problem, I can't make the improvements until there
+are families making use of it, and nobody will make use of it until
+it's in tree... But the basics are already in place and I can help with
+building it out.
 
-Firefox shows the graphs just fine.
+> I guess the devil is in the details; I look forward to the evolution of
+> the patches.
 
-> 
-> * Expand to your screen width
-> * Working search with highlights
-> * Tooltips with counts and percentages
-> * Working zoom
-
++1
 
