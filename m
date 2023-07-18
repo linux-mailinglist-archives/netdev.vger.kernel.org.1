@@ -1,109 +1,118 @@
-Return-Path: <netdev+bounces-18454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1EE7571BB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 04:23:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FCEF757249
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 05:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38A66281403
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:23:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A9021C208EC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 03:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C0815BE;
-	Tue, 18 Jul 2023 02:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5C317D4;
+	Tue, 18 Jul 2023 03:28:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED59E15A6
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:23:40 +0000 (UTC)
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC475EC
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 19:23:38 -0700 (PDT)
-X-QQ-mid: bizesmtp80t1689647011thb9acji
-Received: from localhost.localdomain ( [122.235.243.13])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Jul 2023 10:23:23 +0800 (CST)
-X-QQ-SSF: 01400000000000N0Z000000A0000000
-X-QQ-FEAT: 3M0okmaRx3gIrtly7mTynavFVV10FDJYPLJvgqQYfoyuAs550uYkZaJn9/y2m
-	krxmeyt5n0NFX4B3xxLm0i78hFDv6F3/A21iyXLOFDpnd5V5+cOCgkEmN7HbBgRwg+oEBxS
-	0VBM++3Dj0pGmhGBQz4lXLTQjgtkq/s661fDOhBZEmnz8uULu9t8aaDQtGJ6iUGiiCsHLu+
-	795DlzryPsOYrT21OiKwmWIq5YbYYp+T9lj44Vp0XcpSCp/PcbfwPsM0DxESAIDobZEsUj0
-	uvyEKfuKIomHAM6hFj2b6gUrTgI5IlLc1sv4bI80F/DuJgyWuzy4CCUv/zj71hu6cpvMYPH
-	3ROagYFphkT83iql7E0JHBYKujfP3jRCnbkgYZVxAGVzs1QUVJ4dvVnDpS9OcvsjnqJ0pyt
-	z1LK1dnpBfY=
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 10636233484625894450
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next] net: core: add member ncsi_enabled to net_device
-Date: Tue, 18 Jul 2023 10:23:21 +0800
-Message-ID: <3CF66F8947B520BF+20230718022321.30911-1-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA88617CE
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 03:28:28 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C9419A0;
+	Mon, 17 Jul 2023 20:28:23 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b8c364ad3bso10724075ad.1;
+        Mon, 17 Jul 2023 20:28:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689650903; x=1692242903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=psBP24l7zlb5k0jEystqFOMehQF8hRtk/uG9lxnBgBQ=;
+        b=XAnXgt3B8RD4u5xrk0zG82Hk6LEKPGGoCqISAfbI3dK7ctg+m1DWgYz8wr+dQ/0NoT
+         3nWtB0t2DKCjlzg0k/7dgSHTl7P87e1kS3urOv2FJbGkV29mzOuU6Aj/EkH6il341UXH
+         ICQjR1048trzcyXPuGSk/exPUAiVj2EEd84rfavYsai5maJ0fYdjq46R0KBuLAWddwO1
+         ik6ERx3hJMlLpLDbZpQ0o8kd2OqIKNjVMTEdFPPS4KnK82hNIJx40XBH6z7lmafkCZn/
+         iOcwQSLkpfi1IeTUzpMyEdf5Kh3OgOLhw/QJqifwaWEq+OLCkrxzRQ9djIef0CFToahi
+         SSQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689650903; x=1692242903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=psBP24l7zlb5k0jEystqFOMehQF8hRtk/uG9lxnBgBQ=;
+        b=WjK1A8Ae2o4hcTtZXdVJwfMcgzDp+e3G84fJf9KlBwWe5n+wX6Nxjxa5SPwtWzrrAh
+         JxFEuPTvztEOFBDbjB/Vwd+rGzMjDQ2pFOoa81paPTU4VzA6+q7retYAzSvJucwbyd3O
+         EaSsYdY3ppXqwJFLBM7bvfEZR9CYB8G/+8NjiTi51/gKM3Mnbo+bfLkXwKt7dCI/59TY
+         w4bfFUOeChYBoI5+CkmOgXn72cSoii7/6DN/P9iBBU5F7B3e7lwx4QNiet3efGxzzyIL
+         TqB3Nbe37tZO1ksSs+rkqcJxSIoD2KrIHkleGdanYJfcoDDTvSs/sarxMq62BUCvCXzM
+         krxQ==
+X-Gm-Message-State: ABy/qLZzLc2lU+FDVPYNxZcjdE9JXrEyHZLpED3bZ2f7lkELpzjkdl4E
+	IKRI/BOGjKr0k+HREYIi9Es=
+X-Google-Smtp-Source: APBJJlH/LxAG9wfB0qXauFE3c0hRH9osU27co+0/TEO32WfnGe5PDqNa0thcqtzx8qKYTAxTvWG0Iw==
+X-Received: by 2002:a17:902:e883:b0:1b8:1591:9f81 with SMTP id w3-20020a170902e88300b001b815919f81mr9634860plg.4.1689650902887;
+        Mon, 17 Jul 2023 20:28:22 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id l12-20020a170903244c00b001b9e9edbf43sm601461pls.171.2023.07.17.20.28.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jul 2023 20:28:22 -0700 (PDT)
+Date: Mon, 17 Jul 2023 20:28:13 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Max Georgiev <glipus@gmail.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Casper Andersson <casper.casan@gmail.com>,
+	Sergey Organov <sorganov@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 net-next 00/10] Introduce ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+Message-ID: <ZLYGzUQRyjE689tW@hoboy.vegasvil.org>
+References: <20230713121907.3249291-1-vladimir.oltean@nxp.com>
+ <CAP5jrPFbt7vc77wVi5buYM88gDQ-OCHzm3Hg=EzRxJiha7Ur5A@mail.gmail.com>
+ <20230717112534.nhy7ldeer42r4rz3@skbuf>
+ <5f8da155-736e-cdd8-35bf-0f68385c6117@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f8da155-736e-cdd8-35bf-0f68385c6117@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add flag ncsi_enabled to struct net_device indicating whether
-NCSI is enabled. Phy_suspend() will use it to decide whether PHY
-can be suspended or not.
+On Mon, Jul 17, 2023 at 01:23:02PM -0700, Jacob Keller wrote:
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- drivers/net/phy/phy_device.c | 4 +++-
- include/linux/netdevice.h    | 3 +++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+> For a mock device thats not really an issue. However, I'd prefer to
+> avoid such in the kernel so that its not available for copying when
+> someone without such knowledge comes along to write a new driver.
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 0c2014accba7..83e988043492 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1859,7 +1859,9 @@ int phy_suspend(struct phy_device *phydev)
- 		return 0;
- 
- 	phy_ethtool_get_wol(phydev, &wol);
--	phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
-+	phydev->wol_enabled = wol.wolopts ||
-+			      (netdev && netdev->wol_enabled) ||
-+			      (netdev && netdev->ncsi_enabled);
- 	/* If the device has WOL enabled, we cannot suspend the PHY */
- 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
- 		return -EBUSY;
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index b828c7a75be2..828fa2206464 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2024,6 +2024,8 @@ enum netdev_ml_priv_type {
-  *
-  *	@wol_enabled:	Wake-on-LAN is enabled
-  *
-+ *	@ncsi_enabled:	NCSI is enabled
-+ *
-  *	@threaded:	napi threaded mode is enabled
-  *
-  *	@net_notifier_list:	List of per-net netdev notifier block
-@@ -2393,6 +2395,7 @@ struct net_device {
- 	struct lock_class_key	*qdisc_tx_busylock;
- 	bool			proto_down;
- 	unsigned		wol_enabled:1;
-+	unsigned		ncsi_enabled:1;
- 	unsigned		threaded:1;
- 
- 	struct list_head	net_notifier_list;
--- 
-2.41.0
-
++1
 
