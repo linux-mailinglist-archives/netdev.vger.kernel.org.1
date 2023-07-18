@@ -1,145 +1,171 @@
-Return-Path: <netdev+bounces-18547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81CEE757949
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 12:32:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 685CC757957
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 12:35:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 396AF281511
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:32:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D7E61C20CAE
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D930A945;
-	Tue, 18 Jul 2023 10:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3D95662;
+	Tue, 18 Jul 2023 10:34:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9181FFC15
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:32:25 +0000 (UTC)
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63248E4C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 03:32:24 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id 4454A32002F9;
-	Tue, 18 Jul 2023 06:32:23 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Tue, 18 Jul 2023 06:32:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1689676342; x=1689762742; bh=AT4+qPytjC5U8
-	SKl/B31tXQN3r3W0JfcCHcfgVdzut4=; b=LnWRjWvx7ScgKU8Db/OXeh+wZksIZ
-	D7nSQe7nnGGxMOY2N+zN1D9U8T0lVPoxZh5ZbXoadhqbOJyX+dIa9ZpO3hATnivx
-	JdJkpMFUXEcmmJas70Uww1khsH84JjtdxWbBfq3TFngHxnWfmaVWUwgloKTcQK3t
-	PUFkhGm5ndnykZVyFKWB6a2akUi/VeMzJJTz7qZ1brkiGbfEqB15WmtzC+fFxO7W
-	9eR6Ck5pkwETjbF1Fis4s6Om472PuzFFD48BeFqRYQRf1hlttKgHovZsC626rr+S
-	0bRteD1zsx/HJg/9CPeYu6c90/Eu9b0e/BqmSP+VAlUIRDsKg/z+bT+aw==
-X-ME-Sender: <xms:Nmq2ZPMnelqu_kYWIFt4m989VGZI2ntErprKbsr6XbpF71AdeAdWQg>
-    <xme:Nmq2ZJ9w4RvwiXcQKfIek-_aHHakAZDFqmYBGk0Gi0wHHgOlDTzgTHuw3qh_ngyLP
-    iUY1eSQgWOBFmw>
-X-ME-Received: <xmr:Nmq2ZOQlIBal4Lw8CUDGhojbS64F8kdFzUfk-cCA3EznS1EKE_UK5sH53fOvIFHxWGSTbc9WQU0lmmkOWfpr-DTwVD4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeeggddvkecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:Nmq2ZDtmzjgdl06JfeyJatKUtGcqZRzzeCoM1hcjPg6DEkH1liVACA>
-    <xmx:Nmq2ZHdNYkRfsnRm2awUcNaELmvGJRa14f-V6LNZZ1_bX05WJfcODA>
-    <xmx:Nmq2ZP2BDozR_187Z3RlM9bchGZvX9kW48eEF4iRaLshkMZoDdz7Cg>
-    <xmx:Nmq2ZIHyENETpsIVGiH3Vgo33iV7N54kEf7kA9rLbYYJr1470JKP-Q>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 18 Jul 2023 06:32:21 -0400 (EDT)
-Date: Tue, 18 Jul 2023 13:32:19 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Message-ID: <ZLZqMw/wOjwtQg+K@shredder>
-References: <20230718080044.2738833-1-liuhangbin@gmail.com>
- <ZLZnGkMxI+T8gFQK@shredder>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C34253C8
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:34:56 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220241B6
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 03:34:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689676494;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XmJ5er1AV6LuYMRqG6UG7ANRyTQybKdF3pT2kD/7TDM=;
+	b=JzL52eDSw8YJNshJrpCPyjd5ey2Je///pOJpVfppkHwYOQcVgmNH5EdvlIFrM4Vof1sK0L
+	UjtE2nEZ82VF7XXqzRxC/DUQIkxUlqtCoKlktKEszDOiruLFBheD8x+rWlhyU9/YvcWctb
+	fIyLHtTKzaeW2xCG0+ZzKL3OnSo6+Ns=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-317-KLjTRdNcMb2u30V4pLkE1A-1; Tue, 18 Jul 2023 06:34:53 -0400
+X-MC-Unique: KLjTRdNcMb2u30V4pLkE1A-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7672918d8a4so129723385a.0
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 03:34:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689676492; x=1692268492;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XmJ5er1AV6LuYMRqG6UG7ANRyTQybKdF3pT2kD/7TDM=;
+        b=SPodyRrOrwUaxRVN0rOqppY7N+LmzHrqiy9VS5cP9ZDjZzyzBCaax0DXWiwNOJN/NH
+         ey3s/CC5AY5jS1B15tfyWtBBt/jppFuAR4xgGU0PCzV7xO6MNuPLuKhubWzEv3XNhgz6
+         eWe6piFs5L3Np2b6wVIroAPRb2Ax29izI0jB9BkT1zO4JvSfwIcV5zMUMKQBgKRp71P2
+         xkQqGz2epGmEt6Ji5chxkt2XgSvDjh+fybL5HcW0wm31zDLPn59dwk+0Eaq1c/L/7xME
+         xzEs6I5bdyb+50/ILRhX1LfS16NwM4DbRzPH1G/nGjWHkQFnjlRvmxBBV+gbpkSlB/nN
+         oa+w==
+X-Gm-Message-State: ABy/qLaVu4RhCIHocJMjosJZQL9CD0HTI6tRS6lKZkDnXb2FvBxnymyS
+	298jBdYmPkBE2Wl/LQhgnZfJb4Qh5tOUlePs8isOhkKWR4Pbqpa+op0P/lMwUtrqi0HY6/1r5+M
+	SxX4jiYd4CGVQBvkF
+X-Received: by 2002:a05:620a:4545:b0:766:3190:8052 with SMTP id u5-20020a05620a454500b0076631908052mr11364159qkp.0.1689676492695;
+        Tue, 18 Jul 2023 03:34:52 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHYrO0ABUIgMBDYx5gO9Jkfww39fKwJPig8csSo20B2W+m6BY5xe8lsA4ooxsL5552qLzpvyg==
+X-Received: by 2002:a05:620a:4545:b0:766:3190:8052 with SMTP id u5-20020a05620a454500b0076631908052mr11364150qkp.0.1689676492422;
+        Tue, 18 Jul 2023 03:34:52 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id g16-20020a05620a13d000b007620b03ee65sm497256qkl.37.2023.07.18.03.34.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 03:34:51 -0700 (PDT)
+Message-ID: <e7def8ab99c2a27176e0861117efbe4797c908eb.camel@redhat.com>
+Subject: Re: [PATCH v1 net 1/4] llc: Check netns in llc_dgram_match().
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov
+	 <razor@blackwall.org>
+Cc: "Eric W. Biederman" <ebiederm@xmission.com>, Harry Coin
+	 <hcoin@quietfountain.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, 
+	netdev@vger.kernel.org
+Date: Tue, 18 Jul 2023 12:34:47 +0200
+In-Reply-To: <20230715021338.34747-2-kuniyu@amazon.com>
+References: <20230715021338.34747-1-kuniyu@amazon.com>
+	 <20230715021338.34747-2-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLZnGkMxI+T8gFQK@shredder>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 01:19:13PM +0300, Ido Schimmel wrote:
-> On Tue, Jul 18, 2023 at 04:00:44PM +0800, Hangbin Liu wrote:
-> > After deleting an interface address in fib_del_ifaddr(), the function
-> > scans the fib_info list for stray entries and calls fib_flush.
-> > Then the stray entries will be deleted silently and no RTM_DELROUTE
-> > notification will be sent.
-> 
-> [...]
-> 
-> > diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-> > index 74d403dbd2b4..1a88013f6a5b 100644
-> > --- a/net/ipv4/fib_trie.c
-> > +++ b/net/ipv4/fib_trie.c
-> > @@ -2026,6 +2026,7 @@ void fib_table_flush_external(struct fib_table *tb)
-> >  int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
-> >  {
-> >  	struct trie *t = (struct trie *)tb->tb_data;
-> > +	struct nl_info info = { .nl_net = net };
-> >  	struct key_vector *pn = t->kv;
-> >  	unsigned long cindex = 1;
-> >  	struct hlist_node *tmp;
-> > @@ -2088,6 +2089,8 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
-> >  
-> >  			fib_notify_alias_delete(net, n->key, &n->leaf, fa,
-> >  						NULL);
-> > +			rtmsg_fib(RTM_DELROUTE, htonl(n->key), fa,
-> > +				  KEYLENGTH - fa->fa_slen, tb->tb_id, &info, 0);
-> 
-> fib_table_flush() isn't only called when an address is deleted, but also
-> when an interface is deleted or put down. The lack of notification in
-> these cases is deliberate. Commit 7c6bb7d2faaf ("net/ipv6: Add knob to
-> skip DELROUTE message on device down") introduced a sysctl to make IPv6
-> behave like IPv4 in this regard, but this patch breaks it.
-> 
-> IMO, the number of routes being flushed because a preferred source
-> address is deleted is significantly lower compared to interface down /
-> deletion, so generating notifications in this case is probably OK. It
-> also seems to be consistent with IPv6 given that rt6_remove_prefsrc()
-> calls fib6_clean_all() and not fib6_clean_all_skip_notify().
+Hi,
 
-Actually, looking closer at IPv6, it seems that routes are not deleted,
-but instead the preferred source address is simply removed from them
-(w/o a notification).
+the series LGTM, I have only a couple of (very) minor nit, see below...
 
-Anyway, my point is that a RTM_DELROUTE notification should not be
-emitted for routes that are deleted because of interface down /
-deletion.
+On Fri, 2023-07-14 at 19:13 -0700, Kuniyuki Iwashima wrote:
+> We will remove this restriction in llc_rcv() in the following patch,
 
-> 
-> >  			hlist_del_rcu(&fa->fa_list);
-> >  			fib_release_info(fa->fa_info);
-> >  			alias_free_mem_rcu(fa);
-> > -- 
-> > 2.38.1
-> > 
-> > 
+s/following patch/soon/, as the following patch will not do that ;)
+
+> which means that the protocol handler must be aware of netns.
+>=20
+> 	if (!net_eq(dev_net(dev), &init_net))
+> 		goto drop;
+>=20
+> llc_rcv() fetches llc_type_handlers[llc_pdu_type(skb) - 1] and calls it
+> if not NULL.
+>=20
+> If the PDU type is LLC_DEST_SAP, llc_sap_handler() is called to pass skb
+> to corresponding sockets.  Then, we must look up a proper socket in the
+> same netns with skb->dev.
+>=20
+> If the destination is a multicast address, llc_sap_handler() calls
+> llc_sap_mcast().  It calculates a hash based on DSAP and skb->dev->ifinde=
+x,
+> iterates on a socket list, and calls llc_mcast_match() to check if the
+> socket is the correct destination.  Then, llc_mcast_match() checks if
+> skb->dev matches with llc_sk(sk)->dev.  So, we need not check netns here.
+>=20
+> OTOH, if the destination is a unicast address, llc_sap_handler() calls
+> llc_lookup_dgram() to look up a socket, but it does not check the netns.
+>=20
+> Therefore, we need to add netns check in llc_lookup_dgram().
+>=20
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/llc/llc_sap.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/net/llc/llc_sap.c b/net/llc/llc_sap.c
+> index 6805ce43a055..5c83fca3acd5 100644
+> --- a/net/llc/llc_sap.c
+> +++ b/net/llc/llc_sap.c
+> @@ -294,13 +294,15 @@ static void llc_sap_rcv(struct llc_sap *sap, struct=
+ sk_buff *skb,
+> =20
+>  static inline bool llc_dgram_match(const struct llc_sap *sap,
+>  				   const struct llc_addr *laddr,
+> -				   const struct sock *sk)
+> +				   const struct sock *sk,
+> +				   const struct net *net)
+>  {
+>       struct llc_sock *llc =3D llc_sk(sk);
+> =20
+>       return sk->sk_type =3D=3D SOCK_DGRAM &&
+> -	  llc->laddr.lsap =3D=3D laddr->lsap &&
+> -	  ether_addr_equal(llc->laddr.mac, laddr->mac);
+> +	     net_eq(sock_net(sk), net) &&
+> +	     llc->laddr.lsap =3D=3D laddr->lsap &&
+> +	     ether_addr_equal(llc->laddr.mac, laddr->mac);
+>  }
+> =20
+>  /**
+> @@ -312,7 +314,8 @@ static inline bool llc_dgram_match(const struct llc_s=
+ap *sap,
+>   *	mac, and local sap. Returns pointer for socket found, %NULL otherwise=
+.
+>   */
+
+As this function has doxygen documentation, you should additionally
+document the 'net' argument.
+
+Thanks,
+
+Paolo
+
 
