@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-18612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56E5D757F4C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:20:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33A6A757F90
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7D6C281586
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E235A2815AD
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F5AF9EA;
-	Tue, 18 Jul 2023 14:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B2AC8D1;
+	Tue, 18 Jul 2023 14:31:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C35AD4B
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E20CFC11
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:31:22 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD10E7E;
-	Tue, 18 Jul 2023 07:20:27 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910261BC6;
+	Tue, 18 Jul 2023 07:31:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CCWgwOpFRQ5XqsiPbGDMwwFojNqf8ujX2CR9i45zWzI=; b=cUaiaLEwT86VbsrvDDtd3lmfsc
-	6P6lhJsp4LilqQUvzPzwBsNp/DT7K/cdlQlz8og1QXVqJLswf0xjZyJ9/+toh4MpakkQmZ/N2Lb3Y
-	ssgfpIgQ3+5SM22Z9tKYZq7nBk421B0656m1oY50TVHXmMA3p7D8o4sulipB/HHVuvX2qLKRpasfG
-	j9wbyjuQi9djwAN2mZ4NV2ivYzvwk2EGP88VJxPLC09zvDEItY+mXRP22IcOr80xwymzv137lHfnN
-	YOshTBsvJxiTlhnYYzMQWkNxdhIrid39KCCJZ2yfByL+s2dbnv05mSwrqCpUIc9FLz6dOJL1UKLsd
-	wxxLM7MQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51756)
+	bh=XL5HpWpvSZ6bXIocoWJRq1XHyxJYL5lSUA7SoP9MkaA=; b=1T01Z0VtbWfEgVQgd7NQ64UAZh
+	EOzIk/fiDOXv1fS+d/KyaJdEnbIoVXqbVX0dcJgReaJfVk4wPhZewzegSQwKtKTXgtQxmqnNn+CFw
+	IKdDKxYI2BUTcyJ9MHPTDbcHzYeJKoVuatsHjFv6/fITu/IKRAysCnqotbNGmObz9MG6L2a5ud7w+
+	ZrA72n/yuWglqXXdVZOLgRrkuca/EOOHZjENHlcH94soqFtkSn77PF86iNTnhMGNBzcvRjjLouJBh
+	JG1njiXJJg98GleMFHzYQ9YlNo4X8kmXcsZLUYq1vEh/ROK6hgUtLRuIDaROIoegCb3xUI3qk849M
+	CRfqNvjg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49238)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1qLlYp-0005nb-1w;
-	Tue, 18 Jul 2023 15:20:19 +0100
+	id 1qLljE-0005oW-1J;
+	Tue, 18 Jul 2023 15:31:04 +0100
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qLlYj-00036j-CY; Tue, 18 Jul 2023 15:20:13 +0100
-Date: Tue, 18 Jul 2023 15:20:13 +0100
+	id 1qLljD-00036w-Cz; Tue, 18 Jul 2023 15:31:03 +0100
+Date: Tue, 18 Jul 2023 15:31:03 +0100
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
@@ -73,11 +73,11 @@ Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Sergey Organov <sorganov@gmail.com>,
 	Michal Kubecek <mkubecek@suse.cz>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 net-next 06/12] net: fec: convert to
- ndo_hwtstamp_get() and ndo_hwtstamp_set()
-Message-ID: <ZLafnWuAlytSN7B+@shell.armlinux.org.uk>
+Subject: Re: [PATCH v8 net-next 10/12] net: transfer rtnl_lock() requirement
+ from ethtool_set_ethtool_phy_ops() to caller
+Message-ID: <ZLaiJ4G6TaJYGJyU@shell.armlinux.org.uk>
 References: <20230717152709.574773-1-vladimir.oltean@nxp.com>
- <20230717152709.574773-7-vladimir.oltean@nxp.com>
+ <20230717152709.574773-11-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230717152709.574773-7-vladimir.oltean@nxp.com>
+In-Reply-To: <20230717152709.574773-11-vladimir.oltean@nxp.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
@@ -95,67 +95,45 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 17, 2023 at 06:27:03PM +0300, Vladimir Oltean wrote:
-> -static int fec_enet_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
-> -{
-> -	struct fec_enet_private *fep = netdev_priv(ndev);
-> -	struct phy_device *phydev = ndev->phydev;
-> -
-> -	if (!netif_running(ndev))
-> -		return -EINVAL;
-> -
-> -	if (!phydev)
-> -		return -ENODEV;
-> -
-... process hwtstamp calls
+On Mon, Jul 17, 2023 at 06:27:07PM +0300, Vladimir Oltean wrote:
+> phy_init() and phy_exit() will have to do more stuff under rtnl_lock()
+> in a future change. Since rtnl_unlock() -> netdev_run_todo() does a lot
+> of stuff under the hood, it's a pity to lock and unlock the rtnetlink
+> mutex twice in a row.
+> 
+> Change the calling convention such that the only caller of
+> ethtool_set_ethtool_phy_ops(), phy_device.c, provides a context where
+> the rtnl_mutex is already acquired.
+> 
+> Note that phy_exit() wasn't performing the opposite teardown of
+> phy_init(). Reverse mdio_bus_init() with ethtool_set_ethtool_phy_ops(),
+> so that this is now the case.
 
-So if the network device is not running, ioctl() returns -EINVAL. From
-what I can see in fec_enet_mii_probe() called from fec_enet_open(), we
-guarantee that phydev will not be NULL once the first open has
-succeeded, so I don't think the second if() statement has any effect.
+To me, this looks buggy.
 
-> +static int fec_hwtstamp_get(struct net_device *ndev,
-> +			    struct kernel_hwtstamp_config *config)
-> +{
-> +	struct fec_enet_private *fep = netdev_priv(ndev);
-> +	struct phy_device *phydev = ndev->phydev;
+> @@ -3451,11 +3452,14 @@ static int __init phy_init(void)
+>  {
+>  	int rc;
+>  
+> +	rtnl_lock();
+> +	ethtool_set_ethtool_phy_ops(&phy_ethtool_phy_ops);
+> +	rtnl_unlock();
 > +
-> +	if (phy_has_hwtstamp(phydev))
-> +		return phy_mii_ioctl(phydev, config->ifr, SIOCGHWTSTAMP);
-> +
-> +	if (!fep->bufdesc_ex)
-> +		return -EOPNOTSUPP;
+>  	rc = mdio_bus_init();
+>  	if (rc)
+>  		return rc;
 
-If the interface hasn't been brought up at least once, then phydev
-here will be NULL, and we'll drop through to this test. If the FEC
-doesn't support extended buffer descriptors, userspace will see
--EOPNOTSUPP rather than -EINVAL. This could be misleading to userspace.
+If mdio_bus_init() fails, and phylib is built as a module, then we
+leave ethtool_phy_ops pointing into module space that has potentially
+been freed or re-used for another module. This error path needs to
+properly clean up.
 
-Does this need something like:
+The same is also true for the other failure paths in phy_init() which
+already do not cater for their failures leaving a dangling pointer in
+ethtool_phy_ops. This should probably be fixed first in a separate
+patch for the net tree.
 
-	if (!netif_running(ndev))
-		return -EINVAL;
-
-before, or maybe just after phy_has_hwtstamp() to give equivalent
-behaviour?
-
-> +static int fec_hwtstamp_set(struct net_device *ndev,
-> +			    struct kernel_hwtstamp_config *config,
-> +			    struct netlink_ext_ack *extack)
-> +{
-> +	struct fec_enet_private *fep = netdev_priv(ndev);
-> +	struct phy_device *phydev = ndev->phydev;
-> +
-> +	if (phy_has_hwtstamp(phydev)) {
-> +		fec_ptp_disable_hwts(ndev);
-> +
-> +		return phy_mii_ioctl(phydev, config->ifr, SIOCSHWTSTAMP);
-> +	}
-> +
-> +	if (!fep->bufdesc_ex)
-> +		return -EOPNOTSUPP;
-
-Same comment here.
+Thanks.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
