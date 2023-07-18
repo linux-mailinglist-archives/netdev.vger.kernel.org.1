@@ -1,173 +1,253 @@
-Return-Path: <netdev+bounces-18694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C1807584E0
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:34:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93B6F7584F4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24B651C204F0
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:34:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7538A1C20DF1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8369E168B9;
-	Tue, 18 Jul 2023 18:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FE4101E9;
+	Tue, 18 Jul 2023 18:39:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77236168A7
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:33:59 +0000 (UTC)
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DEE09D
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 11:33:58 -0700 (PDT)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-577637de4beso61593367b3.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 11:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689705237; x=1692297237;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8kjW4qFXphPcJ9bYD5PankezvrfSw22Y9GSmpsJ/4tY=;
-        b=fs7ldUBuyMlqbBny8PQKd8/lbSxYDOZhen1QzAf0NZkbqW3rd998rBNyBdJcJ1iydN
-         z/wUbPNw0puUBBajjEnkN7cCecboGRAlPTQDUWCUWYSiU3aKQF5c6a8ofjt2vDR4nmZg
-         jlIhomHHnnZHoAbP2TwM265HokYQJYbakNuHgR6CDoainC+aMJUsgEbrEDiwrs87HI5T
-         kKtAa8njCjBmzYE2/P/XlbEBD30+YmoOdzNvfavfoPDkxTPvl5HYRUhpML9IqBVyeuOW
-         bKog7bQlyAwZR9F3VRWyhohIM3Dhvsr3RMDv6rAV3AIlTSMfGyFCPf3FVFtrMrTSgxDj
-         05JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689705237; x=1692297237;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8kjW4qFXphPcJ9bYD5PankezvrfSw22Y9GSmpsJ/4tY=;
-        b=gf03jZu+GyazsMcGOsJ678u/4xVa+YhpuhOO65/8GbyiYywW/ZCMTKYyJdXMufxFOX
-         VkcevUZC2yhFJ29SQTd3c6T2YFS2rc+MvxGDlVQuFuk7ikgRXZZxp3k7tS1bhACZKL1C
-         lU/AtlIYvi6pxjvcfZpgXUvRhmeDvHeKuxXi9VaKdL/07G/XuIvS57zuX5HnPDRRfDAF
-         9cE/23KvBSvDzZct/hD8gsKUPckpBSAuE3DFgRNsswlIbjUKSDfAkU5rG5nemKDVYXdd
-         nyuHX2Bh8/0n+zJFYdX+RFkFyJpEpAycDO52cpM0lR4zN7kbLoBgaH53nDqptVaKPNbB
-         4tgg==
-X-Gm-Message-State: ABy/qLbMulwQEKTLXmjbUTU9sd2yQFRoHU8yXDNbzxqd473eWk1sQvSc
-	sgC2stLfqGlI88G50l28ma0=
-X-Google-Smtp-Source: APBJJlE3RNrLKnltKu/ffMfg9VWsUjMyurcLXx8GOmwvnRVLWj/C6s7yi1yQVoImomWwPQtRRDLPRA==
-X-Received: by 2002:a0d:cc87:0:b0:56d:28b:8042 with SMTP id o129-20020a0dcc87000000b0056d028b8042mr474993ywd.40.1689705237611;
-        Tue, 18 Jul 2023 11:33:57 -0700 (PDT)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:770d:e789:cf56:fb43])
-        by smtp.gmail.com with ESMTPSA id r66-20020a0dcf45000000b0057069c60799sm607227ywd.53.2023.07.18.11.33.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 11:33:57 -0700 (PDT)
-From: Kui-Feng Lee <thinker.li@gmail.com>
-X-Google-Original-From: Kui-Feng Lee <kuifeng@meta.com>
-To: dsahern@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	martin.lau@linux.dev,
-	kernel-team@meta.com,
-	yhs@meta.com
-Cc: Kui-Feng Lee <kuifeng@meta.com>
-Subject: [PATCH net-next v3 2/2] selftests: fib_tests: Add a test case for IPv6 garbage collection
-Date: Tue, 18 Jul 2023 11:33:51 -0700
-Message-Id: <20230718183351.297506-3-kuifeng@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230718183351.297506-1-kuifeng@meta.com>
-References: <20230718183351.297506-1-kuifeng@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B201346A1
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:39:50 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAF1F9;
+	Tue, 18 Jul 2023 11:39:48 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id AAAD660173;
+	Tue, 18 Jul 2023 20:39:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689705586; bh=y8LKM/0CokKO2vVzIn2LDXeZ5ru9UAbuIkefHGPIjm4=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=0r83uC3SXNE1V7UD/Y2I2f/LbJkRGPCF9dyh+rMv8N192XY4z7NyuyFhCMnlT9PDI
+	 I23jHs3Q3FN0o6MPsUwh1Xva+cPSDOwoUABiZ508xYz6mzgEMBi8/y23WNm2MUIOSq
+	 nqEo/Ew/FHhHG+0KOt4NxtGIU7a5A0T0dnozud89jsy0a1PE9+MCgUJLkJiLdEsaJo
+	 VFUdwjvdiW6pkPBLEODeEbBT9wkaQQuu/z1N+8HIcr7qCrE7WpjfuVXxqInQ7hqA7J
+	 NsD3lHXKRzOciTNlEC48afYYO4qYM3AkvIdR+h3z/LUn7T0WjyOtprwSHtAu/xDhi/
+	 aUpe7vlVBe4Xg==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id zhmTaWmv8Cp7; Tue, 18 Jul 2023 20:39:44 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 1E93F60171;
+	Tue, 18 Jul 2023 20:39:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689705583; bh=y8LKM/0CokKO2vVzIn2LDXeZ5ru9UAbuIkefHGPIjm4=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=diwIpzLCpPKaQey0gkERET0dKbleabhoImIHjU+FNwr5NnbDA/ezscEjrg6TseVlQ
+	 HuNvVTp0Da5fEALfq/AQZxdglu6VAfJrOTNEfAeBASiVKJnTWL2Pp9I+QaiJ+xc37+
+	 mf4NkuJDJFplHqnmEtJMdTXJhKaaSfNjKNibu+M+DlWg0A2d3CSR3dToa7OpKJgq+E
+	 hKEL77KvqkiNggtxDpPY5Lh/pgT3K1IfCB/wgXN7un49XexgmH9Cccp5l1qTZNxyEm
+	 OjTVkvaRlSj0Cjblo6PFnLUsyNSjE1UeF3bcjjRdDndyAw5e2GNm9ugSmTfNXMsT7O
+	 RHP5DtUcUFEUw==
+Message-ID: <1c2a2d56-95a0-72f8-23a0-1e186e6443a2@alu.unizg.hr>
+Date: Tue, 18 Jul 2023 20:39:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PROBLEM] selftests: net/forwarding/*.sh: 'Command line is not
+ complete. Try option "help"'
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, petrm@nvidia.com
+References: <856d454e-f83c-20cf-e166-6dc06cbc1543@alu.unizg.hr>
+ <ZLY9yiaVwCGy5H3R@shredder>
+ <8d149f8c-818e-d141-a0ce-a6bae606bc22@alu.unizg.hr>
+Content-Language: en-US
+In-Reply-To: <8d149f8c-818e-d141-a0ce-a6bae606bc22@alu.unizg.hr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add 10 IPv6 routes with expiration time.  Wait for a few seconds
-to make sure they are removed correctly.
+On 7/18/23 20:19, Mirsad Todorovac wrote:
+> On 7/18/23 09:22, Ido Schimmel wrote:
+>> On Mon, Jul 17, 2023 at 10:51:04PM +0200, Mirsad Todorovac wrote:
+>>> Tests fail with error message:
+>>>
+>>> Command line is not complete. Try option "help"
+>>> Failed to create netif
+>>>
+>>> The script
+>>>
+>>> # tools/testing/seltests/net/forwarding/bridge_igmp.sh
+>>>
+>>> bash `set -x` ends with an error:
+>>>
+>>> ++ create_netif_veth
+>>> ++ local i
+>>> ++ (( i = 1 ))
+>>> ++ (( i <= NUM_NETIFS ))
+>>> ++ local j=2
+>>> ++ ip link show dev
+>>> ++ [[ 255 -ne 0 ]]
+>>> ++ ip link add type veth peer name
+>>> Command line is not complete. Try option "help"
+>>> ++ [[ 255 -ne 0 ]]
+>>> ++ echo 'Failed to create netif'
+>>> Failed to create netif
+>>> ++ exit 1
+>>>
+>>> The problem seems to be linked with this piece of code of "lib.sh":
+>>>
+>>> create_netif_veth()
+>>> {
+>>>          local i
+>>>
+>>>          for ((i = 1; i <= NUM_NETIFS; ++i)); do
+>>>                  local j=$((i+1))
+>>>
+>>>                  ip link show dev ${NETIFS[p$i]} &> /dev/null
+>>>                  if [[ $? -ne 0 ]]; then
+>>>                          ip link add ${NETIFS[p$i]} type veth \
+>>>                                  peer name ${NETIFS[p$j]}
+>>>                          if [[ $? -ne 0 ]]; then
+>>>                                  echo "Failed to create netif"
+>>>                                  exit 1
+>>>                          fi
+>>>                  fi
+>>>                  i=$j
+>>>          done
+>>> }
+>>>
+>>> Somehow, ${NETIFS[p$i]} is evaluated to an empty string?
+>>
+>> You need to provide a configuration file in
+>> tools/testing/selftests/net/forwarding/forwarding.config. See
+>> tools/testing/selftests/net/forwarding/forwarding.config.sample for
+>> example.
+>>
+>> Another option is to provide the interfaces on the command line.
+>>
+>> ./bridge_igmp.sh veth0 veth1 veth2 veth3
+>>
+>> If no configuration file is present, we can try to assume that the
+>> tests are meant to be run with veth pairs and not with physical
+>> loopbacks. Something like:
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 71f7c0c49677..5b0183013017 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
+>>   WAIT_TIME=${WAIT_TIME:=5}
+>>   PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+>>   PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+>> -NETIF_TYPE=${NETIF_TYPE:=veth}
+>> -NETIF_CREATE=${NETIF_CREATE:=yes}
+>>   MCD=${MCD:=smcrouted}
+>>   MC_CLI=${MC_CLI:=smcroutectl}
+>>   PING_COUNT=${PING_COUNT:=10}
+>> @@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> +NETIF_TYPE=${NETIF_TYPE:=veth}
+>> +NETIF_CREATE=${NETIF_CREATE:=yes}
+>> +declare -A NETIFS=(
+>> +       [p1]=veth0
+>> +       [p2]=veth1
+>> +       [p3]=veth2
+>> +       [p4]=veth3
+>> +       [p5]=veth4
+>> +       [p6]=veth5
+>> +       [p7]=veth6
+>> +       [p8]=veth7
+>> +       [p9]=veth8
+>> +       [p10]=veth9
+>> +)
+>>   relative_path="${BASH_SOURCE%/*}"
+>>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+> 
+> This patch appears to work for the first testing script
+> 
+> root@defiant:# ./bridge_igmp.sh
+> TEST: IGMPv2 report 239.10.10.10                                    [ OK ]
+> TEST: IGMPv2 leave 239.10.10.10                                     [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 is_include                         [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 include -> allow                   [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 include -> is_include              [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 include -> is_exclude              [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 include -> to_exclude              [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 exclude -> allow                   [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 exclude -> is_include              [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 exclude -> is_exclude              [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 exclude -> to_exclude              [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 include -> block                   [ OK ]
+> TEST: IGMPv3 report 239.10.10.10 exclude -> block                   [ OK ]
+> TEST: IGMPv3 group 239.10.10.10 exclude timeout                     [ OK ]
+> TEST: IGMPv3 S,G port entry automatic add to a *,G port             [ OK ]
+> root@defiant:#
+> 
+> However, I suggest setting tools/testing/selftest/net/forwarding/settings:timeout=150 at least,
+> because default 45 is premature on my box and it leaves the networking system in an undefined
+> state upon exit.
 
-Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
----
- tools/testing/selftests/net/fib_tests.sh | 46 +++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+There is also a gotcha here: you do not delete all veths:
 
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 35d89dfa6f11..87c871cae8c3 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -9,7 +9,7 @@ ret=0
- ksft_skip=4
- 
- # all tests in this script. Can be overridden with -t option
--TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh"
-+TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test"
- 
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -747,6 +747,49 @@ fib_notify_test()
- 	cleanup &> /dev/null
- }
- 
-+fib6_gc_test()
-+{
-+	setup
-+
-+	echo
-+	echo "Fib6 garbage collection test"
-+	set -e
-+
-+	# Check expiration of routes every 3 seconds (GC)
-+	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=3
-+
-+	$IP link add dummy_10 type dummy
-+	$IP link set dev dummy_10 up
-+	$IP -6 address add 2001:10::1/64 dev dummy_10
-+
-+	for i in 0 1 2 3 4 5 6 7 8 9; do
-+	    # Expire route after 2 seconds
-+	    $IP -6 route add 2001:20::1$i \
-+		via 2001:10::2 dev dummy_10 expires 2
-+	done
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 10 ]; then
-+		echo "FAIL: expected 10 routes with expires, got $N_EXP"
-+		ret=1
-+	else
-+	    sleep 4
-+	    N_EXP_s20=$($IP -6 route list |grep expires|wc -l)
-+
-+	    if [ $N_EXP_s20 -ne 0 ]; then
-+		echo "FAIL: expected 0 routes with expires, got $N_EXP_s20"
-+		ret=1
-+	    else
-+		ret=0
-+	    fi
-+	fi
-+
-+	set +e
-+
-+	log_test $ret 0 "ipv6 route garbage collection"
-+
-+	cleanup &> /dev/null
-+}
-+
- fib_suppress_test()
- {
- 	echo
-@@ -2217,6 +2260,7 @@ do
- 	ipv4_mangle)			ipv4_mangle_test;;
- 	ipv6_mangle)			ipv6_mangle_test;;
- 	ipv4_bcast_neigh)		ipv4_bcast_neigh_test;;
-+	fib6_gc_test|ipv6_gc)		fib6_gc_test;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
- 	esac
--- 
-2.34.1
+root@defiant:# ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
+root@defiant:# ./bridge_igmp.sh
+TEST: IGMPv2 report 239.10.10.10                                    [ OK ]
+TEST: IGMPv2 leave 239.10.10.10                                     [ OK ]
+TEST: IGMPv3 report 239.10.10.10 is_include                         [ OK ]
+TEST: IGMPv3 report 239.10.10.10 include -> allow                   [ OK ]
+TEST: IGMPv3 report 239.10.10.10 include -> is_include              [ OK ]
+TEST: IGMPv3 report 239.10.10.10 include -> is_exclude              [ OK ]
+TEST: IGMPv3 report 239.10.10.10 include -> to_exclude              [ OK ]
+TEST: IGMPv3 report 239.10.10.10 exclude -> allow                   [ OK ]
+TEST: IGMPv3 report 239.10.10.10 exclude -> is_include              [ OK ]
+TEST: IGMPv3 report 239.10.10.10 exclude -> is_exclude              [ OK ]
+TEST: IGMPv3 report 239.10.10.10 exclude -> to_exclude              [ OK ]
+TEST: IGMPv3 report 239.10.10.10 include -> block                   [ OK ]
+TEST: IGMPv3 report 239.10.10.10 exclude -> block                   [ OK ]
+TEST: IGMPv3 group 239.10.10.10 exclude timeout                     [ OK ]
+TEST: IGMPv3 S,G port entry automatic add to a *,G port             [ OK ]
+root@defiant:# ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
+3: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+     link/ether b6:46:e6:4c:e4:00 brd ff:ff:ff:ff:ff:ff
+4: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+     link/ether 2e:ff:7f:8a:6b:d4 brd ff:ff:ff:ff:ff:ff
+5: veth3@veth2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+     link/ether ba:33:37:81:dc:5b brd ff:ff:ff:ff:ff:ff
+6: veth2@veth3: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+     link/ether f2:fd:0a:9b:94:17 brd ff:ff:ff:ff:ff:ff
+root@defiant:#
+
+Also, I ran into problems with some other tests, but for documentation sake
+I will address the issue in a separate thread.
+
+Best regards,
+Mirsad Todorovac
 
 
