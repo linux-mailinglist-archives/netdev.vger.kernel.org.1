@@ -1,212 +1,269 @@
-Return-Path: <netdev+bounces-18603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72988757D7C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:28:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A113757E1B
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32339281117
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:28:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F03CB1C20CCD
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B28DD306;
-	Tue, 18 Jul 2023 13:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844C4D521;
+	Tue, 18 Jul 2023 13:49:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B966DD50B
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:28:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7490C433C7;
-	Tue, 18 Jul 2023 13:28:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1689686905;
-	bh=IfFSl5miGLKpU9JXTSuFV2QgCkNHFc9sfpnTtl033W8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CqD/Wnuj2EA3n7pncpARw/ceC8y0Td/v4T33XE3wJFp7AFE82WF+XRcrC7HLkQ4w8
-	 RDGUiQqjoBI9ysrkSOwYTOlbgl7liq3K1ceqfy0hchsK8G/m862P+hNPQNCu2WYouv
-	 lWq1GUzhAsF2jYZdv6FJf1a8zqqHv7lzkYrssxC0=
-Date: Tue, 18 Jul 2023 15:28:20 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Ross Maynard <bids.7405@bigpond.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, Oliver Neukum <oneukum@suse.com>
-Subject: Re: [PATCH] USB: zaurus: 3 broken Zaurus devices
-Message-ID: <2023071846-salvation-frosting-e345@gregkh>
-References: <4963f4df-e36d-94e2-a045-48469ab2a892@bigpond.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE1FC8FA
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:49:00 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73A4E18B
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:48:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689688137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LLaxw2NzrWW+r009Dr4j7Rdw/NRY2OqVU5CYMXXm6+8=;
+	b=bNtz4/rE0HhTa5x4M1BpEmWkTfBRu9alR9G3ia7OoAOVcgcSrjry5Nqm9gx2ne+M/mqi7F
+	AN1HRcGTs1oiceYQSDxVwcppDxYVKxm9GtlffwhDprHKERXTaO9tZFbPyiin6qRTgz3Qwb
+	oo9wYHiZ30JzbbgnXFKYZ1MiKJhYCA0=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-486-Up8Uf_o3MnKv9btGlLsc7Q-1; Tue, 18 Jul 2023 09:48:55 -0400
+X-MC-Unique: Up8Uf_o3MnKv9btGlLsc7Q-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-765a632f342so663712285a.0
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:48:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689688135; x=1690292935;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LLaxw2NzrWW+r009Dr4j7Rdw/NRY2OqVU5CYMXXm6+8=;
+        b=UmJMQTUNkn42bXmFxLVaXeFuEm2OrE5qePOBP6LsbC/w6kPuqbP4g0hQejC8J7/ZiW
+         6TnNrgqzNGoRTRM1MhtK+c9nWW+v/zgqYwNCMYeJoYzKrnGE/LXKnde0S7i1/kFgPMhd
+         MCg/Fa8jHDP47PSPql+iIuKA9FT+1xlW4wDNoRyJHFTkqhSWROEr4yUzLMlpDPsND6UG
+         I2FG6FDOqZaRyZUzOi2bQfM2ZQCavCdZ83GB9ORM6WZkDOk1uTIxyOlg1yN/aYa5If+T
+         /zRrwOOYBMGQKxgeD0OzqAUaKURYLk6T0BDRfvDge9GsnAszsn9T9VokGG52ErzXyp+a
+         cWQg==
+X-Gm-Message-State: ABy/qLaoSQ/JzBuSbcnGeCdBr8IpaoQlm9ZlPHZIV6ftDnVHPz3auW45
+	pb4ZMtT8ZsWfuhOlIvx/Ki9yO9YowlQGnoD/3pZLRo9DQzxEpCho4ou6Kt3mXWHuVzPw8DPeXSU
+	96oEDDXBdqvsBl1ND
+X-Received: by 2002:a05:620a:6785:b0:767:35bc:540a with SMTP id rr5-20020a05620a678500b0076735bc540amr2159576qkn.17.1689688135504;
+        Tue, 18 Jul 2023 06:48:55 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG4MukNT5hzLYq1GhLxnnXJi0mdSCeXfoowDToROhwgmWHtxW1zaVxLyYJoJSQVYJMBJ6xHvQ==
+X-Received: by 2002:a05:620a:6785:b0:767:35bc:540a with SMTP id rr5-20020a05620a678500b0076735bc540amr2159561qkn.17.1689688135249;
+        Tue, 18 Jul 2023 06:48:55 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-94.retail.telecomitalia.it. [79.46.200.94])
+        by smtp.gmail.com with ESMTPSA id pe8-20020a05620a850800b00767502e8601sm606015qkn.35.2023.07.18.06.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 06:48:54 -0700 (PDT)
+Date: Tue, 18 Jul 2023 15:48:50 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v1 1/4] vsock/virtio/vhost: read data from
+ non-linear skb
+Message-ID: <mhpoxo3jsoqp6tnmm2maa47tqlm3bd5sveo4n7aqnnvbh7ryjh@ur54eno5povg>
+References: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
+ <20230717210051.856388-2-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <4963f4df-e36d-94e2-a045-48469ab2a892@bigpond.com>
+In-Reply-To: <20230717210051.856388-2-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 10:16:55AM +1000, Ross Maynard wrote:
-> Hi Greg,
-> 
-> This is related to Oliver Neukum's patch
-> 6605cc67ca18b9d583eb96e18a20f5f4e726103c (USB: zaurus: support another
-> broken Zaurus) which you committed in 2022 to fix broken support for the
-> Zaurus SL-6000.
-> 
-> Prior to that I had been able to track down the original offending patch
-> using git bisect as you had suggested to me:
-> 16adf5d07987d93675945f3cecf0e33706566005 (usbnet: Remove over-broad module
-> alias from zaurus).
-> 
-> It turns out that the offending patch also broke support for 3 other Zaurus
-> models: A300, C700 and B500/SL-5600. My patch adds the 3 device IDs to the
-> driver in the same way Oliver added the SL-6000 ID in his patch.
-> 
-> Could you please review the attached patch? I tested it on all 3 devices and
-> it fixed the problem. For your reference, the associated bug URL is
-> https://bugzilla.kernel.org/show_bug.cgi?id=217632.
-> 
-> Thank you.
-> 
-> Regards,
-> 
-> Ross
-> 
+On Tue, Jul 18, 2023 at 12:00:48AM +0300, Arseniy Krasnov wrote:
+>This is preparation patch for MSG_ZEROCOPY support. It adds handling of
+>non-linear skbs by replacing direct calls of 'memcpy_to_msg()' with
+>'skb_copy_datagram_iter()'. Main advantage of the second one is that it
+>can handle paged part of the skb by using 'kmap()' on each page, but if
+>there are no pages in the skb, it behaves like simple copying to iov
+>iterator. This patch also adds new field to the control block of skb -
+>this value shows current offset in the skb to read next portion of data
+>(it doesn't matter linear it or not). Idea behind this field is that
+>'skb_copy_datagram_iter()' handles both types of skb internally - it
+>just needs an offset from which to copy data from the given skb. This
+>offset is incremented on each read from skb. This approach allows to
+>avoid special handling of non-linear skbs:
+>1) We can't call 'skb_pull()' on it, because it updates 'data' pointer.
+>2) We need to update 'data_len' also on each read from this skb.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> Changelog:
+> v5(big patchset) -> v1:
+>  * Merge 'virtio_transport_common.c' and 'vhost/vsock.c' patches into
+>    this single patch.
+>  * Commit message update: grammar fix and remark that this patch is
+>    MSG_ZEROCOPY preparation.
+>  * Use 'min_t()' instead of comparison using '<>' operators.
 
-> Signed-off-by: Ross Maynard <bids.7405@bigpond.com>
-> Reported-by: Ross Maynard <bids.7405@bigpond.com>
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=217632
-> ---
->  drivers/net/usb/cdc_ether.c | 21 +++++++++++++++++++++
->  drivers/net/usb/zaurus.c    | 21 +++++++++++++++++++++
->  2 files changed, 42 insertions(+)
-> 
-> --- a/drivers/net/usb/cdc_ether.c
-> +++ b/drivers/net/usb/cdc_ether.c
-> @@ -616,6 +616,13 @@ static const struct usb_device_id	products[] = {
->  }, {
->  	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
->  			  | USB_DEVICE_ID_MATCH_DEVICE,
-> +	.idVendor		= 0x04DD,
-> +	.idProduct		= 0x8005,   /* A-300 */
-> +	ZAURUS_FAKE_INTERFACE,
-> +	.driver_info        = 0,
-> +}, {
-> +	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-> +			  | USB_DEVICE_ID_MATCH_DEVICE,
->  	.idVendor		= 0x04DD,
->  	.idProduct		= 0x8006,	/* B-500/SL-5600 */
->  	ZAURUS_MASTER_INTERFACE,
-> @@ -623,12 +630,26 @@ static const struct usb_device_id	products[] = {
->  }, {
->  	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
->  			  | USB_DEVICE_ID_MATCH_DEVICE,
-> +	.idVendor		= 0x04DD,
-> +	.idProduct		= 0x8006,   /* B-500/SL-5600 */
-> +	ZAURUS_FAKE_INTERFACE,
-> +	.driver_info        = 0,
-> +}, {
-> +	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-> +			  | USB_DEVICE_ID_MATCH_DEVICE,
->  	.idVendor		= 0x04DD,
->  	.idProduct		= 0x8007,	/* C-700 */
->  	ZAURUS_MASTER_INTERFACE,
->  	.driver_info		= 0,
->  }, {
->  	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-> +			  | USB_DEVICE_ID_MATCH_DEVICE,
-> +	.idVendor		= 0x04DD,
-> +	.idProduct		= 0x8007,   /* C-700 */
-> +	ZAURUS_FAKE_INTERFACE,
-> +	.driver_info        = 0,
-> +}, {
-> +	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
->  		 | USB_DEVICE_ID_MATCH_DEVICE,
->  	.idVendor               = 0x04DD,
->  	.idProduct              = 0x9031,	/* C-750 C-760 */
-> --- a/drivers/net/usb/zaurus.c
-> +++ b/drivers/net/usb/zaurus.c
-> @@ -289,9 +289,23 @@ static const struct usb_device_id	products [] = {
->  	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
->  			  | USB_DEVICE_ID_MATCH_DEVICE,
->  	.idVendor		= 0x04DD,
-> +	.idProduct		= 0x8005,	/* A-300 */
-> +	ZAURUS_FAKE_INTERFACE,
-> +	.driver_info = (unsigned long)&bogus_mdlm_info,
-> +}, {
-> +	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-> +			  | USB_DEVICE_ID_MATCH_DEVICE,
-> +	.idVendor		= 0x04DD,
->  	.idProduct		= 0x8006,	/* B-500/SL-5600 */
->  	ZAURUS_MASTER_INTERFACE,
->  	.driver_info = ZAURUS_PXA_INFO,
-> +}, {
-> +	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-> +			  | USB_DEVICE_ID_MATCH_DEVICE,
-> +	.idVendor		= 0x04DD,
-> +	.idProduct		= 0x8006,	/* B-500/SL-5600 */
-> +	ZAURUS_FAKE_INTERFACE,
-> +	.driver_info = (unsigned long)&bogus_mdlm_info,
->  }, {
->  	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
->  	          | USB_DEVICE_ID_MATCH_DEVICE,
-> @@ -301,6 +315,13 @@ static const struct usb_device_id	products [] = {
->  	.driver_info = ZAURUS_PXA_INFO,
->  }, {
->  	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-> +			  | USB_DEVICE_ID_MATCH_DEVICE,
-> +	.idVendor		= 0x04DD,
-> +	.idProduct		= 0x8007,	/* C-700 */
-> +	ZAURUS_FAKE_INTERFACE,
-> +	.driver_info = (unsigned long)&bogus_mdlm_info,
-> +}, {
-> +	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
->  		 | USB_DEVICE_ID_MATCH_DEVICE,
->  	.idVendor               = 0x04DD,
->  	.idProduct              = 0x9031,	/* C-750 C-760 */
-> 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
+>
+> drivers/vhost/vsock.c                   | 14 ++++++++-----
+> include/linux/virtio_vsock.h            |  1 +
+> net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++---------
+> 3 files changed, 28 insertions(+), 14 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 817d377a3f36..8c917be32b5d 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -114,6 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		struct sk_buff *skb;
+> 		unsigned out, in;
+> 		size_t nbytes;
+>+		u32 frag_off;
+> 		int head;
+>
+> 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
+>@@ -156,7 +157,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		}
+>
+> 		iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[out], in, iov_len);
+>-		payload_len = skb->len;
+>+		frag_off = VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
+>+		payload_len = skb->len - frag_off;
+> 		hdr = virtio_vsock_hdr(skb);
+>
+> 		/* If the packet is greater than the space available in the
+>@@ -197,8 +199,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 			break;
+> 		}
+>
+>-		nbytes = copy_to_iter(skb->data, payload_len, &iov_iter);
+>-		if (nbytes != payload_len) {
+>+		if (skb_copy_datagram_iter(skb,
+>+					   frag_off,
+>+					   &iov_iter,
+>+					   payload_len)) {
+> 			kfree_skb(skb);
+> 			vq_err(vq, "Faulted on copying pkt buf\n");
+> 			break;
+>@@ -212,13 +216,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		vhost_add_used(vq, head, sizeof(*hdr) + payload_len);
+> 		added = true;
+>
+>-		skb_pull(skb, payload_len);
+>+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += payload_len;
+> 		total_len += payload_len;
+>
+> 		/* If we didn't send all the payload we can requeue the packet
+> 		 * to send it with the next available buffer.
+> 		 */
+>-		if (skb->len > 0) {
+>+		if (VIRTIO_VSOCK_SKB_CB(skb)->frag_off < skb->len) {
+> 			hdr->flags |= cpu_to_le32(flags_to_restore);
+>
+> 			/* We are queueing the same skb to handle
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index c58453699ee9..17dbb7176e37 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -12,6 +12,7 @@
+> struct virtio_vsock_skb_cb {
+> 	bool reply;
+> 	bool tap_delivered;
+>+	u32 frag_off;
+> };
+>
+> #define VIRTIO_VSOCK_SKB_CB(skb) ((struct virtio_vsock_skb_cb *)((skb)->cb))
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index b769fc258931..1a376f808ae6 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -355,7 +355,7 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 	spin_lock_bh(&vvs->rx_lock);
+>
+> 	skb_queue_walk_safe(&vvs->rx_queue, skb,  tmp) {
+>-		off = 0;
+>+		off = VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
+>
+> 		if (total == len)
+> 			break;
+>@@ -370,7 +370,10 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 			 */
+> 			spin_unlock_bh(&vvs->rx_lock);
+>
+>-			err = memcpy_to_msg(msg, skb->data + off, bytes);
+>+			err = skb_copy_datagram_iter(skb, off,
+>+						     &msg->msg_iter,
+>+						     bytes);
+>+
+> 			if (err)
+> 				goto out;
+>
+>@@ -413,25 +416,28 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 	while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
+> 		skb = skb_peek(&vvs->rx_queue);
+>
+>-		bytes = len - total;
+>-		if (bytes > skb->len)
+>-			bytes = skb->len;
+>+		bytes = min_t(size_t, len - total,
+>+			      skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off);
+>
+> 		/* sk_lock is held by caller so no one else can dequeue.
+> 		 * Unlock rx_lock since memcpy_to_msg() may sleep.
+> 		 */
+> 		spin_unlock_bh(&vvs->rx_lock);
+>
+>-		err = memcpy_to_msg(msg, skb->data, bytes);
+>+		err = skb_copy_datagram_iter(skb,
+>+					     VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
+>+					     &msg->msg_iter, bytes);
+>+
+> 		if (err)
+> 			goto out;
+>
+> 		spin_lock_bh(&vvs->rx_lock);
+>
+> 		total += bytes;
+>-		skb_pull(skb, bytes);
+>
+>-		if (skb->len == 0) {
+>+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += bytes;
+>+
+>+		if (skb->len == VIRTIO_VSOCK_SKB_CB(skb)->frag_off) {
+> 			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+>
+> 			virtio_transport_dec_rx_pkt(vvs, pkt_len);
+>@@ -503,7 +509,10 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> 				 */
+> 				spin_unlock_bh(&vvs->rx_lock);
+>
+>-				err = memcpy_to_msg(msg, skb->data, bytes_to_copy);
+>+				err = skb_copy_datagram_iter(skb, 0,
+>+							     &msg->msg_iter,
+>+							     bytes_to_copy);
+>+
+> 				if (err) {
+> 					/* Copy of message failed. Rest of
+> 					 * fragments will be freed without copy.
+>-- 
+>2.25.1
+>
 
-Hi,
-
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- Your patch was attached, please place it inline so that it can be
-  applied directly from the email message itself.
-
-- You did not specify a description of why the patch is needed, or
-  possibly, any description at all, in the email body.  Please read the
-  section entitled "The canonical patch format" in the kernel file,
-  Documentation/process/submitting-patches.rst for what is needed in
-  order to properly describe the change.
-
-- You did not write a descriptive Subject: for the patch, allowing Greg,
-  and everyone else, to know what this patch is all about.  Please read
-  the section entitled "The canonical patch format" in the kernel file,
-  Documentation/process/submitting-patches.rst for what a proper
-  Subject: line should look like.
-
-- This looks like a new version of a previously submitted patch, but you
-  did not list below the --- line any changes from the previous version.
-  Please read the section entitled "The canonical patch format" in the
-  kernel file, Documentation/process/submitting-patches.rst for what
-  needs to be done here to properly describe this.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
 
