@@ -1,160 +1,173 @@
-Return-Path: <netdev+bounces-18532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDF55757869
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:49:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BCBB757880
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF4B21C20C45
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:49:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B8622808E3
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1BBF9C3;
-	Tue, 18 Jul 2023 09:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49928F9D6;
+	Tue, 18 Jul 2023 09:53:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03D2A941
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:49:40 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E995E56
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:49:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Kst6dAgE09mi88B5qGeBaegxBTLfam6+pXeAkiQDwMk=; b=03Va6wsfrF1MqXefEych8hK42C
-	2xEaouccIPoYSv7H/NdHAqZuYCMsoffh7YnNXxNEV9eqQTbBGAFWSscFdNYHN2AmQAYbt7Qw6lnnF
-	bVEHYkRK/6+bJyeaPSPK91R2ibeQbpLbCxyu/E/Qdz23i2oucu9LtGWLCi+IpFa9my9I4Au/kw9u5
-	2tubmHRmIDL26mcxTQi2vbO0e0Wo2PUsdLwNDDMSo4C6WG/volfvpEKgX0+9Up2whPf02JEo7xXu5
-	yao/6h3H4QMRstoqiCvhlRyNKVt3e/nxxhHLsdsEykxYkLcQixShAwuolCASgcLEDE3RvA4VyPUsQ
-	Wi4US7Sw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47322)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qLhKd-0005e5-26;
-	Tue, 18 Jul 2023 10:49:23 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qLhKX-0002wY-TN; Tue, 18 Jul 2023 10:49:17 +0100
-Date: Tue, 18 Jul 2023 10:49:17 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: 'Simon Horman' <simon.horman@corigine.com>, kabel@kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Message-ID: <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk>
-References: <ZK/RYFBjI5OypfTB@corigine.com>
- <ZK/TWbG/SkXtbMkV@shell.armlinux.org.uk>
- <ZK/V57+pl36NhknG@corigine.com>
- <ZK/Xtg3df6n+Nj11@shell.armlinux.org.uk>
- <043401d9b57d$66441e60$32cc5b20$@trustnetic.com>
- <ZK/i3Ta2mcr7xVot@shell.armlinux.org.uk>
- <043501d9b580$31798870$946c9950$@trustnetic.com>
- <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com>
- <ZLUymspsQlJL1k8n@shell.armlinux.org.uk>
- <013701d9b957$fc66f740$f534e5c0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D35C8D8
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:53:37 +0000 (UTC)
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2072.outbound.protection.outlook.com [40.107.102.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B6810E0;
+	Tue, 18 Jul 2023 02:53:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JshX6IzKK8It2qus1OZ9pu6NvoLXgF88mvgsp1/YZj/xbOxCKImamZ+ElKT8gSCIZZtmJWk4WrdW6uIkmzh1lTfJP2UTeH1aKFsX1TAMBwAkkz+e2WhXqojTj3O3sUQUNzKAD7elH+rdJKuusK8BYQupBVC6wNNMsERpvNlFzy8002UUS1XiyMM0HyBEYZEqAGaYX7AdFhqxcM/myM1NKyzIFxw7HwZJT3J51XVAHZs0dxu14x7i4tsoMjASJUPZ1GjuFUOeMCnyUYDcutyJW/KDwBbjq8AvRCYPmnY0x1H9poN385zeziwqTxnHmfsCRhBsI15htY1AFymm1rJQKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=U0D3KvU1Vgdt9kbEaP42kKnqlCcBPvhehoE6DJD5NIM=;
+ b=k1BEMbahf61BWQAZrXv5a0tEl/mRxHeZ1mAPPJ8k6fJi/gGvdez0BDxaFQq77QuyWYsHcWvaS48/+l5U9I3PRWuy6SK/xfBCRxHLzx/GsqRMmDZTcabDAPxjG3xzWOfKRUAmWLnHLpNoPAXX3oyI/a1dHop10wr6nIJFCtUBVPN94pu5rpJw4ldgDLgEkKsEsfZ/BQoeZQQf7hMKkTgIrvUPQDL19hRNHdLArkUMHDdUN1E7Eq40ZUWAuCjLFGdXVRbeU8zBX0OitdkPkDJB9LoA4eAEVrOYkQzORRMieDcp3LZ26x5OFhRWMSX/J3D//GKq/fyjRUauAOGeEueZfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=quicinc.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U0D3KvU1Vgdt9kbEaP42kKnqlCcBPvhehoE6DJD5NIM=;
+ b=OO/R9XQ20PxbqqO+7cN6Pk4jHUPbyoASA4QqTTu+/ithiprriBxKn9WxLwNlfz7rVzJSmsV5xCMTHNnJdqmhTI4Gi0KrcAyVFv6b5dDOl4AGAGbWcJpTc+QiduCETxJZJS1EqBYJkK/9IA34/Gadz4UBIx6ZoxLu1GY4G0PkX/QQKmqTJ/F2EZjXbn41j2No1/7XfXgaeJ/TYZM8LCu8qfgPbgal8qoKM2MuXp9b8hwyhDaZfsQ49Ob3Qn8dESBhu95drYikyrSoz916aCt2/En7Xl0k/zkQ8Ngf5HU2ynHjOyUwPovRzqnT7u1JkpTTmsfhIfZC9xRNMWdPosTWHg==
+Received: from BN9PR03CA0330.namprd03.prod.outlook.com (2603:10b6:408:112::35)
+ by SA1PR12MB6728.namprd12.prod.outlook.com (2603:10b6:806:257::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
+ 2023 09:52:55 +0000
+Received: from BN8NAM11FT091.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:112:cafe::78) by BN9PR03CA0330.outlook.office365.com
+ (2603:10b6:408:112::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
+ Transport; Tue, 18 Jul 2023 09:52:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN8NAM11FT091.mail.protection.outlook.com (10.13.176.134) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6588.33 via Frontend Transport; Tue, 18 Jul 2023 09:52:54 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 18 Jul 2023
+ 02:52:46 -0700
+Received: from localhost (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 18 Jul
+ 2023 02:52:45 -0700
+Date: Tue, 18 Jul 2023 12:52:42 +0300
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Ilia Lin <quic_ilial@quicinc.com>
+CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Ilia Lin <ilia.lin@kernel.org>
+Subject: Re: [PATCH] xfrm: Allow ESP over UDP in packet offload mode
+Message-ID: <20230718095242.GC8808@unreal>
+References: <20230718092405.4124345-1-quic_ilial@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <013701d9b957$fc66f740$f534e5c0$@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230718092405.4124345-1-quic_ilial@quicinc.com>
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT091:EE_|SA1PR12MB6728:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96ba5525-55f1-41e3-16a8-08db8774c27b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4UkP1VBp1wFmaEyx+axnDxOdEX6SigJWJlaPpoBghTG9GWgH3mv86GNSQ5YYdiiE2gwDPpcgP+D4MT+aYHqrY7ldrul6jq3cKonAEi6RAfOM0ctgSwUNFOHxp5uoSeS6ooCql+uVyL4KTjtiEF3b0IS+DkwBOdagjZJq4R4JKqDbuBbXOh9DdeKKylUnimhY/87/6RL2pn+1FWn9d6e8IiUMcsjyxp8u987/xY8ZVQk5G0bWLXJMPY515gYAXb1nB9M7A4gva8Ypn/U9qVASICqQj+izrH5oUFr40eXmI0FqEBZAUvJ1G0/n2QqSEBbHgFeZeMJwbGpWeYk+wNRpbz7ZitBDJ4ioaKPbjIt15vjcNCb7O8KTcHnkRXFXxBmRktzgWeoZ10RFloV3lzKfgUFvznM+kqZUNgr6PPYayKk4xPCzdbFDd6JaThsImvynXmpsfuR5+4U4XloQdrHjHxOLvvLkO+RK3sJrf3ffrPBfcOEMGirLfu6u3FR2v5iogWFfE9KlIWCTDvB5k/FubIYN25N2iVZ/BffjX8+GerZVMw9YczL+XBaAEwXhZ6t/LHyag2BjaH9zQMgTYfL0/GTbE8GIk1qzkWWgPcu/QfZLHf+UycYYEY7K2GmEYlPZDi3+/xul/D5/PaeX+8GNWmYANRcF/pwDUPe9DN+jMU3WV94esRt5uQ/cjiqlcMQ4At2uqura8eJ+XUbaeOz0t21vln2D/Z8yT8rNivbw3QqW9H7eU5y+nDrfQbJqzGebj74vUU9Eqp3/7qPUIi55Jzrc3xpgVmEAqJFTkLx6KrQ=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(7916004)(396003)(346002)(136003)(39860400002)(376002)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(33716001)(2906002)(478600001)(54906003)(6666004)(8676002)(8936002)(7416002)(41300700001)(70206006)(316002)(4326008)(70586007)(6916009)(82740400003)(83380400001)(426003)(336012)(47076005)(86362001)(7636003)(356005)(9686003)(966005)(40460700003)(5660300002)(36860700001)(1076003)(16526019)(26005)(186003)(33656002)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 09:52:54.9984
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96ba5525-55f1-41e3-16a8-08db8774c27b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN8NAM11FT091.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6728
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 05:12:33PM +0800, Jiawen Wu wrote:
-> On Monday, July 17, 2023 8:23 PM, Russell King (Oracle) wrote:
-> > On Mon, Jul 17, 2023 at 06:51:38PM +0800, Jiawen Wu wrote:
-> > > > > > > There are two places that mv3310_reset() is called, mv3310_config_mdix()
-> > > > > > > and mv3310_set_edpd(). One of them is in the probe function, after we
-> > > > > > > have powered up the PHY.
-> > > > > > >
-> > > > > > > I think we need much more information from the reporter before we can
-> > > > > > > guess which commit is a problem, if any.
-> > > > > > >
-> > > > > > > When does the reset time out?
-> > > > > > > What is the code path that we see mv3310_reset() timing out?
-> > > > > > > Does the problem happen while resuming or probing?
-> > > > > > > How soon after clearing the power down bit is mv3310_reset() called?
-> > > > > >
-> > > > > > I need to test it more times for more information.
-> > > > > >
-> > > > > > As far as I know, reset timeout appears in mv3310_set_edpd(), after mv3310_power_up()
-> > > > > > in mv3310_config_init().
-> > > > > >
-> > > > > > Now what I'm confused about is, sometimes there was weird values while probing, just
-> > > > > > to read out a weird firmware version, that caused the test to fail.
-> > > > > >
-> > > > > > And for this phy_read_mmd_poll_timeout(), it only succeeds when sleep_before_read = true.
-> > > > > > Otherwise, it would never succeed to clear the power down bit. Currently it looks like clearing
-> > > > > > the bit takes about 1ms.
-> > > > >
-> > > > > So, reading the bit before the first delay period results in the bit not
-> > > > > clearing, despite having written it to be zero?
-> > > >
-> > > > Yes. So in the original code, there is no delay to read the register again for
-> > > > setting software reset bit. I think the power down bit is not actually cleared
-> > > > in my test.
-> > >
-> > > Hi Russell,
-> > >
-> > > I confirmed last week that this change is valid to make mv3310_reset() success.
-> > > But now reset fails again, only on port 0. Reset timeout still appears in
-> > > mv3310_config_init() -> mv3310_set_edpd() -> mv3310_reset(). I deleted this
-> > > change to test again, and the result shows that this change is valid for port 1.
-> > >
-> > > So I'm a little confused. Since I don't have programming guidelines for this PHY,
-> > > but only a datasheet. Could you please help to check for any possible problems
-> > > with it?
-> > 
-> > I think the question that's missing is... why do other 88x3310 users not
-> > see this problem - what is special about your port 0?
-> > 
-> > Maybe there's a clue with the hardware schematics? Do you have access to
-> > those?
+On Tue, Jul 18, 2023 at 12:24:05PM +0300, Ilia Lin wrote:
+> The ESP encapsulation is not supported only in crypto mode.
+> In packet offload mode, the RX is bypassing the XFRM,
+> so we can enable the encapsulation.
+
+It is not accurate. RX is bypassed after XFRM validated packet to ensure
+that it was really handled by HW.
+
+However, this patch should come with relevant driver code which should
+support ESP over UDP. You can see it here:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=xfrm-next
+ xfrm: Support UDP encapsulation in packet offload mode
+ net/mlx5e: Support IPsec NAT-T functionality
+ net/mlx5e: Check for IPsec NAT-T support
+ net/mlx5: Add relevant capabilities bits to support NAT-T
+
+Thanks
+
 > 
-> This problem never happened again after I poweroff and restart the machine.
-> However, this patch is still required to successfully probe the PHY.
+> Signed-off-by: Ilia Lin <ilia.lin@kernel.org>
+> ---
+>  net/xfrm/xfrm_device.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> One thing I've noticed is that there is restriction in mv3310_power_up(), software
-> reset not performed when priv->firmware_ver < 0x00030000. And my 88x3310's
-> firmware version happens to 0x20200. Will this restriction cause subsequent reset
-> timeout(without this patch)?
-
-We (Matteo and I) discovered the need for software reset by
-experimentation on his Macchiatobin and trying different firmware
-versions. Essentially, I had 0.2.1.0 which didn't need the software
-reset, Matteo had 0.3.3.0 which did seem to need it.
-
-I also upgraded my firmware to 0.3.3.0 and even 0.3.10.0 and confirmed
-that the software reset works on the two PHYs on my boards.
-
-What I don't understand is "this patch is still required to successfully
-probe the PHY". The power-up path is not called during probe - nor is
-the EDPD path. By "probe" I'm assuming we're talking about the driver
-probe, in other words, mv3310_probe(), not the config_init - it may be
-that you're terminology is not matching phylib's terminology. Please
-can you clarify.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> index 4aff76c6f12e0..3018468d97662 100644
+> --- a/net/xfrm/xfrm_device.c
+> +++ b/net/xfrm/xfrm_device.c
+> @@ -246,8 +246,10 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+>  		return -EINVAL;
+>  	}
+>  
+> -	/* We don't yet support UDP encapsulation and TFC padding. */
+> -	if (x->encap || x->tfcpad) {
+> +	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
+> +
+> +	/* We don't yet support UDP encapsulation except full mode and TFC padding. */
+> +	if ((!is_packet_offload && x->encap) || x->tfcpad) {
+>  		NL_SET_ERR_MSG(extack, "Encapsulation and TFC padding can't be offloaded");
+>  		return -EINVAL;
+>  	}
+> @@ -258,7 +260,6 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+>  		return -EINVAL;
+>  	}
+>  
+> -	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
+>  	dev = dev_get_by_index(net, xuo->ifindex);
+>  	if (!dev) {
+>  		if (!(xuo->flags & XFRM_OFFLOAD_INBOUND)) {
+> -- 
+> 
+> 
 
