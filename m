@@ -1,57 +1,63 @@
-Return-Path: <netdev+bounces-18684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFD6758450
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:15:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B00B8758458
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:16:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F70B28162D
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:15:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E03B21C20D9D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C10716429;
-	Tue, 18 Jul 2023 18:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC14A1642E;
+	Tue, 18 Jul 2023 18:16:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE6A14A85
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:15:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB4D9C433C8;
-	Tue, 18 Jul 2023 18:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBA614A85
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:16:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 964E8C433C7;
+	Tue, 18 Jul 2023 18:16:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689704110;
-	bh=QH0xYXdTL5ojivjEzeCT3IU9wzvatahM/LtkztuvSTY=;
+	s=k20201202; t=1689704183;
+	bh=dLw0o8GM5ZiBvdbNfsNS2F4dK0uCCiB3AzKY0zXlyXc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M2xJPN8NkR7qyXSRJpzqMsqZ0hj4ofVwtTavhx3nB43D9hiF17Jgg0vUBjoG6GOyZ
-	 NHkodP8ygOWRSS9EcGASWagCYZyhTXUHuYsu/CHwV0wazaWRQoZmVa0kpq7LXp2KEo
-	 28do4tKMH65/CCglk9STCpu4TQbBi/e0ydhVmLGH3TWi1Je5kii3sUONcHdZqYy8U0
-	 8duXFGfRsHj7lNVAeSuuI6a3XqyZcESPQZSAS3CRKS7mCfin+89r6P8xdnFUriaByd
-	 /8tmr35CcRgdRHefUBhC2OWYDewm1En+PQlBGS0Xnera7dOX1hV4Lo/tGRsDCtGUpg
-	 Kr8fgqNGjuE0g==
-Date: Tue, 18 Jul 2023 11:15:08 -0700
+	b=Sk34ZwNBe/3LC5ZIESpIzoRXj4R8CoaZFCUhRCCRjVBdh7WY6p9UGAQJ8anvUVIBk
+	 bwm6uah3bWKRroO9mMyGstbl+cmPOfMayBy0jMEdDp4ojAA5T1phqU2xDBfAqrfymG
+	 TT1zwfibNIIqZZTCMCdCFYUS9F3HE9UtrEF3w8g4nYDNByJlEUSSXnOIjVxtp0qkmV
+	 8jZCxDUu0QlDS2mYALIsha2JHv6NqdnVTBz/iNqiuqVNCNNGrmpGNms5pteH6v8xZq
+	 ZK2etPYINuucQ/iQ0VkMegoraBmpDAkaRKNtqbq6tNXFu39zkWnejECZVTzmYcSkQA
+	 iBVbYV3mFpcow==
+Date: Tue, 18 Jul 2023 11:16:21 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Mina Almasry <almasrymina@google.com>, Andy Lutomirski
- <luto@kernel.org>, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, Sumit Semwal
- <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Yunsheng Lin
+ <yunshenglin0825@gmail.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang
+ Chen <liangchen.linux@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
  Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, David Ahern
- <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>
-Subject: Re: [RFC PATCH 00/10] Device Memory TCP
-Message-ID: <20230718111508.6f0b9a83@kernel.org>
-In-Reply-To: <ZLbUpdNYvyvkD27P@ziepe.ca>
-References: <20230710223304.1174642-1-almasrymina@google.com>
-	<12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
-	<CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
-	<ZLbUpdNYvyvkD27P@ziepe.ca>
+ <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH v5 RFC 1/6] page_pool: frag API support for 32-bit arch
+ with 64-bit DMA
+Message-ID: <20230718111621.35a64a0b@kernel.org>
+In-Reply-To: <6c94f7b8-f553-1fce-f3f1-66cdead9e056@huawei.com>
+References: <20230629120226.14854-1-linyunsheng@huawei.com>
+	<20230629120226.14854-2-linyunsheng@huawei.com>
+	<20230707170157.12727e44@kernel.org>
+	<3d973088-4881-0863-0207-36d61b4505ec@gmail.com>
+	<20230710113841.482cbeac@kernel.org>
+	<8639b838-8284-05a2-dbc3-7e4cb45f163a@intel.com>
+	<20230711093705.45454e41@kernel.org>
+	<1bec23ff-d38b-3fdf-1bb3-89658c1d465a@intel.com>
+	<46ad09d9-6596-cf07-5cab-d6ceb1e36f3c@huawei.com>
+	<20230712102603.5038980e@kernel.org>
+	<9a5b4c50-2401-b3e7-79aa-33d3ccee41c5@huawei.com>
+	<20230714105214.39ad4e4d@kernel.org>
+	<6c94f7b8-f553-1fce-f3f1-66cdead9e056@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +67,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Jul 2023 15:06:29 -0300 Jason Gunthorpe wrote:
-> netlink feels like a weird API choice for that, in particular it would
-> be really wrong to somehow bind the lifecycle of a netlink object to a
-> process.
+On Mon, 17 Jul 2023 20:33:05 +0800 Yunsheng Lin wrote:
+> > Only those used in function prototypes. Pointers in structures 
+> > are somewhat special and don't require fwd declaration.  
+> 
+> I gave it a try to split it, and something as below come out:
+> 
+> https://github.com/gestionlin/linux/commit/11ac8c1959f7eda06a7b987903f37212b490b292
+> 
+> As the 'helpers.h' is not really useful when splitting, so only
+> 'page_pool_types.h' is added, and include 'page_pool_types.h' in
+> 'page_pool.h', does it make sense?
+> 
+> As Alexander is sending a new RFC for the similar problem, I think
+> we need to align on which is the better way to solve the problem.
 
-Netlink is the right API, life cycle of objects can be easily tied to
-a netlink socket.
+LGTM, thanks!
 
