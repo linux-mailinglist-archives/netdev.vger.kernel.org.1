@@ -1,143 +1,220 @@
-Return-Path: <netdev+bounces-18536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B19A7578B9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 12:01:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D30EB7578B2
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 12:00:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36FC52812A6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:01:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 465A328141C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 10:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F343F9FA;
-	Tue, 18 Jul 2023 10:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67464F9F0;
+	Tue, 18 Jul 2023 10:00:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311B5A941
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:01:08 +0000 (UTC)
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C36FAC
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 03:00:59 -0700 (PDT)
-X-QQ-mid:Yeas50t1689674309t583t29858
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.243.13])
-X-QQ-SSF:00400000000000F0FPF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 10721024056483986855
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: "'Simon Horman'" <simon.horman@corigine.com>,
-	<kabel@kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-References: <ZK/RYFBjI5OypfTB@corigine.com> <ZK/TWbG/SkXtbMkV@shell.armlinux.org.uk> <ZK/V57+pl36NhknG@corigine.com> <ZK/Xtg3df6n+Nj11@shell.armlinux.org.uk> <043401d9b57d$66441e60$32cc5b20$@trustnetic.com> <ZK/i3Ta2mcr7xVot@shell.armlinux.org.uk> <043501d9b580$31798870$946c9950$@trustnetic.com> <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com> <ZLUymspsQlJL1k8n@shell.armlinux.org.uk> <013701d9b957$fc66f740$f534e5c0$@trustnetic.com> <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk>
-In-Reply-To: <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk>
-Subject: RE: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Date: Tue, 18 Jul 2023 17:58:28 +0800
-Message-ID: <013e01d9b95e$66c10350$344309f0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6FDA932
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 10:00:19 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CCB5188;
+	Tue, 18 Jul 2023 03:00:16 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36I9wkGR021989;
+	Tue, 18 Jul 2023 04:58:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1689674326;
+	bh=I05cpe/5PNH+nd3/lltH/WL4YOk+fvTtXZQyDgYqHVA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=KAlrUlH00MufWrrkhwith2WtivgjZ453MLQCRnG8HKpdeb0KsZLKOP2WdAxdqC/CS
+	 xexnzqixR4ZegZljXX2ICTqGwdMFAkh6yiqgbCmEdjlSIIUXTDqXLAA6Wq3OC3Py+E
+	 zS2+qSIe1axmxD8hfCkITzMKsctsTcn5PWGePFM0=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36I9wkaG022008
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 18 Jul 2023 04:58:46 -0500
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 18
+ Jul 2023 04:58:46 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 18 Jul 2023 04:58:46 -0500
+Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36I9wePe095601;
+	Tue, 18 Jul 2023 04:58:40 -0500
+Message-ID: <78c1a348-8dd7-032f-62ce-d0dad360972a@ti.com>
+Date: Tue, 18 Jul 2023 15:28:39 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [EXTERNAL] Re: [PATCH v9 2/2] net: ti: icssg-prueth: Add ICSSG
+ ethernet driver
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20230714094432.1834489-1-danishanwar@ti.com>
+ <20230714094432.1834489-3-danishanwar@ti.com>
+ <78b82c086c91be61d6a15582a7dc6f52b92f1b3e.camel@redhat.com>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <78b82c086c91be61d6a15582a7dc6f52b92f1b3e.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQJ8wJH4xT8YA9GxR1NNeOaW9y9H2QG8NQP0AfGKM9MBxi/OwALXGYu6AhlMCZABTDorlQFjhYqqApkC1W8CGUSlBAG/1/rdrd0IQOA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
-	autolearn_force=no version=3.4.6
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tuesday, July 18, 2023 5:49 PM, Russell King (Oracle) wrote:
-> On Tue, Jul 18, 2023 at 05:12:33PM +0800, Jiawen Wu wrote:
-> > On Monday, July 17, 2023 8:23 PM, Russell King (Oracle) wrote:
-> > > On Mon, Jul 17, 2023 at 06:51:38PM +0800, Jiawen Wu wrote:
-> > > > > > > > There are two places that mv3310_reset() is called, mv3310_config_mdix()
-> > > > > > > > and mv3310_set_edpd(). One of them is in the probe function, after we
-> > > > > > > > have powered up the PHY.
-> > > > > > > >
-> > > > > > > > I think we need much more information from the reporter before we can
-> > > > > > > > guess which commit is a problem, if any.
-> > > > > > > >
-> > > > > > > > When does the reset time out?
-> > > > > > > > What is the code path that we see mv3310_reset() timing out?
-> > > > > > > > Does the problem happen while resuming or probing?
-> > > > > > > > How soon after clearing the power down bit is mv3310_reset() called?
-> > > > > > >
-> > > > > > > I need to test it more times for more information.
-> > > > > > >
-> > > > > > > As far as I know, reset timeout appears in mv3310_set_edpd(), after mv3310_power_up()
-> > > > > > > in mv3310_config_init().
-> > > > > > >
-> > > > > > > Now what I'm confused about is, sometimes there was weird values while probing, just
-> > > > > > > to read out a weird firmware version, that caused the test to fail.
-> > > > > > >
-> > > > > > > And for this phy_read_mmd_poll_timeout(), it only succeeds when sleep_before_read = true.
-> > > > > > > Otherwise, it would never succeed to clear the power down bit. Currently it looks like clearing
-> > > > > > > the bit takes about 1ms.
-> > > > > >
-> > > > > > So, reading the bit before the first delay period results in the bit not
-> > > > > > clearing, despite having written it to be zero?
-> > > > >
-> > > > > Yes. So in the original code, there is no delay to read the register again for
-> > > > > setting software reset bit. I think the power down bit is not actually cleared
-> > > > > in my test.
-> > > >
-> > > > Hi Russell,
-> > > >
-> > > > I confirmed last week that this change is valid to make mv3310_reset() success.
-> > > > But now reset fails again, only on port 0. Reset timeout still appears in
-> > > > mv3310_config_init() -> mv3310_set_edpd() -> mv3310_reset(). I deleted this
-> > > > change to test again, and the result shows that this change is valid for port 1.
-> > > >
-> > > > So I'm a little confused. Since I don't have programming guidelines for this PHY,
-> > > > but only a datasheet. Could you please help to check for any possible problems
-> > > > with it?
-> > >
-> > > I think the question that's missing is... why do other 88x3310 users not
-> > > see this problem - what is special about your port 0?
-> > >
-> > > Maybe there's a clue with the hardware schematics? Do you have access to
-> > > those?
-> >
-> > This problem never happened again after I poweroff and restart the machine.
-> > However, this patch is still required to successfully probe the PHY.
-> >
-> > One thing I've noticed is that there is restriction in mv3310_power_up(), software
-> > reset not performed when priv->firmware_ver < 0x00030000. And my 88x3310's
-> > firmware version happens to 0x20200. Will this restriction cause subsequent reset
-> > timeout(without this patch)?
-> 
-> We (Matteo and I) discovered the need for software reset by
-> experimentation on his Macchiatobin and trying different firmware
-> versions. Essentially, I had 0.2.1.0 which didn't need the software
-> reset, Matteo had 0.3.3.0 which did seem to need it.
-> 
-> I also upgraded my firmware to 0.3.3.0 and even 0.3.10.0 and confirmed
-> that the software reset works on the two PHYs on my boards.
-> 
-> What I don't understand is "this patch is still required to successfully
-> probe the PHY". The power-up path is not called during probe - nor is
-> the EDPD path. By "probe" I'm assuming we're talking about the driver
-> probe, in other words, mv3310_probe(), not the config_init - it may be
-> that you're terminology is not matching phylib's terminology. Please
-> can you clarify.
+Hi Paolo,
 
-I'm sorry for the mistake in my description. I mean MAC driver probe, in fact
-it is in phy_connect_direct(), to call mv3310_config_init().
+On 18/07/23 1:52 pm, Paolo Abeni wrote:
+> On Fri, 2023-07-14 at 15:14 +0530, MD Danish Anwar wrote:
+>> +static int prueth_netdev_init(struct prueth *prueth,
+>> +			      struct device_node *eth_node)
+>> +{
+>> +	int ret, num_tx_chn = PRUETH_MAX_TX_QUEUES;
+>> +	struct prueth_emac *emac;
+>> +	struct net_device *ndev;
+>> +	enum prueth_port port;
+>> +	enum prueth_mac mac;
+>> +
+>> +	port = prueth_node_port(eth_node);
+>> +	if (port == PRUETH_PORT_INVALID)
+>> +		return -EINVAL;
+>> +
+>> +	mac = prueth_node_mac(eth_node);
+>> +	if (mac == PRUETH_MAC_INVALID)
+>> +		return -EINVAL;
+>> +
+>> +	ndev = alloc_etherdev_mq(sizeof(*emac), num_tx_chn);
+>> +	if (!ndev)
+>> +		return -ENOMEM;
+>> +
+>> +	emac = netdev_priv(ndev);
+>> +	prueth->emac[mac] = emac;
+>> +	emac->prueth = prueth;
+>> +	emac->ndev = ndev;
+>> +	emac->port_id = port;
+>> +	emac->cmd_wq = create_singlethread_workqueue("icssg_cmd_wq");
+>> +	if (!emac->cmd_wq) {
+>> +		ret = -ENOMEM;
+>> +		goto free_ndev;
+>> +	}
+>> +	INIT_WORK(&emac->rx_mode_work, emac_ndo_set_rx_mode_work);
+>> +
+>> +	ret = pruss_request_mem_region(prueth->pruss,
+>> +				       port == PRUETH_PORT_MII0 ?
+>> +				       PRUSS_MEM_DRAM0 : PRUSS_MEM_DRAM1,
+>> +				       &emac->dram);
+>> +	if (ret) {
+>> +		dev_err(prueth->dev, "unable to get DRAM: %d\n", ret);
+>> +		ret = -ENOMEM;
+>> +		goto free_wq;
+>> +	}
+>> +
+>> +	emac->tx_ch_num = 1;
+>> +
+>> +	SET_NETDEV_DEV(ndev, prueth->dev);
+>> +	spin_lock_init(&emac->lock);
+>> +	mutex_init(&emac->cmd_lock);
+>> +
+>> +	emac->phy_node = of_parse_phandle(eth_node, "phy-handle", 0);
+>> +	if (!emac->phy_node && !of_phy_is_fixed_link(eth_node)) {
+>> +		dev_err(prueth->dev, "couldn't find phy-handle\n");
+>> +		ret = -ENODEV;
+>> +		goto free;
+>> +	} else if (of_phy_is_fixed_link(eth_node)) {
+>> +		ret = of_phy_register_fixed_link(eth_node);
+>> +		if (ret) {
+>> +			ret = dev_err_probe(prueth->dev, ret,
+>> +					    "failed to register fixed-link phy\n");
+>> +			goto free;
+>> +		}
+>> +
+>> +		emac->phy_node = eth_node;
+>> +	}
+>> +
+>> +	ret = of_get_phy_mode(eth_node, &emac->phy_if);
+>> +	if (ret) {
+>> +		dev_err(prueth->dev, "could not get phy-mode property\n");
+>> +		goto free;
+>> +	}
+>> +
+>> +	if (emac->phy_if != PHY_INTERFACE_MODE_MII &&
+>> +	    !phy_interface_mode_is_rgmii(emac->phy_if)) {
+>> +		dev_err(prueth->dev, "PHY mode unsupported %s\n", phy_modes(emac->phy_if));
+>> +		ret = -EINVAL;
+>> +		goto free;
+>> +	}
+>> +
+>> +	/* AM65 SR2.0 has TX Internal delay always enabled by hardware
+>> +	 * and it is not possible to disable TX Internal delay. The below
+>> +	 * switch case block describes how we handle different phy modes
+>> +	 * based on hardware restriction.
+>> +	 */
+>> +	switch (emac->phy_if) {
+>> +	case PHY_INTERFACE_MODE_RGMII_ID:
+>> +		emac->phy_if = PHY_INTERFACE_MODE_RGMII_RXID;
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+>> +		emac->phy_if = PHY_INTERFACE_MODE_RGMII;
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_RGMII:
+>> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+>> +		dev_err(prueth->dev, "RGMII mode without TX delay is not supported");
+>> +		return -EINVAL;
+> 
+> At this point ndev prueth->emac[mac] == emac, so the caller will try to
+> clean it up via prueth_netdev_exit(), which in turn expects the device
+> being fully initialized, while this is not. Notably the napi instance
+> has not being registered yet.
+> 
+> You should 'goto free;' above and possibly move the 'ndev prueth-
+>> emac[mac] = emac' assignment at the end of this function.
+> 
 
+Sure Paolo. Instead of returning -EINVAL in this switch case, I will do the
+below change.
+
+	ret = -EINVAL
+	goto free;
+
+Also I will move the 'ndev prueth-> emac[mac] = emac' assignment at the end of
+this function.
+
+Please let me know if you have any more comments / suggestions. I will try to
+address them and send a next revision.
+
+-- 
+Thanks and Regards,
+Danish.
 
