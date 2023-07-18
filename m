@@ -1,101 +1,125 @@
-Return-Path: <netdev+bounces-18615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB8E2757FCF
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:41:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4495E757FC6
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA091C20D02
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:41:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3B8F2815B4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB93D2F6;
-	Tue, 18 Jul 2023 14:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134A3C2F2;
+	Tue, 18 Jul 2023 14:38:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34E0C2F2
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:41:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75042EC
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 07:41:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689691281;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=CCg5WDaXzv03l28o1RN2K36+Jpm9hzngTCK2Y9mPiyQ=;
-	b=EC3gQ0BnPR2M54ZxizjSJklCa2YSo8KXtWeGE+5PBZwgFje6mhU3b6oDRomXT0SZK66xEE
-	iWOC1Q0qZlUL9lQDrko9AV614IeGsQGIaOHNJs77ahnGi4Ejv/SZh/mmNpHZUNT616tZQn
-	OcNVw91Qe6j/rd8D6l+DAwG7acE71OI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-1-FqzJvgWKNvSOxwt5HZkmBg-1; Tue, 18 Jul 2023 10:41:15 -0400
-X-MC-Unique: FqzJvgWKNvSOxwt5HZkmBg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D788891F27;
-	Tue, 18 Jul 2023 14:38:50 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.66])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 06D5240C6F4C;
-	Tue, 18 Jul 2023 14:38:48 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A41AD4B
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:38:35 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89D11719;
+	Tue, 18 Jul 2023 07:38:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QDGVvqTwYt8b/dIF34Msb2Qg2sBePCy/DbtoiGhv/Tw=; b=0u7cH2PdolnPrx5b7qW29u6eRC
+	r+8lDPLaakp9SdLiN0/jRQ6robsjWftZ37DJHaQp3/mR7AAyQi3YdOvkrVKgKEE9ytZ0l2Afe/ohu
+	YvXAck7vUXxypO6TB1TLOhjvO5AnpnpKYKN2d/KpbwYQkqbhK7wTUsQQ+HU79og3OEEnb2O2u4u70
+	LCc+rWjVK2+LWVUz4yalNM3Krrs4OorDHZJ/yTC6neomWYwJGZK2v3I0xbrOM3gMP/TsGTc4OKm3+
+	6mkrwzYYm3VW7azPXv5ZS3ZOf+6YDffNgRvcFnVeuvR7sn24IAkJin/SjpVbfG3S8gf+DWbY2kp5j
+	aM7mcFXg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47782)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qLlqQ-0005pT-17;
+	Tue, 18 Jul 2023 15:38:30 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qLlqN-000378-Oi; Tue, 18 Jul 2023 15:38:27 +0100
+Date: Tue, 18 Jul 2023 15:38:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH v2 net-next] udp: use indirect call wrapper for data ready()
-Date: Tue, 18 Jul 2023 16:38:09 +0200
-Message-ID: <d47d53e6f8ee7a11228ca2f025d6243cc04b77f3.1689691004.git.pabeni@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxim Georgiev <glipus@gmail.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Casper Andersson <casper.casan@gmail.com>,
+	Sergey Organov <sorganov@gmail.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 net-next 12/12] net: remove phy_has_hwtstamp() ->
+ phy_mii_ioctl() decision from converted drivers
+Message-ID: <ZLaj40L3s+FssNHq@shell.armlinux.org.uk>
+References: <20230717152709.574773-1-vladimir.oltean@nxp.com>
+ <20230717152709.574773-13-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230717152709.574773-13-vladimir.oltean@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In most cases UDP sockets use the default data ready callback.
-Leverage the indirect call wrapper for such callback to avoid an
-indirect call in fastpath.
+On Mon, Jul 17, 2023 at 06:27:09PM +0300, Vladimir Oltean wrote:
+> +static int dev_set_hwtstamp_phylib(struct net_device *dev,
+> +				   struct kernel_hwtstamp_config *cfg,
+> +				   struct netlink_ext_ack *extack)
+> +{
+> +	const struct net_device_ops *ops = dev->netdev_ops;
+> +	bool phy_ts = phy_has_hwtstamp(dev->phydev);
+> +	struct kernel_hwtstamp_config old_cfg = {};
+> +	bool changed = false;
+> +	int err;
+> +
+> +	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
+> +
+> +	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
 
-The above gives small but measurable performance gain under UDP flood.
+I suppose the idea here is that for something like mvpp2, which when we
+have PTP support for Marvell PHYs in general will want to prefer to use
+the MAC-based PTP rather than PHY-based, that driver needs to set
+IFF_SEE_ALL_HWTSTAMP_REQUESTS so that the ndo timestamp ops always get
+called? I didn't see this discussed in the commit message for this
+patch.
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v1 -> v2:
- - do not introduce the specific helper (Willem)
----
- net/ipv4/udp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 42a96b3547c9..8c3ebd95f5b9 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1553,7 +1553,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	spin_unlock(&list->lock);
- 
- 	if (!sock_flag(sk, SOCK_DEAD))
--		sk->sk_data_ready(sk);
-+		INDIRECT_CALL_1(sk->sk_data_ready, sock_def_readable, sk);
- 
- 	busylock_release(busy);
- 	return 0;
 -- 
-2.41.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
