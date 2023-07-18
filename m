@@ -1,91 +1,131 @@
-Return-Path: <netdev+bounces-18617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C8F757FE8
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:43:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411F7757FE5
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:43:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E8FC2815E1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:43:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF9F92815B4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C053FC04;
-	Tue, 18 Jul 2023 14:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDB7D2F6;
+	Tue, 18 Jul 2023 14:43:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C28FBEE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:43:25 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B719E171C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 07:43:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=rZDLcsetw14NvgAmWpqUlwaLyO2tN1KOZr18htadwm4=; b=UrkixZwAqt5H0KL5t+vYEoaE9p
-	Xcrcn6NXnEd6yx88zlve3roQToHlEIEz/waU19HU+IER9emsRt6yvDsinaoD9Av24JeR9zIuK+Z6g
-	kLdtZGyfAqnqog6FDpKArG0yws7XN5rlRmlzuvnYQuYwWhxKdwtZ9wUsKrlYmKQhyE+h8dm88IRbs
-	uW6yv2OxT6rA9xAbwHXjCRgC4O7XZTXAFChb92ATsemvpkxb4pdT1qj4ukxZ0xcG7z3iIq5+DptQJ
-	YfyB+o5ARTxe/CBPBT8YqyLVbdFrnHKrw4Y6u2j/x61QbcMO/06iNkpySxgq0UPPfFkaTkB0CKsBD
-	trrwsK6w==;
-Received: from [192.168.1.4] (port=58146 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qLlv1-0004IH-1N;
-	Tue, 18 Jul 2023 16:43:15 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 18 Jul 2023 16:43:14 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <pabeni@redhat.com>
-CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <davem@davemloft.net>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <olteanv@gmail.com>
-Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Tue, 18 Jul 2023 16:43:10 +0200
-Message-ID: <20230718144310.4887-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <164e816460523a9b54b06b1586f89b3bd2d09fc9.camel@redhat.com>
-References: <164e816460523a9b54b06b1586f89b3bd2d09fc9.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4FEFBEE
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:43:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B843FC433C7;
+	Tue, 18 Jul 2023 14:43:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689691402;
+	bh=bgDvRF5E5PFtVZZCHvdXqPTAMliRzTgjWef0coaWvTY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BC1gk+rQApQDFTV9Wp6kIXpUUoiD8QNlWcKsLB39hT/d3LW9LoR1gJFnUiPPbeYib
+	 lb8f57ErwUztOPjM+GXxTy1B7A4UiOc8/aDpq74sOE0uOyMnBNES8AORcysi3Vwic4
+	 6D/5UUwc4jiIgPcUMEgIf7enSniGAjnD0gBcNIOgjMpSOolAxtRwI9/SEj7iEkHg1w
+	 WnWE8/YlQTJ1zJUY2ijIBYzSDe7X+g7iQJ2LuTeZzzIvhbY8Awr4Iqk33SEQXhn5cG
+	 unDAi0/dYNvkrQSYN1vcmrzOkmNRBytVUTwxj28FF0F+22+Sb1ngSLLS+Rs6zRER78
+	 VQX7KSAaJRlFw==
+Message-ID: <564f1ddc-cd96-4c60-8351-e9757543714e@kernel.org>
+Date: Tue, 18 Jul 2023 08:43:20 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH net-next] IPv6: add extack info for inet6_addr_add/del
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Beniamino Galvani <bgalvani@redhat.com>
+References: <20230717093316.2428813-1-liuhangbin@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230717093316.2428813-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> It does not apply cleanly to net-next. Please respin. You can retain
-> Andrew's Reviewed-by tag.
+On 7/17/23 3:33 AM, Hangbin Liu wrote:
+> Add extack info for inet6_addr_add(), ipv6_add_addr() and
+> inet6_addr_del(), which would be useful for users to understand the
+> problem without having to read kernel code.
+> 
+> Suggested-by: Beniamino Galvani <bgalvani@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  net/ipv6/addrconf.c | 66 ++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 48 insertions(+), 18 deletions(-)
+> 
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index e5213e598a04..199de4b37f24 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -1066,15 +1066,19 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>  	     !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) ||
+>  	    (!(idev->dev->flags & IFF_LOOPBACK) &&
+>  	     !netif_is_l3_master(idev->dev) &&
+> -	     addr_type & IPV6_ADDR_LOOPBACK))
+> +	     addr_type & IPV6_ADDR_LOOPBACK)) {
+> +		NL_SET_ERR_MSG(extack, "Cannot assign requested address");
+>  		return ERR_PTR(-EADDRNOTAVAIL);
+> +	}
+>  
+>  	if (idev->dead) {
+> -		err = -ENODEV;			/*XXX*/
+> +		NL_SET_ERR_MSG(extack, "No such device");
 
-Respin might need a complete rework of the patch as with the
-conversion of 88e639x to phylink_pcs (introduced with commit
-e5b732a275f5fae0f1342fb8cf76de654cd51e50) the original code flow
-has completely changed so it will not be as simple as finding a new
-place to stick the patch. 
-The new phylink mostly hides away mv88e6xxx_chip struct which is needed 
-to identify the correct device and writing to relevant registers has also
-changed in favor of mv88e639x_pcs struct etc.
-I think you can see where I am going with this. In this sense I am not sure 
-about keeping the Reviewed-by tag, more likely a complete rewrite 
-should be done.
-I will repost V3 once I figure out how to make it work with the new
-framework.
+ENODEV error string gives the same information. Here we can be more
+informative with something like "Device marked as dead".
+
+
+> +		err = -ENODEV;
+>  		goto out;
+>  	}
+>  
+>  	if (idev->cnf.disable_ipv6) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
+>  		err = -EACCES;
+>  		goto out;
+>  	}
+> @@ -1097,12 +1101,14 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>  
+>  	ifa = kzalloc(sizeof(*ifa), gfp_flags | __GFP_ACCOUNT);
+>  	if (!ifa) {
+> +		NL_SET_ERR_MSG(extack, "No buffer space available");
+
+If I recall correctly, extack messages are not returned for memory
+allocation failure since it will be the same as strerror(ENOMEM) and
+strerror(ENOBUFS).
+
+
+>  		err = -ENOBUFS;
+>  		goto out;
+>  	}
+>  
+>  	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags);
+>  	if (IS_ERR(f6i)) {
+> +		NL_SET_ERR_MSG(extack, "Dest allocate failed");
+>  		err = PTR_ERR(f6i);
+>  		f6i = NULL;
+>  		goto out;
+> @@ -1142,6 +1148,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>  
+>  	err = ipv6_add_addr_hash(idev->dev, ifa);
+>  	if (err < 0) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 address add failed");
+
+Add extack to ipv6_add_addr_hash and convert the debug string in that
+function to to return the error.
+
+>  		rcu_read_unlock();
+>  		goto out;
+>  	}
 
 
