@@ -1,103 +1,262 @@
-Return-Path: <netdev+bounces-18637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F100758186
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 17:58:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23E4B758191
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9511C20D51
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:58:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 466F61C20CE1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC591118C;
-	Tue, 18 Jul 2023 15:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1802125D8;
+	Tue, 18 Jul 2023 16:00:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D9310952
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 15:58:18 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6FAA9
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:58:16 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-666eb03457cso3746444b3a.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 08:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1689695896; x=1692287896;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=91916OdaNtuNU7V+LSmrrihsXUvi9Px3IIrwBZBnog0=;
-        b=xOoQUCpKMGuQPELmVeOk8FzTtXHZHM4NaizXAGgAFRJQ0MS+RtuF7mVfMNI22/Iaxz
-         Uq+nbVRhlZzh0pdKEdsy+DuijMoTMtmJ9OS6wrJsivn+EBGGmSEiTL5BPpVQjr/DoDqX
-         UBQoO4jJ0xDWCnQV46Q1Sevn3GAXTSbb4+WeQ/o2earSePBSXcTb9r4oUZts5qaNxVAi
-         KWhlcqOkUsUMcADXmZxZi7Crjqo7M/O+EtQylYwtzE8IFhued3PQujZJxV1LtJZE19Yb
-         MIPwuK046IztntoysbvH+y8gsOzxmtjbMOMGjedZOopepBDRbiwuI7LPVOWYp9w+kIJb
-         yuwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689695896; x=1692287896;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=91916OdaNtuNU7V+LSmrrihsXUvi9Px3IIrwBZBnog0=;
-        b=E7OndoP15GRcrtOmHUDGYLV+GGXfzqxFjC7/w60x9Gb5HLWNdaZyVO/eGTnn82Ufi4
-         sjUIhAYGbhOLKwHlI49X3EeOtNVkSUIywkAoMzg9np8TdAOgGcns32LZC+WxqMA/lbYN
-         gAHeidiGHf1/txF052ringAeiC4YP0XrtToNf9jVEzsfKjsB4Yo3nJ48+Wz8soUbZTI9
-         VkGQaN1qhMtdffoK//PzLUJUylhJQeyQD3wkevVwrkXc29JoegJ4R+yOro+RDH0KSI2k
-         uJkP070r5OVPgD0eSy/s5rb5+zh//XtYUPFqitG/FJW+pGXn/Ho5poarp+dIbzS21LQ+
-         JrcQ==
-X-Gm-Message-State: ABy/qLYfXPfV8ae9qnQhvaTMrTXoiknMaBzE+6i0qU4HP/dYlJ6CotS2
-	i4sXD4+K2InFaN14+2eFzVbU0Q==
-X-Google-Smtp-Source: APBJJlGQgMweVxwZ0BmECKoBgi62tpEmv2gkY+WPYIlDKfoOE5qinnmfoBQCLGwz/W6fFbadpPHaaQ==
-X-Received: by 2002:a05:6a00:8d3:b0:686:25fe:d575 with SMTP id s19-20020a056a0008d300b0068625fed575mr2410800pfu.11.1689695896294;
-        Tue, 18 Jul 2023 08:58:16 -0700 (PDT)
-Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
-        by smtp.gmail.com with ESMTPSA id t14-20020a62ea0e000000b00680af5e4184sm1691811pfh.160.2023.07.18.08.58.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 08:58:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE45FFC06
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 16:00:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE7A6C433C7;
+	Tue, 18 Jul 2023 16:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689696036;
+	bh=jvMVNhdv/97zl9sPMxZQndXVmhxPoD5xlaUndo6zZv8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FteMW5mLmz58s7a9E5NDYgKBur+BL1NbhXkAd4O+2Vti6gO1zw0GdngI1Rj4ZL862
+	 pMizkXjotag4O3QHuwSSkFMDZ+QorloBhXZgsq2kItnp4Mqf/N6Wz6AZdJFmJAXell
+	 exStooah3RAcIGnY/9HYqsLG1eVkNjtSkeRbSd6NT9ZSNoiM1qRsfdQD+2yQEbhhCG
+	 bmhmqjLQuTTCjZ8FgR4UHoNVe7tZoS10M1S67p13ROH9gUucgWZd/9aj/2TgJ5SsJL
+	 k62fkbZ7JZU9RcvyuAQ+n95aIb6W5Z3uHSqyybZ5lR4x1Y8Gyxj+JrhpkwDcyyKy6a
+	 jOoEZAYeU3TiQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: corbet@lwn.net
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	linux@leemhuis.info,
+	broonie@kernel.org,
+	krzk@kernel.org
+Subject: [PATCH docs v2] docs: maintainer: document expectations of small time maintainers
 Date: Tue, 18 Jul 2023 08:58:14 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, "David S .
- Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Message-ID: <20230718085814.4301b9dd@hermes.local>
-In-Reply-To: <ZLZnGkMxI+T8gFQK@shredder>
-References: <20230718080044.2738833-1-liuhangbin@gmail.com>
-	<ZLZnGkMxI+T8gFQK@shredder>
+Message-ID: <20230718155814.1674087-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Tue, 18 Jul 2023 13:19:06 +0300
-Ido Schimmel <idosch@idosch.org> wrote:
+We appear to have a gap in our process docs. We go into detail
+on how to contribute code to the kernel, and how to be a subsystem
+maintainer. I can't find any docs directed towards the thousands
+of small scale maintainers, like folks maintaining a single driver
+or a single network protocol.
 
-> fib_table_flush() isn't only called when an address is deleted, but also
-> when an interface is deleted or put down. The lack of notification in
-> these cases is deliberate. Commit 7c6bb7d2faaf ("net/ipv6: Add knob to
-> skip DELROUTE message on device down") introduced a sysctl to make IPv6
-> behave like IPv4 in this regard, but this patch breaks it.
-> 
-> IMO, the number of routes being flushed because a preferred source
-> address is deleted is significantly lower compared to interface down /
-> deletion, so generating notifications in this case is probably OK. It
-> also seems to be consistent with IPv6 given that rt6_remove_prefsrc()
-> calls fib6_clean_all() and not fib6_clean_all_skip_notify().
+Document our expectations and best practices. I'm hoping this doc
+will be particularly useful to set expectations with HW vendors.
 
-Agree. Imagine the case of 3 million routes and device goes down.
-There is a reason IPv4 behaves the way it does.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - use Thorsten's wording for bug fixing requirements
+ - put more words into the review/response timeline expectations
+v1: https://lore.kernel.org/all/20230713223432.1501133-1-kuba@kernel.org/
+
+CC: workflows@vger.kernel.org
+CC: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: gregkh@linuxfoundation.org
+Cc: linux@leemhuis.info
+Cc: broonie@kernel.org
+Cc: krzk@kernel.org
+---
+ .../feature-and-driver-maintainers.rst        | 155 ++++++++++++++++++
+ Documentation/maintainer/index.rst            |   1 +
+ 2 files changed, 156 insertions(+)
+ create mode 100644 Documentation/maintainer/feature-and-driver-maintainers.rst
+
+diff --git a/Documentation/maintainer/feature-and-driver-maintainers.rst b/Documentation/maintainer/feature-and-driver-maintainers.rst
+new file mode 100644
+index 000000000000..7064b5de076d
+--- /dev/null
++++ b/Documentation/maintainer/feature-and-driver-maintainers.rst
+@@ -0,0 +1,155 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++==============================
++Feature and driver maintainers
++==============================
++
++The term "maintainer" spans a very wide range of levels of engagement
++from people handling patches and pull requests as almost a full time job
++to people responsible for a small feature or a driver.
++
++Unlike most of the chapter, this section is meant for the latter (more
++populous) group. It provides tips and describes the expectations and
++responsibilities of maintainers of a small(ish) section of the code.
++
++Driver and alike most often do not have their own mailing lists and
++git trees but instead send and review patches on the list of a larger
++subsystem.
++
++Responsibilities
++================
++
++The amount of maintenance work is usually proportional to the size
++and popularity of the code base. Small features and drivers should
++require relatively small amount of care and feeding. Nonetheless
++when the work does arrive (in form of patches which need review,
++user bug reports etc.) it has to be acted upon promptly.
++Even when single driver only sees one patch a month, or a quarter,
++a subsystem could well have a hundred such drivers. Subsystem
++maintainers cannot afford to wait a long time to hear from reviewers.
++
++The exact expectations on the response time will vary by subsystem.
++The patch review SLA the subsystem had set for itself can sometimes
++be found in the subsystem documentation. Failing that as a rule of thumb
++reviewers should try to respond quicker than what is the usual patch
++review delay of the subsystem maintainer. The resulting expectations
++may range from two working days for fast-paced subsystems (e.g. networking)
++to as long as a few weeks in slower moving parts of the kernel.
++
++Mailing list participation
++--------------------------
++
++Linux kernel uses mailing lists as the primary form of communication.
++Maintainers must be subscribed and follow the appropriate subsystem-wide
++mailing list. Either by subscribing to the whole list or using more
++modern, selective setup like
++`lei <https://people.kernel.org/monsieuricon/lore-lei-part-1-getting-started>`_.
++
++Maintainers must know how to communicate on the list (plain text, no invasive
++legal footers, no top posting, etc.)
++
++Reviews
++-------
++
++Maintainers must review *all* patches touching exclusively their drivers,
++no matter how trivial. If the patch is a tree wide change and modifies
++multiple drivers - whether to provide a review is left to the maintainer.
++
++There should be multiple maintainers for any piece of code, an ``Acked-by``
++or ``Reviewed-by`` tag (or review comments) from a single maintainer is
++enough to satisfy this requirement.
++
++If review process or validation for a particular change will take longer
++than the expected review timeline for the subsystem, maintainer should
++reply to the submission indicating that the work is being done, and when
++to expect full results.
++
++Refactoring and core changes
++----------------------------
++
++Occasionally core code needs to be changed to improve the maintainability
++of the kernel as a whole. Maintainers are expected to be present and
++help guide and test changes to their code to fit the new infrastructure.
++
++Bug reports
++-----------
++
++Maintainers must ensure severe problems in their code reported to them
++are resolved in a timely manner: regressions, kernel crashes, kernel warnings,
++compilation errors, lockups, data loss, and other bugs of similar scope.
++
++Maintainers furthermore should respond to reports about other kind of
++bugs as well, if the report is of reasonable quality or indicates a
++problem that might be severe -- especially if they have *Supported*
++status of the codebase in the MAINTAINERS file.
++
++Selecting the maintainer
++========================
++
++The previous section described the expectations of the maintainer,
++this section provides guidance on selecting one and decribes common
++misconceptions.
++
++The author
++----------
++
++Most natural and common choice of a maintainer is the author of the code.
++The author is intimately familiar with the code, so it is the best person
++to take care of it on an ongoing basis.
++
++That said, being a maintainer is an active role. The MAINTAINERS file
++is not a list of credits (in fact a separate CREDITS file exists),
++it is a list of those who will actively help with the code.
++If the author does not have the time, interest or ability to maintain
++the code, a different maintainer must be selected.
++
++Multiple maintainers
++--------------------
++
++Modern best practices dictate that there should be at least two maintainers
++for any piece of code, no matter how trivial. It spreads the burden, helps
++people take vacations and prevents burnout, trains new members of
++the community etc. etc. Even when there is clearly one perfect candidate,
++another maintainer should be found.
++
++Maintainers must be human, however, it is not acceptable to add a mailing
++list or a group email as a maintainer. Trust and understanding are the
++foundation of kernel maintenance and one cannot build trust with a mailing
++list.
++
++Corporate structures
++--------------------
++
++To an outsider the Linux kernel may resemble a hierarchical organization
++with Linus as the CEO. While the code flows in a hierarchical fashion,
++the corporate template does not apply here. Linux is an anarchy held
++together by (rarely expressed) mutual respect, trust and convenience.
++
++All that is to say that managers almost never make good maintainers.
++The maintainer position more closely matches an on-call rotation
++than a position of power.
++
++The following characteristics of a person selected as a maintainer
++are clear red flags:
++
++ - unknown to the community, never sent an email to the list before
++ - did not author any of the code
++ - (when development is contracted) works for a company which paid
++   for the development rather than the company which did the work
++
++Non compliance
++==============
++
++Subsystem maintainers may remove inactive maintainers from the MAINTAINERS
++file. If the maintainer was a significant author or have played an important
++role in the development of the code they should be moved to the CREDITS file.
++
++Removing an inactive maintainer should not be seen as a punitive action.
++Having an inactive maintainer has a real cost as all developeres have
++to remember to include the maintainers in discussions and subsystem
++maintainers spend brain power figuring out how to solicit feedback.
++
++Subsystem maintainers may remove code for lacking maintenance.
++
++Subsystem maintainers may refuse accepting code from companies
++which repeatedly neglected their maintainership duties.
+diff --git a/Documentation/maintainer/index.rst b/Documentation/maintainer/index.rst
+index 3e03283c144e..eeee27f8b18c 100644
+--- a/Documentation/maintainer/index.rst
++++ b/Documentation/maintainer/index.rst
+@@ -9,6 +9,7 @@ additions to this manual.
+ .. toctree::
+    :maxdepth: 2
+ 
++   feature-and-driver-maintainers
+    configure-git
+    rebasing-and-merging
+    pull-requests
+-- 
+2.41.0
+
 
