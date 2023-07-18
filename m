@@ -1,120 +1,87 @@
-Return-Path: <netdev+bounces-18713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8961775859B
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:34:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD367585B4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6714F1C20DE2
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:34:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 962D41C20DE4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98AC171BF;
-	Tue, 18 Jul 2023 19:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C934171C3;
+	Tue, 18 Jul 2023 19:41:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93D2171BE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:34:50 +0000 (UTC)
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2A2198D
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 12:34:48 -0700 (PDT)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1qLqT6-00011A-1F;
-	Tue, 18 Jul 2023 19:34:44 +0000
-Date: Tue, 18 Jul 2023 20:34:37 +0100
-From: Daniel Golle <daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6AB171BE
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:41:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471F5C433C7;
+	Tue, 18 Jul 2023 19:41:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689709317;
+	bh=e5TeCW4dLFqhF4I7vtXPeuXyiF89ZhZmbGGaNJLtsuU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XZmUyhUNdt4h2uDTeo1tZEPe79idS0yJjGLCyV0L1I75XRoF45kTFlvgfJKdsfY0O
+	 70bXQtCxFmA4fF/FJTi4i/L8GduaT4jhAhh31ouYhwVq2J6ZH47MBxujs0/OM3jsf4
+	 SzzL+AMPmvnlFTemY9NkB9Es3O4N3a1XWDzskMDmXClqKcK5i2CIkHMqu2SMmhBCNo
+	 T8ZP7R59dEajX3QnT997W5kol1+DSOIa43iEIzSXQDeaRHgdK7Ptf2Bd3wpn5QQ4ed
+	 KPBtxOUPXv2i9NDKdTfgwS+7QHSoo5r1qg8zHtRt/ASTaTtPkG3HD5IS9SyRsHaDU2
+	 VbQwK9ivcklGA==
+Date: Tue, 18 Jul 2023 12:41:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Simon Horman <simon.horman@corigine.com>,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH v2 net-next 1/3] led: trig: netdev: Fix requesting
- offload device
-Message-ID: <ZLbpTWT0StW0AnqX@makrotopia.org>
-References: <20230624205629.4158216-1-andrew@lunn.ch>
- <20230624205629.4158216-2-andrew@lunn.ch>
+Cc: Kees Cook <kees@kernel.org>, justinstitt@google.com, Florian Fainelli
+ <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nick
+ Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH] net: dsa: remove deprecated strncpy
+Message-ID: <20230718124156.07632716@kernel.org>
+In-Reply-To: <dbfb40d7-502e-40c0-bdaf-1616834b64e4@lunn.ch>
+References: <20230718-net-dsa-strncpy-v1-1-e84664747713@google.com>
+	<316E4325-6845-4EFC-AAF8-160622C42144@kernel.org>
+	<20230718121116.72267fff@kernel.org>
+	<dbfb40d7-502e-40c0-bdaf-1616834b64e4@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230624205629.4158216-2-andrew@lunn.ch>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 24, 2023 at 10:56:27PM +0200, Andrew Lunn wrote:
-> When the netdev trigger is activates, it tries to determine what
-> device the LED blinks for, and what the current blink mode is.
+On Tue, 18 Jul 2023 21:31:04 +0200 Andrew Lunn wrote:
+> On Tue, Jul 18, 2023 at 12:11:16PM -0700, Jakub Kicinski wrote:
+> > On Tue, 18 Jul 2023 11:05:23 -0700 Kees Cook wrote:  
+> > > Honestly I find the entire get_strings API to be very fragile given
+> > > the lack of passing the length of the buffer, instead depending on
+> > > the string set length lookups in each callback, but refactoring that
+> > > looks like a ton of work for an uncertain benefit.  
+> > 
+> > We have been adding better APIs for long term, and a print helper short
+> > term - ethtool_sprintf(). Should we use ethtool_sprintf() here?  
 > 
-> The documentation for hw_control_get() says:
+> I was wondering about that as well. There is no variable expansion in
+> most cases, so the vsnprintf() is a waste of time.
 > 
-> 	 * Return 0 on success, a negative error number on failing parsing the
-> 	 * initial mode. Error from this function is NOT FATAL as the device
-> 	 * may be in a not supported initial state by the attached LED trigger.
-> 	 */
+> Maybe we should actually add another helper:
 > 
-> For the Marvell PHY and the Armada 370-rd board, the initial LED blink
-> mode is not supported by the trigger, so it returns an error. This
-> resulted in not getting the device the LED is blinking for. As a
-> result, the device is unknown and offloaded is never performed.
-> 
-> Change to condition to always get the device if offloading is
-> supported, and reduce the scope of testing for an error from
-> hw_control_get() to skip setting trigger internal state if there is an
-> error.
-> 
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->  drivers/leds/trigger/ledtrig-netdev.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-> index 32b66703068a..247b100ee1d3 100644
-> --- a/drivers/leds/trigger/ledtrig-netdev.c
-> +++ b/drivers/leds/trigger/ledtrig-netdev.c
-> @@ -565,15 +565,17 @@ static int netdev_trig_activate(struct led_classdev *led_cdev)
->  	/* Check if hw control is active by default on the LED.
->  	 * Init already enabled mode in hw control.
->  	 */
-> -	if (supports_hw_control(led_cdev) &&
-> -	    !led_cdev->hw_control_get(led_cdev, &mode)) {
-> +	if (supports_hw_control(led_cdev)) {
->  		dev = led_cdev->hw_control_get_device(led_cdev);
->  		if (dev) {
->  			const char *name = dev_name(dev);
->  
->  			set_device_name(trigger_data, name, strlen(name));
->  			trigger_data->hw_control = true;
-> -			trigger_data->mode = mode;
-> +
-> +			rc = led_cdev->hw_control_get(led_cdev, &mode);
+> ethtool_name_cpy(u8 **data, unsigned int index, const char *name);
 
-Shouldn't there also be something like
-led_cdev->hw_control_get(led_cdev, 0);
-in netdev_trig_deactivate then?
-Because somehow we need to tell the hardware to no longer perform an
-offloading operation.
+I wasn't sure if vsnprintf() is costly enough to bother, but SG.
 
-> +			if (!rc)
-> +				trigger_data->mode = mode;
->  		}
->  	}
->  
-> -- 
-> 2.40.1
+Probably without the "unsigned int index", since the ethtool_sprintf()
+API updates the first argument for the caller.
+
+> Then over the next decade, slowly convert all drivers to it. And then
+> eventually replace the u8 with a struct including the length.
 > 
-> 
+> The netlink API is a bit better. It is one kAPI call which does
+> everything, and it holds RTNL. So it is less likely the number of
+> statistics will change between the calls into the driver.
 
