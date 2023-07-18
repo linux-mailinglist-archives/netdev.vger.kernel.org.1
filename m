@@ -1,142 +1,208 @@
-Return-Path: <netdev+bounces-18447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D862B7570BB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:04:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8787570D1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:17:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 142DC1C20BF1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:04:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1D321C20BDA
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE077EA;
-	Tue, 18 Jul 2023 00:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADE57EA;
+	Tue, 18 Jul 2023 00:17:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B948E19C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 00:04:35 +0000 (UTC)
-Received: from mail-oo1-xc4a.google.com (mail-oo1-xc4a.google.com [IPv6:2607:f8b0:4864:20::c4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 987D5FF
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 17:04:32 -0700 (PDT)
-Received: by mail-oo1-xc4a.google.com with SMTP id 006d021491bc7-56662adc40bso6740125eaf.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 17:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689638672; x=1692230672;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MPNHw59Y2ag4IkzmSNpZisnjn27L/MlDJm7h5idWBn8=;
-        b=S65TZVHPcH6uRPZb/fHNfGAcZ4q2fX3J8TeaIkzb9hjk1r9RK5GCc7gxTU1gT7BVFb
-         2mtAd5EN9chZTfUcFc7hL2MrdAfuUv0ZKe+RCCjPVqIAfcm1rxtQ2Nee3GWXlKLKGvvT
-         j0uABVfAF88xKqp15sbUj4Guyba5QkCxOXgSVFDvrttBZVEfL4Gj9ySNzwqjVCdKKVc+
-         O3aHFsAlTQIz7RcfgqMhiL0dmlCF+b9PMWN5yevf8JJP30j7wYHo0ofvbJlgfAJTeSC8
-         emqYu0USrNG9OIhDCdgyyPcjNH3d9ONnvURLC6m0T2VDt4Y5QkKgBt2JOQgFfe75oSIh
-         TSyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689638672; x=1692230672;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MPNHw59Y2ag4IkzmSNpZisnjn27L/MlDJm7h5idWBn8=;
-        b=Nd/MEtvT8FBoMg1W/3EG1v0e9Gass++ZwUGJhtrvyPfygQVnj8V+P3bJKaOInZzzBe
-         03WiJxS/+flGaSnrXIUgww76yRF/XjxDmJNTjf4fZ4em9ROAuL9INt5x8KVIdQ2RPp/w
-         /0RfikfeVbzYweb89tDAosjdPLB+CgQCEOi+IcMKEIsQO0SHB8iH3yjbAja0ejx8JTtF
-         Jc3Wl/AKLFUCUr8G2RZ78RZn8hs7/oEierSoK/BlkW/WWtQHiOes/+wymzHHcAUDJoga
-         mMXsFNiWmz9VzbmqyX7yMLeBiQBVjyxCUcFLU93j94gqTIZwcz9PuhB1U4eNW3Fmx6Ma
-         C4Yg==
-X-Gm-Message-State: ABy/qLYEx5GC08UlFZM/z/gVy5taDumUPK+eZfM+TOyXfuTxX/BaK7VI
-	FA5I7+NmSo0IwehszyI9jpL6AEa3BlZ1BPL3dQ==
-X-Google-Smtp-Source: APBJJlH9/sYwjrw0dkrjUb9VX/Yq4xUQpwZ/U3IgrKelC5j/eN2Ak33Hd62xQYSUtM5Qs+CsxWEtQXLiE6OotuPBeQ==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a4a:d0b7:0:b0:547:54e2:688a with SMTP
- id t23-20020a4ad0b7000000b0054754e2688amr613648oor.0.1689638672021; Mon, 17
- Jul 2023 17:04:32 -0700 (PDT)
-Date: Tue, 18 Jul 2023 00:04:19 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D07D19C
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 00:17:06 +0000 (UTC)
+Received: from exhmta17.bpe.bigpond.com (exhmta17.bpe.bigpond.com [203.42.40.161])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D0A188;
+	Mon, 17 Jul 2023 17:17:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
+	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:To:Subject:From;
+	bh=Q0ZgKzQZd4FX/D+rysn1QvJp6Cn5FgznCU7I/mWePQ4=; b=BdTVojFH19bpzxzE0yOoEysqxW
+	nTsF+DV2Pr+MJz6UwYbf9h68cp8N1BhSi+33fVlWx65wYuynKeNI+gHNM4WV7TnD3dQfmu+gAVb02
+	uah9YwcrdlIKxPc9gX1avo+sCG8WSUmhndLtUR2kkHm+Gkdi9e+5iAEH9VV0N140Jj4ibE37FR7aI
+	jsNUsFbtOuTjHo+Ad51RW6kQeUflRz4shuX3jv6eal4ymAZ0rRFft2GcEh2Q7LooMKtUH+0pVRg/l
+	XmcO1o3bvM/bYvdvI8PSHG4qZiq1hQuJc9Xy1hFTx20ItoyHuaKYi/J3KqdBmmEqZm6IypnucEAlm
+	y22YvjeQ==;
+Received: from exhprdcmr03
+	 by exhprdomr17 with esmtp
+	 (envelope-from <bids.7405@bigpond.com>)
+	 id 1qLYOh-0007Hk-1c
+	 for ;
+	Tue, 18 Jul 2023 10:16:59 +1000
+Received: from [101.191.138.223] (helo=[10.0.0.38])
+	 by exhprdcmr03 with esmtpa
+	(envelope-from <bids.7405@bigpond.com>)
+	id 1qLYOh-0008eX-0y;
+	Tue, 18 Jul 2023 10:16:59 +1000
+From: Ross Maynard <bids.7405@bigpond.com>
+Subject: [PATCH] USB: zaurus: 3 broken Zaurus devices
+To: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Message-ID: <4963f4df-e36d-94e2-a045-48469ab2a892@bigpond.com>
+Date: Tue, 18 Jul 2023 10:16:55 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAALXtWQC/5WNQQ6DIBBFr2JYlwYYKbar3qNxgTAqSQsGjKkx3
- r3oqps2cXZvkvf+QhJGh4ncioVEnFxywWfgp4KYXvsOqbOZiWACmOKKehypTZqmMXozzLQqS6N
- 5PmwEydYQsXXvvfioM/cujSHO+8DEt+/v1sQpp0IoBVLzqwV570Lonng24bW1/4tKGNuW7VVaW x0SNUh1AUAQzcFFUwEY0Fwy9i3W67p+ALpXh7taAQAA
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689638671; l=1971;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=4lIe4DSxFXAQphj2dJbrjzQzYQVdZZkIiaZbjRvA4y0=; b=qL/KVpwldCbzLT8NKNpxMObelj3cI09HIcE678bPAe5u640yOLnrfVvF3yT6wO3JK+6CyNe1h
- MsYgBS679IdA4jOGv1+uPHc9bJJ8WOrcQCpXcEPYjQGKWCnJqtfsGoa
-X-Mailer: b4 0.12.3
-Message-ID: <20230718-net-dsa-strncpy-v1-1-e84664747713@google.com>
-Subject: [PATCH] net: dsa: remove deprecated strncpy
-From: justinstitt@google.com
-To: Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------D0D6B9EE406C3C126D1D9B9D"
+Content-Language: en-US
+X-tce-id: bids.7405@bigpond.com
+X-tce-ares-id: e{574c812c-f7a5-4f03-878b-cf17a3d432d5}1
+X-tce-spam-action: no action
+X-tce-spam-score: 0.0
+X-Cm-Analysis: v=2.4 cv=PNXJu9mC c=1 sm=1 tr=0 ts=64b5d9fb a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=ws7JD89P4LkA:10 a=r77TgQKjGQsHNAKrUKIA:9 a=VwQbUJbxAAAA:8 a=vca9FNj1airBrpF0sQMA:9 a=QEXdDO2ut3YA:10 a=1IlZJK9HAAAA:8 a=iXZdpN1a21TaRPcZ4IIA:9 a=B2y7HmGcmWMA:10 a=AjGcO6oz07-iQ99wixmX:22
+X-Cm-Envelope: MS4xfFavOt6c0+/h0YKaw/uC8Di/Vg708bI+MXh28FIG7Xg911w3ZUQsfPpxhK6xb2OJyNSiVtiFOzuZ7tEhBItCM2PWoe7y5ky4CaXdB/IXmvL3/rOBRvxr 43RBBWMk7IfE/W9GRC4sLFQHdfQfmLECNB0PCIwINoafXlRpb3rlXINp3EcjS5MYiKoO2Gu3cq1cNA==
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-`strncpy` is deprecated for use on NUL-terminated destination strings [1].
+This is a multi-part message in MIME format.
+--------------D0D6B9EE406C3C126D1D9B9D
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Even call sites utilizing length-bounded destination buffers should
-switch over to using `strtomem` or `strtomem_pad`. In this case,
-however, the compiler is unable to determine the size of the `data`
-buffer which renders `strtomem` unusable. Due to this, `strscpy`
-should be used.
+Hi Greg,
 
-It should be noted that most call sites already zero-initialize the
-destination buffer. However, I've opted to use `strscpy_pad` to maintain
-the same exact behavior that `strncpy` produced (zero-padded tail up to
-`len`).
+This is related to Oliver Neukum's patch 
+6605cc67ca18b9d583eb96e18a20f5f4e726103c (USB: zaurus: support another 
+broken Zaurus) which you committed in 2022 to fix broken support for the 
+Zaurus SL-6000.
 
-Also see [3].
+Prior to that I had been able to track down the original offending patch 
+using git bisect as you had suggested to me: 
+16adf5d07987d93675945f3cecf0e33706566005 (usbnet: Remove over-broad 
+module alias from zaurus).
 
-[1]: www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings
-[2]: elixir.bootlin.com/linux/v6.3/source/net/ethtool/ioctl.c#L1944
-[3]: manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html
+It turns out that the offending patch also broke support for 3 other 
+Zaurus models: A300, C700 and B500/SL-5600. My patch adds the 3 device 
+IDs to the driver in the same way Oliver added the SL-6000 ID in his patch.
 
-Link: https://github.com/KSPP/linux/issues/90
-Signed-off-by: Justin Stitt <justinstitt@google.com>
+Could you please review the attached patch? I tested it on all 3 devices 
+and it fixed the problem. For your reference, the associated bug URL is 
+https://bugzilla.kernel.org/show_bug.cgi?id=217632.
+
+Thank you.
+
+Regards,
+
+Ross
+
+
+--------------D0D6B9EE406C3C126D1D9B9D
+Content-Type: text/x-patch; charset=UTF-8;
+ name="3-broken-zaurus-devices.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="3-broken-zaurus-devices.patch"
+
+Signed-off-by: Ross Maynard <bids.7405@bigpond.com>
+Reported-by: Ross Maynard <bids.7405@bigpond.com>
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=217632
 ---
- net/dsa/slave.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/usb/cdc_ether.c | 21 +++++++++++++++++++++
+ drivers/net/usb/zaurus.c    | 21 +++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/net/dsa/slave.c b/net/dsa/slave.c
-index 527b1d576460..c9f77b7e5895 100644
---- a/net/dsa/slave.c
-+++ b/net/dsa/slave.c
-@@ -1056,10 +1056,10 @@ static void dsa_slave_get_strings(struct net_device *dev,
- 	if (stringset == ETH_SS_STATS) {
- 		int len = ETH_GSTRING_LEN;
- 
--		strncpy(data, "tx_packets", len);
--		strncpy(data + len, "tx_bytes", len);
--		strncpy(data + 2 * len, "rx_packets", len);
--		strncpy(data + 3 * len, "rx_bytes", len);
-+		strscpy_pad(data, "tx_packets", len);
-+		strscpy_pad(data + len, "tx_bytes", len);
-+		strscpy_pad(data + 2 * len, "rx_packets", len);
-+		strscpy_pad(data + 3 * len, "rx_bytes", len);
- 		if (ds->ops->get_strings)
- 			ds->ops->get_strings(ds, dp->index, stringset,
- 					     data + 4 * len);
+--- a/drivers/net/usb/cdc_ether.c
++++ b/drivers/net/usb/cdc_ether.c
+@@ -616,6 +616,13 @@ static const struct usb_device_id	products[] = {
+ }, {
+ 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8005,   /* A-300 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info        = 0,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
+ 	ZAURUS_MASTER_INTERFACE,
+@@ -623,12 +630,26 @@ static const struct usb_device_id	products[] = {
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8006,   /* B-500/SL-5600 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info        = 0,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8007,	/* C-700 */
+ 	ZAURUS_MASTER_INTERFACE,
+ 	.driver_info		= 0,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8007,   /* C-700 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info        = 0,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 		 | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor               = 0x04DD,
+ 	.idProduct              = 0x9031,	/* C-750 C-760 */
+--- a/drivers/net/usb/zaurus.c
++++ b/drivers/net/usb/zaurus.c
+@@ -289,9 +289,23 @@ static const struct usb_device_id	products [] = {
+ 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
++	.idProduct		= 0x8005,	/* A-300 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long)&bogus_mdlm_info,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
+ 	ZAURUS_MASTER_INTERFACE,
+ 	.driver_info = ZAURUS_PXA_INFO,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8006,	/* B-500/SL-5600 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long)&bogus_mdlm_info,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 	          | USB_DEVICE_ID_MATCH_DEVICE,
+@@ -301,6 +315,13 @@ static const struct usb_device_id	products [] = {
+ 	.driver_info = ZAURUS_PXA_INFO,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8007,	/* C-700 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long)&bogus_mdlm_info,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 		 | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor               = 0x04DD,
+ 	.idProduct              = 0x9031,	/* C-750 C-760 */
 
----
-base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
-change-id: 20230717-net-dsa-strncpy-844ca1111eb2
 
-Best regards,
--- 
-Justin Stitt <justinstitt@google.com>
-
+--------------D0D6B9EE406C3C126D1D9B9D--
 
