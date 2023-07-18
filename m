@@ -1,208 +1,162 @@
-Return-Path: <netdev+bounces-18449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8787570D1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:17:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31E7A75711A
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1D321C20BDA
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:17:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E07AE281418
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADE57EA;
-	Tue, 18 Jul 2023 00:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F49EDE;
+	Tue, 18 Jul 2023 00:51:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D07D19C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 00:17:06 +0000 (UTC)
-Received: from exhmta17.bpe.bigpond.com (exhmta17.bpe.bigpond.com [203.42.40.161])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D0A188;
-	Mon, 17 Jul 2023 17:17:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
-	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:To:Subject:From;
-	bh=Q0ZgKzQZd4FX/D+rysn1QvJp6Cn5FgznCU7I/mWePQ4=; b=BdTVojFH19bpzxzE0yOoEysqxW
-	nTsF+DV2Pr+MJz6UwYbf9h68cp8N1BhSi+33fVlWx65wYuynKeNI+gHNM4WV7TnD3dQfmu+gAVb02
-	uah9YwcrdlIKxPc9gX1avo+sCG8WSUmhndLtUR2kkHm+Gkdi9e+5iAEH9VV0N140Jj4ibE37FR7aI
-	jsNUsFbtOuTjHo+Ad51RW6kQeUflRz4shuX3jv6eal4ymAZ0rRFft2GcEh2Q7LooMKtUH+0pVRg/l
-	XmcO1o3bvM/bYvdvI8PSHG4qZiq1hQuJc9Xy1hFTx20ItoyHuaKYi/J3KqdBmmEqZm6IypnucEAlm
-	y22YvjeQ==;
-Received: from exhprdcmr03
-	 by exhprdomr17 with esmtp
-	 (envelope-from <bids.7405@bigpond.com>)
-	 id 1qLYOh-0007Hk-1c
-	 for ;
-	Tue, 18 Jul 2023 10:16:59 +1000
-Received: from [101.191.138.223] (helo=[10.0.0.38])
-	 by exhprdcmr03 with esmtpa
-	(envelope-from <bids.7405@bigpond.com>)
-	id 1qLYOh-0008eX-0y;
-	Tue, 18 Jul 2023 10:16:59 +1000
-From: Ross Maynard <bids.7405@bigpond.com>
-Subject: [PATCH] USB: zaurus: 3 broken Zaurus devices
-To: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Message-ID: <4963f4df-e36d-94e2-a045-48469ab2a892@bigpond.com>
-Date: Tue, 18 Jul 2023 10:16:55 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC86B10FB
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 00:51:52 +0000 (UTC)
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB5EA172C;
+	Mon, 17 Jul 2023 17:51:37 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3a425ef874dso3636102b6e.0;
+        Mon, 17 Jul 2023 17:51:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689641497; x=1692233497;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lz+8CarDNbfuh8OfKKezu1WG0K0jECzwZysn86ImSis=;
+        b=EZApaMs4gPJVrUIaeSPlMHa2Ubxx+ljVSgRceCanZxrxGNNKcrHVRdwxqf+J/i93eS
+         bCVCmkZGoBTZIrpNuD7CYzc3Vd6qp+GujdSJoHFaZnudn11SQ22BfE3l/Rgd9in/Dlgq
+         OxKFNtL93tIqLR/181oyic7HVL4EIEmsi6FsT2n1n8790US2gL6QHJke2g5bj7niI1YT
+         47JlDZF/+b7YI7ApdN9OgTGyXQvEfGFHlRZ79pUoaS5fSUOdlnYK3KZN6KlM4PNB5G4D
+         pZHZKTjVpoljidyzHjHOC6/wblYRuPi6qW6/WvfnrnEAP5HeSi57xsmv8NeKpRv+0OqW
+         WVlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689641497; x=1692233497;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lz+8CarDNbfuh8OfKKezu1WG0K0jECzwZysn86ImSis=;
+        b=boOZ5Zaq/DsoYpT/nXnUf/QM9rXdnCxuGdYQp+R+1fsJQkPzmEGbu9jmTOdLt2afib
+         V3APiPwj7WLMR8JsMkYE0Lj/vR4A2IJ0EgNOfbLk1UJdVZVd6ccNhUAEnYcMo7cFCJg2
+         AivQQ+KsuZuqeSQJtynxN+JBV7yyXrfcQwsp3T5ZxbRhkBJNrj3UNl/Y+QwTkSV3h/wf
+         GYIHWKH8+rG1n9czv0Av2D+G/N8WD12gnBMwqi22BUiihRJgi0An4u5jFsbUjZU3CsuH
+         KfN2XdHdSpaCPpSVpO0E0N+I15C3ZT8cj6qiQeAsApspquv1gmW4qrFhHzn89GzG6GIo
+         g/MA==
+X-Gm-Message-State: ABy/qLYSILTP3Dp7FXQpp2nBqG5Em5JWciT/4zjDK76VcEp3DLQjuvCv
+	4B4qjs9Ba0y+mmw21h4qloo=
+X-Google-Smtp-Source: APBJJlGeBHqkRxL+zWXusQBpUdihf6v3b11hnUADferAFcbDtzk1JOfTMdtHdDSOktc+ANmDRfwJnQ==
+X-Received: by 2002:a05:6358:6f97:b0:133:a8e:6feb with SMTP id s23-20020a0563586f9700b001330a8e6febmr9453004rwn.12.1689641496991;
+        Mon, 17 Jul 2023 17:51:36 -0700 (PDT)
+Received: from [192.168.0.104] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id j7-20020a62e907000000b00673e652985esm53912pfh.44.2023.07.17.17.51.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jul 2023 17:51:36 -0700 (PDT)
+Message-ID: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
+Date: Tue, 18 Jul 2023 07:51:24 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------D0D6B9EE406C3C126D1D9B9D"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
 Content-Language: en-US
-X-tce-id: bids.7405@bigpond.com
-X-tce-ares-id: e{574c812c-f7a5-4f03-878b-cf17a3d432d5}1
-X-tce-spam-action: no action
-X-tce-spam-score: 0.0
-X-Cm-Analysis: v=2.4 cv=PNXJu9mC c=1 sm=1 tr=0 ts=64b5d9fb a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=ws7JD89P4LkA:10 a=r77TgQKjGQsHNAKrUKIA:9 a=VwQbUJbxAAAA:8 a=vca9FNj1airBrpF0sQMA:9 a=QEXdDO2ut3YA:10 a=1IlZJK9HAAAA:8 a=iXZdpN1a21TaRPcZ4IIA:9 a=B2y7HmGcmWMA:10 a=AjGcO6oz07-iQ99wixmX:22
-X-Cm-Envelope: MS4xfFavOt6c0+/h0YKaw/uC8Di/Vg708bI+MXh28FIG7Xg911w3ZUQsfPpxhK6xb2OJyNSiVtiFOzuZ7tEhBItCM2PWoe7y5ky4CaXdB/IXmvL3/rOBRvxr 43RBBWMk7IfE/W9GRC4sLFQHdfQfmLECNB0PCIwINoafXlRpb3rlXINp3EcjS5MYiKoO2Gu3cq1cNA==
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+To: Andrzej Kacprowski <andrzej.kacprowski@linux.intel.com>,
+ Krystian Pradzynski <krystian.pradzynski@linux.intel.com>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+ Oded Gabbay <ogabbay@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>,
+ hq.dev+kernel@msdfc.xyz
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux DRI Development <dri-devel@lists.freedesktop.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Intel Ethernet Drivers <intel-wired-lan@lists.osuosl.org>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Fwd: Unexplainable packet drop starting at v6.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a multi-part message in MIME format.
---------------D0D6B9EE406C3C126D1D9B9D
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi,
 
-Hi Greg,
+I notice a regression report on Bugzilla [1]. Quoting from it:
 
-This is related to Oliver Neukum's patch 
-6605cc67ca18b9d583eb96e18a20f5f4e726103c (USB: zaurus: support another 
-broken Zaurus) which you committed in 2022 to fix broken support for the 
-Zaurus SL-6000.
+> Hi,
+> 
+> After I updated to 6.4 through Archlinux kernel update, suddenly I noticed random packet losses on my routers like nodes. I have these networking relevant config on my nodes
+> 
+> 1. Using archlinux
+> 2. Network config through systemd-networkd
+> 3. Using bird2 for BGP routing, but not relevant to this bug.
+> 4. Using nftables for traffic control, but seems not relevant to this bug. 
+> 5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 level
+> 
+> After I ruled out systemd-networkd, nftables related issues. I tracked down issues to kernel.
+> 
+> Here's the tcpdump I'm seeing on one side of my node ""
+> 
+> ```
+> sudo tcpdump -i fios_wan port 38851
+> tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+> listening on fios_wan, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+> 10:33:06.073236 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+> 10:33:11.406607 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+> 10:33:16.739969 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+> 10:33:21.859856 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+> 10:33:27.193176 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+> 5 packets captured
+> 5 packets received by filter
+> 0 packets dropped by kernel
+> ```
+> 
+> But on the other side "[REDACTED_PUBLIC_IPv4_1]", tcpdump is replying packets in this wireguard stream. So packet is lost somewhere in the link.
+> 
+> From the otherside, I can do "mtr" to "[BOS1_NODE]"'s public IP and found the moment the link got lost is right at "[BOS1_NODE]", that means "[BOS1_NODE]"'s networking stack completely drop the inbound packets from specific ip addresses.
+> 
+> Some more digging
+> 
+> 1. This situation began after booting in different delays. Sometimes can trigger after 30 seconds after booting, and sometimes will be after 18 hours or more.
+> 2. It can envolve into worse case that when I do "ip neigh show", the ipv4 ARP table and ipv6 neighbor discovery start to appear as "invalid", meaning the internet is completely loss.
+> 3. When this happened to wan facing interface, it seems OK with lan facing interfaces. WAN interface was using Intel X710-T4L using i40e and lan side was using virtio
+> 4. I tried to bisect in between 6.3 and 6.4, and the first bad commit it reports was "a3efabee5878b8d7b1863debb78cb7129d07a346". But this is not relevant to networking at all, maybe it's the wrong commit to look at. At the meantime, because I haven't found a reproducible way of 100% trigger the issue, it may be the case during bisect some "good" commits are actually bad. 
+> 5. I also tried to look at "dmesg", nothing interesting pop up. But I'll make it available upon request.
+> 
+> This is my first bug reports. Sorry for any confusion it may lead to and thanks for reading.
 
-Prior to that I had been able to track down the original offending patch 
-using git bisect as you had suggested to me: 
-16adf5d07987d93675945f3cecf0e33706566005 (usbnet: Remove over-broad 
-module alias from zaurus).
+See Bugzilla for the full thread.
 
-It turns out that the offending patch also broke support for 3 other 
-Zaurus models: A300, C700 and B500/SL-5600. My patch adds the 3 device 
-IDs to the driver in the same way Oliver added the SL-6000 ID in his patch.
+Thorsten: The reporter had a bad bisect (some bad commits were marked as good
+instead), hence SoB chain for culprit (unrelated) ipvu commit is in To:
+list. I also asked the reporter (also in To:) to provide dmesg and request
+rerunning bisection, but he doesn't currently have a reliable reproducer.
+Is it the best I can do?
 
-Could you please review the attached patch? I tested it on all 3 devices 
-and it fixed the problem. For your reference, the associated bug URL is 
-https://bugzilla.kernel.org/show_bug.cgi?id=217632.
+Anyway, I'm adding this regression to be tracked in regzbot:
 
-Thank you.
+#regzbot introduced: a3efabee5878b8 https://bugzilla.kernel.org/show_bug.cgi?id=217678
+#regzbot title: packet drop on Intel X710-T4L due to ipvu boot fix
 
-Regards,
+Thanks.
 
-Ross
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217678
 
-
---------------D0D6B9EE406C3C126D1D9B9D
-Content-Type: text/x-patch; charset=UTF-8;
- name="3-broken-zaurus-devices.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="3-broken-zaurus-devices.patch"
-
-Signed-off-by: Ross Maynard <bids.7405@bigpond.com>
-Reported-by: Ross Maynard <bids.7405@bigpond.com>
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=217632
----
- drivers/net/usb/cdc_ether.c | 21 +++++++++++++++++++++
- drivers/net/usb/zaurus.c    | 21 +++++++++++++++++++++
- 2 files changed, 42 insertions(+)
-
---- a/drivers/net/usb/cdc_ether.c
-+++ b/drivers/net/usb/cdc_ether.c
-@@ -616,6 +616,13 @@ static const struct usb_device_id	products[] = {
- }, {
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8005,   /* A-300 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info        = 0,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
-@@ -623,12 +630,26 @@ static const struct usb_device_id	products[] = {
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8006,   /* B-500/SL-5600 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info        = 0,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8007,	/* C-700 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info		= 0,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8007,   /* C-700 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info        = 0,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
---- a/drivers/net/usb/zaurus.c
-+++ b/drivers/net/usb/zaurus.c
-@@ -289,9 +289,23 @@ static const struct usb_device_id	products [] = {
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8005,	/* A-300 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long)&bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info = ZAURUS_PXA_INFO,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8006,	/* B-500/SL-5600 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long)&bogus_mdlm_info,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 	          | USB_DEVICE_ID_MATCH_DEVICE,
-@@ -301,6 +315,13 @@ static const struct usb_device_id	products [] = {
- 	.driver_info = ZAURUS_PXA_INFO,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8007,	/* C-700 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long)&bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
-
-
---------------D0D6B9EE406C3C126D1D9B9D--
+-- 
+An old man doll... just what I always wanted! - Clara
 
