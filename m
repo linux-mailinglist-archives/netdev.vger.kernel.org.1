@@ -1,269 +1,249 @@
-Return-Path: <netdev+bounces-18604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A113757E1B
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:49:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20721757E32
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F03CB1C20CCD
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:49:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8F62280F49
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844C4D521;
-	Tue, 18 Jul 2023 13:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3686D529;
+	Tue, 18 Jul 2023 13:52:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE1FC8FA
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:49:00 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73A4E18B
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689688137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LLaxw2NzrWW+r009Dr4j7Rdw/NRY2OqVU5CYMXXm6+8=;
-	b=bNtz4/rE0HhTa5x4M1BpEmWkTfBRu9alR9G3ia7OoAOVcgcSrjry5Nqm9gx2ne+M/mqi7F
-	AN1HRcGTs1oiceYQSDxVwcppDxYVKxm9GtlffwhDprHKERXTaO9tZFbPyiin6qRTgz3Qwb
-	oo9wYHiZ30JzbbgnXFKYZ1MiKJhYCA0=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-486-Up8Uf_o3MnKv9btGlLsc7Q-1; Tue, 18 Jul 2023 09:48:55 -0400
-X-MC-Unique: Up8Uf_o3MnKv9btGlLsc7Q-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-765a632f342so663712285a.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 06:48:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689688135; x=1690292935;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LLaxw2NzrWW+r009Dr4j7Rdw/NRY2OqVU5CYMXXm6+8=;
-        b=UmJMQTUNkn42bXmFxLVaXeFuEm2OrE5qePOBP6LsbC/w6kPuqbP4g0hQejC8J7/ZiW
-         6TnNrgqzNGoRTRM1MhtK+c9nWW+v/zgqYwNCMYeJoYzKrnGE/LXKnde0S7i1/kFgPMhd
-         MCg/Fa8jHDP47PSPql+iIuKA9FT+1xlW4wDNoRyJHFTkqhSWROEr4yUzLMlpDPsND6UG
-         I2FG6FDOqZaRyZUzOi2bQfM2ZQCavCdZ83GB9ORM6WZkDOk1uTIxyOlg1yN/aYa5If+T
-         /zRrwOOYBMGQKxgeD0OzqAUaKURYLk6T0BDRfvDge9GsnAszsn9T9VokGG52ErzXyp+a
-         cWQg==
-X-Gm-Message-State: ABy/qLaoSQ/JzBuSbcnGeCdBr8IpaoQlm9ZlPHZIV6ftDnVHPz3auW45
-	pb4ZMtT8ZsWfuhOlIvx/Ki9yO9YowlQGnoD/3pZLRo9DQzxEpCho4ou6Kt3mXWHuVzPw8DPeXSU
-	96oEDDXBdqvsBl1ND
-X-Received: by 2002:a05:620a:6785:b0:767:35bc:540a with SMTP id rr5-20020a05620a678500b0076735bc540amr2159576qkn.17.1689688135504;
-        Tue, 18 Jul 2023 06:48:55 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG4MukNT5hzLYq1GhLxnnXJi0mdSCeXfoowDToROhwgmWHtxW1zaVxLyYJoJSQVYJMBJ6xHvQ==
-X-Received: by 2002:a05:620a:6785:b0:767:35bc:540a with SMTP id rr5-20020a05620a678500b0076735bc540amr2159561qkn.17.1689688135249;
-        Tue, 18 Jul 2023 06:48:55 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-94.retail.telecomitalia.it. [79.46.200.94])
-        by smtp.gmail.com with ESMTPSA id pe8-20020a05620a850800b00767502e8601sm606015qkn.35.2023.07.18.06.48.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 06:48:54 -0700 (PDT)
-Date: Tue, 18 Jul 2023 15:48:50 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v1 1/4] vsock/virtio/vhost: read data from
- non-linear skb
-Message-ID: <mhpoxo3jsoqp6tnmm2maa47tqlm3bd5sveo4n7aqnnvbh7ryjh@ur54eno5povg>
-References: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
- <20230717210051.856388-2-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB41E543
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:52:13 +0000 (UTC)
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88113C7;
+	Tue, 18 Jul 2023 06:52:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689688330; x=1721224330;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=GETKLMqAWkPybSuFJ2DzARDVOeOzqofyc132MEY5YSQ=;
+  b=X/XFJifQx3I049nWQ7AUMYa/KWCCY07GHcU3bxypS2PcqzF0dXtKG4ox
+   /8F2xcZoBbyUv/+ywpCgqvWBBmu8dXbMHwvnqk3lDo2GmjeukTFB8+mU1
+   IIY9L4+cRojg8G/Vlo1Cz8yVS+naxIBQrbRVlalhSVjwXnLhYF+TvOyFj
+   rN6ZXc0R4gr7DENbySchTk4qDdhVY+0ZhOwJd6u1tHfv4w9GlVuA0sZfJ
+   1/DA6XFaAMuTJT0FqQUCckN9YKH+SHZuW/c3l1wFTlLejSNGcIZXHn+4y
+   fO4npTZ4umXpYQO5JuZ/F1Bc/6Iop1Yf8G2blUbCaqc53hiTXSwKLX+XK
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="452589567"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="452589567"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:51:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="970249242"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="970249242"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga006.fm.intel.com with ESMTP; 18 Jul 2023 06:51:53 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 18 Jul 2023 06:51:53 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 18 Jul 2023 06:51:52 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 18 Jul 2023 06:51:52 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.107)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 18 Jul 2023 06:51:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fThylvbL8AnHHNNq1nviCNIR63F54UjJ2/oN0flb78zzti7EzymLcqd3ApgmnZfb5CKzAS55lJW8qQr4WINb0nCCsCtOHmhkeOTsB0Bx9twOod1UtPygWWmmvvcTsrEQVKzQGABLQ9xr6NKb3hFtCjbvDoNN6GLqRulx/BOQ//Tv0PhwzOlDu8iJzzIbiq3zSlRhJyVyjDbGxuGqUmwwF+hyNf850KxFwUc378GSo1yapaENr5VuhKiAAHVgSjlSeCACkzvTf5JYFFUzdxEIcUVHCcVFJzr6Wf9MZ29J8a7QCrkx02wY9nCxZnA9U+GHkuRQX2QhFBXcOOYrHrCOEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ANOAwAwFFFNNtUzcpDpakeLKQAAQX1tkeEW9q5OY02k=;
+ b=Wn6g2+y+ugiy7+pyj9ZwDv+MZoHW2+/XDRL30cSetO0ZH8r4rre4kXJ7yr2XWIubR0K39SPB5vXzWvPwpsFmyo26JSAhT6NIZnb3U4Tmtf2dEHyp4CgK7rNxEecwf0yTyEU9GFq529W3TCFm84ZR6TDUIxYVV+jp7xdyawR97L19mQtrb9xci5nkqqgFyybexXGeCOFmsRU8exNfKSTgpM6IAycKdoiacFG6Xa86AD7BFz3VOAYidoBNyQyk1XhTTJoAQaeGGdws+ia5/40BdQtRVG1GPdWJZq9Yt9UxcpOC8WHnmqHl91kX9wf0MpHiP3K+uwJP6BO87Ms8C+jtNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by DM4PR11MB5551.namprd11.prod.outlook.com (2603:10b6:5:392::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Tue, 18 Jul
+ 2023 13:51:49 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
+ 13:51:49 +0000
+Message-ID: <e48185cb-3057-e778-75c4-d266a249088b@intel.com>
+Date: Tue, 18 Jul 2023 15:50:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RFC net-next v2 2/7] net: page_pool: place frag_* fields
+ in one cacheline
+Content-Language: en-US
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <brouer@redhat.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
+ <20230714170853.866018-3-aleksander.lobakin@intel.com>
+ <ac97825d-6a27-f121-4cee-9d2ee0934ce6@redhat.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <ac97825d-6a27-f121-4cee-9d2ee0934ce6@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0204.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a5::9) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230717210051.856388-2-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DM4PR11MB5551:EE_
+X-MS-Office365-Filtering-Correlation-Id: 60a6e1bf-865d-4551-c9ad-08db8796225f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gfXQmt1vI8mSEKAN35dQKp7Qy5U+ZvxQb1rQW95GyqEYh/eIIPOCaxHppcAwZirx4R25OgVcOMF+dL3ClNMoTN7lwGrQb5SLbpBbQy683nYXPTIJFw65lLJ/mCHTumIiNUibiBwVZ9P9MBcAyzBRjjSK9dau89Ky1A/Rj9pKQ9/uTQShAmapA0UljZIutlfTat2lHmeE2atv/o1wedTL5dM9PN2lk/8xvj12ImUIwmL2kd18JfBY/ztYXvN0Uu2p/ybDPTtAGkWeVeUt7it1pk/r8WOXqtHDEdUjKD7skpCCQPo+j2vjFvLMtO4HSZf8Uo1L4585ahEIT6AbKcHFJE///VObAO3vbPoLzcUytEEr8xByC86IjQHh+fn8HaCxiv1pJrDzTCqL0JnErtdyftavfGqgP7hrQi3BwoKlJx+rY1J3WhREHBuvTHU0m9a6ayKN8dNH/++TGbf16yemo7EfVQVgyOmjJRI5mMxK+GF5gcvs52bkb+Lyqpu0el4yMh4vpT3FJrnT71IKhYB2Ziswl/x2y+RuyjZgEfsNgPe6o3gYX26pGf9fymgP/h/zJIM3OPv+3hzLOyvXxdsJzDxcNg04sXWMjWMKfRG75bDztGDDepbRALfwvNPzITxARY5eCY0ajhgKjoYgBKKP/w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(376002)(366004)(39860400002)(396003)(451199021)(2906002)(41300700001)(316002)(7416002)(5660300002)(8936002)(8676002)(86362001)(31696002)(36756003)(6512007)(6506007)(26005)(478600001)(6666004)(6486002)(83380400001)(186003)(2616005)(31686004)(82960400001)(38100700002)(6916009)(4326008)(66476007)(66556008)(66946007)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R0hST2tWV0tteHdNSW5tTTJndC9QYXlSWEtXb3JERkZOcGxTdHhEUUdteTZj?=
+ =?utf-8?B?RENVcjZNeFNOQVBmRGZZOXM1SnVtdkZNbEdqU3J0N0NaNitHWldkbHZhR3BN?=
+ =?utf-8?B?cDJEdVZVNWt6NGF3Vmpqc0YwK2pPdG1iK1dTaC9IVzNLa2NBNEtTM09jT1VG?=
+ =?utf-8?B?cjFZMXRTUHdPYVlvSTlLTWJwV1RmeVBvZ2Z6MTk0RHQ0L21HQUZIZ2hqZGY0?=
+ =?utf-8?B?RkRlRWtUeHpscHJQL1lFKzBpZGpveW5CN0NjcFR6TXJtV052eFhKTjRWSWxH?=
+ =?utf-8?B?VDFwOWVxNDIwSVpwRzRBNHFBN2dRRU5LQ0x5WEtqMXhqVjVqdld0V2oyRlFa?=
+ =?utf-8?B?bDBBVHY2djJmN2tveTFQQVZaSlRHMHFxOXBUTUtxWFBXdlBRMkppUE90ZmI2?=
+ =?utf-8?B?R3lEQVI4UTJnVk9JSU5qeVY4a00wMkR5TzZBTG1ncEdNVE4wMEVZWWlxTXZk?=
+ =?utf-8?B?cC85TUx4WExKeloybzdmMHg0dnNHVno0NkxLK0RkekJvMEZONGtNdHJtVUM2?=
+ =?utf-8?B?M3ZTMm9GTzVzOTYwU2lQRWh5ZithNlJxdzVPM2RmRHpHWFBHS3lXR1JGblpp?=
+ =?utf-8?B?NWlpbk1ZVUZsS29lZlNWZGpwY1J6RFgzRkVRMTNBckVsQ1FxekVHR3lxRUw4?=
+ =?utf-8?B?d0VUcE53c3crRWVNVmNXRittOWlleXNyK1FwNlJQNGJEbUp0QkY4amFxZDgv?=
+ =?utf-8?B?M0xuWWR1REFXdXBrNFgxcVFwRkV1U0JZQ295aUpvYmJGS1JmYjJBNHBwMHkv?=
+ =?utf-8?B?L0FUQWpJL1NOcHlqMks5NC9Ua3VWYXU2dFloRHlieUE1Y0tYTzFBbzB4MEha?=
+ =?utf-8?B?ckJ1UU5sZWdYdWdJV3A5ZktlVEZrUnNjWExLR0pmWk9kTWNvK2ltcExSemhx?=
+ =?utf-8?B?Y2NZdFEwQWk1TU44ckdRYXpqelB6RVI5RS9KZjhGUHRzTm9WYU9OdFR6cHk1?=
+ =?utf-8?B?T3FQaUNKRGlFNHRxUVdmVk53T1YxQmxUemtVZy9WaDhtZ09laDNIRGt4d3RD?=
+ =?utf-8?B?dm9aa3QwVHE0UHBvb1hFdVdwY0tTYWsvYzVyNUpPUGR3WWt1U28rRjc4U1ZL?=
+ =?utf-8?B?WG1UUnkyQTZYYmwrM0Zpa2x4ek02d1N1NmhRdDM2Q3N2aHQ5MEdQUFJGUTlP?=
+ =?utf-8?B?N2pSOWg2UWN4VFFNNm5HM3BGTmkrWUM5cjFOcWlyb01mdHNKc3gyb2gzcWdE?=
+ =?utf-8?B?RXY5TVZETmp0OUtMOWNUOVljMmNTK1VBeEtEbW1hZmdycE5pQnNONnAwZ2JG?=
+ =?utf-8?B?c2FLZGQ4cVlDc3B4RXY4ZzFWZ3AvaS96eVFSblhvVlZlMGMxMUttQU1pTHYz?=
+ =?utf-8?B?czFrL1hSNjR3N3BaL3VFRzdLTHdWbmxWd0RIRjR3NzJGV042NkNyRmVnRnAy?=
+ =?utf-8?B?WUMzM29DUmpnN2NRVUo3T0JFQUtXQktoSTk4SmZlMmU3bVRjYWNBTEdGVHFh?=
+ =?utf-8?B?WmM2UGhCdERxYjRwRXVhSU1RU01RejdScGg2UmNOWFlWemtpN25xUkx3ZGxi?=
+ =?utf-8?B?S0w2b0Z3ZW9VMHhqOXF6T25DWnczWDRCNDViaDNVMENsb2pmSzZIRUY4blUv?=
+ =?utf-8?B?dit1QWJDVmtCTDBiQWhROXRjSW5YMUUxdFBIK1crSFNUaS9wWENqK0JCSk9Z?=
+ =?utf-8?B?UHZvTWsveURHN0NJaWZuY1d1T0gzMmhYTy9jZXk2Z1VEMHdOczY4TWJUYTIw?=
+ =?utf-8?B?cEZkSWhhcFZXRnU3bCtQWUVlQVgxZjdFSk5ZMTVqQzZ1amV3czFHL2J2c0hs?=
+ =?utf-8?B?TTIvQk15eWQ4UXU3b2pTR3cycFNFU3ZjVUJySXBFQzhubnZZLzNnOGd1Snkv?=
+ =?utf-8?B?L0xHT245TUZqQmQ5bm9GK2pIYWJ2bXg5dTBFamxiZWdLUkpnU2FTTnFPNTZV?=
+ =?utf-8?B?eVVyVlZVZm5GemZmZ1p5eDBrcEVIcE44U0RrbjFObStiK3NqbmE4SmdpZ1hq?=
+ =?utf-8?B?MmVGcjBBaEdPM2J2WjVxUnIvbGZNU25JazBHRFQzMWNMcktRY3JLdEk0NGNK?=
+ =?utf-8?B?U0x3RTU2SFdOOGNhNjlIU0dVblFJWTAzdU9tNkNBVnR4TDZyazgycG5xR3NR?=
+ =?utf-8?B?QmdINGEyVitzOThNU3N0VC9ydkxxaDRnTmZ0ZHpzc0RET2Z5S29GTm5pUmpY?=
+ =?utf-8?B?ZmdYby9QMmFLNTlXLzZHYU1kZkxRTjl0c1lVcmt4cmQxbXlGdFgzaGhDOHAy?=
+ =?utf-8?B?dkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60a6e1bf-865d-4551-c9ad-08db8796225f
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 13:51:49.6798
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3kR/SoL4DEW3isnsVhAcSWK2HbW+BjAjgfnf7ANa1dPK1ByjvEUiQYec3q/7FWary4BRKsZxnpC4oI1g7Os6RuYw7YU6IxvXcRijoHfcvFU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5551
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 12:00:48AM +0300, Arseniy Krasnov wrote:
->This is preparation patch for MSG_ZEROCOPY support. It adds handling of
->non-linear skbs by replacing direct calls of 'memcpy_to_msg()' with
->'skb_copy_datagram_iter()'. Main advantage of the second one is that it
->can handle paged part of the skb by using 'kmap()' on each page, but if
->there are no pages in the skb, it behaves like simple copying to iov
->iterator. This patch also adds new field to the control block of skb -
->this value shows current offset in the skb to read next portion of data
->(it doesn't matter linear it or not). Idea behind this field is that
->'skb_copy_datagram_iter()' handles both types of skb internally - it
->just needs an offset from which to copy data from the given skb. This
->offset is incremented on each read from skb. This approach allows to
->avoid special handling of non-linear skbs:
->1) We can't call 'skb_pull()' on it, because it updates 'data' pointer.
->2) We need to update 'data_len' also on each read from this skb.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> Changelog:
-> v5(big patchset) -> v1:
->  * Merge 'virtio_transport_common.c' and 'vhost/vsock.c' patches into
->    this single patch.
->  * Commit message update: grammar fix and remark that this patch is
->    MSG_ZEROCOPY preparation.
->  * Use 'min_t()' instead of comparison using '<>' operators.
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Date: Fri, 14 Jul 2023 20:37:39 +0200
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> 
+> On 14/07/2023 19.08, Alexander Lobakin wrote:
+>> On x86_64, frag_* fields of struct page_pool are scattered across two
+>> cachelines despite the summary size of 24 bytes. The last field,
+>> ::frag_users, is pushed out to the next one, sharing it with
+>> ::alloc_stats.
+>> All three fields are used in pretty much the same places. There are some
+>> holes and cold members to move around. Move frag_* one block up, placing
+>> them right after &page_pool_params perfectly at the beginning of CL2.
+>> This doesn't do any meaningful to the second block, as those are some
+>> destroy-path cold structures, and doesn't do anything to ::alloc_stats,
+>> which still starts at 200-byte offset, 8 bytes after CL3 (still fitting
+>> into 1 cacheline).
+>> On my setup, this yields 1-2% of Mpps when using PP frags actively.
+>> When it comes to 32-bit architectures with 32-byte CL: &page_pool_params
+>> plus ::pad is 44 bytes, the block taken care of is 16 bytes within one
+>> CL, so there should be at least no regressions from the actual change.
+>>
+>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>> ---
+>>   include/net/page_pool.h | 10 +++++-----
+>>   1 file changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+>> index 829dc1f8ba6b..212d72b5cfec 100644
+>> --- a/include/net/page_pool.h
+>> +++ b/include/net/page_pool.h
+>> @@ -130,16 +130,16 @@ static inline u64
+>> *page_pool_ethtool_stats_get(u64 *data, void *stats)
+>>   struct page_pool {
+>>       struct page_pool_params p;
+>>   +    long frag_users;
+>> +    struct page *frag_page;
+>> +    unsigned int frag_offset;
+>> +    u32 pages_state_hold_cnt;
+> 
+> I think this is okay, but I want to highlight that:
+>  - pages_state_hold_cnt and pages_state_release_cnt
+> need to be kept on separate cache-lines.
 
->
-> drivers/vhost/vsock.c                   | 14 ++++++++-----
-> include/linux/virtio_vsock.h            |  1 +
-> net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++---------
-> 3 files changed, 28 insertions(+), 14 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 817d377a3f36..8c917be32b5d 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -114,6 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		struct sk_buff *skb;
-> 		unsigned out, in;
-> 		size_t nbytes;
->+		u32 frag_off;
-> 		int head;
->
-> 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
->@@ -156,7 +157,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		}
->
-> 		iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[out], in, iov_len);
->-		payload_len = skb->len;
->+		frag_off = VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
->+		payload_len = skb->len - frag_off;
-> 		hdr = virtio_vsock_hdr(skb);
->
-> 		/* If the packet is greater than the space available in the
->@@ -197,8 +199,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			break;
-> 		}
->
->-		nbytes = copy_to_iter(skb->data, payload_len, &iov_iter);
->-		if (nbytes != payload_len) {
->+		if (skb_copy_datagram_iter(skb,
->+					   frag_off,
->+					   &iov_iter,
->+					   payload_len)) {
-> 			kfree_skb(skb);
-> 			vq_err(vq, "Faulted on copying pkt buf\n");
-> 			break;
->@@ -212,13 +216,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		vhost_add_used(vq, head, sizeof(*hdr) + payload_len);
-> 		added = true;
->
->-		skb_pull(skb, payload_len);
->+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += payload_len;
-> 		total_len += payload_len;
->
-> 		/* If we didn't send all the payload we can requeue the packet
-> 		 * to send it with the next available buffer.
-> 		 */
->-		if (skb->len > 0) {
->+		if (VIRTIO_VSOCK_SKB_CB(skb)->frag_off < skb->len) {
-> 			hdr->flags |= cpu_to_le32(flags_to_restore);
->
-> 			/* We are queueing the same skb to handle
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index c58453699ee9..17dbb7176e37 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -12,6 +12,7 @@
-> struct virtio_vsock_skb_cb {
-> 	bool reply;
-> 	bool tap_delivered;
->+	u32 frag_off;
-> };
->
-> #define VIRTIO_VSOCK_SKB_CB(skb) ((struct virtio_vsock_skb_cb *)((skb)->cb))
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index b769fc258931..1a376f808ae6 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -355,7 +355,7 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-> 	spin_lock_bh(&vvs->rx_lock);
->
-> 	skb_queue_walk_safe(&vvs->rx_queue, skb,  tmp) {
->-		off = 0;
->+		off = VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
->
-> 		if (total == len)
-> 			break;
->@@ -370,7 +370,10 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-> 			 */
-> 			spin_unlock_bh(&vvs->rx_lock);
->
->-			err = memcpy_to_msg(msg, skb->data + off, bytes);
->+			err = skb_copy_datagram_iter(skb, off,
->+						     &msg->msg_iter,
->+						     bytes);
->+
-> 			if (err)
-> 				goto out;
->
->@@ -413,25 +416,28 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 	while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
-> 		skb = skb_peek(&vvs->rx_queue);
->
->-		bytes = len - total;
->-		if (bytes > skb->len)
->-			bytes = skb->len;
->+		bytes = min_t(size_t, len - total,
->+			      skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off);
->
-> 		/* sk_lock is held by caller so no one else can dequeue.
-> 		 * Unlock rx_lock since memcpy_to_msg() may sleep.
-> 		 */
-> 		spin_unlock_bh(&vvs->rx_lock);
->
->-		err = memcpy_to_msg(msg, skb->data, bytes);
->+		err = skb_copy_datagram_iter(skb,
->+					     VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
->+					     &msg->msg_iter, bytes);
->+
-> 		if (err)
-> 			goto out;
->
-> 		spin_lock_bh(&vvs->rx_lock);
->
-> 		total += bytes;
->-		skb_pull(skb, bytes);
->
->-		if (skb->len == 0) {
->+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += bytes;
->+
->+		if (skb->len == VIRTIO_VSOCK_SKB_CB(skb)->frag_off) {
-> 			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
->
-> 			virtio_transport_dec_rx_pkt(vvs, pkt_len);
->@@ -503,7 +509,10 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-> 				 */
-> 				spin_unlock_bh(&vvs->rx_lock);
->
->-				err = memcpy_to_msg(msg, skb->data, bytes_to_copy);
->+				err = skb_copy_datagram_iter(skb, 0,
->+							     &msg->msg_iter,
->+							     bytes_to_copy);
->+
-> 				if (err) {
-> 					/* Copy of message failed. Rest of
-> 					 * fragments will be freed without copy.
->-- 
->2.25.1
->
+They're pretty far away from each other. I moved hold_cnt here as well
+to keep it stacked with frag_offset and avoid introducing 32-bit holes.
 
+> 
+> 
+>> +
+>>       struct delayed_work release_dw;
+>>       void (*disconnect)(void *);
+>>       unsigned long defer_start;
+>>       unsigned long defer_warn;
+>>   -    u32 pages_state_hold_cnt;
+>> -    unsigned int frag_offset;
+>> -    struct page *frag_page;
+>> -    long frag_users;
+>> -
+>>   #ifdef CONFIG_PAGE_POOL_STATS
+>>       /* these stats are incremented while in softirq context */
+>>       struct page_pool_alloc_stats alloc_stats;
+> 
+
+Thanks,
+Olek
 
