@@ -1,260 +1,263 @@
-Return-Path: <netdev+bounces-18607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350F6757E38
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 15:52:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6CD757EDC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 16:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 582921C20CD9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 13:52:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63C51281186
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45209D52E;
-	Tue, 18 Jul 2023 13:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E7CD532;
+	Tue, 18 Jul 2023 14:01:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3752BD51A
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 13:52:23 +0000 (UTC)
-Received: from BN6PR00CU002.outbound.protection.outlook.com (mail-eastus2azon11021016.outbound.protection.outlook.com [52.101.57.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A3012F;
-	Tue, 18 Jul 2023 06:52:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7C8C8FA
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 14:01:03 +0000 (UTC)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B3451FCD;
+	Tue, 18 Jul 2023 07:00:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689688849; x=1721224849;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=lBmMmPzpy3sCBZRZ3qvkDbczZs/L3W9/IfSCZHmrjDA=;
+  b=TjUCoMYzSvddrjPHcxZVoxO1AA5PovL9g1VI51hgQyJ62M+TLpywuFIe
+   DnbT5qigdH3OM63jGJStaOFT5QH2GP5Zp8JL1sMXNi3YUqBvAUq0PxaoP
+   qIqXsTaOVCzSY2lykwL7UiueKuPn/mAO45lKTu2iaXZtp0/x1eTF9yc2a
+   H9xVlQwcOntRViBKO+sgU6oeY8czvPUW5LTF1eslPvbkFrab18tYjH+jX
+   wkNH6zKxcuWEI591rKkmuTP9bpHtchA3tMNc0UuBYeSOIR85wwFYNpR/t
+   RVm70PHXk9rtXpf42WaEgW1TUoo/xSIQRdpNLJzmO1FK7413GjcyC0gnp
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="365089427"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="365089427"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:58:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="673926142"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="673926142"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP; 18 Jul 2023 06:58:38 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 18 Jul 2023 06:58:37 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 18 Jul 2023 06:58:36 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 18 Jul 2023 06:58:36 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 18 Jul 2023 06:58:36 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JDVozUlfqIJbhqAl1pMvZIP8ODSBGervTFc73V3g/BXqeovEVs9IQFPvM0c7wdjeKXWD3475QxwYzW557ixSRXUJKjVGBtOWE4G9d6v1ejhOSgSPke5Feuqs5ZSHGE6MBb2wMFw8/Oei8abkhDbK2ySEnFBMoczF3pUW3Vejn5dfgeXYRCSW8n0M/6i9Bvjvt9Xm+qD1JblQRh/591Z10FRCo9/H3DIfvDdH1zTwYN2T7CJdojIjgJBrIZCbf3CzPUz+J3xCF2jKdk6rdwuUY1IkeLpL9rNZg72KdSsCDnXOZmM+J/naczc/2jGF3BLt8UKZ7vByvZk7aIOTiA7zCA==
+ b=RV2N8GRZbpZKSaBKlOW8SPoXoxUgasBrhPpyOk3MxmmZjtaCKhGyvhVKD4Vb4GHKiaevV3gnsxoUJEQIACzzZJyI8UeTLX58f77xkGyoJs7YLuxI61k9YKNEiyz8kIgXK9GTXI4ZpRPYdAigRDF+JBfxwEAa0hDpUTprtxzVeXLQLWW5RkLsPAjjL96krJIl1zmZnRIffFFW94e9ak3fMTcP+RYHzEKDOshVq/gwiFQaE0xWpUUxBdQmQRXQKdyK3uxhQSDFTLpy6nmTc42CMi96CB5ESFJk1Sm9grN5CmRJGmgCIz3n0IGn/KKuz/a7RRa8OOKYoh3VOjkd96NXgQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UkE6/25rB3Hdm5NyQKbDGf8j3snz2CR9ctyjBU6sL44=;
- b=X80erqy4WxA1UZ87b63LFMeH4XNCJzBTy6TeDOxiRh4kmVAp6ieenTOA0diKfK7fhywbQFfL2VkeIqpyOS786cXb5jVw0SIX48s5tLPAoCR+DJwH44TGO5zbnt7f1Sc0nbjD15dE4lzhLcu3eVDOwlfJmmCieuxjGnsQw2InzBLlbe/3RO8oBaOUNeY9beHPOzaEBNcQpSGvsuiDWrGadhpP/dJGniY1uN+pQsQy26bH/5RYVF64o3IiaUPCOKlUTZKsyeSVNfvMiA9VT0PxwZsjD9IbpffPIIJs9kzdCKP/KOL1zaej0IK4a7xD2csh5LyfTRwYS/NzvvubL8/Kcg==
+ bh=sAVa3rMgzkAhJYMd9+AuzlSLFmxvMjtmCXraz2aYvcs=;
+ b=ab8ry4jYRUhHAhjgseOQpUS+WpJBhRChZUyQtZu+WSJCtT6HhnOC/oHP22/Xo/GuTIqNbBmBQSrVSEfLM64g3Iw4oQs/ItumCc3OegQIqP5FK/8JUvZ025Rlw42eLLtZuV+xFSJSFzXLaJ4dUf7jj7KvGEZh9OrZXAsgHjCkZauIXQ9BczqFWpUOmUh/4a7Mc3cXff4Pl5yXrtvOCU9TOQ3I6Mgba8n56fKxwFHsuyi4ppU+i7uzWrfUGmik3vQc/ZRhdVj48a+GoBROUS7eCoZN5l359j7unxty6LlQNfAEyBv7PgSGgCI7q/n8yUr3Z75zJDjehA29bn5s0SMf7Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UkE6/25rB3Hdm5NyQKbDGf8j3snz2CR9ctyjBU6sL44=;
- b=Cu6NGfElVrVQHU5C8LMqdOzf1tAw5EmMJIMLuJdOd6lAVYYXgHgOOZTsjL7BPYWmggiOSBi/eC/hyYYAWq8bnfZTADq/xwxO2LqejD/yMgWVM0CH2Vkj+peoeOn/02qSnKO9NstAIgnteBN5cVEYuAnasM4lvJ5W7mdIw+MFvFY=
-Received: from PH7PR21MB3116.namprd21.prod.outlook.com (2603:10b6:510:1d0::10)
- by CY5PR21MB3421.namprd21.prod.outlook.com (2603:10b6:930:f::18) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SA2PR11MB4972.namprd11.prod.outlook.com (2603:10b6:806:fb::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.8; Tue, 18 Jul
- 2023 13:52:17 +0000
-Received: from PH7PR21MB3116.namprd21.prod.outlook.com
- ([fe80::1cd5:4b0e:d53d:3089]) by PH7PR21MB3116.namprd21.prod.outlook.com
- ([fe80::1cd5:4b0e:d53d:3089%6]) with mapi id 15.20.6609.020; Tue, 18 Jul 2023
- 13:52:16 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, KY Srinivasan <kys@microsoft.com>, Wei Liu
-	<wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Long Li
-	<longli@microsoft.com>, "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: RE: [PATCH] hv_netvsc: support a new host capability
- AllowRscDisabledStatus
-Thread-Topic: [PATCH] hv_netvsc: support a new host capability
- AllowRscDisabledStatus
-Thread-Index: AQHZqnBMGWxSndAt1U6NS9TBDf5Ag6+huQmQgAXCSwCAF/JCgIAAOxRw
-Date: Tue, 18 Jul 2023 13:52:16 +0000
-Message-ID:
- <PH7PR21MB3116832BC97FF4469A8DAA6BCA38A@PH7PR21MB3116.namprd21.prod.outlook.com>
-References:
- <1688032719-22847-1-git-send-email-shradhagupta@linux.microsoft.com>
- <PH7PR21MB3116F77C196628B6BBADA3C7CA25A@PH7PR21MB3116.namprd21.prod.outlook.com>
- <20230703043742.GA9533@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20230718101845.GA24931@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To:
- <20230718101845.GA24931@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
+ 2023 13:58:29 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
+ 13:58:29 +0000
+Message-ID: <9275b613-3a9d-2de3-2f21-407e56c09622@intel.com>
+Date: Tue, 18 Jul 2023 15:56:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RFC net-next v4 6/9] iavf: switch to Page Pool
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=6e5712da-a967-4a1c-96e5-839fbc6eaa47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-07-18T13:50:11Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR21MB3116:EE_|CY5PR21MB3421:EE_
-x-ms-office365-filtering-correlation-id: e3a7f4a7-d9cb-41ba-0274-08db87963292
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Te3tqZstrgovp/V7teB7idXFz0+i09hPT8YnEqw2wSk+NdKZHebIxqR//jclue2kloLz3vLgMRWe/5exMWv8vllc2iXC8ACCsm4VY8XMj6TVy/uUXamwx1iDgk8xaM9LrktaMkuObdSLM1qr+fPRLEmdByRsehvaKOg+3/rLIacQIYplGw0TtKndXUJbMXRM7fWgc/xEH6ErK6Nh1W5AtBdc6qrJGhiyR59PHHKXdOqMfjOviyQrfIGjflv00lZQn8RU5jzOBvRAD+w+FFi+ypLMWGziOrmuHZqRXjLIQSMk/D4ep1FcPoAxwdjzYHwB0EfGPdPoKUnwuOnJ2Z/Wfz2ELlNSdAf9hQhyoYwBExUu5bzGHPHTDhKHcmwgXhTBaQmZrm++rj/d1JlGxb6ZKKoBgPNo4NpxKcQ0h8ZoLdf3txTwCHFch8J/8L/1HdvcD2Nul1n/1H3MXOJj9xXvdtSW6GG2HtJn71NWVV1mBV/qX3cVPmiE+eL0G8gHO2L2B3d3P+UJRgRP7ptD2guMMiSjC29o4zv/6uDYSk9PjLOOKH6T0IOw42mtACSkr+nR+qFyD30EnjtTxg8gh9KgU8fs6zSjlUKajSXimlj3rQxffaOC7ptHg9AqvvoxUBINFhzJZEfTNqElCyv3e4y9rPfPzWLIxmVRrMoemuxobK4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3116.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(376002)(39860400002)(346002)(136003)(451199021)(5660300002)(38100700002)(122000001)(316002)(8936002)(41300700001)(8676002)(82950400001)(82960400001)(52536014)(6862004)(55016003)(38070700005)(4326008)(76116006)(66946007)(10290500003)(71200400001)(478600001)(66476007)(66556008)(66446008)(64756008)(33656002)(186003)(8990500004)(53546011)(6506007)(2906002)(86362001)(54906003)(7696005)(83380400001)(9686003)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?BqvLrhCxZCyM4SVVbORHZZGhWtk/60ETkzHz5HezifH4GZDD4BKeJhXI3fwJ?=
- =?us-ascii?Q?QLMkoHfnyJTwH5pssyNMQrdVAU0pA9SAy0jEBMIqx++a2l0tfc1Z/7zhFa5/?=
- =?us-ascii?Q?8yadrJOeWuT5f9A5c/63ItrxMdBajdmur4uSnHbhjNYRvyoQCTzOAw0bSI8b?=
- =?us-ascii?Q?NwfQ0Zpf3aTsN9SsRWmu1MYLJzWbmCTUZPDTfaMRiYVYycmicBgYoTiRSzS5?=
- =?us-ascii?Q?DWWA0T+Aymq0XsW8DjdjHeIB7Eupqp3DYJ7A1uoj17XBiu1597Z4wCyFVdgM?=
- =?us-ascii?Q?z1bjaWwvSS/rf37qiTycuN2kRSF7MCdVp5CiEzP18LDS8AGLEo7kmcaITb5p?=
- =?us-ascii?Q?U7uQ1LsGgkmrcmZ+Iq27WbmyWvHz7XwS49l7rqLc6D1HTockBU7wv2zD1PjR?=
- =?us-ascii?Q?a7gDqK6kAzMa1+hZe5TufOMVPi2H7i4FbODxKMn3GuMiyvJe6riLHrDyR36P?=
- =?us-ascii?Q?5anQXesrr2ddEvbdkH4uzREHZEZUjvBGy1tXAR2ISGHGJdxt8XLDaK3+Qu7l?=
- =?us-ascii?Q?7r4Ej0cCXURccKrNF/QcJtOP2M3KbzVVt6MODYrBumrXVJ3YmM6fi/xmiNOK?=
- =?us-ascii?Q?acG+ObfoTVPwWYFlu5x4jJM+ql5YBzD/Lh89BFK+V1bfkr2PMZw8fVtfwghk?=
- =?us-ascii?Q?1O2asWhNYuLi3TcfTuV91HwEoEMY45UsekA4BTNWvVn1x2wDqwUeLmcBczF6?=
- =?us-ascii?Q?JkjGEj1aVK1rqTigQlBXFeYgln1aY0eDhh2XBVSw1t7Y/dL1h8zUHvIdBz9B?=
- =?us-ascii?Q?RhkWcdu0Rq8zbqdkWy3PFsdQrrJurtr6wCrg9Iy1TwxB1xJjbD00gKXH+X9W?=
- =?us-ascii?Q?iuQROr/LfDY4pG+9U0/XZ5tOJ0R6k98OQjx3Y58fjKwOklie50RYeZwIObI4?=
- =?us-ascii?Q?AIbIgcx89J5SWr4+WJFg24jkSCTPOsUus3h6LVM7IBqEfCR9tbRmq1WKB88R?=
- =?us-ascii?Q?j8dAogBwTDvfp2TaPO4S+WgUaQ1HjUWcg6pOe4dWFdDNMb8AD9d79yr1dc6f?=
- =?us-ascii?Q?LbEtAwR+spRwJ1LgpJlOQuW7HVsrBdRG91q/QvnS2pIobe8aUAjbxunZYrAq?=
- =?us-ascii?Q?TF/9CVGqg5XzFJO2kMCTj/LBNHanPwt1l3drCfSF6cukzlZJaKTq02KEeP59?=
- =?us-ascii?Q?mbb86N+RWOZL/aH720YnzMBLwec5N9x7ezv8dHei3oShh197TqRH6Dkrk4Dz?=
- =?us-ascii?Q?qWlvxkoYIaTcyzjJAoIeP5KN53LbEiKsl6T58T5sSKVvvQ8ZWHeRrehfrJbE?=
- =?us-ascii?Q?STAT7c3vjY1vRR711JhBaymA8Mls5n66IlgrqvrTNpfufmdnkzZSiBtNaEPw?=
- =?us-ascii?Q?PmBiZJyezblhUu7c4NYGda+sMESc9z2Rgt1LlWehUQxYdl8z2YX/gEjd2SLT?=
- =?us-ascii?Q?2wTqLOEtQAseVa6ZzLduUkk81L86IDeBTxLLUEsXQ7kkDzVRIzd8d4n/EJHK?=
- =?us-ascii?Q?7u+chn+bF/Zze2G/jkfhgQ7BzGdEnkGknice3jhJXNNTFRwaJzekIlJU2u9Z?=
- =?us-ascii?Q?nHuT1xHPFe0fw0fegCxrTIDZMTLgB2SvbHF/9MyrLoW6oVKqxkrGHPSaxQ3A?=
- =?us-ascii?Q?wg8HEba8rXjiMZ2Vxh8BO+YCel+xE+9Aen0ZrYmw?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: Yunsheng Lin <linyunsheng@huawei.com>
+CC: Yunsheng Lin <yunshenglin0825@gmail.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, David Christensen <drc@linux.vnet.ibm.com>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, Paul Menzel <pmenzel@molgen.mpg.de>,
+	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230705155551.1317583-1-aleksander.lobakin@intel.com>
+ <20230705155551.1317583-7-aleksander.lobakin@intel.com>
+ <6b8bc66f-8a02-b6b4-92cc-f8aaf067abd8@huawei.com>
+ <bc495d87-3968-495f-c672-bf1bab38524a@intel.com>
+ <4946b9df-66ea-d184-b97c-0ba687e41df8@gmail.com>
+ <95c5ba92-bccd-6a9a-5373-606a482e36a3@intel.com>
+ <558849ff-6b68-7547-cf99-36801ff24c25@huawei.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <558849ff-6b68-7547-cf99-36801ff24c25@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE1P281CA0028.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:15::11) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SA2PR11MB4972:EE_
+X-MS-Office365-Filtering-Correlation-Id: 34b9fa14-7e2f-4754-4574-08db87971024
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OCh3gEifIqGbQghZ9OBc/CEPvo5W6j8tx2PrpTE1j90FG8Rm9tb9e6J0P761JAfeTW8NzVZSCX29EYFWh5zJZ39MU5WXtErATLeNKk6qGSaFlmZxBgLpNRPfScsM2etddQzahQc6XmKfwmJhiGYfMgKJdRA20d7S0HHnyWn3NMWczsczuibW+B79AXiVdxIgrcrllmuNcp7Gm+pX5WAtRpjqErmLTmd9qh3611yJDkNIqovqi3h/sS9XNV8LlmMK8QR8X7mwJrMB6p2aCNJbrRYKUaBC2prSsARIk0edA+D8n7dC56ZkgiKomEdAmVXNeg3exkzMiTwH+4xdeSgNV5L7B6EHAaUgKQQFt7E3Bk8EZzy0WbzU/CVB565+aQhe3kABA80GKMLqZxHY7N9+v/42H/tcfagLPskpo5RqihQX/HloCZIfcIHViggweNBA2gA2z/EECC1S7KG4zOhmt0IIW6GAGwjDxMywRY2t23SJoh8qZ5++uYfTnAAjH2haIBTOuyKWhMua58x0flZZ3LNDP40TPjAMRvFOnhuA519mWFHLJvEMPuD85uSlhxWOGRZ8SVsXhvlJPwBwu6WuJZa6Cua53jJm8LdDQfz3ddKtZJbysZdDAsby3vKOvWHPFlcMMIncQTRuH5CRhMF3tA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(366004)(39860400002)(396003)(346002)(451199021)(31686004)(6486002)(54906003)(6666004)(478600001)(2616005)(83380400001)(31696002)(86362001)(2906002)(186003)(6506007)(53546011)(6512007)(26005)(38100700002)(82960400001)(66476007)(66556008)(41300700001)(66946007)(4326008)(316002)(6916009)(8676002)(5660300002)(8936002)(36756003)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eUxOelBXWWhWZG1VYWl0NFdaNysvY1dJRlNLREFyU2tTT0RNd3RwbktuYzNl?=
+ =?utf-8?B?V29nNkRnVW9NNHFEd3FKcXpMT3c3VFRES1ZrQ2VCYzd4QWlJZ01yMDBPN1A3?=
+ =?utf-8?B?V1ZKRzIzZDZUY1NvbEdKRXRoY1ZRMFBlNjZhMHkwb3RtMG4vMWU1NUg4dkZp?=
+ =?utf-8?B?V2NNTUxrOGx3NmJjUjlmTkRpZXFINnFycU10cXJEa2tSOTlRK3YwanRTZjVD?=
+ =?utf-8?B?LzZZRXBxMTlXNXU1RXNhbHdkek4xd2xnOSthUWVybXVtU0pqNVlDeXBVQXFx?=
+ =?utf-8?B?Zm1YZ3ZBa1NhaWxoZTVQZlRwazlzWlQ1WFNDY2kxNU5CTmZXUmx2anU3Y0lU?=
+ =?utf-8?B?bDZTcUk2YVJUUEVNSkZQQjRWcjZSSkszN3IydXVWZlFjVjVxaWxpV01IWW5a?=
+ =?utf-8?B?WVBlc3JnVlZCL3Z0SW9XM0YwWWJrWEpON1Zad05HTzB0SEFQeHFBZUlMRXNC?=
+ =?utf-8?B?OUwrT3VkNGliZG1CNDM4TTFXbXBPd2pFaGFrYVNlZXJwNDlFTHUvSisyTTJi?=
+ =?utf-8?B?cWhlSWFwS2Q1RWYyWUxNWGtNNWNVSFJqdUdWM0Y3SitXblZZZkhLNlQ2QXps?=
+ =?utf-8?B?ZG5uUVVnUjZXZWNOK3lsUUxCZ2Z1U2tsVGE2WnpLbHRMVXIwWll0NW9YMXRy?=
+ =?utf-8?B?TnBJTWcyaTZ2QWpBNS9JNjMvSmFoL0FJak9aOHRBd3k1TThrNThRUWQvdFRq?=
+ =?utf-8?B?bHRQTmtzVU12T200L0lIalZVUkRJcFZvMk9mQUVZdWpFM0VoeDliMWRnUENx?=
+ =?utf-8?B?M2E1VTRka3h4Y3RsWEMrejBrZXg1WkEvcjJLU3lvSHoxK1A0NVpGMXVNSW5H?=
+ =?utf-8?B?SjEvMElOYVdFazN0VzJPVnFMTlRxckVPOTR1cWxrV0Q0bUpZaFhKNXh0ckd6?=
+ =?utf-8?B?WDZPbXk3L2VXdEJzQ2NVNmlBZVdDWGJIYVFGMDBvSzJjR2RHdW4vcW9qUndW?=
+ =?utf-8?B?RktUNzU3UEg2K0hsNklMaTJGTDdFd0QrQTQ1RFMzRllVVHJ0NWhTNEc5eGhC?=
+ =?utf-8?B?TWlpTkpHMlNMS2dJcWVHdmVuVzhxc2hNRmNsU0J5ejR1dHhYakZTR3dNdnFJ?=
+ =?utf-8?B?TkUwNnRWVDhGdFN6dGZHR05RN2xaRzd2MlQ3UTZpVzRXQjJGeDN6K2gvekNE?=
+ =?utf-8?B?WnlVZGhaUUZSSzNKVDlJZ3NEK2hTaFlXN1o4NW1hZlJoWTg1WmYzV1ZLWmlG?=
+ =?utf-8?B?QXpvenpJdjhlbjkxK1Q1bHlTSm52WHphVkJaMkhqSFRFcGFKUHQ3QlJhM2Zq?=
+ =?utf-8?B?KzVsQmJwNFBscGp6VWs0Z0VyTkNXMG9wY2N1Y01aeUpiL1BaOThSWERTRTBh?=
+ =?utf-8?B?Nmw0MVhMSUVCc01pSGhtZ1JiTEJMMmJMRWhZYWpkaTRnQzFhTVd4ZEhxdml4?=
+ =?utf-8?B?d3YxaktTTmVnWmpiQWh6dHJ2OUlzM1JTZUxDeDdJMW54bEFPYWluWHFPb0JN?=
+ =?utf-8?B?ek8vV1JlVGNyVFY1cDVMdWR1WkZiT0VoaGVOSVpiclZGdmUydGc3elBCdXJP?=
+ =?utf-8?B?SUpWWUtVVENWMk9zVlRqay91REpCVjZhWXZ6MTNFMnltZUZrRUNzVEt1YUVD?=
+ =?utf-8?B?SXQwRmhiTmRrRXlKTzZEUnNOUnpoTGpNeWFkRFZvaVEwRXBMMEx2ckJlUW0z?=
+ =?utf-8?B?RVhWK2hhMk05alhxQkVGeHJxQW5YcVBBWnF1UWxHU1RTbU1JU3JJQWc1eFN3?=
+ =?utf-8?B?RFROZGt2S0ZIZlEvQzZ1dTIzWDZJa0lGQlpxTHJFYllEbnBWZ2VqNjY4NklU?=
+ =?utf-8?B?bHBkazNEME5IdGJFeVlMRS9IUGg1NWhLZ0xLUUhCb3I0RUVTY0hFT0NOZTBM?=
+ =?utf-8?B?YzJ6RXlJVitBNUhNSzBtcGtiV2NBd3g2UlptNURWYmlBMk9uRU1DeHMxenNw?=
+ =?utf-8?B?ZjJkVUhHYVBtb2YvSG45MVNjdE1abTMrUHdndDIxdyswSkMwK0hWWURkdFk3?=
+ =?utf-8?B?QzJadUp5VkN2UHliczFsRW5ycWU3bnlPdysrSjY5cnNXbmZZZVZ3OTlxakg1?=
+ =?utf-8?B?QWJBRjZrejkrNGxoTy8zcVlkbmZYcEJNRWJLWmI4aHZiNjdFTDJvVTZTWGdj?=
+ =?utf-8?B?UnhORnRLeE5HRFo2U1N4L1NTNWFjRzQwY2c5S0k5T00zc05paE9LT0lKUzNO?=
+ =?utf-8?B?Ungvd0pBNCtlc2ViNVNvSlZqNmVCWTFnN25MWW96UzNWRy92NGsrTFFUbXFH?=
+ =?utf-8?B?VFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34b9fa14-7e2f-4754-4574-08db87971024
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3116.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3a7f4a7-d9cb-41ba-0274-08db87963292
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2023 13:52:16.5827
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 13:58:28.6967
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SX9tTAowYoTBgEfc1RRPtLx5POO1W2OxLG5QBNoBLhd80YfIChl+Q9I+51wFQNC50fliD1OblrqXWqXRer+o9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR21MB3421
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7sVuaYZVmm4bmc4HCjx2uWoAwqyI8h5tj/Fi1Xh+i8600npBS+uH305AB76zPAdRnfIwKFJlnzE96oT6Sv5XM5G0pDzoLBUQBXUGTfGXCJ4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4972
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Date: Tue, 11 Jul 2023 19:47:14 +0800
 
+> On 2023/7/10 21:34, Alexander Lobakin wrote:
+>> From: Yunsheng Lin <yunshenglin0825@gmail.com>
+>> Date: Sun, 9 Jul 2023 13:16:39 +0800
+>>
+>>> On 2023/7/7 0:38, Alexander Lobakin wrote:
+>>>
+>>> ...
+>>>  
+>>>>>
+>>>>>>  /**
+>>>>>> @@ -766,13 +742,19 @@ void iavf_free_rx_resources(struct iavf_ring *rx_ring)
+>>>>>>   **/
+>>>>>>  int iavf_setup_rx_descriptors(struct iavf_ring *rx_ring)
+>>>>>>  {
+>>>>>> -	struct device *dev = rx_ring->dev;
+>>>>>> -	int bi_size;
+>>>>>> +	struct page_pool *pool;
+>>>>>> +
+>>>>>> +	pool = libie_rx_page_pool_create(&rx_ring->q_vector->napi,
+>>>>>> +					 rx_ring->count);
+>>>>>
+>>>>> If a page is able to be spilt between more than one desc, perhaps the
+>>>>> prt_ring size does not need to be as big as rx_ring->count.
+>>>>
+>>>> But we doesn't know in advance, right? Esp. given that it's hidden in
+>>>> the lib. But anyway, you can only assume that in regular cases if you
+>>>> always allocate frags of the same size, PP will split pages when 2+
+>>>> frags can fit there or return the whole page otherwise, but who knows
+>>>> what might happen.
+>>>
+>>> It seems intel driver is able to know the size of memory it needs when
+>>> creating the ring/queue/napi/pp, maybe the driver only tell the libie
+>>> how many descs does it use for queue, and libie can adjust it accordingly?
+>>
+>> But libie can't say for sure how PP will split pages for it, right?
+>>
+>>>
+>>>> BTW, with recent recycling optimization, most of recycling is done
+>>>> directly through cache, not ptr_ring. So I'd even say it's safe to start
+>>>> creating smaller ptr_rings in the drivers.
+>>>
+>>> The problem is that we may use more memory than before for certain case
+>>> if we don't limit the size of ptr_ring, unless we can ensure all of
+>>> recycling is done directly through cache, not ptr_ring.
+>> Also not sure I'm following =\
+> 
+> Before adding page pool support, the max memory used in the driver is as
+> below:
+> rx_ring->count * PAGE_SIZE;
+> 
+> After adding page pool support, the max memory used in the driver is as
+> below:
+> 
+> ptr_ring->size * PAGE_SIZE +
+> PP_ALLOC_CACHE_SIZE * PAGE_SIZE +
+> rx_ring->count * PAGE_SIZE / pp.init_arg
 
-> -----Original Message-----
-> From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Sent: Tuesday, July 18, 2023 6:19 AM
-> To: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: linux-kernel@vger.kernel.org; linux-hyperv@vger.kernel.org;
-> netdev@vger.kernel.org; Eric Dumazet <edumazet@google.com>; Jakub Kicinsk=
-i
-> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; KY Srinivasan
-> <kys@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui
-> <decui@microsoft.com>; Long Li <longli@microsoft.com>; Michael Kelley
-> (LINUX) <mikelley@microsoft.com>; David S. Miller <davem@davemloft.net>
-> Subject: Re: [PATCH] hv_netvsc: support a new host capability
-> AllowRscDisabledStatus
->=20
-> On Sun, Jul 02, 2023 at 09:37:42PM -0700, Shradha Gupta wrote:
-> > On Thu, Jun 29, 2023 at 12:44:26PM +0000, Haiyang Zhang wrote:
-> > >
-> > >
-> > > > -----Original Message-----
-> > > > From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > > > Sent: Thursday, June 29, 2023 5:59 AM
-> > > > To: linux-kernel@vger.kernel.org; linux-hyperv@vger.kernel.org;
-> > > > netdev@vger.kernel.org
-> > > > Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>; Eric Dumazet
-> > > > <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Aben=
-i
-> > > > <pabeni@redhat.com>; KY Srinivasan <kys@microsoft.com>; Haiyang
-> Zhang
-> > > > <haiyangz@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui
-> > > > <decui@microsoft.com>; Long Li <longli@microsoft.com>; Michael Kell=
-ey
-> > > > (LINUX) <mikelley@microsoft.com>; David S. Miller
-> <davem@davemloft.net>
-> > > > Subject: [PATCH] hv_netvsc: support a new host capability
-> > > > AllowRscDisabledStatus
-> > > >
-> > > > A future Azure host update has the potential to change RSC behavior
-> > > > in the VMs. To avoid this invisble change, Vswitch will check the
-> > > > netvsc version of a VM before sending its RSC capabilities, and wil=
-l
-> > > > always indicate that the host performs RSC if the VM doesn't have a=
-n
-> > > > updated netvsc driver regardless of the actual host RSC capabilitie=
-s.
-> > > > Netvsc now advertises a new capability: AllowRscDisabledStatus
-> > > > The host will check for this capability before sending RSC status,
-> > > > and if a VM does not have this capability it will send RSC enabled
-> > > > status regardless of host RSC settings
-> > > >
-> > > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > > > ---
-> > > >  drivers/net/hyperv/hyperv_net.h | 3 +++
-> > > >  drivers/net/hyperv/netvsc.c     | 8 ++++++++
-> > > >  2 files changed, 11 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/hyperv/hyperv_net.h
-> b/drivers/net/hyperv/hyperv_net.h
-> > > > index dd5919ec408b..218e0f31dd66 100644
-> > > > --- a/drivers/net/hyperv/hyperv_net.h
-> > > > +++ b/drivers/net/hyperv/hyperv_net.h
-> > > > @@ -572,6 +572,9 @@ struct nvsp_2_vsc_capability {
-> > > >  			u64 teaming:1;
-> > > >  			u64 vsubnetid:1;
-> > > >  			u64 rsc:1;
-> > > > +			u64 timestamp:1;
-> > > > +			u64 reliablecorrelationid:1;
-> > > > +			u64 allowrscdisabledstatus:1;
-> > > >  		};
-> > > >  	};
-> > > >  } __packed;
-> > > > diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvs=
-c.c
-> > > > index da737d959e81..2eb1e85ba940 100644
-> > > > --- a/drivers/net/hyperv/netvsc.c
-> > > > +++ b/drivers/net/hyperv/netvsc.c
-> > > > @@ -619,6 +619,14 @@ static int negotiate_nvsp_ver(struct hv_device
-> > > > *device,
-> > > >  	init_packet->msg.v2_msg.send_ndis_config.mtu =3D ndev->mtu +
-> > > > ETH_HLEN;
-> > > >  	init_packet->msg.v2_msg.send_ndis_config.capability.ieee8021q =3D=
- 1;
-> > > >
-> > > > +	/* Don't need a version check while setting this bit because if w=
-e
-> > > > +	 * have a New VM on an old host, the VM will set the bit but the =
-host
-> > > > +	 * won't check it. If we have an old VM on a new host, the host w=
-ill
-> > > > +	 * check the bit, see its zero, and it'll know the VM has an
-> > > > +	 * older NetVsc
-> > > > +	 */
-> > > > +	init_packet-
-> > > > >msg.v2_msg.send_ndis_config.capability.allowrscdisabledstatus =3D =
-1;
-> > >
-> > > Have you tested on the new host to verify: Before this patch, the hos=
-t shows
-> > > RSC status on, and after this patch the host shows it's off?
-> > I have completed the patch sanilty tests. We are working on an upgraded=
- host
-> setup
-> > to test the rsc specific changes, will update with results soon.
-> > >
-> > > Thanks,
-> > > - Haiyang
->=20
-> Completed this testing, rsc status reflects properly with the patch.
+I know. I was wondering how your message connects with what I said
+regarding that using direct recycling more aggressively allows us to
+reduce ptr_ring sizes, as e.g. on my setup ptr_ring is not used at all
+(it still will be in other cases, but a lot less often than before).
 
-Thanks for the update.
+> 
+>>
+>> [...]
+>>
+>> Thanks,
+>> Olek
+>>
+>> .
+>>
 
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-
+Thanks,
+Olek
 
