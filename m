@@ -1,144 +1,224 @@
-Return-Path: <netdev+bounces-18570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C627757C0A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:43:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D280B757C5F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 14:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 474E21C20CD0
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 12:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66575281235
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 12:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E712DC2F3;
-	Tue, 18 Jul 2023 12:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22825C8D4;
+	Tue, 18 Jul 2023 12:59:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1C8C2E0
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 12:43:43 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5311B118
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 05:43:42 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-668704a5b5bso5667072b3a.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 05:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689684222; x=1692276222;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gM/YgQOHeZ56BBUJtDtFJHEmngLOGV7x/3NVPgw+uwg=;
-        b=w2hgTYFo0jHGi/AdVX7TD2uUbk+BXLb+ZG2Zdw4rHJpk2T64R7srvLTU1EecmWqOqS
-         +2jICAWOFdA3n+NCVvYfHl0gbvmHFdN/TULrzU34DmJFhmBJ7HFP7kD5ELlciAE0SsxV
-         kgKsVcvw9mNvmcXpwZJ5BsgmfldRJD4EnkdtvBbHkjY7R1wkzXZqohfr1f2V2t/auNvo
-         uOLi0T3d6Ic7oVvvNRQKN86yHEsfxfjzgpmHSNnGOf0CgRVMHzyIXHqFgtUkPuw34m6B
-         abB+AOkZ+UV4Q+lnWukzd73MYDLSmt8SFGtfUhAx+cIIkzHJHWVCM1nTKlaOQTXdZ+OC
-         icaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689684222; x=1692276222;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gM/YgQOHeZ56BBUJtDtFJHEmngLOGV7x/3NVPgw+uwg=;
-        b=AVHzpPZjhsNU6Q5PvZ4mWrxT1KX1gdbaSiKKt+K3jYANFpR3MfBzatl++ab2TkSj1m
-         pQST5v5OK2RNQvN5Z/CKU9RXggNVUhZdoi5Ga1O4w3qXf4cfHLH//T2agwvBaBFOND8d
-         AVqOeEYX3V2X750BzoVpLLC4YtJqKoIyqrUkbVcqwAXjXTD2fXrFj6Ml1h75uE1hypZq
-         FflZ8ad8Gi+TjkqsLshJXzrCjQOjDlKMSnM3Y5Vm1WZ16GLWq1DgX3UXxGmkERHYwVV5
-         +qJx+fbnGpnWGOSgnMKUDxxGKee9Bgp0dAg940Vd9iQCNQ/S2WhlvF/Zfi9/HDPgLonZ
-         N2rg==
-X-Gm-Message-State: ABy/qLaVijRfm/TwdLPONtSsikuM3og04XV/wH3NoUlcGC2qIuQkOJms
-	6DS7xN2P6xcRcE2cMqrt2kbC
-X-Google-Smtp-Source: APBJJlGIyCLi2xXMxJXvF91GTdpgYQEGsEVobhqGEnYYRfEsOVgBWaJGpPgU4Z2/dyfXjMaz88khfw==
-X-Received: by 2002:a05:6a20:a121:b0:133:249f:2ce2 with SMTP id q33-20020a056a20a12100b00133249f2ce2mr18924689pzk.0.1689684221820;
-        Tue, 18 Jul 2023 05:43:41 -0700 (PDT)
-Received: from thinkpad ([117.217.191.149])
-        by smtp.gmail.com with ESMTPSA id u21-20020aa78395000000b0065434edd521sm1444932pfm.196.2023.07.18.05.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 05:43:41 -0700 (PDT)
-Date: Tue, 18 Jul 2023 18:13:34 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Vivek Pernamitta <quic_vpernami@quicinc.com>
-Cc: mhi@lists.linux.dev, mrana@quicinc.com, quic_qianyu@quicinc.com,
-	quic_vbadigan@quicinc.com, quic_krichai@quicinc.com,
-	quic_skananth@quicinc.com, linux-arm-msm@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A38BE73
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 12:59:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C77C433C7;
+	Tue, 18 Jul 2023 12:59:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689685167;
+	bh=oU3njfkwyQcLUTNStlO3v1g92OOq3MI+JFNfnGQ7rWU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cjNGC6n0Lacvu32Av8BjPOj2sVHcmbn3b5C1j1cIqMYcw5AKSbq127bwEDURXEFnI
+	 1RzGblo+Ckqo8sU61AuVnpm/vSRCI9fx6Tl4pGO5C3aykVbeez63VZ35UD7gTc2+Yz
+	 0O8ijaCN1hiZ5VE8p5G2S/GK2z4GCyD+HJJ4NFGBRqfrTFEVnYmnzfVqvONti7enoY
+	 dxrJdTEVPVBuDYXeBMQDTHwsiansN18Pd5F8MOH9bQt6vKXjB7x8sNJq2/1WBNOO0L
+	 T2kmWzS4s/j0mcN9oKBJHplaQD/1M7Nzb/yUJXu1BH2ftnqIDL5KwYKB334Xe1JbVY
+	 sCBbLS5ESfhkg==
+From: Ard Biesheuvel <ardb@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	Haren Myneni <haren@us.ibm.com>,
+	Nick Terrell <terrelln@fb.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Richard Weinberger <richard@nod.at>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2] net: mhi : Add support to enable ethernet interface
-Message-ID: <20230718124334.GG4771@thinkpad>
-References: <1689660928-12092-1-git-send-email-quic_vpernami@quicinc.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-mtd@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [RFC PATCH 00/21] crypto: consolidate and clean up compression APIs
+Date: Tue, 18 Jul 2023 14:58:26 +0200
+Message-Id: <20230718125847.3869700-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7841; i=ardb@kernel.org; h=from:subject; bh=oU3njfkwyQcLUTNStlO3v1g92OOq3MI+JFNfnGQ7rWU=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIWVbT05tieP81WwrPyjIKzjVPPPfGRHTIPqvqdtgrV280 HNnoesdJSwMYhwMsmKKLAKz/77beXqiVK3zLFmYOaxMIEMYuDgFYCKLFjP8eH15qtDcQlPFNpVi DbF19Sd2ZP9yP3cpdv7LrQW6f7eFM/xTemyzcX69C4tV2YxNE2zeblIzPyh7w/pr43X9dVWp2xs ZAQ==
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1689660928-12092-1-git-send-email-quic_vpernami@quicinc.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 11:45:28AM +0530, Vivek Pernamitta wrote:
-> Add support to enable ethernet interface for MHI SWIP channels.
-> 
+This series is presented as an RFC, because I haven't quite convinced
+myself that the acomp API really needs both scatterlists and request
+objects to encapsulate the in- and output buffers, and perhaps there are
+more drastic simplifications that we might consider.
 
-Please add more info in the commit message i.e., why this interface is added and
-how it is going to benefit the users etc..
+However, the current situation with comp, scomp and acomp APIs is
+definitely something that needs cleaning up, and so I implemented this
+series under the working assumption that we will keep the current acomp
+semantics wrt scatterlists and request objects.
 
-Since you are modifying the existing mhi_swip interface, this isn't an ABI
-change?
+Patch #1 drops zlib-deflate support in software, along with the test
+cases we have for it. This has no users and should have never been
+added.
 
-> Signed-off-by: Vivek Pernamitta <quic_vpernami@quicinc.com>
-> Reviewed-by: Daniele Palmas <dnlplm@gmail.com>
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> ---
-> 
-> changes since v1:
-> 	- Moved to net-next from linux-next	
-> 	- moved to eth_hw_addr_random() to assign Ethernet MAC address
-> 	  from eth_random_addr()
-> ---
->  drivers/net/mhi_net.c | 53 ++++++++++++++++++++++++++++++++++++++-------------
->  1 file changed, 40 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
-> index 3d322ac..5bb8d99 100644
-> --- a/drivers/net/mhi_net.c
-> +++ b/drivers/net/mhi_net.c
+Patch #2 removes the support for on-the-fly allocation of destination
+buffers and scatterlists from the Intel QAT driver. This is never used,
+and not even implemented by all drivers (the HiSilicon ZIP driver does
+not support it). The diffstat of this patch makes a good case why the
+caller should be in charge of allocating the memory, not the driver.
 
-[...]
+Patch #3 removes this on-the-fly allocation from the core acomp API.
 
-> @@ -380,10 +405,12 @@ static void mhi_net_remove(struct mhi_device *mhi_dev)
->  
->  static const struct mhi_device_info mhi_hwip0 = {
->  	.netname = "mhi_hwip%d",
-> +	.ethernet_if = false,
->  };
->  
->  static const struct mhi_device_info mhi_swip0 = {
->  	.netname = "mhi_swip%d",
-> +	.ethernet_if = false,
+Patch #4 does a minimal conversion of IPcomp to the acomp API.
 
-false?
+Patch #5 and #6 are independent UBIFS fixes for things I ran into while
+working on patch #7.
 
-- Mani
+Patch #7 converts UBIFS to the acomp API.
 
->  };
->  
->  static const struct mhi_device_id mhi_net_id_table[] = {
-> -- 
-> 2.7.4
-> 
+Patch #8 converts the zram block driver to the acomp API.
+
+Patches #9 to #19 remove the existing 'comp' API implementations as well
+as the core plumbing, now that all clients of the API have been
+converted. (Note that pstore stopped using the 'comp' API as well, but
+these changes are already queued elsewhere)
+
+Patch #20 converts the generic deflate compression driver to the acomp
+API, so that it can natively operate on discontiguous buffers, rather
+than requiring scratch buffers. This is the only IPcomp compression
+algorithm we actually implement in software in the kernel, and this
+conversion could help IPcomp if we decide to convert it further, and
+remove the code that 'linearizes' SKBs in order to present them to the
+compression API as a contiguous range.
+
+Patch #21 converts the acomp-to-scomp adaptation layer so it no longer
+requires per-CPU scratch buffers. This takes advantage of the fact that
+all existing users of the acomp API pass contiguous memory regions, and
+so scratch buffers are only needed in exceptional cases, and can be
+allocated and deallocated on the fly. This removes the need for
+preallocated per-CPU scratch buffers that can easily add up to tens of
+megabytes on modern systems with high core counts and SMT.
+
+These changes have been build tested and only lightly runtime tested. In
+particular, I haven't performed any thorough testing on the acomp
+conversions of IPcomp, UBIFS and ZRAM. Any hints on which respective
+methods and test cases to use here are highly appreciated.
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Haren Myneni <haren@us.ibm.com>
+Cc: Nick Terrell <terrelln@fb.com>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: qat-linux@intel.com
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-mtd@lists.infradead.org
+Cc: netdev@vger.kernel.org
+
+Ard Biesheuvel (21):
+  crypto: scomp - Revert "add support for deflate rfc1950 (zlib)"
+  crypto: qat - Drop support for allocating destination buffers
+  crypto: acompress - Drop destination scatterlist allocation feature
+  net: ipcomp: Migrate to acomp API from deprecated comp API
+  ubifs: Pass worst-case buffer size to compression routines
+  ubifs: Avoid allocating buffer space unnecessarily
+  ubifs: Migrate to acomp compression API
+  zram: Migrate to acomp compression API
+  crypto: nx - Migrate to scomp API
+  crypto: 842 - drop obsolete 'comp' implementation
+  crypto: deflate - drop obsolete 'comp' implementation
+  crypto: lz4 - drop obsolete 'comp' implementation
+  crypto: lz4hc - drop obsolete 'comp' implementation
+  crypto: lzo-rle - drop obsolete 'comp' implementation
+  crypto: lzo - drop obsolete 'comp' implementation
+  crypto: zstd - drop obsolete 'comp' implementation
+  crypto: cavium/zip - drop obsolete 'comp' implementation
+  crypto: compress_null - drop obsolete 'comp' implementation
+  crypto: remove obsolete 'comp' compression API
+  crypto: deflate - implement acomp API directly
+  crypto: scompress - Drop the use of per-cpu scratch buffers
+
+ Documentation/crypto/architecture.rst               |   2 -
+ crypto/842.c                                        |  63 +---
+ crypto/Makefile                                     |   2 +-
+ crypto/acompress.c                                  |   6 -
+ crypto/api.c                                        |   4 -
+ crypto/compress.c                                   |  32 --
+ crypto/crypto_null.c                                |  31 +-
+ crypto/crypto_user_base.c                           |  16 -
+ crypto/crypto_user_stat.c                           |   4 -
+ crypto/deflate.c                                    | 386 ++++++--------------
+ crypto/lz4.c                                        |  61 +---
+ crypto/lz4hc.c                                      |  63 +---
+ crypto/lzo-rle.c                                    |  60 +--
+ crypto/lzo.c                                        |  60 +--
+ crypto/proc.c                                       |   3 -
+ crypto/scompress.c                                  | 169 ++++-----
+ crypto/testmgr.c                                    | 184 +---------
+ crypto/testmgr.h                                    |  75 ----
+ crypto/zstd.c                                       |  56 +--
+ drivers/block/zram/zcomp.c                          |  67 +++-
+ drivers/block/zram/zcomp.h                          |   7 +-
+ drivers/block/zram/zram_drv.c                       |  12 +-
+ drivers/crypto/cavium/zip/zip_crypto.c              |  40 --
+ drivers/crypto/cavium/zip/zip_crypto.h              |  10 -
+ drivers/crypto/cavium/zip/zip_main.c                |  50 +--
+ drivers/crypto/intel/qat/qat_common/qat_bl.c        | 159 --------
+ drivers/crypto/intel/qat/qat_common/qat_bl.h        |   6 -
+ drivers/crypto/intel/qat/qat_common/qat_comp_algs.c |  86 +----
+ drivers/crypto/intel/qat/qat_common/qat_comp_req.h  |  10 -
+ drivers/crypto/nx/nx-842.c                          |  34 +-
+ drivers/crypto/nx/nx-842.h                          |  14 +-
+ drivers/crypto/nx/nx-common-powernv.c               |  30 +-
+ drivers/crypto/nx/nx-common-pseries.c               |  32 +-
+ fs/ubifs/compress.c                                 |  61 +++-
+ fs/ubifs/file.c                                     |  46 +--
+ fs/ubifs/journal.c                                  |  33 +-
+ fs/ubifs/ubifs.h                                    |  15 +-
+ include/crypto/acompress.h                          |  21 +-
+ include/crypto/internal/scompress.h                 |   2 -
+ include/crypto/scatterwalk.h                        |   2 +-
+ include/linux/crypto.h                              |  49 +--
+ include/net/ipcomp.h                                |   4 +-
+ net/xfrm/xfrm_algo.c                                |   7 +-
+ net/xfrm/xfrm_ipcomp.c                              | 107 ++++--
+ 44 files changed, 502 insertions(+), 1679 deletions(-)
+ delete mode 100644 crypto/compress.c
 
 -- 
-மணிவண்ணன் சதாசிவம்
+2.39.2
+
 
