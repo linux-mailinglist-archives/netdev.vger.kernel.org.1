@@ -1,173 +1,190 @@
-Return-Path: <netdev+bounces-18533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BCBB757880
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:53:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 228AB757891
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B8622808E3
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:53:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 536BB1C208F1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49928F9D6;
-	Tue, 18 Jul 2023 09:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FF4F9EA;
+	Tue, 18 Jul 2023 09:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D35C8D8
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:53:37 +0000 (UTC)
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2072.outbound.protection.outlook.com [40.107.102.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B6810E0;
-	Tue, 18 Jul 2023 02:53:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JshX6IzKK8It2qus1OZ9pu6NvoLXgF88mvgsp1/YZj/xbOxCKImamZ+ElKT8gSCIZZtmJWk4WrdW6uIkmzh1lTfJP2UTeH1aKFsX1TAMBwAkkz+e2WhXqojTj3O3sUQUNzKAD7elH+rdJKuusK8BYQupBVC6wNNMsERpvNlFzy8002UUS1XiyMM0HyBEYZEqAGaYX7AdFhqxcM/myM1NKyzIFxw7HwZJT3J51XVAHZs0dxu14x7i4tsoMjASJUPZ1GjuFUOeMCnyUYDcutyJW/KDwBbjq8AvRCYPmnY0x1H9poN385zeziwqTxnHmfsCRhBsI15htY1AFymm1rJQKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U0D3KvU1Vgdt9kbEaP42kKnqlCcBPvhehoE6DJD5NIM=;
- b=k1BEMbahf61BWQAZrXv5a0tEl/mRxHeZ1mAPPJ8k6fJi/gGvdez0BDxaFQq77QuyWYsHcWvaS48/+l5U9I3PRWuy6SK/xfBCRxHLzx/GsqRMmDZTcabDAPxjG3xzWOfKRUAmWLnHLpNoPAXX3oyI/a1dHop10wr6nIJFCtUBVPN94pu5rpJw4ldgDLgEkKsEsfZ/BQoeZQQf7hMKkTgIrvUPQDL19hRNHdLArkUMHDdUN1E7Eq40ZUWAuCjLFGdXVRbeU8zBX0OitdkPkDJB9LoA4eAEVrOYkQzORRMieDcp3LZ26x5OFhRWMSX/J3D//GKq/fyjRUauAOGeEueZfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=quicinc.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U0D3KvU1Vgdt9kbEaP42kKnqlCcBPvhehoE6DJD5NIM=;
- b=OO/R9XQ20PxbqqO+7cN6Pk4jHUPbyoASA4QqTTu+/ithiprriBxKn9WxLwNlfz7rVzJSmsV5xCMTHNnJdqmhTI4Gi0KrcAyVFv6b5dDOl4AGAGbWcJpTc+QiduCETxJZJS1EqBYJkK/9IA34/Gadz4UBIx6ZoxLu1GY4G0PkX/QQKmqTJ/F2EZjXbn41j2No1/7XfXgaeJ/TYZM8LCu8qfgPbgal8qoKM2MuXp9b8hwyhDaZfsQ49Ob3Qn8dESBhu95drYikyrSoz916aCt2/En7Xl0k/zkQ8Ngf5HU2ynHjOyUwPovRzqnT7u1JkpTTmsfhIfZC9xRNMWdPosTWHg==
-Received: from BN9PR03CA0330.namprd03.prod.outlook.com (2603:10b6:408:112::35)
- by SA1PR12MB6728.namprd12.prod.outlook.com (2603:10b6:806:257::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
- 2023 09:52:55 +0000
-Received: from BN8NAM11FT091.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:112:cafe::78) by BN9PR03CA0330.outlook.office365.com
- (2603:10b6:408:112::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
- Transport; Tue, 18 Jul 2023 09:52:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN8NAM11FT091.mail.protection.outlook.com (10.13.176.134) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.33 via Frontend Transport; Tue, 18 Jul 2023 09:52:54 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 18 Jul 2023
- 02:52:46 -0700
-Received: from localhost (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 18 Jul
- 2023 02:52:45 -0700
-Date: Tue, 18 Jul 2023 12:52:42 +0300
-From: Leon Romanovsky <leonro@nvidia.com>
-To: Ilia Lin <quic_ilial@quicinc.com>
-CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Ilia Lin <ilia.lin@kernel.org>
-Subject: Re: [PATCH] xfrm: Allow ESP over UDP in packet offload mode
-Message-ID: <20230718095242.GC8808@unreal>
-References: <20230718092405.4124345-1-quic_ilial@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367ADF9D4
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:55:30 +0000 (UTC)
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C7626B2;
+	Tue, 18 Jul 2023 02:55:12 -0700 (PDT)
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-c2cf4e61bc6so5807310276.3;
+        Tue, 18 Jul 2023 02:55:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689674112; x=1692266112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dkfu4+zrfsEvNM/oP4wLx2h/8nsgQPK5hugPJnR2T8Y=;
+        b=bpbkAuFRysVLakByeshb8zpAsRtDwSouyWI2zK8LDbire43Ga6Px797CbkzAEiYTKh
+         piTAc/yW/QL3vr53oUbNpxFt5cPJkATey1YCK71ZQagCHeVXrO32uIis8HA7XLQFfqsW
+         S5n52bvq5HBIybyTxHoC8tZ3iUO5lzXGf0Oai+tGxmOCqcyqyD9P34lpYl0pQppd/BLd
+         xFtARFHae+ozxOlCh1aIc0RgweteWxn/3C7dNypw34JcK45OkiqAiJGGCJUzpWg6mavK
+         PqldY9eDrQR3+uGc4HbfLWR05ihT06SvVrQh22NKEjO2C3COV1RX6dSdLs3T51QHncMi
+         yoeg==
+X-Gm-Message-State: ABy/qLaKFV4gKKmCio9VcszED83JhY/l94h7gsHuaSgsQvcG/fREdS2p
+	Sq903AZKZLFu6PblYNwErObL3XvKfNFUbA==
+X-Google-Smtp-Source: APBJJlGPc04fhgxz0E0wgRdcDYs3513a4we7nVqGeT+GTp9gDnYZ0rkf654mHClpLr/GNVPMHelMGg==
+X-Received: by 2002:a25:6fc2:0:b0:c91:717e:7658 with SMTP id k185-20020a256fc2000000b00c91717e7658mr2408070ybc.2.1689674111749;
+        Tue, 18 Jul 2023 02:55:11 -0700 (PDT)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id x71-20020a25ce4a000000b00cec105e03d1sm123056ybe.38.2023.07.18.02.55.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jul 2023 02:55:10 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-bc379e4c1cbso5811573276.2;
+        Tue, 18 Jul 2023 02:55:10 -0700 (PDT)
+X-Received: by 2002:a25:860f:0:b0:cec:59f7:b352 with SMTP id
+ y15-20020a25860f000000b00cec59f7b352mr989091ybk.58.1689674110647; Tue, 18 Jul
+ 2023 02:55:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230718092405.4124345-1-quic_ilial@quicinc.com>
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT091:EE_|SA1PR12MB6728:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96ba5525-55f1-41e3-16a8-08db8774c27b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	4UkP1VBp1wFmaEyx+axnDxOdEX6SigJWJlaPpoBghTG9GWgH3mv86GNSQ5YYdiiE2gwDPpcgP+D4MT+aYHqrY7ldrul6jq3cKonAEi6RAfOM0ctgSwUNFOHxp5uoSeS6ooCql+uVyL4KTjtiEF3b0IS+DkwBOdagjZJq4R4JKqDbuBbXOh9DdeKKylUnimhY/87/6RL2pn+1FWn9d6e8IiUMcsjyxp8u987/xY8ZVQk5G0bWLXJMPY515gYAXb1nB9M7A4gva8Ypn/U9qVASICqQj+izrH5oUFr40eXmI0FqEBZAUvJ1G0/n2QqSEBbHgFeZeMJwbGpWeYk+wNRpbz7ZitBDJ4ioaKPbjIt15vjcNCb7O8KTcHnkRXFXxBmRktzgWeoZ10RFloV3lzKfgUFvznM+kqZUNgr6PPYayKk4xPCzdbFDd6JaThsImvynXmpsfuR5+4U4XloQdrHjHxOLvvLkO+RK3sJrf3ffrPBfcOEMGirLfu6u3FR2v5iogWFfE9KlIWCTDvB5k/FubIYN25N2iVZ/BffjX8+GerZVMw9YczL+XBaAEwXhZ6t/LHyag2BjaH9zQMgTYfL0/GTbE8GIk1qzkWWgPcu/QfZLHf+UycYYEY7K2GmEYlPZDi3+/xul/D5/PaeX+8GNWmYANRcF/pwDUPe9DN+jMU3WV94esRt5uQ/cjiqlcMQ4At2uqura8eJ+XUbaeOz0t21vln2D/Z8yT8rNivbw3QqW9H7eU5y+nDrfQbJqzGebj74vUU9Eqp3/7qPUIi55Jzrc3xpgVmEAqJFTkLx6KrQ=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(7916004)(396003)(346002)(136003)(39860400002)(376002)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(33716001)(2906002)(478600001)(54906003)(6666004)(8676002)(8936002)(7416002)(41300700001)(70206006)(316002)(4326008)(70586007)(6916009)(82740400003)(83380400001)(426003)(336012)(47076005)(86362001)(7636003)(356005)(9686003)(966005)(40460700003)(5660300002)(36860700001)(1076003)(16526019)(26005)(186003)(33656002)(40480700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 09:52:54.9984
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96ba5525-55f1-41e3-16a8-08db8774c27b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN8NAM11FT091.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6728
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org> <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+ <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
+ <ZK3MBfPS-3-tJgjO@slm.duckdns.org> <ZK30CR196rs-OWLq@slm.duckdns.org>
+ <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com> <ZLXIvXBvhsnL-ik_@slm.duckdns.org>
+In-Reply-To: <ZLXIvXBvhsnL-ik_@slm.duckdns.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 18 Jul 2023 11:54:58 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdU8CGhsU-1PZNdWH1xjbWcWSg2s2RFAegXi+vs=d-0t8Q@mail.gmail.com>
+Message-ID: <CAMuHMdU8CGhsU-1PZNdWH1xjbWcWSg2s2RFAegXi+vs=d-0t8Q@mail.gmail.com>
+Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
+ 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
+To: Tejun Heo <tj@kernel.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
+	Linux PM list <linux-pm@vger.kernel.org>, 
+	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
+	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 12:24:05PM +0300, Ilia Lin wrote:
-> The ESP encapsulation is not supported only in crypto mode.
-> In packet offload mode, the RX is bypassing the XFRM,
-> so we can enable the encapsulation.
+Hi Tejun,
 
-It is not accurate. RX is bypassed after XFRM validated packet to ensure
-that it was really handled by HW.
+On Tue, Jul 18, 2023 at 1:03=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
+> Can you please the following patch and see how many reports you get? Look=
+ing
+> back at your reports, I think some of them probably should be converted t=
+o
+> UNBOUND but we should have a better idea with the adjusted threshold.
+>
+> Thanks.
+>
+> From 8555cbd4b22e5f85eb2bdcb84fd1d1f519a0a0d3 Mon Sep 17 00:00:00 2001
+> From: Tejun Heo <tj@kernel.org>
+> Date: Mon, 17 Jul 2023 12:50:02 -1000
+> Subject: [PATCH] workqueue: Scale up wq_cpu_intensive_thresh_us if BogoMI=
+PS is
+>  below 1000
+>
+> wq_cpu_intensive_thresh_us is used to detect CPU-hogging per-cpu work ite=
+ms.
+> Once detected, they're excluded from concurrency management to prevent th=
+em
+> from blocking other per-cpu work items. If CONFIG_WQ_CPU_INTENSIVE_REPORT=
+ is
+> enabled, repeat offenders are also reported so that the code can be updat=
+ed.
+>
+> The default threshold is 10ms which is long enough to do fair bit of work=
+ on
+> modern CPUs while short enough to be usually not noticeable. This
+> unfortunately leads to a lot of, arguable spurious, detections on very sl=
+ow
+> CPUs. Using the same threshold across CPUs whose performance levels may b=
+e
+> apart by multiple levels of magnitude doesn't make whole lot of sense.
+>
+> This patch scales up wq_cpu_intensive_thresh_us upto 1 second when BogoMI=
+PS
+> is below 1000. This is obviously very inaccurate but it doesn't have to b=
+e
+> accurate to be useful. The mechanism is still useful when the threshold i=
+s
+> fully scaled up and the benefits of reports are usually shared with every=
+one
+> regardless of who's reporting, so as long as there are sufficient number =
+of
+> fast machines reporting, we don't lose much.
+>
+> Some (or is it all?) ARM CPUs systemtically report significantly lower
+> BogoMIPS. While this doesn't break anything, given how widespread ARM CPU=
+s
+> are, it's at least a missed opportunity and it probably would be a good i=
+dea
+> to teach workqueue about it.
+>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
 
-However, this patch should come with relevant driver code which should
-support ESP over UDP. You can see it here:
+Thanks!
 
-https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=xfrm-next
- xfrm: Support UDP encapsulation in packet offload mode
- net/mlx5e: Support IPsec NAT-T functionality
- net/mlx5e: Check for IPsec NAT-T support
- net/mlx5: Add relevant capabilities bits to support NAT-T
+I gave it a try on a system with an 800 MHz Cortex A9, only to discover
+it makes no difference, as that machine has 1600 BogoMIPS:
 
-Thanks
+workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 4 times,
+consider switching to WQ_UNBOUND
+workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 8 times,
+consider switching to WQ_UNBOUND
+workqueue: genpd_power_off_work_fn hogged CPU for >10000us 4 times,
+consider switching to WQ_UNBOUND
+workqueue: blk_mq_run_work_fn hogged CPU for >10000us 4 times,
+consider switching to WQ_UNBOUND
+workqueue: pm_runtime_work hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
+workqueue: phy_state_machine hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
+workqueue: drm_mode_rmfb_work_fn hogged CPU for >10000us 4 times,
+consider switching to WQ_UNBOUND
+workqueue: sync_hw_clock hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
+workqueue: rtc_timer_do_work hogged CPU for >10000us 4 times, consider
+switching to WQ_UNBOUND
 
-> 
-> Signed-off-by: Ilia Lin <ilia.lin@kernel.org>
-> ---
->  net/xfrm/xfrm_device.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index 4aff76c6f12e0..3018468d97662 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -246,8 +246,10 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
->  		return -EINVAL;
->  	}
->  
-> -	/* We don't yet support UDP encapsulation and TFC padding. */
-> -	if (x->encap || x->tfcpad) {
-> +	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
-> +
-> +	/* We don't yet support UDP encapsulation except full mode and TFC padding. */
-> +	if ((!is_packet_offload && x->encap) || x->tfcpad) {
->  		NL_SET_ERR_MSG(extack, "Encapsulation and TFC padding can't be offloaded");
->  		return -EINVAL;
->  	}
-> @@ -258,7 +260,6 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
->  		return -EINVAL;
->  	}
->  
-> -	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
->  	dev = dev_get_by_index(net, xuo->ifindex);
->  	if (!dev) {
->  		if (!(xuo->flags & XFRM_OFFLOAD_INBOUND)) {
-> -- 
-> 
-> 
+Artificially low BogoMIPS numbers only happen on systems that have
+the related timers (Cortex A7/A15 and later, Cortex A9 MPCore,
+and arm64).
+
+I will test on more systems, but that will probably not happen until
+next week...
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
