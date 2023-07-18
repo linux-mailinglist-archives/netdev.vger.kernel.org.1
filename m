@@ -1,141 +1,142 @@
-Return-Path: <netdev+bounces-18448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E407570C5
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:09:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D862B7570BB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 02:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCADC1C20BF3
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:09:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 142DC1C20BF1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 00:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67576646;
-	Tue, 18 Jul 2023 00:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE077EA;
+	Tue, 18 Jul 2023 00:04:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C75F19C
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 00:09:18 +0000 (UTC)
-X-Greylist: delayed 555 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 17 Jul 2023 17:09:16 PDT
-Received: from out-32.mta0.migadu.com (out-32.mta0.migadu.com [IPv6:2001:41d0:1004:224b::20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF210FA
-	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 17:09:16 -0700 (PDT)
-Message-ID: <062768e0-90d6-33dc-162a-c4adaa612f67@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1689638399;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bhW9hWOzuPO3ascL2TqqhoQF4927LJi53dnYLFnBGSs=;
-	b=SkzjRAxh0UkLbY0uBKTCS5sP9FXnWZKGihuXHKPOF1ffAqOWKdCsk6+ZpM+MVCPSmnPWo5
-	Eyq9IItyWV8dpK/3lig2h85063nUWXxGqyieU99J9i6e67JcYKpJ4MAy7OdtVIor0iorQO
-	JvxkaW6Bb575fVSKPCEETcayyHZlgF8=
-Date: Tue, 18 Jul 2023 07:59:47 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B948E19C
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 00:04:35 +0000 (UTC)
+Received: from mail-oo1-xc4a.google.com (mail-oo1-xc4a.google.com [IPv6:2607:f8b0:4864:20::c4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 987D5FF
+	for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 17:04:32 -0700 (PDT)
+Received: by mail-oo1-xc4a.google.com with SMTP id 006d021491bc7-56662adc40bso6740125eaf.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jul 2023 17:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689638672; x=1692230672;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MPNHw59Y2ag4IkzmSNpZisnjn27L/MlDJm7h5idWBn8=;
+        b=S65TZVHPcH6uRPZb/fHNfGAcZ4q2fX3J8TeaIkzb9hjk1r9RK5GCc7gxTU1gT7BVFb
+         2mtAd5EN9chZTfUcFc7hL2MrdAfuUv0ZKe+RCCjPVqIAfcm1rxtQ2Nee3GWXlKLKGvvT
+         j0uABVfAF88xKqp15sbUj4Guyba5QkCxOXgSVFDvrttBZVEfL4Gj9ySNzwqjVCdKKVc+
+         O3aHFsAlTQIz7RcfgqMhiL0dmlCF+b9PMWN5yevf8JJP30j7wYHo0ofvbJlgfAJTeSC8
+         emqYu0USrNG9OIhDCdgyyPcjNH3d9ONnvURLC6m0T2VDt4Y5QkKgBt2JOQgFfe75oSIh
+         TSyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689638672; x=1692230672;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MPNHw59Y2ag4IkzmSNpZisnjn27L/MlDJm7h5idWBn8=;
+        b=Nd/MEtvT8FBoMg1W/3EG1v0e9Gass++ZwUGJhtrvyPfygQVnj8V+P3bJKaOInZzzBe
+         03WiJxS/+flGaSnrXIUgww76yRF/XjxDmJNTjf4fZ4em9ROAuL9INt5x8KVIdQ2RPp/w
+         /0RfikfeVbzYweb89tDAosjdPLB+CgQCEOi+IcMKEIsQO0SHB8iH3yjbAja0ejx8JTtF
+         Jc3Wl/AKLFUCUr8G2RZ78RZn8hs7/oEierSoK/BlkW/WWtQHiOes/+wymzHHcAUDJoga
+         mMXsFNiWmz9VzbmqyX7yMLeBiQBVjyxCUcFLU93j94gqTIZwcz9PuhB1U4eNW3Fmx6Ma
+         C4Yg==
+X-Gm-Message-State: ABy/qLYEx5GC08UlFZM/z/gVy5taDumUPK+eZfM+TOyXfuTxX/BaK7VI
+	FA5I7+NmSo0IwehszyI9jpL6AEa3BlZ1BPL3dQ==
+X-Google-Smtp-Source: APBJJlH9/sYwjrw0dkrjUb9VX/Yq4xUQpwZ/U3IgrKelC5j/eN2Ak33Hd62xQYSUtM5Qs+CsxWEtQXLiE6OotuPBeQ==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a4a:d0b7:0:b0:547:54e2:688a with SMTP
+ id t23-20020a4ad0b7000000b0054754e2688amr613648oor.0.1689638672021; Mon, 17
+ Jul 2023 17:04:32 -0700 (PDT)
+Date: Tue, 18 Jul 2023 00:04:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: RE: [PATCH net-next] net: mana: Add page pool for RX buffers
-To: Haiyang Zhang <haiyangz@microsoft.com>,
- Jesper Dangaard Brouer <jbrouer@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: "brouer@redhat.com" <brouer@redhat.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Dexuan Cui <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
- Paul Rosswurm <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org"
- <leon@kernel.org>, Long Li <longli@microsoft.com>,
- "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org"
- <ast@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>,
- "hawk@kernel.org" <hawk@kernel.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>,
- "shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>
-References: <1689259687-5231-1-git-send-email-haiyangz@microsoft.com>
- <20230713205326.5f960907@kernel.org>
- <85bfa818-6856-e3ea-ef4d-16646c57d1cc@redhat.com>
- <PH7PR21MB31166EF9DB2F453999D2E92ECA34A@PH7PR21MB3116.namprd21.prod.outlook.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <PH7PR21MB31166EF9DB2F453999D2E92ECA34A@PH7PR21MB3116.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAALXtWQC/5WNQQ6DIBBFr2JYlwYYKbar3qNxgTAqSQsGjKkx3
+ r3oqps2cXZvkvf+QhJGh4ncioVEnFxywWfgp4KYXvsOqbOZiWACmOKKehypTZqmMXozzLQqS6N
+ 5PmwEydYQsXXvvfioM/cujSHO+8DEt+/v1sQpp0IoBVLzqwV570Lonng24bW1/4tKGNuW7VVaW x0SNUh1AUAQzcFFUwEY0Fwy9i3W67p+ALpXh7taAQAA
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689638671; l=1971;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=4lIe4DSxFXAQphj2dJbrjzQzYQVdZZkIiaZbjRvA4y0=; b=qL/KVpwldCbzLT8NKNpxMObelj3cI09HIcE678bPAe5u640yOLnrfVvF3yT6wO3JK+6CyNe1h
+ MsYgBS679IdA4jOGv1+uPHc9bJJ8WOrcQCpXcEPYjQGKWCnJqtfsGoa
+X-Mailer: b4 0.12.3
+Message-ID: <20230718-net-dsa-strncpy-v1-1-e84664747713@google.com>
+Subject: [PATCH] net: dsa: remove deprecated strncpy
+From: justinstitt@google.com
+To: Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-在 2023/7/14 20:51, Haiyang Zhang 写道:
-> 
-> 
->> -----Original Message-----
->> From: Jesper Dangaard Brouer <jbrouer@redhat.com>
->> On 14/07/2023 05.53, Jakub Kicinski wrote:
->>> On Thu, 13 Jul 2023 14:48:45 +0000 Haiyang Zhang wrote:
->>>> Add page pool for RX buffers for faster buffer cycle and reduce CPU
->>>> usage.
->>>>
->>>> Get an extra ref count of a page after allocation, so after upper
->>>> layers put the page, it's still referenced by the pool. We can reuse
->>>> it as RX buffer without alloc a new page.
->>>
->>> Please use the real page_pool API from include/net/page_pool.h
->>> We've moved past every driver reinventing the wheel, sorry.
->>
->> +1
->>
->> Quoting[1]: Documentation/networking/page_pool.rst
->>
->>    Basic use involves replacing alloc_pages() calls with the
->> page_pool_alloc_pages() call.
->>    Drivers should use page_pool_dev_alloc_pages() replacing
->> dev_alloc_pages().
->   
-> Thank Jakub and Jesper for the reviews.
-> I'm aware of the page_pool.rst doc, and actually tried it before this
-> patch, but I got lower perf. If I understand correctly, we should call
-> page_pool_release_page() before passing the SKB to napi_gro_receive().
-> 
+`strncpy` is deprecated for use on NUL-terminated destination strings [1].
 
-If I get this commit correctly, this commit is to use page pool to get 
-better performance.
+Even call sites utilizing length-bounded destination buffers should
+switch over to using `strtomem` or `strtomem_pad`. In this case,
+however, the compiler is unable to determine the size of the `data`
+buffer which renders `strtomem` unusable. Due to this, `strscpy`
+should be used.
 
-IIRC, folio is to make memory optimization. From the performance 
-results, with folio, the performance will get about 10%.
+It should be noted that most call sites already zero-initialize the
+destination buffer. However, I've opted to use `strscpy_pad` to maintain
+the same exact behavior that `strncpy` produced (zero-padded tail up to
+`len`).
 
-So not sure if the folio can be used in this commit to get better 
-performance.
+Also see [3].
 
-That is my 2 cent.
+[1]: www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings
+[2]: elixir.bootlin.com/linux/v6.3/source/net/ethtool/ioctl.c#L1944
+[3]: manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html
 
-Zhu Yanjun
+Link: https://github.com/KSPP/linux/issues/90
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+ net/dsa/slave.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> I found the page_pool_dev_alloc_pages() goes through the slow path,
-> because the page_pool_release_page() let the page leave the pool.
-> 
-> Do we have to call page_pool_release_page() before passing the SKB
-> to napi_gro_receive()? Any better way to recycle the pages from the
-> upper layer of non-XDP case?
-> 
-> Thanks,
-> - Haiyang
-> 
+diff --git a/net/dsa/slave.c b/net/dsa/slave.c
+index 527b1d576460..c9f77b7e5895 100644
+--- a/net/dsa/slave.c
++++ b/net/dsa/slave.c
+@@ -1056,10 +1056,10 @@ static void dsa_slave_get_strings(struct net_device *dev,
+ 	if (stringset == ETH_SS_STATS) {
+ 		int len = ETH_GSTRING_LEN;
+ 
+-		strncpy(data, "tx_packets", len);
+-		strncpy(data + len, "tx_bytes", len);
+-		strncpy(data + 2 * len, "rx_packets", len);
+-		strncpy(data + 3 * len, "rx_bytes", len);
++		strscpy_pad(data, "tx_packets", len);
++		strscpy_pad(data + len, "tx_bytes", len);
++		strscpy_pad(data + 2 * len, "rx_packets", len);
++		strscpy_pad(data + 3 * len, "rx_bytes", len);
+ 		if (ds->ops->get_strings)
+ 			ds->ops->get_strings(ds, dp->index, stringset,
+ 					     data + 4 * len);
+
+---
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+change-id: 20230717-net-dsa-strncpy-844ca1111eb2
+
+Best regards,
+-- 
+Justin Stitt <justinstitt@google.com>
 
 
