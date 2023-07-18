@@ -1,136 +1,74 @@
-Return-Path: <netdev+bounces-18676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A278758421
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:06:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F3A8758425
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 20:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53FCC2815B9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:06:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B71D1C2087E
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 18:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765E216404;
-	Tue, 18 Jul 2023 18:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0DB16406;
+	Tue, 18 Jul 2023 18:06:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649E216403
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:06:33 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DF4B6
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 11:06:32 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b8ad356f03so35861465ad.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 11:06:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689703591; x=1692295591;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nXz9xDxwT7BaavIhnCmafXwp3/aDUnwPYqui5jTbzSQ=;
-        b=groKThLKhcGdvS7VGO7C4SDS0MFs8h/VRyqV+OQecO/1MgBAs/ZfpPKMHdEDFc18U6
-         lL6E01mKA8UE5kLtpd7OED7gt7ztbJ5zG6ZR10SH2TRXOQQY1VxzoLfjSQ8X+8hvr7zc
-         87zzsMTMDmeVha3PmXm/KENBZCBJR0whtZvmDjcbID28N6ghyDcrk5tXGBvdZgk2kE89
-         c/ehnZ5oymDKSDagYvboYUn0sxTqAeqXz24JaL1wf81rDQDv/hEv3XN80y+jSOV2M/0E
-         6T7xuWgJpH1NmtIjdE8p3/Mzy7HrBdkuTncvzIqpvybXisn6eFXd5MAeGA3KsBbF/NVQ
-         x6YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689703591; x=1692295591;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nXz9xDxwT7BaavIhnCmafXwp3/aDUnwPYqui5jTbzSQ=;
-        b=Ppf3nFgZqVH2IE3axaJkeECK/yfrejIsbtCyHKUebY5+FL/RSJANz71MK1GVWJfbzc
-         Ahvfao3oMM3z5SDGJPyUnWqrT15e7+AIQWOVbHObqdKrBzUmYiD8FmWJHj8i3inXAjRw
-         DzMg9O0qV3YaQbxFT2hbbmc5RMMTigE/AIlCUd3UDV2t3HHxL9G19PhlwAOdCzE/7MzP
-         CR+xa2dnyUwgs+Svtne3Pw2PlXDVyE0Z3AXe9S0h2CHuDNxTGFUD7ZxDBFl3mkqxkkQn
-         NIxNUK+Qlyd0gMtVnEAFrH8bOrurQmw8k+ytGS350IO5SFY/arw/i9SCM+EU4o0xclgk
-         Tr0A==
-X-Gm-Message-State: ABy/qLbAdyNC4TnCg704iI4Dl/kEq6aui2BRQstsCJypDeaH2ALIDKxN
-	jSHIGzYfwnl46Q/DRvkJAUH2Zw==
-X-Google-Smtp-Source: APBJJlF7FlQJHF3FMLrPPssG4qg4BrXeUhwWshlLKfnw7NuTDc181VYHZRzG6vsaH9PJ4JGKGoGO3g==
-X-Received: by 2002:a17:902:c406:b0:1b9:e9b2:1288 with SMTP id k6-20020a170902c40600b001b9e9b21288mr530425plk.38.1689703591309;
-        Tue, 18 Jul 2023 11:06:31 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id z10-20020a1709028f8a00b001b89c313185sm2171634plo.205.2023.07.18.11.06.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 11:06:30 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1qLp5h-002aj7-9n;
-	Tue, 18 Jul 2023 15:06:29 -0300
-Date: Tue, 18 Jul 2023 15:06:29 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [RFC PATCH 00/10] Device Memory TCP
-Message-ID: <ZLbUpdNYvyvkD27P@ziepe.ca>
-References: <20230710223304.1174642-1-almasrymina@google.com>
- <12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
- <CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6345716403
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 18:06:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE3CC433C7;
+	Tue, 18 Jul 2023 18:06:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689703615;
+	bh=88mOW/Jxt3hWqsKWEzcfOJPc4T/peV4NshcYKjzQeRk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tRIRNV9xuItBjPLIPo5eYoGYUpetQN69SoaS11o/Trrpq+PNH3zu98+n12K66NRXl
+	 y0Hrs1r5XJkJ0DURie+rFr/KCZKHzCFS2/e5J7JIT5eobHLVBO28Pq6Cc563b66Rfh
+	 i5nZs4KbH66LYayy6xhq8lLxAalXJ4FpUIzsiKmAARnYdovH0ezvgwaJpwsS4HsgVD
+	 3HlmmPQR00WxAaXPb3TBvSqfpiQ1irDh9F4spvq8yl7kOmazHllO7Hz5SbH2AYFUIa
+	 BTJAKgHBoEw1NPOG7Fd5lS7oJHbJaCgegvmC1JJ2/9H4aAXpXCX4eBSnJ98ROAfJ+9
+	 RRN81ukzNNhrA==
+Message-ID: <8331449d-6b25-7ea0-4c28-9128ab483fba@kernel.org>
+Date: Tue, 18 Jul 2023 20:06:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH docs v2] docs: maintainer: document expectations of small
+ time maintainers
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, corbet@lwn.net
+Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ gregkh@linuxfoundation.org, linux@leemhuis.info, broonie@kernel.org
+References: <20230718155814.1674087-1-kuba@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <20230718155814.1674087-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 18, 2023 at 10:36:52AM -0700, Mina Almasry wrote:
+On 18/07/2023 17:58, Jakub Kicinski wrote:
+> We appear to have a gap in our process docs. We go into detail
+> on how to contribute code to the kernel, and how to be a subsystem
+> maintainer. I can't find any docs directed towards the thousands
+> of small scale maintainers, like folks maintaining a single driver
+> or a single network protocol.
+> 
+> Document our expectations and best practices. I'm hoping this doc
+> will be particularly useful to set expectations with HW vendors.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> That is specific to this proposal, and will likely be very different
-> in future ones. I thought the dma-buf pages approach was extensible
-> and the uapi belonged somewhere in dma-buf. Clearly not. The next
-> proposal, I think, will program the rxq via some net uapi and will
-> take the dma-buf as input. Probably some netlink api (not sure if
-> ethtool family or otherwise). I'm working out details of this
-> non-paged networking first.
 
-In practice you want the application to startup, get itself some 3/5
-tuples and then request the kernel to setup the flow steering and
-provision the NIC queues.
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-This is the right moment for the application to provide the backing
-for the rx queue memory via a DMABUF handle.
+Best regards,
+Krzysztof
 
-Ideally this would all be accessible to non-priv applications as well,
-so I think you'd want some kind of system call that sets all this up
-and takes in a FD for the 3/5-tuple socket (to prove ownership over
-the steering) and the DMABUF FD.
-
-The queues and steering should exist only as long as the application
-is still running (whatever that means). Otherwise you have a big mess
-to clean up whenever anything crashes.
-
-netlink feels like a weird API choice for that, in particular it would
-be really wrong to somehow bind the lifecycle of a netlink object to a
-process.
-
-Further, if you are going to all the trouble of doing this, it seems
-to me you should make it work with any kind of memory, including CPU
-memory. Get a consistent approach to zero-copy TCP RX. So also allow a
-memfd or similar to be passed in as the backing storage.
-
-Jason
 
