@@ -1,135 +1,137 @@
-Return-Path: <netdev+bounces-18529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 495177577F7
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:27:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F717757829
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 11:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0520E280FA7
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:27:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D07AB1C20C45
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 09:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EB5E56E;
-	Tue, 18 Jul 2023 09:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9A4E56F;
+	Tue, 18 Jul 2023 09:34:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAB3E547
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:27:21 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20AD010C2
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689672438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z0vyMeOfw7fSC/qxKnZBBj+xlz8lL8pZMksMNnnuzCg=;
-	b=K7TqF0DNUlcG9za22J4Zz7DRxNCZQ3nix1UAh2gErwSgekXMLIhPvNGwNCQqqTFyNMdwhy
-	etWVYGfmGf6QJaOGaHpOHCzwxkezWulucN8FEtJUtDoprmEn3RA4SZglG0Xt8+fe/Ddwi5
-	FG/j3EbMWqoPAJ0KlAKvKiRo6VXdn0A=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-7-tRY0rGf4MP2Lbh-BWFpeNQ-1; Tue, 18 Jul 2023 05:27:16 -0400
-X-MC-Unique: tRY0rGf4MP2Lbh-BWFpeNQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-63c9463c116so5251356d6.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 02:27:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689672436; x=1690277236;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z0vyMeOfw7fSC/qxKnZBBj+xlz8lL8pZMksMNnnuzCg=;
-        b=hdzUDaJ7F74z6GBUP9sWZ0c9Ydg9T+IQ3diSHoWOgfvd0lNgnuZzExJWTVhx91JkR3
-         /AO3XAyNFqbNvaUXiqKV507jGj1hMga93s2eM/3FT2esY2bVhTyDOAvDeHLLiRnjAxUH
-         iubX+5VkGq7mtjmkAzZuAcqbCTjnOYDz/9TGbC2bm7zDxEnDHF95eXONkiGfiKbJKK/w
-         I+msa6f3YKJr+Pw6wXK74hBTfSiMHUtLztwXnL+/lVQGTXEDb8pfAui+1Im4lie2RtBt
-         Kz4LlBWsVZpl7SM1WymJkFVny227R3SY9B9zze/Q08/wRYpUx59GFo39GahY615VAd96
-         hKkQ==
-X-Gm-Message-State: ABy/qLZV0zeB8McV7eANO3tV9x2to7pATgbtCTVNtfc+sRX66tnHgipT
-	M3sXVdlQDhHiVasUIj1KgjOqpfGxxsXuif22MuWR7n0Ytyon2VKO3SGrX3KR9daSoajVhcEws5g
-	U+lIkIJTpMskAmZ6M
-X-Received: by 2002:a05:6214:509d:b0:63c:7427:e7e9 with SMTP id kk29-20020a056214509d00b0063c7427e7e9mr12261335qvb.6.1689672436175;
-        Tue, 18 Jul 2023 02:27:16 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFYFNw7x3jThmvZICEe6iXFu0qG+zQql7vEpRKMvc0qVPxJUK7o8zW+ji84Z85dUEkIw+qD2g==
-X-Received: by 2002:a05:6214:509d:b0:63c:7427:e7e9 with SMTP id kk29-20020a056214509d00b0063c7427e7e9mr12261327qvb.6.1689672435965;
-        Tue, 18 Jul 2023 02:27:15 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
-        by smtp.gmail.com with ESMTPSA id h10-20020a0cf20a000000b00635fc10afd6sm592785qvk.70.2023.07.18.02.27.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 02:27:15 -0700 (PDT)
-Message-ID: <ee31215ededd386eba19fb62b0de8d0bad78d687.camel@redhat.com>
-Subject: Re: [PATCH] net: Explicitly include correct DT includes
-From: Paolo Abeni <pabeni@redhat.com>
-To: Alex Elder <elder@ieee.org>, Rob Herring <robh@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Alex Elder <elder@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-can@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
- linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
- linux-renesas-soc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-amlogic@lists.infradead.org, linux-oxnas@groups.io, 
- linux-tegra@vger.kernel.org, linux-omap@vger.kernel.org, 
- linux-wpan@vger.kernel.org, ath10k@lists.infradead.org, 
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
- wcn36xx@lists.infradead.org
-Date: Tue, 18 Jul 2023 11:27:10 +0200
-In-Reply-To: <1c6175fc-496a-843c-c8c5-2173e065eaa8@ieee.org>
-References: <20230714174809.4060885-1-robh@kernel.org>
-	 <1c6175fc-496a-843c-c8c5-2173e065eaa8@ieee.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93040E547
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 09:34:34 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C48E0;
+	Tue, 18 Jul 2023 02:34:33 -0700 (PDT)
+Received: from mercury (dyndsl-091-248-212-239.ewe-ip-backbone.de [91.248.212.239])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id E103A660703C;
+	Tue, 18 Jul 2023 10:34:31 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1689672872;
+	bh=pDdoHgD/R4j/O2UCXvRlSSP9z0NmI3OdmRQNP6aFg30=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OfHkRS1Fnn2sxv+9ZYTgwkAvWjw4/zzVsMiwQ/4Gdpil0vhSHhiMpF70TpvqNPRCx
+	 czb43+nlO876FJId7eHvLkuwNv6XEl/S6KOT68IL8Fcjnob0znAhqOdrmilUseyPyF
+	 paXOpv93DV1txJfP089cQv2Am6jjhnAVapnajoZwekrfj1bT5eewHDaFZdM48oGVCb
+	 MlzuY8rPaDY4UWxlhgVSFcwKUIHazMS5FFU/t5xQm3nWKJohWUUxGqAPjvowUioQnp
+	 R8MdzbuPa1jyx/Jq1SGdRLfQ79aIynMdmkAoX19cfJSVUhqrUNCXIZF4bSACbuGZZY
+	 /zsNQJjMMkXLg==
+Received: by mercury (Postfix, from userid 1000)
+	id EEF551060D95; Tue, 18 Jul 2023 11:34:28 +0200 (CEST)
+Date: Tue, 18 Jul 2023 11:34:28 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Eugen Hristev <eugen.hristev@collabora.com>
+Cc: linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, david.wu@rock-chips.com, heiko@sntech.de,
+	krzysztof.kozlowski+dt@linaro.org, kernel@collabora.com
+Subject: Re: [PATCH] dt-bindings: net: rockchip-dwmac: add default 'input'
+ for clock_in_out
+Message-ID: <20230718093428.ofld4ywhwbpmnw5w@mercury.elektranox.org>
+References: <20230718090914.282293-1-eugen.hristev@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p4uagyzg7ikm4k3p"
+Content-Disposition: inline
+In-Reply-To: <20230718090914.282293-1-eugen.hristev@collabora.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+
+--p4uagyzg7ikm4k3p
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
 Hi,
 
-On Sat, 2023-07-15 at 10:11 -0500, Alex Elder wrote:
-> On 7/14/23 12:48 PM, Rob Herring wrote:
-> > The DT of_device.h and of_platform.h date back to the separate
-> > of_platform_bus_type before it as merged into the regular platform bus.
-> > As part of that merge prepping Arm DT support 13 years ago, they
-> > "temporarily" include each other. They also include platform_device.h
-> > and of.h. As a result, there's a pretty much random mix of those includ=
-e
-> > files used throughout the tree. In order to detangle these headers and
-> > replace the implicit includes with struct declarations, users need to
-> > explicitly include the correct includes.
-> >=20
-> > Signed-off-by: Rob Herring <robh@kernel.org>
+On Tue, Jul 18, 2023 at 12:09:14PM +0300, Eugen Hristev wrote:
+> 'clock_in_out' property is optional, and it can be one of two enums.
+> The binding does not specify what is the behavior when the property is
+> missing altogether.
+> Hence, add a default value that the driver can use.
 >=20
-> (I significantly reduced the addressee list to permit the message
-> to be sent.)
+> Signed-off-by: Eugen Hristev <eugen.hristev@collabora.com>
+> ---
+
+Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+
+-- Sebastian
+
+>  Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> For "drivers/net/ipa/ipa_main.c":
+> diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/=
+Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> index 176ea5f90251..bb943c96c196 100644
+> --- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> @@ -80,6 +80,7 @@ properties:
+>        "output" means GMAC provides the reference clock.
+>      $ref: /schemas/types.yaml#/definitions/string
+>      enum: [input, output]
+> +    default: input
+> =20
+>    rockchip,grf:
+>      description: The phandle of the syscon node for the general register=
+ file.
+> --=20
+> 2.34.1
 >=20
-> Acked-by: Alex Elder <elder@linaro.org>
+>=20
+> --=20
+> To unsubscribe, send mail to kernel-unsubscribe@lists.collabora.co.uk.
 
-The patch does not apply cleanly to net-next. Rob, could you please re-
-spin it? While at that, have you considered splitting it in a few
-smaller patches (e.g. can, dsa, freescale, ibm, marvel, mediatek,
-stmmicro,  sun, ti, xilinx, wireless, remaining)?
+--p4uagyzg7ikm4k3p
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks!
+-----BEGIN PGP SIGNATURE-----
 
-Paolo
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmS2XKEACgkQ2O7X88g7
++prE4xAAmh5G/otIOOGE3B28pMwGVdmjdOwa1BRNEfNCHvSeWkh12GQ+Eswe5kqG
+BSB2DE/QqMNTqcrBTOlarZ0BWEMGKnWlpm2W0cBzDHro9ASDyikGy5MyNFtb6Pa2
+kc8L9JGhZB8NN/GD+qWLTnkg0HB056GGBcZF4pediWVSjJERDM8WXEVkEMjxARa2
+PRMpAknIO5kZpHzsekietpLOW4RpfuYCiVVmnCQpURUNK0FH3+la4hLWjvzuiEcM
+rUyTJ9MZwx73KEuKDrCPhRfS8bk6gC+QwSbtjTiIn/ZsUOWbcz0ovkzSpEg3ytrM
+pwLOCNM127Pvhitp9hV3lqad1yn5cioVfM4lmHjBNKxGxBPdQdiFBVWlczWT//p0
+Mg90MJtmkWMqF5OzLQ5UZhRS9Vf9rFROwnrGo6Pl++zAzIesUe62+oSvv2hMo/XG
+0UKo1Xwnl8edOORpjuSMtHbyJXIcpQ+hXRF+C21gZT268wWmxC6mBJi5r6Iunp/I
+uxqYNAxd3Jtd4Kq3D8omE6f0fewzQL+t4cegcKqEdngl9c+a8FwzkEOHa2RDRReB
+1t6XWKsHbgRbrWjt+PmatvnN8Ei/V4gFszQSIWYMhalviQCwqcqBqDKOi33kpFfh
+OZFltVUI6Fj1SZCMsAGBaozAXQ+FZF73haMosgXiWPUwQmr52EM=
+=9u/K
+-----END PGP SIGNATURE-----
 
+--p4uagyzg7ikm4k3p--
 
