@@ -1,309 +1,209 @@
-Return-Path: <netdev+bounces-18706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B18F758546
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B28B758549
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56B12281199
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:02:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18DD28174F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 19:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D66168BC;
-	Tue, 18 Jul 2023 19:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E0D168BC;
+	Tue, 18 Jul 2023 19:02:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7246168A1;
-	Tue, 18 Jul 2023 19:02:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08F8EC433C8;
-	Tue, 18 Jul 2023 19:02:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689706921;
-	bh=JlJvrBCMuSJqKk+McFytPrLKB9QBfH+KxP0ME52UcTg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=D/iMmmAhK2QCMiR3pLTqlth/7BpYKAKgClCbWxsm1FjTrVpC/AWydFD4ObXz5+ZAX
-	 VXRMtCofDsraQgHjwhaQbE4vaG/84CHuyO6IFk4D1VSx+v0ZFqDgfUayPUsw/gYrqL
-	 iQTxmb/XSyAXbT65h5ZyesKTzR52pTkNc45sY0/Aj5Xpy2jFckwUafTLXJTrz0hHQs
-	 Kiyi71fhj9uiqHorOIIc4Ea4Do3cDTK5jsGnbF8somjiLR/qW7IElTogIETUHN7Lgw
-	 c9kiY9yEc3H4geOnF+wHThXUGbT7Rj9bJU/AeaC/qcsRfCqLpU+6091yOT87HvtMRR
-	 P1g9RK7uyjjzQ==
-Subject: [PATCH net-next v1 7/7] net/handshake: Trace events for TLS Alert
- helpers
-From: Chuck Lever <cel@kernel.org>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
-Date: Tue, 18 Jul 2023 15:01:50 -0400
-Message-ID: 
- <168970690005.5330.12576672055397583164.stgit@oracle-102.nfsv4bat.org>
-In-Reply-To: 
- <168970659111.5330.9206348580241518146.stgit@oracle-102.nfsv4bat.org>
-References: 
- <168970659111.5330.9206348580241518146.stgit@oracle-102.nfsv4bat.org>
-User-Agent: StGit/1.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505143FF4
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:02:39 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ACBBF0;
+	Tue, 18 Jul 2023 12:02:37 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id BA80760173;
+	Tue, 18 Jul 2023 21:02:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689706954; bh=oOp9GOBt7dGLDZev6mjA2E8gLrnDmnMsc86ZWopvLRs=;
+	h=Date:To:Cc:From:Subject:From;
+	b=zt1bSAbAq7PTNBJ4LktA7jN0Q7caUe3IIYGimjm/YL+RAAGVFbe3MoPthCj4pn1O4
+	 G/uRb1KR5WMFw0pnd2GCGMqHTXHn89/Bekk7Tzs6T8BnOUTMfgD2Mx/u3gK18+yA/+
+	 6/4qjOZfZZddOEvBb0Rps5VveKv5gn8sepXMi6VY8vQegapY9tZazyarMZ7eh1QiK3
+	 jGSy8d+XX/Shw/Nzl212tStNHKVvlsKP0Nt9VG8Szv3bsisvv94iOefBthqbjQeS31
+	 hkQUQbR1BCWDsNf/NeM3MUoEVvXDlWg1jawT3QXF8Fwq38ihCvB1OvoS/dyO1Uin9a
+	 pKELNltHcQBnw==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 2qCcU3mQkzED; Tue, 18 Jul 2023 21:02:32 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 6A29560171;
+	Tue, 18 Jul 2023 21:02:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689706952; bh=oOp9GOBt7dGLDZev6mjA2E8gLrnDmnMsc86ZWopvLRs=;
+	h=Date:To:Cc:From:Subject:From;
+	b=m1dF4U9hBzPILv/EBb3gNQOtcluD6sjl8UzvCkfTMTPwcwYfgHG5vafT5W4DnTE3M
+	 TVkqiRtxmFnLuQIllSVtXGhr4dxZCR192BnysWfdzh/oXRis4nJf5DvzbM1ve/faYw
+	 0rMqRU15fHmq2T0RN+Mje2dXeC7r0WbRLRc1zOfGhW/gpW4Pwgt1C5xxIkOhA6aOIH
+	 pHUxbGkVo24kmTRolSFxsgN9FxbNDMaPgssXBz90japnd5Vko1e3n3El99w66EHSVO
+	 PS1pdVTTAHXilCXSI4P8RExP32vw3KYoX9QDSHFAqokY4llvbd1TINu24CuE/+tVF9
+	 0PU/XXmL5kRyQ==
+Message-ID: <6b04b2ba-2372-6f6b-3ac8-b7cba1cfae83@alu.unizg.hr>
+Date: Tue, 18 Jul 2023 21:02:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Content-Language: en-US
+To: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ Petr Machata <petrm@nvidia.com>, linux-kernel@vger.kernel.org
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Subject: [PROBLEM] selftests: net/forwarding/bridge_mdb.sh: 'Command "replace"
+ is unknown, try "bridge mdb help"'
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Chuck Lever <chuck.lever@oracle.com>
+Hi,
 
-Add observability for the new TLS Alert infrastructure.
+Consequential to the previous problem report, this one addresses almost the very
+next test script.
 
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- include/trace/events/handshake.h |  160 ++++++++++++++++++++++++++++++++++++++
- net/handshake/alert.c            |    7 ++
- net/handshake/trace.c            |    2 
- 3 files changed, 169 insertions(+)
+The testing environment is the same: 6.5-rc2 vanilla Torvalds tree on Ubuntu 22.04 LTS.
 
-diff --git a/include/trace/events/handshake.h b/include/trace/events/handshake.h
-index 8dadcab5f12a..bdd8a03cf5ba 100644
---- a/include/trace/events/handshake.h
-+++ b/include/trace/events/handshake.h
-@@ -6,7 +6,86 @@
- #define _TRACE_HANDSHAKE_H
- 
- #include <linux/net.h>
-+#include <net/tls_prot.h>
- #include <linux/tracepoint.h>
-+#include <trace/events/net_probe_common.h>
-+
-+#define TLS_RECORD_TYPE_LIST \
-+	record_type(CHANGE_CIPHER_SPEC) \
-+	record_type(ALERT) \
-+	record_type(HANDSHAKE) \
-+	record_type(DATA) \
-+	record_type(HEARTBEAT) \
-+	record_type(TLS12_CID) \
-+	record_type_end(ACK)
-+
-+#undef record_type
-+#undef record_type_end
-+#define record_type(x)		TRACE_DEFINE_ENUM(TLS_RECORD_TYPE_##x);
-+#define record_type_end(x)	TRACE_DEFINE_ENUM(TLS_RECORD_TYPE_##x);
-+
-+TLS_RECORD_TYPE_LIST
-+
-+#undef record_type
-+#undef record_type_end
-+#define record_type(x)		{ TLS_RECORD_TYPE_##x, #x },
-+#define record_type_end(x)	{ TLS_RECORD_TYPE_##x, #x }
-+
-+#define show_tls_content_type(type) \
-+	__print_symbolic(type, TLS_RECORD_TYPE_LIST)
-+
-+TRACE_DEFINE_ENUM(TLS_ALERT_LEVEL_WARNING);
-+TRACE_DEFINE_ENUM(TLS_ALERT_LEVEL_FATAL);
-+
-+#define show_tls_alert_level(level) \
-+	__print_symbolic(level, \
-+		{ TLS_ALERT_LEVEL_WARNING,	"Warning" }, \
-+		{ TLS_ALERT_LEVEL_FATAL,	"Fatal" })
-+
-+#define TLS_ALERT_DESCRIPTION_LIST \
-+	alert_description(CLOSE_NOTIFY) \
-+	alert_description(UNEXPECTED_MESSAGE) \
-+	alert_description(BAD_RECORD_MAC) \
-+	alert_description(RECORD_OVERFLOW) \
-+	alert_description(HANDSHAKE_FAILURE) \
-+	alert_description(BAD_CERTIFICATE) \
-+	alert_description(UNSUPPORTED_CERTIFICATE) \
-+	alert_description(CERTIFICATE_REVOKED) \
-+	alert_description(CERTIFICATE_EXPIRED) \
-+	alert_description(CERTIFICATE_UNKNOWN) \
-+	alert_description(ILLEGAL_PARAMETER) \
-+	alert_description(UNKNOWN_CA) \
-+	alert_description(ACCESS_DENIED) \
-+	alert_description(DECODE_ERROR) \
-+	alert_description(DECRYPT_ERROR) \
-+	alert_description(TOO_MANY_CIDS_REQUESTED) \
-+	alert_description(PROTOCOL_VERSION) \
-+	alert_description(INSUFFICIENT_SECURITY) \
-+	alert_description(INTERNAL_ERROR) \
-+	alert_description(INAPPROPRIATE_FALLBACK) \
-+	alert_description(USER_CANCELED) \
-+	alert_description(MISSING_EXTENSION) \
-+	alert_description(UNSUPPORTED_EXTENSION) \
-+	alert_description(UNRECOGNIZED_NAME) \
-+	alert_description(BAD_CERTIFICATE_STATUS_RESPONSE) \
-+	alert_description(UNKNOWN_PSK_IDENTITY) \
-+	alert_description(CERTIFICATE_REQUIRED) \
-+	alert_description_end(NO_APPLICATION_PROTOCOL)
-+
-+#undef alert_description
-+#undef alert_description_end
-+#define alert_description(x)		TRACE_DEFINE_ENUM(TLS_ALERT_DESC_##x);
-+#define alert_description_end(x)	TRACE_DEFINE_ENUM(TLS_ALERT_DESC_##x);
-+
-+TLS_ALERT_DESCRIPTION_LIST
-+
-+#undef alert_description
-+#undef alert_description_end
-+#define alert_description(x)		{ TLS_ALERT_DESC_##x, #x },
-+#define alert_description_end(x)	{ TLS_ALERT_DESC_##x, #x }
-+
-+#define show_tls_alert_description(desc) \
-+	__print_symbolic(desc, TLS_ALERT_DESCRIPTION_LIST)
- 
- DECLARE_EVENT_CLASS(handshake_event_class,
- 	TP_PROTO(
-@@ -106,6 +185,47 @@ DECLARE_EVENT_CLASS(handshake_error_class,
- 		),						\
- 		TP_ARGS(net, req, sk, err))
- 
-+DECLARE_EVENT_CLASS(handshake_alert_class,
-+	TP_PROTO(
-+		const struct sock *sk,
-+		unsigned char level,
-+		unsigned char description
-+	),
-+	TP_ARGS(sk, level, description),
-+	TP_STRUCT__entry(
-+		/* sockaddr_in6 is always bigger than sockaddr_in */
-+		__array(__u8, saddr, sizeof(struct sockaddr_in6))
-+		__array(__u8, daddr, sizeof(struct sockaddr_in6))
-+		__field(unsigned int, netns_ino)
-+		__field(unsigned long, level)
-+		__field(unsigned long, description)
-+	),
-+	TP_fast_assign(
-+		const struct inet_sock *inet = inet_sk(sk);
-+
-+		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
-+		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
-+		TP_STORE_ADDR_PORTS(__entry, inet, sk);
-+
-+		__entry->netns_ino = sock_net(sk)->ns.inum;
-+		__entry->level = level;
-+		__entry->description = description;
-+	),
-+	TP_printk("src=%pISpc dest=%pISpc %s: %s",
-+		__entry->saddr, __entry->daddr,
-+		show_tls_alert_level(__entry->level),
-+		show_tls_alert_description(__entry->description)
-+	)
-+);
-+#define DEFINE_HANDSHAKE_ALERT(name)				\
-+	DEFINE_EVENT(handshake_alert_class, name,		\
-+		TP_PROTO(					\
-+			const struct sock *sk,			\
-+			unsigned char level,			\
-+			unsigned char description		\
-+		),						\
-+		TP_ARGS(sk, level, description))
-+
- 
- /*
-  * Request lifetime events
-@@ -154,6 +274,46 @@ DEFINE_HANDSHAKE_ERROR(handshake_cmd_accept_err);
- DEFINE_HANDSHAKE_FD_EVENT(handshake_cmd_done);
- DEFINE_HANDSHAKE_ERROR(handshake_cmd_done_err);
- 
-+/*
-+ * TLS Record events
-+ */
-+
-+TRACE_EVENT(tls_contenttype,
-+	TP_PROTO(
-+		const struct sock *sk,
-+		unsigned char type
-+	),
-+	TP_ARGS(sk, type),
-+	TP_STRUCT__entry(
-+		/* sockaddr_in6 is always bigger than sockaddr_in */
-+		__array(__u8, saddr, sizeof(struct sockaddr_in6))
-+		__array(__u8, daddr, sizeof(struct sockaddr_in6))
-+		__field(unsigned int, netns_ino)
-+		__field(unsigned long, type)
-+	),
-+	TP_fast_assign(
-+		const struct inet_sock *inet = inet_sk(sk);
-+
-+		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
-+		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
-+		TP_STORE_ADDR_PORTS(__entry, inet, sk);
-+
-+		__entry->netns_ino = sock_net(sk)->ns.inum;
-+		__entry->type = type;
-+	),
-+	TP_printk("src=%pISpc dest=%pISpc %s",
-+		__entry->saddr, __entry->daddr,
-+		show_tls_content_type(__entry->type)
-+	)
-+);
-+
-+/*
-+ * TLS Alert events
-+ */
-+
-+DEFINE_HANDSHAKE_ALERT(tls_alert_send);
-+DEFINE_HANDSHAKE_ALERT(tls_alert_recv);
-+
- #endif /* _TRACE_HANDSHAKE_H */
- 
- #include <trace/define_trace.h>
-diff --git a/net/handshake/alert.c b/net/handshake/alert.c
-index 93e05d8d599c..e6cbeebe48f5 100644
---- a/net/handshake/alert.c
-+++ b/net/handshake/alert.c
-@@ -22,6 +22,8 @@
- 
- #include "handshake.h"
- 
-+#include <trace/events/handshake.h>
-+
- /**
-  * tls_alert_send - send a TLS Alert on a kTLS socket
-  * @sock: open kTLS socket to send on
-@@ -40,6 +42,8 @@ int tls_alert_send(struct socket *sock, u8 level, u8 description)
- 	u8 alert[2];
- 	int ret;
- 
-+	trace_tls_alert_send(sock->sk, level, description);
-+
- 	alert[0] = level;
- 	alert[1] = description;
- 	iov.iov_base = alert;
-@@ -78,6 +82,7 @@ u8 tls_record_type(const struct sock *sk, const struct cmsghdr *cmsg)
- 		return 0;
- 
- 	record_type = *((u8 *)CMSG_DATA(cmsg));
-+	trace_tls_contenttype(sk, record_type);
- 	return record_type;
- }
- EXPORT_SYMBOL(tls_record_type);
-@@ -103,6 +108,8 @@ bool tls_alert_recv(const struct sock *sk, const struct msghdr *msg,
- 	data = iov->iov_base;
- 	*level = data[0];
- 	*description = data[1];
-+
-+	trace_tls_alert_recv(sk, *level, *description);
- 	return true;
- }
- EXPORT_SYMBOL(tls_alert_recv);
-diff --git a/net/handshake/trace.c b/net/handshake/trace.c
-index 1c4d8e27e17a..44432d0857b9 100644
---- a/net/handshake/trace.c
-+++ b/net/handshake/trace.c
-@@ -8,8 +8,10 @@
-  */
- 
- #include <linux/types.h>
-+#include <linux/ipv6.h>
- 
- #include <net/sock.h>
-+#include <net/inet_sock.h>
- #include <net/netlink.h>
- #include <net/genetlink.h>
- 
+The used config is the same, please find it with the bridge_mdb.sh normal and "set -x"
+output on this link (too large to attach):
 
+https://domac.alu.unizg.hr/~mtodorov/linux/selftests/net-forwarding/bridge_mdb.sh/
 
+root@defiant:# ./bridge_mdb.sh
+
+INFO: # Host entries configuration tests
+TEST: Common host entries configuration tests (IPv4)                [FAIL]
+	Managed to add IPv4 host entry with a filter mode
+TEST: Common host entries configuration tests (IPv6)                [FAIL]
+	Managed to add IPv6 host entry with a filter mode
+TEST: Common host entries configuration tests (L2)                  [FAIL]
+	Managed to add L2 host entry with a filter mode
+
+INFO: # Port group entries configuration tests - (*, G)
+Command "replace" is unknown, try "bridge mdb help".
+TEST: Common port group entries configuration tests (IPv4 (*, G))   [FAIL]
+	Failed to replace IPv4 (*, G) entry
+Command "replace" is unknown, try "bridge mdb help".
+TEST: Common port group entries configuration tests (IPv6 (*, G))   [FAIL]
+	Failed to replace IPv6 (*, G) entry
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+RTNETLINK answers: Invalid argument
+Error: bridge: (*, G) group is already joined by port.
+Error: bridge: (*, G) group is already joined by port.
+TEST: IPv4 (*, G) port group entries configuration tests            [FAIL]
+	(S, G) entry not created
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+RTNETLINK answers: Invalid argument
+Error: bridge: (*, G) group is already joined by port.
+Error: bridge: (*, G) group is already joined by port.
+TEST: IPv6 (*, G) port group entries configuration tests            [FAIL]
+	(S, G) entry not created
+
+INFO: # Port group entries configuration tests - (S, G)
+Command "replace" is unknown, try "bridge mdb help".
+TEST: Common port group entries configuration tests (IPv4 (S, G))   [FAIL]
+	Failed to replace IPv4 (S, G) entry
+Command "replace" is unknown, try "bridge mdb help".
+TEST: Common port group entries configuration tests (IPv6 (S, G))   [FAIL]
+	Failed to replace IPv6 (S, G) entry
+Error: bridge: (S, G) group is already joined by port.
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IPv4 (S, G) port group entries configuration tests            [FAIL]
+	Managed to add an entry with a filter mode
+Error: bridge: (S, G) group is already joined by port.
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IPv6 (S, G) port group entries configuration tests            [FAIL]
+	"temp" entry has an unpending group timer
+
+INFO: # Port group entries configuration tests - L2
+Command "replace" is unknown, try "bridge mdb help".
+TEST: Common port group entries configuration tests (L2 (*, G))     [FAIL]
+	Failed to replace L2 (*, G) entry
+TEST: L2 (*, G) port group entries configuration tests              [FAIL]
+	Managed to add an entry with a filter mode
+
+INFO: # Large scale dump tests
+TEST: IPv4 large scale dump tests                                   [ OK ]
+TEST: IPv6 large scale dump tests                                   [ OK ]
+TEST: L2 large scale dump tests                                     [ OK ]
+
+INFO: # Forwarding tests
+Error: bridge: Group is already joined by host.
+TEST: IPv4 host entries forwarding tests                            [FAIL]
+	Packet not locally received after adding a host entry
+Error: bridge: Group is already joined by host.
+TEST: IPv6 host entries forwarding tests                            [FAIL]
+	Packet locally received after flood
+TEST: L2 host entries forwarding tests                              [FAIL]
+	Packet not locally received after flood
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IPv4 port group "exclude" entries forwarding tests            [FAIL]
+	Packet from valid source not received on H2 after adding entry
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IPv6 port group "exclude" entries forwarding tests            [FAIL]
+	Packet from invalid source received on H2 after adding entry
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IPv4 port group "include" entries forwarding tests            [FAIL]
+	Packet from valid source not received on H2 after adding entry
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IPv6 port group "include" entries forwarding tests            [FAIL]
+	Packet from invalid source received on H2 after adding entry
+TEST: L2 port entries forwarding tests                              [ OK ]
+
+INFO: # Control packets tests
+Command "replace" is unknown, try "bridge mdb help".
+TEST: IGMPv3 MODE_IS_INCLUDE tests                                  [FAIL]
+	Source not add to source list
+Command "replace" is unknown, try "bridge mdb help".
+TEST: MLDv2 MODE_IS_INCLUDE tests                                   [FAIL]
+	Source not add to source list
+root@defiant:# bridge mdb show
+root@defiant:#
+
+NOTE that several "sleep 10" command looped in the script can easily exceed
+the default timeout of 45 seconds, and SIGTERM to the script isn't processed,
+so it leaves the system in an unpredictable state from which even
+"systemctl restart networking" didn't bail out.
+
+Setting tools/testing/selftests/net/forwarding/settings:timeout=150 seemed enough.
+
+Best regards,
+Mirsad Todorovac
 
