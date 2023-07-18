@@ -1,169 +1,249 @@
-Return-Path: <netdev+bounces-18744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03DF758786
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 23:57:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191657587E8
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 00:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E19311C20E29
-	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 21:57:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4AD4281761
+	for <lists+netdev@lfdr.de>; Tue, 18 Jul 2023 22:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8668217757;
-	Tue, 18 Jul 2023 21:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45261775A;
+	Tue, 18 Jul 2023 22:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0703915AEA
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 21:57:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BB83C433C8;
-	Tue, 18 Jul 2023 21:57:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689717421;
-	bh=Wo4I4cr9gdcSh0tE9VozsMVfVY5BjPp2OtQmdbI2bgw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SRaR7TUrsVM04PiUfqWevP4oNgJsftX3cNM2tGjYhpRYWg2t3HOq+v4YkGMe8VfbN
-	 NzNw/TpIFaH48d7pVVVSe96rATGxmryJ65ZPkMA+l7e/PmkkkepzMszlLDpR7vM43F
-	 Ll72D7Adw1Wt3UEMWcuhl/CH+pBv7HTI73vkMuUT+UqlF5sJxDx9vcpAJc9AZWwqHd
-	 1vgmNN04mhrh9Vqdt+SNtoAmI6aBGqg8D7/HRhQfsjya4Kx8I/NHM3qvTasW0/OSKd
-	 IYJ0SQR+ik/p5485M5P4aE5wB1Wz2paF+M3B0Ix819vad8dObIhLaXYz9Ppm+Mh6vN
-	 j/Oj0TFk8u09Q==
-Date: Tue, 18 Jul 2023 14:57:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Babrou <ivan@cloudflare.com>
-Cc: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, David Ahern <dsahern@kernel.org>
-Subject: Re: [RFC PATCH net-next] tcp: add a tracepoint for
- tcp_listen_queue_drop
-Message-ID: <20230718145700.5d6f766d@kernel.org>
-In-Reply-To: <CABWYdi2BGi=iRCfLhmQCqO=1eaQ1WaCG7F9WsJrz-7==ocZidg@mail.gmail.com>
-References: <20230711043453.64095-1-ivan@cloudflare.com>
-	<20230711193612.22c9bc04@kernel.org>
-	<CAO3-PbrZHn1syvhb3V57oeXigE_roiHCbzYz5Mi4wiymogTg2A@mail.gmail.com>
-	<20230712104210.3b86b779@kernel.org>
-	<CABWYdi3VJU7HUxzKJBKgX9wF9GRvmA0TKVpjuHvJyz_EdpxZFA@mail.gmail.com>
-	<20230713201427.2c50fc7b@kernel.org>
-	<CABWYdi2BGi=iRCfLhmQCqO=1eaQ1WaCG7F9WsJrz-7==ocZidg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F4F174D7
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 22:01:06 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E02B198D;
+	Tue, 18 Jul 2023 15:01:05 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b8bd586086so49972035ad.2;
+        Tue, 18 Jul 2023 15:01:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689717664; x=1692309664;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/DBv5NGK1dmc+CZMq0/WXS3utH3EmBQl9zIKDmjQ1i4=;
+        b=cathwXRCdEL7wvuiZ7bcMAHF2YkxTm1Pa99hNgy2x+3oEKy8vP5p1pu9MijkOsOxyc
+         jVjO8T1YTkH454Bng4g8CC+ThLmAff8Zub0Wh44Fl8hmA3B+pz1cCE8AhFvDJSoUkJID
+         NS7KV1XDtpxLbe2HWUcgGi+EM6yjEGw6Sq2n/Qnwk0U558oV9/CsEMgkI+jF8M4J14Bl
+         j/CISxZtgmOZEeF8ngbj99zwzx/DpIifrqP3yzGJWnNbKrjb9QyRTvPr1aPJ88+oJ9jy
+         batIZ/8swsAtixDHJfvcm05Qd0arLM9+ER1NC94CBHpMmwXt1e8Hdw90O3brBFBThqFk
+         WTSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689717664; x=1692309664;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/DBv5NGK1dmc+CZMq0/WXS3utH3EmBQl9zIKDmjQ1i4=;
+        b=F/tUQgnLIUh7k4cfUVhIpjDliLqZwwf0l41Huwl4zjXkQA0JKojnj2mFfHcFN90heM
+         ZNbtYX3rUTK3Nol+nW4v4BHKcgNmwO8xMX7lkLLXW1z5OYg0rBbtYNeufujSJz0LudmE
+         ap9YOyYtsubLNUtxkhGuddJbAgc/nUy1cvxsrNN+KIPG/ZbvETsLH6xukHX8VlDZ3k5v
+         MyMC5tQd+mF/VtpXuLOImcgLrPZFCR6j/kcY2F88npPbhsrgio1+cn7GrLyRJuqWkitc
+         1UDaQ1QcWVifKaNcMEl7zHrT7scCcyHv8E04X3vVdoUvgB8dLJ1QIhgSp3NuPs1SkXgs
+         JIIw==
+X-Gm-Message-State: ABy/qLY304gpiS7wb5vBgM1nPYoUGsg7u5ovfsOTbAjHNu9NVn6WTmIk
+	+62EVgK6e1cxGvCCLb8O2xk=
+X-Google-Smtp-Source: APBJJlEKmijXIQPxNbeLXXqgtsMDd/YUFQr0MtJ3gF/quDqVxbtlCH7F50lGttR5T6rSx/zqeT1Vfg==
+X-Received: by 2002:a17:902:768c:b0:1ba:ff05:d8b1 with SMTP id m12-20020a170902768c00b001baff05d8b1mr982129pll.19.1689717664188;
+        Tue, 18 Jul 2023 15:01:04 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:fbd8])
+        by smtp.gmail.com with ESMTPSA id g15-20020a1709029f8f00b001b8b2a6c4a4sm2354458plq.172.2023.07.18.15.01.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 15:01:03 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 18 Jul 2023 12:01:02 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	kernel-team@meta.com, Linux PM list <linux-pm@vger.kernel.org>,
+	DRI Development <dri-devel@lists.freedesktop.org>,
+	linux-rtc@vger.kernel.org,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	netdev <netdev@vger.kernel.org>,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+	Linux MMC List <linux-mmc@vger.kernel.org>,
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
+ 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE
+ mechanism)
+Message-ID: <ZLcLnoAoJmQ9WTuM@slm.duckdns.org>
+References: <20230511181931.869812-1-tj@kernel.org>
+ <20230511181931.869812-7-tj@kernel.org>
+ <ZF6WsSVGX3O1d0pL@slm.duckdns.org>
+ <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
+ <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
+ <ZK3MBfPS-3-tJgjO@slm.duckdns.org>
+ <ZK30CR196rs-OWLq@slm.duckdns.org>
+ <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
+ <ZLXIvXBvhsnL-ik_@slm.duckdns.org>
+ <CAMuHMdU8CGhsU-1PZNdWH1xjbWcWSg2s2RFAegXi+vs=d-0t8Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdU8CGhsU-1PZNdWH1xjbWcWSg2s2RFAegXi+vs=d-0t8Q@mail.gmail.com>
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 14 Jul 2023 16:21:08 -0700 Ivan Babrou wrote:
-> > Just the stacks.  
-> 
-> Here you go: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=Zah28QwZ_5RU-xcxLFUK2Zj08A8MrLk9jzg@mail.gmail.com/
+Hello,
 
-Thanks! I'll follow the discussion there. Just the one remaining
-clarification here:
+On Tue, Jul 18, 2023 at 11:54:58AM +0200, Geert Uytterhoeven wrote:
+> I gave it a try on a system with an 800 MHz Cortex A9, only to discover
+> it makes no difference, as that machine has 1600 BogoMIPS:
 
-> > > Even if I was only interested in one specific reason, I would still
-> > > have to arm the whole tracepoint and route a ton of skbs I'm not
-> > > interested in into my bpf code. This seems like a lot of overhead,
-> > > especially if I'm dropping some attack packets.  
-> >
-> > That's what I meant with my drop vs exception comment. We already have
-> > two tracepoints on the skb free path (free and consume), adding another
-> > shouldn't rise too many eyebrows.  
-> 
-> I'm a bit confused. Previously you said:
-> 
-> > Specifically what I'm wondering is whether we should also have
-> > a separation between policy / "firewall drops" and error / exception
-> > drops. Within the skb drop reason codes, I mean.  
-> 
-> My understanding was that you proposed adding more SKB_DROP_REASON_*,
-> but now you seem to imply that we might want to add another
-> tracepoint. Could you clarify which path you have in mind?
+Oops.
 
-What I had in mind was sorting the drop reasons to be able to easily
-distinguish policy drops from error drops.
+> workqueue: blk_mq_run_work_fn hogged CPU for >10000us 4 times,
+> consider switching to WQ_UNBOUND
 
-> We can add a few reasons that would satisfy my need by covering
-> whatever results into tcp_listendrop() calls today. The problem is:
-> unless we remove some other reasons from kfree_skb, adding more
-> reasons for firewall drops / exceptions wouldn't change the cost at
-> all. We'd still have the same number of calls into the tracepoint and
-> the condition to find "interesting" reasons would be the same:
-> 
-> if (reason == SKB_DROP_REASON_TCP_OVERFLOW_OR_SOMETHING)
-> 
-> It still seems very expensive to consume a firehose of kfree_skb just
-> to find some rare nuggets.
+It could be that we actually want to switch to UNBOUND for some reports but
+the above triggering most likely indicates that the threshold is too
+aggressive.
 
-Let me show you a quick mock-up of a diff:
+> Artificially low BogoMIPS numbers only happen on systems that have
+> the related timers (Cortex A7/A15 and later, Cortex A9 MPCore,
+> and arm64).
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index a2b953b57689..86ee70fcf540 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -5,12 +5,18 @@
+Ah, I see. Thanks for the explanation.
+
+> I will test on more systems, but that will probably not happen until
+> next week...
+
+Thanks, really appreciate it. Can you try the following instead when you
+have time? I just pushed up the lower boundary to 4000 MIPS. The scaling is
+still capped at 1s.
+
+From 8555cbd4b22e5f85eb2bdcb84fd1d1f519a0a0d3 Mon Sep 17 00:00:00 2001
+From: Tejun Heo <tj@kernel.org>
+Date: Mon, 17 Jul 2023 12:50:02 -1000
+Subject: [PATCH] workqueue: Scale up wq_cpu_intensive_thresh_us if BogoMIPS is
+ below 4000
+
+wq_cpu_intensive_thresh_us is used to detect CPU-hogging per-cpu work items.
+Once detected, they're excluded from concurrency management to prevent them
+from blocking other per-cpu work items. If CONFIG_WQ_CPU_INTENSIVE_REPORT is
+enabled, repeat offenders are also reported so that the code can be updated.
+
+The default threshold is 10ms which is long enough to do fair bit of work on
+modern CPUs while short enough to be usually not noticeable. This
+unfortunately leads to a lot of, arguable spurious, detections on very slow
+CPUs. Using the same threshold across CPUs whose performance levels may be
+apart by multiple levels of magnitude doesn't make whole lot of sense.
+
+This patch scales up wq_cpu_intensive_thresh_us upto 1 second when BogoMIPS
+is below 4000. This is obviously very inaccurate but it doesn't have to be
+accurate to be useful. The mechanism is still useful when the threshold is
+fully scaled up and the benefits of reports are usually shared with everyone
+regardless of who's reporting, so as long as there are sufficient number of
+fast machines reporting, we don't lose much.
+
+Some (or is it all?) ARM CPUs systemtically report significantly lower
+BogoMIPS. While this doesn't break anything, given how widespread ARM CPUs
+are, it's at least a missed opportunity and it probably would be a good idea
+to teach workqueue about it.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ kernel/workqueue.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 02a8f402eeb5..0d7a3d29762f 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -52,6 +52,7 @@
+ #include <linux/sched/debug.h>
+ #include <linux/nmi.h>
+ #include <linux/kvm_para.h>
++#include <linux/delay.h>
  
- #define DEFINE_DROP_REASON(FN, FNe)	\
- 	FN(NOT_SPECIFIED)		\
-+	/* Policy-driven/intentional drops: */	\
-+	FN(NETFILTER_DROP)		\
-+	FN(BPF_CGROUP_EGRESS)		\
-+	FN(TC_INGRESS)			\
-+	FN(TC_EGRESS)			\
-+	FN(XDP)				\
-+	/* Errors: */			\
- 	FN(NO_SOCKET)			\
- 	FN(PKT_TOO_SMALL)		\
- 	FN(TCP_CSUM)			\
- 	FN(SOCKET_FILTER)		\
- 	FN(UDP_CSUM)			\
--	FN(NETFILTER_DROP)		\
- 	FN(OTHERHOST)			\
- 	FN(IP_CSUM)			\
- 	FN(IP_INHDR)			\
-@@ -41,17 +47,13 @@
- 	FN(TCP_OFO_QUEUE_PRUNE)		\
- 	FN(TCP_OFO_DROP)		\
- 	FN(IP_OUTNOROUTES)		\
--	FN(BPF_CGROUP_EGRESS)		\
- 	FN(IPV6DISABLED)		\
- 	FN(NEIGH_CREATEFAIL)		\
- 	FN(NEIGH_FAILED)		\
- 	FN(NEIGH_QUEUEFULL)		\
- 	FN(NEIGH_DEAD)			\
--	FN(TC_EGRESS)			\
- 	FN(QDISC_DROP)			\
- 	FN(CPU_BACKLOG)			\
--	FN(XDP)				\
--	FN(TC_INGRESS)			\
- 	FN(UNHANDLED_PROTO)		\
- 	FN(SKB_CSUM)			\
- 	FN(SKB_GSO_SEG)			\
-@@ -80,6 +82,8 @@
- 	FN(IPV6_NDISC_NS_OTHERHOST)	\
- 	FNe(MAX)
+ #include "workqueue_internal.h"
  
-+#define	__SKB_POLICY_DROP_END	SKB_DROP_REASON_NO_SOCKET
+@@ -338,8 +339,10 @@ static cpumask_var_t *wq_numa_possible_cpumask;
+  * Per-cpu work items which run for longer than the following threshold are
+  * automatically considered CPU intensive and excluded from concurrency
+  * management to prevent them from noticeably delaying other per-cpu work items.
++ * ULONG_MAX indicates that the user hasn't overridden it with a boot parameter.
++ * The actual value is initialized in wq_cpu_intensive_thresh_init().
+  */
+-static unsigned long wq_cpu_intensive_thresh_us = 10000;
++static unsigned long wq_cpu_intensive_thresh_us = ULONG_MAX;
+ module_param_named(cpu_intensive_thresh_us, wq_cpu_intensive_thresh_us, ulong, 0644);
+ 
+ static bool wq_disable_numa;
+@@ -6513,6 +6516,42 @@ void __init workqueue_init_early(void)
+ 	       !system_freezable_power_efficient_wq);
+ }
+ 
++static void __init wq_cpu_intensive_thresh_init(void)
++{
++	unsigned long thresh;
++	unsigned long mips;
++
++	/* if the user set it to a specific value, keep it */
++	if (wq_cpu_intensive_thresh_us != ULONG_MAX)
++		return;
++
++	/*
++	 * The default of 10ms is derived from the fact that most modern (as of
++	 * 2023) processors can do a lot in 10ms and that it's just below what
++	 * most consider human-perceivable. However, the kernel also runs on a
++	 * lot slower CPUs including microcontrollers where the threshold is way
++	 * too low.
++	 *
++	 * Let's scale up the threshold upto 1 second if BogoMips is below 4000.
++	 * This is by no means accurate but it doesn't have to be. The mechanism
++	 * is still useful even when the threshold is fully scaled up. Also, as
++	 * the reports would usually be applicable to everyone, some machines
++	 * operating on longer thresholds won't significantly diminish their
++	 * usefulness.
++	 */
++	thresh = 10 * USEC_PER_MSEC;
++
++	/* see init/calibrate.c for lpj -> BogoMIPS calculation */
++	mips = max_t(unsigned long, loops_per_jiffy / 500000 * HZ, 1);
++	if (mips < 4000)
++		thresh = min_t(unsigned long, thresh * 4000 / mips, USEC_PER_SEC);
++
++	pr_debug("wq_cpu_intensive_thresh: lpj=%lu mips=%lu thresh_us=%lu\n",
++		 loops_per_jiffy, mips, thresh);
++
++	wq_cpu_intensive_thresh_us = thresh;
++}
 +
  /**
-  * enum skb_drop_reason - the reasons of skb drops
+  * workqueue_init - bring workqueue subsystem fully online
   *
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 6c5915efbc17..a36c498eb693 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1031,6 +1031,8 @@ bool __kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
+@@ -6528,6 +6567,8 @@ void __init workqueue_init(void)
+ 	struct worker_pool *pool;
+ 	int cpu, bkt;
  
- 	if (reason == SKB_CONSUMED)
- 		trace_consume_skb(skb, __builtin_return_address(0));
-+	else if (reason < __SKB_POLICY_DROP_END)
-+		trace_drop_skb(skb, __builtin_return_address(0), reason);
- 	else
- 		trace_kfree_skb(skb, __builtin_return_address(0), reason);
- 	return true;
++	wq_cpu_intensive_thresh_init();
++
+ 	/*
+ 	 * It'd be simpler to initialize NUMA in workqueue_init_early() but
+ 	 * CPU to node mapping may not be available that early on some
+-- 
+2.41.0
+
 
