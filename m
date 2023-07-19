@@ -1,114 +1,152 @@
-Return-Path: <netdev+bounces-19287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1663D75A2E8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D32175A2ED
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8EEB1C21212
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:41:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 155EF1C211F3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FDE263A8;
-	Wed, 19 Jul 2023 23:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BE5263AC;
+	Wed, 19 Jul 2023 23:48:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEE11BB27
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:41:19 +0000 (UTC)
-Received: from resdmta-c1p-023853.sys.comcast.net (resdmta-c1p-023853.sys.comcast.net [IPv6:2001:558:fd00:56::e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53C6710A
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:41:18 -0700 (PDT)
-Received: from resomta-c1p-023269.sys.comcast.net ([96.102.18.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
-	(Client did not present a certificate)
-	by resdmta-c1p-023853.sys.comcast.net with ESMTP
-	id M9VMqmIkThn8ZMGnFqwF5V; Wed, 19 Jul 2023 23:41:17 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902771BB27
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:48:40 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A27DB172D
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:48:38 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51e2a6a3768so175418a12.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:48:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=comcastmailservice.net; s=20211018a; t=1689810077;
-	bh=D0Zxwoc5PyVtQd58yNNXz/EasT5elbjv8i+Mv7KlxLk=;
-	h=Received:Received:From:To:Subject:Date:MIME-Version:Message-ID:
-	 Content-Type:Xfinity-Spam-Result;
-	b=t2iRwMhVWONQk48PpghAswYn9HMhYwb29p7UAjB3nm3pKeRkzkTCm/+z61CaFaJXo
-	 nAkYlBv9iUSZ8xOHXwI0Zo5agRLnDdtLk3fAAj0PfxydgVfRuT+3/iSh7ueKE59Pz8
-	 TZq8q+wDE2jr+tkDCTKqZEKP1EQBYn7IMm+1EmjWIR/NetdsoTiNyuJU5C2dmizcqP
-	 kdXuOZ9Er1vbQb9ybwWUy21MF2y0Ed7VJORfT0IO9i6mCgEV9vojoM1bSTrJ54iKf8
-	 OOKHsOCYzyKwdmFwBp/ioTUwpc93oJlLxlw+qDp5FLT3HW1hjnrKVV9TCUPYxK2x4K
-	 8VWtjt3cMingw==
-Received: from localhost ([IPv6:2601:18c:9082:afd:219:d1ff:fe75:dc2f])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
-	(Client did not present a certificate)
-	by resomta-c1p-023269.sys.comcast.net with ESMTPSA
-	id MGn6q5Mwsf3EjMGn7qAANV; Wed, 19 Jul 2023 23:41:13 +0000
-X-Xfinity-VMeta: sc=-100.00;st=legit
-From: Matt Whitlock <kernel@mattwhitlock.name>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Matthew Wilcox <willy@infradead.org>,
- Miklos Szeredi <miklos@szeredi.hu>,
- David Howells <dhowells@redhat.com>,
- <netdev@vger.kernel.org>,
- Dave Chinner <david@fromorbit.com>,
- Jens Axboe <axboe@kernel.dk>,
- <linux-fsdevel@kvack.org>,
- <linux-mm@kvack.org>,
- <linux-kernel@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- <linux-fsdevel@vger.kernel.org>
-Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after =?iso-8859-1?Q?splice()_returns?=
-Date: Wed, 19 Jul 2023 19:41:07 -0400
+        d=linux-foundation.org; s=google; t=1689810517; x=1690415317;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xITvYVSy1BHIKVEC9gx23jBZUjPhKEXUypo/Br0I0Ws=;
+        b=D4iqILciLzn7WTiO1p1n9bdvliLyspYUZILG9YBKTCYmU+QgFYSdY/rntmy0VeqoGH
+         sDc8CDY17K/9ymmr19ynrCAU4/FLQDdYFove8g/WAFJFY7nByt7CogliX4y9g9NVcnBS
+         2ll2pGJTYgplQMNR1GHIOT8LRuenCD0WjAVnc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689810517; x=1690415317;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xITvYVSy1BHIKVEC9gx23jBZUjPhKEXUypo/Br0I0Ws=;
+        b=ffGe37KWgYOeoaL8b5O+zbkdCyijQnbMpWBwOM0arezFUK98lwGKTEOYt4IkqXPrxi
+         KlnHVIoHqYTakwI1e4OTqIkSkhbu2aDHzvf9aL5oSmXUdTWo4gIEnXZEr0rAbNmkbEuX
+         UUslioddKxHywMqm5En3t1yOash4oG2cNcBAuVa93gN7FsO1T9EcpqIWTUT+rMbzMlZu
+         rt9Yje2PrUnmry3ntlMHrRTXtwRBIgaj58sRv4zGB9wKSvHSF8uSM2dRAKVZhS9vcIq2
+         fZgwEKAYPXkH0WhD9FZfTtRckx8wplYhdoffHpJ3VjXAgw73hivBzSCj108LpVwKizBu
+         VWYw==
+X-Gm-Message-State: ABy/qLZDGjWsljkP0d4EpblrfPQcr41CtG9+QVMmIlLxV9xtufhqz6sB
+	GzkNSLFML2fC5DauMA8gBjRq9Ka1XZut5BxWvmyRpw5s
+X-Google-Smtp-Source: APBJJlFWqESlPnm9u7yXGgiNIz/nTgxt4dvgRQmoan+I8Ze9tPDHCVUmbxmSt9xgk5UQOtjPh5h+ug==
+X-Received: by 2002:aa7:d659:0:b0:51d:d295:6741 with SMTP id v25-20020aa7d659000000b0051dd2956741mr3305374edr.6.1689810516981;
+        Wed, 19 Jul 2023 16:48:36 -0700 (PDT)
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com. [209.85.208.46])
+        by smtp.gmail.com with ESMTPSA id p3-20020a056402074300b0052177c077eesm3279249edy.68.2023.07.19.16.48.35
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jul 2023 16:48:35 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-51e29ede885so153356a12.3
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:48:35 -0700 (PDT)
+X-Received: by 2002:aa7:cd52:0:b0:521:aeba:c6c8 with SMTP id
+ v18-20020aa7cd52000000b00521aebac6c8mr3187409edw.39.1689810514772; Wed, 19
+ Jul 2023 16:48:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <0d10033a-7ea1-48e3-806b-f74000045915@mattwhitlock.name>
-In-Reply-To: <CAHk-=wh7OY=7ocTFY8styG8GgQ1coWxds=b09acHZG4t36OxWg@mail.gmail.com>
-References: <20230629155433.4170837-1-dhowells@redhat.com>
- <20230629155433.4170837-2-dhowells@redhat.com>
+References: <20230629155433.4170837-1-dhowells@redhat.com> <20230629155433.4170837-2-dhowells@redhat.com>
  <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
- <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name>
- <CAJfpegvq4M_Go7fHiWVBBkrK6h4ChLqQTd0+EOKbRWZDcVerWA@mail.gmail.com>
- <ZLg9HbhOVnLk1ogA@casper.infradead.org>
- <CAHk-=wiq95bWiWLyz96ombPfpy=PNrc2KKyzJ2d+WMrxi6=OVA@mail.gmail.com>
- <6609f1b8-3264-4017-ac3c-84a01ea12690@mattwhitlock.name>
- <CAHk-=wh7OY=7ocTFY8styG8GgQ1coWxds=b09acHZG4t36OxWg@mail.gmail.com>
-User-Agent: Trojita/v0.7-595-g7738cd47; Qt/5.15.10; xcb; Linux; Gentoo Linux
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MIME_QP_LONG_LINE,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+ <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name> <CAJfpegvq4M_Go7fHiWVBBkrK6h4ChLqQTd0+EOKbRWZDcVerWA@mail.gmail.com>
+ <ZLg9HbhOVnLk1ogA@casper.infradead.org> <CAHk-=wiq95bWiWLyz96ombPfpy=PNrc2KKyzJ2d+WMrxi6=OVA@mail.gmail.com>
+ <6609f1b8-3264-4017-ac3c-84a01ea12690@mattwhitlock.name> <CAHk-=wh7OY=7ocTFY8styG8GgQ1coWxds=b09acHZG4t36OxWg@mail.gmail.com>
+In-Reply-To: <CAHk-=wh7OY=7ocTFY8styG8GgQ1coWxds=b09acHZG4t36OxWg@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 19 Jul 2023 16:48:17 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wguPaB+O0cSZaT-Zi1o+h0FccqL91s7rDokwkruNHE2BQ@mail.gmail.com>
+Message-ID: <CAHk-=wguPaB+O0cSZaT-Zi1o+h0FccqL91s7rDokwkruNHE2BQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after
+ splice() returns
+To: Matt Whitlock <kernel@mattwhitlock.name>
+Cc: Matthew Wilcox <willy@infradead.org>, Miklos Szeredi <miklos@szeredi.hu>, 
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
+	Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>, linux-fsdevel@kvack.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wednesday, 19 July 2023 19:20:32 EDT, Linus Torvalds wrote:
->> On Wednesday, 19 July 2023 16:16:07 EDT, Linus Torvalds wrote:
->>> The *ONLY* reason for splice() existing is for zero-copy.
->>=20
->> The very first sentence of splice(2) reads: "splice() moves data between
->> two file descriptors without copying between kernel address space and user=
-
->> address space." Thus, it is not unreasonable to believe that the point of
->> splice is to avoid copying between user-space and kernel-space.
+On Wed, 19 Jul 2023 at 16:20, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> I'm not at all opposed to clarifying the documentation.
+> If you want "one-copy", what you can do is:
+>
+>  - mmap() the file data (zero copy, not stable yet)
+>
+>  - use "write()" to write the data to the network. This will copy it
+> to the skbs before the write() call returns and that copy makes it
+> stable.
+>
+> Alternatively, if you want to be more than a bit odd, you _can_ do the
+> zero-copy on the write side, by doing
+>
+>  - read the file data (one copy, now it's stable)
+>
+>  - vmsplice() to the kernel buffer (zero copy)
+>
+>  - splice() to the network (zero copy at least for the good cases)
 
-Then that is my request. This entire complaint/discussion/argument would=20
-have been avoided if splice(2) had contained a sentence like this one from=20=
+Actually, I guess technically there's a third way:
 
-sendfile(2):
+ - mmap the input (zero copy)
 
-"If out_fd refers to a socket or pipe with zero-copy support, callers must=20=
+ - write() to a pipe (one copy)
 
-ensure the transferred portions of the file referred to by in_fd remain=20
-unmodified until the reader on the other end of out_fd has consumed the=20
-transferred data."
+ - splice() to the network (zero copy)
 
-That is a clear warning of the perils of the implementation under the hood,=20=
+which doesn't seem to really have any sane use cases, but who knows...
+It avoids the user buffer management of the vmsplice() model, and
+while you cannot do anything to the data in user space *before* it is
+stable (because it only becomes stable as it is copied to the pipe
+buffers by the 'write()' system call), you could use "tee()" to
+duplicate the now stable stream and perhaps log it or create a
+checksum after-the-fact.
 
-and it could/should be copied, more or less verbatim, to splice(2).
+Another use-case would be if you want to send the *same* stable stream
+to two different network connections, while still only having one
+copy. You can't do that with plain splice() - because the data isn't
+guaranteed to be stable, and the two network connections might see
+different streams. You can't do that with the 'mmap and then
+write-to-socket' approach, because the two writes not only copy twice,
+they might copy different data.
+
+And while you *can* do it with the "read+vmsplice()" approach, maybe
+the "write to pipe() in order to avoid any user space buffer issues"
+model is better. And "tee()" avoids the overhead of doing multiple
+vmsplice() calls on the same buffer.
+
+I dunno.
+
+What I *am* trying to say is that "splice()" is actually kind of
+designed for people to do these kinds of combinations. But very very
+few people actually do it.
+
+For example, the "tee()" system call exists, but it is crazy hard to
+use, I'm not sure it has ever actually been used for anything real.
+
+               Linus
 
