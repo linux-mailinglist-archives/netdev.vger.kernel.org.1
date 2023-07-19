@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-19081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD62759859
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:29:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9534E75985B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E64728165B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:29:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91901C20C27
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC24D156CB;
-	Wed, 19 Jul 2023 14:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7481E156E7;
+	Wed, 19 Jul 2023 14:29:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A7914004
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:29:41 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C5FD3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695C6156E6
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:29:42 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DEA710B
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:29:40 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-991fe70f21bso930278366b.3
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b95eac836eso7329631fa.3
         for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:29:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689776978; x=1692368978;
+        d=gmail.com; s=20221208; t=1689776979; x=1692368979;
         h=to:cc:date:message-id:subject:mime-version
          :content-transfer-encoding:from:from:to:cc:subject:date:message-id
          :reply-to;
         bh=Z1yyT1jOhSZbFBWg89Bp+RpbP2H6TOxo2NfH1lSH9qs=;
-        b=TohKD6BeyAVbQ2Z4kOTAsvrv/SXAh92a8ON9X4rwD1AH2vsCyxcYHgKaJmVkhhx+Lb
-         MOwbPg4rel3zAoOfGAf9gfRH9L3lQXQvbYaKCpdwGFdY2N7NTvK6MSb0FK74+iHLcMLX
-         0KpJP3ZpEVFvn440RGnoge+mymSfe7Xf/JDGBECqAN7oYMq+txdzxXZaDQoAy9O5wtxB
-         SpK7vFG2MntEqSSE8L8mbs65HvycfJlJh0z5tN1XuNKfrG6bcGpMI3lRbsToF6D1mtKo
-         PdkDBNLB7lsoGlhJO/VcPutDXQ/+dhRXiciwRwBvU43R3iwOkEMF8fycO0dlOc5nrGyX
-         kHhw==
+        b=Yj3Ejlg/zgomJhw4T9BCcx2iwIBsMWKCy4fNrMD6o0lqMEFH7aXaHX/0XiI7ZTY54x
+         Y0dvCIja0Y/bGrOQxscRtuedd6Zc0M4+VATLaMIS+D/qvcxrtWZgxQJU7SMJ8W0zd55O
+         mx/JM/Y9FagTQLbPasyf4usz5S4aXKnD5Ix4Y6OO1XTNsPoLEQsf/IDPO/4Btm2xEYgE
+         O3ieo3+d44jb/CUJIeR9gUK933H5HPxFIKqv+g8I0oonZ/cROQXYV0PdWkKBP4X+3sh1
+         lHJ5NYaYN9FG8ycpybFhmLR0+eihkiyJPOmaC7+EII+3df0nB34jIjvBpiuzlc4y6JMu
+         UC9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689776978; x=1692368978;
+        d=1e100.net; s=20221208; t=1689776979; x=1692368979;
         h=to:cc:date:message-id:subject:mime-version
          :content-transfer-encoding:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
         bh=Z1yyT1jOhSZbFBWg89Bp+RpbP2H6TOxo2NfH1lSH9qs=;
-        b=hJuPM8wgrV5wQS7FE2CHy8lu8qN7VXugMq08Hq2Kg4GlxWG4yJ0HgnNsyfGNrIrPBl
-         EQw44K9uVbPYWwlP8LgvahR3o9QA1K1QWWSb0QnCZPR50IFN9kGoqQvxZ0LCkfuY14VO
-         vrKoasYtOAwRaOhnEIIwfKorcbDuD8H9ZTRvnbcPPB5RJ9BXStKPATtZgyBCSdwpUFRT
-         6hQ43owNo+95PoGu9wVY78V6VlPmtsXXHrVQL1B5nNlYLLZQ7Egz7eEaQW2akhIUqYy9
-         cU67q8jg7FjM/3jHCs6JxE09EIHdFZ4u+A3VHhYWWmsC1ffn/JJUP5oAG8ZoU3zuZyj4
-         MtUg==
-X-Gm-Message-State: ABy/qLa5nI2l+qpqifRr940QqjGKZjMndj4GkO+nMB+k294q4zalKhRV
-	8kiTbUiw8QRVsu0a3EIHLUw=
-X-Google-Smtp-Source: APBJJlGi9COPub/HIdy+b8t61WaahZHGeewmK/7EPWF0+MRritic7NNKW22mELMl8DQKhsso3duG7A==
-X-Received: by 2002:a17:906:280e:b0:988:f93:32e8 with SMTP id r14-20020a170906280e00b009880f9332e8mr2464471ejc.26.1689776978441;
+        b=WZWfg2NHuKfZKrxyAVMbwMWocTpUAr/dUd/97FfFyWKISVEBrX3Wwm285ESV0Olo5e
+         EA42C8waKYrvtj21EYQxx4dHUR7ijloWqE02h5XUiKPo0wFlCBf//go35S74/sgQo8WQ
+         y2uTnaTSX8ZRUN5bVnuUE2lKjwVpVOdUsLgAKhA+AtjSHg/9KACo2od6+7XXOM/muWZR
+         8Fk8oJa7h3EVBbetrFLscnOQY3P4QmncZ84tajfucejBiJc7dCHlKHfiGNYWmr9cXCtS
+         mvxQMUJgFbVt+OjCLu4dZlqIcAHdFburjUHmMWVlo912etTC78KI3BZ7vWxE83QX1zsk
+         j3zA==
+X-Gm-Message-State: ABy/qLYOndlMPBIhf4f/qHUBbpeGXycN3tCxs4s38xQU4H1/RWe+UwWB
+	rp3uPMY6XWve9KnfUsJexNVEEu28G/tbxQ==
+X-Google-Smtp-Source: APBJJlEM0Rp9KAtQIkRYBaDejZNNoN9j0ph2GypTGnXc0CcJSA4/rlOQQxfnzXRdk9VxL6BLAQk5bg==
+X-Received: by 2002:a2e:9c82:0:b0:2b6:d2c5:4d54 with SMTP id x2-20020a2e9c82000000b002b6d2c54d54mr54037lji.18.1689776978576;
         Wed, 19 Jul 2023 07:29:38 -0700 (PDT)
 Received: from smtpclient.apple ([178.254.237.20])
-        by smtp.gmail.com with ESMTPSA id rp25-20020a170906d97900b009786ae9ed50sm2414978ejb.194.2023.07.19.07.29.37
+        by smtp.gmail.com with ESMTPSA id a25-20020a17090682d900b009829d2e892csm2452592ejy.15.2023.07.19.07.29.37
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
         Wed, 19 Jul 2023 07:29:38 -0700 (PDT)
 From: Martin Zaharinov <micron10@gmail.com>
@@ -81,7 +81,8 @@ X-Mailer: Apple Mail (2.3731.600.7)
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
 	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
