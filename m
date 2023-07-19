@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-18997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5393B759479
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:41:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E48CE75947A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BC802817E4
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:41:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CF9C281797
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBA713ACA;
-	Wed, 19 Jul 2023 11:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D7A1428E;
+	Wed, 19 Jul 2023 11:40:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0CD14274
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3513A14274
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:40:14 +0000 (UTC)
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D331FFC
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:39:53 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626BD211D
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:39:55 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out2.suse.de (Postfix) with ESMTP id C12051FEB3;
+	by smtp-out2.suse.de (Postfix) with ESMTP id C4A771FEB4;
 	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1689766720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=b6jtiezrHbpPbHdDJAQk+MY/BXvcSOqXXZBiE03yA8s=;
-	b=i6dHIDC1P8dXm4raN+9ug2bYvOg0HUsi6A4/TZjO7NdhbJN5RRBtF2rt7VIB3sNQIhshqw
-	+K62c050L+EYL3Y8i4G081iqpc8HzM58ZjFr6MrQ0SRNPxmO3r3AmjSPKBrqzoa+r+KIva
-	splwbIvVAJNepKHmhFSeRU1Dj4GmSRk=
+	bh=XIMcA8z+WBKAkW13YsjUtCNEo27aVXFivONyOXhQiIk=;
+	b=wgC8KlUx2p1MRO1EQJmo7DboJYYV+64f5zch53knWhIRXboah2DBps4OzwDIzKCuOdTRl1
+	EgRo2ivoqSPqdI4rP+48V1mu8Hkdsyzu0eqXDdQHVcXIDv2FAg0a3Lf7e5XLSsIUoqB6xO
+	FE1AAb4Bm5gDqdPhWzpSAL4QsGZ3JGE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1689766720;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=b6jtiezrHbpPbHdDJAQk+MY/BXvcSOqXXZBiE03yA8s=;
-	b=B1FMkEpFBFl/GVgW1AGeHoki7FpKax3Zf33QYpUxlWPGgfNBltCl2gkxo+Q1NSR1mAd0Tv
-	cN10bXhwZCuCoaAA==
+	bh=XIMcA8z+WBKAkW13YsjUtCNEo27aVXFivONyOXhQiIk=;
+	b=A0yXHFfdwtQO+H8N5G0NvbQKNhC1qdH49VK3TQtix5IBEAfiFilp7a92IzWpEL+w9o6m7I
+	Bpwx3lSRB/jfKrDw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id A99A82C145;
+	by relay2.suse.de (Postfix) with ESMTP id AF37C2C146;
 	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id 9C9C951C9ECF; Wed, 19 Jul 2023 13:38:40 +0200 (CEST)
+	id A2C1D51C9ED1; Wed, 19 Jul 2023 13:38:40 +0200 (CEST)
 From: Hannes Reinecke <hare@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>,
@@ -57,9 +57,9 @@ Cc: Sagi Grimberg <sagi@grimberg.me>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 2/6] net/tls: handle MSG_EOR for tls_device TX flow
-Date: Wed, 19 Jul 2023 13:38:32 +0200
-Message-Id: <20230719113836.68859-3-hare@suse.de>
+Subject: [PATCH 3/6] selftests/net/tls: add test for MSG_EOR
+Date: Wed, 19 Jul 2023 13:38:33 +0200
+Message-Id: <20230719113836.68859-4-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230719113836.68859-1-hare@suse.de>
 References: <20230719113836.68859-1-hare@suse.de>
@@ -77,38 +77,37 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-tls_push_data() MSG_MORE, but bails out on MSG_EOR.
-Seeing that MSG_EOR is basically the opposite of MSG_MORE
-this patch adds handling MSG_EOR by treating it as the
-absence of MSG_MORE.
-Consequently we should return an error when both are set.
+As the recent patch is modifying the behaviour for TLS re MSG_EOR
+handling we should be having a test for it.
 
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
 Signed-off-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- net/tls/tls_device.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/tls.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 2021fe557e50..5df18f696d7f 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -441,9 +441,13 @@ static int tls_push_data(struct sock *sk,
- 	long timeo;
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index a3c57004344c..4b63708c6a81 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -486,6 +486,17 @@ TEST_F(tls, msg_more_unsent)
+ 	EXPECT_EQ(recv(self->cfd, buf, send_len, MSG_DONTWAIT), -1);
+ }
  
- 	if (flags &
--	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SPLICE_PAGES))
-+	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
-+	      MSG_SPLICE_PAGES | MSG_EOR))
- 		return -EOPNOTSUPP;
- 
-+	if ((flags & (MSG_MORE | MSG_EOR)) == (MSG_MORE | MSG_EOR))
-+		return -EINVAL;
++TEST_F(tls, msg_eor)
++{
++	char const *test_str = "test_read";
++	int send_len = 10;
++	char buf[10];
 +
- 	if (unlikely(sk->sk_err))
- 		return -sk->sk_err;
- 
++	EXPECT_EQ(send(self->fd, test_str, send_len, MSG_EOR), send_len);
++	EXPECT_EQ(recv(self->cfd, buf, send_len, MSG_WAITALL), send_len);
++	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
++}
++
+ TEST_F(tls, sendmsg_single)
+ {
+ 	struct msghdr msg;
 -- 
 2.35.3
 
