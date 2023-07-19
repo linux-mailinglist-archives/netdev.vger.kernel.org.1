@@ -1,140 +1,108 @@
-Return-Path: <netdev+bounces-19110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A28759C31
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:14:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF73759C3E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:18:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B5672819C0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:14:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1984028198C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0031FB44;
-	Wed, 19 Jul 2023 17:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596E51FB44;
+	Wed, 19 Jul 2023 17:18:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134151FB42
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 17:14:20 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D9F172E
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:14:18 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-516500163b2so425a12.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689786857; x=1692378857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kflaIto2ZRy9FWnKKeA2RV1so53nf9Q2TlLkLWYnNhM=;
-        b=7jt8a5ZQWinJTMLOsw76Ptd82nTpItUAmde9SVR7wLXITm2emnqVMqRjtd/0cT2Ocy
-         +g/b0COH/UoOS1SiDsnu6P9dn+S7qwCBEmvhjNsDWyx58HOsfS1rYJS+P4pNZYh5ls6j
-         YxonkfEkWc/zBUjIS5fSAkYJzxGaxBS4sfEA9iUbn/Uxo6bH3RJ/5m4pQ27F1P1VEpEf
-         AsvOsmek2U4OIi0U5mccr9RVZzSvn4w/Q8RwzJgXXMNwdR2KLUH/UybanHexn6gg1lTZ
-         73eM3Rz3Kl4PVhQGK4h2QlmPtrI0+CHdTlDbkEwySFMcGYvRvVbzLqN4MK+YAbERJQdE
-         hX4A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAFB17F6
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 17:18:55 +0000 (UTC)
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFBD189;
+	Wed, 19 Jul 2023 10:18:53 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-52166c7f77cso8685885a12.2;
+        Wed, 19 Jul 2023 10:18:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689786857; x=1692378857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kflaIto2ZRy9FWnKKeA2RV1so53nf9Q2TlLkLWYnNhM=;
-        b=M4IXrGOhHajCHCydlBz/AC7zTNd1Xm0KXNl+1pqr6SPatF2/rPLsmbKZfx8KZmkxTm
-         66OLaKGtTi4WhAyJ4l437/x87RY9CS0aqBnyeqMyOf9b8DMq73nMwskOzgoBv6FLxAjb
-         jsGxUPet/IWnKw6h0/yPo1fO2evKQCqpHvNwg8gNJpIyr0s7WGTnpu3dm4WE3ra4OpTe
-         bqvKHitPiv660AZa6b9sEBpOAqlqHJz+Yl9R1hBqF/SJWtvPy5QQPzqM/Vq/DZUfC5hA
-         PQgLm4SnTLELd/B/KXdAG8CslJrvAtwTQkMxCeK5MS2k2Z1TCLR9V62orqLCOnq2cABz
-         UESA==
-X-Gm-Message-State: ABy/qLYSExVfuV1PFys8g7vmmmBAL2orF6itJ+9ZzRNJwe/iOuLtXim6
-	M8JK1QZJTghal2EwAmV2IAAuAaXqARoT4+j1WmZkng==
-X-Google-Smtp-Source: APBJJlGRSF0tEvXGE/is/Qajw4UR5pJnc/wD1guMNvVxbc7T5ofk/LmI5ZFD/CCrOen4zd1SJi9EmJc0BviY3nDh0Ak=
-X-Received: by 2002:a50:d783:0:b0:506:b280:4993 with SMTP id
- w3-20020a50d783000000b00506b2804993mr1169edi.2.1689786857109; Wed, 19 Jul
- 2023 10:14:17 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689787132; x=1692379132;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HJ8zyPA28H2PBLz8lr4+2NlPFh5DMTLYGFS9mgafKcY=;
+        b=EdmHU8N936Tg5yFldrBTh0UBsL6U1yjpXDu+8EdaGEJtcAulimdbkyDbmHUIzsL5/T
+         Z8NQrLkOu6HA+qdYGGriwFa5KOuZzBxRx+JpK664QqO+9AnKHUPlSas7Hya1fsqtPGTD
+         N9xVypkjYvVFsupXiUKKjENvPYFSBRMO6vy8SA3jjC+7jeRBxJHxZbvQzBu935/mfnNR
+         l75p3QHodqDfMZyLZIHtPDtXb7qWsH6Ka3PBGswUgWZ0O7MtZWDG8j0HkYKkyZC3xQhF
+         8IFpt5f7raGa4CB5j+sE6tTLhy44Rw9lthkKrWju+8Wr0Py/qlfbBffBUvHgRRHP7GPK
+         UsPQ==
+X-Gm-Message-State: ABy/qLaQFG54qtG1V1rD6l97CZPsAKtY2vngbjFaeqWmvPAfoOFBBUnM
+	sPPjDgtmbHAf1KdqMKRFkik=
+X-Google-Smtp-Source: APBJJlEOJvQn9kSsZWsRdnFrSThCTxwiUITIx9D1MPZqWcvz6lb1LwjVA9hbY8O/MmLpzg1hUSocNw==
+X-Received: by 2002:a05:6402:1a31:b0:51d:96d2:6578 with SMTP id be17-20020a0564021a3100b0051d96d26578mr3359383edb.28.1689787131622;
+        Wed, 19 Jul 2023 10:18:51 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-017.fbsv.net. [2a03:2880:31ff:11::face:b00c])
+        by smtp.gmail.com with ESMTPSA id k19-20020a05640212d300b00521d1c34b23sm371987edx.83.2023.07.19.10.18.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 10:18:51 -0700 (PDT)
+Date: Wed, 19 Jul 2023 10:18:49 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexander@mihalicyn.com, ast@kernel.org, davem@davemloft.net,
+	dhowells@redhat.com, edumazet@google.com, kernelxing@tencent.com,
+	kuba@kernel.org, leit@meta.com, linux-kernel@vger.kernel.org,
+	lucien.xin@gmail.com, martin.lau@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] net: Use _K_SS_MAXSIZE instead of absolute value
+Message-ID: <ZLga+cBUKkN5Fnn7@gmail.com>
+References: <20230719084415.1378696-1-leitao@debian.org>
+ <20230719170445.30993-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230719170446.GR20457@twin.jikos.cz> <00000000000042a3ac0600da1f69@google.com>
-In-Reply-To: <00000000000042a3ac0600da1f69@google.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Wed, 19 Jul 2023 19:14:05 +0200
-Message-ID: <CANp29Y4Dx3puutrowfZBzkHy1VpWHhQ6tZboBrwq_qNcFRrFGw@mail.gmail.com>
-Subject: Re: [syzbot] [btrfs?] [netfilter?] BUG: MAX_LOCKDEP_CHAIN_HLOCKS too
- low! (2)
-To: syzbot <syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com>
-Cc: dsterba@suse.cz, bakmitopiacibubur@boga.indosterling.com, clm@fb.com, 
-	davem@davemloft.net, dsahern@kernel.org, dsterba@suse.com, fw@strlen.de, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, josef@toxicpanda.com, 
-	kadlec@netfilter.org, kuba@kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com, yoshfuji@linux-ipv6.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,PLING_QUERY,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719170445.30993-1-kuniyu@amazon.com>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 7:11=E2=80=AFPM syzbot
-<syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com> wrote:
->
-> > On Wed, Jul 19, 2023 at 02:32:51AM -0700, syzbot wrote:
-> >> syzbot has found a reproducer for the following issue on:
-> >>
-> >> HEAD commit:    e40939bbfc68 Merge branch 'for-next/core' into for-ker=
-nelci
-> >> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/li=
-nux.git for-kernelci
-> >> console output: https://syzkaller.appspot.com/x/log.txt?x=3D15d92aaaa8=
-0000
-> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dc4a2640e42=
-13bc2f
-> >> dashboard link: https://syzkaller.appspot.com/bug?extid=3D9bbbacfbf1e0=
-4d5221f7
-> >> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for =
-Debian) 2.40
-> >> userspace arch: arm64
-> >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D149b2d66=
-a80000
-> >> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1214348aa8=
-0000
-> >>
-> >> Downloadable assets:
-> >> disk image: https://storage.googleapis.com/syzbot-assets/9d87aa312c0e/=
-disk-e40939bb.raw.xz
-> >> vmlinux: https://storage.googleapis.com/syzbot-assets/22a11d32a8b2/vml=
-inux-e40939bb.xz
-> >> kernel image: https://storage.googleapis.com/syzbot-assets/0978b5788b5=
-2/Image-e40939bb.gz.xz
-> >
-> > #syz unset btrfs
->
-> The following labels did not exist: btrfs
+On Wed, Jul 19, 2023 at 10:04:45AM -0700, Kuniyuki Iwashima wrote:
+> From: Breno Leitao <leitao@debian.org>
+> Date: Wed, 19 Jul 2023 01:44:12 -0700
+> > Looking at sk_getsockopt function, it is unclear why 128 is a magical
+> > number.
+> > 
+> > Use the proper macro, so it becomes clear to understand what the value
+> > mean, and get a reference where it is coming from (user-exported API).
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  net/core/sock.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index 9370fd50aa2c..58b6f00197d6 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -1815,7 +1815,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+> >  
+> >  	case SO_PEERNAME:
+> >  	{
+> > -		char address[128];
+> > +		char address[_K_SS_MAXSIZE];
+> 
+> I guess you saw a bug caught by the fortified memcpy(), but this
+> doesn't fix it properly.
 
-#syz set subsystems: netfilter
+Not really, in fact. I was reading this code, and I found this
+discussion a while ago, where I got the idea:
 
->
-> >
-> > The MAX_LOCKDEP_CHAIN_HLOCKS bugs/warnings can be worked around by
-> > configuration, otherwise are considered invalid. This report has also
-> > 'netfilter' label so I'm not closing it right away.
->
-> --
-> You received this message because you are subscribed to the Google Groups=
- "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an=
- email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgi=
-d/syzkaller-bugs/00000000000042a3ac0600da1f69%40google.com.
+https://lore.kernel.org/lkml/20140930.005925.995989898229686123.davem@davemloft.net/
 
