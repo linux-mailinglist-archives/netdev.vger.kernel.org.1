@@ -1,88 +1,107 @@
-Return-Path: <netdev+bounces-18898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A91D3759076
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:40:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8FE759087
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:44:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52452281583
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:40:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 844282815E3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6CBD300;
-	Wed, 19 Jul 2023 08:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677A4D53E;
+	Wed, 19 Jul 2023 08:44:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA53BE40
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:40:16 +0000 (UTC)
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E7510E
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:40:12 -0700 (PDT)
-X-QQ-mid:Yeas48t1689755917t735t43708
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.243.13])
-X-QQ-SSF:00400000000000F0FQF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 3527007509173599446
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: "'Simon Horman'" <simon.horman@corigine.com>,
-	<kabel@kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-References: <043501d9b580$31798870$946c9950$@trustnetic.com> <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com> <ZLUymspsQlJL1k8n@shell.armlinux.org.uk> <013701d9b957$fc66f740$f534e5c0$@trustnetic.com> <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk> <013e01d9b95e$66c10350$344309f0$@trustnetic.com> <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk> <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com> <ZLeHyzsRqxAj4ZGO@shell.armlinux.org.uk> <01b401d9ba16$aacf75f0$006e61d0$@trustnetic.com> <ZLeeZMU4HeiHthQ2@shell.armlinux.org.uk>
-In-Reply-To: <ZLeeZMU4HeiHthQ2@shell.armlinux.org.uk>
-Subject: RE: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Date: Wed, 19 Jul 2023 16:38:36 +0800
-Message-ID: <01b701d9ba1c$691d9fa0$3b58dee0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562673207
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:44:25 +0000 (UTC)
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F3D0FC;
+	Wed, 19 Jul 2023 01:44:23 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3128fcd58f3so6835379f8f.1;
+        Wed, 19 Jul 2023 01:44:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689756261; x=1692348261;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RT28KMZUfUxLqE36E2WVSHWEOsxWuK8+5KaakQzM+v8=;
+        b=YavyBslqvgKfg5jrXB9gxeGsyVgB0y+5VsNNTX6tuEtyQjcs65B8nSLzVMEcagYrGa
+         qWl2HN7tsYelNJvf11eBF5ZFv/a6K2Oe343QEZLK9e27sISimxKq/FAL9ZljQiNn3GJh
+         b6N9+moZWqXRQcahaNbCO2eby3Jc4yoE/qX+9dVedoqiOU8iD/nHsnu6f8CWVp4F5zp2
+         NxPY8nDKVuwVZiVcFUW4lHvi5LvRZaTcGs0SmoWkI4X0ACH5CJXi+R1Dpyhmrcj++hiP
+         mW8HN4Gj0LkPngQQMdCucaAMRXZLuCfkuk35mtio7lM1sR0Hs2HVFmXKHXz4g/Ogh5uJ
+         PZcQ==
+X-Gm-Message-State: ABy/qLaq9cRLwxMkJvIX6RZdK7VRDSDVRV7MC4aGs8d12CaZp237+JHW
+	LdSh6arwDGkAyfyTKMW2N8o=
+X-Google-Smtp-Source: APBJJlF/ywwhKzxGBt1Io0V8KucgEnzbjqfPGnb6QDESp3ONMvIdSj92bog0DWa1BNuxba/gvMaUjA==
+X-Received: by 2002:adf:ee43:0:b0:314:39d0:26f6 with SMTP id w3-20020adfee43000000b0031439d026f6mr14656317wro.18.1689756261248;
+        Wed, 19 Jul 2023 01:44:21 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-005.fbsv.net. [2a03:2880:31ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id k28-20020a5d525c000000b0030ada01ca78sm4688105wrc.10.2023.07.19.01.44.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 01:44:20 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: leit@meta.com,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	David Howells <dhowells@redhat.com>,
+	Jason Xing <kernelxing@tencent.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: Use _K_SS_MAXSIZE instead of absolute value
+Date: Wed, 19 Jul 2023 01:44:12 -0700
+Message-Id: <20230719084415.1378696-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQFMOiuVG72ejxJpQ9dFJOgJWFa94gFjhYqqApkC1W8CGUSlBAG/1/rdAwkAc4UCHFYsuQJ0/BrNAYfQyTgDYvYnlAM9fevwsB8AUxA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wednesday, July 19, 2023 4:27 PM, Russell King (Oracle) wrote:
-> On Wed, Jul 19, 2023 at 03:57:30PM +0800, Jiawen Wu wrote:
-> > > According to this read though (which is in get_mactype), the write
-> > > didn't take effect.
-> > >
-> > > If you place a delay of 1ms after phy_clear_bits_mmd() in
-> > > mv3310_power_up(), does it then work?
-> >
-> > Yes, I just experimented, it works well.
-> 
-> Please send a patch adding it, with a comment along the lines of:
-> 
-> 	/* Sometimes, the power down bit doesn't clear immediately, and
-> 	 * a read of this register causes the bit not to clear. Delay
-> 	 * 1ms to allow the PHY to come out of power down mode before
-> 	 * the next access.
-> 	 */
+Looking at sk_getsockopt function, it is unclear why 128 is a magical
+number.
 
-After multiple experiments, I determined that the minimum delay it required
-is 55us. Does the delay need to be reduced? But I'm not sure whether it is
-related to the system. I use udelay(55) in the test.
+Use the proper macro, so it becomes clear to understand what the value
+mean, and get a reference where it is coming from (user-exported API).
 
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9370fd50aa2c..58b6f00197d6 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1815,7 +1815,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 
+ 	case SO_PEERNAME:
+ 	{
+-		char address[128];
++		char address[_K_SS_MAXSIZE];
+ 
+ 		lv = sock->ops->getname(sock, (struct sockaddr *)address, 2);
+ 		if (lv < 0)
+-- 
+2.34.1
 
 
