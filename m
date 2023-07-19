@@ -1,105 +1,275 @@
-Return-Path: <netdev+bounces-19136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A308C759D58
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:32:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59BD6759D5C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EC29281935
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:32:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10DB5281A1D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94A324C40;
-	Wed, 19 Jul 2023 18:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A43275C4;
+	Wed, 19 Jul 2023 18:32:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6917F3D3B2
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:31:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAB7C433C8;
-	Wed, 19 Jul 2023 18:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91642721F
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:32:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE7AAC433C7;
+	Wed, 19 Jul 2023 18:32:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689791490;
-	bh=1DccyJH/V5mxxc3FHyGNfZqC5N/PPxlYjCJJzbgu52I=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=ruExub29BrFO6myWNunbMqMxyX4SlXG5DR+7Rt2l9rusjMekSHuulCtVlWjQBFtrQ
-	 5l5y7pLVfXaWpgLbC1hDfP4uQVGCmir09oQ2mp3nQXySlqwM2xbmPTn/ByLoSI/dzR
-	 BoHcBygdEsGJ2lzDebCPEyVDOAmofvINtQyDod9YKrb0KC3DFohGKY4hLwisP+f0Lr
-	 m9m8f74PYn+E3r01xDzEIVlzPjh4/kCexJuBj5wu2EAKNGn83QitqvWuxtQy3YRTB1
-	 gHimkPj1UwsQblOqhTJ0N1WmPbM/Ii2FrxkNXRX6QwJsnfu9PcfDeYrK/LGulNXLzQ
-	 ++GcQBWjDNyPw==
-Subject: [PATCH v3 5/5] SUNRPC: Reduce thread wake-up rate when receiving
- large RPC messages
-From: Chuck Lever <cel@kernel.org>
-To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org
-Cc: Chuck Lever <chuck.lever@oracle.com>, dhowells@redhat.com
-Date: Wed, 19 Jul 2023 14:31:29 -0400
-Message-ID: 
- <168979148906.1905271.2650584507923874010.stgit@morisot.1015granger.net>
-In-Reply-To: 
- <168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net>
-References: 
- <168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net>
-User-Agent: StGit/1.5
+	s=k20201202; t=1689791548;
+	bh=02JA6SkAO5tb/bQLVN69V1D7RvNYxrFjl5FAn2THwks=;
+	h=From:To:Cc:Subject:Date:From;
+	b=im8hRfNOnC0hwryWeGeDvCmXc0nVuTotByOq7M/Lbz6nxJKqsV8n/Q0CzPfEydmz1
+	 9Z38Hi91xyDjaJkVWaaoJWDaa4B/3S3zgAihNG1lSPURXm/z5AaMR0xtu56Y4EQk71
+	 ZVX7smAIr8YjveapNQjCegook5hE1qn6kq6prctR60/fHdiyXre5xivHv8dpYVkapV
+	 Cw+kBuI3j9IEslVVGRTUig0WgsJqP328L2OK3Hdw6SUHx8fimpE1WNkCDwTeKizBWV
+	 QDxRILCSg16v5WSkOX0r0WSg3ntU06+5aTBwPCrTHxP3IZuzULoimdndTOX/+vpvzS
+	 83NtaEJwFmZDA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: corbet@lwn.net
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux@leemhuis.info,
+	kvalo@kernel.org,
+	benjamin.poirier@gmail.com
+Subject: [PATCH docs v3] docs: maintainer: document expectations of small time maintainers
+Date: Wed, 19 Jul 2023 11:32:25 -0700
+Message-ID: <20230719183225.1827100-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-From: Chuck Lever <chuck.lever@oracle.com>
+We appear to have a gap in our process docs. We go into detail
+on how to contribute code to the kernel, and how to be a subsystem
+maintainer. I can't find any docs directed towards the thousands
+of small scale maintainers, like folks maintaining a single driver
+or a single network protocol.
 
-With large NFS WRITE requests on TCP, I measured 5-10 thread wake-
-ups to receive each request. This is because the socket layer
-calls ->sk_data_ready() frequently, and each call triggers a
-thread wake-up. Each recvmsg() seems to pull in less than 100KB.
+Document our expectations and best practices. I'm hoping this doc
+will be particularly useful to set expectations with HW vendors.
 
-Have the socket layer hold ->sk_data_ready() calls until the full
-incoming message has arrived to reduce the wake-up rate.
-
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/sunrpc/svcsock.c |   12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+v3:
+ - clarify that mailings list in addition to humans is fine (Mark)
+ - reword the "review from one maintainer is enough" (Benjamin)
+ - grammar fixes (Benjamin, Shannon)
+ - typos (Andrew, Shannon)
+v2: https://lore.kernel.org/all/20230718155814.1674087-1-kuba@kernel.org/
+ - use Thorsten's wording for bug fixing requirements
+ - put more words into the review/response timeline expectations
+v1: https://lore.kernel.org/all/20230713223432.1501133-1-kuba@kernel.org/
 
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 7b7358908a21..36e5070132ea 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1088,6 +1088,9 @@ static void svc_tcp_fragment_received(struct svc_sock *svsk)
- 	/* If we have more data, signal svc_xprt_enqueue() to try again */
- 	svsk->sk_tcplen = 0;
- 	svsk->sk_marker = xdr_zero;
+CC: workflows@vger.kernel.org
+CC: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux@leemhuis.info
+Cc: kvalo@kernel.org
+Cc: benjamin.poirier@gmail.com
+---
+ .../feature-and-driver-maintainers.rst        | 155 ++++++++++++++++++
+ Documentation/maintainer/index.rst            |   1 +
+ 2 files changed, 156 insertions(+)
+ create mode 100644 Documentation/maintainer/feature-and-driver-maintainers.rst
+
+diff --git a/Documentation/maintainer/feature-and-driver-maintainers.rst b/Documentation/maintainer/feature-and-driver-maintainers.rst
+new file mode 100644
+index 000000000000..f04cc183e1de
+--- /dev/null
++++ b/Documentation/maintainer/feature-and-driver-maintainers.rst
+@@ -0,0 +1,155 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
-+	smp_wmb();
-+	tcp_set_rcvlowat(svsk->sk_sk, 1);
- }
++==============================
++Feature and driver maintainers
++==============================
++
++The term "maintainer" spans a very wide range of levels of engagement
++from people handling patches and pull requests as almost a full time job
++to people responsible for a small feature or a driver.
++
++Unlike most of the chapter, this section is meant for the latter (more
++populous) group. It provides tips and describes the expectations and
++responsibilities of maintainers of a small(ish) section of the code.
++
++Drivers and alike most often do not have their own mailing lists and
++git trees but instead send and review patches on the list of a larger
++subsystem.
++
++Responsibilities
++================
++
++The amount of maintenance work is usually proportional to the size
++and popularity of the code base. Small features and drivers should
++require relatively small amount of care and feeding. Nonetheless
++when the work does arrive (in form of patches which need review,
++user bug reports etc.) it has to be acted upon promptly.
++Even when a particular driver only sees one patch a month, or a quarter,
++a subsystem could well have a hundred such drivers. Subsystem
++maintainers cannot afford to wait a long time to hear from reviewers.
++
++The exact expectations on the response time will vary by subsystem.
++The patch review SLA the subsystem had set for itself can sometimes
++be found in the subsystem documentation. Failing that as a rule of thumb
++reviewers should try to respond quicker than what is the usual patch
++review delay of the subsystem maintainer. The resulting expectations
++may range from two working days for fast-paced subsystems (e.g. networking)
++to as long as a few weeks in slower moving parts of the kernel.
++
++Mailing list participation
++--------------------------
++
++Linux kernel uses mailing lists as the primary form of communication.
++Maintainers must be subscribed and follow the appropriate subsystem-wide
++mailing list. Either by subscribing to the whole list or using more
++modern, selective setup like
++`lei <https://people.kernel.org/monsieuricon/lore-lei-part-1-getting-started>`_.
++
++Maintainers must know how to communicate on the list (plain text, no invasive
++legal footers, no top posting, etc.)
++
++Reviews
++-------
++
++Maintainers must review *all* patches touching exclusively their drivers,
++no matter how trivial. If the patch is a tree wide change and modifies
++multiple drivers - whether to provide a review is left to the maintainer.
++
++When there are multiple maintainers for a piece of code an ``Acked-by``
++or ``Reviewed-by`` tag (or review comments) from a single maintainer is
++enough to satisfy this requirement.
++
++If the review process or validation for a particular change will take longer
++than the expected review timeline for the subsystem, maintainer should
++reply to the submission indicating that the work is being done, and when
++to expect full results.
++
++Refactoring and core changes
++----------------------------
++
++Occasionally core code needs to be changed to improve the maintainability
++of the kernel as a whole. Maintainers are expected to be present and
++help guide and test changes to their code to fit the new infrastructure.
++
++Bug reports
++-----------
++
++Maintainers must ensure severe problems in their code reported to them
++are resolved in a timely manner: regressions, kernel crashes, kernel warnings,
++compilation errors, lockups, data loss, and other bugs of similar scope.
++
++Maintainers furthermore should respond to reports about other kinds of
++bugs as well, if the report is of reasonable quality or indicates a
++problem that might be severe -- especially if they have *Supported*
++status of the codebase in the MAINTAINERS file.
++
++Selecting the maintainer
++========================
++
++The previous section described the expectations of the maintainer,
++this section provides guidance on selecting one and describes common
++misconceptions.
++
++The author
++----------
++
++Most natural and common choice of a maintainer is the author of the code.
++The author is intimately familiar with the code, so it is the best person
++to take care of it on an ongoing basis.
++
++That said, being a maintainer is an active role. The MAINTAINERS file
++is not a list of credits (in fact a separate CREDITS file exists),
++it is a list of those who will actively help with the code.
++If the author does not have the time, interest or ability to maintain
++the code, a different maintainer must be selected.
++
++Multiple maintainers
++--------------------
++
++Modern best practices dictate that there should be at least two maintainers
++for any piece of code, no matter how trivial. It spreads the burden, helps
++people take vacations and prevents burnout, trains new members of
++the community etc. etc. Even when there is clearly one perfect candidate,
++another maintainer should be found.
++
++Maintainers must be human, therefore, it is not acceptable to add a mailing
++list or a group email as a maintainer. Trust and understanding are the
++foundation of kernel maintenance and one cannot build trust with a mailing
++list. Having a mailing list *in addition* to humans is perfectly fine.
++
++Corporate structures
++--------------------
++
++To an outsider the Linux kernel may resemble a hierarchical organization
++with Linus as the CEO. While the code flows in a hierarchical fashion,
++the corporate template does not apply here. Linux is an anarchy held
++together by (rarely expressed) mutual respect, trust and convenience.
++
++All that is to say that managers almost never make good maintainers.
++The maintainer position more closely matches an on-call rotation
++than a position of power.
++
++The following characteristics of a person selected as a maintainer
++are clear red flags:
++
++ - unknown to the community, never sent an email to the list before
++ - did not author any of the code
++ - (when development is contracted) works for a company which paid
++   for the development rather than the company which did the work
++
++Non compliance
++==============
++
++Subsystem maintainers may remove inactive maintainers from the MAINTAINERS
++file. If the maintainer was a significant author or played an important
++role in the development of the code, they should be moved to the CREDITS file.
++
++Removing an inactive maintainer should not be seen as a punitive action.
++Having an inactive maintainer has a real cost as all developers have
++to remember to include the maintainers in discussions and subsystem
++maintainers spend brain power figuring out how to solicit feedback.
++
++Subsystem maintainers may remove code for lacking maintenance.
++
++Subsystem maintainers may refuse accepting code from companies
++which repeatedly neglected their maintainership duties.
+diff --git a/Documentation/maintainer/index.rst b/Documentation/maintainer/index.rst
+index 3e03283c144e..eeee27f8b18c 100644
+--- a/Documentation/maintainer/index.rst
++++ b/Documentation/maintainer/index.rst
+@@ -9,6 +9,7 @@ additions to this manual.
+ .. toctree::
+    :maxdepth: 2
  
- /**
-@@ -1177,10 +1180,17 @@ static int svc_tcp_recvfrom(struct svc_rqst *rqstp)
- 		goto err_delete;
- 	if (len == want)
- 		svc_tcp_fragment_received(svsk);
--	else
-+	else {
-+		/* Avoid more ->sk_data_ready() calls until the rest
-+		 * of the message has arrived. This reduces service
-+		 * thread wake-ups on large incoming messages. */
-+		tcp_set_rcvlowat(svsk->sk_sk,
-+				 svc_sock_reclen(svsk) - svsk->sk_tcplen);
-+
- 		trace_svcsock_tcp_recv_short(&svsk->sk_xprt,
- 				svc_sock_reclen(svsk),
- 				svsk->sk_tcplen - sizeof(rpc_fraghdr));
-+	}
- 	goto err_noclose;
- error:
- 	if (len != -EAGAIN)
-
++   feature-and-driver-maintainers
+    configure-git
+    rebasing-and-merging
+    pull-requests
+-- 
+2.41.0
 
 
