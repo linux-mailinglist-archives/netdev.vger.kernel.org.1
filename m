@@ -1,69 +1,39 @@
-Return-Path: <netdev+bounces-18994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF5C675946D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:40:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163B375947E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B4AA28185B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:40:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4716B1C20EE6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF2E13AC8;
-	Wed, 19 Jul 2023 11:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E255F13AF1;
+	Wed, 19 Jul 2023 11:40:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C122E13AC2
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:39:56 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE91F19B9
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:39:32 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out2.suse.de (Postfix) with ESMTP id D2A921FEB7;
-	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1689766720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o3p0dVCyhrp9NlRfX+MDby+KmQBnRbC+np8nuy9UWz4=;
-	b=rgFTxf1uZIYjP5CixoXM113s0BZKB7c2yhOdFGB3m8x+MCIDHAiaDLOxhL+qV1bq70wFmY
-	rqNvKbJgf51ML5Zef0+E16sxwovAu5MrK8w3T0IyXVCMcfYRk7d3LTFMTjbGybwgrltLHh
-	f1bLc2wlksKAMJoP1L40SklGEE7fVr8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1689766720;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o3p0dVCyhrp9NlRfX+MDby+KmQBnRbC+np8nuy9UWz4=;
-	b=PgrKLJAxYyvsMdAIfu2wHImJ4wk9NRfqBXzG67mYP5RZAsUwzMGN5c4WgOk9/ql7UNbND1
-	bMykg9VrMW11msDg==
-Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id BCC4F2C14E;
-	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
-Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id AFFD451C9ED7; Wed, 19 Jul 2023 13:38:40 +0200 (CEST)
-From: Hannes Reinecke <hare@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	linux-nvme@lists.infradead.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Boris Pismenny <boris.pismenny@gmail.com>
-Subject: [PATCH 6/6] net/tls: implement ->read_sock()
-Date: Wed, 19 Jul 2023 13:38:36 +0200
-Message-Id: <20230719113836.68859-7-hare@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230719113836.68859-1-hare@suse.de>
-References: <20230719113836.68859-1-hare@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19181429E
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:40:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 55A0DC433CA;
+	Wed, 19 Jul 2023 11:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689766820;
+	bh=iW/wY6IXsINxSp0RxmTTr0pltUrRCYnqRAeox/7HdBU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PneJgMLEub3R21CAb+KI8H+VvqtF+a3O1asQyM2qWdp/9HtHRmuG29EE/QWNZvfFb
+	 nN3omiZ+lg5c8XcyIB2UYHAHwlhCG3QOPEk/k1Y/tA9odapjxIR0TTXhsqg88WXyDN
+	 t2z0c/vznM56fptTc0S5OLe5h67a1MfYR60ydWFReKOSAeyI22TgpTaCpBM1mE+lQT
+	 Bc14+Vg8aBJpBdZxHpPwPOvF0VR+9D6USiuqJO1pHnwXVsmHTySXfmy3JPSXUGnq58
+	 NeoPmzhPp/noFbz5NGV81Gq7fr/rMjGuB5bc5vNgdT1M0sgkOZFcueO6kBNO6XX36S
+	 KX4U5SOvehs4A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 342F6E21EFF;
+	Wed, 19 Jul 2023 11:40:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,164 +41,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next v2 0/2][pull request] Intel Wired LAN Driver Updates
+ 2023-07-14 (i40e)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168976682020.23748.8273277474530562675.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Jul 2023 11:40:20 +0000
+References: <20230714201253.1717957-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20230714201253.1717957-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
-Implement ->read_sock() function for use with nvme-tcp.
+Hello:
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Cc: Boris Pismenny <boris.pismenny@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
----
- net/tls/tls.h      |  2 +
- net/tls/tls_main.c |  2 +
- net/tls/tls_sw.c   | 96 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-diff --git a/net/tls/tls.h b/net/tls/tls.h
-index 86cef1c68e03..7e4d45537deb 100644
---- a/net/tls/tls.h
-+++ b/net/tls/tls.h
-@@ -110,6 +110,8 @@ bool tls_sw_sock_is_readable(struct sock *sk);
- ssize_t tls_sw_splice_read(struct socket *sock, loff_t *ppos,
- 			   struct pipe_inode_info *pipe,
- 			   size_t len, unsigned int flags);
-+int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-+		     sk_read_actor_t read_actor);
- 
- int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
- void tls_device_splice_eof(struct socket *sock);
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index b6896126bb92..7dbb8cd8f809 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -962,10 +962,12 @@ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
- 	ops[TLS_BASE][TLS_SW  ] = ops[TLS_BASE][TLS_BASE];
- 	ops[TLS_BASE][TLS_SW  ].splice_read	= tls_sw_splice_read;
- 	ops[TLS_BASE][TLS_SW  ].poll		= tls_sk_poll;
-+	ops[TLS_BASE][TLS_SW  ].read_sock	= tls_sw_read_sock;
- 
- 	ops[TLS_SW  ][TLS_SW  ] = ops[TLS_SW  ][TLS_BASE];
- 	ops[TLS_SW  ][TLS_SW  ].splice_read	= tls_sw_splice_read;
- 	ops[TLS_SW  ][TLS_SW  ].poll		= tls_sk_poll;
-+	ops[TLS_SW  ][TLS_SW  ].read_sock	= tls_sw_read_sock;
- 
- #ifdef CONFIG_TLS_DEVICE
- 	ops[TLS_HW  ][TLS_BASE] = ops[TLS_BASE][TLS_BASE];
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index d0636ea13009..4829d2cb9a7c 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2202,6 +2202,102 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
- 	goto splice_read_end;
- }
- 
-+int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-+		     sk_read_actor_t read_actor)
-+{
-+	struct tls_context *tls_ctx = tls_get_ctx(sk);
-+	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
-+	struct strp_msg *rxm = NULL;
-+	struct tls_msg *tlm;
-+	struct sk_buff *skb;
-+	struct sk_psock *psock;
-+	ssize_t copied = 0;
-+	bool bpf_strp_enabled;
-+	int err, used;
-+
-+	psock = sk_psock_get(sk);
-+	err = tls_rx_reader_acquire(sk, ctx, true);
-+	if (err < 0)
-+		goto psock_put;
-+	bpf_strp_enabled = sk_psock_strp_enabled(psock);
-+
-+	/* If crypto failed the connection is broken */
-+	err = ctx->async_wait.err;
-+	if (err)
-+		goto read_sock_end;
-+
-+	do {
-+		if (!skb_queue_empty(&ctx->rx_list)) {
-+			skb = __skb_dequeue(&ctx->rx_list);
-+			rxm = strp_msg(skb);
-+		} else {
-+			struct tls_decrypt_arg darg;
-+
-+			err = tls_rx_rec_wait(sk, psock, true, true);
-+			if (err <= 0)
-+				goto read_sock_end;
-+
-+			memset(&darg.inargs, 0, sizeof(darg.inargs));
-+			darg.zc = !bpf_strp_enabled && ctx->zc_capable;
-+
-+			rxm = strp_msg(tls_strp_msg(ctx));
-+			tlm = tls_msg(tls_strp_msg(ctx));
-+
-+			/* read_sock does not support reading control messages */
-+			if (tlm->control != TLS_RECORD_TYPE_DATA) {
-+				err = -EINVAL;
-+				goto read_sock_requeue;
-+			}
-+
-+			if (!bpf_strp_enabled)
-+				darg.async = ctx->async_capable;
-+			else
-+				darg.async = false;
-+
-+			err = tls_rx_one_record(sk, NULL, &darg);
-+			if (err < 0) {
-+				tls_err_abort(sk, -EBADMSG);
-+				goto read_sock_end;
-+			}
-+
-+			sk_flush_backlog(sk);
-+			skb = darg.skb;
-+			rxm = strp_msg(skb);
-+
-+			tls_rx_rec_done(ctx);
-+		}
-+
-+		used = read_actor(desc, skb, rxm->offset, rxm->full_len);
-+		if (used <= 0) {
-+			if (!copied)
-+				err = used;
-+			goto read_sock_end;
-+		}
-+		copied += used;
-+		if (used < rxm->full_len) {
-+			rxm->offset += used;
-+			rxm->full_len -= used;
-+			if (!desc->count)
-+				goto read_sock_requeue;
-+		} else {
-+			consume_skb(skb);
-+			if (!desc->count)
-+				skb = NULL;
-+		}
-+	} while (skb);
-+
-+read_sock_end:
-+	tls_rx_reader_release(sk, ctx);
-+psock_put:
-+	if (psock)
-+		sk_psock_put(sk, psock);
-+	return copied ? : err;
-+
-+read_sock_requeue:
-+	__skb_queue_head(&ctx->rx_list, skb);
-+	goto read_sock_end;
-+}
-+
- bool tls_sw_sock_is_readable(struct sock *sk)
- {
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
+On Fri, 14 Jul 2023 13:12:51 -0700 you wrote:
+> This series contains updates to i40e driver only.
+> 
+> Ivan Vecera adds waiting for VF to complete initialization on VF related
+> configuration callbacks.
+> 
+> The following are changes since commit 68af900072c157c0cdce0256968edd15067e1e5a:
+>   gve: trivial spell fix Recive to Receive
+> and are available in the git repository at:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/2] i40e: Add helper for VF inited state check with timeout
+    https://git.kernel.org/netdev/net-next/c/df84f0ce569d
+  - [net-next,v2,2/2] i40e: Wait for pending VF reset in VF set callbacks
+    https://git.kernel.org/netdev/net-next/c/efb6f4a35954
+
+You are awesome, thank you!
 -- 
-2.35.3
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
