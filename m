@@ -1,97 +1,158 @@
-Return-Path: <netdev+bounces-19017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E9C7595CF
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:44:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94AE7595EC
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97FB11C20FB3
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:44:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE402281586
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A557E13AF6;
-	Wed, 19 Jul 2023 12:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F6E14278;
+	Wed, 19 Jul 2023 12:51:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A23614A86
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:44:00 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27742E0
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:43:59 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R5b8G1J1qzrRg0;
-	Wed, 19 Jul 2023 20:43:10 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 19 Jul
- 2023 20:43:54 +0800
-Subject: Re: [RFC PATCH net-next 1/2] net: veth: Page pool creation error
- handling for existing pools only
-To: Liang Chen <liangchen.linux@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <hawk@kernel.org>, <ilias.apalodimas@linaro.org>, <daniel@iogearbox.net>,
-	<ast@kernel.org>, <netdev@vger.kernel.org>
-References: <20230719072907.100948-1-liangchen.linux@gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <dd01d05c-015f-708f-8357-1dd4db15d5de@huawei.com>
-Date: Wed, 19 Jul 2023 20:43:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62B0107B6
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:51:08 +0000 (UTC)
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C919F7
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:51:07 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-401d1d967beso664221cf.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:51:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689771066; x=1690375866;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VH+KY+sAnIU4CzTSsdzOW1eUFr67P+UwIjOHBLtTt8Y=;
+        b=atpWm7LDbJuINpPMbfxDovC79TSP0MoOYkpGFyproz8WtPpNVjEBe161d4wRMkQWmR
+         ygKIOv9tuJttcP99pVlmLDYy6wBVJcVlJJXq6IIiZHyz2KSD/FFJWOCyoV2+ba53rl83
+         8XAKttvnRMTA/A66e+/8G3Wfs5Q2voZVVfQF//EeRSlAd17jzU9xb1eoAb6INPNqGv4b
+         XMFoW0+HwAnodgb/qwB/CbW0Ryaa3RdUC24EI4q5G5m1LwLAXY84KgbXHPolSMR2Vy9h
+         Mqg9mqxHwrRXvmDsOmM59N225V/qEb04jD4Z88WAvk65V0qpK1uhEyqOqLXaTRHqCjMZ
+         WwyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689771066; x=1690375866;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VH+KY+sAnIU4CzTSsdzOW1eUFr67P+UwIjOHBLtTt8Y=;
+        b=A7CLGLp1BELZbJlDKQxbHlDOl13RP9X60wJOfyCuN5KdBZ0ZGNLzMgh2QcjirZ5cA5
+         pGYZGWXnnGro557YQvq9c3CDRhy21DuDpfRdDf2hlxfpTFFOLRXQx+qewUO+Zbo3K8fk
+         2ruBNjbCtAsNpMq/JE7gYtW8PV9fXYIKP0lp8eE0M2AWl+hIhL3sVycq5urxypIjWfBs
+         HD+vxLqXrKUx0wkihYjwhm0T0q1THnuQutApOzF6dOSl5s8TMvC7Gl7kNqODcMwh1+LR
+         mNpezu6Kd7pqLR5TRmyY/FX8pMuWR5IM6vHAiOrb4K6zBJ7AwY7+b87Q26yVzzx3SD3Q
+         8IDw==
+X-Gm-Message-State: ABy/qLbdmwGJ9w7pw/rb32IHhf2EkEIchZeZpS3vLHATLBfzS8IA8Qry
+	vSwjicmHkVOQ8TcN7GGCMvLxc5WUSdPCSP4F5qqitOyhKJ5p9rS+d1eyVETMWew=
+X-Google-Smtp-Source: APBJJlEPYi6VDK59Q6EGVblhbrOoGNp9YlmOWFS99lJccv+OkoCteLAFuvXP3MGpGmny5eei44VtosZYMjdUzEMmiqM=
+X-Received: by 2002:ac8:7dd6:0:b0:403:9572:e37f with SMTP id
+ c22-20020ac87dd6000000b004039572e37fmr574664qte.22.1689771066148; Wed, 19 Jul
+ 2023 05:51:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230719072907.100948-1-liangchen.linux@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230712135520.743211-1-maze@google.com> <ca044aea-e9ee-788c-f06d-5f148382452d@kernel.org>
+ <CANP3RGeR8oKQ=JfRWofb47zt9YF3FRqtemjg63C_Mn4i8R79Dg@mail.gmail.com>
+ <7f295784-b833-479a-daf4-84e4f89ec694@kernel.org> <20230718160832.0caea152@kernel.org>
+ <ZLeHEDdWYVkABUDE@nanopsycho>
+In-Reply-To: <ZLeHEDdWYVkABUDE@nanopsycho>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Wed, 19 Jul 2023 14:50:53 +0200
+Message-ID: <CANP3RGdBM+8yZcCmgrw9LTGUbGNNRD0xAx+hLgQE64wxAyda4g@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6 addrconf: fix bug where deleting a mngtmpaddr
+ can create a new temporary address
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/19 15:29, Liang Chen wrote:
-> The failure handling procedure destroys page pools for all queues,
-> including those that haven't had their page pool created yet. this patch
-> introduces necessary adjustments to prevent potential risks and
-> inconsistency with the error handling behavior.
-> 
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> ---
->  drivers/net/veth.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index 614f3e3efab0..509e901da41d 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -1081,8 +1081,9 @@ static int __veth_napi_enable_range(struct net_device *dev, int start, int end)
->  err_xdp_ring:
->  	for (i--; i >= start; i--)
->  		ptr_ring_cleanup(&priv->rq[i].xdp_ring, veth_ptr_free);
-> +	i = end;
->  err_page_pool:
-> -	for (i = start; i < end; i++) {
-> +	for (i--; i >= start; i--) {
->  		page_pool_destroy(priv->rq[i].page_pool);
->  		priv->rq[i].page_pool = NULL;
+On Wed, Jul 19, 2023 at 8:47=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+> Wed, Jul 19, 2023 at 01:08:32AM CEST, kuba@kernel.org wrote:
+> >On Fri, 14 Jul 2023 08:49:55 -0600 David Ahern wrote:
+> >> > I did consider that and I couldn't quite convince myself that simply
+> >> > removing "|| list_empty()" from the if statement is necessarily corr=
+ect
+> >> > (thus I went with the more obviously correct change).
+> >> >
+> >> > Are you convinced dropping the || list_empty would work?
+> >> > I assume it's there for some reason...
+> >>
+> >> I am hoping Jiri can recall why that part was added since it has the
+> >> side effect of adding an address on a delete which should not happen.
+> >
+> >Did we get stuck here? Jiri are you around to answer?
+>
+> Most probably a bug. But, this is 10 years since the change, I don't
+> remember much after this period. I didn't touch the code since :/
 
-There is NULL checking in page_pool_destroy(),
-priv->rq[i].page_pool is set to NULL here, and the kcalloc()
-in veth_alloc_queues() ensure it is NULL initially, maybe it
-is fine as it is?
+I *think* there might be cases where we want
+  addrconf_prefix_rcv_add_addr() -> manage_tempaddrs(create=3Dfalse)
+to result in the creation of a new temporary address.
 
->  	}
-> 
+Basically the 'create' argument is a boolean with interpretation
+"was managetmpaddr added/created" as opposed to "should a temporary
+address be created"
+
+Think:
+- RA comes in, we create the managetmpaddr, we call
+manage_tempaddrs(create=3Dtrue), a temporary address gets created
+- someone comes in and deletes the temporary address (perhaps by hand?
+or it expires?)
+- another RA comes in, we don't create the managetmpaddr, since it
+already exists, we call manage_tempaddrs(create=3Dfalse),
+  it notices there are no temporary addresses (by virtue of the ||
+list_empty check), and creates a new one.
+
+Note that:
+  #define TEMP_VALID_LIFETIME (7*86400)
+  #define TEMP_PREFERRED_LIFETIME (86400)
+but these are tweakable...
+  $ cat /proc/sys/net/ipv6/conf/*/temp_valid_lft | uniq -c
+     37 604800
+  $ cat /proc/sys/net/ipv6/conf/*/temp_prefered_lft | uniq -c
+     37 86400
+so we could have these be < unsolicited RA frequency.
+(that's probably a bad idea for other reasons... but that's besides the poi=
+nt)
+
+I have similar misgivings about  inet6_addr_modify() -> manage_tempaddrs()
+
+if (was_managetempaddr || ifp->flags & IFA_F_MANAGETEMPADDR) {
+if (was_managetempaddr &&
+!(ifp->flags & IFA_F_MANAGETEMPADDR)) {
+cfg->valid_lft =3D 0;
+cfg->preferred_lft =3D 0;
+}
+manage_tempaddrs(ifp->idev, ifp, cfg->valid_lft,
+cfg->preferred_lft, !was_managetempaddr,
+jiffies);
+}
+
+Here create =3D=3D !was_managetempaddr,
+but technically we can have create =3D=3D false, and yet valid/prefered !=
+=3D 0.
+
+This will be the case if we have inet6_addr_modify() called where
+*both* the before and after state is a managetempaddr.
+Perhaps because the expiration was updated?
+
+Anyway... because of the above I remain unconvinced that just removing
+'|| list_empty' is safe...
 
