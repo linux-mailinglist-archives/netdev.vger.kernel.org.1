@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-18922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 486AD759165
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:19:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3005759169
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02854281672
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:19:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE3AA1C20E52
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A5011C88;
-	Wed, 19 Jul 2023 09:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466E2111A1;
+	Wed, 19 Jul 2023 09:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6596DDDA1
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:19:09 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2129.outbound.protection.outlook.com [40.107.92.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38A4310CC
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:19:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C8E11CB8
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:19:18 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2072f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::72f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 954C59D
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:19:16 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SeH30uaqJ3ZSgXHqfuDUKXtFuHfmtk5a+nP/7Yj7G5mtqKjdZVWvcz4t8OlUN/b7tiK6AFAbTt71qxrjU9ctCWgt7+t2v2TVCEfyfB3kupywF86KI07MurhLYbLLM+BrVEaksEIW+JGU1gCjqzjUM7hlSyOgdHjxbJed/itYJtnO9TeU8bcUwIgeMnMyk62dyglXskWBiCgdg+jrlkmBrD/7JfHwFiXnlmrklOlZRXIRnf+F59S1ZO7B+4eUjBCQ73PAnX1uIV6FP2eWGyPaIl85UuLRovof6F0bqkwXPCm+2PT/AhFi9K4bz6d2WRb3CWKjiXqTqmOvWK8RmeYmNw==
+ b=FYNQXpQzGefo4g6zQqnETaZ8BkASidOTv2XNuvRZKao7o6iKl0HLTmKq4gIWjMDanL00JNERkKHjzwl/hBZ+ogjIXqULeNqoYiOAmOBR4p9pZ3yO1mBD4ui01TPpYaBl7P4PEX2t1rQAubpg6wBwGMMSkK0rbbdMLTZsOsWIaZEnrXamUWh83/+G+ErvoWs/4rc3bbHwXNfbwJQPviOl2pe0bVbnJzXKdloJVe8A7JC4J3u2956Vss1k8BAxvK2ZvVN+dVxsmEiMGNVn40NFf4sHlfjpfvSllDilQ/xb6yOGLeAX+0i4R0C04sZMARrZwjiRKRzYic+s403GgXegkw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6G4rduk9kRLG7wpHItEbNdYmGiU7fRXUjN7AuzkYuCE=;
- b=XT+/Yy8fQDHTJukDQ4foNe6iZfQwWhwfVVcrCnMuKOiQmgexyrJkKpnLVVxJpfm+xB8evlItiAeR+gGBBFUBJMaKyU4KctRfM/BkxMcYcmgiReSQc5y5PUQ+jRfyfF1VviNtWIkfVX2I7AMHHLxzB1odUusChExzcWdx5zIozYdUPt7zea2pUcpV3PfMlZtdKZzf8G1sS4cv6S5UQNy0v/NXlmTtVy2hra8dYW7AYnd0gFbP0dhKeMn1B5FJLeU9fPr+lROFh0tgEGMNwNzw8Z+k34hj4D7+eH4UDLYpD9hnJuS0vBx+xW3mMolL9Rr+96GQ0ROy1tuBOHjn80gVDg==
+ bh=6tcPW8nXDyNsawkfEe7s8eCT9C3xk8JcfDRxJ02hVBk=;
+ b=M+kTH4MdLgpezrwrek6V2HcRdMpOGukYBNpFvE/Dfg+2ZDeqkpXix3s/5kUbrhzvuCqAXnmGnwiMSo2IJD4WcaQi5J6064TVisVGHZ0VaTDpT5vrNiSO8KNCp6Wqja1GQUBa206FO/YgVvE2HehOig3mTmXE6Wrrz77QDmhUelUkRGgX1rLIQlfPghGr77WgaIMzxxkYcehrVEzlyNm0TD8+lee9MgPFdcVNl07wNBsi2JiSsMkzGZI6FzeQZntlw5gdewh7Z7BjfRPAwDObK6e+QgBTNuoLWFBT8guO/DuToSmCHk9ceH2XBjeIyoAs/SJTBLYUJjlH+0MUcUeQNg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6G4rduk9kRLG7wpHItEbNdYmGiU7fRXUjN7AuzkYuCE=;
- b=SmmA1gqiT5NfhzAJIjRT0yJnxuEa0DocZFo8OgJk1+h9r4o/oFy2R2nTBsDfW46ioYQlHZ5L5DQ17E1nxpaiz+nJagArLEoj4Lc8sEklXbkym2RXcIdsS2bLoGFJesBG77QToAufOLUbClxX01RW/CdAb7N24pGe3c/VWXdlYxQ=
+ bh=6tcPW8nXDyNsawkfEe7s8eCT9C3xk8JcfDRxJ02hVBk=;
+ b=iZFtJnB500/d7xNZsmTjZ5yWUt71Rp94uy5eaME+ENkRMQIxSB+oYi8WkN2FqhqkrNGjsY4d1AWfFSqjeMf+n0oaeKmvADaDhPBUX8AXxMFLuM6r/OCo89h8Sj/m05fY+g9+UDYH9O5y2NvX7r9pGSdYVMBDEkQX04GAgvww0EE=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
  SN4PR13MB5661.namprd13.prod.outlook.com (2603:10b6:806:21c::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Wed, 19 Jul
- 2023 09:19:06 +0000
+ 2023 09:19:13 +0000
 Received: from DM6PR13MB4249.namprd13.prod.outlook.com
  ([fe80::c131:407c:3679:b781]) by DM6PR13MB4249.namprd13.prod.outlook.com
  ([fe80::c131:407c:3679:b781%5]) with mapi id 15.20.6609.024; Wed, 19 Jul 2023
- 09:19:06 +0000
+ 09:19:12 +0000
 From: Louis Peens <louis.peens@corigine.com>
 To: David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -58,9 +58,9 @@ Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	Shihong Wang <shihong.wang@corigine.com>,
 	netdev@vger.kernel.org,
 	oss-drivers@corigine.com
-Subject: [PATCH net-next 1/2] xfrm: add the description of CHACHA20-POLY1305 for xfrm algorithm description
-Date: Wed, 19 Jul 2023 11:18:29 +0200
-Message-Id: <20230719091830.50866-2-louis.peens@corigine.com>
+Subject: [PATCH net-next 2/2] nfp: add support CHACHA20-POLY1305 offload for ipsec
+Date: Wed, 19 Jul 2023 11:18:30 +0200
+Message-Id: <20230719091830.50866-3-louis.peens@corigine.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230719091830.50866-1-louis.peens@corigine.com>
 References: <20230719091830.50866-1-louis.peens@corigine.com>
@@ -76,108 +76,139 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|SN4PR13MB5661:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a95c77a-afd0-4285-22d1-08db88393397
+X-MS-Office365-Filtering-Correlation-Id: 198f0c80-6e00-4c4b-c3a9-08db88393712
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	wK1dlFqMSk/5wAcfaH2IJfj/CwKBd3W91ZR3WyqUg7nLWGYRiStEfYMMshmKWAL8qbtuDWiXjfJ+278py+mEMAFyo8sL5LddeWst6eQPEtiv9tDFqhqpcZSozLNWfTzJn+BGzKzl+CnKJMQeibwmrnyymcKzu7REP5uIb0oi5B9/LINzP1XMrxw6LbeJrx1RS/r8WJcSFio0mrFSYxswAZG7NlVzWAp2yqeO7HMR6d7g5RE1NuWL6j7RRKph74zGRe33PnMkx3QbuhWGvaJzjuJw2eAmrYAmAzUfKMOhouDaTQjmmvyzSJfwHN6goGKf97dmUytvIzUgx+b4TNYIVdML6oJoj8xGuIO4Ka1BCdRqvrSJmFojojmRKBffUyKefzZmJ7vI+qUvpsR2gNbYFnu+lKdeNGVcYtFfQnkHnI+hLv4m4G5hmVqzpSYTCAp4jwLUN4Wcbza9M7f166eyHBxcfpdGaY9AWbGJ+ZZBTKthm1fuwF+9UUSBy/wZi50CISCfWGObprJrLFfz9cq5BZAM81XIG6upmYEybNCW9XQ+tig/zlboDy1AsnWvcuyaMUpWgJ1q08sD6P0HYTEL63kALDNdJ0BWDI7v4RwkPxtD9fdE2xaXkw/L8gRNGmA6lFAo2v3ykrxysY/fB2mY9FJgQdbXAyuspFvYPYo2Idk=
+	amWTT/ZTIpCIKuoOG5dNOAHRkwUOp+Iu8/UR9p5zh6VTjqh6qNKRzUKKS2/ywPPWP87+G5uwUsuvpCMRNM0FAvDXQ40yMUcSwklmSHjFe8gyqW+stWC2m8B/8xa0tJsabCPWCl0LwmcqPhIILoSEu/d55d8f54NuixohmfFYXQXEs8/+/6vwZcvnDcaIdUkHmTnIp22Sb5SJ3ZzgblTB0N5v/AhQ95MYPkIrKoPuHsb1If7lhGDMLTmphfK7bxU9sD0ChM6vLJhTCGdQW7LObmaEQUhcwfw2S5xFXBf86f9CscoQSpWBKRQF5ufx+lebD9yaB0ErUHYqAKzywvPFK7yS9QVqFixeblw6q+WaFGIBrZAeG6OAP/WVHHqeZQLhCJaeVLdVQwcuKIwqGEWnAomPlq2R291Mwqc/QkLaU6RqbH18p5h7XvlNn8jTVgZR6Se2+dthEPcIQ0qUHSE7DNppRuURhRU2Wopzfxd2Q3v0221HErvyM4yVePXgAd+QXELddxScR2HCI5wckdOLdVk/ToxcggEiFH5hr+Ts7qKZ1phI2KkOYAK+GN8LwlvhGruRmr+x83gVg+yMFAfhw/0JRw5tNI/+uawKTPSi1Eq/LojomatVRHrvqzQKp/082sJ3w+Lqj9XZZ8lifLckwzX3MtpjzX5ZKcd5+HmEAno=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(366004)(376002)(346002)(136003)(396003)(451199021)(54906003)(478600001)(38100700002)(38350700002)(6666004)(2906002)(86362001)(6486002)(52116002)(66476007)(66556008)(66946007)(4326008)(316002)(83380400001)(6512007)(41300700001)(36756003)(186003)(1076003)(6506007)(26005)(2616005)(8676002)(8936002)(110136005)(5660300002)(107886003)(44832011);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?iEtbUJilaz+rjCgrrUYMO7KNWu7MNKUtvB5YGocvFw2bb4PCPGsYSf815q9z?=
- =?us-ascii?Q?YeIrZI1xU+EdQCEDdlWefJ6Qc78UB67mmepdq4KddqxlbkUBpkBZGhAmdzNJ?=
- =?us-ascii?Q?Bkh19zkBX9KYCmkCI1oq14+nn+dzUcst7DPGuzNczNrs2k3b8r4d+8OsXm+S?=
- =?us-ascii?Q?wySnUSkBcRxY+SKNeHTCUy8OInbdlK1ScTDdHnE6qQjzo78sY5WtTQSlJnuB?=
- =?us-ascii?Q?Aq5jGYYH4625ZphezFlz3GCIdE6U3iuB9rA1NZue0cVA2f3JSOVpJRnj6Ho6?=
- =?us-ascii?Q?FBTzZkujdE+RqO/G2NG4x3c/ypj4sYl2XF7YcSAqNWcIeSbPmbw8V+YsxYfM?=
- =?us-ascii?Q?lJ2zwyjxVz74eKbEI1GKOasUwejpFPvI8yVb8gs/Xwqnm7SymIJYm7t7BydD?=
- =?us-ascii?Q?MEBDWWgaLcul1dLRstM9tk6Vu04ZH03U9pSLp6yorem/y2I2yhGJ7/+Pc10p?=
- =?us-ascii?Q?NLJ4YhSp57JEcytyMDZ6sBFzLpDJkzHRXrD93+a9H89WOS8cGuLyhJKLiAOz?=
- =?us-ascii?Q?HBJkyS8t4qTCKPx8GuIExMoahUXx3ufUPDtWhbP1edIujgcuU//l2KGVMNGT?=
- =?us-ascii?Q?q55gaDGvYL3tl10RQY1MS7XXLgCe991mSL4pQUjNUol7EGshcHKJFBlCFRzm?=
- =?us-ascii?Q?EyQj5sYUHonBy4JgzKA2SlVHlvh/LuvN6gk5RfLrCZizTxtRAjE6NaFiwGsN?=
- =?us-ascii?Q?5wMIhZnTEe58/HfKyCI2d5TGX/c7LNbhgsk8PPPQTVaiMmec6Sn+cKTNYFIu?=
- =?us-ascii?Q?q3em6tmJ/Vn6h6n4PRqRWrTLt3UEFAmpMtfmGxIdzXutclpISvJZwh0dP2/q?=
- =?us-ascii?Q?jvxANWiJrzoWTccxvqRpZsiGq6wyfMu4QUv3iUZOUi3Hb71GFkFkMvdL8OiZ?=
- =?us-ascii?Q?yBtbYYYBNfrrUJ/7CVVhOosRtLS9HlxAgnF/kRcyHGdLDDdM3YfTzB+uOynu?=
- =?us-ascii?Q?ZM2Ul5QhOxPyqNnfIvdLnh9fCjtJHHRPoalcgMJqwBwwGNE8t29HKiJo0fbc?=
- =?us-ascii?Q?PUxkcQ/yptc5XoLGq/GxjZOX/kOutDWpJ7TodGIV6VmWQ9S0QSqM4DstGGzS?=
- =?us-ascii?Q?2h2C4R3PItGGmSHjPVDsexku4BYj5+ShNuIUoyJDENkFC8ixiHT+uttE0bDY?=
- =?us-ascii?Q?sIIhD6EyL1gTu/QNri7xWAIX8e7jpglY+/+xRpCG0nQbGHrBQ1ysgdSXfbGo?=
- =?us-ascii?Q?hudGhX78MOxh5W4UlRstuG6HA+xoSy9LEPIOfNHIpUMn0m0tk0PuBRQ4ZO9A?=
- =?us-ascii?Q?wloFSAUhy52ZJWbe7kWofQSiLbZIg4DNWrvgfQz2xJoRC5tSP7w2lzqwHNcO?=
- =?us-ascii?Q?o7fNC1sN1lRCDkRQqICRhv/LsAtddApkkplJLZvbAs6lOauXOUhDu6vqJk/s?=
- =?us-ascii?Q?pujWw0wCsiiydu1ny5aFYZ5FTboAty0Ppm331nGV+pw0kvUmvBSJ6PQqxos4?=
- =?us-ascii?Q?H16iKXbVe9egYpESc/T2gPZp7TIiQh54Kbp4axcoWjcwQNQSYEgP29iMWCiJ?=
- =?us-ascii?Q?2I0qxLDn0X8BZMSZslmT+6ovU77mTbJj2lgbMBVieR5/kziZy+VMuAa2/KfX?=
- =?us-ascii?Q?GCHxBXBiU53X1XB48nfaApZl14N4FZvTnU0qXTLFw6ZU1pOzKp00uqudgJLb?=
- =?us-ascii?Q?Ww=3D=3D?=
+	=?us-ascii?Q?/DYC0SgoYmU1S9CzKNseD+MEhX4e3xuNyrAAISAKO28ZdEtYtQhr/nDHP0Av?=
+ =?us-ascii?Q?iKyrko0HiQ5kE6aMDodpWxqKZOD+r7qVK5GSZWyPWIUtlYHNICuJTMBhX8Uv?=
+ =?us-ascii?Q?OErEIcG55SbeQbAhggDhKamPlZ9MNQoVm6AcbKGVVtfOvy7LO+Qt6Qh38JYB?=
+ =?us-ascii?Q?aofCCUJm7r0IiYqLN8PX4jpmfG2/PLpgsPYrftYn9pJZW19awvEbzbWgt6Cl?=
+ =?us-ascii?Q?P5CAxAt8MKgG4ylWlOdqcSKpyy/g4SyEq/jvVu6M+S0fj6TGO2ATGWZt3WV8?=
+ =?us-ascii?Q?s07mNcoSEBs07yR5E9MKjePM2eddb07fplkNty0SP2iqay+C+WzE26orNAli?=
+ =?us-ascii?Q?BN8aBFdAMXr6b5BBg1zfvdXGQvmYVs/8N2UtlKTMmVbj5IGf74RtdCrbPStz?=
+ =?us-ascii?Q?Ijz53On6gPMRXHXi71spab2MnIvy9rmLpCtOqWPtGZaPoIhejVI7G2Pq9Rtd?=
+ =?us-ascii?Q?bA9V2YHsRzeNbBdCYNpaGNGrTgAkceJYMNMMOk8zDl5zPtaq3jYUd073IW/V?=
+ =?us-ascii?Q?DtJLb2rQVTmhEyJ/TOEEmC3EHtT0WcPfmzSqN//DuSmtIgwzQPQ5QXVmGSki?=
+ =?us-ascii?Q?vJ2CPf16JQqi1EpoNa9jFZClhwRK2awrSxmImB2qpAbDzmoxa41TN0Uuiyju?=
+ =?us-ascii?Q?aepTp3lyc78i/gMamBmsJq/xu6NNZciIYb7RLJ+ndZ2gcKHtepeaXLcKvRxM?=
+ =?us-ascii?Q?F5jqCoCqRb+qZDoiIR5XYyrPnLQNIkW9QBse3lZL3eCS2pQQ7LsA1l3w7zw6?=
+ =?us-ascii?Q?gzeaSTjvsq0zkF6EXTKcKxg+rq/ygdBvEFRwfCOtezttW4uZJbDfXTjs3q3q?=
+ =?us-ascii?Q?kRELjxrbvgZ8xsj6QjK/51hWkptGPDT8fot7Nbhhp7c7EOoEOfLo9Z13vvM3?=
+ =?us-ascii?Q?iihBEiV+Ef10QyhBK1DNUTkPiD+CucjMRiBT7NSdLc60p7fb+xqj/C/hqkam?=
+ =?us-ascii?Q?z1Pqv/F930XHDdA4tLWT8RoqZpwgUu8nyJQ0+X+2H2QuonlqtKb9J1g5rsLG?=
+ =?us-ascii?Q?wrq74GemLaKgiamuz490vxCulV9dTZbe63WSlyyj2ImVvJ1H1yJ9AsJNLPwb?=
+ =?us-ascii?Q?QaNe95wvk+m1NLMg42Ba0w8DwvN0IQbvgfqnD1a+5VX89r9OklNRn1jA1pO+?=
+ =?us-ascii?Q?U1VseV15X5+vVlnUuC4V71Mr6m840umdrYcPA6aTql3hJaHq4LpNW67ktste?=
+ =?us-ascii?Q?/o2nHffCqBfGADfSpjaGz0mmnphSqIzRq8588HX59wHRPI/WrnAlKY1/Z3ky?=
+ =?us-ascii?Q?Nen4ZaczQ/ZSB/yczTrGqAsTGz2WISjWmGjzPNykalE+U6hW3JmwlhRrDAju?=
+ =?us-ascii?Q?36u5dDfrU5r0cWNtWO4+67f+IQJZaP9NJg8a4vBmzD+2ZHk+q61P3fT6zEiS?=
+ =?us-ascii?Q?bcLIL+fguoqYd484JKWUdE/nQSof3w91vuaZFr2lZEaSxJjE2l/P0QEdcrkR?=
+ =?us-ascii?Q?VkqtB3h6X3ekCIgDpf/O5oFoU+FSGP/rRzgkph193GR8TQ2ClQM8KEPGxQGN?=
+ =?us-ascii?Q?CrAtddkD2F5s0WV0bbwSYV/yfv3NSMzC0l56I+pDxRmnZhrPc4Pdi77S82VI?=
+ =?us-ascii?Q?g0xW6haAanZDNOMqU2XqRx7wf/LGlAvTBhKN2DFtaKCQYtEscZcu7V5NyA0E?=
+ =?us-ascii?Q?9A=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a95c77a-afd0-4285-22d1-08db88393397
+X-MS-Exchange-CrossTenant-Network-Message-Id: 198f0c80-6e00-4c4b-c3a9-08db88393712
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 09:19:06.4361
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 09:19:12.2885
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sy0YnPQmHBgZzxUK+DEcF6nBApwNcboJkitJYVmzBhLQdmWt0ZKwGOtXxf4wjSU5wG2PJJiyFyttF1ls7UWEqWH6obDtr7jkNfIodlQyXiI=
+X-MS-Exchange-CrossTenant-UserPrincipalName: m7q+PR6q1n/nqjcAeNHN5+8AYss6ihnHEoRLNoWbCODo6ZsGV+3ukvudA+nSUaMHAVm4oQKc41apOVSXt35wz+p5rFiGMeveobWDDjHJwsA=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5661
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Shihong Wang <shihong.wang@corigine.com>
 
-Add the description of CHACHA20-POLY1305 for xfrm algorithm description
-and set pfkey_supported to 1 so that xfrm supports that the algorithm
-can be offloaded to the NIC.
+Add the configuration of CHACHA20-POLY1305 to the driver and send the
+message to hardware so that the NIC supports the algorithm.
 
 Signed-off-by: Shihong Wang <shihong.wang@corigine.com>
 Acked-by: Simon Horman <simon.horman@corigine.com>
 Signed-off-by: Louis Peens <louis.peens@corigine.com>
 ---
- include/uapi/linux/pfkeyv2.h | 1 +
- net/xfrm/xfrm_algo.c         | 9 ++++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ .../net/ethernet/netronome/nfp/crypto/ipsec.c | 42 +++++++++++++++++--
+ 1 file changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/include/uapi/linux/pfkeyv2.h b/include/uapi/linux/pfkeyv2.h
-index 8abae1f6749c..d0ab530e1069 100644
---- a/include/uapi/linux/pfkeyv2.h
-+++ b/include/uapi/linux/pfkeyv2.h
-@@ -331,6 +331,7 @@ struct sadb_x_filter {
- #define SADB_X_EALG_CAMELLIACBC		22
- #define SADB_X_EALG_NULL_AES_GMAC	23
- #define SADB_X_EALG_SM4CBC		24
-+#define SADB_X_EALG_CHACHA20_POLY1305	25
- #define SADB_EALG_MAX                   253 /* last EALG */
- /* private allocations should use 249-255 (RFC2407) */
- #define SADB_X_EALG_SERPENTCBC  252     /* draft-ietf-ipsec-ciph-aes-cbc-00 */
-diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
-index 094734fbec96..140821e9e840 100644
---- a/net/xfrm/xfrm_algo.c
-+++ b/net/xfrm/xfrm_algo.c
-@@ -167,7 +167,14 @@ static struct xfrm_algo_desc aead_list[] = {
+diff --git a/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c b/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
+index b1f026b81dea..6b8a1874e4fc 100644
+--- a/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
++++ b/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
+@@ -421,12 +421,38 @@ static int nfp_net_xfrm_add_state(struct xfrm_state *x,
+ 			return -EINVAL;
  		}
- 	},
- 
--	.pfkey_supported = 0,
-+	.pfkey_supported = 1,
+ 		break;
++	case SADB_X_EALG_CHACHA20_POLY1305:
++		if (nn->pdev->device != PCI_DEVICE_ID_NFP3800) {
++			NL_SET_ERR_MSG_MOD(extack, "Unsupported encryption algorithm for offload");
++			return -EINVAL;
++		}
++		if (!x->aead) {
++			NL_SET_ERR_MSG_MOD(extack, "Invalid CHACHA20 key data");
++			return -EINVAL;
++		}
++		if (x->aead->alg_icv_len != 128) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "ICV must be 128bit with SADB_X_EALG_CHACHA20_POLY1305");
++			return -EINVAL;
++		}
 +
-+	.desc = {
-+		.sadb_alg_id = SADB_X_EALG_CHACHA20_POLY1305,
-+		.sadb_alg_ivlen = 8,
-+		.sadb_alg_minbits = 256,
-+		.sadb_alg_maxbits = 256
-+	}
- },
- };
++		/* Aead->alg_key_len includes 32-bit salt */
++		if (x->aead->alg_key_len - 32 != 256) {
++			NL_SET_ERR_MSG_MOD(extack, "Unsupported CHACHA20 key length");
++			return -EINVAL;
++		}
++
++		/* The CHACHA20's mode is not configured */
++		cfg->ctrl_word.hash = NFP_IPSEC_HASH_POLY1305_128;
++		cfg->ctrl_word.cipher = NFP_IPSEC_CIPHER_CHACHA20;
++		break;
+ 	default:
+ 		NL_SET_ERR_MSG_MOD(extack, "Unsupported encryption algorithm for offload");
+ 		return -EINVAL;
+ 	}
  
+ 	if (x->aead) {
++		int key_offset = 0;
+ 		int salt_len = 4;
+ 
+ 		key_len = DIV_ROUND_UP(x->aead->alg_key_len, BITS_PER_BYTE);
+@@ -437,9 +463,19 @@ static int nfp_net_xfrm_add_state(struct xfrm_state *x,
+ 			return -EINVAL;
+ 		}
+ 
+-		for (i = 0; i < key_len / sizeof(cfg->ciph_key[0]) ; i++)
+-			cfg->ciph_key[i] = get_unaligned_be32(x->aead->alg_key +
+-							      sizeof(cfg->ciph_key[0]) * i);
++		/* The CHACHA20's key order needs to be adjusted based on hardware design.
++		 * Other's key order: {K0, K1, K2, K3, K4, K5, K6, K7}
++		 * CHACHA20's key order: {K4, K5, K6, K7, K0, K1, K2, K3}
++		 */
++		if (x->props.ealgo == SADB_X_EALG_CHACHA20_POLY1305)
++			key_offset = key_len / sizeof(cfg->ciph_key[0]) >> 1;
++
++		for (i = 0; i < key_len / sizeof(cfg->ciph_key[0]); i++) {
++			int index = (i + key_offset) % (key_len / sizeof(cfg->ciph_key[0]));
++
++			cfg->ciph_key[index] = get_unaligned_be32(x->aead->alg_key +
++								  sizeof(cfg->ciph_key[0]) * i);
++		}
+ 
+ 		/* Load up the salt */
+ 		cfg->aesgcm_fields.salt = get_unaligned_be32(x->aead->alg_key + key_len);
 -- 
 2.34.1
 
