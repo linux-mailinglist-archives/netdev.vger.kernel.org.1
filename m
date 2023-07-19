@@ -1,216 +1,121 @@
-Return-Path: <netdev+bounces-19285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB32B75A2B5
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:20:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8C675A2CE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC01C2818E4
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:20:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9969281865
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D18263A3;
-	Wed, 19 Jul 2023 23:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C1B263A6;
+	Wed, 19 Jul 2023 23:24:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB021BB27
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:20:54 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9639E68
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:20:52 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-986d8332f50so39952166b.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:20:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CA71BB27
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:24:59 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E092101
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:24:54 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-666ecf9a081so126265b3a.2
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:24:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1689808851; x=1692400851;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXADNzZ3eBsdw+cIUAh9/E7CHKbroOI07B9bl0Cc/y4=;
-        b=R0RiCWp9xgiCHGbGQhulpuYYLaFv/6Y/Uf9Do58rXt+8egGWjeDMmb7M0z0x9Hu1Gd
-         eoRDEE+sLmpn877NWU3gafXvLVBe+RP0iwjXEBC0t+ZZpnxSNwu7NTMRUpd+4fxN+NN5
-         gqDGJfWEfb68nww8V8Mj6MXOoFhEfkGh5VZ/s=
+        d=ziepe.ca; s=google; t=1689809094; x=1690413894;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QMBXWfDTfMeBEXpKpdrCux7UOxDUWWDJl0r9KLthi7I=;
+        b=RitoPG5vg2KH92ckG+V7d8L8L9W7M1MBD8JemTd7YYR3fTJrTOVFYtqqXzUnBKMuir
+         5mWALTL5KmWaQJU0sCdTf1pDvm6hLmYvUeYrkwPsO1SZCFet8sGivcjzWo2/jJSQ+69r
+         tWFF5/07XRl/q/8uN+rCYjwQhkZBkDDkJmR7gbwa/MDL9f0w0sZGSvooJmm5Ax+0ioy1
+         H/sOq8DkuI4B9Gm5OL3DqroseeCwVW7yCWj9quaQcgXz/+7NKt05sQF+GJ9/12jWPXZ6
+         8j+EKQKrYcWo0PuWQibJD8tsH5yifa7BtFwNC8Ufe7awQAN0xt48aMlwNrlWN/lcUSoO
+         93QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689808851; x=1692400851;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fXADNzZ3eBsdw+cIUAh9/E7CHKbroOI07B9bl0Cc/y4=;
-        b=fiwCLPdAAz225skrjAJScyFzo98wJpHTi0rZA+zBTEKvmdeUA4O28KUYEL7UtkC1dS
-         wzSPuCqM14gBFM+bQ/TIXL++XsEd2D3tMogxwsrYRyqLi0w4f11aA8Z/2O8046LULB+4
-         kF3SQ1QdKgidWaCLYH8/oWNXpXgLzKRkEUyHIg0MFig8+Q6ZRoWzejWoC2Yr/7CXRb7E
-         sGIpkxi44oGCedRXM98YkzAy7Hmoh/+IU4xAJcEXPTZ8HNJUjC/joastDtd/hNMF8g4Q
-         s2BV/z9HJh4E0shNpwfaUy0OIw9MEUWmxpqlUR2u1c1y/BNuQph05MYB5yLvSBvaS4bv
-         Ttpw==
-X-Gm-Message-State: ABy/qLZvRrQx55FTgv9SbSClX3FX8s527iAea5rBRkmz9CXvJK8eZkfM
-	3xzBuOIc8PjjB2B/LbRmme0pHKVDj/avj8kEdX+hmX7o
-X-Google-Smtp-Source: APBJJlHEfhL29gng5PVAwAZv5wCRmQY9fVSW9spooSM3ZVug7API+Tw394EFT70KTrR0mUSV1RdYmA==
-X-Received: by 2002:a17:906:7791:b0:992:764b:90d5 with SMTP id s17-20020a170906779100b00992764b90d5mr593019ejm.71.1689808851051;
-        Wed, 19 Jul 2023 16:20:51 -0700 (PDT)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id ke8-20020a17090798e800b009920e9a3a73sm2934073ejc.115.2023.07.19.16.20.50
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jul 2023 16:20:50 -0700 (PDT)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-51e57870becso124814a12.2
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:20:50 -0700 (PDT)
-X-Received: by 2002:aa7:d4da:0:b0:521:6d39:7e45 with SMTP id
- t26-20020aa7d4da000000b005216d397e45mr536050edr.31.1689808849578; Wed, 19 Jul
- 2023 16:20:49 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689809094; x=1690413894;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QMBXWfDTfMeBEXpKpdrCux7UOxDUWWDJl0r9KLthi7I=;
+        b=XUqd3lmOeJ+dbDq08dUQ896+fbvM1+9h2V4TJCteWrnZLQaWS/KRK7z16IUWNdD5bh
+         Crz01LsRDtHXyXI5LPKDsTjaa0fYa8gp8+Tv21ofWTOoq3OVCxLQjCItDRB/FVrAGsIH
+         doyIoB7IMXQmV9Zootdib5D74kskh5hxVleWb7X9Qe2+P4Tf3pa2Lg6YmM3AzExYkyYt
+         nejvvhlnhXavm+yRHBq3LI9kxW6y0n9oXdpwW9mUzL6cfDni6PbOlmn7z9Iqm05FISGH
+         VsLHCfrY+J02ZJBn7HqX33/3GiagZlWtsvS6AcaBzG9T9ed+ugnh9SDOGFzdkUXnnft+
+         6RJw==
+X-Gm-Message-State: ABy/qLYQRBNexQ+s+5C/qlVC9TgS2EP0vQLRNt6LcxNAGNGFWY3dqpB/
+	fzxD0zyc5CXjeJUU5eOs2ONr0g==
+X-Google-Smtp-Source: APBJJlF1RVY7gVrV+x6J0pGqg/vEpRGAJ3WpkIaplw7rwOALVicAHlHdlSUsDv1w5+4aog7vtr7zhQ==
+X-Received: by 2002:a05:6a20:840b:b0:126:a80d:4960 with SMTP id c11-20020a056a20840b00b00126a80d4960mr28216893pzd.30.1689809094040;
+        Wed, 19 Jul 2023 16:24:54 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id g23-20020aa78757000000b0067a1f4f4f7dsm3780558pfo.169.2023.07.19.16.24.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 16:24:53 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qMGXL-002tBd-Tt;
+	Wed, 19 Jul 2023 20:24:51 -0300
+Date: Wed, 19 Jul 2023 20:24:51 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	netdev@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [RFC PATCH 00/10] Device Memory TCP
+Message-ID: <ZLhww+P+7zhTTUk7@ziepe.ca>
+References: <12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
+ <CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
+ <ZLbUpdNYvyvkD27P@ziepe.ca>
+ <20230718111508.6f0b9a83@kernel.org>
+ <35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
+ <20230718112940.2c126677@kernel.org>
+ <eb34f812-a866-a1a3-9f9b-7d5054d17609@kernel.org>
+ <20230718154503.0421b4cd@kernel.org>
+ <CAHS8izPORN=r2-hzYSgN4s_Aoo2dnwoJXrU5Hu=43sb8zsWyhQ@mail.gmail.com>
+ <20230719105711.448f8cad@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230629155433.4170837-1-dhowells@redhat.com> <20230629155433.4170837-2-dhowells@redhat.com>
- <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
- <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name> <CAJfpegvq4M_Go7fHiWVBBkrK6h4ChLqQTd0+EOKbRWZDcVerWA@mail.gmail.com>
- <ZLg9HbhOVnLk1ogA@casper.infradead.org> <CAHk-=wiq95bWiWLyz96ombPfpy=PNrc2KKyzJ2d+WMrxi6=OVA@mail.gmail.com>
- <6609f1b8-3264-4017-ac3c-84a01ea12690@mattwhitlock.name>
-In-Reply-To: <6609f1b8-3264-4017-ac3c-84a01ea12690@mattwhitlock.name>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 19 Jul 2023 16:20:32 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wh7OY=7ocTFY8styG8GgQ1coWxds=b09acHZG4t36OxWg@mail.gmail.com>
-Message-ID: <CAHk-=wh7OY=7ocTFY8styG8GgQ1coWxds=b09acHZG4t36OxWg@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after
- splice() returns
-To: Matt Whitlock <kernel@mattwhitlock.name>
-Cc: Matthew Wilcox <willy@infradead.org>, Miklos Szeredi <miklos@szeredi.hu>, 
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
-	Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>, linux-fsdevel@kvack.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719105711.448f8cad@hermes.local>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 19 Jul 2023 at 14:02, Matt Whitlock <kernel@mattwhitlock.name> wrote:
->
-> On Wednesday, 19 July 2023 16:16:07 EDT, Linus Torvalds wrote:
-> > The *ONLY* reason for splice() existing is for zero-copy.
->
-> The very first sentence of splice(2) reads: "splice() moves data between
-> two file descriptors without copying between kernel address space and user
-> address space." Thus, it is not unreasonable to believe that the point of
-> splice is to avoid copying between user-space and kernel-space.
+On Wed, Jul 19, 2023 at 10:57:11AM -0700, Stephen Hemminger wrote:
 
-I'm not at all opposed to clarifying the documentation.
+> Naive idea.
+> Would it be possible for process to use mmap() on the GPU memory and then
+> do zero copy TCP receive some how? Or is this what is being proposed.
 
-But I *am* very much against changing existing semantics. People rely
-on it. The networking layer knows about it. The whole design is all
-around "copy by reference".
+It could be possible, but currently there is no API to recover the
+underlying dmabuf from the VMA backing the mmap.
 
-And changing existing semantics would not only slow things down, it
-wouldn't even *fix* anything that got this wrong. They'd still be
-broken on old kernels.
+Also you can't just take arbitary struct pages from any old VMA and
+make them "netmem"
 
-When documentation and reality collide, documentation loses. That's
-how this works.
-
-> If you use read() and write(), then you're making two copies. If you use
-> splice(), then you're making one copy (or zero, but that's an optimization
-> that should be invisible to the user).
-
-No. It really isn't.
-
-It is an optimization that is INHERENT IN THE INTERFACE and has been
-there literally since day #1. It was *never* invisible. It was the
-*point*.
-
-You getting this use case wrong is not an excuse to change reality. It
-is, at most, a good reason to clarify the documentation.
-
-The "without copying between kernel address space and user address
-space" is about the ability to not copy AT ALL, and yes, let's by all
-means clarify that part.
-
-Really. If you cannot understand this fact, and the fact that you
-simply misunderstood how splice() worked, I can't really help you
-about that.
-
-I repeat: if you want a stable copy of some file data, you *have* to
-copy the file data. There's no magic. There's no difference between
-"copy to user space" or "copy in kernel space". So you had better just
-use "read()".
-
-If you want to avoid the copy, you use one of the interfaces that are
-about references to the data. splice() is not the only such interface.
-mmap() acts the same way (on input).
-
-You really should see splice() into a pipe as a way to 'mmap the data
-without allocating user space backing store".
-
-Of course, splice() *out* of a pipe is different too. It's the same
-system call, but "splice into pipe" and "splice out of pipe" are
-actually very different animals.
-
-So splicing into a pipe is kind of like a small temporary mmap without
-the TLB flush or VM allocation overhead.
-
-But splicing out of the pipe is more akin to "map this buffer into
-your own buffers as long as you don't modify it", so it basically say
-"you can take just a reference to this page" (complexity addition:
-SPLICE_F_GIFT and buffer stealing).
-
-And all of this is literally designed to be able to do zero-copy from
-multiple sources to multiple destinations. Not "sendpage()", which
-could only do file->network, but a more generic ability like having
-data that is sourced from (say) a TV capture card, and is transferred
-to the network or maybe to another accelerator for encoding.
-
-That's why the "pipe" part exists. It's the buffer in between
-arbitrary end points. It's the replacement for a user buffer. But it's
-also literally designed to be all about copy-by-reference.
-
-Really.
-
-So stop arguing. You misused splice(), because you didn't understand
-it, and you got burnt. You don't like that. I get it. But that doesn't
-make splice() wrong. That only made your use of it buggy.
-
-So splice() is for zero-copy. It expects that you either stabilized
-the data somehow (maybe those files are never modified, or maybe you
-have other synchronization) or that you simply don't care whether it's
-stable, and if the file changes, maybe the data you send changed too.
-
-If you want "one-copy", what you can do is:
-
- - mmap() the file data (zero copy, not stable yet)
-
- - use "write()" to write the data to the network. This will copy it
-to the skbs before the write() call returns and that copy makes it
-stable.
-
-Alternatively, if you want to be more than a bit odd, you _can_ do the
-zero-copy on the write side, by doing
-
- - read the file data (one copy, now it's stable)
-
- - vmsplice() to the kernel buffer (zero copy)
-
- - splice() to the network (zero copy at least for the good cases)
-
-and now you just need to make sure that you don't re-use the user
-buffer until the network data has actually been sent. Which makes this
-second alternative much more complicated than the first one, and I'm
-absolutely not recommending it, but I'm mentioning it as a
-possibility.
-
-Honestly, the read/vmsplice/splice model is kind of crazy, but there
-might be real reasons to do it that odd way, and the buffer handling
-in user space is manageable (you might, for example, just decide to
-"munmap()" the buffer after sending it out).
-
-For an example of "why would you ever do that", you might have content
-conversion issues between the read/vmsplice, or need to generate a
-checksum on the stable data or whatever. So it's a *valid* use of
-splice(), but it's certainly a bit odd.
-
-              Linus
+Jason
 
