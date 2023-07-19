@@ -1,188 +1,177 @@
-Return-Path: <netdev+bounces-19058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27500759740
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:44:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA975759772
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98780281828
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:44:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C351B1C20FE1
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9479B13FED;
-	Wed, 19 Jul 2023 13:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717DA13FFA;
+	Wed, 19 Jul 2023 13:54:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8903313FE4
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:44:46 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA03189
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:44:44 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fbc59de009so64137185e9.3
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:44:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689774283; x=1690379083;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DxEa7ZwmbtgvUZmyPwt7LvypfZDgVVCC3R8/YAt2SXA=;
-        b=Ye6BA598dBDYf1XKC40Vlgb6lcjT0j/ASLtOw8IE0Ecnnr7Ri+S4jJwtNlfNxxQMkV
-         VEKymcXNZkZAuFn8Pi4zJOFHNiod6v1LpNqzNRpYccNUxrtL/PiNxN3SINw6+YhimgtN
-         7SOR0TfGR0x3QQl4E+dkdZr8lu1mxT8ScjsRwfqeZhUnrqvcSSPTLN2KlqMXJOTXnDtD
-         3mIkDM0yzj4zCAKar6qoH4tK5CF1W2a4tsDEjP6HvNVXdWe8bFPX1NeA7S9I0soABQBv
-         nMuVZ1wHqp8e8Yyc6488I1/CIJR6O2+LsbJsI/B+MYEHxIShuHAoSnbMzAPXQ8zmdf6G
-         j3/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689774283; x=1690379083;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DxEa7ZwmbtgvUZmyPwt7LvypfZDgVVCC3R8/YAt2SXA=;
-        b=Fc/AgEsCQJ35bPmG7vFOSCEUcCXrSCODy/nyNirZ+yyEb5vXnGtbSBCiwWuTLgQNB1
-         cJZz9ZXZneIbUS4vm9ZOmFnNAzVA1kt5I6CA0GZ03BjE7hZjKK3Sr1DFIQNgskcOXdIo
-         WQUJyTf0pqc8q7hnv509bjJdx7ZhgDFkNQn8qbUuMu3pzJNEg8Ec2G6OaiQQoyKLzaYJ
-         hyT+UG56W+OHoFaqlKvoavccYiLWRp2K4Oi+9QjG8ZzimpyegNg/D0JSeaxQksTwaOdJ
-         7icHECCGmn5erzEpKglCS1IlBfJj8VcbXRpDNrxmHTXAmauN8QFcQLD19gemujrgIVah
-         WM4A==
-X-Gm-Message-State: ABy/qLav2Ltiq9yx7AOV3/ER19R4aRCGDn6HAHCDT0jZaMsGGIdNMbMO
-	7yFkbJEYJoPESaTWpTtduR7Z8A==
-X-Google-Smtp-Source: APBJJlGRAbCaxxekeDgGVO/og5aN4wlb/W1+ZPJxbkKSNWedMnsl46RdKW0o44vi2mkr4L7iQMTUag==
-X-Received: by 2002:a1c:e913:0:b0:3fb:9ef2:157 with SMTP id q19-20020a1ce913000000b003fb9ef20157mr1929582wmc.28.1689774282928;
-        Wed, 19 Jul 2023 06:44:42 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id i2-20020adffc02000000b0030c4d8930b1sm5397706wrr.91.2023.07.19.06.44.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 06:44:40 -0700 (PDT)
-Date: Wed, 19 Jul 2023 16:44:37 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Patrick Rohr <prohr@google.com>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	Linux Network Development Mailing List <netdev@vger.kernel.org>,
-	Patrick Rohr <prohr@google.com>,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>
-Subject: Re: [net-next] net: add sysctl accept_ra_min_rtr_lft
-Message-ID: <8ab106ad-d153-4c3e-8b4a-de4826d29da6@kadam.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F6513FE0
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:54:46 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2048.outbound.protection.outlook.com [40.107.92.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28D012C;
+	Wed, 19 Jul 2023 06:54:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IgsFx/VCNBY6/32u6f89ove6yAvf1f/viZ9tIvKbvx1qqUYJmUyVHJIiniX1Wxo1/xka+V3Xeun7kI7WmL6OxhrlDMR66Lv0Sq31wz0ajqjUnQ1JS1dwRdLN55nBN8SpwR66jUcOCAaaozAjm02RsbhCcArl5e2s6YN9F3H3L0BmvFlx38UbYJ2Vw5PFN/HEZN2M1Pz/WTejGfc2aM/xFd709VAUYDMfuFs7ZtrRQTRUrJl8Revnuma5MMDX1qvGTWZSF1eYZKf+zYsxtlNvJvIqkitz/5vgCFqWAN17DXsANeJwFW+gw4WeowxepV2AqJdEHBNSdX7RIHnZ0mksJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o4laEa9hBnO7FSbSjdE1eon/nVyrJ5D1Yc/0g9elRkY=;
+ b=QqO6bU/iR4LMgDPkSCozO19lvObhPohVF5iRUzqQO+ctjeIuASGcCGwhOUuc+tUAyd+baofwrHAeMvTolFmKaYbjVzGBaV6JJcuoCY1obpXVK9BrdFqbXjaRpqya68yVam85MBJGpYocRqSgoMVTaKu3JqOCcwOZ5BSo2EbUnzu6Gr/Y9fMe4hxNtQoN8BVmlo+dW11TPQxl/nHrvDDHAZ5yI/BU9vq4XZytZejAhD4vrHfHNRcm/jd4UYTZDpZVpg5tyLaZOPLtKi5HZ3SMKjdpNyBFY56C37YdICi8wcoZ4ZGX6hheLhykK+rabf2ccePR7cpnTn4dt1hN2AtpWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o4laEa9hBnO7FSbSjdE1eon/nVyrJ5D1Yc/0g9elRkY=;
+ b=GpmUE2lYytUI693jUsx8OkfzoLujyawi9L09KCgmP3oEZZEw8mwZqWUIWwQs2DqTtJx1GVYzERpuSXtZfpRmCyjBnf47JZ4I96cnIFk5LgZ8moBYMxgCUBfIlz/SkhgSpIaS/WUPtetxWcCYDEjtGhxkZ1NUg60FN6/0ZT0PNh8Q9g5AEEu0b7+SreqvdcWJwOCT/hgK/f+MfCRMKGEVyvg/SMD9UX+apUq4qUdLLppRwvjPRLASNCN8yc7Cv25SaA3vnWK2AN5vLMFa1gReBfnAWYF4Wkl4v23TyeIdsGcHRAIh9+pFIBglYZ9X1c0jASdi6TJ/28h8YgeQ6KDZzQ==
+Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
+ by DS0PR12MB7746.namprd12.prod.outlook.com (2603:10b6:8:135::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Wed, 19 Jul
+ 2023 13:54:41 +0000
+Received: from MN2PR12MB4373.namprd12.prod.outlook.com
+ ([fe80::982f:232b:f4af:29ec]) by MN2PR12MB4373.namprd12.prod.outlook.com
+ ([fe80::982f:232b:f4af:29ec%5]) with mapi id 15.20.6609.022; Wed, 19 Jul 2023
+ 13:54:41 +0000
+From: Benjamin Poirier <bpoirier@nvidia.com>
+To: David Ahern <dsahern@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Shuah Khan
+	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCH net-next 1/4] nexthop: Factor out hash threshold fdb
+ nexthop selection
+Thread-Topic: [PATCH net-next 1/4] nexthop: Factor out hash threshold fdb
+ nexthop selection
+Thread-Index: Adm6SJCO8cVTtOL88kWwn27DbVh5Dw==
+Date: Wed, 19 Jul 2023 13:54:40 +0000
+Message-ID: <ZLfrG3Layt4fUmt8@d3>
+References: <20230529201914.69828-1-bpoirier@nvidia.com>
+ <20230529201914.69828-2-bpoirier@nvidia.com>
+ <d030c097-ac93-eed4-5bdd-11f902b16fca@kernel.org>
+In-Reply-To: <d030c097-ac93-eed4-5bdd-11f902b16fca@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-clientproxiedby: YQBPR01CA0122.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:1::22) To MN2PR12MB4373.namprd12.prod.outlook.com
+ (2603:10b6:208:261::8)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN2PR12MB4373:EE_|DS0PR12MB7746:EE_
+x-ms-office365-filtering-correlation-id: ad7c1b43-51c8-44ae-9994-08db885fb318
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ HcUKgkgIAlkgc/r5GPUAleo1vXbt1oKe7m69OVnD6t0BQwtnOuJbFNfXF7Wu1BXJoAQ3qpmSQzm1nt3Ce2Skl9BpLscVdOEJ26KTmaC4LlXZkbmtf7zmMv+BYFXJtvrGuvoFcejptLrAdqTqXAW4X8IARkJbq4sZYiVcCe83xBpoqLc5ioxP7f6DHgX1mnk7ypMWoOVHTxVvVEhSTyANQRPvwjBI5lZxwTSw/+wQ1iEvsSX6E+8S7x5rdyJ4ZnmEIKUWsNupzHs7wo9KWVGMitGwSTdBZS/0zk85CsEnBljVhKkP1LLkSnsKVC3rFlKbv0oUmVUQcPFult2uX5/9aVaAiFV2Dy+9+yWh1rRsatJ3vQQY9Yn4bPxTGB79xIAd/AVOc5RHQgKO1E5iqWDc/HHizs8bcYGYpjS+3SGAzUFNFu6kIQhwpxWt5MzFsY2cSNqNf2UHArdMwTHlV7b4F3MXYoU/0IgciCrjfXY2oE7aFZF8xmp5S90Cof1gqp1K+UDHkPUBcL0170rXSv1Z4wzbR7ebsLhKKfDHb5qmCer7hwH+ZjM43vQ1TFosurfF
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(366004)(136003)(396003)(39860400002)(376002)(346002)(451199021)(5660300002)(66556008)(66446008)(66476007)(66946007)(54906003)(64756008)(316002)(4326008)(6916009)(8936002)(2906002)(8676002)(41300700001)(71200400001)(66899021)(478600001)(6512007)(9686003)(53546011)(6486002)(107886003)(6506007)(26005)(38100700002)(186003)(122000001)(33716001)(86362001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?5BBLDgzO1Ar2M7JJK36PtPS72N3O3tMnM+IXX/3HiTWNuNX9d5V8Zo2KBHFz?=
+ =?us-ascii?Q?UafhabWm1rsGDNzxtGNrg/tLOv5HP99036MET8BsbVqbkD7TJE8PrUxT3iWg?=
+ =?us-ascii?Q?qUZDtJiYDtVuiAKcog3whmSgkqaA7Z7HCCx+qVcGw8pLg54+Dj3I6+tLpBu6?=
+ =?us-ascii?Q?jvl32Bj6Iph6+9yGlMvxnG7MaEAq+PqAfWt67F8oB7qsoXXhTdlH8fkX/wBj?=
+ =?us-ascii?Q?7FLPYHvsU/skAy250KkaIhcQYtobFazvxu/qQSXKLqystYcl43qGpVHJHmdQ?=
+ =?us-ascii?Q?4saFclmw/ePkn5QBoYkUkB3uuR4mc3JIXbqev7wqgGavilV3cn9UbLxl7qej?=
+ =?us-ascii?Q?/Zprh9GOjqGPZvGlYSxS4Ewj/IFzkl4AkpqTx8Tcs4+FMA4ec+Veo4a0se+r?=
+ =?us-ascii?Q?EVJD+n5g7EsOUoYThSoXasGC7/pLOCjpHY6CdIEmOTtyJttMQ4z9jnvHYHrz?=
+ =?us-ascii?Q?EzVAEWj0VzNCiHvAOdzd3Jz4zqlUhK6w/0qlJGlMekfIe4k3QrjiV5ASbKBF?=
+ =?us-ascii?Q?NbXPt7H7I2RRTz98HXeSywVG3nSeLwlBydTegN2RLD6WpJ+8a72c6kV/OkzC?=
+ =?us-ascii?Q?7kVjYWynz3fJfc2SZ2r6aDbhgZ3GvMb6Dc+biXqBqh8xdv+1hRwu87YLzJcy?=
+ =?us-ascii?Q?A5wylrIkXbTw9HdaDxOybVFJj2suk4JVsgo9UO+EUbAJBag9ggqAR/EEOjhO?=
+ =?us-ascii?Q?aDsM76UnEmKIS7UoYT1h4UeFifhJFbBX3AkMvU8qQa+pqKnwohPy5izrQh/Q?=
+ =?us-ascii?Q?KX523dMoQ2rwg518C4AOp1H2bUrDRtsxVwpAcLn23n3iIkqmcNnNGUO/MmEO?=
+ =?us-ascii?Q?yNu3qE7heeS1tX+R4SAXIMTFZLR7DIzQpDJkM5a07oTmCwug2k/Sz319yJ2F?=
+ =?us-ascii?Q?uW895mjBf1CSbdV/EtZS7AZ/37Jkr6f9fQxY3nrVQ9iH2lLtwB3HQX1losx6?=
+ =?us-ascii?Q?AjZ5woL7PMJRWci9F/48YXpZ7mzkoulANQpM1NVlFWkXV9z7jQSyniQgf4Li?=
+ =?us-ascii?Q?WXOXQPWjxPdnb8qxlXy4FWbZ4ojmryt77deLzMleu0GIaD4QSOvhMyv2jp3p?=
+ =?us-ascii?Q?YPUW29X0ncFSKWqaKv2ODXETDkPQYvb0rSpYrsdHXNvxKnD5Ylx60KZK+TPt?=
+ =?us-ascii?Q?OzULzC3Ymq+mVk4c40+/WZc8v4PX3L26pe8s1RYcpo6+SzkKF8snwK/njDl0?=
+ =?us-ascii?Q?M6WCEm1cNKgDhvtbzdrCaKCkB/kRdb7XddOWfOhR3dEb/Qogn7fwuNWbI9AU?=
+ =?us-ascii?Q?rNgLjlAHNbKYWJbG8WjWkOEphsusYnOtFe6kZV0rRQ4MeDxos2YDyvfEeKIs?=
+ =?us-ascii?Q?bMCGgkAvLA1bDtKAG2fHg6HLtlPwhq/wTxCVuJ9wqzpkSBPpar5Z4px2ldOi?=
+ =?us-ascii?Q?jIxeCQLSjBYtSc8lBa1Lfcwb0DlLwl4DBo1iHRM3SIVRroFG2OXeR9jXvTCq?=
+ =?us-ascii?Q?xO6PXIC9/dkToG2Vs+Nq1bcY82q2Orob1yOTRLQLmxx+q08mqxI4ZyF/jD1q?=
+ =?us-ascii?Q?LQV0ATi5g4vRtWv5FNlyeR/P9aH0xhx6pM18r+LjZV8pA5EGSPpxL6Uu0+bP?=
+ =?us-ascii?Q?wHddOpIgcER1QY2fjpJBsXUzgCG6n5jAnijQE/Lr?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <F699DD611AAD7E4BA45340F54E3E50E9@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718213709.688186-1-prohr@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad7c1b43-51c8-44ae-9994-08db885fb318
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2023 13:54:41.0741
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 67xeL91rVs5JqmyL34izsZY/WGVFFA4XS/Ln0xqVUQO0fOsSz43/+F9o0lFsySqPd8ppHT7/rQDQ0u7RXC7PJA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7746
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Patrick,
+On 2023-05-30 08:57 -0600, David Ahern wrote:
+> On 5/29/23 2:19 PM, Benjamin Poirier wrote:
+> > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+> > index f95142e56da0..27089dea0ed0 100644
+> > --- a/net/ipv4/nexthop.c
+> > +++ b/net/ipv4/nexthop.c
+> > @@ -1152,11 +1152,31 @@ static bool ipv4_good_nh(const struct fib_nh *n=
+h)
+> >  	return !!(state & NUD_VALID);
+> >  }
+> > =20
+> > +static struct nexthop *nexthop_select_path_fdb(struct nh_group *nhg, i=
+nt hash)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i =3D 0; i < nhg->num_nh; i++) {
+> > +		struct nh_grp_entry *nhge =3D &nhg->nh_entries[i];
+> > +
+> > +		if (hash > atomic_read(&nhge->hthr.upper_bound))
+> > +			continue;
+> > +
+> > +		return nhge->nh;
+> > +	}
+> > +
+> > +	WARN_ON_ONCE(1);
+>=20
+> I do not see how the stack is going to provide useful information; it
+> should always be vxlan_xmit ... nexthop_select_path_fdb, right?
 
-kernel test robot noticed the following build warnings:
+Not always, it is also possible to have a resilient nhg with fdb
+nexthops. In that case, nexthop_select_path_fdb() is not called. In
+practice, I tried such a configuration and it does not work well. I have
+prepared a fix that I'll send after the current series has been dealt
+with.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Patrick-Rohr/net-add-sysctl-accept_ra_min_rtr_lft/20230719-053943
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230718213709.688186-1-prohr%40google.com
-patch subject: [net-next] net: add sysctl accept_ra_min_rtr_lft
-config: x86_64-randconfig-m001-20230717 (https://download.01.org/0day-ci/archive/20230719/202307192116.N4bDjayg-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230719/202307192116.N4bDjayg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202307192116.N4bDjayg-lkp@intel.com/
-
-smatch warnings:
-net/ipv6/ndisc.c:1501 ndisc_router_discovery() error: uninitialized symbol 'lifetime'.
-
-vim +/lifetime +1501 net/ipv6/ndisc.c
-
-  1279  
-  1280          if (!ndisc_parse_options(skb->dev, opt, optlen, &ndopts))
-  1281                  return SKB_DROP_REASON_IPV6_NDISC_BAD_OPTIONS;
-  1282  
-  1283          if (!ipv6_accept_ra(in6_dev)) {
-  1284                  ND_PRINTK(2, info,
-  1285                            "RA: %s, did not accept ra for dev: %s\n",
-  1286                            __func__, skb->dev->name);
-  1287                  goto skip_linkparms;
-                        ^^^^^^^^^^^^^^^^^^^^
-This goto happens before lifetime is set
-
-  1288          }
-  1289  
-  1290          lifetime = ntohs(ra_msg->icmph.icmp6_rt_lifetime);
-
-Set here
-
-  1291          if (lifetime != 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_lft) {
-  1292                  ND_PRINTK(2, info,
-  1293                            "RA: router lifetime (%ds) is too short: %s\n",
-  1294                            lifetime, skb->dev->name);
-  1295                  goto skip_linkparms;
-  1296          }
-  1297  
-  1298  #ifdef CONFIG_IPV6_NDISC_NODETYPE
-
-[ SNIP ]
-
-  1464  
-  1465  skip_linkparms:
-  1466  
-  1467          /*
-  1468           *      Process options.
-  1469           */
-  1470  
-  1471          if (!neigh)
-  1472                  neigh = __neigh_lookup(&nd_tbl, &ipv6_hdr(skb)->saddr,
-  1473                                         skb->dev, 1);
-  1474          if (neigh) {
-  1475                  u8 *lladdr = NULL;
-  1476                  if (ndopts.nd_opts_src_lladdr) {
-  1477                          lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr,
-  1478                                                       skb->dev);
-  1479                          if (!lladdr) {
-  1480                                  ND_PRINTK(2, warn,
-  1481                                            "RA: invalid link-layer address length\n");
-  1482                                  goto out;
-  1483                          }
-  1484                  }
-  1485                  ndisc_update(skb->dev, neigh, lladdr, NUD_STALE,
-  1486                               NEIGH_UPDATE_F_WEAK_OVERRIDE|
-  1487                               NEIGH_UPDATE_F_OVERRIDE|
-  1488                               NEIGH_UPDATE_F_OVERRIDE_ISROUTER|
-  1489                               NEIGH_UPDATE_F_ISROUTER,
-  1490                               NDISC_ROUTER_ADVERTISEMENT, &ndopts);
-  1491                  reason = SKB_CONSUMED;
-  1492          }
-  1493  
-  1494          if (!ipv6_accept_ra(in6_dev)) {
-  1495                  ND_PRINTK(2, info,
-  1496                            "RA: %s, accept_ra is false for dev: %s\n",
-  1497                            __func__, skb->dev->name);
-  1498                  goto out;
-  1499          }
-  1500  
-  1501          if (lifetime != 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_lft) {
-                    ^^^^^^^^
-Uninitialized
-
-  1502                  ND_PRINTK(2, info,
-  1503                            "RA: router lifetime (%ds) is too short: %s\n",
-  1504                            lifetime, skb->dev->name);
-  1505                  goto out;
-  1506          }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Sorry for the long delay before my reply.
 
