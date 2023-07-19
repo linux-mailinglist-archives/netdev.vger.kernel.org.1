@@ -1,44 +1,43 @@
-Return-Path: <netdev+bounces-19133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCDF759D52
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:31:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 779EE759D53
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE25A281935
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:31:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A82331C210FE
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCC725151;
-	Wed, 19 Jul 2023 18:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BE71BB55;
+	Wed, 19 Jul 2023 18:31:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146FD1BB51
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:31:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 998F2C433C7;
-	Wed, 19 Jul 2023 18:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E45A23136
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:31:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19B8CC433C8;
+	Wed, 19 Jul 2023 18:31:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689791470;
-	bh=qPL1XmQINNAE+Qi03ydyBs8JMJCLspAjkFez1BvTBzk=;
+	s=k20201202; t=1689791477;
+	bh=D6DwcPwywvoVU7CXOxDCIrUiHzrDx4usY5dx9EsKCaI=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=ZKO7qQJ2T50a5CCfwHoxnC0/pT48MPI1oNf7nGTso5ju1rnfT8yYEvu5lHezU2+64
-	 H7bF9d2EHD818tCqfUhgLELQDZVgR4VykY0fp/hzIOHUswm3IMe6S6nJ8rsAUbFnxf
-	 vRSKXs1knNXakS2hV9PeVQx1l/wg9AHpSwyUGuWneEH21j+kDYMyFZcX+eQeJ555zV
-	 iU/zY443jdiruqPJyM65oWHRlEacJTOZhlKRl0SzUO6v+P3gN69INLnQT6k5gTbMiy
-	 o9fkTeGSgbVgKNW0jird0sC+pX9aeXDrmQ2g/cK0mu0tHhOBnAZ1yL44czOKMrKWRH
-	 JXqR9AxR/vCSA==
-Subject: [PATCH v3 2/5] SUNRPC: Send RPC message on TCP with a single
- sock_sendmsg() call
+	b=eVonETjNis11TjJ1oRLkrr3NJ4iHzlF7nw72KDfLquSbo2B4zMpOWrTfYToeZuGDP
+	 sriFE2tNBDGZrTo4tCMhmITUnid9+1HjIUJZ3YLbPTj3vw21s8ZEJRC/lpMQsZnE+b
+	 9WWuDQ3DEoSAR/ztkxluu8RCQeYyvWTzQ493WSRjUt8B+99EAJQZffLXon+XUvC239
+	 5kU2/bT29ZXOwxH10FnCahbw7T3KNIH93COT+4cqOGJlFIShXnsVpSvfKcidjoJgCm
+	 3O1FhQXDtIrEpkFcdWkNv+3G8Tw+hM3wXu5NwsYDT3NPgCcLsgdooE8sbCFMLvs2yR
+	 EgWJgrvrzJItg==
+Subject: [PATCH v3 3/5] SUNRPC: Convert svc_udp_sendto() to use the per-socket
+ bio_vec array
 From: Chuck Lever <cel@kernel.org>
 To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>, Chuck Lever <chuck.lever@oracle.com>,
- dhowells@redhat.com
-Date: Wed, 19 Jul 2023 14:31:09 -0400
+Cc: Chuck Lever <chuck.lever@oracle.com>, dhowells@redhat.com
+Date: Wed, 19 Jul 2023 14:31:16 -0400
 Message-ID: 
- <168979146971.1905271.4709699930756258041.stgit@morisot.1015granger.net>
+ <168979147611.1905271.944494362977362823.stgit@morisot.1015granger.net>
 In-Reply-To: 
  <168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net>
 References: 
@@ -55,103 +54,70 @@ Content-Transfer-Encoding: 7bit
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-There is now enough infrastructure in place to combine the stream
-record marker into the biovec array used to send each outgoing RPC
-message on TCP. The whole message can be more efficiently sent with
-a single call to sock_sendmsg() using a bio_vec iterator.
+Commit da1661b93bf4 ("SUNRPC: Teach server to use xprt_sock_sendmsg
+for socket sends") modified svc_udp_sendto() to use xprt_sock_sendmsg()
+because we originally believed xprt_sock_sendmsg() would be needed
+for TLS support. That does not actually appear to be the case.
 
-Note that this also helps with RPC-with-TLS: the TLS implementation
-can now clearly see where the upper layer message boundaries are.
-Before, it would send each component of the xdr_buf (record marker,
-head, page payload, tail) in separate TLS records.
+In addition, the linkage between the client and server send code has
+been a bit of a maintenance headache because of the distinct ways
+that the client and server handle memory allocation.
 
-Suggested-by: David Howells <dhowells@redhat.com>
+Going forward, eventually the XDR layer will deal with its buffers
+in the form of bio_vec arrays, so convert this function accordingly.
+
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- include/linux/sunrpc/svcsock.h |    2 ++
- net/sunrpc/svcsock.c           |   33 ++++++++++++++++++---------------
- 2 files changed, 20 insertions(+), 15 deletions(-)
+ net/sunrpc/svcsock.c |   23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/sunrpc/svcsock.h b/include/linux/sunrpc/svcsock.h
-index a7116048a4d4..caf3308f1f07 100644
---- a/include/linux/sunrpc/svcsock.h
-+++ b/include/linux/sunrpc/svcsock.h
-@@ -38,6 +38,8 @@ struct svc_sock {
- 	/* Number of queued send requests */
- 	atomic_t		sk_sendqlen;
- 
-+	struct page_frag_cache  sk_frag_cache;
-+
- 	struct completion	sk_handshake_done;
- 
- 	struct page *		sk_pages[RPCSVC_MAXPAGES];	/* received data */
 diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 90b1ab95c223..d4d816036c04 100644
+index d4d816036c04..f28790f282c2 100644
 --- a/net/sunrpc/svcsock.c
 +++ b/net/sunrpc/svcsock.c
-@@ -1213,31 +1213,30 @@ static int svc_tcp_recvfrom(struct svc_rqst *rqstp)
- static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
- 			   rpc_fraghdr marker, unsigned int *sentp)
- {
--	struct kvec rm = {
--		.iov_base	= &marker,
--		.iov_len	= sizeof(marker),
--	};
- 	struct msghdr msg = {
--		.msg_flags	= MSG_MORE,
-+		.msg_flags	= MSG_SPLICE_PAGES,
+@@ -695,7 +695,7 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
+ 		.msg_control	= cmh,
+ 		.msg_controllen	= sizeof(buffer),
  	};
- 	unsigned int count;
-+	void *buf;
- 	int ret;
+-	unsigned int sent;
++	unsigned int count;
+ 	int err;
  
- 	*sentp = 0;
+ 	svc_udp_release_ctxt(xprt, rqstp->rq_xprt_ctxt);
+@@ -708,22 +708,23 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
+ 	if (svc_xprt_is_dead(xprt))
+ 		goto out_notconn;
  
--	ret = kernel_sendmsg(svsk->sk_sock, &msg, &rm, 1, rm.iov_len);
--	if (ret < 0)
--		return ret;
--	*sentp += ret;
--	if (ret != rm.iov_len)
--		return -EAGAIN;
-+	/* The stream record marker is copied into a temporary page
-+	 * fragment buffer so that it can be included in rq_bvec.
-+	 */
-+	buf = page_frag_alloc(&svsk->sk_frag_cache, sizeof(marker),
-+			      GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+	memcpy(buf, &marker, sizeof(marker));
-+	bvec_set_virt(rqstp->rq_bvec, buf, sizeof(marker));
+-	err = xdr_alloc_bvec(xdr, GFP_KERNEL);
+-	if (err < 0)
+-		goto out_unlock;
++	count = xdr_buf_to_bvec(rqstp->rq_bvec,
++				ARRAY_SIZE(rqstp->rq_bvec), xdr);
  
--	count = xdr_buf_to_bvec(rqstp->rq_bvec, ARRAY_SIZE(rqstp->rq_bvec),
--				&rqstp->rq_res);
-+	count = xdr_buf_to_bvec(rqstp->rq_bvec + 1,
-+				ARRAY_SIZE(rqstp->rq_bvec) - 1, &rqstp->rq_res);
+-	err = xprt_sock_sendmsg(svsk->sk_sock, &msg, xdr, 0, 0, &sent);
++	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
++		      count, 0);
++	err = sock_sendmsg(svsk->sk_sock, &msg);
+ 	if (err == -ECONNREFUSED) {
+ 		/* ICMP error on earlier request. */
+-		err = xprt_sock_sendmsg(svsk->sk_sock, &msg, xdr, 0, 0, &sent);
++		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
++			      count, 0);
++		err = sock_sendmsg(svsk->sk_sock, &msg);
+ 	}
+-	xdr_free_bvec(xdr);
++
+ 	trace_svcsock_udp_send(xprt, err);
+-out_unlock:
++
+ 	mutex_unlock(&xprt->xpt_mutex);
+-	if (err < 0)
+-		return err;
+-	return sent;
++	return err;
  
--	msg.msg_flags = MSG_SPLICE_PAGES;
- 	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
--		      count, rqstp->rq_res.len);
-+		      1 + count, sizeof(marker) + rqstp->rq_res.len);
- 	ret = sock_sendmsg(svsk->sk_sock, &msg);
- 	if (ret < 0)
- 		return ret;
-@@ -1616,6 +1615,7 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
-+	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1625,5 +1625,8 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
-+	if (pfc->va)
-+		__page_frag_cache_drain(virt_to_head_page(pfc->va),
-+					pfc->pagecnt_bias);
- 	kfree(svsk);
- }
+ out_notconn:
+ 	mutex_unlock(&xprt->xpt_mutex);
 
 
 
