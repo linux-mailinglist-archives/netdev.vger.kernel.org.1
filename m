@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-18973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD277593E1
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:08:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DEBB7593F1
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:08:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF13C1C20FE0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:08:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CCC9280E4D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6960812B88;
-	Wed, 19 Jul 2023 11:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178CF134BA;
+	Wed, 19 Jul 2023 11:05:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B478830;
-	Wed, 19 Jul 2023 11:05:32 +0000 (UTC)
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9065197;
-	Wed, 19 Jul 2023 04:05:29 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id d2e1a72fcca58-668730696a4so4582570b3a.1;
-        Wed, 19 Jul 2023 04:05:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689764729; x=1690369529;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hFsE/K6gUAIXkP05EqNENfRpK1bhpEZsF99N61vWloE=;
-        b=g23qWW+P9F4/xy1Kafm+XGVUvORdC8zJAIToX89ML26LZ6ptcANrUBMFVhtQ+2c5Ch
-         B5CV9Lx3rx2c98ImyBDrDMJbuMqPD0KqeXlNw/eT+qLAvfGyonOvV8BAg5AgrKniDesd
-         sPw6qi06EYniqagV0wDNOiKib5lZsCHFfVHTWZ5/mIkVIblDEIuQu6tXeUT1dG1q/55x
-         b7bSeDuYiIuBlontTBRmxHhLfmX2VtTLvhgNJqxIIVVVIQHu6gHlsGYiA+ySOFb8LxP6
-         CgmxC9pJ/Ir8Ji5PG6CVsavg5zsNIq6M2t/psKRf1nTMYm/xHgjC3FdMPopzgd88+eSX
-         TEnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689764729; x=1690369529;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hFsE/K6gUAIXkP05EqNENfRpK1bhpEZsF99N61vWloE=;
-        b=W2WuorzFYQzsCvbGycKDzluqEx88zGTpawFlfrLwHiB5QWJsax0mYsJj/mF1GaKiw2
-         i9ZITlWP7oWjErJSwZQciMxVHbtOCWwVUFdFpcEaOXQCbzu7h87xNb757PYjtiwGgT8B
-         jxkFjHc7qWKxnjVIJkRkhQeTogK2S0LWKdFrCeP0TgD4eKpIbizQ1QxHhwXXGJH6HHcw
-         fQ1pJFHFFMRyBXu7pm51c2YrD2xzUUnZIjrfhyFtmd4PLyeAVUUybBtP3njP/ODvisUv
-         GMfnvll0fbbqW3eM+Y/A7VcLOiVjYriCBsRgxiFKBSg9uM7fevxGYbVWoaEjsKMQU7ix
-         g8NQ==
-X-Gm-Message-State: ABy/qLbX5E+i4gNjnbiw3c/EXfiOS0PRanLF7fo9Hc6YcFoM8NlO4BRb
-	zzI3MVgFVwQNkdCiDyBoby+BtK/3wuw4BO6vSdw=
-X-Google-Smtp-Source: APBJJlHZk6bMFYQH4zS8hQT5yWHMzYO7s2xc1b5R3Ge7j1Pa/VBS2SFHC++3Qll9rk0DlvSly1tR9g==
-X-Received: by 2002:a05:6a21:6d89:b0:137:48cc:9cfa with SMTP id wl9-20020a056a216d8900b0013748cc9cfamr1033460pzb.24.1689764729250;
-        Wed, 19 Jul 2023 04:05:29 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.81])
-        by smtp.gmail.com with ESMTPSA id v10-20020a62ac0a000000b00682c864f35bsm3124196pfe.140.2023.07.19.04.05.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 04:05:28 -0700 (PDT)
-From: menglong8.dong@gmail.com
-X-Google-Original-From: imagedong@tencent.com
-To: yhs@fb.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	imagedong@tencent.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hao Peng <flyingpeng@tencent.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH bpf-next] bpf, x86: initialize the variable "first_off" in save_args()
-Date: Wed, 19 Jul 2023 19:03:30 +0800
-Message-Id: <20230719110330.2007949-1-imagedong@tencent.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C353134B4
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:05:42 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29679E42;
+	Wed, 19 Jul 2023 04:05:41 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36J9jrtn013032;
+	Wed, 19 Jul 2023 04:05:20 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=JC+SlG2J1cwHPNYKwRoVuKapytz+jNTHeq1scJHPdeg=;
+ b=Ix3MCGYUm998VvdjXYeUNa3FsQVhI0bC4a6Es5AB+hcIXPcvzcjwaELEuKvy5En/8ANn
+ DDK42qPxz2KArvU+vVF+LeJ1OKG/95COP013imq1zwU6wjs0UVrJudrLnQU1+5DGFFzL
+ +quWuKuT86s1KkJ2VuMN5YRZk1g1mX8sqIVRUpVwbT+m3f5wewxrSmBvqE8NiAaPJuxm
+ 8/G0/PXqan6Wd+gi4WBMJnkDrO9hwVOf7Mxh9ezm4X6CKsFGq3BJ+6xyqzSg8xLziBLK
+ e51oQuc5mXKbmW2m0KUsPt54PRCZvbwbmxsx7h5WwySjvpqNz62nc6PuK7GFlGZ+Ymea dQ== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rwyc6je0u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jul 2023 04:05:18 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jul
+ 2023 04:04:50 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 19 Jul 2023 04:04:50 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 197623F704F;
+	Wed, 19 Jul 2023 04:04:44 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>,
+        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
+        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
+Subject: [net-next PatchV4 0/4] octeontx2-pf: support Round Robin scheduling
+Date: Wed, 19 Jul 2023 16:34:39 +0530
+Message-ID: <20230719110443.15310-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: gv3LVWq6OLvDfRF9DNmHhmgmuMhz9Eo4
+X-Proofpoint-ORIG-GUID: gv3LVWq6OLvDfRF9DNmHhmgmuMhz9Eo4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-19_06,2023-07-19_01,2023-05-22_02
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Menglong Dong <imagedong@tencent.com>
+octeontx2 and CN10K silicons support Round Robin scheduling. When multiple
+traffic flows reach transmit level with the same priority, with Round Robin
+scheduling traffic flow with the highest quantum value is picked. With this
+support, the user can add multiple classes with the same priority and
+different quantum in htb offload.
 
-As Dan Carpenter reported, the variable "first_off" which is passed to
-clean_stack_garbage() in save_args() can be uninitialized, which can
-cause runtime warnings with KMEMsan. Therefore, init it with 0.
+This series of patches adds support for the same.
 
-Fixes: 473e3150e30a ("bpf, x86: allow function arguments up to 12 for TRACING")
-Cc: Hao Peng <flyingpeng@tencent.com>
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/bpf/09784025-a812-493f-9829-5e26c8691e07@moroto.mountain/
-Signed-off-by: Menglong Dong <imagedong@tencent.com>
+Patch1: implement transmit schedular allocation algorithm as preparation
+        for support round robin scheduling.
+
+Patch2: Allow quantum parameter in HTB offload mode.
+
+Patch3: extends octeontx2 htb offload support for Round Robin scheduling
+
+Patch4: extend QOS documentation for Round Robin scheduling
+
+Hariprasad Kelam (1):
+  docs: octeontx2: extend documentation for Round Robin scheduling
+
+Naveen Mamindlapalli (3):
+  octeontx2-pf: implement transmit schedular allocation algorithm
+  sch_htb: Allow HTB quantum parameter in offload mode
+  octeontx2-pf: htb offload support for Round Robin scheduling
 ---
- arch/x86/net/bpf_jit_comp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v4 * update classid values in documentation.
 
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index 5ab531be56ac..83c4b45dc65f 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -1925,7 +1925,7 @@ static int get_nr_used_regs(const struct btf_func_model *m)
- static void save_args(const struct btf_func_model *m, u8 **prog,
- 		      int stack_size, bool for_call_origin)
- {
--	int arg_regs, first_off, nr_regs = 0, nr_stack_slots = 0;
-+	int arg_regs, first_off = 0, nr_regs = 0, nr_stack_slots = 0;
- 	int i, j;
- 
- 	/* Store function arguments to stack.
--- 
-2.40.1
+v3 * 1. update QOS documentation for round robin scheduling
+     2. added out of bound checks for quantum parameter
 
+v2 * change data type of otx2_index_used to reduce size of structure
+     otx2_qos_cfg
+
+ .../ethernet/marvell/octeontx2.rst            |   8 +
+ .../marvell/octeontx2/nic/otx2_common.c       |   1 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   1 +
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  | 398 ++++++++++++++++--
+ .../net/ethernet/marvell/octeontx2/nic/qos.h  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |   4 +-
+ include/net/pkt_cls.h                         |   1 +
+ net/sched/sch_htb.c                           |   7 +-
+ 8 files changed, 388 insertions(+), 43 deletions(-)
+
+--
+2.17.1
 
