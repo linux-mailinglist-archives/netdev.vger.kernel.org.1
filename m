@@ -1,177 +1,168 @@
-Return-Path: <netdev+bounces-19238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEE175A050
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:05:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C1775A059
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89E9B2819F4
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23571281116
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEBC1BB5E;
-	Wed, 19 Jul 2023 21:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E06822EF1;
+	Wed, 19 Jul 2023 21:09:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECBE7F2
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:05:04 +0000 (UTC)
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D705B1FC0;
-	Wed, 19 Jul 2023 14:05:01 -0700 (PDT)
-Received: from [192.168.1.103] (178.176.79.158) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Thu, 20 Jul
- 2023 00:04:53 +0300
-Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
-To: Yunsheng Lin <linyunsheng@huawei.com>, Zheng Hacker
-	<hackerzheng666@gmail.com>
-CC: Zheng Wang <zyytlz.wz@163.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<1395428693sheep@gmail.com>, <alex000young@gmail.com>
-References: <20230311180630.4011201-1-zyytlz.wz@163.com>
- <57f6d87e-8bfb-40fc-7724-89676c2e75ef@huawei.com>
- <CAJedcCy8QOCv3SC-Li2JkaFEQydTDd1aiY77BHn7ht0Y8r1nUA@mail.gmail.com>
- <43a4a617-2633-a501-6fd1-b2495aed90f7@huawei.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <10f72b0a-663b-7f71-06c2-7315bd0bf368@omp.ru>
-Date: Thu, 20 Jul 2023 00:04:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826691FB25
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:09:03 +0000 (UTC)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E26A1BF0
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:09:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689800943; x=1721336943;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=wLNiGM11K2K1HCO2weFDCpExzeMXR5fOBfUbc0RRoV0=;
+  b=oz8B/x0JgQ0+RqPXgnjzFZ0KmRR8v60J/oBAwMwGzZO3DO9b8xAecIgb
+   tgm1kezbH06VOPyeJ9yFR66KvGuEK1BeU3/BjnnWBu1GIW/zY86CWYnKR
+   Qbvu/8xxVCyMeXd5rXK+T2ls+FicuWFpqB2f7EETj5LeAqSaWJoX1F1Jf
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.01,216,1684800000"; 
+   d="scan'208";a="340640634"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 21:08:59 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com (Postfix) with ESMTPS id 477098A9A1;
+	Wed, 19 Jul 2023 21:08:57 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 19 Jul 2023 21:08:53 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.39) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Wed, 19 Jul 2023 21:08:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <gustavoars@kernel.org>,
+	<keescook@chromium.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<leitao@debian.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzkaller@googlegroups.com>, <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v1 net 2/2] af_packet: Fix warning of fortified memcpy() in packet_getname().
+Date: Wed, 19 Jul 2023 14:08:41 -0700
+Message-ID: <20230719210841.61515-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230719185322.44255-3-kuniyu@amazon.com>
+References: <20230719185322.44255-3-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <43a4a617-2633-a501-6fd1-b2495aed90f7@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.79.158]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 07/19/2023 18:09:23
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 178730 [Jul 19 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.158 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.158 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;178.176.79.158:7.1.2,7.7.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.79.158
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/19/2023 18:16:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/19/2023 5:01:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_BL_SPAMCOP_NET,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.39]
+X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello!
-
-On 3/13/23 6:32 AM, Yunsheng Lin wrote:
-[...]
-
->>> On 2023/3/12 2:06, Zheng Wang wrote:
->>>> In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
->>>> If timeout occurs, it will start the work. And if we call
->>>> ravb_remove without finishing the work, there may be a
->>>> use-after-free bug on ndev.
->>>>
->>>> Fix it by finishing the job before cleanup in ravb_remove.
->>>>
->>>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
->>>> Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
->>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->>>> ---
->>>> v3:
->>>> - fix typo in commit message
->>>> v2:
->>>> - stop dev_watchdog so that handle no more timeout work suggested by Yunsheng Lin,
->>>> add an empty line to make code clear suggested by Sergey Shtylyov
->>>> ---
->>>>  drivers/net/ethernet/renesas/ravb_main.c | 4 ++++
->>>>  1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>>> index 0f54849a3823..eb63ea788e19 100644
->>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>>> @@ -2892,6 +2892,10 @@ static int ravb_remove(struct platform_device *pdev)
->>>>       struct ravb_private *priv = netdev_priv(ndev);
->>>>       const struct ravb_hw_info *info = priv->info;
->>>>
->>>> +     netif_carrier_off(ndev);
->>>> +     netif_tx_disable(ndev);
->>>> +     cancel_work_sync(&priv->work);
->>>
->>> LGTM.
->>> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
->>>
->>> As noted by Sergey, ravb_remove() and ravb_close() may
->>> share the same handling, but may require some refactoring
->>> in order to do that. So for a fix, it seems the easiest
->>> way to just add the handling here.
->>
->> Dear Yunsheng,
->>
->> I think Sergey is right for I've seen other drivers' same handling
->> logic. Do you think we should try to move the cancel-work-related code
->> from ravb_remove to ravb_close funtion?
->> Appreciate for your precise advice.
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Wed, 19 Jul 2023 11:53:22 -0700
+> syzkaller found a warning in packet_getname() [0], where we try to
+> copy 16 bytes to sockaddr_ll.sll_addr[8].
 > 
-> As Sergey question "can ravb_remove() be called without ravb_close()
-> having been called on the bound devices?"
-> If I understand it correctly, I think ravb_remove() can be called
-> without ravb_close() having been called on the bound devices. I am
-> happy to be corrected if I am wrong.
+> Some devices (ip6gre, vti6, ip6tnl) have 16 bytes address expressed
+> by struct in6_addr.
+> 
+> The write seems to overflow, but actually not since we use struct
+> sockaddr_storage defined in __sys_getsockname().
+> 
+> To avoid the warning, we need to let __fortify_memcpy_chk() know the
+> actual buffer size.
+> 
+> Another option would be to use strncpy() and limit the copied length
+> to sizeof(sll_addr), but it will return the partial address and might
+> break an application that passes sockaddr_storage to getsockname().
+> 
+> [0]:
+> memcpy: detected field-spanning write (size 16) of single field "sll->sll_addr" at net/packet/af_packet.c:3604 (size 8)
+> WARNING: CPU: 0 PID: 255 at net/packet/af_packet.c:3604 packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
+> Modules linked in:
+> CPU: 0 PID: 255 Comm: syz-executor750 Not tainted 6.5.0-rc1-00330-g60cc1f7d0605 #4
+> Hardware name: linux,dummy-virt (DT)
+> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
+> lr : packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
+> sp : ffff800089887bc0
+> x29: ffff800089887bc0 x28: ffff000010f80f80 x27: 0000000000000003
+> x26: dfff800000000000 x25: ffff700011310f80 x24: ffff800087d55000
+> x23: dfff800000000000 x22: ffff800089887c2c x21: 0000000000000010
+> x20: ffff00000de08310 x19: ffff800089887c20 x18: ffff800086ab1630
+> x17: 20646c6569662065 x16: 6c676e697320666f x15: 0000000000000001
+> x14: 1fffe0000d56d7ca x13: 0000000000000000 x12: 0000000000000000
+> x11: 0000000000000000 x10: 0000000000000000 x9 : 3e60944c3da92b00
+> x8 : 3e60944c3da92b00 x7 : 0000000000000001 x6 : 0000000000000001
+> x5 : ffff8000898874f8 x4 : ffff800086ac99e0 x3 : ffff8000803f8808
+> x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000000
+> Call trace:
+>  packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
+>  __sys_getsockname+0x168/0x24c net/socket.c:2042
+>  __do_sys_getsockname net/socket.c:2057 [inline]
+>  __se_sys_getsockname net/socket.c:2054 [inline]
+>  __arm64_sys_getsockname+0x7c/0x94 net/socket.c:2054
+>  __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+>  invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
+>  el0_svc_common+0x134/0x240 arch/arm64/kernel/syscall.c:139
+>  do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:188
+>  el0_svc+0x2c/0x7c arch/arm64/kernel/entry-common.c:647
+>  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
+>  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
+> 
+> Fixes: df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/packet/af_packet.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index 85ff90a03b0c..5eef94a32a4f 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -3601,7 +3601,10 @@ static int packet_getname(struct socket *sock, struct sockaddr *uaddr,
+>  	if (dev) {
+>  		sll->sll_hatype = dev->type;
+>  		sll->sll_halen = dev->addr_len;
+> -		memcpy(sll->sll_addr, dev->dev_addr, dev->addr_len);
+> +
+> +		/* Let __fortify_memcpy_chk() know the actual buffer size. */
+> +		memcpy(((struct sockaddr_storage *)sll)->__data +
+> +		       offsetof(struct sockaddr_ll, sll_addr), dev->dev_addr, dev->addr_len);
 
-   Yes, correct. It's ravb_remove() that calls unregister_netdev()
-which results in calling ravb_close() on the opened devices...
+Sorry, this offset was wrong and needs minus
+offsetof(struct sockaddr_ll, sll_family).
 
-> Yes, you can call *_close() directly in *_remove(), but that may
-> require some refactoring and a lot of testing.
+Will fix in v2.
 
-   No need to do that I think, as it's called anyways...
+pw-bot: cr
 
-> Also, if you found the bug through some static analysis, it may
-> be better to make it clear in the commit log and share some info
-> about the static analysis, which I suppose it is a tool?
 
-   Agreed. :-)
+>  	} else {
+>  		sll->sll_hatype = 0;	/* Bad: we have no ARPHRD_UNSPEC */
+>  		sll->sll_halen = 0;
+> -- 
+> 2.30.2
 
->> Best regards,
->> Zheng
-
-MBR, Sergey
 
