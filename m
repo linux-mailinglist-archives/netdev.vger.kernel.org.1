@@ -1,74 +1,79 @@
-Return-Path: <netdev+bounces-19165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81246759DF6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:55:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D49759E0B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:59:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AE0028199D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:55:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E7E7281AA7
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91816275D0;
-	Wed, 19 Jul 2023 18:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF65275D7;
+	Wed, 19 Jul 2023 18:59:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8654A275B5
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:55:38 +0000 (UTC)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0E710CC;
-	Wed, 19 Jul 2023 11:55:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689792935; x=1721328935;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VgOUC4K9fx66jXJxsabJ6cjLbIddps+gucTz9RAEk7M=;
-  b=SkEbiWXYO5ZZQnGI6LJ4KL+gMJ84u5JXU7a5j7KWhLACPY7pEmkeHK5e
-   BBm2lll6i0SZGtBoOA/jslbYZQmllDhx/P11Vi9znqR2Y3ExEx312kEJL
-   r56mtr9dx5lxl/ClC4lpTET7stD6+tJB9GccIKRjsYjeJCVsc2jEd4tjl
-   pyRlqEGwuDL4mW2fyxBUiScyEzrfKNjdS1AClYaTBy34qUtcOZKnXc9g6
-   mD6wTMzv4nIhwxzOE9QndvoRLM0R4rUndKu72bOB1twwVYBhp6Zcz9qL1
-   0xQNIr0SrhVu+ZF1jykzYJtvLWkhCDsQFAANOSPTkh/1eMlXaAGz/GU/6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="366586882"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="366586882"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 11:55:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="848148918"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="848148918"
-Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 19 Jul 2023 11:55:29 -0700
-Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qMCKf-0005OE-0T;
-	Wed, 19 Jul 2023 18:55:29 +0000
-Date: Thu, 20 Jul 2023 02:54:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Johannes Zink <j.zink@pengutronix.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	patchwork-jzi@pengutronix.de,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Johannes Zink <j.zink@pengutronix.de>
-Subject: Re: [PATCH] net: stmmac: correct MAC propagation delay
-Message-ID: <202307200225.B8rmKQPN-lkp@intel.com>
-References: <20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF42275BD;
+	Wed, 19 Jul 2023 18:59:39 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12E35199A;
+	Wed, 19 Jul 2023 11:59:38 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bb119be881so50713615ad.3;
+        Wed, 19 Jul 2023 11:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689793177; x=1692385177;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ke2+UctC+DoOwplZHrK3x2BR06F4065MTKEWhT518s=;
+        b=CbsznE8dvx8wKJEQAxpORbIXdmli5Zh/FPlmQ4MIyqQYlQlNjsA5dP40FCBBYE+eQY
+         4/+4JI9nwSc9KoqplrIaeDxJ0dydcLJ2b5q9tzkzky9Sd40Y5guMJY70lstH44YvnLGr
+         U1KlW4zL7ZqqCi5Q05CgPJEwjYxGbfvMMRPaxxJQGYEPTF3ljzUWl1nmZyuzp1FZNJKB
+         LVl3xkYBzyK+8E1mHV8Bx+M+Cdj9c8VF2zzhhajhxy7BeAmrZQMBZcv6p++uDIAj67PP
+         jnO/iqLE891qEavXM+s5x9i9CNqWRTlgOMfgUrE7TPggt3g0e/mFo+tACWmH+drqStJA
+         Yprw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689793177; x=1692385177;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5ke2+UctC+DoOwplZHrK3x2BR06F4065MTKEWhT518s=;
+        b=ROIAX41pkiwhFTyaAPKAZrrMaweAGiD6bWjNzaJwj38rSPO4rcPbwx8ce1P1rp+Lsg
+         RtWXxqkwdfwWBWs5/bRmHyKvtdGsWB4s7pn/zNctpHtVFXs7sKqYt7QKafaiWNMfCdhV
+         3bHFmPqOHRZZrKPrIM6XH4tO8RML5tu03+WPAnB4jSFL8eDUAIO6bWeGtAWagbVzy4/a
+         0/UG0v3nx4426N5JqjcKpPagvsJYkF8c26ePurQounvV+odDjjT47aoPkOYerpw8mc6y
+         dZRZBMcE3Swcak6Wt6D/6HSgGRybbCCwUYsnYs5EBW4/+EYpRQinyTq6jQJu0mW43t6e
+         cW6w==
+X-Gm-Message-State: ABy/qLZH+7M5wjHtXHvp+KZvGy0W/yfIpJbUMxo4HqJ36JGrShps2g26
+	ZlvdvXFzH/KETrzn70WGXs4=
+X-Google-Smtp-Source: APBJJlFFs6ZPqDq5j/f2gL+3ynFPPHBUrnM/pdVxNM3ZzTJGDgYheYOnkkODQvN1NPk3F+2i0jkrtQ==
+X-Received: by 2002:a17:902:cec3:b0:1b8:971c:b7b7 with SMTP id d3-20020a170902cec300b001b8971cb7b7mr23731180plg.56.1689793177405;
+        Wed, 19 Jul 2023 11:59:37 -0700 (PDT)
+Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:500::4:8907])
+        by smtp.gmail.com with ESMTPSA id l8-20020a170902f68800b001b892aac5c9sm4305624plg.298.2023.07.19.11.59.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 11:59:37 -0700 (PDT)
+Date: Wed, 19 Jul 2023 11:59:30 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 13/21] ice: Implement checksum hint
+Message-ID: <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
+References: <20230719183734.21681-1-larysa.zaremba@intel.com>
+ <20230719183734.21681-14-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,85 +82,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230719183734.21681-14-larysa.zaremba@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Johannes,
+On Wed, Jul 19, 2023 at 08:37:26PM +0200, Larysa Zaremba wrote:
+> Implement .xmo_rx_csum callback to allow XDP code to determine,
+> whether HW has validated any checksums.
+> 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 29 +++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> index 54685d0747aa..6647a7e55ac8 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> @@ -660,8 +660,37 @@ static int ice_xdp_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan_tci,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * ice_xdp_rx_csum_lvl - Get level, at which HW has checked the checksum
+> + * @ctx: XDP buff pointer
+> + * @csum_status: destination address
+> + * @csum_info: destination address
+> + *
+> + * Copy HW checksum level (if was checked) to the destination address.
+> + */
+> +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
+> +			   enum xdp_csum_status *csum_status,
+> +			   union xdp_csum_info *csum_info)
+> +{
+> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
+> +	const union ice_32b_rx_flex_desc *eop_desc;
+> +	enum ice_rx_csum_status status;
+> +	u16 ptype;
+> +
+> +	eop_desc = xdp_ext->pkt_ctx.eop_desc;
+> +	ptype = ice_get_ptype(eop_desc);
+> +
+> +	status = ice_get_rx_csum_status(eop_desc, ptype);
+> +	if (status & ICE_RX_CSUM_NONE)
+> +		return -ENODATA;
+> +
+> +	*csum_status = ice_rx_csum_lvl(status) + 1;
+> +	return 0;
+> +}
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 36395b2efe905650cd179d67411ffee3b770268b]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Johannes-Zink/net-stmmac-correct-MAC-propagation-delay/20230719-221258
-base:   36395b2efe905650cd179d67411ffee3b770268b
-patch link:    https://lore.kernel.org/r/20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334%40pengutronix.de
-patch subject: [PATCH] net: stmmac: correct MAC propagation delay
-config: i386-randconfig-i002-20230720 (https://download.01.org/0day-ci/archive/20230720/202307200225.B8rmKQPN-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230720/202307200225.B8rmKQPN-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307200225.B8rmKQPN-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.o: in function `correct_latency':
->> drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c:83: undefined reference to `__udivdi3'
-
-
-vim +83 drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-
-    62	
-    63	static void correct_latency(struct stmmac_priv *priv)
-    64	{
-    65		void __iomem *ioaddr = priv->ptpaddr;
-    66		u32 reg_tsic, reg_tsicsns;
-    67		u32 reg_tsec, reg_tsecsns;
-    68		u64 scaled_ns;
-    69		u32 val;
-    70	
-    71		/* MAC-internal ingress latency */
-    72		scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
-    73	
-    74		/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
-    75		 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
-    76		 */
-    77		val = readl(ioaddr + PTP_TCR);
-    78		if (val & PTP_TCR_TSCTRLSSR)
-    79			/* nanoseconds field is in decimal format with granularity of 1ns/bit */
-    80			scaled_ns = (NSEC_PER_SEC << 16) - scaled_ns;
-    81		else
-    82			/* nanoseconds field is in binary format with granularity of ~0.466ns/bit */
-  > 83			scaled_ns = ((1ULL << 31) << 16) - scaled_ns * PSEC_PER_NSEC / 466;
-    84	
-    85		reg_tsic = scaled_ns >> 16;
-    86		reg_tsicsns = scaled_ns & 0xff00;
-    87	
-    88		/* set bit 31 for 2's compliment */
-    89		reg_tsic |= BIT(31);
-    90	
-    91		writel(reg_tsic, ioaddr + PTP_TS_INGR_CORR_NS);
-    92		writel(reg_tsicsns, ioaddr + PTP_TS_INGR_CORR_SNS);
-    93	
-    94		/* MAC-internal egress latency */
-    95		scaled_ns = readl(ioaddr + PTP_TS_EGR_LAT);
-    96	
-    97		reg_tsec = scaled_ns >> 16;
-    98		reg_tsecsns = scaled_ns & 0xff00;
-    99	
-   100		writel(reg_tsec, ioaddr + PTP_TS_EGR_CORR_NS);
-   101		writel(reg_tsecsns, ioaddr + PTP_TS_EGR_CORR_SNS);
-   102	}
-   103	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+and xdp_csum_info from previous patch left uninitialized?
+What was the point adding it then?
 
