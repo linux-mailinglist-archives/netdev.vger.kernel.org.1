@@ -1,165 +1,63 @@
-Return-Path: <netdev+bounces-19263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B90075A0C0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:51:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C127B75A0D3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54A701C211FC
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:51:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA9241C211B2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2B025147;
-	Wed, 19 Jul 2023 21:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFAC25148;
+	Wed, 19 Jul 2023 21:55:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF291BB23;
-	Wed, 19 Jul 2023 21:51:21 +0000 (UTC)
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B10E41FF1;
-	Wed, 19 Jul 2023 14:51:18 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-7654e1d83e8so15086685a.1;
-        Wed, 19 Jul 2023 14:51:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689803478; x=1690408278;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I6znaKwzT2W7vgJvU/pVQCid0fljnEMc1pWgZYNykTk=;
-        b=XmWaPZelNKumkFx7Y9x+5cV9BKFzHFOJ5Rw4EGMUCZ5Xe5tr+BiSG73d6Xo89y34sS
-         iNAcvQtOvOXLA3bx2Yw4euTOn7VRjKEDDRXHukFkHKhAuNRXCeZPmwPL2isEUaP+Z6EG
-         evymV5lHSfGpVtvxa89yS58xQ2n8QmUCbiHfucRhk3hy3NIJoRPmGBjCd5p1A0jRtD/o
-         Mb9E/0pVy2SA37Tc5trL8ChgC1GKIBn5ansYPaZJokhzBgqaLVLOyQ54QQrHK1tm4vPq
-         xrCW5j0vtNiDjreOAiZPafiWFMligRLI5hEPPhnIEcfYQNR8p7ujFACikCg3lB9rg5X9
-         4NlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689803478; x=1690408278;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=I6znaKwzT2W7vgJvU/pVQCid0fljnEMc1pWgZYNykTk=;
-        b=HQzJ8wy/s7mGKJkJ7oQgsdICyzzfzunXSKWkrDc8g41125BKr0nhW45hlQFvzIgW2n
-         YjlVCYgMDbFiUrCDiQk9eXOvdA/Tl/SX3lw5hZ+81Wie8H4LoYrG/BsYiL+etMTmEesG
-         LtcQ5Ug4fYeJn+2wTjYHYQZWxjEIxwG/TCqwgWETMic1cv1Lrk6KdSx9W3um5FC0rTiu
-         i/+F4FfktpHNsHj8XlIOZME25ZrDx4n5933lzwm5qX4k1H+SAuP89vJ7uxnx/ybtCLbD
-         Tj8C+0X+qnrvPItGQwW7ZHrp7LvV8tXetf9tfechaB0MGJobqP8MBdFRaiUmLMY6sVLD
-         Fl4w==
-X-Gm-Message-State: ABy/qLZNXJZsegmem7yrlf1MkSChIA43IC8TMXdJWvUsLnt8CjqgWQxl
-	SC5VqmppCYdSYwtNB9nfpR0=
-X-Google-Smtp-Source: APBJJlHqk3S7ZpojYwSyvRrCvv1sgJVWHTPYVfGlfEacATFU0U8JXzpg0wi7I8vfifs6luEC3o70mQ==
-X-Received: by 2002:a05:620a:258e:b0:766:fa1f:4ea4 with SMTP id x14-20020a05620a258e00b00766fa1f4ea4mr992430qko.1.1689803477790;
-        Wed, 19 Jul 2023 14:51:17 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id f21-20020ae9ea15000000b00767b37256ecsm1529421qkg.107.2023.07.19.14.51.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 14:51:17 -0700 (PDT)
-Date: Wed, 19 Jul 2023 17:51:17 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
- Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- martin.lau@linux.dev, 
- song@kernel.org, 
- yhs@fb.com, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@google.com, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- David Ahern <dsahern@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Jesper Dangaard Brouer <brouer@redhat.com>, 
- Anatoly Burakov <anatoly.burakov@intel.com>, 
- Alexander Lobakin <alexandr.lobakin@intel.com>, 
- Magnus Karlsson <magnus.karlsson@gmail.com>, 
- Maryam Tahhan <mtahhan@redhat.com>, 
- xdp-hints@xdp-project.net, 
- netdev@vger.kernel.org
-Message-ID: <64b85ad52d012_2849c1294df@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
-References: <20230719183734.21681-1-larysa.zaremba@intel.com>
- <20230719183734.21681-14-larysa.zaremba@intel.com>
- <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
-Subject: Re: [PATCH bpf-next v3 13/21] ice: Implement checksum hint
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35D922EF1
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:55:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39491C433C7;
+	Wed, 19 Jul 2023 21:55:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689803735;
+	bh=LZGTzFpSHfpTcvbThJ8bOlUPyqc49MIpWv26NdWHD/0=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=K+6JiuEzRS0YoJ/68ES/WWbnnDYk1c6OFzTPqUKDYEQ+wscgxicKF3dTRUB9nOdyV
+	 3m8Uo6XLeEvf9fdNr+lBBVjIbWueYOEF5if2vWaPkqtY6fkp11jR+1XfSMvZ7cOBci
+	 fTkVYanYbzaCNGOUmOVm3khxSF6V4qaTOomUypN2bKbxidZiDRKJOh4j8OXUcp6dqi
+	 l3oWPATq6xkuZhcLNfc6UF0l/tFJ2gZ2OL/quQqgE88J0+F4FVGV74fClFR58l5KH0
+	 v2mx7qhd/sLgZWGLQ292okszTzmPxar44Z+5GZN2yQO3B4M61ROEPj25iT/IcDKEbf
+	 gjS6CiFvrmgBA==
+Message-ID: <a7f78b4e812a4cd6ea4b61ef4ebc5f19.sboyd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230630-topic-oxnas-upstream-remove-v2-1-fb6ab3dea87c@linaro.org>
+References: <20230630-topic-oxnas-upstream-remove-v2-0-fb6ab3dea87c@linaro.org> <20230630-topic-oxnas-upstream-remove-v2-1-fb6ab3dea87c@linaro.org>
+Subject: Re: [PATCH v2 01/15] clk: oxnas: remove obsolete clock driver
+From: Stephen Boyd <sboyd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, linux-mtd@lists.infradead.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org, linux-oxnas@groups.io, Neil Armstrong <neil.armstrong@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Daniel Golle <daniel@makrotopia.org>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andy Shevchenko <andy@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Conor Dooley <conor+dt@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Linus Walleij <linus.walleij@linaro.org>, Marc Zyngier <maz@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Michael Turquette <mturquette@baylibre.com>, Miquel Raynal <miquel.raynal@bootlin.com>, Neil Armstrong <neil.armstrong@linaro.org>, Paolo Abeni <pabeni@redhat.com>, Richard Weinberger <richard@nod.at>, Rob Herring <robh+dt@kernel.org>, Sebastian Reichel <sre@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Vignesh Raghavendra <vigneshr@ti.com>
+Date: Wed, 19 Jul 2023 14:55:33 -0700
+User-Agent: alot/0.10
 
-Alexei Starovoitov wrote:
-> On Wed, Jul 19, 2023 at 08:37:26PM +0200, Larysa Zaremba wrote:
-> > Implement .xmo_rx_csum callback to allow XDP code to determine,
-> > whether HW has validated any checksums.
-> > 
-> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 29 +++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > index 54685d0747aa..6647a7e55ac8 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > @@ -660,8 +660,37 @@ static int ice_xdp_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan_tci,
-> >  	return 0;
-> >  }
-> >  
-> > +/**
-> > + * ice_xdp_rx_csum_lvl - Get level, at which HW has checked the checksum
-> > + * @ctx: XDP buff pointer
-> > + * @csum_status: destination address
-> > + * @csum_info: destination address
-> > + *
-> > + * Copy HW checksum level (if was checked) to the destination address.
-> > + */
-> > +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
-> > +			   enum xdp_csum_status *csum_status,
-> > +			   union xdp_csum_info *csum_info)
-> > +{
-> > +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
-> > +	const union ice_32b_rx_flex_desc *eop_desc;
-> > +	enum ice_rx_csum_status status;
-> > +	u16 ptype;
-> > +
-> > +	eop_desc = xdp_ext->pkt_ctx.eop_desc;
-> > +	ptype = ice_get_ptype(eop_desc);
-> > +
-> > +	status = ice_get_rx_csum_status(eop_desc, ptype);
-> > +	if (status & ICE_RX_CSUM_NONE)
-> > +		return -ENODATA;
-> > +
-> > +	*csum_status = ice_rx_csum_lvl(status) + 1;
-> > +	return 0;
-> > +}
-> 
-> and xdp_csum_info from previous patch left uninitialized?
-> What was the point adding it then?
+Quoting Neil Armstrong (2023-06-30 09:58:26)
+> Due to lack of maintenance and stall of development for a few years now,
+> and since no new features will ever be added upstream, remove support
+> for OX810 and OX820 clock driver.
+>=20
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> Acked-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> ---
 
-I suppose this driver only returns CHECKSUM_NONE or
-CHECKSUM_UNNECESSARY? Also based on a grep of the driver dir.
-
-In general the layout makes sense to me, and +1 on supporting
-other drivers that do return CHECKSUM_COMPLETE or CHECKSUM_PARTIAL
-rigth from the start.
-
-
-
+Applied to clk-next
 
