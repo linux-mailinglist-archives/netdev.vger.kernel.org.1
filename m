@@ -1,140 +1,157 @@
-Return-Path: <netdev+bounces-19166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D49759E0B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:59:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62361759EA9
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E7E7281AA7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:59:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 468071C21159
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF65275D7;
-	Wed, 19 Jul 2023 18:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCDE156D5;
+	Wed, 19 Jul 2023 19:32:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF42275BD;
-	Wed, 19 Jul 2023 18:59:39 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12E35199A;
-	Wed, 19 Jul 2023 11:59:38 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bb119be881so50713615ad.3;
-        Wed, 19 Jul 2023 11:59:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689793177; x=1692385177;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ke2+UctC+DoOwplZHrK3x2BR06F4065MTKEWhT518s=;
-        b=CbsznE8dvx8wKJEQAxpORbIXdmli5Zh/FPlmQ4MIyqQYlQlNjsA5dP40FCBBYE+eQY
-         4/+4JI9nwSc9KoqplrIaeDxJ0dydcLJ2b5q9tzkzky9Sd40Y5guMJY70lstH44YvnLGr
-         U1KlW4zL7ZqqCi5Q05CgPJEwjYxGbfvMMRPaxxJQGYEPTF3ljzUWl1nmZyuzp1FZNJKB
-         LVl3xkYBzyK+8E1mHV8Bx+M+Cdj9c8VF2zzhhajhxy7BeAmrZQMBZcv6p++uDIAj67PP
-         jnO/iqLE891qEavXM+s5x9i9CNqWRTlgOMfgUrE7TPggt3g0e/mFo+tACWmH+drqStJA
-         Yprw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689793177; x=1692385177;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5ke2+UctC+DoOwplZHrK3x2BR06F4065MTKEWhT518s=;
-        b=ROIAX41pkiwhFTyaAPKAZrrMaweAGiD6bWjNzaJwj38rSPO4rcPbwx8ce1P1rp+Lsg
-         RtWXxqkwdfwWBWs5/bRmHyKvtdGsWB4s7pn/zNctpHtVFXs7sKqYt7QKafaiWNMfCdhV
-         3bHFmPqOHRZZrKPrIM6XH4tO8RML5tu03+WPAnB4jSFL8eDUAIO6bWeGtAWagbVzy4/a
-         0/UG0v3nx4426N5JqjcKpPagvsJYkF8c26ePurQounvV+odDjjT47aoPkOYerpw8mc6y
-         dZRZBMcE3Swcak6Wt6D/6HSgGRybbCCwUYsnYs5EBW4/+EYpRQinyTq6jQJu0mW43t6e
-         cW6w==
-X-Gm-Message-State: ABy/qLZH+7M5wjHtXHvp+KZvGy0W/yfIpJbUMxo4HqJ36JGrShps2g26
-	ZlvdvXFzH/KETrzn70WGXs4=
-X-Google-Smtp-Source: APBJJlFFs6ZPqDq5j/f2gL+3ynFPPHBUrnM/pdVxNM3ZzTJGDgYheYOnkkODQvN1NPk3F+2i0jkrtQ==
-X-Received: by 2002:a17:902:cec3:b0:1b8:971c:b7b7 with SMTP id d3-20020a170902cec300b001b8971cb7b7mr23731180plg.56.1689793177405;
-        Wed, 19 Jul 2023 11:59:37 -0700 (PDT)
-Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:500::4:8907])
-        by smtp.gmail.com with ESMTPSA id l8-20020a170902f68800b001b892aac5c9sm4305624plg.298.2023.07.19.11.59.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 11:59:37 -0700 (PDT)
-Date: Wed, 19 Jul 2023 11:59:30 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
-	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	Anatoly Burakov <anatoly.burakov@intel.com>,
-	Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3 13/21] ice: Implement checksum hint
-Message-ID: <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
-References: <20230719183734.21681-1-larysa.zaremba@intel.com>
- <20230719183734.21681-14-larysa.zaremba@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D23B275B5
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:32:57 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 266F0211B;
+	Wed, 19 Jul 2023 12:32:48 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 57AF7120079;
+	Wed, 19 Jul 2023 22:32:45 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 57AF7120079
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1689795165;
+	bh=JfItgTN1w9bippRrFKrzexAkhi74JmbU2Y5XEzXgfcs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=VaceMRo6JbUNtAMGXKuDHc0O91MLMLSEIrlkFX41V1SMDxnw+WCAOJTssmM+fwacF
+	 qyc1Ea7LcoZYgVVw/il9ip48f08MGt1kyLkVCl3TXlUy6mVwoiHwOWJexonIFpqii4
+	 9+i8n67LCj5WJXm175SXI7+cLiCnSX1NI6g63sASO5hp4l2SSq4Rn84G+oIPUHw9bd
+	 AxmJ6GraiWNlS2w6rZm5rvlA/5GcfO3en5nE/C8V+I+UOHIlgeF60uYDrM3EvUntOG
+	 Dy4xGfrZCgQbS6B/2tfJYXs24Bl//C75Ge8b8W90xz6vpmSway3KUYrsUAsc1SQYRL
+	 nwEcQvRhT9dMQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 19 Jul 2023 22:32:45 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 19 Jul 2023 22:32:44 +0300
+From: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@sberdevices.ru>,
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v2 0/4] virtio/vsock: some updates for MSG_PEEK flag
+Date: Wed, 19 Jul 2023 22:27:04 +0300
+Message-ID: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230719183734.21681-14-larysa.zaremba@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178730 [Jul 19 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, lore.kernel.org:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;git.kernel.org:7.1.1;sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/19 15:51:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/19 15:51:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/19 15:29:00 #21641898
+X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 08:37:26PM +0200, Larysa Zaremba wrote:
-> Implement .xmo_rx_csum callback to allow XDP code to determine,
-> whether HW has validated any checksums.
-> 
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 29 +++++++++++++++++++
->  1 file changed, 29 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> index 54685d0747aa..6647a7e55ac8 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> @@ -660,8 +660,37 @@ static int ice_xdp_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan_tci,
->  	return 0;
->  }
->  
-> +/**
-> + * ice_xdp_rx_csum_lvl - Get level, at which HW has checked the checksum
-> + * @ctx: XDP buff pointer
-> + * @csum_status: destination address
-> + * @csum_info: destination address
-> + *
-> + * Copy HW checksum level (if was checked) to the destination address.
-> + */
-> +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
-> +			   enum xdp_csum_status *csum_status,
-> +			   union xdp_csum_info *csum_info)
-> +{
-> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
-> +	const union ice_32b_rx_flex_desc *eop_desc;
-> +	enum ice_rx_csum_status status;
-> +	u16 ptype;
-> +
-> +	eop_desc = xdp_ext->pkt_ctx.eop_desc;
-> +	ptype = ice_get_ptype(eop_desc);
-> +
-> +	status = ice_get_rx_csum_status(eop_desc, ptype);
-> +	if (status & ICE_RX_CSUM_NONE)
-> +		return -ENODATA;
-> +
-> +	*csum_status = ice_rx_csum_lvl(status) + 1;
-> +	return 0;
-> +}
+Hello,
 
-and xdp_csum_info from previous patch left uninitialized?
-What was the point adding it then?
+This patchset does several things around MSG_PEEK flag support. In
+general words it reworks MSG_PEEK test and adds support for this flag
+in SOCK_SEQPACKET logic. Here is per-patch description:
+
+1) This is cosmetic change for SOCK_STREAM implementation of MSG_PEEK:
+   1) I think there is no need of "safe" mode walk here as there is no
+      "unlink" of skbs inside loop (it is MSG_PEEK mode - we don't change
+      queue).
+   2) Nested while loop is removed: in case of MSG_PEEK we just walk
+      over skbs and copy data from each one. I guess this nested loop
+      even didn't behave as loop - it always executed just for single
+      iteration.
+
+2) This adds MSG_PEEK support for SOCK_SEQPACKET. It could be implemented
+   be reworking MSG_PEEK callback for SOCK_STREAM to support SOCK_SEQPACKET
+   also, but I think it will be more simple and clear from potential
+   bugs to implemented it as separate function thus not mixing logics
+   for both types of socket. So I've added it as dedicated function.
+
+3) This is reworked MSG_PEEK test for SOCK_STREAM. Previous version just
+   sent single byte, then tried to read it with MSG_PEEK flag, then read
+   it in normal way. New version is more complex: now sender uses buffer
+   instead of single byte and this buffer is initialized with random
+   values. Receiver tests several things:
+   1) Read empty socket with MSG_PEEK flag.
+   2) Read part of buffer with MSG_PEEK flag.
+   3) Read whole buffer with MSG_PEEK flag, then checks that it is same
+      as buffer from 2) (limited by size of buffer from 2) of course).
+   4) Read whole buffer without any flags, then checks that it is same
+      as buffer from 3).
+
+4) This is MSG_PEEK test for SOCK_SEQPACKET. It works in the same way
+   as for SOCK_STREAM, except it also checks combination of MSG_TRUNC
+   and MSG_PEEK.
+
+Head is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=60cc1f7d0605598b47ee3c0c2b4b6fbd4da50a06
+
+Link to v1:
+https://lore.kernel.org/netdev/20230618062451.79980-1-AVKrasnov@sberdevices.ru/
+
+Changelog:
+ v1 -> v2:
+ * Patchset is rebased on the new HEAD of net-next.
+ * 0001: R-b tag added.
+ * 0003: check return value of 'send()' call. 
+
+Arseniy Krasnov (4):
+  virtio/vsock: rework MSG_PEEK for SOCK_STREAM
+  virtio/vsock: support MSG_PEEK for SOCK_SEQPACKET
+  vsock/test: rework MSG_PEEK test for SOCK_STREAM
+  vsock/test: MSG_PEEK test for SOCK_SEQPACKET
+
+ net/vmw_vsock/virtio_transport_common.c | 104 +++++++++++++-----
+ tools/testing/vsock/vsock_test.c        | 136 ++++++++++++++++++++++--
+ 2 files changed, 208 insertions(+), 32 deletions(-)
+
+-- 
+2.25.1
+
 
