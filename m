@@ -1,103 +1,228 @@
-Return-Path: <netdev+bounces-18893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C318759034
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:27:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 156DE75903B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF34281185
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FF5D1C20CF6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B76101E3;
-	Wed, 19 Jul 2023 08:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CA4101E4;
+	Wed, 19 Jul 2023 08:28:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAA4C2E9
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:27:32 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251AA1723
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:27:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=N6+akn0phQziho/EEIuyUoRqe176z1tkVAjC0tqL/uA=; b=zG6HJnwySxIOsmwC7+CMKFn3mh
-	9jAihdxKWN4o3d8Evgb3v5tEHQ/Lof+oFODK4TD+SiSpPO53cpTJDeuYmAnFdk7lK2MkK84KnJWzC
-	VumqNsK4JfMQoy2G0X+IXC1oLEHxRLMQW75E4NhhQ2fVcSgT7ef/e6aDZZ2MbpN4fVSNdMaKzpK8d
-	A3CmRo777SRDyvdROYiAjfuZkM1NF6q7zfmqdrsUyPTMHw3bZ9pNyC4qCKwAwbrygcnlj2D89GpV3
-	tdgiXq5kf5yLufftL/5ZAdIkJWdFehSVZe2XhM4Hp2vQk5wjukf8mPMEg7IpwLnhra890B09hrRxf
-	StpYJTqw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35364)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qM2Wm-0007Ac-2g;
-	Wed, 19 Jul 2023 09:27:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qM2Wj-0003v5-15; Wed, 19 Jul 2023 09:27:17 +0100
-Date: Wed, 19 Jul 2023 09:27:16 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: 'Simon Horman' <simon.horman@corigine.com>, kabel@kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Message-ID: <ZLeeZMU4HeiHthQ2@shell.armlinux.org.uk>
-References: <043501d9b580$31798870$946c9950$@trustnetic.com>
- <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com>
- <ZLUymspsQlJL1k8n@shell.armlinux.org.uk>
- <013701d9b957$fc66f740$f534e5c0$@trustnetic.com>
- <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk>
- <013e01d9b95e$66c10350$344309f0$@trustnetic.com>
- <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk>
- <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com>
- <ZLeHyzsRqxAj4ZGO@shell.armlinux.org.uk>
- <01b401d9ba16$aacf75f0$006e61d0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D2DD51D
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:28:32 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A45B1724;
+	Wed, 19 Jul 2023 01:28:29 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36J8S3YA059156;
+	Wed, 19 Jul 2023 03:28:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1689755283;
+	bh=rh4jR5p7dRiOXl51jelf9sjH/P1zNbiAlocST962Fk0=;
+	h=From:To:CC:Subject:Date;
+	b=qNyYgWvVvs4g0n2HvJSEI698koIL0NRy/jvJwYXTzjVvlxfA4ZW95SQIybB3CfDwl
+	 0XNrC4gpP5qBE0Uamg8GHdrqrh2QB27ia9bzpQa6kR2rN00eqMB16L6vmO+UcD3MHV
+	 AowEBeduL2wwMqWQW1c/n1Ey6CCR/IDIfKiEkqm8=
+Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36J8S3Ad007129
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 19 Jul 2023 03:28:03 -0500
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 19
+ Jul 2023 03:28:03 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 19 Jul 2023 03:28:03 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36J8S3cY094772;
+	Wed, 19 Jul 2023 03:28:03 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 36J8S2N4017679;
+	Wed, 19 Jul 2023 03:28:02 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        MD Danish Anwar <danishanwar@ti.com>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v10 0/2] Introduce ICSSG based ethernet Driver
+Date: Wed, 19 Jul 2023 13:57:53 +0530
+Message-ID: <20230719082755.3399424-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01b401d9ba16$aacf75f0$006e61d0$@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 03:57:30PM +0800, Jiawen Wu wrote:
-> > According to this read though (which is in get_mactype), the write
-> > didn't take effect.
-> > 
-> > If you place a delay of 1ms after phy_clear_bits_mmd() in
-> > mv3310_power_up(), does it then work?
-> 
-> Yes, I just experimented, it works well.
+The Programmable Real-time Unit and Industrial Communication Subsystem
+Gigabit (PRU_ICSSG) is a low-latency microcontroller subsystem in the TI
+SoCs. This subsystem is provided for the use cases like the implementation
+of custom peripheral interfaces, offloading of tasks from the other
+processor cores of the SoC, etc.
 
-Please send a patch adding it, with a comment along the lines of:
+The subsystem includes many accelerators for data processing like
+multiplier and multiplier-accumulator. It also has peripherals like
+UART, MII/RGMII, MDIO, etc. Every ICSSG core includes two 32-bit
+load/store RISC CPU cores called PRUs.
 
-	/* Sometimes, the power down bit doesn't clear immediately, and
-	 * a read of this register causes the bit not to clear. Delay
-	 * 1ms to allow the PHY to come out of power down mode before
-	 * the next access.
-	 */
+The above features allow it to be used for implementing custom firmware
+based peripherals like ethernet.
 
-Thanks.
+This series adds the YAML documentation and the driver with basic EMAC
+support for TI AM654 Silicon Rev 2 SoC with the PRU_ICSSG Sub-system.
+running dual-EMAC firmware.
+This currently supports basic EMAC with 1Gbps and 100Mbps link. 10M and
+half-duplex modes are not yet supported because they require the support
+of an IEP, which will be added later.
+Advanced features like switch-dev and timestamping will be added later. 
+
+This is the v10 of the patch series [v1]. This version of the patchset 
+addresses comments made on v9.
+
+There series doesn't have any dependency.
+
+Changes from v9 to v10 :
+*) Rebased the series on latest net-next.
+*) Moved 'ndev prueth->emac[mac] == emac' assignment to the end of function
+   prueth_netdev_init().
+*) In unsupported phy_mode switch case instead of returning -EINVAL, store
+   the error code in ret and 'goto free'
+
+Changes from v8 to v9 :
+*) Rebased the series on latest net-next.
+*) Fixed smatch and sparse warnings as pointed by Simon.
+*) Fixed leaky ndev in prueth_netdev_init() as asked by Simon.
+
+Changes from v7 to v8 :
+*) Rebased the series on 6.5-rc1.
+*) Fixed few formattings. 
+
+Changes from v6 to v7 :
+*) Added RB tag of Rob in patch 1 of this series.
+*) Addressed Simon's comment on patch 2 of the series.
+*) Rebased patchset on next-20230428 linux-next.
+
+Changes from v5 to v6 :
+*) Added RB tag of Andrew Lunn in patch 2 of this series.
+*) Addressed Rob's comment on patch 1 of the series.
+*) Rebased patchset on next-20230421 linux-next.
+
+Changes from v4 to v5 :
+*) Re-arranged properties section in ti,icssg-prueth.yaml file.
+*) Added requirement for minimum one ethernet port.
+*) Fixed some minor formatting errors as asked by Krzysztof.
+*) Dropped SGMII mode from enum mii_mode as SGMII mode is not currently
+   supported by the driver.
+*) Added switch-case block to handle different phy modes by ICSSG driver.
+
+Changes from v3 to v4 :
+*) Addressed Krzysztof's comments and fixed dt_binding_check errors in 
+   patch 1/2.
+*) Added interrupt-extended property in ethernet-ports properties section.
+*) Fixed comments in file icssg_switch_map.h according to the Linux coding
+   style in patch 2/2. Added Documentation of structures in patch 2/2.
+
+Changes from v2 to v3 :
+*) Addressed Rob and Krzysztof's comments on patch 1 of this series.
+   Fixed indentation. Removed description and pinctrl section from 
+   ti,icssg-prueth.yaml file.
+*) Addressed Krzysztof, Paolo, Randy, Andrew and Christophe's comments on 
+   patch 2 of this seires.
+*) Fixed blanklines in Kconfig and Makefile. Changed structures to const 
+   as suggested by Krzysztof.
+*) Fixed while loop logic in emac_tx_complete_packets() API as suggested 
+   by Paolo. Previously in the loop's last iteration 'budget' was 0 and 
+   napi_consume_skb would wrongly assume the caller is not in NAPI context
+   Now, budget won't be zero in last iteration of loop. 
+*) Removed inline functions addr_to_da1() and addr_to_da0() as asked by 
+   Andrew.
+*) Added dev_err_probe() instead of dev_err() as suggested by Christophe.
+*) In ti,icssg-prueth.yaml file, in the patternProperties section of 
+   ethernet-ports, kept the port name as "port" instead of "ethernet-port" 
+   as all other drivers were using "port". Will change it if is compulsory 
+   to use "ethernet-port".
+
+[v1] https://lore.kernel.org/all/20220506052433.28087-1-p-mohan@ti.com/
+[v2] https://lore.kernel.org/all/20220531095108.21757-1-p-mohan@ti.com/
+[v3] https://lore.kernel.org/all/20221223110930.1337536-1-danishanwar@ti.com/
+[v4] https://lore.kernel.org/all/20230206060708.3574472-1-danishanwar@ti.com/
+[v5] https://lore.kernel.org/all/20230210114957.2667963-1-danishanwar@ti.com/
+[v6] https://lore.kernel.org/all/20230424053233.2338782-1-danishanwar@ti.com/
+[v7] https://lore.kernel.org/all/20230502061650.2716736-1-danishanwar@ti.com/
+[v8] https://lore.kernel.org/all/20230710053550.89160-1-danishanwar@ti.com/
+[v9] https://lore.kernel.org/all/20230714094432.1834489-1-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+
+MD Danish Anwar (1):
+  dt-bindings: net: Add ICSSG Ethernet
+
+Roger Quadros (1):
+  net: ti: icssg-prueth: Add ICSSG ethernet driver
+
+ .../bindings/net/ti,icssg-prueth.yaml         |  184 ++
+ drivers/net/ethernet/ti/Kconfig               |   13 +
+ drivers/net/ethernet/ti/Makefile              |    2 +
+ drivers/net/ethernet/ti/icssg_classifier.c    |  367 ++++
+ drivers/net/ethernet/ti/icssg_config.c        |  450 ++++
+ drivers/net/ethernet/ti/icssg_config.h        |  200 ++
+ drivers/net/ethernet/ti/icssg_ethtool.c       |  326 +++
+ drivers/net/ethernet/ti/icssg_mii_cfg.c       |  120 ++
+ drivers/net/ethernet/ti/icssg_mii_rt.h        |  151 ++
+ drivers/net/ethernet/ti/icssg_prueth.c        | 1890 +++++++++++++++++
+ drivers/net/ethernet/ti/icssg_prueth.h        |  252 +++
+ drivers/net/ethernet/ti/icssg_queues.c        |   38 +
+ drivers/net/ethernet/ti/icssg_switch_map.h    |  234 ++
+ 13 files changed, 4227 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssg_classifier.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_config.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_config.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_ethtool.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_mii_cfg.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_mii_rt.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_prueth.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_prueth.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_queues.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_switch_map.h
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
