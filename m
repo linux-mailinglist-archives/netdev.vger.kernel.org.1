@@ -1,225 +1,124 @@
-Return-Path: <netdev+bounces-19194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E005E759EBF
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:34:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2881F759ECE
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0319C1C21198
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:34:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E79D281A63
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED561BB3D;
-	Wed, 19 Jul 2023 19:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC791BB46;
+	Wed, 19 Jul 2023 19:36:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FF11FB42
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:33:10 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA21B268B;
-	Wed, 19 Jul 2023 12:32:51 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id B094112007F;
-	Wed, 19 Jul 2023 22:32:49 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru B094112007F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1689795169;
-	bh=xFK6wvHnDMcWR1WaNUgaOhaKf8/llnzNh96n/+7csqE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=l0v7DCbAdFJvikgtKrOlNcHeGkfzFDhYfYqHkQNUEfKLwwZ+bxt4xePmrzjHu3s0S
-	 qzU+hWYJByGI2Qg95558OZfWegyoumn3Fdxi9iSc+Uk3fru8DVXeDunTIJ6zz+bCSb
-	 ebScfgtoTcUgkaY7j2YD+iVuYj4QNogMvW9Tw9PZVTCVGoyZ5APsRMgRuNrb5FLEBd
-	 NzbH8gFsDcaCg1fWugYGqE/jVHiHnzlBa7VXqH2pXGXilszx/j5sqiUnPibYCbOhuX
-	 YCo7IDkKDnwfBlhwPrNlXQwShZkKr/yKPmRFl7an5Q7/RYqp/OlRVU0hpR/+O+y6gj
-	 jU0ZWcbv1GwDA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 19 Jul 2023 22:32:49 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 22:32:48 +0300
-From: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@sberdevices.ru>,
-	Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v2 4/4] vsock/test: MSG_PEEK test for SOCK_SEQPACKET
-Date: Wed, 19 Jul 2023 22:27:08 +0300
-Message-ID: <20230719192708.1775162-5-AVKrasnov@sberdevices.ru>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
-References: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F010C138
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:36:46 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A23C1FD8
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:36:20 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b95d5ee18dso14442351fa.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1689795345; x=1692387345;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rtl6gXXMYsoBnIpPYfSTqQ6nm1s8Hn5GW+fEct1ALRE=;
+        b=Zhw4JJ4K/38BOlZM21pHWDopKnx38TCDNfnXcKZHpT7uRqEqXE9WONINOAv9x6yiUj
+         z+XUsIZz2aKcBKEiQPUdSZ4hejspiaLEcEvoQjmfzw/3G5HXTxgK4A9mvFZ//TIcP2A6
+         YyRF2CDGgYyMaztEqeHFfJfxRmV3g4oGKIn6g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689795345; x=1692387345;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rtl6gXXMYsoBnIpPYfSTqQ6nm1s8Hn5GW+fEct1ALRE=;
+        b=QcPSwCtgu7sTOf4Q9e8IueE6izo8vY71iq8o6AAMEw97G+hBzvN/cl0GBIb4OF5otj
+         EiDbA3qjnU421KuGnIIHmVxUKkd+3czy5Dr5V3fj0z734HDgHC5NE6K8VcZHcjA54RzD
+         li6qarOoytMD8ifXZYXdIYuFjz5pfXIv2iFezI0lNNaDz3denJF/QAmGYCFHKkNbnB4J
+         eNbIgTVovsAXEZs8oN+hKKQAp/dZ4IP93zFfVowymd3lS3pgRS73tTuRmHtMZpv9e3C1
+         HqkM6Q6KtYwaQSmqHqtSwW0JatefgZkyR3LotQgLc3PnmRGbipIMKw1u46gS692pMIKH
+         SWYg==
+X-Gm-Message-State: ABy/qLZfJJFaBKEghPTCueS+aQ3ubLgl3eYU8XWOdVGx4JKoDO+wKfsa
+	TVK2XxXZE7OQl9f1vo+8rqGzAFOZcNXlZob1qFiYGg==
+X-Google-Smtp-Source: APBJJlF263loCbf4G/vbjQ8OkGORJrA6h2pTRLBd08SnNbJHsNdGQLjuleOM0+lhq7ys4UZ/gSu7iS5raBbyA9YXqQA=
+X-Received: by 2002:a2e:9584:0:b0:2b6:e2c1:980f with SMTP id
+ w4-20020a2e9584000000b002b6e2c1980fmr643994ljh.36.1689795345357; Wed, 19 Jul
+ 2023 12:35:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178730 [Jul 19 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/19 15:29:00 #21641898
-X-KSMG-AntiVirus-Status: Clean, skipped
+References: <20230629155433.4170837-1-dhowells@redhat.com> <20230629155433.4170837-2-dhowells@redhat.com>
+ <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com> <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name>
+In-Reply-To: <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Wed, 19 Jul 2023 21:35:33 +0200
+Message-ID: <CAJfpegvq4M_Go7fHiWVBBkrK6h4ChLqQTd0+EOKbRWZDcVerWA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after
+ splice() returns
+To: Matt Whitlock <kernel@mattwhitlock.name>
+Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
+	Matthew Wilcox <willy@infradead.org>, Dave Chinner <david@fromorbit.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, linux-fsdevel@kvack.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This adds MSG_PEEK test for SOCK_SEQPACKET. It works in the same way as
-SOCK_STREAM test, except it also tests MSG_TRUNC flag.
+On Wed, 19 Jul 2023 at 19:59, Matt Whitlock <kernel@mattwhitlock.name> wrot=
+e:
+>
+> On Wednesday, 19 July 2023 06:17:51 EDT, Miklos Szeredi wrote:
+> > On Thu, 29 Jun 2023 at 17:56, David Howells <dhowells@redhat.com> wrote=
+:
+> >>
+> >> Splicing data from, say, a file into a pipe currently leaves the sourc=
+e
+> >> pages in the pipe after splice() returns - but this means that those p=
+ages
+> >> can be subsequently modified by shared-writable mmap(), write(),
+> >> fallocate(), etc. before they're consumed.
+> >
+> > What is this trying to fix?   The above behavior is well known, so
+> > it's not likely to be a problem.
+>
+> Respectfully, it's not well-known, as it's not documented. If the splice(=
+2)
+> man page had mentioned that pages can be mutated after they're already
+> ostensibly at rest in the output pipe buffer, then my nightly backups
+> wouldn't have been incurring corruption silently for many months.
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
----
- tools/testing/vsock/vsock_test.c | 58 +++++++++++++++++++++++++++++---
- 1 file changed, 54 insertions(+), 4 deletions(-)
+splice(2):
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 444a3ff0681f..2ca2cbfa9808 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -257,14 +257,19 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
- 
- #define MSG_PEEK_BUF_LEN 64
- 
--static void test_stream_msg_peek_client(const struct test_opts *opts)
-+static void __test_msg_peek_client(const struct test_opts *opts,
-+				   bool seqpacket)
- {
- 	unsigned char buf[MSG_PEEK_BUF_LEN];
- 	ssize_t send_size;
- 	int fd;
- 	int i;
- 
--	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (seqpacket)
-+		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
-+	else
-+		fd = vsock_stream_connect(opts->peer_cid, 1234);
-+
- 	if (fd < 0) {
- 		perror("connect");
- 		exit(EXIT_FAILURE);
-@@ -290,7 +295,8 @@ static void test_stream_msg_peek_client(const struct test_opts *opts)
- 	close(fd);
- }
- 
--static void test_stream_msg_peek_server(const struct test_opts *opts)
-+static void __test_msg_peek_server(const struct test_opts *opts,
-+				   bool seqpacket)
- {
- 	unsigned char buf_half[MSG_PEEK_BUF_LEN / 2];
- 	unsigned char buf_normal[MSG_PEEK_BUF_LEN];
-@@ -298,7 +304,11 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- 	ssize_t res;
- 	int fd;
- 
--	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (seqpacket)
-+		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
-+	else
-+		fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+
- 	if (fd < 0) {
- 		perror("accept");
- 		exit(EXIT_FAILURE);
-@@ -340,6 +350,21 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- 		exit(EXIT_FAILURE);
- 	}
- 
-+	if (seqpacket) {
-+		/* This type of socket supports MSG_TRUNC flag,
-+		 * so check it with MSG_PEEK. We must get length
-+		 * of the message.
-+		 */
-+		res = recv(fd, buf_half, sizeof(buf_half), MSG_PEEK |
-+			   MSG_TRUNC);
-+		if (res != sizeof(buf_peek)) {
-+			fprintf(stderr,
-+				"recv(2) + MSG_PEEK | MSG_TRUNC, exp %zu, got %zi\n",
-+				sizeof(buf_half), res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
- 	res = recv(fd, buf_normal, sizeof(buf_normal), 0);
- 	if (res != sizeof(buf_normal)) {
- 		fprintf(stderr, "recv(2), expected %zu, got %zi\n",
-@@ -356,6 +381,16 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_stream_msg_peek_client(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_client(opts, false);
-+}
-+
-+static void test_stream_msg_peek_server(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_server(opts, false);
-+}
-+
- #define SOCK_BUF_SIZE (2 * 1024 * 1024)
- #define MAX_MSG_SIZE (32 * 1024)
- 
-@@ -1125,6 +1160,16 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_seqpacket_msg_peek_client(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_client(opts, true);
-+}
-+
-+static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_server(opts, true);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1200,6 +1245,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_virtio_skb_merge_client,
- 		.run_server = test_stream_virtio_skb_merge_server,
- 	},
-+	{
-+		.name = "SOCK_SEQPACKET MSG_PEEK",
-+		.run_client = test_seqpacket_msg_peek_client,
-+		.run_server = test_seqpacket_msg_peek_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+       Though we talk of copying, actual copies are generally avoided.
+The kernel does this by implementing a pipe buffer as a set  of
+refer=E2=80=90
+       ence-counted  pointers  to  pages  of kernel memory.  The
+kernel creates "copies" of pages in a buffer by creating new pointers
+(for the
+       output buffer) referring to the pages, and increasing the
+reference counts for the pages: only pointers are copied, not the
+pages of the
+       buffer.
 
+While not explicitly stating that the contents of the pages can change
+after being spliced, this can easily be inferred from the above
+semantics.
+
+Thanks,
+Miklos
 
