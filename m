@@ -1,110 +1,152 @@
-Return-Path: <netdev+bounces-19013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB2E759526
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:32:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F55759534
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E1BD281821
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:32:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 208922818ED
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B06C12B9E;
-	Wed, 19 Jul 2023 12:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6E38107B5;
+	Wed, 19 Jul 2023 12:36:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB1114AA0
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:32:17 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D49136
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:32:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=1z4UMtFUS+UMq9pCbej0PTan3ZjiLdHvyY77ZjGpLQE=; b=ZDAdE0ZDjk9+g9wDhOb4YushFa
-	FqFmcKw7APWOqanWS0Wp50YoI2mPE7XSoouKkWvsTozvTGpmxMqd3C36xHEs9kFSppVo++osxQhL9
-	EjcqqYsqVjCGiXsOQW4n8wB2HLNXHxjounl5rueoGd0DVDCtCMViL6FGqmJpIhUaZ9E6jg/LdETSs
-	WIzu+BFGQatHr1nBEyRFcQoRxq6sehna+jGkS92Q3vY2H4aZQw10OroLBsj8c5dGX4g/irU3IC37F
-	LOUPRn9rL6bxkmDJ9OfF9KCGjQ9c9GIlErf9Khphp8z8EGRA7+aX5h96tthWP4mzIzYbP6jotZOr0
-	/C83G/QA==;
-Received: from [192.168.1.4] (port=34992 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qM6Lb-0003nx-18;
-	Wed, 19 Jul 2023 14:32:03 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Wed, 19 Jul 2023 14:32:02 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <ante.knezic@helmholz.de>
-CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Wed, 19 Jul 2023 14:31:59 +0200
-Message-ID: <20230719123159.7099-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20230719090853.21509-1-ante.knezic@helmholz.de>
-References: <20230719090853.21509-1-ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A68101E6
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:36:10 +0000 (UTC)
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C938E0;
+	Wed, 19 Jul 2023 05:36:09 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso5178285a12.3;
+        Wed, 19 Jul 2023 05:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689770169; x=1690374969;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BZdKOkj/pVrFSmE8tkXiZ35iQBmOuKBnbuFSjBYYCYM=;
+        b=qKujtPbWHCdhULLk6BL+9cSOPZl355b9NMUZuqVpy1vP9noL9gzlP0beeIT8Aybc9r
+         22QjjwKM9utPp+OeTlI1AABqGgDU7PqYvGPvSOV5z5K2b/kCNgEvTfFSv+UGZzHrVZ3H
+         H9lBLip5BoITAL9mXlNUdZUrpe7s0FZ5XKJoBe6fHGIAIGhcEIka1h9kWHJOkUfoV73l
+         vW7KXdMPLDe9tO0R/BebWTSW/2lnDjCbgXkZyZn1jVhPWPnrjYAP8sPo11DohIadhTEW
+         sfQMJD/9tfuVzDzTJV8bNoruPxgtXuNm+fZLA3ic8k6xs9vsf6z3uzyo0zv+8v8GYke2
+         AaYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689770169; x=1690374969;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BZdKOkj/pVrFSmE8tkXiZ35iQBmOuKBnbuFSjBYYCYM=;
+        b=W2izTA5jHmDsOzruWANzRFP6U2Vf51J38TgO+qkX1LLKcp5DRo4vNq2MnObfsP8ENZ
+         ZZF5TiP0v1/qfjQeTSdP7FwCebJmSPy4Lbed+gg80wLO9b5ZeJg7Ut8jfdWRr0dY3OmO
+         AfC5iL0QrG+dXWGs7cWMJmtLh54+4gLtQuUl5XEj+8aCFJYiTN1/ek8HM5wXdKbpYKQn
+         gN6WfSrR1a5X+KuY/Hi4v7mGERrx7V5Ktzkxv2IdXOXQfteNd1keOfNojQU2adbcwCcU
+         AQPe5S97qHrm/4Fx49zDwVjgC9YUMLm4l5N6XSoPnTsPyYNn5dLGgmtbiHs0oZIsx2j8
+         D2qQ==
+X-Gm-Message-State: ABy/qLYDWkjdbSNUKAJPhiWApqyl4VClt4Cbx5hUado0SZPJ7QDC5i8Z
+	026z0Phpl2Kqqhd4IFXEK9xju3Zip1kZ4G+3
+X-Google-Smtp-Source: APBJJlGucFMUwkgT49zJJYTKA+XetmHtHCMMw1YV8DRbgBunp2jmaYGuZc7Ec1h8XcCkNNaQh+NrQQ==
+X-Received: by 2002:a17:90a:d392:b0:262:d661:75e4 with SMTP id q18-20020a17090ad39200b00262d66175e4mr1965052pju.0.1689770168957;
+        Wed, 19 Jul 2023 05:36:08 -0700 (PDT)
+Received: from smtpclient.apple ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id 22-20020a17090a019600b0026309d57724sm1185425pjc.39.2023.07.19.05.36.05
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 19 Jul 2023 05:36:08 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [PATCH net-next v2] net: tcp: support to probe tcp receiver OOM
+From: Menglong Dong <menglong8.dong@gmail.com>
+In-Reply-To: <CANn89iJMzChaDsB+bPAuCEDUHVApsYs8KtD3oEC+oU_Qvi1KvQ@mail.gmail.com>
+Date: Wed, 19 Jul 2023 20:35:39 +0800
+Cc: ncardwell@google.com,
+ davem@davemloft.net,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ corbet@lwn.net,
+ dsahern@kernel.org,
+ kuniyu@amazon.com,
+ morleyd@google.com,
+ imagedong@tencent.com,
+ mfreemon@cloudflare.com,
+ mubashirq@google.com,
+ netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <95B4463B-F57A-46A0-8F04-D52A84058343@gmail.com>
+References: <20230713112404.2022373-1-imagedong@tencent.com>
+ <CANn89iJMzChaDsB+bPAuCEDUHVApsYs8KtD3oEC+oU_Qvi1KvQ@mail.gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+X-Mailer: Apple Mail (2.3731.600.7)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > It needs to be implemented exactly as posted here? After mv88e6390_serdes_power()
-> > is called on any port/lane, mv88e6390x_serdes_erratum_3_14() needs to run
-> > for all lanes? That might be a problem.
-> 
-> Actually, I tested applying erratum only on requested lane in pcs_post_config and
-> it seems to work out fine, so we might use something like:
-> static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
-> {
-> 	int err;
-> 
-> 	/* 88e6190x and 88e6390x errata 3.14:
-> 	 * After chip reset, SERDES reconfiguration or SERDES core
-> 	 * Software Reset, the SERDES lanes may not be properly aligned
-> 	 * resulting in CRC errors
-> 	 */
-> 
-> 	err = mdiodev_c45_write(&mpcs->mdio, MDIO_MMD_PHYXS,
-> 					 0xf054, 0x400C);
-> 	if (err)
-> 	        return err;
-> 
-> 	err = mdiodev_c45_write(&mpcs->mdio, MDIO_MMD_PHYXS,
-> 				 0xf054, 0x4000);
-> 	if (err)
-> 	        return err;
-> 
-> 	return 0;
-> }
 
-Unfortunatelly, above statement is not correct. I managed to occasionally replicate
-the issue when applying erratum on requested lane only. This happens on occasion
-only but it looks like we need to apply erratum on all serdes lanes to ensure 
-proper operation.
-The Errata document falls short on this detail and does not clearly state whether all 
-or only specific lanes need to be written to.
+
+> On Jul 18, 2023, at 00:46, Eric Dumazet <edumazet@google.com> wrote:
+>=20
+> On Thu, Jul 13, 2023 at 1:24=E2=80=AFPM <menglong8.dong@gmail.com> =
+wrote:
+>>=20
+>> From: Menglong Dong <imagedong@tencent.com>
+>>=20
+>> For now, skb will be dropped directly if rmem schedule fails, which =
+means
+>> tcp_try_rmem_schedule() returns an error. This can happen on =
+following
+>> cases:
+>>=20
+>> 1. The total memory allocated for TCP protocol is up to tcp_mem[2], =
+and
+>>   the receive queue of the tcp socket is not empty.
+>> 2. The receive buffer of the tcp socket is full, which can happen on =
+small
+>>   packet cases.
+>>=20
+>> If the user hangs and doesn't take away the packet in the receive =
+queue
+>> with recv() or read() for a long time, the sender will keep
+>> retransmitting until timeout, and the tcp connection will break.
+>>=20
+>> In order to handle such case, we introduce the tcp protocol OOM =
+detection
+>> in following steps, as Neal Cardwell suggested:
+>>=20
+>=20
+> For the record, I dislike this patch. I am not sure what Neal had in =
+mind.
+>=20
+> I suggested instead to send an ACK RWIN 0, whenever we were under
+> extreme memory pressure,
+> and we only could queue one skb in the receive queue.
+>=20
+> For details, look at the points we call sk_forced_mem_schedule().
+> This would be a matter of refactoring code around it, in =
+tcp_data_queue()
+>=20
+> The patch would be much simpler. Nothing changed at the sender side :/
+
+I think you are right. I misunderstood the code in =
+tcp_retransmit_timer().
+It seems that it already handle the window shrink case properly.
+
+Let me do more testing first.
+
+Thanks!
+Menglong Dong
 
 
