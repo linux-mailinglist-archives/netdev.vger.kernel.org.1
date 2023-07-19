@@ -1,107 +1,237 @@
-Return-Path: <netdev+bounces-18945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A1F7592A2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:20:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 369977592C5
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6F6E281698
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:20:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 649B31C20E06
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AFA12B63;
-	Wed, 19 Jul 2023 10:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F54A12B68;
+	Wed, 19 Jul 2023 10:22:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC7C125C8;
-	Wed, 19 Jul 2023 10:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 208FBC433C9;
-	Wed, 19 Jul 2023 10:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689762022;
-	bh=vf8HyJJMrc8y7a7IGPiDvWuMwVrymE8dAVACw2+VXLk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dyPvgc7QPw92aTMqOMCFf0EVygxyojg/kI76uXPrVf0yXopJTOOw98lV/L4NSn+uM
-	 aiHrCeLetjHDC6LImN7FStfe20PaCqqqoS5vEloINk9sRfZSte3N0XX1OYCNALUY3j
-	 Gz0Iw9hAs5SHbKzfYEa6p5rwnh+Ouj1I5/ERYOFMuuN/FQDsIzZb/oB6VyV9spijCp
-	 XW/3S7UgTEEU/RKI4atORf03n1N6zkbdHtttu7AAnaU3hxlZrji3382yGicDMzfeEa
-	 CqRPbZPMRrkK65sdBeB6Xb47afXkp40enwisLphkCSfUCSv7hZrTFsDi03F2SF5o4v
-	 dR6MxgixWCQtA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 03177E21EFE;
-	Wed, 19 Jul 2023 10:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535B1125C8
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:22:08 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD5530C6;
+	Wed, 19 Jul 2023 03:21:37 -0700 (PDT)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36J4gS0r008449;
+	Wed, 19 Jul 2023 10:21:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id; s=qcppdkim1;
+ bh=H1tWmuhbuVnxEhxL5TNv7ayIR5yNwafgkSHF+1A4gYI=;
+ b=eeSbcJvx12vKU91V4jypzzaD/+nSAmDCLacmZzS6+d7y4AWLk1uHzVucAk/aYB20LMsf
+ csitA4xqSl486y+VCty0F5oxGfYxdXCfcDfh/IlvmLrPc4VmgP5os7N2+hsM+pT7s13V
+ NB29nGeII3nV4mgwnNny+bPsGWN+niQ8gTmgYCWLgYG76JwtJH5e1zjGDqoKamZsIv4y
+ LROvKZExJVvhWvgszbyuQ35Atd4L6+XWcfIC1iWeqJ1MifsO7RsehJaIoaJs+tWZFIGe
+ 6OkE8I2DVvyHh4g0h87WOYRcd3cq1jQDuB30ei6IgwHtSJlbea4UAhx2dqyD36ojiS02 kw== 
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rwnrrk1yj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jul 2023 10:21:02 +0000
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 36JAKxBb008071;
+	Wed, 19 Jul 2023 10:20:59 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3rumhm2ngb-1;
+	Wed, 19 Jul 2023 10:20:59 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36JAKwlN008066;
+	Wed, 19 Jul 2023 10:20:59 GMT
+Received: from hu-sgudaval-hyd.qualcomm.com (hu-vpernami-hyd.qualcomm.com [10.213.107.240])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 36JAKwkW008065;
+	Wed, 19 Jul 2023 10:20:58 +0000
+Received: by hu-sgudaval-hyd.qualcomm.com (Postfix, from userid 2370923)
+	id 8C5794BFF; Wed, 19 Jul 2023 15:50:57 +0530 (+0530)
+From: Vivek Pernamitta <quic_vpernami@quicinc.com>
+To: mhi@lists.linux.dev
+Cc: mrana@quicinc.com, quic_qianyu@quicinc.com,
+        manivannan.sadhasivam@linaro.org, quic_vbadigan@quicinc.com,
+        quic_krichai@quicinc.com, quic_skananth@quicinc.com,
+        andersson@kernel.org, simon.horman@corigine.com, dnlplm@gmail.com,
+        linux-arm-msm@vger.kernel.org,
+        Vivek Pernamitta <quic_vpernami@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH V3] net: mhi : Add support to enable ethernet interface
+Date: Wed, 19 Jul 2023 15:50:54 +0530
+Message-Id: <1689762055-12570-1-git-send-email-quic_vpernami@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: aZkQJcWMLG1M_zCuv_KJlx3G7RdfW1lV
+X-Proofpoint-ORIG-GUID: aZkQJcWMLG1M_zCuv_KJlx3G7RdfW1lV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-19_06,2023-07-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ malwarescore=0 suspectscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=873 priorityscore=1501 impostorscore=0 mlxscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307190093
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/13] selftests: mptcp: format subtests results
- in TAP
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168976202200.10961.989071815064643315.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jul 2023 10:20:22 +0000
-References: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
-In-Reply-To: <20230717-upstream-net-next-20230712-selftests-mptcp-subtests-v1-0-695127e0ad83@tessares.net>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
 
-Hello:
+Add support to enable ethernet network device for MHI NET driver
+currenlty we have support only NET driver.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Vivek Pernamitta <quic_vpernami@quicinc.com>
+---
+ drivers/net/mhi_net.c | 53 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 40 insertions(+), 13 deletions(-)
 
-On Mon, 17 Jul 2023 15:21:20 +0200 you wrote:
-> The current selftests infrastructure formats the results in TAP 13. This
-> version doesn't support subtests and only the end result of each
-> selftest is taken into account. It means that a single issue in a
-> subtest of a selftest containing multiple subtests forces the whole
-> selftest to be marked as failed. It also means that subtests results are
-> not tracked by CI executing selftests.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/13] selftests: mptcp: connect: don't stop if error
-    https://git.kernel.org/netdev/net-next/c/edbc16c43b27
-  - [net-next,02/13] selftests: mptcp: userspace pm: don't stop if error
-    https://git.kernel.org/netdev/net-next/c/e141c1e8e4c1
-  - [net-next,03/13] selftests: mptcp: userspace_pm: fix shellcheck warnings
-    https://git.kernel.org/netdev/net-next/c/8320b1387a15
-  - [net-next,04/13] selftests: mptcp: userspace_pm: uniform results printing
-    https://git.kernel.org/netdev/net-next/c/e198ad759273
-  - [net-next,05/13] selftests: mptcp: userspace_pm: reduce dup code around printf
-    https://git.kernel.org/netdev/net-next/c/d8463d81652d
-  - [net-next,06/13] selftests: mptcp: lib: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/c4192967e62f
-  - [net-next,07/13] selftests: mptcp: connect: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/dd350f46e35e
-  - [net-next,08/13] selftests: mptcp: pm_netlink: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/d85555ac11f9
-  - [net-next,09/13] selftests: mptcp: join: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/7f117cd37c61
-  - [net-next,10/13] selftests: mptcp: diag: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/ce9902573652
-  - [net-next,11/13] selftests: mptcp: simult flows: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/675d99338e7a
-  - [net-next,12/13] selftests: mptcp: sockopt: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/9e86a297796b
-  - [net-next,13/13] selftests: mptcp: userspace_pm: format subtests results in TAP
-    https://git.kernel.org/netdev/net-next/c/f589234e1af0
-
-You are awesome, thank you!
+diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+index 3d322ac..5bb8d99 100644
+--- a/drivers/net/mhi_net.c
++++ b/drivers/net/mhi_net.c
+@@ -11,6 +11,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/skbuff.h>
+ #include <linux/u64_stats_sync.h>
++#include <linux/etherdevice.h>
+ 
+ #define MHI_NET_MIN_MTU		ETH_MIN_MTU
+ #define MHI_NET_MAX_MTU		0xffff
+@@ -38,10 +39,12 @@ struct mhi_net_dev {
+ 	u32 rx_queue_sz;
+ 	int msg_enable;
+ 	unsigned int mru;
++	bool ethernet_if;
+ };
+ 
+ struct mhi_device_info {
+ 	const char *netname;
++	bool ethernet_if;
+ };
+ 
+ static int mhi_ndo_open(struct net_device *ndev)
+@@ -140,6 +143,14 @@ static void mhi_net_setup(struct net_device *ndev)
+ 	ndev->tx_queue_len = 1000;
+ }
+ 
++static void mhi_ethernet_setup(struct net_device *ndev)
++{
++	ndev->netdev_ops = &mhi_netdev_ops;
++	ether_setup(ndev);
++	ndev->min_mtu = ETH_MIN_MTU;
++	ndev->max_mtu = ETH_MAX_MTU;
++}
++
+ static struct sk_buff *mhi_net_skb_agg(struct mhi_net_dev *mhi_netdev,
+ 				       struct sk_buff *skb)
+ {
+@@ -209,16 +220,22 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
+ 			mhi_netdev->skbagg_head = NULL;
+ 		}
+ 
+-		switch (skb->data[0] & 0xf0) {
+-		case 0x40:
+-			skb->protocol = htons(ETH_P_IP);
+-			break;
+-		case 0x60:
+-			skb->protocol = htons(ETH_P_IPV6);
+-			break;
+-		default:
+-			skb->protocol = htons(ETH_P_MAP);
+-			break;
++		if (mhi_netdev->ethernet_if) {
++			skb_copy_to_linear_data(skb, skb->data,
++						mhi_res->bytes_xferd);
++			skb->protocol = eth_type_trans(skb, mhi_netdev->ndev);
++		} else {
++			switch (skb->data[0] & 0xf0) {
++			case 0x40:
++				skb->protocol = htons(ETH_P_IP);
++				break;
++			case 0x60:
++				skb->protocol = htons(ETH_P_IPV6);
++				break;
++			default:
++				skb->protocol = htons(ETH_P_MAP);
++				break;
++			}
+ 		}
+ 
+ 		u64_stats_update_begin(&mhi_netdev->stats.rx_syncp);
+@@ -301,11 +318,17 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+ 		schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
+ }
+ 
+-static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
++static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev, bool eth_dev)
+ {
+ 	struct mhi_net_dev *mhi_netdev;
+ 	int err;
+ 
++	if (eth_dev) {
++		eth_hw_addr_random(ndev);
++		if (!is_valid_ether_addr(ndev->dev_addr))
++			return -EADDRNOTAVAIL;
++	}
++
+ 	mhi_netdev = netdev_priv(ndev);
+ 
+ 	dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+@@ -313,6 +336,7 @@ static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
+ 	mhi_netdev->mdev = mhi_dev;
+ 	mhi_netdev->skbagg_head = NULL;
+ 	mhi_netdev->mru = mhi_dev->mhi_cntrl->mru;
++	mhi_netdev->ethernet_if = eth_dev;
+ 
+ 	INIT_DELAYED_WORK(&mhi_netdev->rx_refill, mhi_net_rx_refill_work);
+ 	u64_stats_init(&mhi_netdev->stats.rx_syncp);
+@@ -356,13 +380,14 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+ 	int err;
+ 
+ 	ndev = alloc_netdev(sizeof(struct mhi_net_dev), info->netname,
+-			    NET_NAME_PREDICTABLE, mhi_net_setup);
++			    NET_NAME_PREDICTABLE, info->ethernet_if ?
++			    mhi_ethernet_setup : mhi_net_setup);
+ 	if (!ndev)
+ 		return -ENOMEM;
+ 
+ 	SET_NETDEV_DEV(ndev, &mhi_dev->dev);
+ 
+-	err = mhi_net_newlink(mhi_dev, ndev);
++	err = mhi_net_newlink(mhi_dev, ndev, info->ethernet_if);
+ 	if (err) {
+ 		free_netdev(ndev);
+ 		return err;
+@@ -380,10 +405,12 @@ static void mhi_net_remove(struct mhi_device *mhi_dev)
+ 
+ static const struct mhi_device_info mhi_hwip0 = {
+ 	.netname = "mhi_hwip%d",
++	.ethernet_if = false,
+ };
+ 
+ static const struct mhi_device_info mhi_swip0 = {
+ 	.netname = "mhi_swip%d",
++	.ethernet_if = false,
+ };
+ 
+ static const struct mhi_device_id mhi_net_id_table[] = {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.7.4
 
 
