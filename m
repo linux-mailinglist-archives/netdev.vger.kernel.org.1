@@ -1,108 +1,98 @@
-Return-Path: <netdev+bounces-19111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF73759C3E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:18:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37C29759C46
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1984028198C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 448221C210D4
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596E51FB44;
-	Wed, 19 Jul 2023 17:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85521FB54;
+	Wed, 19 Jul 2023 17:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAFB17F6
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 17:18:55 +0000 (UTC)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFBD189;
-	Wed, 19 Jul 2023 10:18:53 -0700 (PDT)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-52166c7f77cso8685885a12.2;
-        Wed, 19 Jul 2023 10:18:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689787132; x=1692379132;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HJ8zyPA28H2PBLz8lr4+2NlPFh5DMTLYGFS9mgafKcY=;
-        b=EdmHU8N936Tg5yFldrBTh0UBsL6U1yjpXDu+8EdaGEJtcAulimdbkyDbmHUIzsL5/T
-         Z8NQrLkOu6HA+qdYGGriwFa5KOuZzBxRx+JpK664QqO+9AnKHUPlSas7Hya1fsqtPGTD
-         N9xVypkjYvVFsupXiUKKjENvPYFSBRMO6vy8SA3jjC+7jeRBxJHxZbvQzBu935/mfnNR
-         l75p3QHodqDfMZyLZIHtPDtXb7qWsH6Ka3PBGswUgWZ0O7MtZWDG8j0HkYKkyZC3xQhF
-         8IFpt5f7raGa4CB5j+sE6tTLhy44Rw9lthkKrWju+8Wr0Py/qlfbBffBUvHgRRHP7GPK
-         UsPQ==
-X-Gm-Message-State: ABy/qLaQFG54qtG1V1rD6l97CZPsAKtY2vngbjFaeqWmvPAfoOFBBUnM
-	sPPjDgtmbHAf1KdqMKRFkik=
-X-Google-Smtp-Source: APBJJlEOJvQn9kSsZWsRdnFrSThCTxwiUITIx9D1MPZqWcvz6lb1LwjVA9hbY8O/MmLpzg1hUSocNw==
-X-Received: by 2002:a05:6402:1a31:b0:51d:96d2:6578 with SMTP id be17-20020a0564021a3100b0051d96d26578mr3359383edb.28.1689787131622;
-        Wed, 19 Jul 2023 10:18:51 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-017.fbsv.net. [2a03:2880:31ff:11::face:b00c])
-        by smtp.gmail.com with ESMTPSA id k19-20020a05640212d300b00521d1c34b23sm371987edx.83.2023.07.19.10.18.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 10:18:51 -0700 (PDT)
-Date: Wed, 19 Jul 2023 10:18:49 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: alexander@mihalicyn.com, ast@kernel.org, davem@davemloft.net,
-	dhowells@redhat.com, edumazet@google.com, kernelxing@tencent.com,
-	kuba@kernel.org, leit@meta.com, linux-kernel@vger.kernel.org,
-	lucien.xin@gmail.com, martin.lau@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next] net: Use _K_SS_MAXSIZE instead of absolute value
-Message-ID: <ZLga+cBUKkN5Fnn7@gmail.com>
-References: <20230719084415.1378696-1-leitao@debian.org>
- <20230719170445.30993-1-kuniyu@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4C51FB20;
+	Wed, 19 Jul 2023 17:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 01CEFC433CA;
+	Wed, 19 Jul 2023 17:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689787225;
+	bh=URXPVHsvBOUjIT9KmzBdm/AoUMJJhjsghGcnMvLx9rg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p+ZTJ/k87gOBjTBkElebeXSjP6H/MvIq02w7qUX3n8MtkjyDR35nRTR9rJeWrdpFU
+	 5EKCH1QYQLlWuKyfy72n00iV3FTwxyzar8LDbrWA587JhCpVFc0YXvP5PWAfcJhjK/
+	 94yze/ieaGRa9AAMnahWA8Wt98IklQ0XwF/Zal27m/0BKz7A/b53FS67ARKHiOgf1B
+	 3xI6n4bWE2BtWSXRhazYTAQKtKyzmlkqZOb8PC+ixtn+wm++WR8XWfqixVz7pNAijw
+	 uZYOu/4e9anpTYf3r+tqC7DPNrMPTQ27/dr3TyREze1quMsJ0FuE0dV/DygN/wQv0y
+	 YtCF+q/3KdJEg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CF41AE22AE2;
+	Wed, 19 Jul 2023 17:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230719170445.30993-1-kuniyu@amazon.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v6 0/8] BPF link support for tc BPF programs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168978722484.3388.18420866659582599783.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Jul 2023 17:20:24 +0000
+References: <20230719140858.13224-1-daniel@iogearbox.net>
+In-Reply-To: <20230719140858.13224-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+ kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
+ davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
 
-On Wed, Jul 19, 2023 at 10:04:45AM -0700, Kuniyuki Iwashima wrote:
-> From: Breno Leitao <leitao@debian.org>
-> Date: Wed, 19 Jul 2023 01:44:12 -0700
-> > Looking at sk_getsockopt function, it is unclear why 128 is a magical
-> > number.
-> > 
-> > Use the proper macro, so it becomes clear to understand what the value
-> > mean, and get a reference where it is coming from (user-exported API).
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  net/core/sock.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index 9370fd50aa2c..58b6f00197d6 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -1815,7 +1815,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
-> >  
-> >  	case SO_PEERNAME:
-> >  	{
-> > -		char address[128];
-> > +		char address[_K_SS_MAXSIZE];
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Wed, 19 Jul 2023 16:08:50 +0200 you wrote:
+> This series adds BPF link support for tc BPF programs. We initially
+> presented the motivation, related work and design at last year's LPC
+> conference in the networking & BPF track [0], and a recent update on
+> our progress of the rework during this year's LSF/MM/BPF summit [1].
+> The main changes are in first two patches and the last two have an
+> extensive batch of test cases we developed along with it, please see
+> individual patches for details. We tested this series with tc-testing
+> selftest suite as well as BPF CI/selftests. Thanks!
 > 
-> I guess you saw a bug caught by the fortified memcpy(), but this
-> doesn't fix it properly.
+> [...]
 
-Not really, in fact. I was reading this code, and I found this
-discussion a while ago, where I got the idea:
+Here is the summary with links:
+  - [bpf-next,v6,1/8] bpf: Add generic attach/detach/query API for multi-progs
+    https://git.kernel.org/bpf/bpf-next/c/053c8e1f235d
+  - [bpf-next,v6,2/8] bpf: Add fd-based tcx multi-prog infra with link support
+    https://git.kernel.org/bpf/bpf-next/c/e420bed02507
+  - [bpf-next,v6,3/8] libbpf: Add opts-based attach/detach/query API for tcx
+    https://git.kernel.org/bpf/bpf-next/c/fe20ce3a5126
+  - [bpf-next,v6,4/8] libbpf: Add link-based API for tcx
+    https://git.kernel.org/bpf/bpf-next/c/55cc3768473e
+  - [bpf-next,v6,5/8] libbpf: Add helper macro to clear opts structs
+    https://git.kernel.org/bpf/bpf-next/c/4e9c2d9af561
+  - [bpf-next,v6,6/8] bpftool: Extend net dump with tcx progs
+    https://git.kernel.org/bpf/bpf-next/c/57c61da8bff4
+  - [bpf-next,v6,7/8] selftests/bpf: Add mprog API tests for BPF tcx opts
+    https://git.kernel.org/bpf/bpf-next/c/cd13c91d9290
+  - [bpf-next,v6,8/8] selftests/bpf: Add mprog API tests for BPF tcx links
+    https://git.kernel.org/bpf/bpf-next/c/c6d479b3346c
 
-https://lore.kernel.org/lkml/20140930.005925.995989898229686123.davem@davemloft.net/
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
