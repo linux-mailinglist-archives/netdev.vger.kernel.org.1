@@ -1,48 +1,63 @@
-Return-Path: <netdev+bounces-19181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13E8759E27
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:04:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83348759DED
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 091101C21153
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:04:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B27AA1C20AB1
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFDE25166;
-	Wed, 19 Jul 2023 19:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77890275C1;
+	Wed, 19 Jul 2023 18:53:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59472515F
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:00:06 +0000 (UTC)
-Received: from mail.svario.it (mail.svario.it [IPv6:2a02:2770:13::112:0:1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1ED1FDC
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:00:05 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-002-244-020-234.2.244.pool.telefonica.de [2.244.20.234])
-	by mail.svario.it (Postfix) with ESMTPSA id D10B6D9025;
-	Wed, 19 Jul 2023 20:52:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
-	t=1689792742; bh=4OWvfVTihXyFLM3f8m6KyvkSxVc+OvcuHIvxG1vI32k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=wD+RjeT8rLlOog/Fk0k5+6yHQmxXj42NPVfHnBCclHG8Ssp6P3lhnDInm8YAW2YSq
-	 5mbcyNj+Ml6K5tQFzg7fcvAFGCk9aY/ANR991gpSBTWE7z/Ar2Z++5TAjPvjkCpesd
-	 HSq3bbvgUpnrEKXznGqyRLgl8QSjhlvX/SO8FoZvFexez7v6ZBZEgBPSEgeRqP5qjZ
-	 1YhHDbQCQnCP9ASP5su7vPOnDoBsEU2Wz3JIq1BXP4dUW2kCcbh+7Vh6BiAx0/pWjn
-	 hMeQXvCXGnb9a/GqWTNkAyoDtiH3FnNVJoVRx+fIzm5IiqxpORSK6NVq+WOEOoCuCe
-	 KJUvwqbNVA6zw==
-From: Gioele Barabucci <gioele@svario.it>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Gioele Barabucci <gioele@svario.it>
-Subject: [iproute2 22/22] Makefile: Install default configuration files in /usr
-Date: Wed, 19 Jul 2023 20:51:06 +0200
-Message-Id: <20230719185106.17614-23-gioele@svario.it>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230719185106.17614-1-gioele@svario.it>
-References: <20230719185106.17614-1-gioele@svario.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B801275A1
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:53:51 +0000 (UTC)
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DA4E5
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:53:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689792830; x=1721328830;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8oJxOIZ1yOlDcS55AeeSirf/hDu1n8cwIodrdTUEoic=;
+  b=bIlRadX/qf7iZkxDHlG3uxaB2UfHKHMmaAZM8CBgIaNHT4qRtI5LSYUA
+   RRB/mDVycWH+ZAJDRZjBqCJadje+mrh2ACLrBN5uEpbToWOvRgKvMxXgm
+   CD/FTU8lVc6FMeACyHScHWZ/Ju2SayAvIU1RyInmEyVnRWe/iDRmzy3mH
+   s=;
+X-IronPort-AV: E=Sophos;i="6.01,216,1684800000"; 
+   d="scan'208";a="296274976"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:53:44 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com (Postfix) with ESMTPS id 7FB24804EA;
+	Wed, 19 Jul 2023 18:53:39 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 19 Jul 2023 18:53:38 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.39) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 19 Jul 2023 18:53:35 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kees Cook
+	<keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	"Breno Leitao" <leitao@debian.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"Kuniyuki Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net 0/2] net: Fix error/warning by -fstrict-flex-arrays=3
+Date: Wed, 19 Jul 2023 11:53:20 -0700
+Message-ID: <20230719185322.44255-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,37 +65,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.39]
+X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Signed-off-by: Gioele Barabucci <gioele@svario.it>
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") started applying
+strict rules for standard string functions (strlen(), memcpy(), etc.) if
+CONFIG_FORTIFY_SOURCE=y.
 
-diff --git a/Makefile b/Makefile
-index a2af4426..7d1819ce 100644
---- a/Makefile
-+++ b/Makefile
-@@ -102,11 +102,11 @@ config.mk:
- 
- install: all
- 	install -m 0755 -d $(DESTDIR)$(SBINDIR)
--	install -m 0755 -d $(DESTDIR)$(CONF_ETC_DIR)
-+	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
- 	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
- 	install -m 0755 -d $(DESTDIR)$(HDRDIR)
- 	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
--	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_ETC_DIR)
-+	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_USR_DIR)
- 	install -m 0755 -d $(DESTDIR)$(BASH_COMPDIR)
- 	install -m 0644 bash-completion/tc $(DESTDIR)$(BASH_COMPDIR)
- 	install -m 0644 bash-completion/devlink $(DESTDIR)$(BASH_COMPDIR)
+This series fixes two false positives caught by syzkaller.
+
+
+Kuniyuki Iwashima (2):
+  af_unix: Fix fortify_panic() in unix_bind_bsd().
+  af_packet: Fix warning of fortified memcpy() in packet_getname().
+
+ net/packet/af_packet.c |  5 ++++-
+ net/unix/af_unix.c     | 16 +++++++++++++---
+ 2 files changed, 17 insertions(+), 4 deletions(-)
+
 -- 
-2.39.2
+2.30.2
 
 
