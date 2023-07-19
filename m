@@ -1,93 +1,80 @@
-Return-Path: <netdev+bounces-18813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF0C758B92
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:53:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722CC758B94
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 818611C20922
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:53:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 832F8281865
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1359317D1;
-	Wed, 19 Jul 2023 02:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2D617C4;
+	Wed, 19 Jul 2023 02:54:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C4A17C4
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:53:44 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8D3C1BC9;
-	Tue, 18 Jul 2023 19:53:33 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qLxJb-00043q-Tk; Wed, 19 Jul 2023 04:53:23 +0200
-Date: Wed, 19 Jul 2023 04:53:23 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Subject: Re: [PATCH nf-next 1/2] netlink: allow be16 and be32 types in all
- uint policy checks
-Message-ID: <20230719025323.GA27896@breakpoint.cc>
-References: <20230718075234.3863-1-fw@strlen.de>
- <20230718075234.3863-2-fw@strlen.de>
- <20230718115633.3a15062d@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0178D1FAF
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:54:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206D3C433C8;
+	Wed, 19 Jul 2023 02:54:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689735255;
+	bh=wlZfctky3f4PK8EC1uB7joPxedy1epUHYSMhC4EUhUY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tZf6/6a76OyeGixaJOFwU+ORSziU9wVBHSN+Z2MLWUH9dZydOURdxlBEtBRxTZsck
+	 C2oiq+IKiAQzUMQP0trAVCPLpjPeZIbhHWmKUigqARKPXIJfxLHlRWqT8w51laFm3u
+	 P7PoKoOik5KdhokVOx6gWXVTHiapOv7O+yMZpspgl8Vrh3xtK3jccVzMj9OMEJuVxL
+	 BNUASAAkUpkrv7RvH7/E6YsO2ci1YsWXYvcXLuv45UaF7ZXx8gE8uYPEIP8vuuaFyX
+	 z4bDa+KPriS2ThXw44nJdQoSdZOUypyAKQ2Bl4+kajv1U8qJAu/egr1yD1FqKPzGIw
+	 jd0y3w/oHhOeg==
+Date: Tue, 18 Jul 2023 19:54:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Carlos Bilbao <carlos.bilbao@amd.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net,
+ edumazet@google.com, linux-kernel@vger.kernel.org, mchan@broadcom.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, prashant@broadcom.com,
+ siva.kallam@broadcom.com
+Subject: Re: [PATCH] tg3: fix array subscript out of bounds compilation
+ error
+Message-ID: <20230718195414.4c6f359f@kernel.org>
+In-Reply-To: <c196f8f9-3d2c-27c6-6807-75a6e6e4d5a5@amd.com>
+References: <20230717143443.163732-1-carlos.bilbao@amd.com>
+	<20230717192403.96187-1-kuniyu@amazon.com>
+	<c196f8f9-3d2c-27c6-6807-75a6e6e4d5a5@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718115633.3a15062d@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NO_DNS_FOR_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE,
-	T_SPF_TEMPERROR autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 18 Jul 2023 09:52:29 +0200 Florian Westphal wrote:
-> > __NLA_IS_BEINT_TYPE(tp) isn't useful.  NLA_BE16/32 are identical to
-> > NLA_U16/32, the only difference is that it tells the netlink validation
-> > functions that byteorder conversion might be needed before comparing
-> > the value to the policy min/max ones.
-> > 
-> > After this change all policy macros that can be used with UINT types,
-> > such as NLA_POLICY_MASK() can also be used with NLA_BE16/32.
-> > 
-> > This will be used to validate nf_tables flag attributes which
-> > are in bigendian byte order.
-> 
-> Semi-related, how well do we do with NLA_F_NET_BYTEORDER?
+On Tue, 18 Jul 2023 10:52:39 -0500 Carlos Bilbao wrote:
+> >> Fix encountered compilation error in tg3.c where an array subscript wa=
+s =20
+> >=20
+> > What is the error ? =20
+>=20
+> drivers/net/ethernet/broadcom/tg3.c: In function =E2=80=98tg3_init_one=E2=
+=80=99:
 
-Looks incomplete at best.
+What compiler are you using? Any extra flags?
 
-> On a quick grep we were using it in the kernel -> user
-> direction but not validating on input. Is that right?
+I remember seeing this warning too, but I can't repro it now (gcc 13.1;
+clang 16).
 
-Looks like ipset is the only user, it sets it for kernel->user
-dir.
+> >> above the array bounds of 'struct tg3_napi[5]'. Add an additional chec=
+k in
+> >> the for loop to ensure that it does not exceed the bounds of
+> >> 'struct tg3_napi' (defined by TG3_IRQ_MAX_VECS).
+> >>
+> >> Reviewed-By: Carlos Bilbao <carlos.bilbao@amd.com>
 
-I see ipset userspace even sets it on user -> kernel dir but
-like you say, its not checked and BE encoding is assumed on
-kernel side.
-
-From a quick glance in ipset all Uxx types are always treated as
-bigendian, which would mean things should not fall apart if ipset
-stops announcing NLA_F_NET_BYTEORDER.  Not sure its worth risking
-any breakage though.
-
-I suspect that in practice, given both producer and consumer need
-to agree of the meaning of type "12345" anyway its easier to just
-agree on the byte ordering as well.
-
-Was there a specific reason for the question?
+We need a sign-off tag
+--=20
+pw-bot: cr
 
