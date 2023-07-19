@@ -1,415 +1,277 @@
-Return-Path: <netdev+bounces-19084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1FD7598C0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:45:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 699AF7598CF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A178428196D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:45:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9638D1C2105F
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737631400F;
-	Wed, 19 Jul 2023 14:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0981514277;
+	Wed, 19 Jul 2023 14:50:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557EA11CB4;
-	Wed, 19 Jul 2023 14:45:06 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68FE1726;
-	Wed, 19 Jul 2023 07:44:52 -0700 (PDT)
-Received: from kwepemi500020.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R5dmm4yMJzNm5t;
-	Wed, 19 Jul 2023 22:41:28 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemi500020.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 19 Jul 2023 22:44:47 +0800
-Message-ID: <63986ef9-10a4-bcef-369d-0bad28b192d1@huawei.com>
-Date: Wed, 19 Jul 2023 22:44:47 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E699811CB4
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:50:30 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2112.outbound.protection.outlook.com [40.107.243.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37F72137;
+	Wed, 19 Jul 2023 07:50:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NUinR/gthL+4wOMT0XtQiC53fcT+6NBLqQpauJlv38+gNm2NZvWeSTtfrAkksumrqjQdn9X9dIttdCJiHrPXCDFsx1eY6sNfLEBSY9FZ4YT78njdEqkbJ1Vti//dvrOMm1ncI7gIxmriE/9umhgws9MVX+w3S+yokMpc+KFwZ8DJa0svn/WDGMJRoX1ihqRMMbVEaPC8Ps4EZqWKwMsMNNm6YKEZVefPgZ+Dhu7NvecBDXTqZ8mkRG0YBDQP3Cwmkt61WxE/HVLWGsOHH6Lic2cbm3vtihnWE9uz5RV2fErwtf0U9Z8vhrLX/UyFw6akC9P5GahHvS9kb1f3ywTG0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UPr81LvKj49RgTjS8yk3ARW5PKbWnpc21I6/fnMH1qI=;
+ b=ZhSj1p0wR2760c08fWHG+dQc+aAOP9l0uRji3Fbsj2brYiEO84P+cDQsC113iFFr9foHdjma1yRXoPzHpMyJ1iA2sRngbJneqLMllamqQE5cNZpsGxZHJa9WSies5Z7RWLLUgXSEaxbWu11PDeVWcjmi0pc0/EKBp+NtTuIvlOPFKG5/TG+o8unqJJu+P2m1u3KnGGiQdw6CVgbb+GtNNYZfzDn7Q+aec1HwvjbxSbZhP1d5upUO2YNGfKsKg9prBXWMgo6HOQNWIeIkebivj+204TDTxvWk7dNZ4ZF3aD+6cMX5p9tN9GZtIf432LblBwcIMzqoE7EcMmO/3FIuVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UPr81LvKj49RgTjS8yk3ARW5PKbWnpc21I6/fnMH1qI=;
+ b=FmDIr6NTZrEcb/ME9+RN6Q8/BMoRs8eqBfPNch1Ri0lKvGr8atfOxnRIg8i8YGt1eE5aIj9slaoSbwBZHqKSd6d2l0tLvuvfCAkclP82wJnePKX0ffKBloVYDCdiXg6HnUyqHfvegrmP0Sbn0N2h58cw2e1el3JcR481Tm3qBec=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH0PR13MB5997.namprd13.prod.outlook.com (2603:10b6:510:161::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Wed, 19 Jul
+ 2023 14:49:58 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.024; Wed, 19 Jul 2023
+ 14:49:58 +0000
+Date: Wed, 19 Jul 2023 15:49:48 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net PATCH V3 1/2] octeontx2-af: Fix hash extraction mbox message
+Message-ID: <ZLf4DKJ6IU8+Z2zS@corigine.com>
+References: <20230716193049.2499410-1-sumang@marvell.com>
+ <20230716193049.2499410-2-sumang@marvell.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230716193049.2499410-2-sumang@marvell.com>
+X-ClientProxiedBy: LO2P265CA0450.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:e::30) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-From: Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf] riscv, bpf: Adapt bpf trampoline to optimized riscv
- ftrace framework
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Pu Lehui
-	<pulehui@huaweicloud.com>, <bpf@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
-	<martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
-	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Guo Ren <guoren@kernel.org>, Song Shuai
-	<suagrfillet@gmail.com>
-References: <20230715090137.2141358-1-pulehui@huaweicloud.com>
- <87lefdougi.fsf@all.your.base.are.belong.to.us>
-Content-Language: en-US
-In-Reply-To: <87lefdougi.fsf@all.your.base.are.belong.to.us>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.109.184]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemi500020.china.huawei.com (7.221.188.8)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5997:EE_
+X-MS-Office365-Filtering-Correlation-Id: 80b9aa2d-414b-4726-9248-08db88676be2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	X+FZR0wkvuDRMTmsuTOyuoDSSTaGd95IjL8PP+uhQBEMmTa/cpkrYYbL0Bs7qq86G0j7wimokbkb4UqVDk0D8NuDSFQMap4bww64/dTILgK+/cZh403lows/bfCQWZpKZI6I2RtO2XLtmQwK+7PwkRhz1G6VBQPCtr+asrENQP4PMcET699z5G9CNjGrBdXM85jfQgY3UajE/hy4n1ebWstwhhKmjfb3glxkvW58dqzVzUcid0eh17/5TS5f7ROqyMXvngnslTpvTzPlrj78F+zSZfuFpSLE6owsQ1pjYLQfDo43dwVwr4zXu/wOZFFj0GCQjIe+eW9ZgZVWLwyY33YIdE+E+t0xNZ8CiIlIv4/AufhDCLtNfQk8gaMjo1rqimCracIOIcFWyKr97NCtbrJapww7DCDYdbMcVusxBRo2eFvz6NnXeNR4+GyK+ZEd5r+gcxW/8aK+2ZuW+SovlmewHDXjB25WXO6RJMXS385huyyPmtBcft/j5gnJhKtiUqIgxe3NKMw81S1pEk6JvSnlEZJngQEbRXTbEgh1Q0KRyqYMUe5CWyzlVQqOCyj1gGN6Y06K0GAqfsW99A+hVbeD7q0xvH8C/MtsgyGw2QS1+kXsvcFX7LbqQbkiKYCZmLIM9NCFYrPmiQJ0pSlOiCK4w5hRISFvHhgHCSusxZg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(39830400003)(396003)(366004)(451199021)(55236004)(26005)(186003)(6506007)(478600001)(15650500001)(41300700001)(6486002)(6916009)(83380400001)(4326008)(5660300002)(66556008)(66476007)(66946007)(316002)(6666004)(8676002)(8936002)(6512007)(36756003)(44832011)(7416002)(38100700002)(86362001)(2906002)(2616005)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?2gJ7Am6q42gMTZaOYJmOb2EU7oVinE4xSqEFMz9hPfyNCEA8Wy+stWwOv1AO?=
+ =?us-ascii?Q?kU/b/7F4BfcDKrIH/cW+KwkDrB/whKi6ViR0RYC9ofRPGRJX9OrB072dlsUy?=
+ =?us-ascii?Q?g6qLMcil+5Hd1aigCClcaX/AE0WIIndfV1UTh03WWWKZAu77DKSgJtwM1KNW?=
+ =?us-ascii?Q?l3Zb0PQ82syjews+IGnnsBYO/qU9qkAjk97D+IWcYXv7OCzIjorhWH0kY19F?=
+ =?us-ascii?Q?DysVRHRhz2dpMkEO5RT9/HS0NjeSGFqtzhXrF0k/fhTAFKZRss7BNYlXREEX?=
+ =?us-ascii?Q?RICRisMpyfrYwxFnwr5He8Rp1cN0hdzmxx6grje01D7Rqg29f4I56DW/Vc/C?=
+ =?us-ascii?Q?HE/uWnt99hk4uEz29DfgAMcEiqdl5nxB5BWB6z/vZvBnnMc6iBznOYUlLLpg?=
+ =?us-ascii?Q?FLPrkOmvrHu8noRAZdVzjU1O8dnXqhob/cg/ShCi+A+8WubPfV9YFRLtzEqi?=
+ =?us-ascii?Q?MLESYx+FJuKz4podV2cvRmHVIfemoJQl9Sc5+dhN6cWfUAzebNQjErK4AwP3?=
+ =?us-ascii?Q?jNN/ITChm9zlAgOc5qx4cgVm5IHnYYrohLLuX77zmd5eGbfxgbbZKD5B8M3r?=
+ =?us-ascii?Q?OzPitBlAmHB9qK3ji1qfkLig8HChOBSgbBpEUWrBL08xSVgxNFh1yFJQGO3Z?=
+ =?us-ascii?Q?seC1b6fjh24Qt9CzQplux5+UuNhKMI48OkmngrhMMsV7e3CutjSWpo7SDpOa?=
+ =?us-ascii?Q?wxoO1CxUofki+6RCJs49VsN0FiQ6sRkSrJ5F2Ff1n4k9PuHk+hO5Psa7N1FM?=
+ =?us-ascii?Q?hfUVRtQTKrup4GRhQHAmmf8H3B9O/jiQ9TY0eZiHc/IIqZRKPoWMIKJ3ZGtr?=
+ =?us-ascii?Q?mrk3UGf+F11seAOBEsg/Q8JsLXLnCORIidlaoVuJUXYOFe13vpLhJOYiMP6s?=
+ =?us-ascii?Q?H+mualxmv5Lz6JxjtKWyCaku94ANbLNFiySzzp1Vsg4VRloikjyMClL8txvf?=
+ =?us-ascii?Q?x933kisENJ82OjQvhk5hHtWooX+FRbAAevx6SngTyvD3h2SVmUEUNoRRs+B/?=
+ =?us-ascii?Q?APQ89XRKKgR6hqf3Rk8b6WkcPPovxUfNOO/qoG+Ej3wWxMPtUVyF1mfE+Lkm?=
+ =?us-ascii?Q?H/NUiHWtfHgqSCtKF3MNFl+zWXWqbbbEXHe6mTRAXn/zqazqhQ8aaV1J202k?=
+ =?us-ascii?Q?D68dF1k1yCAJj9vkVrMIIfRFakhqnTOTKbfMuRDBKNwlQQocLGNyoo9B+zAo?=
+ =?us-ascii?Q?qew4gxahJK8107yvaFciNKRH4UU3+IWwHu4iPxjGrNKfiRZPjaQnQeQ+rHls?=
+ =?us-ascii?Q?a3ZCP75u82oApSR47TlhEFsy6m+OozmwC/+ln6Y0AVv0ewlDVt9IURJ0laP1?=
+ =?us-ascii?Q?NCz27+wxEhznrtY+9VVJ/ooa6w/WFfi47eFuW1DIt6ICawreVXcRL6m6YVHx?=
+ =?us-ascii?Q?JLB55t5vRKN+ykfZSGBufBLbZDpxkWAftrTMDjg4TtjOk0/b3u02vpWdogrH?=
+ =?us-ascii?Q?UJYYpD3RuatVcCfor9utMYJ3HdaVIFVmwEhJdifxzciP09udA2l8/GG50nrP?=
+ =?us-ascii?Q?eOgb68Co3Yy/W2U7Q96LX0JZ6+fpJM2xAFMYk8bKlKbfniH90nxWkzd/iSNg?=
+ =?us-ascii?Q?itaECeLkzFb+c0JEYgkDMFdB+D3Y+a9z1yOu6p70RI8Icw2OSHg6mZnueHmz?=
+ =?us-ascii?Q?qA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80b9aa2d-414b-4726-9248-08db88676be2
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 14:49:57.9278
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mLjlt/HToaSiVUKt2BzVhDhPneKnF2jBDGf35OEhKJ1G1DjARjTWM6+rJn23QRRVtIUnN3xVqGuIgRrLY4HTWRQWncbAtcYYSXq3xDAZVIg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5997
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Jul 17, 2023 at 01:00:48AM +0530, Suman Ghosh wrote:
+> As of today, hash extraction mbox message response supports only the
+> secret key which is not a complete solution. This patch fixes that and
+> adds support to extract both hash mask and hash control along with the
+> secret key. These are needed to use hash reduction of 128 bit IPv6
+> address to 32 bit. Hash mask decides on the bits from the 128 bit IPv6
+> address which should be used for 32 bit hash calculation. After
+> generating the 32 bit hash, hash control decides how many bits from the
+> 32 bit hash can be taken into consideration.
+> 
+> Fixes: a95ab93550d3 ("octeontx2-af: Use hashed field in MCAM key")
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> ---
+>  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  6 ++---
+>  .../marvell/octeontx2/af/rvu_npc_hash.c       | 27 ++++++++++---------
+>  .../marvell/octeontx2/af/rvu_npc_hash.h       |  9 ++++---
+>  3 files changed, 23 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> index eba307eee2b2..5a5c23a02261 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -246,9 +246,9 @@ M(NPC_MCAM_READ_BASE_RULE, 0x6011, npc_read_base_steer_rule,            \
+>  M(NPC_MCAM_GET_STATS, 0x6012, npc_mcam_entry_stats,                     \
+>  				   npc_mcam_get_stats_req,              \
+>  				   npc_mcam_get_stats_rsp)              \
+> -M(NPC_GET_FIELD_HASH_INFO, 0x6013, npc_get_field_hash_info,                     \
+> -				   npc_get_field_hash_info_req,              \
+> -				   npc_get_field_hash_info_rsp)              \
+> +M(NPC_GET_FIELD_HASH_INFO, 0x6013, npc_get_field_hash_info,             \
+> +				   npc_get_field_hash_info_req,         \
+> +				   npc_get_field_hash_info_rsp)         \
+>  M(NPC_GET_FIELD_STATUS, 0x6014, npc_get_field_status,                     \
+>  				   npc_get_field_status_req,              \
+>  				   npc_get_field_status_rsp)              \
 
+This hunk is a white-space only change that doesn't seem
+related to the patch description.
 
-On 2023/7/19 4:06, Björn Töpel wrote:
-> Pu Lehui <pulehui@huaweicloud.com> writes:
-> 
->> From: Pu Lehui <pulehui@huawei.com>
->>
->> Commit 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to
->> half") optimizes the detour code size of kernel functions to half with
->> T0 register and the upcoming DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv
->> is based on this optimization, we need to adapt riscv bpf trampoline
->> based on this. One thing to do is to reduce detour code size of bpf
->> programs, and the second is to deal with the return address after the
->> execution of bpf trampoline. Meanwhile, add more comments and rename
->> some variables to make more sense. The related tests have passed.
->>
->> This adaptation needs to be merged before the upcoming
->> DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv, otherwise it will crash due
->> to a mismatch in the return address. So we target this modification to
->> bpf tree and add fixes tag for locating.
-> 
-> Thank you for working on this!
-> 
->> Fixes: 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to half")
-> 
-> This is not a fix. Nothing is broken. Only that this patch much come
-> before or as part of the ftrace series.
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+> index 6fe67f3a7f6f..a3bc53d22dc0 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+> @@ -96,7 +96,7 @@ u32 npc_field_hash_calc(u64 *ldata, struct npc_get_field_hash_info_rsp rsp,
+>  	field_hash = rvu_npc_toeplitz_hash(data_padded, hash_key, 128, 159);
+>  
+>  	field_hash &= FIELD_GET(GENMASK(63, 32), rsp.hash_ctrl[intf][hash_idx]);
+> -	field_hash += FIELD_GET(GENMASK(31, 0), rsp.hash_ctrl[intf][hash_idx]);
+> +	field_hash |= FIELD_GET(GENMASK(31, 0), rsp.hash_ctrl[intf][hash_idx]);
+>  	return field_hash;
+>  }
+>  
+> @@ -253,7 +253,8 @@ void npc_update_field_hash(struct rvu *rvu, u8 intf,
+>  	}
+>  
+>  	req.intf = intf;
+> -	rvu_mbox_handler_npc_get_field_hash_info(rvu, &req, &rsp);
+> +	if (rvu_mbox_handler_npc_get_field_hash_info(rvu, &req, &rsp))
+> +		return;
+>  
+>  	for (hash_idx = 0; hash_idx < NPC_MAX_HASH; hash_idx++) {
+>  		cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_HASHX_CFG(intf, hash_idx));
+> @@ -319,9 +320,9 @@ int rvu_mbox_handler_npc_get_field_hash_info(struct rvu *rvu,
+>  					     struct npc_get_field_hash_info_req *req,
+>  					     struct npc_get_field_hash_info_rsp *rsp)
+>  {
+> +	int hash_idx, hash_mask_idx, blkaddr;
+>  	u64 *secret_key = rsp->secret_key;
+>  	u8 intf = req->intf;
+> -	int i, j, blkaddr;
+>  
+>  	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+>  	if (blkaddr < 0) {
+> @@ -333,18 +334,18 @@ int rvu_mbox_handler_npc_get_field_hash_info(struct rvu *rvu,
+>  	secret_key[1] = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_SECRET_KEY1(intf));
+>  	secret_key[2] = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_SECRET_KEY2(intf));
+>  
+> -	for (i = 0; i < NPC_MAX_HASH; i++) {
+> -		for (j = 0; j < NPC_MAX_HASH_MASK; j++) {
+> -			rsp->hash_mask[NIX_INTF_RX][i][j] =
+> -				GET_KEX_LD_HASH_MASK(NIX_INTF_RX, i, j);
+> -			rsp->hash_mask[NIX_INTF_TX][i][j] =
+> -				GET_KEX_LD_HASH_MASK(NIX_INTF_TX, i, j);
+> +	for (hash_idx = 0; hash_idx < NPC_MAX_HASH; hash_idx++)
+> +		for (hash_mask_idx = 0; hash_mask_idx < NPC_MAX_HASH_MASK; hash_mask_idx++) {
+> +			rsp->hash_mask[NIX_INTF_RX][hash_idx][hash_mask_idx] =
+> +				GET_KEX_LD_HASH_MASK(NIX_INTF_RX, hash_idx, hash_mask_idx);
+> +			rsp->hash_mask[NIX_INTF_TX][hash_idx][hash_mask_idx] =
+> +				GET_KEX_LD_HASH_MASK(NIX_INTF_TX, hash_idx, hash_mask_idx);
+>  		}
+> -	}
+>  
+> -	for (i = 0; i < NPC_MAX_INTF; i++)
+> -		for (j = 0; j < NPC_MAX_HASH; j++)
+> -			rsp->hash_ctrl[i][j] = GET_KEX_LD_HASH_CTRL(i, j);
+> +	for (hash_idx = 0; hash_idx < NPC_MAX_INTF; hash_idx++)
+> +		for (hash_mask_idx = 0; hash_mask_idx < NPC_MAX_HASH; hash_mask_idx++)
+> +			rsp->hash_ctrl[hash_idx][hash_mask_idx] =
+> +				GET_KEX_LD_HASH_CTRL(hash_idx, hash_mask_idx);
+>  
+>  	return 0;
+>  }
 
-Yep, it's really not a fix. I have no idea whether this patch target to 
-bpf-next tree can be ahead of the ftrace series of riscv tree?
+The three hunks above appear to change the iterator variables for the loops
+without changing functionality. This doesn't seem to match the patch
+description.
 
->  >> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->> ---
->>   arch/riscv/net/bpf_jit_comp64.c | 110 ++++++++++++++------------------
->>   1 file changed, 47 insertions(+), 63 deletions(-)
->>
->> diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
->> index c648864c8cd1..ffc9aa42f918 100644
->> --- a/arch/riscv/net/bpf_jit_comp64.c
->> +++ b/arch/riscv/net/bpf_jit_comp64.c
->> @@ -241,7 +241,7 @@ static void __build_epilogue(bool is_tail_call, struct rv_jit_context *ctx)
->>   	if (!is_tail_call)
->>   		emit_mv(RV_REG_A0, RV_REG_A5, ctx);
->>   	emit_jalr(RV_REG_ZERO, is_tail_call ? RV_REG_T3 : RV_REG_RA,
->> -		  is_tail_call ? 20 : 0, /* skip reserved nops and TCC init */
->> +		  is_tail_call ? 12 : 0, /* skip reserved nops and TCC init */
-> 
-> Maybe be explicit, and use the "DETOUR_INSNS" from below (and convert to
-> bytes)?
-> 
->>   		  ctx);
->>   }
->>   
->> @@ -618,32 +618,7 @@ static int add_exception_handler(const struct bpf_insn *insn,
->>   	return 0;
->>   }
->>   
->> -static int gen_call_or_nops(void *target, void *ip, u32 *insns)
->> -{
->> -	s64 rvoff;
->> -	int i, ret;
->> -	struct rv_jit_context ctx;
->> -
->> -	ctx.ninsns = 0;
->> -	ctx.insns = (u16 *)insns;
->> -
->> -	if (!target) {
->> -		for (i = 0; i < 4; i++)
->> -			emit(rv_nop(), &ctx);
->> -		return 0;
->> -	}
->> -
->> -	rvoff = (s64)(target - (ip + 4));
->> -	emit(rv_sd(RV_REG_SP, -8, RV_REG_RA), &ctx);
->> -	ret = emit_jump_and_link(RV_REG_RA, rvoff, false, &ctx);
->> -	if (ret)
->> -		return ret;
->> -	emit(rv_ld(RV_REG_RA, -8, RV_REG_SP), &ctx);
->> -
->> -	return 0;
->> -}
->> -
->> -static int gen_jump_or_nops(void *target, void *ip, u32 *insns)
->> +static int gen_jump_or_nops(void *target, void *ip, u32 *insns, bool is_call)
->>   {
->>   	s64 rvoff;
->>   	struct rv_jit_context ctx;
->> @@ -658,38 +633,38 @@ static int gen_jump_or_nops(void *target, void *ip, u32 *insns)
->>   	}
->>   
->>   	rvoff = (s64)(target - ip);
->> -	return emit_jump_and_link(RV_REG_ZERO, rvoff, false, &ctx);
->> +	return emit_jump_and_link(is_call ? RV_REG_T0 : RV_REG_ZERO,
->> +				  rvoff, false, &ctx);
-> 
-> Nit: Please use the full 100 char width.
-> 
->>   }
->>   
->> +#define DETOUR_NINSNS	2
-> 
-> Better name? Maybe call this patchable function entry something? Also,
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+> index a1c3d987b804..eb9cb311b934 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+> @@ -12,9 +12,6 @@
+>  #define RVU_NPC_HASH_SECRET_KEY1 0xa9d5af4c9fbc87b4
+>  #define RVU_NPC_HASH_SECRET_KEY2 0x5954c9e7
+>  
+> -#define NPC_MAX_HASH 2
+> -#define NPC_MAX_HASH_MASK 2
+> -
 
-How about RV_FENTRY_NINSNS?
+This seems to remove duplicated #defines.
+This doesn't seem to match the patch description.
 
-> to catch future breaks like this -- would it make sense to have a
-> static_assert() combined with something tied to
-> -fpatchable-function-entry= from arch/riscv/Makefile?
+>  #define KEX_LD_CFG_USE_HASH(use_hash, bytesm1, hdr_ofs, ena, flags_ena, key_ofs) \
+>  			    ((use_hash) << 20 | ((bytesm1) << 16) | ((hdr_ofs) << 8) | \
+>  			     ((ena) << 7) | ((flags_ena) << 6) | ((key_ofs) & 0x3F))
+> @@ -41,6 +38,12 @@
+>  	rvu_write64(rvu, blkaddr,	\
+>  		    NPC_AF_INTFX_HASHX_RESULT_CTRL(intf, ld), cfg)
+>  
+> +#define GET_KEX_LD_HASH_CTRL(intf, ld)  \
+> +	rvu_read64(rvu, blkaddr, NPC_AF_INTFX_HASHX_RESULT_CTRL(intf, ld))
+> +
+> +#define GET_KEX_LD_HASH_MASK(intf, ld, mask_idx)	\
+> +	rvu_read64(rvu, blkaddr, NPC_AF_INTFX_HASHX_MASKX(intf, ld, mask_idx))
+> +
 
-It is very necessary, but it doesn't seem to be easy. I try to find GCC 
-related functions, something like __builtin_xxx, but I can't find it so 
-far. Also try to make it as a CONFIG_PATCHABLE_FUNCTION_ENTRY=4 in 
-Makefile and then static_assert, but obviously it shouldn't be done. 
-Maybe we can deal with this later when we have a solution?
+This seems to duplicate existing MACROS,
+which appear a few lines further above in this file.
 
-> 
->> +
->>   int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
->>   		       void *old_addr, void *new_addr)
->>   {
->> -	u32 old_insns[4], new_insns[4];
->> +	u32 old_insns[DETOUR_NINSNS], new_insns[DETOUR_NINSNS];
->>   	bool is_call = poke_type == BPF_MOD_CALL;
->> -	int (*gen_insns)(void *target, void *ip, u32 *insns);
->> -	int ninsns = is_call ? 4 : 2;
->>   	int ret;
->>   
->> -	if (!is_bpf_text_address((unsigned long)ip))
->> +	if (!is_kernel_text((unsigned long)ip) &&
->> +	    !is_bpf_text_address((unsigned long)ip))
->>   		return -ENOTSUPP;
->>   
->> -	gen_insns = is_call ? gen_call_or_nops : gen_jump_or_nops;
->> -
->> -	ret = gen_insns(old_addr, ip, old_insns);
->> +	ret = gen_jump_or_nops(old_addr, ip, old_insns, is_call);
->>   	if (ret)
->>   		return ret;
->>   
->> -	if (memcmp(ip, old_insns, ninsns * 4))
->> +	if (memcmp(ip, old_insns, DETOUR_NINSNS * 4))
->>   		return -EFAULT;
->>   
->> -	ret = gen_insns(new_addr, ip, new_insns);
->> +	ret = gen_jump_or_nops(new_addr, ip, new_insns, is_call);
->>   	if (ret)
->>   		return ret;
->>   
->>   	cpus_read_lock();
->>   	mutex_lock(&text_mutex);
->> -	if (memcmp(ip, new_insns, ninsns * 4))
->> -		ret = patch_text(ip, new_insns, ninsns);
->> +	if (memcmp(ip, new_insns, DETOUR_NINSNS * 4))
->> +		ret = patch_text(ip, new_insns, DETOUR_NINSNS);
->>   	mutex_unlock(&text_mutex);
->>   	cpus_read_unlock();
->>   
->> @@ -717,7 +692,7 @@ static void restore_args(int nregs, int args_off, struct rv_jit_context *ctx)
->>   }
->>   
->>   static int invoke_bpf_prog(struct bpf_tramp_link *l, int args_off, int retval_off,
->> -			   int run_ctx_off, bool save_ret, struct rv_jit_context *ctx)
->> +			   int run_ctx_off, bool save_retval, struct rv_jit_context *ctx)
-> 
-> Why the save_retval name change? This churn is not needed IMO
-> (especially since you keep using the _ret name below). Please keep the
-> old name. >
->>   {
->>   	int ret, branch_off;
->>   	struct bpf_prog *p = l->link.prog;
->> @@ -757,7 +732,7 @@ static int invoke_bpf_prog(struct bpf_tramp_link *l, int args_off, int retval_of
->>   	if (ret)
->>   		return ret;
->>   
->> -	if (save_ret)
->> +	if (save_retval)
->>   		emit_sd(RV_REG_FP, -retval_off, regmap[BPF_REG_0], ctx);
->>   
->>   	/* update branch with beqz */
->> @@ -787,20 +762,19 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
->>   	int i, ret, offset;
->>   	int *branches_off = NULL;
->>   	int stack_size = 0, nregs = m->nr_args;
->> -	int retaddr_off, fp_off, retval_off, args_off;
->> -	int nregs_off, ip_off, run_ctx_off, sreg_off;
->> +	int fp_off, retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_off;
->>   	struct bpf_tramp_links *fentry = &tlinks[BPF_TRAMP_FENTRY];
->>   	struct bpf_tramp_links *fexit = &tlinks[BPF_TRAMP_FEXIT];
->>   	struct bpf_tramp_links *fmod_ret = &tlinks[BPF_TRAMP_MODIFY_RETURN];
->>   	void *orig_call = func_addr;
->> -	bool save_ret;
->> +	bool save_retval, traced_ret;
->>   	u32 insn;
->>   
->>   	/* Generated trampoline stack layout:
->>   	 *
->>   	 * FP - 8	    [ RA of parent func	] return address of parent
->>   	 *					  function
->> -	 * FP - retaddr_off [ RA of traced func	] return address of traced
->> +	 * FP - 16	    [ RA of traced func	] return address of
->>   	traced
-> 
-> BPF code uses frame pointers. Shouldn't the trampoline frame look like a
-> regular frame [1], i.e. start with return address followed by previous
-> frame pointer?
-> 
-
-oops, will fix it. Also we need to consider two types of trampoline 
-stack layout, that is:
-
-* 1. trampoline called from function entry
-* --------------------------------------
-* FP + 8           [ RA of parent func ] return address of parent
-*                                        function
-* FP + 0           [ FP                ]
-*
-* FP - 8           [ RA of traced func ] return address of traced
-*                                        function
-* FP - 16          [ FP                ]
-* --------------------------------------
-*
-* 2. trampoline called directly
-* --------------------------------------
-* FP - 8           [ RA of caller func ] return address of caller
-*                                        function
-* FP - 16          [ FP                ]
-* --------------------------------------
-
->>   	 *					  function
->>   	 * FP - fp_off	    [ FP of parent func ]
->>   	 *
->> @@ -833,17 +807,20 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
->>   	if (nregs > 8)
->>   		return -ENOTSUPP;
->>   
->> -	/* room for parent function return address */
->> +	/* room for return address of parent function */
->>   	stack_size += 8;
->>   
->> -	stack_size += 8;
->> -	retaddr_off = stack_size;
->> +	/* whether return to return address of traced function after bpf trampoline */
->> +	traced_ret = func_addr && !(flags & BPF_TRAMP_F_SKIP_FRAME);
->> +	/* room for return address of traced function */
->> +	if (traced_ret)
->> +		stack_size += 8;
->>   
->>   	stack_size += 8;
->>   	fp_off = stack_size;
->>   
->> -	save_ret = flags & (BPF_TRAMP_F_CALL_ORIG | BPF_TRAMP_F_RET_FENTRY_RET);
->> -	if (save_ret) {
->> +	save_retval = flags & (BPF_TRAMP_F_CALL_ORIG | BPF_TRAMP_F_RET_FENTRY_RET);
->> +	if (save_retval) {
->>   		stack_size += 8;
->>   		retval_off = stack_size;
->>   	}
->> @@ -869,7 +846,11 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
->>   
->>   	emit_addi(RV_REG_SP, RV_REG_SP, -stack_size, ctx);
->>   
->> -	emit_sd(RV_REG_SP, stack_size - retaddr_off, RV_REG_RA, ctx);
->> +	/* store return address of parent function */
->> +	emit_sd(RV_REG_SP, stack_size - 8, RV_REG_RA, ctx);
->> +	/* store return address of traced function */
->> +	if (traced_ret)
->> +		emit_sd(RV_REG_SP, stack_size - 16, RV_REG_T0, ctx);
->>   	emit_sd(RV_REG_SP, stack_size - fp_off, RV_REG_FP, ctx);
->>   
->>   	emit_addi(RV_REG_FP, RV_REG_SP, stack_size, ctx);
->> @@ -890,7 +871,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
->>   
->>   	/* skip to actual body of traced function */
->>   	if (flags & BPF_TRAMP_F_SKIP_FRAME)
->> -		orig_call += 16;
->> +		orig_call += 8;
-> 
-> Use the define above so it's obvious what you're skipping.
-> 
->>   
->>   	if (flags & BPF_TRAMP_F_CALL_ORIG) {
->>   		emit_imm(RV_REG_A0, (const s64)im, ctx);
->> @@ -962,22 +943,25 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
->>   	if (flags & BPF_TRAMP_F_RESTORE_REGS)
->>   		restore_args(nregs, args_off, ctx);
->>   
->> -	if (save_ret)
->> +	if (save_retval)
->>   		emit_ld(RV_REG_A0, -retval_off, RV_REG_FP, ctx);
->>   
->>   	emit_ld(RV_REG_S1, -sreg_off, RV_REG_FP, ctx);
->>   
->> -	if (flags & BPF_TRAMP_F_SKIP_FRAME)
->> -		/* return address of parent function */
->> +	if (traced_ret) {
->> +		/* restore return address of parent function */
->>   		emit_ld(RV_REG_RA, stack_size - 8, RV_REG_SP, ctx);
->> -	else
->> -		/* return address of traced function */
->> -		emit_ld(RV_REG_RA, stack_size - retaddr_off, RV_REG_SP, ctx);
->> +		/* restore return address of traced function */
->> +		emit_ld(RV_REG_T0, stack_size - 16, RV_REG_SP, ctx);
->> +	} else {
->> +		/* restore return address of parent function */
->> +		emit_ld(RV_REG_T0, stack_size - 8, RV_REG_SP, ctx);
->> +	}
->>   
->>   	emit_ld(RV_REG_FP, stack_size - fp_off, RV_REG_SP, ctx);
->>   	emit_addi(RV_REG_SP, RV_REG_SP, stack_size, ctx);
->>   
->> -	emit_jalr(RV_REG_ZERO, RV_REG_RA, 0, ctx);
->> +	emit_jalr(RV_REG_ZERO, RV_REG_T0, 0, ctx);
->>   
->>   	ret = ctx->ninsns;
->>   out:
->> @@ -1664,7 +1648,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
->>   
->>   void bpf_jit_build_prologue(struct rv_jit_context *ctx)
->>   {
->> -	int i, stack_adjust = 0, store_offset, bpf_stack_adjust;
->> +	int stack_adjust = 0, store_offset, bpf_stack_adjust;
->>   
->>   	bpf_stack_adjust = round_up(ctx->prog->aux->stack_depth, 16);
->>   	if (bpf_stack_adjust)
->> @@ -1691,9 +1675,9 @@ void bpf_jit_build_prologue(struct rv_jit_context *ctx)
->>   
->>   	store_offset = stack_adjust - 8;
->>   
->> -	/* reserve 4 nop insns */
->> -	for (i = 0; i < 4; i++)
->> -		emit(rv_nop(), ctx);
->> +	/* 2 nops reserved for auipc+jalr pair */
->> +	emit(rv_nop(), ctx);
->> +	emit(rv_nop(), ctx);
-> 
-> Use the define above, instead of hardcoding two nops.
+>  struct npc_mcam_kex_hash {
+>  	/* NPC_AF_INTF(0..1)_LID(0..7)_LT(0..15)_LD(0..1)_CFG */
+>  	bool lid_lt_ld_hash_en[NPC_MAX_INTF][NPC_MAX_LID][NPC_MAX_LT][NPC_MAX_LD];
+> -- 
+> 2.25.1
 > 
 > 
-> Thanks,
-> Björn
-> 
-> [1] https://github.com/riscv-non-isa/riscv-elf-psabi-doc/blob/master/riscv-cc.adoc#frame-pointer-convention
 
