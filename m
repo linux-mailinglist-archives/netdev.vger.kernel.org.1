@@ -1,222 +1,119 @@
-Return-Path: <netdev+bounces-18979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 792127593F7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:10:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 366F57593FB
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 925871C203B3
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:10:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70CC6281871
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36079134BC;
-	Wed, 19 Jul 2023 11:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EAB12B8E;
+	Wed, 19 Jul 2023 11:10:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2544812B7A
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:06:33 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1403C270C
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:06:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689764764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6G25Wpf6urdNog1RrCIh1jSfsrggg+8NTa2ueC8cR3I=;
-	b=FesK7vsjFMYMgyGUbIZ+poXZNJDgbdImixj0RSmgitx0Te0ps4xVwbx3d8CL3Y4EejDoKp
-	QIRYLnqXBx7w8cDNyjegFmoGh2HKbUkhb74Q9iULzkbLqlpWbDkQtAkJ7wnBQCvzWaY0o5
-	ojqnK6ImZV3yQtFikvyu6klaQkFF02M=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-330-c4qwD0TqPyiMOnns8h9MZA-1; Wed, 19 Jul 2023 07:06:02 -0400
-X-MC-Unique: c4qwD0TqPyiMOnns8h9MZA-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4fbcdca8fcbso5684340e87.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:06:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689764761; x=1692356761;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6G25Wpf6urdNog1RrCIh1jSfsrggg+8NTa2ueC8cR3I=;
-        b=MakDn6Wv5wGfk5zPVADbZ+MZyHzJw65sn2uNbShoRJqt65vbhpOwn36H91iH5NNLaH
-         j2BAZ5HH/JGKX7thQeWl+DXA/mMfLmgz1zdMLmPymqgw5vR9aMGLKHOlTxkkFbkw5vGK
-         tcXiY8jFLRCbZ1Y2LngqkbFkZ1S1ZVIx/q+t1gHJcxYKBY/L5eV+pQsCcevunrGu/7oe
-         CXAxwWX4j9kEJJFHCpC7ThBk9DY98M707qcBlPMKdeUKhYMvvuIoalRqk4T7KDkUtO0i
-         xqSUQANV4mxt/c5wbS1IsiRpTvwQ7e/cmkkAZneWuK5S8mNxT5vWS3p6Z7nm/upPg7b5
-         OchQ==
-X-Gm-Message-State: ABy/qLbxGba4JZ2Wqs5uP4RAesyjNwgXCHANznMrZhgyW1Cx6u6qOOW8
-	ktWXOYmig4jJMz97QP4NxSqdZmneN+0A8Amlho0jRkmbR3ZaSrTEUUoSrQ6no5U+Ieo8xMckLDZ
-	khGcfWuwx0ua/hg6f
-X-Received: by 2002:a05:6512:2316:b0:4fd:d9dd:7a22 with SMTP id o22-20020a056512231600b004fdd9dd7a22mr96826lfu.26.1689764761273;
-        Wed, 19 Jul 2023 04:06:01 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGVmVc0nOSbjtLvsVkw0Xfo9zLoMCLBrAktPo4kwD8j+ZtvK0aKteVH/Zyf6WXfLny5TxU5yw==
-X-Received: by 2002:a05:6512:2316:b0:4fd:d9dd:7a22 with SMTP id o22-20020a056512231600b004fdd9dd7a22mr96797lfu.26.1689764760864;
-        Wed, 19 Jul 2023 04:06:00 -0700 (PDT)
-Received: from redhat.com ([2.52.16.41])
-        by smtp.gmail.com with ESMTPSA id s13-20020a7bc38d000000b003fbd0c50ba2sm1419609wmj.32.2023.07.19.04.05.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 04:06:00 -0700 (PDT)
-Date: Wed, 19 Jul 2023 07:05:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: kernel test robot <lkp@intel.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	virtualization@lists.linux-foundation.org,
-	oe-kbuild-all@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH vhost v12 10/10] virtio_net: merge dma operations when
- filling mergeable buffers
-Message-ID: <20230719070450-mutt-send-email-mst@kernel.org>
-References: <20230719040422.126357-11-xuanzhuo@linux.alibaba.com>
- <202307191819.0tatknWa-lkp@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC65BA38
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:10:26 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77ABF186
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:10:24 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 7611D20826;
+	Wed, 19 Jul 2023 13:10:22 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id b7LByB9XVJ0f; Wed, 19 Jul 2023 13:10:21 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 841B72065A;
+	Wed, 19 Jul 2023 13:10:21 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id 7AFA480004A;
+	Wed, 19 Jul 2023 13:10:21 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 19 Jul 2023 13:10:21 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 19 Jul
+ 2023 13:10:21 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id C296F3182B3A; Wed, 19 Jul 2023 13:10:20 +0200 (CEST)
+Date: Wed, 19 Jul 2023 13:10:20 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Yinjun Zhang <yinjun.zhang@corigine.com>
+CC: Louis Peens <louis.peens@corigine.com>, David Miller
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, "Leon
+ Romanovsky" <leon@kernel.org>, Simon Horman <simon.horman@corigine.com>,
+	Shihong Wang <shihong.wang@nephogine.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, oss-drivers <oss-drivers@corigine.com>
+Subject: Re: [PATCH net-next 1/2] xfrm: add the description of
+ CHACHA20-POLY1305 for xfrm algorithm description
+Message-ID: <ZLfEnOO0bzgBfJFj@gauss3.secunet.de>
+References: <20230719091830.50866-1-louis.peens@corigine.com>
+ <20230719091830.50866-2-louis.peens@corigine.com>
+ <ZLesfwnwXZ22A0fA@gauss3.secunet.de>
+ <CH2PR13MB37022A82BF61E33B537F99D0FC39A@CH2PR13MB3702.namprd13.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <202307191819.0tatknWa-lkp@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+In-Reply-To: <CH2PR13MB37022A82BF61E33B537F99D0FC39A@CH2PR13MB3702.namprd13.prod.outlook.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 06:33:05PM +0800, kernel test robot wrote:
-> Hi Xuan,
+On Wed, Jul 19, 2023 at 10:52:03AM +0000, Yinjun Zhang wrote:
+> On Wednesday, July 19, 2023 5:27 PM, Steffen Klassert wrote:
+> > On Wed, Jul 19, 2023 at 11:18:29AM +0200, Louis Peens wrote:
+> > > From: Shihong Wang <shihong.wang@corigine.com>
+> > >
+> > > Add the description of CHACHA20-POLY1305 for xfrm algorithm description
+> > > and set pfkey_supported to 1 so that xfrm supports that the algorithm
+> > > can be offloaded to the NIC.
+> > >
+> > > Signed-off-by: Shihong Wang <shihong.wang@corigine.com>
+> > > Acked-by: Simon Horman <simon.horman@corigine.com>
+> > > Signed-off-by: Louis Peens <louis.peens@corigine.com>
+> > > ---
+> > >  include/uapi/linux/pfkeyv2.h | 1 +
+> > >  net/xfrm/xfrm_algo.c         | 9 ++++++++-
+> > >  2 files changed, 9 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/include/uapi/linux/pfkeyv2.h b/include/uapi/linux/pfkeyv2.h
+> > > index 8abae1f6749c..d0ab530e1069 100644
+> > > --- a/include/uapi/linux/pfkeyv2.h
+> > > +++ b/include/uapi/linux/pfkeyv2.h
+> > > @@ -331,6 +331,7 @@ struct sadb_x_filter {
+> > >  #define SADB_X_EALG_CAMELLIACBC              22
+> > >  #define SADB_X_EALG_NULL_AES_GMAC    23
+> > >  #define SADB_X_EALG_SM4CBC           24
+> > > +#define SADB_X_EALG_CHACHA20_POLY1305        25
+> > 
+> > Please don't add new stuff to pfkey, use netlink instead. This interface
+> > is deprecated and will go away someday.
 > 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on v6.4]
-> [cannot apply to mst-vhost/linux-next linus/master v6.5-rc2 v6.5-rc1 next-20230719]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_ring-check-use_dma_api-before-unmap-desc-for-indirect/20230719-121424
-> base:   v6.4
-> patch link:    https://lore.kernel.org/r/20230719040422.126357-11-xuanzhuo%40linux.alibaba.com
-> patch subject: [PATCH vhost v12 10/10] virtio_net: merge dma operations when filling mergeable buffers
-> config: i386-randconfig-i006-20230718 (https://download.01.org/0day-ci/archive/20230719/202307191819.0tatknWa-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce: (https://download.01.org/0day-ci/archive/20230719/202307191819.0tatknWa-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202307191819.0tatknWa-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    drivers/net/virtio_net.c: In function 'virtnet_rq_init_one_sg':
-> >> drivers/net/virtio_net.c:624:41: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
->      624 |                 rq->sg[0].dma_address = (dma_addr_t)addr;
->          |                                         ^
->    drivers/net/virtio_net.c: In function 'virtnet_rq_alloc':
-> >> drivers/net/virtio_net.c:682:28: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
->      682 |                 *sg_addr = (void *)(dma->addr + alloc_frag->offset - sizeof(*dma));
->          |                            ^
+> Sorry, we don't get it. How does driver know which algo it is without these
+> definitions? Is there any document guide that we can refer to?
 
-
-yea these casts are pretty creepy. I think it's possible dma_addr_t won't fit in a pointer
-or a pointer won't fit in dma_addr_t.
-
-> 
-> vim +624 drivers/net/virtio_net.c
-> 
->    619	
->    620	static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *addr, u32 len)
->    621	{
->    622		if (rq->do_dma) {
->    623			sg_init_table(rq->sg, 1);
->  > 624			rq->sg[0].dma_address = (dma_addr_t)addr;
->    625			rq->sg[0].length = len;
->    626		} else {
->    627			sg_init_one(rq->sg, addr, len);
->    628		}
->    629	}
->    630	
->    631	static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size,
->    632				      void **sg_addr, gfp_t gfp)
->    633	{
->    634		struct page_frag *alloc_frag = &rq->alloc_frag;
->    635		struct virtnet_rq_dma *dma;
->    636		struct device *dev;
->    637		void *buf, *head;
->    638		dma_addr_t addr;
->    639	
->    640		if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
->    641			return NULL;
->    642	
->    643		head = (char *)page_address(alloc_frag->page);
->    644	
->    645		if (rq->do_dma) {
->    646			dma = head;
->    647	
->    648			/* new pages */
->    649			if (!alloc_frag->offset) {
->    650				if (rq->last_dma) {
->    651					/* Now, the new page is allocated, the last dma
->    652					 * will not be used. So the dma can be unmapped
->    653					 * if the ref is 0.
->    654					 */
->    655					virtnet_rq_unmap(rq, rq->last_dma, 0);
->    656					rq->last_dma = NULL;
->    657				}
->    658	
->    659				dev = virtqueue_dma_dev(rq->vq);
->    660	
->    661				dma->len = alloc_frag->size - sizeof(*dma);
->    662	
->    663				addr = dma_map_single_attrs(dev, dma + 1, dma->len, DMA_FROM_DEVICE, 0);
->    664				if (addr == DMA_MAPPING_ERROR)
->    665					return NULL;
->    666	
->    667				dma->addr = addr;
->    668				dma->need_sync = dma_need_sync(dev, addr);
->    669	
->    670				/* Add a reference to dma to prevent the entire dma from
->    671				 * being released during error handling. This reference
->    672				 * will be freed after the pages are no longer used.
->    673				 */
->    674				get_page(alloc_frag->page);
->    675				dma->ref = 1;
->    676				alloc_frag->offset = sizeof(*dma);
->    677	
->    678				rq->last_dma = dma;
->    679			}
->    680	
->    681			++dma->ref;
->  > 682			*sg_addr = (void *)(dma->addr + alloc_frag->offset - sizeof(*dma));
->    683		} else {
->    684			*sg_addr = head + alloc_frag->offset;
->    685		}
->    686	
->    687		buf = head + alloc_frag->offset;
->    688	
->    689		get_page(alloc_frag->page);
->    690		alloc_frag->offset += size;
->    691	
->    692		return buf;
->    693	}
->    694	
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
-
+Ugh, I've just seen that you use this in the drivers. The correct way
+would be to parse the name of the algorithm, as the crypto layer does
+it.
 
