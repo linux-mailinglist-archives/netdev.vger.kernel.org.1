@@ -1,105 +1,159 @@
-Return-Path: <netdev+bounces-18854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1758F758E15
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:47:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2C92758E16
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8192281635
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:47:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E808281635
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071B25242;
-	Wed, 19 Jul 2023 06:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBFE5242;
+	Wed, 19 Jul 2023 06:47:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF65E1844
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:47:50 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273611BFC
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:47:48 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51de9c2bc77so8905552a12.3
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:47:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E6CAD45
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:47:58 +0000 (UTC)
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044881BFC
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:47:57 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id af79cd13be357-7682705c039so272114285a.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:47:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689749266; x=1692341266;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kjN0tLMfhhbwPG0cD5N+BU3Ej/18jrzjOMkzaASLGXk=;
-        b=3oLaMtulUk+KibeojFShc+KJpkHml93hjuBgMyE2IDuJFoOc/Hpr7M7S1io78YR+tZ
-         i+a2wwQJKo0qCY2sfQ9o3MOgK1iXkYYfco4poWTO85ucwBnqpBbOQMow9cxWvXde/OX0
-         g67fxCSXBEzUBtsNSGhR+z9rAvTfcB//VZfgzH+bflgzu2NovFxJmaXmXpHLjQFteSMq
-         jwmRPUGzfXoIuaBO86QgcKQbtpuXLd/8RtKk8uoQEBLQcaThpVJGrhuPDVE8suWwcNyY
-         CG8otl5Cdz0Q6XqKxAowat/1ury3XHNI18E5LwL4Wr/dNzW+UOsxbYdkBqyBQpna9Rug
-         wHng==
+        d=google.com; s=20221208; t=1689749276; x=1692341276;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LrM52kzX9eNA6vn1Q+/ISMM2ennPazWpPjDqunPq+CY=;
+        b=qC8dTnVzlFafRIWR+EV9dfav7BJf0aTHEPfO7eGnQREvr80xd63Hf/HLTluiXkmxSX
+         aPC0sbvL/DxOVDFlIiHBX6PhP41nd4i4zXcYWqMqpeJdE6Qdz2i7sC31tSFDZKDbxMtt
+         DvOHBrBSjUGvAk5z9S9kvrvTZ6IbLhVesjoJ+tfWzKtKRU+DFlRidpMZIwbfk/MEM7Dn
+         0AlE3rLxjS+562x1gRVC/DW+yOuQki/oLcfFtrVgP9AW3PFS0eDpjCi35fP9ZCXg+mNK
+         s/VdiULFMe5vpCFKnbqtlLw61mE5tNygg+rWqQcrPasb9TdmUdjwfghIeQ9c/S4vK6vL
+         Gahg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689749266; x=1692341266;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kjN0tLMfhhbwPG0cD5N+BU3Ej/18jrzjOMkzaASLGXk=;
-        b=UKqS+Z6Ed8TVLDPbU6EUzORxeh5IGJ2Vt67I3CVyhJ3F+xGqBJfzcq+f5zbiJTIWCM
-         lVrzrenPJhJi1EUpWCvFuu5D8yjdeH9yj8CaE1idNYZ6HNBaM6HstD48Yd9wb0VQNJQO
-         gyS8BEgiJlRxAhw8UiU/eso5UV3get8WekoWVo8DTyGO8FPEs6DhfOkIRg6Qfkj+xLVm
-         lVDnJVo4kcTpV+CEgbxHFYyCq5lrktGIMQID0MHU4BV6ZD5uTrg9j/n9/pPvH13lS4nm
-         810U+vEHp+33nrEgfHWex5uwqWia3rotG1/EWhuIBpwESrakirTS0u9uVeNPE4NXbXJx
-         wTuw==
-X-Gm-Message-State: ABy/qLaWVSSQRValB+TlpYsi6mDMFAMlMD/V6XqtIANehcQFUHQh1sA+
-	H47jyVSwreHilFY7qpBUw/6WQzEFLp4h2kSVgoA=
-X-Google-Smtp-Source: APBJJlF170M9fXHN/tZM63CDcIwqRn/P8fMM0z78/vcIdodNexSgRaO1fRx7+WlHwGcmYZtOLeKwaA==
-X-Received: by 2002:a17:907:75c3:b0:993:e94e:7234 with SMTP id jl3-20020a17090775c300b00993e94e7234mr1468369ejc.77.1689749266528;
-        Tue, 18 Jul 2023 23:47:46 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id o22-20020a1709062e9600b009937dbabbd5sm1862229eji.220.2023.07.18.23.47.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 23:47:45 -0700 (PDT)
-Date: Wed, 19 Jul 2023 08:47:44 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Linux Network Development Mailing List <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net] ipv6 addrconf: fix bug where deleting a mngtmpaddr
- can create a new temporary address
-Message-ID: <ZLeHEDdWYVkABUDE@nanopsycho>
-References: <20230712135520.743211-1-maze@google.com>
- <ca044aea-e9ee-788c-f06d-5f148382452d@kernel.org>
- <CANP3RGeR8oKQ=JfRWofb47zt9YF3FRqtemjg63C_Mn4i8R79Dg@mail.gmail.com>
- <7f295784-b833-479a-daf4-84e4f89ec694@kernel.org>
- <20230718160832.0caea152@kernel.org>
+        d=1e100.net; s=20221208; t=1689749276; x=1692341276;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LrM52kzX9eNA6vn1Q+/ISMM2ennPazWpPjDqunPq+CY=;
+        b=V/nT6d9nCY7N+Yc9aniu48IKHRm/iIrtmU4HiOGcjqxn3h1opbYNDnoj5MN2cjpfwQ
+         9MLqG5vIHTrbqFXggLpFowk19moPK0xNrm/+CIapejlc+rW5tDxvERm4z3NCJWXaud7b
+         GyVX7kKOJGr7XJX3/NQfPKcLdyKKA5wUdLslkpP+f2lq5t+aUeReIYn36Hb97fkn/bZf
+         3HXWCYks7Ve5zUgcleBZRVnJspbntFnbjXQJFzln3EjKC3mju0OcHR/F1N6LJuexHxMO
+         du8u3db/p+hp3Us5aJByzvDUYuYlqoICH3erkYUBPpt1vvtlbHL5Q6XYBYOcYSrBzBWT
+         O+aQ==
+X-Gm-Message-State: ABy/qLbbUzkTfElnNOh+N/LQHGq20w+lFvYK64ez7ggkZruHZeP679jU
+	fXpRFwX9YOuXe1pSqpEQAXxWO92HpkQe5g==
+X-Google-Smtp-Source: APBJJlGA2GFr/ZWAcaBK3gTT4nwhWnchGlVxMvklqjaMj/QuM2XXS+hlnBCvFDZnNVRs3C0lg6JmXjlUilCvaw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:622a:1b8c:b0:403:daba:38a2 with SMTP
+ id bp12-20020a05622a1b8c00b00403daba38a2mr89062qtb.11.1689749276035; Tue, 18
+ Jul 2023 23:47:56 -0700 (PDT)
+Date: Wed, 19 Jul 2023 06:47:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718160832.0caea152@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230719064754.2794106-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: add TCP_OLD_SEQUENCE drop reason
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Jul 19, 2023 at 01:08:32AM CEST, kuba@kernel.org wrote:
->On Fri, 14 Jul 2023 08:49:55 -0600 David Ahern wrote:
->> > I did consider that and I couldn't quite convince myself that simply
->> > removing "|| list_empty()" from the if statement is necessarily correct
->> > (thus I went with the more obviously correct change).
->> > 
->> > Are you convinced dropping the || list_empty would work?
->> > I assume it's there for some reason...  
->> 
->> I am hoping Jiri can recall why that part was added since it has the
->> side effect of adding an address on a delete which should not happen.
->
->Did we get stuck here? Jiri are you around to answer?
+tcp_sequence() uses two conditions to decide to drop a packet,
+and we currently report generic TCP_INVALID_SEQUENCE drop reason.
 
-Most probably a bug. But, this is 10 years since the change, I don't
-remember much after this period. I didn't touch the code since :/
+Duplicates are common, we need to distinguish them from
+the other case.
+
+I chose to not reuse TCP_OLD_DATA, and instead added
+TCP_OLD_SEQUENCE drop reason.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/dropreason-core.h |  3 +++
+ net/ipv4/tcp_input.c          | 16 +++++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index a2b953b57689b8233f35ef508716a3128dabb4a8..f291a3b0f9e512bd933b961caa4368367c3c5c6c 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -30,6 +30,7 @@
+ 	FN(TCP_OVERWINDOW)		\
+ 	FN(TCP_OFOMERGE)		\
+ 	FN(TCP_RFC7323_PAWS)		\
++	FN(TCP_OLD_SEQUENCE)		\
+ 	FN(TCP_INVALID_SEQUENCE)	\
+ 	FN(TCP_RESET)			\
+ 	FN(TCP_INVALID_SYN)		\
+@@ -188,6 +189,8 @@ enum skb_drop_reason {
+ 	 * LINUX_MIB_PAWSESTABREJECTED
+ 	 */
+ 	SKB_DROP_REASON_TCP_RFC7323_PAWS,
++	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
++	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
+ 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
+ 	SKB_DROP_REASON_TCP_INVALID_SEQUENCE,
+ 	/** @SKB_DROP_REASON_TCP_RESET: Invalid RST packet */
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 3cd92035e0902298baa8afd89ae5edcbfce300e5..2258eebf0f0045c730a3bc2b50fb37176e245c07 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -4313,10 +4313,16 @@ static inline bool tcp_paws_discard(const struct sock *sk,
+  * (borrowed from freebsd)
+  */
+ 
+-static inline bool tcp_sequence(const struct tcp_sock *tp, u32 seq, u32 end_seq)
++static enum skb_drop_reason tcp_sequence(const struct tcp_sock *tp,
++					 u32 seq, u32 end_seq)
+ {
+-	return	!before(end_seq, tp->rcv_wup) &&
+-		!after(seq, tp->rcv_nxt + tcp_receive_window(tp));
++	if (before(end_seq, tp->rcv_wup))
++		return SKB_DROP_REASON_TCP_OLD_SEQUENCE;
++
++	if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
++		return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
++
++	return SKB_NOT_DROPPED_YET;
+ }
+ 
+ /* When we get a reset we do this. */
+@@ -5739,7 +5745,8 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+ 	}
+ 
+ 	/* Step 1: check sequence number */
+-	if (!tcp_sequence(tp, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq)) {
++	reason = tcp_sequence(tp, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq);
++	if (reason) {
+ 		/* RFC793, page 37: "In all states except SYN-SENT, all reset
+ 		 * (RST) segments are validated by checking their SEQ-fields."
+ 		 * And page 69: "If an incoming segment is not acceptable,
+@@ -5756,7 +5763,6 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+ 		} else if (tcp_reset_check(sk, skb)) {
+ 			goto reset;
+ 		}
+-		SKB_DR_SET(reason, TCP_INVALID_SEQUENCE);
+ 		goto discard;
+ 	}
+ 
+-- 
+2.41.0.255.g8b1d071c50-goog
 
 
