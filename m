@@ -1,112 +1,177 @@
-Return-Path: <netdev+bounces-19237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B21975A04C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:02:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFEE175A050
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14A381C211AB
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:02:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89E9B2819F4
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95031BB57;
-	Wed, 19 Jul 2023 21:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEBC1BB5E;
+	Wed, 19 Jul 2023 21:05:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7CA1BB20
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:02:19 +0000 (UTC)
-Received: from resdmta-h1p-028482.sys.comcast.net (resdmta-h1p-028482.sys.comcast.net [IPv6:2001:558:fd02:2446::c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F1BA1B9
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:02:17 -0700 (PDT)
-Received: from resomta-h1p-027914.sys.comcast.net ([96.102.179.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
-	(Client did not present a certificate)
-	by resdmta-h1p-028482.sys.comcast.net with ESMTP
-	id MAd5qbI3KKSvQMEJNqoJgH; Wed, 19 Jul 2023 21:02:17 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=comcastmailservice.net; s=20211018a; t=1689800537;
-	bh=xqMj+3VVjo+8UbUEghVnxRyNG8G2SG/j/lJTsRoSPsQ=;
-	h=Received:Received:From:To:Subject:Date:MIME-Version:Message-ID:
-	 Content-Type:Xfinity-Spam-Result;
-	b=XsdnxAS8/btV6MSv+rhCgassN5hoIM7DesGMF3qwjj5IF6L+XG9amjExINSYZp0+J
-	 oK7z4faQGqsBqzVNuQAJbfOTiAACwMyUlOLyDH6ovwk7YNSzWvALrEaTjIXXfm+r/j
-	 O7OYdmeKvaAWW9O4m7oDlYcdgg1seiArhos6vTbLOWx0OOopi5JWjgSqKUwpV3kBNL
-	 tPQkEj4iCMgh4DyOntUSwP8EszP16y7JDVwsLLwjOYk/3Vj3g02CwF83pLo4F1XpdL
-	 25uhMZgAGLMfRCuF3HXpDJCJzvfjH9SRn5rid322p8zD9r0qPd7UUkhuPRX0TZyWYh
-	 XFh5OC3OiAF1A==
-Received: from localhost ([IPv6:2601:18c:9082:afd:219:d1ff:fe75:dc2f])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
-	(Client did not present a certificate)
-	by resomta-h1p-027914.sys.comcast.net with ESMTPSA
-	id MEJAqBpSU0WpqMEJCqnizK; Wed, 19 Jul 2023 21:02:12 +0000
-X-Xfinity-VMeta: sc=-100.00;st=legit
-From: Matt Whitlock <kernel@mattwhitlock.name>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Matthew Wilcox <willy@infradead.org>,
- Miklos Szeredi <miklos@szeredi.hu>,
- David Howells <dhowells@redhat.com>,
- <netdev@vger.kernel.org>,
- Dave Chinner <david@fromorbit.com>,
- Jens Axboe <axboe@kernel.dk>,
- <linux-fsdevel@kvack.org>,
- <linux-mm@kvack.org>,
- <linux-kernel@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- <linux-fsdevel@vger.kernel.org>
-Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after =?iso-8859-1?Q?splice()_returns?=
-Date: Wed, 19 Jul 2023 17:02:04 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECBE7F2
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:05:04 +0000 (UTC)
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D705B1FC0;
+	Wed, 19 Jul 2023 14:05:01 -0700 (PDT)
+Received: from [192.168.1.103] (178.176.79.158) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Thu, 20 Jul
+ 2023 00:04:53 +0300
+Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
+To: Yunsheng Lin <linyunsheng@huawei.com>, Zheng Hacker
+	<hackerzheng666@gmail.com>
+CC: Zheng Wang <zyytlz.wz@163.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<1395428693sheep@gmail.com>, <alex000young@gmail.com>
+References: <20230311180630.4011201-1-zyytlz.wz@163.com>
+ <57f6d87e-8bfb-40fc-7724-89676c2e75ef@huawei.com>
+ <CAJedcCy8QOCv3SC-Li2JkaFEQydTDd1aiY77BHn7ht0Y8r1nUA@mail.gmail.com>
+ <43a4a617-2633-a501-6fd1-b2495aed90f7@huawei.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <10f72b0a-663b-7f71-06c2-7315bd0bf368@omp.ru>
+Date: Thu, 20 Jul 2023 00:04:50 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <6609f1b8-3264-4017-ac3c-84a01ea12690@mattwhitlock.name>
-In-Reply-To: <CAHk-=wiq95bWiWLyz96ombPfpy=PNrc2KKyzJ2d+WMrxi6=OVA@mail.gmail.com>
-References: <20230629155433.4170837-1-dhowells@redhat.com>
- <20230629155433.4170837-2-dhowells@redhat.com>
- <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
- <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name>
- <CAJfpegvq4M_Go7fHiWVBBkrK6h4ChLqQTd0+EOKbRWZDcVerWA@mail.gmail.com>
- <ZLg9HbhOVnLk1ogA@casper.infradead.org>
- <CAHk-=wiq95bWiWLyz96ombPfpy=PNrc2KKyzJ2d+WMrxi6=OVA@mail.gmail.com>
-User-Agent: Trojita/v0.7-595-g7738cd47; Qt/5.15.10; xcb; Linux; Gentoo Linux
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <43a4a617-2633-a501-6fd1-b2495aed90f7@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.79.158]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 07/19/2023 18:09:23
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 178730 [Jul 19 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.158 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.158 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;178.176.79.158:7.1.2,7.7.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.79.158
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/19/2023 18:16:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/19/2023 5:01:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_BL_SPAMCOP_NET,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wednesday, 19 July 2023 16:16:07 EDT, Linus Torvalds wrote:
-> The *ONLY* reason for splice() existing is for zero-copy.
+Hello!
 
-The very first sentence of splice(2) reads: "splice() moves data between=20
-two file descriptors without copying between kernel address space and user=20=
+On 3/13/23 6:32 AM, Yunsheng Lin wrote:
+[...]
 
-address space." Thus, it is not unreasonable to believe that the point of=20
-splice is to avoid copying between user-space and kernel-space.
+>>> On 2023/3/12 2:06, Zheng Wang wrote:
+>>>> In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
+>>>> If timeout occurs, it will start the work. And if we call
+>>>> ravb_remove without finishing the work, there may be a
+>>>> use-after-free bug on ndev.
+>>>>
+>>>> Fix it by finishing the job before cleanup in ravb_remove.
+>>>>
+>>>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+>>>> Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+>>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>>> ---
+>>>> v3:
+>>>> - fix typo in commit message
+>>>> v2:
+>>>> - stop dev_watchdog so that handle no more timeout work suggested by Yunsheng Lin,
+>>>> add an empty line to make code clear suggested by Sergey Shtylyov
+>>>> ---
+>>>>  drivers/net/ethernet/renesas/ravb_main.c | 4 ++++
+>>>>  1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> index 0f54849a3823..eb63ea788e19 100644
+>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> @@ -2892,6 +2892,10 @@ static int ravb_remove(struct platform_device *pdev)
+>>>>       struct ravb_private *priv = netdev_priv(ndev);
+>>>>       const struct ravb_hw_info *info = priv->info;
+>>>>
+>>>> +     netif_carrier_off(ndev);
+>>>> +     netif_tx_disable(ndev);
+>>>> +     cancel_work_sync(&priv->work);
+>>>
+>>> LGTM.
+>>> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
+>>>
+>>> As noted by Sergey, ravb_remove() and ravb_close() may
+>>> share the same handling, but may require some refactoring
+>>> in order to do that. So for a fix, it seems the easiest
+>>> way to just add the handling here.
+>>
+>> Dear Yunsheng,
+>>
+>> I think Sergey is right for I've seen other drivers' same handling
+>> logic. Do you think we should try to move the cancel-work-related code
+>> from ravb_remove to ravb_close funtion?
+>> Appreciate for your precise advice.
+> 
+> As Sergey question "can ravb_remove() be called without ravb_close()
+> having been called on the bound devices?"
+> If I understand it correctly, I think ravb_remove() can be called
+> without ravb_close() having been called on the bound devices. I am
+> happy to be corrected if I am wrong.
 
-If you use read() and write(), then you're making two copies. If you use=20
-splice(), then you're making one copy (or zero, but that's an optimization=20=
+   Yes, correct. It's ravb_remove() that calls unregister_netdev()
+which results in calling ravb_close() on the opened devices...
 
-that should be invisible to the user).
+> Yes, you can call *_close() directly in *_remove(), but that may
+> require some refactoring and a lot of testing.
 
-> And no, we don't start some kind of crazy "versioned zero-copy with
-> COW". That's a fundamental mistake.
+   No need to do that I think, as it's called anyways...
 
-Agreed. splice() should steal the reference if it can, copy the page data=20
-if it must. Note that, even in the slow case where the page data must be=20
-copied, this still gives a better-than-50% speedup over read()+write()=20
-since an entire copy (and one syscall) is elided.
+> Also, if you found the bug through some static analysis, it may
+> be better to make it clear in the commit log and share some info
+> about the static analysis, which I suppose it is a tool?
 
-> IF YOU DON'T UNDERSTAND THE *POINT* OF SPLICE, DON'T USE SPLICE.
+   Agreed. :-)
 
-Thanks for being so condescending. Your reputation is deserved.
+>> Best regards,
+>> Zheng
 
+MBR, Sergey
 
