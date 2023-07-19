@@ -1,137 +1,100 @@
-Return-Path: <netdev+bounces-19106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18FEF759C0A
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:10:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F04759C1C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16D1A1C210CC
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30DF71C21103
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F5F1FB40;
-	Wed, 19 Jul 2023 17:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B3D1FB48;
+	Wed, 19 Jul 2023 17:11:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA920800;
-	Wed, 19 Jul 2023 17:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54A0AC433C7;
-	Wed, 19 Jul 2023 17:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689786626;
-	bh=bOaXy+PGLlJn8I0K7pnq5buiHn4QTxMQ16ptcuUNH2s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KeqNzkIW///HE/FRmZ9+yPoghaScd42TAazSvn54WdlVowhRtC+jObGgs3V3S8UPI
-	 kuyWahpOKJ7+BZ9gzrlwE1Mlg0Xbhx+7ypYCiP7ezM8DG9p4lepJu1ulrQt7tPgA1G
-	 hBT9XU1szunwxtoQ0vXqVijJQjN2kLw1B1l7lMBJhRvpxzlGWSp+mgK6beDx/PKeE9
-	 PloX6BKr3l2QFrZ5dsX4lEP2V93ELsuWLZdq5OcZzn9/zk5bZCj41Ekh/OvP9kJdm2
-	 xIvdAKok/WFL6ikuTCN2P7HKQIhNsK6PFox7Hybr0yzXyeqpPl+p6m7codAA/3aIOC
-	 kReywcCIb2BeA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 26435E21EFA;
-	Wed, 19 Jul 2023 17:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AC212B70
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 17:11:30 +0000 (UTC)
+Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3215D1BB
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:11:28 -0700 (PDT)
+Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-39fb9cce400so12022712b6e.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:11:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689786687; x=1692378687;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LiK3UAz0+c77ryW/gb9cMTyS6vAEJ/XrFX6N9k9mOJQ=;
+        b=jKiCsA8/gtNYmqHLX5ZOsO0kZz3uM0y8ZaJ6z+li/81+cg8iaLP2P6FfW8UHWhii7f
+         KHZLhuw9Z/Hw9vNfTl+DWKCEdP5oqZIT0q+OqudqAAXU7/2d9Ga97pwiqBVNy8iW/RU8
+         punpsRlEzloC2vR8wPWyjNei9Z/D1oUHuAxxyY/tEMZq3/Q003AgeH0XeaQg08sz0yXJ
+         7HGwmrZMxzXEIGJhFhm6QJsX3KKqqGwn1SchTpfDiyecon3nJ+nOJ3xHH4I6ScuBEjFA
+         eGs7jxURJXWyoqmRaMNyd4ctZiJRJREADB3L333K8LZr9aQ4DsKxIdANQOUk6qk+g8pm
+         Jy8g==
+X-Gm-Message-State: ABy/qLZdsrGMDhTAhBc47f7A7tG0UGdLUoRFiMs1iKhJk2eqX4ACU9NM
+	sJHbsBWx79bwqbEu1HIYA511ssHaMn9A/hGAKPUl7EFh/Fbw
+X-Google-Smtp-Source: APBJJlGqZ3iWxxXhT33LNAjfh+QREvkhQDEruriIX1JMirS2inBiRbWmSWpri4JcCeIQNkkHGF5KNA+oUFrsArjTbOfZC6ur6PVu
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v7 bpf-next 00/24] xsk: multi-buffer support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168978662615.29125.14969531440674735433.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jul 2023 17:10:26 +0000
-References: <20230719132421.584801-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20230719132421.584801-1-maciej.fijalkowski@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
- bjorn@kernel.org, toke@kernel.org, kuba@kernel.org, horms@kernel.org,
- tirthendu.sarkar@intel.com
+X-Received: by 2002:a05:6808:15aa:b0:3a4:48e1:3116 with SMTP id
+ t42-20020a05680815aa00b003a448e13116mr12661379oiw.0.1689786687593; Wed, 19
+ Jul 2023 10:11:27 -0700 (PDT)
+Date: Wed, 19 Jul 2023 10:11:27 -0700
+In-Reply-To: <20230719170446.GR20457@twin.jikos.cz>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000042a3ac0600da1f69@google.com>
+Subject: Re: [syzbot] [btrfs?] [netfilter?] BUG: MAX_LOCKDEP_CHAIN_HLOCKS too
+ low! (2)
+From: syzbot <syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com>
+To: dsterba@suse.cz
+Cc: bakmitopiacibubur@boga.indosterling.com, clm@fb.com, davem@davemloft.net, 
+	dsahern@kernel.org, dsterba@suse.com, dsterba@suse.cz, fw@strlen.de, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, josef@toxicpanda.com, 
+	kadlec@netfilter.org, kuba@kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com, yoshfuji@linux-ipv6.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,PLING_QUERY,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+> On Wed, Jul 19, 2023 at 02:32:51AM -0700, syzbot wrote:
+>> syzbot has found a reproducer for the following issue on:
+>> 
+>> HEAD commit:    e40939bbfc68 Merge branch 'for-next/core' into for-kernelci
+>> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=15d92aaaa80000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=c4a2640e4213bc2f
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=9bbbacfbf1e04d5221f7
+>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>> userspace arch: arm64
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=149b2d66a80000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1214348aa80000
+>> 
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/9d87aa312c0e/disk-e40939bb.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/22a11d32a8b2/vmlinux-e40939bb.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/0978b5788b52/Image-e40939bb.gz.xz
+>
+> #syz unset btrfs
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+The following labels did not exist: btrfs
 
-On Wed, 19 Jul 2023 15:23:57 +0200 you wrote:
-> v6->v7:
-> - rebase...[Alexei]
-> 
-> v5->v6:
-> - update bpf_xdp_query_opts__last_field in patch 10 [Alexei]
-> 
-> v4->v5:
-> - align options argument size to match options from xdp_desc [Benjamin]
-> - cleanup skb from xdp_sock on socket termination [Toke]
-> - introduce new netlink attribute for letting user space know about Tx
->   frag limit; this substitutes xdp_features flag previously dedicated
->   for setting ZC multi-buffer support [Toke, Jakub]
-> - include i40e ZC multi-buffer support
-> - enable TOO_MANY_FRAGS for ZC on xskxceiver; this is now possible due
->   to netlink attribute mentioned two bullets above
-> 
-> [...]
-
-Here is the summary with links:
-  - [v7,bpf-next,01/24] xsk: prepare 'options' in xdp_desc for multi-buffer use
-    https://git.kernel.org/bpf/bpf-next/c/63a64a56bc3f
-  - [v7,bpf-next,02/24] xsk: introduce XSK_USE_SG bind flag for xsk socket
-    https://git.kernel.org/bpf/bpf-next/c/81470b5c3c66
-  - [v7,bpf-next,03/24] xsk: prepare both copy and zero-copy modes to co-exist
-    https://git.kernel.org/bpf/bpf-next/c/556444c4e683
-  - [v7,bpf-next,04/24] xsk: move xdp_buff's data length check to xsk_rcv_check
-    https://git.kernel.org/bpf/bpf-next/c/faa91b839b09
-  - [v7,bpf-next,05/24] xsk: add support for AF_XDP multi-buffer on Rx path
-    https://git.kernel.org/bpf/bpf-next/c/804627751b42
-  - [v7,bpf-next,06/24] xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path
-    https://git.kernel.org/bpf/bpf-next/c/b7f72a30e9ac
-  - [v7,bpf-next,07/24] xsk: allow core/drivers to test EOP bit
-    https://git.kernel.org/bpf/bpf-next/c/1b725b0c8163
-  - [v7,bpf-next,08/24] xsk: add support for AF_XDP multi-buffer on Tx path
-    https://git.kernel.org/bpf/bpf-next/c/cf24f5a5feea
-  - [v7,bpf-next,09/24] xsk: discard zero length descriptors in Tx path
-    https://git.kernel.org/bpf/bpf-next/c/07428da9e25a
-  - [v7,bpf-next,10/24] xsk: add new netlink attribute dedicated for ZC max frags
-    https://git.kernel.org/bpf/bpf-next/c/13ce2daa259a
-  - [v7,bpf-next,11/24] xsk: support mbuf on ZC RX
-    https://git.kernel.org/bpf/bpf-next/c/24ea50127ecf
-  - [v7,bpf-next,12/24] ice: xsk: add RX multi-buffer support
-    https://git.kernel.org/bpf/bpf-next/c/1bbc04de607b
-  - [v7,bpf-next,13/24] i40e: xsk: add RX multi-buffer support
-    https://git.kernel.org/bpf/bpf-next/c/1c9ba9c14658
-  - [v7,bpf-next,14/24] xsk: support ZC Tx multi-buffer in batch API
-    https://git.kernel.org/bpf/bpf-next/c/d5581966040f
-  - [v7,bpf-next,15/24] ice: xsk: Tx multi-buffer support
-    https://git.kernel.org/bpf/bpf-next/c/eeb2b5381038
-  - [v7,bpf-next,16/24] i40e: xsk: add TX multi-buffer support
-    https://git.kernel.org/bpf/bpf-next/c/a92b96c4ae10
-  - [v7,bpf-next,17/24] xsk: add multi-buffer documentation
-    https://git.kernel.org/bpf/bpf-next/c/49ca37d0d825
-  - [v7,bpf-next,18/24] selftests/xsk: transmit and receive multi-buffer packets
-    https://git.kernel.org/bpf/bpf-next/c/17f1034dd76d
-  - [v7,bpf-next,19/24] selftests/xsk: add basic multi-buffer test
-    https://git.kernel.org/bpf/bpf-next/c/f540d44e05cf
-  - [v7,bpf-next,20/24] selftests/xsk: add unaligned mode test for multi-buffer
-    https://git.kernel.org/bpf/bpf-next/c/1005a226da9a
-  - [v7,bpf-next,21/24] selftests/xsk: add invalid descriptor test for multi-buffer
-    https://git.kernel.org/bpf/bpf-next/c/697604492b64
-  - [v7,bpf-next,22/24] selftests/xsk: add metadata copy test for multi-buff
-    https://git.kernel.org/bpf/bpf-next/c/f80ddbec4762
-  - [v7,bpf-next,23/24] selftests/xsk: add test for too many frags
-    https://git.kernel.org/bpf/bpf-next/c/807bf4da2049
-  - [v7,bpf-next,24/24] selftests/xsk: reset NIC settings to default after running test suite
-    https://git.kernel.org/bpf/bpf-next/c/3666bccab43a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>
+> The MAX_LOCKDEP_CHAIN_HLOCKS bugs/warnings can be worked around by
+> configuration, otherwise are considered invalid. This report has also
+> 'netfilter' label so I'm not closing it right away.
 
