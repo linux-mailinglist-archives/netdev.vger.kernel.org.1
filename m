@@ -1,93 +1,189 @@
-Return-Path: <netdev+bounces-18917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF21575913A
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:10:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9CF2759138
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B86C1C20E23
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:10:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F171C20EE7
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FFC111BC;
-	Wed, 19 Jul 2023 09:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80681097F;
+	Wed, 19 Jul 2023 09:10:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67277111BB
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:10:33 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3927EA4
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:10:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=AoKJ8U7zqgVLphnsB4DDPWwdoD7ZYEsS9sz4gBR8PlI=; b=CKdWhiEg60VtAnvu47b7MGXSYp
-	uHHwTIOppHcxfnwHNX4UeDrqOhLBdxhT83ThPa6NlJGWxGH5+sfKIUNz546s+30fEgyPV7rmXwpb7
-	0EF9GH3OcPRHWCutME47EFxm724L4uAqN7AzTrirM4/dJqUKHyDoduqczvRDZBKj+iBtjv89rUbtQ
-	af7NQYmbqNFoaJUP1NUQx1ss+Mj4YFTj/VjfPpMdw/g8lBpiYiwB+3Xabq4WugFEXNXtAjDgEFwu6
-	guNlDeHkWIAnE1at3weA/dNCvVHp8aQdF4hgj9IUFTLqvHeDcfPHjqUubMFYCZqNiNYruvsGxGNpS
-	fSRU/0tQ==;
-Received: from [192.168.1.4] (port=15906 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qM3CS-0001FJ-2d;
-	Wed, 19 Jul 2023 11:10:24 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Wed, 19 Jul 2023 11:10:24 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <andrew@lunn.ch>
-CC: <ante.knezic@helmholz.de>, <davem@davemloft.net>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Wed, 19 Jul 2023 11:10:24 +0200
-Message-ID: <20230719091024.21693-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <61e40941-5e2b-48b5-bbc4-fdd94967aaf1@lunn.ch>
-References: <61e40941-5e2b-48b5-bbc4-fdd94967aaf1@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC831095B
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:10:32 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28AFA10B;
+	Wed, 19 Jul 2023 02:10:30 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1D2ED1BF20D;
+	Wed, 19 Jul 2023 09:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1689757829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q1eVxvJoHRW/P/5bJgfspjlVG3ESYGo71QPyGyqj6VU=;
+	b=i1ML7HlnJtI1Eoq6gTI6hWHyNmy87FERW4SLnATfYDjeoLgit+HviupMf5bNipk940P3is
+	Cve2b7gooMnmPeESQu5vY049yz84+RwGFfkPr3yRoMmaw6yVikkHYN6iyRjGwef1Ww3Qtf
+	LO/nIlJFEpuaitV6pqFKTyagiRFk9i75PmEAa5Etr+3g8Cx2JNXuFbIp5vsJrcSBA+p0fz
+	ofZHC8sK8rsZSe5S0R8TqvE5hyaafJ3lkJX6joeObzKtaRtA9s3nFKB0G3tNsbLMlqtLPs
+	/6kv2vM6E34DsBnsefgFf8m4wzTZMLoNiZ//JQ2T8zFiOZwml9vDE/6DU7gY1g==
+Date: Wed, 19 Jul 2023 11:10:26 +0200
+From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+To: Matt Johnston <matt@codeconstruct.com.au>
+Cc: linux-i3c@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next v2 2/3] i3c: Add support for bus enumeration &
+ notification
+Message-ID: <2023071909102651470012@mail.local>
+References: <20230717040638.1292536-1-matt@codeconstruct.com.au>
+ <20230717040638.1292536-3-matt@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230717040638.1292536-3-matt@codeconstruct.com.au>
+X-GND-Sasl: alexandre.belloni@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > I don't think so. The erratum from the patch needs to be applied on each
-> > SERDES reconfiguration or reset. For example, when replugging different 
-> > SFPs (sgmii - 10g - sgmii interface). Erratum 4_6 is done only once? 
-> > My guess is to put it in mv88e639x_sgmii_pcs_post_config but still I 
-> > need the device product number
+On 17/07/2023 12:06:37+0800, Matt Johnston wrote:
+> From: Jeremy Kerr <jk@codeconstruct.com.au>
 > 
-> You might be able to read the product number from the ID registers of
-> the SERDES, registers 2 and 3 ? That is kind of cleaner. It is the
-> SERDES which needs the workaround, so look at the SERDES ID ...
+> This allows other drivers to be notified when new i3c busses are
+> attached, referring to a whole i3c bus as opposed to individual
+> devices.
 > 
-> > maybe embedding a pointer to the 
-> > mv88e6xxx_chip chip inside the mv88e639x_pcs struct would be the cleanest way.
->  
->  That would also work.
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
+> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
 
-Correct me if I am wrong but I think we still need the chip ptr as pcs interface
-provides access only to SERDES registers. If you are refering to "PHY IDENTIFIER"
-registers (Page 0, Register 2,3), we need something like mv88e6xxx_port_read
-unless we want to do some direct mdio magic?
+Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+> ---
+>  drivers/i3c/master.c       | 35 +++++++++++++++++++++++++++++++++++
+>  include/linux/i3c/master.h | 11 +++++++++++
+>  2 files changed, 46 insertions(+)
+> 
+> diff --git a/drivers/i3c/master.c b/drivers/i3c/master.c
+> index 08aeb69a7800..2276abe38bdc 100644
+> --- a/drivers/i3c/master.c
+> +++ b/drivers/i3c/master.c
+> @@ -22,6 +22,7 @@
+>  static DEFINE_IDR(i3c_bus_idr);
+>  static DEFINE_MUTEX(i3c_core_lock);
+>  static int __i3c_first_dynamic_bus_num;
+> +static BLOCKING_NOTIFIER_HEAD(i3c_bus_notifier);
+>  
+>  /**
+>   * i3c_bus_maintenance_lock - Lock the bus for a maintenance operation
+> @@ -453,6 +454,36 @@ static int i3c_bus_init(struct i3c_bus *i3cbus, struct device_node *np)
+>  	return 0;
+>  }
+>  
+> +void i3c_for_each_bus_locked(int (*fn)(struct i3c_bus *bus, void *data),
+> +			     void *data)
+> +{
+> +	struct i3c_bus *bus;
+> +	int id;
+> +
+> +	mutex_lock(&i3c_core_lock);
+> +	idr_for_each_entry(&i3c_bus_idr, bus, id)
+> +		fn(bus, data);
+> +	mutex_unlock(&i3c_core_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(i3c_for_each_bus_locked);
+> +
+> +int i3c_register_notifier(struct notifier_block *nb)
+> +{
+> +	return blocking_notifier_chain_register(&i3c_bus_notifier, nb);
+> +}
+> +EXPORT_SYMBOL_GPL(i3c_register_notifier);
+> +
+> +int i3c_unregister_notifier(struct notifier_block *nb)
+> +{
+> +	return blocking_notifier_chain_unregister(&i3c_bus_notifier, nb);
+> +}
+> +EXPORT_SYMBOL_GPL(i3c_unregister_notifier);
+> +
+> +static void i3c_bus_notify(struct i3c_bus *bus, unsigned int action)
+> +{
+> +	blocking_notifier_call_chain(&i3c_bus_notifier, action, bus);
+> +}
+> +
+>  static const char * const i3c_bus_mode_strings[] = {
+>  	[I3C_BUS_MODE_PURE] = "pure",
+>  	[I3C_BUS_MODE_MIXED_FAST] = "mixed-fast",
+> @@ -2678,6 +2709,8 @@ int i3c_master_register(struct i3c_master_controller *master,
+>  	if (ret)
+>  		goto err_del_dev;
+>  
+> +	i3c_bus_notify(i3cbus, I3C_NOTIFY_BUS_ADD);
+> +
+>  	/*
+>  	 * We're done initializing the bus and the controller, we can now
+>  	 * register I3C devices discovered during the initial DAA.
+> @@ -2710,6 +2743,8 @@ EXPORT_SYMBOL_GPL(i3c_master_register);
+>   */
+>  void i3c_master_unregister(struct i3c_master_controller *master)
+>  {
+> +	i3c_bus_notify(&master->bus, I3C_NOTIFY_BUS_REMOVE);
+> +
+>  	i3c_master_i2c_adapter_cleanup(master);
+>  	i3c_master_unregister_i3c_devs(master);
+>  	i3c_master_bus_cleanup(master);
+> diff --git a/include/linux/i3c/master.h b/include/linux/i3c/master.h
+> index 0b52da4f2346..db909ef79be4 100644
+> --- a/include/linux/i3c/master.h
+> +++ b/include/linux/i3c/master.h
+> @@ -24,6 +24,12 @@
+>  
+>  struct i2c_client;
+>  
+> +/* notifier actions. notifier call data is the struct i3c_bus */
+> +enum {
+> +	I3C_NOTIFY_BUS_ADD,
+> +	I3C_NOTIFY_BUS_REMOVE,
+> +};
+> +
+>  struct i3c_master_controller;
+>  struct i3c_bus;
+>  struct i3c_device;
+> @@ -652,4 +658,9 @@ void i3c_master_queue_ibi(struct i3c_dev_desc *dev, struct i3c_ibi_slot *slot);
+>  
+>  struct i3c_ibi_slot *i3c_master_get_free_ibi_slot(struct i3c_dev_desc *dev);
+>  
+> +void i3c_for_each_bus_locked(int (*fn)(struct i3c_bus *bus, void *data),
+> +			     void *data);
+> +int i3c_register_notifier(struct notifier_block *nb);
+> +int i3c_unregister_notifier(struct notifier_block *nb);
+> +
+>  #endif /* I3C_MASTER_H */
+> -- 
+> 2.37.2
+> 
+
+-- 
+Alexandre Belloni, co-owner and COO, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
