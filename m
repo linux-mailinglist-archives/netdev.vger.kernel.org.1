@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-19095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC580759A78
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:08:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE015759A84
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD4CA1C21098
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:08:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8041E28154E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441AD3D3A9;
-	Wed, 19 Jul 2023 16:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E8C3D3AE;
+	Wed, 19 Jul 2023 16:12:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390C411C93
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:08:39 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C214D10F3
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:08:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689782911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7/82hxOWYMwQd1IMPDVxeYFXOdlufmLKO6oLmwWprQo=;
-	b=TNK1z/38++mn6LjfsO9JC1M3kybkPfjF0SVpYa4kR5w/GIYsCptw4JADHtSCbauPFtMIvh
-	KdpUp/bixQ0zqfM1UQvlafUKTkRmDKfQah4eeahxkdELzXt/fcM7kycU2jjJXxjQGurkca
-	iEWeis5B+aJxyk469zqVzl6uuz/ekGk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-385-C7mMsEmuOSqcEG2lJRk0QQ-1; Wed, 19 Jul 2023 12:08:28 -0400
-X-MC-Unique: C7mMsEmuOSqcEG2lJRk0QQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B91EE186E128;
-	Wed, 19 Jul 2023 16:08:12 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.34.58])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FBAB1121314;
-	Wed, 19 Jul 2023 16:08:11 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>,  dev@openvswitch.org,
-  davem@davemloft.net,  kuba@kernel.org,  Eric Dumazet
- <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Pravin B Shelar
- <pshelar@ovn.org>,  Jamal Hadi Salim <jhs@mojatatu.com>,  Cong Wang
- <xiyou.wangcong@gmail.com>,  Jiri Pirko <jiri@resnulli.us>,  Pablo Neira
- Ayuso <pablo@netfilter.org>,  Florian Westphal <fw@strlen.de>,  Marcelo
- Ricardo Leitner <marcelo.leitner@gmail.com>,  Davide Caratti
- <dcaratti@redhat.com>
-Subject: Re: [PATCH net-next 3/3] openvswitch: set IPS_CONFIRMED in tmpl
- status only when commit is set in conntrack
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A6F11C93
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:12:58 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067171739
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:12:46 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qM9n6-0000em-OH; Wed, 19 Jul 2023 18:12:40 +0200
+Date: Wed, 19 Jul 2023 18:12:40 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Xin Long <lucien.xin@gmail.com>,
+	network dev <netdev@vger.kernel.org>, dev@openvswitch.org,
+	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net-next 0/3] net: handle the exp removal problem with
+ ovs upcall properly
+Message-ID: <20230719161240.GB32192@breakpoint.cc>
 References: <cover.1689541664.git.lucien.xin@gmail.com>
-	<cf477f4a26579e752465a5951c1d28ba109346e3.1689541664.git.lucien.xin@gmail.com>
-Date: Wed, 19 Jul 2023 12:08:10 -0400
-In-Reply-To: <cf477f4a26579e752465a5951c1d28ba109346e3.1689541664.git.lucien.xin@gmail.com>
-	(Xin Long's message of "Sun, 16 Jul 2023 17:09:19 -0400")
-Message-ID: <f7tzg3r6g0l.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+ <20230718195827.4c1db980@kernel.org>
+ <20230719030131.GA15663@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719030131.GA15663@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Xin Long <lucien.xin@gmail.com> writes:
+Florian Westphal <fw@strlen.de> wrote:
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> > On Sun, 16 Jul 2023 17:09:16 -0400 Xin Long wrote:
+> > > With the OVS upcall, the original ct in the skb will be dropped, and when
+> > > the skb comes back from userspace it has to create a new ct again through
+> > > nf_conntrack_in() in either OVS __ovs_ct_lookup() or TC tcf_ct_act().
+> > > 
+> > > However, the new ct will not be able to have the exp as the original ct
+> > > has taken it away from the hash table in nf_ct_find_expectation(). This
+> > > will cause some flow never to be matched, like:
+> > > 
+> > >   'ip,ct_state=-trk,in_port=1 actions=ct(zone=1)'
+> > >   'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=1)'
+> > >   'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=2),normal'
+> > > 
+> > > if the 2nd flow triggers the OVS upcall, the 3rd flow will never get
+> > > matched.
+> > > 
+> > > OVS conntrack works around this by adding its own exp lookup function to
+> > > not remove the exp from the hash table and saving the exp and its master
+> > > info to the flow keys instead of create a real ct. But this way doesn't
+> > > work for TC act_ct.
+> > > 
+> > > The patch 1/3 allows nf_ct_find_expectation() not to remove the exp from
+> > > the hash table if tmpl is set with IPS_CONFIRMED when doing lookup. This
+> > > allows both OVS conntrack and TC act_ct to have a simple and clear fix
+> > > for this problem in the patch 2/3 and 3/3.
+> > 
+> > Florian, Pablo, any opinion on these?
+> 
+> Sorry for the silence.  I dislike moving tc/ovs artifacts into
+> the conntrack core.
 
-> By not setting IPS_CONFIRMED in tmpl that allows the exp not to be removed
-> from the hashtable when lookup, we can simplify the exp processing code a
-> lot in openvswitch conntrack.
->
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
+Can't find a better solution, feel free to take this though the net-next tree.
 
-Acked-by: Aaron Conole <aconole@redhat.com>
-
+Acked-by: Florian Westphal <fw@strlen.de>
 
