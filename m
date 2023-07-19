@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-18869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1A46758EEA
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:26:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377DA758EDA
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 161861C20C48
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 07:26:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE6CB280DB6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 07:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B51101DF;
-	Wed, 19 Jul 2023 07:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA267C2D5;
+	Wed, 19 Jul 2023 07:24:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F5D101DE
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC69063A4
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:24:32 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ADF5E43
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 00:24:33 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23C1E60
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 00:24:30 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qM1Xz-0002rf-Em
-	for netdev@vger.kernel.org; Wed, 19 Jul 2023 09:24:31 +0200
+	id 1qM1Xx-0002pe-Br
+	for netdev@vger.kernel.org; Wed, 19 Jul 2023 09:24:29 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 8989A1F4C6D
+	by bjornoya.blackshift.org (Postfix) with SMTP id 05AD21F4C82
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:23:52 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 9662B1F4C14;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id B1D471F4C17;
 	Wed, 19 Jul 2023 07:23:50 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id d626ed38;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 81935049;
 	Wed, 19 Jul 2023 07:23:49 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -45,12 +45,11 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Srinivas Neeli <srinivas.neeli@amd.com>,
-	Michal Simek <michal.simek@amd.com>,
+	Rob Herring <robh@kernel.org>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 4/8] can: xilinx_can: Add support for controller reset
-Date: Wed, 19 Jul 2023 09:23:44 +0200
-Message-Id: <20230719072348.525039-5-mkl@pengutronix.de>
+Subject: [PATCH net-next 5/8] can: Explicitly include correct DT includes
+Date: Wed, 19 Jul 2023 09:23:45 +0200
+Message-Id: <20230719072348.525039-6-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230719072348.525039-1-mkl@pengutronix.de>
 References: <20230719072348.525039-1-mkl@pengutronix.de>
@@ -67,124 +66,43 @@ X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to f
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Srinivas Neeli <srinivas.neeli@amd.com>
+From: Rob Herring <robh@kernel.org>
 
-Add support for an optional reset for the CAN controller using the reset
-driver. If the CAN node contains the "resets" property, then this logic
-will perform CAN controller reset.
+The DT of_device.h and of_platform.h date back to the separate
+of_platform_bus_type before it as merged into the regular platform bus.
+As part of that merge prepping Arm DT support 13 years ago, they
+"temporarily" include each other. They also include platform_device.h
+and of.h. As a result, there's a pretty much random mix of those include
+files used throughout the tree. In order to detangle these headers and
+replace the implicit includes with struct declarations, users need to
+explicitly include the correct includes.
 
-Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
-Signed-off-by: Michal Simek <michal.simek@amd.com>
-Link: https://lore.kernel.org/all/ab7e6503aa3343e39ead03c1797e765be6c50de2.1689164442.git.michal.simek@amd.com
+Signed-off-by: Rob Herring <robh@kernel.org>
+Link: https://lore.kernel.org/all/20230714174757.4060748-1-robh@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/xilinx_can.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ drivers/net/can/grcan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-index 4d3283db3a13..abe58f103043 100644
---- a/drivers/net/can/xilinx_can.c
-+++ b/drivers/net/can/xilinx_can.c
-@@ -30,6 +30,7 @@
- #include <linux/can/error.h>
- #include <linux/phy/phy.h>
- #include <linux/pm_runtime.h>
-+#include <linux/reset.h>
+diff --git a/drivers/net/can/grcan.c b/drivers/net/can/grcan.c
+index 3174efdae271..6d3ba71a6a73 100644
+--- a/drivers/net/can/grcan.c
++++ b/drivers/net/can/grcan.c
+@@ -30,8 +30,9 @@
+ #include <linux/ethtool.h>
+ #include <linux/io.h>
+ #include <linux/can/dev.h>
++#include <linux/platform_device.h>
+ #include <linux/spinlock.h>
+-#include <linux/of_platform.h>
++#include <linux/of.h>
+ #include <linux/of_irq.h>
  
- #define DRIVER_NAME	"xilinx_can"
- 
-@@ -200,6 +201,7 @@ struct xcan_devtype_data {
-  * @can_clk:			Pointer to struct clk
-  * @devtype:			Device type specific constants
-  * @transceiver:		Optional pointer to associated CAN transceiver
-+ * @rstc:			Pointer to reset control
-  */
- struct xcan_priv {
- 	struct can_priv can;
-@@ -218,6 +220,7 @@ struct xcan_priv {
- 	struct clk *can_clk;
- 	struct xcan_devtype_data devtype;
- 	struct phy *transceiver;
-+	struct reset_control *rstc;
- };
- 
- /* CAN Bittiming constants as per Xilinx CAN specs */
-@@ -1799,6 +1802,16 @@ static int xcan_probe(struct platform_device *pdev)
- 	priv->can.do_get_berr_counter = xcan_get_berr_counter;
- 	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
- 					CAN_CTRLMODE_BERR_REPORTING;
-+	priv->rstc = devm_reset_control_get_optional_exclusive(&pdev->dev, NULL);
-+	if (IS_ERR(priv->rstc)) {
-+		dev_err(&pdev->dev, "Cannot get CAN reset.\n");
-+		ret = PTR_ERR(priv->rstc);
-+		goto err_free;
-+	}
-+
-+	ret = reset_control_reset(priv->rstc);
-+	if (ret)
-+		goto err_free;
- 
- 	if (devtype->cantype == XAXI_CANFD) {
- 		priv->can.data_bittiming_const =
-@@ -1827,7 +1840,7 @@ static int xcan_probe(struct platform_device *pdev)
- 	/* Get IRQ for the device */
- 	ret = platform_get_irq(pdev, 0);
- 	if (ret < 0)
--		goto err_free;
-+		goto err_reset;
- 
- 	ndev->irq = ret;
- 
-@@ -1843,21 +1856,21 @@ static int xcan_probe(struct platform_device *pdev)
- 	if (IS_ERR(priv->can_clk)) {
- 		ret = dev_err_probe(&pdev->dev, PTR_ERR(priv->can_clk),
- 				    "device clock not found\n");
--		goto err_free;
-+		goto err_reset;
- 	}
- 
- 	priv->bus_clk = devm_clk_get(&pdev->dev, devtype->bus_clk_name);
- 	if (IS_ERR(priv->bus_clk)) {
- 		ret = dev_err_probe(&pdev->dev, PTR_ERR(priv->bus_clk),
- 				    "bus clock not found\n");
--		goto err_free;
-+		goto err_reset;
- 	}
- 
- 	transceiver = devm_phy_optional_get(&pdev->dev, NULL);
- 	if (IS_ERR(transceiver)) {
- 		ret = PTR_ERR(transceiver);
- 		dev_err_probe(&pdev->dev, ret, "failed to get phy\n");
--		goto err_free;
-+		goto err_reset;
- 	}
- 	priv->transceiver = transceiver;
- 
-@@ -1904,6 +1917,8 @@ static int xcan_probe(struct platform_device *pdev)
- err_disableclks:
- 	pm_runtime_put(priv->dev);
- 	pm_runtime_disable(&pdev->dev);
-+err_reset:
-+	reset_control_assert(priv->rstc);
- err_free:
- 	free_candev(ndev);
- err:
-@@ -1920,9 +1935,11 @@ static int xcan_probe(struct platform_device *pdev)
- static void xcan_remove(struct platform_device *pdev)
- {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
-+	struct xcan_priv *priv = netdev_priv(ndev);
- 
- 	unregister_candev(ndev);
- 	pm_runtime_disable(&pdev->dev);
-+	reset_control_assert(priv->rstc);
- 	free_candev(ndev);
- }
- 
+ #include <linux/dma-mapping.h>
 -- 
 2.40.1
 
