@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-19182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3181F759E28
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:04:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CCED759E31
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:06:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F56A1C21150
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:04:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DE1B1C2118B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1175E25173;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF1F26B06;
 	Wed, 19 Jul 2023 19:00:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0018E2516C
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB37E25176
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:00:07 +0000 (UTC)
 Received: from mail.svario.it (mail.svario.it [84.22.98.252])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6F81734
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340171FE6
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:00:05 -0700 (PDT)
 Received: from localhost.localdomain (dynamic-002-244-020-234.2.244.pool.telefonica.de [2.244.20.234])
-	by mail.svario.it (Postfix) with ESMTPSA id 0063BD900E;
-	Wed, 19 Jul 2023 20:52:18 +0200 (CEST)
+	by mail.svario.it (Postfix) with ESMTPSA id 406D1D9010;
+	Wed, 19 Jul 2023 20:52:19 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
-	t=1689792739; bh=k/0wT11xb3jpnIRM6tie7sEsp9VK8wIiYVGWK52Byi4=;
+	t=1689792739; bh=S6i3drzMgFVr+j9+q/n4zKpqI5Aa+IPqFw1OAIwVAPE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gumTQOwa7MFxOX9SbcIvB5iCwPBAtl16mAKt4UefJT5kx9gGC2CadaNd2m9ro4aWK
-	 5zYeVHYmYF/ApbAXOm1NSt3mA6WcLtf/dk/09V7TBuGVPNnKSZn4nHWa1aH7xb6z9q
-	 Zd8sh4VO3eqdsPXTNNzDw8zXiGWgSA0NiD4Bf+e8Pp2SKZ9Z479xAq2maIy8hedx25
-	 P1DRm+CsblX4xg3lOzPYN4P/O1HPaxusZbzqUav8uP95v4zGel4emBhQGnt4TxlfmC
-	 nhg1bReiEt12SI/Dl2JqOqDir/fcqc5c3buG7OSkoe/51JPyWNxyuZkiQWSsrOcDHQ
-	 RVjR9jcjt7+LA==
+	b=kkdemKwu/mGQxSfzIzGRIQaINVoxphjBonPbf2dFtLOgJ3dWhg4YOrIL8hBNLy9Mj
+	 W8K/FWYY+/dVRm18jxWUQOiCJnqtuSeFDoSW1KlFgwYIacSMx9h3+mHeEK6yGdCRcR
+	 mFo+h34Psrr6582+d9Sajp31SgDbWG1lKkIoW3xmJHzrOJDZQq/k6X4zj6ZsDuZfPr
+	 OkU8ZaxLR2A7+KZXZ4v7xvIlHWpckZ7qgVZftzHI0mgBHx9lMITxKr4t+OaPjSm6dJ
+	 gEzkS/8nSxZ1Vdt68HVdh6EPK1l60xnepVpDz5f9zG9a9Qd0I0FLKpTI843wIleBv2
+	 NK/6BDVLcZNRg==
 From: Gioele Barabucci <gioele@svario.it>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>,
 	Gioele Barabucci <gioele@svario.it>
-Subject: [iproute2 11/22] lib/rt_names: Read rt_scopes from /etc and /usr
-Date: Wed, 19 Jul 2023 20:50:55 +0200
-Message-Id: <20230719185106.17614-12-gioele@svario.it>
+Subject: [iproute2 12/22] lib/rt_names: Read rt_names from /etc and /usr
+Date: Wed, 19 Jul 2023 20:50:56 +0200
+Message-Id: <20230719185106.17614-13-gioele@svario.it>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230719185106.17614-1-gioele@svario.it>
 References: <20230719185106.17614-1-gioele@svario.it>
@@ -63,26 +63,26 @@ Signed-off-by: Gioele Barabucci <gioele@svario.it>
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/lib/rt_names.c b/lib/rt_names.c
-index 142954cd..37f85ded 100644
+index 37f85ded..5b911753 100644
 --- a/lib/rt_names.c
 +++ b/lib/rt_names.c
-@@ -305,9 +305,14 @@ static int rtnl_rtscope_init;
+@@ -375,9 +375,14 @@ static int rtnl_rtrealm_init;
  
- static void rtnl_rtscope_initialize(void)
+ static void rtnl_rtrealm_initialize(void)
  {
 +	int ret;
 +
- 	rtnl_rtscope_init = 1;
--	rtnl_tab_initialize(CONF_ETC_DIR "/rt_scopes",
--			    rtnl_rtscope_tab, 256);
-+	ret = rtnl_tab_initialize(CONF_ETC_DIR "/rt_scopes",
-+			          rtnl_rtscope_tab, 256);
+ 	rtnl_rtrealm_init = 1;
+-	rtnl_tab_initialize(CONF_ETC_DIR "/rt_realms",
+-			    rtnl_rtrealm_tab, 256);
++	ret = rtnl_tab_initialize(CONF_ETC_DIR "/rt_realms",
++	                          rtnl_rtrealm_tab, 256);
 +	if (ret == -ENOENT)
-+		rtnl_tab_initialize(CONF_USR_DIR "/rt_scopes",
-+				    rtnl_rtscope_tab, 256);
++		rtnl_tab_initialize(CONF_USR_DIR "/rt_realms",
++		                    rtnl_rtrealm_tab, 256);
  }
  
- const char *rtnl_rtscope_n2a(int id, char *buf, int len)
+ const char *rtnl_rtrealm_n2a(int id, char *buf, int len)
 -- 
 2.39.2
 
