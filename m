@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-19091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EEE8759A0E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:41:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BFE7759A64
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE9E2281932
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:41:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43B511C20818
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1801F16416;
-	Wed, 19 Jul 2023 15:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3A83D3A5;
+	Wed, 19 Jul 2023 16:02:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B14211C93
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F325A20F96
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:02:56 +0000 (UTC)
 Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3F72113
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:41:21 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailout.nyi.internal (Postfix) with ESMTP id 39D6A5C008F;
-	Wed, 19 Jul 2023 11:41:16 -0400 (EDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3618CE42
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:02:55 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id A032F5C005F;
+	Wed, 19 Jul 2023 12:02:54 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Wed, 19 Jul 2023 11:41:16 -0400
+  by compute5.internal (MEProxy); Wed, 19 Jul 2023 12:02:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:content-type:date:date
 	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
 	:message-id:mime-version:references:reply-to:sender:subject
 	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1689781276; x=1689867676; bh=gCsM4hAyMCNkt
-	LaiUDPjOwpaoCchPjCBcTQRqo1CNvg=; b=0b4s8Idbm3pytQc3xQOoRHsx9kE51
-	7fJL3/+grovVGjo+kTPAZ4Dxt4olwqdks5f95vF4Cx6k/GDhK95DikPsub+xYAYH
-	dKglvjdvkIlmCweJNTJ0GbcKPKHBz+6lDxGkKVtx0vpNxvkFhiYPSbvclh+3Yzo+
-	gLZf48Oif5nC9cMIftpcl3m6jY726Dsi+kiwFrea84rRcYAQHkBrzcNlqLba+lXQ
-	VbrZsqlbsuHZfPxz7K3R2S8+osWGpGCKB+HzY1/aklA7NAmOSoleXYESDyBXuCap
-	+bMR/2GCQf0ops/f0qBNPiXAdy3geWR+0QhEoo/eXKHeErezMueWZ6LjA==
-X-ME-Sender: <xms:HAS4ZBZXT-97ZJHPn4aVK5DsPyeXnPBEtsivzP2MdAkG1l4_LfcrzA>
-    <xme:HAS4ZIb0Q9E_PYnOu3Xod5S9GhNErLGiMsUcTdcORZyyHWnqpqb0Nvrgt98Y7y6ak
-    tAFWYp4i1iUlD8>
-X-ME-Received: <xmr:HAS4ZD_Zh77i_Od2mCfirJ0WbkLxzuoCK-0-lY0aTQjgLNPboaaFkCU0oMCDa15XNEVSGU43cmMWbJYa5tZuxo7GWD8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeekgdejhecutefuodetggdotefrodftvf
+	:x-sasl-enc; s=fm3; t=1689782574; x=1689868974; bh=PmCQ6UyS0G6kN
+	FrXMukpNdZM2pxX7XVXZoO3Ow/JLYw=; b=WAhyRz7J/IzFxpOvmdFsV6BAIS5wI
+	OJ/+vY9VWW+loGJx0VjsuzPqxL7M9v41o95epbt4boFSNFAehSpWq5wquXOMI2mZ
+	kT4ON3gMcbM3yzSJyJzuIZnPFNHf1nGPkFhwJHyfUnNAxLjJOARvbFs/1PNdqgLy
+	26KpoxloGySuC6LgEu6IVNBrqu/9axbCDYLYVr3YYOmbzmY2/BMgCBacvC68WWGf
+	kvQ+W9TQShj9DB+T5W3M5Ox6japzl1dTdSVCCPQ5FJ6nuZCyDVQB2ht0UH2drw7p
+	iyYayYpDDAahN+O4oLI/y5SkVuBLgsUGTNjHHqGtiw4+5BVWKmHOE+lzQ==
+X-ME-Sender: <xms:Lgm4ZNXDXdemWoK93PNUTq3AfXZwv3xAnbEMaVlQ-DcSpXeIzIpjbg>
+    <xme:Lgm4ZNnbL3c1ERHGFF7NPY_Q0vC10uJhqQI6KhPtrI2mxB_jnH6NjYRksLX9ISHi8
+    _nBKgt08kkaRbc>
+X-ME-Received: <xmr:Lgm4ZJbpUZBkjH_YTDKRcYyeJhF0zZYq6eRGLhsi1eod6WJuO1PpcMpwv7vc5XWiic17dy1yfxnSdbAxj0M910t_Ogw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeekgdejlecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
     uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
     fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
@@ -50,14 +50,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeekgdejhecutefuodetggdote
     gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
     hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
     hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:HAS4ZPqF_Vnpe1AO-8thZUP9ERiMp1yi0VfX75XYSbdGdfUC-CteBQ>
-    <xmx:HAS4ZMprDKIR_NDdN5WD3GFVb1zJr6MGmZhEB8MU42VwDcoTVWzogg>
-    <xmx:HAS4ZFT9PzOhpkMsFMcjTy3gYd__Zs6WXbU1bJiJQnKvSdDZvCUMWw>
-    <xmx:HAS4ZBA2qS5uAfSu_xsnFRcDTI0J7NTisBJtsyDo6b49laNpi_ck2A>
+X-ME-Proxy: <xmx:Lgm4ZAWl6LmXdKNGD3lzmGXAep-z8LLHrlEC6C49M7WQFl_JF4FyVw>
+    <xmx:Lgm4ZHmFMN-JuVq2qADDhxn5MzprjYvdN_lNk-TRKxcsF28pDsxkpA>
+    <xmx:Lgm4ZNcmBhoOeG_dWxeE_wW4sL-XPavDOE5rENp3lQkBrS0twx_ydw>
+    <xmx:Lgm4ZCsXS8bAF4rjzzIRu71gZ2dk6qJzLWY5dgbhVGdlo6T2CjoXLQ>
 Feedback-ID: i494840e7:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 19 Jul 2023 11:41:15 -0400 (EDT)
-Date: Wed, 19 Jul 2023 18:41:11 +0300
+ 19 Jul 2023 12:02:53 -0400 (EDT)
+Date: Wed, 19 Jul 2023 19:02:50 +0300
 From: Ido Schimmel <idosch@idosch.org>
 To: Hangbin Liu <liuhangbin@gmail.com>
 Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
@@ -66,7 +66,7 @@ Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Thomas Haller <thaller@redhat.com>
 Subject: Re: [PATCHv2 net] ipv6: do not match device when remove source route
-Message-ID: <ZLgEF9w903kI5pHs@shredder>
+Message-ID: <ZLgJKo09Z3idzAr5@shredder>
 References: <20230719095449.2998778-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,71 +85,113 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On Wed, Jul 19, 2023 at 05:54:49PM +0800, Hangbin Liu wrote:
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 64e873f5895f..4f49677e24a2 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -4590,10 +4590,11 @@ static int fib6_remove_prefsrc(struct fib6_info *rt, void *arg)
->  	struct net_device *dev = ((struct arg_dev_net_ip *)arg)->dev;
->  	struct net *net = ((struct arg_dev_net_ip *)arg)->net;
->  	struct in6_addr *addr = ((struct arg_dev_net_ip *)arg)->addr;
-> +	u32 tb6_id = l3mdev_fib_table(dev) ? : RT_TABLE_MAIN;
+> +ipv6_del_addr_test()
+> +{
+> +	echo
+> +	echo "IPv6 delete address route tests"
+> +
+> +	setup
+> +
+> +	set -e
+> +	$IP li add dummy1 type dummy
+> +	$IP li set dummy1 up
+> +	$IP li add dummy2 type dummy
+> +	$IP li set dummy2 up
+> +	$IP li add red type vrf table 1111
+> +	$IP li set red up
+> +	$IP ro add vrf red unreachable default
+> +	$IP li set dummy2 vrf red
+> +
+> +	$IP addr add dev dummy1 2001:db8:104::1/64
+> +	$IP addr add dev dummy1 2001:db8:104::11/64
+> +	$IP addr add dev dummy1 2001:db8:104::12/64
+> +	$IP addr add dev dummy1 2001:db8:104::13/64
+> +	$IP addr add dev dummy2 2001:db8:104::1/64
+> +	$IP addr add dev dummy2 2001:db8:104::11/64
+> +	$IP addr add dev dummy2 2001:db8:104::12/64
+> +	$IP route add 2001:db8:105::/64 via 2001:db8:104::2 src 2001:db8:104::11
+> +	$IP route add 2001:db8:106::/64 dev lo src 2001:db8:104::12
+> +	$IP route add table 0 2001:db8:107::/64 via 2001:db8:104::2 src 2001:db8:104::13
+> +	$IP route add vrf red 2001:db8:105::/64 via 2001:db8:104::2 src 2001:db8:104::11
+> +	$IP route add vrf red 2001:db8:106::/64 dev lo src 2001:db8:104::12
+> +	set +e
+> +
+> +	# removing address from device in vrf should only remove route from vrf table
 
-l3mdev_fib_table() handles the case of 'dev' being NULL, so this looks
-OK.
+removing address from device in vrf should only remove it as a preferred
+source address from routes in vrf table
 
->  
->  	if (!rt->nh &&
-> -	    ((void *)rt->fib6_nh->fib_nh_dev == dev || !dev) &&
+> +	echo "    Regular FIB info"
+> +
+> +	$IP addr del dev dummy2 2001:db8:104::11/64
+> +	# Checking if the source address exist instead of the dest subnet
 
-Now that we are not checking the nexthop device, I believe we should
-remove the '!rt->nh' check. With this check, the source address is not
-removed from IPv6 routes that are using a nexthop object. This is in
-contrast to IPv4 [1]. After removing the check, IPv4 and IPv6 are
-consistent (disregarding the fundamental difference of removing the
-route vs. only the source address) [2].
+s/exist/exists/
 
->  	    rt != net->ipv6.fib6_null_entry &&
-> +	    rt->fib6_table->tb6_id == tb6_id &&
->  	    ipv6_addr_equal(addr, &rt->fib6_prefsrc.addr)) {
->  		spin_lock_bh(&rt6_exception_lock);
->  		/* remove prefsrc entry */
+> +	# as IPv6 only remove the preferred source address, not whole route.
 
-[1]
-+ ip link add name dummy1 up type dummy
-+ ip link add name dummy2 up type dummy
-+ ip -4 nexthop add id 1 dev dummy1
-+ ip -6 nexthop add id 2 dev dummy1
-+ ip address add 192.0.2.1/24 dev dummy2
-+ ip address add 2001:db8:1::1/64 dev dummy2
-+ ip route add 198.51.100.0/24 nhid 1 src 192.0.2.1
-+ ip route add 2001:db8:10::/64 nhid 2 src 2001:db8:1::1
-+ ip -4 route show 198.51.100.0/24
-198.51.100.0/24 nhid 1 dev dummy1 src 192.0.2.1 
-+ ip -6 route show 2001:db8:10::/64
-2001:db8:10::/64 nhid 2 dev dummy1 src 2001:db8:1::1 metric 1024 pref medium
-+ ip address del 192.0.2.1/24 dev dummy2
-+ ip address del 2001:db8:1::1/64 dev dummy2
-+ ip -4 route show 198.51.100.0/24
-+ ip -6 route show 2001:db8:10::/64
-2001:db8:10::/64 nhid 2 dev dummy1 src 2001:db8:1::1 metric 1024 pref medium
+s/remove/removes/
 
-[2]
-+ ip link add name dummy1 up type dummy
-+ ip link add name dummy2 up type dummy
-+ ip -4 nexthop add id 1 dev dummy1
-+ ip -6 nexthop add id 2 dev dummy1
-+ ip address add 192.0.2.1/24 dev dummy2
-+ ip address add 2001:db8:1::1/64 dev dummy2
-+ ip route add 198.51.100.0/24 nhid 1 src 192.0.2.1
-+ ip route add 2001:db8:10::/64 nhid 2 src 2001:db8:1::1
-+ ip -4 route show 198.51.100.0/24
-198.51.100.0/24 nhid 1 dev dummy1 src 192.0.2.1 
-+ ip -6 route show 2001:db8:10::/64
-2001:db8:10::/64 nhid 2 dev dummy1 src 2001:db8:1::1 metric 1024 pref medium
-+ ip address del 192.0.2.1/24 dev dummy2
-+ ip address del 2001:db8:1::1/64 dev dummy2
-+ ip -4 route show 198.51.100.0/24
-+ ip -6 route show 2001:db8:10::/64
-2001:db8:10::/64 nhid 2 dev dummy1 metric 1024 pref medium
+> +	$IP -6 ro ls vrf red | grep -q 2001:db8:104::11
+
+I prefer "src 2001:db8:104::11". Same in other places.
+
+> +	log_test $? 1 "Route removed from VRF when source address deleted"
+
+Unlike IPv4, the route is not removed so maybe "Preferred source address
+removed ..." (or something similar). Same in other places.
+
+> +
+> +	$IP -6 ro ls | grep -q 2001:db8:104::11
+> +	log_test $? 0 "Route in default VRF not removed"
+> +
+> +	$IP addr add dev dummy2 2001:db8:104::11/64
+> +	$IP route replace vrf red 2001:db8:105::/64 via 2001:db8:104::2 src 2001:db8:104::11
+> +
+> +	$IP addr del dev dummy1 2001:db8:104::11/64
+> +	$IP -6 ro ls | grep -q 2001:db8:104::11
+> +	log_test $? 1 "Route removed in default VRF when source address deleted"
+> +
+> +	$IP -6 ro ls vrf red | grep -q 2001:db8:104::11
+> +	log_test $? 0 "Route in VRF is not removed by address delete"
+> +
+> +	# removing address from device in vrf should only remove route from vrf
+> +	# table even when the associated fib info only differs in table ID
+
+Likewise, route not remove.
+
+> +	echo "    Identical FIB info with different table ID"
+> +
+> +	$IP addr del dev dummy2 2001:db8:104::12/64
+> +	$IP -6 ro ls vrf red | grep -q 2001:db8:104::12
+> +	log_test $? 1 "Route removed from VRF when source address deleted"
+> +
+> +	$IP -6 ro ls | grep -q 2001:db8:104::12
+> +	log_test $? 0 "Route in default VRF not removed"
+> +
+> +	$IP addr add dev dummy2 2001:db8:104::12/64
+> +	$IP route replace vrf red 2001:db8:106::/64 dev lo src 2001:db8:104::12
+> +
+> +	$IP addr del dev dummy1 2001:db8:104::12/64
+> +	$IP -6 ro ls | grep -q 2001:db8:104::12
+> +	log_test $? 1 "Route removed in default VRF when source address deleted"
+> +
+> +	$IP -6 ro ls vrf red | grep -q 2001:db8:104::12
+> +	log_test $? 0 "Route in VRF is not removed by address delete"
+> +
+> +	# removing address from device in default vrf should remove route from
+> +	# the default vrf even when route was inserted with a table ID of 0.
+
+Likewise.
+
+> +	echo "    Table ID 0"
+> +
+> +	$IP addr del dev dummy1 2001:db8:104::13/64
+> +	$IP -6 ro ls | grep -q 2001:db8:104::13
+> +	log_test $? 1 "Route removed in default VRF when source address deleted"
+> +
+> +	$IP li del dummy1
+> +	$IP li del dummy2
+> +	cleanup
+> +}
 
