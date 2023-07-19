@@ -1,122 +1,136 @@
-Return-Path: <netdev+bounces-19260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21D875A0AB
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:38:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E6575A0AC
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:39:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BCD6281AA9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:38:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 864151C20FB0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B3922F17;
-	Wed, 19 Jul 2023 21:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A8D22F1B;
+	Wed, 19 Jul 2023 21:39:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553E822F0B
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:38:50 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9251FD5
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:38:48 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-321-Rz-uIRDPNRGmb65ChaqQQA-1; Wed, 19 Jul 2023 22:38:45 +0100
-X-MC-Unique: Rz-uIRDPNRGmb65ChaqQQA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jul
- 2023 22:38:44 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 19 Jul 2023 22:38:44 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "gustavoars@kernel.org" <gustavoars@kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, "kuni1840@gmail.com" <kuni1840@gmail.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>, "leitao@debian.org"
-	<leitao@debian.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "syzkaller@googlegroups.com"
-	<syzkaller@googlegroups.com>
-Subject: RE: [PATCH v1 net 2/2] af_packet: Fix warning of fortified memcpy()
- in packet_getname().
-Thread-Topic: [PATCH v1 net 2/2] af_packet: Fix warning of fortified memcpy()
- in packet_getname().
-Thread-Index: AQHZuojKKXmXWzaE7kCaTSM9ZQwyvq/BnRaw
-Date: Wed, 19 Jul 2023 21:38:44 +0000
-Message-ID: <c391b7352213421da9771e5479d2a6ca@AcuMS.aculab.com>
-References: <64b8525db522_2831cb294d@willemb.c.googlers.com.notmuch>
- <20230719212709.63492-1-kuniyu@amazon.com>
- <64b856d553b5b_2842f2294f0@willemb.c.googlers.com.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3768714A8B
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:39:20 +0000 (UTC)
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA551FCD
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689802758; x=1721338758;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KDagl80bAgLG3sJrPSV39DW+F2EN1xNPIokLQQk7Sn0=;
+  b=V8YgnuUWnr76xs81J5w7rXOyxSQ2V59S316Po5tPs+dRhoP4y5QF0NNg
+   JkDc7vnnh9Oqo6ZmdAhXRIQVxJjDThFp8cbR8OK7Qaos/xPAqwLdsdMcH
+   R4PUodpF8eR8WN5k8PArL+pN2AnZ/vEEUpewsBLEMSC50THGiSiAdBBSh
+   U=;
+X-IronPort-AV: E=Sophos;i="6.01,216,1684800000"; 
+   d="scan'208";a="17318659"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 21:39:16 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id 3A87840D5C;
+	Wed, 19 Jul 2023 21:39:16 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 19 Jul 2023 21:39:15 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.39) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 19 Jul 2023 21:39:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <gustavoars@kernel.org>,
+	<keescook@chromium.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <leitao@debian.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
+Subject: RE: [PATCH v1 net 2/2] af_packet: Fix warning of fortified memcpy() in packet_getname().
+Date: Wed, 19 Jul 2023 14:39:03 -0700
+Message-ID: <20230719213903.65060-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 In-Reply-To: <64b856d553b5b_2842f2294f0@willemb.c.googlers.com.notmuch>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+References: <64b856d553b5b_2842f2294f0@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.39]
+X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RnJvbTogV2lsbGVtIGRlIEJydWlqbg0KPiBTZW50OiAxOSBKdWx5IDIwMjMgMjI6MzQNCj4gDQo+
-ID4gPg0KPiA+ID4gPiBUaGUgd3JpdGUgc2VlbXMgdG8gb3ZlcmZsb3csIGJ1dCBhY3R1YWxseSBu
-b3Qgc2luY2Ugd2UgdXNlIHN0cnVjdA0KPiA+ID4gPiBzb2NrYWRkcl9zdG9yYWdlIGRlZmluZWQg
-aW4gX19zeXNfZ2V0c29ja25hbWUoKS4NCj4gPiA+DQo+ID4gPiBXaGljaCBnaXZlcyBfS19TU19N
-QVhTSVpFID09IDEyOCwgbWludXMgb2Zmc2V0b2Yoc3RydWN0IHNvY2thZGRyX2xsLCBzbGxfYWRk
-cikuDQo+ID4gPg0KPiA+ID4gRm9yIGZ1biwgdGhlcmUgaXMgYW5vdGhlciBjYWxsZXIuIGdldHNv
-Y2tvcHQgU09fUEVFUk5BTUUgYWxzbyBjYWxscw0KPiA+ID4gc29jay0+b3BzLT5nZXRuYW1lLCB3
-aXRoIGEgYnVmZmVyIGhhcmRjb2RlZCB0byAxMjguIFNob3VsZCBwcm9iYWJseQ0KPiA+ID4gdXNl
-IHNpemVvZihzb2NrYWRkcl9zdG9yYWdlKSBmb3IgZG9jdW1lbnRhdGlvbiwgYXQgbGVhc3QuDQo+
-ID4gPg0KPiA+ID4gLi4gYW5kIEkganVzdCBub3RpY2VkIHRoYXQgdGhhdCB3YXMgYXR0ZW1wdGVk
-LCBidXQgbm90IGNvbXBsZXRlZA0KPiA+ID4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC8y
-MDE0MDkyODEzNTU0NS5HQTIzMjIwQHR5cGUueW91cGkucGVyc28uYXF1aWxlbmV0LmZyLw0KPiA+
-DQo+ID4gWWVzLCBhY3V0YWxseSBteSBmaXJzdCBkcmFmdCBoYWQgdGhlIGRpZmYgYmVsb3csIGJ1
-dCBJIGRyb3BwZWQgaXQNCj4gPiBiZWNhdXNlIHBhY2tldF9nZXRuYW1lKCkgZG9lcyBub3QgY2Fs
-bCBtZW1jcHkoKSBmb3IgU09fUEVFUk5BTUUgYXQNCj4gPiBsZWFzdCwgYW5kIHNhbWUgZm9yIGdl
-dHBlZXJuYW1lKCkuDQo+ID4NCj4gPiBBbmQgaW50ZXJlc3RpbmdseSB0aGVyZSB3YXMgYSByZXZp
-dmFsIHRocmVhZC4NCj4gPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9uZXRkZXYvMjAyMzA3MTkw
-ODQ0MTUuMTM3ODY5Ni0xLWxlaXRhb0BkZWJpYW4ub3JnLw0KPiANCj4gQWggaW50ZXJlc3Rpbmcg
-OikgVG9waWNhbC4NCj4gDQo+ID4gSSBjYW4gaW5jbHVkZSB0aGlzIGluIHYyIGlmIG5lZWRlZC4N
-Cj4gPiBXaGF0IGRvIHlvdSB0aGluayA/DQo+ID4NCj4gPiAtLS04PC0tLQ0KPiA+IGRpZmYgLS1n
-aXQgYS9uZXQvY29yZS9zb2NrLmMgYi9uZXQvY29yZS9zb2NrLmMNCj4gPiBpbmRleCA5MzcwZmQ1
-MGFhMmMuLmYxZTg4N2MzMTE1ZiAxMDA2NDQNCj4gPiAtLS0gYS9uZXQvY29yZS9zb2NrLmMNCj4g
-PiArKysgYi9uZXQvY29yZS9zb2NrLmMNCj4gPiBAQCAtMTgxNSwxNCArMTgxNSwxNCBAQCBpbnQg
-c2tfZ2V0c29ja29wdChzdHJ1Y3Qgc29jayAqc2ssIGludCBsZXZlbCwgaW50IG9wdG5hbWUsDQo+
-ID4NCj4gPiAgCWNhc2UgU09fUEVFUk5BTUU6DQo+ID4gIAl7DQo+ID4gLQkJY2hhciBhZGRyZXNz
-WzEyOF07DQo+ID4gKwkJc3RydWN0IHNvY2thZGRyX3N0b3JhZ2UgYWRkcmVzczsNCj4gPg0KPiA+
-IC0JCWx2ID0gc29jay0+b3BzLT5nZXRuYW1lKHNvY2ssIChzdHJ1Y3Qgc29ja2FkZHIgKilhZGRy
-ZXNzLCAyKTsNCj4gPiArCQlsdiA9IHNvY2stPm9wcy0+Z2V0bmFtZShzb2NrLCAoc3RydWN0IHNv
-Y2thZGRyICopJmFkZHJlc3MsIDIpOw0KPiA+ICAJCWlmIChsdiA8IDApDQo+ID4gIAkJCXJldHVy
-biAtRU5PVENPTk47DQo+ID4gIAkJaWYgKGx2IDwgbGVuKQ0KPiA+ICAJCQlyZXR1cm4gLUVJTlZB
-TDsNCj4gPiAtCQlpZiAoY29weV90b19zb2NrcHRyKG9wdHZhbCwgYWRkcmVzcywgbGVuKSkNCj4g
-PiArCQlpZiAoY29weV90b19zb2NrcHRyKG9wdHZhbCwgJmFkZHJlc3MsIGxlbikpDQo+ID4gIAkJ
-CXJldHVybiAtRUZBVUxUOw0KPiA+ICAJCWdvdG8gbGVub3V0Ow0KPiA+ICAJfQ0KPiA+IC0tLTg8
-LS0tDQo+IA0KPiBJIGFncmVlIHRoYXQgaXQncyBhIHdvcnRod2hpbGUgY2hhbmdlLiBJIHRoaW5r
-IGl0IHNob3VsZCBiZSBhbg0KPiBpbmRlcGVuZGVudCBjb21taXQuIEFuZCBzaW5jZSBpdCBkb2Vz
-IG5vdCBmaXggYSBidWcsIHRhcmdldCBuZXQtbmV4dC4NCg0KSXQgaXMgcG90ZW50aWFsbHkgYSBi
-dWcuDQpUaGVyZSBpcyBubyByZXF1aXJlbWVudCB0aGF0IHRoZSBjb21waWxlciBhbGlnbiAnY2hh
-ciBhZGRyZXNzWzEyOF0nLg0KU28gdGhlIGFjY2Vzc2VzIGNvdWxkIGZhdWx0IGxhdGVyIG9uLg0K
-DQpJbiBwcmFjdGlzZSBpdCB3aWxsIGJlIGFsaWduZWQgLSB1bmxlc3MgdGhlIGNvbXBpbGVyIGlz
-IGJlaW5nDQpwZXJ2ZXJzZS4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtl
-c2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBV
-Sw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Wed, 19 Jul 2023 17:34:13 -0400
+> > > > The write seems to overflow, but actually not since we use struct
+> > > > sockaddr_storage defined in __sys_getsockname().
+> > > 
+> > > Which gives _K_SS_MAXSIZE == 128, minus offsetof(struct sockaddr_ll, sll_addr).
+> > > 
+> > > For fun, there is another caller. getsockopt SO_PEERNAME also calls
+> > > sock->ops->getname, with a buffer hardcoded to 128. Should probably
+> > > use sizeof(sockaddr_storage) for documentation, at least.
+> > > 
+> > > .. and I just noticed that that was attempted, but not completed
+> > > https://lore.kernel.org/lkml/20140928135545.GA23220@type.youpi.perso.aquilenet.fr/
+> > 
+> > Yes, acutally my first draft had the diff below, but I dropped it
+> > because packet_getname() does not call memcpy() for SO_PEERNAME at
+> > least, and same for getpeername().
+> > 
+> > And interestingly there was a revival thread.
+> > https://lore.kernel.org/netdev/20230719084415.1378696-1-leitao@debian.org/
+> 
+> Ah interesting :) Topical.
+> 
+> > I can include this in v2 if needed.
+> > What do you think ?
+> > 
+> > ---8<---
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index 9370fd50aa2c..f1e887c3115f 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -1815,14 +1815,14 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+> >  
+> >  	case SO_PEERNAME:
+> >  	{
+> > -		char address[128];
+> > +		struct sockaddr_storage address;
+> >  
+> > -		lv = sock->ops->getname(sock, (struct sockaddr *)address, 2);
+> > +		lv = sock->ops->getname(sock, (struct sockaddr *)&address, 2);
+> >  		if (lv < 0)
+> >  			return -ENOTCONN;
+> >  		if (lv < len)
+> >  			return -EINVAL;
+> > -		if (copy_to_sockptr(optval, address, len))
+> > +		if (copy_to_sockptr(optval, &address, len))
+> >  			return -EFAULT;
+> >  		goto lenout;
+> >  	}
+> > ---8<---
+> 
+> I agree that it's a worthwhile change. I think it should be an
+> independent commit. And since it does not fix a bug, target net-next.
 
+Sure, will post a patch to net-next later.
 
