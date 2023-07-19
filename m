@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-18941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C65C759268
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:10:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F772759269
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 611D31C20DFC
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:10:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09BE62815AD
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F4412B68;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1D412B75;
 	Wed, 19 Jul 2023 10:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5522F125C3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD21125D0
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9D67C433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2FC2C43391;
 	Wed, 19 Jul 2023 10:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689761421;
-	bh=Szvpo3jPm6xFX2CjBL67LKjIExmiX39UOjbELPu04do=;
+	bh=c2UEHPFuhGfZOFd31QJQjfIX++Nbo6YKMqG9JatMuTU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=odSk7cwk85Y6E1GTrYTfQD1t32H3n/cthps7bvDWi6t9BU8kCbHvF248DGEJp5OJa
-	 2e+VMlRR+dzd8d/bLuuHVgh7uKBnPVJ/8hdWGqKzoDbl+YyfNgf5xEdaokISiASd3H
-	 B+9MYyYcx7znGy0E+pSf+7xpUDks6W4jIBrDehtwH9Qo5qKxMHP+UMo1BqeIJYjeuE
-	 VLn0sbvBWaVHoT0wc3wKqTU0BPV91hQLqPj9EZTHI3ukWznUWI6q+8s6mwxaUs7l+S
-	 5bu5+IkfiEwLHUrIFRcG1EWiXFeecPx7gD2y5qz9a+E2wcoSyzf/nKxtqM1xoxi8To
-	 aZcATMuwohoGg==
+	b=oJMsmvwZmkpUeh7anTEfAa/IBxDqJUCHmHkgHDIIC5FGvua/XZKRDcyLRJjcLbhmu
+	 ueSV/ebApoM4f/6qK0rBZdPe/0Cz7qM8kXV3m+J7wju1TgoryW3WhwKE6Hk9y1k2p6
+	 M2aQ50hU90xwEjG8R4rzRN9i2VMMQ+TL+BNciL/J+IZ8R463ML8G70gRRyoIvmmpLa
+	 NSmX5l7GkcTiAuj8pl9Owg3sG6NbRWzh7YnN6JwSWc7CmzTLAV25LMFwP2dwjQ36J4
+	 yM0YJLuZ9ycu3aNchxsZusFBumZPBXZW19rDYQXhzrJOiQKZ8llfPHhrd8RXAMSJID
+	 WMKqRbkn/aOcw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AD025C6445A;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5A30E21EFF;
 	Wed, 19 Jul 2023 10:10:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,46 +41,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] Add backup nexthop ID support
+Subject: Re: [PATCH net-next 1/1] net: stmmac: xgmac: Fix L3L4 filter count
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168976142170.5988.10461851053537614919.git-patchwork-notify@kernel.org>
+ <168976142174.5988.2207846071493224223.git-patchwork-notify@kernel.org>
 Date: Wed, 19 Jul 2023 10:10:21 +0000
-References: <20230717081229.81917-1-idosch@nvidia.com>
-In-Reply-To: <20230717081229.81917-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- razor@blackwall.org, roopa@nvidia.com, dsahern@gmail.com, petrm@nvidia.com,
- taspelund@nvidia.com
+References: <20230717120603.5053-1-rohan.g.thomas@intel.com>
+In-Reply-To: <20230717120603.5053-1-rohan.g.thomas@intel.com>
+To: Rohan G Thomas <rohan.g.thomas@intel.com>
+Cc: davem@davemloft.net, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ andriy.shevchenko@linux.intel.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 17 Jul 2023 11:12:25 +0300 you wrote:
-> tl;dr
-> =====
+On Mon, 17 Jul 2023 20:06:03 +0800 you wrote:
+> Get the exact count of L3L4 filters when the L3L4FNUM field of
+> HW_FEATURE1 register is >= 8. If L3L4FNUM < 8, then the number of L3L4
+> filters supported by XGMAC is equal to L3L4FNUM. From L3L4FNUM >= 8
+> the number of L3L4 filters goes on like 8, 16, 32, ... Current
+> maximum of L3L4FNUM = 10.
 > 
-> This patchset adds a new bridge port attribute specifying the nexthop
-> object ID to attach to a redirected skb as tunnel metadata. The ID is
-> used by the VXLAN driver to choose the target VTEP for the skb. This is
-> useful for EVPN multi-homing, where we want to redirect local
-> (intra-rack) traffic upon carrier loss through one of the other VTEPs
-> (ES peers) connected to the target host.
+> Also, fix the XGMAC_IDDR bitmask of L3L4_ADDR_CTRL register. IDDR
+> field starts from the 8th bit of the L3L4_ADDR_CTRL register. IDDR[3:0]
+> indicates the type of L3L4 filter register while IDDR[8:4] indicates
+> the filter number (0 to 31). So overall 9 bits are used for IDDR
+> (i.e. L3L4_ADDR_CTRL[16:8]) to address the registers of all the
+> filters. Currently, XGMAC_IDDR is GENMASK(15,8), causing issues
+> accessing L3L4 filters above 15 for those XGMACs configured with more
+> than 16 L3L4 filters.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/4] ip_tunnels: Add nexthop ID field to ip_tunnel_key
-    https://git.kernel.org/netdev/net-next/c/8bb5e82589f0
-  - [net-next,v2,2/4] vxlan: Add support for nexthop ID metadata
-    https://git.kernel.org/netdev/net-next/c/d977e1c8e3a1
-  - [net-next,v2,3/4] bridge: Add backup nexthop ID support
-    https://git.kernel.org/netdev/net-next/c/29cfb2aaa442
-  - [net-next,v2,4/4] selftests: net: Add bridge backup port and backup nexthop ID test
-    https://git.kernel.org/netdev/net-next/c/b408453053fb
+  - [net-next,1/1] net: stmmac: xgmac: Fix L3L4 filter count
+    https://git.kernel.org/netdev/net-next/c/47448ff2d5c7
 
 You are awesome, thank you!
 -- 
