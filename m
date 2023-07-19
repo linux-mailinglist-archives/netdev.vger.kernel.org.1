@@ -1,112 +1,226 @@
-Return-Path: <netdev+bounces-19097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9BAD759AC1
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:30:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03EB759B01
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFB051C210E2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:30:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AD52281874
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A0BECC;
-	Wed, 19 Jul 2023 16:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D933800;
+	Wed, 19 Jul 2023 16:38:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7B81BB3C;
-	Wed, 19 Jul 2023 16:30:36 +0000 (UTC)
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B6E1733;
-	Wed, 19 Jul 2023 09:30:35 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b933bbd3eeso75719441fa.1;
-        Wed, 19 Jul 2023 09:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689784234; x=1692376234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O7QrzdqRJDmBXPI4sTDgiqyvsQI/8XFjzdONJvE8L8g=;
-        b=DPBkE0BteEojQ9L1pgfzJUzR37XAkt9HpKm7BwtrtF8of6PGpvZxXBPhOpFmK0IjdW
-         RiafYe5sGrTOq6GoBXTA7YWbijO2ScxAttwCQJNQ2Kyg2yudp5SqX6rOr/aaeMKJjO/o
-         vLPmNw7waaX6cavcTaBFw1UE2SNZTJUebLdM+HMKzjFCq7DLuEUYp7OMajdoWYot53qQ
-         cA+ZZIh9s/VLi5bh8c9wing79nVUZuUrKKs0L2CcomqtTjo6MVLQAv+o+jZ4iKvFs4HL
-         JoDhNeIXHSOpdEhSCIVivdWMegfmAtHsFxG1kedZwr0466DhuTiLOWw5FiwTK+8HjgaR
-         mbhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689784234; x=1692376234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O7QrzdqRJDmBXPI4sTDgiqyvsQI/8XFjzdONJvE8L8g=;
-        b=kQCsvPruM1h2Pxbsm4crpSRIr752tV2undu4CzQJTGBy2jQsVoUrePqNI4xxG+iCoA
-         TS/YkeaKpplbRedTTRIcfgK7jBynx2GIO1/CmQGyH0GGuyn+gfGmxhiTChVKCQE379AP
-         0hKFVuGHae62qTAmwsoNeBYQH6OtuwgUYFcpISxhf3UTpVVyznV4jHlwNsnz1Ecbvqwb
-         m4wfgrT1tjYtMHr+tceYDzVAeTSRT0MbKvVslEVxHxmQyJlybZj5NxphhnR2iXBNCS6i
-         dXqn9ebvBFjDDpO1BJY90BZpj9+anarSyxtvbOMil4ngL+5III7MHe3ogeUrTTgOfCfV
-         MLUg==
-X-Gm-Message-State: ABy/qLZeA703T9jB1lJTsp4YBWyz4XrUr9zz1WTR16LR6an+YY/xtPFS
-	iPYpa56iuhPrJp6QkPYdOIyqK/YlJK2sNqp8PmU=
-X-Google-Smtp-Source: APBJJlFdYqVBILwlIBca95ud/FR/YVJREdldr5HU4X4xISoRWauvA69yC39i4a8UF7K8WBU1FOQm8CjycyzIYBF5DiY=
-X-Received: by 2002:a2e:9f17:0:b0:2b6:fe55:7318 with SMTP id
- u23-20020a2e9f17000000b002b6fe557318mr328753ljk.12.1689784233480; Wed, 19 Jul
- 2023 09:30:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A12D11C93
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:38:19 +0000 (UTC)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C181BF2;
+	Wed, 19 Jul 2023 09:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689784697; x=1721320697;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JOskHYsjMbwZ84H4y+pyIWUQL0/BoAamhZW4OAbijwM=;
+  b=N3wpM3zQiUF3YjabPpvTzWgwOg63BJ/P4klICeJ554iClUjFw9zlk5Ph
+   WKQWiaM1UJJBq4rob3fFBtI17lrwQas78gJeZYYLnBPhBqfgvQ8zaHzRS
+   WhuPi8wdaiTb0hRxp0FI0HBOb/osau+wKQabnEUjNsUCNKwsrwwEq3xQY
+   Ss7sUAA43VnBVMNfPN925uOt72ASp1vHOI2FeDdJjZSpaR/RvC+c9+BL8
+   NMHIHsaHOYr1IgLQC6RrB2fIoDo/AqwmLoxWYgSmPQrK5QYSr5lydzU9Z
+   yt1A8uCHc5l+783bsRiPibs+pbE5fEIguy0MTEEhqJdUETuz+NcVrwxHw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="356475370"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="356475370"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 09:36:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="1054801807"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="1054801807"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga005.fm.intel.com with ESMTP; 19 Jul 2023 09:36:44 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 19 Jul 2023 09:36:44 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 19 Jul 2023 09:36:43 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 19 Jul 2023 09:36:43 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 19 Jul 2023 09:36:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zh0GwPKeMKqhakRSaadumaU2QYfGIpO85I/VxCfhscXRCd3KK0MwCtfAIyVX4TZFSoORqvyddhTHWEPN+ZgovjHK9gmpeZrHb8PHrkeZpY3A3VqUK24lmVXdDIvW6DezpVfYO1NB9DeE4sUE/VcyS68CMEsogPQ9b7UTiZQYi/qSOSiWswy7kBMmwwXgJIArIwx1BwLaC3g4hVmKU7OEVfKUWB8y6mVDMum9xiokrA838GM+zT+ZtP6VimeP3G2p/aW6YbWXLKMnFfizSZRYgTtsO5H5wXFE/7aSBd6icD1iLCBfoMRx2kjES6BWcyLC60KJJPB0SrqhWBqUOzllLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tmz4WdEHD+5ZXDgnjkCWN194nkqoeJyJOcq6wK36cqg=;
+ b=g3WS9kCqwaS1q+CFweEoR53KzyJKInR1Q7zQttZrQpQXgUdjGFe92bqWSCgSoW7W6uMTDBbu6C6OWgD3Oo+VgGhdIPWkO0+DFMKKeweneSGyWRd5lMIgos+gW4PjRbhX4tx/ArcJsqPrRJ4+tmLoewq/3xd5a6Rj3X8RkhbUTG729pS37q66hVlCAOK0Axh7WutCf53gG4rOwm9n4F+HoTnPo855a3dYF9WEPvSXfwQiW6dKexYs7G9fTnxBeTgLzkRMwa000bkggqnmHcWpivZqq36O8QTeJDv8z3YNYyoQ2ShzOESQ4P8N51LEeGui0/AkjRG4lWkKz4lNH77UiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SJ0PR11MB6720.namprd11.prod.outlook.com (2603:10b6:a03:479::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Wed, 19 Jul
+ 2023 16:36:41 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6609.024; Wed, 19 Jul 2023
+ 16:36:41 +0000
+Message-ID: <d7cd1903-de0e-0fe3-eb15-0146b589c7b0@intel.com>
+Date: Wed, 19 Jul 2023 18:34:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RFC net-next v2 7/7] net: skbuff: always try to recycle PP
+ pages directly when in softirq
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
+ <20230714170853.866018-10-aleksander.lobakin@intel.com>
+ <20230718174042.67c02449@kernel.org>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20230718174042.67c02449@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE0P281CA0021.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:14::8) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230718234021.43640-1-alexei.starovoitov@gmail.com> <dae5886a8b3b4d9f869e4f8ab3cefa96@AcuMS.aculab.com>
-In-Reply-To: <dae5886a8b3b4d9f869e4f8ab3cefa96@AcuMS.aculab.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 19 Jul 2023 09:30:22 -0700
-Message-ID: <CAADnVQJ+NSeVOJROKHYY1VVRDwK8Gm8jgSoRTCmbrN8XG=y3JA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] bpf, net: Introduce skb_pointer_if_linear().
-To: David Laight <David.Laight@aculab.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"kernel-team@fb.com" <kernel-team@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SJ0PR11MB6720:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b0ac531-040c-4ae2-3510-08db8876549b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: e8lIGsG1zeV+zf6QuUIQmwqqnczM/lLCe2pGRq01uGJz8CtaxKFaqtxWIcbFlqTqcADfYFmNfBmHVnQ/HYWiBxctezqnqESeJzYjij3UEy1Va0sj0RDBdf6oWG6dVm2M9eLEqJDqoY4OpoTMUjvrFmkx6xYZneU3+o+6ZejKgAYTezougXGwDm2BbpABlG8MF6QVtkv4UQIrCyKPKymW7QRZ2ld/F/OCmHFinl0UKBuFYJJF8T5afm6q25SFBw6hyZq8wCUhtq7s9gr2geZiz0ddJtMKw0EYXZVEzGWPxNAzmwV+4ZG4+u4essolgbixMq9a2kbdYySjsw9kQjnSoV45spainDv9NoEzXTjrh/vtphbKSZlFUJ5k4zlhYlWmjeAfjwqinHQYB0ZSOK6vj14P0y5dBZ3q41drwQ2CBmFib/F+8tbo/uCgmnVenZRJ3RTCUVKj8zauPxTd1RKfRZtj6B1MRnfwIITkwBziWdPm8B/Mv6Ws73xZM6jWLSDDN0duI1H7248ypbemT38JBDhEWCODz5kTE8rGpw47QSN5vGReZqiZKJauuqiXKFKkTyZ4+AAFC0Qw+QSz4NXlZpf5efdSyJdnDhhfIfAOuEq+8mZZjbGGCgBEfUq8LxPz+rBs6VJdhn+O46WIIXHiHA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(396003)(376002)(136003)(366004)(451199021)(2906002)(38100700002)(86362001)(83380400001)(82960400001)(6512007)(5660300002)(186003)(26005)(31696002)(6506007)(8936002)(8676002)(7416002)(36756003)(478600001)(54906003)(41300700001)(316002)(66476007)(4326008)(6486002)(6916009)(66946007)(66556008)(31686004)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?akIrY0l2TUhubCtvd1ZEVVY1ZTdNR1gxMEdXTTNrSXpiWXpDZUJhZUdpL1dO?=
+ =?utf-8?B?dlZLemxZeStqR0ZRdUc1UDRQQjg3cERzSFErWU8vVnhLVS9kZUtZbmtLNkZY?=
+ =?utf-8?B?aklpenlkeHF5T3ZTSUY5c1o5dWlpc0hFQXlaVFM5R2tIMmoyS2RVWlJGbnlw?=
+ =?utf-8?B?WHV1N2djdlRTRURBUm50cCs0SU5GcmlGRzVVZGZiUk9Va3B6dEdUN2thNncw?=
+ =?utf-8?B?NXl4bWtrNGNJYlpLOWNNVklHK1RpaHNEMXRXN2NobUdRVjBTZmMyeC9PTktZ?=
+ =?utf-8?B?dGxpTkVoYVdrQjUwSEZEY2dLcHJpZU4rTkxwMzdRaGRNb3JtV0hqRmpsVVZ5?=
+ =?utf-8?B?OUpCa0QrY0ppSWUrWE54RjNwdC9LZTN1aVI1UWZPR003ejA4V3NoOUN0VXZS?=
+ =?utf-8?B?aDdVOW9YS2dEczFyN2Y4eVFYc1lyd0lWeGt4Tk1pMTUyUFNiNnBBWldhUU9H?=
+ =?utf-8?B?S3BQZjlzZXVPcXI0aXdiRGdWSjdIMkpaRzVIbWVmUEw1NUdJOTVDTXo1bkZJ?=
+ =?utf-8?B?NS9IQUR3OGdtaEhnS2VLakRKQ2tGUVdsQ205Qnk4KytqaE9mUmlYRmhnLzlO?=
+ =?utf-8?B?NDVhdTNtQVdEWXVEV3crY1FkN2p5cURYVEtZdGNROVlSOUVBbXlpaEdvUjMr?=
+ =?utf-8?B?ZGJYc2laRmE0UFRFR2pZK0pDN2VBUkZoRWJhVEhGUWsvb2l3MUtPUGRpQzk2?=
+ =?utf-8?B?cEErZkNJbWZYU2VEQVNaQzJOaWhlRXkyR1IxNGdkSUdWVVlSc0txOXZPcGxz?=
+ =?utf-8?B?SnBDWE55NlJPZnNOamsyeWxHa0x3UGpJUnFxWlZEMHo5MnlRN1BDR0d3RmlJ?=
+ =?utf-8?B?eEFXR1RieWE0OFY2d24vdTZiaXdTOC9rZVhzclFhVFJJOE0waHNOS2R2QllG?=
+ =?utf-8?B?R2Y0cHBYL3Z4eStiTi9GUGU2RlEzNURvY3F4bGIzTWhDRkN1b0p1QmNraEZt?=
+ =?utf-8?B?YXJDSWY1MHVUODUxNWJRQ2tyV293L3ZpZmdnZ2V0dzlHQW5YOUVYT0J2cVor?=
+ =?utf-8?B?M1FSN0NPc3hVcWI1dlIxSHVyb0JrNmRCYU5nL1ZOOUIrRVNkTGMwcE1UZVda?=
+ =?utf-8?B?Mnc4MytjNFNPd0pQMUJJQkdWS1ViK1IvZHlacjFkb1RtbGo2WHk4R1hEUVh0?=
+ =?utf-8?B?V21tdEhzbFVlbG9ibXZqeEJRT2xNZzUwRGx2dnRWckxmcjlZSkVsZ2hVak5S?=
+ =?utf-8?B?b2ZWNWcwNVBGcGsyQzZBVWpmUklJYUZvTGpsd3ZoaXppL2pJU2VIZ1dPQXJ6?=
+ =?utf-8?B?TUIxWHBZMmZ1MmdVMlc4aDJnNWhtcGR3WHExUXpkNDh4MkcrbEVDWnkrbW02?=
+ =?utf-8?B?aFBqQ0F1UTFvY01yYm51M2lFSUpDanVraWJ1VzBnL2Vua1VESWFRZ3BQYXlq?=
+ =?utf-8?B?MlNPaWcxTkk0cmhXUzlJWGRiYWZERzB2NncrQXN0WTdJMW5OK2NIOU96UEla?=
+ =?utf-8?B?cG1vbGtCcUFQck1Qa3VKbW5KWUF2dlMzc2srdTRGMWVSN3hVM0NBK1BmQjln?=
+ =?utf-8?B?VmVvMVV1WDV1TFYvVWg2MjFBT2JXWXlDaldaK3QzaFNTbEkrSHhMdFpTd00v?=
+ =?utf-8?B?VTdFT2FFeTdjb3FLN1FtRUdsWWtlV0duakRYVkQ5UG5SUkQybjVRUTlZSTFx?=
+ =?utf-8?B?MVlMbDhjRnFLMmVLR1NUcHVNaVQxSmE3Qlh4blFBZXNPbFdYbXJQL2FUWUFy?=
+ =?utf-8?B?ditpdCtwb01laG15YnI3eHlhNTVHaGNqRjVKRGpTZkREUmM3UVZUQWlUd0hK?=
+ =?utf-8?B?czFxV2h3enI0QWc3WFdZcTQ0U1FyMXhCbCtOQ2RNZ3ZTVVhFQzFxazhNaHIw?=
+ =?utf-8?B?MlI5bzIraWJYNjF0bUlGMlFIQThScTFsZHRrU2lrc09YVWpWRm80RFNucDdh?=
+ =?utf-8?B?OFQ4OERMZUNRKzJOWVhoTU9lWDYxTmdHc1hoU0JUdXU4a3ZrYml5dkVmNGRh?=
+ =?utf-8?B?VGIyY0l4WmY2QlhFUU10ZTJ1Q09kUzVncTFiQWFlMWliYUxvQlU1eGp3Q0Fm?=
+ =?utf-8?B?c3BRYmFDMVVpV1hybTF0eFM1b3dLc1VOTjgvQnlCdk5nRXVsNUl4SDZYUVdQ?=
+ =?utf-8?B?YlhtTHlnVzl0Szh1Q0lRYW54eXdEc2dLT25FanROdVZ3UFRwYzhCNVYwQlAv?=
+ =?utf-8?B?YUxqSzJMNGxObkt2VE5aYXRqcXA1b096bENQajI3d0IvcUFNRUtLUWNvSC9j?=
+ =?utf-8?B?UUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b0ac531-040c-4ae2-3510-08db8876549b
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 16:36:41.2678
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n5YCKVcr2IufHUq0ds9dTwIfyfLSIfB/zP0bSCR0S2XDXUCuvLA097hQdmcVj87vSJppmkQ8EMvYtGV0VEwbJ/WPndi4HBpLv6tbCINqxCc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6720
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 6:10=E2=80=AFAM David Laight <David.Laight@aculab.c=
-om> wrote:
->
-> From: Alexei Starovoitov
-> > Sent: 19 July 2023 00:40
-> >
-> > Network drivers always call skb_header_pointer() with non-null buffer.
-> > Remove !buffer check to prevent accidental misuse of skb_header_pointer=
-().
-> > Introduce skb_pointer_if_linear() instead.
-> >
-> ...
-> > +static inline void * __must_check
-> > +skb_pointer_if_linear(const struct sk_buff *skb, int offset, int len)
-> > +{
-> > +     if (likely(skb_headlen(skb) - offset >=3D len))
-> > +             return skb->data + offset;
-> > +     return NULL;
-> > +}
->
-> Shouldn't both 'offset' and 'len' be 'unsigned int' ?
->
-> The check should probably be written:
->                 offset + len <=3D skb_headlen(skb)
-> so that it fails if 'offset' is also large.
-> (Provided 'offset + len' itself doesn't wrap.)
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Tue, 18 Jul 2023 17:40:42 -0700
 
-I agree that this style is easier to read, but
-consistency with skb_header_pointer() trumps all such considerations.
+> On Fri, 14 Jul 2023 19:08:52 +0200 Alexander Lobakin wrote:
+>> Suggested-by: Jakub Kicinski <kuba@kernel.org> # in_softirq()
+> 
+> I thought I said something along the lines as "if this is safe you can
+> as well" which falls short of a suggestion, cause I don't think it is
+> safe :)
+
+Ok, I'll drop you if you insist :D
+
+> 
+>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+>> index fc1470aab5cf..1c22fd33be6c 100644
+>> --- a/net/core/skbuff.c
+>> +++ b/net/core/skbuff.c
+>> @@ -902,7 +902,7 @@ bool page_pool_return_skb_page(struct page *page, bool napi_safe)
+>>  	 * in the same context as the consumer would run, so there's
+>>  	 * no possible race.
+>>  	 */
+>> -	if (napi_safe) {
+>> +	if (napi_safe || in_softirq()) {
+>>  		const struct napi_struct *napi = READ_ONCE(pp->p.napi);
+>>  
+>>  		allow_direct = napi &&
+> 
+> What if we got here from netpoll? napi budget was 0, so napi_safe is
+> false, but in_softirq() can be true or false.
+
+If we're on the same CPU where the NAPI would run and in the same
+context, i.e. softirq, in which the NAPI would run, what is the problem?
+If there really is a good one, I can handle it here.
+
+> 
+> XDP SKB is a toy, I really don't think 3-4% in XDP SKB warrants the
+> risk here.
+
+It affects not only XDP skb, I told ya already :D @napi_safe is very
+conservative and misses a good bunch of stuff.
+I really don't think that very rare corner cases (which can be handled
+if needed) warrants the perf miss here.
+
+Thanks,
+Olek
 
