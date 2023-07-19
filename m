@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-18768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DEB7589D2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:00:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA50E7589E0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3821C20E8A
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 00:00:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B7892817A0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 00:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9C817ADF;
-	Wed, 19 Jul 2023 00:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B3D180;
+	Wed, 19 Jul 2023 00:04:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3DD17ACE;
-	Wed, 19 Jul 2023 00:00:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6929C433C9;
-	Wed, 19 Jul 2023 00:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689724821;
-	bh=qxxeeH4BpVPJRWJ4+RBZAoXm54CuQ1BuSkX6X7QPBno=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aM26f95NosLZkRBrJfElkigefJKCG4RGcGm7yoQa0kV402AWkNwxeOcvbA5zBw1nu
-	 LH8/v9SpSyraWj2UFraGByiTEAsRpdyNSfxBjcKwf2yisrg1rf+ffy1cE5ivVwkUhL
-	 KCi1B5rnO8iIy5XRlANVrw5nNvzm4c7/6i12TsYvFy0QaR4PsXQlbG8PSZ5HSDf8MQ
-	 sd+99fC9x5txVMyehtWqt5b+s4l6E1kWLYCqTRNR/oQ0v188B61pnv/5N8Q76OlOsm
-	 Rif0k4UoJyFDOkm065tfBNTz4lEy/PdHz33ZoNduRd+mOmg4urmNR/1cWh3WhxrTv6
-	 Bssl9fiykT76w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9A7C8E22AE4;
-	Wed, 19 Jul 2023 00:00:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D17179
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 00:04:25 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719E01BE2;
+	Tue, 18 Jul 2023 17:03:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qKSs/GhjDKvKDvpu4wuEhgU/FW9hGWlYn3svaB7ZpIE=; b=1RWmYl7YH83beIFBTnXhfUo3Tc
+	cUMePwzNLiMq0qMU1AngQfw6UIrbPwYnKVwGd+KVVZeGBRSEjsBIpKp5CopzpOaV+UocUNipUkZ/V
+	6Oe0VU3pMnWPyUPKur2DXnLmKrxrE36KpwjZXyZQBi7TLWE43/EnihU8ujGDWugX+vo8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qLufK-001fwb-PP; Wed, 19 Jul 2023 02:03:38 +0200
+Date: Wed, 19 Jul 2023 02:03:38 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michael Walle <mwalle@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next v3 10/11] net: mdio: add C45-over-C22 fallback
+ to fwnode_mdiobus_register_phy()
+Message-ID: <4b31b4d0-e327-4ee5-a887-a5c35d51b2af@lunn.ch>
+References: <20230620-feature-c45-over-c22-v3-0-9eb37edf7be0@kernel.org>
+ <20230620-feature-c45-over-c22-v3-10-9eb37edf7be0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] selftests: tc: increase timeout and add missing
- kconfig
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168972482162.23822.8375282604196078031.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jul 2023 00:00:21 +0000
-References: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
-In-Reply-To: <20230713-tc-selftests-lkft-v1-0-1eb4fd3a96e7@tessares.net>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- shuah@kernel.org, keescook@chromium.org, davem@davemloft.net,
- paulb@mellanox.com, marcelo.leitner@gmail.com, mptcp@lists.linux.dev,
- pctammela@mojatatu.com, skhan@linuxfoundation.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620-feature-c45-over-c22-v3-10-9eb37edf7be0@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+> Please note, that both with the old and the new code compatible =
+> "ethernet-phy-idNNNN.NNNN" only works for the C22 case. I'm wondering if
+> compatible = "ethernet-phy-idNNNN.NNNN", "ethernet-phy-ieee802.3-c45
+> even makes sense because there might be multiple C45 ids. At least it is
+> an allowed pattern according to the device tree bindings. But with the
+> current code, the ethernet-phy-idNNNN.NNNN is ignored in the c45 case.
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I think these two should be orthogonal.
 
-On Thu, 13 Jul 2023 23:16:43 +0200 you wrote:
-> When looking for something else in LKFT reports [1], I noticed that the
-> TC selftest ended with a timeout error:
-> 
->   not ok 1 selftests: tc-testing: tdc.sh # TIMEOUT 45 seconds
-> 
-> I also noticed most of the tests were skipped because the "teardown
-> stage" did not complete successfully. It was due to missing kconfig.
-> 
-> [...]
+ethernet-phy-idNNNN.NNNN should be used to load the driver. The driver
+has a list of IDs it can drive, and we want the module loading
+machinery to load a module which can driver this ID.
 
-Here is the summary with links:
-  - [net,1/3] selftests: tc: set timeout to 15 minutes
-    https://git.kernel.org/netdev/net/c/fda05798c22a
-  - [net,2/3] selftests: tc: add 'ct' action kconfig dep
-    https://git.kernel.org/netdev/net/c/719b4774a8cb
-  - [net,3/3] selftests: tc: add ConnTrack procfs kconfig
-    https://git.kernel.org/netdev/net/c/031c99e71fed
+"ethernet-phy-ieee802.3-c45" should be about how to read the ID
+registers, if ethernet-phy-idNNNN.NNNN is not present.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+	Andrew
 
 
