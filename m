@@ -1,86 +1,190 @@
-Return-Path: <netdev+bounces-18829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F23758C42
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 05:55:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A35758C47
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C36931C20F09
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 03:55:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACAF61C20F63
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E363D87;
-	Wed, 19 Jul 2023 03:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8975229;
+	Wed, 19 Jul 2023 04:04:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F0A17F9
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 03:55:39 +0000 (UTC)
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F72A4
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 20:55:34 -0700 (PDT)
-X-QQ-mid:Yeas3t1689738813t070t56102
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.243.13])
-X-QQ-SSF:00400000000000F0FQF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 1871001362217384513
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: "'Simon Horman'" <simon.horman@corigine.com>,
-	<kabel@kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-References: <ZK/V57+pl36NhknG@corigine.com> <ZK/Xtg3df6n+Nj11@shell.armlinux.org.uk> <043401d9b57d$66441e60$32cc5b20$@trustnetic.com> <ZK/i3Ta2mcr7xVot@shell.armlinux.org.uk> <043501d9b580$31798870$946c9950$@trustnetic.com> <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com> <ZLUymspsQlJL1k8n@shell.armlinux.org.uk> <013701d9b957$fc66f740$f534e5c0$@trustnetic.com> <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk> <013e01d9b95e$66c10350$344309f0$@trustnetic.com> <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk> <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com>
-In-Reply-To: <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com>
-Subject: RE: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Date: Wed, 19 Jul 2023 11:53:31 +0800
-Message-ID: <019101d9b9f4$95cae080$c160a180$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA00417F9;
+	Wed, 19 Jul 2023 04:04:28 +0000 (UTC)
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F74127;
+	Tue, 18 Jul 2023 21:04:26 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0Vnk1le9_1689739462;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vnk1le9_1689739462)
+          by smtp.aliyun-inc.com;
+          Wed, 19 Jul 2023 12:04:23 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: virtualization@lists.linux-foundation.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH vhost v12 00/10] virtio core prepares for AF_XDP
+Date: Wed, 19 Jul 2023 12:04:12 +0800
+Message-Id: <20230719040422.126357-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHxijPTuEE90Wk3AsfAJFZNC2gr6QHGL87AAtcZi7oCGUwJkAFMOiuVAWOFiqoCmQLVbwIZRKUEAb/X+t0DCQBzhQIcViy5AnT8Gs2u1TzugA==
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
+X-Git-Hash: fc7afa711e97
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > Okay, so how about this for an alternative theory.
-> >
-> > The PHY is being probed, which places the PHY in power down mode.
-> > Then your network driver (which?) gets probed, connects immediately
-> > to the PHY, which attempts to power up the PHY - but maybe the PHY
-> > hasn't finished powering down yet, and thus delays the powering up.
-> >
-> > However, according to the functional spec, placing the device in
-> > power-down mode as we do is immediate.
-> >
-> > Please can you try experimenting with a delay in mv3310_config_init()
-> > before the call to mv3310_power_up() to see whether that has any
-> > beneficial effect?
-> 
-> I experimented with delays of 100ms to 1s, all reset timed out. Unfortunately,
-> the theory doesn't seem to be true. :(
+## About DMA APIs
 
-And I tried to add 100ms delay after mv3310_power_up() and before chip->get_mactype(phydev),
-it showed that power down bit cleared while reading the reg in mv3310_get_mactype().
-Then the reset executed successfully.
+Now, virtio may can not work with DMA APIs when virtio features do not have
+VIRTIO_F_ACCESS_PLATFORM.
+
+1. I tried to let DMA APIs return phy address by virtio-device. But DMA APIs just
+   work with the "real" devices.
+2. I tried to let xsk support callballs to get phy address from virtio-net
+   driver as the dma address. But the maintainers of xsk may want to use dma-buf
+   to replace the DMA APIs. I think that may be a larger effort. We will wait
+   too long.
+
+So rethinking this, firstly, we can support premapped-dma only for devices with
+VIRTIO_F_ACCESS_PLATFORM. In the case of af-xdp, if the users want to use it,
+they have to update the device to support VIRTIO_F_RING_RESET, and they can also
+enable the device's VIRTIO_F_ACCESS_PLATFORM feature.
+
+Thanks for the help from Christoph.
+
+## For AF_XDP
+
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good.
+
+ENV: Qemu with vhost.
+
+                   vhost cpu | Guest APP CPU |Guest Softirq CPU | PPS
+-----------------------------|---------------|------------------|------------
+xmit by sockperf:     90%    |   100%        |                  |  318967
+xmit by xsk:          100%   |   30%         |   33%            | 1192064
+recv by sockperf:     100%   |   68%         |   100%           |  692288
+recv by xsk:          100%   |   33%         |   43%            |  771670
+
+Before achieving the function of Virtio-Net, we also have to let virtio core
+support these features:
+
+1. virtio core support premapped
+2. virtio core support reset per-queue
+
+## VirtioNET rx dma merge
+
+After introducing premapping, I added an example to virtio-net. virtio-net can
+merge dma mappings through this feature. @Jason
+
+kernel command line: intel_iommu=on iommu.passthrough=0
+
+           |  strict=0  | strict=1
+    Before |  775496pps | 428614pps
+    After  | 1109316pps | 742853pps
+
+Please review.
+
+Thanks.
+
+v12:
+ 1. Alloc dma info from the alloc frag. Avoid alloc array to store the dma info.
+ 2. rename virtqueue_set_premapped() to virtqueue_set_dma_premapped()
+
+v11
+ 1. virtio-net merges dma operates based on the feature premapped
+ 2. A better way to handle the map error with the premapped
+
+v10:
+ 1. support to set vq to premapped mode, then the vq just handles the premapped request.
+ 2. virtio-net support to do dma mapping in advance
+
+v9:
+ 1. use flag to distinguish the premapped operations. no do judgment by sg.
+
+v8:
+ 1. vring_sg_address: check by sg_page(sg) not dma_address. Because 0 is a valid dma address
+ 2. remove unused code from vring_map_one_sg()
+
+v7:
+ 1. virtqueue_dma_dev() return NULL when virtio is without DMA API.
+
+v6:
+ 1. change the size of the flags to u32.
+
+v5:
+ 1. fix for error handler
+ 2. add flags to record internal dma mapping
+
+v4:
+ 1. rename map_inter to dma_map_internal
+ 2. fix: Excess function parameter 'vq' description in 'virtqueue_dma_dev'
+
+v3:
+ 1. add map_inter to struct desc state to reocrd whether virtio core do dma map
+
+v2:
+ 1. based on sgs[0]->dma_address to judgment is premapped
+ 2. based on extra.addr to judgment to do unmap for no-indirect desc
+ 3. based on indir_desc to judgment to do unmap for indirect desc
+ 4. rename virtqueue_get_dma_dev to virtqueue_dma_dev
+
+v1:
+ 1. expose dma device. NO introduce the api for dma and sync
+ 2. split some commit for review.
+
+
+
+
+
+
+Xuan Zhuo (10):
+  virtio_ring: check use_dma_api before unmap desc for indirect
+  virtio_ring: put mapping error check in vring_map_one_sg
+  virtio_ring: introduce virtqueue_set_dma_premapped()
+  virtio_ring: support add premapped buf
+  virtio_ring: introduce virtqueue_dma_dev()
+  virtio_ring: skip unmap for premapped
+  virtio_ring: correct the expression of the description of
+    virtqueue_resize()
+  virtio_ring: separate the logic of reset/enable from virtqueue_resize
+  virtio_ring: introduce virtqueue_reset()
+  virtio_net: merge dma operations when filling mergeable buffers
+
+ drivers/net/virtio_net.c     | 225 +++++++++++++++++++++++++----
+ drivers/virtio/virtio_ring.c | 265 ++++++++++++++++++++++++++++-------
+ include/linux/virtio.h       |   6 +
+ 3 files changed, 418 insertions(+), 78 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
