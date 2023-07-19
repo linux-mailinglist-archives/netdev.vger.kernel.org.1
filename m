@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-18962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7E17593B2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:04:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 071297593B7
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B33A1C20F6A
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:04:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B8501C203B0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62ED12B6E;
-	Wed, 19 Jul 2023 11:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80B714268;
+	Wed, 19 Jul 2023 11:02:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A964D13AE6
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:02:34 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2058.outbound.protection.outlook.com [40.107.212.58])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE56918D
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:02:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C641C14267
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:02:40 +0000 (UTC)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2062.outbound.protection.outlook.com [40.107.96.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995D018D
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:02:39 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oVtllsaV61zO1Uq8fAJwZ0c1NgzyPzMbrHsF87FIfRgjYqef/REZ8V1JWLmt2zrw2nhfT4drzSZuAHbXCvO1gzGad2Ciii1vec6Mdx5GUA50CKn7hsg3uGSZxOwmnMioMGn6zbYs9cZxXKI1SQFDmoiUmkfN6kIvOsnJ83dqLErqs1md+S61OnJMYpH408KBk2oBVD2OQP+F6cXvX3hTQSwsckIGdSKf+GjMgzBIncOK1ySxXIQcXX+l2GjMBmfL/8YeCBBIxlIwr6aQsV1yeMb4ISzHh+Yh6aEioyP0yOQg6N8xjz7HETuF5U596N0ntB8VBVFEYlLkdEv6z+Lnyg==
+ b=ELvb5rKBMNg64hy9fRPQ+6AlW+kFC+5ijB7OKHiVgpx0j/iYjzITK0HG4EADwTfBqzz81XwtyiRzVBXS9ay1IOsk0oFHX2+Vt1HlUycKSq2DqA3gE7xoxSEoqKy+HWwpXY3KFf4UfX7z44QQ2tRRtcn+OibV12e4rbslsjjSRMIbePDjtfdB8h6SBbCI0UZEOO1XAOVrLOWzLc4Obh86EgKY/7gyHKLHVYPMgmsaOpF3Rfvvi5GVcwDcFF8OP7jm7J1e+sGGbAVk0lrC8bo5owfGBMOsf6k83MvOYLrM4knQdh2pZOP0i0kGM5qhLcPOMYIuIGHbJbHGhCNHRQk5pg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x5tnSeg9y5Bu8DjdrJ+TXcTzKepIqy5K4zDnOiaH0p4=;
- b=Hc/hi2IKCt8AKzD+P/vJDJFEKgfrmWhkdK168GjcK7jWTtWhQPin6Z/mdDsmnvIzQEa6tNZost9DlZhTkVEx8IXAE4Hu/j1Ff7AAwUA50iCKHL+zDiXXTeSdirv7hDyPQLHNC9rp4cZdiPyP6/SUpfFPS6davl3s7ojc0E9AHcmboPWzsDvoVZ3j/sstblXPq8Ux8e8+Z8K6XDA740byAPols9/sBxqbYR97XwtYSXzhlp0BUFXXfu4nYsn5Uslkt4u0/4gFgpW8TplWiZlANNztmrPF66EBxBKNGaJEWZG4ligMdKbUis4yZtAzAmtzhLxYvaQDRvPdTvufYqDvCA==
+ bh=b4VfrTBvmM+n6PhPjAZEOvqe1/im6TtTvJfrFCPM1Hc=;
+ b=Vo3yJUyY+dk18F3L2h6777sfCgf7aNLxejmBLWGjucvjZvFJvITNlRYBUL3H8ToGc5HXzwPjbb2E8WFnok9L8KtFOSu76H3iR8XDsG13sepvPlHxkvBlB9TiFRoT+frTEB+AtYIuFaj4F/Z07Pvgc3eCCslKnUd2epIcP2rZstucxRTkcOWObHqadsJOYgSPVTvsxW+6dVBxNG8qM91nGtr+5NhBEAag7Q+ResGQL7z0plAt9Xy7MibxFZdbstZX6+EKyXLjD/YWXS6aONU9+w8HJkSwC7U+409cjvEPTxFW283qf6Vrs2m+Lq+PCxWXVaya+b5N21rmis6wZwFEvw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x5tnSeg9y5Bu8DjdrJ+TXcTzKepIqy5K4zDnOiaH0p4=;
- b=rOFcLEmR3LawUtJYCPznrrZir3BHDrorP+11VQvzt78KtHTBaYirIAkuQ5P9d2j17DCYvRJef/X3mA0GE/src5I/qNCKZKYJ1nH9u1ybt7ZdHv7RNrHS4ehSJU1r01gKw1F6UCbHVw9N/tA4Nqp6i0XiyQkBzBj90HS8dK6cmB6Nua9VamUk1wX4SvNJcuckFil7h1BI7I5DjABhw84IszVKBZCoq2+JO2W8J+/hYQZlLV7FVgdjpQMbkMpCzIT8F8rGj86mEzl92JhW4GNgLfMLt5Z++2S+2V6heKQeDBX59YowPlKjmkSJ6GVCWsbTS8ksYLelf1ghqRPbuQRtiw==
-Received: from BN9PR03CA0203.namprd03.prod.outlook.com (2603:10b6:408:f9::28)
- by SA3PR12MB7859.namprd12.prod.outlook.com (2603:10b6:806:305::7) with
+ bh=b4VfrTBvmM+n6PhPjAZEOvqe1/im6TtTvJfrFCPM1Hc=;
+ b=FflWtcWBHcWDkNYUesGlHBNFJs4VJFw8BazYreES3gcvQDHD9f215YBZWSirsZop/m9yOrhIulf1EUJyLrCb4NWhSdXRxgE5xoLccASHvcD0RHpt+5mjcPuAQ0JBf+Wvqn6MutKqvYLdWEulEH3SzRjDYEhj2kTjeDzNlSEus6vghLNzOs1ne56NQNat44iGKYCpuCIyNbWdhqo2XKTy9SuEpObIbHh4e2ZuED1cZTMag4VF6vGUmtWEGlyaQFv9sivJn8/j54PuWjxcSMt6AeBqG6Q9OJxwEZ9mraRcjpqcG7k1wy+7td9kT13+a2CaivOwo3/1W3bgLJ6DbJdI/Q==
+Received: from BN7PR06CA0049.namprd06.prod.outlook.com (2603:10b6:408:34::26)
+ by CH2PR12MB4939.namprd12.prod.outlook.com (2603:10b6:610:61::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Wed, 19 Jul
- 2023 11:02:30 +0000
-Received: from BN8NAM11FT096.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:f9:cafe::89) by BN9PR03CA0203.outlook.office365.com
- (2603:10b6:408:f9::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
- Transport; Wed, 19 Jul 2023 11:02:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.23; Wed, 19 Jul
+ 2023 11:02:35 +0000
+Received: from BN8NAM11FT115.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:34:cafe::67) by BN7PR06CA0049.outlook.office365.com
+ (2603:10b6:408:34::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24 via Frontend
+ Transport; Wed, 19 Jul 2023 11:02:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN8NAM11FT096.mail.protection.outlook.com (10.13.177.195) with Microsoft SMTP
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT115.mail.protection.outlook.com (10.13.177.151) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.34 via Frontend Transport; Wed, 19 Jul 2023 11:02:30 +0000
+ 15.20.6588.35 via Frontend Transport; Wed, 19 Jul 2023 11:02:34 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 19 Jul 2023
- 04:02:17 -0700
+ 04:02:19 -0700
 Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 19 Jul
- 2023 04:02:14 -0700
+ 2023 04:02:17 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	Danielle Ratson <danieller@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 07/17] mlxsw: spectrum: Allow event handlers to check unowned bridges
-Date: Wed, 19 Jul 2023 13:01:22 +0200
-Message-ID: <ef33b2c960341712310b9448d601c87fb7de6394.1689763088.git.petrm@nvidia.com>
+Subject: [PATCH net-next 08/17] mlxsw: spectrum: Add a replay_deslavement argument to event handlers
+Date: Wed, 19 Jul 2023 13:01:23 +0200
+Message-ID: <34822af84ea869634e909f5cbac2915fa48acd33.1689763088.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1689763088.git.petrm@nvidia.com>
 References: <cover.1689763088.git.petrm@nvidia.com>
@@ -90,26 +90,26 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT096:EE_|SA3PR12MB7859:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a15ae5b-7b06-4b29-5d18-08db8847a568
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT115:EE_|CH2PR12MB4939:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88db0979-b5fb-43f6-cc4a-08db8847a7f8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	fVdwYQKBk4OlSSgfLrvGFqE9CBCfF9NGNc5fXaxFFQIIck2rWajZQjlJBRFyGucL7lAIOQ4d2ZXAdcppfIZxJOklDRKVXpp8CDz+LXoi4DcWvo6kAD1eoUtzCmlOTnWbF9KrNXRZQ/w09cEN+cC+BMr4wIMEMC9sStxAl0bLug1DYzYQZJJTQRMK9wk3SgYEvYpUZotP/bcPbUDBRBEFSP1w+NKVAobKZoI89OV/jRVEZcNs/K3bwRj63Lv8tmyXEqJgDxMkCP1JWv/SoYDrTq6l2xG1Yf0/Nl+kt8EZKZlof2BEdC1e/odpa+8dA6b9GU6rpcBv2e0yFeTDMuGDlyL8LoIgUdBLw8fJHPXWibj54eR5GMLygmmZIiKasMa81RD39ENwoAg1nA+QYlflBwXVksgYFXp9KFCbNz1jYsx+55em7Kt5KX/1uq6KPWaIT+KGHPCpJEoJ3iDPXuet0shMIaKsdyrssniMQ2iXogm4gpmTdcbSN47PnLgwPBHYxA25u42Kpl6iH//Mg6TyjIps+ExAKdrSRnPAlthzV1qiziDgMIOMQoOSwk60SSJX5LoS8kM0Vj1jHvrxRUaYUpBsHa3sbJ3ivjVh6dy2dgWclJ3lWm/SN1HMkPb++nnVg1oFF9JsJGBgmWgkth965LiIVdx4MdK2YP0uITHSYXTM9UScRGqvpeQWomuWgXXBAReAdzcbVH++uShMjIrtFWOrQ0vRlB1GiEjbUwpOqbE=
+	wNeh4eluXWB3EdzeQFIpLVKBPLhar71uPz88wKQp7TbjpEuxGJhaeysbljuz0W6jKQhqzSWrrVv2mCCe55mNlbGU1IYH9DZS8uDOCV62GHSx14jgdVaENurmUW0CJwhoVVtxrxBQQqCANSsho3dPmm2BQJMO+dX+8CHnzEkI+cCsxia9YaOU4zEg/kKX3UnHTE0LG8cFO2kQP2ju2a7nuO32JCkL+UEZtprM8q/pfjnMUWF84qokMKC3LS2DksbfnxZGyySHxZRalMrvtA6AGv8dWNkv0TWDu+rKmlLy1FaI0G8S6jwogEI9Ou398bRBxXVz8MX07drrB3T6NAknsr4jWJ1cdotOyCPwwigPywwBubUDNPtEPetxM9lb1Lww6DTK0khtLLy3Z2h9DkvhL5anda60m/z5hOkoMRazpQhSF9i3M88Y11WNObRl1J66wnVATYao0kbwzau9vi+DaBqD6CnPw75sRhUAMMDGKqB0wylAEiTmhJQwuDFLk/O4xEqXDOCVF96k0DPSsnJk1lf82HG8myWMHyK8F4oMHIQLCqLXiLx/W2XW75ABMJBlmZaoW0d8t1+9VrjwmnJSChEGBZkAx8Fin9fXEnkV3xyOj/7QLZsvnc1gokXX94DERWpYxwnMzJ/sGHfo15WUie3D72rxQVOxwnHpNUPXRxV7fdlmE/Mi5ni0hiYr3Il9STp1WGA1OwYZBfwLeYvD8cOvTB57d13u9T4gviNqbsY=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(136003)(396003)(346002)(82310400008)(451199021)(40470700004)(36840700001)(46966006)(6666004)(478600001)(54906003)(110136005)(336012)(186003)(16526019)(26005)(107886003)(2906002)(82740400003)(316002)(41300700001)(4326008)(70206006)(5660300002)(70586007)(8936002)(8676002)(7636003)(356005)(86362001)(40460700003)(36756003)(36860700001)(426003)(2616005)(83380400001)(47076005)(40480700001);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(396003)(346002)(39860400002)(451199021)(82310400008)(40470700004)(46966006)(36840700001)(36860700001)(41300700001)(316002)(426003)(66574015)(83380400001)(26005)(2616005)(107886003)(186003)(336012)(16526019)(47076005)(40460700003)(356005)(7636003)(82740400003)(478600001)(110136005)(54906003)(6666004)(4326008)(40480700001)(70206006)(70586007)(5660300002)(86362001)(8936002)(8676002)(36756003)(2906002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 11:02:30.0161
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 11:02:34.3181
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a15ae5b-7b06-4b29-5d18-08db8847a568
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88db0979-b5fb-43f6-cc4a-08db8847a7f8
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN8NAM11FT096.eop-nam11.prod.protection.outlook.com
+	BN8NAM11FT115.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7859
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4939
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -118,130 +118,107 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Currently the bridge-related handlers bail out when the event is related to
-a netdevice that is not an upper of one of the front-panel ports. In order
-to allow enslavement of front-panel ports to bridges that already have
-uppers, it will be necessary to replay CHANGEUPPER events to validate that
-the configuration is offloadable. In order for the replay to be effective,
-it must be possible to ignore unsupported configuration in the context of
-an actual notifier event, but to still "veto" these configurations when the
-validation is performed.
+When handling deslavement of LAG or its upper from a bridge device, when
+the deslaved netdevice has an IP address, it should join the router. This
+should be done after all the lowers of the LAG have left the bridge. The
+replay intended to cause the device to join the router therefore cannot be
+invoked unconditionally in the event handlers themselves. It can be done
+right away if the handler is invoked for a sole device, but when it is
+invoked repeated for each LAG lower, the replay needs to be postponed
+until after this processing is done.
 
-To that end, introduce two parameters to a number of handlers: mlxsw_sp,
-because it will not be possible to deduce that from the netdevice lowers;
-and process_foreign to indicate whether netdevices that are not front panel
-uppers should be validated.
+To that end, add a boolean parameter, replay_deslavement, to
+mlxsw_sp_netdevice_port_upper_event(), mlxsw_sp_netdevice_port_vlan_event()
+and one helper on the call path. Have the invocations that are done for
+sole netdevices pass true, and those done for LAG lowers pass false.
+
+Nothing depends on this flag at this point, but it removes some noise from
+the patch that introduces the replay itself.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Danielle Ratson <danieller@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlxsw/spectrum.c    | 40 +++++++++++--------
- 1 file changed, 24 insertions(+), 16 deletions(-)
+ .../net/ethernet/mellanox/mlxsw/spectrum.c    | 20 +++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 0488fe5695bd..3d1a045ff470 100644
+index 3d1a045ff470..b9ceffe258bf 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -4936,17 +4936,17 @@ static int mlxsw_sp_netdevice_lag_port_vlan_event(struct net_device *vlan_dev,
- 	return 0;
- }
+@@ -4641,7 +4641,8 @@ static bool mlxsw_sp_bridge_vxlan_is_valid(struct net_device *br_dev,
  
--static int mlxsw_sp_netdevice_bridge_vlan_event(struct net_device *vlan_dev,
-+static int mlxsw_sp_netdevice_bridge_vlan_event(struct mlxsw_sp *mlxsw_sp,
-+						struct net_device *vlan_dev,
- 						struct net_device *br_dev,
- 						unsigned long event, void *ptr,
--						u16 vid)
-+						u16 vid, bool process_foreign)
+ static int mlxsw_sp_netdevice_port_upper_event(struct net_device *lower_dev,
+ 					       struct net_device *dev,
+-					       unsigned long event, void *ptr)
++					       unsigned long event, void *ptr,
++					       bool replay_deslavement)
  {
--	struct mlxsw_sp *mlxsw_sp = mlxsw_sp_lower_get(vlan_dev);
- 	struct netdev_notifier_changeupper_info *info = ptr;
- 	struct netlink_ext_ack *extack;
- 	struct net_device *upper_dev;
+ 	struct netdev_notifier_changeupper_info *info;
+ 	struct mlxsw_sp_port *mlxsw_sp_port;
+@@ -4815,13 +4816,15 @@ static int mlxsw_sp_netdevice_port_lower_event(struct net_device *dev,
  
--	if (!mlxsw_sp)
-+	if (!process_foreign && !mlxsw_sp_lower_get(vlan_dev))
- 		return 0;
- 
- 	extack = netdev_notifier_info_to_extack(&info->info);
-@@ -4979,8 +4979,10 @@ static int mlxsw_sp_netdevice_bridge_vlan_event(struct net_device *vlan_dev,
- 	return 0;
- }
- 
--static int mlxsw_sp_netdevice_vlan_event(struct net_device *vlan_dev,
+ static int mlxsw_sp_netdevice_port_event(struct net_device *lower_dev,
+ 					 struct net_device *port_dev,
 -					 unsigned long event, void *ptr)
-+static int mlxsw_sp_netdevice_vlan_event(struct mlxsw_sp *mlxsw_sp,
-+					 struct net_device *vlan_dev,
 +					 unsigned long event, void *ptr,
-+					 bool process_foreign)
++					 bool replay_deslavement)
  {
- 	struct net_device *real_dev = vlan_dev_real_dev(vlan_dev);
- 	u16 vid = vlan_dev_vlan_id(vlan_dev);
-@@ -4993,22 +4995,25 @@ static int mlxsw_sp_netdevice_vlan_event(struct net_device *vlan_dev,
+ 	switch (event) {
+ 	case NETDEV_PRECHANGEUPPER:
+ 	case NETDEV_CHANGEUPPER:
+ 		return mlxsw_sp_netdevice_port_upper_event(lower_dev, port_dev,
+-							   event, ptr);
++							   event, ptr,
++							   replay_deslavement);
+ 	case NETDEV_CHANGELOWERSTATE:
+ 		return mlxsw_sp_netdevice_port_lower_event(port_dev, event,
+ 							   ptr);
+@@ -4840,7 +4843,7 @@ static int mlxsw_sp_netdevice_lag_event(struct net_device *lag_dev,
+ 	netdev_for_each_lower_dev(lag_dev, dev, iter) {
+ 		if (mlxsw_sp_port_dev_check(dev)) {
+ 			ret = mlxsw_sp_netdevice_port_event(lag_dev, dev, event,
+-							    ptr);
++							    ptr, false);
+ 			if (ret)
+ 				return ret;
+ 		}
+@@ -4852,7 +4855,7 @@ static int mlxsw_sp_netdevice_lag_event(struct net_device *lag_dev,
+ static int mlxsw_sp_netdevice_port_vlan_event(struct net_device *vlan_dev,
+ 					      struct net_device *dev,
+ 					      unsigned long event, void *ptr,
+-					      u16 vid)
++					      u16 vid, bool replay_deslavement)
+ {
+ 	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
+ 	struct mlxsw_sp *mlxsw_sp = mlxsw_sp_port->mlxsw_sp;
+@@ -4927,7 +4930,7 @@ static int mlxsw_sp_netdevice_lag_port_vlan_event(struct net_device *vlan_dev,
+ 		if (mlxsw_sp_port_dev_check(dev)) {
+ 			ret = mlxsw_sp_netdevice_port_vlan_event(vlan_dev, dev,
+ 								 event, ptr,
+-								 vid);
++								 vid, false);
+ 			if (ret)
+ 				return ret;
+ 		}
+@@ -4989,7 +4992,8 @@ static int mlxsw_sp_netdevice_vlan_event(struct mlxsw_sp *mlxsw_sp,
+ 
+ 	if (mlxsw_sp_port_dev_check(real_dev))
+ 		return mlxsw_sp_netdevice_port_vlan_event(vlan_dev, real_dev,
+-							  event, ptr, vid);
++							  event, ptr, vid,
++							  true);
+ 	else if (netif_is_lag_master(real_dev))
+ 		return mlxsw_sp_netdevice_lag_port_vlan_event(vlan_dev,
  							      real_dev, event,
- 							      ptr, vid);
- 	else if (netif_is_bridge_master(real_dev))
--		return mlxsw_sp_netdevice_bridge_vlan_event(vlan_dev, real_dev,
--							    event, ptr, vid);
-+		return mlxsw_sp_netdevice_bridge_vlan_event(mlxsw_sp, vlan_dev,
-+							    real_dev, event,
-+							    ptr, vid,
-+							    process_foreign);
- 
- 	return 0;
- }
- 
--static int mlxsw_sp_netdevice_bridge_event(struct net_device *br_dev,
--					   unsigned long event, void *ptr)
-+static int mlxsw_sp_netdevice_bridge_event(struct mlxsw_sp *mlxsw_sp,
-+					   struct net_device *br_dev,
-+					   unsigned long event, void *ptr,
-+					   bool process_foreign)
- {
--	struct mlxsw_sp *mlxsw_sp = mlxsw_sp_lower_get(br_dev);
- 	struct netdev_notifier_changeupper_info *info = ptr;
- 	struct netlink_ext_ack *extack;
- 	struct net_device *upper_dev;
- 	u16 proto;
- 
--	if (!mlxsw_sp)
-+	if (!process_foreign && !mlxsw_sp_lower_get(br_dev))
- 		return 0;
- 
- 	extack = netdev_notifier_info_to_extack(&info->info);
-@@ -5147,7 +5152,8 @@ static int mlxsw_sp_netdevice_vxlan_event(struct mlxsw_sp *mlxsw_sp,
- }
- 
- static int __mlxsw_sp_netdevice_event(struct mlxsw_sp *mlxsw_sp,
--				      unsigned long event, void *ptr)
-+				      unsigned long event, void *ptr,
-+				      bool process_foreign)
- {
- 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
- 	struct mlxsw_sp_span_entry *span_entry;
-@@ -5166,9 +5172,11 @@ static int __mlxsw_sp_netdevice_event(struct mlxsw_sp *mlxsw_sp,
+@@ -5168,7 +5172,7 @@ static int __mlxsw_sp_netdevice_event(struct mlxsw_sp *mlxsw_sp,
+ 	if (netif_is_vxlan(dev))
+ 		err = mlxsw_sp_netdevice_vxlan_event(mlxsw_sp, dev, event, ptr);
+ 	else if (mlxsw_sp_port_dev_check(dev))
+-		err = mlxsw_sp_netdevice_port_event(dev, dev, event, ptr);
++		err = mlxsw_sp_netdevice_port_event(dev, dev, event, ptr, true);
  	else if (netif_is_lag_master(dev))
  		err = mlxsw_sp_netdevice_lag_event(dev, event, ptr);
  	else if (is_vlan_dev(dev))
--		err = mlxsw_sp_netdevice_vlan_event(dev, event, ptr);
-+		err = mlxsw_sp_netdevice_vlan_event(mlxsw_sp, dev, event, ptr,
-+						    process_foreign);
- 	else if (netif_is_bridge_master(dev))
--		err = mlxsw_sp_netdevice_bridge_event(dev, event, ptr);
-+		err = mlxsw_sp_netdevice_bridge_event(mlxsw_sp, dev, event, ptr,
-+						      process_foreign);
- 	else if (netif_is_macvlan(dev))
- 		err = mlxsw_sp_netdevice_macvlan_event(dev, event, ptr);
- 
-@@ -5183,7 +5191,7 @@ static int mlxsw_sp_netdevice_event(struct notifier_block *nb,
- 
- 	mlxsw_sp = container_of(nb, struct mlxsw_sp, netdevice_nb);
- 	mlxsw_sp_span_respin(mlxsw_sp);
--	err = __mlxsw_sp_netdevice_event(mlxsw_sp, event, ptr);
-+	err = __mlxsw_sp_netdevice_event(mlxsw_sp, event, ptr, false);
- 
- 	return notifier_from_errno(err);
- }
 -- 
 2.40.1
 
