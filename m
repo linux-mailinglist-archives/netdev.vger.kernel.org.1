@@ -1,99 +1,112 @@
-Return-Path: <netdev+bounces-19096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE015759A84
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:13:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BAD759AC1
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8041E28154E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:13:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFB051C210E2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E8C3D3AE;
-	Wed, 19 Jul 2023 16:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A0BECC;
+	Wed, 19 Jul 2023 16:30:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A6F11C93
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 16:12:58 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067171739
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:12:46 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qM9n6-0000em-OH; Wed, 19 Jul 2023 18:12:40 +0200
-Date: Wed, 19 Jul 2023 18:12:40 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Xin Long <lucien.xin@gmail.com>,
-	network dev <netdev@vger.kernel.org>, dev@openvswitch.org,
-	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Aaron Conole <aconole@redhat.com>
-Subject: Re: [PATCH net-next 0/3] net: handle the exp removal problem with
- ovs upcall properly
-Message-ID: <20230719161240.GB32192@breakpoint.cc>
-References: <cover.1689541664.git.lucien.xin@gmail.com>
- <20230718195827.4c1db980@kernel.org>
- <20230719030131.GA15663@breakpoint.cc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7B81BB3C;
+	Wed, 19 Jul 2023 16:30:36 +0000 (UTC)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B6E1733;
+	Wed, 19 Jul 2023 09:30:35 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b933bbd3eeso75719441fa.1;
+        Wed, 19 Jul 2023 09:30:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689784234; x=1692376234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O7QrzdqRJDmBXPI4sTDgiqyvsQI/8XFjzdONJvE8L8g=;
+        b=DPBkE0BteEojQ9L1pgfzJUzR37XAkt9HpKm7BwtrtF8of6PGpvZxXBPhOpFmK0IjdW
+         RiafYe5sGrTOq6GoBXTA7YWbijO2ScxAttwCQJNQ2Kyg2yudp5SqX6rOr/aaeMKJjO/o
+         vLPmNw7waaX6cavcTaBFw1UE2SNZTJUebLdM+HMKzjFCq7DLuEUYp7OMajdoWYot53qQ
+         cA+ZZIh9s/VLi5bh8c9wing79nVUZuUrKKs0L2CcomqtTjo6MVLQAv+o+jZ4iKvFs4HL
+         JoDhNeIXHSOpdEhSCIVivdWMegfmAtHsFxG1kedZwr0466DhuTiLOWw5FiwTK+8HjgaR
+         mbhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689784234; x=1692376234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O7QrzdqRJDmBXPI4sTDgiqyvsQI/8XFjzdONJvE8L8g=;
+        b=kQCsvPruM1h2Pxbsm4crpSRIr752tV2undu4CzQJTGBy2jQsVoUrePqNI4xxG+iCoA
+         TS/YkeaKpplbRedTTRIcfgK7jBynx2GIO1/CmQGyH0GGuyn+gfGmxhiTChVKCQE379AP
+         0hKFVuGHae62qTAmwsoNeBYQH6OtuwgUYFcpISxhf3UTpVVyznV4jHlwNsnz1Ecbvqwb
+         m4wfgrT1tjYtMHr+tceYDzVAeTSRT0MbKvVslEVxHxmQyJlybZj5NxphhnR2iXBNCS6i
+         dXqn9ebvBFjDDpO1BJY90BZpj9+anarSyxtvbOMil4ngL+5III7MHe3ogeUrTTgOfCfV
+         MLUg==
+X-Gm-Message-State: ABy/qLZeA703T9jB1lJTsp4YBWyz4XrUr9zz1WTR16LR6an+YY/xtPFS
+	iPYpa56iuhPrJp6QkPYdOIyqK/YlJK2sNqp8PmU=
+X-Google-Smtp-Source: APBJJlFdYqVBILwlIBca95ud/FR/YVJREdldr5HU4X4xISoRWauvA69yC39i4a8UF7K8WBU1FOQm8CjycyzIYBF5DiY=
+X-Received: by 2002:a2e:9f17:0:b0:2b6:fe55:7318 with SMTP id
+ u23-20020a2e9f17000000b002b6fe557318mr328753ljk.12.1689784233480; Wed, 19 Jul
+ 2023 09:30:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230719030131.GA15663@breakpoint.cc>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20230718234021.43640-1-alexei.starovoitov@gmail.com> <dae5886a8b3b4d9f869e4f8ab3cefa96@AcuMS.aculab.com>
+In-Reply-To: <dae5886a8b3b4d9f869e4f8ab3cefa96@AcuMS.aculab.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 19 Jul 2023 09:30:22 -0700
+Message-ID: <CAADnVQJ+NSeVOJROKHYY1VVRDwK8Gm8jgSoRTCmbrN8XG=y3JA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf, net: Introduce skb_pointer_if_linear().
+To: David Laight <David.Laight@aculab.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"kernel-team@fb.com" <kernel-team@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Florian Westphal <fw@strlen.de> wrote:
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Sun, 16 Jul 2023 17:09:16 -0400 Xin Long wrote:
-> > > With the OVS upcall, the original ct in the skb will be dropped, and when
-> > > the skb comes back from userspace it has to create a new ct again through
-> > > nf_conntrack_in() in either OVS __ovs_ct_lookup() or TC tcf_ct_act().
-> > > 
-> > > However, the new ct will not be able to have the exp as the original ct
-> > > has taken it away from the hash table in nf_ct_find_expectation(). This
-> > > will cause some flow never to be matched, like:
-> > > 
-> > >   'ip,ct_state=-trk,in_port=1 actions=ct(zone=1)'
-> > >   'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=1)'
-> > >   'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=2),normal'
-> > > 
-> > > if the 2nd flow triggers the OVS upcall, the 3rd flow will never get
-> > > matched.
-> > > 
-> > > OVS conntrack works around this by adding its own exp lookup function to
-> > > not remove the exp from the hash table and saving the exp and its master
-> > > info to the flow keys instead of create a real ct. But this way doesn't
-> > > work for TC act_ct.
-> > > 
-> > > The patch 1/3 allows nf_ct_find_expectation() not to remove the exp from
-> > > the hash table if tmpl is set with IPS_CONFIRMED when doing lookup. This
-> > > allows both OVS conntrack and TC act_ct to have a simple and clear fix
-> > > for this problem in the patch 2/3 and 3/3.
-> > 
-> > Florian, Pablo, any opinion on these?
-> 
-> Sorry for the silence.  I dislike moving tc/ovs artifacts into
-> the conntrack core.
+On Wed, Jul 19, 2023 at 6:10=E2=80=AFAM David Laight <David.Laight@aculab.c=
+om> wrote:
+>
+> From: Alexei Starovoitov
+> > Sent: 19 July 2023 00:40
+> >
+> > Network drivers always call skb_header_pointer() with non-null buffer.
+> > Remove !buffer check to prevent accidental misuse of skb_header_pointer=
+().
+> > Introduce skb_pointer_if_linear() instead.
+> >
+> ...
+> > +static inline void * __must_check
+> > +skb_pointer_if_linear(const struct sk_buff *skb, int offset, int len)
+> > +{
+> > +     if (likely(skb_headlen(skb) - offset >=3D len))
+> > +             return skb->data + offset;
+> > +     return NULL;
+> > +}
+>
+> Shouldn't both 'offset' and 'len' be 'unsigned int' ?
+>
+> The check should probably be written:
+>                 offset + len <=3D skb_headlen(skb)
+> so that it fails if 'offset' is also large.
+> (Provided 'offset + len' itself doesn't wrap.)
 
-Can't find a better solution, feel free to take this though the net-next tree.
-
-Acked-by: Florian Westphal <fw@strlen.de>
+I agree that this style is easier to read, but
+consistency with skb_header_pointer() trumps all such considerations.
 
