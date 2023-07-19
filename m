@@ -1,91 +1,97 @@
-Return-Path: <netdev+bounces-19016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E3027595C7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:42:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E9C7595CF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58F83281824
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:42:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97FB11C20FB3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7275713AF6;
-	Wed, 19 Jul 2023 12:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A557E13AF6;
+	Wed, 19 Jul 2023 12:44:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35119101E6
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:42:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE4AC433C7;
-	Wed, 19 Jul 2023 12:42:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689770574;
-	bh=HyVoxX8AEi9B94ASA5k8kd4DUFL0wTVKIY1KcFtkfDY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A+Kws3lxThBlltt/f12GSaRAtAPzhFg7bYb/YuJz81qIKKbGOM8s0gZ93UM2nntD5
-	 WTdVlTaZ9UpAoV01CmvQTGSWbkfflC6gz7szk9vgcbt2wAzyyXirymJ0HiE7ttgdUL
-	 YrItBCsCKRLpUeWupKKLHiWcZHkLDvhVbHTjOeGNGyu8qgdUud2B18ijrklNUgxOor
-	 WG8pU/E6h7bNVbGXA3cJ7bAaDoY616B26mEroXMJzLXzvnixNrRAXWezamCq4SIPa0
-	 A7sTZ8nQMcfWQ4aGevhi6NChrMr/u7EmXTcVJDRJbFSXBTvo4Hx9UTBVoAYtpCjXuQ
-	 4vZGjWCIvDUIg==
-Date: Wed, 19 Jul 2023 13:42:50 +0100
-From: Mark Brown <broonie@kernel.org>
-To: =?utf-8?B?5p2c5pWP5p2w?= <duminjie@vivo.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"open list:FREESCALE DSPI DRIVER" <linux-spi@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:PTP HARDWARE CLOCK SUPPORT" <netdev@vger.kernel.org>,
-	"opensource.kernel" <opensource.kernel@vivo.com>
-Subject: Re: [PATCH v1] spi: fsl-dspi: Use dev_err_probe() in
- dspi_request_dma()
-Message-ID: <dd60d083-6ffe-4d74-8c5b-588a62303b34@sirena.org.uk>
-References: <20230719071239.4736-1-duminjie@vivo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A23614A86
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:44:00 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27742E0
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:43:59 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R5b8G1J1qzrRg0;
+	Wed, 19 Jul 2023 20:43:10 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 19 Jul
+ 2023 20:43:54 +0800
+Subject: Re: [RFC PATCH net-next 1/2] net: veth: Page pool creation error
+ handling for existing pools only
+To: Liang Chen <liangchen.linux@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <hawk@kernel.org>, <ilias.apalodimas@linaro.org>, <daniel@iogearbox.net>,
+	<ast@kernel.org>, <netdev@vger.kernel.org>
+References: <20230719072907.100948-1-liangchen.linux@gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <dd01d05c-015f-708f-8357-1dd4db15d5de@huawei.com>
+Date: Wed, 19 Jul 2023 20:43:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yplmLVqcDsA0Kwdt"
-Content-Disposition: inline
-In-Reply-To: <20230719071239.4736-1-duminjie@vivo.com>
-X-Cookie: They just buzzed and buzzed...buzzed.
+In-Reply-To: <20230719072907.100948-1-liangchen.linux@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+On 2023/7/19 15:29, Liang Chen wrote:
+> The failure handling procedure destroys page pools for all queues,
+> including those that haven't had their page pool created yet. this patch
+> introduces necessary adjustments to prevent potential risks and
+> inconsistency with the error handling behavior.
+> 
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> ---
+>  drivers/net/veth.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index 614f3e3efab0..509e901da41d 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -1081,8 +1081,9 @@ static int __veth_napi_enable_range(struct net_device *dev, int start, int end)
+>  err_xdp_ring:
+>  	for (i--; i >= start; i--)
+>  		ptr_ring_cleanup(&priv->rq[i].xdp_ring, veth_ptr_free);
+> +	i = end;
+>  err_page_pool:
+> -	for (i = start; i < end; i++) {
+> +	for (i--; i >= start; i--) {
+>  		page_pool_destroy(priv->rq[i].page_pool);
+>  		priv->rq[i].page_pool = NULL;
 
---yplmLVqcDsA0Kwdt
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+There is NULL checking in page_pool_destroy(),
+priv->rq[i].page_pool is set to NULL here, and the kcalloc()
+in veth_alloc_queues() ensure it is NULL initially, maybe it
+is fine as it is?
 
-On Wed, Jul 19, 2023 at 07:13:02AM +0000, =E6=9D=9C=E6=95=8F=E6=9D=B0 wrote:
-
-> -		dev_err(dev, "rx dma channel not available\n");
-> -		ret =3D PTR_ERR(dma->chan_rx);
-> -		return ret;
-> +		return dev_err_probe(dev, PTR_ERR(dma->chan_rx),
-> +							"rx dma channel not available\n");
-
-The indentation on the second line is messed up here, it's far too
-indented.
-
---yplmLVqcDsA0Kwdt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmS32kkACgkQJNaLcl1U
-h9AsAwf/XRlF/OUeW8KspA4enro+hJVLmo1S1OP2Q+sUoS0nCV2LL3aj++22ZNVb
-gB0Jmw0xhhdm9x/mw/oI6SZ1UJnKtRg4af3SF40tzTp5RgjkVOHWq0AethK9kLvr
-DN4mrd8DunsuOCSoNOXHVDsHKtVwE7LQ9aNgSpHTdK/XVz20HnRYasSYzYFI81Al
-FIzP816JKvW6fDqWSA2UmDGrwSjkonQxJHw4pRW/dhrDVqCdmCmj43JvRcH1XDo5
-N2URSskEi/8AfIUYsHAkXdGfptKBFa/3xM2IeQZKCT1T+TzwqlozFcSx5D7YtS+R
-phO5DyksBpm4CRd+VgHt9wwsc6zo7w==
-=unq7
------END PGP SIGNATURE-----
-
---yplmLVqcDsA0Kwdt--
+>  	}
+> 
 
