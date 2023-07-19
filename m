@@ -1,266 +1,421 @@
-Return-Path: <netdev+bounces-19272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A8C75A1DE
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 00:28:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1F275A1E9
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 00:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB23E281AF2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DAF31C21202
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E376C2516D;
-	Wed, 19 Jul 2023 22:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3343B263AC;
+	Wed, 19 Jul 2023 22:30:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D552617FE9
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 22:28:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4982118
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689805666;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GRWr26/a3fW93qtfogg6jzmjztOmv2YuNrAH4tmN+jk=;
-	b=SaHxMX59ivmBJBhni2d9uxUpfrDJpaKIwy+8FA8TiN5nKl/gSZG9l5l4KzpAipQeNC7h9+
-	75fFWtOI7ENR2F5M492QGXBNKb/b+jbr/5hiwRk44vVQsodkKUdkESXJbVBYjj3597tAUY
-	cswPr467U3bujiIFr8UxcOKV/no1pqo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-Tf0l2kT4MsCDbwdc5WvEww-1; Wed, 19 Jul 2023 18:27:45 -0400
-X-MC-Unique: Tf0l2kT4MsCDbwdc5WvEww-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3143b277985so94597f8f.2
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:27:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689805604; x=1692397604;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GRWr26/a3fW93qtfogg6jzmjztOmv2YuNrAH4tmN+jk=;
-        b=IU0y17zsI6PDbekeh7oFRLuLjItMVzavoPJMlfwOW+hDG1CcwsKzrTrg2RHgLs5yom
-         JLT4ylzZBQBE4R+BfKB2wicl+ccro1OeeshPmBDaWXv4b/c1h2ZsoDBrR8X/NWHtf/fG
-         +OoNOzaG1JFfy2R2vCUEPpQemL2x0e1pJ857RzVNHRdHw1yuZ4dycH8tByxcdOCjdeYj
-         hYO6XwOpxitbyFvBAcyK/NtUYeY/9S7bHQl3dKSWhc87uakCL5WJS+MRxX+Mobbazfpx
-         zJBGap0qRGqLlEAGPGY9KppuWHDA3kPGttraEhIctrSpZqPIjYtFc3df6AUksl6gjWji
-         z2nw==
-X-Gm-Message-State: ABy/qLZs8xtGmirmvvUyHPEjHWUtUIqkZToRylY12G59VFGFUPBZTWr6
-	4CZNdM6c2VtHAIC+6LuO1BP/XYx3gAZWvpXxmg1oBcOpFeymxmcKkW0vQRx/+8Z2SEa3XOQ+aNz
-	2sHT+fYWHFtRVPSIB
-X-Received: by 2002:a05:6000:1042:b0:315:adee:1297 with SMTP id c2-20020a056000104200b00315adee1297mr891988wrx.10.1689805604600;
-        Wed, 19 Jul 2023 15:26:44 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEvlUX8tU5JXgVBrbk/KZWgr/MLOWrxY/kV5bYVSTY8sYIDCMK2pUOuvQQKyWa5poxeJ9b+2A==
-X-Received: by 2002:a05:6000:1042:b0:315:adee:1297 with SMTP id c2-20020a056000104200b00315adee1297mr891970wrx.10.1689805604145;
-        Wed, 19 Jul 2023 15:26:44 -0700 (PDT)
-Received: from redhat.com ([2.52.16.41])
-        by smtp.gmail.com with ESMTPSA id t7-20020a5d5347000000b003143add4396sm6313184wrv.22.2023.07.19.15.26.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 15:26:43 -0700 (PDT)
-Date: Wed, 19 Jul 2023 18:26:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Si-Wei Liu <si-wei.liu@oracle.com>
-Cc: Shannon Nelson <shannon.nelson@amd.com>, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	Eugenio Perez Martin <eperezma@redhat.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
- not support it
-Message-ID: <20230719182112-mutt-send-email-mst@kernel.org>
-References: <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org>
- <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org>
- <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <CAJaqyWd0QC6x9WHBT0x9beZyC8ZrF2y=d9HvmT0+05RtGc8_og@mail.gmail.com>
- <eff34828-545b-956b-f400-89b585706fe4@amd.com>
- <20230706020603-mutt-send-email-mst@kernel.org>
- <1fdf73cb-f23e-0c34-f95f-f1bac74332da@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D66263A8
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 22:30:36 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C16F1BF0;
+	Wed, 19 Jul 2023 15:30:34 -0700 (PDT)
+Received: from mercury (unknown [185.209.196.239])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id DF2DE6607058;
+	Wed, 19 Jul 2023 23:30:32 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1689805833;
+	bh=+kf7RoDivTxamgEcoW6Au+YH65J2a8+x+Q1W6naqTd0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Crowx33tiA1ZszqiIpnxygnHyfnjM68Sv6gGo3eOwU4048AtB6megzV41TdG7003e
+	 wK6g+4BoWKC3V6fz8J1mN50/vWgcq+FC+WV145TneGEdmHihPD4E3vQWqNhp3N8uLS
+	 3tmX4sRASjDNI7gOnI/KBhJd3UsAt5qEa2G0PL2yRPgOFBB1lUqS8ggsdFKMubHrKO
+	 jMHKtMUwaNSfUFncWG0xK2tE3g9izJveNslEGhU/MRTCKePlnTwXZDXmcr9jWpnBDY
+	 RRuEBFLDJAvcCoX4mXY6ZfpqhfcGn+3C1Pp1uGUlFfzRfz7o8p+WTSebgiayh/6n5E
+	 ZgmkB5sVNIlNg==
+Received: by mercury (Postfix, from userid 1000)
+	id D2FE31062877; Thu, 20 Jul 2023 00:30:30 +0200 (CEST)
+Date: Thu, 20 Jul 2023 00:30:30 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Neil Armstrong <neil.armstrong@linaro.org>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Andy Shevchenko <andy@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-mtd@lists.infradead.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-oxnas@groups.io,
+	Arnd Bergmann <arnd@arndb.de>, Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH v2 12/15] power: reset: oxnas-restart: remove obsolete
+ restart driver
+Message-ID: <20230719223030.5yvdm3stj4lojlg6@mercury.elektranox.org>
+References: <20230630-topic-oxnas-upstream-remove-v2-0-fb6ab3dea87c@linaro.org>
+ <20230630-topic-oxnas-upstream-remove-v2-12-fb6ab3dea87c@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lyw6wy7zr4wdlke6"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1fdf73cb-f23e-0c34-f95f-f1bac74332da@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230630-topic-oxnas-upstream-remove-v2-12-fb6ab3dea87c@linaro.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 03:20:03PM -0700, Si-Wei Liu wrote:
-> 
-> 
-> On 7/5/2023 11:07 PM, Michael S. Tsirkin wrote:
-> > On Wed, Jul 05, 2023 at 05:07:11PM -0700, Shannon Nelson wrote:
-> > > On 7/5/23 11:27 AM, Eugenio Perez Martin wrote:
-> > > > On Wed, Jul 5, 2023 at 9:50 AM Jason Wang <jasowang@redhat.com> wrote:
-> > > > > On Tue, Jul 4, 2023 at 11:45 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
-> > > > > > > On Tue, Jul 4, 2023 at 12:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
-> > > > > > > > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
-> > > > > > > > > > > With the current code it is accepted as long as userland send it.
-> > > > > > > > > > > 
-> > > > > > > > > > > Although userland should not set a feature flag that has not been
-> > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
-> > > > > > > > > > > complain for it.
-> > > > > > > > > > > 
-> > > > > > > > > > > Since there is no specific reason for any parent to reject that backend
-> > > > > > > > > > > feature bit when it has been proposed, let's control it at vdpa frontend
-> > > > > > > > > > > level. Future patches may move this control to the parent driver.
-> > > > > > > > > > > 
-> > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> > > > > > > > > > Please do send v3. And again, I don't want to send "after driver ok" hack
-> > > > > > > > > > upstream at all, I merged it in next just to give it some testing.
-> > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > > > 
-> > > > > > > > > Current devices do not support that semantic.
-> > > > > > > > Which devices specifically access the ring after DRIVER_OK but before
-> > > > > > > > a kick?
-> > > The PDS vdpa device can deal with a call to .set_vq_ready after DRIVER_OK is
-> > > set.  And I'm told that our VQ activity should start without a kick.
-> > > 
-> > > Our vdpa device FW doesn't currently have support for VIRTIO_F_RING_RESET,
-> > > but I believe it could be added without too much trouble.
-> > > 
-> > > sln
-> > > 
-> > OK it seems clear at least in the current version pds needs
-> > VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK.
-> > However can we also code up the RING_RESET path as the default?
-> What's the rationale of making RING_RESET path the default? Noted this is on
-> a performance critical path (for live migration downtime), did we ever get
-> consensus from every or most hardware vendors that RING_RESET has lower cost
-> in terms of latency overall than ENABLE_AFTER_DRIVER_OK? I think (RING)RESET
-> in general falls on the slow path for hardware, while I assume either
-> RING_RESET or ENABLE_AFTER_DRIVER_OK doesn't matters much on software backed
-> vdpa e.g. vp_vdpa. Maybe should make ENABLE_AFTER_DRIVER_OK as the default?
-> 
-> -Siwei
 
-Coming from the spec RING_RESET has clearer semantics.
-As long as we support it it is not critical which one
-is the default though.
+--lyw6wy7zr4wdlke6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Hi,
 
-> > Then down the road vendors can choose what to do.
-> > 
-> > 
-> > 
-> > 
-> > 
-> > > > > > > Previous versions of the QEMU LM series did a spurious kick to start
-> > > > > > > traffic at the LM destination [1]. When it was proposed, that spurious
-> > > > > > > kick was removed from the series because to check for descriptors
-> > > > > > > after driver_ok, even without a kick, was considered work of the
-> > > > > > > parent driver.
-> > > > > > > 
-> > > > > > > I'm ok to go back to this spurious kick, but I'm not sure if the hw
-> > > > > > > will read the ring before the kick actually. I can ask.
-> > > > > > > 
-> > > > > > > Thanks!
-> > > > > > > 
-> > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775.html
-> > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
-> > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
-> > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > > > 
-> > > > > But this reminds me one thing, as the thread is going too long, I
-> > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
-> > > > > supported?
-> > > > > 
-> > > > The problem with that is that the device needs to support all
-> > > > RING_RESET, like to be able to change vq address etc after DRIVER_OK.
-> > > > Not all HW support it.
-> > > > 
-> > > > We just need the subset of having the dataplane freezed until all CVQ
-> > > > commands have been consumed. I'm sure current vDPA code already
-> > > > supports it in some devices, like MLX and PSD.
-> > > > 
-> > > > Thanks!
-> > > > 
-> > > > > Thanks
-> > > > > 
-> > > > > > 
-> > > > > > 
-> > > > > > > > > My plan was to convert
-> > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
-> > > > > > > > > was not explicit enough.
-> > > > > > > > > 
-> > > > > > > > > The only solution I can see to that is to trap & emulate in the vdpa
-> > > > > > > > > (parent?) driver, as talked in virtio-comment. But that complicates
-> > > > > > > > > the architecture:
-> > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > > * Store vq enable state separately, at
-> > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
-> > > > > > > > > * Store the doorbell state separately, but do not configure it to the
-> > > > > > > > > device directly.
-> > > > > > > > > 
-> > > > > > > > > But how to recover if the device cannot configure them at kick time,
-> > > > > > > > > for example?
-> > > > > > > > > 
-> > > > > > > > > Maybe we can just fail if the parent driver does not support enabling
-> > > > > > > > > the vq after DRIVER_OK? That way no new feature flag is needed.
-> > > > > > > > > 
-> > > > > > > > > Thanks!
-> > > > > > > > > 
-> > > > > > > > > > > ---
-> > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
-> > > > > > > > > > > commit. Please let me know if I should send a v3 of [1] instead.
-> > > > > > > > > > > 
-> > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
-> > > > > > > > > > > ---
-> > > > > > > > > > >    drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > > >    1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > > > > 
-> > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
-> > > > > > > > > > >    {
-> > > > > > > > > > >         struct vhost_vdpa *v = filep->private_data;
-> > > > > > > > > > >         struct vhost_dev *d = &v->vdev;
-> > > > > > > > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
-> > > > > > > > > > >         void __user *argp = (void __user *)arg;
-> > > > > > > > > > >         u64 __user *featurep = argp;
-> > > > > > > > > > > -     u64 features;
-> > > > > > > > > > > +     u64 features, parent_features = 0;
-> > > > > > > > > > >         long r = 0;
-> > > > > > > > > > > 
-> > > > > > > > > > >         if (cmd == VHOST_SET_BACKEND_FEATURES) {
-> > > > > > > > > > >                 if (copy_from_user(&features, featurep, sizeof(features)))
-> > > > > > > > > > >                         return -EFAULT;
-> > > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
-> > > > > > > > > > >                 if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-> > > > > > > > > > >                                  BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
-> > > > > > > > > > >                                  BIT_ULL(VHOST_BACKEND_F_RESUME) |
-> > > > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > > +                              parent_features))
-> > > > > > > > > > >                         return -EOPNOTSUPP;
-> > > > > > > > > > >                 if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
-> > > > > > > > > > >                      !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > > --
-> > > > > > > > > > > 2.39.3
-> > _______________________________________________
-> > Virtualization mailing list
-> > Virtualization@lists.linux-foundation.org
-> > https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+On Fri, Jun 30, 2023 at 06:58:37PM +0200, Neil Armstrong wrote:
+> Due to lack of maintenance and stall of development for a few years now,
+> and since no new features will ever be added upstream, remove support
+> for OX810 and OX820 restart feature.
+>=20
+> Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> Acked-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> ---
 
+Thanks, queued.
+
+-- Sebastian
+
+>  drivers/power/reset/Kconfig         |   7 --
+>  drivers/power/reset/Makefile        |   1 -
+>  drivers/power/reset/oxnas-restart.c | 233 ------------------------------=
+------
+>  3 files changed, 241 deletions(-)
+>=20
+> diff --git a/drivers/power/reset/Kconfig b/drivers/power/reset/Kconfig
+> index fff07b2bd77b..59e1ebb7842e 100644
+> --- a/drivers/power/reset/Kconfig
+> +++ b/drivers/power/reset/Kconfig
+> @@ -148,13 +148,6 @@ config POWER_RESET_ODROID_GO_ULTRA_POWEROFF
+>  	help
+>  	  This driver supports Power off for Odroid Go Ultra device.
+> =20
+> -config POWER_RESET_OXNAS
+> -	bool "OXNAS SoC restart driver"
+> -	depends on ARCH_OXNAS
+> -	default MACH_OX820
+> -	help
+> -	  Restart support for OXNAS/PLXTECH OX820 SoC.
+> -
+>  config POWER_RESET_PIIX4_POWEROFF
+>  	tristate "Intel PIIX4 power-off driver"
+>  	depends on PCI
+> diff --git a/drivers/power/reset/Makefile b/drivers/power/reset/Makefile
+> index d763e6735ee3..a95d1bd275d1 100644
+> --- a/drivers/power/reset/Makefile
+> +++ b/drivers/power/reset/Makefile
+> @@ -14,7 +14,6 @@ obj-$(CONFIG_POWER_RESET_HISI) +=3D hisi-reboot.o
+>  obj-$(CONFIG_POWER_RESET_LINKSTATION) +=3D linkstation-poweroff.o
+>  obj-$(CONFIG_POWER_RESET_MSM) +=3D msm-poweroff.o
+>  obj-$(CONFIG_POWER_RESET_MT6323) +=3D mt6323-poweroff.o
+> -obj-$(CONFIG_POWER_RESET_OXNAS) +=3D oxnas-restart.o
+>  obj-$(CONFIG_POWER_RESET_QCOM_PON) +=3D qcom-pon.o
+>  obj-$(CONFIG_POWER_RESET_OCELOT_RESET) +=3D ocelot-reset.o
+>  obj-$(CONFIG_POWER_RESET_ODROID_GO_ULTRA_POWEROFF) +=3D odroid-go-ultra-=
+poweroff.o
+> diff --git a/drivers/power/reset/oxnas-restart.c b/drivers/power/reset/ox=
+nas-restart.c
+> deleted file mode 100644
+> index 13090bec058a..000000000000
+> --- a/drivers/power/reset/oxnas-restart.c
+> +++ /dev/null
+> @@ -1,233 +0,0 @@
+> -// SPDX-License-Identifier: (GPL-2.0)
+> -/*
+> - * oxnas SoC reset driver
+> - * based on:
+> - * Microsemi MIPS SoC reset driver
+> - * and ox820_assert_system_reset() written by Ma Hajun <mahaijuns@gmail.=
+com>
+> - *
+> - * Copyright (c) 2013 Ma Hajun <mahaijuns@gmail.com>
+> - * Copyright (c) 2017 Microsemi Corporation
+> - * Copyright (c) 2020 Daniel Golle <daniel@makrotopia.org>
+> - */
+> -#include <linux/delay.h>
+> -#include <linux/io.h>
+> -#include <linux/notifier.h>
+> -#include <linux/mfd/syscon.h>
+> -#include <linux/of_address.h>
+> -#include <linux/of_device.h>
+> -#include <linux/platform_device.h>
+> -#include <linux/reboot.h>
+> -#include <linux/regmap.h>
+> -
+> -/* bit numbers of reset control register */
+> -#define OX820_SYS_CTRL_RST_SCU                0
+> -#define OX820_SYS_CTRL_RST_COPRO              1
+> -#define OX820_SYS_CTRL_RST_ARM0               2
+> -#define OX820_SYS_CTRL_RST_ARM1               3
+> -#define OX820_SYS_CTRL_RST_USBHS              4
+> -#define OX820_SYS_CTRL_RST_USBHSPHYA          5
+> -#define OX820_SYS_CTRL_RST_MACA               6
+> -#define OX820_SYS_CTRL_RST_MAC                OX820_SYS_CTRL_RST_MACA
+> -#define OX820_SYS_CTRL_RST_PCIEA              7
+> -#define OX820_SYS_CTRL_RST_SGDMA              8
+> -#define OX820_SYS_CTRL_RST_CIPHER             9
+> -#define OX820_SYS_CTRL_RST_DDR                10
+> -#define OX820_SYS_CTRL_RST_SATA               11
+> -#define OX820_SYS_CTRL_RST_SATA_LINK          12
+> -#define OX820_SYS_CTRL_RST_SATA_PHY           13
+> -#define OX820_SYS_CTRL_RST_PCIEPHY            14
+> -#define OX820_SYS_CTRL_RST_STATIC             15
+> -#define OX820_SYS_CTRL_RST_GPIO               16
+> -#define OX820_SYS_CTRL_RST_UART1              17
+> -#define OX820_SYS_CTRL_RST_UART2              18
+> -#define OX820_SYS_CTRL_RST_MISC               19
+> -#define OX820_SYS_CTRL_RST_I2S                20
+> -#define OX820_SYS_CTRL_RST_SD                 21
+> -#define OX820_SYS_CTRL_RST_MACB               22
+> -#define OX820_SYS_CTRL_RST_PCIEB              23
+> -#define OX820_SYS_CTRL_RST_VIDEO              24
+> -#define OX820_SYS_CTRL_RST_DDR_PHY            25
+> -#define OX820_SYS_CTRL_RST_USBHSPHYB          26
+> -#define OX820_SYS_CTRL_RST_USBDEV             27
+> -#define OX820_SYS_CTRL_RST_ARMDBG             29
+> -#define OX820_SYS_CTRL_RST_PLLA               30
+> -#define OX820_SYS_CTRL_RST_PLLB               31
+> -
+> -/* bit numbers of clock control register */
+> -#define OX820_SYS_CTRL_CLK_COPRO              0
+> -#define OX820_SYS_CTRL_CLK_DMA                1
+> -#define OX820_SYS_CTRL_CLK_CIPHER             2
+> -#define OX820_SYS_CTRL_CLK_SD                 3
+> -#define OX820_SYS_CTRL_CLK_SATA               4
+> -#define OX820_SYS_CTRL_CLK_I2S                5
+> -#define OX820_SYS_CTRL_CLK_USBHS              6
+> -#define OX820_SYS_CTRL_CLK_MACA               7
+> -#define OX820_SYS_CTRL_CLK_MAC                OX820_SYS_CTRL_CLK_MACA
+> -#define OX820_SYS_CTRL_CLK_PCIEA              8
+> -#define OX820_SYS_CTRL_CLK_STATIC             9
+> -#define OX820_SYS_CTRL_CLK_MACB               10
+> -#define OX820_SYS_CTRL_CLK_PCIEB              11
+> -#define OX820_SYS_CTRL_CLK_REF600             12
+> -#define OX820_SYS_CTRL_CLK_USBDEV             13
+> -#define OX820_SYS_CTRL_CLK_DDR                14
+> -#define OX820_SYS_CTRL_CLK_DDRPHY             15
+> -#define OX820_SYS_CTRL_CLK_DDRCK              16
+> -
+> -/* Regmap offsets */
+> -#define OX820_CLK_SET_REGOFFSET               0x2c
+> -#define OX820_CLK_CLR_REGOFFSET               0x30
+> -#define OX820_RST_SET_REGOFFSET               0x34
+> -#define OX820_RST_CLR_REGOFFSET               0x38
+> -#define OX820_SECONDARY_SEL_REGOFFSET         0x14
+> -#define OX820_TERTIARY_SEL_REGOFFSET          0x8c
+> -#define OX820_QUATERNARY_SEL_REGOFFSET        0x94
+> -#define OX820_DEBUG_SEL_REGOFFSET             0x9c
+> -#define OX820_ALTERNATIVE_SEL_REGOFFSET       0xa4
+> -#define OX820_PULLUP_SEL_REGOFFSET            0xac
+> -#define OX820_SEC_SECONDARY_SEL_REGOFFSET     0x100014
+> -#define OX820_SEC_TERTIARY_SEL_REGOFFSET      0x10008c
+> -#define OX820_SEC_QUATERNARY_SEL_REGOFFSET    0x100094
+> -#define OX820_SEC_DEBUG_SEL_REGOFFSET         0x10009c
+> -#define OX820_SEC_ALTERNATIVE_SEL_REGOFFSET   0x1000a4
+> -#define OX820_SEC_PULLUP_SEL_REGOFFSET        0x1000ac
+> -
+> -struct oxnas_restart_context {
+> -	struct regmap *sys_ctrl;
+> -	struct notifier_block restart_handler;
+> -};
+> -
+> -static int ox820_restart_handle(struct notifier_block *this,
+> -				 unsigned long mode, void *cmd)
+> -{
+> -	struct oxnas_restart_context *ctx =3D container_of(this, struct
+> -							oxnas_restart_context,
+> -							restart_handler);
+> -	u32 value;
+> -
+> -	/*
+> -	 * Assert reset to cores as per power on defaults
+> -	 * Don't touch the DDR interface as things will come to an impromptu
+> -	 * stop NB Possibly should be asserting reset for PLLB, but there are
+> -	 * timing concerns here according to the docs
+> -	 */
+> -	value =3D BIT(OX820_SYS_CTRL_RST_COPRO)		|
+> -		BIT(OX820_SYS_CTRL_RST_USBHS)		|
+> -		BIT(OX820_SYS_CTRL_RST_USBHSPHYA)	|
+> -		BIT(OX820_SYS_CTRL_RST_MACA)		|
+> -		BIT(OX820_SYS_CTRL_RST_PCIEA)		|
+> -		BIT(OX820_SYS_CTRL_RST_SGDMA)		|
+> -		BIT(OX820_SYS_CTRL_RST_CIPHER)		|
+> -		BIT(OX820_SYS_CTRL_RST_SATA)		|
+> -		BIT(OX820_SYS_CTRL_RST_SATA_LINK)	|
+> -		BIT(OX820_SYS_CTRL_RST_SATA_PHY)	|
+> -		BIT(OX820_SYS_CTRL_RST_PCIEPHY)		|
+> -		BIT(OX820_SYS_CTRL_RST_STATIC)		|
+> -		BIT(OX820_SYS_CTRL_RST_UART1)		|
+> -		BIT(OX820_SYS_CTRL_RST_UART2)		|
+> -		BIT(OX820_SYS_CTRL_RST_MISC)		|
+> -		BIT(OX820_SYS_CTRL_RST_I2S)		|
+> -		BIT(OX820_SYS_CTRL_RST_SD)		|
+> -		BIT(OX820_SYS_CTRL_RST_MACB)		|
+> -		BIT(OX820_SYS_CTRL_RST_PCIEB)		|
+> -		BIT(OX820_SYS_CTRL_RST_VIDEO)		|
+> -		BIT(OX820_SYS_CTRL_RST_USBHSPHYB)	|
+> -		BIT(OX820_SYS_CTRL_RST_USBDEV);
+> -
+> -	regmap_write(ctx->sys_ctrl, OX820_RST_SET_REGOFFSET, value);
+> -
+> -	/* Release reset to cores as per power on defaults */
+> -	regmap_write(ctx->sys_ctrl, OX820_RST_CLR_REGOFFSET,
+> -			BIT(OX820_SYS_CTRL_RST_GPIO));
+> -
+> -	/*
+> -	 * Disable clocks to cores as per power-on defaults - must leave DDR
+> -	 * related clocks enabled otherwise we'll stop rather abruptly.
+> -	 */
+> -	value =3D BIT(OX820_SYS_CTRL_CLK_COPRO)		|
+> -		BIT(OX820_SYS_CTRL_CLK_DMA)		|
+> -		BIT(OX820_SYS_CTRL_CLK_CIPHER)		|
+> -		BIT(OX820_SYS_CTRL_CLK_SD)		|
+> -		BIT(OX820_SYS_CTRL_CLK_SATA)		|
+> -		BIT(OX820_SYS_CTRL_CLK_I2S)		|
+> -		BIT(OX820_SYS_CTRL_CLK_USBHS)		|
+> -		BIT(OX820_SYS_CTRL_CLK_MAC)		|
+> -		BIT(OX820_SYS_CTRL_CLK_PCIEA)		|
+> -		BIT(OX820_SYS_CTRL_CLK_STATIC)		|
+> -		BIT(OX820_SYS_CTRL_CLK_MACB)		|
+> -		BIT(OX820_SYS_CTRL_CLK_PCIEB)		|
+> -		BIT(OX820_SYS_CTRL_CLK_REF600)		|
+> -		BIT(OX820_SYS_CTRL_CLK_USBDEV);
+> -
+> -	regmap_write(ctx->sys_ctrl, OX820_CLK_CLR_REGOFFSET, value);
+> -
+> -	/* Enable clocks to cores as per power-on defaults */
+> -
+> -	/* Set sys-control pin mux'ing as per power-on defaults */
+> -	regmap_write(ctx->sys_ctrl, OX820_SECONDARY_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_TERTIARY_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_QUATERNARY_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_DEBUG_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_ALTERNATIVE_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_PULLUP_SEL_REGOFFSET, 0);
+> -
+> -	regmap_write(ctx->sys_ctrl, OX820_SEC_SECONDARY_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_SEC_TERTIARY_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_SEC_QUATERNARY_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_SEC_DEBUG_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_SEC_ALTERNATIVE_SEL_REGOFFSET, 0);
+> -	regmap_write(ctx->sys_ctrl, OX820_SEC_PULLUP_SEL_REGOFFSET, 0);
+> -
+> -	/*
+> -	 * No need to save any state, as the ROM loader can determine whether
+> -	 * reset is due to power cycling or programatic action, just hit the
+> -	 * (self-clearing) CPU reset bit of the block reset register
+> -	 */
+> -	value =3D
+> -		BIT(OX820_SYS_CTRL_RST_SCU) |
+> -		BIT(OX820_SYS_CTRL_RST_ARM0) |
+> -		BIT(OX820_SYS_CTRL_RST_ARM1);
+> -
+> -	regmap_write(ctx->sys_ctrl, OX820_RST_SET_REGOFFSET, value);
+> -
+> -	pr_emerg("Unable to restart system\n");
+> -	return NOTIFY_DONE;
+> -}
+> -
+> -static int ox820_restart_probe(struct platform_device *pdev)
+> -{
+> -	struct oxnas_restart_context *ctx;
+> -	struct regmap *sys_ctrl;
+> -	struct device *dev =3D &pdev->dev;
+> -	int err =3D 0;
+> -
+> -	sys_ctrl =3D syscon_node_to_regmap(pdev->dev.of_node);
+> -	if (IS_ERR(sys_ctrl))
+> -		return PTR_ERR(sys_ctrl);
+> -
+> -	ctx =3D devm_kzalloc(&pdev->dev, sizeof(*ctx), GFP_KERNEL);
+> -	if (!ctx)
+> -		return -ENOMEM;
+> -
+> -	ctx->sys_ctrl =3D sys_ctrl;
+> -	ctx->restart_handler.notifier_call =3D ox820_restart_handle;
+> -	ctx->restart_handler.priority =3D 192;
+> -	err =3D register_restart_handler(&ctx->restart_handler);
+> -	if (err)
+> -		dev_err(dev, "can't register restart notifier (err=3D%d)\n", err);
+> -
+> -	return err;
+> -}
+> -
+> -static const struct of_device_id ox820_restart_of_match[] =3D {
+> -	{ .compatible =3D "oxsemi,ox820-sys-ctrl" },
+> -	{}
+> -};
+> -
+> -static struct platform_driver ox820_restart_driver =3D {
+> -	.probe =3D ox820_restart_probe,
+> -	.driver =3D {
+> -		.name =3D "ox820-chip-reset",
+> -		.of_match_table =3D ox820_restart_of_match,
+> -	},
+> -};
+> -builtin_platform_driver(ox820_restart_driver);
+>=20
+> --=20
+> 2.34.1
+>=20
+
+--lyw6wy7zr4wdlke6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmS4Y/sACgkQ2O7X88g7
++pqWORAAhnuSzBSgSarcodT3gxHpEZgAj/XnfVKr1PDfxOVhyV17RiZPStEXlbYU
+ODsrFEhVjIN9BuagUVjIWf0yRJ6NjhCQr9JuO9+y0MIlKRPZmVnlEzYiyReYPgPi
+EazV0/RhPRCoqUOUlrjrn0UYBXiISj+O6Ig/sbwZ76KLycaUEFVSqP9bJawa/T3a
+C/jNg2qVjDcwUJ22g/xidwXNNg7ie8kOggyA0uyp7y2MHm1eRL8O403sZh7v7wZZ
+MI2bXkQxg8iBnXLTWQ1g7Dbrt60LjO9PEqbe7bKsGkoIA5pVltMy0YKh+FeH8S3h
+VIXaCIbRA/uJXQPsolubLQOP6rQDrGOLyNLp7bjP8gRyvbE76poixd1/KGmXLNkV
+KRXq3cuBhDU8jtpXhh3E9IsLkaHwXS/xxcu7HXWRDF2e5kY3mQyyARkXpe4SUPkx
+CiGnUTg4TB+2z9Y7QbNrVNErzoMmNTFjr0ZQ/O72jRtrpNTnXmQSOeEQET7TgcXf
+Ywif3RIUkvt/uskyQogTpHd6gJHII4kQ1czwfQ8gMKXH/2r5yHx5u+KY2NpYB+7K
+lKMQVweY52wdFPat9xsqorHcHE+jE3PujNQD8ryr3IV8luVWh6ND5KjwFGXx5WHY
+/51coHqpHCKUvUTtlMkSdHChPpnHNW54ieSDwzrTvksDmd1nKSs=
+=rMk0
+-----END PGP SIGNATURE-----
+
+--lyw6wy7zr4wdlke6--
 
