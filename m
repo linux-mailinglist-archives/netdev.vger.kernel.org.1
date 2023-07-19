@@ -1,100 +1,181 @@
-Return-Path: <netdev+bounces-19128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3DE759CFD
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:02:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61BD5759D2D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15796280FEA
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:01:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FA4628175F
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356BA156D0;
-	Wed, 19 Jul 2023 18:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6951E1BB23;
+	Wed, 19 Jul 2023 18:22:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248C713FE7
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:01:56 +0000 (UTC)
-X-Greylist: delayed 150 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 Jul 2023 11:01:54 PDT
-Received: from resqmta-a1p-077721.sys.comcast.net (resqmta-a1p-077721.sys.comcast.net [IPv6:2001:558:fd01:2bb4::a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D261FC8
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:01:54 -0700 (PDT)
-Received: from resomta-a1p-076786.sys.comcast.net ([96.103.145.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
-	(Client did not present a certificate)
-	by resqmta-a1p-077721.sys.comcast.net with ESMTP
-	id M66gqDkcqwNuzMBSMqqtpx; Wed, 19 Jul 2023 17:59:22 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=comcastmailservice.net; s=20211018a; t=1689789562;
-	bh=/6lKYap9PZZRLrRmess6iU23U+m+a8OOtwMIqKZ8RIU=;
-	h=Received:Received:From:To:Subject:Date:MIME-Version:Message-ID:
-	 Content-Type:Xfinity-Spam-Result;
-	b=AfvwybmUYQ6GTvqP31/kBXkK8h7P3sPntGnaZMMts7qC2th5DuM8KgfF6EPnHkoeQ
-	 NCZZyM1mBV7F2VMNVrGTGshhtBROwOCfbONbXhVnhGCbELU1HBb5oQTqIv9cD7LgGO
-	 13N/D7R+CWudSnjEDD2CgKwYa3KGrvUCaGYjvWuFr7RJt8zO5Vt42A525ju7AwGvEX
-	 YSY6BJXNCNnLetsWKFPcpucEHawvMpvuXG2J4JC0u/7pF0j8EW27PSwe6HOjOff11v
-	 Uwp2dSTSl9/G748ax7Cp0xRpjT29x/kFSu+KYRiV79C0topMy3SBXiKdogwvNj2Cse
-	 b+b2df/6wpdJA==
-Received: from localhost ([IPv6:2601:18c:9082:afd:219:d1ff:fe75:dc2f])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
-	(Client did not present a certificate)
-	by resomta-a1p-076786.sys.comcast.net with ESMTPSA
-	id MBSEqFdsmeadOMBSEqzqUD; Wed, 19 Jul 2023 17:59:18 +0000
-X-Xfinity-VMeta: sc=-100.00;st=legit
-From: Matt Whitlock <kernel@mattwhitlock.name>
-To: Miklos Szeredi <miklos@szeredi.hu>
-Cc: David Howells <dhowells@redhat.com>,
- <netdev@vger.kernel.org>,
- Matthew Wilcox <willy@infradead.org>,
- Dave Chinner <david@fromorbit.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Jens Axboe <axboe@kernel.dk>,
- <linux-fsdevel@kvack.org>,
- <linux-mm@kvack.org>,
- <linux-kernel@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- <linux-fsdevel@vger.kernel.org>
-Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after =?iso-8859-1?Q?splice()_returns?=
-Date: Wed, 19 Jul 2023 13:59:13 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AD71FB3E
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:22:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C188C433C8;
+	Wed, 19 Jul 2023 18:22:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689790928;
+	bh=sp4JMZHJA+829ThoZ/Zig1BxBGReZArQFiCA4dwxmn8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sOkum4AT2oJeNwiVsoHgYWs97q9c1gstUyTsMQbNSUD1nKEA47RIlSuVzlifBJlK9
+	 etNjegAQTkLulUmAgOTxK9o9eXy/9Hh2hRHbjFJkV/CcOqdQrraZTklrOiWCXJIM/d
+	 hOl2szJw1Qwbm/tLhv0wG+twH5qkPRjqRvYVKfGgOSNSxrGnIH3seiPijDR2OVNgcX
+	 ciuk0/I4mx/k88QdEHDleXXPMXoogs7ksfcIDJTa4c0kuhwSnGymK1CEfU8RdaEum6
+	 bTyaETuqn3V/c/8yOcowlkxCVsK1VFTw5zf7P3adPvPWYfk+MF6xq7TTl6TnqWXcBW
+	 EbIRhtgJq76Bw==
+Received: (nullmailer pid 540738 invoked by uid 1000);
+	Wed, 19 Jul 2023 18:22:06 -0000
+Date: Wed, 19 Jul 2023 12:22:06 -0600
+From: Rob Herring <robh@kernel.org>
+To: Pranavi Somisetty <pranavi.somisetty@amd.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, michal.simek@amd.com, harini.katakam@amd.com, git@amd.com, radhey.shyam.pandey@amd.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2] dt-bindings: net: xilinx_gmii2rgmii: Convert to json
+ schema
+Message-ID: <20230719182206.GA537052-robh@kernel.org>
+References: <20230719061808.30967-1-pranavi.somisetty@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name>
-In-Reply-To: <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
-References: <20230629155433.4170837-1-dhowells@redhat.com>
- <20230629155433.4170837-2-dhowells@redhat.com>
- <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
-User-Agent: Trojita/v0.7-595-g7738cd47; Qt/5.15.10; xcb; Linux; Gentoo Linux
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MIME_QP_LONG_LINE,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719061808.30967-1-pranavi.somisetty@amd.com>
 
-On Wednesday, 19 July 2023 06:17:51 EDT, Miklos Szeredi wrote:
-> On Thu, 29 Jun 2023 at 17:56, David Howells <dhowells@redhat.com> wrote:
->>=20
->> Splicing data from, say, a file into a pipe currently leaves the source
->> pages in the pipe after splice() returns - but this means that those pages=
+On Wed, Jul 19, 2023 at 12:18:08AM -0600, Pranavi Somisetty wrote:
+> Convert the Xilinx GMII to RGMII Converter device tree binding
+> documentation to json schema.
+> This converter is usually used as gem <---> gmii2rgmii <---> external phy
+> and, it's phy-handle should point to the phandle of the external phy.
+> 
+> Signed-off-by: Pranavi Somisetty <pranavi.somisetty@amd.com>
+> ---
+> Changes v2:
+> 1. Changed description for the property "reg".
+> 2. Added a reference to the description of "phy-handle" property.
+> ---
+>  .../bindings/net/xilinx_gmii2rgmii.txt        | 35 ------------
+>  .../bindings/net/xlnx,gmii-to-rgmii.yaml      | 54 +++++++++++++++++++
+>  2 files changed, 54 insertions(+), 35 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt b/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+> deleted file mode 100644
+> index 038dda48b8e6..000000000000
+> --- a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+> +++ /dev/null
+> @@ -1,35 +0,0 @@
+> -XILINX GMIITORGMII Converter Driver Device Tree Bindings
+> ---------------------------------------------------------
+> -
+> -The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
+> -Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
+> -Ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
+> -This core can be used in all three modes of operation(10/100/1000 Mb/s).
+> -The Management Data Input/Output (MDIO) interface is used to configure the
+> -Speed of operation. This core can switch dynamically between the three
+> -Different speed modes by configuring the conveter register through mdio write.
+> -
+> -This converter sits between the ethernet MAC and the external phy.
+> -MAC <==> GMII2RGMII <==> RGMII_PHY
+> -
+> -For more details about mdio please refer phy.txt file in the same directory.
+> -
+> -Required properties:
+> -- compatible	: Should be "xlnx,gmii-to-rgmii-1.0"
+> -- reg		: The ID number for the phy, usually a small integer
+> -- phy-handle	: Should point to the external phy device.
+> -		  See ethernet.txt file in the same directory.
+> -
+> -Example:
+> -	mdio {
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+> -		phy: ethernet-phy@0 {
+> -			......
+> -		};
+> -		gmiitorgmii: gmiitorgmii@8 {
+> -			compatible = "xlnx,gmii-to-rgmii-1.0";
+> -			reg = <8>;
+> -			phy-handle = <&phy>;
+> -		};
+> -	};
+> diff --git a/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> new file mode 100644
+> index 000000000000..9d22382a64ba
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> @@ -0,0 +1,54 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/xlnx,gmii-to-rgmii.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Xilinx GMII to RGMII Converter
+> +
+> +maintainers:
+> +  - Harini Katakam <harini.katakam@amd.com>
+> +
+> +description:
+> +  The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
+> +  Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
+> +  ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
+> +  This core can be used in all three modes of operation(10/100/1000 Mb/s).
+> +  The Management Data Input/Output (MDIO) interface is used to configure the
+> +  speed of operation. This core can switch dynamically between the three
+> +  different speed modes by configuring the converter register through mdio write.
+> +  The core cannot function without an external phy connected to it.
+> +
+> +properties:
+> +  compatible:
+> +    const: xlnx,gmii-to-rgmii-1.0
+> +
+> +  reg:
+> +    minimum: 0
+> +    maximum: 31
+> +    description: The ID number for the phy.
+> +
+> +  phy-handle:
+> +    $ref: ethernet-controller.yaml#/properties/phy-handle
 
->> can be subsequently modified by shared-writable mmap(), write(),
->> fallocate(), etc. before they're consumed.
->
-> What is this trying to fix?   The above behavior is well known, so
-> it's not likely to be a problem.
+Don't reference individual properties like this. Instead add a $ref at 
+the top level to just "ethernet-controller.yaml#". Since this is the 
+only property you want from there, put a 'phy-handle: true' here and use 
+additionalProperties instead of unevaluatedProperties below.
 
-Respectfully, it's not well-known, as it's not documented. If the splice(2)=20=
-
-man page had mentioned that pages can be mutated after they're already=20
-ostensibly at rest in the output pipe buffer, then my nightly backups=20
-wouldn't have been incurring corruption silently for many months.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - phy-handle
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +        phy: ethernet-phy@0 {
+> +            reg = <0>;
+> +        };
+> +        gmiitorgmii@8 {
+> +            compatible = "xlnx,gmii-to-rgmii-1.0";
+> +            reg = <8>;
+> +            phy-handle = <&phy>;
+> +        };
+> +    };
+> -- 
+> 2.36.1
+> 
 
