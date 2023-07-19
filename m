@@ -1,80 +1,85 @@
-Return-Path: <netdev+bounces-18814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 722CC758B94
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:54:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE63758BA6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 832F8281865
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:54:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67DEB281758
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2D617C4;
-	Wed, 19 Jul 2023 02:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EBA17D1;
+	Wed, 19 Jul 2023 02:58:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0178D1FAF
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:54:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206D3C433C8;
-	Wed, 19 Jul 2023 02:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBC417C4
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:58:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CE68C433C7;
+	Wed, 19 Jul 2023 02:58:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689735255;
-	bh=wlZfctky3f4PK8EC1uB7joPxedy1epUHYSMhC4EUhUY=;
+	s=k20201202; t=1689735508;
+	bh=D6w6EeYtNDLWbQlw/yP+9AleWHyemKxx0ltn0aIqius=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tZf6/6a76OyeGixaJOFwU+ORSziU9wVBHSN+Z2MLWUH9dZydOURdxlBEtBRxTZsck
-	 C2oiq+IKiAQzUMQP0trAVCPLpjPeZIbhHWmKUigqARKPXIJfxLHlRWqT8w51laFm3u
-	 P7PoKoOik5KdhokVOx6gWXVTHiapOv7O+yMZpspgl8Vrh3xtK3jccVzMj9OMEJuVxL
-	 BNUASAAkUpkrv7RvH7/E6YsO2ci1YsWXYvcXLuv45UaF7ZXx8gE8uYPEIP8vuuaFyX
-	 z4bDa+KPriS2ThXw44nJdQoSdZOUypyAKQ2Bl4+kajv1U8qJAu/egr1yD1FqKPzGIw
-	 jd0y3w/oHhOeg==
-Date: Tue, 18 Jul 2023 19:54:14 -0700
+	b=sWcU+iZQs3Ox31kZv4QQmp8MUgq1weM87kotu6Q3oyurJyGlZ7xdJ81CFTMkXfZXh
+	 uL4gePmvjrAboUQ2Chf+Z5iCQNUvNc9bfWn/GO4ViWWCLwfHieGGNATid1/xgfzk3w
+	 EUpNU7JfnVkqI4Sy7mrIt4bsXQ0Y3b1/WW4e3Hl6w9UKKb9XYPV67W5iAaMkjczF8k
+	 cCPQWZzDY85wWkLEUJJQd4OTBV8DAfElP0GbWXh9NogjjeEkK8PLM3Ef7oVEKroNg9
+	 /4GTXF1JrIxnAl2oZ5x15BUKbrfgm+NTswyk1M0UXqLrCiocijxuRQMCTNiV1tr0W8
+	 vi0zphRMFfnbw==
+Date: Tue, 18 Jul 2023 19:58:27 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Carlos Bilbao <carlos.bilbao@amd.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net,
- edumazet@google.com, linux-kernel@vger.kernel.org, mchan@broadcom.com,
- netdev@vger.kernel.org, pabeni@redhat.com, prashant@broadcom.com,
- siva.kallam@broadcom.com
-Subject: Re: [PATCH] tg3: fix array subscript out of bounds compilation
- error
-Message-ID: <20230718195414.4c6f359f@kernel.org>
-In-Reply-To: <c196f8f9-3d2c-27c6-6807-75a6e6e4d5a5@amd.com>
-References: <20230717143443.163732-1-carlos.bilbao@amd.com>
-	<20230717192403.96187-1-kuniyu@amazon.com>
-	<c196f8f9-3d2c-27c6-6807-75a6e6e4d5a5@amd.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
+Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ dev@openvswitch.org, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar
+ <pshelar@ovn.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marcelo Ricardo
+ Leitner <marcelo.leitner@gmail.com>, Davide Caratti <dcaratti@redhat.com>,
+ Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net-next 0/3] net: handle the exp removal problem with
+ ovs upcall properly
+Message-ID: <20230718195827.4c1db980@kernel.org>
+In-Reply-To: <cover.1689541664.git.lucien.xin@gmail.com>
+References: <cover.1689541664.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Jul 2023 10:52:39 -0500 Carlos Bilbao wrote:
-> >> Fix encountered compilation error in tg3.c where an array subscript wa=
-s =20
-> >=20
-> > What is the error ? =20
->=20
-> drivers/net/ethernet/broadcom/tg3.c: In function =E2=80=98tg3_init_one=E2=
-=80=99:
+On Sun, 16 Jul 2023 17:09:16 -0400 Xin Long wrote:
+> With the OVS upcall, the original ct in the skb will be dropped, and when
+> the skb comes back from userspace it has to create a new ct again through
+> nf_conntrack_in() in either OVS __ovs_ct_lookup() or TC tcf_ct_act().
+> 
+> However, the new ct will not be able to have the exp as the original ct
+> has taken it away from the hash table in nf_ct_find_expectation(). This
+> will cause some flow never to be matched, like:
+> 
+>   'ip,ct_state=-trk,in_port=1 actions=ct(zone=1)'
+>   'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=1)'
+>   'ip,ct_state=+trk+new+rel,in_port=1 actions=ct(commit,zone=2),normal'
+> 
+> if the 2nd flow triggers the OVS upcall, the 3rd flow will never get
+> matched.
+> 
+> OVS conntrack works around this by adding its own exp lookup function to
+> not remove the exp from the hash table and saving the exp and its master
+> info to the flow keys instead of create a real ct. But this way doesn't
+> work for TC act_ct.
+> 
+> The patch 1/3 allows nf_ct_find_expectation() not to remove the exp from
+> the hash table if tmpl is set with IPS_CONFIRMED when doing lookup. This
+> allows both OVS conntrack and TC act_ct to have a simple and clear fix
+> for this problem in the patch 2/3 and 3/3.
 
-What compiler are you using? Any extra flags?
-
-I remember seeing this warning too, but I can't repro it now (gcc 13.1;
-clang 16).
-
-> >> above the array bounds of 'struct tg3_napi[5]'. Add an additional chec=
-k in
-> >> the for loop to ensure that it does not exceed the bounds of
-> >> 'struct tg3_napi' (defined by TG3_IRQ_MAX_VECS).
-> >>
-> >> Reviewed-By: Carlos Bilbao <carlos.bilbao@amd.com>
-
-We need a sign-off tag
---=20
-pw-bot: cr
+Florian, Pablo, any opinion on these? 
+Would you prefer to take them via netfilter?
 
