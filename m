@@ -1,164 +1,86 @@
-Return-Path: <netdev+bounces-19232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2F2759FE7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:36:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 958CC75A000
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:38:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD283281B70
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:36:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0F7A1C21246
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D52288DA;
-	Wed, 19 Jul 2023 20:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54ECF2515E;
+	Wed, 19 Jul 2023 20:37:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D28C288D7
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 20:31:36 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::70f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E211E2700;
-	Wed, 19 Jul 2023 13:31:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mx7vydefjrBvTAJCQ2Lux+Vt+nGbIfMHFm3Hx6jy8wBPQ1/tWL17VkGAeW2hMU/DLJmJnNygCTihhdH4pAcOMU3XBcu0UJrNlHPoo0T73RHRX9Ybip6Ex62zxY4Rbz0T5L4X/npKRTh5alJC2ZU3xBJjKIFXAF4xzYBpVAlBi7regwN4KviZsa6vdRZihXjIsH+aL3WVdjuBF8WxTWX5uWSvI0iwePNs2wGxhPTUuwqXCKsQiqX7mPrqbGaZJSmj0BwNuYnB+ChiDuJbxOpVPeFnc/UFUADQFZFpROnKAmeYl6n3WPO1j4MMAs8mcdall+L3FVBQhiySpVLDUNJJmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/r64cTRbXWrKuv/7glCpOeJToLOqq/+33OMOfBT0l6M=;
- b=mGe/hB997Xzd4OOqNsRxKM2Iu9ngCgs9W0QdYoUsyvYHcUu3fLdNRAIWczfUZFLpsrT+3MPJj2vRQeaI4MkPY5CGBzCeoJt1/iYrVCGxDR45VqE2XKqJ46L7acgS0xJzbzahPKhhAj8Oxe02lPeUOoMQvy5L5nkfLLdSE+j4YLNRvJyQU23r1qG61u/5dVckpUrwU/wVv3KwlP+4gxrWKxMV4UjDNI3s/Uml/+rXcSHrxB8cotP/frOsjLKcC2HGvcrYXQvC2BddpsLgUADxgjJ231hfrewQt7UKdx4yxJy+5TxKT9jIw15O8w0m5FQlbl63VWT7Qn95lYOXyK5M7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/r64cTRbXWrKuv/7glCpOeJToLOqq/+33OMOfBT0l6M=;
- b=CPRrDxgmw905tHjrenBOpMhiuGlzyruu2KCA96TvFMRyEoeEIntJ5R57fiFxxbAnMG0CSL+8rduUCD3bOGq7iTwKfy6Su/b/6+8dFB6DHyI45s6Oun1iJEDfqUSfLtZtirZtGsnKZvXRb/Dc1xGzSX9I7Q+msnzD9R6IrPtMJF4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY5PR13MB3698.namprd13.prod.outlook.com (2603:10b6:a03:226::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.32; Wed, 19 Jul
- 2023 20:29:39 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.024; Wed, 19 Jul 2023
- 20:29:38 +0000
-Date: Wed, 19 Jul 2023 21:29:30 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com
-Subject: Re: [net-next PATCH V3] octeontx2-af: Install TC filter rules in
- hardware based on priority
-Message-ID: <ZLhHqn2mNP6L4qNJ@corigine.com>
-References: <20230718044049.2546328-1-sumang@marvell.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718044049.2546328-1-sumang@marvell.com>
-X-ClientProxiedBy: LO4P302CA0023.GBRP302.PROD.OUTLOOK.COM
- (2603:10a6:600:2c1::15) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BCD2611E
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 20:37:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2BE5C433C8;
+	Wed, 19 Jul 2023 20:37:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689799021;
+	bh=SL7k8eZ8nRbX0vwXOdVgFN2hRtqQGVAaTbvJqY57BEU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BuvyrT061YUMSD8cNtGfuZUYzuxPpFcZw8zFsExRkWlWUhjNMtWkE7mxb2izkRBZ9
+	 O1WBwZ6bb8drf/uwk8Wa0VszOc7EqWwXPbEuhOssWsbLQP48hw/F10jMiOTwcXPOgD
+	 EpO9kWXvGYiD9ZFJolRqG+ZSTPWbFE4Ak23jeb1eBfxk7yZCM9F9dl45vayuudNpRz
+	 3lka10SYYniiqESB1Tx8VVwqa/QrJX4KG7lGdFRY2SN14mLkl0k9oEYjJU+zvtG0Cw
+	 2AS37/gepyGO5pHewv4AQ8sUuKpeu8scpNrKlFO90A8Nl2c2rIgIuO1PaB2FBj01XT
+	 CMknK6m3ulovw==
+Date: Wed, 19 Jul 2023 13:36:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Andy
+ Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, Sumit Semwal
+ <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>
+Subject: Re: [RFC PATCH 00/10] Device Memory TCP
+Message-ID: <20230719133659.5529729e@kernel.org>
+In-Reply-To: <CAHS8izPORN=r2-hzYSgN4s_Aoo2dnwoJXrU5Hu=43sb8zsWyhQ@mail.gmail.com>
+References: <20230710223304.1174642-1-almasrymina@google.com>
+	<12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
+	<CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
+	<ZLbUpdNYvyvkD27P@ziepe.ca>
+	<20230718111508.6f0b9a83@kernel.org>
+	<35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
+	<20230718112940.2c126677@kernel.org>
+	<eb34f812-a866-a1a3-9f9b-7d5054d17609@kernel.org>
+	<20230718154503.0421b4cd@kernel.org>
+	<CAHS8izPORN=r2-hzYSgN4s_Aoo2dnwoJXrU5Hu=43sb8zsWyhQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB3698:EE_
-X-MS-Office365-Filtering-Correlation-Id: 33e2a212-042e-42ac-99e5-08db8896dfdf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	FtDUlCxq2pHfaba8zAgHsa43WY5Ub9rInl/phgS6FS+PsO6w595+d2vvAqW9KEdm1qMT+UPxdXO09m7pLNejbDvMypGuUMgC28xpxqWIsIJqk0Dub1Q4W2zOoeGa4YIWxyOCnIIhWlERTqJmtt1MCvGYb/Ey7jm73mg6tfQA7XGQEnpvl28crpszKSIKil0NNrACjqTfqlSmtyIikYx5ZXTDuNO4buvuhesaVzzZujnQFTgw6AYO8HXp3JPlUKbkZnJQXiicAOB0rVi9nywZN/QJJI3ILmrzt3pzv8fn1fKuIoNjj2blpyNaN30Nh+Bf5IRHQRTD3KIKQOqtvwma17K4mqyLiWyCHxXdZwVjnKXz6+SEtxWZztCCDdEbCKTnRK6Rde+x0uPmX5NQLb+Ks3nHldoxHBNM21ybBOLzGufxlh6p11005RbRVRJWWvkg89Gbf26phDSPDcB0vIRPSboZdEEwxlfbNTAs2nuqUbWH9XHgiMTHajOc8PKQpwLq+gP3u5oQtSMNcZYADsgv/o7JtfhEcV9YqZzDjJjFkB25ln9i6BymDbEDlsGx/iP0iB2anzRXG5FgErfTw1MTolC1yGvFBubb/pjyKLVAIjA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(396003)(376002)(366004)(39830400003)(451199021)(8676002)(7416002)(4326008)(44832011)(41300700001)(5660300002)(38100700002)(8936002)(316002)(6916009)(83380400001)(2616005)(66476007)(66556008)(66946007)(2906002)(36756003)(86362001)(4744005)(478600001)(6666004)(6512007)(6486002)(186003)(26005)(55236004)(6506007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fyQh0KReBH0ci5vURzghhlwx/hzhrPwx+dy79bHfHPaADnS8yDe5j3gYeA9u?=
- =?us-ascii?Q?LJZwmyU+ROsaT1Ug0ufxH8PNmgF6T6swbJIJaoBLrsFbq9yrhjUraWxUouyP?=
- =?us-ascii?Q?JSSEA+s1qRPtwUsmxN053DPS8XoQj2eKUEiuU/WUz5julAzh64QUgwB9na7h?=
- =?us-ascii?Q?HGcEVy5J8krdbw+gNykM1f8qXNlMEBOwE3BbJVc/QmeFfZjakVhXFXrcXfmK?=
- =?us-ascii?Q?VliREJvdkIFS3bA1ppVKSBTrLNIfqcu93W27mau0Eclfdv2XpMs5TXpNRvZ8?=
- =?us-ascii?Q?MND0885IW/HBAN/RJJTWgi7wKaIGxnI8hTZAqBvpbWdOSv1+0XLfyMZI1e3a?=
- =?us-ascii?Q?+VDev6a8mgZanEIfFb75V87e6QuHUpaG9iy932uz9Z7DkvNl99TCHQf7bfUX?=
- =?us-ascii?Q?yco0swAJm1ICotu/0sV+U2ou/PF6UA6UJBwNeEiBakjw17yKgdmz7yTt2jKc?=
- =?us-ascii?Q?MPx6vi303SgrsdLdy/kf1VQiYwXmHI0QTxyS44tgWysJl9UYclS9TAyAGGrq?=
- =?us-ascii?Q?eN0L3LijWezlYeFx0USk3xpjkfh0cd23sGdMYMieHQGby1ifibDb3BRAsIcm?=
- =?us-ascii?Q?b1AKGqaKKRZv5B1KbZT3EsEiuyr1uwo/yRLC58vqfaXWAbHxZvcFdznELglf?=
- =?us-ascii?Q?+q+OfGLSALdlBJPxPaan3CPKENveWWJb/HJpvLYSgNQYfJEl3mI/hRzn9W0j?=
- =?us-ascii?Q?gWELL/L1adk9NdurdaoqcakQuG8wnlOkVaZRXC5Qc0aosivukODAt6KgQk66?=
- =?us-ascii?Q?gVCxlkZB4ib/AZRJTFTtBKDVNCbTBT6wtwQpOM/9ZkIzoFmM1T6bMW1Fz8UA?=
- =?us-ascii?Q?YoxqjmUxIYGVtO+mDzNlDF7qAoVTMQDF17z0O2dqDWTuxxLPaJoBwPUqBoTc?=
- =?us-ascii?Q?f83xvXCkIfRstwOwEcrH1hV4L84eYBU3WBp9aGiGe6czULXaDlsPE3APrlFM?=
- =?us-ascii?Q?PXt9BXLV4bz2JZXygrmU9zPru4MH70srgmfrcpQN0kIBvbwJhgXXbIAzhOg6?=
- =?us-ascii?Q?b5hkYqbv/rfMx5GjqEaFchxQjuaF48f/u54rAojrs0TuVdCmYpxVTS0GvT4t?=
- =?us-ascii?Q?JPcFUwqg1CqtzvTIT3HYYe8iKR/DZij3ohsIAhqo5nH7nCn/Uc4OEkqb1jxG?=
- =?us-ascii?Q?je2Ut9gT3SAGK2/aYH4HVHmT2FazS/gDQRyFFlQ03ZEfwRUFjhUhsicUF6JS?=
- =?us-ascii?Q?N2Ap+fH0SvocNJpnFuYBzHokpjRPSBEq4NyEjUg1CieuFIkmnKjo+PJLnZyQ?=
- =?us-ascii?Q?I4UfPYClCF3uiCJagAM7yfxuFdKBpAOsxo8S3YZpj3q2q1ixnoQAo4abNTBt?=
- =?us-ascii?Q?tSSnpzDYu+lCaqrUkUwzVsKCuvaZiaLCc2KOAL37/NVVo/5dBnOVb4APTzCH?=
- =?us-ascii?Q?6bEbv8xYe585ONcBG9NU8+ly91JEZtTpdQdJqFgCnHq/COJSv41Ci5uw0BgY?=
- =?us-ascii?Q?1iNeqTZWHnRnjlltvIke9GTi3m9oN87WLiJq/GdbOwD4hpLHoNfFFcW7nbgq?=
- =?us-ascii?Q?MraH5p3UtMnN0IR0Ghoj2HlDMn32d9KY1xWlVLac1E2vX93Dyu1iSdStDdIf?=
- =?us-ascii?Q?NPqE0gVcupw6TAgCn3USF4PQ+QS3XBdGUOkLrvcwoZaQ8J46JTzAD1crHGPD?=
- =?us-ascii?Q?4g=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33e2a212-042e-42ac-99e5-08db8896dfdf
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 20:29:38.7039
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8iEiGVR0hfw274C8pb1Hd6qSsQsPBYqMVjxElCrodf3JQg3fwD7T5JqEM9Z8zUKIb/OvF8mMsHKcOnOTVhCfY69+WoXya/5uDOX7JOnnb2A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB3698
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 18, 2023 at 10:10:49AM +0530, Suman Ghosh wrote:
-> As of today, hardware does not support installing tc filter
-> rules based on priority. This patch adds support to install
-> the hardware rules based on priority. The final hardware rules
-> will not be dependent on rule installation order, it will be strictly
-> priority based, same as software.
-> 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+On Wed, 19 Jul 2023 08:10:58 -0700 Mina Almasry wrote:
+> From Jakub and David's comments it sounds (if I understood correctly),
+> you'd like to tie the dma-buf bind/unbind functions to the lifetime of
+> a netlink socket, rather than a struct file like I was thinking. That
+> does sound cleaner, but I'm not sure how. Can you link me to any
+> existing code examples? Or rough pointers to any existing code?
 
-...
+I don't have a strong preference whether the lifetime is bound to 
+the socket or not. My main point was that if we're binding lifetimes
+to processes, it should be done via netlink sockets, not special-
+-purpose FDs. Inevitably more commands and info will be needed and
+we'll start reinventing the uAPI wheel which is Netlink.
 
-> @@ -729,22 +816,106 @@ static int otx2_del_mcam_flow_entry(struct otx2_nic *nic, u16 entry)
->  		mutex_unlock(&nic->mbox.lock);
->  		return -EFAULT;
->  	}
-> +
-> +	if (cntr_val) {
-> +		rsp = (struct npc_delete_flow_rsp *)otx2_mbox_get_rsp(&nic->mbox.mbox,
-> +								      0, &req->hdr);
-> +		*cntr_val = rsp->cntr_val;
-
-Hi Suman,
-
-otx2_mbox_get_rsp may return an ERR_PTR.
-Is it ok not to check that before dereferencing rsp?
-
-> +	}
-> +
->  	mutex_unlock(&nic->mbox.lock);
-> +	return 0;
-> +}
-
-...
+Currently adding state to netlink sockets is a bit raw. You can create
+an Xarray which stores the per socket state using socket's portid
+(genl_info->snd_portid) and use netlink_register_notifier() to get
+notifications when sockets are closed.
 
