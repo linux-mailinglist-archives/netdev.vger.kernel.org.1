@@ -1,159 +1,133 @@
-Return-Path: <netdev+bounces-18855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2C92758E16
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:48:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41436758E21
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E808281635
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:48:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BACD281655
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBFE5242;
-	Wed, 19 Jul 2023 06:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C498F50;
+	Wed, 19 Jul 2023 06:51:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E6CAD45
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:47:58 +0000 (UTC)
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044881BFC
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:47:57 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id af79cd13be357-7682705c039so272114285a.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689749276; x=1692341276;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LrM52kzX9eNA6vn1Q+/ISMM2ennPazWpPjDqunPq+CY=;
-        b=qC8dTnVzlFafRIWR+EV9dfav7BJf0aTHEPfO7eGnQREvr80xd63Hf/HLTluiXkmxSX
-         aPC0sbvL/DxOVDFlIiHBX6PhP41nd4i4zXcYWqMqpeJdE6Qdz2i7sC31tSFDZKDbxMtt
-         DvOHBrBSjUGvAk5z9S9kvrvTZ6IbLhVesjoJ+tfWzKtKRU+DFlRidpMZIwbfk/MEM7Dn
-         0AlE3rLxjS+562x1gRVC/DW+yOuQki/oLcfFtrVgP9AW3PFS0eDpjCi35fP9ZCXg+mNK
-         s/VdiULFMe5vpCFKnbqtlLw61mE5tNygg+rWqQcrPasb9TdmUdjwfghIeQ9c/S4vK6vL
-         Gahg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689749276; x=1692341276;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LrM52kzX9eNA6vn1Q+/ISMM2ennPazWpPjDqunPq+CY=;
-        b=V/nT6d9nCY7N+Yc9aniu48IKHRm/iIrtmU4HiOGcjqxn3h1opbYNDnoj5MN2cjpfwQ
-         9MLqG5vIHTrbqFXggLpFowk19moPK0xNrm/+CIapejlc+rW5tDxvERm4z3NCJWXaud7b
-         GyVX7kKOJGr7XJX3/NQfPKcLdyKKA5wUdLslkpP+f2lq5t+aUeReIYn36Hb97fkn/bZf
-         3HXWCYks7Ve5zUgcleBZRVnJspbntFnbjXQJFzln3EjKC3mju0OcHR/F1N6LJuexHxMO
-         du8u3db/p+hp3Us5aJByzvDUYuYlqoICH3erkYUBPpt1vvtlbHL5Q6XYBYOcYSrBzBWT
-         O+aQ==
-X-Gm-Message-State: ABy/qLbbUzkTfElnNOh+N/LQHGq20w+lFvYK64ez7ggkZruHZeP679jU
-	fXpRFwX9YOuXe1pSqpEQAXxWO92HpkQe5g==
-X-Google-Smtp-Source: APBJJlGA2GFr/ZWAcaBK3gTT4nwhWnchGlVxMvklqjaMj/QuM2XXS+hlnBCvFDZnNVRs3C0lg6JmXjlUilCvaw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:622a:1b8c:b0:403:daba:38a2 with SMTP
- id bp12-20020a05622a1b8c00b00403daba38a2mr89062qtb.11.1689749276035; Tue, 18
- Jul 2023 23:47:56 -0700 (PDT)
-Date: Wed, 19 Jul 2023 06:47:54 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7882F3D8C
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:51:17 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F105B1FC4
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:51:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FMwWRkM1/XjZq+zyUUm3yKUq0t9DDi45K1JVEA6trWg=; b=MCBOCTu3K4CbdyQbH5L8CJoq8J
+	UIy5rwixM3SDCs0ZF4jc2FFjY5Hq/36dAt3jnd8X0LyPeknpQhY3MBstxOitDL2zjclux3m6kA937
+	/guyTBbUNqVKzP9J2OKACRyxgytlgz93QSE065LU/vbhqhKn5uio42kgBnw/r17cDnghqqqTesIaQ
+	VMf6JiI11J2x4W5Z8RDHKcY1t5jiyE30+GLScRN1lt/kATlc+7PCQSi/wCRWD90vE4HQ1YETVzB+1
+	2g9O6qQk+TwX0tnfRmUXL6ORIqEHM0uoQ+CzwLLUoZJr1wt/+w/F2rkb8tKqFm4Bmg8Yzs3DnlT6L
+	Npykdy6A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51588)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qM11X-0006tx-0O;
+	Wed, 19 Jul 2023 07:50:59 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qM11P-0003rC-Pl; Wed, 19 Jul 2023 07:50:51 +0100
+Date: Wed, 19 Jul 2023 07:50:51 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: 'Simon Horman' <simon.horman@corigine.com>, kabel@kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
+Message-ID: <ZLeHyzsRqxAj4ZGO@shell.armlinux.org.uk>
+References: <043401d9b57d$66441e60$32cc5b20$@trustnetic.com>
+ <ZK/i3Ta2mcr7xVot@shell.armlinux.org.uk>
+ <043501d9b580$31798870$946c9950$@trustnetic.com>
+ <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com>
+ <ZLUymspsQlJL1k8n@shell.armlinux.org.uk>
+ <013701d9b957$fc66f740$f534e5c0$@trustnetic.com>
+ <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk>
+ <013e01d9b95e$66c10350$344309f0$@trustnetic.com>
+ <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk>
+ <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230719064754.2794106-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: add TCP_OLD_SEQUENCE drop reason
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-tcp_sequence() uses two conditions to decide to drop a packet,
-and we currently report generic TCP_INVALID_SEQUENCE drop reason.
+On Wed, Jul 19, 2023 at 10:29:38AM +0800, Jiawen Wu wrote:
+> [59697.591809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=6, val=c000
+> [59697.592811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=5, val=9a
+> [59697.593814] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=2, val=2b
+> [59697.594817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=3, val=9ab
+> [59697.595811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=2, val=2b
+> [59697.596811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=3, val=9ab
+> [59697.597811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=4, regnum=2, val=141
+> [59697.598809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=4, regnum=3, val=dab
+> [59697.599809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=2, val=2b
+> [59697.600810] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=3, val=9ab
+> [59697.601815] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1e, regnum=8, val=0
+> [59697.602930] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=8, val=fffe
+> [59697.608811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=d00d, val=680b
+> [59697.609823] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=c050, val=7e
+> [59697.610814] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=c011, val=2
+> [59697.611817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=c012, val=200
+> [59697.611820] mv88x3310 txgbe-400:00: Firmware version 0.2.2.0
+> [59697.612817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f001, val=803
 
-Duplicates are common, we need to distinguish them from
-the other case.
+So here we can see the PHY is already in low-power mode, so presumably
+it's configured to do that from power-up?
 
-I chose to not reuse TCP_OLD_DATA, and instead added
-TCP_OLD_SEQUENCE drop reason.
+> [59697.612820] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=1f, regnum=f08c, val=9600
+> [59697.613819] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f08a, val=cd9a
+> [59697.613822] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=1f, regnum=f08a, val=d9a
+> [59697.614818] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=1, val=9ab
+> [59697.615816] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=8, val=9701
+> [59697.616817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=b, val=1a4
+> [59697.617814] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=14, val=e
+> [59697.618809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=15, val=3
+> [59697.619811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=3c, val=0
+> [59697.619831] mv88x3310 txgbe-400:00: attached PHY driver (mii_bus:phy_addr=txgbe-400:00, irq=POLL)
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/dropreason-core.h |  3 +++
- net/ipv4/tcp_input.c          | 16 +++++++++++-----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+The following is where we attempt to power up the PHY:
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index a2b953b57689b8233f35ef508716a3128dabb4a8..f291a3b0f9e512bd933b961caa4368367c3c5c6c 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -30,6 +30,7 @@
- 	FN(TCP_OVERWINDOW)		\
- 	FN(TCP_OFOMERGE)		\
- 	FN(TCP_RFC7323_PAWS)		\
-+	FN(TCP_OLD_SEQUENCE)		\
- 	FN(TCP_INVALID_SEQUENCE)	\
- 	FN(TCP_RESET)			\
- 	FN(TCP_INVALID_SYN)		\
-@@ -188,6 +189,8 @@ enum skb_drop_reason {
- 	 * LINUX_MIB_PAWSESTABREJECTED
- 	 */
- 	SKB_DROP_REASON_TCP_RFC7323_PAWS,
-+	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
-+	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
- 	SKB_DROP_REASON_TCP_INVALID_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_RESET: Invalid RST packet */
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 3cd92035e0902298baa8afd89ae5edcbfce300e5..2258eebf0f0045c730a3bc2b50fb37176e245c07 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4313,10 +4313,16 @@ static inline bool tcp_paws_discard(const struct sock *sk,
-  * (borrowed from freebsd)
-  */
- 
--static inline bool tcp_sequence(const struct tcp_sock *tp, u32 seq, u32 end_seq)
-+static enum skb_drop_reason tcp_sequence(const struct tcp_sock *tp,
-+					 u32 seq, u32 end_seq)
- {
--	return	!before(end_seq, tp->rcv_wup) &&
--		!after(seq, tp->rcv_nxt + tcp_receive_window(tp));
-+	if (before(end_seq, tp->rcv_wup))
-+		return SKB_DROP_REASON_TCP_OLD_SEQUENCE;
-+
-+	if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
-+		return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
-+
-+	return SKB_NOT_DROPPED_YET;
- }
- 
- /* When we get a reset we do this. */
-@@ -5739,7 +5745,8 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
- 	}
- 
- 	/* Step 1: check sequence number */
--	if (!tcp_sequence(tp, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq)) {
-+	reason = tcp_sequence(tp, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq);
-+	if (reason) {
- 		/* RFC793, page 37: "In all states except SYN-SENT, all reset
- 		 * (RST) segments are validated by checking their SEQ-fields."
- 		 * And page 69: "If an incoming segment is not acceptable,
-@@ -5756,7 +5763,6 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
- 		} else if (tcp_reset_check(sk, skb)) {
- 			goto reset;
- 		}
--		SKB_DR_SET(reason, TCP_INVALID_SEQUENCE);
- 		goto discard;
- 	}
- 
+> [59697.830169] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f001, val=803
+> [59697.830179] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=1f, regnum=f001, val=3
+
+The above is our attempt to clear the low power bit.
+
+> [59697.830926] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f001, val=803
+
+According to this read though (which is in get_mactype), the write
+didn't take effect.
+
+If you place a delay of 1ms after phy_clear_bits_mmd() in
+mv3310_power_up(), does it then work?
+
 -- 
-2.41.0.255.g8b1d071c50-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
