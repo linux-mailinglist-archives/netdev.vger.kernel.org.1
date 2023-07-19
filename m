@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-18970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71ACE7593D2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D73027593D0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 950A21C20FDF
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:07:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0627B1C20D71
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A75214AA8;
-	Wed, 19 Jul 2023 11:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EAD1429E;
+	Wed, 19 Jul 2023 11:02:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793AE14A92
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:02:59 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2049.outbound.protection.outlook.com [40.107.223.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD7F19A
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:02:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657D514291
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:02:56 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EC18189
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:02:55 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UKlnwjlEO0FYOR2LbW3fqOF0yXbx2J+h4eFUcj8cQGmyv2zy3liHN/qJ4BZYQtMF7wYO7Zr1n0Ww4KXEYVmL4nTwyJsulNxZcKR7Kt/VblsiVJahmUmamgtHEvBUKCkBHpwQFYkuL4jfygSowOKa7CFZBxEF/km8XaIk6wa1R//3n9r149jYm/SGYP+vhuLGaAjZtiZGLmqoDVudcJoQQxHWw1GOyYEI5GiqCI4YP9yf6UV9LdKpq+mlLIsmkUx/2V9gAbnwvzo/otCMV3Cny0Z3YFCjw53mYuLgYvhmS0kjIJvheoHEeG85IyQFRMMgBTP2pAsqXkCX5bu6n2atog==
+ b=b4ouNlvJkEg9l2vr2i+n0eDsQA85AAW/1/A9T04rPW2HsubOx4CvPoXTx0u3AFd7E1VkyUQrIdYZAeB9CTK/chLz1LDQRRG6ZK1UKTkDc6/ob6ut+Dw8pCiJ+d9VmHqwbdJdnyu6ZhZgn+sA7KLvb7nANKm3YODGDOVhc6b3AKarUycpFIBLH/T++d/hq0aFm7OLfsACydj/0oc4inj/9OjYHXeq3PokLlOs0YLozZgQGURSlAZIswSr1pFIow1EE3hJhnXjBv7iumuROM1AoZKAXIdH7caNX3UWLIUCBbYsA5uR7LrcyHjbAQHYddzSnRVjNLzhPcr0sOU9K7tXNQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0AKvmlslWDXzimHfINoD4lj32Ud0L0SOPbnVJuPFDco=;
- b=fXcTyGMNhKf3gv6Kp2rBWujO7OprEEkTffP/19FUpZ6zDNFKlneNGcf6Hkuj4Azpxmx81XSctW5QmdarwczECt2YR9joWt+aR+UmBI8bN0FA5M/KCtTcdmw3qyri2VV37q/lg0L/VsgOHX64p3WPh8/fGTvhYjkwFu2F47n8meCQU6y344PEaLDYwKoOixQK6+HDKBPZW7ZmPqaRPnXvkiHT0g3hHFn5FOx85sm7NFdSYu8hXS2hwN0+tOPf1dxciGoi3z5cRCc9XKs0WekTzDAeXFFJ+3Q1twJTTGmjNHY+yTi6lgIrTguU3xJgpl8CSgyCFyS7H1uzQvierAcycA==
+ bh=4WzgnRxfmV8Us0G+JG50PX5lI7Lbx0EwgBYbUL4jkx8=;
+ b=itJKUphla8PWn/IPMvbY/DKuSqeVQ/vHKaAmZQQPqQI+a8uJ9oW1YmooWD14b9oIoNZ3UDretVenhnfi4rBlXIYacglnC3bjtqZ3xFqhKVK5VyIQYPkNdLFEGoFd4w3IDrT7vEAkdHicQqPt/zdPeJH0o6yJvzTl7ASSY8yr7V0LQIFSs1pfKgQIGPLIczCf1gE9IENiCuxGOBP5xoqSATfzKbJTyUwHyJY/632lbItkU36RUrgneJqTqKHl9pP87f5bxnJfLdMxYEguUiq6jWFLJYWvOSQtPRFhAuRIocS2iMMC7JRYzDt5iEIqP++WUQmvOuDHxw7QV2TK0ceHyw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0AKvmlslWDXzimHfINoD4lj32Ud0L0SOPbnVJuPFDco=;
- b=eQtnNtnOtveM3cH9q/zhfgTyRGjzwicZ2ssiZNlKW0SgrZJ8CaP4Tt4Zpp+Pl3d9O0h3LkD4hGflDR7OBbQe8EXFhpClYhF5kBEDFDTCd8aeyBCYlh/pfyECYn+44Vfjhufp4tmKMuc/ItlHfWu/E9rn1slHaEp7H2ePHjTzl6vu1BYcovL7rIGPCPfioGXnfpJTlbLkn3ezF9Jd3/diAthvKMTGUec7TN26lw6SzDn3IUbeS4EUSnWmOo7UHjjqe5+VvYvDusHvGtda3d2QWsO0eUYl/TNTy4Qc/L+uxL8LvXetODTVxt6QM83YroS0o4tyYuqAwe7qjA6LkwqsFQ==
-Received: from BN0PR04CA0010.namprd04.prod.outlook.com (2603:10b6:408:ee::15)
- by IA1PR12MB6601.namprd12.prod.outlook.com (2603:10b6:208:3a3::15) with
+ bh=4WzgnRxfmV8Us0G+JG50PX5lI7Lbx0EwgBYbUL4jkx8=;
+ b=T4CWTq3mAZf47MWl425CUK0jkSsMwabmgOfn6Q0DzmjSh8U+/U6kxEwcOt3j3RyILDaWsMWGiiwFY61Gz2fAnNBlzbcLLO0dcpdFBLxwdgkNVmeTh7uvcI2r9PhNY+6ZlIm7rb+1PwnCjz5HIV0BDJRhf6lHU1N1hDPKTRf3SPZaltnOoPeWStMH1hwDEC3F1XcdTTZv/Sx4TGM4jFn9qN6MUaipoXnC55k2/MLc3nC87Eo54/PrsADOlpSgD1uryH/uh2Fl8WUeA3QHYTZF+NIrzCGUigG77+BgCSVVJnPwZ00GDoQOEbABiGcK7QzjzGQvtFqWStZA3IeK/1JT+w==
+Received: from BN9PR03CA0777.namprd03.prod.outlook.com (2603:10b6:408:13a::32)
+ by MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Wed, 19 Jul
- 2023 11:02:50 +0000
-Received: from BN8NAM11FT113.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ee:cafe::60) by BN0PR04CA0010.outlook.office365.com
- (2603:10b6:408:ee::15) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 11:02:53 +0000
+Received: from BN8NAM11FT111.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13a:cafe::c8) by BN9PR03CA0777.outlook.office365.com
+ (2603:10b6:408:13a::32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24 via Frontend
- Transport; Wed, 19 Jul 2023 11:02:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ Transport; Wed, 19 Jul 2023 11:02:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT113.mail.protection.outlook.com (10.13.176.163) with Microsoft SMTP
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN8NAM11FT111.mail.protection.outlook.com (10.13.177.54) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.33 via Frontend Transport; Wed, 19 Jul 2023 11:02:50 +0000
+ 15.20.6588.35 via Frontend Transport; Wed, 19 Jul 2023 11:02:52 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 19 Jul 2023
- 04:02:33 -0700
+ 04:02:36 -0700
 Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 19 Jul
- 2023 04:02:30 -0700
+ 2023 04:02:33 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	Danielle Ratson <danieller@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 13/17] mlxsw: spectrum_router: Replay MACVLANs when RIF is made
-Date: Wed, 19 Jul 2023 13:01:28 +0200
-Message-ID: <d0ecef7df1891ac790b12a3e96b43f301fccbdcf.1689763089.git.petrm@nvidia.com>
+Subject: [PATCH net-next 14/17] mlxsw: spectrum_router: Replay neighbours when RIF is made
+Date: Wed, 19 Jul 2023 13:01:29 +0200
+Message-ID: <348ed6d1ba0ff56ecbf625f0927510b2712d375f.1689763089.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1689763088.git.petrm@nvidia.com>
 References: <cover.1689763088.git.petrm@nvidia.com>
@@ -90,253 +90,130 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT113:EE_|IA1PR12MB6601:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb8b7bc8-f276-4b35-7fd4-08db8847b161
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT111:EE_|MW4PR12MB7141:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54dd8d1f-0e51-41ec-4798-08db8847b285
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	ldkXwHmN9BfwECWhdogS4QxVmfCqwPRJuisDkVGNnKjHHi+1QkUMfLCeQ+rEdYvNP+YQO+Cjalx3aqh5zITncQkbj1coQz/HyomAzAKTqXeDnNFLL4IYr+XaflzFrhkTG57xEnzqs3nw8xu6NxKqeBLQpsaV4o1VU7ZgaWBV7tR45vFRXngEAGsDj+whTAxbaI94xZCcrhoLPkHPy2GqE5474vL7TZDDc8cfS2O6cGSr6CDm4ypES8J2TUVa9lct4S3s3yrUeu0KG4ibu6sYDqUvIN94D65k2a6j2ivQWBGzLTbndJU516EX6Pk1mWe/pvJj5wgTRKvWpvvZ4oWDH3oxnBc4hI5ueqNY2Wf0CD0iMDMj45bVqe/hLHmP/1Y9N8GayfCLddQmegy0Spxv0RivtYj8IKUT4JH/RHJoAlIy0pP1OwOlZaH7DcdqHBYFMD21md+3gJKwfILlOojpRHUTiyvQQDXFpjFdDL8hvTdCNFjkxd4eKYOSO/+TPftMrUJfBG9Wpnu8qiBgqKs91TCmemzaiOrntCa634Fnd0akM812jHi49Ke3+wglqhtWk7MxXNP6QJr6J4jmFJ6iUXIGYOGNhLhwV8guRX1Ht1UAGaUSYje3Wrdi88uqg/Py6VfedECOu+nfQnQz8AznQPSor6IGAXqvLbAG0nF7H34Vu8w8l9fjK2homSfTK0KaQYFYFnqOmbvdWbYd9s9rI9NSCJzYshW43MsB2O/ZKRHBUzhzjcSDVUWNKT2/dVdp
+	/x68Kmdqa8gbyWS8Jp6uIiECxEJ6HtoyccLTkvTsTEZw0XHeJclfGFEijEVCcoMxREx8sgxnx5Ee4Y8XyQJCgApRVKwRczUU1fqgdzbznqsKn0cfWR2Mfq2xQGRi3HCz0Hdsj0JE+BvsEtdPfkEufpR9eWLrCxbmq/bebu0zh3eqkDcwZGLT+stzgm2zFX5sR6IsL79P1m8P8sRVk8hQci7Ga6O9vaCe/bz34YJ5TpJ7LqYB+Mgkb4008UF6B672ijBy3wGqVE+rPSGB5qMBvLWIaxZbQJ1MeZ/SFr6U8MbzUyx5W9cmJP38vvcOXI9ur3ZX4FgJD65EgPRYADzQ4CCicJPfrT/T8LEAPAQ7gQ86y9zl/NPwv6bgPjl2mEJLOcqDX5xbMXNx7TFCUG+BgnNe8rN+PJc3iZ83V67PdgmsPcivQudu1JQS7Vn/GP+F5sRHVYOWJ4UulO+NYvT42MU11a/fWvmPJrkZwoVygrMelPZvMq7L/zKw5vpjGd3CVsC+ggXYO7+Z8H4s89gDFsy4YQswJWvDYP4xR6rn6ffKj0R75qBIjnHxa93XiZ8SE9aZ/k/7isugWCEYFd8XhaeMZsrV4RnUcPU6cyQpqFu5/LWvu0zZz+VutE3lY5Q8Yg636I7Ac/P8FKaU2V2sxVPBhz2CyRPG586Su/5FBft65OCXtrgiz1dAz9xEtuOGFS9iRMK6+38/z4/qy+JLH/3O9zdFEA0H9V93E4f+BqLO7KnZwTqhy++s1P6/X8R2
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(346002)(396003)(136003)(451199021)(82310400008)(40470700004)(36840700001)(46966006)(4326008)(54906003)(478600001)(110136005)(82740400003)(2616005)(36860700001)(83380400001)(426003)(47076005)(40460700003)(86362001)(66574015)(40480700001)(356005)(2906002)(70586007)(186003)(16526019)(107886003)(26005)(316002)(7636003)(336012)(70206006)(41300700001)(36756003)(8676002)(5660300002)(8936002);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(376002)(39860400002)(82310400008)(451199021)(40470700004)(36840700001)(46966006)(2906002)(478600001)(110136005)(6666004)(8936002)(8676002)(54906003)(36756003)(41300700001)(70206006)(70586007)(4326008)(316002)(356005)(336012)(83380400001)(426003)(66574015)(47076005)(86362001)(7636003)(82740400003)(186003)(16526019)(5660300002)(40460700003)(36860700001)(107886003)(26005)(40480700001)(2616005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 11:02:50.1038
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 11:02:52.0160
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb8b7bc8-f276-4b35-7fd4-08db8847b161
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54dd8d1f-0e51-41ec-4798-08db8847b285
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN8NAM11FT113.eop-nam11.prod.protection.outlook.com
+	BN8NAM11FT111.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6601
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7141
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-If IP address is added to a MACVLAN netdevice, the effect is of configuring
-VRRP on the RIF for the netdevice linked to the MACVLAN. Because the
-MACVLAN offload is tied to existence of a RIF at the linked netdevice,
-adding a MACVLAN is currently not allowed until a RIF is present.
+As neighbours are created, mlxsw is involved through the netevent
+notifications. When at the time there is no RIF for a given neighbour, the
+notification is not acted upon. When the RIF is later created, these
+outstanding neighbours are left unoffloaded and cause traffic to go through
+the SW datapath.
 
-If this requirement stays, it will never be possible to attach a first port
-into a topology that involves a MACVLAN. Thus topologies would need to be
-built in a certain order, which is impractical.
-
-Additionally, IP address removal, which leads to disappearance of the RIF
-that the MACVLAN depends on, cannot be vetoed. Thus even as things stand
-now it is possible to get to a state where a MACVLAN netdevice exists
-without a RIF, despite having mlxsw lowers. And once the MACVLAN is
-un-offloaded due to RIF getting destroyed, recreating the RIF does not
-bring it back.
-
-In this patch, accept that MACVLAN can be created out of order and support
-that use case.
-
-One option would seem to be to simply recognize MACVLAN netdevices as
-"interesting", and let the existing replay mechanisms take care of the
-offload. However, that does not address the necessity to reoffload MACVLAN
-once a RIF is created.
-
-Thus add a new replay hook, symmetrical to mlxsw_sp_rif_macvlan_flush(),
-called mlxsw_sp_rif_macvlan_replay(), which instead of unwinding the
-existing offloads, applies the configuration as if the netdevice were
-created just now.
-
-Additionally, remove all vetoes and warning messages that checked for
-presence of a RIF at the linked device.
+In order to fix this issue, as a RIF is created, walk the ARP and ND tables
+and find neighbours for the netdevice that represents the RIF. Then
+schedule neighbour work for them, allowing them to be offloaded.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Danielle Ratson <danieller@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlxsw/spectrum.c    | 22 -------
- .../ethernet/mellanox/mlxsw/spectrum_router.c | 59 +++++++++++++++++--
- 2 files changed, 54 insertions(+), 27 deletions(-)
+ .../ethernet/mellanox/mlxsw/spectrum_router.c | 62 ++++++++++++++++++-
+ 1 file changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 8087da00f38f..4346cc736579 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -4786,11 +4786,6 @@ static int mlxsw_sp_netdevice_port_upper_event(struct net_device *lower_dev,
- 			NL_SET_ERR_MSG_MOD(extack, "Can not put a VLAN on a LAG port");
- 			return -EINVAL;
- 		}
--		if (netif_is_macvlan(upper_dev) &&
--		    !mlxsw_sp_rif_exists(mlxsw_sp, lower_dev)) {
--			NL_SET_ERR_MSG_MOD(extack, "macvlan is only supported on top of router interfaces");
--			return -EOPNOTSUPP;
--		}
- 		if (netif_is_ovs_master(upper_dev) && vlan_uses_dev(dev)) {
- 			NL_SET_ERR_MSG_MOD(extack, "Master device is an OVS master and this device has a VLAN");
- 			return -EINVAL;
-@@ -4979,11 +4974,6 @@ static int mlxsw_sp_netdevice_port_vlan_event(struct net_device *vlan_dev,
- 			NL_SET_ERR_MSG_MOD(extack, "Enslaving a port to a device that already has an upper device is not supported");
- 			return -EINVAL;
- 		}
--		if (netif_is_macvlan(upper_dev) &&
--		    !mlxsw_sp_rif_exists(mlxsw_sp, vlan_dev)) {
--			NL_SET_ERR_MSG_MOD(extack, "macvlan is only supported on top of router interfaces");
--			return -EOPNOTSUPP;
--		}
- 		break;
- 	case NETDEV_CHANGEUPPER:
- 		upper_dev = info->upper_dev;
-@@ -5052,13 +5042,6 @@ static int mlxsw_sp_netdevice_bridge_vlan_event(struct mlxsw_sp *mlxsw_sp,
- 			NL_SET_ERR_MSG_MOD(extack, "Unknown upper device type");
- 			return -EOPNOTSUPP;
- 		}
--		if (!info->linking)
--			break;
--		if (netif_is_macvlan(upper_dev) &&
--		    !mlxsw_sp_rif_exists(mlxsw_sp, vlan_dev)) {
--			NL_SET_ERR_MSG_MOD(extack, "macvlan is only supported on top of router interfaces");
--			return -EOPNOTSUPP;
--		}
- 		break;
- 	case NETDEV_CHANGEUPPER:
- 		upper_dev = info->upper_dev;
-@@ -5135,11 +5118,6 @@ static int mlxsw_sp_netdevice_bridge_event(struct mlxsw_sp *mlxsw_sp,
- 			NL_SET_ERR_MSG_MOD(extack, "VLAN uppers are only supported with 802.1q VLAN protocol");
- 			return -EOPNOTSUPP;
- 		}
--		if (netif_is_macvlan(upper_dev) &&
--		    !mlxsw_sp_rif_exists(mlxsw_sp, br_dev)) {
--			NL_SET_ERR_MSG_MOD(extack, "macvlan is only supported on top of router interfaces");
--			return -EOPNOTSUPP;
--		}
- 		break;
- 	case NETDEV_CHANGEUPPER:
- 		upper_dev = info->upper_dev;
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-index fe1855cc2c76..2322429cdb72 100644
+index 2322429cdb72..9263a914bcc7 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-@@ -9121,10 +9121,8 @@ static int mlxsw_sp_rif_macvlan_add(struct mlxsw_sp *mlxsw_sp,
- 	int err;
- 
- 	rif = mlxsw_sp_rif_find_by_dev(mlxsw_sp, vlan->lowerdev);
--	if (!rif) {
--		NL_SET_ERR_MSG_MOD(extack, "macvlan is only supported on top of router interfaces");
--		return -EOPNOTSUPP;
--	}
-+	if (!rif)
-+		return 0;
- 
- 	err = mlxsw_sp_rif_fdb_op(mlxsw_sp, macvlan_dev->dev_addr,
- 				  mlxsw_sp_fid_index(rif->fid), true);
-@@ -9857,6 +9855,40 @@ static int mlxsw_sp_router_netdevice_event(struct notifier_block *nb,
- 	return notifier_from_errno(err);
+@@ -2983,6 +2983,52 @@ static void mlxsw_sp_neigh_rif_gone_sync(struct mlxsw_sp *mlxsw_sp,
+ 	}
  }
  
-+struct mlxsw_sp_macvlan_replay {
++struct mlxsw_sp_neigh_rif_made_sync {
 +	struct mlxsw_sp *mlxsw_sp;
-+	struct netlink_ext_ack *extack;
++	struct mlxsw_sp_rif *rif;
++	int err;
 +};
 +
-+static int mlxsw_sp_macvlan_replay_upper(struct net_device *dev,
-+					 struct netdev_nested_priv *priv)
++static void mlxsw_sp_neigh_rif_made_sync_each(struct neighbour *n, void *data)
 +{
-+	const struct mlxsw_sp_macvlan_replay *rms = priv->data;
-+	struct netlink_ext_ack *extack = rms->extack;
-+	struct mlxsw_sp *mlxsw_sp = rms->mlxsw_sp;
++	struct mlxsw_sp_neigh_rif_made_sync *rms = data;
++	int rc;
 +
-+	if (!netif_is_macvlan(dev))
-+		return 0;
-+
-+	return mlxsw_sp_rif_macvlan_add(mlxsw_sp, dev, extack);
++	if (rms->err)
++		return;
++	if (n->dev != mlxsw_sp_rif_dev(rms->rif))
++		return;
++	rc = mlxsw_sp_router_schedule_neigh_work(rms->mlxsw_sp->router, n);
++	if (rc != NOTIFY_DONE)
++		rms->err = -ENOMEM;
 +}
 +
-+static int mlxsw_sp_macvlan_replay(struct mlxsw_sp_rif *rif,
-+				   struct netlink_ext_ack *extack)
++static int mlxsw_sp_neigh_rif_made_sync(struct mlxsw_sp *mlxsw_sp,
++					struct mlxsw_sp_rif *rif)
 +{
-+	struct mlxsw_sp_macvlan_replay rms = {
-+		.mlxsw_sp = rif->mlxsw_sp,
-+		.extack = extack,
-+	};
-+	struct netdev_nested_priv priv = {
-+		.data = &rms,
++	struct mlxsw_sp_neigh_rif_made_sync rms = {
++		.mlxsw_sp = mlxsw_sp,
++		.rif = rif,
 +	};
 +
-+	return netdev_walk_all_upper_dev_rcu(mlxsw_sp_rif_dev(rif),
-+					     mlxsw_sp_macvlan_replay_upper,
-+					     &priv);
++	neigh_for_each(&arp_tbl, mlxsw_sp_neigh_rif_made_sync_each, &rms);
++	if (rms.err)
++		goto err_arp;
++
++#if IS_ENABLED(CONFIG_IPV6)
++	neigh_for_each(&nd_tbl, mlxsw_sp_neigh_rif_made_sync_each, &rms);
++#endif
++	if (rms.err)
++		goto err_nd;
++
++	return 0;
++
++err_nd:
++err_arp:
++	mlxsw_sp_neigh_rif_gone_sync(mlxsw_sp, rif);
++	return rms.err;
 +}
 +
- static int __mlxsw_sp_rif_macvlan_flush(struct net_device *dev,
- 					struct netdev_nested_priv *priv)
+ enum mlxsw_sp_nexthop_type {
+ 	MLXSW_SP_NEXTHOP_TYPE_ETH,
+ 	MLXSW_SP_NEXTHOP_TYPE_IPIP,
+@@ -7937,7 +7983,21 @@ static int mlxsw_sp_router_rif_disable(struct mlxsw_sp *mlxsw_sp, u16 rif)
+ static int mlxsw_sp_router_rif_made_sync(struct mlxsw_sp *mlxsw_sp,
+ 					 struct mlxsw_sp_rif *rif)
  {
-@@ -9879,7 +9911,6 @@ static int mlxsw_sp_rif_macvlan_flush(struct mlxsw_sp_rif *rif)
- 	if (!netif_is_macvlan_port(dev))
- 		return 0;
- 
--	netdev_warn(dev, "Router interface is deleted. Upper macvlans will not work\n");
- 	return netdev_walk_all_upper_dev_rcu(dev,
- 					     __mlxsw_sp_rif_macvlan_flush, &priv);
+-	return mlxsw_sp_nexthop_rif_made_sync(mlxsw_sp, rif);
++	int err;
++
++	err = mlxsw_sp_neigh_rif_made_sync(mlxsw_sp, rif);
++	if (err)
++		return err;
++
++	err = mlxsw_sp_nexthop_rif_made_sync(mlxsw_sp, rif);
++	if (err)
++		goto err_nexthop;
++
++	return 0;
++
++err_nexthop:
++	mlxsw_sp_neigh_rif_gone_sync(mlxsw_sp, rif);
++	return err;
  }
-@@ -9937,6 +9968,10 @@ static int mlxsw_sp_rif_subport_configure(struct mlxsw_sp_rif *rif,
- 	if (err)
- 		goto err_rif_subport_op;
  
-+	err = mlxsw_sp_macvlan_replay(rif, extack);
-+	if (err)
-+		goto err_macvlan_replay;
-+
- 	err = mlxsw_sp_rif_fdb_op(rif->mlxsw_sp, dev->dev_addr,
- 				  mlxsw_sp_fid_index(rif->fid), true);
- 	if (err)
-@@ -9952,6 +9987,8 @@ static int mlxsw_sp_rif_subport_configure(struct mlxsw_sp_rif *rif,
- 	mlxsw_sp_rif_fdb_op(rif->mlxsw_sp, dev->dev_addr,
- 			    mlxsw_sp_fid_index(rif->fid), false);
- err_rif_fdb_op:
-+	mlxsw_sp_rif_macvlan_flush(rif);
-+err_macvlan_replay:
- 	mlxsw_sp_rif_subport_op(rif, false);
- err_rif_subport_op:
- 	mlxsw_sp_rif_mac_profile_put(rif->mlxsw_sp, mac_profile);
-@@ -10038,6 +10075,10 @@ static int mlxsw_sp_rif_fid_configure(struct mlxsw_sp_rif *rif,
- 	if (err)
- 		goto err_fid_bc_flood_set;
- 
-+	err = mlxsw_sp_macvlan_replay(rif, extack);
-+	if (err)
-+		goto err_macvlan_replay;
-+
- 	err = mlxsw_sp_rif_fdb_op(rif->mlxsw_sp, dev->dev_addr,
- 				  mlxsw_sp_fid_index(rif->fid), true);
- 	if (err)
-@@ -10053,6 +10094,8 @@ static int mlxsw_sp_rif_fid_configure(struct mlxsw_sp_rif *rif,
- 	mlxsw_sp_rif_fdb_op(rif->mlxsw_sp, dev->dev_addr,
- 			    mlxsw_sp_fid_index(rif->fid), false);
- err_rif_fdb_op:
-+	mlxsw_sp_rif_macvlan_flush(rif);
-+err_macvlan_replay:
- 	mlxsw_sp_fid_flood_set(rif->fid, MLXSW_SP_FLOOD_TYPE_BC,
- 			       mlxsw_sp_router_port(mlxsw_sp), false);
- err_fid_bc_flood_set:
-@@ -10200,6 +10243,10 @@ static int mlxsw_sp_rif_vlan_configure(struct mlxsw_sp_rif *rif, u16 efid,
- 	if (err)
- 		goto err_fid_bc_flood_set;
- 
-+	err = mlxsw_sp_macvlan_replay(rif, extack);
-+	if (err)
-+		goto err_macvlan_replay;
-+
- 	err = mlxsw_sp_rif_fdb_op(rif->mlxsw_sp, dev->dev_addr,
- 				  mlxsw_sp_fid_index(rif->fid), true);
- 	if (err)
-@@ -10215,6 +10262,8 @@ static int mlxsw_sp_rif_vlan_configure(struct mlxsw_sp_rif *rif, u16 efid,
- 	mlxsw_sp_rif_fdb_op(rif->mlxsw_sp, dev->dev_addr,
- 			    mlxsw_sp_fid_index(rif->fid), false);
- err_rif_fdb_op:
-+	mlxsw_sp_rif_macvlan_flush(rif);
-+err_macvlan_replay:
- 	mlxsw_sp_fid_flood_set(rif->fid, MLXSW_SP_FLOOD_TYPE_BC,
- 			       mlxsw_sp_router_port(mlxsw_sp), false);
- err_fid_bc_flood_set:
+ static void mlxsw_sp_router_rif_gone_sync(struct mlxsw_sp *mlxsw_sp,
 -- 
 2.40.1
 
