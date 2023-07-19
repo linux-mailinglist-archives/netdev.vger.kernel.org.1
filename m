@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-19005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1217594AD
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:54:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F008E7594AE
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83E0D28172D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:54:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BF9E1C20837
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF2913AF9;
-	Wed, 19 Jul 2023 11:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C778813AFE;
+	Wed, 19 Jul 2023 11:55:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BAB14261
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD7D14261
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:55:22 +0000 (UTC)
 Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580F5D3
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:54:41 -0700 (PDT)
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-3facc7a4e8aso11887575e9.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:54:41 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64280D3
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:55:21 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-3fa86b08efcso11655325e9.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:55:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689767679; x=1690372479;
+        d=1e100.net; s=20221208; t=1689767720; x=1692359720;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=g5UM/B+22hN+jFGr93Zsqnle+Rytem77AjqqYKaA04xcLKWYtyrlZxZ6G1svKr/PGP
-         NG1tcsa+gydfeV2FGIAilb92hMI2L+bX2sCdTSKegFyESc1zvzOdsccuRlhbGoKUKZkj
-         rC4feBx4kFuCWZ53o9ktqqrd6rqRYgKzuAZ208XL+SZkaVPUbY9jT17sBwdWudocvssy
-         gb9bzAITrnWBtxfiXX8zpJsqdPvw+SDSx7zKY9XYwC9zaIk5aTTRA00K3A2YfUIYlCzP
-         K+4fXJNnVs0n9mEW9aWiYPumEkVjefJ5rbz0GBYboy9NfE/gl26xm84UCkSGIpYA8uy+
-         37Xw==
-X-Gm-Message-State: ABy/qLY5NkgHR0gXNKMBSeonJrfB0SEYeQdpzlDObZSoXB0W93BQv1+P
-	1HOvzqH1f1g4ScmqdjXFLS8=
-X-Google-Smtp-Source: APBJJlFx8Nd2zlU9HdityaHbsCvPzRJ8CDYkz7ZT0B5SWlmZjncwynDWN9bPd9GX29OqJ7s1zk4sKw==
-X-Received: by 2002:a05:600c:860f:b0:3fb:3dd9:89c with SMTP id ha15-20020a05600c860f00b003fb3dd9089cmr2154320wmb.0.1689767679449;
-        Wed, 19 Jul 2023 04:54:39 -0700 (PDT)
+        bh=/a4ZoeUIQd+ndOko8895m/fdnD+arM41bba+h2c+H8w=;
+        b=GcXttjRnRDe2jOeTJnEpW8ubXZXCnkzYM+dAIG5priC9SwQxUgu77jJgi+zEdL6MT3
+         2k9KvGJlLT7w3XNiPcPXia74v934VLAQiryLdIxLuil19UQI0hnLL4tFGHUbSBWTFMg2
+         qBxNuXhg20JEVe84j9D5qip06rPLH1eDv7orLZ4fKWMDBIqmqWIq4IFzVyG4OdSWdWL7
+         L0Whp5Dy5d8G3MD+boZW+izlGN4enganffhpWConDTixmuB7g6WemdoP2qOiqoX91p4Q
+         uqih0pR7U0aLlkEvsbsoFCzdp4HDTIf16w6qdqrTKT1PBscSb8QksW6xZj41T0vSXZxZ
+         3r2g==
+X-Gm-Message-State: ABy/qLaJxmZ8ftPkbkn76uZBgHvJg1BP2h7XnUvPkwukW9pnuUeYhESl
+	W8j3NCYXq2zXB0hkoJKCsYc=
+X-Google-Smtp-Source: APBJJlESnghbYQXGyfZxB4mM4YLWOfrFx755yr/rKauJE470zLJzZB7SXY+XrWpq0hmJNvePuvLq+g==
+X-Received: by 2002:a05:600c:3b89:b0:3fb:f4f1:2739 with SMTP id n9-20020a05600c3b8900b003fbf4f12739mr2344442wms.3.1689767719536;
+        Wed, 19 Jul 2023 04:55:19 -0700 (PDT)
 Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
-        by smtp.gmail.com with ESMTPSA id 8-20020a05600c028800b003fbc30825fbsm1498095wmk.39.2023.07.19.04.54.37
+        by smtp.gmail.com with ESMTPSA id k8-20020a7bc408000000b003fa95f328afsm1509740wmi.29.2023.07.19.04.55.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jul 2023 04:54:38 -0700 (PDT)
-Message-ID: <9bbb2635-c4fd-884e-4cf4-0a01c3e29415@grimberg.me>
-Date: Wed, 19 Jul 2023 14:54:36 +0300
+        Wed, 19 Jul 2023 04:55:19 -0700 (PDT)
+Message-ID: <f26a613d-1cba-5448-1365-c51ad7aace02@grimberg.me>
+Date: Wed, 19 Jul 2023 14:55:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,17 +54,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH 4/6] net/tls: Use tcp_read_sock() instead of
- ops->read_sock()
+Subject: Re: [PATCH 6/6] net/tls: implement ->read_sock()
 Content-Language: en-US
 To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
 Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
  Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Boris Pismenny <boris.pismenny@gmail.com>
 References: <20230719113836.68859-1-hare@suse.de>
- <20230719113836.68859-5-hare@suse.de>
+ <20230719113836.68859-7-hare@suse.de>
 From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230719113836.68859-5-hare@suse.de>
+In-Reply-To: <20230719113836.68859-7-hare@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
@@ -75,5 +75,9 @@ X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+
+> Implement ->read_sock() function for use with nvme-tcp.
+
+This implementation looks better.
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 
