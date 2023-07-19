@@ -1,419 +1,183 @@
-Return-Path: <netdev+bounces-18852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B32758E0E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:44:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FE1E758E12
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BF9D281655
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:44:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDAE0281670
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5D3BE40;
-	Wed, 19 Jul 2023 06:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A1A5242;
+	Wed, 19 Jul 2023 06:46:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBEDC8C0
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:43:29 +0000 (UTC)
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48DC1FCE
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:43:27 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-51e57870becso8659837a12.2
-        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689749006; x=1692341006;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yixXqZX7eF/4cDROyITTMI6IjRRU7qXkpHSTf8PAF+8=;
-        b=dF4AzClD6ps09v7vhPqd9BNVLM5OF8fY9kXM9jc0xMAhQm6Zf5l4dI1HExPiNu4U4W
-         cnot1qtD16VvXCN8yjcqlxaI2XX5i7R0U+YIUukEUpi+me3lxMSmlJ9eYzpJ0jajpqZs
-         AXP6w2WoDIkBw2VagEcTU9YU6pAUDazlGfEryxcz4rx2czv3fTNuTip3qcgupueOz4ky
-         kwyny3ae+11q1Ptcf1VLVUyEGBW8At5FS2e7U78BjGh9vMEO1MoN+imz/rM4FowVp6Pj
-         u6iPBFcfmiMJkNYIAvWuRj7+xufiGHmtZV2ju8vA/KbnzeUotsw1/RQUN78g5oFmABBf
-         UHTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689749006; x=1692341006;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yixXqZX7eF/4cDROyITTMI6IjRRU7qXkpHSTf8PAF+8=;
-        b=gF5iJVGUhDp/TlPaag60JeHPNg4yRTWuJea3K3QeSCAUBM4fjtPTll9m8DvTw1uyJF
-         vO5/wSGp9orE0hHdsSiNqQD0Af75gzoF1IkMKp3vO3ZxCaIWZEhsxPjd+crnj4ENOC0X
-         Lg4UvElM7utr43avFerDvztWpP98S9Ktn80ayT/YErB82tQr94HM+vEGbyuM+tc7c37/
-         lCtsS82KznbwLv+t0Erm2UcAX2Hth86z/QoKLIlMk1Rbt3QTIAllKOKx8Mz55ibkXura
-         OFSLu08YbH5bEPXdKEuFBAtTyDWg/OSZPqDV+RbtA2KnhCGwk7q9XfMXW4nuj+wouThu
-         GXuQ==
-X-Gm-Message-State: ABy/qLZIe46i13HRgH5m7PGBRJyDzQ0vrwIeFBVurBGFHbcuOJJqtarw
-	QfUIboipvpX624lqAjLeL3/dNvXLNnoNvA==
-X-Google-Smtp-Source: APBJJlHE/BpLtC06qsBdMCysHS01sSgdlXeJogZKzugenLvDRqPvlfpurWuKpopBwjJ+ECXs0O1IMg==
-X-Received: by 2002:aa7:d1d8:0:b0:51d:9f71:23e2 with SMTP id g24-20020aa7d1d8000000b0051d9f7123e2mr1565499edp.21.1689749006053;
-        Tue, 18 Jul 2023 23:43:26 -0700 (PDT)
-Received: from eichest-laptop.lan ([2a02:168:af72:0:b88b:69a9:6066:94ef])
-        by smtp.gmail.com with ESMTPSA id g8-20020a056402180800b0051e0f8aac74sm2301868edy.8.2023.07.18.23.43.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 23:43:25 -0700 (PDT)
-From: Stefan Eichenberger <eichest@gmail.com>
-To: netdev@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	francesco.dolcini@toradex.com,
-	kabel@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	eichest@gmail.com
-Subject: [PATCH net-next v4 5/5] net: phy: marvell-88q2xxx: add driver for the Marvell 88Q2110 PHY
-Date: Wed, 19 Jul 2023 08:42:58 +0200
-Message-Id: <20230719064258.9746-6-eichest@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230719064258.9746-1-eichest@gmail.com>
-References: <20230719064258.9746-1-eichest@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0BB1844
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:46:10 +0000 (UTC)
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A621FC4;
+	Tue, 18 Jul 2023 23:46:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689749169; x=1721285169;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=3HWSZPLfe63jyruIzncyGrTB6B69Z8qKP4a90FW8cBw=;
+  b=TzujoLAWKLDEr9tbz05ssZ1mUS01Y9jxaG6jNCv2ggJccepOehKbPRDG
+   0vAoDsEltPAMsGmRPI2L7euoO+DuTmCmO7lOv5Qz26qxzRNmSsH2SSpht
+   o/SPaGkAsMPBO2bKFfmhecwOLX5flokO/BW9ngoZPpZK24uJA9+7OzE33
+   vly8FKF8FC9XMU5W4ZfBGnRQTFlpkOg/uW0ZayxJDkhuI79KfXSSq2Cp/
+   HEmbcG32qYB+MKLvNtpw1HrWgzOatYzobqZ5fwCXXp2AcsPL6Vfv69TfS
+   LjhI30oALBu1peEppNwh8RxWbzbjwjEC1km+eiiZCJpRs+cBfO3xZvXm7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="351255985"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="351255985"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 23:46:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="727198267"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="727198267"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga007.fm.intel.com with ESMTP; 18 Jul 2023 23:46:04 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 18 Jul 2023 23:46:04 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 18 Jul 2023 23:46:04 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.174)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 18 Jul 2023 23:46:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ioWSmCgrzkkjlf8MWrqh3GCohHpaJvJPySCr27FpHU/JRbZn2ffJkSqtsXMcapxw4AYJ3N4LGV02sZb7a/wnV1/dz1Xt7QhVw5LKd76HKFaQK6WV12LYqpf9O/9k193jx3txqERCWPP8S8YjpY6Hn46+Slpx7PXvbwfSs0UX0qAD6pDrKL6rYtmpGW7s+hDvJEeHZHRGpmKsC04Ye6Ymf5u+SGOpJHuYaNG2jNn47BLEbitq9m02MJNlUkR3Nd7VTXoQxnzkiioBk3lSDPKLz9rgcaZlUS7JXWZ1Z2V38WpRKsqzbKwWKL7m4OdhUc51ZpakyzOYPhnyyy8rNaNvzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3HWSZPLfe63jyruIzncyGrTB6B69Z8qKP4a90FW8cBw=;
+ b=VXqnYxt+OlAajPxPEoS3csYrzVFaP06JT67YtR/ITPPaPo+ALy6Bk0g7VwGAfAAKh0C1+jEB1vbnbvjaPlBTGIUBfXInBc9Q40gzBvNlEMEXSZrNmXapnxEkOKjlMtXsnWDjKUHRFWjc1XkHLMFosW4glMfSPtATStpRHwoZvwEfuZDKYknBpBD3mgKz8NrdzFtz76BEzZiEFdHF57U0z4UPDYBXamYDBnse6QAtcgb6NINZcoGyXx4FpWxs3Fvd5v8mNEvHkogFOdCQldpar4OeirAjE4QOktJvMEEZ+cfR3VOgU8YTWAseWbORoccfUaUaflDUiNIWTh/5rAE0Bg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB6043.namprd11.prod.outlook.com (2603:10b6:8:62::8) by
+ MN6PR11MB8218.namprd11.prod.outlook.com (2603:10b6:208:47c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Wed, 19 Jul
+ 2023 06:45:56 +0000
+Received: from DM4PR11MB6043.namprd11.prod.outlook.com
+ ([fe80::e1a8:582d:1efc:dffc]) by DM4PR11MB6043.namprd11.prod.outlook.com
+ ([fe80::e1a8:582d:1efc:dffc%4]) with mapi id 15.20.6588.031; Wed, 19 Jul 2023
+ 06:45:56 +0000
+From: "Peer, Ilan" <ilan.peer@intel.com>
+To: Rudi Heitbaum <rudi@heitbaum.com>
+CC: Bagas Sanjaya <bagasdotme@gmail.com>, Johannes Berg
+	<johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>, Andrew Morton
+	<akpm@linux-foundation.org>, Linux Kernel Mailing List
+	<linux-kernel@vger.kernel.org>, Linux Regressions
+	<regressions@lists.linux.dev>, Linux Memory Management List
+	<linux-mm@kvack.org>, Linux Networking <netdev@vger.kernel.org>, "Linux
+ Wireless" <linux-wireless@vger.kernel.org>
+Subject: RE: mm/page_alloc.c:4453 with cfg80211_wiphy_work [cfg80211]
+Thread-Topic: mm/page_alloc.c:4453 with cfg80211_wiphy_work [cfg80211]
+Thread-Index: AQHZt9Y8Drzo+t4D60uEaI2mUoJeL6+9+JZAgAE0GgCAAXycwA==
+Date: Wed, 19 Jul 2023 06:45:56 +0000
+Message-ID: <DM4PR11MB604304FC3551BCD9AB13EBBDE939A@DM4PR11MB6043.namprd11.prod.outlook.com>
+References: <51e53417-cfad-542c-54ee-0fb9e26c4a38@gmail.com>
+ <DM4PR11MB6043088A4A65CBF124F5D518E93BA@DM4PR11MB6043.namprd11.prod.outlook.com>
+ <ZLZHDm3mcxaLdvRH@503599e9be06>
+In-Reply-To: <ZLZHDm3mcxaLdvRH@503599e9be06>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB6043:EE_|MN6PR11MB8218:EE_
+x-ms-office365-filtering-correlation-id: 4436cff0-14be-48ad-664a-08db8823cdd5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 8nPIZ1yOtbaIbdQySiXhxbv86fwelcELPfMpfzSROlOHj1ZzKWaaa2GQD7i9KaWANcsfabKwJe+1Wqg1y4fuQWaFO93OGyU/C6l/WFTT9jRbeq/SWJDJRPGMEfRJ7tvVpMieY9RjTD5vQGVvKP37OmgU4Oc2nRxXEx5ukZJQoYEwsSNOJFz6EhqrOWhOehuawTXvkA0TIMmg9/AAtO+aPEpLWUNBTJRmcuu7cgd53OfmLvS/S+hscEjxg0+3M9kz4P18O+/AWKLteOJoLCsW3ilnHUg1flgZjnOfnUfI3glw8CO1tSR8j6y147JbBaVFcdagReOQL5WRuU8uCb29UOKRSmMYCcK/HvLtI8wgyE3d+E8l/0heGSR5y+IOulHFDNwPl//kpJKCBPFGw27k/7u8sa7/mk6dZuexii+9709vf+L8Z6G9qx2vvYElb/TJ4f4oVr3qo8miHRKmhIi6O7mLYBYirTNX+iZsYJv+cLLIX0zfw3JHCDkKqm7aXG631HztnsmbJMW11xCyOqCkuHEfaXjVw82hMdhPgVQjuJttb/Si6H3Z9EiPkIZ70nGyCrORArnAHNK4xjDLq72X5Y8XoqCdmoHcnPAYxwDEdUZfJzOqr8gzDfZ0m+El8BhM
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6043.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(136003)(39860400002)(346002)(376002)(451199021)(71200400001)(9686003)(478600001)(54906003)(7696005)(6506007)(186003)(26005)(2906002)(76116006)(8936002)(64756008)(5660300002)(6916009)(66946007)(4326008)(41300700001)(7416002)(66446008)(316002)(8676002)(52536014)(66556008)(82960400001)(38100700002)(122000001)(38070700005)(86362001)(558084003)(83380400001)(55016003)(33656002)(66476007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?K6/p0Z2YgDVzxwwjciGS3yi8TPGzOA4nOVoyxauI2h0C1dog360MuHo9Wqo4?=
+ =?us-ascii?Q?BYG7woo13d5etGxVO0FCf1+54MLFjwkbXBWeBH2wJeifY9jXdimvcxzvP7pX?=
+ =?us-ascii?Q?dNnTtKt6dU1X2Lbt1Nd97Majqryalya+3ilGwPFEttp9obyVjGRcxraQcA3C?=
+ =?us-ascii?Q?jrdGLv1b20nDWsrdci1wNVwCL2LwbNbN49pFlNJ07VSSTtY+u0hMjbv2cmiG?=
+ =?us-ascii?Q?RQ0Cw2QVa7SoizOdsk/wMsYiFlhzib0PaFuul3mY5NC+yHLkMwNiij8IeUBk?=
+ =?us-ascii?Q?WTvcjNPf0H3iwy1DKyf0ti/BXqWY5O+4F+kP+sPo3tdNqbc8sGVOUFFIRf+s?=
+ =?us-ascii?Q?jYiZ5Zal5TMH91D+6G7S7gL2Kp1ZBdISgGB6Fv1m8nXzZIUPVqumkBWVtAb8?=
+ =?us-ascii?Q?0cLCSZPpwcJxD3wjQLsEBUsJRdraTl5Y8mDz9LgFgQQOTS0ZOrc406RLZVdb?=
+ =?us-ascii?Q?l8TIO87uUjeoTIHFrvKRp0sbON6MjxFB8yTfiJ+SsIFVbLppqbqulZuAzgse?=
+ =?us-ascii?Q?70xfOW0LMKYYluX4jIfqvTPIPXbQebUXzTqB5fD67EXarJDQdqXVGhMM5WRg?=
+ =?us-ascii?Q?clWxYUxvt+DTvsMwdQv20pwywqeDpJjd/528eNNqDRUrjT3fC5uoIxUxPXJO?=
+ =?us-ascii?Q?qc+gcg6x4sUcSrFeaB5o6Ys5YycUFzwFK4Cvb7iMr+9qDuhQVQZuA658yiD8?=
+ =?us-ascii?Q?EPJEVnHf4awEoyWYfBz5sire4pol8oMQnJjI5YCQNe3gdg8SQwK88SfUxcOZ?=
+ =?us-ascii?Q?FegyaLvz8w/15n+OlJwZU9g0PD41ekdbW0zj/qW9I1bXKD3moOXkQBq76Hv4?=
+ =?us-ascii?Q?AO8U2VQ3AqOAW9WrG0Km3Yr8YpFxq3dpgmgcTasfdfxs82PpRBUDqmk6VzHt?=
+ =?us-ascii?Q?6vm+nH+0N+XhX104cmFRmvwIZmpZtTKaSWGYpIofnUYdCT2yYvio2ZIMFgvT?=
+ =?us-ascii?Q?dwLPYE2wmZWuO5OdH8Kc+5fM5qwFSOz4QjGQ8doDq3B0vs5v0PUq5DUYEHU/?=
+ =?us-ascii?Q?Q/TDkaiQmbu0Z6G/DMJpYw+B89aSsCl9tFU3lYMIeBZuOkv9GVaj33BKUef7?=
+ =?us-ascii?Q?RgDu3NspCB/kTCG77KVvso3WG0SioffqZ8GZ9txY4iosqkGIlBT+kfYOQq5I?=
+ =?us-ascii?Q?rJFQVHxDxL1axv5E2njqJD8rX41NnyOOwFDGVWYg4Itl3qkHF4Ivzl0HQR4W?=
+ =?us-ascii?Q?ydDw3AZtFupD3XYAsqeyILm9X1xjyOwmbQ2rTeHl4jrWqRzPG9qK7dxbdsSw?=
+ =?us-ascii?Q?GqrVSerVNeGw+rlI2e8uTY6zooqmKIXGttas/SOA8dG7oU3tUHXeLapA8uBQ?=
+ =?us-ascii?Q?NhGtuNZfNnw3Ni7RfREH5GiX27tL3Ir+lf4Qakz/q/tAHqzUYj/7IbVSR0Cj?=
+ =?us-ascii?Q?KTV6zv2RpuabxyDyJLJa3gwFuEN8NPV1C9yrlCQEWodTdC1HSV+zCVceS5zI?=
+ =?us-ascii?Q?knhcoOu6P/TIPu0ADD+Hso6it31JB9DoHdQWSPmkAhbZmVTymgC2tc2R3hr9?=
+ =?us-ascii?Q?Df+KnO6U/AHyo7veiQNRrooxI2uA5mJG3lNAmdzOKE8ZjmpXt+Xw0JsGROng?=
+ =?us-ascii?Q?DXQZgh+6Q4NkIbdtWAU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6043.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4436cff0-14be-48ad-664a-08db8823cdd5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2023 06:45:56.1502
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hjDCpoT1v3qahUdEZBnu/QGy08ipTsSE+NW02BC7jyP52wEgoktQd/IcyXqk1JmSr4nIx+r46y+bplWfACXSSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8218
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a driver for the Marvell 88Q2110. This driver allows to detect the
-link, switch between 100BASE-T1 and 1000BASE-T1 and switch between
-master and slave mode. Autonegotiation supported by the PHY does not yet
-work.
+Hi,
 
-Signed-off-by: Stefan Eichenberger <eichest@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/phy/Kconfig           |   6 +
- drivers/net/phy/Makefile          |   1 +
- drivers/net/phy/marvell-88q2xxx.c | 263 ++++++++++++++++++++++++++++++
- include/linux/marvell_phy.h       |   1 +
- 4 files changed, 271 insertions(+)
- create mode 100644 drivers/net/phy/marvell-88q2xxx.c
+> Hi Ilan,
+>=20
+> I can confirm that this fixes the error in my dmesg.
+>=20
+> Regards
+> Rudi
+>=20
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 78e6981650d94..87b8238587173 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -217,6 +217,12 @@ config MARVELL_10G_PHY
- 	help
- 	  Support for the Marvell Alaska MV88X3310 and compatible PHYs.
- 
-+config MARVELL_88Q2XXX_PHY
-+	tristate "Marvell 88Q2XXX PHY"
-+	help
-+	  Support for the Marvell 88Q2XXX 100/1000BASE-T1 Automotive Ethernet
-+	  PHYs.
-+
- config MARVELL_88X2222_PHY
- 	tristate "Marvell 88X2222 PHY"
- 	help
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 2fe51ea83babe..35142780fc9da 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -66,6 +66,7 @@ obj-$(CONFIG_LSI_ET1011C_PHY)	+= et1011c.o
- obj-$(CONFIG_LXT_PHY)		+= lxt.o
- obj-$(CONFIG_MARVELL_10G_PHY)	+= marvell10g.o
- obj-$(CONFIG_MARVELL_PHY)	+= marvell.o
-+obj-$(CONFIG_MARVELL_88Q2XXX_PHY)	+= marvell-88q2xxx.o
- obj-$(CONFIG_MARVELL_88X2222_PHY)	+= marvell-88x2222.o
- obj-$(CONFIG_MAXLINEAR_GPHY)	+= mxl-gpy.o
- obj-$(CONFIG_MEDIATEK_GE_PHY)	+= mediatek-ge.o
-diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-new file mode 100644
-index 0000000000000..1c3ff77de56b4
---- /dev/null
-+++ b/drivers/net/phy/marvell-88q2xxx.c
-@@ -0,0 +1,263 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Marvell 88Q2XXX automotive 100BASE-T1/1000BASE-T1 PHY driver
-+ */
-+#include <linux/ethtool_netlink.h>
-+#include <linux/marvell_phy.h>
-+#include <linux/phy.h>
-+
-+#define MDIO_MMD_AN_MV_STAT			32769
-+#define MDIO_MMD_AN_MV_STAT_ANEG		0x0100
-+#define MDIO_MMD_AN_MV_STAT_LOCAL_RX		0x1000
-+#define MDIO_MMD_AN_MV_STAT_REMOTE_RX		0x2000
-+#define MDIO_MMD_AN_MV_STAT_LOCAL_MASTER	0x4000
-+#define MDIO_MMD_AN_MV_STAT_MS_CONF_FAULT	0x8000
-+
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1			33032
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1_IDLE_ERROR	0x00FF
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1_JABBER		0x0100
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1_LINK		0x0200
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1_LOCAL_RX		0x1000
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1_REMOTE_RX		0x2000
-+#define MDIO_MMD_PCS_MV_100BT1_STAT1_LOCAL_MASTER	0x4000
-+
-+#define MDIO_MMD_PCS_MV_100BT1_STAT2		33033
-+#define MDIO_MMD_PCS_MV_100BT1_STAT2_JABBER	0x0001
-+#define MDIO_MMD_PCS_MV_100BT1_STAT2_POL	0x0002
-+#define MDIO_MMD_PCS_MV_100BT1_STAT2_LINK	0x0004
-+#define MDIO_MMD_PCS_MV_100BT1_STAT2_ANGE	0x0008
-+
-+static int mv88q2xxx_soft_reset(struct phy_device *phydev)
-+{
-+	int ret;
-+	int val;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PCS,
-+			    MDIO_PCS_1000BT1_CTRL, MDIO_PCS_1000BT1_CTRL_RESET);
-+	if (ret < 0)
-+		return ret;
-+
-+	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PCS,
-+					 MDIO_PCS_1000BT1_CTRL, val,
-+					 !(val & MDIO_PCS_1000BT1_CTRL_RESET),
-+					 50000, 600000, true);
-+}
-+
-+static int mv88q2xxx_read_link_gbit(struct phy_device *phydev)
-+{
-+	int ret;
-+	bool link = false;
-+
-+	/* Read vendor specific Auto-Negotiation status register to get local
-+	 * and remote receiver status according to software initialization
-+	 * guide.
-+	 */
-+	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT);
-+	if (ret < 0) {
-+		return ret;
-+	} else if ((ret & MDIO_MMD_AN_MV_STAT_LOCAL_RX) &&
-+		   (ret & MDIO_MMD_AN_MV_STAT_REMOTE_RX)) {
-+		/* The link state is latched low so that momentary link
-+		 * drops can be detected. Do not double-read the status
-+		 * in polling mode to detect such short link drops except
-+		 * the link was already down.
-+		 */
-+		if (!phy_polling_mode(phydev) || !phydev->link) {
-+			ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
-+			if (ret < 0)
-+				return ret;
-+			else if (ret & MDIO_PCS_1000BT1_STAT_LINK)
-+				link = true;
-+		}
-+
-+		if (!link) {
-+			ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_STAT);
-+			if (ret < 0)
-+				return ret;
-+			else if (ret & MDIO_PCS_1000BT1_STAT_LINK)
-+				link = true;
-+		}
-+	}
-+
-+	phydev->link = link;
-+
-+	return 0;
-+}
-+
-+static int mv88q2xxx_read_link_100m(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* The link state is latched low so that momentary link
-+	 * drops can be detected. Do not double-read the status
-+	 * in polling mode to detect such short link drops except
-+	 * the link was already down. In case we are not polling,
-+	 * we always read the realtime status.
-+	 */
-+	if (!phy_polling_mode(phydev) || !phydev->link) {
-+		ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_100BT1_STAT1);
-+		if (ret < 0)
-+			return ret;
-+		else if (ret & MDIO_MMD_PCS_MV_100BT1_STAT1_LINK)
-+			goto out;
-+	}
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_100BT1_STAT1);
-+	if (ret < 0)
-+		return ret;
-+
-+out:
-+	/* Check if we have link and if the remote and local receiver are ok */
-+	if ((ret & MDIO_MMD_PCS_MV_100BT1_STAT1_LINK) &&
-+	    (ret & MDIO_MMD_PCS_MV_100BT1_STAT1_LOCAL_RX) &&
-+	    (ret & MDIO_MMD_PCS_MV_100BT1_STAT1_REMOTE_RX))
-+		phydev->link = true;
-+	else
-+		phydev->link = false;
-+
-+	return 0;
-+}
-+
-+static int mv88q2xxx_read_link(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* The 88Q2XXX PHYs do not have the PMA/PMD status register available,
-+	 * therefore we need to read the link status from the vendor specific
-+	 * registers depending on the speed.
-+	 */
-+	if (phydev->speed == SPEED_1000)
-+		ret = mv88q2xxx_read_link_gbit(phydev);
-+	else
-+		ret = mv88q2xxx_read_link_100m(phydev);
-+
-+	return ret;
-+}
-+
-+static int mv88q2xxx_read_status(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = mv88q2xxx_read_link(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	return genphy_c45_read_pma(phydev);
-+}
-+
-+static int mv88q2xxx_get_features(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = genphy_c45_pma_read_abilities(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* We need to read the baset1 extended abilities manually because the
-+	 * PHY does not signalize it has the extended abilities register
-+	 * available.
-+	 */
-+	ret = genphy_c45_pma_baset1_read_abilities(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* The PHY signalizes it supports autonegotiation. Unfortunately, so
-+	 * far it was not possible to get a link even when following the init
-+	 * sequence provided by Marvell. Disable it for now until a proper
-+	 * workaround is found or a new PHY revision is released.
-+	 */
-+	linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
-+
-+	return 0;
-+}
-+
-+static int mv88q2xxx_config_aneg(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = genphy_c45_config_aneg(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return mv88q2xxx_soft_reset(phydev);
-+}
-+
-+static int mv88q2xxx_config_init(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* The 88Q2XXX PHYs do have the extended ability register available, but
-+	 * register MDIO_PMA_EXTABLE where they should signalize it does not
-+	 * work according to specification. Therefore, we force it here.
-+	 */
-+	phydev->pma_extable = MDIO_PMA_EXTABLE_BT1;
-+
-+	/* Read the current PHY configuration */
-+	ret = genphy_c45_read_pma(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return mv88q2xxx_config_aneg(phydev);
-+}
-+
-+static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	if (phydev->speed == SPEED_100) {
-+		/* Read the SQI from the vendor specific receiver status
-+		 * register
-+		 */
-+		ret = phy_read_mmd(phydev, MDIO_MMD_PCS, 0x8230);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = ret >> 12;
-+	} else {
-+		/* Read from vendor specific registers, they are not documented
-+		 * but can be found in the Software Initialization Guide. Only
-+		 * revisions >= A0 are supported.
-+		 */
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, 0xFC5D, 0x00FF, 0x00AC);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = phy_read_mmd(phydev, MDIO_MMD_PCS, 0xfc88);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	return ret & 0x0F;
-+}
-+
-+static int mv88q2xxxx_get_sqi_max(struct phy_device *phydev)
-+{
-+	return 15;
-+}
-+
-+static struct phy_driver mv88q2xxx_driver[] = {
-+	{
-+		.phy_id			= MARVELL_PHY_ID_88Q2110,
-+		.phy_id_mask		= MARVELL_PHY_ID_MASK,
-+		.name			= "mv88q2110",
-+		.get_features		= mv88q2xxx_get_features,
-+		.config_aneg		= mv88q2xxx_config_aneg,
-+		.config_init		= mv88q2xxx_config_init,
-+		.read_status		= mv88q2xxx_read_status,
-+		.soft_reset		= mv88q2xxx_soft_reset,
-+		.set_loopback		= genphy_c45_loopback,
-+		.get_sqi		= mv88q2xxxx_get_sqi,
-+		.get_sqi_max		= mv88q2xxxx_get_sqi_max,
-+	},
-+};
-+
-+module_phy_driver(mv88q2xxx_driver);
-+
-+static struct mdio_device_id __maybe_unused mv88q2xxx_tbl[] = {
-+	{ MARVELL_PHY_ID_88Q2110, MARVELL_PHY_ID_MASK },
-+	{ /*sentinel*/ }
-+};
-+MODULE_DEVICE_TABLE(mdio, mv88q2xxx_tbl);
-+
-+MODULE_DESCRIPTION("Marvell 88Q2XXX 100/1000BASE-T1 Automotive Ethernet PHY driver");
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/marvell_phy.h b/include/linux/marvell_phy.h
-index 0f06c2287b527..9b54c4f0677f8 100644
---- a/include/linux/marvell_phy.h
-+++ b/include/linux/marvell_phy.h
-@@ -25,6 +25,7 @@
- #define MARVELL_PHY_ID_88X3310		0x002b09a0
- #define MARVELL_PHY_ID_88E2110		0x002b09b0
- #define MARVELL_PHY_ID_88X2222		0x01410f10
-+#define MARVELL_PHY_ID_88Q2110		0x002b0980
- 
- /* Marvel 88E1111 in Finisar SFP module with modified PHY ID */
- #define MARVELL_PHY_ID_88E1111_FINISAR	0x01ff0cc0
--- 
-2.39.2
+Thanks for the update. I'll push a patch to the wireless mailing list.
 
+Regards,
+
+Ilan.
 
