@@ -1,166 +1,110 @@
-Return-Path: <netdev+bounces-19023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D28759612
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B462759614
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F06161C20F7C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:59:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CDA71C20F69
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989BF14A98;
-	Wed, 19 Jul 2023 12:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F4C14A9B;
+	Wed, 19 Jul 2023 13:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6E314A95
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:59:30 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E79C113;
-	Wed, 19 Jul 2023 05:59:28 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 512D05C00AD;
-	Wed, 19 Jul 2023 08:59:25 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Wed, 19 Jul 2023 08:59:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1689771565; x=1689857965; bh=tTNyPZitoSE69
-	bfMeeZHw81SO7vH8/lOR1ecEDTdkuU=; b=ma/TCNemj65HAhn9cHs93Q6YY6arL
-	h8f+aLsoF91MhCiTtVlDNkNPUoWUD0TEPuDp0qO8fFBR15XNTRvHKODwi7iuNTDP
-	jUlEcrsfPQbzvI2dviMK3eRaeerSHJfBTyWg9gPLjT0KMXOQUOHsyRQwL6wqAo8L
-	1W+/6mBm4pKqL7epyZEIXt5J9tswjLqkNxsN+K+S9QjGlF4t7POkkV83P2j/K89y
-	WoGeD+GlveXaG3FACMLLMFRXVD1Q1WqpwG1xWWRBpvV1K7TlNZWRfB0UNmF5T2PI
-	M/k8Tf58fHEkwlEn80t1a5wZ6jR9j0Tcv5h77u9glQWfX/SruiOIWWepg==
-X-ME-Sender: <xms:LN63ZPx8QTKwCBbR6Vsam_9clItFGtG6_59BiFQHxxAQg9X7sBTsgA>
-    <xme:LN63ZHS7ckRWg4g3PJ6mkCD4snAeZJ20YjZFSRSop0OuHTzKjKDo9ReskwKINBk7M
-    8XTxOovqMt4OaE>
-X-ME-Received: <xmr:LN63ZJVglJfeLJHzPYTfExMbX2SPmSamT8Pfjp2_REF30VRzhXPSD96gK0D9GqLxiOwYzVZMU2RpJrmsvQk91m3l4Kk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeekgdegvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:LN63ZJhpMl0B24HzAzwYR1_LHEl4HDy5iydMQAZ_na3gEmdVy-0FJg>
-    <xmx:LN63ZBBKuV3MaWtCxXzqw3Ny5n7f7q6XwevW9YN06leud4-YW7N67Q>
-    <xmx:LN63ZCKFFQhBYhGUNwTU1f1gTTFiRAulMmv_js3iZoGIItn15Q4RhQ>
-    <xmx:Ld63ZFsglQSXT6V74-B81LCui_2UgJ-pwis7YBMqwebwbhoXrL-zcQ>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 19 Jul 2023 08:59:23 -0400 (EDT)
-Date: Wed, 19 Jul 2023 15:59:19 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	petrm@nvidia.com
-Subject: Re: [PROBLEM] selftests: net/forwarding/*.sh: 'Command line is not
- complete. Try option "help"'
-Message-ID: <ZLfeJzFJ1HEeooZR@shredder>
-References: <856d454e-f83c-20cf-e166-6dc06cbc1543@alu.unizg.hr>
- <ZLY9yiaVwCGy5H3R@shredder>
- <8d149f8c-818e-d141-a0ce-a6bae606bc22@alu.unizg.hr>
- <1c2a2d56-95a0-72f8-23a0-1e186e6443a2@alu.unizg.hr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D9514A95
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:01:04 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127901711;
+	Wed, 19 Jul 2023 06:01:02 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qM6nT-00079S-1s; Wed, 19 Jul 2023 15:00:51 +0200
+Message-ID: <6bcdeee4-5348-c08e-701e-47bc138be74f@leemhuis.info>
+Date: Wed, 19 Jul 2023 15:00:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c2a2d56-95a0-72f8-23a0-1e186e6443a2@alu.unizg.hr>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: Fwd: Unexplainable packet drop starting at v6.4
+Content-Language: en-US, de-DE
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Andrzej Kacprowski <andrzej.kacprowski@linux.intel.com>,
+ Krystian Pradzynski <krystian.pradzynski@linux.intel.com>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+ Oded Gabbay <ogabbay@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ hq.dev+kernel@msdfc.xyz
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux DRI Development <dri-devel@lists.freedesktop.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Intel Ethernet Drivers <intel-wired-lan@lists.osuosl.org>
+References: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
+ <444d8158-cc58-761d-a878-91e5d4d28b71@leemhuis.info>
+ <4759e7d4-5a8c-8acb-1775-e049b9b06cc1@gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <4759e7d4-5a8c-8acb-1775-e049b9b06cc1@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1689771663;6c1522dc;
+X-HE-SMSGID: 1qM6nT-00079S-1s
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 08:39:33PM +0200, Mirsad Todorovac wrote:
-> There is also a gotcha here: you do not delete all veths:
-> 
-> root@defiant:# ip link show
-> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
->     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-> 2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
->     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
-> root@defiant:# ./bridge_igmp.sh
+On 19.07.23 14:30, Bagas Sanjaya wrote:
+> On 7/19/23 18:49, Thorsten Leemhuis wrote:
+>> On 18.07.23 02:51, Bagas Sanjaya wrote:
+>>> I notice a regression report on Bugzilla [1]. Quoting from it:
+>>>
+>>>> After I updated to 6.4 through Archlinux kernel update, suddenly I noticed random packet losses on my routers like nodes. I have these networking relevant config on my nodes
+>>>>
+>>>> 1. Using archlinux
+>>>> 2. Network config through systemd-networkd
+>>>> 3. Using bird2 for BGP routing, but not relevant to this bug.
+>>>> 4. Using nftables for traffic control, but seems not relevant to this bug. 
+>>>> 5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 level
+>>>>
+>>>> After I ruled out systemd-networkd, nftables related issues. I tracked down issues to kernel.
+>>> [...]
+>>> See Bugzilla for the full thread.
+>>>
+>>> Thorsten: The reporter had a bad bisect (some bad commits were marked as good
+>>> instead), hence SoB chain for culprit (unrelated) ipvu commit is in To:
+>>> list. I also asked the reporter (also in To:) to provide dmesg and request
+>>> rerunning bisection, but he doesn't currently have a reliable reproducer.
+>>> Is it the best I can do?
+>>
+>> When a bisection apparently went sideways it's best to not bother the
+>> culprit's developers with it, they most likely will just be annoyed by
+>> it (and then they might become annoyed by regression tracking, which we
+>> need to avoid).
+>
+> I mean don't Cc: the culprit author in that case?
 
-[...]
+Yes. If a bisection lands on a commit that seems like a pretty unlikely
+culprit for the problem at hand (which even the reporter admitted in the
+report), then ask the reporter to verify the result (e.g. ideally by
+trying to revert it ontop of latest mainline; checking the parent commit
+again sometimes can do the trick as well)  before involving the people
+that authored and handled said change. Otherwise you just raise a false
+alarm and then people will be annoyed by our work or if we are unlucky
+start to ignore us -- and we need to prevent that.
 
-> root@defiant:# ip link show
-> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
->     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-> 2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
->     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
-> 3: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->     link/ether b6:46:e6:4c:e4:00 brd ff:ff:ff:ff:ff:ff
-> 4: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->     link/ether 2e:ff:7f:8a:6b:d4 brd ff:ff:ff:ff:ff:ff
-> 5: veth3@veth2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->     link/ether ba:33:37:81:dc:5b brd ff:ff:ff:ff:ff:ff
-> 6: veth2@veth3: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->     link/ether f2:fd:0a:9b:94:17 brd ff:ff:ff:ff:ff:ff
-> root@defiant:#
-
-These tests can be run with veth pairs or with loop backed physical
-ports. We can't delete the latter and I don't see a clean way to delete
-the veth pairs.
-
-The following patch [1] changes the default to not create interfaces so
-that by default these tests will be skipped [2]. Those who care about
-running the tests can create a forwarding.config file (using
-forwarding.config.sample as an example) and either create the veth pairs
-themselves or opt-in for the interfaces to be created automatically
-(setting NETIF_CREATE=yes), but not deleted.
-
-[1]
-diff --git a/tools/testing/selftests/net/forwarding/forwarding.config.sample b/tools/testing/selftests/net/forwarding/forwarding.config.sample
-index 4a546509de90..b72f08dfd491 100644
---- a/tools/testing/selftests/net/forwarding/forwarding.config.sample
-+++ b/tools/testing/selftests/net/forwarding/forwarding.config.sample
-@@ -36,8 +36,9 @@ PAUSE_ON_FAIL=no
- PAUSE_ON_CLEANUP=no
- # Type of network interface to create
- NETIF_TYPE=veth
--# Whether to create virtual interfaces (veth) or not
--NETIF_CREATE=yes
-+# Whether to create virtual interfaces (veth) or not. Created interfaces are
-+# not automatically deleted
-+NETIF_CREATE=no
- # Timeout (in seconds) before ping exits regardless of how many packets have
- # been sent or received
- PING_TIMEOUT=5
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 9ddb68dd6a08..1b1bc634c63e 100755
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -17,7 +17,7 @@ WAIT_TIME=${WAIT_TIME:=5}
- PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
- PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
- NETIF_TYPE=${NETIF_TYPE:=veth}
--NETIF_CREATE=${NETIF_CREATE:=yes}
-+NETIF_CREATE=${NETIF_CREATE:=no}
- MCD=${MCD:=smcrouted}
- MC_CLI=${MC_CLI:=smcroutectl}
- PING_COUNT=${PING_COUNT:=10}
-
-[2]
-# ./bridge_igmp.sh 
-SKIP: could not find all required interfaces
+Ciao, Thorsten
 
