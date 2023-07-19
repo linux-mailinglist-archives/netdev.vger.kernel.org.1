@@ -1,121 +1,88 @@
-Return-Path: <netdev+bounces-18897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3013075905A
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:34:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A91D3759076
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD9C0281797
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:34:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52452281583
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4735C8D7;
-	Wed, 19 Jul 2023 08:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6CBD300;
+	Wed, 19 Jul 2023 08:40:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD0EBE40
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:34:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E0F4C433A9;
-	Wed, 19 Jul 2023 08:34:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689755649;
-	bh=WMX//Zd4vQHTl2wSNqngG3i/KSedW7bESZCEVdywQQg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=npivonAoU/JLz34y+sU/NQYHPvNpLVQT+U0/+j+878TThXUt2K/EknBClxtbnhFJS
-	 GgrvtoIgMqCqeZGw7UEkZRjZzrsr5BhPFx3T8EdDuxBipmyDyGB+J1ClvT1lOAsDgr
-	 l5rDJbQBqAualqYJ7CgBqQKBilcA8larUuWgBBWmi4RO7OMatAn8VPgF7/bNLiAq9E
-	 S5HIMsTnGT0sdXVOVV1YkwWJl72Whv/nA8r38/EWZNq9VEjelxvff1tKjzTSSewPmh
-	 yorAW1NVYQIVtHiKYhZZKK8eyOcxMZhZfC43m6ucmTjEhDqTWGtIEiLMM7Q9gcFSrC
-	 bEYx1FSSR02sQ==
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-4fbb281eec6so10747014e87.1;
-        Wed, 19 Jul 2023 01:34:08 -0700 (PDT)
-X-Gm-Message-State: ABy/qLZQxaAo2aRTG1tPmJJrznKOb0zoMb9tC5ONuZ5Bd0FnPWdk5VlO
-	3hehMzVw/e4Vv9DdPYaYR2gv9J8DQtDGcIHsAWA=
-X-Google-Smtp-Source: APBJJlGeSF5V0ZncchYeqcmkqwpUY28YQJ5DiF5w2vBv40Stfz5hfjtiPkQFB2dDWAAbFdheF+NmWD6HTwZKJ8tR1ic=
-X-Received: by 2002:ac2:4db2:0:b0:4fd:c8dc:2f55 with SMTP id
- h18-20020ac24db2000000b004fdc8dc2f55mr3519001lfe.66.1689755647078; Wed, 19
- Jul 2023 01:34:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA53BE40
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:40:16 +0000 (UTC)
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E7510E
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:40:12 -0700 (PDT)
+X-QQ-mid:Yeas48t1689755917t735t43708
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.243.13])
+X-QQ-SSF:00400000000000F0FQF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 3527007509173599446
+To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
+Cc: "'Simon Horman'" <simon.horman@corigine.com>,
+	<kabel@kernel.org>,
+	<andrew@lunn.ch>,
+	<hkallweit1@gmail.com>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<netdev@vger.kernel.org>
+References: <043501d9b580$31798870$946c9950$@trustnetic.com> <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com> <ZLUymspsQlJL1k8n@shell.armlinux.org.uk> <013701d9b957$fc66f740$f534e5c0$@trustnetic.com> <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk> <013e01d9b95e$66c10350$344309f0$@trustnetic.com> <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk> <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com> <ZLeHyzsRqxAj4ZGO@shell.armlinux.org.uk> <01b401d9ba16$aacf75f0$006e61d0$@trustnetic.com> <ZLeeZMU4HeiHthQ2@shell.armlinux.org.uk>
+In-Reply-To: <ZLeeZMU4HeiHthQ2@shell.armlinux.org.uk>
+Subject: RE: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
+Date: Wed, 19 Jul 2023 16:38:36 +0800
+Message-ID: <01b701d9ba1c$691d9fa0$3b58dee0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-6-ardb@kernel.org>
- <20230718223813.GC1005@sol.localdomain>
-In-Reply-To: <20230718223813.GC1005@sol.localdomain>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 19 Jul 2023 10:33:55 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
-Message-ID: <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/21] ubifs: Pass worst-case buffer size to
- compression routines
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Kees Cook <keescook@chromium.org>, Haren Myneni <haren@us.ibm.com>, Nick Terrell <terrelln@fb.com>, 
-	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>, 
-	Richard Weinberger <richard@nod.at>, David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, qat-linux@intel.com, 
-	linuxppc-dev@lists.ozlabs.org, linux-mtd@lists.infradead.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQFMOiuVG72ejxJpQ9dFJOgJWFa94gFjhYqqApkC1W8CGUSlBAG/1/rdAwkAc4UCHFYsuQJ0/BrNAYfQyTgDYvYnlAM9fevwsB8AUxA=
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 19 Jul 2023 at 00:38, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Jul 18, 2023 at 02:58:31PM +0200, Ard Biesheuvel wrote:
-> > Currently, the ubifs code allocates a worst case buffer size to
-> > recompress a data node, but does not pass the size of that buffer to the
-> > compression code. This means that the compression code will never use
-> > the additional space, and might fail spuriously due to lack of space.
+On Wednesday, July 19, 2023 4:27 PM, Russell King (Oracle) wrote:
+> On Wed, Jul 19, 2023 at 03:57:30PM +0800, Jiawen Wu wrote:
+> > > According to this read though (which is in get_mactype), the write
+> > > didn't take effect.
+> > >
+> > > If you place a delay of 1ms after phy_clear_bits_mmd() in
+> > > mv3310_power_up(), does it then work?
 > >
-> > So let's multiply out_len by WORST_COMPR_FACTOR after allocating the
-> > buffer. Doing so is guaranteed not to overflow, given that the preceding
-> > kmalloc_array() call would have failed otherwise.
-> >
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > ---
-> >  fs/ubifs/journal.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
-> > index dc52ac0f4a345f30..4e5961878f336033 100644
-> > --- a/fs/ubifs/journal.c
-> > +++ b/fs/ubifs/journal.c
-> > @@ -1493,6 +1493,8 @@ static int truncate_data_node(const struct ubifs_info *c, const struct inode *in
-> >       if (!buf)
-> >               return -ENOMEM;
-> >
-> > +     out_len *= WORST_COMPR_FACTOR;
-> > +
-> >       dlen = le32_to_cpu(dn->ch.len) - UBIFS_DATA_NODE_SZ;
-> >       data_size = dn_size - UBIFS_DATA_NODE_SZ;
-> >       compr_type = le16_to_cpu(dn->compr_type);
->
-> This looks like another case where data that would be expanded by compression
-> should just be stored uncompressed instead.
->
-> In fact, it seems that UBIFS does that already.  ubifs_compress() has this:
->
->         /*
->          * If the data compressed only slightly, it is better to leave it
->          * uncompressed to improve read speed.
->          */
->         if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF)
->                 goto no_compr;
->
-> So it's unclear why the WORST_COMPR_FACTOR thing is needed at all.
->
+> > Yes, I just experimented, it works well.
+> 
+> Please send a patch adding it, with a comment along the lines of:
+> 
+> 	/* Sometimes, the power down bit doesn't clear immediately, and
+> 	 * a read of this register causes the bit not to clear. Delay
+> 	 * 1ms to allow the PHY to come out of power down mode before
+> 	 * the next access.
+> 	 */
 
-It is not. The buffer is used for decompression in the truncation
-path, so none of this logic even matters. Even if the subsequent
-recompression of the truncated data node could result in expansion
-beyond the uncompressed size of the original data (which seems
-impossible to me), increasing the size of this buffer would not help
-as it is the input buffer for the compression not the output buffer.
+After multiple experiments, I determined that the minimum delay it required
+is 55us. Does the delay need to be reduced? But I'm not sure whether it is
+related to the system. I use udelay(55) in the test.
+
+
 
