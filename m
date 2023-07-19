@@ -1,226 +1,236 @@
-Return-Path: <netdev+bounces-18846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C10C758DA0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D833758D9D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E83C1C20C8E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBA18281637
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585176129;
-	Wed, 19 Jul 2023 06:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C476129;
+	Wed, 19 Jul 2023 06:18:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472AC8BFE
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:18:43 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35AF81FC8;
-	Tue, 18 Jul 2023 23:18:36 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id DC6B010002B;
-	Wed, 19 Jul 2023 09:18:33 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru DC6B010002B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1689747513;
-	bh=T5//4veKF9G1kOtGCcNXq0VI2OqwBcKn7BZ/2ww7RM8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-	b=LlK0jZKGNAC0gd8i62mWbtHVMu9jzhbmZhi2vt+gXYplBuTFh6U+qeEpd1MAQrnte
-	 pbhl1DGl7Au3q3S8F0tVBMjG6juM6aLqi15/zMsfWyc6UDy55JUu/ZevgQvazEEMH6
-	 +duU7P5eOptffWT0BlJT32yqVZIs+8Tl/aqpuo88Pc1MLRtFt9drXrhU/jw+CaUEYR
-	 z4NHhxqIwGsa1CoHL7RUKJhxZn+lU9VNPRzUShslJtzPRtdAY2Wl9oEf4nrsWOAIZD
-	 ItMUw+0yQ1mmGC6zPK03K8/hQeDNFOJqTqvA66C7XZtoc7Nif4a/JdSx5uj3Upki1W
-	 sMlxEjG4GliJg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 19 Jul 2023 09:18:33 +0300 (MSK)
-Received: from [192.168.0.12] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 09:18:33 +0300
-Message-ID: <48090ce4-e610-58c9-5d92-34570d2eeed4@sberdevices.ru>
-Date: Wed, 19 Jul 2023 09:13:09 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CB71FDF
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:18:19 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2070.outbound.protection.outlook.com [40.107.237.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA381BFC;
+	Tue, 18 Jul 2023 23:18:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=knYYnScYRJ4BAUL4hRMBQOQXqg0OXpi5XGRMSKb0r+tUhdQ+IrAe7ryIa5XWsrOr2IXa3Jle06ehzKm/rBD/h86ZoZ+yzR7jVDCrAqNIMp52eNmYbdTtAhgeYtj898Q2OB2J5qzqM3vvQFesuzBum1npjRu/4X/afU3GN3t2aY1Syrvv1ebuQuxmfYUJVsxwYtOx2qzP2L1hWSVDvsT7RtxYZcxOKEJfQ5SDZ3/ajc7NiZ+vd0XShXskbw2CH+ssDtmMYxBVMdAaLFugCuaU9bGUEOlb00wWDleguHGrM4AaStZVS6+QThuEDpszscDAzai0tVfbMbmO4d+TBmTBXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HQr7yKxa5KQsSQ4v1lrv/GpxXDKOX3PE7ssJpVYGODI=;
+ b=C0zatDWlh3Kt8XPm5L8v97nENYlDXt8JBRaL/ZArlBJEYVExc9zNNcmo+N8Kl8Qh1Sxlia2No77vNIsIaLnweBcTRx2ievCc1BHUqf8pWp6R+xmSl9v3Yy3Jk8GANM6UW3aR4IfJAlGPgh2fgnLc12l3+dLhJ44ZkvyG/KqD5CfJ2z6AUh3bQZvaPiBNHp85Slt51nx/yjUDMaDd5BkW2UTrWCt1qEGtUdA0rWURYGIpR/9PSy4nmTN8dvEDFcf2BTzszRNB/FrocJfgfRTbWUvpgwVZa9K1nLD7XHb6ly0Te+90A4gFu8Stey+6X2A25NNy1ZD7OT2I5kp9wlxRdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HQr7yKxa5KQsSQ4v1lrv/GpxXDKOX3PE7ssJpVYGODI=;
+ b=SMtpeIpQIrV+dsYW0Jm8bj9O7kgBaKaTJXwHGkaMWr1VLZTkebafY1ZDJx6v65Yct7Wt3qKbFGutm5Bt3CWQJ8JO8RvnKzOFnZkFZ5JZYqyslCL3MVvcTpFllMOuMz6WDhNxKznGigfMmcQ7eS2rc9ct4eY0Fx/GJCqZ5AK+mOo=
+Received: from SJ0PR05CA0045.namprd05.prod.outlook.com (2603:10b6:a03:33f::20)
+ by SN7PR12MB6814.namprd12.prod.outlook.com (2603:10b6:806:266::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Wed, 19 Jul
+ 2023 06:18:15 +0000
+Received: from DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:a03:33f:cafe::5e) by SJ0PR05CA0045.outlook.office365.com
+ (2603:10b6:a03:33f::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.23 via Frontend
+ Transport; Wed, 19 Jul 2023 06:18:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DM6NAM11FT008.mail.protection.outlook.com (10.13.172.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6588.33 via Frontend Transport; Wed, 19 Jul 2023 06:18:14 +0000
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 19 Jul
+ 2023 01:18:13 -0500
+Received: from xhdpranavis40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.23 via Frontend
+ Transport; Wed, 19 Jul 2023 01:18:09 -0500
+From: Pranavi Somisetty <pranavi.somisetty@amd.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <michal.simek@amd.com>, <harini.katakam@amd.com>
+CC: <git@amd.com>, <radhey.shyam.pandey@amd.com>, <pranavi.somisetty@amd.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v2] dt-bindings: net: xilinx_gmii2rgmii: Convert to json schema
+Date: Wed, 19 Jul 2023 00:18:08 -0600
+Message-ID: <20230719061808.30967-1-pranavi.somisetty@amd.com>
+X-Mailer: git-send-email 2.36.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v2 2/4] vsock/virtio: support to send non-linear
- skb
-Content-Language: en-US
-From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230718180237.3248179-1-AVKrasnov@sberdevices.ru>
- <20230718180237.3248179-3-AVKrasnov@sberdevices.ru>
- <20230718162202-mutt-send-email-mst@kernel.org>
- <1ac4be11-0814-05af-6c2e-8563ac15e206@sberdevices.ru>
-In-Reply-To: <1ac4be11-0814-05af-6c2e-8563ac15e206@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178705 [Jul 19 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/19 03:54:00 #21637026
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT008:EE_|SN7PR12MB6814:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1e9258b-33b6-4106-8dda-08db881fef83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	uEL+yK9OIy23sUqlvYMqwMuhTn482qXSvVTGAr1LUeXBBbOkwctnNjDCniw3yp3+F+YEOr5mguSeq5x6xklv9SP2xFS99oXHy1Wz1fJTgFuMBmnbR/h3OVjgjWnVuGBcUs6kPaNZzldIG7cLm0UOk8szvicIBvGxTV1JMv9qEGGgI4TSwKQ4SVWutXJXl8VwmGExLJIXdKhsFrgwaRo0DsDpsfbz8darI/uwW8BeWJI4JJZeuQPTtDXvwzrdUNOPOw1dOQU4l6SgW7WNbQIPwAdFJWEkJuwZBe84BxmtSH6nQi4PGkBUcYJlZvishu5wqeg+CJLCbncYjZ5o0Oo5LMFKXZT+WRCDON4i10yEWX0vnX7pj+FhuIOXg59e0xxlY7HYZ0grub3mcQrIRLEPGrO4SrIazp4o8cj0lx9ApBf/ueC7LpzNldN2k+Zf/CeBOTgWWVn0RqRvnfOLjPjJ+X0BaCibt48tLO54tmzPFGo6XgbhXVmXCLiXXhlxXP27juP7n7IdlnZ4siJQ6/ldzlAXckkSu5WwUtJI9i5tO6v4fGo04H7axH2Vf7ReyP4wqEYiiy9hAK2DeQm13ioKT2Ho9Vx8ei1ORhRCBNT4ofObFkogQ9bYIJnXkYXwjlzZbpQ7u25sKhbXB5eX7TOY99/MBIJNbHpgXuYmRGUsF85KTJXtpkeS6/h6BbSV91oGfzIuCowFZgj/ZZ8i+Z5gn6S7F8LPJzyx1qgu9XDvAvVbf7IGNETXK2qsaXotLBoWHHCB5KCatJ6zg0K8IuvOBt+BKp64B/cKTdgVFcARLMY=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(136003)(396003)(39860400002)(82310400008)(451199021)(40470700004)(36840700001)(46966006)(110136005)(54906003)(478600001)(36860700001)(426003)(2616005)(83380400001)(36756003)(40460700003)(47076005)(40480700001)(26005)(2906002)(966005)(186003)(336012)(1076003)(41300700001)(316002)(8936002)(70586007)(82740400003)(81166007)(44832011)(4326008)(356005)(6636002)(5660300002)(7416002)(70206006)(8676002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2023 06:18:14.6015
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1e9258b-33b6-4106-8dda-08db881fef83
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6814
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Convert the Xilinx GMII to RGMII Converter device tree binding
+documentation to json schema.
+This converter is usually used as gem <---> gmii2rgmii <---> external phy
+and, it's phy-handle should point to the phandle of the external phy.
 
+Signed-off-by: Pranavi Somisetty <pranavi.somisetty@amd.com>
+---
+Changes v2:
+1. Changed description for the property "reg".
+2. Added a reference to the description of "phy-handle" property.
+---
+ .../bindings/net/xilinx_gmii2rgmii.txt        | 35 ------------
+ .../bindings/net/xlnx,gmii-to-rgmii.yaml      | 54 +++++++++++++++++++
+ 2 files changed, 54 insertions(+), 35 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+ create mode 100644 Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
 
-On 19.07.2023 07:46, Arseniy Krasnov wrote:
-> 
-> 
-> On 18.07.2023 23:27, Michael S. Tsirkin wrote:
->> On Tue, Jul 18, 2023 at 09:02:35PM +0300, Arseniy Krasnov wrote:
->>> For non-linear skb use its pages from fragment array as buffers in
->>> virtio tx queue. These pages are already pinned by 'get_user_pages()'
->>> during such skb creation.
->>>
->>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->>> ---
->>>  net/vmw_vsock/virtio_transport.c | 40 +++++++++++++++++++++++++++-----
->>>  1 file changed, 34 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->>> index e95df847176b..6cbb45bb12d2 100644
->>> --- a/net/vmw_vsock/virtio_transport.c
->>> +++ b/net/vmw_vsock/virtio_transport.c
->>> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>>  	vq = vsock->vqs[VSOCK_VQ_TX];
->>>  
->>>  	for (;;) {
->>> -		struct scatterlist hdr, buf, *sgs[2];
->>> +		/* +1 is for packet header. */
->>> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
->>> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
->>>  		int ret, in_sg = 0, out_sg = 0;
->>>  		struct sk_buff *skb;
->>>  		bool reply;
->>> @@ -111,12 +113,38 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>>  
->>>  		virtio_transport_deliver_tap_pkt(skb);
->>>  		reply = virtio_vsock_skb_reply(skb);
->>> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
->>> +			    sizeof(*virtio_vsock_hdr(skb)));
->>> +		sgs[out_sg] = &bufs[out_sg];
->>> +		out_sg++;
->>> +
->>> +		if (!skb_is_nonlinear(skb)) {
->>> +			if (skb->len > 0) {
->>> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
->>> +				sgs[out_sg] = &bufs[out_sg];
->>> +				out_sg++;
->>> +			}
->>> +		} else {
->>> +			struct skb_shared_info *si;
->>> +			int i;
->>> +
->>> +			si = skb_shinfo(skb);
->>> +
->>> +			for (i = 0; i < si->nr_frags; i++) {
->>> +				skb_frag_t *skb_frag = &si->frags[i];
->>> +				void *va = page_to_virt(skb_frag->bv_page);
->>>  
->>> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
->>> -		sgs[out_sg++] = &hdr;
->>> -		if (skb->len > 0) {
->>> -			sg_init_one(&buf, skb->data, skb->len);
->>> -			sgs[out_sg++] = &buf;
->>> +				/* We will use 'page_to_virt()' for userspace page here,
->>
->> don't put comments after code they refer to, please?
->>
->>> +				 * because virtio layer will call 'virt_to_phys()' later
->>
->> it will but not always. sometimes it's the dma mapping layer.
->>
->>
->>> +				 * to fill buffer descriptor. We don't touch memory at
->>> +				 * "virtual" address of this page.
->>
->>
->> you need to stick "the" in a bunch of places above.
-> 
-> Ok, I'll fix this comment!
-> 
->>
->>> +				 */
->>> +				sg_init_one(&bufs[out_sg],
->>> +					    va + skb_frag->bv_offset,
->>> +					    skb_frag->bv_len);
->>> +				sgs[out_sg] = &bufs[out_sg];
->>> +				out_sg++;
->>> +			}
->>>  		}
->>>  
->>>  		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
->>
->>
->> There's a problem here: if there vq is small this will fail.
->> So you really should check free vq s/gs and switch to non-zcopy
->> if too small.
-> 
-> Ok, so idea is that:
-> 
-> if (out_sg > vq->num_free)
->     reorganise current skb for copy mode (e.g. 2 out_sg - header and data)
->     and try to add it to vq again.
-> 
-> ?
+diff --git a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt b/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+deleted file mode 100644
+index 038dda48b8e6..000000000000
+--- a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
++++ /dev/null
+@@ -1,35 +0,0 @@
+-XILINX GMIITORGMII Converter Driver Device Tree Bindings
+---------------------------------------------------------
+-
+-The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
+-Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
+-Ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
+-This core can be used in all three modes of operation(10/100/1000 Mb/s).
+-The Management Data Input/Output (MDIO) interface is used to configure the
+-Speed of operation. This core can switch dynamically between the three
+-Different speed modes by configuring the conveter register through mdio write.
+-
+-This converter sits between the ethernet MAC and the external phy.
+-MAC <==> GMII2RGMII <==> RGMII_PHY
+-
+-For more details about mdio please refer phy.txt file in the same directory.
+-
+-Required properties:
+-- compatible	: Should be "xlnx,gmii-to-rgmii-1.0"
+-- reg		: The ID number for the phy, usually a small integer
+-- phy-handle	: Should point to the external phy device.
+-		  See ethernet.txt file in the same directory.
+-
+-Example:
+-	mdio {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-		phy: ethernet-phy@0 {
+-			......
+-		};
+-		gmiitorgmii: gmiitorgmii@8 {
+-			compatible = "xlnx,gmii-to-rgmii-1.0";
+-			reg = <8>;
+-			phy-handle = <&phy>;
+-		};
+-	};
+diff --git a/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+new file mode 100644
+index 000000000000..9d22382a64ba
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+@@ -0,0 +1,54 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/xlnx,gmii-to-rgmii.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Xilinx GMII to RGMII Converter
++
++maintainers:
++  - Harini Katakam <harini.katakam@amd.com>
++
++description:
++  The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
++  Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
++  ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
++  This core can be used in all three modes of operation(10/100/1000 Mb/s).
++  The Management Data Input/Output (MDIO) interface is used to configure the
++  speed of operation. This core can switch dynamically between the three
++  different speed modes by configuring the converter register through mdio write.
++  The core cannot function without an external phy connected to it.
++
++properties:
++  compatible:
++    const: xlnx,gmii-to-rgmii-1.0
++
++  reg:
++    minimum: 0
++    maximum: 31
++    description: The ID number for the phy.
++
++  phy-handle:
++    $ref: ethernet-controller.yaml#/properties/phy-handle
++
++required:
++  - compatible
++  - reg
++  - phy-handle
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++        phy: ethernet-phy@0 {
++            reg = <0>;
++        };
++        gmiitorgmii@8 {
++            compatible = "xlnx,gmii-to-rgmii-1.0";
++            reg = <8>;
++            phy-handle = <&phy>;
++        };
++    };
+-- 
+2.36.1
 
-I guess I need to check number of elements in sg list against 'vq->num_max' - as this is
-maximum number for totally free queue (if even big sg list does not fit to be added to the
-tx queue at this moment, skb will be requeued below, waiting for enough space). I'll pass
-'vq->num_max' value by another transport callback to 'virtio_transport_common.c' and check
-number of user pages against this value - if user's buffer is too big, then use copy mode,
-thus there will be only 2 elements in sg list and this will fit to vq anyway.
-
-Thanks, Arseniy
-
-> 
-> @Stefano, I'll remove net-next tag (guess RFC is not required again, but not net-next
-> anyway) as this change will require review. R-b I think should be also removed. All
-> other patches in this set still unchanged.
-> 
-> Thanks, Arseniy
-> 
->>
->>> -- 
->>> 2.25.1
->>
 
