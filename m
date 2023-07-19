@@ -1,218 +1,198 @@
-Return-Path: <netdev+bounces-18809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C8FE758B5D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:31:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84986758B53
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 986641C20F29
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:31:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F772281744
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 02:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABE118E;
-	Wed, 19 Jul 2023 02:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC2317F6;
+	Wed, 19 Jul 2023 02:29:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1B4125B3
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:31:24 +0000 (UTC)
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CABB71BC3
-	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 19:31:20 -0700 (PDT)
-X-QQ-mid:Yeas54t1689733779t804t50769
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.243.13])
-X-QQ-SSF:00400000000000F0FQF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 13635437705656717840
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: "'Simon Horman'" <simon.horman@corigine.com>,
-	<kabel@kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4AB17D0
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:29:46 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2040.outbound.protection.outlook.com [40.107.223.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F9331BC6;
+	Tue, 18 Jul 2023 19:29:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vj540kJKu/n6d00Zh6M1dUET6i4U0cmP0GFMBkL6P3MQtU11SgtlzVxzadH1+zpfe3u5isoNhxFNAM69NMxF95wDl3gcqXNWvKnd2Yrlx/me9N0eZFuN37bYhG24LtaoKB0z2syKcWplgvD880NAvAwiy0NHw/tjX+oRKm8FGSSWaFoBAoOXzEgoWPrrsthqRNvjlwwt5csQGQGeP13TImN01JzJOzZhU0tMq+tevr2Hz3rWhAar7zTqgHx6+kbxRhgf70FGuqoV9OwKzepXJ0pYUQu5oh6384hAhkUAbbjYG3vv7R/DHMF6LxBnotcxVU1sb8n0BCOKDiIRtmHZqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZaVCpHOPaBUR/NZJWYFrraFTfmsRWHmM2UZewpxm+B4=;
+ b=XGOVFCMQLmb3LgbdBRn517vxdmLUIdenjsZXN4O5UUo3lfH2zk1f5J/viAA/SMs152bfTmVMPfHf6cvWQvpISW95y3hojMxaTT074+iXyOlwVF53obPjKmmlcyhjGf34eWBYzStoBzo+ZVDh/rJnCWE1rVv1DS2fJTk4AV9v9qwHUoEupvYcg5/kWuBWHY1mj2opu8fDbMEW8pqkG5h8WfWdOmwQQFN67LFwnGE5f4ffT8eESBK88wopdAz3lPUdg4CZ+q3S605GsBDNA1YbbXeTBfM71VjYMiu+VnUopdsAFaI7ohqB89yRmd114JxhHM+WeE4RBbaE1S4kHlRy5w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZaVCpHOPaBUR/NZJWYFrraFTfmsRWHmM2UZewpxm+B4=;
+ b=tMTsyGfOkOXhQESCZp26L9Mp8eWRkYTo4ZNZocSHPUz6sW9YH5Rm6zS3WAEna7GjcX8nPf4i3rRvwklTw31ALRnO+kLx0EUmnujuMgU9HjTyTXcOdVlBJTTFNqOzGksaSBp3nTMX3ELaznERADJKqheYYk+6qp19J9aP+KBo750=
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com (2603:10b6:5:45::18) by
+ CO6PR12MB5396.namprd12.prod.outlook.com (2603:10b6:303:139::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6609.24; Wed, 19 Jul 2023 02:29:41 +0000
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::93dc:de92:88e7:b765]) by DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::93dc:de92:88e7:b765%4]) with mapi id 15.20.6588.031; Wed, 19 Jul 2023
+ 02:29:41 +0000
+From: "Quan, Evan" <Evan.Quan@amd.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "rafael@kernel.org" <rafael@kernel.org>, "lenb@kernel.org"
+	<lenb@kernel.org>, "Deucher, Alexander" <Alexander.Deucher@amd.com>, "Koenig,
+ Christian" <Christian.Koenig@amd.com>, "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+	"airlied@gmail.com" <airlied@gmail.com>, "daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "Limonciello, Mario"
+	<Mario.Limonciello@amd.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>, "hdegoede@redhat.com"
+	<hdegoede@redhat.com>, "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
+	"Lazar, Lijo" <Lijo.Lazar@amd.com>, "jim.cromie@gmail.com"
+	<jim.cromie@gmail.com>, "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
+	"andrealmeid@igalia.com" <andrealmeid@igalia.com>, "trix@redhat.com"
+	<trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de"
+	<arnd@arndb.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org"
+	<linux-acpi@vger.kernel.org>, "amd-gfx@lists.freedesktop.org"
+	<amd-gfx@lists.freedesktop.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>, "netdev@vger.kernel.org"
 	<netdev@vger.kernel.org>
-References: <ZK/V57+pl36NhknG@corigine.com> <ZK/Xtg3df6n+Nj11@shell.armlinux.org.uk> <043401d9b57d$66441e60$32cc5b20$@trustnetic.com> <ZK/i3Ta2mcr7xVot@shell.armlinux.org.uk> <043501d9b580$31798870$946c9950$@trustnetic.com> <011201d9b89c$a9a93d30$fcfbb790$@trustnetic.com> <ZLUymspsQlJL1k8n@shell.armlinux.org.uk> <013701d9b957$fc66f740$f534e5c0$@trustnetic.com> <ZLZgHRNMVws//QEZ@shell.armlinux.org.uk> <013e01d9b95e$66c10350$344309f0$@trustnetic.com> <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk>
-In-Reply-To: <ZLZ70F74dPKCIdtK@shell.armlinux.org.uk>
-Subject: RE: [PATCH net] net: phy: marvell10g: fix 88x3310 power up
-Date: Wed, 19 Jul 2023 10:29:38 +0800
-Message-ID: <017401d9b9e8$ddd1dd90$997598b0$@trustnetic.com>
+Subject: RE: [PATCH V6 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Thread-Topic: [PATCH V6 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Thread-Index: AQHZswnuaUrcGkEUvkO69ZFpbKmfV6+2xnYAgAiUksCAAEOtgIAAzFPg
+Date: Wed, 19 Jul 2023 02:29:40 +0000
+Message-ID:
+ <DM6PR12MB26193915145D5C32ECC345D5E439A@DM6PR12MB2619.namprd12.prod.outlook.com>
+References: <20230710083641.2132264-1-evan.quan@amd.com>
+ <20230710083641.2132264-2-evan.quan@amd.com>
+ <5439dd61-7b5f-4fc9-8ccd-f7df43a791dd@lunn.ch>
+ <DM6PR12MB2619CF4D4601864FF251A1FAE438A@DM6PR12MB2619.namprd12.prod.outlook.com>
+ <642e3f4d-976b-4ee1-8f63-844b9568462e@lunn.ch>
+In-Reply-To: <642e3f4d-976b-4ee1-8f63-844b9568462e@lunn.ch>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=0a4e7673-5735-4d66-9a58-992e97d36ed8;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=0;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2023-07-19T02:27:25Z;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB2619:EE_|CO6PR12MB5396:EE_
+x-ms-office365-filtering-correlation-id: c8309da3-b302-43f2-322d-08db88000186
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ f+9P7GH8uHLy2OSUISPGVeNaEQqGzFTDJ3l8QmNw7WibK7tFQun/5ntOCgYhFIjVACjos3AiwDjU3BYVySz4pRMHFGoMXBvJPGrlBPvc60PmAM3hyv/pV7R4A0Ga/AZ/SSRW1IZeOowiF3hyS7RzyB6EyvRsc6Q3l7T61SlBYdC/Sc4R+MiwZCJHVpymFomG7YOVb6hda5cyNuFlqVSIgbFqTe+EUZe3yVgC5EOSU+u/aQJZDY3l0HEM3gaT2ecPiC39Mg5xyZesoEPNcn+XmFimZxpwRGxWSwcdW2Pa1m12yAeHZgq+G6dk6iLd1bejCuDo2t66/1oRiMbWv5rxZDamu95LvCpVuBNqwhSlGB+WWNdFU18C4ebydf0cvZGr2dpfxRQ5XrVfZtmUTMx04v4aHy4B7NEJ4af3PXnbeKuJAOGbfSO98RH0ppzFLPe3OgLhSm6w4toetebmwlgJIEtsmeAvpLVfQDtC6ccx/VoWDqQH8nTQSsOC3r5kk7cFbaAcC3ypMuy6SQkdoXGuWERlOJ1zEuQtLaHSmOzn7O7agqqHs8xJ1WoqPpTdTOPzEFrUB7Ap7wsRv7Y+sKOUqqOKHvdzdaMF2WQcWovlKIR2kTvHYM3/MZw/KcD9WLNg
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2619.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(376002)(396003)(366004)(346002)(451199021)(55016003)(54906003)(478600001)(38070700005)(86362001)(186003)(26005)(33656002)(6506007)(53546011)(71200400001)(122000001)(83380400001)(38100700002)(9686003)(2906002)(7696005)(7416002)(8936002)(8676002)(52536014)(6916009)(41300700001)(64756008)(76116006)(66446008)(66476007)(66556008)(66946007)(5660300002)(316002)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?VYbk73/l3kpVglm4+2oNneT0ERyB2weVQXH+SkIpMnB8T9wKFdFExIAzzwpM?=
+ =?us-ascii?Q?K+xjJVUHSVo5Jt5eH3kkab93N8VDcpD6J1xK7tXfXJi+o3gxNuNcmmIHs9cg?=
+ =?us-ascii?Q?YhHe7N1ewWuqHinss5vI5PiVUQ6F6rh0fyqv6ZNsxVfhLMZjpxQ+KLcgnUsI?=
+ =?us-ascii?Q?B8YxO/HSdMs1vxGw3033M4oSkWZX9bWxk+25QPPnNTXaEpFz7zTCiH4YhuaM?=
+ =?us-ascii?Q?UhNrMikX9IaYlxdJVX4sWCB+LvUfq7aUPmTViv0BR60jQQNZoMbRT/hFIS2W?=
+ =?us-ascii?Q?vEzehbGLHGnt5AT1swtX2N7QklE8q7/FprjyRP95NnmBDaRzOtGlIyn29cvY?=
+ =?us-ascii?Q?Sp4bJ1XimkADms4G45PHd8auhN2Lk/UIsUP4TBrDMJzG2Sp5qgNSoTwheKlO?=
+ =?us-ascii?Q?rcdXCcQWekoD96YABC+i+qRx4HlsU+7lQtIyGZ3Pv0dePSUoTsORVxiMUWLe?=
+ =?us-ascii?Q?vMmryrBwndoKEzyyUCCRPlnSTwUarzDLm6Z+fhfTIjFszkdHAepqOdcC+iU4?=
+ =?us-ascii?Q?13oCXY85OE3GJYhu6TEAKxSym0m4o9PeUChdRW8yt9buLxWta3PB2449oBt6?=
+ =?us-ascii?Q?BIhbNDpxMuO3i6NOafaAjWEKftHqJu0KHDGslRDuqI7OrLgqQYZ1iI89p4Df?=
+ =?us-ascii?Q?W3qH2/dwukKaKR++QDTUEY1epM5sKb1Yf9vUi+0ZzWipJ8QkF68GjK6S4Ffm?=
+ =?us-ascii?Q?C981bcVWzO4M5sFgYPoFHDN1SFHFJvBQJaQadHQdoCAmDFysoKR0AW19aXQ6?=
+ =?us-ascii?Q?rWq0i43R+d6dnNNwznj5p+EZBUcR1wBDO/OGob8t9AyxMMuEj0N0SS0Nkv/R?=
+ =?us-ascii?Q?YPcX+BXgfZY0t0RjitIzL7ExZUwamub9tZpdQnC2OIxhUjjDpMZv8GzEohsg?=
+ =?us-ascii?Q?wDPHuypYjIiWxcVdj7b7xkAJG1iyHYKY09V7TwukbfK/eJjUGkP6rgp2T/13?=
+ =?us-ascii?Q?R8TMS1TweAgkGvI0xHMUEuhIVUesurXJVLWzy+7Co7TSw8mjlftAXwXGWUAs?=
+ =?us-ascii?Q?GsnVo9JEOw8P2UCuEd3HRbS1GjA6HfYo4uN2d/T0XjRZfxJhwMh5xMvcy5k1?=
+ =?us-ascii?Q?+vXdveLW1OS7EmSdOfqjcgHlS1//ztgZ3Llh7KWCdo3rUltcu/sCExi38A8b?=
+ =?us-ascii?Q?8Ktl5WPttA1/JHi8Giq9OfBt1w/aFGdW0WIhvrFgxXAo/evs0zv5eMQSvbJM?=
+ =?us-ascii?Q?wWRJS1gFVSK2YYSk2A6KoGqX2AEP7UixjDlWm07PzjGUcZsQclKFbZIf3lzA?=
+ =?us-ascii?Q?hP6uB0YR4fS2gjp9RsSeFjMkbnBqUAHp1ZcO2sv0o9u1v7Gd6377sLvjqb9a?=
+ =?us-ascii?Q?sbmxQjxwMgxiKUrkVNxRmd1gUOXtfugT1NDjp2MzNWWQZ+tcfs5/acTb1ahs?=
+ =?us-ascii?Q?THbVyX7jBr+icjW5Mslpb0enb1A443iq3ndqdio6GVs9L8FLyhwZQEJYWtQE?=
+ =?us-ascii?Q?wINS9EyvPSA0dJ2aL0bwEAHKzK9M1Cgmmu3GXpVbR5mIwqymwpBfDM/siqKp?=
+ =?us-ascii?Q?zaYPvdm56mujDw/bRAePNpXQqbT/JO24WmfaWOqJujx3X09Rp6xiitW+u4SV?=
+ =?us-ascii?Q?joJkHv5n5aFbwiukh3M=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHxijPTuEE90Wk3AsfAJFZNC2gr6QHGL87AAtcZi7oCGUwJkAFMOiuVAWOFiqoCmQLVbwIZRKUEAb/X+t0DCQBzhQIcViy5rujFQDA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2619.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c8309da3-b302-43f2-322d-08db88000186
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2023 02:29:40.9977
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iWFoeuvMkpnEILYdRKxNBwuRqq+vsQslesngGyOqMSd7qsl5EZw30XGjpC4wZPAB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5396
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tuesday, July 18, 2023 7:47 PM, Russell King (Oracle) wrote:
-> On Tue, Jul 18, 2023 at 05:58:28PM +0800, Jiawen Wu wrote:
-> > On Tuesday, July 18, 2023 5:49 PM, Russell King (Oracle) wrote:
-> > > On Tue, Jul 18, 2023 at 05:12:33PM +0800, Jiawen Wu wrote:
-> > > > On Monday, July 17, 2023 8:23 PM, Russell King (Oracle) wrote:
-> > > > > On Mon, Jul 17, 2023 at 06:51:38PM +0800, Jiawen Wu wrote:
-> > > > > > > > > > There are two places that mv3310_reset() is called, mv3310_config_mdix()
-> > > > > > > > > > and mv3310_set_edpd(). One of them is in the probe function, after we
-> > > > > > > > > > have powered up the PHY.
-> > > > > > > > > >
-> > > > > > > > > > I think we need much more information from the reporter before we can
-> > > > > > > > > > guess which commit is a problem, if any.
-> > > > > > > > > >
-> > > > > > > > > > When does the reset time out?
-> > > > > > > > > > What is the code path that we see mv3310_reset() timing out?
-> > > > > > > > > > Does the problem happen while resuming or probing?
-> > > > > > > > > > How soon after clearing the power down bit is mv3310_reset() called?
-> > > > > > > > >
-> > > > > > > > > I need to test it more times for more information.
-> > > > > > > > >
-> > > > > > > > > As far as I know, reset timeout appears in mv3310_set_edpd(), after mv3310_power_up()
-> > > > > > > > > in mv3310_config_init().
-> > > > > > > > >
-> > > > > > > > > Now what I'm confused about is, sometimes there was weird values while probing, just
-> > > > > > > > > to read out a weird firmware version, that caused the test to fail.
-> > > > > > > > >
-> > > > > > > > > And for this phy_read_mmd_poll_timeout(), it only succeeds when sleep_before_read = true.
-> > > > > > > > > Otherwise, it would never succeed to clear the power down bit. Currently it looks like clearing
-> > > > > > > > > the bit takes about 1ms.
-> > > > > > > >
-> > > > > > > > So, reading the bit before the first delay period results in the bit not
-> > > > > > > > clearing, despite having written it to be zero?
-> > > > > > >
-> > > > > > > Yes. So in the original code, there is no delay to read the register again for
-> > > > > > > setting software reset bit. I think the power down bit is not actually cleared
-> > > > > > > in my test.
-> > > > > >
-> > > > > > Hi Russell,
-> > > > > >
-> > > > > > I confirmed last week that this change is valid to make mv3310_reset() success.
-> > > > > > But now reset fails again, only on port 0. Reset timeout still appears in
-> > > > > > mv3310_config_init() -> mv3310_set_edpd() -> mv3310_reset(). I deleted this
-> > > > > > change to test again, and the result shows that this change is valid for port 1.
-> > > > > >
-> > > > > > So I'm a little confused. Since I don't have programming guidelines for this PHY,
-> > > > > > but only a datasheet. Could you please help to check for any possible problems
-> > > > > > with it?
-> > > > >
-> > > > > I think the question that's missing is... why do other 88x3310 users not
-> > > > > see this problem - what is special about your port 0?
-> > > > >
-> > > > > Maybe there's a clue with the hardware schematics? Do you have access to
-> > > > > those?
-> > > >
-> > > > This problem never happened again after I poweroff and restart the machine.
-> > > > However, this patch is still required to successfully probe the PHY.
-> > > >
-> > > > One thing I've noticed is that there is restriction in mv3310_power_up(), software
-> > > > reset not performed when priv->firmware_ver < 0x00030000. And my 88x3310's
-> > > > firmware version happens to 0x20200. Will this restriction cause subsequent reset
-> > > > timeout(without this patch)?
-> > >
-> > > We (Matteo and I) discovered the need for software reset by
-> > > experimentation on his Macchiatobin and trying different firmware
-> > > versions. Essentially, I had 0.2.1.0 which didn't need the software
-> > > reset, Matteo had 0.3.3.0 which did seem to need it.
-> > >
-> > > I also upgraded my firmware to 0.3.3.0 and even 0.3.10.0 and confirmed
-> > > that the software reset works on the two PHYs on my boards.
-> > >
-> > > What I don't understand is "this patch is still required to successfully
-> > > probe the PHY". The power-up path is not called during probe - nor is
-> > > the EDPD path. By "probe" I'm assuming we're talking about the driver
-> > > probe, in other words, mv3310_probe(), not the config_init - it may be
-> > > that you're terminology is not matching phylib's terminology. Please
-> > > can you clarify.
-> >
-> > I'm sorry for the mistake in my description. I mean MAC driver probe, in fact
-> > it is in phy_connect_direct(), to call mv3310_config_init().
-> 
-> Okay, so how about this for an alternative theory.
-> 
-> The PHY is being probed, which places the PHY in power down mode.
-> Then your network driver (which?) gets probed, connects immediately
-> to the PHY, which attempts to power up the PHY - but maybe the PHY
-> hasn't finished powering down yet, and thus delays the powering up.
-> 
-> However, according to the functional spec, placing the device in
-> power-down mode as we do is immediate.
-> 
-> Please can you try experimenting with a delay in mv3310_config_init()
-> before the call to mv3310_power_up() to see whether that has any
-> beneficial effect?
+[AMD Official Use Only - General]
 
-I experimented with delays of 100ms to 1s, all reset timed out. Unfortunately,
-the theory doesn't seem to be true. :(
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Tuesday, July 18, 2023 10:16 PM
+> To: Quan, Evan <Evan.Quan@amd.com>
+> Cc: rafael@kernel.org; lenb@kernel.org; Deucher, Alexander
+> <Alexander.Deucher@amd.com>; Koenig, Christian
+> <Christian.Koenig@amd.com>; Pan, Xinhui <Xinhui.Pan@amd.com>;
+> airlied@gmail.com; daniel@ffwll.ch; johannes@sipsolutions.net;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; Limonciello, Mario <Mario.Limonciello@amd.com>;
+> mdaenzer@redhat.com; maarten.lankhorst@linux.intel.com;
+> tzimmermann@suse.de; hdegoede@redhat.com; jingyuwang_vip@163.com;
+> Lazar, Lijo <Lijo.Lazar@amd.com>; jim.cromie@gmail.com;
+> bellosilicio@gmail.com; andrealmeid@igalia.com; trix@redhat.com;
+> jsg@jsg.id.au; arnd@arndb.de; linux-kernel@vger.kernel.org; linux-
+> acpi@vger.kernel.org; amd-gfx@lists.freedesktop.org; dri-
+> devel@lists.freedesktop.org; linux-wireless@vger.kernel.org;
+> netdev@vger.kernel.org
+> Subject: Re: [PATCH V6 1/9] drivers core: Add support for Wifi band RF
+> mitigations
+>
+> > The wbrf_supported_producer and wbrf_supported_consumer APIs seem
+> > unnecessary for the generic implementation.
+>
+> I'm happy with these, once the description is corrected. As i said in ano=
+ther
+> comment, 'can' should be replaced with 'should'. The device itself knows =
+if it
+> can, only the core knows if it should, based on the policy of if actions =
+need to
+> be taken, and there are both providers and consumers registered with the
+> core.
+Sure, will update that in V7.
 
-There is a log dump while I tried in 200ms.
-
-[59697.591809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=6, val=c000
-[59697.592811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=5, val=9a
-[59697.593814] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=2, val=2b
-[59697.594817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=3, val=9ab
-[59697.595811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=2, val=2b
-[59697.596811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=3, val=9ab
-[59697.597811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=4, regnum=2, val=141
-[59697.598809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=4, regnum=3, val=dab
-[59697.599809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=2, val=2b
-[59697.600810] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=3, val=9ab
-[59697.601815] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1e, regnum=8, val=0
-[59697.602930] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=8, val=fffe
-[59697.608811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=d00d, val=680b
-[59697.609823] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=c050, val=7e
-[59697.610814] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=c011, val=2
-[59697.611817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=c012, val=200
-[59697.611820] mv88x3310 txgbe-400:00: Firmware version 0.2.2.0
-[59697.612817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f001, val=803
-[59697.612820] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=1f, regnum=f08c, val=9600
-[59697.613819] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f08a, val=cd9a
-[59697.613822] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=1f, regnum=f08a, val=d9a
-[59697.614818] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=1, val=9ab
-[59697.615816] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=8, val=9701
-[59697.616817] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=b, val=1a4
-[59697.617814] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=14, val=e
-[59697.618809] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1, regnum=15, val=3
-[59697.619811] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=7, regnum=3c, val=0
-[59697.619831] mv88x3310 txgbe-400:00: attached PHY driver (mii_bus:phy_addr=txgbe-400:00, irq=POLL)
-[59697.830169] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f001, val=803
-[59697.830179] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=1f, regnum=f001, val=3
-[59697.830926] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=1f, regnum=f001, val=803
-[59697.831926] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=8000, val=60
-[59697.831932] txgbe 0000:04:00.0: [W]phy_addr=0, devnum=3, regnum=8000, val=360
-[59697.832926] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.838922] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.844815] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.850812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.856813] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.862812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.868812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.874812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.880812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.886812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.892812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.898812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.904812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.910812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.916812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.922812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.928812] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.934813] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.935813] txgbe 0000:04:00.0: [R]phy_addr=0, devnum=3, regnum=0, val=a040
-[59697.935815] mv88x3310 txgbe-400:00: mv3310_reset failed: -110
-
+Evan
+>
+>    Andrew
 
