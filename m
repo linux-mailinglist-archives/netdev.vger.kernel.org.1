@@ -1,96 +1,121 @@
-Return-Path: <netdev+bounces-19015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3032375956B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEB475951C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE326281760
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:40:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 105C52811A3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26281125BE;
-	Wed, 19 Jul 2023 12:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818D8569F;
+	Wed, 19 Jul 2023 12:30:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F86101E6
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:40:42 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8861723;
-	Wed, 19 Jul 2023 05:40:39 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R5ZZr5FWhzNmTM;
-	Wed, 19 Jul 2023 20:17:40 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 19 Jul
- 2023 20:21:00 +0800
-Subject: Re: [PATCH v5 RFC 1/6] page_pool: frag API support for 32-bit arch
- with 64-bit DMA
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin
-	<yunshenglin0825@gmail.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>
-References: <20230629120226.14854-1-linyunsheng@huawei.com>
- <20230629120226.14854-2-linyunsheng@huawei.com>
- <20230707170157.12727e44@kernel.org>
- <3d973088-4881-0863-0207-36d61b4505ec@gmail.com>
- <20230710113841.482cbeac@kernel.org>
- <8639b838-8284-05a2-dbc3-7e4cb45f163a@intel.com>
- <20230711093705.45454e41@kernel.org>
- <1bec23ff-d38b-3fdf-1bb3-89658c1d465a@intel.com>
- <46ad09d9-6596-cf07-5cab-d6ceb1e36f3c@huawei.com>
- <20230712102603.5038980e@kernel.org>
- <9a5b4c50-2401-b3e7-79aa-33d3ccee41c5@huawei.com>
- <20230714105214.39ad4e4d@kernel.org>
- <6c94f7b8-f553-1fce-f3f1-66cdead9e056@huawei.com>
- <20230718111621.35a64a0b@kernel.org>
- <9dc9674c-9aea-6e57-a7ec-2de954e12a90@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <aef5355b-f702-32ad-f41f-e2fba02f1000@huawei.com>
-Date: Wed, 19 Jul 2023 20:21:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760E814A88
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:30:30 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C1013E
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:30:28 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-196-TmQF06h3N0mgSpi61nJSKQ-1; Wed, 19 Jul 2023 13:30:25 +0100
+X-MC-Unique: TmQF06h3N0mgSpi61nJSKQ-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jul
+ 2023 13:30:24 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 19 Jul 2023 13:30:24 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>
+Subject: Unexpected ICMP errors for UDP packets to 127.0.0.1
+Thread-Topic: Unexpected ICMP errors for UDP packets to 127.0.0.1
+Thread-Index: Adm6NH7v7EHG77rAQpq5zHt2O6xZeg==
+Date: Wed, 19 Jul 2023 12:30:24 +0000
+Message-ID: <225a9a92c82a4654b10cb8db68abfc3a@AcuMS.aculab.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9dc9674c-9aea-6e57-a7ec-2de954e12a90@intel.com>
-Content-Type: text/plain; charset="utf-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/19 2:28, Alexander Lobakin wrote:
-> 
-> (BTW it would be nice to inspect page_pool.h users whether each of them
->  needs the full-blown header)
+We are seeing an application (running on AWS) failing because in
+is receiving an ICMP error indication for a UDP packet to 127.0.0.1.
 
-It seems other page_pool.h users are all drivers, so the full-blown header
-is needed.
+It is very rare - 3 instances since the end of January 2023.
+No errors were reported in the previous 6 month with much the
+same workload (or for several years without ipsec).
+So we suspect a kernel change between (about) 5.10.147 and 5.10.162
+(the last fail was with 5.10.184).
 
-> 
-> Thanks,
-> Olek
-> .
-> 
+The loopback UDP sockets are created at startup and are never closed.
+The sender is an IPv6 socket bound to ::, the receiver a connected
+IPv4 socket.
+(All the traffic is actually IPv4.)
+
+The sender does a recvmsg(... MSG_ERRQUEUE) and gets a
+SO_EE_ORIGIN_ICMP indication (we don't know which type!).
+
+AFAICT this is only generated for a received ICMP message
+(ie nothing in the transmit path can generate it).
+
+The receiving socket is still there, it later reports ECONNREFUSED
+as a consequence of the sender closing its socket.
+
+We think the trigger is changes to the ipsec config (changes the
+xfrm tables) for some tunnels on eth0.
+Somewhere this must be causing a transient error in the routing.
+
+There are 10-20 ipsec connections with a lifetime of hours.
+There are 100s of other UDP sockets and lots of 'host unreachable'
+indications being sent.
+
+So either the kernel decides it can deliver a packet to 127.0.0.1
+received from lo0 or the udp socket lookup fails.
+Could the latter happen (somehow) if the 'dst' address on the
+socket is somehow different to the one in the skb?
+Perhaps due to the effects of rcu updates?
+
+Early dmux is enabled, and there were some associated changes
+prior to 5.10.162 - but they don't look problematic.
+There are also some additional checks in the fib lookup code
+and in the xfrm code, I don't know that code at all.
+But AFAICT the xfrm code causes silent discards - not icmp.
+
+Any ideas as to what to look for?
+This is a live system on AWS - we can't use a test kernel.
+There is also a lot of UDP traffic (it is processing RTP audio).
+So options are rather limited.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
