@@ -1,39 +1,62 @@
-Return-Path: <netdev+bounces-18991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03A19759431
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:31:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8ED759470
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:40:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C6BE28184E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:31:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C93922817D6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D638E14275;
-	Wed, 19 Jul 2023 11:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0345013AED;
+	Wed, 19 Jul 2023 11:39:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B6E134C6
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EAF6C433D9;
-	Wed, 19 Jul 2023 11:30:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689766221;
-	bh=TQnotEzT45fytfUHWkANemNoKil6DWSpk4y142ROpog=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LLWfvm0KIOWDdv64OIVGEKOu2umskc7+ZXSLLeAwJEOLxN2j5PixNVPHtBgNHMYOh
-	 7MV3VF3VbeimMIR1kZd4wc0ez55NlsSpj3MVKrw88VAAKAROfVrtGkUoya03Wc/mNE
-	 6EnsFyGcup0TeQk/TBpbGR1f+psRNuSp90g9AxNrWE5Vrx3bDFcQe7ranYM0NNxDW8
-	 2F6QKToAxMkHYuC0N0AljOr4AC9AqCR8D6pLldxB9eAoZuklp9Dq2DNNq8aSS2/HYI
-	 rsMo2g3fVpAb3MRGXXZUBAXkPpX40m0sWT2acGxsmwG9zqJntDJ5LfV6Z6OS6QkaeW
-	 CNOBW+PadzR4w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDDF0E22AE4;
-	Wed, 19 Jul 2023 11:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29D313AE6
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:39:56 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0437D2110
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:39:31 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+	by smtp-out1.suse.de (Postfix) with ESMTP id BB3A621B98;
+	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1689766720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=MjE+MOFpFadd0F3lZwj3UXnm3sqwZEpBmBb74wm7f0c=;
+	b=j4z/i8vfjPyQPDpROWLntORA/iOaOIx9pSUu2jVGBvJ/GjVxkAQ0fOQToFuAlE6oXa9Wc2
+	nKNHVPdbtdDiTVnjquDlnTZpqUz6u2Z1/OCAXyTaOIbfKhVIm3B62+kByNr4AxXFAFFz8a
+	+KcAPIS6xdkK8zId6xvO4n0eq7qTnp4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1689766720;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=MjE+MOFpFadd0F3lZwj3UXnm3sqwZEpBmBb74wm7f0c=;
+	b=km34e623ab1u2UylPoopyVK66Mvu27tUCP1o3qXYcqwtvb7iiXkfIXZOpI+vl/wJgLUQ4I
+	leF4/MMNiZXcxzAA==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+	by relay2.suse.de (Postfix) with ESMTP id A2BBC2C142;
+	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+	id 91FFF51C9ECB; Wed, 19 Jul 2023 13:38:40 +0200 (CEST)
+From: Hannes Reinecke <hare@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	linux-nvme@lists.infradead.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: [RESENT PATCHv7 0/6] net/tls: fixes for NVMe-over-TLS
+Date: Wed, 19 Jul 2023 13:38:30 +0200
+Message-Id: <20230719113836.68859-1-hare@suse.de>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,40 +64,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/1] drivers:net: fix return value check in
- ocelot_fdma_receive_skb
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168976622090.17456.1429286800608558144.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jul 2023 11:30:20 +0000
-References: <20230717144652.23408-1-ruc_gongyuanjun@163.com>
-In-Reply-To: <20230717144652.23408-1-ruc_gongyuanjun@163.com>
-To: Yuanjun Gong <ruc_gongyuanjun@163.com>
-Cc: vladimir.oltean@nxp.com, claudiu.manoil@nxp.com,
- alexandre.belloni@bootlin.com, netdev@vger.kernel.org
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi all,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+here are some small fixes to get NVMe-over-TLS up and running.
+The first set are just minor modifications to have MSG_EOR handled
+for TLS, but the second set implements the ->read_sock() callback for tls_sw
+which I guess could do with some reviews.
 
-On Mon, 17 Jul 2023 22:46:52 +0800 you wrote:
-> ocelot_fdma_receive_skb should return false if an unexpected
-> value is returned by pskb_trim.
-> 
-> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
-> ---
->  drivers/net/ethernet/mscc/ocelot_fdma.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+As usual, comments and reviews are welcome.
 
-Here is the summary with links:
-  - [1/1] drivers:net: fix return value check in ocelot_fdma_receive_skb
-    https://git.kernel.org/netdev/net/c/bce5603365d8
+Changes to the original submission:
+- Add a testcase for MSG_EOR handling
 
-You are awesome, thank you!
+Changes to v2:
+- Bail out on conflicting message flags
+- Rework flag handling
+
+Changes to v3:
+- Return -EINVAL on conflicting flags
+- Rebase on top of net-next
+
+Changes to v4:
+- Add tlx_rx_reader_lock() to read_sock
+- Add MSG_EOR handling to tls_sw_readpages()
+
+Changes to v5:
+- Rebase to latest upstream
+- Split tls_rx_reader_lock() as suggested by Sagi
+
+Changes to v6:
+- Fixup tls_strp_read_copyin() to avoid infinite recursion
+  in tls_read_sock()
+- Rework tls_read_sock() to read all available data
+
+Hannes Reinecke (6):
+  net/tls: handle MSG_EOR for tls_sw TX flow
+  net/tls: handle MSG_EOR for tls_device TX flow
+  selftests/net/tls: add test for MSG_EOR
+  net/tls: Use tcp_read_sock() instead of ops->read_sock()
+  net/tls: split tls_rx_reader_lock
+  net/tls: implement ->read_sock()
+
+ net/tls/tls.h                     |   2 +
+ net/tls/tls_device.c              |   6 +-
+ net/tls/tls_main.c                |   2 +
+ net/tls/tls_strp.c                |   3 +-
+ net/tls/tls_sw.c                  | 139 ++++++++++++++++++++++++++----
+ tools/testing/selftests/net/tls.c |  11 +++
+ 6 files changed, 143 insertions(+), 20 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.35.3
 
 
