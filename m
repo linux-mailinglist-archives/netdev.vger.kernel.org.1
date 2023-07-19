@@ -1,108 +1,222 @@
-Return-Path: <netdev+bounces-18977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 924237593F4
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:09:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 792127593F7
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAF791C20F58
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:09:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 925871C203B3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D9F813AFC;
-	Wed, 19 Jul 2023 11:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36079134BC;
+	Wed, 19 Jul 2023 11:06:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232D913AC3
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:05:45 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C33E75;
-	Wed, 19 Jul 2023 04:05:42 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36J9jrtw013032;
-	Wed, 19 Jul 2023 04:05:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0220; bh=eFDFWqo6gID/QCN9gvy4Wc0KOi3v8oToQsz9Y0xKUEM=;
- b=fMEahkCFyEDQ+yVc4vL/9n+kHMu9Vo1uABeMjR2/e+uA3RXa/s5LN6kHGevyTpLPZKS4
- N+wmvfZfMCbqms4Vz6PZubEH9GQEul01sPhKPlg9Gk0PfCM9OPlyhfVGyvGC7jUkMLI0
- pJ0eGPBkq71MGlQ71My+sN7S8bUJZkUhXEPZRPN+w6jx3X6qSNR5TxiVQBw8uDDG1fEC
- DCYjGrJm/LOgyQiDq5P7jIWBlfqzrixOgVury41Fe4uYqWXCYUnXuAyDjhxEONoZC2MR
- 1tBCNJ5BcRslx2v1V2EwTmDyj0MkjRYvVwBTj7g1ZF9XaadBRdvkRDkrvOMgoR2ftOQv ag== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rwyc6jdya-12
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jul 2023 04:05:31 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jul
- 2023 04:05:17 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 19 Jul 2023 04:05:17 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id AE97F3F704F;
-	Wed, 19 Jul 2023 04:05:10 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>,
-        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
-        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
-        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
-        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
-Subject: [net-next PatchV4 4/4] docs: octeontx2: extend documentation for Round Robin scheduling
-Date: Wed, 19 Jul 2023 16:34:43 +0530
-Message-ID: <20230719110443.15310-5-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230719110443.15310-1-hkelam@marvell.com>
-References: <20230719110443.15310-1-hkelam@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2544812B7A
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:06:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1403C270C
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:06:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689764764;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6G25Wpf6urdNog1RrCIh1jSfsrggg+8NTa2ueC8cR3I=;
+	b=FesK7vsjFMYMgyGUbIZ+poXZNJDgbdImixj0RSmgitx0Te0ps4xVwbx3d8CL3Y4EejDoKp
+	QIRYLnqXBx7w8cDNyjegFmoGh2HKbUkhb74Q9iULzkbLqlpWbDkQtAkJ7wnBQCvzWaY0o5
+	ojqnK6ImZV3yQtFikvyu6klaQkFF02M=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-c4qwD0TqPyiMOnns8h9MZA-1; Wed, 19 Jul 2023 07:06:02 -0400
+X-MC-Unique: c4qwD0TqPyiMOnns8h9MZA-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4fbcdca8fcbso5684340e87.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:06:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689764761; x=1692356761;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6G25Wpf6urdNog1RrCIh1jSfsrggg+8NTa2ueC8cR3I=;
+        b=MakDn6Wv5wGfk5zPVADbZ+MZyHzJw65sn2uNbShoRJqt65vbhpOwn36H91iH5NNLaH
+         j2BAZ5HH/JGKX7thQeWl+DXA/mMfLmgz1zdMLmPymqgw5vR9aMGLKHOlTxkkFbkw5vGK
+         tcXiY8jFLRCbZ1Y2LngqkbFkZ1S1ZVIx/q+t1gHJcxYKBY/L5eV+pQsCcevunrGu/7oe
+         CXAxwWX4j9kEJJFHCpC7ThBk9DY98M707qcBlPMKdeUKhYMvvuIoalRqk4T7KDkUtO0i
+         xqSUQANV4mxt/c5wbS1IsiRpTvwQ7e/cmkkAZneWuK5S8mNxT5vWS3p6Z7nm/upPg7b5
+         OchQ==
+X-Gm-Message-State: ABy/qLbxGba4JZ2Wqs5uP4RAesyjNwgXCHANznMrZhgyW1Cx6u6qOOW8
+	ktWXOYmig4jJMz97QP4NxSqdZmneN+0A8Amlho0jRkmbR3ZaSrTEUUoSrQ6no5U+Ieo8xMckLDZ
+	khGcfWuwx0ua/hg6f
+X-Received: by 2002:a05:6512:2316:b0:4fd:d9dd:7a22 with SMTP id o22-20020a056512231600b004fdd9dd7a22mr96826lfu.26.1689764761273;
+        Wed, 19 Jul 2023 04:06:01 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGVmVc0nOSbjtLvsVkw0Xfo9zLoMCLBrAktPo4kwD8j+ZtvK0aKteVH/Zyf6WXfLny5TxU5yw==
+X-Received: by 2002:a05:6512:2316:b0:4fd:d9dd:7a22 with SMTP id o22-20020a056512231600b004fdd9dd7a22mr96797lfu.26.1689764760864;
+        Wed, 19 Jul 2023 04:06:00 -0700 (PDT)
+Received: from redhat.com ([2.52.16.41])
+        by smtp.gmail.com with ESMTPSA id s13-20020a7bc38d000000b003fbd0c50ba2sm1419609wmj.32.2023.07.19.04.05.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 04:06:00 -0700 (PDT)
+Date: Wed, 19 Jul 2023 07:05:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: kernel test robot <lkp@intel.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux-foundation.org,
+	oe-kbuild-all@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH vhost v12 10/10] virtio_net: merge dma operations when
+ filling mergeable buffers
+Message-ID: <20230719070450-mutt-send-email-mst@kernel.org>
+References: <20230719040422.126357-11-xuanzhuo@linux.alibaba.com>
+ <202307191819.0tatknWa-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: kQcd5XplTZQUYor0wMPBDCB8AF2UIF6L
-X-Proofpoint-ORIG-GUID: kQcd5XplTZQUYor0wMPBDCB8AF2UIF6L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-19_06,2023-07-19_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202307191819.0tatknWa-lkp@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add example tc-htb commands for Round robin scheduling
+On Wed, Jul 19, 2023 at 06:33:05PM +0800, kernel test robot wrote:
+> Hi Xuan,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on v6.4]
+> [cannot apply to mst-vhost/linux-next linus/master v6.5-rc2 v6.5-rc1 next-20230719]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_ring-check-use_dma_api-before-unmap-desc-for-indirect/20230719-121424
+> base:   v6.4
+> patch link:    https://lore.kernel.org/r/20230719040422.126357-11-xuanzhuo%40linux.alibaba.com
+> patch subject: [PATCH vhost v12 10/10] virtio_net: merge dma operations when filling mergeable buffers
+> config: i386-randconfig-i006-20230718 (https://download.01.org/0day-ci/archive/20230719/202307191819.0tatknWa-lkp@intel.com/config)
+> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+> reproduce: (https://download.01.org/0day-ci/archive/20230719/202307191819.0tatknWa-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202307191819.0tatknWa-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    drivers/net/virtio_net.c: In function 'virtnet_rq_init_one_sg':
+> >> drivers/net/virtio_net.c:624:41: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+>      624 |                 rq->sg[0].dma_address = (dma_addr_t)addr;
+>          |                                         ^
+>    drivers/net/virtio_net.c: In function 'virtnet_rq_alloc':
+> >> drivers/net/virtio_net.c:682:28: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+>      682 |                 *sg_addr = (void *)(dma->addr + alloc_frag->offset - sizeof(*dma));
+>          |                            ^
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
- .../device_drivers/ethernet/marvell/octeontx2.rst         | 8 ++++++++
- 1 file changed, 8 insertions(+)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-index bfd233cfac35..1e196cb9ce25 100644
---- a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-+++ b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-@@ -332,3 +332,11 @@ Setup HTB offload
-         # tc class add dev <interface> parent 1: classid 1:1 htb rate 10Gbit prio 1
- 
-         # tc class add dev <interface> parent 1: classid 1:2 htb rate 10Gbit prio 7
-+
-+4. Create tc classes with same priorities and different quantum::
-+
-+        # tc class add dev <interface> parent 1: classid 1:1 htb rate 10Gbit prio 2 quantum 409600
-+
-+        # tc class add dev <interface> parent 1: classid 1:2 htb rate 10Gbit prio 2 quantum 188416
-+
-+        # tc class add dev <interface> parent 1: classid 1:3 htb rate 10Gbit prio 2 quantum 32768
--- 
-2.17.1
+yea these casts are pretty creepy. I think it's possible dma_addr_t won't fit in a pointer
+or a pointer won't fit in dma_addr_t.
+
+> 
+> vim +624 drivers/net/virtio_net.c
+> 
+>    619	
+>    620	static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *addr, u32 len)
+>    621	{
+>    622		if (rq->do_dma) {
+>    623			sg_init_table(rq->sg, 1);
+>  > 624			rq->sg[0].dma_address = (dma_addr_t)addr;
+>    625			rq->sg[0].length = len;
+>    626		} else {
+>    627			sg_init_one(rq->sg, addr, len);
+>    628		}
+>    629	}
+>    630	
+>    631	static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size,
+>    632				      void **sg_addr, gfp_t gfp)
+>    633	{
+>    634		struct page_frag *alloc_frag = &rq->alloc_frag;
+>    635		struct virtnet_rq_dma *dma;
+>    636		struct device *dev;
+>    637		void *buf, *head;
+>    638		dma_addr_t addr;
+>    639	
+>    640		if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+>    641			return NULL;
+>    642	
+>    643		head = (char *)page_address(alloc_frag->page);
+>    644	
+>    645		if (rq->do_dma) {
+>    646			dma = head;
+>    647	
+>    648			/* new pages */
+>    649			if (!alloc_frag->offset) {
+>    650				if (rq->last_dma) {
+>    651					/* Now, the new page is allocated, the last dma
+>    652					 * will not be used. So the dma can be unmapped
+>    653					 * if the ref is 0.
+>    654					 */
+>    655					virtnet_rq_unmap(rq, rq->last_dma, 0);
+>    656					rq->last_dma = NULL;
+>    657				}
+>    658	
+>    659				dev = virtqueue_dma_dev(rq->vq);
+>    660	
+>    661				dma->len = alloc_frag->size - sizeof(*dma);
+>    662	
+>    663				addr = dma_map_single_attrs(dev, dma + 1, dma->len, DMA_FROM_DEVICE, 0);
+>    664				if (addr == DMA_MAPPING_ERROR)
+>    665					return NULL;
+>    666	
+>    667				dma->addr = addr;
+>    668				dma->need_sync = dma_need_sync(dev, addr);
+>    669	
+>    670				/* Add a reference to dma to prevent the entire dma from
+>    671				 * being released during error handling. This reference
+>    672				 * will be freed after the pages are no longer used.
+>    673				 */
+>    674				get_page(alloc_frag->page);
+>    675				dma->ref = 1;
+>    676				alloc_frag->offset = sizeof(*dma);
+>    677	
+>    678				rq->last_dma = dma;
+>    679			}
+>    680	
+>    681			++dma->ref;
+>  > 682			*sg_addr = (void *)(dma->addr + alloc_frag->offset - sizeof(*dma));
+>    683		} else {
+>    684			*sg_addr = head + alloc_frag->offset;
+>    685		}
+>    686	
+>    687		buf = head + alloc_frag->offset;
+>    688	
+>    689		get_page(alloc_frag->page);
+>    690		alloc_frag->offset += size;
+>    691	
+>    692		return buf;
+>    693	}
+>    694	
+> 
+> -- 
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
 
