@@ -1,1691 +1,236 @@
-Return-Path: <netdev+bounces-19076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 150DA7597DB
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:13:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C00517597DE
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:14:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B72F22818DD
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E64DF1C21085
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E27C168B6;
-	Wed, 19 Jul 2023 14:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26B4156D2;
+	Wed, 19 Jul 2023 14:11:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BAC1401B;
-	Wed, 19 Jul 2023 14:11:00 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2EA0F7;
-	Wed, 19 Jul 2023 07:10:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=VP6bbDlnJp+pMBI54jTP+ufQ+E1xCSQGLtkOEwc9W2Y=; b=WpJkdn902i5CYZ8LuBDKfaIFTO
-	HscUUjXIstMc0HGulMZYTrf+Ds033cMOVRbDiAnotM4La2PGmuo1AYwRqk2XSYaM0Fge0XI+wdAkp
-	3cTsUBdIgZrnWVU9KRE2xNq5nBpVPY+v8ju2Nlrl6kzPVZjXBCzDA3jLsEoTOFQu4JEO1qBPJH2j8
-	qRrDIZEdenboZqKmKRJgYMXljY5Q+NlsNW3ZqlvyfrWLjdW0BBtICxXKcPL55984iFbyvovvMdSRy
-	AW65YhTHt/SgUPEHhnUwJiXIrYYC8KOw/HdVF8B6QlulO9Yq2uo5LXPcJXGORtpv22lKJd4CboMIZ
-	iCPwPlBg==;
-Received: from [124.148.184.141] (helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qM7tD-0008Kv-LE; Wed, 19 Jul 2023 16:10:54 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: ast@kernel.org
-Cc: andrii@kernel.org,
-	martin.lau@linux.dev,
-	razor@blackwall.org,
-	sdf@google.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	dxu@dxuuu.xyz,
-	joe@cilium.io,
-	toke@kernel.org,
-	davem@davemloft.net,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH bpf-next v6 8/8] selftests/bpf: Add mprog API tests for BPF tcx links
-Date: Wed, 19 Jul 2023 16:08:58 +0200
-Message-Id: <20230719140858.13224-9-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20230719140858.13224-1-daniel@iogearbox.net>
-References: <20230719140858.13224-1-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A745614280
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:11:09 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E2610B
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:11:07 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qM7tG-0003ij-5J; Wed, 19 Jul 2023 16:10:54 +0200
+Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qM7tC-000cnD-8D; Wed, 19 Jul 2023 16:10:50 +0200
+Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
+	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.94.2)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qM7tB-003DGO-Bm; Wed, 19 Jul 2023 16:10:49 +0200
+From: Johannes Zink <j.zink@pengutronix.de>
+Date: Wed, 19 Jul 2023 16:10:38 +0200
+Subject: [PATCH] net: stmmac: correct MAC propagation delay
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26974/Wed Jul 19 09:28:18 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAN3ut2QC/x2NUQrCMBBEr1L220ATCzVeRaRsNqtdSFPZtKKU3
+ r3Rv3kDb2aDwipc4NpsoPyWInOuYE8N0Ij5yUZiZXCtO7e99aYs04Q00KzKtAy/HDnh13Suv1D
+ w0QeyUPWAhU1QzDTWgbymVMuX8kM+/7/bfd8PVFGWSX8AAAA=
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Johannes Zink <j.zink@pengutronix.de>
+X-Mailer: b4 0.12.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a big batch of test coverage to assert all aspects of the tcx link API:
+The IEEE1588 Standard specifies that the timestamps of Packets must be
+captured when the PTP message timestamp point (leading edge of first
+octet after the start of frame delimiter) crosses the boundary between
+the node and the network. As the MAC latches the timestamp at an
+internal point, the captured timestamp must be corrected for the
+additional path latency, as described in the publicly available
+datasheet [1].
 
-  # ./vmtest.sh -- ./test_progs -t tc_links
-  [...]
-  #225     tc_links_after:OK
-  #226     tc_links_append:OK
-  #227     tc_links_basic:OK
-  #228     tc_links_before:OK
-  #229     tc_links_chain_classic:OK
-  #230     tc_links_dev_cleanup:OK
-  #231     tc_links_invalid:OK
-  #232     tc_links_prepend:OK
-  #233     tc_links_replace:OK
-  #234     tc_links_revision:OK
-  Summary: 10/0 PASSED, 0 SKIPPED, 0 FAILED
+This patch only corrects for the MAC-Internal delay, which can be read
+out from the MAC_Ingress_Timestamp_Latency register, since the Phy
+framework currently does not support querying the Phy ingress and egress
+latency. The Closs Domain Crossing Circuits errors as indicated in [1]
+are already being accounted in the stmmac_get_tx_hwtstamp() function and
+are not corrected here.
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+As the Latency varies for different link speeds and MII
+modes of operation, the correction value needs to be updated on each
+link state change.
+
+As the delay also causes a phase shift in the timestamp counter compared
+to the rest of the network, this correction will also reduce phase error
+when generating PPS outputs from the timestamp counter.
+
+[1] i.MX8MP Reference Manual, rev.1 Section 11.7.2.5.3 "Timestamp
+correction"
+
+Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
 ---
- .../selftests/bpf/prog_tests/tc_links.c       | 1583 +++++++++++++++++
- 1 file changed, 1583 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_links.c
+ drivers/net/ethernet/stmicro/stmmac/hwif.h         |  3 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  | 42 ++++++++++++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  4 +++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h   |  6 ++++
+ 4 files changed, 55 insertions(+)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_links.c b/tools/testing/selftests/bpf/prog_tests/tc_links.c
-new file mode 100644
-index 000000000000..81eea5f10742
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_links.c
-@@ -0,0 +1,1583 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Isovalent */
-+#include <uapi/linux/if_link.h>
-+#include <net/if.h>
-+#include <test_progs.h>
-+
-+#define loopback 1
-+#define ping_cmd "ping -q -c1 -w1 127.0.0.1 > /dev/null"
-+
-+#include "test_tc_link.skel.h"
-+#include "tc_helpers.h"
-+
-+void serial_test_tc_links_basic(void)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index 6ee7cf07cfd7..95a4d6099577 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -536,6 +536,7 @@ struct stmmac_hwtimestamp {
+ 	void (*get_systime) (void __iomem *ioaddr, u64 *systime);
+ 	void (*get_ptptime)(void __iomem *ioaddr, u64 *ptp_time);
+ 	void (*timestamp_interrupt)(struct stmmac_priv *priv);
++	void (*correct_latency)(struct stmmac_priv *priv);
+ };
+ 
+ #define stmmac_config_hw_tstamping(__priv, __args...) \
+@@ -554,6 +555,8 @@ struct stmmac_hwtimestamp {
+ 	stmmac_do_void_callback(__priv, ptp, get_ptptime, __args)
+ #define stmmac_timestamp_interrupt(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, ptp, timestamp_interrupt, __args)
++#define stmmac_correct_latency(__priv, __args...) \
++	stmmac_do_void_callback(__priv, ptp, correct_latency, __args)
+ 
+ struct stmmac_tx_queue;
+ struct stmmac_rx_queue;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
+index fa2c3ba7e9fe..1749cba7b206 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
+@@ -60,6 +60,47 @@ static void config_sub_second_increment(void __iomem *ioaddr,
+ 		*ssinc = data;
+ }
+ 
++static void correct_latency(struct stmmac_priv *priv)
 +{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 prog_ids[2], link_ids[2];
-+	__u32 pid1, pid2, lid1, lid2;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
++	void __iomem *ioaddr = priv->ptpaddr;
++	u32 reg_tsic, reg_tsicsns;
++	u32 reg_tsec, reg_tsecsns;
++	u64 scaled_ns;
++	u32 val;
 +
-+	skel = test_tc_link__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_load"))
-+		goto cleanup;
++	/* MAC-internal ingress latency */
++	scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
 +
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
++	/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
++	 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
++	 */
++	val = readl(ioaddr + PTP_TCR);
++	if (val & PTP_TCR_TSCTRLSSR)
++		/* nanoseconds field is in decimal format with granularity of 1ns/bit */
++		scaled_ns = (NSEC_PER_SEC << 16) - scaled_ns;
++	else
++		/* nanoseconds field is in binary format with granularity of ~0.466ns/bit */
++		scaled_ns = ((1ULL << 31) << 16) - scaled_ns * PSEC_PER_NSEC / 466;
 +
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
++	reg_tsic = scaled_ns >> 16;
++	reg_tsicsns = scaled_ns & 0xff00;
 +
-+	assert_mprog_count(BPF_TCX_INGRESS, 0);
-+	assert_mprog_count(BPF_TCX_EGRESS, 0);
++	/* set bit 31 for 2's compliment */
++	reg_tsic |= BIT(31);
 +
-+	ASSERT_EQ(skel->bss->seen_tc1, false, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
++	writel(reg_tsic, ioaddr + PTP_TS_INGR_CORR_NS);
++	writel(reg_tsicsns, ioaddr + PTP_TS_INGR_CORR_SNS);
 +
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
++	/* MAC-internal egress latency */
++	scaled_ns = readl(ioaddr + PTP_TS_EGR_LAT);
 +
-+	skel->links.tc1 = link;
++	reg_tsec = scaled_ns >> 16;
++	reg_tsecsns = scaled_ns & 0xff00;
 +
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(BPF_TCX_INGRESS, 1);
-+	assert_mprog_count(BPF_TCX_EGRESS, 0);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, BPF_TCX_INGRESS, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+	ASSERT_NEQ(lid1, lid2, "link_ids_1_2");
-+
-+	assert_mprog_count(BPF_TCX_INGRESS, 1);
-+	assert_mprog_count(BPF_TCX_EGRESS, 1);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, BPF_TCX_EGRESS, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid2, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid2, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count(BPF_TCX_INGRESS, 0);
-+	assert_mprog_count(BPF_TCX_EGRESS, 0);
++	writel(reg_tsec, ioaddr + PTP_TS_EGR_CORR_NS);
++	writel(reg_tsecsns, ioaddr + PTP_TS_EGR_CORR_SNS);
 +}
 +
-+static void test_tc_links_before_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 prog_ids[5], link_ids[5];
-+	__u32 pid1, pid2, pid3, pid4;
-+	__u32 lid1, lid2, lid3, lid4;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3, target),
-+		  0, "tc3_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc4, target),
-+		  0, "tc4_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+	pid4 = id_from_prog_fd(bpf_program__fd(skel->progs.tc4));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid3, pid4, "prog_ids_3_4");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+
-+	assert_mprog_count(target, 2);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid2, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid2, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, false, "seen_tc4");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+		.relative_fd = bpf_program__fd(skel->progs.tc2),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc3 = link;
-+
-+	lid3 = id_from_link_fd(bpf_link__fd(skel->links.tc3));
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_LINK,
-+		.relative_id = lid1,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc4, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc4 = link;
-+
-+	lid4 = id_from_link_fd(bpf_link__fd(skel->links.tc4));
-+
-+	assert_mprog_count(target, 4);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 4, "count");
-+	ASSERT_EQ(optq.revision, 5, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid4, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid4, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid1, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid1, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], pid3, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], lid3, "link_ids[2]");
-+	ASSERT_EQ(optq.prog_ids[3], pid2, "prog_ids[3]");
-+	ASSERT_EQ(optq.link_ids[3], lid2, "link_ids[3]");
-+	ASSERT_EQ(optq.prog_ids[4], 0, "prog_ids[4]");
-+	ASSERT_EQ(optq.link_ids[4], 0, "link_ids[4]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, true, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, true, "seen_tc4");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_before(void)
-+{
-+	test_tc_links_before_target(BPF_TCX_INGRESS);
-+	test_tc_links_before_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_links_after_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 prog_ids[5], link_ids[5];
-+	__u32 pid1, pid2, pid3, pid4;
-+	__u32 lid1, lid2, lid3, lid4;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3, target),
-+		  0, "tc3_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc4, target),
-+		  0, "tc4_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+	pid4 = id_from_prog_fd(bpf_program__fd(skel->progs.tc4));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid3, pid4, "prog_ids_3_4");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+
-+	assert_mprog_count(target, 2);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid2, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid2, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, false, "seen_tc4");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc3 = link;
-+
-+	lid3 = id_from_link_fd(bpf_link__fd(skel->links.tc3));
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER | BPF_F_LINK,
-+		.relative_fd = bpf_link__fd(skel->links.tc2),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc4, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc4 = link;
-+
-+	lid4 = id_from_link_fd(bpf_link__fd(skel->links.tc4));
-+
-+	assert_mprog_count(target, 4);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 4, "count");
-+	ASSERT_EQ(optq.revision, 5, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid3, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid3, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], pid2, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], lid2, "link_ids[2]");
-+	ASSERT_EQ(optq.prog_ids[3], pid4, "prog_ids[3]");
-+	ASSERT_EQ(optq.link_ids[3], lid4, "link_ids[3]");
-+	ASSERT_EQ(optq.prog_ids[4], 0, "prog_ids[4]");
-+	ASSERT_EQ(optq.link_ids[4], 0, "link_ids[4]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, true, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, true, "seen_tc4");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_after(void)
-+{
-+	test_tc_links_after_target(BPF_TCX_INGRESS);
-+	test_tc_links_after_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_links_revision_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 prog_ids[3], link_ids[3];
-+	__u32 pid1, pid2, lid1, lid2;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+
-+	assert_mprog_count(target, 0);
-+
-+	optl.expected_revision = 1;
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	optl.expected_revision = 1;
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 1);
-+
-+	optl.expected_revision = 2;
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+
-+	assert_mprog_count(target, 2);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid2, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid2, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "prog_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_revision(void)
-+{
-+	test_tc_links_revision_target(BPF_TCX_INGRESS);
-+	test_tc_links_revision_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_chain_classic(int target, bool chain_tc_old)
-+{
-+	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
-+	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .ifindex = loopback);
-+	bool hook_created = false, tc_attached = false;
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 pid1, pid2, pid3;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	if (chain_tc_old) {
-+		tc_hook.attach_point = target == BPF_TCX_INGRESS ?
-+				       BPF_TC_INGRESS : BPF_TC_EGRESS;
-+		err = bpf_tc_hook_create(&tc_hook);
-+		if (err == 0)
-+			hook_created = true;
-+		err = err == -EEXIST ? 0 : err;
-+		if (!ASSERT_OK(err, "bpf_tc_hook_create"))
-+			goto cleanup;
-+
-+		tc_opts.prog_fd = bpf_program__fd(skel->progs.tc3);
-+		err = bpf_tc_attach(&tc_hook, &tc_opts);
-+		if (!ASSERT_OK(err, "bpf_tc_attach"))
-+			goto cleanup;
-+		tc_attached = true;
-+	}
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	assert_mprog_count(target, 2);
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, chain_tc_old, "seen_tc3");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+	skel->bss->seen_tc3 = false;
-+
-+	err = bpf_link__detach(skel->links.tc2);
-+	if (!ASSERT_OK(err, "prog_detach"))
-+		goto cleanup;
-+
-+	assert_mprog_count(target, 1);
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, chain_tc_old, "seen_tc3");
-+cleanup:
-+	if (tc_attached) {
-+		tc_opts.flags = tc_opts.prog_fd = tc_opts.prog_id = 0;
-+		err = bpf_tc_detach(&tc_hook, &tc_opts);
-+		ASSERT_OK(err, "bpf_tc_detach");
-+	}
-+	if (hook_created) {
-+		tc_hook.attach_point = BPF_TC_INGRESS | BPF_TC_EGRESS;
-+		bpf_tc_hook_destroy(&tc_hook);
-+	}
-+	assert_mprog_count(target, 1);
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_chain_classic(void)
-+{
-+	test_tc_chain_classic(BPF_TCX_INGRESS, false);
-+	test_tc_chain_classic(BPF_TCX_EGRESS, false);
-+	test_tc_chain_classic(BPF_TCX_INGRESS, true);
-+	test_tc_chain_classic(BPF_TCX_EGRESS, true);
-+}
-+
-+static void test_tc_links_replace_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 pid1, pid2, pid3, lid1, lid2;
-+	__u32 prog_ids[4], link_ids[4];
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3, target),
-+		  0, "tc3_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	optl.expected_revision = 1;
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+		.relative_id = pid1,
-+		.expected_revision = 2,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+
-+	assert_mprog_count(target, 2);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid2, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid2, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid1, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid1, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+	skel->bss->seen_tc3 = false;
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_REPLACE,
-+		.relative_fd = bpf_program__fd(skel->progs.tc2),
-+		.expected_revision = 3,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 2);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_REPLACE | BPF_F_LINK,
-+		.relative_fd = bpf_link__fd(skel->links.tc2),
-+		.expected_revision = 3,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 2);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_REPLACE | BPF_F_LINK | BPF_F_AFTER,
-+		.relative_id = lid2,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 2);
-+
-+	err = bpf_link__update_program(skel->links.tc2, skel->progs.tc3);
-+	if (!ASSERT_OK(err, "link_update"))
-+		goto cleanup;
-+
-+	assert_mprog_count(target, 2);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 4, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid3, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid2, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid1, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid1, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, true, "seen_tc3");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+	skel->bss->seen_tc3 = false;
-+
-+	err = bpf_link__detach(skel->links.tc2);
-+	if (!ASSERT_OK(err, "link_detach"))
-+		goto cleanup;
-+
-+	assert_mprog_count(target, 1);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 5, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+	skel->bss->seen_tc3 = false;
-+
-+	err = bpf_link__update_program(skel->links.tc1, skel->progs.tc1);
-+	if (!ASSERT_OK(err, "link_update_self"))
-+		goto cleanup;
-+
-+	assert_mprog_count(target, 1);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 5, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_replace(void)
-+{
-+	test_tc_links_replace_target(BPF_TCX_INGRESS);
-+	test_tc_links_replace_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_links_invalid_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 pid1, pid2, lid1;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+
-+	assert_mprog_count(target, 0);
-+
-+	optl.flags = BPF_F_BEFORE | BPF_F_AFTER;
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_ID,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER | BPF_F_ID,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_ID,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_LINK,
-+		.relative_fd = bpf_program__fd(skel->progs.tc2),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_LINK,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.relative_fd = bpf_program__fd(skel->progs.tc2),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_AFTER,
-+		.relative_fd = bpf_program__fd(skel->progs.tc2),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_ID,
-+		.relative_id = pid2,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_ID,
-+		.relative_id = 42,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_LINK,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, 0, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER | BPF_F_LINK,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 0);
-+
-+	LIBBPF_OPTS_RESET(optl);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER | BPF_F_LINK,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_LINK | BPF_F_ID,
-+		.relative_id = ~0,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_LINK | BPF_F_ID,
-+		.relative_id = lid1,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_ID,
-+		.relative_id = pid1,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE | BPF_F_LINK | BPF_F_ID,
-+		.relative_id = lid1,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	assert_mprog_count(target, 2);
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_invalid(void)
-+{
-+	test_tc_links_invalid_target(BPF_TCX_INGRESS);
-+	test_tc_links_invalid_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_links_prepend_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 prog_ids[5], link_ids[5];
-+	__u32 pid1, pid2, pid3, pid4;
-+	__u32 lid1, lid2, lid3, lid4;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3, target),
-+		  0, "tc3_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc4, target),
-+		  0, "tc4_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+	pid4 = id_from_prog_fd(bpf_program__fd(skel->progs.tc4));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid3, pid4, "prog_ids_3_4");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+
-+	assert_mprog_count(target, 2);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid2, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid2, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid1, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid1, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, false, "seen_tc4");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc3 = link;
-+
-+	lid3 = id_from_link_fd(bpf_link__fd(skel->links.tc3));
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc4, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc4 = link;
-+
-+	lid4 = id_from_link_fd(bpf_link__fd(skel->links.tc4));
-+
-+	assert_mprog_count(target, 4);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 4, "count");
-+	ASSERT_EQ(optq.revision, 5, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid4, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid4, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid3, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid3, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], pid2, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], lid2, "link_ids[2]");
-+	ASSERT_EQ(optq.prog_ids[3], pid1, "prog_ids[3]");
-+	ASSERT_EQ(optq.link_ids[3], lid1, "link_ids[3]");
-+	ASSERT_EQ(optq.prog_ids[4], 0, "prog_ids[4]");
-+	ASSERT_EQ(optq.link_ids[4], 0, "link_ids[4]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, true, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, true, "seen_tc4");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_prepend(void)
-+{
-+	test_tc_links_prepend_target(BPF_TCX_INGRESS);
-+	test_tc_links_prepend_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_links_append_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	__u32 prog_ids[5], link_ids[5];
-+	__u32 pid1, pid2, pid3, pid4;
-+	__u32 lid1, lid2, lid3, lid4;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3, target),
-+		  0, "tc3_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc4, target),
-+		  0, "tc4_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+	pid4 = id_from_prog_fd(bpf_program__fd(skel->progs.tc4));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid3, pid4, "prog_ids_3_4");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count(target, 1);
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+
-+	assert_mprog_count(target, 2);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid2, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid2, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, false, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, false, "seen_tc4");
-+
-+	skel->bss->seen_tc1 = false;
-+	skel->bss->seen_tc2 = false;
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc3 = link;
-+
-+	lid3 = id_from_link_fd(bpf_link__fd(skel->links.tc3));
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_AFTER,
-+	);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc4, loopback, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc4 = link;
-+
-+	lid4 = id_from_link_fd(bpf_link__fd(skel->links.tc4));
-+
-+	assert_mprog_count(target, 4);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(loopback, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 4, "count");
-+	ASSERT_EQ(optq.revision, 5, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid2, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid2, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], pid3, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], lid3, "link_ids[2]");
-+	ASSERT_EQ(optq.prog_ids[3], pid4, "prog_ids[3]");
-+	ASSERT_EQ(optq.link_ids[3], lid4, "link_ids[3]");
-+	ASSERT_EQ(optq.prog_ids[4], 0, "prog_ids[4]");
-+	ASSERT_EQ(optq.link_ids[4], 0, "link_ids[4]");
-+
-+	ASSERT_OK(system(ping_cmd), ping_cmd);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+	ASSERT_EQ(skel->bss->seen_tc3, true, "seen_tc3");
-+	ASSERT_EQ(skel->bss->seen_tc4, true, "seen_tc4");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+	assert_mprog_count(target, 0);
-+}
-+
-+void serial_test_tc_links_append(void)
-+{
-+	test_tc_links_append_target(BPF_TCX_INGRESS);
-+	test_tc_links_append_target(BPF_TCX_EGRESS);
-+}
-+
-+static void test_tc_links_dev_cleanup_target(int target)
-+{
-+	LIBBPF_OPTS(bpf_tcx_opts, optl);
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	__u32 pid1, pid2, pid3, pid4;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err, ifindex;
-+
-+	ASSERT_OK(system("ip link add dev tcx_opts1 type veth peer name tcx_opts2"), "add veth");
-+	ifindex = if_nametoindex("tcx_opts1");
-+	ASSERT_NEQ(ifindex, 0, "non_zero_ifindex");
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1, target),
-+		  0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2, target),
-+		  0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3, target),
-+		  0, "tc3_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc4, target),
-+		  0, "tc4_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+	pid3 = id_from_prog_fd(bpf_program__fd(skel->progs.tc3));
-+	pid4 = id_from_prog_fd(bpf_program__fd(skel->progs.tc4));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+	ASSERT_NEQ(pid3, pid4, "prog_ids_3_4");
-+	ASSERT_NEQ(pid2, pid3, "prog_ids_2_3");
-+
-+	assert_mprog_count(target, 0);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc1, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	assert_mprog_count_ifindex(ifindex, target, 1);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc2, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	assert_mprog_count_ifindex(ifindex, target, 2);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc3, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc3 = link;
-+
-+	assert_mprog_count_ifindex(ifindex, target, 3);
-+
-+	link = bpf_program__attach_tcx(skel->progs.tc4, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc4 = link;
-+
-+	assert_mprog_count_ifindex(ifindex, target, 4);
-+
-+	ASSERT_OK(system("ip link del dev tcx_opts1"), "del veth");
-+	ASSERT_EQ(if_nametoindex("tcx_opts1"), 0, "dev1_removed");
-+	ASSERT_EQ(if_nametoindex("tcx_opts2"), 0, "dev2_removed");
-+
-+	ASSERT_EQ(ifindex_from_link_fd(bpf_link__fd(skel->links.tc1)), 0, "tc1_ifindex");
-+	ASSERT_EQ(ifindex_from_link_fd(bpf_link__fd(skel->links.tc2)), 0, "tc2_ifindex");
-+	ASSERT_EQ(ifindex_from_link_fd(bpf_link__fd(skel->links.tc3)), 0, "tc3_ifindex");
-+	ASSERT_EQ(ifindex_from_link_fd(bpf_link__fd(skel->links.tc4)), 0, "tc4_ifindex");
-+
-+	test_tc_link__destroy(skel);
-+	return;
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	ASSERT_OK(system("ip link del dev tcx_opts1"), "del veth");
-+	ASSERT_EQ(if_nametoindex("tcx_opts1"), 0, "dev1_removed");
-+	ASSERT_EQ(if_nametoindex("tcx_opts2"), 0, "dev2_removed");
-+}
-+
-+void serial_test_tc_links_dev_cleanup(void)
-+{
-+	test_tc_links_dev_cleanup_target(BPF_TCX_INGRESS);
-+	test_tc_links_dev_cleanup_target(BPF_TCX_EGRESS);
-+}
+ static int init_systime(void __iomem *ioaddr, u32 sec, u32 nsec)
+ {
+ 	u32 value;
+@@ -221,4 +262,5 @@ const struct stmmac_hwtimestamp stmmac_ptp = {
+ 	.get_systime = get_systime,
+ 	.get_ptptime = get_ptptime,
+ 	.timestamp_interrupt = timestamp_interrupt,
++	.correct_latency = correct_latency,
+ };
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index efe85b086abe..ee78e69e9ae3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -909,6 +909,8 @@ static int stmmac_init_ptp(struct stmmac_priv *priv)
+ 	priv->hwts_tx_en = 0;
+ 	priv->hwts_rx_en = 0;
+ 
++	stmmac_correct_latency(priv, priv);
++
+ 	return 0;
+ }
+ 
+@@ -1094,6 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 
+ 	if (priv->dma_cap.fpesel)
+ 		stmmac_fpe_link_state_handle(priv, true);
++
++	stmmac_correct_latency(priv, priv);
+ }
+ 
+ static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
+index bf619295d079..d1fe4b46f162 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
+@@ -26,6 +26,12 @@
+ #define	PTP_ACR		0x40	/* Auxiliary Control Reg */
+ #define	PTP_ATNR	0x48	/* Auxiliary Timestamp - Nanoseconds Reg */
+ #define	PTP_ATSR	0x4c	/* Auxiliary Timestamp - Seconds Reg */
++#define	PTP_TS_INGR_CORR_NS	0x58	/* Ingress timestamp correction nanoseconds */
++#define	PTP_TS_EGR_CORR_NS	0x5C	/* Egress timestamp correction nanoseconds*/
++#define	PTP_TS_INGR_CORR_SNS	0x60	/* Ingress timestamp correction subnanoseconds */
++#define	PTP_TS_EGR_CORR_SNS	0x64	/* Egress timestamp correction subnanoseconds */
++#define	PTP_TS_INGR_LAT	0x68	/* MAC internal Ingress Latency */
++#define	PTP_TS_EGR_LAT	0x6c	/* MAC internal Egress Latency */
+ 
+ #define	PTP_STNSUR_ADDSUB_SHIFT	31
+ #define	PTP_DIGITAL_ROLLOVER_MODE	0x3B9ACA00	/* 10e9-1 ns */
+
+---
+base-commit: 36395b2efe905650cd179d67411ffee3b770268b
+change-id: 20230719-stmmac_correct_mac_delay-4278cb9d9bc1
+
+Best regards,
 -- 
-2.34.1
+Johannes Zink <j.zink@pengutronix.de>
 
 
