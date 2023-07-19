@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-19179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435F3759E24
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:04:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3E19759E13
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2861281A28
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:04:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFE29281B79
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1502515C;
-	Wed, 19 Jul 2023 19:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F211BB43;
+	Wed, 19 Jul 2023 19:00:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE49E25140
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:00:06 +0000 (UTC)
-Received: from mail.svario.it (mail.svario.it [84.22.98.252])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855551FC8
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:00:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB591BB4C
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 19:00:03 +0000 (UTC)
+Received: from mail.svario.it (mail.svario.it [IPv6:2a02:2770:13::112:0:1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08870199A
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:00:02 -0700 (PDT)
 Received: from localhost.localdomain (dynamic-002-244-020-234.2.244.pool.telefonica.de [2.244.20.234])
-	by mail.svario.it (Postfix) with ESMTPSA id 1A9DED9008;
+	by mail.svario.it (Postfix) with ESMTPSA id 6DABDD900A;
 	Wed, 19 Jul 2023 20:52:18 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
-	t=1689792738; bh=h+NqQAn3cG7OXy/7rxTDlVqhCyHatGRlhFodOgdXFLM=;
+	t=1689792738; bh=5zmj3yGJ1jlr9vWtjGZXSea2E2fNG4zSD5Rm8wAJ9Co=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EqjkfzTrrZ+vJj71PTeIElNF4tBNIIm+0psntJo5CpAD1PVT+QEaBnOpxrogINBmD
-	 FMvVTzsmuwSbFQSIe3ateZpKRG161VQi1iNzhFg8JP3IZ37flLV3nogsd5aW6tHN/9
-	 ZUcEIJCZUUssgBaqZIT6lNp+Mo2VgQPrqR8eLIntkLQFAnh+qrKjMSoU0ryYhKE5PP
-	 gs3maQQ+/FKibqof1DWFFPxRa2nsQLDRYm3YYRf/Zi4s19spBHMhYcwqdtk2fSLsD8
-	 TyCFJOG4KpIfluw6OWyHWxzqRhz2qQvqVqrieeCumKFVwnunLWbySolscdaGbD0O2S
-	 dPQ9hyHGFJITQ==
+	b=zHDaa033+t8eat7P5uYcTNA0InObKBEesIb/6I6eI+2wTjr/JUXWIa8LnRVfW1idu
+	 w9XZPlo/97uSjRpZND9DqH7/kUsGmozTTzOasi8B78PxnGxLfXEn0oJTH3H7n04OjX
+	 J49ejjrBCOjYBqKm3/nubFPwRM7wyDwRQg5mJd1AQAH+RGDxKnQhSK4MKDl+v/xuuq
+	 1kCU3BWtPOO6H6DaOhWzCgMjPv2zSRUcl/XdmEGlm+FQsEdVeyJE2ARLjX1CUfc6eg
+	 mqudBPyMsxvGsxYSY4nRqYtAgpWXuFHnzh4IC3rjrPsmzXe4AjMGxRS1x01UpLKaGS
+	 y2Y6gtSdhSbDw==
 From: Gioele Barabucci <gioele@svario.it>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>,
 	Gioele Barabucci <gioele@svario.it>
-Subject: [iproute2 08/22] lib/rt_names: rtnl_hash_initialize: Relay returned value
-Date: Wed, 19 Jul 2023 20:50:52 +0200
-Message-Id: <20230719185106.17614-9-gioele@svario.it>
+Subject: [iproute2 09/22] lib/rt_names: rtnl_tab_initialize: Relay returned value
+Date: Wed, 19 Jul 2023 20:50:53 +0200
+Message-Id: <20230719185106.17614-10-gioele@svario.it>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230719185106.17614-1-gioele@svario.it>
 References: <20230719185106.17614-1-gioele@svario.it>
@@ -59,31 +59,23 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 Signed-off-by: Gioele Barabucci <gioele@svario.it>
 ---
- lib/rt_names.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ lib/rt_names.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/lib/rt_names.c b/lib/rt_names.c
-index 0407b361..27aca3ec 100644
+index 27aca3ec..f64602b5 100644
 --- a/lib/rt_names.c
 +++ b/lib/rt_names.c
-@@ -14,6 +14,7 @@
- #include <sys/socket.h>
- #include <dirent.h>
- #include <limits.h>
-+#include <errno.h>
- 
- #include <asm/types.h>
- #include <linux/rtnetlink.h>
-@@ -56,7 +57,7 @@ static int fread_id_name(FILE *fp, int *id, char *namebuf)
+@@ -96,7 +96,7 @@ rtnl_hash_initialize(const char *file, struct rtnl_hash_entry **hash, int size)
  	return 0;
  }
  
--static void
-+static int
- rtnl_hash_initialize(const char *file, struct rtnl_hash_entry **hash, int size)
+-static void rtnl_tab_initialize(const char *file, char **tab, int size)
++static int rtnl_tab_initialize(const char *file, char **tab, int size)
  {
- 	struct rtnl_hash_entry *entry;
-@@ -67,14 +68,14 @@ rtnl_hash_initialize(const char *file, struct rtnl_hash_entry **hash, int size)
+ 	FILE *fp;
+ 	int id;
+@@ -105,14 +105,14 @@ static void rtnl_tab_initialize(const char *file, char **tab, int size)
  
  	fp = fopen(file, "r");
  	if (!fp)
@@ -98,17 +90,17 @@ index 0407b361..27aca3ec 100644
 -			return;
 +			return -1;
  		}
- 
- 		if (id < 0)
-@@ -91,6 +92,8 @@ rtnl_hash_initialize(const char *file, struct rtnl_hash_entry **hash, int size)
- 		hash[id & (size - 1)] = entry;
+ 		if (id < 0 || id > size)
+ 			continue;
+@@ -120,6 +120,8 @@ static void rtnl_tab_initialize(const char *file, char **tab, int size)
+ 		tab[id] = strdup(namebuf);
  	}
  	fclose(fp);
 +
 +	return 0;
  }
  
- static void rtnl_tab_initialize(const char *file, char **tab, int size)
+ static char *rtnl_rtprot_tab[256] = {
 -- 
 2.39.2
 
