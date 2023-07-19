@@ -1,212 +1,172 @@
-Return-Path: <netdev+bounces-18843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53BCE758CC9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:51:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DA92758CDB
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 07:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 279841C20CC2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 04:51:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3EE1C20CC2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 05:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FC81FAF;
-	Wed, 19 Jul 2023 04:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A8B566F;
+	Wed, 19 Jul 2023 05:05:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55BD17D2
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:51:34 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B9E1BF2;
-	Tue, 18 Jul 2023 21:51:32 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 61263100015;
-	Wed, 19 Jul 2023 07:51:29 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 61263100015
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1689742289;
-	bh=/PmxMitYAcz/XIeFph9ao549lMZtCxFvTPAj02fOQ+I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=XFN29qlI1i5BeBj6tcSZnWfUmaZ+n4VpRs/aLVRipofiIyO6BjYbUqhnRxmlDFN0E
-	 HmOqwEAe1uHa2xnWu0F7BeS9UQ09U3EHUpRYhZy3Qca5QFlAOBRzv5AJIPO631gUxV
-	 VweWDl6vx7pLlzYGp4ToJwNS2rcTGpob/KweRJTkiUz5jF9dKs05nyZZENW7RYTqtU
-	 p6zK502EMKSHSkvnAXLWcqAw/LnIVkgxSdOM0wTITj9bT/j9M5n5Y+OoUF5MsAGoD2
-	 ZZsNucvjenNhkF3ApfBlhcF72kCOoFqt39KqTRnBrUaAKJYHt9TY09wnalr5lVKOOn
-	 EnUHf8vyUGkTw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 19 Jul 2023 07:51:29 +0300 (MSK)
-Received: from [192.168.0.12] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 07:51:28 +0300
-Message-ID: <1ac4be11-0814-05af-6c2e-8563ac15e206@sberdevices.ru>
-Date: Wed, 19 Jul 2023 07:46:05 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBDD17D2
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 05:05:10 +0000 (UTC)
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0911BFC
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 22:05:08 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-40371070eb7so493971cf.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 22:05:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689743108; x=1692335108;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7PCWnotveVA/7iFt/FZ6cY9FtIJgmCHS8Q1l6pZTMlw=;
+        b=xg58N9xeL1FKsCRyRkoWxJqJwEWppJ//Ba/BnHZGiYMzAxsyWAYbdmWHVVmAok2V8l
+         wZHoyAogaPOsrkE6p9g5sMDFgdMkuTj6eLOqsZ2rW1+xBgKGOg3lC1ig9s0ut4auoGJC
+         8qtdmVC4hPc76jRJe+xQ6hDfpaN+b5cTbTD2076BrpyydJkX4IkGhYLfrZoNtjNz92My
+         3Jn5lbuFCY9egmGnb1BiJ66i+yI56Kf4UYJBKTO6F3h1wCbG3rFvQIWPXv1wNk1I3/GN
+         28NvLJ3r9dmPkdiFvrgGnLUQVrbxW5d1aTY2F7O4m5qim11U2UuTTslozQh+03CGj7BJ
+         /bng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689743108; x=1692335108;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7PCWnotveVA/7iFt/FZ6cY9FtIJgmCHS8Q1l6pZTMlw=;
+        b=eygFJKC0QS/3B7liBQLBvwkJZBCefp0jvlO4Qny6+nBabZntiZJ5Dgg4HljRUn6VHl
+         adlLNrsBjEibduQhHeqeOqQoMDGrU5kcEaDKBB+lldqjaSXxlpOyzoKdghSbYjgPRLvs
+         IUxJB7UAN9p9boJzbK8K8hpz+cpfkOFSY1eUNlDgxwqAB0qrPEa/TdeDA5wi1C08sae1
+         EXk5GcAPOsuq5YyMLrRlIYfESlsgk4se8dR08xRPNHRwih+I3FVjxsgBTli5ZjiHyGFr
+         3gBJOuG1X3MXeeMSgG5Q5C/vfCM2JYeUogSIJ9yh6ipF2Qspyg+SZM7CLUS9BWvwuEwq
+         igOg==
+X-Gm-Message-State: ABy/qLY0AZn4/2+naMoStcbA/07ivJTpyFZcKnLxzp+uP8LsYXt1iEYh
+	RyiXQx3RTiDctAThGHd/hVteAVZtkJmWWgW9oI+d4csR4vCYVpJe8v4tWQ==
+X-Google-Smtp-Source: APBJJlEsnVdvVhlqauvKLngQpQifQUoEWZR/Q1biTuLxF8okYuPXdwhHP8Md0JFs7gpHaHVtSYSQhirzsKwMVi0tjJs=
+X-Received: by 2002:ac8:7e8d:0:b0:3f5:2006:50f1 with SMTP id
+ w13-20020ac87e8d000000b003f5200650f1mr524107qtj.12.1689743107793; Tue, 18 Jul
+ 2023 22:05:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v2 2/4] vsock/virtio: support to send non-linear
- skb
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230718180237.3248179-1-AVKrasnov@sberdevices.ru>
- <20230718180237.3248179-3-AVKrasnov@sberdevices.ru>
- <20230718162202-mutt-send-email-mst@kernel.org>
-From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230718162202-mutt-send-email-mst@kernel.org>
+References: <20230711011737.1969582-1-william.xuanziyang@huawei.com>
+ <20230717-clubhouse-swinger-8f0fa23b0628-mkl@pengutronix.de>
+ <CANn89iJ47sVXAEEryvODoGv-iUpT-ACTCSWQTmdtJ9Fqs0s40Q@mail.gmail.com> <1e0e6539-412a-cc8d-b104-e2921a099e48@huawei.com>
+In-Reply-To: <1e0e6539-412a-cc8d-b104-e2921a099e48@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 19 Jul 2023 07:04:56 +0200
+Message-ID: <CANn89iKoTWHBGgMW-RyJHHeM0QuiN9De=eNWMM8VRom++n_o_g@mail.gmail.com>
+Subject: Re: [PATCH net v3] can: raw: fix receiver memory leak
+To: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, socketcan@hartkopp.net, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178703 [Jul 19 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/19 00:03:00 #21636206
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Wed, Jul 19, 2023 at 6:41=E2=80=AFAM Ziyang Xuan (William)
+<william.xuanziyang@huawei.com> wrote:
+>
+> > On Mon, Jul 17, 2023 at 9:27=E2=80=AFAM Marc Kleine-Budde <mkl@pengutro=
+nix.de> wrote:
+> >>
+> >> On 11.07.2023 09:17:37, Ziyang Xuan wrote:
+> >>> Got kmemleak errors with the following ltp can_filter testcase:
+> >>>
+> >>> for ((i=3D1; i<=3D100; i++))
+> >>> do
+> >>>         ./can_filter &
+> >>>         sleep 0.1
+> >>> done
+> >>>
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
+> >>> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
+> >>> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
+> >>> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
+> >>> [<00000000fd468496>] do_syscall_64+0x33/0x40
+> >>> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+> >>>
+> >>> It's a bug in the concurrent scenario of unregister_netdevice_many()
+> >>> and raw_release() as following:
+> >>>
+> >>>              cpu0                                        cpu1
+> >>> unregister_netdevice_many(can_dev)
+> >>>   unlist_netdevice(can_dev) // dev_get_by_index() return NULL after t=
+his
+> >>>   net_set_todo(can_dev)
+> >>>                                               raw_release(can_socket)
+> >>>                                                 dev =3D dev_get_by_in=
+dex(, ro->ifindex); // dev =3D=3D NULL
+> >>>                                                 if (dev) { // receive=
+rs in dev_rcv_lists not free because dev is NULL
+> >>>                                                   raw_disable_allfilt=
+ers(, dev, );
+> >>>                                                   dev_put(dev);
+> >>>                                                 }
+> >>>                                                 ...
+> >>>                                                 ro->bound =3D 0;
+> >>>                                                 ...
+> >>>
+> >>> call_netdevice_notifiers(NETDEV_UNREGISTER, )
+> >>>   raw_notify(, NETDEV_UNREGISTER, )
+> >>>     if (ro->bound) // invalid because ro->bound has been set 0
+> >>>       raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists =
+will never be freed
+> >>>
+> >>> Add a net_device pointer member in struct raw_sock to record bound ca=
+n_dev,
+> >>> and use rtnl_lock to serialize raw_socket members between raw_bind(),=
+ raw_release(),
+> >>> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to f=
+ree receivers in
+> >>> dev_rcv_lists.
+> >>>
+> >>> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice no=
+tifier")
+> >>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+> >>> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> >>> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> >>
+> >> Added to linux-can/testing.
+> >>
+> >
+> > This patch causes three syzbot LOCKDEP reports so far.
+>
+> Hello Eric,
+>
+> Is there reproducer? I want to understand the specific root cause.
+>
 
+No repro yet, but simply look at other functions in net/can/raw.c
 
-On 18.07.2023 23:27, Michael S. Tsirkin wrote:
-> On Tue, Jul 18, 2023 at 09:02:35PM +0300, Arseniy Krasnov wrote:
->> For non-linear skb use its pages from fragment array as buffers in
->> virtio tx queue. These pages are already pinned by 'get_user_pages()'
->> during such skb creation.
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  net/vmw_vsock/virtio_transport.c | 40 +++++++++++++++++++++++++++-----
->>  1 file changed, 34 insertions(+), 6 deletions(-)
->>
->> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->> index e95df847176b..6cbb45bb12d2 100644
->> --- a/net/vmw_vsock/virtio_transport.c
->> +++ b/net/vmw_vsock/virtio_transport.c
->> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>  	vq = vsock->vqs[VSOCK_VQ_TX];
->>  
->>  	for (;;) {
->> -		struct scatterlist hdr, buf, *sgs[2];
->> +		/* +1 is for packet header. */
->> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
->> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
->>  		int ret, in_sg = 0, out_sg = 0;
->>  		struct sk_buff *skb;
->>  		bool reply;
->> @@ -111,12 +113,38 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>  
->>  		virtio_transport_deliver_tap_pkt(skb);
->>  		reply = virtio_vsock_skb_reply(skb);
->> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
->> +			    sizeof(*virtio_vsock_hdr(skb)));
->> +		sgs[out_sg] = &bufs[out_sg];
->> +		out_sg++;
->> +
->> +		if (!skb_is_nonlinear(skb)) {
->> +			if (skb->len > 0) {
->> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
->> +				sgs[out_sg] = &bufs[out_sg];
->> +				out_sg++;
->> +			}
->> +		} else {
->> +			struct skb_shared_info *si;
->> +			int i;
->> +
->> +			si = skb_shinfo(skb);
->> +
->> +			for (i = 0; i < si->nr_frags; i++) {
->> +				skb_frag_t *skb_frag = &si->frags[i];
->> +				void *va = page_to_virt(skb_frag->bv_page);
->>  
->> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
->> -		sgs[out_sg++] = &hdr;
->> -		if (skb->len > 0) {
->> -			sg_init_one(&buf, skb->data, skb->len);
->> -			sgs[out_sg++] = &buf;
->> +				/* We will use 'page_to_virt()' for userspace page here,
-> 
-> don't put comments after code they refer to, please?
-> 
->> +				 * because virtio layer will call 'virt_to_phys()' later
-> 
-> it will but not always. sometimes it's the dma mapping layer.
-> 
-> 
->> +				 * to fill buffer descriptor. We don't touch memory at
->> +				 * "virtual" address of this page.
-> 
-> 
-> you need to stick "the" in a bunch of places above.
+You must always take locks in the same order.
 
-Ok, I'll fix this comment!
+raw_bind(), raw_setsockopt() use:
 
-> 
->> +				 */
->> +				sg_init_one(&bufs[out_sg],
->> +					    va + skb_frag->bv_offset,
->> +					    skb_frag->bv_len);
->> +				sgs[out_sg] = &bufs[out_sg];
->> +				out_sg++;
->> +			}
->>  		}
->>  
->>  		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
-> 
-> 
-> There's a problem here: if there vq is small this will fail.
-> So you really should check free vq s/gs and switch to non-zcopy
-> if too small.
+rtnl_lock();
+lock_sock(sk);
 
-Ok, so idea is that:
+Therefore, raw_release() must _also_ use the same order, or risk deadlock.
 
-if (out_sg > vq->num_free)
-    reorganise current skb for copy mode (e.g. 2 out_sg - header and data)
-    and try to add it to vq again.
-
-?
-
-@Stefano, I'll remove net-next tag (guess RFC is not required again, but not net-next
-anyway) as this change will require review. R-b I think should be also removed. All
-other patches in this set still unchanged.
-
-Thanks, Arseniy
-
-> 
->> -- 
->> 2.25.1
-> 
+Please build a LOCKDEP enabled kernel, and run your tests ?
 
