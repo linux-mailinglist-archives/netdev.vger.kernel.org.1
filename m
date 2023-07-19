@@ -1,137 +1,100 @@
-Return-Path: <netdev+bounces-19127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84E3A759CF0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 19:57:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C3DE759CFD
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 405EE280D32
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 17:57:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15796280FEA
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EB9156CD;
-	Wed, 19 Jul 2023 17:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356BA156D0;
+	Wed, 19 Jul 2023 18:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F09A1FB5E
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 17:57:17 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54D91FF1
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:57:14 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-668709767b1so5383938b3a.2
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:57:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248C713FE7
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:01:56 +0000 (UTC)
+X-Greylist: delayed 150 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 Jul 2023 11:01:54 PDT
+Received: from resqmta-a1p-077721.sys.comcast.net (resqmta-a1p-077721.sys.comcast.net [IPv6:2001:558:fd01:2bb4::a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D261FC8
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:01:54 -0700 (PDT)
+Received: from resomta-a1p-076786.sys.comcast.net ([96.103.145.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
+	(Client did not present a certificate)
+	by resqmta-a1p-077721.sys.comcast.net with ESMTP
+	id M66gqDkcqwNuzMBSMqqtpx; Wed, 19 Jul 2023 17:59:22 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1689789434; x=1690394234;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4FVEMGAeC4A4acfilWsGklHz88eR5z5EWRCCV9Kst0I=;
-        b=0Q1tzUOb9vYJXHmPeDryrYB5A4pEESrmEqXYj9Hg+90Z5+QCPv2ecrkofZgQVHrh2Q
-         2SmV6ESktQAtsjCYVJZhJojTRHsrQLvYLqNH0EoTgXcN4+EyUGH6ZSXKFYb02Y0hiirh
-         icie1/r4QjaO+Xr/8VrDJJ+t8iIcRUo2snH46DM7aXAbB12rMZS46rJ2h5Z2q3coLAKN
-         GMT7GgUwcUUW4SpZr+6zG8X6fnKROWImTBv7u2v/1CdFXwNuMSzJvhzr6uNXEVsoU8p0
-         jr3ynj+/29rinW5TGGhTFa+uF7yLH222PS2w2a9Iu7qAlX2Am1gjapUEui6PcMe/HT1i
-         pwCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689789434; x=1690394234;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4FVEMGAeC4A4acfilWsGklHz88eR5z5EWRCCV9Kst0I=;
-        b=fgTISInie+fgwUvpXPb+PoH0GoxzQ5z9LlqVoywN6DIX3HjgDYKSX7EiUBjizDsXdJ
-         fhWkv52Bw+ASs7Nto/yNfUFcWu6OS2ZmiZrsm9A3ta6904fkhvD5nx2CnUDlBSJZnRWs
-         d0mtsRKYAM+pLBNAbVwIuNy2KdgDTU50LEWQG7ni9sAp2dT/SAvuMdUZnJdzcSRUxdcp
-         NJ8qWVhAClybkZazYmUsHqJE+5v0w77rzNptta+O+1w1fow6jnzpo5UM810ZBX2pWEfy
-         608BEeHOpH2d7JdWZs23iY3xQXWMIQeHmfEEai9XHIWaQmpcFqnOko8IMvGITkf59Zox
-         FFng==
-X-Gm-Message-State: ABy/qLZFSF3cdzgX0sRxg7mCoM0EnNOlDllc2DHiHMEjiDOEhrZ0/n8r
-	3841k6hEnA2t4vGWwGQo4IEutS38hODEXm9bOa7Wgd5F
-X-Google-Smtp-Source: APBJJlEsVXT/riHHb217/IRnC4FkTdrL+WEIRgGEaqW1QkKPQqx7J9SZ2+4YPKCL/Z0Wz9JzjQeyoQ==
-X-Received: by 2002:a17:90a:d598:b0:264:97a:2ba6 with SMTP id v24-20020a17090ad59800b00264097a2ba6mr4560333pju.7.1689789434001;
-        Wed, 19 Jul 2023 10:57:14 -0700 (PDT)
-Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
-        by smtp.gmail.com with ESMTPSA id nw17-20020a17090b255100b00263f41a655esm1415304pjb.43.2023.07.19.10.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 10:57:13 -0700 (PDT)
-Date: Wed, 19 Jul 2023 10:57:11 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Andy Lutomirski <luto@kernel.org>,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- netdev@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Sumit Semwal <sumit.semwal@linaro.org>,
- Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
- <shuah@kernel.org>
-Subject: Re: [RFC PATCH 00/10] Device Memory TCP
-Message-ID: <20230719105711.448f8cad@hermes.local>
-In-Reply-To: <CAHS8izPORN=r2-hzYSgN4s_Aoo2dnwoJXrU5Hu=43sb8zsWyhQ@mail.gmail.com>
-References: <20230710223304.1174642-1-almasrymina@google.com>
-	<12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
-	<CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
-	<ZLbUpdNYvyvkD27P@ziepe.ca>
-	<20230718111508.6f0b9a83@kernel.org>
-	<35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
-	<20230718112940.2c126677@kernel.org>
-	<eb34f812-a866-a1a3-9f9b-7d5054d17609@kernel.org>
-	<20230718154503.0421b4cd@kernel.org>
-	<CAHS8izPORN=r2-hzYSgN4s_Aoo2dnwoJXrU5Hu=43sb8zsWyhQ@mail.gmail.com>
+	d=comcastmailservice.net; s=20211018a; t=1689789562;
+	bh=/6lKYap9PZZRLrRmess6iU23U+m+a8OOtwMIqKZ8RIU=;
+	h=Received:Received:From:To:Subject:Date:MIME-Version:Message-ID:
+	 Content-Type:Xfinity-Spam-Result;
+	b=AfvwybmUYQ6GTvqP31/kBXkK8h7P3sPntGnaZMMts7qC2th5DuM8KgfF6EPnHkoeQ
+	 NCZZyM1mBV7F2VMNVrGTGshhtBROwOCfbONbXhVnhGCbELU1HBb5oQTqIv9cD7LgGO
+	 13N/D7R+CWudSnjEDD2CgKwYa3KGrvUCaGYjvWuFr7RJt8zO5Vt42A525ju7AwGvEX
+	 YSY6BJXNCNnLetsWKFPcpucEHawvMpvuXG2J4JC0u/7pF0j8EW27PSwe6HOjOff11v
+	 Uwp2dSTSl9/G748ax7Cp0xRpjT29x/kFSu+KYRiV79C0topMy3SBXiKdogwvNj2Cse
+	 b+b2df/6wpdJA==
+Received: from localhost ([IPv6:2601:18c:9082:afd:219:d1ff:fe75:dc2f])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
+	(Client did not present a certificate)
+	by resomta-a1p-076786.sys.comcast.net with ESMTPSA
+	id MBSEqFdsmeadOMBSEqzqUD; Wed, 19 Jul 2023 17:59:18 +0000
+X-Xfinity-VMeta: sc=-100.00;st=legit
+From: Matt Whitlock <kernel@mattwhitlock.name>
+To: Miklos Szeredi <miklos@szeredi.hu>
+Cc: David Howells <dhowells@redhat.com>,
+ <netdev@vger.kernel.org>,
+ Matthew Wilcox <willy@infradead.org>,
+ Dave Chinner <david@fromorbit.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ <linux-fsdevel@kvack.org>,
+ <linux-mm@kvack.org>,
+ <linux-kernel@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>,
+ <linux-fsdevel@vger.kernel.org>
+Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after =?iso-8859-1?Q?splice()_returns?=
+Date: Wed, 19 Jul 2023 13:59:13 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name>
+In-Reply-To: <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
+References: <20230629155433.4170837-1-dhowells@redhat.com>
+ <20230629155433.4170837-2-dhowells@redhat.com>
+ <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
+User-Agent: Trojita/v0.7-595-g7738cd47; Qt/5.15.10; xcb; Linux; Gentoo Linux
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,MIME_QP_LONG_LINE,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 19 Jul 2023 08:10:58 -0700
-Mina Almasry <almasrymina@google.com> wrote:
+On Wednesday, 19 July 2023 06:17:51 EDT, Miklos Szeredi wrote:
+> On Thu, 29 Jun 2023 at 17:56, David Howells <dhowells@redhat.com> wrote:
+>>=20
+>> Splicing data from, say, a file into a pipe currently leaves the source
+>> pages in the pipe after splice() returns - but this means that those pages=
 
-> On Tue, Jul 18, 2023 at 3:45=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Tue, 18 Jul 2023 16:35:17 -0600 David Ahern wrote: =20
-> > > I do not see how 1 RSS context (or more specifically a h/w Rx queue) =
-can
-> > > be used properly with memory from different processes (or dma-buf
-> > > references). =20
->=20
-> Right, my experience with dma-bufs from GPUs are that they're
-> allocated from the userspace and owned by the process that allocated
-> the backing GPU memory and generated the dma-buf from it. I.e., we're
-> limited to 1 dma-buf per RX queue. If we enable binding multiple
-> dma-bufs to the same RX queue, we have a problem, because AFAIU the
-> NIC can't decide which dma-buf to put the packet into (it hasn't
-> parsed the packet's destination yet).
->=20
-> > > When the process dies, that memory needs to be flushed from
-> > > the H/W queues. Queues with interlaced submissions make that more
-> > > complicated. =20
-> > =20
->=20
-> When the process dies, do we really want to flush the memory from the
-> hardware queues? The drivers I looked at don't seem to have a function
-> to flush the rx queues alone, they usually do an entire driver reset
-> to achieve that. Not sure if that's just convenience or there is some
-> technical limitation there. Do we really want  to trigger a driver
-> reset at the event a userspace process crashes?
+>> can be subsequently modified by shared-writable mmap(), write(),
+>> fallocate(), etc. before they're consumed.
+>
+> What is this trying to fix?   The above behavior is well known, so
+> it's not likely to be a problem.
 
-Naive idea.
-Would it be possible for process to use mmap() on the GPU memory and then
-do zero copy TCP receive some how? Or is this what is being proposed.
+Respectfully, it's not well-known, as it's not documented. If the splice(2)=20=
+
+man page had mentioned that pages can be mutated after they're already=20
+ostensibly at rest in the output pipe buffer, then my nightly backups=20
+wouldn't have been incurring corruption silently for many months.
 
