@@ -1,236 +1,98 @@
-Return-Path: <netdev+bounces-19077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C00517597DE
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 285017597E7
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 16:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E64DF1C21085
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:14:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AE0A1C21010
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26B4156D2;
-	Wed, 19 Jul 2023 14:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB97814280;
+	Wed, 19 Jul 2023 14:15:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A745614280
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:11:09 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E2610B
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:11:07 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF9314008;
+	Wed, 19 Jul 2023 14:15:36 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7F2F1722;
+	Wed, 19 Jul 2023 07:15:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=AhhvPKL15Njp8ql/nNcgeKlt/Q5zwJ+eEpKyUjaMZkM=; b=nnF4tz+QvQ9syCL5aBlALdUw6q
+	LB5Jb/RddevX91br7W+/B/lbbHMR4omQEHQl6bV8JVO3BS9VKkWeLLu//mUBb4hOonGrgEK/uLz3K
+	TaLROpb5wmNUr8sJ7yskFpDhxr8z3gKny6SC5CBjmMKlohQouDnt+20BbrbgEOSksozkBIiZxvSXd
+	Q+XfOZlHyPVruTBjMByyomzUSUGxNi34TjJGycwQV7eXLvTyls8SsOz4yDmdgAmVx7/AU0IdUNG1a
+	wa7Gc4Vy9A9K3H7WIOfSQkNArHj8RaY4Uf0emL2vn3F74R+/bGNA1Hr/4d5VmhqeNPe9iUc3D8/Pn
+	LqrE6gaw==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qM7xc-0009qU-4y; Wed, 19 Jul 2023 16:15:24 +0200
+Received: from [124.148.184.141] (helo=192-168-1-114.tpgi.com.au)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qM7tG-0003ij-5J; Wed, 19 Jul 2023 16:10:54 +0200
-Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qM7tC-000cnD-8D; Wed, 19 Jul 2023 16:10:50 +0200
-Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
-	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qM7tB-003DGO-Bm; Wed, 19 Jul 2023 16:10:49 +0200
-From: Johannes Zink <j.zink@pengutronix.de>
-Date: Wed, 19 Jul 2023 16:10:38 +0200
-Subject: [PATCH] net: stmmac: correct MAC propagation delay
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qM7xb-000PIm-Cl; Wed, 19 Jul 2023 16:15:23 +0200
+Subject: Re: [PATCH bpf-next v5 2/8] bpf: Add fd-based tcx multi-prog infra
+ with link support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+ dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org, davem@davemloft.net,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20230714141545.26904-1-daniel@iogearbox.net>
+ <20230714141545.26904-3-daniel@iogearbox.net>
+ <20230718172531.67b639fc@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <d96b725d-6a7f-9b80-04f2-27872b1b3ca4@iogearbox.net>
+Date: Wed, 19 Jul 2023 16:15:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20230718172531.67b639fc@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAN3ut2QC/x2NUQrCMBBEr1L220ATCzVeRaRsNqtdSFPZtKKU3
- r3Rv3kDb2aDwipc4NpsoPyWInOuYE8N0Ij5yUZiZXCtO7e99aYs04Q00KzKtAy/HDnh13Suv1D
- w0QeyUPWAhU1QzDTWgbymVMuX8kM+/7/bfd8PVFGWSX8AAAA=
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Johannes Zink <j.zink@pengutronix.de>
-X-Mailer: b4 0.12.2
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26974/Wed Jul 19 09:28:18 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The IEEE1588 Standard specifies that the timestamps of Packets must be
-captured when the PTP message timestamp point (leading edge of first
-octet after the start of frame delimiter) crosses the boundary between
-the node and the network. As the MAC latches the timestamp at an
-internal point, the captured timestamp must be corrected for the
-additional path latency, as described in the publicly available
-datasheet [1].
+On 7/19/23 2:25 AM, Jakub Kicinski wrote:
+> On Fri, 14 Jul 2023 16:15:39 +0200 Daniel Borkmann wrote:
+>> +void tcx_inc(void)
+>> +{
+>> +	static_branch_inc(&tcx_needed_key);
+>> +}
+>> +EXPORT_SYMBOL_GPL(tcx_inc);
+>> +
+>> +void tcx_dec(void)
+>> +{
+>> +	static_branch_dec(&tcx_needed_key);
+>> +}
+>> +EXPORT_SYMBOL_GPL(tcx_dec);
+> 
+> Do these need to be exported? Otherwise:
+> 
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
 
-This patch only corrects for the MAC-Internal delay, which can be read
-out from the MAC_Ingress_Timestamp_Latency register, since the Phy
-framework currently does not support querying the Phy ingress and egress
-latency. The Closs Domain Crossing Circuits errors as indicated in [1]
-are already being accounted in the stmmac_get_tx_hwtstamp() function and
-are not corrected here.
-
-As the Latency varies for different link speeds and MII
-modes of operation, the correction value needs to be updated on each
-link state change.
-
-As the delay also causes a phase shift in the timestamp counter compared
-to the rest of the network, this correction will also reduce phase error
-when generating PPS outputs from the timestamp counter.
-
-[1] i.MX8MP Reference Manual, rev.1 Section 11.7.2.5.3 "Timestamp
-correction"
-
-Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
----
- drivers/net/ethernet/stmicro/stmmac/hwif.h         |  3 ++
- .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  | 42 ++++++++++++++++++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  4 +++
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h   |  6 ++++
- 4 files changed, 55 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index 6ee7cf07cfd7..95a4d6099577 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -536,6 +536,7 @@ struct stmmac_hwtimestamp {
- 	void (*get_systime) (void __iomem *ioaddr, u64 *systime);
- 	void (*get_ptptime)(void __iomem *ioaddr, u64 *ptp_time);
- 	void (*timestamp_interrupt)(struct stmmac_priv *priv);
-+	void (*correct_latency)(struct stmmac_priv *priv);
- };
- 
- #define stmmac_config_hw_tstamping(__priv, __args...) \
-@@ -554,6 +555,8 @@ struct stmmac_hwtimestamp {
- 	stmmac_do_void_callback(__priv, ptp, get_ptptime, __args)
- #define stmmac_timestamp_interrupt(__priv, __args...) \
- 	stmmac_do_void_callback(__priv, ptp, timestamp_interrupt, __args)
-+#define stmmac_correct_latency(__priv, __args...) \
-+	stmmac_do_void_callback(__priv, ptp, correct_latency, __args)
- 
- struct stmmac_tx_queue;
- struct stmmac_rx_queue;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-index fa2c3ba7e9fe..1749cba7b206 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-@@ -60,6 +60,47 @@ static void config_sub_second_increment(void __iomem *ioaddr,
- 		*ssinc = data;
- }
- 
-+static void correct_latency(struct stmmac_priv *priv)
-+{
-+	void __iomem *ioaddr = priv->ptpaddr;
-+	u32 reg_tsic, reg_tsicsns;
-+	u32 reg_tsec, reg_tsecsns;
-+	u64 scaled_ns;
-+	u32 val;
-+
-+	/* MAC-internal ingress latency */
-+	scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
-+
-+	/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
-+	 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
-+	 */
-+	val = readl(ioaddr + PTP_TCR);
-+	if (val & PTP_TCR_TSCTRLSSR)
-+		/* nanoseconds field is in decimal format with granularity of 1ns/bit */
-+		scaled_ns = (NSEC_PER_SEC << 16) - scaled_ns;
-+	else
-+		/* nanoseconds field is in binary format with granularity of ~0.466ns/bit */
-+		scaled_ns = ((1ULL << 31) << 16) - scaled_ns * PSEC_PER_NSEC / 466;
-+
-+	reg_tsic = scaled_ns >> 16;
-+	reg_tsicsns = scaled_ns & 0xff00;
-+
-+	/* set bit 31 for 2's compliment */
-+	reg_tsic |= BIT(31);
-+
-+	writel(reg_tsic, ioaddr + PTP_TS_INGR_CORR_NS);
-+	writel(reg_tsicsns, ioaddr + PTP_TS_INGR_CORR_SNS);
-+
-+	/* MAC-internal egress latency */
-+	scaled_ns = readl(ioaddr + PTP_TS_EGR_LAT);
-+
-+	reg_tsec = scaled_ns >> 16;
-+	reg_tsecsns = scaled_ns & 0xff00;
-+
-+	writel(reg_tsec, ioaddr + PTP_TS_EGR_CORR_NS);
-+	writel(reg_tsecsns, ioaddr + PTP_TS_EGR_CORR_SNS);
-+}
-+
- static int init_systime(void __iomem *ioaddr, u32 sec, u32 nsec)
- {
- 	u32 value;
-@@ -221,4 +262,5 @@ const struct stmmac_hwtimestamp stmmac_ptp = {
- 	.get_systime = get_systime,
- 	.get_ptptime = get_ptptime,
- 	.timestamp_interrupt = timestamp_interrupt,
-+	.correct_latency = correct_latency,
- };
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index efe85b086abe..ee78e69e9ae3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -909,6 +909,8 @@ static int stmmac_init_ptp(struct stmmac_priv *priv)
- 	priv->hwts_tx_en = 0;
- 	priv->hwts_rx_en = 0;
- 
-+	stmmac_correct_latency(priv, priv);
-+
- 	return 0;
- }
- 
-@@ -1094,6 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 
- 	if (priv->dma_cap.fpesel)
- 		stmmac_fpe_link_state_handle(priv, true);
-+
-+	stmmac_correct_latency(priv, priv);
- }
- 
- static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-index bf619295d079..d1fe4b46f162 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-@@ -26,6 +26,12 @@
- #define	PTP_ACR		0x40	/* Auxiliary Control Reg */
- #define	PTP_ATNR	0x48	/* Auxiliary Timestamp - Nanoseconds Reg */
- #define	PTP_ATSR	0x4c	/* Auxiliary Timestamp - Seconds Reg */
-+#define	PTP_TS_INGR_CORR_NS	0x58	/* Ingress timestamp correction nanoseconds */
-+#define	PTP_TS_EGR_CORR_NS	0x5C	/* Egress timestamp correction nanoseconds*/
-+#define	PTP_TS_INGR_CORR_SNS	0x60	/* Ingress timestamp correction subnanoseconds */
-+#define	PTP_TS_EGR_CORR_SNS	0x64	/* Egress timestamp correction subnanoseconds */
-+#define	PTP_TS_INGR_LAT	0x68	/* MAC internal Ingress Latency */
-+#define	PTP_TS_EGR_LAT	0x6c	/* MAC internal Egress Latency */
- 
- #define	PTP_STNSUR_ADDSUB_SHIFT	31
- #define	PTP_DIGITAL_ROLLOVER_MODE	0x3B9ACA00	/* 10e9-1 ns */
-
----
-base-commit: 36395b2efe905650cd179d67411ffee3b770268b
-change-id: 20230719-stmmac_correct_mac_delay-4278cb9d9bc1
-
-Best regards,
--- 
-Johannes Zink <j.zink@pengutronix.de>
-
+Thanks! Indeed not, I removed them for v6.
 
