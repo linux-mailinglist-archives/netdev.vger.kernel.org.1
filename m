@@ -1,78 +1,66 @@
-Return-Path: <netdev+bounces-18797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40212758ADC
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 03:30:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736B4758ADF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 03:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1C8D2818B6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 01:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 356D0281408
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 01:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F9C15D1;
-	Wed, 19 Jul 2023 01:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335AE15D1;
+	Wed, 19 Jul 2023 01:33:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C8EECA
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:30:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A18E5C433C9;
-	Wed, 19 Jul 2023 01:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF94E17C8
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:33:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BA38C433C8;
+	Wed, 19 Jul 2023 01:33:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689730220;
-	bh=YrrmVDLFzf3q5dwLmu3MAmKlODGJLhUyKUhXK8hPOx8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MZHgHRWD6H900hG1vK66GnB0lKBVic8+DGsEcrcUx8yaH7vaaUlG7qPYG8yh6peo4
-	 dvHb1ydxp6/wkUwaf9+nOVW5zdZFVFg8dGclM3aC09SWLlaUx7J1VoIdIgT9YVLQYn
-	 sg3ZHWYfeoxAsT0/5RIBGvmX+QPwypD2UezHJKKUNFHPWL9Ym3enaxXvsEq/g9FIEY
-	 7waC9Ry5/5uuj2uEvaMFAnS9kawsZ+h07NNXoZhzZkqvQc1dYCpl/UExEj9ajJUTXv
-	 YcWMg72aZWCA7qMpVbnya4uyS96hgQvPSqBXmuM3X8EnsFl5nwe1U6jc18Kgf4lNqV
-	 OQCz15r+Bkyaw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84FBAC64458;
-	Wed, 19 Jul 2023 01:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1689730396;
+	bh=cnB634d5MilJx61cRbzEaIgLNrGvhl8lhYE1cM+RK3M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=joJppOyiXXcr17Mg9CVU5knqiGd6Wk7zb0/Ghi7YXkFsjmOUhKagdbWS1kjBBZ2nw
+	 KvVPD+k6NvIKErN++63eeAU5Jn9uDpbteK6pfLChEkafjptVKkoiT1jS0+hZ52Ol76
+	 BDF94l3Zh/g4p1+yZlCr9xyU27X+HPKcf/i7cb6ccShJ30FFmo6i1oq+zkk/lB3ECu
+	 gUPZGnzTV0NutlXrUZG4X50Jp7BrrcKWtRPCoxrETTA/V7t4TYXscaBGJptt9EibdD
+	 MM7iespl5Wp9rAWI93m9h0MzlP83OV2qPH7pfkPuZNXgtP+/CTTCiJ/R+miawAvdAO
+	 cVQw+SxFuJ85g==
+Date: Tue, 18 Jul 2023 18:33:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
+ kernel@pengutronix.de, Jimmy Assarsson <extja@kvaser.com>, Martin Jocic
+ <majoc@kvaser.com>
+Subject: Re: [PATCH net-next 7/8] can: kvaser_pciefd: Move hardware specific
+ constants and functions into a driver_data struct
+Message-ID: <20230718183315.27c0cd27@kernel.org>
+In-Reply-To: <20230717182229.250565-8-mkl@pengutronix.de>
+References: <20230717182229.250565-1-mkl@pengutronix.de>
+	<20230717182229.250565-8-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] mailmap: Add entry for old intel email
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168973022054.4553.8064290695233635886.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jul 2023 01:30:20 +0000
-References: <20230717173306.38407-1-john.fastabend@gmail.com>
-In-Reply-To: <20230717173306.38407-1-john.fastabend@gmail.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 17 Jul 2023 20:22:28 +0200 Marc Kleine-Budde wrote:
+> +const struct kvaser_pciefd_address_offset kvaser_pciefd_altera_address_offset = {
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> +const struct kvaser_pciefd_irq_mask kvaser_pciefd_altera_irq_mask = {
 
-On Mon, 17 Jul 2023 10:33:06 -0700 you wrote:
-> Fix old email to avoid bouncing email from net/drivers and older
-> netdev work. Anyways my @intel email hasn't been active for years.
-> 
-> Signed-off-by: John Fastabend <john.fastabend@gmail.com>
-> ---
->  .mailmap | 1 +
->  1 file changed, 1 insertion(+)
+> +const struct kvaser_pciefd_dev_ops kvaser_pciefd_altera_dev_ops = {
 
-Here is the summary with links:
-  - [net-next] mailmap: Add entry for old intel email
-    https://git.kernel.org/netdev/net/c/195e903b342a
+> +const struct kvaser_pciefd_driver_data kvaser_pciefd_altera_driver_data = {
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+sparse points out the structs in this and subsequent patch should
+be static. Would you be able to queue a quick fix on top and resend,
+or should we pull as is?
 
