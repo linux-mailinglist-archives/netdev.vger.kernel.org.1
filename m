@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-18999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 163B375947E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:41:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 084E675947F
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4716B1C20EE6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:41:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C001C20F40
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E255F13AF1;
-	Wed, 19 Jul 2023 11:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA3914A92;
+	Wed, 19 Jul 2023 11:40:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19181429E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18E414274
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:40:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55A0DC433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C881C433C8;
 	Wed, 19 Jul 2023 11:40:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689766820;
-	bh=iW/wY6IXsINxSp0RxmTTr0pltUrRCYnqRAeox/7HdBU=;
+	bh=O7KE6QURVyG2deYSiL5ojlS/R2PfvC0hv2Gs+IrY7Rs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PneJgMLEub3R21CAb+KI8H+VvqtF+a3O1asQyM2qWdp/9HtHRmuG29EE/QWNZvfFb
-	 nN3omiZ+lg5c8XcyIB2UYHAHwlhCG3QOPEk/k1Y/tA9odapjxIR0TTXhsqg88WXyDN
-	 t2z0c/vznM56fptTc0S5OLe5h67a1MfYR60ydWFReKOSAeyI22TgpTaCpBM1mE+lQT
-	 Bc14+Vg8aBJpBdZxHpPwPOvF0VR+9D6USiuqJO1pHnwXVsmHTySXfmy3JPSXUGnq58
-	 NeoPmzhPp/noFbz5NGV81Gq7fr/rMjGuB5bc5vNgdT1M0sgkOZFcueO6kBNO6XX36S
-	 KX4U5SOvehs4A==
+	b=SM9HlMi7I0VLwP3EQW15edoyGCWkpKwaeHJi4bIXhmZkYQcIDjBgHb/7Jak7n5bFS
+	 CyCkOqV4zi2haiMnI+3xG1kIKn96Zv5YFgLp4A1N6ikTxWt75ZT2e5MPKiuw0xdGk9
+	 fLwyr40vmJKeBNs0L5MRrwKptRLsxuTI0PpgiY5EUocQq5QSbtEn1FWTM9Zx629fYG
+	 TONpweJHqoRh9hI4LJeo4Hldz+pOrVKPnSPLk/AA34esMprz2YvgGo3CD4xVkev4e2
+	 R5G509oCwCJAkVR6irYLIr4rCqQ2CMQ7qRNyPR1/9Dw7gNZyCeqitfgWTfl3ET7+8d
+	 GUNvmoG0K+Q7Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 342F6E21EFF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2A891E21EFA;
 	Wed, 19 Jul 2023 11:40:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,41 +41,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2][pull request] Intel Wired LAN Driver Updates
- 2023-07-14 (i40e)
+Subject: Re: [PATCH net-next 0/3] net: Remove more RTO_ONLINK users.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168976682020.23748.8273277474530562675.git-patchwork-notify@kernel.org>
+ <168976682016.23748.15879521041642434800.git-patchwork-notify@kernel.org>
 Date: Wed, 19 Jul 2023 11:40:20 +0000
-References: <20230714201253.1717957-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230714201253.1717957-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <cover.1689600901.git.gnault@redhat.com>
+In-Reply-To: <cover.1689600901.git.gnault@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+ edumazet@google.com, netdev@vger.kernel.org, pablo@netfilter.org,
+ laforge@gnumonks.org, osmocom-net-gprs@lists.osmocom.org,
+ dccp@vger.kernel.org, marcelo.leitner@gmail.com, lucien.xin@gmail.com,
+ linux-sctp@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+by David S. Miller <davem@davemloft.net>:
 
-On Fri, 14 Jul 2023 13:12:51 -0700 you wrote:
-> This series contains updates to i40e driver only.
+On Mon, 17 Jul 2023 15:53:24 +0200 you wrote:
+> Code that initialise a flowi4 structure manually before doing a fib
+> lookup can easily avoid overloading ->flowi4_tos with the RTO_ONLINK
+> bit. They can just set ->flowi4_scope correctly instead.
 > 
-> Ivan Vecera adds waiting for VF to complete initialization on VF related
-> configuration callbacks.
-> 
-> The following are changes since commit 68af900072c157c0cdce0256968edd15067e1e5a:
->   gve: trivial spell fix Recive to Receive
-> and are available in the git repository at:
->   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
+> Properly separating the routing scope from ->flowi4_tos will allow to
+> eventually convert this field to dscp_t (to ensure proper separation
+> between DSCP and ECN).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/2] i40e: Add helper for VF inited state check with timeout
-    https://git.kernel.org/netdev/net-next/c/df84f0ce569d
-  - [net-next,v2,2/2] i40e: Wait for pending VF reset in VF set callbacks
-    https://git.kernel.org/netdev/net-next/c/efb6f4a35954
+  - [net-next,1/3] gtp: Set TOS and routing scope independently for fib lookups.
+    https://git.kernel.org/netdev/net-next/c/b16b50476714
+  - [net-next,2/3] dccp: Set TOS and routing scope independently for fib lookups.
+    https://git.kernel.org/netdev/net-next/c/2d6c85ca3eb8
+  - [net-next,3/3] sctp: Set TOS and routing scope independently for fib lookups.
+    https://git.kernel.org/netdev/net-next/c/ba80e20d7f3f
 
 You are awesome, thank you!
 -- 
