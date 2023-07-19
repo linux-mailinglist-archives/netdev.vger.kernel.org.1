@@ -1,107 +1,111 @@
-Return-Path: <netdev+bounces-18899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E8FE759087
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:44:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F92075908E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 844282815E3
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:44:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 584981C20D37
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677A4D53E;
-	Wed, 19 Jul 2023 08:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC2B101E4;
+	Wed, 19 Jul 2023 08:45:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562673207
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:44:25 +0000 (UTC)
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F3D0FC;
-	Wed, 19 Jul 2023 01:44:23 -0700 (PDT)
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3128fcd58f3so6835379f8f.1;
-        Wed, 19 Jul 2023 01:44:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3CF3207
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 08:45:22 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD9A19F
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:45:21 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f58444a410so6868e87.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 01:45:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689756320; x=1692348320;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ODNQm7Qd7e/6+bGpKRi1Bv+uUs4PUVQ4+Hl7PdGDhgI=;
+        b=Shfd+XwM+ukB58E8y/z8euPhlM+SvzoOTYSs6aINdGFcivqnZsETWBhPWCQIfabh1+
+         ixRB7zSx6pOpNIowU2P30GYQm5Wwb97ikG+XbEaaNP+T6GL562JY0N0Ce5y2zR/pfkiF
+         L/otFKwsLEHDB2Pp5lCN/TGKEZzQ9npdeY9DSXZeCDvG8yPk9SYtT4WC7wonBWJPQ+yd
+         j0hsMO2acZ5Sm70zmtbKHynIg9QiwD7weWGFOkfrasA/3NWRGIFNYz46mM7fClKvuLlk
+         mHAqFEuhCsm1JSKkH3qvy+iXVHkFjSIcAEm3sZvUpBe3ruQ/wSDjYccFvINIwTUfI/su
+         v3kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689756261; x=1692348261;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RT28KMZUfUxLqE36E2WVSHWEOsxWuK8+5KaakQzM+v8=;
-        b=YavyBslqvgKfg5jrXB9gxeGsyVgB0y+5VsNNTX6tuEtyQjcs65B8nSLzVMEcagYrGa
-         qWl2HN7tsYelNJvf11eBF5ZFv/a6K2Oe343QEZLK9e27sISimxKq/FAL9ZljQiNn3GJh
-         b6N9+moZWqXRQcahaNbCO2eby3Jc4yoE/qX+9dVedoqiOU8iD/nHsnu6f8CWVp4F5zp2
-         NxPY8nDKVuwVZiVcFUW4lHvi5LvRZaTcGs0SmoWkI4X0ACH5CJXi+R1Dpyhmrcj++hiP
-         mW8HN4Gj0LkPngQQMdCucaAMRXZLuCfkuk35mtio7lM1sR0Hs2HVFmXKHXz4g/Ogh5uJ
-         PZcQ==
-X-Gm-Message-State: ABy/qLaq9cRLwxMkJvIX6RZdK7VRDSDVRV7MC4aGs8d12CaZp237+JHW
-	LdSh6arwDGkAyfyTKMW2N8o=
-X-Google-Smtp-Source: APBJJlF/ywwhKzxGBt1Io0V8KucgEnzbjqfPGnb6QDESp3ONMvIdSj92bog0DWa1BNuxba/gvMaUjA==
-X-Received: by 2002:adf:ee43:0:b0:314:39d0:26f6 with SMTP id w3-20020adfee43000000b0031439d026f6mr14656317wro.18.1689756261248;
-        Wed, 19 Jul 2023 01:44:21 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-005.fbsv.net. [2a03:2880:31ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id k28-20020a5d525c000000b0030ada01ca78sm4688105wrc.10.2023.07.19.01.44.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 01:44:20 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: leit@meta.com,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	David Howells <dhowells@redhat.com>,
-	Jason Xing <kernelxing@tencent.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: Use _K_SS_MAXSIZE instead of absolute value
-Date: Wed, 19 Jul 2023 01:44:12 -0700
-Message-Id: <20230719084415.1378696-1-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20221208; t=1689756320; x=1692348320;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ODNQm7Qd7e/6+bGpKRi1Bv+uUs4PUVQ4+Hl7PdGDhgI=;
+        b=azGJ9rZRT5+H+baBE1wvfTYFtMu+JAkWysGzYH5Mxcgu/RIGB9D3r2/i5z/IzhifAY
+         f5ElEDpd2hceBpUsFro4KVfdVWi+5lUALaxlUGbms2lOlaTxvgT2o/pdgLWBigrnrUlJ
+         LfmK6K6COMDbY+f7T7Y/sGDuyRVRhABPwANf/ULMMtt1BWjoYEflw8/WvL3RRlcwCREh
+         i+wbpFnqemfs9q6fQSa9oXfjpoJvXoaVzoApNC5+xkKNuo5weJ0iPNJfVt0tFLzxU9lq
+         /sy8XWeDHbcs524cAmapaamT3wR8lZQbZy5yTcjc3x32nAk83TGaGQBaysiYjvi2QQcL
+         qzLQ==
+X-Gm-Message-State: ABy/qLZw3WyR4g3DujkzeXLOLDTqbncbyufjr3N/Qx/tFNiudTY4KpUE
+	86ZCqMYN5aCuTTEdWWX7bptDy0yB2c5mnZwHl4lAsQ==
+X-Google-Smtp-Source: APBJJlHLnwRtT8dY4p/gFDWF0KgvHLNMG0seYCvYQfXnGLLU6blkTWYuxyClSv9V8XvEISNEZUh5P+X8OHVF+seMG/k=
+X-Received: by 2002:a19:7018:0:b0:4f2:632d:4d61 with SMTP id
+ h24-20020a197018000000b004f2632d4d61mr166153lfc.6.1689756319638; Wed, 19 Jul
+ 2023 01:45:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <00000000000049baa505e65e3939@google.com> <00000000000077b5650600b48ed0@google.com>
+ <20230718124548.7b1d3196@kernel.org>
+In-Reply-To: <20230718124548.7b1d3196@kernel.org>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Wed, 19 Jul 2023 10:45:07 +0200
+Message-ID: <CANp29Y6T2sKnnTGtotraCX8saAUw1kSUhS-be=3GM_t+szZ-3Q@mail.gmail.com>
+Subject: Re: [syzbot] [bluetooth?] general protection fault in hci_uart_tty_ioctl
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: syzbot <syzbot+c19afa60d78984711078@syzkaller.appspotmail.com>, 
+	davem@davemloft.net, hdanton@sina.com, jiri@nvidia.com, 
+	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Looking at sk_getsockopt function, it is unclear why 128 is a magical
-number.
+On Tue, Jul 18, 2023 at 9:45=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 17 Jul 2023 13:22:24 -0700 syzbot wrote:
+> > syzbot suspects this issue was fixed by commit:
+> >
+> > commit d772781964415c63759572b917e21c4f7ec08d9f
+> > Author: Jakub Kicinski <kuba@kernel.org>
+> > Date:   Fri Jan 6 06:33:54 2023 +0000
+> >
+> >     devlink: bump the instance index directly when iterating
+>
+> Hm, don't think so. It's not the first issue where syzbot decided
+> this commit was the resolution. I wonder what makes it special.
 
-Use the proper macro, so it becomes clear to understand what the value
-mean, and get a reference where it is coming from (user-exported API).
+Judging by the bisection log, the commit fixed some "INFO: rcu
+detected stall in" error that was also triggerable by the reproducer.
+Though for me it's not clear how exactly -- at least the reproducer
+does not seem to be interacting with devlink..
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/core/sock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--=20
+Aleksandr
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9370fd50aa2c..58b6f00197d6 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1815,7 +1815,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 
- 	case SO_PEERNAME:
- 	{
--		char address[128];
-+		char address[_K_SS_MAXSIZE];
- 
- 		lv = sock->ops->getname(sock, (struct sockaddr *)address, 2);
- 		if (lv < 0)
--- 
-2.34.1
 
+>
+> --
 
