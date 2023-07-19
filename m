@@ -1,48 +1,52 @@
-Return-Path: <netdev+bounces-18995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8ED759470
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:40:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05108759469
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C93922817D6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:40:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1F9B1C20F63
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0345013AED;
-	Wed, 19 Jul 2023 11:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E5313AC2;
+	Wed, 19 Jul 2023 11:39:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29D313AE6
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:39:56 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0437D2110
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:39:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B811112B8D
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:39:47 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9069E1BCF
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 04:39:16 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out1.suse.de (Postfix) with ESMTP id BB3A621B98;
+	by smtp-out2.suse.de (Postfix) with ESMTP id BBB7A1FEAE;
 	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1689766720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=MjE+MOFpFadd0F3lZwj3UXnm3sqwZEpBmBb74wm7f0c=;
-	b=j4z/i8vfjPyQPDpROWLntORA/iOaOIx9pSUu2jVGBvJ/GjVxkAQ0fOQToFuAlE6oXa9Wc2
-	nKNHVPdbtdDiTVnjquDlnTZpqUz6u2Z1/OCAXyTaOIbfKhVIm3B62+kByNr4AxXFAFFz8a
-	+KcAPIS6xdkK8zId6xvO4n0eq7qTnp4=
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gvILd7sk13wwDq+N4D5AU+ZHek+MVfhla4H8J9D8dBw=;
+	b=Scx4WTPtEFnCnjs7Bf8HH8z2UJrQpAMhRLhiTHFfzq2yaGff2MJxyFLu61XwaaSVH7d+xI
+	DIqOayvZ007trApA2733LRMH7aDq3L2AAaYEXcMfXREyLzqfMKClSUjRq1vwjRFVBcF8LK
+	c25yWjtRlhsbq42tN1f6FssfrDnM/XM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1689766720;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=MjE+MOFpFadd0F3lZwj3UXnm3sqwZEpBmBb74wm7f0c=;
-	b=km34e623ab1u2UylPoopyVK66Mvu27tUCP1o3qXYcqwtvb7iiXkfIXZOpI+vl/wJgLUQ4I
-	leF4/MMNiZXcxzAA==
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gvILd7sk13wwDq+N4D5AU+ZHek+MVfhla4H8J9D8dBw=;
+	b=Gk2bqXwFNOqlXwihHiVG3cpKzgXVb7YJfP4iOREdfTUM7fqis3JqxYancLHZpFC04N63uf
+	cX8WSnBTBqN+ReCw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id A2BBC2C142;
+	by relay2.suse.de (Postfix) with ESMTP id A2DD92C143;
 	Wed, 19 Jul 2023 11:38:40 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id 91FFF51C9ECB; Wed, 19 Jul 2023 13:38:40 +0200 (CEST)
+	id 9605B51C9ECD; Wed, 19 Jul 2023 13:38:40 +0200 (CEST)
 From: Hannes Reinecke <hare@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>,
@@ -53,10 +57,12 @@ Cc: Sagi Grimberg <sagi@grimberg.me>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>
-Subject: [RESENT PATCHv7 0/6] net/tls: fixes for NVMe-over-TLS
-Date: Wed, 19 Jul 2023 13:38:30 +0200
-Message-Id: <20230719113836.68859-1-hare@suse.de>
+Subject: [PATCH 1/6] net/tls: handle MSG_EOR for tls_sw TX flow
+Date: Wed, 19 Jul 2023 13:38:31 +0200
+Message-Id: <20230719113836.68859-2-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20230719113836.68859-1-hare@suse.de>
+References: <20230719113836.68859-1-hare@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,55 +77,43 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi all,
+tls_sw_sendmsg() already handles MSG_MORE, but bails
+out on MSG_EOR.
+Seeing that MSG_EOR is basically the opposite of
+MSG_MORE this patch adds handling MSG_EOR by treating
+it as the negation of MSG_MORE.
+And erroring out if MSG_EOR is specified with MSG_MORE.
 
-here are some small fixes to get NVMe-over-TLS up and running.
-The first set are just minor modifications to have MSG_EOR handled
-for TLS, but the second set implements the ->read_sock() callback for tls_sw
-which I guess could do with some reviews.
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ net/tls/tls_sw.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-As usual, comments and reviews are welcome.
-
-Changes to the original submission:
-- Add a testcase for MSG_EOR handling
-
-Changes to v2:
-- Bail out on conflicting message flags
-- Rework flag handling
-
-Changes to v3:
-- Return -EINVAL on conflicting flags
-- Rebase on top of net-next
-
-Changes to v4:
-- Add tlx_rx_reader_lock() to read_sock
-- Add MSG_EOR handling to tls_sw_readpages()
-
-Changes to v5:
-- Rebase to latest upstream
-- Split tls_rx_reader_lock() as suggested by Sagi
-
-Changes to v6:
-- Fixup tls_strp_read_copyin() to avoid infinite recursion
-  in tls_read_sock()
-- Rework tls_read_sock() to read all available data
-
-Hannes Reinecke (6):
-  net/tls: handle MSG_EOR for tls_sw TX flow
-  net/tls: handle MSG_EOR for tls_device TX flow
-  selftests/net/tls: add test for MSG_EOR
-  net/tls: Use tcp_read_sock() instead of ops->read_sock()
-  net/tls: split tls_rx_reader_lock
-  net/tls: implement ->read_sock()
-
- net/tls/tls.h                     |   2 +
- net/tls/tls_device.c              |   6 +-
- net/tls/tls_main.c                |   2 +
- net/tls/tls_strp.c                |   3 +-
- net/tls/tls_sw.c                  | 139 ++++++++++++++++++++++++++----
- tools/testing/selftests/net/tls.c |  11 +++
- 6 files changed, 143 insertions(+), 20 deletions(-)
-
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 53f944e6d8ef..9aef45e870a5 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -984,6 +984,9 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+ 	int ret = 0;
+ 	int pending;
+ 
++	if (!eor && (msg->msg_flags & MSG_EOR))
++		return -EINVAL;
++
+ 	if (unlikely(msg->msg_controllen)) {
+ 		ret = tls_process_cmsg(sk, msg, &record_type);
+ 		if (ret) {
+@@ -1193,7 +1196,7 @@ int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 	int ret;
+ 
+ 	if (msg->msg_flags & ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
+-			       MSG_CMSG_COMPAT | MSG_SPLICE_PAGES |
++			       MSG_CMSG_COMPAT | MSG_SPLICE_PAGES | MSG_EOR |
+ 			       MSG_SENDPAGE_NOPOLICY))
+ 		return -EOPNOTSUPP;
+ 
 -- 
 2.35.3
 
