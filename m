@@ -1,208 +1,266 @@
-Return-Path: <netdev+bounces-19271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1720F75A1DC
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 00:27:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41A8C75A1DE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 00:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 483D01C211D5
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:27:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB23E281AF2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EDE2516B;
-	Wed, 19 Jul 2023 22:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E376C2516D;
+	Wed, 19 Jul 2023 22:28:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20C317FE9
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 22:27:10 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E68226BF
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:26:37 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-403b6b7c0f7so1774631cf.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:26:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689805596; x=1690410396;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hP+JX+PW/j/FBnezQE1zfVtv5VoOh6/Tn0Ser/4xCKI=;
-        b=ft3GWq6ZW2gRdoHYXcm03f7+easVJqeqUnMMNxjx+md5W/JAZ2vkPnAU5BoKnlY/dM
-         EDZH3JMiG/K9skdBEBPy2QnS06qpGkOFuUL9zQrNxbuIcCCLm3//hPuq2IjGQCdCv3Rv
-         Xcuny++G1KEJU7AmD0/h1OkGDofUPtgx0Z3sv7xUxm9e8TdN5plqrj3Tik9AC9Rp9YFn
-         Jb5hzzH2VI2jCH4VN5jmj7q04L5SmE//jebGIJ7eCLIR2X+LHnVoexPc9ApuZ1bpYdOX
-         o0StRZm3/y6seJGyqwGnOpBSdmAPCTHEY8sTLOAnLS4EqvFRN/YGbyvF4OMDa0wTSmkT
-         xu4w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D552617FE9
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 22:28:10 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4982118
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:27:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689805666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GRWr26/a3fW93qtfogg6jzmjztOmv2YuNrAH4tmN+jk=;
+	b=SaHxMX59ivmBJBhni2d9uxUpfrDJpaKIwy+8FA8TiN5nKl/gSZG9l5l4KzpAipQeNC7h9+
+	75fFWtOI7ENR2F5M492QGXBNKb/b+jbr/5hiwRk44vVQsodkKUdkESXJbVBYjj3597tAUY
+	cswPr467U3bujiIFr8UxcOKV/no1pqo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-Tf0l2kT4MsCDbwdc5WvEww-1; Wed, 19 Jul 2023 18:27:45 -0400
+X-MC-Unique: Tf0l2kT4MsCDbwdc5WvEww-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3143b277985so94597f8f.2
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 15:27:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689805596; x=1690410396;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hP+JX+PW/j/FBnezQE1zfVtv5VoOh6/Tn0Ser/4xCKI=;
-        b=i7YbLYOZGHqWdy2QdGGis/m7poaW3mDPQUgFdzzVhto0emq0BxzXDMHUGPSTkypDpx
-         HOZmztBwEPo9Pq2L8ikzfN8kAHl84A7Eg3DPXKy/oG3/2Q3JigKB1jGynI7/QnP47EeL
-         U88ERf5PCF16J6fDBN3GLjKriyw4jDn5EDm6a2nWvNHZaMvqJBo4fX8QlyTL+abAZEqa
-         e53uJI0cWhQzARhQes0b8/fvwH4mKn4LOAGGGWHS7AjHCqW6dNs9xCxukB20Cq8nBqJ0
-         XBWRjoV5Hg5bx3CGs+6M/BPZIg8Y2eAXBE3vbS7kMS+2F2Dk7eRwVXe4eyDHBN5dJFRm
-         6u8Q==
-X-Gm-Message-State: ABy/qLZPUz1uNWmy0qees6ko0PcupY+6ygwkyk6V4UtIQeGwpW5X2BI4
-	CMP2OYf2Xtl6vLbWEwvzRHc=
-X-Google-Smtp-Source: APBJJlEGxzQjb5S5nCwuB3Bcav2ZB3YQSckU3QAylngnYSybnAmed/cXp5mhmQ7ox+BQ2rOPmjUqpg==
-X-Received: by 2002:a05:622a:210:b0:403:b382:613f with SMTP id b16-20020a05622a021000b00403b382613fmr23595612qtx.44.1689805596104;
-        Wed, 19 Jul 2023 15:26:36 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id qf1-20020a0562144b8100b006360931c12fsm1754380qvb.96.2023.07.19.15.26.35
+        d=1e100.net; s=20221208; t=1689805604; x=1692397604;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GRWr26/a3fW93qtfogg6jzmjztOmv2YuNrAH4tmN+jk=;
+        b=IU0y17zsI6PDbekeh7oFRLuLjItMVzavoPJMlfwOW+hDG1CcwsKzrTrg2RHgLs5yom
+         JLT4ylzZBQBE4R+BfKB2wicl+ccro1OeeshPmBDaWXv4b/c1h2ZsoDBrR8X/NWHtf/fG
+         +OoNOzaG1JFfy2R2vCUEPpQemL2x0e1pJ857RzVNHRdHw1yuZ4dycH8tByxcdOCjdeYj
+         hYO6XwOpxitbyFvBAcyK/NtUYeY/9S7bHQl3dKSWhc87uakCL5WJS+MRxX+Mobbazfpx
+         zJBGap0qRGqLlEAGPGY9KppuWHDA3kPGttraEhIctrSpZqPIjYtFc3df6AUksl6gjWji
+         z2nw==
+X-Gm-Message-State: ABy/qLZs8xtGmirmvvUyHPEjHWUtUIqkZToRylY12G59VFGFUPBZTWr6
+	4CZNdM6c2VtHAIC+6LuO1BP/XYx3gAZWvpXxmg1oBcOpFeymxmcKkW0vQRx/+8Z2SEa3XOQ+aNz
+	2sHT+fYWHFtRVPSIB
+X-Received: by 2002:a05:6000:1042:b0:315:adee:1297 with SMTP id c2-20020a056000104200b00315adee1297mr891988wrx.10.1689805604600;
+        Wed, 19 Jul 2023 15:26:44 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEvlUX8tU5JXgVBrbk/KZWgr/MLOWrxY/kV5bYVSTY8sYIDCMK2pUOuvQQKyWa5poxeJ9b+2A==
+X-Received: by 2002:a05:6000:1042:b0:315:adee:1297 with SMTP id c2-20020a056000104200b00315adee1297mr891970wrx.10.1689805604145;
+        Wed, 19 Jul 2023 15:26:44 -0700 (PDT)
+Received: from redhat.com ([2.52.16.41])
+        by smtp.gmail.com with ESMTPSA id t7-20020a5d5347000000b003143add4396sm6313184wrv.22.2023.07.19.15.26.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 15:26:35 -0700 (PDT)
-Date: Wed, 19 Jul 2023 18:26:35 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Kees Cook <keescook@chromium.org>, 
- "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
- Breno Leitao <leitao@debian.org>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Kuniyuki Iwashima <kuni1840@gmail.com>, 
- netdev@vger.kernel.org, 
- syzkaller <syzkaller@googlegroups.com>
-Message-ID: <64b8631b8f1b0_286a73294cc@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230719185322.44255-2-kuniyu@amazon.com>
-References: <20230719185322.44255-1-kuniyu@amazon.com>
- <20230719185322.44255-2-kuniyu@amazon.com>
-Subject: RE: [PATCH v1 net 1/2] af_unix: Fix fortify_panic() in
- unix_bind_bsd().
+        Wed, 19 Jul 2023 15:26:43 -0700 (PDT)
+Date: Wed, 19 Jul 2023 18:26:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Si-Wei Liu <si-wei.liu@oracle.com>
+Cc: Shannon Nelson <shannon.nelson@amd.com>, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	Eugenio Perez Martin <eperezma@redhat.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
+ not support it
+Message-ID: <20230719182112-mutt-send-email-mst@kernel.org>
+References: <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org>
+ <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org>
+ <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <CAJaqyWd0QC6x9WHBT0x9beZyC8ZrF2y=d9HvmT0+05RtGc8_og@mail.gmail.com>
+ <eff34828-545b-956b-f400-89b585706fe4@amd.com>
+ <20230706020603-mutt-send-email-mst@kernel.org>
+ <1fdf73cb-f23e-0c34-f95f-f1bac74332da@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1fdf73cb-f23e-0c34-f95f-f1bac74332da@oracle.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Kuniyuki Iwashima wrote:
-> syzkaller found a bug in unix_bind_bsd() [0].  We can reproduce it
-> by bind()ing a socket on a path with length 108.
+On Wed, Jul 19, 2023 at 03:20:03PM -0700, Si-Wei Liu wrote:
 > 
-> 108 is the size of sun_addr of struct sockaddr_un and is the maximum
-> valid length for the pathname socket.  When calling bind(), we use
-> struct sockaddr_storage as the actual buffer size, so terminating
-> sun_addr[108] with null is legitimate.
 > 
-> However, strlen(sunaddr) for such a case causes fortify_panic() if
-> CONFIG_FORTIFY_SOURCE=y.  __fortify_strlen() has no idea about the
-> actual buffer size and takes 108 as overflow, although 108 still
-> fits in struct sockaddr_storage.
+> On 7/5/2023 11:07 PM, Michael S. Tsirkin wrote:
+> > On Wed, Jul 05, 2023 at 05:07:11PM -0700, Shannon Nelson wrote:
+> > > On 7/5/23 11:27 AM, Eugenio Perez Martin wrote:
+> > > > On Wed, Jul 5, 2023 at 9:50 AM Jason Wang <jasowang@redhat.com> wrote:
+> > > > > On Tue, Jul 4, 2023 at 11:45 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
+> > > > > > > On Tue, Jul 4, 2023 at 12:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
+> > > > > > > > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
+> > > > > > > > > > > With the current code it is accepted as long as userland send it.
+> > > > > > > > > > > 
+> > > > > > > > > > > Although userland should not set a feature flag that has not been
+> > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
+> > > > > > > > > > > complain for it.
+> > > > > > > > > > > 
+> > > > > > > > > > > Since there is no specific reason for any parent to reject that backend
+> > > > > > > > > > > feature bit when it has been proposed, let's control it at vdpa frontend
+> > > > > > > > > > > level. Future patches may move this control to the parent driver.
+> > > > > > > > > > > 
+> > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+> > > > > > > > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> > > > > > > > > > Please do send v3. And again, I don't want to send "after driver ok" hack
+> > > > > > > > > > upstream at all, I merged it in next just to give it some testing.
+> > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > > > > > 
+> > > > > > > > > Current devices do not support that semantic.
+> > > > > > > > Which devices specifically access the ring after DRIVER_OK but before
+> > > > > > > > a kick?
+> > > The PDS vdpa device can deal with a call to .set_vq_ready after DRIVER_OK is
+> > > set.  And I'm told that our VQ activity should start without a kick.
+> > > 
+> > > Our vdpa device FW doesn't currently have support for VIRTIO_F_RING_RESET,
+> > > but I believe it could be added without too much trouble.
+> > > 
+> > > sln
+> > > 
+> > OK it seems clear at least in the current version pds needs
+> > VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK.
+> > However can we also code up the RING_RESET path as the default?
+> What's the rationale of making RING_RESET path the default? Noted this is on
+> a performance critical path (for live migration downtime), did we ever get
+> consensus from every or most hardware vendors that RING_RESET has lower cost
+> in terms of latency overall than ENABLE_AFTER_DRIVER_OK? I think (RING)RESET
+> in general falls on the slow path for hardware, while I assume either
+> RING_RESET or ENABLE_AFTER_DRIVER_OK doesn't matters much on software backed
+> vdpa e.g. vp_vdpa. Maybe should make ENABLE_AFTER_DRIVER_OK as the default?
 > 
-> Let's make __fortify_strlen() recognise the actual buffer size.
-> 
-> [0]:
-> detected buffer overflow in __fortify_strlen
-> kernel BUG at lib/string_helpers.c:1031!
-> Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-> Modules linked in:
-> CPU: 0 PID: 255 Comm: syz-executor296 Not tainted 6.5.0-rc1-00330-g60cc1f7d0605 #4
-> Hardware name: linux,dummy-virt (DT)
-> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : fortify_panic+0x1c/0x20 lib/string_helpers.c:1030
-> lr : fortify_panic+0x1c/0x20 lib/string_helpers.c:1030
-> sp : ffff800089817af0
-> x29: ffff800089817af0 x28: ffff800089817b40 x27: 1ffff00011302f68
-> x26: 000000000000006e x25: 0000000000000012 x24: ffff800087e60140
-> x23: dfff800000000000 x22: ffff800089817c20 x21: ffff800089817c8e
-> x20: 000000000000006c x19: ffff00000c323900 x18: ffff800086ab1630
-> x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000001
-> x14: 1ffff00011302eb8 x13: 0000000000000000 x12: 0000000000000000
-> x11: 0000000000000000 x10: 0000000000000000 x9 : 64a26b65474d2a00
-> x8 : 64a26b65474d2a00 x7 : 0000000000000001 x6 : 0000000000000001
-> x5 : ffff800089817438 x4 : ffff800086ac99e0 x3 : ffff800080f19e8c
-> x2 : 0000000000000001 x1 : 0000000100000000 x0 : 000000000000002c
-> Call trace:
->  fortify_panic+0x1c/0x20 lib/string_helpers.c:1030
->  _Z16__fortify_strlenPKcU25pass_dynamic_object_size1 include/linux/fortify-string.h:217 [inline]
->  unix_bind_bsd net/unix/af_unix.c:1212 [inline]
->  unix_bind+0xba8/0xc58 net/unix/af_unix.c:1326
->  __sys_bind+0x1ac/0x248 net/socket.c:1792
->  __do_sys_bind net/socket.c:1803 [inline]
->  __se_sys_bind net/socket.c:1801 [inline]
->  __arm64_sys_bind+0x7c/0x94 net/socket.c:1801
->  __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
->  invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
->  el0_svc_common+0x134/0x240 arch/arm64/kernel/syscall.c:139
->  do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:188
->  el0_svc+0x2c/0x7c arch/arm64/kernel/entry-common.c:647
->  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
->  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
-> Code: aa0003e1 d0000e80 91030000 97ffc91a (d4210000)
-> 
-> Fixes: df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> -Siwei
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Coming from the spec RING_RESET has clearer semantics.
+As long as we support it it is not critical which one
+is the default though.
 
-The extensive comments are really helpful to understand what's
-going on.
 
-An alternative would be to just cast sunaddr to a struct
-sockaddr_storage *ss and use that both here and in unix_mkname_bsd?
-It's not immediately trivial that the caller has always actually
-allocated one of those. But the rest becomes self documenting.
-
-> ---
->  net/unix/af_unix.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 123b35ddfd71..e1b1819b96d1 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -302,6 +302,18 @@ static void unix_mkname_bsd(struct sockaddr_un *sunaddr, int addr_len)
->  	((char *)sunaddr)[addr_len] = 0;
->  }
->  
-> +static int unix_strlen_bsd(struct sockaddr_un *sunaddr)
-> +{
-> +	/* Don't pass sunaddr->sun_path to strlen().  Otherwise, the
-> +	 * max valid length UNIX_PATH_MAX (108) will cause panic if
-> +	 * CONFIG_FORTIFY_SOURCE=y.  Let __fortify_strlen() know that
-> +	 * the actual buffer is struct sockaddr_storage and that 108
-> +	 * is within __data[].  See also: unix_mkname_bsd().
-> +	 */
-> +	return strlen(((struct sockaddr_storage *)sunaddr)->__data) +
-> +		offsetof(struct sockaddr_un, sun_path) + 1;
-> +}
-> +
->  static void __unix_remove_socket(struct sock *sk)
->  {
->  	sk_del_node_init(sk);
-> @@ -1209,9 +1221,7 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
->  	int err;
->  
->  	unix_mkname_bsd(sunaddr, addr_len);
-> -	addr_len = strlen(sunaddr->sun_path) +
-> -		offsetof(struct sockaddr_un, sun_path) + 1;
-> -
-> +	addr_len = unix_strlen_bsd(sunaddr);
->  	addr = unix_create_addr(sunaddr, addr_len);
->  	if (!addr)
->  		return -ENOMEM;
-> -- 
-> 2.30.2
-> 
-
+> > Then down the road vendors can choose what to do.
+> > 
+> > 
+> > 
+> > 
+> > 
+> > > > > > > Previous versions of the QEMU LM series did a spurious kick to start
+> > > > > > > traffic at the LM destination [1]. When it was proposed, that spurious
+> > > > > > > kick was removed from the series because to check for descriptors
+> > > > > > > after driver_ok, even without a kick, was considered work of the
+> > > > > > > parent driver.
+> > > > > > > 
+> > > > > > > I'm ok to go back to this spurious kick, but I'm not sure if the hw
+> > > > > > > will read the ring before the kick actually. I can ask.
+> > > > > > > 
+> > > > > > > Thanks!
+> > > > > > > 
+> > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775.html
+> > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
+> > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
+> > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > > > > 
+> > > > > But this reminds me one thing, as the thread is going too long, I
+> > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
+> > > > > supported?
+> > > > > 
+> > > > The problem with that is that the device needs to support all
+> > > > RING_RESET, like to be able to change vq address etc after DRIVER_OK.
+> > > > Not all HW support it.
+> > > > 
+> > > > We just need the subset of having the dataplane freezed until all CVQ
+> > > > commands have been consumed. I'm sure current vDPA code already
+> > > > supports it in some devices, like MLX and PSD.
+> > > > 
+> > > > Thanks!
+> > > > 
+> > > > > Thanks
+> > > > > 
+> > > > > > 
+> > > > > > 
+> > > > > > > > > My plan was to convert
+> > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
+> > > > > > > > > was not explicit enough.
+> > > > > > > > > 
+> > > > > > > > > The only solution I can see to that is to trap & emulate in the vdpa
+> > > > > > > > > (parent?) driver, as talked in virtio-comment. But that complicates
+> > > > > > > > > the architecture:
+> > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > > > > * Store vq enable state separately, at
+> > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
+> > > > > > > > > * Store the doorbell state separately, but do not configure it to the
+> > > > > > > > > device directly.
+> > > > > > > > > 
+> > > > > > > > > But how to recover if the device cannot configure them at kick time,
+> > > > > > > > > for example?
+> > > > > > > > > 
+> > > > > > > > > Maybe we can just fail if the parent driver does not support enabling
+> > > > > > > > > the vq after DRIVER_OK? That way no new feature flag is needed.
+> > > > > > > > > 
+> > > > > > > > > Thanks!
+> > > > > > > > > 
+> > > > > > > > > > > ---
+> > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
+> > > > > > > > > > > commit. Please let me know if I should send a v3 of [1] instead.
+> > > > > > > > > > > 
+> > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
+> > > > > > > > > > > ---
+> > > > > > > > > > >    drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > > > > >    1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > > > > > 
+> > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> > > > > > > > > > >    {
+> > > > > > > > > > >         struct vhost_vdpa *v = filep->private_data;
+> > > > > > > > > > >         struct vhost_dev *d = &v->vdev;
+> > > > > > > > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
+> > > > > > > > > > >         void __user *argp = (void __user *)arg;
+> > > > > > > > > > >         u64 __user *featurep = argp;
+> > > > > > > > > > > -     u64 features;
+> > > > > > > > > > > +     u64 features, parent_features = 0;
+> > > > > > > > > > >         long r = 0;
+> > > > > > > > > > > 
+> > > > > > > > > > >         if (cmd == VHOST_SET_BACKEND_FEATURES) {
+> > > > > > > > > > >                 if (copy_from_user(&features, featurep, sizeof(features)))
+> > > > > > > > > > >                         return -EFAULT;
+> > > > > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
+> > > > > > > > > > >                 if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> > > > > > > > > > >                                  BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
+> > > > > > > > > > >                                  BIT_ULL(VHOST_BACKEND_F_RESUME) |
+> > > > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
+> > > > > > > > > > > +                              parent_features))
+> > > > > > > > > > >                         return -EOPNOTSUPP;
+> > > > > > > > > > >                 if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+> > > > > > > > > > >                      !vhost_vdpa_can_suspend(v))
+> > > > > > > > > > > --
+> > > > > > > > > > > 2.39.3
+> > _______________________________________________
+> > Virtualization mailing list
+> > Virtualization@lists.linux-foundation.org
+> > https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 
 
