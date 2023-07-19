@@ -1,118 +1,155 @@
-Return-Path: <netdev+bounces-18930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9AB77591A2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:29:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E37627591B4
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:32:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA9F71C202D5
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:29:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA2271C20433
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29151111BF;
-	Wed, 19 Jul 2023 09:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995D111CB4;
+	Wed, 19 Jul 2023 09:32:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1B8111BB
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:29:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC7C9C433C7;
-	Wed, 19 Jul 2023 09:29:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689758964;
-	bh=jY8foJhzwaIYoiqIIU/wNHSPQWKg7KfSGXB7Q2CX3lI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kjZ+quM+Dj+kQmuY1wbVgU4Xty/zLJAuWW5Otid4ubFoyeajYZ0PVPVFueptE4RI7
-	 otzcrJou1RGRq40ycdvXoIKFRNrYhe0RqLVeFtBSGmGQdLIak1wT8/wN5jeysf1bPq
-	 iSRWJE5VuM8t3uUSBrLSAwjAiDKCCO/GXopi8T/abiENV5R9hWCiUTUch10roOsxtx
-	 KOWPnHKDP7UTNHNsv+jnzQ+t+ahliStrqdhi8K3vJ0HQJW8ioMzZTgUMEJbsk0xG77
-	 2Ub6C15fNgSra9Dzh5xRCmB3O/nElBVGvR6OTYhpZ+wKG5rf1nDbhbgg8pdHrpnbP9
-	 w35e3WV+TWQBQ==
-Date: Wed, 19 Jul 2023 12:29:20 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next 09/12] net/mlx5: Compare with old_dest param to
- modify rule destination
-Message-ID: <20230719092920.GI8808@unreal>
-References: <20230713100401.5fe0fa77@kernel.org>
- <20230713174317.GH41919@unreal>
- <20230713110556.682d21ba@kernel.org>
- <20230713185833.GI41919@unreal>
- <20230713201727.6dfe7549@kernel.org>
- <20230714184013.GJ41919@unreal>
- <20230714121633.18d19c4c@kernel.org>
- <20230714203258.GL41919@unreal>
- <20230714203032.7f1bf5f7@kernel.org>
- <20230716103947.GA27947@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6A610786
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:32:55 +0000 (UTC)
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383DB10CC
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:32:52 -0700 (PDT)
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-39a9590f9fdso835290b6e.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:32:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689759171; x=1692351171;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+s4mQMd3ZNXcWLrOpu5M5FMS0n9iYFfLHy+Wp/G5cf0=;
+        b=b3kriaE6sOWC6f5/bZ83cRhDfD+RJUv7b3dzL/bGopVNMfJKJpkcFuysrAIfGy7RW4
+         Pv67XDQCez20kzW3tQ1MeKvlOxMjbTO4rz65OW/eJeuNzB55P9C9w8yHmlTMdClsIMst
+         +gjc7XKU72F6J/c3G00wLlIc0+PKwH9VXbRVQ6y2Z2yeiigWFpypX+82ssKcxq7Q+jvD
+         rZCODSPuhfKBdCB7o3gTMvsb8hgU1/Ntu2p7PCMMpE7yhHWYfyLjMqxxEfOCUcCRzeNk
+         DW1FwJ05mlm9XqMml3u/I/mrJC/s5hSxvCi05+sbDQA8YLwBTELlhuMYYPPkubxepaYM
+         /SaA==
+X-Gm-Message-State: ABy/qLZGuqNWUkKSGXs3aSnolxEAbowVun/Dc+5s7k3zCWYn7xVq7AP6
+	bFIj06Pvh0DS8WsEN0zlr4L0kSvfhCgQJknWgfj+3Ejy9FXJ
+X-Google-Smtp-Source: APBJJlF7q279ORMZqETk9cuXcfkye2OVaM9R5CcVzBvzCT3dQ/OxB1+4behLfOddQ5HWVpKO8QPgb+B/Ws/lq+Sg4ZjokzccavM6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230716103947.GA27947@unreal>
+X-Received: by 2002:a05:6808:2183:b0:3a1:e59f:9ec9 with SMTP id
+ be3-20020a056808218300b003a1e59f9ec9mr2721572oib.3.1689759171422; Wed, 19 Jul
+ 2023 02:32:51 -0700 (PDT)
+Date: Wed, 19 Jul 2023 02:32:51 -0700
+In-Reply-To: <000000000000a054ee05bc4b2009@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002b2f180600d3b79e@google.com>
+Subject: Re: [syzbot] [btrfs?] [netfilter?] BUG: MAX_LOCKDEP_CHAIN_HLOCKS too
+ low! (2)
+From: syzbot <syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com>
+To: bakmitopiacibubur@boga.indosterling.com, clm@fb.com, davem@davemloft.net, 
+	dsahern@kernel.org, dsterba@suse.com, fw@strlen.de, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, josef@toxicpanda.com, 
+	kadlec@netfilter.org, kuba@kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com, yoshfuji@linux-ipv6.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,PLING_QUERY,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sun, Jul 16, 2023 at 01:39:47PM +0300, Leon Romanovsky wrote:
-> On Fri, Jul 14, 2023 at 08:30:32PM -0700, Jakub Kicinski wrote:
-> > On Fri, 14 Jul 2023 23:32:58 +0300 Leon Romanovsky wrote:
-> > > On Fri, Jul 14, 2023 at 12:16:33PM -0700, Jakub Kicinski wrote:
-> > > > On Fri, 14 Jul 2023 21:40:13 +0300 Leon Romanovsky wrote:  
-> > > > > It depends on configuration order, if user configures TC first, it will
-> > > > > be a), if he/she configures IPsec first, it will be b).
-> > > > > 
-> > > > > I just think that option b) is really matters.  
-> > > > 
-> > > > And only b) matches what happens in the kernel with policy based IPsec,
-> > > > right?   
-> > > 
-> > > Can you please clarify what do you mean "policy based IPsec"?
-> > 
-> > I mean without a separate xfrm netdev on which you can install TC
-> > rules of its own.
-> 
-> I call it software IPsec.
-> 
-> > 
-> > > > IIUC what you're saying -
-> > > > the result depending on order of configuration may be a major source
-> > > > of surprises / hard to debug problems for the user.  
-> > > 
-> > > When I reviewed patches, I came exactly to an opposite conclusion :)
-> > > 
-> > > My rationale was that users who configure IPsec and TC are advanced
-> > > users who knows their data flow and if they find a) option valuable,
-> > > they can do it.
-> > > 
-> > > For example, a) allows to limit amount of data sent to IPsec engine.
-> > > 
-> > > I believe both a) and b) should be supported.
-> > 
-> > What does it take to switch between the modes?
-> > Even if we want both modes we should have an explicit switch, I reckon.
-> > Or at least a way to read back what mode we ended up in.
-> 
-> I had several internal discussions about how TC and IPsec should work
-> together, and will need some time to think about proper implementation.
-> 
-> For now I'll add patch which makes TC and IPsec mutually exclusive.
+syzbot has found a reproducer for the following issue on:
 
-Even this so called trivial patch is not so trivial in mlx5 current
-implementation. Jianbo is working on it.
+HEAD commit:    e40939bbfc68 Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=15d92aaaa80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c4a2640e4213bc2f
+dashboard link: https://syzkaller.appspot.com/bug?extid=9bbbacfbf1e04d5221f7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=149b2d66a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1214348aa80000
 
-Thanks
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9d87aa312c0e/disk-e40939bb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/22a11d32a8b2/vmlinux-e40939bb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0978b5788b52/Image-e40939bb.gz.xz
 
-> 
-> Thanks
-> 
-> > 
-> 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com
+
+team3253: Mode changed to "activebackup"
+BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
+turning off the locking correctness validator.
+CPU: 1 PID: 9973 Comm: syz-executor246 Not tainted 6.4.0-rc7-syzkaller-ge40939bbfc68 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
+Call trace:
+ dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:233
+ show_stack+0x2c/0x44 arch/arm64/kernel/stacktrace.c:240
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
+ dump_stack+0x1c/0x28 lib/dump_stack.c:113
+ lookup_chain_cache_add kernel/locking/lockdep.c:3794 [inline]
+ validate_chain kernel/locking/lockdep.c:3815 [inline]
+ __lock_acquire+0x1c44/0x7604 kernel/locking/lockdep.c:5088
+ lock_acquire+0x23c/0x71c kernel/locking/lockdep.c:5705
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x48/0x60 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:350 [inline]
+ pl011_console_write+0x180/0x708 drivers/tty/serial/amba-pl011.c:2333
+ console_emit_next_record kernel/printk/printk.c:2877 [inline]
+ console_flush_all+0x5c0/0xb54 kernel/printk/printk.c:2933
+ console_unlock+0x148/0x274 kernel/printk/printk.c:3007
+ vprintk_emit+0x14c/0x2e4 kernel/printk/printk.c:2307
+ vprintk_default+0xa0/0xe4 kernel/printk/printk.c:2318
+ vprintk+0x218/0x2f0 kernel/printk/printk_safe.c:50
+ _printk+0xdc/0x128 kernel/printk/printk.c:2328
+ __netdev_printk+0x1f8/0x39c net/core/dev.c:11273
+ netdev_info+0x104/0x150 net/core/dev.c:11320
+ team_change_mode drivers/net/team/team.c:619 [inline]
+ team_mode_option_set+0x350/0x390 drivers/net/team/team.c:1388
+ team_option_set drivers/net/team/team.c:374 [inline]
+ team_nl_cmd_options_set+0x7e0/0xdec drivers/net/team/team.c:2663
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:968 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1048 [inline]
+ genl_rcv_msg+0x938/0xc1c net/netlink/genetlink.c:1065
+ netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2546
+ genl_rcv+0x38/0x50 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0x660/0x8d4 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x834/0xb18 net/netlink/af_netlink.c:1913
+ sock_sendmsg_nosec net/socket.c:724 [inline]
+ sock_sendmsg net/socket.c:747 [inline]
+ ____sys_sendmsg+0x568/0x81c net/socket.c:2503
+ ___sys_sendmsg net/socket.c:2557 [inline]
+ __sys_sendmsg+0x26c/0x33c net/socket.c:2586
+ __do_sys_sendmsg net/socket.c:2595 [inline]
+ __se_sys_sendmsg net/socket.c:2593 [inline]
+ __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2593
+ __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+ invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
+ el0_svc_common+0x138/0x244 arch/arm64/kernel/syscall.c:142
+ do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:191
+ el0_svc+0x4c/0x160 arch/arm64/kernel/entry-common.c:647
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
