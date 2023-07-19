@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-18871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0922758EEB
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:26:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0ED758EED
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E179D1C2089B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 07:26:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D1F01C20C48
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 07:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60189101FF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6837A10784;
 	Wed, 19 Jul 2023 07:24:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564BD101FB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F5A101F9
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:24:35 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D84A4
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 00:24:34 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD37E69
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 00:24:33 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qM1Y0-0002t4-Mm
-	for netdev@vger.kernel.org; Wed, 19 Jul 2023 09:24:32 +0200
+	id 1qM1Xz-0002sF-Sa
+	for netdev@vger.kernel.org; Wed, 19 Jul 2023 09:24:31 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id BA7011F4C76
+	by bjornoya.blackshift.org (Postfix) with SMTP id A40CB1F4C71
 	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:23:52 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 2DFEB1F4C0C;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 56EC51F4C0E;
 	Wed, 19 Jul 2023 07:23:50 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 7d87ab5d;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 79435df4;
 	Wed, 19 Jul 2023 07:23:49 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -46,13 +46,12 @@ Cc: davem@davemloft.net,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
 	Judith Mendez <jm@ti.com>,
+	Hiago De Franco <hiago.franco@toradex.com>,
 	Tony Lindgren <tony@atomide.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 1/8] dt-bindings: net: can: Remove interrupt properties for MCAN
-Date: Wed, 19 Jul 2023 09:23:41 +0200
-Message-Id: <20230719072348.525039-2-mkl@pengutronix.de>
+Subject: [PATCH net-next 2/8] can: m_can: Add hrtimer to generate software interrupt
+Date: Wed, 19 Jul 2023 09:23:42 +0200
+Message-Id: <20230719072348.525039-3-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230719072348.525039-1-mkl@pengutronix.de>
 References: <20230719072348.525039-1-mkl@pengutronix.de>
@@ -68,76 +67,193 @@ X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Judith Mendez <jm@ti.com>
 
+Introduce timer polling method to MCAN since some SoCs may not
+have M_CAN interrupt routed to A53 Linux and do not have
+interrupt property in device tree M_CAN node.
+
 On AM62x SoC, MCANs on MCU domain do not have hardware interrupt
-routed to A53 Linux, instead they will use software interrupt by
-timer polling.
+routed to A53 Linux, instead they will use timer polling method.
 
-To enable timer polling method, interrupts should be
-optional so remove interrupts property from required section and
-add an example for MCAN node with timer polling enabled.
+Add an hrtimer to MCAN class device. Each MCAN will have its own
+hrtimer instantiated if there is no hardware interrupt found in
+device tree M_CAN node. The timer will generate a software
+interrupt every 1 ms. In hrtimer callback, we check if there is
+a transaction pending by reading a register, then process by
+calling the isr if there is.
 
+Tested-by: Hiago De Franco <hiago.franco@toradex.com> # Toradex Verdin AM62
 Reviewed-by: Tony Lindgren <tony@atomide.com>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: Judith Mendez <jm@ti.com>
-Link: https://lore.kernel.org/all/20230707204714.62964-2-jm@ti.com
+Link: https://lore.kernel.org/all/20230707204714.62964-3-jm@ti.com
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- .../bindings/net/can/bosch,m_can.yaml         | 20 +++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ drivers/net/can/m_can/m_can.c          | 32 +++++++++++++++++++++++++-
+ drivers/net/can/m_can/m_can.h          |  3 +++
+ drivers/net/can/m_can/m_can_platform.c | 21 +++++++++++++----
+ 3 files changed, 51 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml b/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
-index 67879aab623b..bb518c831f7b 100644
---- a/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
-+++ b/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
-@@ -122,8 +122,6 @@ required:
-   - compatible
-   - reg
-   - reg-names
--  - interrupts
--  - interrupt-names
-   - clocks
-   - clock-names
-   - bosch,mram-cfg
-@@ -132,6 +130,7 @@ additionalProperties: false
+diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+index c5af92bcc9c9..13fd84b2e2dd 100644
+--- a/drivers/net/can/m_can/m_can.c
++++ b/drivers/net/can/m_can/m_can.c
+@@ -11,6 +11,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/can/dev.h>
+ #include <linux/ethtool.h>
++#include <linux/hrtimer.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+@@ -308,6 +309,9 @@ enum m_can_reg {
+ #define TX_EVENT_MM_MASK	GENMASK(31, 24)
+ #define TX_EVENT_TXTS_MASK	GENMASK(15, 0)
  
- examples:
-   - |
-+    // Example with interrupts
-     #include <dt-bindings/clock/imx6sx-clock.h>
-     can@20e8000 {
-       compatible = "bosch,m_can";
-@@ -149,4 +148,21 @@ examples:
-       };
-     };
++/* Hrtimer polling interval */
++#define HRTIMER_POLL_INTERVAL_MS		1
++
+ /* The ID and DLC registers are adjacent in M_CAN FIFO memory,
+  * and we can save a (potentially slow) bus round trip by combining
+  * reads and writes to them.
+@@ -1414,6 +1418,12 @@ static int m_can_start(struct net_device *dev)
  
-+  - |
-+    // Example with timer polling
-+    #include <dt-bindings/clock/imx6sx-clock.h>
-+    can@20e8000 {
-+      compatible = "bosch,m_can";
-+      reg = <0x020e8000 0x4000>, <0x02298000 0x4000>;
-+      reg-names = "m_can", "message_ram";
-+      clocks = <&clks IMX6SX_CLK_CANFD>,
-+               <&clks IMX6SX_CLK_CANFD>;
-+      clock-names = "hclk", "cclk";
-+      bosch,mram-cfg = <0x0 0 0 32 0 0 0 1>;
+ 	m_can_enable_all_interrupts(cdev);
+ 
++	if (!dev->irq) {
++		dev_dbg(cdev->dev, "Start hrtimer\n");
++		hrtimer_start(&cdev->hrtimer, ms_to_ktime(HRTIMER_POLL_INTERVAL_MS),
++			      HRTIMER_MODE_REL_PINNED);
++	}
 +
-+      can-transceiver {
-+        max-bitrate = <5000000>;
-+      };
-+    };
+ 	return 0;
+ }
+ 
+@@ -1568,6 +1578,11 @@ static void m_can_stop(struct net_device *dev)
+ {
+ 	struct m_can_classdev *cdev = netdev_priv(dev);
+ 
++	if (!dev->irq) {
++		dev_dbg(cdev->dev, "Stop hrtimer\n");
++		hrtimer_cancel(&cdev->hrtimer);
++	}
 +
- ...
-
-base-commit: 68af900072c157c0cdce0256968edd15067e1e5a
+ 	/* disable all interrupts */
+ 	m_can_disable_all_interrupts(cdev);
+ 
+@@ -1793,6 +1808,18 @@ static netdev_tx_t m_can_start_xmit(struct sk_buff *skb,
+ 	return NETDEV_TX_OK;
+ }
+ 
++static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
++{
++	struct m_can_classdev *cdev = container_of(timer, struct
++						   m_can_classdev, hrtimer);
++
++	m_can_isr(0, cdev->net);
++
++	hrtimer_forward_now(timer, ms_to_ktime(HRTIMER_POLL_INTERVAL_MS));
++
++	return HRTIMER_RESTART;
++}
++
+ static int m_can_open(struct net_device *dev)
+ {
+ 	struct m_can_classdev *cdev = netdev_priv(dev);
+@@ -1831,7 +1858,7 @@ static int m_can_open(struct net_device *dev)
+ 		err = request_threaded_irq(dev->irq, NULL, m_can_isr,
+ 					   IRQF_ONESHOT,
+ 					   dev->name, dev);
+-	} else {
++	} else if (dev->irq) {
+ 		err = request_irq(dev->irq, m_can_isr, IRQF_SHARED, dev->name,
+ 				  dev);
+ 	}
+@@ -2027,6 +2054,9 @@ int m_can_class_register(struct m_can_classdev *cdev)
+ 			goto clk_disable;
+ 	}
+ 
++	if (!cdev->net->irq)
++		cdev->hrtimer.function = &hrtimer_callback;
++
+ 	ret = m_can_dev_setup(cdev);
+ 	if (ret)
+ 		goto rx_offload_del;
+diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+index a839dc71dc9b..2ac18ac867a4 100644
+--- a/drivers/net/can/m_can/m_can.h
++++ b/drivers/net/can/m_can/m_can.h
+@@ -15,6 +15,7 @@
+ #include <linux/device.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/freezer.h>
++#include <linux/hrtimer.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+@@ -93,6 +94,8 @@ struct m_can_classdev {
+ 	int is_peripheral;
+ 
+ 	struct mram_cfg mcfg[MRAM_CFG_NUM];
++
++	struct hrtimer hrtimer;
+ };
+ 
+ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev, int sizeof_priv);
+diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_can/m_can_platform.c
+index 94dc82644113..cdb28d6a092c 100644
+--- a/drivers/net/can/m_can/m_can_platform.c
++++ b/drivers/net/can/m_can/m_can_platform.c
+@@ -5,6 +5,7 @@
+ //
+ // Copyright (C) 2018-19 Texas Instruments Incorporated - http://www.ti.com/
+ 
++#include <linux/hrtimer.h>
+ #include <linux/phy/phy.h>
+ #include <linux/platform_device.h>
+ 
+@@ -82,7 +83,7 @@ static int m_can_plat_probe(struct platform_device *pdev)
+ 	void __iomem *addr;
+ 	void __iomem *mram_addr;
+ 	struct phy *transceiver;
+-	int irq, ret = 0;
++	int irq = 0, ret = 0;
+ 
+ 	mcan_class = m_can_class_allocate_dev(&pdev->dev,
+ 					      sizeof(struct m_can_plat_priv));
+@@ -96,12 +97,24 @@ static int m_can_plat_probe(struct platform_device *pdev)
+ 		goto probe_fail;
+ 
+ 	addr = devm_platform_ioremap_resource_byname(pdev, "m_can");
+-	irq = platform_get_irq_byname(pdev, "int0");
+-	if (IS_ERR(addr) || irq < 0) {
+-		ret = -EINVAL;
++	if (IS_ERR(addr)) {
++		ret = PTR_ERR(addr);
+ 		goto probe_fail;
+ 	}
+ 
++	if (device_property_present(mcan_class->dev, "interrupts") ||
++	    device_property_present(mcan_class->dev, "interrupt-names")) {
++		irq = platform_get_irq_byname(pdev, "int0");
++		if (irq < 0) {
++			ret = irq;
++			goto probe_fail;
++		}
++	} else {
++		dev_dbg(mcan_class->dev, "Polling enabled, initialize hrtimer");
++		hrtimer_init(&mcan_class->hrtimer, CLOCK_MONOTONIC,
++			     HRTIMER_MODE_REL_PINNED);
++	}
++
+ 	/* message ram could be shared */
+ 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "message_ram");
+ 	if (!res) {
 -- 
 2.40.1
 
