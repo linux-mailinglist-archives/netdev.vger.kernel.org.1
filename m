@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-19254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1629A75A099
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:31:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FD7075A09A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:32:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4094D1C21202
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:31:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1453E281B25
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFE6263AE;
-	Wed, 19 Jul 2023 21:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E29263B9;
+	Wed, 19 Jul 2023 21:29:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300DE22EF5
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1779822EF5
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:29:22 +0000 (UTC)
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355E71FC0
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:29:19 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-cbcffb18afeso80780276.2
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:29:19 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D4B1FC0
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:29:20 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c6dd0e46a52so82495276.2
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:29:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689802158; x=1690406958;
+        d=google.com; s=20221208; t=1689802160; x=1690406960;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ODrYuTb22tbPtqX2KfnIrv4Vwi38vnTUGkrI64sRY4=;
-        b=DwfOFKKtGU0vlJkc6zSnuBaHxdzVCUyuTdx2Jlj5FyztVqyRcSXvB1Mfl0VTv02DJM
-         eg9gbkd1ETXhwOK/F9MpFEAK3Jj+M1UxnVVwMC2sJ69i8vYJPZCN2+Au8Jvlr4RPBN5Q
-         tOD1G7c+yB3G8Y0OkH9xHNCGdsszaLwuYzWXEUqEbSmu64+9XDb4DH5nRjXEPTk/bpEe
-         UCK7CD03w2jrFKhZ8WHaxlZz0borWo0gg6JzNLfn3frtNdO7rhyvNjNOfWOqjGJFvnLL
-         bLzucAyasBJiA2zPu95IGbJTFrWn8X6qo6vImYOvE6z7ZzY1ywJJYQ5/4anXszuMmWRC
-         mL9Q==
+        bh=0W2XBGAmdAt/+G45dLGl8lnySX1PByBxox1lbefosjw=;
+        b=NcrvKeDY5twbxtwlGcMlVQuuF9pd9HsNI/7TeLqMstCYkcjOcduDGeio34nT+3NGo7
+         lBpPIWeg+oiYeSELrQw7HqwDCSEyqJ8u7t6J6zWUfiaKq6T9JfZTzvVIHpwywQLdO342
+         +Upw23YJ3n1N3m+65rxoabU+6DOkXh054DUh4ldTxTddk/6EUvWkPxO08MLgHMdQiw4C
+         kalN0C9kFwGcB0Cw9Okk2zB0JId3AO4kHX8DIj9P0OMpreUHGaObPK5LATZLpOOxQLFo
+         1wupbgWIsu37gZhHIWswUzaYqYvDXgdBNtaRuRs8JoVC29dQ4IVAvMuHBIzC35u2Zz8K
+         /RRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689802158; x=1690406958;
+        d=1e100.net; s=20221208; t=1689802160; x=1690406960;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ODrYuTb22tbPtqX2KfnIrv4Vwi38vnTUGkrI64sRY4=;
-        b=X6oCstImxji+CLl6mK3LDJ5/mM9wxe74/dcPXcgCL+ki91DpPeMyj6651T4Mw/otoh
-         G3lZD4k9wminVJh371poSIWaR2q5Wvfy1QJuqM1I8F5dQmu8vjrIU0bra1AEHi8M3obp
-         nI6K7m9U3a37ZCXPD2tm7/ehvT/onSWizoMUwiMYa7/Bg8PNFiQjOG0vhJK/qnmm3CJQ
-         56NH+wq9KAuUR6rrBiUCW2tayhB0azyXdRSAALGig7zSgtfCoY/3htAH6LD0DniBQbn+
-         QcodI7DkWrm/fh6QDN2Djl5763DFKV3PswfbeqXY2DTVBhhiyvqPAA7hcZg3uMqahHSo
-         LdHg==
-X-Gm-Message-State: ABy/qLZqNX97iVG5JqLBpdtp4pjWbsB8Iy/ytgCqw/W6EWkkMR2KoQKZ
-	v46NOTyqbtraqKuh9wAQ4rGstZ1NflsJsw==
-X-Google-Smtp-Source: APBJJlEm9k9PsxIiEzxTwnpZ6dHtG1OsCZWLmia/8YJe+ugQjzFEStKhAQD0vHZbUi4jLGtlayBiVgSlbx52Vw==
+        bh=0W2XBGAmdAt/+G45dLGl8lnySX1PByBxox1lbefosjw=;
+        b=PIqSVWvX/NWmF/uCAVG9QxK0t/mkWIJa47nnX+MsuERR4JE33dwHwwrenjLcS8PUSc
+         zbGPfCwt4fjf4eTzTyV48V1l2gA1EZDTDvX7HPrvKLY4fNnrRxmdfV7FeN6RWBSIWjR0
+         WvOo0I7fxAqTmAB2W+2Fl8RAOshyy1e2CaAWn5SgwVhKfpMU46Uc9aLd5h9Mrpr3vsQR
+         V378B7LSsD0s6GV6bPUjzab91DKdD6HTO+2MCmIOuxOrwQJ7iEnIBKerHysUFWF6Z/gT
+         fqhhrMXBRAZFUGPIDAwfdrf+R0ZUhrY5qGHlqdgdPR4QBbx18rvpNddLDBjU5U9ZTQR2
+         dUpg==
+X-Gm-Message-State: ABy/qLa1wv5MI1tzZNiVrUMqZHFRTzu/nFPt0OEh2DZCEy84TTKCBXm+
+	5w5LQ5tPEPOCOM9OAtKKl9XkAWx0Ji0t3g==
+X-Google-Smtp-Source: APBJJlElnwtmj9UhRwhgLQuEirxCG4G0m/FTzBdw3ufGzgNZ35bF7Lczaz5NeJjukbf5JdhwSEVaTQQNuzObug==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:868b:0:b0:c9c:67b6:328c with SMTP id
- z11-20020a25868b000000b00c9c67b6328cmr30874ybk.8.1689802158518; Wed, 19 Jul
- 2023 14:29:18 -0700 (PDT)
-Date: Wed, 19 Jul 2023 21:28:54 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1746:b0:cea:ef04:1c61 with SMTP
+ id bz6-20020a056902174600b00ceaef041c61mr30350ybb.1.1689802160182; Wed, 19
+ Jul 2023 14:29:20 -0700 (PDT)
+Date: Wed, 19 Jul 2023 21:28:55 +0000
 In-Reply-To: <20230719212857.3943972-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230719212857.3943972-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230719212857.3943972-9-edumazet@google.com>
-Subject: [PATCH net 08/11] tcp: annotate data-races around rskq_defer_accept
+Message-ID: <20230719212857.3943972-10-edumazet@google.com>
+Subject: [PATCH net 09/11] tcp: annotate data-races around tp->notsent_lowat
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -77,44 +77,55 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-do_tcp_getsockopt() reads rskq_defer_accept while another cpu
-might change its value.
+tp->notsent_lowat can be read locklessly from do_tcp_getsockopt()
+and tcp_poll().
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: c9bee3b7fdec ("tcp: TCP_NOTSENT_LOWAT socket option")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ include/net/tcp.h | 6 +++++-
+ net/ipv4/tcp.c    | 4 ++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 855dbe72e431776257037d75e32037b44905453c..a32d1963cb75ff81c164b3021a848d3d29816642 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2059,7 +2059,11 @@ void __tcp_v4_send_check(struct sk_buff *skb, __be32 saddr, __be32 daddr);
+ static inline u32 tcp_notsent_lowat(const struct tcp_sock *tp)
+ {
+ 	struct net *net = sock_net((struct sock *)tp);
+-	return tp->notsent_lowat ?: READ_ONCE(net->ipv4.sysctl_tcp_notsent_lowat);
++	u32 val;
++
++	val = READ_ONCE(tp->notsent_lowat);
++
++	return val ?: READ_ONCE(net->ipv4.sysctl_tcp_notsent_lowat);
+ }
+ 
+ bool tcp_stream_memory_free(const struct sock *sk, int wake);
 diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 2cf129a0c00bfef813e1f1e12cb247ef8107fa88..5beec71a5c418db65e19eb2a68ffd839d4550efc 100644
+index 5beec71a5c418db65e19eb2a68ffd839d4550efc..2b2241e9b492726562a6b5055cf8c168e5fed799 100644
 --- a/net/ipv4/tcp.c
 +++ b/net/ipv4/tcp.c
-@@ -3594,9 +3594,9 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 
- 	case TCP_DEFER_ACCEPT:
- 		/* Translate value in seconds to number of retransmits */
--		icsk->icsk_accept_queue.rskq_defer_accept =
--			secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
--					TCP_RTO_MAX / HZ);
-+		WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
-+			   secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
-+					   TCP_RTO_MAX / HZ));
+@@ -3664,7 +3664,7 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
+ 		err = tcp_repair_set_window(tp, optval, optlen);
  		break;
- 
- 	case TCP_WINDOW_CLAMP:
-@@ -4002,8 +4002,9 @@ int do_tcp_getsockopt(struct sock *sk, int level,
- 			val = (val ? : READ_ONCE(net->ipv4.sysctl_tcp_fin_timeout)) / HZ;
+ 	case TCP_NOTSENT_LOWAT:
+-		tp->notsent_lowat = val;
++		WRITE_ONCE(tp->notsent_lowat, val);
+ 		sk->sk_write_space(sk);
  		break;
- 	case TCP_DEFER_ACCEPT:
--		val = retrans_to_secs(icsk->icsk_accept_queue.rskq_defer_accept,
--				      TCP_TIMEOUT_INIT / HZ, TCP_RTO_MAX / HZ);
-+		val = READ_ONCE(icsk->icsk_accept_queue.rskq_defer_accept);
-+		val = retrans_to_secs(val, TCP_TIMEOUT_INIT / HZ,
-+				      TCP_RTO_MAX / HZ);
+ 	case TCP_INQ:
+@@ -4164,7 +4164,7 @@ int do_tcp_getsockopt(struct sock *sk, int level,
+ 		val = tcp_time_stamp_raw() + READ_ONCE(tp->tsoffset);
  		break;
- 	case TCP_WINDOW_CLAMP:
- 		val = tp->window_clamp;
+ 	case TCP_NOTSENT_LOWAT:
+-		val = tp->notsent_lowat;
++		val = READ_ONCE(tp->notsent_lowat);
+ 		break;
+ 	case TCP_INQ:
+ 		val = tp->recvmsg_inq;
 -- 
 2.41.0.255.g8b1d071c50-goog
 
