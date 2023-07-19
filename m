@@ -1,136 +1,280 @@
-Return-Path: <netdev+bounces-19261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55E6575A0AC
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:39:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 909C475A0B0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 23:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 864151C20FB0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C16081C211A2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 21:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A8D22F1B;
-	Wed, 19 Jul 2023 21:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3273125140;
+	Wed, 19 Jul 2023 21:42:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3768714A8B
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 21:39:20 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA551FCD
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 14:39:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F5C14A8B;
+	Wed, 19 Jul 2023 21:42:07 +0000 (UTC)
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F4C1FCD;
+	Wed, 19 Jul 2023 14:42:06 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-635de03a85bso895506d6.3;
+        Wed, 19 Jul 2023 14:42:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689802758; x=1721338758;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KDagl80bAgLG3sJrPSV39DW+F2EN1xNPIokLQQk7Sn0=;
-  b=V8YgnuUWnr76xs81J5w7rXOyxSQ2V59S316Po5tPs+dRhoP4y5QF0NNg
-   JkDc7vnnh9Oqo6ZmdAhXRIQVxJjDThFp8cbR8OK7Qaos/xPAqwLdsdMcH
-   R4PUodpF8eR8WN5k8PArL+pN2AnZ/vEEUpewsBLEMSC50THGiSiAdBBSh
-   U=;
-X-IronPort-AV: E=Sophos;i="6.01,216,1684800000"; 
-   d="scan'208";a="17318659"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 21:39:16 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id 3A87840D5C;
-	Wed, 19 Jul 2023 21:39:16 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 21:39:15 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 21:39:12 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <willemdebruijn.kernel@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <gustavoars@kernel.org>,
-	<keescook@chromium.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <leitao@debian.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
-Subject: RE: [PATCH v1 net 2/2] af_packet: Fix warning of fortified memcpy() in packet_getname().
-Date: Wed, 19 Jul 2023 14:39:03 -0700
-Message-ID: <20230719213903.65060-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <64b856d553b5b_2842f2294f0@willemb.c.googlers.com.notmuch>
-References: <64b856d553b5b_2842f2294f0@willemb.c.googlers.com.notmuch>
+        d=gmail.com; s=20221208; t=1689802925; x=1690407725;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ZEcCPwF3lDOUhSWr4rx2J6ccsDG/MDNU7XzCgytqJE=;
+        b=q8uaNSyIZJDXAfHarfVvGy84rIoyBULL2U1BJX4XMsiyB1FiVQIneIgqCj+ksHUT+p
+         nr5IGkRsTiG6M9lF46DALZN5D8O8JUpHqTbib8lRg3un6JPpUvMaj/w67ECGd4B6Okk/
+         JTM58C2Cy5qI4asNAF154L8Eva8DDijaONfD457NGTZlWQWruGecaIaSAZhKbouui+7i
+         IiuBQQAu/JraWuxXji5pnQRo5awzyzQqOpITKJNlg81TLtq454V959d6v4FVON1m2VLp
+         PRAMk3p0ZiK+5uDXcUnFQ6QhlwR+yyn/k4jPOBIEPRZGORhexSPjH7ila4l/kk2QsMxe
+         qDZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689802925; x=1690407725;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+ZEcCPwF3lDOUhSWr4rx2J6ccsDG/MDNU7XzCgytqJE=;
+        b=UGxyJ9aTZ279z/qXRacSvShwkS37zg+3Ixk79JmedEhrdj9sQo4Qo98jDSzVwM0XLx
+         cELOG2lTP64Ey51+rqtWbTSKf4x9mUEhr4c9tuiLyV9SEF9B7215N4ouIyVDx5l4PL11
+         3kMKkvs2wlUePVz+gFOvpxe0Dtjgc5KHFrenVKY7rrbMqzi+BYw7UiyY01Z+UTzOv9lV
+         fuB8MTNE6wvxb25r/nq/xcjaZImi+U4Uqlldqd7MUHLHKu/FvCr6/pSJ9cmd/tJPJ+v5
+         fC6fboUugKDlc7JMqrawMK1rin2096XmO3MxDy9Y5iIL7SCYuOwudmh61zmqpOSFvEEl
+         R83g==
+X-Gm-Message-State: ABy/qLaRYtPiy6y6AwwpjI46DR/wSLiNCriV8BCGobr+4DntXudxOje1
+	USIhCtIgZWFmS/k1nQ/Qu6M=
+X-Google-Smtp-Source: APBJJlFwMjqkiMyuAPZwC0xNzA4OX/TJkkbRb3VVNOW4r/JE7iuS5YOdD2hiG3LlBfdR1pluhe+wvQ==
+X-Received: by 2002:a0c:8d8e:0:b0:630:14e0:9827 with SMTP id t14-20020a0c8d8e000000b0063014e09827mr3576176qvb.28.1689802925218;
+        Wed, 19 Jul 2023 14:42:05 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id y26-20020a0c9a9a000000b00632191a70a2sm1730379qvd.103.2023.07.19.14.42.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 14:42:04 -0700 (PDT)
+Date: Wed, 19 Jul 2023 17:42:04 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>, 
+ bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ song@kernel.org, 
+ yhs@fb.com, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@google.com, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ David Ahern <dsahern@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jesper Dangaard Brouer <brouer@redhat.com>, 
+ Anatoly Burakov <anatoly.burakov@intel.com>, 
+ Alexander Lobakin <alexandr.lobakin@intel.com>, 
+ Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ Maryam Tahhan <mtahhan@redhat.com>, 
+ xdp-hints@xdp-project.net, 
+ netdev@vger.kernel.org
+Message-ID: <64b858ac9edd3_2849c129476@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230719183734.21681-13-larysa.zaremba@intel.com>
+References: <20230719183734.21681-1-larysa.zaremba@intel.com>
+ <20230719183734.21681-13-larysa.zaremba@intel.com>
+Subject: RE: [PATCH bpf-next v3 12/21] xdp: Add checksum hint
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.39]
-X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Wed, 19 Jul 2023 17:34:13 -0400
-> > > > The write seems to overflow, but actually not since we use struct
-> > > > sockaddr_storage defined in __sys_getsockname().
-> > > 
-> > > Which gives _K_SS_MAXSIZE == 128, minus offsetof(struct sockaddr_ll, sll_addr).
-> > > 
-> > > For fun, there is another caller. getsockopt SO_PEERNAME also calls
-> > > sock->ops->getname, with a buffer hardcoded to 128. Should probably
-> > > use sizeof(sockaddr_storage) for documentation, at least.
-> > > 
-> > > .. and I just noticed that that was attempted, but not completed
-> > > https://lore.kernel.org/lkml/20140928135545.GA23220@type.youpi.perso.aquilenet.fr/
-> > 
-> > Yes, acutally my first draft had the diff below, but I dropped it
-> > because packet_getname() does not call memcpy() for SO_PEERNAME at
-> > least, and same for getpeername().
-> > 
-> > And interestingly there was a revival thread.
-> > https://lore.kernel.org/netdev/20230719084415.1378696-1-leitao@debian.org/
+Larysa Zaremba wrote:
+> Implement functionality that enables drivers to expose to XDP code checksum
+> information that consists of:
 > 
-> Ah interesting :) Topical.
+> - Checksum status - bitfield that consists of
+>   - number of consecutive validated checksums. This is almost the same as
+>     csum_level in skb, but starts with 1. Enum names for those bits still
+>     use checksum level concept, so it is less confusing for driver
+>     developers.
+>   - Is checksum partial? This bit cannot coexist with any other
+>   - Is there a complete checksum available?
+> - Additional checksum data, a union of:
+>   - checksum start and offset, if checksum is partial
+>   - complete checksum, if available
 > 
-> > I can include this in v2 if needed.
-> > What do you think ?
-> > 
-> > ---8<---
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index 9370fd50aa2c..f1e887c3115f 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -1815,14 +1815,14 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
-> >  
-> >  	case SO_PEERNAME:
-> >  	{
-> > -		char address[128];
-> > +		struct sockaddr_storage address;
-> >  
-> > -		lv = sock->ops->getname(sock, (struct sockaddr *)address, 2);
-> > +		lv = sock->ops->getname(sock, (struct sockaddr *)&address, 2);
-> >  		if (lv < 0)
-> >  			return -ENOTCONN;
-> >  		if (lv < len)
-> >  			return -EINVAL;
-> > -		if (copy_to_sockptr(optval, address, len))
-> > +		if (copy_to_sockptr(optval, &address, len))
-> >  			return -EFAULT;
-> >  		goto lenout;
-> >  	}
-> > ---8<---
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  Documentation/networking/xdp-rx-metadata.rst |  3 ++
+>  include/linux/netdevice.h                    |  3 ++
+>  include/net/xdp.h                            | 46 ++++++++++++++++++++
+>  kernel/bpf/offload.c                         |  2 +
+>  net/core/xdp.c                               | 23 ++++++++++
+>  5 files changed, 77 insertions(+)
 > 
-> I agree that it's a worthwhile change. I think it should be an
-> independent commit. And since it does not fix a bug, target net-next.
+> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+> index ea6dd79a21d3..7f056a44f682 100644
+> --- a/Documentation/networking/xdp-rx-metadata.rst
+> +++ b/Documentation/networking/xdp-rx-metadata.rst
+> @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
+>  .. kernel-doc:: net/core/xdp.c
+>     :identifiers: bpf_xdp_metadata_rx_vlan_tag
+>  
+> +.. kernel-doc:: net/core/xdp.c
+> +   :identifiers: bpf_xdp_metadata_rx_csum
+> +
+>  An XDP program can use these kfuncs to read the metadata into stack
+>  variables for its own consumption. Or, to pass the metadata on to other
+>  consumers, an XDP program can store it into the metadata area carried
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 1749f4f75c64..4f6da36ac123 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1660,6 +1660,9 @@ struct xdp_metadata_ops {
+>  			       enum xdp_rss_hash_type *rss_type);
+>  	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tci,
+>  				   __be16 *vlan_proto);
+> +	int	(*xmo_rx_csum)(const struct xdp_md *ctx,
+> +			       enum xdp_csum_status *csum_status,
+> +			       union xdp_csum_info *csum_info);
+>  };
+>  
+>  /**
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index 89c58f56ffc6..2b7a7d678ff4 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
+>  			   bpf_xdp_metadata_rx_hash) \
+>  	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
+>  			   bpf_xdp_metadata_rx_vlan_tag) \
+> +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM, \
+> +			   bpf_xdp_metadata_rx_csum) \
+>  
+>  enum {
+>  #define XDP_METADATA_KFUNC(name, _) name,
+> @@ -448,6 +450,50 @@ enum xdp_rss_hash_type {
+>  	XDP_RSS_TYPE_L4_IPV6_SCTP_EX = XDP_RSS_TYPE_L4_IPV6_SCTP | XDP_RSS_L3_DYNHDR,
+>  };
+>  
+> +union xdp_csum_info {
+> +	/* Checksum referred to by ``csum_start + csum_offset`` is considered
+> +	 * valid, but was never calculated, TX device has to do this,
+> +	 * starting from csum_start packet byte.
+> +	 * Any preceding checksums are also considered valid.
+> +	 * Available, if ``status == XDP_CHECKSUM_PARTIAL``.
+> +	 */
+> +	struct {
+> +		u16 csum_start;
+> +		u16 csum_offset;
+> +	};
+> +
+> +	/* Checksum, calculated over the whole packet.
+> +	 * Available, if ``status & XDP_CHECKSUM_COMPLETE``.
+> +	 */
+> +	u32 checksum;
+> +};
+> +
+> +enum xdp_csum_status {
+> +	/* HW had parsed several transport headers and validated their
+> +	 * checksums, same as ``CHECKSUM_UNNECESSARY`` in ``sk_buff``.
+> +	 * 3 least significat bytes contain number of consecutive checksum,
 
-Sure, will post a patch to net-next later.
+typo: significant
+
+(I did not scan for typos, just came across this when trying to understand
+the skb->csum_level + 1 trick. Probably good to run a spell check).
+
+> +	 * starting with the outermost, reported by hardware as valid.
+> +	 * ``sk_buff`` checksum level (``csum_level``) notation is provided
+> +	 * for driver developers.
+> +	 */
+> +	XDP_CHECKSUM_VALID_LVL0		= 1,	/* 1 outermost checksum */
+> +	XDP_CHECKSUM_VALID_LVL1		= 2,	/* 2 outermost checksums */
+> +	XDP_CHECKSUM_VALID_LVL2		= 3,	/* 3 outermost checksums */
+> +	XDP_CHECKSUM_VALID_LVL3		= 4,	/* 4 outermost checksums */
+> +	XDP_CHECKSUM_VALID_NUM_MASK	= GENMASK(2, 0),
+> +	XDP_CHECKSUM_VALID		= XDP_CHECKSUM_VALID_NUM_MASK,
+> +
+> +	/* Occurs if packet is sent virtually (between Linux VMs / containers)
+> +	 * This status cannot coexist with any other.
+> +	 * Refer to ``csum_start`` and ``csum_offset`` in ``xdp_csum_info``
+> +	 * for more information.
+> +	 */
+> +	XDP_CHECKSUM_PARTIAL	= BIT(3),
+> +
+> +	/* Checksum, calculated over the entire packet is provided */
+> +	XDP_CHECKSUM_COMPLETE	= BIT(4),
+> +};
+> +
+>  #ifdef CONFIG_NET
+>  u32 bpf_xdp_metadata_kfunc_id(int id);
+>  bool bpf_dev_bound_kfunc_id(u32 btf_id);
+> diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+> index 986e7becfd42..f60a6add5273 100644
+> --- a/kernel/bpf/offload.c
+> +++ b/kernel/bpf/offload.c
+> @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
+>  		p = ops->xmo_rx_hash;
+>  	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
+>  		p = ops->xmo_rx_vlan_tag;
+> +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM))
+> +		p = ops->xmo_rx_csum;
+>  out:
+>  	up_read(&bpf_devs_lock);
+>  
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index 8b55419d332e..d4ea54046afc 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -772,6 +772,29 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
+>  	return -EOPNOTSUPP;
+>  }
+>  
+> +/**
+> + * bpf_xdp_metadata_rx_csum - Get checksum status with additional info.
+> + * @ctx: XDP context pointer.
+> + * @csum_status: Destination for checksum status.
+> + * @csum_info: Destination for complete checksum or partial checksum offset.
+> + *
+> + * Status (@csum_status) is a bitfield that informs, what checksum
+> + * processing was performed. Additional results of such processing,
+> + * such as complete checksum or partial checksum offsets,
+> + * are passed as info (@csum_info).
+> + *
+> + * Return:
+> + * * Returns 0 on success or ``-errno`` on error.
+> + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
+> + * * ``-ENODATA``    : Checksum status is unknown
+> + */
+> +__bpf_kfunc int bpf_xdp_metadata_rx_csum(const struct xdp_md *ctx,
+> +					 enum xdp_csum_status *csum_status,
+> +					 union xdp_csum_info *csum_info)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  __diag_pop();
+>  
+>  BTF_SET8_START(xdp_metadata_kfunc_ids)
+> -- 
+> 2.41.0
+> 
+
+
 
