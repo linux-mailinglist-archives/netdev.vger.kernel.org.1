@@ -1,446 +1,535 @@
-Return-Path: <netdev+bounces-19207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88195759F96
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:21:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF51759FA5
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 22:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D6D6281A4C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:21:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18D04281A73
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB67425142;
-	Wed, 19 Jul 2023 20:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28B722EE7;
+	Wed, 19 Jul 2023 20:26:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF72321D28
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 20:19:45 +0000 (UTC)
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4DFA1FFB;
-	Wed, 19 Jul 2023 13:19:30 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36JFOYs8027141;
-	Wed, 19 Jul 2023 20:19:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2023-03-30;
- bh=FIiLJ5lpayMhUkOh0BqdJyvlyvcwDkfk1KO9C7kI+lM=;
- b=hbLLMlc4f5UH7SHjRMKP7ziX3QvUWDK6T3nT2d0F3LAz9bDn01CM9kjHIZv8rbneRYQl
- rKit0QH6Jwqr5kj97LFU2m1QF5I4n2HEo9TIlJqmh1ph+s2wW0jmK9ycQuvCE9fMOxyL
- 2VEg/XbC3C1iC81xj1uGjsKGcnaN8NB/6UsVxJ6DMn4H4+SpYLRrxjpmRoWd6qN1uXPt
- tYHeTLMtZ5Vqz4zYaQaU31i+vCjc7xnh0TAKCFS7KuvKHIC0mv4yBOKmWa9NHH5B3HH6
- wdgtFuulLD3Ard9WvC81Lre+R+XIqpCCXJbtTjCAnZ9TnNqtwFqHR0Djmy+0lccHzv5H Tw== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3run78888d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jul 2023 20:19:13 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 36JK5IHf038238;
-	Wed, 19 Jul 2023 20:19:00 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3ruhw7dwx2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jul 2023 20:19:00 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36JKIrMm007349;
-	Wed, 19 Jul 2023 20:19:00 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3ruhw7dwct-7;
-	Wed, 19 Jul 2023 20:19:00 +0000
-From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-To: davem@davemloft.net
-Cc: Liam.Howlett@Oracle.com, akpm@linux-foundation.org, david@fries.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        zbr@ioremap.net, brauner@kernel.org, johannes@sipsolutions.net,
-        ecree.xilinx@gmail.com, leon@kernel.org, keescook@chromium.org,
-        socketcan@hartkopp.net, petrm@nvidia.com, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, anjali.k.kulkarni@oracle.com
-Subject: [PATCH net-next v10 6/6] connector/cn_proc: Selftest for proc connector
-Date: Wed, 19 Jul 2023 13:18:21 -0700
-Message-ID: <20230719201821.495037-7-anjali.k.kulkarni@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBA4275BC
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 20:26:47 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268891734
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:26:41 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fbc656873eso299965e9.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1689798399; x=1692390399;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lvOfBli5ohuMQpjpxH93lKvVg1kVKy6ZsQduVRAw0Rs=;
+        b=Xhr5JokHovMoeiBHUrfh4kC1UBzm2eKRqFr07o+XzgRAqvUN0OTPeKAuJ5TEvF64Di
+         BLfv6liVsA4x3eEBv7AJjZzb0QNS7m9Co7w/3FjxGZ7uQf3qe5QgJMepnzzCaeuXbO44
+         6JcomqQ50VFBhHn/41FuCtMVhPwWXH94yO03ccG3Finp069zB0DWwa1y7ZvBT4CcQF0h
+         XrkmslgvodtPNT1rEdb+uOm7akAEgyb6TYnA/5XY7SZHNiF5qOZc28Q/uxrOKqgM2H6z
+         Wjb7ILlUFDVIdOWFXvl+Kvvx8dx5XIqeVdxHwj4Pd9asM7BIxsFv+HyV+BiM/0DQGiHD
+         FdhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689798399; x=1692390399;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lvOfBli5ohuMQpjpxH93lKvVg1kVKy6ZsQduVRAw0Rs=;
+        b=fkXeX1JRbbj4qZJmZTxk7yvk7L3fsUZFEXw8rC+I8l7Hab75jBYg9hmoxmIX53SZVk
+         OxJNI13OO582odDBKMAsKjbYs3W3+21qw/WJWMkQKjRFNfNW25DtAV7FNI+CcqioyfxX
+         DlcqKOljLbLDuoyg9u9/libUgyK/FS94ySc+1OMh6Jbz4ktD5exc6ZQjODhCyM3cMqqm
+         tVnZQHW0T72dwsZ+aUjzh7QxzuBnfxyZX2SoVfQgU8QR7PW+VP6u71ACJ7v61rbEKg07
+         dQ1bvqoSdRVVTGeCIv7xwMHyzKjajjA+lOG4OJIa6a2S2uZV7RjkU3WNtvtoNzijGQKE
+         DXWQ==
+X-Gm-Message-State: ABy/qLb28NxFBhbRjytsUf0yiEKD6c9jjbKNCSPefYoTCyppzcpFj1C6
+	doBo6Z3+JDYo5NulYgztzHGmsg==
+X-Google-Smtp-Source: APBJJlFkQGVCsrjuXjroC4xrdzggekehsSqMgOAntvhWqAeGS9Q4jHA2wMp+N3FE3BEY2pLbwc3Cgg==
+X-Received: by 2002:a05:600c:2103:b0:3fc:5bcc:a91a with SMTP id u3-20020a05600c210300b003fc5bcca91amr5583352wml.6.1689798399403;
+        Wed, 19 Jul 2023 13:26:39 -0700 (PDT)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id 3-20020a05600c234300b003fc04d13242sm2432319wmq.0.2023.07.19.13.26.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jul 2023 13:26:38 -0700 (PDT)
+From: Dmitry Safonov <dima@arista.com>
+To: David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org,
+	Dmitry Safonov <dima@arista.com>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Bob Gilligan <gilligan@arista.com>,
+	Dan Carpenter <error27@gmail.com>,
+	David Laight <David.Laight@aculab.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Donald Cassidy <dcassidy@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Ivan Delalande <colona@arista.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	"Tetreault, Francois" <ftetreau@ciena.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH v8 00/23] net/tcp: Add TCP-AO support
+Date: Wed, 19 Jul 2023 21:26:05 +0100
+Message-ID: <20230719202631.472019-1-dima@arista.com>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230719201821.495037-1-anjali.k.kulkarni@oracle.com>
-References: <20230719201821.495037-1-anjali.k.kulkarni@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-19_14,2023-07-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 phishscore=0
- adultscore=0 spamscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2307190183
-X-Proofpoint-ORIG-GUID: NuXIfb1LyZmMdCSCS_9lEWq59BBOfXlN
-X-Proofpoint-GUID: NuXIfb1LyZmMdCSCS_9lEWq59BBOfXlN
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_TEMPERROR,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Run as ./proc_filter -f to run new filter code. Run without "-f" to run
-usual proc connector code without the new filtering code.
+Hi,
 
-Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
----
- tools/testing/selftests/Makefile              |   1 +
- tools/testing/selftests/connector/Makefile    |   6 +
- .../testing/selftests/connector/proc_filter.c | 310 ++++++++++++++++++
- 3 files changed, 317 insertions(+)
- create mode 100644 tools/testing/selftests/connector/Makefile
- create mode 100644 tools/testing/selftests/connector/proc_filter.c
+This is version 8 of TCP-AO support. I base it on master and there
+weren't any conflicts on my tentative merge to linux-next.
 
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 666b56f22a41..5c60a7cea732 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -8,6 +8,7 @@ TARGETS += cachestat
- TARGETS += capabilities
- TARGETS += cgroup
- TARGETS += clone3
-+TARGETS += connector
- TARGETS += core
- TARGETS += cpufreq
- TARGETS += cpu-hotplug
-diff --git a/tools/testing/selftests/connector/Makefile b/tools/testing/selftests/connector/Makefile
-new file mode 100644
-index 000000000000..21c9f3a973a0
---- /dev/null
-+++ b/tools/testing/selftests/connector/Makefile
-@@ -0,0 +1,6 @@
-+# SPDX-License-Identifier: GPL-2.0
-+CFLAGS += -Wall
-+
-+TEST_GEN_PROGS = proc_filter
-+
-+include ../lib.mk
-diff --git a/tools/testing/selftests/connector/proc_filter.c b/tools/testing/selftests/connector/proc_filter.c
-new file mode 100644
-index 000000000000..4fe8c6763fd8
---- /dev/null
-+++ b/tools/testing/selftests/connector/proc_filter.c
-@@ -0,0 +1,310 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <sys/types.h>
-+#include <sys/epoll.h>
-+#include <sys/socket.h>
-+#include <linux/netlink.h>
-+#include <linux/connector.h>
-+#include <linux/cn_proc.h>
-+
-+#include <stddef.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <strings.h>
-+#include <errno.h>
-+#include <signal.h>
-+#include <string.h>
-+
-+#include "../kselftest.h"
-+
-+#define NL_MESSAGE_SIZE (sizeof(struct nlmsghdr) + sizeof(struct cn_msg) + \
-+			 sizeof(struct proc_input))
-+#define NL_MESSAGE_SIZE_NF (sizeof(struct nlmsghdr) + sizeof(struct cn_msg) + \
-+			 sizeof(int))
-+
-+#define MAX_EVENTS 1
-+
-+volatile static int interrupted;
-+static int nl_sock, ret_errno, tcount;
-+static struct epoll_event evn;
-+
-+static int filter;
-+
-+#ifdef ENABLE_PRINTS
-+#define Printf printf
-+#else
-+#define Printf ksft_print_msg
-+#endif
-+
-+int send_message(void *pinp)
-+{
-+	char buff[NL_MESSAGE_SIZE];
-+	struct nlmsghdr *hdr;
-+	struct cn_msg *msg;
-+
-+	hdr = (struct nlmsghdr *)buff;
-+	if (filter)
-+		hdr->nlmsg_len = NL_MESSAGE_SIZE;
-+	else
-+		hdr->nlmsg_len = NL_MESSAGE_SIZE_NF;
-+	hdr->nlmsg_type = NLMSG_DONE;
-+	hdr->nlmsg_flags = 0;
-+	hdr->nlmsg_seq = 0;
-+	hdr->nlmsg_pid = getpid();
-+
-+	msg = (struct cn_msg *)NLMSG_DATA(hdr);
-+	msg->id.idx = CN_IDX_PROC;
-+	msg->id.val = CN_VAL_PROC;
-+	msg->seq = 0;
-+	msg->ack = 0;
-+	msg->flags = 0;
-+
-+	if (filter) {
-+		msg->len = sizeof(struct proc_input);
-+		((struct proc_input *)msg->data)->mcast_op =
-+			((struct proc_input *)pinp)->mcast_op;
-+		((struct proc_input *)msg->data)->event_type =
-+			((struct proc_input *)pinp)->event_type;
-+	} else {
-+		msg->len = sizeof(int);
-+		*(int *)msg->data = *(enum proc_cn_mcast_op *)pinp;
-+	}
-+
-+	if (send(nl_sock, hdr, hdr->nlmsg_len, 0) == -1) {
-+		ret_errno = errno;
-+		perror("send failed");
-+		return -3;
-+	}
-+	return 0;
-+}
-+
-+int register_proc_netlink(int *efd, void *input)
-+{
-+	struct sockaddr_nl sa_nl;
-+	int err = 0, epoll_fd;
-+
-+	nl_sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_CONNECTOR);
-+
-+	if (nl_sock == -1) {
-+		ret_errno = errno;
-+		perror("socket failed");
-+		return -1;
-+	}
-+
-+	bzero(&sa_nl, sizeof(sa_nl));
-+	sa_nl.nl_family = AF_NETLINK;
-+	sa_nl.nl_groups = CN_IDX_PROC;
-+	sa_nl.nl_pid    = getpid();
-+
-+	if (bind(nl_sock, (struct sockaddr *)&sa_nl, sizeof(sa_nl)) == -1) {
-+		ret_errno = errno;
-+		perror("bind failed");
-+		return -2;
-+	}
-+
-+	epoll_fd = epoll_create1(EPOLL_CLOEXEC);
-+	if (epoll_fd < 0) {
-+		ret_errno = errno;
-+		perror("epoll_create1 failed");
-+		return -2;
-+	}
-+
-+	err = send_message(input);
-+
-+	if (err < 0)
-+		return err;
-+
-+	evn.events = EPOLLIN;
-+	evn.data.fd = nl_sock;
-+	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, nl_sock, &evn) < 0) {
-+		ret_errno = errno;
-+		perror("epoll_ctl failed");
-+		return -3;
-+	}
-+	*efd = epoll_fd;
-+	return 0;
-+}
-+
-+static void sigint(int sig)
-+{
-+	interrupted = 1;
-+}
-+
-+int handle_packet(char *buff, int fd, struct proc_event *event)
-+{
-+	struct nlmsghdr *hdr;
-+
-+	hdr = (struct nlmsghdr *)buff;
-+
-+	if (hdr->nlmsg_type == NLMSG_ERROR) {
-+		perror("NLMSG_ERROR error\n");
-+		return -3;
-+	} else if (hdr->nlmsg_type == NLMSG_DONE) {
-+		event = (struct proc_event *)
-+			((struct cn_msg *)NLMSG_DATA(hdr))->data;
-+		tcount++;
-+		switch (event->what) {
-+		case PROC_EVENT_EXIT:
-+			Printf("Exit process %d (tgid %d) with code %d, signal %d\n",
-+			       event->event_data.exit.process_pid,
-+			       event->event_data.exit.process_tgid,
-+			       event->event_data.exit.exit_code,
-+			       event->event_data.exit.exit_signal);
-+			break;
-+		case PROC_EVENT_FORK:
-+			Printf("Fork process %d (tgid %d), parent %d (tgid %d)\n",
-+			       event->event_data.fork.child_pid,
-+			       event->event_data.fork.child_tgid,
-+			       event->event_data.fork.parent_pid,
-+			       event->event_data.fork.parent_tgid);
-+			break;
-+		case PROC_EVENT_EXEC:
-+			Printf("Exec process %d (tgid %d)\n",
-+			       event->event_data.exec.process_pid,
-+			       event->event_data.exec.process_tgid);
-+			break;
-+		case PROC_EVENT_UID:
-+			Printf("UID process %d (tgid %d) uid %d euid %d\n",
-+			       event->event_data.id.process_pid,
-+			       event->event_data.id.process_tgid,
-+			       event->event_data.id.r.ruid,
-+			       event->event_data.id.e.euid);
-+			break;
-+		case PROC_EVENT_GID:
-+			Printf("GID process %d (tgid %d) gid %d egid %d\n",
-+			       event->event_data.id.process_pid,
-+			       event->event_data.id.process_tgid,
-+			       event->event_data.id.r.rgid,
-+			       event->event_data.id.e.egid);
-+			break;
-+		case PROC_EVENT_SID:
-+			Printf("SID process %d (tgid %d)\n",
-+			       event->event_data.sid.process_pid,
-+			       event->event_data.sid.process_tgid);
-+			break;
-+		case PROC_EVENT_PTRACE:
-+			Printf("Ptrace process %d (tgid %d), Tracer %d (tgid %d)\n",
-+			       event->event_data.ptrace.process_pid,
-+			       event->event_data.ptrace.process_tgid,
-+			       event->event_data.ptrace.tracer_pid,
-+			       event->event_data.ptrace.tracer_tgid);
-+			break;
-+		case PROC_EVENT_COMM:
-+			Printf("Comm process %d (tgid %d) comm %s\n",
-+			       event->event_data.comm.process_pid,
-+			       event->event_data.comm.process_tgid,
-+			       event->event_data.comm.comm);
-+			break;
-+		case PROC_EVENT_COREDUMP:
-+			Printf("Coredump process %d (tgid %d) parent %d, (tgid %d)\n",
-+			       event->event_data.coredump.process_pid,
-+			       event->event_data.coredump.process_tgid,
-+			       event->event_data.coredump.parent_pid,
-+			       event->event_data.coredump.parent_tgid);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+	return 0;
-+}
-+
-+int handle_events(int epoll_fd, struct proc_event *pev)
-+{
-+	char buff[CONNECTOR_MAX_MSG_SIZE];
-+	struct epoll_event ev[MAX_EVENTS];
-+	int i, event_count = 0, err = 0;
-+
-+	event_count = epoll_wait(epoll_fd, ev, MAX_EVENTS, -1);
-+	if (event_count < 0) {
-+		ret_errno = errno;
-+		if (ret_errno != EINTR)
-+			perror("epoll_wait failed");
-+		return -3;
-+	}
-+	for (i = 0; i < event_count; i++) {
-+		if (!(ev[i].events & EPOLLIN))
-+			continue;
-+		if (recv(ev[i].data.fd, buff, sizeof(buff), 0) == -1) {
-+			ret_errno = errno;
-+			perror("recv failed");
-+			return -3;
-+		}
-+		err = handle_packet(buff, ev[i].data.fd, pev);
-+		if (err < 0)
-+			return err;
-+	}
-+	return 0;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int epoll_fd, err;
-+	struct proc_event proc_ev;
-+	struct proc_input input;
-+
-+	signal(SIGINT, sigint);
-+
-+	if (argc > 2) {
-+		printf("Expected 0(assume no-filter) or 1 argument(-f)\n");
-+		exit(1);
-+	}
-+
-+	if (argc == 2) {
-+		if (strcmp(argv[1], "-f") == 0) {
-+			filter = 1;
-+		} else {
-+			printf("Valid option : -f (for filter feature)\n");
-+			exit(1);
-+		}
-+	}
-+
-+	if (filter) {
-+		input.event_type = PROC_EVENT_NONZERO_EXIT;
-+		input.mcast_op = PROC_CN_MCAST_LISTEN;
-+		err = register_proc_netlink(&epoll_fd, (void*)&input);
-+	} else {
-+		enum proc_cn_mcast_op op = PROC_CN_MCAST_LISTEN;
-+		err = register_proc_netlink(&epoll_fd, (void*)&op);
-+	}
-+
-+	if (err < 0) {
-+		if (err == -2)
-+			close(nl_sock);
-+		if (err == -3) {
-+			close(nl_sock);
-+			close(epoll_fd);
-+		}
-+		exit(1);
-+	}
-+
-+	while (!interrupted) {
-+		err = handle_events(epoll_fd, &proc_ev);
-+		if (err < 0) {
-+			if (ret_errno == EINTR)
-+				continue;
-+			if (err == -2)
-+				close(nl_sock);
-+			if (err == -3) {
-+				close(nl_sock);
-+				close(epoll_fd);
-+			}
-+			exit(1);
-+		}
-+	}
-+
-+	if (filter) {
-+		input.mcast_op = PROC_CN_MCAST_IGNORE;
-+		send_message((void*)&input);
-+	} else {
-+		enum proc_cn_mcast_op op = PROC_CN_MCAST_IGNORE;
-+		send_message((void*)&op);
-+	}
-+
-+	close(epoll_fd);
-+	close(nl_sock);
-+
-+	printf("Done total count: %d\n", tcount);
-+	exit(0);
-+}
+The good news is that all pre-required patches have merged to
+Torvald's/master. Thanks to Herbert, crypto clone-tfm just works on
+master for all TCP-AO supported algorithms.
+So, this is the first version of the patch set that has only net-related
+changes (well, selftests as well, but they'll be upstreamed separately).
+
+In this version, I've finally spent time and written Documentation/ page
+on TCP-AO. It has Frequently Asked Questions (FAQ) on RFC 5925 - I found
+it very useful to answer those before writing the actual code.
+It provides answers to common questions that arise on a quick read of
+the RFC as well as how they were answered. There's also a comparison
+to the TCP-MD5 option, an evaluation of per-socket vs in-kernel-DB
+approaches and a description of uAPI provided.
+I hope it will be as useful for reviewing the code as it was for writing.
+
+The most important changes in this version are:
+- CONFIG_TCP_AO implies CONFIG_IPV6 != m. I don't feel like that
+  combination would be useful to anyone and it'd be painful to fix.
+- uAPI change in TCP_AO_REPAIR (introduced in version 7): I removed
+  {snd,rcv}_sne_seq counters. They were just copies of snd_nxt/snd_una.
+  No reason for polluting uAPI as well as needlessly copying them.
+- TCP_AO_MAX_HASH_SIZE is removed and all temporary buffers are
+  kmalloc()'d. That also saves a couple of bytes for hmac(sha1) and
+  cmac(aes128) traffic keys as they now are allocated with
+  exact hash algo's digest_size.
+
+There's an independent patch set for TCP-MD5 to verify segments on twsk:
+https://lore.kernel.org/all/20230509221608.2569333-1-dima@arista.com/T/#u
+That may be used to verify TCP-AO segments on twsk as well.
+
+There seem to be more people that connected me off-list asking me about
+the status of patches and when I expect them to merge. Cc'ing more
+interested parties here (ping me directly if you don't want to be in
+copy). It would be helpful if you provide your reviews and tested-by's.
+As far as I'm aware, version 7 was ported to RHEL, so now there are
+probably more downstream kernels with TCP-AO support.
+
+Also available as a git branch for pulling:
+https://github.com/0x7f454c46/linux/tree/tcp-ao-v8
+And another branch with selftests, that will be sent later separately:
+https://github.com/0x7f454c46/linux/tree/tcp-ao-v8-with-selftests
+
+Thanks for your time and reviews,
+         Dmitry
+
+--- Changelog ---
+
+Changes from v7:
+- Fixed copy'n'paste typo in unsigned-md5.c selftest output
+- Fix build error in tcp_v6_send_reset() (kernel test robot <lkp@intel.com>)
+- Make CONFIG_TCP_AO imply IPV6 != m
+- Cleanup EXPORT_SYMBOL*() as they aren't needed with IPV6 != m
+- Used scratch area instead of on-stack buffer for scatter-gather list
+  in tcp_v{4,6}_ao_calc_key(). Fixes CONFIG_VMAP_STACK=y + CONFIG_DEBUG_SG=y
+- Allocated digest_size'd buffers for traffic keys in tcp_ao_key instead
+  of maximum-sized buffers of TCP_AO_MAX_HASH_SIZE. That will save
+  little space per key and also potentially allow algorithms with
+  digest size > TCP_AO_MAX_HASH_SIZE.
+- Removed TCP_AO_MAX_HASH_SIZE and used kmalloc(GFP_ATOMIC) instead of
+  on-stack hash buffer.
+- Don't treat fd=0 as invalid in selftests
+- Make TCP-AO selftests work with CONFIG_CRYPTO_FIPS=y
+- Don't tcp_ao_compute_sne() for snd_sne on twsk: it's redundant as
+  no data can be sent on twsk
+- Get rid of {snd,rcv}_sne_seq: use snd_nxt/snd_una or rcv_nxt instead
+- {rcv,snd}_sne and tcp_ao_compute_sne() now are introduced in
+  "net/tcp: Add TCP-AO SNE support" patch
+- trivial copy_to_sockptr() fixup for tcp_ao_get_repair() - it could
+  try copying bigger struct than the kernel one (embarrassing!)
+- Added Documentation/networking/tcp_ao.rst that describes:
+  uAPI, has FAQ on RFC 5925 and has implementation details of Linux TCP-AO
+
+Changes from v6:
+- Some more trivial build warnings fixups (kernel test robot <lkp@intel.com>)
+- Added TCP_AO_REPAIR setsockopt(), getsockopt()
+- Allowed TCP_AO_* setsockopts if (tp->repair) is on
+- Added selftests for TCP_AO_REPAIR, that also check incorrect
+  ISNs/SNEs, which result in a broken TCP-AO connection - that verifies
+  that both Initial Sequence Numbers and Sequence Number Extension are
+  part of MAC generation
+- Using TCP_AO_REPAIR added a selftest for SEQ numbers rollover,
+  checking that SNE was incremented, connection is alive post-rolloever
+  and no TCP segments with a wrong signature arrived
+- Wrote a selftest for RST segments: both active reset (goes through
+  transmit_skb()) and passive reset (goes through tcp_v{4,6}_send_reset()).
+- Refactored and made readable tcp_v{4,6}_send_reset(), also adding
+  support for TCP_LISTEN/TCP_NEW_SYN_RECV
+- Dropped per-CPU ahash requests allocations in favor of Herbert's
+  clone-tfm crypto API
+- Added Donald Cassidy to Cc as he's interested in getting it into RHEL.
+
+Version 6: https://lore.kernel.org/all/20230512202311.2845526-1-dima@arista.com/T/#u
+
+iperf[3] benchmarks for version 6:
+                           v6.4-rc1                 TCP-AO-v6
+  TCP                      43.9 Gbits/sec           43.5 Gbits/sec
+  TCP-MD5                  2.20 Gbits/sec           2.25 Gbits/sec
+  TCP-AO(hmac(sha1))                                2.53 Gbits/sec
+  TCP-AO(hmac(sha512))                              1.67 Gbits/sec
+  TCP-AO(hmac(sha384))                              1.77 Gbits/sec
+  TCP-AO(hmac(sha224))                              1.29 Gbits/sec
+  TCP-AO(hmac(sha3-512))                             481 Mbits/sec
+  TCP-AO(hmac(md5))                                 2.07 Gbits/sec
+  TCP-AO(hmac(rmd160))                              1.01 Gbits/sec
+  TCP-AO(cmac(aes128))                              2.11 Gbits/sec
+
+Changes from v5:
+- removed check for TCP_AO_KEYF_IFINDEX in delete command:
+  VRF might have been destroyed, there still needs to be a way to delete
+  keys that were bound to that l3intf (should tcp_v{4,6}_parse_md5_keys()
+  avoid the same check as well?)
+- corrected copy'n'paste typo in tcp_ao_info_cmd() (assign ao_info->rnext_key)
+- simplified a bit tcp_ao_copy_mkts_to_user(); added more UAPI checks
+  for getsockopt(TCP_AO_GET_KEYS)
+- More UAPI selftests in setsockopt-closed: 29 => 120
+- ported TCP-AO patches on Herbert's clone-tfm changes
+- adjusted iperf patch for TCP-AO UAPI changes from version 5
+- added measures for TCP-AO with tcp_sigpool & clone_tfm backends
+
+Version 5: https://lore.kernel.org/all/20230403213420.1576559-1-dima@arista.com/T/#u
+
+Changes from v4:
+- Renamed tcp_ao_matched_key() => tcp_ao_established_key()
+- Missed `static` in function definitions
+  (kernel test robot <lkp@intel.com>)
+- Fixed CONFIG_IPV6=m build
+- Unexported tcp_md5_*_sigpool() functions
+- Cleaned up tcp_ao.h: undeclared tcp_ao_cache_traffic_keys(),
+  tcp_v4_ao_calc_key_skb(); removed tcp_v4_inbound_ao_hash()
+- Marked "net/tcp: Prepare tcp_md5sig_pool for TCP-AO" as a [draft] patch
+- getsockopt() now returns TCP-AO per-key counters
+- Another getsockopt() now returns per-ao_info stats: counters
+  and accept_icmps flag state
+- Wired up getsockopt() returning counters to selftests
+- Fixed a porting mistake: TCP-AO hash in some cases was written in TCP
+  header without accounting for MAC length of the key, rewritting skb
+  shared info
+- Fail adding a key with L3 ifindex when !TCP_AO_KEYF_IFINDEX, instead
+  of ignoring tcpa_ifindex (stricter UAPI check)
+- Added more test-cases to setsockopt-closed.c selftest
+- tcp_ao_hash_skb_data() was a copy'n'paste of tcp_md5_hash_skb_data()
+  share it now under tcp_sigpool_hash_skb_data()
+- tcp_ao_mkt_overlap_v{4,6}() deleted as they just re-invented
+  tcp_ao_do_lookup(). That fixes an issue with multiple IPv4-mapped-IPv6
+  keys for different peers on a listening socket.
+- getsockopt() now is tested to return correct VRF number for a key
+- TCP-AO and TCP-MD5 interraction in non/default VRFs: added +19 selftests
+  made them SKIP when CONFIG_VRF=n
+- unsigned-md5 selftests now checks both scenarios:
+  (1) adding TCP-AO key _after_ TCP-MD5 key
+  (2) adding TCP-MD5 key _after_ TCP-AO key
+- Added a ratelimited warning if TCP-AO key.ifindex doesn't match
+  sk->sk_bound_dev_if - that will warn a user for potential VRF issues
+- tcp_v{4,6}_parse_md5_keys() now allows adding TCP-MD5 key with
+  ifindex=0 and TCP_MD5SIG_FLAG_IFINDEX together with TCP-AO key from
+  another VRF
+- Add TCP_AO_CMDF_AO_REQUIRED, which makes a socket TCP-AO only,
+  rejecting TCP-MD5 keys or any unsigned TCP segments
+- Remove `tcpa_' prefix for UAPI structure members
+- UAPI cleanup: I've separated & renamed per-socket settings
+  (such as ao_info flags + current/rnext set) from per-key changes:
+  TCP_AO     => TCP_AO_ADD_KEY
+  TCP_AO_DEL => TCP_AO_DEL_KEY
+  TCP_AO_GET => TCP_AO_GET_KEYS
+  TCP_AO_MOD => TCP_AO_INFO, the structure is now valid for both
+                getsockopt() and setsockopt().
+- tcp_ao_current_rnext() was split up in order to fail earlier when
+  sndid/rcvid specified can't be set, before anything was changed in ao_info
+- fetch current_key before dumping TCP-AO keys in getsockopt(TCP_AO_GET_KEYS):
+  it may race with changing current_key by RX, which in result might
+  produce a dump with no current_key for userspace.
+- instead of TCP_AO_CMDF_* flags, used bitfileds: the flags weren't
+  shared between all TCP_AO_{ADD,GET,DEL}_KEY{,S}, so bitfields are more
+  descriptive here
+- use READ_ONCE()/WRITE_ONCE() for current_key and rnext_key more
+  consistently; document in comment the rules for accessing them
+- selftests: check all setsockopts()/getsockopts() support extending
+  option structs
+
+Version 4: https://lore.kernel.org/all/20230215183335.800122-1-dima@arista.com/T/#u
+
+Changes from v3:
+- TCP_MD5 dynamic static key enable/disable patches merged separately [4]
+- crypto_pool patches were nacked [5], so instead this patch set extends
+  TCP-MD5-sigpool to be used for TCP-AO as well as for TCP-MD5
+- Added missing `static' for tcp_v6_ao_calc_key()
+  (kernel test robot <lkp@intel.com>)
+- Removed CONFIG_TCP_AO default=y and added "If unsure, say N."
+- Don't leak ao_info and don't create an unsigned TCP socket if there was
+  a TCP-AO key during handshake, but it was removed from listening socket
+  while the connection was being established
+- Migrate to use static_key_fast_inc_not_disabled() and check return
+  code of static_branch_inc()
+- Change some return codes to EAFNOSUPPORT for error-pathes where
+  family is neither AF_INET nor AF_INET6
+- setsockopt()s on a closed/listen socket might have created stray ao_info,
+  remove it if connect() is called with a correct TCP-MD5 key, the same
+  for the reverse situation: remove md5sig_info straight away from the
+  socket if it's going to be TCP-AO connection
+- IPv4-mapped-IPv6 addresses + selftest in fcnal-test.sh (by Salam)
+- fix using uninitialized sisn/disn from stack - it would only make
+  non-SYN packets fail verification on a listen socket, which are not
+  expected anyway (kernel test robot <lkp@intel.com>)
+- implicit padding in UAPI TCP-AO structures converted to explicit
+  (spotted-by David Laight)
+- Some selftests missed zero-initializers for uapi structs on stack
+- Removed tcp_ao_do_lookup_rcvid() and tcp_ao_do_lookup_sndid() in
+  favor of unified tcp_ao_matched_key()
+- Disallowed setting current/rnext keys on listen sockets - that wasn't
+  supported and didn't affect anything, cleanup for the UAPI
+- VRFs support for TCP-AO
+
+Version 3: https://lore.kernel.org/all/20221027204347.529913-1-dima@arista.com/T/#u
+
+Changes from v2:
+- Added more missing `static' declarations for local functions
+  (kernel test robot <lkp@intel.com>)
+- Building now with CONFIG_TCP_AO=n and CONFIG_TCP_MD5SIG=n
+  (kernel test robot <lkp@intel.com>)
+- Now setsockopt(TCP_AO) is allowed when it's TCP_LISTEN or TCP_CLOSE
+  state OR the key added is not the first key on a socket (by Salam)
+- CONFIG_TCP_AO does not depend on CONFIG_TCP_MD5SIG anymore
+- Don't leak tcp_md5_needed static branch counter when TCP-MD5 key
+  is modified/changed
+- TCP-AO lookups are dynamically enabled/disabled with static key when
+  there is ao_info in the system (and when it is destroyed)
+- Wired SYN cookies up to TCP-AO (by Salam)
+- Fix verification for possible re-transmitted SYN packets (by Salam)
+- use sockopt_lock_sock() instead of lock_sock()
+  (from v6.1 rebase, commit d51bbff2aba7)
+- use sockptr_t in getsockopt(TCP_AO_GET)
+  (from v6.1 rebase, commit 34704ef024ae)
+- Fixed reallocating crypto_pool's scratch area by IPI while
+  crypto_pool_get() was get by another CPU
+- selftests on older kernels (or with CONFIG_TCP_AO=n) should exit with
+  SKIP, not FAIL (Shuah Khan <shuah@kernel.org>)
+- selftests that check interaction between TCP-AO and TCP-MD5 now
+  SKIP when CONFIG_TCP_MD5SIG=n
+- Measured the performance of different hashing algorithms for TCP-AO
+  and compare with TCP-MD5 performance. This is done with hacky patches
+  to iperf (see [3]). At this moment I've done it in qemu/KVM with CPU
+  affinities set on Intel(R) Core(TM) i7-7600U CPU @ 2.80GHz.
+  No performance degradation was noticed before/after patches, but given
+  the measures were done in a VM, without measuring it on a physical dut
+  it only gives a hint of relative speed for different hash algorithms
+  with TCP-AO. Here are results, averaging on 30 measures each:
+  TCP:                    3.51Gbits/sec
+  TCP-MD5:                1.12Gbits/sec
+  TCP-AO(HMAC(SHA1)):     1.53Gbits/sec
+  TCP-AO(CMAC(AES128)):   621Mbits/sec
+  TCP-AO(HMAC(SHA512)):   1.21Gbits/sec
+  TCP-AO(HMAC(SHA384)):   1.20Gbits/sec
+  TCP-AO(HMAC(SHA224)):   961Mbits/sec
+  TCP-AO(HMAC(SHA3-512)): 157Mbits/sec
+  TCP-AO(HMAC(RMD160)):   659Mbits/sec
+  TCP-AO(HMAC(MD5):       1.12Gbits/sec
+  (the last one is just for fun, but may make sense as it provides
+  the same security as TCP-MD5, but allows multiple keys and a mechanism
+  to change them from RFC5925)
+
+Version 2: https://lore.kernel.org/all/20220923201319.493208-1-dima@arista.com/T/#u
+
+Changes from v1:
+- Building now with CONFIG_IPV6=n (kernel test robot <lkp@intel.com>)
+- Added missing static declarations for local functions
+  (kernel test robot <lkp@intel.com>)
+- Addressed static analyzer and review comments by Dan Carpenter
+  (thanks, they were very useful!)
+- Fix elif without defined() for !CONFIG_TCP_AO
+- Recursively build selftests/net/tcp_ao (Shuah Khan), patches in:
+  https://lore.kernel.org/all/20220919201958.279545-1-dima@arista.com/T/#u
+- Don't leak crypto_pool reference when TCP-MD5 key is modified/changed
+- Add TCP-AO support for nettest.c and fcnal-test.sh
+  (will be used for VRF testing in later versions)
+
+Comparison between Leonard proposal and this (overview):
+https://lore.kernel.org/all/3cf03d51-74db-675c-b392-e4647fa5b5a6@arista.com/T/#u
+
+Version 1: https://lore.kernel.org/all/20220818170005.747015-1-dima@arista.com/T/#u
+
+This patchset implements the TCP-AO option as described in RFC5925. There
+is a request from industry to move away from TCP-MD5SIG and it seems the time
+is right to have a TCP-AO upstreamed. This TCP option is meant to replace
+the TCP MD5 option and address its shortcomings. Specifically, it provides
+more secure hashing, key rotation and support for long-lived connections
+(see the summary of TCP-AO advantages over TCP-MD5 in (1.3) of RFC5925).
+The patch series starts with six patches that are not specific to TCP-AO
+but implement a general crypto facility that we thought is useful
+to eliminate code duplication between TCP-MD5SIG and TCP-AO as well as other
+crypto users. These six patches are being submitted separately in
+a different patchset [1]. Including them here will show better the gain
+in code sharing. Next are 18 patches that implement the actual TCP-AO option,
+followed by patches implementing selftests.
+
+The patch set was written as a collaboration of three authors (in alphabetical
+order): Dmitry Safonov, Francesco Ruggeri and Salam Noureddine. Additional
+credits should be given to Prasad Koya, who was involved in early prototyping
+a few years back. There is also a separate submission done by Leonard Crestez
+whom we thank for his efforts getting an implementation of RFC5925 submitted
+for review upstream [2]. This is an independent implementation that makes
+different design decisions.
+
+For example, we chose a similar design to the TCP-MD5SIG implementation and
+used setsockopts to program per-socket keys, avoiding the extra complexity
+of managing a centralized key database in the kernel. A centralized database
+in the kernel has dubious benefits since it doesn’t eliminate per-socket
+setsockopts needed to specify which sockets need TCP-AO and what are the
+currently preferred keys. It also complicates traffic key caching and
+preventing deletion of in-use keys.
+
+In this implementation, a centralized database of keys can be thought of
+as living in user space and user applications would have to program those
+keys on matching sockets. On the server side, the user application programs
+keys (MKTS in TCP-AO nomenclature) on the listening socket for all peers that
+are expected to connect. Prefix matching on the peer address is supported.
+When a peer issues a successful connect, all the MKTs matching the IP address
+of the peer are copied to the newly created socket. On the active side,
+when a connect() is issued all MKTs that do not match the peer are deleted
+from the socket since they will never match the peer. This implementation
+uses three setsockopt()s for adding, deleting and modifying keys on a socket.
+All three setsockopt()s have extensive sanity checks that prevent
+inconsistencies in the keys on a given socket. A getsockopt() is provided
+to get key information from any given socket.
+
+Few things to note about this implementation:
+- Traffic keys are cached for established connections avoiding the cost of
+  such calculation for each packet received or sent.
+- Great care has been taken to avoid deleting in-use MKTs
+  as required by the RFC.
+- Any crypto algorithm supported by the Linux kernel can be used
+  to calculate packet hashes.
+- Fastopen works with TCP-AO but hasn’t been tested extensively.
+- Tested for interop with other major networking vendors (on linux-4.19),
+  including testing for key rotation and long lived connections.
+
+[1]: https://lore.kernel.org/all/20220726201600.1715505-1-dima@arista.com/
+[2]: https://lore.kernel.org/all/cover.1658815925.git.cdleonard@gmail.com/
+[3]: https://github.com/0x7f454c46/iperf/tree/tcp-md5-ao
+[4]: https://lore.kernel.org/all/166995421700.16716.17446147162780881407.git-patchwork-notify@kernel.org/T/#u
+[5]: https://lore.kernel.org/all/Y8kSkW4X4vQdFyOl@gondor.apana.org.au/T/#u
+[6]: https://lore.kernel.org/all/ZDefxOq6Ax0JeTRH@gondor.apana.org.au/T/#u
+
+Cc: Andy Lutomirski <luto@amacapital.net>
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Bob Gilligan <gilligan@arista.com>
+Cc: Dan Carpenter <error27@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: David Laight <David.Laight@aculab.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Donald Cassidy <dcassidy@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: Francesco Ruggeri <fruggeri05@gmail.com>
+Cc: Gaillardetz, Dominik <dgaillar@ciena.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Ivan Delalande <colona@arista.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Leonard Crestez <cdleonard@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: Tetreault, Francois <ftetreau@ciena.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Dmitry Safonov (23):
+  net/tcp: Prepare tcp_md5sig_pool for TCP-AO
+  net/tcp: Add TCP-AO config and structures
+  net/tcp: Introduce TCP_AO setsockopt()s
+  net/tcp: Prevent TCP-MD5 with TCP-AO being set
+  net/tcp: Calculate TCP-AO traffic keys
+  net/tcp: Add TCP-AO sign to outgoing packets
+  net/tcp: Add tcp_parse_auth_options()
+  net/tcp: Add AO sign to RST packets
+  net/tcp: Add TCP-AO sign to twsk
+  net/tcp: Wire TCP-AO to request sockets
+  net/tcp: Sign SYN-ACK segments with TCP-AO
+  net/tcp: Verify inbound TCP-AO signed segments
+  net/tcp: Add TCP-AO segments counters
+  net/tcp: Add TCP-AO SNE support
+  net/tcp: Add tcp_hash_fail() ratelimited logs
+  net/tcp: Ignore specific ICMPs for TCP-AO connections
+  net/tcp: Add option for TCP-AO to (not) hash header
+  net/tcp: Add TCP-AO getsockopt()s
+  net/tcp: Allow asynchronous delete for TCP-AO keys (MKTs)
+  net/tcp: Add static_key for TCP-AO
+  net/tcp: Wire up l3index to TCP-AO
+  net/tcp: Add TCP_AO_REPAIR
+  Documentation/tcp: Add TCP-AO documentation
+
+ Documentation/networking/index.rst  |    1 +
+ Documentation/networking/tcp_ao.rst |  422 +++++
+ include/linux/sockptr.h             |   23 +
+ include/linux/tcp.h                 |   30 +-
+ include/net/dropreason-core.h       |   30 +
+ include/net/tcp.h                   |  224 ++-
+ include/net/tcp_ao.h                |  349 ++++
+ include/uapi/linux/snmp.h           |    5 +
+ include/uapi/linux/tcp.h            |  105 ++
+ net/ipv4/Kconfig                    |   17 +
+ net/ipv4/Makefile                   |    2 +
+ net/ipv4/proc.c                     |    5 +
+ net/ipv4/syncookies.c               |    4 +
+ net/ipv4/tcp.c                      |  236 +--
+ net/ipv4/tcp_ao.c                   | 2367 +++++++++++++++++++++++++++
+ net/ipv4/tcp_input.c                |   97 +-
+ net/ipv4/tcp_ipv4.c                 |  333 +++-
+ net/ipv4/tcp_minisocks.c            |   50 +-
+ net/ipv4/tcp_output.c               |  232 ++-
+ net/ipv4/tcp_sigpool.c              |  357 ++++
+ net/ipv6/Makefile                   |    1 +
+ net/ipv6/syncookies.c               |    5 +
+ net/ipv6/tcp_ao.c                   |  167 ++
+ net/ipv6/tcp_ipv6.c                 |  334 +++-
+ 24 files changed, 5026 insertions(+), 370 deletions(-)
+ create mode 100644 Documentation/networking/tcp_ao.rst
+ create mode 100644 include/net/tcp_ao.h
+ create mode 100644 net/ipv4/tcp_ao.c
+ create mode 100644 net/ipv4/tcp_sigpool.c
+ create mode 100644 net/ipv6/tcp_ao.c
+
+
+base-commit: ccff6d117d8dc8d8d86e8695a75e5f8b01e573bf
 -- 
 2.41.0
 
