@@ -1,103 +1,104 @@
-Return-Path: <netdev+bounces-18937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67EEA75923F
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB859759242
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:02:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C3271C20DA0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:02:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27A461C20DA0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 10:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013EC125C8;
-	Wed, 19 Jul 2023 10:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B021C125DC;
+	Wed, 19 Jul 2023 10:02:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE38DF6F
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:02:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BF1C433C8;
-	Wed, 19 Jul 2023 10:02:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689760946;
-	bh=7RLTkekLYGKgz6wXIqWeb2EVAaRvDY1n9b3KWZ0aoWw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eHm5tuLEJdXMsKlx+8Si04k5YF7xh4lGFThB6f6OtIFi2WSuJm3NGLBk++9jELfy2
-	 e7tDLppm/ZAv+JjeovJwIimUHU1mDfm8Zl0XcJi4bMnHBWq95HwD9KcDhxm3vdVqwg
-	 AZZ1elo0Dj8Hy5ojCthJCTMEm4oQhdlFn9XlImACPjcZgJphIWL1lo8yS10qR65xbV
-	 iTJTOSlukaZThIscmxqfcgstw1czOIb+8gEK6+5c+2PKXS7Wm/tbEB/tYebA++RlLe
-	 vLL1xP+0H25YQ+1X9qtB20ZYeIWznb1lg5IEZ+4MdpDnh20cfv7px2ShSGUFYd/hPt
-	 EI13atBmjgZRA==
-Date: Wed, 19 Jul 2023 13:02:22 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Louis Peens <louis.peens@corigine.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Simon Horman <simon.horman@corigine.com>,
-	Shihong Wang <shihong.wang@corigine.com>, netdev@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: Re: [PATCH net-next 1/2] xfrm: add the description of
- CHACHA20-POLY1305 for xfrm algorithm description
-Message-ID: <20230719100222.GL8808@unreal>
-References: <20230719091830.50866-1-louis.peens@corigine.com>
- <20230719091830.50866-2-louis.peens@corigine.com>
- <ZLesfwnwXZ22A0fA@gauss3.secunet.de>
- <20230719093509.GJ8808@unreal>
- <ZLeyLedVE2pwGEnK@gauss3.secunet.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1099125CA
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 10:02:38 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6D01FD7
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 03:02:37 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id B27D02083E;
+	Wed, 19 Jul 2023 12:02:35 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id m_a6Aroawh7W; Wed, 19 Jul 2023 12:02:35 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 37D9D206B0;
+	Wed, 19 Jul 2023 12:02:35 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout2.secunet.com (Postfix) with ESMTP id 2975080004A;
+	Wed, 19 Jul 2023 12:02:35 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 19 Jul 2023 12:02:34 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 19 Jul
+ 2023 12:02:34 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 57C5A3182B6D; Wed, 19 Jul 2023 12:02:34 +0200 (CEST)
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/1] pull request (net-next): ipsec-next 2023-07-19
+Date: Wed, 19 Jul 2023 12:02:27 +0200
+Message-ID: <20230719100228.373055-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLeyLedVE2pwGEnK@gauss3.secunet.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 11:51:41AM +0200, Steffen Klassert wrote:
-> On Wed, Jul 19, 2023 at 12:35:09PM +0300, Leon Romanovsky wrote:
-> > On Wed, Jul 19, 2023 at 11:27:27AM +0200, Steffen Klassert wrote:
-> > > On Wed, Jul 19, 2023 at 11:18:29AM +0200, Louis Peens wrote:
-> > > > From: Shihong Wang <shihong.wang@corigine.com>
-> > > > 
-> > > > Add the description of CHACHA20-POLY1305 for xfrm algorithm description
-> > > > and set pfkey_supported to 1 so that xfrm supports that the algorithm
-> > > > can be offloaded to the NIC.
-> > > > 
-> > > > Signed-off-by: Shihong Wang <shihong.wang@corigine.com>
-> > > > Acked-by: Simon Horman <simon.horman@corigine.com>
-> > > > Signed-off-by: Louis Peens <louis.peens@corigine.com>
-> > > > ---
-> > > >  include/uapi/linux/pfkeyv2.h | 1 +
-> > > >  net/xfrm/xfrm_algo.c         | 9 ++++++++-
-> > > >  2 files changed, 9 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/include/uapi/linux/pfkeyv2.h b/include/uapi/linux/pfkeyv2.h
-> > > > index 8abae1f6749c..d0ab530e1069 100644
-> > > > --- a/include/uapi/linux/pfkeyv2.h
-> > > > +++ b/include/uapi/linux/pfkeyv2.h
-> > > > @@ -331,6 +331,7 @@ struct sadb_x_filter {
-> > > >  #define SADB_X_EALG_CAMELLIACBC		22
-> > > >  #define SADB_X_EALG_NULL_AES_GMAC	23
-> > > >  #define SADB_X_EALG_SM4CBC		24
-> > > > +#define SADB_X_EALG_CHACHA20_POLY1305	25
-> > > 
-> > > Please don't add new stuff to pfkey, use netlink instead. This interface
-> > > is deprecated and will go away someday
-> > 
-> > Steffen, I have general questions.
-> > >From where did all these SADB_X_EALG_* values come?
-> > And there are they used?
-> 
-> The pfkey interface was used by the old ipsec tools:
-> https://ipsec-tools.sourceforge.net/
-> 
-> The development of ipsec-tools has been abandoned
-> in 2014, as you can see at the webpage.
+Just a leftover from the last development cycle:
 
-Thanks
+1) delete a clear to zero of encap_oa, it is not needed anymore.
+   From Leon Romanovsky.
+
+Please pull or let me know if there are problems.
+
+Thanks!
+
+The following changes since commit b2cbac9b9b28730e9e53be20b6cdf979d3b9f27e:
+
+  net: Remove low_thresh in ip defrag (2023-05-15 08:42:07 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git tags/ipsec-next-2023-07-19
+
+for you to fetch changes up to a94fd40a18ae76ba76dbaa8eca0e3c46aa1142c1:
+
+  xfrm: delete not-needed clear to zero of encap_oa (2023-06-09 09:19:11 +0200)
+
+----------------------------------------------------------------
+ipsec-next-2023-07-19
+
+----------------------------------------------------------------
+Leon Romanovsky (1):
+      xfrm: delete not-needed clear to zero of encap_oa
+
+ net/key/af_key.c | 1 -
+ 1 file changed, 1 deletion(-)
 
