@@ -1,116 +1,164 @@
-Return-Path: <netdev+bounces-18873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4207C758EF5
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:27:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9DAC758E37
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 08:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72A931C208B8
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 07:27:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CADD21C20756
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 06:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA9CC2DE;
-	Wed, 19 Jul 2023 07:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25BEAD21;
+	Wed, 19 Jul 2023 06:58:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E1FC2D5
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 07:24:40 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC431BF0
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 00:24:39 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qM1Xy-0002qy-Uc; Wed, 19 Jul 2023 09:24:31 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 78B531F4B8B;
-	Wed, 19 Jul 2023 06:53:05 +0000 (UTC)
-Date: Wed, 19 Jul 2023 08:53:04 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
-	kernel@pengutronix.de, Jimmy Assarsson <extja@kvaser.com>,
-	Martin Jocic <majoc@kvaser.com>
-Subject: Re: [PATCH net-next 7/8] can: kvaser_pciefd: Move hardware specific
- constants and functions into a driver_data struct
-Message-ID: <20230719-purge-obtrusive-997e0ac2d998-mkl@pengutronix.de>
-References: <20230717182229.250565-1-mkl@pengutronix.de>
- <20230717182229.250565-8-mkl@pengutronix.de>
- <20230718183315.27c0cd27@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C7D3D8B
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:58:21 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95CA91B9
+	for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:58:18 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9928abc11deso893195366b.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jul 2023 23:58:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689749897; x=1692341897;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HiQ1ya2Vx/jvZEdWpDejEV/ueqVWa0CUVCzYMuLpt3A=;
+        b=ih2pfbdbHahkCjOs6AGDGXaKH2QHQeoM4569JR82H8ay75NwvkFSKO9x0g/lW87nVN
+         Zw3o2JHEeBXn5eKaFj7J3wKwfefJBXWIQ9WS1GD8CjF69diQkyx8UbMvSGzI4XHbAJT6
+         oJuZxxyxlCivu7gJ66knmDOeZ5blHGfX4mZA+r0I506ypPh4XzqqKDaygLwuoADFaGzo
+         mJKWNB3xNxVgISqvzYONh+l0JMSj7zlY2pSPdNIxPZebTcy/KWq7m1Inl1P+SeWvDzV9
+         cZmTvSWbq+T+5I6TsybJd3rCrUhe6JQnGLfv/iW5FspFfpypr5HMxYhxv/c4aSJNckve
+         v9QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689749897; x=1692341897;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HiQ1ya2Vx/jvZEdWpDejEV/ueqVWa0CUVCzYMuLpt3A=;
+        b=gV6EntG/OtIY33cSd+rUIYhXAj7QUseQedWSBaX4HflYdgfD+/bkOR2C8Vk970wRr3
+         VKwSGMVwoSSboMK/OvH+8VUXgmOvrDuGTuEI18eZWPkXrM8y60+vFuExWZjM1/Z6/Rq0
+         0WncGXP+4G3dHFiSQ1b9+bveAiQ6rQeyo2iURK+tOWmJ7/tpG3bWZOmpLTeu77UbLquc
+         yOvOSlrzngIrlolnVFVZjuUzwHIHDGjDLYWkcuALxtfKnby4K8IzPVL3nUVsFz8n2F3k
+         wFyZJ3FFplk+f6dERzvuwLLmg7qvMzrGCQebX9oKfSlqDt4JsO9Y6qSI+Dq9f4wJEGw2
+         1N9w==
+X-Gm-Message-State: ABy/qLYuZAOp7xuOK9IZ3oc6oP2XHHVa0fmLqSUxpdKQZL5FwOXOiGmX
+	BjLoMk6hZP3S5/warViOltWa3g==
+X-Google-Smtp-Source: APBJJlE5ZgBavnvlZCV3/u4bBdrjFGWaL2d7i/P3Md+EUmM54ETrgEpbPWbD7g1htS6tzyI3vE71KA==
+X-Received: by 2002:a17:906:739b:b0:993:ffcb:ad55 with SMTP id f27-20020a170906739b00b00993ffcbad55mr1645449ejl.9.1689749896922;
+        Tue, 18 Jul 2023 23:58:16 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id bn14-20020a170906c0ce00b009925cbafeaasm1909898ejb.100.2023.07.18.23.58.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jul 2023 23:58:16 -0700 (PDT)
+Message-ID: <2a4bca2f-15e5-1705-b6d2-8c250bf470ea@linaro.org>
+Date: Wed, 19 Jul 2023 08:58:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="znjxi2cp3uovi2gj"
-Content-Disposition: inline
-In-Reply-To: <20230718183315.27c0cd27@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next v3 2/9] dt-bindings: net: mediatek,net: add
+ mt7988-eth binding
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+ Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, Greg Ungerer <gerg@kernel.org>,
+ =?UTF-8?Q?Bj=c3=b8rn_Mork?= <bjorn@mork.no>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <cover.1689714290.git.daniel@makrotopia.org>
+ <584b459ebb0a74a2ce6ca661f1148f59b9014667.1689714291.git.daniel@makrotopia.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <584b459ebb0a74a2ce6ca661f1148f59b9014667.1689714291.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 18/07/2023 23:30, Daniel Golle wrote:
+> Introduce DT bindings for the MT7988 SoC to mediatek,net.yaml.
+> The MT7988 SoC got 3 Ethernet MACs operating at a maximum of
+> 10 Gigabit/sec supported by 2 packet processor engines for
+> offloading tasks.
+> The first MAC is hard-wired to a built-in switch which exposes
+> four 1000Base-T PHYs as user ports.
+> It also comes with built-in 2500Base-T PHY which can be used
+> with the 2nd GMAC.
+> The 2nd and 3rd GMAC can be connected to external PHYs or provide
+> SFP(+) cages attached via SGMII, 1000Base-X, 2500Base-X, USXGMII,
+> 5GBase-KR or 10GBase-KR.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../devicetree/bindings/net/mediatek,net.yaml | 74 +++++++++++++++++--
+>  1 file changed, 69 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> index 38aa3d97ee234..ae2062f3c1833 100644
+> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> @@ -24,6 +24,7 @@ properties:
+>        - mediatek,mt7629-eth
+>        - mediatek,mt7981-eth
+>        - mediatek,mt7986-eth
+> +      - mediatek,mt7988-eth
+>        - ralink,rt5350-eth
+>  
+>    reg:
+> @@ -61,6 +62,12 @@ properties:
+>        Phandle to the mediatek hifsys controller used to provide various clocks
+>        and reset to the system.
+>  
+> +  mediatek,infracfg:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Phandle to the syscon node that handles the path from GMAC to
+> +      PHY variants.
+> +
+>    mediatek,sgmiisys:
+>      $ref: /schemas/types.yaml#/definitions/phandle-array
+>      minItems: 1
+> @@ -229,11 +236,7 @@ allOf:
+>              - const: sgmii_ck
+>              - const: eth2pll
+>  
+> -        mediatek,infracfg:
+> -          $ref: /schemas/types.yaml#/definitions/phandle
+> -          description:
+> -            Phandle to the syscon node that handles the path from GMAC to
+> -            PHY variants.
+> +        mediatek,infracfg: true
 
---znjxi2cp3uovi2gj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Did it mean that it was defined only here? Then this "true" is not
+really needed.
 
-On 18.07.2023 18:33:15, Jakub Kicinski wrote:
-> On Mon, 17 Jul 2023 20:22:28 +0200 Marc Kleine-Budde wrote:
-> > +const struct kvaser_pciefd_address_offset kvaser_pciefd_altera_address=
-_offset =3D {
->=20
-> > +const struct kvaser_pciefd_irq_mask kvaser_pciefd_altera_irq_mask =3D {
->=20
-> > +const struct kvaser_pciefd_dev_ops kvaser_pciefd_altera_dev_ops =3D {
->=20
-> > +const struct kvaser_pciefd_driver_data kvaser_pciefd_altera_driver_dat=
-a =3D {
->=20
-> sparse points out the structs in this and subsequent patch should
-> be static. Would you be able to queue a quick fix on top and resend,
-> or should we pull as is?
+You should however disallow it ("false") in other variants).
 
-Sorry, I'll post an updated pull request.
 
-Marc
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Best regards,
+Krzysztof
 
---znjxi2cp3uovi2gj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS3iE4ACgkQvlAcSiqK
-BOgNnQgAkJ9B8RHY+hLzgnfPbVr0Em9zuVDJdh1qvs0vS0eiic5x+J3rfvIP83do
-rSHw1h2uP0GRzUVCq1c6jPLyJRZif41Cn8vBb5zy10ZcpSRimCJ31tsns/fupEkx
-HHeaDP6r2oKBSdVWzFSqCrGrfbDVMht5RN3RFOsMTLlpuYa3jYN7kKvhqrirluCi
-V6pUyQjSuBbSCF8E/58aLY9W8vNev47GAglnFwAReK/F/RfCYYTvf5gtw7gn8ehd
-uEAagpv9BBqmJBcFx435H5cdAvW4jk2S446QyhIetDB/ovF7HJx8PNEBYubQmnWN
-4Xsh37ooQD8h9YHgi1El0FC1eHrE6w==
-=N+Sh
------END PGP SIGNATURE-----
-
---znjxi2cp3uovi2gj--
 
