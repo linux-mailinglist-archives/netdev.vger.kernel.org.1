@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-18919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-18920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB9F6759143
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:11:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2237B759155
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 11:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 780CD2816AF
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:11:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41B52816A3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 09:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D4F11192;
-	Wed, 19 Jul 2023 09:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B067011198;
+	Wed, 19 Jul 2023 09:14:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6662111190
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:11:36 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5531019B1;
-	Wed, 19 Jul 2023 02:11:28 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CB0A0FF818;
-	Wed, 19 Jul 2023 09:11:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1689757886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f84nkPfrwMn/3eLaRQd5GjJzAg3jngCL9dYTvmRIvUM=;
-	b=SU0jjGdxGPP52Yam69nVPKd4b+CELuc8c4p3sBoKg8RwSfP/glbAzBoHYe6/mTdIXBnt1B
-	4VJ1m0r0N9jbxhj8yaLA9jD20i/VuimYyWfnCMjWC/zihQRDf30ZduDGPGqo2+vDvb1C4V
-	Yzj9URJhovfQN70377Ozg2DK/P5v2v3vLKoPbnNFn0tM0bP50qoBt8r+gRlMbhYCvMVTbW
-	WFW++2LtntTbpl1hX01ux2j/Rr/0MgF4YknQqOt33IAuAJfWbjzk+I5gXTHUFImtDzvsMi
-	7jYXmLAJ+qLOb9V+h4uX2HPVZu7krJSDT+PZ9nQ6Ou1qO2J8YVOggWJgc1B9Ew==
-Date: Wed, 19 Jul 2023 11:11:24 +0200
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Matt Johnston <matt@codeconstruct.com.au>,
-	linux-i3c@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, Jeremy Kerr <jk@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Subject: Re: [PATCH net-next v2 2/3] i3c: Add support for bus enumeration &
- notification
-Message-ID: <2023071909112418ec7fdc@mail.local>
-References: <20230717040638.1292536-1-matt@codeconstruct.com.au>
- <20230717040638.1292536-3-matt@codeconstruct.com.au>
- <20230718185757.54ae1e2e@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B3510961
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 09:14:08 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3854C19B4
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 02:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bej1uizILHHV76GP1k1h8jN6rm9Rqan2jN5WfXSgkNE=; b=1JmMzvwaMLcoQjfQHveoks605r
+	rVl4GWi8Og9GeDcdUaWSUnuk2lkac4nyqbuoOXbYmOmRfGRcn3PpLf9EyOiClpKz7Al2wruuxGwB+
+	hq3VIVkcb9ctJgT8vBeS3iKNfEJ6/SP0kp78rwT7zNKQy8GoAG0CySlH6ni5euKTLTyjoN3mi1upU
+	8LSbl3PfaD2+/VHyIAxnRqDJ3BGDbZGf6QnZxrMWH8C36iivrGs6jHYx64xTOJ6q9M7tVTBrz+KlB
+	NpdOLC6Ve59Wbp8aIBnDanlNRuiVqb2EKjnMchw5g8VluuOGnZergO28GPlrwCDUtqTbHk+weIWv8
+	iyeHJQdg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41906)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qM3Fs-0007Fl-2V;
+	Wed, 19 Jul 2023 10:13:56 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qM3Fs-0003xN-63; Wed, 19 Jul 2023 10:13:56 +0100
+Date: Wed, 19 Jul 2023 10:13:56 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: kabel@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] net: phy: marvell10g: fix 88x3310 power up
+Message-ID: <ZLepVNgW7muOF3mR@shell.armlinux.org.uk>
+References: <20230719092233.137844-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,44 +59,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230718185757.54ae1e2e@kernel.org>
-X-GND-Sasl: alexandre.belloni@bootlin.com
+In-Reply-To: <20230719092233.137844-1-jiawenwu@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 18/07/2023 18:57:57-0700, Jakub Kicinski wrote:
-> On Mon, 17 Jul 2023 12:06:37 +0800 Matt Johnston wrote:
-> > From: Jeremy Kerr <jk@codeconstruct.com.au>
-> > 
-> > This allows other drivers to be notified when new i3c busses are
-> > attached, referring to a whole i3c bus as opposed to individual
-> > devices.
-> > 
-> > Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> > Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
+On Wed, Jul 19, 2023 at 05:22:33PM +0800, Jiawen Wu wrote:
+> Clear MV_V2_PORT_CTRL_PWRDOWN bit to set power up for 88x3310 PHY,
+> it sometimes does not take effect immediately. And a read of this
+> register causes the bit not to clear. This will cause mv3310_reset()
+> to time out, which will fail the config initialization. So add a delay
+> before the next access.
 > 
-> We need one of:
->  - sign-off from Alexandre that he's okay with this code going via
->    netdev; or
->  - stable branch from Alexandre based on an upstream -rc tag which 
->    we can pull into net-next; or
->  - wait until 6.6 merge window for the change to propagate.
-> Until then we can't do much on our end, so I'll mark the patches as
-> deferred from netdev perspective.
+> Fixes: c9cc1c815d36 ("net: phy: marvell10g: place in powersave mode at probe")
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-I'm fine with the series going through netdev. Matt, please carry my ack
-on the next versions.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-> -- 
-> pw-bot: defer
+Thanks!
 
 -- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
