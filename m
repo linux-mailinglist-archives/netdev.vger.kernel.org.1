@@ -1,110 +1,138 @@
-Return-Path: <netdev+bounces-19024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B462759614
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:01:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A0175962C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CDA71C20F69
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:01:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFA78281868
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F4C14A9B;
-	Wed, 19 Jul 2023 13:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699ED14AB4;
+	Wed, 19 Jul 2023 13:05:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D9514A95
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:01:04 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127901711;
-	Wed, 19 Jul 2023 06:01:02 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qM6nT-00079S-1s; Wed, 19 Jul 2023 15:00:51 +0200
-Message-ID: <6bcdeee4-5348-c08e-701e-47bc138be74f@leemhuis.info>
-Date: Wed, 19 Jul 2023 15:00:50 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B6414AAC
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:05:24 +0000 (UTC)
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16D21986;
+	Wed, 19 Jul 2023 06:05:20 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailout.nyi.internal (Postfix) with ESMTP id 1DBE45C0145;
+	Wed, 19 Jul 2023 09:05:20 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 19 Jul 2023 09:05:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1689771920; x=1689858320; bh=siYFJLdfTwI4H
+	sjetwx60OIcBExO9uyJZ22N85nYicM=; b=EyhLIFk3QZGbzPk9a/2CsQl+bWSkx
+	+rf5EUc8oHC0kqo0iPXtwSKCKWvopRnD27quu1ojrRkVJv1XSyKruCCxu3TSv+ht
+	7Z3ndflYqWdO44tQ980vujHnyzGeWRPUdpuf0t9ObDGPw6hFLCcggxfHD9RetcN4
+	f2WQXNEzdp271oELA8NQiRmaZwZoY++Uz+rx5Rgsd0mwG5A7UZSNFNgnYZIRHTQ5
+	Sz35NUnbdyD/RvEbWGVceo48O18exJU8GVBX1l6f7mtRA37P1cG13Ci/mn6KheRJ
+	051ysczjv8Ys4qqn1zXplhEqwXdcF0Wu9iVSOWeul1LeNkSHCn8sX1sYg==
+X-ME-Sender: <xms:j9-3ZNol6LZ1AYQFwnmQr-_3o5RzhuXTA1m3NG2JHEsFpvRyvlML_w>
+    <xme:j9-3ZPoVyKtWmj9PnPftQFg3T2WxqnqjJQNNVQiUnQYlF4BYeZiMwC2gSTnw_fKVN
+    C9KGd8WCVT2meU>
+X-ME-Received: <xmr:j9-3ZKNPyO1HwPVDGQ6fXhe6sbWu0Wsq04i0JwStWFfSOWKqCgcqMG8b9Gb-_UjIienSVo3Djq0CmxhVAuhx_5i4jUI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeekgdeggecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeffueevhffhuddvjeetfeeuudfgheegledvveehheeuueduvdehgedtteefheeg
+    feenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:j9-3ZI7G_T6zgOtN5gnwqWiNxm7BR64f7vD-vRtmxQ-96PIFABP9yQ>
+    <xmx:j9-3ZM7inD1TaP-hmWsrEe4mopWmlTLXuiDgzTswPWe9q5HblZf0fA>
+    <xmx:j9-3ZAhCYGqYDtQejFEUaftUnw7Ncx8MJGredtEjSe92CATxeffnRw>
+    <xmx:kN-3ZNGmaU8pcdpgjOlvZB83Baf1W4j3hZTcSPXdZfifgfmhtbSdfQ>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 19 Jul 2023 09:05:18 -0400 (EDT)
+Date: Wed, 19 Jul 2023 16:05:16 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PROBLEM] selftests: net/forwarding/bridge_mdb.sh: 'Command
+ "replace" is unknown, try "bridge mdb help"'
+Message-ID: <ZLffjNMaJZiGJytj@shredder>
+References: <6b04b2ba-2372-6f6b-3ac8-b7cba1cfae83@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: Fwd: Unexplainable packet drop starting at v6.4
-Content-Language: en-US, de-DE
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Andrzej Kacprowski <andrzej.kacprowski@linux.intel.com>,
- Krystian Pradzynski <krystian.pradzynski@linux.intel.com>,
- Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
- Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
- Oded Gabbay <ogabbay@kernel.org>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- hq.dev+kernel@msdfc.xyz
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux DRI Development <dri-devel@lists.freedesktop.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Intel Ethernet Drivers <intel-wired-lan@lists.osuosl.org>
-References: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
- <444d8158-cc58-761d-a878-91e5d4d28b71@leemhuis.info>
- <4759e7d4-5a8c-8acb-1775-e049b9b06cc1@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <4759e7d4-5a8c-8acb-1775-e049b9b06cc1@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1689771663;6c1522dc;
-X-HE-SMSGID: 1qM6nT-00079S-1s
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6b04b2ba-2372-6f6b-3ac8-b7cba1cfae83@alu.unizg.hr>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 19.07.23 14:30, Bagas Sanjaya wrote:
-> On 7/19/23 18:49, Thorsten Leemhuis wrote:
->> On 18.07.23 02:51, Bagas Sanjaya wrote:
->>> I notice a regression report on Bugzilla [1]. Quoting from it:
->>>
->>>> After I updated to 6.4 through Archlinux kernel update, suddenly I noticed random packet losses on my routers like nodes. I have these networking relevant config on my nodes
->>>>
->>>> 1. Using archlinux
->>>> 2. Network config through systemd-networkd
->>>> 3. Using bird2 for BGP routing, but not relevant to this bug.
->>>> 4. Using nftables for traffic control, but seems not relevant to this bug. 
->>>> 5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 level
->>>>
->>>> After I ruled out systemd-networkd, nftables related issues. I tracked down issues to kernel.
->>> [...]
->>> See Bugzilla for the full thread.
->>>
->>> Thorsten: The reporter had a bad bisect (some bad commits were marked as good
->>> instead), hence SoB chain for culprit (unrelated) ipvu commit is in To:
->>> list. I also asked the reporter (also in To:) to provide dmesg and request
->>> rerunning bisection, but he doesn't currently have a reliable reproducer.
->>> Is it the best I can do?
->>
->> When a bisection apparently went sideways it's best to not bother the
->> culprit's developers with it, they most likely will just be annoyed by
->> it (and then they might become annoyed by regression tracking, which we
->> need to avoid).
->
-> I mean don't Cc: the culprit author in that case?
+On Tue, Jul 18, 2023 at 09:02:31PM +0200, Mirsad Todorovac wrote:
+> Command "replace" is unknown, try "bridge mdb help".
 
-Yes. If a bisection lands on a commit that seems like a pretty unlikely
-culprit for the problem at hand (which even the reporter admitted in the
-report), then ask the reporter to verify the result (e.g. ideally by
-trying to revert it ontop of latest mainline; checking the parent commit
-again sometimes can do the trick as well)  before involving the people
-that authored and handled said change. Otherwise you just raise a false
-alarm and then people will be annoyed by our work or if we are unlucky
-start to ignore us -- and we need to prevent that.
+You are running the test with an old iproute2 that doesn't support the
+replace command. The following patches [1][2] skip the tests in this
+case. However, you will get better test coverage with iproute2-next [3]
+compared to the version shipped with your distribution.
 
-Ciao, Thorsten
+[1]
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+index ae3f9462a2b6..a1bd4900acb6 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+@@ -1206,6 +1206,12 @@ ctrl_test()
+        ctrl_mldv2_is_in_test
+ }
+ 
++bridge mdb help 2>&1 | grep -q "replace"
++if [ $? -ne 0 ]; then
++       echo "SKIP: iproute2 too old, missing bridge mdb replace support"
++       exit $ksft_skip
++fi
++
+ trap cleanup EXIT
+ 
+ setup_prepare
+
+[2]
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh b/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh
+index ae255b662ba3..a1c4aec4cbb1 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh
+@@ -1328,6 +1328,12 @@ test_8021qvs()
+        switch_destroy
+ }
+ 
++bridge link help 2>&1 | grep -q "mcast_max_groups"
++if [ $? -ne 0 ]; then
++       echo "SKIP: iproute2 too old, missing bridge \"mcast_max_groups\" support"
++       exit $ksft_skip
++fi
++
+ trap cleanup EXIT
+ 
+ setup_prepare
+
+[3] https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
 
