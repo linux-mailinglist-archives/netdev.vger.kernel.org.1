@@ -1,160 +1,161 @@
-Return-Path: <netdev+bounces-19164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7B4759DF0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:54:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81246759DF6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 20:55:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E739A1C20756
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AE0028199D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 18:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28B2275CD;
-	Wed, 19 Jul 2023 18:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91816275D0;
+	Wed, 19 Jul 2023 18:55:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DA5275A1
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:54:50 +0000 (UTC)
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ACC171E
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 11:54:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689792889; x=1721328889;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HphxHhLbP1g/vaPeilVVEQW2DgF2V7kO44YGZerFfHc=;
-  b=PSH7nLOMeATNF6DFlOT9s/1Q+qqAM7cMImgvnc6fz+fwsCROTjKevezW
-   JyRixkuYagSZi/32Nd0aWKd0RU4ywSq/yW28G+Yt7snG8GNKjFaBENc2F
-   AKsfpiSH3zPReh3OxKzzvYoKDYcAYZ0YHBC6HpWYd64MOlojwqQ00MuqZ
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.01,216,1684800000"; 
-   d="scan'208";a="1143927797"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:54:35 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com (Postfix) with ESMTPS id 98273A0E65;
-	Wed, 19 Jul 2023 18:54:31 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 18:54:30 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 18:54:27 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kees Cook
-	<keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	"Breno Leitao" <leitao@debian.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	"Kuniyuki Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>, syzkaller
-	<syzkaller@googlegroups.com>
-Subject: [PATCH v1 net 2/2] af_packet: Fix warning of fortified memcpy() in packet_getname().
-Date: Wed, 19 Jul 2023 11:53:22 -0700
-Message-ID: <20230719185322.44255-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230719185322.44255-1-kuniyu@amazon.com>
-References: <20230719185322.44255-1-kuniyu@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8654A275B5
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 18:55:38 +0000 (UTC)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0E710CC;
+	Wed, 19 Jul 2023 11:55:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689792935; x=1721328935;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VgOUC4K9fx66jXJxsabJ6cjLbIddps+gucTz9RAEk7M=;
+  b=SkEbiWXYO5ZZQnGI6LJ4KL+gMJ84u5JXU7a5j7KWhLACPY7pEmkeHK5e
+   BBm2lll6i0SZGtBoOA/jslbYZQmllDhx/P11Vi9znqR2Y3ExEx312kEJL
+   r56mtr9dx5lxl/ClC4lpTET7stD6+tJB9GccIKRjsYjeJCVsc2jEd4tjl
+   pyRlqEGwuDL4mW2fyxBUiScyEzrfKNjdS1AClYaTBy34qUtcOZKnXc9g6
+   mD6wTMzv4nIhwxzOE9QndvoRLM0R4rUndKu72bOB1twwVYBhp6Zcz9qL1
+   0xQNIr0SrhVu+ZF1jykzYJtvLWkhCDsQFAANOSPTkh/1eMlXaAGz/GU/6
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="366586882"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="366586882"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 11:55:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="848148918"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="848148918"
+Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 19 Jul 2023 11:55:29 -0700
+Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qMCKf-0005OE-0T;
+	Wed, 19 Jul 2023 18:55:29 +0000
+Date: Thu, 20 Jul 2023 02:54:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Johannes Zink <j.zink@pengutronix.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	patchwork-jzi@pengutronix.de,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Johannes Zink <j.zink@pengutronix.de>
+Subject: Re: [PATCH] net: stmmac: correct MAC propagation delay
+Message-ID: <202307200225.B8rmKQPN-lkp@intel.com>
+References: <20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.39]
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzkaller found a warning in packet_getname() [0], where we try to
-copy 16 bytes to sockaddr_ll.sll_addr[8].
+Hi Johannes,
 
-Some devices (ip6gre, vti6, ip6tnl) have 16 bytes address expressed
-by struct in6_addr.
+kernel test robot noticed the following build errors:
 
-The write seems to overflow, but actually not since we use struct
-sockaddr_storage defined in __sys_getsockname().
+[auto build test ERROR on 36395b2efe905650cd179d67411ffee3b770268b]
 
-To avoid the warning, we need to let __fortify_memcpy_chk() know the
-actual buffer size.
+url:    https://github.com/intel-lab-lkp/linux/commits/Johannes-Zink/net-stmmac-correct-MAC-propagation-delay/20230719-221258
+base:   36395b2efe905650cd179d67411ffee3b770268b
+patch link:    https://lore.kernel.org/r/20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334%40pengutronix.de
+patch subject: [PATCH] net: stmmac: correct MAC propagation delay
+config: i386-randconfig-i002-20230720 (https://download.01.org/0day-ci/archive/20230720/202307200225.B8rmKQPN-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230720/202307200225.B8rmKQPN-lkp@intel.com/reproduce)
 
-Another option would be to use strncpy() and limit the copied length
-to sizeof(sll_addr), but it will return the partial address and might
-break an application that passes sockaddr_storage to getsockname().
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307200225.B8rmKQPN-lkp@intel.com/
 
-[0]:
-memcpy: detected field-spanning write (size 16) of single field "sll->sll_addr" at net/packet/af_packet.c:3604 (size 8)
-WARNING: CPU: 0 PID: 255 at net/packet/af_packet.c:3604 packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
-Modules linked in:
-CPU: 0 PID: 255 Comm: syz-executor750 Not tainted 6.5.0-rc1-00330-g60cc1f7d0605 #4
-Hardware name: linux,dummy-virt (DT)
-pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
-lr : packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
-sp : ffff800089887bc0
-x29: ffff800089887bc0 x28: ffff000010f80f80 x27: 0000000000000003
-x26: dfff800000000000 x25: ffff700011310f80 x24: ffff800087d55000
-x23: dfff800000000000 x22: ffff800089887c2c x21: 0000000000000010
-x20: ffff00000de08310 x19: ffff800089887c20 x18: ffff800086ab1630
-x17: 20646c6569662065 x16: 6c676e697320666f x15: 0000000000000001
-x14: 1fffe0000d56d7ca x13: 0000000000000000 x12: 0000000000000000
-x11: 0000000000000000 x10: 0000000000000000 x9 : 3e60944c3da92b00
-x8 : 3e60944c3da92b00 x7 : 0000000000000001 x6 : 0000000000000001
-x5 : ffff8000898874f8 x4 : ffff800086ac99e0 x3 : ffff8000803f8808
-x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000000
-Call trace:
- packet_getname+0x25c/0x3a0 net/packet/af_packet.c:3604
- __sys_getsockname+0x168/0x24c net/socket.c:2042
- __do_sys_getsockname net/socket.c:2057 [inline]
- __se_sys_getsockname net/socket.c:2054 [inline]
- __arm64_sys_getsockname+0x7c/0x94 net/socket.c:2054
- __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
- invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
- el0_svc_common+0x134/0x240 arch/arm64/kernel/syscall.c:139
- do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:188
- el0_svc+0x2c/0x7c arch/arm64/kernel/entry-common.c:647
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
+All errors (new ones prefixed by >>):
 
-Fixes: df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/packet/af_packet.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+   ld: drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.o: in function `correct_latency':
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c:83: undefined reference to `__udivdi3'
 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 85ff90a03b0c..5eef94a32a4f 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -3601,7 +3601,10 @@ static int packet_getname(struct socket *sock, struct sockaddr *uaddr,
- 	if (dev) {
- 		sll->sll_hatype = dev->type;
- 		sll->sll_halen = dev->addr_len;
--		memcpy(sll->sll_addr, dev->dev_addr, dev->addr_len);
-+
-+		/* Let __fortify_memcpy_chk() know the actual buffer size. */
-+		memcpy(((struct sockaddr_storage *)sll)->__data +
-+		       offsetof(struct sockaddr_ll, sll_addr), dev->dev_addr, dev->addr_len);
- 	} else {
- 		sll->sll_hatype = 0;	/* Bad: we have no ARPHRD_UNSPEC */
- 		sll->sll_halen = 0;
+
+vim +83 drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
+
+    62	
+    63	static void correct_latency(struct stmmac_priv *priv)
+    64	{
+    65		void __iomem *ioaddr = priv->ptpaddr;
+    66		u32 reg_tsic, reg_tsicsns;
+    67		u32 reg_tsec, reg_tsecsns;
+    68		u64 scaled_ns;
+    69		u32 val;
+    70	
+    71		/* MAC-internal ingress latency */
+    72		scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
+    73	
+    74		/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
+    75		 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
+    76		 */
+    77		val = readl(ioaddr + PTP_TCR);
+    78		if (val & PTP_TCR_TSCTRLSSR)
+    79			/* nanoseconds field is in decimal format with granularity of 1ns/bit */
+    80			scaled_ns = (NSEC_PER_SEC << 16) - scaled_ns;
+    81		else
+    82			/* nanoseconds field is in binary format with granularity of ~0.466ns/bit */
+  > 83			scaled_ns = ((1ULL << 31) << 16) - scaled_ns * PSEC_PER_NSEC / 466;
+    84	
+    85		reg_tsic = scaled_ns >> 16;
+    86		reg_tsicsns = scaled_ns & 0xff00;
+    87	
+    88		/* set bit 31 for 2's compliment */
+    89		reg_tsic |= BIT(31);
+    90	
+    91		writel(reg_tsic, ioaddr + PTP_TS_INGR_CORR_NS);
+    92		writel(reg_tsicsns, ioaddr + PTP_TS_INGR_CORR_SNS);
+    93	
+    94		/* MAC-internal egress latency */
+    95		scaled_ns = readl(ioaddr + PTP_TS_EGR_LAT);
+    96	
+    97		reg_tsec = scaled_ns >> 16;
+    98		reg_tsecsns = scaled_ns & 0xff00;
+    99	
+   100		writel(reg_tsec, ioaddr + PTP_TS_EGR_CORR_NS);
+   101		writel(reg_tsecsns, ioaddr + PTP_TS_EGR_CORR_SNS);
+   102	}
+   103	
+
 -- 
-2.30.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
