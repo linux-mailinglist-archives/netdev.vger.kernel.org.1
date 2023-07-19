@@ -1,98 +1,166 @@
-Return-Path: <netdev+bounces-19025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E7075962B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 15:05:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20D28759612
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 14:59:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE1A51C20FDA
-	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 13:05:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F06161C20F7C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jul 2023 12:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473F814AA3;
-	Wed, 19 Jul 2023 13:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989BF14A98;
+	Wed, 19 Jul 2023 12:59:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3781814A95
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 13:05:24 +0000 (UTC)
-X-Greylist: delayed 400 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 Jul 2023 06:05:19 PDT
-Received: from mail.kernel-space.org (unknown [IPv6:2a01:4f8:c2c:5a84::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC11E1711
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 06:05:19 -0700 (PDT)
-Received: from ziongate (localhost [127.0.0.1])
-	by ziongate (OpenSMTPD) with ESMTP id 52d853d3;
-	Wed, 19 Jul 2023 12:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=simple; d=kernel-space.org; h=
-	message-id:date:mime-version:to:from:subject:cc:content-type
-	:content-transfer-encoding; s=default; bh=g65oZ3V85PpPnPP1ajr+Vn
-	kX6Jo=; b=kNxfhuYECfAsoflX3bUAgFWRWVnEfcQyFZI+UzUDu4qeoio16q/BN/
-	SRFvMc3TsQrG+s0Gbf7KXOxtMcCU5y1xfniturc32F7jaC0b/YBrpUBryTfI6lbl
-	iaUIc1tAZ9fn5WTSqJrcYNfrs4iGBP6mcWmoxQ4pGQlMG6tM7f++g=
-DomainKey-Signature: a=rsa-sha1; c=simple; d=kernel-space.org; h=
-	message-id:date:mime-version:to:from:subject:cc:content-type
-	:content-transfer-encoding; q=dns; s=default; b=M/r2FqfdGE6K1du2
-	zOU0vYgiHG4PwJjq3W1U/vmlB2aqj5dUTMBEog6DLp6GBtslDlhNe6qNLv1S4T5e
-	GIjhiaWUSw6Ro4tPB33Xk2MUfnSAIq81NosUpSDgldBD0U0X+CH/sL0AitTSJUcp
-	9yKn199Qc0FmsJBOn+gQmNpQ5Ck=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel-space.org;
-	s=20190913; t=1689771517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d1GeZToQPtZ+ZrlIv8WzQTBfjEEslUayBxVsZqpaYlc=;
-	b=l7cRGpDPhzy7nw9zPFMcCaRLXsHjQ108UfGyl/fTxf6ETxNr0mMZi2HDFLM+LJCY8H9Yi/
-	YlehaXyXE8SgWjpCa2wviBs0iIdMvSh6La1EGKLUxxcKzNCpFJDSnu+/rN0KhbpQDWSOPe
-	sdQ02wCE7VqIdz6jQUIZDvf4Qsboq6Y=
-Received: from [192.168.0.2] (host-80-182-57-72.pool80182.interbusiness.it [80.182.57.72])
-	by ziongate (OpenSMTPD) with ESMTPSA id 86a64b19 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 19 Jul 2023 12:58:37 +0000 (UTC)
-Message-ID: <dfd93459-c007-ef05-9706-4eb1ee34cf63@kernel-space.org>
-Date: Wed, 19 Jul 2023 14:58:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6E314A95
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 12:59:30 +0000 (UTC)
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E79C113;
+	Wed, 19 Jul 2023 05:59:28 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 512D05C00AD;
+	Wed, 19 Jul 2023 08:59:25 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Wed, 19 Jul 2023 08:59:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1689771565; x=1689857965; bh=tTNyPZitoSE69
+	bfMeeZHw81SO7vH8/lOR1ecEDTdkuU=; b=ma/TCNemj65HAhn9cHs93Q6YY6arL
+	h8f+aLsoF91MhCiTtVlDNkNPUoWUD0TEPuDp0qO8fFBR15XNTRvHKODwi7iuNTDP
+	jUlEcrsfPQbzvI2dviMK3eRaeerSHJfBTyWg9gPLjT0KMXOQUOHsyRQwL6wqAo8L
+	1W+/6mBm4pKqL7epyZEIXt5J9tswjLqkNxsN+K+S9QjGlF4t7POkkV83P2j/K89y
+	WoGeD+GlveXaG3FACMLLMFRXVD1Q1WqpwG1xWWRBpvV1K7TlNZWRfB0UNmF5T2PI
+	M/k8Tf58fHEkwlEn80t1a5wZ6jR9j0Tcv5h77u9glQWfX/SruiOIWWepg==
+X-ME-Sender: <xms:LN63ZPx8QTKwCBbR6Vsam_9clItFGtG6_59BiFQHxxAQg9X7sBTsgA>
+    <xme:LN63ZHS7ckRWg4g3PJ6mkCD4snAeZJ20YjZFSRSop0OuHTzKjKDo9ReskwKINBk7M
+    8XTxOovqMt4OaE>
+X-ME-Received: <xmr:LN63ZJVglJfeLJHzPYTfExMbX2SPmSamT8Pfjp2_REF30VRzhXPSD96gK0D9GqLxiOwYzVZMU2RpJrmsvQk91m3l4Kk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrgeekgdegvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
+    hoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:LN63ZJhpMl0B24HzAzwYR1_LHEl4HDy5iydMQAZ_na3gEmdVy-0FJg>
+    <xmx:LN63ZBBKuV3MaWtCxXzqw3Ny5n7f7q6XwevW9YN06leud4-YW7N67Q>
+    <xmx:LN63ZCKFFQhBYhGUNwTU1f1gTTFiRAulMmv_js3iZoGIItn15Q4RhQ>
+    <xmx:Ld63ZFsglQSXT6V74-B81LCui_2UgJ-pwis7YBMqwebwbhoXrL-zcQ>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 19 Jul 2023 08:59:23 -0400 (EDT)
+Date: Wed, 19 Jul 2023 15:59:19 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	petrm@nvidia.com
+Subject: Re: [PROBLEM] selftests: net/forwarding/*.sh: 'Command line is not
+ complete. Try option "help"'
+Message-ID: <ZLfeJzFJ1HEeooZR@shredder>
+References: <856d454e-f83c-20cf-e166-6dc06cbc1543@alu.unizg.hr>
+ <ZLY9yiaVwCGy5H3R@shredder>
+ <8d149f8c-818e-d141-a0ce-a6bae606bc22@alu.unizg.hr>
+ <1c2a2d56-95a0-72f8-23a0-1e186e6443a2@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Betterbird/102.11.0
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Angelo Dureghello <angelo@kernel-space.org>
-Subject: dsa: mv88e6xxx rstp convergence test
-Cc: olteanv@gmail.com, vivien.didelot@gmail.com, andrew@lunn.ch
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c2a2d56-95a0-72f8-23a0-1e186e6443a2@alu.unizg.hr>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Dear all,
+On Tue, Jul 18, 2023 at 08:39:33PM +0200, Mirsad Todorovac wrote:
+> There is also a gotcha here: you do not delete all veths:
+> 
+> root@defiant:# ip link show
+> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+>     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+> 2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+>     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
+> root@defiant:# ./bridge_igmp.sh
 
-i am testing three switches connected together, the switches are
-linux-based using mv88e6xxx dsa driver on kernel 5.4.70. rstp is active 
-as a daemon at userspace level.
+[...]
 
+> root@defiant:# ip link show
+> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+>     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+> 2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+>     link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
+> 3: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>     link/ether b6:46:e6:4c:e4:00 brd ff:ff:ff:ff:ff:ff
+> 4: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>     link/ether 2e:ff:7f:8a:6b:d4 brd ff:ff:ff:ff:ff:ff
+> 5: veth3@veth2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>     link/ether ba:33:37:81:dc:5b brd ff:ff:ff:ff:ff:ff
+> 6: veth2@veth3: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>     link/ether f2:fd:0a:9b:94:17 brd ff:ff:ff:ff:ff:ff
+> root@defiant:#
 
-    SW A  ---- Host
-    /    \
-SW B --- SW C
+These tests can be run with veth pairs or with loop backed physical
+ports. We can't delete the latter and I don't see a clean way to delete
+the veth pairs.
 
+The following patch [1] changes the default to not create interfaces so
+that by default these tests will be skipped [2]. Those who care about
+running the tests can create a forwarding.config file (using
+forwarding.config.sample as an example) and either create the veth pairs
+themselves or opt-in for the interfaces to be created automatically
+(setting NETIF_CREATE=yes), but not deleted.
 
-A host connected to A sends 1000 arp requests per secs
-to SW B, while i disconnect the root path, to test convergence.
+[1]
+diff --git a/tools/testing/selftests/net/forwarding/forwarding.config.sample b/tools/testing/selftests/net/forwarding/forwarding.config.sample
+index 4a546509de90..b72f08dfd491 100644
+--- a/tools/testing/selftests/net/forwarding/forwarding.config.sample
++++ b/tools/testing/selftests/net/forwarding/forwarding.config.sample
+@@ -36,8 +36,9 @@ PAUSE_ON_FAIL=no
+ PAUSE_ON_CLEANUP=no
+ # Type of network interface to create
+ NETIF_TYPE=veth
+-# Whether to create virtual interfaces (veth) or not
+-NETIF_CREATE=yes
++# Whether to create virtual interfaces (veth) or not. Created interfaces are
++# not automatically deleted
++NETIF_CREATE=no
+ # Timeout (in seconds) before ping exits regardless of how many packets have
+ # been sent or received
+ PING_TIMEOUT=5
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 9ddb68dd6a08..1b1bc634c63e 100755
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -17,7 +17,7 @@ WAIT_TIME=${WAIT_TIME:=5}
+ PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+ PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+ NETIF_TYPE=${NETIF_TYPE:=veth}
+-NETIF_CREATE=${NETIF_CREATE:=yes}
++NETIF_CREATE=${NETIF_CREATE:=no}
+ MCD=${MCD:=smcrouted}
+ MC_CLI=${MC_CLI:=smcroutectl}
+ PING_COUNT=${PING_COUNT:=10}
 
-Convergence happens sometimes < 50 msec, sometimes near 100.
-
-Do you think i can get a constant convergence time < 50 msec
-in some other way ?
-
-Thanks a lot,
-angelo
+[2]
+# ./bridge_igmp.sh 
+SKIP: could not find all required interfaces
 
