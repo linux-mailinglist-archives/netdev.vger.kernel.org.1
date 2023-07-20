@@ -1,115 +1,86 @@
-Return-Path: <netdev+bounces-19421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF6CD75A996
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:50:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDCB275A998
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32339281DB2
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A1D1281D86
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3579A380;
-	Thu, 20 Jul 2023 08:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE29361;
+	Thu, 20 Jul 2023 08:50:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A826F361
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 720F0C433C8;
-	Thu, 20 Jul 2023 08:50:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689843021;
-	bh=HiymFkzn2VlYD4erRYjbfat/dY8f93cmuvR+0otyWxs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ifUlMrsbt+YcgBYzM30q1vFPtQuhbtGKxS9M8FqfreP4wpGVEv66nhkhmZO136qNU
-	 P48X3xm1ksR1mRoJ85uWBgn6WGoBthjYVQFZEPsLXea143gc0OOhQvdXyYhNalofci
-	 4Vdk8n6fdVjrcGH+hNXgRTo97IuWQD/QoceW72zjNHO9Nbu2ms+bksvi3AiXtAKQxc
-	 cR6fVL5gIDmGDeH5W8DLfm5Idyw4GLlOsjM0VI3babvmpde1dXr+xGycBBwBeIiZDG
-	 6eCwrEwxyvmkr+8KcjGwIzCEy84CBEq3GRH5GcxFPBYTNd1S82ORM1EGFRUuKHZPzv
-	 F8WsUQ6ZTvEWQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A177E21EF6;
-	Thu, 20 Jul 2023 08:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26D5156D7
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:50:58 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1C22115
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 01:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689843056;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NZM4iXPMRlIzB3VEwUhKMAJFTkLOTWrNj+AuF3fihYY=;
+	b=QMsQIhO3X6s/KGN4sFPQnhXuvIlhxGlLNiME+d0MbMgo7ETFlcQpQy9KfSHZ1VoiJMf0P9
+	UZDYLRQPTaCa3Dqhjg+p/gMy/Mh7MrGBSojjCBjK2Ex9Ac1x8Khe+3sPRt+Hqi4Ls3OC6G
+	sj+KS93jYfXtkpiycQO2rUVdgIjY+vo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-489-62VV_1G9PPOsYu3rrhF2nw-1; Thu, 20 Jul 2023 04:50:50 -0400
+X-MC-Unique: 62VV_1G9PPOsYu3rrhF2nw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB2258F1842;
+	Thu, 20 Jul 2023 08:50:49 +0000 (UTC)
+Received: from griffin (unknown [10.45.226.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AE192166B25;
+	Thu, 20 Jul 2023 08:50:48 +0000 (UTC)
+Date: Thu, 20 Jul 2023 10:50:47 +0200
+From: Jiri Benc <jbenc@redhat.com>
+To: Eyal Birger <eyal.birger@gmail.com>
+Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: Re: [PATCH net] vxlan: calculate correct header length for GPE
+Message-ID: <20230720105047.18dcc5e2@griffin>
+In-Reply-To: <CAHsH6GvCEusX1Uuy7tk7Do-V0xDQRB+Q45UCpCjOeUV0=GFfzQ@mail.gmail.com>
+References: <0699747bc9bd7aaf7dc87efd33aa6b95de7d793e.1689677201.git.jbenc@redhat.com>
+	<CAHsH6GvCEusX1Uuy7tk7Do-V0xDQRB+Q45UCpCjOeUV0=GFfzQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net 0/4] net: Support STP on bridge in non-root netns.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168984302136.20786.4393470788080951518.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Jul 2023 08:50:21 +0000
-References: <20230718174152.57408-1-kuniyu@amazon.com>
-In-Reply-To: <20230718174152.57408-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, roopa@nvidia.com, razor@blackwall.org,
- ebiederm@xmission.com, hcoin@quietfountain.com, kuni1840@gmail.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 18 Jul 2023 10:41:48 -0700 you wrote:
-> Currently, STP does not work in non-root netns as llc_rcv() drops
-> packets from non-root netns.
+On Thu, 20 Jul 2023 11:43:05 +0300, Eyal Birger wrote:
+> From looking at the geneve code it appears geneve would also have this
+> problem when inner_proto_inherit=true as GENEVE_IPV4_HLEN includes
+> ETH_HLEN.
 > 
-> This series fixes it by making some protocol handlers netns-aware,
-> which are called from llc_rcv() as follows:
-> 
->   llc_rcv()
->   |
->   |- sap->rcv_func : registered by llc_sap_open()
->   |
->   |  * functions : regsitered by register_8022_client()
->   |    -> No in-kernel user call register_8022_client()
->   |
->   |  * snap_rcv()
->   |    |
->   |    `- proto->rcvfunc() : registered by register_snap_client()
->   |
->   |       * aarp_rcv()  : drop packets from non-root netns
->   |       * atalk_rcv() : drop packets from non-root netns
->   |
->   |  * stp_pdu_rcv()
->   |    |
->   |    `- garp_protos[]->rcv() : registered by stp_proto_register()
->   |
->   |       * garp_pdu_rcv() : netns-aware
->   |       * br_stp_rcv()   : netns-aware
->   |
->   |- llc_type_handlers[llc_pdu_type(skb) - 1]
->   |
->   |  * llc_sap_handler()  : NOT netns-aware (Patch 1)
->   |  * llc_conn_handler() : NOT netns-aware (Patch 2)
->   |
->   `- llc_station_handler
-> 
-> [...]
+> Would you consider adding a fix to it as part of a series?
 
-Here is the summary with links:
-  - [v2,net,1/4] llc: Check netns in llc_dgram_match().
-    https://git.kernel.org/netdev/net/c/9b64e93e83c2
-  - [v2,net,2/4] llc: Check netns in llc_estab_match() and llc_listener_match().
-    https://git.kernel.org/netdev/net/c/97b1d320f48c
-  - [v2,net,3/4] llc: Don't drop packet from non-root netns.
-    https://git.kernel.org/netdev/net/c/6631463b6e66
-  - [v2,net,4/4] Revert "bridge: Add extack warning when enabling STP in netns."
-    https://git.kernel.org/netdev/net/c/7ebd00a5a20c
+I can look into that. I wouldn't call it a series, though :-) Let's do
+both separately.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+ Jiri
 
 
