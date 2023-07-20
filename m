@@ -1,134 +1,96 @@
-Return-Path: <netdev+bounces-19558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FECC75B2ED
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:35:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A72B75B316
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:39:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C12711C214EE
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:35:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35F66281C9B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FC718C0D;
-	Thu, 20 Jul 2023 15:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB9CA18C0D;
+	Thu, 20 Jul 2023 15:39:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE61E1772A
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:35:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07C7EC433C9;
-	Thu, 20 Jul 2023 15:35:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689867321;
-	bh=OVcvzXqOdhx1DIqYZHcTWn4jGte6HtcZDHDvPjBMs+I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Io5qyGUefFPAyM2joBWD1y6bdQE/BITEHZxsQ0aWyQ/KaxgwoPq4rKJDF9AQQ3jFJ
-	 Kf1zKZdTS0zwdof4r6np2/i9eM//PWw3GLwex0gRVDR02eXFqwHuiO5ZaQwzmAv6LL
-	 QBVfYUu4NYYP1OFwE3/p0LJSDRW00yN0sAKIvIeVY/9EVBq0dll6mzIbF9lW3FPLbN
-	 EORWKBpfrucmKu63kpbBfk36lFYbIR1COUD9gl4pBw9VGk8WZpAASjWNINuZ2QPEgO
-	 RhjiNK+7HTeTqkWkFe+Xs2iwbtpkJsIadDETFYLnOLQBeGdLaNhP0Mwo1gMlT6YA+z
-	 Kt6YZi2ywJESw==
-Message-ID: <f3e69ba8-2a20-f2ac-d4a0-3165065a6707@kernel.org>
-Date: Thu, 20 Jul 2023 09:35:20 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03C918B11
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:39:13 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D092D51
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:39:12 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1qMVjn-0000me-3S; Thu, 20 Jul 2023 17:38:43 +0200
+Received: from mfe by ptx.hi.pengutronix.de with local (Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1qMVjj-0001sD-IF; Thu, 20 Jul 2023 17:38:39 +0200
+Date: Thu, 20 Jul 2023 17:38:39 +0200
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 2/2] net: stmmac: add support for phy-supply
+Message-ID: <20230720153839.klrukzea3o2dxif7@pengutronix.de>
+References: <20230718132049.3028341-1-m.felsch@pengutronix.de>
+ <20230718132049.3028341-2-m.felsch@pengutronix.de>
+ <20230719211235.1758bbc0@kernel.org>
+ <20230720064636.5l45ad64kwwgd2iw@pengutronix.de>
+ <20230720081945.5cf783f0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net] ipv6 addrconf: fix bug where deleting a mngtmpaddr
- can create a new temporary address
-Content-Language: en-US
-To: =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <maze@google.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Linux Network Development Mailing List <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>
-References: <20230712135520.743211-1-maze@google.com>
- <ca044aea-e9ee-788c-f06d-5f148382452d@kernel.org>
- <CANP3RGeR8oKQ=JfRWofb47zt9YF3FRqtemjg63C_Mn4i8R79Dg@mail.gmail.com>
- <7f295784-b833-479a-daf4-84e4f89ec694@kernel.org>
- <20230718160832.0caea152@kernel.org> <ZLeHEDdWYVkABUDE@nanopsycho>
- <CANP3RGdBM+8yZcCmgrw9LTGUbGNNRD0xAx+hLgQE64wxAyda4g@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CANP3RGdBM+8yZcCmgrw9LTGUbGNNRD0xAx+hLgQE64wxAyda4g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230720081945.5cf783f0@kernel.org>
+User-Agent: NeoMutt/20180716
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/19/23 6:50 AM, Maciej Żenczykowski wrote:
-> On Wed, Jul 19, 2023 at 8:47 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> Wed, Jul 19, 2023 at 01:08:32AM CEST, kuba@kernel.org wrote:
->>> On Fri, 14 Jul 2023 08:49:55 -0600 David Ahern wrote:
->>>>> I did consider that and I couldn't quite convince myself that simply
->>>>> removing "|| list_empty()" from the if statement is necessarily correct
->>>>> (thus I went with the more obviously correct change).
->>>>>
->>>>> Are you convinced dropping the || list_empty would work?
->>>>> I assume it's there for some reason...
->>>>
->>>> I am hoping Jiri can recall why that part was added since it has the
->>>> side effect of adding an address on a delete which should not happen.
->>>
->>> Did we get stuck here? Jiri are you around to answer?
->>
->> Most probably a bug. But, this is 10 years since the change, I don't
->> remember much after this period. I didn't touch the code since :/
+On 23-07-20, Jakub Kicinski wrote:
+> On Thu, 20 Jul 2023 08:46:36 +0200 Marco Felsch wrote:
+> > > Please fix and rebase because the current version does not apply to
+> > > net-next/main.  
+> > 
+> > Sure, I thought the changelog should be part of the commit message in
+> > net-dev therefore I included it.
 > 
-> I *think* there might be cases where we want
->   addrconf_prefix_rcv_add_addr() -> manage_tempaddrs(create=false)
-> to result in the creation of a new temporary address.
-> 
-> Basically the 'create' argument is a boolean with interpretation
-> "was managetmpaddr added/created" as opposed to "should a temporary
-> address be created"
-> 
-> Think:
-> - RA comes in, we create the managetmpaddr, we call
-> manage_tempaddrs(create=true), a temporary address gets created
-> - someone comes in and deletes the temporary address (perhaps by hand?
-> or it expires?)
-> - another RA comes in, we don't create the managetmpaddr, since it
-> already exists, we call manage_tempaddrs(create=false),
->   it notices there are no temporary addresses (by virtue of the ||
-> list_empty check), and creates a new one.
-> 
-> Note that:
->   #define TEMP_VALID_LIFETIME (7*86400)
->   #define TEMP_PREFERRED_LIFETIME (86400)
-> but these are tweakable...
->   $ cat /proc/sys/net/ipv6/conf/*/temp_valid_lft | uniq -c
->      37 604800
->   $ cat /proc/sys/net/ipv6/conf/*/temp_prefered_lft | uniq -c
->      37 86400
-> so we could have these be < unsolicited RA frequency.
-> (that's probably a bad idea for other reasons... but that's besides the point)
-> 
-> I have similar misgivings about  inet6_addr_modify() -> manage_tempaddrs()
-> 
-> if (was_managetempaddr || ifp->flags & IFA_F_MANAGETEMPADDR) {
-> if (was_managetempaddr &&
-> !(ifp->flags & IFA_F_MANAGETEMPADDR)) {
-> cfg->valid_lft = 0;
-> cfg->preferred_lft = 0;
-> }
-> manage_tempaddrs(ifp->idev, ifp, cfg->valid_lft,
-> cfg->preferred_lft, !was_managetempaddr,
-> jiffies);
-> }
-> 
-> Here create == !was_managetempaddr,
-> but technically we can have create == false, and yet valid/prefered != 0.
-> 
-> This will be the case if we have inet6_addr_modify() called where
-> *both* the before and after state is a managetempaddr.
-> Perhaps because the expiration was updated?
-> 
-> Anyway... because of the above I remain unconvinced that just removing
-> '|| list_empty' is safe...
+> Old rules, I think. Since started adding lore links to all patches you
+> can put the changelog in the cut-off section.
 
-ok, want to resend this patch?
+Make sense.
+
+> Adding a link to the previous revision there is highly encouraged,
+> too!
+
+Sure, I will check my tooling to use b4 for sending, so the links are
+provided autom.
+
+> There's a sample of the preferred format at:
+> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#changes-requested
+
+I will keep that in mind.
+
+Regards,
+  Marco
 
