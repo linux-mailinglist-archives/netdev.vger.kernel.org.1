@@ -1,179 +1,145 @@
-Return-Path: <netdev+bounces-19310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3369E75A3C1
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 03:06:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F2875A3DD
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 03:23:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E14DD281BDF
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:06:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF4311C211A2
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C686C631;
-	Thu, 20 Jul 2023 01:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4B063E;
+	Thu, 20 Jul 2023 01:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEC7649
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 01:05:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41FF8C433CC;
-	Thu, 20 Jul 2023 01:05:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689815108;
-	bh=x/yJhFsPFpsrDwo1jqo8zIXIUG/Fl3+vZWxUrwy2ewQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZyZkm9X7DLtQWLpq5ZbmBZWqxcSsKkl5UiKTytsa51IpHdrnilQ/mFzhq/Q+HTA1F
-	 TfAKQi4pTotPXayfgV5KnwvalDBXF4oIX6U66+0VmsRycd8iGwGVMPs9K/ixuza4Zl
-	 L/3NUtyrZO7v27Zau++tgCHTrrF6TH38EL8k/OG3uot9U6CJHKLejuNgvr0Pg/CuQm
-	 uWQ3MLKKgc+ey4iGo6gCk1ne/gV1d3D2sh6ikoPYhgJpbnGs24jySaNFwKVD83Bv6S
-	 SsWRZZOZXP7ev0ds1qU67WbMyEbvSM1ImLXOirab3aZPjmGuSBfC6Iqb90Hh247lSD
-	 i4+8goiWnr9nA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	michael.chan@broadcom.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 3/3] eth: bnxt: handle invalid Tx completions more gracefully
-Date: Wed, 19 Jul 2023 18:04:40 -0700
-Message-ID: <20230720010440.1967136-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230720010440.1967136-1-kuba@kernel.org>
-References: <20230720010440.1967136-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED4A631
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 01:23:37 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A752101;
+	Wed, 19 Jul 2023 18:23:36 -0700 (PDT)
+Received: from kwepemm600013.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4R5vyn1WCBzLnrV;
+	Thu, 20 Jul 2023 09:21:05 +0800 (CST)
+Received: from [10.174.178.46] (10.174.178.46) by
+ kwepemm600013.china.huawei.com (7.193.23.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 20 Jul 2023 09:23:31 +0800
+Subject: Re: [RFC PATCH 05/21] ubifs: Pass worst-case buffer size to
+ compression routines
+To: Ard Biesheuvel <ardb@kernel.org>
+CC: Eric Biggers <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, Kees Cook <keescook@chromium.org>,
+	Haren Myneni <haren@us.ibm.com>, Nick Terrell <terrelln@fb.com>, Minchan Kim
+	<minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, Jens
+ Axboe <axboe@kernel.dk>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Richard Weinberger <richard@nod.at>, David Ahern <dsahern@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Steffen Klassert <steffen.klassert@secunet.com>,
+	<linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<qat-linux@intel.com>, <linuxppc-dev@lists.ozlabs.org>,
+	<linux-mtd@lists.infradead.org>, <netdev@vger.kernel.org>
+References: <20230718125847.3869700-1-ardb@kernel.org>
+ <20230718125847.3869700-6-ardb@kernel.org>
+ <20230718223813.GC1005@sol.localdomain>
+ <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
+ <3330004f-acac-81b4-e382-a17221a0a128@huawei.com>
+ <CAMj1kXGq=WiJXsQG6R0jEFYu_Mdom_KY+DE=NGqVSF6QmqhKeA@mail.gmail.com>
+From: Zhihao Cheng <chengzhihao1@huawei.com>
+Message-ID: <4fc9930e-152b-1de1-9532-d1eefa6c277c@huawei.com>
+Date: Thu, 20 Jul 2023 09:23:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAMj1kXGq=WiJXsQG6R0jEFYu_Mdom_KY+DE=NGqVSF6QmqhKeA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.178.46]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600013.china.huawei.com (7.193.23.68)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Invalid Tx completions should never happen (tm) but when they do
-they crash the host, because driver blindly trusts that there is
-a valid skb pointer on the ring.
+在 2023/7/19 22:38, Ard Biesheuvel 写道:
+> On Wed, 19 Jul 2023 at 16:23, Zhihao Cheng <chengzhihao1@huawei.com> wrote:
+>>
+>> 在 2023/7/19 16:33, Ard Biesheuvel 写道:
+>>> On Wed, 19 Jul 2023 at 00:38, Eric Biggers <ebiggers@kernel.org> wrote:
+>>>>
+>>>> On Tue, Jul 18, 2023 at 02:58:31PM +0200, Ard Biesheuvel wrote:
+>>>>> Currently, the ubifs code allocates a worst case buffer size to
+>>>>> recompress a data node, but does not pass the size of that buffer to the
+>>>>> compression code. This means that the compression code will never use
+>>
+>> I think you mean the 'out_len' which describes the lengh of 'buf' is
+>> passed into ubifs_decompress, which effects the result of
+>> decompressor(eg. lz4 uses length to calculate the buffer end pos).
+>> So, we should pass the real lenghth of 'buf'.
+>>
+> 
+> Yes, that is what I meant.
+> 
+> But Eric makes a good point, and looking a bit more closely, there is
+> really no need for the multiplication here: we know the size of the
+> decompressed data, so we don't need the additional space.
+> 
 
-The completions I've seen appear to be some form of FW / HW
-miscalculation or staleness, they have typical (small) values
-(<100), but they are most often higher than number of queued
-descriptors. They usually happen after boot.
+Right, we get 'out_len' from 'dn->size' which is the length of 
+uncompressed data. ubifs_compress makes sure the compressed length is 
+smaller than original length.
 
-Instead of crashing, print a warning and schedule a reset.
+> I intend to drop this patch, and replace it with the following:
+> 
+> ----------------8<--------------
+> 
+> Currently, when truncating a data node, a decompression buffer is
+> allocated that is twice the size of the data node's uncompressed size.
+> However, the fact that this space is available is not communicated to
+> the compression routines, as out_len itself is not updated.
+> 
+> The additional space is not needed even in the theoretical worst case
+> where compression might lead to inadvertent expansion: first of all,
+> increasing the size of the input buffer does not help mitigate that
+> issue. And given the truncation of the data node and the fact that the
+> original data compressed well enough to pass the UBIFS_MIN_COMPRESS_DIFF
+> test, there is no way on this particular code path that compression
+> could result in expansion beyond the original decompressed size, and so
+> no mitigation is necessary to begin with.
+> 
+> So let's just drop WORST_COMPR_FACTOR here.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> 
+> diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
+> index dc52ac0f4a345f30..0b55cbfe0c30505e 100644
+> --- a/fs/ubifs/journal.c
+> +++ b/fs/ubifs/journal.c
+> @@ -1489,7 +1489,7 @@ static int truncate_data_node(const struct
+> ubifs_info *c, const struct inode *in
+>          int err, dlen, compr_type, out_len, data_size;
+> 
+>          out_len = le32_to_cpu(dn->size);
+> -       buf = kmalloc_array(out_len, WORST_COMPR_FACTOR, GFP_NOFS);
+> +       buf = kmalloc(out_len, GFP_NOFS);
+>          if (!buf)
+>                  return -ENOMEM;
+> .
+> 
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-v2:
- - factor out the reset scheduling to a helper
- - add the check in XDP as well
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 25 ++++++++++++++++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  3 +++
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  4 +++
- 3 files changed, 31 insertions(+), 1 deletion(-)
+This version looks better.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 7b545d2a98b4..a3bbd13c070f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -331,6 +331,22 @@ static void bnxt_sched_reset_rxr(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
- 	rxr->rx_next_cons = 0xffff;
- }
- 
-+void bnxt_sched_reset_txr(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			  int idx)
-+{
-+	struct bnxt_napi *bnapi = txr->bnapi;
-+
-+	if (bnapi->tx_fault)
-+		return;
-+
-+	netdev_err(bp->dev, "Invalid Tx completion (ring:%d tx_pkts:%d cons:%u prod:%u i:%d)",
-+		   txr->txq_index, bnapi->tx_pkts,
-+		   txr->tx_cons, txr->tx_prod, idx);
-+	WARN_ON_ONCE(1);
-+	bnapi->tx_fault = 1;
-+	bnxt_queue_sp_work(bp, BNXT_RESET_TASK_SP_EVENT);
-+}
-+
- const u16 bnxt_lhint_arr[] = {
- 	TX_BD_FLAGS_LHINT_512_AND_SMALLER,
- 	TX_BD_FLAGS_LHINT_512_TO_1023,
-@@ -690,6 +706,11 @@ static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
- 		skb = tx_buf->skb;
- 		tx_buf->skb = NULL;
- 
-+		if (unlikely(!skb)) {
-+			bnxt_sched_reset_txr(bp, txr, i);
-+			return;
-+		}
-+
- 		tx_bytes += skb->len;
- 
- 		if (tx_buf->is_push) {
-@@ -2576,7 +2597,7 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 
- static void __bnxt_poll_work_done(struct bnxt *bp, struct bnxt_napi *bnapi)
- {
--	if (bnapi->tx_pkts) {
-+	if (bnapi->tx_pkts && !bnapi->tx_fault) {
- 		bnapi->tx_int(bp, bnapi, bnapi->tx_pkts);
- 		bnapi->tx_pkts = 0;
- 	}
-@@ -9429,6 +9450,8 @@ static void bnxt_enable_napi(struct bnxt *bp)
- 		struct bnxt_napi *bnapi = bp->bnapi[i];
- 		struct bnxt_cp_ring_info *cpr;
- 
-+		bnapi->tx_fault = 0;
-+
- 		cpr = &bnapi->cp_ring;
- 		if (bnapi->in_reset)
- 			cpr->sw_stats.rx.rx_resets++;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 080e73496066..9d16757e27fe 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1008,6 +1008,7 @@ struct bnxt_napi {
- 					  int);
- 	int			tx_pkts;
- 	u8			events;
-+	u8			tx_fault:1;
- 
- 	u32			flags;
- #define BNXT_NAPI_FLAG_XDP	0x1
-@@ -2329,6 +2330,8 @@ int bnxt_get_avail_msix(struct bnxt *bp, int num);
- int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init);
- void bnxt_tx_disable(struct bnxt *bp);
- void bnxt_tx_enable(struct bnxt *bp);
-+void bnxt_sched_reset_txr(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			  int idx);
- void bnxt_report_link(struct bnxt *bp);
- int bnxt_update_link(struct bnxt *bp, bool chng_link_state);
- int bnxt_hwrm_set_pause(struct bnxt *);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 4efa5fe6972b..5b6fbdc4dc40 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -149,6 +149,7 @@ void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
- 			tx_buf->action = 0;
- 			tx_buf->xdpf = NULL;
- 		} else if (tx_buf->action == XDP_TX) {
-+			tx_buf->action = 0;
- 			rx_doorbell_needed = true;
- 			last_tx_cons = tx_cons;
- 
-@@ -158,6 +159,9 @@ void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
- 				tx_buf = &txr->tx_buf_ring[tx_cons];
- 				page_pool_recycle_direct(rxr->page_pool, tx_buf->page);
- 			}
-+		} else {
-+			bnxt_sched_reset_txr(bp, txr, i);
-+			return;
- 		}
- 		tx_cons = NEXT_TX(tx_cons);
- 	}
--- 
-2.41.0
+Reviewed-by: Zhihao Cheng <chengzhihao1@huawei.com>
 
 
