@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-19308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CEE675A3BF
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 03:06:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1DA975A3C0
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 03:06:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC8A7281C06
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:06:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D27641C208B5
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 01:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E9339B;
-	Thu, 20 Jul 2023 01:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30526621;
+	Thu, 20 Jul 2023 01:05:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B4E621
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 01:05:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56285C433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4A4631
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 01:05:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C703BC433CB;
 	Thu, 20 Jul 2023 01:05:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689815107;
-	bh=F3Khjs6e+Z1k2X/6B/UBDIqElpqe6NCS8NCiATXxqHg=;
+	s=k20201202; t=1689815108;
+	bh=j8N9VX9HLxrV+w0wWbqFPi0iFjyeRLuEfwNbiLrnA6w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o7qWLBwmWEkDakAftuKDM7Y7SqKE3mWL5wi4yH05yuwJSQjZHwE11WMhAfYxhfafW
-	 taQAHlT/wr6l65P+J4QrbX9d+c5KPA43N6j18FBPoRqQRewYf2WCFs2Geq0Ntf+iP2
-	 IKfPJ3QgZpNFg3+2xdZ83gjJiQHd+w8vldiJPkBJSnEG++Q8eOW0xUnz4VGewC3z5Z
-	 5HnTzL5ejoM5pOaYdurVQUFpXNK7YZCSCJwq13hI5ynxzMfvPqpiaR9t2SdL2/18Z8
-	 OQe4RruayCu9Ptec4hyA4x+y//3FLdie3xDFW4F2dCfynCqoHB2VLK5XlqucVf80CI
-	 C/fVK8jEkYWLw==
+	b=JBQZ04pyEJ0qJpYCbCyX0+RBrcournn82xjLS7ZaG5juCNfgyBogyMDQt1/7wSxCo
+	 cYhGkrYNFErAxNa5HiHcC5rFX7yHR+diX30Z36hwHbospD+ZTlDgwHr+x1RK1mDbUy
+	 NOY7lQMBvrI3Ey3hVmexI0nVKtC1RqL9wqDtMj7qqBAELMafDCm8UuwPWFjxTyz6bV
+	 vAeGvN4tOodw3LQ4bPH4Zk6p7v7m/DTjj788nrYg43As/QlPktdWFIYiuKioF0j1IZ
+	 O1EyUp6F6ZaxRwPnq68qFZGmqEINmDY0ybGKADCWQmcWTGaQaixPnX7i1ySuR4SsNb
+	 SkqmtpiGPCXWw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -37,9 +37,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	michael.chan@broadcom.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/3] eth: bnxt: move and rename reset helpers
-Date: Wed, 19 Jul 2023 18:04:38 -0700
-Message-ID: <20230720010440.1967136-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/3] eth: bnxt: take the bit to set as argument of bnxt_queue_sp_work()
+Date: Wed, 19 Jul 2023 18:04:39 -0700
+Message-ID: <20230720010440.1967136-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230720010440.1967136-1-kuba@kernel.org>
 References: <20230720010440.1967136-1-kuba@kernel.org>
@@ -51,135 +51,164 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the reset helpers, subsequent patches will need some
-of them on the Tx path.
-
-While at it rename bnxt_sched_reset(), on more recent chips
-it schedules a queue reset, instead of a fuller reset.
+Most callers of bnxt_queue_sp_work() set a bit to indicate what work
+to perform right before calling it. Pass it to the function instead.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 72 +++++++++++------------
- 1 file changed, 36 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 61 ++++++++++-------------
+ 1 file changed, 26 insertions(+), 35 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d84ded8db93d..417554a4c837 100644
+index 417554a4c837..7b545d2a98b4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -293,6 +293,38 @@ static void bnxt_db_cq(struct bnxt *bp, struct bnxt_db_info *db, u32 idx)
- 		BNXT_DB_CQ(db, idx);
+@@ -304,7 +304,7 @@ static void bnxt_queue_fw_reset_work(struct bnxt *bp, unsigned long delay)
+ 		schedule_delayed_work(&bp->fw_reset_task, delay);
  }
  
-+static void bnxt_queue_fw_reset_work(struct bnxt *bp, unsigned long delay)
-+{
-+	if (!(test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)))
-+		return;
-+
-+	if (BNXT_PF(bp))
-+		queue_delayed_work(bnxt_pf_wq, &bp->fw_reset_task, delay);
-+	else
-+		schedule_delayed_work(&bp->fw_reset_task, delay);
-+}
-+
-+static void bnxt_queue_sp_work(struct bnxt *bp)
-+{
-+	if (BNXT_PF(bp))
-+		queue_work(bnxt_pf_wq, &bp->sp_task);
-+	else
-+		schedule_work(&bp->sp_task);
-+}
-+
-+static void bnxt_sched_reset_rxr(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
-+{
-+	if (!rxr->bnapi->in_reset) {
-+		rxr->bnapi->in_reset = true;
-+		if (bp->flags & BNXT_FLAG_CHIP_P5)
-+			set_bit(BNXT_RESET_TASK_SP_EVENT, &bp->sp_event);
-+		else
-+			set_bit(BNXT_RST_RING_SP_EVENT, &bp->sp_event);
-+		bnxt_queue_sp_work(bp);
-+	}
-+	rxr->rx_next_cons = 0xffff;
-+}
-+
- const u16 bnxt_lhint_arr[] = {
- 	TX_BD_FLAGS_LHINT_512_AND_SMALLER,
- 	TX_BD_FLAGS_LHINT_512_TO_1023,
-@@ -1234,38 +1266,6 @@ static int bnxt_discard_rx(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 	return 0;
- }
- 
--static void bnxt_queue_fw_reset_work(struct bnxt *bp, unsigned long delay)
--{
--	if (!(test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)))
--		return;
--
--	if (BNXT_PF(bp))
--		queue_delayed_work(bnxt_pf_wq, &bp->fw_reset_task, delay);
--	else
--		schedule_delayed_work(&bp->fw_reset_task, delay);
--}
--
 -static void bnxt_queue_sp_work(struct bnxt *bp)
--{
--	if (BNXT_PF(bp))
--		queue_work(bnxt_pf_wq, &bp->sp_task);
--	else
--		schedule_work(&bp->sp_task);
--}
--
--static void bnxt_sched_reset(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
--{
--	if (!rxr->bnapi->in_reset) {
--		rxr->bnapi->in_reset = true;
--		if (bp->flags & BNXT_FLAG_CHIP_P5)
--			set_bit(BNXT_RESET_TASK_SP_EVENT, &bp->sp_event);
--		else
--			set_bit(BNXT_RST_RING_SP_EVENT, &bp->sp_event);
--		bnxt_queue_sp_work(bp);
--	}
--	rxr->rx_next_cons = 0xffff;
--}
--
- static u16 bnxt_alloc_agg_idx(struct bnxt_rx_ring_info *rxr, u16 agg_id)
++static void __bnxt_queue_sp_work(struct bnxt *bp)
  {
- 	struct bnxt_tpa_idx_map *map = rxr->rx_tpa_idx_map;
-@@ -1320,7 +1320,7 @@ static void bnxt_tpa_start(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
- 		netdev_warn(bp->dev, "TPA cons %x, expected cons %x, error code %x\n",
- 			    cons, rxr->rx_next_cons,
- 			    TPA_START_ERROR_CODE(tpa_start1));
--		bnxt_sched_reset(bp, rxr);
-+		bnxt_sched_reset_rxr(bp, rxr);
- 		return;
+ 	if (BNXT_PF(bp))
+ 		queue_work(bnxt_pf_wq, &bp->sp_task);
+@@ -312,6 +312,12 @@ static void bnxt_queue_sp_work(struct bnxt *bp)
+ 		schedule_work(&bp->sp_task);
+ }
+ 
++static void bnxt_queue_sp_work(struct bnxt *bp, unsigned int event)
++{
++	set_bit(event, &bp->sp_event);
++	__bnxt_queue_sp_work(bp);
++}
++
+ static void bnxt_sched_reset_rxr(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
+ {
+ 	if (!rxr->bnapi->in_reset) {
+@@ -320,7 +326,7 @@ static void bnxt_sched_reset_rxr(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
+ 			set_bit(BNXT_RESET_TASK_SP_EVENT, &bp->sp_event);
+ 		else
+ 			set_bit(BNXT_RST_RING_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
++		__bnxt_queue_sp_work(bp);
  	}
- 	/* Store cfa_code in tpa_info to use in tpa_end
-@@ -1844,7 +1844,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 		if (rxr->rx_next_cons != 0xffff)
- 			netdev_warn(bp->dev, "RX cons %x != expected cons %x\n",
- 				    cons, rxr->rx_next_cons);
--		bnxt_sched_reset(bp, rxr);
-+		bnxt_sched_reset_rxr(bp, rxr);
- 		if (rc1)
- 			return rc1;
- 		goto next_rx_no_prod_no_len;
-@@ -1882,7 +1882,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 			    !(bp->fw_cap & BNXT_FW_CAP_RING_MONITOR)) {
- 				netdev_warn_once(bp->dev, "RX buffer error %x\n",
- 						 rx_err);
--				bnxt_sched_reset(bp, rxr);
-+				bnxt_sched_reset_rxr(bp, rxr);
- 			}
- 		}
- 		goto next_rx_no_len;
-@@ -2329,7 +2329,7 @@ static int bnxt_async_event_process(struct bnxt *bp,
- 			goto async_event_process_exit;
- 		}
- 		rxr = bp->bnapi[grp_idx]->rx_ring;
--		bnxt_sched_reset(bp, rxr);
-+		bnxt_sched_reset_rxr(bp, rxr);
+ 	rxr->rx_next_cons = 0xffff;
+ }
+@@ -2384,7 +2390,7 @@ static int bnxt_async_event_process(struct bnxt *bp,
+ 	default:
  		goto async_event_process_exit;
  	}
- 	case ASYNC_EVENT_CMPL_EVENT_ID_ECHO_REQUEST: {
+-	bnxt_queue_sp_work(bp);
++	__bnxt_queue_sp_work(bp);
+ async_event_process_exit:
+ 	return 0;
+ }
+@@ -2413,8 +2419,7 @@ static int bnxt_hwrm_handler(struct bnxt *bp, struct tx_cmp *txcmp)
+ 		}
+ 
+ 		set_bit(vf_id - bp->pf.first_vf_id, bp->pf.vf_event_bmap);
+-		set_bit(BNXT_HWRM_EXEC_FWD_REQ_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
++		bnxt_queue_sp_work(bp, BNXT_HWRM_EXEC_FWD_REQ_SP_EVENT);
+ 		break;
+ 
+ 	case CMPL_BASE_TYPE_HWRM_ASYNC_EVENT:
+@@ -11031,8 +11036,7 @@ static void bnxt_set_rx_mode(struct net_device *dev)
+ 	if (mask != vnic->rx_mask || uc_update || mc_update) {
+ 		vnic->rx_mask = mask;
+ 
+-		set_bit(BNXT_RX_MASK_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
++		bnxt_queue_sp_work(bp, BNXT_RX_MASK_SP_EVENT);
+ 	}
+ }
+ 
+@@ -11597,8 +11601,7 @@ static void bnxt_tx_timeout(struct net_device *dev, unsigned int txqueue)
+ 	struct bnxt *bp = netdev_priv(dev);
+ 
+ 	netdev_err(bp->dev,  "TX timeout detected, starting reset task!\n");
+-	set_bit(BNXT_RESET_TASK_SP_EVENT, &bp->sp_event);
+-	bnxt_queue_sp_work(bp);
++	bnxt_queue_sp_work(bp, BNXT_RESET_TASK_SP_EVENT);
+ }
+ 
+ static void bnxt_fw_health_check(struct bnxt *bp)
+@@ -11635,8 +11638,7 @@ static void bnxt_fw_health_check(struct bnxt *bp)
+ 	return;
+ 
+ fw_reset:
+-	set_bit(BNXT_FW_EXCEPTION_SP_EVENT, &bp->sp_event);
+-	bnxt_queue_sp_work(bp);
++	bnxt_queue_sp_work(bp, BNXT_FW_EXCEPTION_SP_EVENT);
+ }
+ 
+ static void bnxt_timer(struct timer_list *t)
+@@ -11653,21 +11655,15 @@ static void bnxt_timer(struct timer_list *t)
+ 	if (bp->fw_cap & BNXT_FW_CAP_ERROR_RECOVERY)
+ 		bnxt_fw_health_check(bp);
+ 
+-	if (BNXT_LINK_IS_UP(bp) && bp->stats_coal_ticks) {
+-		set_bit(BNXT_PERIODIC_STATS_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
+-	}
++	if (BNXT_LINK_IS_UP(bp) && bp->stats_coal_ticks)
++		bnxt_queue_sp_work(bp, BNXT_PERIODIC_STATS_SP_EVENT);
+ 
+-	if (bnxt_tc_flower_enabled(bp)) {
+-		set_bit(BNXT_FLOW_STATS_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
+-	}
++	if (bnxt_tc_flower_enabled(bp))
++		bnxt_queue_sp_work(bp, BNXT_FLOW_STATS_SP_EVENT);
+ 
+ #ifdef CONFIG_RFS_ACCEL
+-	if ((bp->flags & BNXT_FLAG_RFS) && bp->ntp_fltr_count) {
+-		set_bit(BNXT_RX_NTP_FLTR_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
+-	}
++	if ((bp->flags & BNXT_FLAG_RFS) && bp->ntp_fltr_count)
++		bnxt_queue_sp_work(bp, BNXT_RX_NTP_FLTR_SP_EVENT);
+ #endif /*CONFIG_RFS_ACCEL*/
+ 
+ 	if (bp->link_info.phy_retry) {
+@@ -11675,21 +11671,17 @@ static void bnxt_timer(struct timer_list *t)
+ 			bp->link_info.phy_retry = false;
+ 			netdev_warn(bp->dev, "failed to update phy settings after maximum retries.\n");
+ 		} else {
+-			set_bit(BNXT_UPDATE_PHY_SP_EVENT, &bp->sp_event);
+-			bnxt_queue_sp_work(bp);
++			bnxt_queue_sp_work(bp, BNXT_UPDATE_PHY_SP_EVENT);
+ 		}
+ 	}
+ 
+-	if (test_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state)) {
+-		set_bit(BNXT_RX_MASK_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
+-	}
++	if (test_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
++		bnxt_queue_sp_work(bp, BNXT_RX_MASK_SP_EVENT);
+ 
+ 	if ((bp->flags & BNXT_FLAG_CHIP_P5) && !bp->chip_rev &&
+-	    netif_carrier_ok(dev)) {
+-		set_bit(BNXT_RING_COAL_NOW_SP_EVENT, &bp->sp_event);
+-		bnxt_queue_sp_work(bp);
+-	}
++	    netif_carrier_ok(dev))
++		bnxt_queue_sp_work(bp, BNXT_RING_COAL_NOW_SP_EVENT);
++
+ bnxt_restart_timer:
+ 	mod_timer(&bp->timer, jiffies + bp->current_interval);
+ }
+@@ -12968,8 +12960,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	bp->ntp_fltr_count++;
+ 	spin_unlock_bh(&bp->ntp_fltr_lock);
+ 
+-	set_bit(BNXT_RX_NTP_FLTR_SP_EVENT, &bp->sp_event);
+-	bnxt_queue_sp_work(bp);
++	bnxt_queue_sp_work(bp, BNXT_RX_NTP_FLTR_SP_EVENT);
+ 
+ 	return new_fltr->sw_id;
+ 
 -- 
 2.41.0
 
