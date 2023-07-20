@@ -1,81 +1,110 @@
-Return-Path: <netdev+bounces-19339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6BE275A50F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:21:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0071175A518
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93093281BFA
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 04:21:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31D671C2129F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 04:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B28F320FE;
-	Thu, 20 Jul 2023 04:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71F820FF;
+	Thu, 20 Jul 2023 04:29:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4022920FF
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B5F48C43397;
-	Thu, 20 Jul 2023 04:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A520A1FB0;
+	Thu, 20 Jul 2023 04:29:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1284CC433C7;
+	Thu, 20 Jul 2023 04:29:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689826821;
-	bh=Bk2LPRHkkD9EX6U+/4vMPDW1uHR2jFXPcpGmyMAj8pg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l2MMCIPpPCTZjWFpX5pqdy6eGbJwO70Vz4WwQ9zbXd4BFX8mMte3QdIopvHXrYAE3
-	 OJZcKfcvaSypi038G3qCTRT/JGlfHpwp21LDLhpdc1WBZudaeVqQvA5jekzjsjJ2l4
-	 DXYUPL/VhQxP9b45kjMtVuPYmrl9cRM/YcAH8lsuAqLhNz9Uqol1UqTNmoh5hxKkrs
-	 MIGpulPw1aWRzwC3N+yyIdXaOxQIQLF+S1gsJSh8j7GeWdCFs7DV19cT41RnEkmTu4
-	 v7zshqvjjUgswUmJMfB+90YqVLxVtBdu5xqK1AuEAjtsCD8B4Cq62uU0hs3T+ioW/H
-	 THVSx6ditxaGg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D317E21EFE;
-	Thu, 20 Jul 2023 04:20:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1689827381;
+	bh=00793e+DVIX+KzxECbpJoJSmHqRjPxWfvFAIRLmu5OA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lGl4yoxCXG41iA0WBnzxDW4JqpYchqiEsKe/VNW6L/qU6UGFO0ogtp3fuAC4r1um7
+	 iYQh1T6+hImHQQNvTaKBU+rDhBSD67g4nEKwJi8l2B2r7u2KvoquSSDlSAP2q0q8Ui
+	 A3EfdWFfkVs8HdRr8NxhJfeDc21tt9TQe0Fsg9/UlXEBOyWrMlkaR562Of//eGyWsn
+	 Ib5OkPFx65BMxlypb9N0lzKSx+e3ifn8i726AdE/2j7vuVqsdJ1zBOAG8+EHX+PY0T
+	 kSmfESVk0CyowibqH1c4ilI1Gnk74Lk1NoKUu/v7hjTvpXsUh7/S5Gv5oT8hHDAG9b
+	 6c3/HW/ju95xA==
+Date: Wed, 19 Jul 2023 21:29:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>, Paul Rosswurm
+ <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>, Long Li
+ <longli@microsoft.com>, "ssengar@linux.microsoft.com"
+ <ssengar@linux.microsoft.com>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "daniel@iogearbox.net"
+ <daniel@iogearbox.net>, "john.fastabend@gmail.com"
+ <john.fastabend@gmail.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "ast@kernel.org" <ast@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>,
+ "hawk@kernel.org" <hawk@kernel.org>, "tglx@linutronix.de"
+ <tglx@linutronix.de>, "shradhagupta@linux.microsoft.com"
+ <shradhagupta@linux.microsoft.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2,net-next] net: mana: Add page pool for RX buffers
+Message-ID: <20230719212939.6da38bc0@kernel.org>
+In-Reply-To: <1689716837-22859-1-git-send-email-haiyangz@microsoft.com>
+References: <1689716837-22859-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] udp: use indirect call wrapper for data ready()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168982682163.14645.16342033613372009667.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Jul 2023 04:20:21 +0000
-References: <d47d53e6f8ee7a11228ca2f025d6243cc04b77f3.1689691004.git.pabeni@redhat.com>
-In-Reply-To: <d47d53e6f8ee7a11228ca2f025d6243cc04b77f3.1689691004.git.pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
- davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, kuba@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 18 Jul 2023 16:38:09 +0200 you wrote:
-> In most cases UDP sockets use the default data ready callback.
-> Leverage the indirect call wrapper for such callback to avoid an
-> indirect call in fastpath.
+On Tue, 18 Jul 2023 21:48:01 +0000 Haiyang Zhang wrote:
+> Add page pool for RX buffers for faster buffer cycle and reduce CPU
+> usage.
 > 
-> The above gives small but measurable performance gain under UDP flood.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> 
-> [...]
+> The standard page pool API is used.
 
-Here is the summary with links:
-  - [v2,net-next] udp: use indirect call wrapper for data ready()
-    https://git.kernel.org/netdev/net-next/c/0558e1674598
+> @@ -1437,8 +1437,12 @@ static void mana_rx_skb(void *buf_va, struct mana_rxcomp_oob *cqe,
+>  
+>  	act = mana_run_xdp(ndev, rxq, &xdp, buf_va, pkt_len);
+>  
+> -	if (act == XDP_REDIRECT && !rxq->xdp_rc)
+> +	if (act == XDP_REDIRECT && !rxq->xdp_rc) {
+> +		if (from_pool)
+> +			page_pool_release_page(rxq->page_pool,
+> +					       virt_to_head_page(buf_va));
 
-You are awesome, thank you!
+
+IIUC you should pass the page_pool as the last argument to 
+xdp_rxq_info_reg_mem_model() and then the page will be recycled
+by the core, you shouldn't release it.
+
+Not to mention the potential race in releasing the page _after_
+giving its ownership to someone else.
+
+> -		page = dev_alloc_page();
+> +		if (is_napi) {
+> +			page = page_pool_dev_alloc_pages(rxq->page_pool);
+> +			*from_pool = true;
+> +		} else {
+> +			page = dev_alloc_page();
+
+FWIW if you're only calling this outside NAPI during init, when NAPI
+can't yet run, I _think_ it's okay to use page_pool_dev_alloc..
+
+> +	pprm.pool_size = RX_BUFFERS_PER_QUEUE;
+> +	pprm.napi = &cq->napi;
+> +	pprm.dev = gc->dev;
+> +	pprm.dma_dir = DMA_FROM_DEVICE;
+
+If you're not setting PP_FLAG_DMA_MAP you don't have to fill in .dev
+and .dma_dir
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
