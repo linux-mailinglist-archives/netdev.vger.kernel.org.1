@@ -1,495 +1,187 @@
-Return-Path: <netdev+bounces-19556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AAA475B2D8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:35:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C3F75B2E3
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6414281ECA
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:35:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AE94281F63
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DE31DDCF;
-	Thu, 20 Jul 2023 15:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5EC18C15;
+	Thu, 20 Jul 2023 15:31:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507041DDCE
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:31:12 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957C52D71
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:30:55 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fba8f2197bso1486732e87.3
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1689867054; x=1690471854;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j9vM5wwa750nRnPWEJb6XAJ919lw+QT8F9GWIwMy1Kw=;
-        b=XbKtG0IrHJHpsbf4p0uTeVQb0rwrbxmiIb8bh876jlF/hsXQItKLwAi045rVm/kxMo
-         6ZtKHuvClG0OsbGsq9kAiLyhlGpqBNuPrM9pk1OqpKII5cqxeeipDIu0XG2BAOpnfqbP
-         a0Xo3kteqeyiUNOWTGHORPNbpvdF3lQNC9lyIr8kazM3/9kRSQa56km4eYfCgoJHseLO
-         zeU4xGyfpKErG4/c41BY8YfZMzo32AZRavXhY20BXbBsSFudZTK0F5QQo3ePFaNvc6Yd
-         7dDT4RfQLTYs2pzy8EBdHFDS4jFCSvIMb8Muj+QSTHieNwp4e3ls7KJrUFRYTVosfYVA
-         VEIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689867054; x=1690471854;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j9vM5wwa750nRnPWEJb6XAJ919lw+QT8F9GWIwMy1Kw=;
-        b=CKgQ8zv3zRrvUOCi2vudgAE4grRul2dgbFg4tunTkDlL6mDgTsk/4zATOXOdP//kQy
-         o7t4Y4dtTFGxPdJmec2qlOuW/6AEkxzaqvVl3IbP+b2ZY3pYsm0IK4RJen+ivpK1ica2
-         nBZrrKHArTCpsoMtP55RFizwrmvoDWUjFE9f8F1VlIk+Z4tKP6akl6M3KjrJn3i/Zrf6
-         lA4b2VGqI9+uG9cQRL4WClY+q9BftRWRx1sq8eBG8PilGUfLqZ7LPsURBINLNuZ2OBvR
-         QvjEpfYB5bQeoMT3F3mYgsvUaMqSiVtVjBtkf4rmNNJI7/Y7Z3LkN6pJGwobSQJkzsOn
-         TNRg==
-X-Gm-Message-State: ABy/qLZ5i6NqsIuzXnBW6Dg0Kaxm7AAtXF5AJkSf9JG11IzEvCoHXOBb
-	ERoyLxiCaLexE+PvOc0NYiG4cA==
-X-Google-Smtp-Source: APBJJlE4HlovfIP4NvH5BEUjtVQ8HqIc0ypdCqhndVMnkY0YkTDj9bSGsVbk2zsTtBVjD5xYk1nMEA==
-X-Received: by 2002:a19:4f02:0:b0:4fb:73d1:58e5 with SMTP id d2-20020a194f02000000b004fb73d158e5mr1563717lfb.53.1689867053782;
-        Thu, 20 Jul 2023 08:30:53 -0700 (PDT)
-Received: from [192.168.188.151] (p200300c1c7176000b788d2ebe49c4b82.dip0.t-ipconnect.de. [2003:c1:c717:6000:b788:d2eb:e49c:4b82])
-        by smtp.gmail.com with ESMTPSA id x10-20020a170906804a00b009893b06e9e3sm851007ejw.225.2023.07.20.08.30.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 08:30:53 -0700 (PDT)
-From: Lorenz Bauer <lmb@isovalent.com>
-Date: Thu, 20 Jul 2023 17:30:12 +0200
-Subject: [PATCH bpf-next v6 8/8] selftests/bpf: Test that SO_REUSEPORT can
- be used with sk_assign helper
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837A718B1E
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:31:40 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2060a.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::60a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFEA30FF;
+	Thu, 20 Jul 2023 08:31:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ACL2U6ttH/silbP8YMOMleM68SQYCTnYYE0FbNiHqYh+5kIRnGOJ9AamSzBUBue223cgbl6T3khEublX/zQe2kVE9xOMXaRVp1+QHOEJdzu1SbGEuY1pT8EtijALwLbb2sitqqwdyIK9krHuXoffT0FNgGJgG6MXg3pHxT5z04jk6VBYH4+CLdBQrRqpv90wvl8MET06rHQuPQpcshrJthZsiqQ/DpWN4w+c7cIS03rpChGTXd1+hOXuvbO7CUrmYX+pwHOxlqWMu6T+xJ0+N54M8W38DvxF8Ngd+M2mMfxRp7mXvt4ZnXqYfU+8cu6pP9poxY2ypRwnDRF1ow0big==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n/iIcRKzljZTnndxDMQNNGl2MLSHJ0aui+qRbAwspLg=;
+ b=gvd4ypht+KXuQFbbKMXQumIlUG7Jcq33jLzNCbXkPpRc+x2mcwokrv4O0/ciVIiSMMDklpQZs4wmjES8QXR9ZTp3+bT/G0A0R3k9yujSuIBMZCeDzXIwJkSpG0MThaNvTdW/sa9/Bsn0r+96mFwoFmBmCHLq+Z5WF8FO/39b1dNRnBtLcJoit1zNOdzJ/aro9NbnWI+f/E7nBx8ebBGp9Y8iMacggKDRlCjzRGXbWcBWbCZh1o+4XV//boSUSzDAjXoX9g5KVaL+ApGFbhGUsh67R16QpQBu03pvRSCyBhEV/6gGjGgvDCPwHX/VHVk+tH3mTKP5BAGGv7tsZ0ehSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n/iIcRKzljZTnndxDMQNNGl2MLSHJ0aui+qRbAwspLg=;
+ b=wO0Rt7CN1Q7qGEX5LYxKozBV+n8gaKXKQ+YMmOBSPnIbJv1G/p9UF5WvdHqF1ycWFzKWplXISvpecB6QOzAXUJ/w04AliJUK2eoJToRfMmxbmt40pGG1Q/wYTXS1Ccg1f2M/UOUSodxGK7LCpwqRdgRqebWU3UQDPlafPUEGuOw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ SJ2PR12MB9210.namprd12.prod.outlook.com (2603:10b6:a03:561::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Thu, 20 Jul
+ 2023 15:31:17 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::bf76:da18:e4b4:746b]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::bf76:da18:e4b4:746b%7]) with mapi id 15.20.6609.024; Thu, 20 Jul 2023
+ 15:31:17 +0000
+Message-ID: <b949697e-319a-7cc1-84d8-1391713fa645@amd.com>
+Date: Thu, 20 Jul 2023 08:31:13 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
+ command waiting loop
+Content-Language: en-US
+To: Jason Wang <jasowang@redhat.com>, mst@redhat.com,
+ xuanzhuo@linux.alibaba.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, edumazet@google.com,
+ maxime.coquelin@redhat.com, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net
+References: <20230720083839.481487-1-jasowang@redhat.com>
+ <20230720083839.481487-3-jasowang@redhat.com>
+From: Shannon Nelson <shannon.nelson@amd.com>
+In-Reply-To: <20230720083839.481487-3-jasowang@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR07CA0031.namprd07.prod.outlook.com
+ (2603:10b6:a02:bc::44) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230720-so-reuseport-v6-8-7021b683cdae@isovalent.com>
-References: <20230720-so-reuseport-v6-0-7021b683cdae@isovalent.com>
-In-Reply-To: <20230720-so-reuseport-v6-0-7021b683cdae@isovalent.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, 
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- Joe Stringer <joe@wand.net.nz>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Hemanth Malla <hemanthmalla@gmail.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Lorenz Bauer <lmb@isovalent.com>, 
- Joe Stringer <joe@cilium.io>
-X-Mailer: b4 0.12.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|SJ2PR12MB9210:EE_
+X-MS-Office365-Filtering-Correlation-Id: db36a43b-c27e-4b3e-a194-08db89365c05
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	aUaGBNE67ha57Y09AAxLC0rqrzWzQhb3XJLxacr6WnlxkYXs9BwaRIdN6JcAvbHEUmoAov8O48o7ffKIb7cyV+s580vrU8L0Gm0f1ncwN2c3Dl3o9VxsXNqQc2Zj8z3JYbtwfLxLSXdj2iFvaLqcyz7iZbc9f5jxb5sdwIs8P7L7NPI2GyzhIJ3KwGWqQPBaASEJScgB6DMlDK2duNNxHDpiYdaRJK/tAg98ujoOn1B5O4j3JrwKDCZUIq5QW9Y8kSDwsn+h46Ga6glncuVSN7RgffeFVOL8ivh3X47b05HEeUwXO0zNGWP3BHyAQWRl9SxlBOQtizNpH1S6IY6Z89ZQl/qv6/F0/Tc4T1JSagw5Lfiryn8Ye+ijF08fMOYqB8h8Z04cQ5jQT1UtG0cEKOedg6XuM6ttR08vfpwvcnpeinfn3okqDz4h+FWNuA2Fe1YWqkL3LtgjY3B6xufZ5UtuIQ9ENI+vhQzIQ4Ln9O/49hxV40peNwOKFq3muo1uwWNIF/9Z/XJVQdyP3840uAlxZa5o69+27kcTQE9U3K62X2eQ6l1d8W7PU19Zj2/jzcLmVz36BYysGJmElqB9zelV3vnrrzPJ0MloQAErw1Z9AFGOsPCPJIjsNpymWyzt+7FH6ez/Z4PDy7F5Isochw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(451199021)(2906002)(86362001)(38100700002)(31696002)(83380400001)(26005)(5660300002)(6512007)(186003)(53546011)(6506007)(2616005)(316002)(6666004)(44832011)(36756003)(8936002)(478600001)(41300700001)(6486002)(8676002)(4326008)(66946007)(66556008)(7416002)(66476007)(966005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SUloTUdBMVdJVExlcVN0bTMxbGdFS0hzc1BJN3FvL1l1bzR3US9ub3BmcWJm?=
+ =?utf-8?B?OE1ZUXYrSXA5T3h6SUpZVWU3bTNlbXpRcWpCWmhmZjNLazlmZEtiT3hlR2hi?=
+ =?utf-8?B?TUdQc2pyZ1VrTWtRMHdlcGp4Yi81NjgxS3JzSTJFRVZsZjB0R1ZyOWRmSHli?=
+ =?utf-8?B?TjRiZWJhVm9kcDVrdmpMSjZvZU9nNGJBZklaWVRxMHpkdGVoQzFZZ3V0SXF2?=
+ =?utf-8?B?UWI5VU80TFlCNU0zcWhpdmcwTTVaa3NrSS9NeXVPOG5hTlNZcFJBSmdWQ2o1?=
+ =?utf-8?B?ZTM4V3FSdDRBeFA1Tk1xQ1lSc2F2VkpCcTRqRVVaR0tnTksrcWZUZTRvTzZ5?=
+ =?utf-8?B?UVppNkpSSDAySWppSWhuNWhNWUNkalBFZDM3ZlpxbzRZZEd1eERlQUROZlE5?=
+ =?utf-8?B?NlJqNElKVkt5K3BOaVBzbGpIRGhYbXk4aVZZcmdSMnpJa3I5RWUwZGVyVXhD?=
+ =?utf-8?B?UGtlTnV2VDRUaksxVGJ1SC9raUlVQ3dBZHNDelVNSCsybnp3Nk9hNTRtRDUv?=
+ =?utf-8?B?RU9hcFgvQVZuamo1aUNLT1dGUWJ4MzhZODkrOE5QeTZDd1pLS2RuUHBMN285?=
+ =?utf-8?B?eXBrN3ZydVBuQlBRUXhpcytaT2Y5R0FwdjM1NFlkelBPVU5vRGZaWkl2a0JY?=
+ =?utf-8?B?d3VOeDBBS0RKUjBaVXNyekEwS01tRkpqd3pVbko3TUFPRlFqd0VjMDdWZjZM?=
+ =?utf-8?B?a1J4ZG5QM2dIeVFXS1hxYWN6NVZWeUJvR2hhNXZvUlE0Ri81TzV0ZWV4anEz?=
+ =?utf-8?B?SEk4RkxPT0dGZFpzVEdjMjBSbTNaeHZPRm9JMnZtS0VjSEFENnErOURTZ2Fw?=
+ =?utf-8?B?VW5uRnZzU09xN21FcS9KU3BZR3hCenp2SGdYRndzc3FXWU5SVis2U0NiV0Q5?=
+ =?utf-8?B?VEM4OHgrNXRZVjh0a2N0SUtIYys4WVpWZDBsMzZFdytSd2NVV1pFK1N1ZlVp?=
+ =?utf-8?B?OW5VK3VwRW1MR1o2U3pXcCs3VENsTHFVUTUzV3IxK0k4cnlEdmNZcm5FckJ6?=
+ =?utf-8?B?czlpS3JkaEdFZVY1Z1pYSkZaNWJUdjVsaG9ZdTd0K3IzOEpyQXhwWkJKQUcx?=
+ =?utf-8?B?QWZkTFpjOHYxUGRaTmVCSkp4L0VOSWVIb0RnN2hIYkFzQThwMHIvZ1I3cnc2?=
+ =?utf-8?B?NmJpajdBWVlxVG5ZNWV2eHNFY2o1ekUyRngvN0E0SUxtdzNkVnhhMnFPTDdj?=
+ =?utf-8?B?VnVWdklZYmdiS21rdkE1WUZldGF4am9NeXQ1b0c5bXBvOUtGekt4dkZSQWdM?=
+ =?utf-8?B?V3dFNnVxUmNiMVcvNk41MDNqUCtwRW9Qb09rVW9GcmtZb2htSFhvdVBxS2ZR?=
+ =?utf-8?B?WUFOaEhKblNFMUd0K2llLzFZVmVScUVBTTU5YzdnSTFTZnBFVHJtNzJ2aktn?=
+ =?utf-8?B?M1cxVG94SVZjUjVYY1U1a29MdG1jTU44V0pDVEdKWXp4NGROMlJxdXNibVdR?=
+ =?utf-8?B?SkNjZTd2NkFZRWEvQi9WYmtuVzlDTSt0enFPaXQzNHFzZUpETkhOUEJYV1Az?=
+ =?utf-8?B?VWVNL3NDa0lmdy93S05qVmFrUVZUY1RFd21JMlZ3bDE0d0RCMWUyeEFNNFpQ?=
+ =?utf-8?B?djJZbDFSTmpudDZVUkxIWm1RZDBGZktNSUd2TzdTMSs3ZDJjYzdpRFREdFBs?=
+ =?utf-8?B?dFdud2RqRkc5cU9SNzRWRU1wMytQckVJUHk5bFFJOURhZHNYZ2JKL3RpMmlV?=
+ =?utf-8?B?amZiV21pS3AvajU5M1J1UHVaa090NWE0RnpYQXpVcGRUK3lacHlGdVdUWS83?=
+ =?utf-8?B?Mm9rRzM3bEYzOUZqNlpIdUR5SE9tcW95dXBCNW04SE0xbGJUdkF4SHl2azl6?=
+ =?utf-8?B?bXlaRVFGcEdqT056cE04L3B6c2dXQVFwNXVEN3ZHazNya3B1Q1NFSzl0Nis2?=
+ =?utf-8?B?K1R1RFhsOG5CNk1iaU5zeE1MWnd0ODU1dXVIbFl3Z1hwdWxPaWRRMlJjVVo4?=
+ =?utf-8?B?S0dXbC9ma0Z1L2p5NnNXUmdtdTd6bE1TMnhrRGtkZlk3blZZRzR4TUkxMXNT?=
+ =?utf-8?B?dW1YcUFtSnBRU1ZtQ210WWtWNUhINjdVQ3VaMzE5Q3oxMEpqNUt6eVl0NHJW?=
+ =?utf-8?B?aGpxUUVyVFhJaUxDcVN3bVRqbDlVMWxoeTVTYXcyOUVZM0hjY2YwSzFtSGI2?=
+ =?utf-8?Q?xvNm0DTm/zTwDcdS4r40fkhKr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db36a43b-c27e-4b3e-a194-08db89365c05
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 15:31:16.9625
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GzaK6e7j3N/xq9aN0+7GumcA+cAEFPeElnjDyUQ/JvUI9kte4NRlec9rhI2XkOPTd7ZbxRiRSBLwuWSNvddgZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9210
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Daniel Borkmann <daniel@iogearbox.net>
+On 7/20/23 1:38 AM, Jason Wang wrote:
+> 
+> Adding cond_resched() to the command waiting loop for a better
+> co-operation with the scheduler. This allows to give CPU a breath to
+> run other task(workqueue) instead of busy looping when preemption is
+> not allowed on a device whose CVQ might be slow.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>   drivers/net/virtio_net.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 9f3b1d6ac33d..e7533f29b219 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2314,8 +2314,10 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+>           * into the hypervisor, so the request should be handled immediately.
+>           */
+>          while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> -              !virtqueue_is_broken(vi->cvq))
+> +              !virtqueue_is_broken(vi->cvq)) {
+> +               cond_resched();
+>                  cpu_relax();
+> +       }
 
-We use two programs to check that the new reuseport logic is executed
-appropriately.
+The cover letter suggests that this addresses the infinite poll for 
+buggy devices, but I don't see how that is resolved here.  This should 
+make it a little nicer to the system, but it still is going to poll 
+forever on a device that has gone catatonic.  Is there a reason that I'm 
+missing that we don't have a polling limit here?
 
-The first is a TC clsact program which bpf_sk_assigns
-the skb to a UDP or TCP socket created by user space. Since the test
-communicates via lo we see both directions of packets in the eBPF.
-Traffic ingressing to the reuseport socket is identified by looking
-at the destination port. For TCP, we additionally need to make sure
-that we only assign the initial SYN packets towards our listening
-socket. The network stack then creates a request socket which
-transitions to ESTABLISHED after the 3WHS.
+sln
 
-The second is a reuseport program which shares the fact that
-it has been executed with user space. This tells us that the delayed
-lookup mechanism is working.
-
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Co-developed-by: Lorenz Bauer <lmb@isovalent.com>
-Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
-Cc: Joe Stringer <joe@cilium.io>
----
- tools/testing/selftests/bpf/network_helpers.c      |   3 +
- .../selftests/bpf/prog_tests/assign_reuse.c        | 197 +++++++++++++++++++++
- .../selftests/bpf/progs/test_assign_reuse.c        | 142 +++++++++++++++
- 3 files changed, 342 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
-index a105c0cd008a..8a33bcea97de 100644
---- a/tools/testing/selftests/bpf/network_helpers.c
-+++ b/tools/testing/selftests/bpf/network_helpers.c
-@@ -423,6 +423,9 @@ struct nstoken *open_netns(const char *name)
- 
- void close_netns(struct nstoken *token)
- {
-+	if (!token)
-+		return;
-+
- 	ASSERT_OK(setns(token->orig_netns_fd, CLONE_NEWNET), "setns");
- 	close(token->orig_netns_fd);
- 	free(token);
-diff --git a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c b/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
-new file mode 100644
-index 000000000000..622f123410f4
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Isovalent */
-+#include <uapi/linux/if_link.h>
-+#include <test_progs.h>
-+
-+#include <netinet/tcp.h>
-+#include <netinet/udp.h>
-+
-+#include "network_helpers.h"
-+#include "test_assign_reuse.skel.h"
-+
-+#define NS_TEST "assign_reuse"
-+#define LOOPBACK 1
-+#define PORT 4443
-+
-+static int attach_reuseport(int sock_fd, int prog_fd)
-+{
-+	return setsockopt(sock_fd, SOL_SOCKET, SO_ATTACH_REUSEPORT_EBPF,
-+			  &prog_fd, sizeof(prog_fd));
-+}
-+
-+static __u64 cookie(int fd)
-+{
-+	__u64 cookie = 0;
-+	socklen_t cookie_len = sizeof(cookie);
-+	int ret;
-+
-+	ret = getsockopt(fd, SOL_SOCKET, SO_COOKIE, &cookie, &cookie_len);
-+	ASSERT_OK(ret, "cookie");
-+	ASSERT_GT(cookie, 0, "cookie_invalid");
-+
-+	return cookie;
-+}
-+
-+static int echo_test_udp(int fd_sv)
-+{
-+	struct sockaddr_storage addr = {};
-+	socklen_t len = sizeof(addr);
-+	char buff[1] = {};
-+	int fd_cl = -1, ret;
-+
-+	fd_cl = connect_to_fd(fd_sv, 100);
-+	ASSERT_GT(fd_cl, 0, "create_client");
-+	ASSERT_EQ(getsockname(fd_cl, (void *)&addr, &len), 0, "getsockname");
-+
-+	ASSERT_EQ(send(fd_cl, buff, sizeof(buff), 0), 1, "send_client");
-+
-+	ret = recv(fd_sv, buff, sizeof(buff), 0);
-+	if (ret < 0)
-+		return errno;
-+
-+	ASSERT_EQ(ret, 1, "recv_server");
-+	ASSERT_EQ(sendto(fd_sv, buff, sizeof(buff), 0, (void *)&addr, len), 1, "send_server");
-+	ASSERT_EQ(recv(fd_cl, buff, sizeof(buff), 0), 1, "recv_client");
-+	close(fd_cl);
-+	return 0;
-+}
-+
-+static int echo_test_tcp(int fd_sv)
-+{
-+	char buff[1] = {};
-+	int fd_cl = -1, fd_sv_cl = -1;
-+
-+	fd_cl = connect_to_fd(fd_sv, 100);
-+	if (fd_cl < 0)
-+		return errno;
-+
-+	fd_sv_cl = accept(fd_sv, NULL, NULL);
-+	ASSERT_GE(fd_sv_cl, 0, "accept_fd");
-+
-+	ASSERT_EQ(send(fd_cl, buff, sizeof(buff), 0), 1, "send_client");
-+	ASSERT_EQ(recv(fd_sv_cl, buff, sizeof(buff), 0), 1, "recv_server");
-+	ASSERT_EQ(send(fd_sv_cl, buff, sizeof(buff), 0), 1, "send_server");
-+	ASSERT_EQ(recv(fd_cl, buff, sizeof(buff), 0), 1, "recv_client");
-+	close(fd_sv_cl);
-+	close(fd_cl);
-+	return 0;
-+}
-+
-+void run_assign_reuse(int family, int sotype, const char *ip, __u16 port)
-+{
-+	DECLARE_LIBBPF_OPTS(bpf_tc_hook, tc_hook,
-+		.ifindex = LOOPBACK,
-+		.attach_point = BPF_TC_INGRESS,
-+	);
-+	DECLARE_LIBBPF_OPTS(bpf_tc_opts, tc_opts,
-+		.handle = 1,
-+		.priority = 1,
-+	);
-+	bool hook_created = false, tc_attached = false;
-+	int ret, fd_tc, fd_accept, fd_drop, fd_map;
-+	int *fd_sv = NULL;
-+	__u64 fd_val;
-+	struct test_assign_reuse *skel;
-+	const int zero = 0;
-+
-+	skel = test_assign_reuse__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	skel->rodata->dest_port = port;
-+
-+	ret = test_assign_reuse__load(skel);
-+	if (!ASSERT_OK(ret, "skel_load"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(skel->bss->sk_cookie_seen, 0, "cookie_init");
-+
-+	fd_tc = bpf_program__fd(skel->progs.tc_main);
-+	fd_accept = bpf_program__fd(skel->progs.reuse_accept);
-+	fd_drop = bpf_program__fd(skel->progs.reuse_drop);
-+	fd_map = bpf_map__fd(skel->maps.sk_map);
-+
-+	fd_sv = start_reuseport_server(family, sotype, ip, port, 100, 1);
-+	if (!ASSERT_NEQ(fd_sv, NULL, "start_reuseport_server"))
-+		goto cleanup;
-+
-+	ret = attach_reuseport(*fd_sv, fd_drop);
-+	if (!ASSERT_OK(ret, "attach_reuseport"))
-+		goto cleanup;
-+
-+	fd_val = *fd_sv;
-+	ret = bpf_map_update_elem(fd_map, &zero, &fd_val, BPF_NOEXIST);
-+	if (!ASSERT_OK(ret, "bpf_sk_map"))
-+		goto cleanup;
-+
-+	ret = bpf_tc_hook_create(&tc_hook);
-+	if (ret == 0)
-+		hook_created = true;
-+	ret = ret == -EEXIST ? 0 : ret;
-+	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
-+		goto cleanup;
-+
-+	tc_opts.prog_fd = fd_tc;
-+	ret = bpf_tc_attach(&tc_hook, &tc_opts);
-+	if (!ASSERT_OK(ret, "bpf_tc_attach"))
-+		goto cleanup;
-+	tc_attached = true;
-+
-+	if (sotype == SOCK_STREAM)
-+		ASSERT_EQ(echo_test_tcp(*fd_sv), ECONNREFUSED, "drop_tcp");
-+	else
-+		ASSERT_EQ(echo_test_udp(*fd_sv), EAGAIN, "drop_udp");
-+	ASSERT_EQ(skel->bss->reuseport_executed, 1, "program executed once");
-+
-+	skel->bss->sk_cookie_seen = 0;
-+	skel->bss->reuseport_executed = 0;
-+	ASSERT_OK(attach_reuseport(*fd_sv, fd_accept), "attach_reuseport(accept)");
-+
-+	if (sotype == SOCK_STREAM)
-+		ASSERT_EQ(echo_test_tcp(*fd_sv), 0, "echo_tcp");
-+	else
-+		ASSERT_EQ(echo_test_udp(*fd_sv), 0, "echo_udp");
-+
-+	ASSERT_EQ(skel->bss->sk_cookie_seen, cookie(*fd_sv),
-+		  "cookie_mismatch");
-+	ASSERT_EQ(skel->bss->reuseport_executed, 1, "program executed once");
-+cleanup:
-+	if (tc_attached) {
-+		tc_opts.flags = tc_opts.prog_fd = tc_opts.prog_id = 0;
-+		ret = bpf_tc_detach(&tc_hook, &tc_opts);
-+		ASSERT_OK(ret, "bpf_tc_detach");
-+	}
-+	if (hook_created) {
-+		tc_hook.attach_point = BPF_TC_INGRESS | BPF_TC_EGRESS;
-+		bpf_tc_hook_destroy(&tc_hook);
-+	}
-+	test_assign_reuse__destroy(skel);
-+	free_fds(fd_sv, 1);
-+}
-+
-+void test_assign_reuse(void)
-+{
-+	struct nstoken *tok = NULL;
-+
-+	SYS(out, "ip netns add %s", NS_TEST);
-+	SYS(cleanup, "ip -net %s link set dev lo up", NS_TEST);
-+
-+	tok = open_netns(NS_TEST);
-+	if (!ASSERT_OK_PTR(tok, "netns token"))
-+		return;
-+
-+	if (test__start_subtest("tcpv4"))
-+		run_assign_reuse(AF_INET, SOCK_STREAM, "127.0.0.1", PORT);
-+	if (test__start_subtest("tcpv6"))
-+		run_assign_reuse(AF_INET6, SOCK_STREAM, "::1", PORT);
-+	if (test__start_subtest("udpv4"))
-+		run_assign_reuse(AF_INET, SOCK_DGRAM, "127.0.0.1", PORT);
-+	if (test__start_subtest("udpv6"))
-+		run_assign_reuse(AF_INET6, SOCK_DGRAM, "::1", PORT);
-+
-+cleanup:
-+	close_netns(tok);
-+	SYS_NOFAIL("ip netns delete %s", NS_TEST);
-+out:
-+	return;
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_assign_reuse.c b/tools/testing/selftests/bpf/progs/test_assign_reuse.c
-new file mode 100644
-index 000000000000..4f2e2321ea06
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_assign_reuse.c
-@@ -0,0 +1,142 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Isovalent */
-+#include <stdbool.h>
-+#include <linux/bpf.h>
-+#include <linux/if_ether.h>
-+#include <linux/in.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
-+#include <linux/tcp.h>
-+#include <linux/udp.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+#include <linux/pkt_cls.h>
-+
-+char LICENSE[] SEC("license") = "GPL";
-+
-+__u64 sk_cookie_seen;
-+__u64 reuseport_executed;
-+union {
-+	struct tcphdr tcp;
-+	struct udphdr udp;
-+} headers;
-+
-+const volatile __u16 dest_port;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-+	__uint(max_entries, 1);
-+	__type(key, __u32);
-+	__type(value, __u64);
-+} sk_map SEC(".maps");
-+
-+SEC("sk_reuseport")
-+int reuse_accept(struct sk_reuseport_md *ctx)
-+{
-+	reuseport_executed++;
-+
-+	if (ctx->ip_protocol == IPPROTO_TCP) {
-+		if (ctx->data + sizeof(headers.tcp) > ctx->data_end)
-+			return SK_DROP;
-+
-+		if (__builtin_memcmp(&headers.tcp, ctx->data, sizeof(headers.tcp)) != 0)
-+			return SK_DROP;
-+	} else if (ctx->ip_protocol == IPPROTO_UDP) {
-+		if (ctx->data + sizeof(headers.udp) > ctx->data_end)
-+			return SK_DROP;
-+
-+		if (__builtin_memcmp(&headers.udp, ctx->data, sizeof(headers.udp)) != 0)
-+			return SK_DROP;
-+	} else {
-+		return SK_DROP;
-+	}
-+
-+	sk_cookie_seen = bpf_get_socket_cookie(ctx->sk);
-+	return SK_PASS;
-+}
-+
-+SEC("sk_reuseport")
-+int reuse_drop(struct sk_reuseport_md *ctx)
-+{
-+	reuseport_executed++;
-+	sk_cookie_seen = 0;
-+	return SK_DROP;
-+}
-+
-+static int
-+assign_sk(struct __sk_buff *skb)
-+{
-+	int zero = 0, ret = 0;
-+	struct bpf_sock *sk;
-+
-+	sk = bpf_map_lookup_elem(&sk_map, &zero);
-+	if (!sk)
-+		return TC_ACT_SHOT;
-+	ret = bpf_sk_assign(skb, sk, 0);
-+	bpf_sk_release(sk);
-+	return ret ? TC_ACT_SHOT : TC_ACT_OK;
-+}
-+
-+static bool
-+maybe_assign_tcp(struct __sk_buff *skb, struct tcphdr *th)
-+{
-+	if (th + 1 > (void *)(long)(skb->data_end))
-+		return TC_ACT_SHOT;
-+
-+	if (!th->syn || th->ack || th->dest != bpf_htons(dest_port))
-+		return TC_ACT_OK;
-+
-+	__builtin_memcpy(&headers.tcp, th, sizeof(headers.tcp));
-+	return assign_sk(skb);
-+}
-+
-+static bool
-+maybe_assign_udp(struct __sk_buff *skb, struct udphdr *uh)
-+{
-+	if (uh + 1 > (void *)(long)(skb->data_end))
-+		return TC_ACT_SHOT;
-+
-+	if (uh->dest != bpf_htons(dest_port))
-+		return TC_ACT_OK;
-+
-+	__builtin_memcpy(&headers.udp, uh, sizeof(headers.udp));
-+	return assign_sk(skb);
-+}
-+
-+SEC("tc")
-+int tc_main(struct __sk_buff *skb)
-+{
-+	void *data_end = (void *)(long)skb->data_end;
-+	void *data = (void *)(long)skb->data;
-+	struct ethhdr *eth;
-+
-+	eth = (struct ethhdr *)(data);
-+	if (eth + 1 > data_end)
-+		return TC_ACT_SHOT;
-+
-+	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
-+		struct iphdr *iph = (struct iphdr *)(data + sizeof(*eth));
-+
-+		if (iph + 1 > data_end)
-+			return TC_ACT_SHOT;
-+
-+		if (iph->protocol == IPPROTO_TCP)
-+			return maybe_assign_tcp(skb, (struct tcphdr *)(iph + 1));
-+		else if (iph->protocol == IPPROTO_UDP)
-+			return maybe_assign_udp(skb, (struct udphdr *)(iph + 1));
-+		else
-+			return TC_ACT_SHOT;
-+	} else {
-+		struct ipv6hdr *ip6h = (struct ipv6hdr *)(data + sizeof(*eth));
-+
-+		if (ip6h + 1 > data_end)
-+			return TC_ACT_SHOT;
-+
-+		if (ip6h->nexthdr == IPPROTO_TCP)
-+			return maybe_assign_tcp(skb, (struct tcphdr *)(ip6h + 1));
-+		else if (ip6h->nexthdr == IPPROTO_UDP)
-+			return maybe_assign_udp(skb, (struct udphdr *)(ip6h + 1));
-+		else
-+			return TC_ACT_SHOT;
-+	}
-+}
-
--- 
-2.41.0
-
+> 
+>          return vi->ctrl->status == VIRTIO_NET_OK;
+>   }
+> --
+> 2.39.3
+> 
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 
