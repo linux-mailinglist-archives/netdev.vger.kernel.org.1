@@ -1,108 +1,136 @@
-Return-Path: <netdev+bounces-19345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9481C75A54D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 07:01:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FE975A550
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 07:03:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3CA5281C56
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 05:01:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F3911C212CB
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 05:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25341C01;
-	Thu, 20 Jul 2023 05:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76355210B;
+	Thu, 20 Jul 2023 05:03:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F93A17F4
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 05:01:36 +0000 (UTC)
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDE826AA
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 22:01:33 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-40371070eb7so133341cf.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 22:01:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689829292; x=1690434092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M1r+7M+7iduJCuOH1Pptct5pU9CyBnmIFvAwXH3+btA=;
-        b=Zw0jRu3YJyQog84YWvutJlhtz2wzjYGuxxSi7UhzbSeaZ52sLr7xaYAoprEUkuI7VO
-         kgsjXA5OaR87TPg1oeGLaFnFm3Fr/sBLIV4r8JuPcn04ZTq3WJR0BFqZiiB3zDX8sk0Q
-         vrhJxl4cgwS7OZHPp3KhsJVpgavJeg8DUJ2yFA3BQA/0wRSqvl4nQoPRHMJPqVKmKDiL
-         g2biidjajRr0kPwYV1ln5R8p5e4OxlgBiUt8d5QWKstZNlgrmFNPXg4lmbuOqlK7s+Ji
-         b0ilW2LIHxz5pXwdPdItqV7umH391Dr+mJb+ufpW1tPbEnOkl8m2QMkfUFgE6l4uawOQ
-         G1vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689829292; x=1690434092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M1r+7M+7iduJCuOH1Pptct5pU9CyBnmIFvAwXH3+btA=;
-        b=dgYL6W7/P3fOpvP/xT22VKb3vja5gCMMHCt8OobzdstRW+jfvTbhwVFOm9gdpdv0F0
-         hqc7xbl8OIIOFG8DJrTXJWyXggcUE3aBGkffo+YkfOnW7IuOq4GVTb7IkPHjBdQSqb5F
-         NNmNECERnkrKcBinJZ5cdCFTeSMhMw/vyk3E3yhleGPWqmwye3+dckLfnzg/84nrdURr
-         mZ+/eEcEUjHPwdkX5WLxOEvi/Fnn3p0G6Uy/Tcw7/FwzLZos5AuciViRhW5SrKDE4fuZ
-         BNYxt87T9tTv9VflXiZ7Yc6bUONf3+I2GGCBATmgt3yIAIHpqUtkmRVItwXNV0Cht7yF
-         GtFQ==
-X-Gm-Message-State: ABy/qLbkxCAOdBVHj7g8AxELAPAwaJq9jndPr1rhPbXX+2RyNDHsWkDE
-	ImuS0APJxZQDGD6Pz26WHNufCRwS5cq8zfuCLolm2g==
-X-Google-Smtp-Source: APBJJlGH0VQ+vUwSbKdi7EttuKPp+F8VLSMO8DSLKsRsQ4a45v/0GA7QlmPTSmnDgw7MT5JIWVzqOIucwkfO6SEmWuM=
-X-Received: by 2002:a05:622a:1449:b0:403:58e8:2d96 with SMTP id
- v9-20020a05622a144900b0040358e82d96mr117408qtx.7.1689829291995; Wed, 19 Jul
- 2023 22:01:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F411C01
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 05:03:36 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88BF4BE;
+	Wed, 19 Jul 2023 22:03:34 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 0608D6015E;
+	Thu, 20 Jul 2023 07:03:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689829411; bh=ATlhYaC4/eBWEtfxH5B5MahIAXkAd2Dl3aEC80RgbtA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=0GFQfHp57rZE3O7//QvLdaIk3wecUDr+qys/SFnxJEoSBDadfF5VViDHUz0lag8xY
+	 XUSPOwfemzh9wE3Enof5apqg7JwnMXW3iU7AQD5x6xBCGT377NDH51AJo8ep4GxPy4
+	 yozekWGSORY9TOg2XocUfn/UPpkUUjS/KQd0TDS+9NDDWOyYu37ABwlTkApPKPMxXN
+	 Lv5GYDMoiYNklx7OsRLyyGv4zi6rzLI4nvWpPdd6BL+tDEIeCD+riiSUBMccYZxw7t
+	 0xiJH+JYEXYAqEEQ+m4whYPzXZzOTgrEEw8PItoKMjkLakbZ9biwgawSQt6gtf2W9C
+	 u7jHHqbqqc8IA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 33o0xE-ZJ_c7; Thu, 20 Jul 2023 07:03:28 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id A160360157;
+	Thu, 20 Jul 2023 07:03:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689829408; bh=ATlhYaC4/eBWEtfxH5B5MahIAXkAd2Dl3aEC80RgbtA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=X0VMgcGh+QgHSRj5tZAf5IWszAcX4u9C+ioajSpcDckDpdpsXUP76GHkZeLKiN8gk
+	 8Pv3xkEVRXZDSjRdTZxrFXLgGOc1YRVHWIeDZfS8CbmkQbI5UYJhKbS+rXNK0XEoTh
+	 PTrIqJIgA8IHTOtuwk/5grJ6CnO6obddRqPpHM08tAYXByHT0ejQCaAYad0cXEKkUI
+	 aRKzDWQHolYLEuU5TvXT7nsQ0+Y9Ppmf2G13FtBRiljO2G3hAdtghRZIH3mNVtZTyx
+	 9jjk9rw+Nvq3td4TcZpkgp1UGrTj0q4eU+I+2FG5uydSfsHmUdQoC4wEbaEDBRjFRI
+	 jIS+poqpj7uDw==
+Message-ID: <7bd3ef7b-a4dc-6d0f-6d58-66533de292cf@alu.unizg.hr>
+Date: Thu, 20 Jul 2023 07:03:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230720005456.88770-1-kuniyu@amazon.com>
-In-Reply-To: <20230720005456.88770-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 20 Jul 2023 07:01:20 +0200
-Message-ID: <CANn89iLmNtDp7gK2xo_znvh+9-JUyNAW7E2xieLkpBMth96DBw@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next] net: Use sockaddr_storage for getsockopt(SO_PEERNAME).
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Breno Leitao <leitao@debian.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PROBLEM] selftests: net/forwarding/bridge_mdb.sh: 'Command
+ "replace" is unknown, try "bridge mdb help"'
+To: Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ linux-kernel@vger.kernel.org
+References: <6b04b2ba-2372-6f6b-3ac8-b7cba1cfae83@alu.unizg.hr>
+ <ZLffjNMaJZiGJytj@shredder>
+Content-Language: en-US
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZLffjNMaJZiGJytj@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 2:55=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> Commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3D3") started
-> applying strict rules to standard string functions.
->
-> It does not work well with conventional socket code around each protocol-
-> specific struct sockaddr_XXX, which is cast from sockaddr_storage and has
-> a bigger size than fortified functions expect.  (See Link)
->
-> We must cast the protocol-specific address back to sockaddr_storage
-> to call such functions.
->
-> However, in the case of getsockaddr(SO_PEERNAME), the rationale is a bit
-> unclear as the buffer is defined by char[128] which is the same size as
-> sockaddr_storage.
->
-> Let's use sockaddr_storage implicitly.
->
-> Link: https://lore.kernel.org/netdev/20230720004410.87588-1-kuniyu@amazon=
-.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On 7/19/23 15:05, Ido Schimmel wrote:
+> On Tue, Jul 18, 2023 at 09:02:31PM +0200, Mirsad Todorovac wrote:
+>> Command "replace" is unknown, try "bridge mdb help".
+> 
+> You are running the test with an old iproute2 that doesn't support the
+> replace command. The following patches [1][2] skip the tests in this
+> case. However, you will get better test coverage with iproute2-next [3]
+> compared to the version shipped with your distribution.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+You are right and though I was using the latest iproute2 from the
+Ubuntu 22.04 LTS and 22.10, the iproute2-next had unlocked the test suite.
 
-Thanks.
+> [1]
+> diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+> index ae3f9462a2b6..a1bd4900acb6 100755
+> --- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+> +++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+> @@ -1206,6 +1206,12 @@ ctrl_test()
+>          ctrl_mldv2_is_in_test
+>   }
+>   
+> +bridge mdb help 2>&1 | grep -q "replace"
+> +if [ $? -ne 0 ]; then
+> +       echo "SKIP: iproute2 too old, missing bridge mdb replace support"
+> +       exit $ksft_skip
+> +fi
+> +
+>   trap cleanup EXIT
+>   
+>   setup_prepare
+> 
+> [2]
+> diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh b/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh
+> index ae255b662ba3..a1c4aec4cbb1 100755
+> --- a/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh
+> +++ b/tools/testing/selftests/net/forwarding/bridge_mdb_max.sh
+> @@ -1328,6 +1328,12 @@ test_8021qvs()
+>          switch_destroy
+>   }
+>   
+> +bridge link help 2>&1 | grep -q "mcast_max_groups"
+> +if [ $? -ne 0 ]; then
+> +       echo "SKIP: iproute2 too old, missing bridge \"mcast_max_groups\" support"
+> +       exit $ksft_skip
+> +fi
+> +
+>   trap cleanup EXIT
+>   
+>   setup_prepare
+> 
+> [3] https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
 
