@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-19414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBDE275A989
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:44:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD5575A987
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14C0F1C21394
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:44:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6A6E281CA3
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 370DE18C0B;
-	Thu, 20 Jul 2023 08:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CF217FFE;
+	Thu, 20 Jul 2023 08:30:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D40C18C09
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D1718C0B
 	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:30:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C2BBC0092D;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35967C4E666;
 	Thu, 20 Jul 2023 08:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689841799;
-	bh=Rn85mdJ/ubzChlkyTdaJIEQMNcdiS2eD3d6eKeixrwY=;
+	bh=tQpRwOI9qd6EISdIVOISFvSg8C78HBc9uOA039m8NQg=;
 	h=From:Date:Subject:References:In-Reply-To:List-Id:To:Cc:Reply-To:
 	 From;
-	b=WAM+gjNO2TOxrg2bHfy4hQC6J5Yy1mao9ey4t60yy5Sd8paDf7taVO7PO+9scuBb6
-	 y0d24CXTbV5g/MueOgTtMMAiMUNHgjJ2fvQQ3wwed4ngJYvMJX6/EgKHwSrZmHrKyS
-	 2owDM0u3XWWjW5+o2TVMi/2zGAItja4mg2xK9dpD2jW20u61Jj3JKmiUCBKLwtKuYE
-	 WXShzeIqez3ddEO/zxCzrwqpJ2OW1v6q13t4Xow8FT18bkDWe+aRdHEt6PPq/ScQ4N
-	 E9WRGb/wmUQ1ngiWVoBfObdg3Uln4OuNCYvX+s548U8Fd57mRM34Oz4H5qsRSHhHgy
-	 52OTAGmeGJ3JQ==
+	b=GYbSz1ZoNassX5VMn5FpD+ybpDhMRbSkdezpYilMz21rr4TFD09A9QUxVOM9EU2d1
+	 fRKnKL9EiKTjs0Gl+QB274vqlfyg+r1TU0YPhE4sRo9jft2Y8NNqZHujaY0O4hmIsq
+	 7WiCrHq+nr0MmiebQ31LJjbYmioDU5CZDMsrVhf0gM7h5SHFJW/N00dZWHc946j3ny
+	 0N59EfKsyRy+GStQ4K01OVWWS+xHmousoWq/ygeJpSGWyFFedv7UmgniZvyR56sJmn
+	 v8V0CDlpogmUrQkVak1dTx/qsdJaj91pfL2Z2eo3143FXcUowXPimeEh0/UFx5Nwab
+	 MhSeLnODLnygQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 079D1C3DA4A;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160E6C25B74;
 	Thu, 20 Jul 2023 08:29:59 +0000 (UTC)
 From:
  Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Thu, 20 Jul 2023 14:29:40 +0300
-Subject: [PATCH v3 40/42] ARM: ep93xx: soc: drop defines
+Date: Thu, 20 Jul 2023 14:29:41 +0300
+Subject: [PATCH v3 41/42] ARM: dts: ep93xx: Add EDB9302 DT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,7 +46,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230605-ep93xx-v3-40-3d63a5f1103e@maquefel.me>
+Message-Id: <20230605-ep93xx-v3-41-3d63a5f1103e@maquefel.me>
 References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
 In-Reply-To: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
 List-Id: <soc.lore.kernel.org>
@@ -88,11 +88,11 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
  linux-input@vger.kernel.org, alsa-devel@alsa-project.org
 X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689852591; l=3461;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689852591; l=4512;
  i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=/0hu0wNyYry9eR46z/4lIsm3+iKNRxnRunuFsPli+8o=; =?utf-8?q?b=3Dt8Gn2nV56UbD?=
- =?utf-8?q?luRJPQc3FRT4VxEEMl7OaEwz+VnOlVqplWzIXprCGjvnSxKqTmm6TVGiAxU3uE3Z?=
- hOjGjomdBuHASZBWo5WDu100TssjQmqkye26+BwegESTc7k8aeLG
+ bh=5A/29Z9MEsZn34YHAjSZrcVyC80yiuUqer7DzC/dFHU=; =?utf-8?q?b=3DQQcWlnw/kBKF?=
+ =?utf-8?q?Rps3KM+YKWtLXhoIshjWyk2O7eP9CGncWEaSJERWuOZCZZyVcCUKfMYJqTqP2u64?=
+ COrsnPXNAU5aP+LE3xWErGGy0JDSJA+HL3C6+HFsQ35RKBIDKxBW
 X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
  pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
 X-Endpoint-Received:
@@ -100,109 +100,212 @@ X-Endpoint-Received:
 X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
 Reply-To: <nikita.shubin@maquefel.me>
 
-From: Nikita Shubin <nikita.shubin@maquefel.me>
+From: Alexander Sverdlin <alexander.sverdlin@gmail.com>
 
-Remove unnecessary defines, as we dropped board files.
+Add device tree for Cirrus EDB9302.
 
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
 Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
 ---
- include/linux/platform_data/eth-ep93xx.h    | 10 ---------
- include/linux/platform_data/keypad-ep93xx.h | 32 -----------------------------
- include/linux/soc/cirrus/ep93xx.h           | 13 ------------
- 3 files changed, 55 deletions(-)
+ arch/arm/boot/dts/cirrus/Makefile           |   1 +
+ arch/arm/boot/dts/cirrus/ep93xx-edb9302.dts | 178 ++++++++++++++++++++++++++++
+ 2 files changed, 179 insertions(+)
 
-diff --git a/include/linux/platform_data/eth-ep93xx.h b/include/linux/platform_data/eth-ep93xx.h
-deleted file mode 100644
-index 8eef637a804d..000000000000
---- a/include/linux/platform_data/eth-ep93xx.h
-+++ /dev/null
-@@ -1,10 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _LINUX_PLATFORM_DATA_ETH_EP93XX
--#define _LINUX_PLATFORM_DATA_ETH_EP93XX
--
--struct ep93xx_eth_data {
--	unsigned char	dev_addr[6];
--	unsigned char	phy_id;
--};
--
--#endif
-diff --git a/include/linux/platform_data/keypad-ep93xx.h b/include/linux/platform_data/keypad-ep93xx.h
-deleted file mode 100644
-index 3054fced8509..000000000000
---- a/include/linux/platform_data/keypad-ep93xx.h
-+++ /dev/null
-@@ -1,32 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __KEYPAD_EP93XX_H
--#define __KEYPAD_EP93XX_H
--
--struct matrix_keymap_data;
--
--/* flags for the ep93xx_keypad driver */
--#define EP93XX_KEYPAD_DISABLE_3_KEY	(1<<0)	/* disable 3-key reset */
--#define EP93XX_KEYPAD_DIAG_MODE		(1<<1)	/* diagnostic mode */
--#define EP93XX_KEYPAD_BACK_DRIVE	(1<<2)	/* back driving mode */
--#define EP93XX_KEYPAD_TEST_MODE		(1<<3)	/* scan only column 0 */
--#define EP93XX_KEYPAD_AUTOREPEAT	(1<<4)	/* enable key autorepeat */
--
--/**
-- * struct ep93xx_keypad_platform_data - platform specific device structure
-- * @keymap_data:	pointer to &matrix_keymap_data
-- * @debounce:		debounce start count; terminal count is 0xff
-- * @prescale:		row/column counter pre-scaler load value
-- * @flags:		see above
-- */
--struct ep93xx_keypad_platform_data {
--	struct matrix_keymap_data *keymap_data;
--	unsigned int	debounce;
--	unsigned int	prescale;
--	unsigned int	flags;
--	unsigned int	clk_rate;
--};
--
--#define EP93XX_MATRIX_ROWS		(8)
--#define EP93XX_MATRIX_COLS		(8)
--
--#endif	/* __KEYPAD_EP93XX_H */
-diff --git a/include/linux/soc/cirrus/ep93xx.h b/include/linux/soc/cirrus/ep93xx.h
-index 77490fe466c6..89ce4867df3a 100644
---- a/include/linux/soc/cirrus/ep93xx.h
-+++ b/include/linux/soc/cirrus/ep93xx.h
-@@ -2,7 +2,6 @@
- #ifndef _SOC_EP93XX_H
- #define _SOC_EP93XX_H
- 
--struct platform_device;
- struct regmap;
- 
- #define EP93XX_CHIP_REV_D0	3
-@@ -11,15 +10,6 @@ struct regmap;
- #define EP93XX_CHIP_REV_E1	6
- #define EP93XX_CHIP_REV_E2	7
- 
--#if defined(CONFIG_EP93XX_SOC_COMMON)
--int ep93xx_i2s_acquire(void);
--void ep93xx_i2s_release(void);
--unsigned int ep93xx_chip_revision(void);
--
--#else
--static inline int ep93xx_i2s_acquire(void) { return 0; }
--static inline void ep93xx_i2s_release(void) {}
--
- #if defined(CONFIG_EP93XX_SOC)
- void ep93xx_syscon_swlocked_write(struct regmap *map, unsigned int reg, unsigned int val);
- void ep93xx_devcfg_set_clear(struct regmap *map, unsigned int set_bits, unsigned int clear_bits);
-@@ -33,9 +23,6 @@ static inline void ep93xx_devcfg_set_clear(struct regmap *map, unsigned int set_
- 
- void ep93xx_swlocked_update_bits(struct regmap *map, unsigned int reg,
- 				unsigned int mask, unsigned int val) { }
--static inline unsigned int ep93xx_chip_revision(void) { return 0; }
--#endif
--
- #endif
- 
- #endif
+diff --git a/arch/arm/boot/dts/cirrus/Makefile b/arch/arm/boot/dts/cirrus/Makefile
+index 211a7e2f2115..e6015983e464 100644
+--- a/arch/arm/boot/dts/cirrus/Makefile
++++ b/arch/arm/boot/dts/cirrus/Makefile
+@@ -4,5 +4,6 @@ dtb-$(CONFIG_ARCH_CLPS711X) += \
+ dtb-$(CONFIG_ARCH_CLPS711X) += \
+ 	ep7211-edb7211.dtb
+ dtb-$(CONFIG_ARCH_EP93XX) += \
++	ep93xx-edb9302.dtb \
+ 	ep93xx-bk3.dtb \
+ 	ep93xx-ts7250.dtb
+diff --git a/arch/arm/boot/dts/cirrus/ep93xx-edb9302.dts b/arch/arm/boot/dts/cirrus/ep93xx-edb9302.dts
+new file mode 100644
+index 000000000000..b048fd131aa5
+--- /dev/null
++++ b/arch/arm/boot/dts/cirrus/ep93xx-edb9302.dts
+@@ -0,0 +1,178 @@
++// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++/*
++ * Device Tree file for Cirrus Logic EDB9302 board based on EP9302 SoC
++ */
++/dts-v1/;
++#include "ep93xx.dtsi"
++#include <dt-bindings/dma/cirrus,ep93xx-dma.h>
++
++/ {
++	#address-cells = <1>;
++	#size-cells = <1>;
++	compatible = "cirrus,edb9302", "cirrus,ep9301";
++	model = "cirrus,edb9302";
++
++	chosen {
++	};
++
++	memory@0 {
++		device_type = "memory";
++		/* should be set from ATAGS */
++		reg = <0x0000000 0x800000>,
++		      <0x1000000 0x800000>,
++		      <0x4000000 0x800000>,
++		      <0x5000000 0x800000>;
++	};
++
++	flash@60000000 {
++		compatible = "cfi-flash";
++		reg = <0x60000000 0x1000000>;
++		bank-width = <2>;
++	};
++
++	sound {
++		compatible = "simple-audio-card";
++		simple-audio-card,name = "EDB93XX";
++		simple-audio-card,format = "i2s";
++		simple-audio-card,mclk-fs = <256>;
++		simple-audio-card,convert-channels = <2>;
++		simple-audio-card,convert-sample-format = "s32_le";
++
++		simple-audio-card,cpu {
++			sound-dai = <&i2s>;
++			system-clock-direction-out;
++			frame-master;
++			bitclock-master;
++			dai-sample-format = "s32_le";
++			dai-channels = <2>;
++		};
++
++		simple-audio-card,codec {
++			sound-dai = <&cs4271>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		led-0 {
++			label = "grled";
++			gpios = <&gpio4 0 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "heartbeat";
++			function = LED_FUNCTION_HEARTBEAT;
++		};
++
++		led-1 {
++			label = "rdled";
++			gpios = <&gpio4 1 GPIO_ACTIVE_HIGH>;
++			function = LED_FUNCTION_FAULT;
++		};
++	};
++};
++
++&adc {
++	status = "okay";
++};
++
++&eth0 {
++	phy-handle = <&phy0>;
++};
++
++&gpio0 {
++	gpio-ranges = <&pinctrl 0 153 1>,
++		      <&pinctrl 1 152 1>,
++		      <&pinctrl 2 151 1>,
++		      <&pinctrl 3 148 1>,
++		      <&pinctrl 4 147 1>,
++		      <&pinctrl 5 146 1>,
++		      <&pinctrl 6 145 1>,
++		      <&pinctrl 7 144 1>;
++};
++
++&gpio1 {
++	gpio-ranges = <&pinctrl 0 143 1>,
++		      <&pinctrl 1 142 1>,
++		      <&pinctrl 2 141 1>,
++		      <&pinctrl 3 140 1>,
++		      <&pinctrl 4 165 1>,
++		      <&pinctrl 5 164 1>,
++		      <&pinctrl 6 163 1>,
++		      <&pinctrl 7 160 1>;
++};
++
++&gpio2 {
++	gpio-ranges = <&pinctrl 0 115 1>;
++	status = "okay";
++};
++
++&gpio4 {
++	gpio-ranges = <&pinctrl 0 97 2>;
++	status = "okay";
++};
++
++&gpio5 {
++	gpio-ranges = <&pinctrl 1 170 1>,
++		      <&pinctrl 2 169 1>,
++		      <&pinctrl 3 168 1>;
++};
++
++&gpio6 {
++	gpio-ranges = <&pinctrl 0 87 2>;
++	status = "okay";
++};
++
++&gpio7 {
++	gpio-ranges = <&pinctrl 2 199 4>;
++	status = "okay";
++};
++
++&i2s {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_on_ac97_pins>;
++	status = "okay";
++};
++
++&mdio0 {
++	phy0: ethernet-phy@1 {
++		reg = <1>;
++		device_type = "ethernet-phy";
++	};
++};
++
++&spi0 {
++	cs-gpios = <&gpio0 6 GPIO_ACTIVE_LOW
++		    &gpio0 7 GPIO_ACTIVE_LOW>;
++	dmas = <&dma1 EP93XX_DMA_SSP>;
++	status = "okay";
++
++	cs4271: codec@0 {
++		compatible = "cirrus,cs4271";
++		reg = <0>;
++		#sound-dai-cells = <0>;
++		spi-max-frequency = <6000000>;
++		spi-cpol;
++		spi-cpha;
++		reset-gpio = <&gpio0 1 GPIO_ACTIVE_HIGH>;
++	};
++
++	at25f1024: eeprom@1 {
++		compatible = "atmel,at25";
++		reg = <1>;
++		address-width = <8>;
++		size = <0x20000>;
++		pagesize = <256>;
++		spi-max-frequency = <20000000>;
++	};
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&uart1 {
++	status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++};
++
 
 -- 
 2.39.2
