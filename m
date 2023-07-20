@@ -1,237 +1,82 @@
-Return-Path: <netdev+bounces-19470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5721C75ACAE
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:15:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4CBF75ACDE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C591C213B0
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:15:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913DC281DE6
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2FB17740;
-	Thu, 20 Jul 2023 11:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FED917742;
+	Thu, 20 Jul 2023 11:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEE917AAD
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:15:27 +0000 (UTC)
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE45426B2;
-	Thu, 20 Jul 2023 04:15:21 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-	by ex01.ufhost.com (Postfix) with ESMTP id 1DB0524E16E;
-	Thu, 20 Jul 2023 19:15:13 +0800 (CST)
-Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 20 Jul
- 2023 19:15:13 +0800
-Received: from starfive-sdk.starfivetech.com (171.223.208.138) by
- EXMBX062.cuchost.com (172.16.6.62) with Microsoft SMTP Server (TLS) id
- 15.0.1497.42; Thu, 20 Jul 2023 19:15:11 +0800
-From: Samin Guo <samin.guo@starfivetech.com>
-To: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Peter Geis <pgwipeout@gmail.com>, Frank
-	<Frank.Sae@motor-comm.com>
-CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Conor Dooley
-	<conor@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"Russell King" <linux@armlinux.org.uk>, Samin Guo
-	<samin.guo@starfivetech.com>, "Yanhong Wang" <yanhong.wang@starfivetech.com>
-Subject: [PATCH v5 2/2] net: phy: motorcomm: Add pad drive strength cfg support
-Date: Thu, 20 Jul 2023 19:15:09 +0800
-Message-ID: <20230720111509.21843-3-samin.guo@starfivetech.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230720111509.21843-1-samin.guo@starfivetech.com>
-References: <20230720111509.21843-1-samin.guo@starfivetech.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3275417729
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C002CC433C9;
+	Thu, 20 Jul 2023 11:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689852021;
+	bh=JhATuRWld8m326cJcmmXb4ZQphF/aYh/S/jht5BqXV4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jujlkXLqkvSTcrvMuNFQcD5mZ61KkQZWerecUP/9GJxQLu4op8k658OsY20R6bXac
+	 Pnscig1MFJ8vSGrmnk+AIbtbjGi1zbebK7oM/W7+JE14u5OJuKfs1wg94svQEvmKsz
+	 PrsfaTM+Pro4ZmCjzKE7+vUCZ+Q2lBdPVn5+s2KCmOqBzW5biuG+ovGsRuVMl29MMJ
+	 ylFsNu+ZVsrsZTrMqZYmL5fEEqzttF6AFuJxbP56hN0PUPKQN7yPYwI+h2gP84Frn8
+	 cOCTo/zgzpTYgkAeQvt4IfkDsLlUnoczE7zgPSH+rNS9328+BclyosriWVhJaOuhNo
+	 Do7uPJnXjTfMg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A3AD7E21EF6;
+	Thu, 20 Jul 2023 11:20:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [171.223.208.138]
-X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX062.cuchost.com
- (172.16.6.62)
-X-YovoleRuleAgent: yovoleflag
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] tcp: add TCP_OLD_SEQUENCE drop reason
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168985202166.22827.15771843060649946489.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jul 2023 11:20:21 +0000
+References: <20230719064754.2794106-1-edumazet@google.com>
+In-Reply-To: <20230719064754.2794106-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-The motorcomm phy (YT8531) supports the ability to adjust the drive
-strength of the rx_clk/rx_data, and the default strength may not be
-suitable for all boards. So add configurable options to better match
-the boards.(e.g. StarFive VisionFive 2)
+Hello:
 
-When we configure the drive strength, we need to read the current
-LDO voltage value to ensure that it is a legal value at that LDO
-voltage.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Reviewed-by: Hal Feng <hal.feng@starfivetech.com>
-Signed-off-by: Samin Guo <samin.guo@starfivetech.com>
----
- drivers/net/phy/motorcomm.c | 118 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 118 insertions(+)
+On Wed, 19 Jul 2023 06:47:54 +0000 you wrote:
+> tcp_sequence() uses two conditions to decide to drop a packet,
+> and we currently report generic TCP_INVALID_SEQUENCE drop reason.
+> 
+> Duplicates are common, we need to distinguish them from
+> the other case.
+> 
+> I chose to not reuse TCP_OLD_DATA, and instead added
+> TCP_OLD_SEQUENCE drop reason.
+> 
+> [...]
 
-diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-index 2fa5a90e073b..7a11fdb687cc 100644
---- a/drivers/net/phy/motorcomm.c
-+++ b/drivers/net/phy/motorcomm.c
-@@ -163,6 +163,10 @@
- 
- #define YT8521_CHIP_CONFIG_REG			0xA001
- #define YT8521_CCR_SW_RST			BIT(15)
-+#define YT8531_RGMII_LDO_VOL_MASK		GENMASK(5, 4)
-+#define YT8531_LDO_VOL_3V3			0x0
-+#define YT8531_LDO_VOL_1V8			0x2
-+
- /* 1b0 disable 1.9ns rxc clock delay  *default*
-  * 1b1 enable 1.9ns rxc clock delay
-  */
-@@ -236,6 +240,12 @@
-  */
- #define YTPHY_WCR_TYPE_PULSE			BIT(0)
- 
-+#define YTPHY_PAD_DRIVE_STRENGTH_REG		0xA010
-+#define YT8531_RGMII_RXC_DS_MASK		GENMASK(15, 13)
-+#define YT8531_RGMII_RXD_DS_HI_MASK		BIT(12)		/* Bit 2 of rxd_ds */
-+#define YT8531_RGMII_RXD_DS_LOW_MASK		GENMASK(5, 4)	/* Bit 1/0 of rxd_ds */
-+#define YT8531_RGMII_RX_DS_DEFAULT		0x3
-+
- #define YTPHY_SYNCE_CFG_REG			0xA012
- #define YT8521_SCR_SYNCE_ENABLE			BIT(5)
- /* 1b0 output 25m clock
-@@ -834,6 +844,110 @@ static int ytphy_rgmii_clk_delay_config_with_lock(struct phy_device *phydev)
- 	return ret;
- }
- 
-+/**
-+ * struct ytphy_ldo_vol_map - map a current value to a register value
-+ * @vol: ldo voltage
-+ * @ds:  value in the register
-+ * @cur: value in device configuration
-+ */
-+struct ytphy_ldo_vol_map {
-+	u32 vol;
-+	u32 ds;
-+	u32 cur;
-+};
-+
-+static const struct ytphy_ldo_vol_map yt8531_ldo_vol[] = {
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 0, .cur = 1200},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 1, .cur = 2100},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 2, .cur = 2700},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 3, .cur = 2910},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 4, .cur = 3110},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 5, .cur = 3600},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 6, .cur = 3970},
-+	{.vol = YT8531_LDO_VOL_1V8, .ds = 7, .cur = 4350},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 0, .cur = 3070},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 1, .cur = 4080},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 2, .cur = 4370},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 3, .cur = 4680},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 4, .cur = 5020},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 5, .cur = 5450},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 6, .cur = 5740},
-+	{.vol = YT8531_LDO_VOL_3V3, .ds = 7, .cur = 6140},
-+};
-+
-+static u32 yt8531_get_ldo_vol(struct phy_device *phydev)
-+{
-+	u32 val;
-+
-+	val = ytphy_read_ext_with_lock(phydev, YT8521_CHIP_CONFIG_REG);
-+	val = FIELD_GET(YT8531_RGMII_LDO_VOL_MASK, val);
-+
-+	return val <= YT8531_LDO_VOL_1V8 ? val : YT8531_LDO_VOL_1V8;
-+}
-+
-+static int yt8531_get_ds_map(struct phy_device *phydev, u32 cur)
-+{
-+	u32 vol;
-+	int i;
-+
-+	vol = yt8531_get_ldo_vol(phydev);
-+	for (i = 0; i < ARRAY_SIZE(yt8531_ldo_vol); i++) {
-+		if (yt8531_ldo_vol[i].vol == vol && yt8531_ldo_vol[i].cur == cur)
-+			return yt8531_ldo_vol[i].ds;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static int yt8531_set_ds(struct phy_device *phydev)
-+{
-+	struct device_node *node = phydev->mdio.dev.of_node;
-+	u32 ds_field_low, ds_field_hi, val;
-+	int ret, ds;
-+
-+	/* set rgmii rx clk driver strength */
-+	if (!of_property_read_u32(node, "motorcomm,rx-clk-drv-microamp", &val)) {
-+		ds = yt8531_get_ds_map(phydev, val);
-+		if (ds < 0)
-+			return dev_err_probe(&phydev->mdio.dev, ds,
-+					     "No matching current value was found.\n");
-+	} else {
-+		ds = YT8531_RGMII_RX_DS_DEFAULT;
-+	}
-+
-+	ret = ytphy_modify_ext_with_lock(phydev,
-+					 YTPHY_PAD_DRIVE_STRENGTH_REG,
-+					 YT8531_RGMII_RXC_DS_MASK,
-+					 FIELD_PREP(YT8531_RGMII_RXC_DS_MASK, ds));
-+	if (ret < 0)
-+		return ret;
-+
-+	/* set rgmii rx data driver strength */
-+	if (!of_property_read_u32(node, "motorcomm,rx-data-drv-microamp", &val)) {
-+		ds = yt8531_get_ds_map(phydev, val);
-+		if (ds < 0)
-+			return dev_err_probe(&phydev->mdio.dev, ds,
-+					     "No matching current value was found.\n");
-+	} else {
-+		ds = YT8531_RGMII_RX_DS_DEFAULT;
-+	}
-+
-+	ds_field_hi = FIELD_GET(BIT(2), ds);
-+	ds_field_hi = FIELD_PREP(YT8531_RGMII_RXD_DS_HI_MASK, ds_field_hi);
-+
-+	ds_field_low = FIELD_GET(GENMASK(1, 0), ds);
-+	ds_field_low = FIELD_PREP(YT8531_RGMII_RXD_DS_LOW_MASK, ds_field_low);
-+
-+	ret = ytphy_modify_ext_with_lock(phydev,
-+					 YTPHY_PAD_DRIVE_STRENGTH_REG,
-+					 YT8531_RGMII_RXD_DS_LOW_MASK | YT8531_RGMII_RXD_DS_HI_MASK,
-+					 ds_field_low | ds_field_hi);
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
-+}
-+
- /**
-  * yt8521_probe() - read chip config then set suitable polling_mode
-  * @phydev: a pointer to a &struct phy_device
-@@ -1518,6 +1632,10 @@ static int yt8531_config_init(struct phy_device *phydev)
- 			return ret;
- 	}
- 
-+	ret = yt8531_set_ds(phydev);
-+	if (ret < 0)
-+		return ret;
-+
- 	return 0;
- }
- 
+Here is the summary with links:
+  - [net-next] tcp: add TCP_OLD_SEQUENCE drop reason
+    https://git.kernel.org/netdev/net-next/c/b44693495af8
+
+You are awesome, thank you!
 -- 
-2.17.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
