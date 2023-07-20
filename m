@@ -1,111 +1,89 @@
-Return-Path: <netdev+bounces-19460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C2D75AC4E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:48:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFEA675AC5D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E971C2134A
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:48:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AF62281D7C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4A6174E9;
-	Thu, 20 Jul 2023 10:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E269A171CC;
+	Thu, 20 Jul 2023 10:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3E62F3F;
-	Thu, 20 Jul 2023 10:48:21 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2C71726;
-	Thu, 20 Jul 2023 03:48:18 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fbf1b82d9cso4904175e9.2;
-        Thu, 20 Jul 2023 03:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689850097; x=1690454897;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sz2Sq0S+RXTbDpe9ecyzrk2o3BfrHc1B7uV4sD294ak=;
-        b=loptYpAXNpFv0UzT4EsQ7SlIaYQ2/6hrwYsrM1Sv37QjPXVP/8jSQXbo2fVrM65g2A
-         xP8NDYXIM2oqX1KqnV92D5kQoQzFUgOdrPMQqkLCBElaCnLgPxkJAMW1t/Z1F3rIWDdj
-         /u0oTmwztDWwwhSxIvNdVr+OqiPuiDePJtFtLivNkw1BDh90ixVnbaq9R31M27+HUvdx
-         44AapSy4jete34LLVB4qSEMRZGPZtD1vTgdbYTkShl8DPKNI2piSJdlKnoPgqsy/Omfd
-         uEd65ZQqOpFvk0cN/oRBs9qUTaakYGpcTgsFMFxWmfczuxNazW34hHtizlTFk6CU7IjG
-         1E8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689850097; x=1690454897;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Sz2Sq0S+RXTbDpe9ecyzrk2o3BfrHc1B7uV4sD294ak=;
-        b=JsoXCdI75xU0kvM9b5KWsnAopMKbObaSUUAcGbzlbEWqFbAxcHfvMFcXxFmaTCBn8N
-         +Wj73moPC3Jkifg6QLoMMtMbnxeYLL8DsIWrDRk4t+dlY5WF+18Yns3ncszAySnpMba1
-         yJd4epQtBh5c6xsSmJ7ie2+kGkOjk5+oeGsTC7Nq1Log6Z4VvUC10JpNm31Y2p8H3TOX
-         3c5gC7c88STWIUkcFSE/AnBMJfb0Qq25L7AjEKsRdFH6AuWSi71fXtQGBoNHi/JOcj9d
-         keUcToSkj6XUeZEx/0X1k5b0YAO+pvCJQJjyj5sr8oQ6KuKELdyeB9jiEEyXmE/12J4Z
-         mabQ==
-X-Gm-Message-State: ABy/qLa+8UWYF3hU8GH1jarryEGEhbgnodriMJNeHhUt3PZtl8HLOxw6
-	8h+XaLjmXXA38B60bXGV3vM=
-X-Google-Smtp-Source: APBJJlFa2N27wsuW7LwOxH+2o4ECxN+x3FVslcpd52LhxX4ODZMoN3kZnKpZRv5TSJFEP1CssvKYQA==
-X-Received: by 2002:a05:600c:2150:b0:3fb:be07:5343 with SMTP id v16-20020a05600c215000b003fbbe075343mr4322704wml.27.1689850096684;
-        Thu, 20 Jul 2023 03:48:16 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id p26-20020a7bcc9a000000b003fbc0a49b57sm893454wma.6.2023.07.20.03.48.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 03:48:15 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] selftests/xsk: Fix spelling mistake "querrying" -> "querying"
-Date: Thu, 20 Jul 2023 11:48:15 +0100
-Message-Id: <20230720104815.123146-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9DD199ED
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:50:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DC98C433C9;
+	Thu, 20 Jul 2023 10:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689850222;
+	bh=Pbu6PsThcCjtA11Eu9h2+NnVNrCz4HVqEbnnSDw7XJM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pQcL4aC8dR2zJElQ39HdEW190q0o2uXxOVNQwPpwZoQOf+0LimQw8p77tb0lDD8V+
+	 sMJX5xpwB8LujcMSbBiuG0xHS4PTKSEdwmojLSsF9k1qI58IbB6iNrDdkRIp/O9h/d
+	 S72A7Gk0HUjwFh06agavciksJfx23nI9bddUbEL1juGRPQkq1PYVuyjPbSOBJZHn9X
+	 no229O/7l+Uhv/RkcdyDv1dSKNMKK1Udq/dz05nYDwe6Kv/JgSG+ut8uArZ0s85URH
+	 C+BNJUDbMpY8LKD9fbXV9VwhwrXZ9ADzxqrwkSD/pWnl9a0JgzeAY6JSsokoGz33XX
+	 TnTSSm+u1RGMQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E2E01E21EF6;
+	Thu, 20 Jul 2023 10:50:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next v4 0/5] Add a driver for the Marvell 88Q2110 PHY
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168985022192.7083.10091007682016221915.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jul 2023 10:50:21 +0000
+References: <20230719064258.9746-1-eichest@gmail.com>
+In-Reply-To: <20230719064258.9746-1-eichest@gmail.com>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, francesco.dolcini@toradex.com, kabel@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
-There is a spelling mistake in an error message. Fix it.
+Hello:
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- tools/testing/selftests/bpf/xskxceiver.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 3ff436706640..2827f2d7cf30 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -2076,7 +2076,7 @@ static void init_iface(struct ifobject *ifobj, const char *dst_mac, const char *
- 
- 	err = bpf_xdp_query(ifobj->ifindex, XDP_FLAGS_DRV_MODE, &query_opts);
- 	if (err) {
--		ksft_print_msg("Error querrying XDP capabilities\n");
-+		ksft_print_msg("Error querying XDP capabilities\n");
- 		exit_with_error(-err);
- 	}
- 	if (query_opts.feature_flags & NETDEV_XDP_ACT_RX_SG)
+On Wed, 19 Jul 2023 08:42:53 +0200 you wrote:
+> Add support for 1000BASE-T1 to the phy-c45 helper and add a first
+> 1000BASE-T1 driver for the Marvell 88Q2110 PHY.
+> 
+> v4:
+>   - Move PHY id to include/linux/marvell_phy.h (Marek)
+>   - Use PHY id ending with 0, gets masked (Andrew)
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v4,1/5] net: phy: add registers to support 1000BASE-T1
+    https://git.kernel.org/netdev/net-next/c/6f1c646d88c5
+  - [net-next,v4,2/5] net: phy: c45: add support for 1000BASE-T1 forced setup
+    https://git.kernel.org/netdev/net-next/c/25108a834e14
+  - [net-next,v4,3/5] net: phy: c45: add a separate function to read BASE-T1 abilities
+    https://git.kernel.org/netdev/net-next/c/eba2e4c2faef
+  - [net-next,v4,4/5] net: phy: c45: detect the BASE-T1 speed from the ability register
+    https://git.kernel.org/netdev/net-next/c/a60eb72066af
+  - [net-next,v4,5/5] net: phy: marvell-88q2xxx: add driver for the Marvell 88Q2110 PHY
+    https://git.kernel.org/netdev/net-next/c/00f11ac71708
+
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
