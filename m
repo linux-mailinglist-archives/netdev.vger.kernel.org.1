@@ -1,213 +1,105 @@
-Return-Path: <netdev+bounces-19596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A1B75B53B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:09:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D443B75B545
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 464F91C214C3
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:09:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FE33281CE8
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F36E2FA3E;
-	Thu, 20 Jul 2023 17:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484A92FA42;
+	Thu, 20 Jul 2023 17:12:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130D32FA28
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 17:09:46 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E8C1995
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:09:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689872984; x=1721408984;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+uq2OtB8q9syx6TUPSFkYRlI9ZR8D9FvAPqVL5EwPMA=;
-  b=rEQbXf/aOXNuetRoMA3apZ48uFUIrFW1Tr+OvrzDNzv3sUMwDF7jRaBG
-   gOaLmbB9q+WdH84AsZkWObr6nIJL11luLlho7yeWBUqsTfkJ+hUYYSsyM
-   hN6q25ivDxKLjbYsgvAkSI8WPYLv8T83rJZGDWlrKnzv0w45049OHL92R
-   M=;
-X-IronPort-AV: E=Sophos;i="6.01,219,1684800000"; 
-   d="scan'208";a="143836634"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 17:09:41 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com (Postfix) with ESMTPS id 6C7B9667A0;
-	Thu, 20 Jul 2023 17:09:37 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 20 Jul 2023 17:09:36 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 20 Jul 2023 17:09:33 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <keescook@chromium.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <gustavoars@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<leitao@debian.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzkaller@googlegroups.com>, <willemb@google.com>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v2 net 1/2] af_unix: Fix fortify_panic() in unix_bind_bsd().
-Date: Thu, 20 Jul 2023 10:09:25 -0700
-Message-ID: <20230720170925.4798-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <202307200726.DBC8EAD9D@keescook>
-References: <202307200726.DBC8EAD9D@keescook>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10ABB2FA3E
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 17:12:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20CDEC433C8;
+	Thu, 20 Jul 2023 17:12:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689873152;
+	bh=zts5NGHn5WQO6o2e+6B3ydRceosp6xQJd00HqAw+IqY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MGgQOpn/VZvgDzWlCQN9LvoD1UVj9oGVDzUyA3BzkG8l0/DDAKaasuWhF+jmTBwMP
+	 YgzWR2xlknaz/X5CbhkIIAM5GtDSv5WiO51OqlwYHFA+QIC8TjW6XF3Ikex7J3jVWm
+	 C/tA19VEADT/7ZnAV49R+vV5cAlrVIxy8LYJAR7fC4vBDkOt8xj9FR+6Kgw9lieP1K
+	 6kC2/2BmnR1sX2CVDRbpiAE8xFQV/Wpb99OWsgaSQ7hIzSi3i0EyMcecBdrEhost88
+	 bmeThMTvqtp9uuZsy9MvD09bPob5spz9okpkSRP6yomR+frUdgyV/nBMdkW+sG53VN
+	 zY8N1jsB/Qicg==
+Date: Thu, 20 Jul 2023 10:12:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
+ <alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC net-next v2 7/7] net: skbuff: always try to recycle
+ PP pages directly when in softirq
+Message-ID: <20230720101231.7a5ff6cd@kernel.org>
+In-Reply-To: <48c1d70b-d4bd-04c0-ab46-d04eaeaf4af0@intel.com>
+References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
+	<20230714170853.866018-10-aleksander.lobakin@intel.com>
+	<20230718174042.67c02449@kernel.org>
+	<d7cd1903-de0e-0fe3-eb15-0146b589c7b0@intel.com>
+	<20230719135150.4da2f0ff@kernel.org>
+	<48c1d70b-d4bd-04c0-ab46-d04eaeaf4af0@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.12]
-X-ClientProxiedBy: EX19D032UWB004.ant.amazon.com (10.13.139.136) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Kees Cook <keescook@chromium.org>
-Date: Thu, 20 Jul 2023 07:39:48 -0700
-> On Wed, Jul 19, 2023 at 05:44:09PM -0700, Kuniyuki Iwashima wrote:
-> > syzkaller found a bug in unix_bind_bsd() [0].  We can reproduce it
-> > by bind()ing a socket on a path with length 108.
+On Thu, 20 Jul 2023 18:46:02 +0200 Alexander Lobakin wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Wed, 19 Jul 2023 13:51:50 -0700
+> 
+> > On Wed, 19 Jul 2023 18:34:46 +0200 Alexander Lobakin wrote:  
+>  [...]  
+> >>
+> >> If we're on the same CPU where the NAPI would run and in the same
+> >> context, i.e. softirq, in which the NAPI would run, what is the problem?
+> >> If there really is a good one, I can handle it here.  
 > > 
-> > 108 is the size of sun_addr of struct sockaddr_un and is the maximum
-> > valid length for the pathname socket.  When calling bind(), we use
-> > struct sockaddr_storage as the actual buffer size, so terminating
-> > sun_addr[108] with null is legitimate.
-> > 
-> > However, strlen(sunaddr) for such a case causes fortify_panic() if
-> > CONFIG_FORTIFY_SOURCE=y.  __fortify_strlen() has no idea about the
-> > actual buffer size and takes 108 as overflow, although 108 still
-> > fits in struct sockaddr_storage.
+> > #define SOFTIRQ_BITS		8
+> > #define SOFTIRQ_MASK		(__IRQ_MASK(SOFTIRQ_BITS) << SOFTIRQ_SHIFT)
+> > # define softirq_count()	(preempt_count() & SOFTIRQ_MASK)
+> > #define in_softirq()		(softirq_count())  
 > 
-> Oh, the max size is 108, but it's allowed to be unterminated? This seems
-> to contradict the comment for unix_validate_addr() (which then doesn't
-> validate this ...)
-
-Because we call it for the abstract socket too which starts with \0 and
-does not handle it specially.
-
-
-> Reading "max 7 unix" seems to clear this up and
-> confirm that it doesn't need to be terminated. Bleh.
+> I do remember those, don't worry :)
 > 
-> Regardless, see below for a simpler solution, since this doesn't need to
-> be arbitrarily long, just potentially unterminated.
+> > I don't know what else to add beyond that and the earlier explanation.  
+> 
+> My question was "how can two things race on one CPU in one context if it
+> implies they won't ever happen simultaneously", but maybe my zero
+> knowledge of netcons hides something from me.
 
-unix_mkname_bsd() terminates it.  Technically, we need not call strlen()
-if we don't optimise the allocated string length.  connect() does not need
-strlen() and just calls unix_mkname_bsd() in unix_find_bsd().
+One of them is in hardirq.
 
+> > AFAIK pages as allocated by page pool do not benefit from the usual
+> > KASAN / KMSAN checkers, so if we were to double-recycle a page once
+> > a day because of a netcons race - it's going to be a month long debug
+> > for those of us using Linux in production.  
+> 
+> if (!test_bit(&napi->state, NPSVC))
 
-> 
-> > Let's make __fortify_strlen() recognise the actual buffer size.
-> > 
-> > [0]:
-> > detected buffer overflow in __fortify_strlen
-> > kernel BUG at lib/string_helpers.c:1031!
-> > Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-> > Modules linked in:
-> > CPU: 0 PID: 255 Comm: syz-executor296 Not tainted 6.5.0-rc1-00330-g60cc1f7d0605 #4
-> > Hardware name: linux,dummy-virt (DT)
-> > pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> > pc : fortify_panic+0x1c/0x20 lib/string_helpers.c:1030
-> > lr : fortify_panic+0x1c/0x20 lib/string_helpers.c:1030
-> > sp : ffff800089817af0
-> > x29: ffff800089817af0 x28: ffff800089817b40 x27: 1ffff00011302f68
-> > x26: 000000000000006e x25: 0000000000000012 x24: ffff800087e60140
-> > x23: dfff800000000000 x22: ffff800089817c20 x21: ffff800089817c8e
-> > x20: 000000000000006c x19: ffff00000c323900 x18: ffff800086ab1630
-> > x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000001
-> > x14: 1ffff00011302eb8 x13: 0000000000000000 x12: 0000000000000000
-> > x11: 0000000000000000 x10: 0000000000000000 x9 : 64a26b65474d2a00
-> > x8 : 64a26b65474d2a00 x7 : 0000000000000001 x6 : 0000000000000001
-> > x5 : ffff800089817438 x4 : ffff800086ac99e0 x3 : ffff800080f19e8c
-> > x2 : 0000000000000001 x1 : 0000000100000000 x0 : 000000000000002c
-> > Call trace:
-> >  fortify_panic+0x1c/0x20 lib/string_helpers.c:1030
-> >  _Z16__fortify_strlenPKcU25pass_dynamic_object_size1 include/linux/fortify-string.h:217 [inline]
-> >  unix_bind_bsd net/unix/af_unix.c:1212 [inline]
-> >  unix_bind+0xba8/0xc58 net/unix/af_unix.c:1326
-> >  __sys_bind+0x1ac/0x248 net/socket.c:1792
-> >  __do_sys_bind net/socket.c:1803 [inline]
-> >  __se_sys_bind net/socket.c:1801 [inline]
-> >  __arm64_sys_bind+0x7c/0x94 net/socket.c:1801
-> >  __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
-> >  invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
-> >  el0_svc_common+0x134/0x240 arch/arm64/kernel/syscall.c:139
-> >  do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:188
-> >  el0_svc+0x2c/0x7c arch/arm64/kernel/entry-common.c:647
-> >  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
-> >  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
-> > Code: aa0003e1 d0000e80 91030000 97ffc91a (d4210000)
-> > 
-> > Fixes: df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3")
-> > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > ---
-> >  net/unix/af_unix.c | 16 +++++++++++++---
-> >  1 file changed, 13 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index 123b35ddfd71..e1b1819b96d1 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -302,6 +302,18 @@ static void unix_mkname_bsd(struct sockaddr_un *sunaddr, int addr_len)
-> >  	((char *)sunaddr)[addr_len] = 0;
-> >  }
-> >  
-> > +static int unix_strlen_bsd(struct sockaddr_un *sunaddr)
-> > +{
-> > +	/* Don't pass sunaddr->sun_path to strlen().  Otherwise, the
-> > +	 * max valid length UNIX_PATH_MAX (108) will cause panic if
-> > +	 * CONFIG_FORTIFY_SOURCE=y.  Let __fortify_strlen() know that
-> > +	 * the actual buffer is struct sockaddr_storage and that 108
-> > +	 * is within __data[].  See also: unix_mkname_bsd().
-> > +	 */
-> > +	return strlen(((struct sockaddr_storage *)sunaddr)->__data) +
-> > +		offsetof(struct sockaddr_un, sun_path) + 1;
-> > +}
-> > +
-> >  static void __unix_remove_socket(struct sock *sk)
-> >  {
-> >  	sk_del_node_init(sk);
-> > @@ -1209,9 +1221,7 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
-> >  	int err;
-> >  
-> >  	unix_mkname_bsd(sunaddr, addr_len);
-> > -	addr_len = strlen(sunaddr->sun_path) +
-> 
-> Instead of a whole new function, I think this can just be:
-> 
-> 		strnlen(sunaddr->sun_path, sizeof(sunaddr->sun_path)) +
-> 
-> > -		offsetof(struct sockaddr_un, sun_path) + 1;
-> > -
-> > +	addr_len = unix_strlen_bsd(sunaddr);
-> >  	addr = unix_create_addr(sunaddr, addr_len);
-> >  	if (!addr)
-> >  		return -ENOMEM;
-> > -- 
-> > 2.30.2
-> > 
-> 
-> -- 
-> Kees Cook
+if you have to the right check is !in_hardirq()
 
+> ? It would mean we're not netpolling.
+> Otherwise, if this still is not enough, I'do go back to my v1 approach
+> with having a NAPI flag, which would tell for sure we're good to go. I
+> got confused by your "wouldn't just checking for softirq be enough"! T.T
+> Joking :D
+
+I guess the problem I'm concerned about can already happen.
+I'll send a lockdep annotation shortly.
 
