@@ -1,101 +1,83 @@
-Return-Path: <netdev+bounces-19336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2066075A508
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:16:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E3B75A50D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE963281206
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 04:16:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 497AC1C21285
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 04:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8941C04;
-	Thu, 20 Jul 2023 04:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D502102;
+	Thu, 20 Jul 2023 04:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A60F20F8
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:16:20 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62B1E172A;
-	Wed, 19 Jul 2023 21:16:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1689826576;
-	bh=vQu5/LUOeP+25OJGN4Hx/Qv5s4HbEcDpwb9jzTjaGhY=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Q/9prB7vcQGAnW8XiYCQl4SzN4xOd/Y3GHnzveskj42nkNV7hCNH0fmVAmgMWgTB6
-	 yOSveBLTP9e/kR1Yu8j5y+/y33l8wLgpzCNNsK0E23mpreWRY+wY4uwB38Y+LASiYF
-	 J/e77Mvzfg+FVmLxXBP4kjX+HxrIrIP5yzzcIAgixBGWvao+QBZRk8i4SAQVQra7/f
-	 wGfnZn0y27ujsZY1K60i8Gc22N0KNFsKr3o0H/nIa44QJMusqYDChQlHeu8U/bEoMj
-	 6wRCgYXCLp5TpzJz5zTOUtJZL+Onk0lcT9p7ios2SemHEweq9wT/Vp9dRluGbYSIKu
-	 x5Z8q2zBBE73w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4R5zrv61Zqz4wqW;
-	Thu, 20 Jul 2023 14:16:15 +1000 (AEST)
-Date: Thu, 20 Jul 2023 14:16:13 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the net-next tree
-Message-ID: <20230720141613.61488b9e@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE7D20FE;
+	Thu, 20 Jul 2023 04:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 79489C433C8;
+	Thu, 20 Jul 2023 04:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689826821;
+	bh=klxwWjqJHJeqwFDN62FMv3knTJ+VzqfyWcqEIxnjsEw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NK5/gdWiDX3oolaWinZ31qWcpN+N6G9afdEoeTRA+g2HuYqohRdJX9nDXkWcrRFkc
+	 FUnlkSSlGCY+lolAmZZTqViDD5L3r0BIl7SKXoDWfh35Wz48aisRy0DADVS+6wsVGi
+	 2tI1yze9bY5sZqUGhRTR2vQXQ5Fec8IkhduiLJcy+ytAmGTgFHDSuG2SUpofDyr3sk
+	 FCgsWyHOO2AIndlUrZapI3vEaGp9M0bqhRpMFLv1NiY9DMaxvHr72RVgzKgXEfElTz
+	 O18fxJpGutC9KUVXJPAwMTTm/xE8ax1smDB5Ix1DhGSNUuq2Sdag+rhZGP1JEeLRAG
+	 dUBnmk+MpYVDg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5AC17E21EFE;
+	Thu, 20 Jul 2023 04:20:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/IXyzaoArFY=brprErVUCnaI";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] r8169: revert two changes that caused regressions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168982682136.14645.17168208094713450395.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jul 2023 04:20:21 +0000
+References: <ddadceae-19c9-81b8-47b5-a4ff85e2563a@gmail.com>
+In-Reply-To: <ddadceae-19c9-81b8-47b5-a4ff85e2563a@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: kuba@kernel.org, davem@davemloft.net, nic_swsd@realtek.com,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ regressions@lists.linux.dev
 
---Sig_/IXyzaoArFY=brprErVUCnaI
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-After merging the net-next tree, today's linux-next build (htmldocs)
-produced this warning:
+On Tue, 18 Jul 2023 13:07:53 +0200 you wrote:
+> This reverts two changes that caused regressions.
+> 
+> Heiner Kallweit (2):
+>   r8169: revert 2ab19de62d67 ("r8169: remove ASPM restrictions now that
+>     ASPM is disabled during NAPI poll")
+>   Revert "r8169: disable ASPM during NAPI poll"
+> 
+> [...]
 
-include/linux/netdevice.h:2415: warning: Function parameter or member 'xdp_=
-zc_max_segs' not described in 'net_device'
+Here is the summary with links:
+  - [net,1/2] r8169: revert 2ab19de62d67 ("r8169: remove ASPM restrictions now that ASPM is disabled during NAPI poll")
+    https://git.kernel.org/netdev/net/c/cf2ffdea0839
+  - [net,2/2] Revert "r8169: disable ASPM during NAPI poll"
+    https://git.kernel.org/netdev/net/c/e31a9fedc7d8
 
-Introduced by commit
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  13ce2daa259a ("xsk: add new netlink attribute dedicated for ZC max frags")
 
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/IXyzaoArFY=brprErVUCnaI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmS4tQ0ACgkQAVBC80lX
-0GxFWQgAiLB7gitEM5GlErUQOnpSVBHqhHbjRhaFngInRmym8UIhHxuaas1r17gv
-THHG/wX+GoJVu1c/xYeJ/s6trsKTShTqZce23BUo3rAgQ64am+uxKzqGdTt8/ZEn
-Fn7WrkbaZdMn9T+bdC7/ownNrmw1jgG2M9Rp2HM68n0SdZm181HiDssrKom0fQcq
-BEmfpotAYhs6KoPVt3G59X/dgTxSx1jRH7MwynaldrTYFEXQ4fh5p1uytVb3wRPA
-pdJEJNTcQhiRCUrQKuc+7QasODxYlZDGmKKiHhuaH5ptwtmjBWwapO6uRj3jCiVm
-zSVK/2KLyqtbGDFGfT7aZ9qxkIajEQ==
-=zf69
------END PGP SIGNATURE-----
-
---Sig_/IXyzaoArFY=brprErVUCnaI--
 
