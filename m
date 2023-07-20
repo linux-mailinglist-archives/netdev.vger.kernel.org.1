@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-19400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2513475A971
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:39:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B36075A979
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF906281C89
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 800E91C2138B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FCC19BC2;
-	Thu, 20 Jul 2023 08:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBF91E506;
+	Thu, 20 Jul 2023 08:30:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937C6174DB
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:30:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 930EBC4AF6E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44900182CE
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:30:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9EB82C4AF6F;
 	Thu, 20 Jul 2023 08:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689841798;
-	bh=12/I5mxTK2I183F2Uca3FzP5Zq+MwR1BSDbbTPa7mNU=;
+	bh=mut5BjLLGkXcmjw1Zj1CjKyOW+UVywRIx0Gr2sW+ML8=;
 	h=From:Date:Subject:References:In-Reply-To:List-Id:To:Cc:Reply-To:
 	 From;
-	b=SWq24cLFdmcHlrESY+25el1BtSug83/0tV/FxXtqLs0k81SGYYFiFnSmtpou6wLOT
-	 a8FGrWmBoEVM3ZBGBMBiHyIeF1N8hgnqbDXBpdwD3AHo9zlhB088xKiurgvLnrb34c
-	 Py8xoufQzOE5PqzEHXYrhw69gn+kBu0qNM/4T8TReFm6IsFRStFXfUG4FxzrXQG/k1
-	 va41I8AWj7/bBqofw7yNnjdPQnyzskkn5VY5zUGX4s8JvoBB6kXJmvP2tzVFv4B3gd
-	 N/RoPvBk6xY7jJv60GE8cMZvz698bkh/Fykut3SL9Xi7yd/OF2sMDra0DoCEvi97F/
-	 91sWsZNdCgA3w==
+	b=R4NxpLD50bY1oAwwVpqoLox8JHjvoap1LWt1cfW71dfNV6SmwqxsDMWfWAGVlUkVr
+	 Pf2J2h7yqjgtc0a4KaZ6zyvE/8ss6z1QzBPOwxftiaKUtFey29q8CFXdSEFg7keLpm
+	 BuApJDgTZt40Fyt75AC80ARXrKRyqaHCvsi54pc0S8X3kwGjpx1r3FuL1FAKBeQnhY
+	 CxFSSdtGhyX5jFBPaYAeGLHjfC7i2/IQg6r2IkJgK1+gqW7+K9xo4E3s2J50Q/vUhy
+	 UDJYZVL5yedzyfLC+MXJ5v7oyQMSEYNrObMIzPam2TCNWze7wKd96PC/+Ncu3Nndhw
+	 fpBeNr3Aj022A==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E321C3DA46;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6C5C10F19;
 	Thu, 20 Jul 2023 08:29:58 +0000 (UTC)
 From:
  Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Thu, 20 Jul 2023 14:29:32 +0300
-Subject: [PATCH v3 32/42] wdt: ts72xx: add DT support for ts72xx
+Date: Thu, 20 Jul 2023 14:29:33 +0300
+Subject: [PATCH v3 33/42] gpio: ep93xx: add DT support for gpio-ep93xx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,7 +46,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230605-ep93xx-v3-32-3d63a5f1103e@maquefel.me>
+Message-Id: <20230605-ep93xx-v3-33-3d63a5f1103e@maquefel.me>
 References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
 In-Reply-To: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
 List-Id: <soc.lore.kernel.org>
@@ -86,13 +86,14 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org, 
  netdev@vger.kernel.org, dmaengine@vger.kernel.org, 
  linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
- linux-input@vger.kernel.org, alsa-devel@alsa-project.org
+ linux-input@vger.kernel.org, alsa-devel@alsa-project.org, 
+ Andy Shevchenko <andy.shevchenko@gmail.com>
 X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689852591; l=1025;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689852591; l=929;
  i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=/pFUHJmR8DUvfiw1Xz02EuXbI462fkIA+hdLJYGTYiA=; =?utf-8?q?b=3DM3Wqmsi/7579?=
- =?utf-8?q?i7J2GmgDeoutVdTKMlSiRw3XikhI9+UmnTQ6CCCyDOK5PkSYehbZgMpn5MdhjPKq?=
- VG/8YZ6XC/Y39kKPNCogijp3J6krn6Z+WVWsRQFU1SEQBm3v0QSa
+ bh=AIgxDPw6Du0WKxKzpJ2J6mJyCGWG+VkPvYnSwlxlDVo=; =?utf-8?q?b=3DP9tiL+QONUN9?=
+ =?utf-8?q?Lf/JsaT+NThJ+mTaQiDZtRBxcubdV/wbrGKNPsXVmcOIgmYxj61qo448MUqF05E3?=
+ lmPiq39GCeTCef2+gQpuc3Ps+fCGcy44ZIcYD31wcfDjpC1muJJc
 X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
  pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
 X-Endpoint-Received:
@@ -104,41 +105,33 @@ From: Nikita Shubin <nikita.shubin@maquefel.me>
 
 Add OF ID match table.
 
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
 ---
- drivers/watchdog/ts72xx_wdt.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/gpio/gpio-ep93xx.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/watchdog/ts72xx_wdt.c b/drivers/watchdog/ts72xx_wdt.c
-index 3d57670befe1..ac709dc31a65 100644
---- a/drivers/watchdog/ts72xx_wdt.c
-+++ b/drivers/watchdog/ts72xx_wdt.c
-@@ -12,6 +12,7 @@
-  */
- 
- #include <linux/platform_device.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
- #include <linux/watchdog.h>
- #include <linux/io.h>
-@@ -160,10 +161,17 @@ static int ts72xx_wdt_probe(struct platform_device *pdev)
- 	return 0;
+diff --git a/drivers/gpio/gpio-ep93xx.c b/drivers/gpio/gpio-ep93xx.c
+index 9a25bb0caf17..c4e272a8773d 100644
+--- a/drivers/gpio/gpio-ep93xx.c
++++ b/drivers/gpio/gpio-ep93xx.c
+@@ -360,9 +360,15 @@ static int ep93xx_gpio_probe(struct platform_device *pdev)
+ 	return devm_gpiochip_add_data(&pdev->dev, gc, egc);
  }
  
-+static const struct of_device_id ts72xx_wdt_of_ids[] = {
-+	{ .compatible = "technologic,ts7200-wdt" },
++static const struct of_device_id ep93xx_gpio_match[] = {
++	{ .compatible = "cirrus,ep9301-gpio" },
 +	{ /* sentinel */ }
 +};
-+MODULE_DEVICE_TABLE(of, ts72xx_wdt_of_ids);
 +
- static struct platform_driver ts72xx_wdt_driver = {
- 	.probe		= ts72xx_wdt_probe,
+ static struct platform_driver ep93xx_gpio_driver = {
  	.driver		= {
- 		.name	= "ts72xx-wdt",
-+		.of_match_table = ts72xx_wdt_of_ids,
+ 		.name	= "gpio-ep93xx",
++		.of_match_table = ep93xx_gpio_match,
  	},
+ 	.probe		= ep93xx_gpio_probe,
  };
- 
 
 -- 
 2.39.2
