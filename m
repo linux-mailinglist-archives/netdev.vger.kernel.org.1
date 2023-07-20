@@ -1,111 +1,118 @@
-Return-Path: <netdev+bounces-19349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6672675A5F5
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:00:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B9875A5FC
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1322E281AD8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4D5B1C212C4
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DCF3FE4;
-	Thu, 20 Jul 2023 06:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4A03FFA;
+	Thu, 20 Jul 2023 06:05:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129533D99
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 06:00:45 +0000 (UTC)
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5AD2130
-	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:00:41 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-267711d2b43so68196a91.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:00:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mihalicyn.com; s=mihalicyn; t=1689832840; x=1690437640;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xtAo4mjJBub60XWMBv8RYd5J7m4MnOyLAC7LPGP3KxI=;
-        b=dN9ux6c865oFKsf2ygQ1/30J9cYIxGwswQHOvg7GC2us6TNA9FZPncM/M/aqlojGZU
-         XFCN7ZrfDVQIA3kL/7SdniQfidXF84siYWJ0fgb/+OxEKiJB0AjKN3BwF93QrQb7uyC+
-         qThezW6FzcimavwO5sGiuCyAHAl5Ho6/Yl9S0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689832840; x=1690437640;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xtAo4mjJBub60XWMBv8RYd5J7m4MnOyLAC7LPGP3KxI=;
-        b=TYgqyF+VmZ4MyRPBhCd1Ekx/4elCinDleWFeg3t+dmB0XfUJA6kKirUTt5mQpnx/wX
-         Kg2asXCsILstUq1P6KyWzSheTqP1a6SJFm7BRAFYe0zUzqBqdm+KXVEZ/grYlYGxIVGa
-         gD+B262p0Kca21jeUT9B/L3uJ1hSoThlITZPVYc/jnj2Jjz4NT/tohDSIiqRsU5auWE9
-         3gR6llZoY7ldQWD1+cZlHoer3ZSSocJRh4Dxzu1BC53uedgAGritqcyomcdYEeVHKJ5S
-         BVyVns2uhFdK6jRuqAidBw9RlruYEtNIJezN7+vNbBwGi1S7lJhIfwJqZCfNCRtvVYXc
-         qsBQ==
-X-Gm-Message-State: ABy/qLaXCkskhv8hOscwWfkpxOoPQMrI8EsKgh3J1szuqjDetBNK2cQ/
-	1UUJhSbpQNb71lhz+CgYkh9okfDGqpyyPu6/vw/ddw==
-X-Google-Smtp-Source: APBJJlH7IDJturi9ztd5thyCUYM+2O3dRdnsCuz2V8+lnzwIxOFaSl2RuroBWcha/7q0B5Ww4N/1POCDpjVG9nCYQmo=
-X-Received: by 2002:a17:90a:8cd:b0:263:730b:f568 with SMTP id
- 13-20020a17090a08cd00b00263730bf568mr1365299pjn.3.1689832840281; Wed, 19 Jul
- 2023 23:00:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4A83D6A
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 06:05:24 +0000 (UTC)
+Received: from mail.svario.it (mail.svario.it [84.22.98.252])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B78921985
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:05:21 -0700 (PDT)
+Received: from [192.168.1.35] (81-5-204-164.hdsl.highway.telekom.at [81.5.204.164])
+	by mail.svario.it (Postfix) with ESMTPSA id EEC76D90CC;
+	Thu, 20 Jul 2023 08:05:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
+	t=1689833118; bh=GVlPlAzNtRa4dtsowkjWeeJgrx35hCVnETjP2lg4JF4=;
+	h=Date:To:Cc:References:From:Subject:In-Reply-To:From;
+	b=DUIwgZZZdeXeUNNJoqfwU9lqPtAwfr1Mn6be6jLQ+YlCz9CXeKcklLU9oxOp6yEKP
+	 ewHWRLeXUZzJ9ilcWk/xfNAtkSAAy2loUG2s76S3EfskaLW79OOqWpPCxYQ0gsCbxN
+	 cDQMHD2drZT1r/P6J3QTsnU14h1Xyy7gX4E0sqlOtFI0dv7lMnMyllD0yAP828AdWb
+	 6Jjc2M6r1oYXExTxeTn/zG5habUD9bxE8U37XId2NXOsxAvAvRkIhbQOBN6FwC5FNm
+	 grur88qdfp4aawdwApCDESkDHxszq4PsCQWTLgjBYQM9AtjEQ5HvinhxXWBCCrKMxM
+	 52Jb6MLP0PU/A==
+Message-ID: <6041446f-ad4f-1b5a-9b7e-b496de080468@svario.it>
+Date: Thu, 20 Jul 2023 08:05:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <PH0PR11MB51269B6805230AB8ED209B14D332A@PH0PR11MB5126.namprd11.prod.outlook.com>
- <20230720105042.64ea23f9@canb.auug.org.au> <20230719182439.7af84ccd@kernel.org>
- <20230720130003.6137c50f@canb.auug.org.au> <PH0PR11MB5126763E5913574B8ED6BDE4D33EA@PH0PR11MB5126.namprd11.prod.outlook.com>
- <20230719202435.636dcc3a@kernel.org>
-In-Reply-To: <20230719202435.636dcc3a@kernel.org>
-From: Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Date: Thu, 20 Jul 2023 08:00:29 +0200
-Message-ID: <CAJqdLroJK34pNGMO8owToH1_Hjtk=1Tf29L4-chw75dqw_UP6g@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the bluetooth tree
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>, Stephen Rothwell <sfr@canb.auug.org.au>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, David Miller <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+References: <20230719185106.17614-1-gioele@svario.it>
+ <20230719143628.4ca42c3f@hermes.local>
+Content-Language: en-US
+From: Gioele Barabucci <gioele@svario.it>
+Subject: Re: [iproute2 00/22] Support for stateless configuration (read from
+ /etc and /usr)
+In-Reply-To: <20230719143628.4ca42c3f@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 5:24=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 20 Jul 2023 03:17:37 +0000 Von Dentz, Luiz wrote:
-> > Sorry for not replying inline, outlook on android, we use scm_recv
-> > not scm_recv_unix, so Id assume that change would return the initial
-> > behavior, if it did not then it is not fixing anything.
->
-> Ack, that's what it seems like to me as well.
->
-> I fired up an allmodconfig build of linux-next. I should be able
-> to get to the bottom of this in ~20min :)
+On 19/07/23 23:36, Stephen Hemminger wrote:
+> On Wed, 19 Jul 2023 20:50:44 +0200
+> Gioele Barabucci <gioele@svario.it> wrote:
+> 
+>> this patch series adds support for the so called "stateless" configuration
+>> pattern, i.e. reading the default configuration from /usr while allowing
+>> overriding it in /etc, giving system administrators a way to define local
+>> configuration without changing any distro-provided files.
+>>
+>> In practice this means that each configuration file FOO is loaded
+>> from /usr/lib/iproute2/FOO unless /etc/iproute2/FOO exists.
+> 
+> I don't understand the motivation for the change.
 
-Dear friends,
+The main, but not the only, motivation for stateless systems is explained in
 
-I'm here and ready to help with fixing this. As far as I understand
-everything should work,
-because in 817efd3cad74 ("Bluetooth: hci_sock: Forward credentials to monit=
-or")
-we have a call to scm_recv(sock, msg, &scm, flags). And scm_recv does
-not use scm_pidfd_recv (and pidfd_prepare).
+https://clearlinux.org/features/stateless
+https://fedoraproject.org/wiki/StatelessLinux
+https://summit.debconf.org/debconf15/meeting/276/stateless-cloud-friendly-debian/
 
-Please tell me if something is not working and which tree I should
-take to reproduce it. I'm ready to dive into it.
+In a nutshell: to better support factory resets, shared read-only base 
+systems, containers & Co, all software should work even without /etc.
 
-Kind regards,
-Alex
+A nice side effect of adopting stateless-style configuration (read from 
+/etc, fallback to /usr) is that it allows for distro-provided files to 
+be strictly read-only, avoiding a bunch of common failures during 
+updates and upgrades (Debian spends a huge amount of resources to 
+correctly handle these so called "conffiles". The fewer, the better.)
+
+> Is /etc going away in some future version of systemd?
+This is unrelated to systemd, although systemd is probably the most well 
+known software that uses this pattern.
+
+> Perhaps just using an an environment variable instead of hard coding
+> /etc/iproute2 directory.
+
+Build-time or run-time env variable?
+
+I'd say that run-time env variables (a là XDG Base Directory) are kind 
+of hard to deal with in a command like `ip` that is often invoked via 
+`sudo` (that filters and changes env in complex ways).
+
+BTW, I strongly suggest to just go with this common pattern that is now 
+known to all sysadmins instead of inventing an ad-hoc way to move the 
+default configuration away from /etc.
+
+> I do like the conslidation of the initialize_dir code though.
+
+Thanks. :)
+
+Regards,
+
+-- 
+Gioele Barabucci
 
