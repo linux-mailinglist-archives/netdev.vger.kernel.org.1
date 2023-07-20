@@ -1,143 +1,138 @@
-Return-Path: <netdev+bounces-19652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC41375B929
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:03:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D2975B95F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1812D1C209F1
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:03:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D13C282008
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC82168AF;
-	Thu, 20 Jul 2023 21:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A07168B6;
+	Thu, 20 Jul 2023 21:11:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D912FA49
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:03:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 559F0196
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:03:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689886988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QxbwNNsUJXE4WSdo9/9FQ7rzSbFKTC0HO55OeJQjfDA=;
-	b=S5Ro2M267SuvvPwrbyE2THyQ7lXPkJIpQvDcl7HmZm6OK4B8Y4f2/I+BEVsylfXLBVzUeQ
-	l0kcFeHF77YTNeBMKd9xoZw3GZDlPMDyEqQkYGR6JwT+09PI5Iw7MTBI4Et4ekS2pP2VB7
-	atzMkB3ku8Vmczw+ShHCNN0nXZAHL2s=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-bH45IXY6NnOXcHfoBxoH_Q-1; Thu, 20 Jul 2023 17:03:07 -0400
-X-MC-Unique: bH45IXY6NnOXcHfoBxoH_Q-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b93f4c300bso12897721fa.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:03:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689886985; x=1690491785;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9C71643C
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:11:47 +0000 (UTC)
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A0BB271E
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:11:46 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-40371070eb7so40971cf.1
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689887505; x=1690492305;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QxbwNNsUJXE4WSdo9/9FQ7rzSbFKTC0HO55OeJQjfDA=;
-        b=cHyyHwsVgdCkh/ufN3UIKPPNW3k/yM7IsmihFedQpnVnIGaK5K0We4/D/wT8C5nZuE
-         MzSgk66GtPadJv0qV1PqframmYqEob7D+evKopLJykXZXXIG7brhoCM9zX4lIiw67lAY
-         opCNHZxy96eT2blR6/edCdez+N4DvfYyFelPTUpJH0u8PlnRN8HwrACy7zspyF/eRNVd
-         uuFjamPMPoc1dzuvSERyUdmqkk6syBaDDYcsO6G3lcLEthIM9QbBPeUa2czAW0tds/1g
-         ArgvzjByn6bUk/jw1at3etyUUYE2Eq400xFXeSnTcjdAPLPuz60h05KT4j9n98DnT7GJ
-         11cA==
-X-Gm-Message-State: ABy/qLZxClM8m4CKSAgA0SfllOhDC+RTnPl2N3cIWLUp7ODC+IqWk6zL
-	uGWYaLz50mD1F9Vguwhw7RhwB8RMnI5RvD67NFGR1mjGUnhR30LDqG9O/k4fv/NXYVrVOFzZvms
-	WENJVP9b02S1YPEOR
-X-Received: by 2002:a2e:9dcf:0:b0:2b6:dbc5:5ca4 with SMTP id x15-20020a2e9dcf000000b002b6dbc55ca4mr86347ljj.16.1689886985702;
-        Thu, 20 Jul 2023 14:03:05 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGkO9895VB0oEJzz7Mt1u7LjrPYNqoemBmNFeHR6tqktWs0kblZ6OrDWTCIs6FgX5K3EX736g==
-X-Received: by 2002:a2e:9dcf:0:b0:2b6:dbc5:5ca4 with SMTP id x15-20020a2e9dcf000000b002b6dbc55ca4mr86325ljj.16.1689886985355;
-        Thu, 20 Jul 2023 14:03:05 -0700 (PDT)
-Received: from redhat.com ([2.52.16.41])
-        by smtp.gmail.com with ESMTPSA id 9-20020a05600c248900b003fbb618f7adsm1982153wms.15.2023.07.20.14.03.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 14:03:04 -0700 (PDT)
-Date: Thu, 20 Jul 2023 17:02:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: Jason Wang <jasowang@redhat.com>, xuanzhuo@linux.alibaba.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, edumazet@google.com,
-	maxime.coquelin@redhat.com, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net
-Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
- command waiting loop
-Message-ID: <20230720170001-mutt-send-email-mst@kernel.org>
-References: <20230720083839.481487-1-jasowang@redhat.com>
- <20230720083839.481487-3-jasowang@redhat.com>
- <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com>
+        bh=GFMBMSuSHT3wjfgxcRFwsxpzW94657vZDmNiGlKTyzE=;
+        b=IPspuDslZlm2yuv2pkMnm34gJ09M9jC1mazBAa+MyjyKQT2PgjpJFMvIY2iv3fLB01
+         XaXFjpgclKZqQIqkcuEfTM3kDXorrJ6nYfH8SLfRNNi1/kXZuXGInFSbV78gZqaGq6x5
+         9WvurKXxRnBEeAPXjPgGu53aoQWWhXW37IroTwlvPHyiPvAeUMpkiPBiYHFO9eSIQn6b
+         gVrgOhKU6RHj6jObpnBs5Dyzhx4UI7+McuaRszsPGt0AZkWhRS8b40v5WREAWvwVmK36
+         XTY0n7az8ibie3Dal1wvEKgqhgHYiE2ixzzJMbO0aNKM20clCXzO0vJkXuE6NrJ37MZS
+         biCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689887505; x=1690492305;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GFMBMSuSHT3wjfgxcRFwsxpzW94657vZDmNiGlKTyzE=;
+        b=FJMNjclId/Yd4iinl7OEfVxyA88Uv4roiC2ZlLXgUNZApJFirvO0oM2+G85sG4ZGgj
+         l2R4N36y4M5DjeGVJIdtiD4tBVSaTkBbedjdZoyP3xRiXuqDPFhFvlIr14GenJC6sIc3
+         ucymrBV4voeylliYRJ8PPfx4iHuxINuCGJuWSXS0cAHTatW6KvzCH0GRuwHWKvy5vmI6
+         0d5YHCbuWsUhT1y5kqCX0pUOCPxRo+hJqfFjGTi5KOMRGCHJJusc+QqFSCEYdBpFJMVB
+         RQbB4sucA8m2Pbt5XKU9GnrEXdBwBithAHGtT88cKPovs3mJ0GwUxoVT8OdPc06FmYnU
+         eEbw==
+X-Gm-Message-State: ABy/qLabW7KTLwSwlF3kXXgQZre9EmFsH/bIRPQ8t1eEfirvcN/vqL8W
+	ubur+VwzwkhNfvl/H6hP+8qGUD+4t2GsM67bDj/mVw==
+X-Google-Smtp-Source: APBJJlFBWH+aa25PymwXQ4F9F/xaqcI0bxtFwMcMF7EMlYPMzL+/MvIfDaqZZfubPOJaRmZVG0MtsUG1oXNV/nH/7LE=
+X-Received: by 2002:a05:622a:1792:b0:3f8:5b2:aef4 with SMTP id
+ s18-20020a05622a179200b003f805b2aef4mr78399qtk.28.1689887505057; Thu, 20 Jul
+ 2023 14:11:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <04C1E631-725C-47AD-9914-25D5CE04DFF4@gmail.com>
+ <CANn89iKJWw7zUP-E_d=Yhaz=Qw0R3Ae7ULaGgrtsi1yf2pfpGg@mail.gmail.com> <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
+In-Reply-To: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 20 Jul 2023 23:11:34 +0200
+Message-ID: <CANn89iLqU=huOuCt2kXmrXf68TUU-N90aQnMykkYcZ+Arx9-aA@mail.gmail.com>
+Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
+To: Alan Huang <mmpgouride@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, rcu@vger.kernel.org, 
+	"Paul E. McKenney" <paulmck@kernel.org>, roman.gushchin@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 01:26:20PM -0700, Shannon Nelson wrote:
-> On 7/20/23 1:38 AM, Jason Wang wrote:
-> > 
-> > Adding cond_resched() to the command waiting loop for a better
-> > co-operation with the scheduler. This allows to give CPU a breath to
-> > run other task(workqueue) instead of busy looping when preemption is
-> > not allowed on a device whose CVQ might be slow.
-> > 
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> 
-> This still leaves hung processes, but at least it doesn't pin the CPU any
-> more.  Thanks.
-> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
-> 
+On Thu, Jul 20, 2023 at 10:00=E2=80=AFPM Alan Huang <mmpgouride@gmail.com> =
+wrote:
+>
+>
+> > 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 03:22=EF=BC=8CEric Dumazet <edumazet=
+@google.com> =E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > On Thu, Jul 20, 2023 at 8:54=E2=80=AFPM Alan Huang <mmpgouride@gmail.co=
+m> wrote:
+> >>
+> >> Hi,
+> >>
+> >> I noticed a commit c87a124a5d5e(=E2=80=9Cnet: force a reload of first =
+item in hlist_nulls_for_each_entry_rcu=E2=80=9D)
+> >> and a related discussion [1].
+> >>
+> >> After reading the whole discussion, it seems like that ptr->field was =
+cached by gcc even with the deprecated
+> >> ACCESS_ONCE(), so my question is:
+> >>
+> >>        Is that a compiler bug? If so, has this bug been fixed today, t=
+en years later?
+> >>
+> >>        What about READ_ONCE(ptr->field)?
+> >
+> > Make sure sparse is happy.
+>
+> It caused a problem without barrier(), and the deprecated ACCESS_ONCE() d=
+idn=E2=80=99t help:
+>
+>         https://lore.kernel.org/all/519D19DA.50400@yandex-team.ru/
+>
+> So, my real question is: With READ_ONCE(ptr->field), are there still some=
+ unusual cases where gcc
+> decides not to reload ptr->field?
 
-I'd like to see a full solution
-1- block until interrupt
-2- still handle surprise removal correctly by waking in that case
+I can not really answer without seeing an actual patch...
 
+Why are you asking ? Are you tracking compiler bug fixes ?
 
-
-> > ---
-> >   drivers/net/virtio_net.c | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 9f3b1d6ac33d..e7533f29b219 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -2314,8 +2314,10 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
-> >           * into the hypervisor, so the request should be handled immediately.
-> >           */
-> >          while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> > -              !virtqueue_is_broken(vi->cvq))
-> > +              !virtqueue_is_broken(vi->cvq)) {
-> > +               cond_resched();
-> >                  cpu_relax();
-> > +       }
-> > 
-> >          return vi->ctrl->status == VIRTIO_NET_OK;
-> >   }
-> > --
-> > 2.39.3
-> > 
-> > _______________________________________________
-> > Virtualization mailing list
-> > Virtualization@lists.linux-foundation.org
-> > https://lists.linuxfoundation.org/mailman/listinfo/virtualization
-
+>
+> >
+> > Do you have a patch for review ?
+>
+> Possibly next month. :)
+>
+> >
+> >
+> >>
+> >>
+> >> [1] https://lore.kernel.org/all/1369699930.3301.494.camel@edumazet-gla=
+ptop/
+> >>
+> >> Thanks,
+> >> Alan
+>
 
