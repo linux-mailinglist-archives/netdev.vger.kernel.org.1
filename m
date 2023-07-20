@@ -1,264 +1,159 @@
-Return-Path: <netdev+bounces-19567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3841075B384
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:53:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF1B75B38F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCFDA281E50
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:53:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A4FF281E5C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CA718C30;
-	Thu, 20 Jul 2023 15:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CFE18C30;
+	Thu, 20 Jul 2023 15:53:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E0C18C15;
-	Thu, 20 Jul 2023 15:52:58 +0000 (UTC)
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F8EE74;
-	Thu, 20 Jul 2023 08:52:55 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-262c42d3fafso694915a91.0;
-        Thu, 20 Jul 2023 08:52:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E8318B15
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:53:51 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2094.outbound.protection.outlook.com [40.107.94.94])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318A1123;
+	Thu, 20 Jul 2023 08:53:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aSC+7qOzsoKLq4EJqd5DrPbTRVwbRCWWSoo3xFQjr9gh5eghYD/B/H6sjxPgFXHYQe55NIA4r1LzaKCrEBR2D2STnzQ+qYlOup3FhVfZ0fb+7jq4Mw20bseLzDB8AKZdYMSK1Gh/p7yF+67S1345EvUcguXgk6cWrHv+oB9fAxhRtkwBy+riFdPmZaasjcGA7mhkp3pD1ZxIH5wVxAlUGO3QGhSxNjV5oO3Cvfo6+tpscZuKuuo6o14eYRJOQSFGEv6UPSmjCQhBx7oO7QiieAgi0ac2udJBm4YqAJVjdELOsa5TlKmW6t8vyeJu12Cw7fheLLbpwqENjv/kHAETVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s2wEN5VYRgjLJvISNiu+qayGsxw9ElXBjPaNTKqHW50=;
+ b=l+fzmcrqOsmOGRTiTDfUV/hFUIZY9vzoE9/oHGH9mBQrFatpiKmhlW1Ppf5cbeuhZA+eb3/9/x84VoW1QDv36saA0cNxE6LJXTa47Cj0iaBKKkOZgt7TEG2losUsEzeflZn4eg3qAmJDkqe94nbNoOUYfoHA7LUQ6ytaj7/zpcfK3TPNo68OaCWt2W7rGgQKxbZQQLu8Y9WzkYDkVpGoRTSpBcXtdUx4qvUFjpt/rK/ZhW/BvadVKKX7HF5522QewWHPPru4dMPwiotbhkGSmYD0ydGCSc7yVOEFY9EZLM0QjtYVmufGzdvKSLBuY9Ho5Jy8EfzniMzQ7aVsZA6gYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689868374; x=1690473174;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZpNCoc8Am7vKi0rz5OBYbPpr0uWW9chVHV3BrFnbwGc=;
-        b=Sov0A4zd3+1/Pr7Qx/yW5IoQ5nBiLcpMbPB7E7zFOwe88mjHNNj+vPmk/2WEDoq8u2
-         6qLmFh89UUIRr3L449uxxGOydd82Qtwwauqw5zz21bmDyWvjbZEKTCvArQjAwU3dTYjS
-         1xgtUPEueO7rB42AM1iP9ImNyI8xLz0aukxhwM7WBC7V0gnmEjPWfa+DqxEYHt7Fld3I
-         Zh/1ekJf6QxHwazyK/j49oYex24AdIvWyqJgJaDb1PxNqKO+AOooC8Ysuwsh9L8dcl3U
-         ep6sqot15AokAUOf8clxQcRWeB1xKm+T9BauYovFb/jjTeixhQnXJJ9kXnf8PqVkZiQs
-         z4Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689868374; x=1690473174;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZpNCoc8Am7vKi0rz5OBYbPpr0uWW9chVHV3BrFnbwGc=;
-        b=kb6njWkKv0z4R00SuHN5ZqZaZ3bsbDL0wgeD5t/DEG41CbmdXAlso0OGXNOJPVSde8
-         uaWynhglYqjkq9yuOHohGpehspiZkNMYN5dbktoR4bSeLHg5Mv95I+bBgrxvNHH5wSp7
-         FMt9eXTw93Pt9Vp28OQbmLr79iU7iQ+3EtV/SATYmtIykeX0/Rb77relURMnm1L3HC4I
-         9oITh+BTUzXtA+Z4GKMn7WHfkka1vn52N9+3xHxPBrlRbBfxYhYjNI7dAARa2TAr9/9/
-         Y0hDsiNNtMDf8cZZUtPquKXOT/GzaH+k+AosjRf9xCEUfFWQjDWYiLZZPuSbt3ErEhrH
-         RkMA==
-X-Gm-Message-State: ABy/qLYuVfazF/VrKT7kVujgngNeCce2SThE2BUEFSNrXMPUrTGMUBZk
-	PphtyEu9oeSL4Po1/HAOTeeVfjNqJ+rBoQyv
-X-Google-Smtp-Source: APBJJlE1aBfjz/xSNLP8Jf+P7zQF/o74c3ze2XPqxl4eqbD51VhfkKLh4M+DRRADs3y1hjNagmGAnw==
-X-Received: by 2002:a17:90b:38d1:b0:262:d1b8:5d43 with SMTP id nn17-20020a17090b38d100b00262d1b85d43mr7786698pjb.22.1689868371329;
-        Thu, 20 Jul 2023 08:52:51 -0700 (PDT)
-Received: from localhost.localdomain (bb219-74-209-211.singnet.com.sg. [219.74.209.211])
-        by smtp.gmail.com with ESMTPSA id n12-20020a170902e54c00b001b8a00d4f7asm1569177plf.9.2023.07.20.08.52.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 08:52:50 -0700 (PDT)
-From: Leon Hwang <hffilwlqm@gmail.com>
-To: ast@kernel.org
-Cc: daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yhs@fb.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	hffilwlqm@gmail.com,
-	tangyeechou@gmail.com,
-	kernel-patches-bot@fb.com,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [RESEND PATCH bpf-next v3 2/2] selftests/bpf: Add testcase for xdp attaching failure tracepoint
-Date: Thu, 20 Jul 2023 23:52:28 +0800
-Message-ID: <20230720155228.5708-3-hffilwlqm@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230720155228.5708-1-hffilwlqm@gmail.com>
-References: <20230720155228.5708-1-hffilwlqm@gmail.com>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s2wEN5VYRgjLJvISNiu+qayGsxw9ElXBjPaNTKqHW50=;
+ b=aVx0WlaV6LGrY6hHu/gcqkoQGc8qFx0+TV7rKfRbI+6up9tBZEayuW21GRDdp+7t3GJOE4aOOVSRul8UqPpOunpLPWA0QWUJLoiJXXgjcSj1vsHxWlZx1G8RR0yoce0Fl0PeT5wH3JcajB4SoHBax0Hxhl8lNsvnZ3NFi8Nc1w8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BLAPR13MB4676.namprd13.prod.outlook.com (2603:10b6:208:30d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Thu, 20 Jul
+ 2023 15:53:31 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Thu, 20 Jul 2023
+ 15:53:30 +0000
+Date: Thu, 20 Jul 2023 16:53:23 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Julien Panis <jpanis@baylibre.com>
+Subject: Re: [PATCH v5 10/12] can: m_can: Use tx_fifo_in_flight for
+ netif_queue control
+Message-ID: <ZLlYc6HGZcdJ1N2y@corigine.com>
+References: <20230718075708.958094-1-msp@baylibre.com>
+ <20230718075708.958094-11-msp@baylibre.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718075708.958094-11-msp@baylibre.com>
+X-ClientProxiedBy: LO6P123CA0005.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:338::10) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BLAPR13MB4676:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e89c5fe-1bc8-4296-e872-08db89397712
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	JFK4zmOhe6N9k3B0/Ij7zXc57B2rLLBBaAQfTmCVZIwlfC0SA4bSGa2iKDmisi9flr25lkpp7zjNOyqub7Xw/K1rW26EV99HjCTZ60hiBDJ+uJrYRAjG2OniLxk+Kge310zVEr49vcmuyMnmT0p6s28WKPKwoM0kRUp7iLPxIOyciTmC3LCahB3SCzfF2HBpghGH0roMh/iQbRa3g0hm5RbGkBMk7DEjh1Tpa373osOGiZ9lUIOXF9hjCq4wRuMdd01VQU0kjvhjqQbsXFVtTlJ2JdL1Hd/hS6XTiUq6b+sESSdekL8lycoIYq1IHGDnwEFOjgEYAZ/LWAuSMEmga8PZVNwr6W7oMPaMWL1+PpJ11nuVrT/s5MC+bcSjuLlFbwNJcmjk1FEiLryCfHOStyYTbTorH9uYTsyP0kmRfkzML8W1Ak4d5K/L0tLD41TthNxZhtBs3MLS1FZGlTqfyUtq0a+bSokazxtILfv23FmsEgd25/SESryuCkp7Ze5TnnvYT0oQTPqZiXn5dPqUCNxRQbAIrT0blkKhEjsA1AzcUDss7xF4H+lKa2XlAGUFAHj+aqh0hcz8gT8d+tIlxltQtfw47/JptbuvGk3T2Fc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(366004)(39840400004)(376002)(451199021)(478600001)(6666004)(6486002)(54906003)(2616005)(86362001)(36756003)(2906002)(26005)(186003)(55236004)(6512007)(6506007)(83380400001)(38100700002)(44832011)(66476007)(41300700001)(8676002)(8936002)(5660300002)(4326008)(6916009)(66946007)(7416002)(66556008)(316002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LIDtNN+tExpWtuJsgQlieSXXedPMgf8x62n1DyLIxbxMBsaN/sDCHNwL62Ay?=
+ =?us-ascii?Q?tsehoXXGYsLdMbVyN/5ACsB4MtSoOPAwYOfCgKDm9I1QUsbNZIg2SRtFm98T?=
+ =?us-ascii?Q?izhBkOK6GG1YIADJAimF6hKaQWahm8nIxJfU4l3o7QzeNWf10aqwrKuyOHYk?=
+ =?us-ascii?Q?nRjVFWJz+MbqKqm58mrak2fIyvTlj5y+0xAaplbWNMswGiUVuhxRlu93Vm3y?=
+ =?us-ascii?Q?OeJRCLl24GOCgSo6J6klMctHyQfyvqu5U+fVKVSWcUJ6csEgV+n4x7ruN2/3?=
+ =?us-ascii?Q?AhJdrnsKM1u/qX1zPxUY7Dwuln7EWf2KxsRktkhOlt8glqWIZT4xNs3mhXn8?=
+ =?us-ascii?Q?jS1F5HGH2/Q04ZRpGbHDpsFuOW8EOVkv7My9W9kZBEVywWppbsSF+4UWWU9U?=
+ =?us-ascii?Q?PJ4+55wukI+srNPnZ2ulFtH3BBMDEQx1ELvihJg2JxgVIG8EX+Rd98Pr6kLY?=
+ =?us-ascii?Q?vp0+ayBz1C5ZoPYBOpIRTJ2IPBIlp0by5kO3IpEtIsz1Jo8LQS1P3OwDwP5P?=
+ =?us-ascii?Q?u3sNZ0mSMFSGo17Gc4Xac9yTn7tn2MYkT35MukGGs6ngjmNcP/rQ2b8t9dX/?=
+ =?us-ascii?Q?VM8OTYHS6qip1c7SayoTJcCdwFcBqpiyDGEbtLLzbyjmxK/cVWragy0V/TCz?=
+ =?us-ascii?Q?F1KtUdWnWsj6hIXsAhmSb1XVrDOW7WunhAkUaSIpJQSnR7+tsaDUXm1hPCmz?=
+ =?us-ascii?Q?EzFkyK9YPpx/iQOlmlNCCb7N/cbzZ7UCtU5bRFWq+AG2v/yECK0WXZCnLPqM?=
+ =?us-ascii?Q?jjG6w5AWwFzpbmKd3zqs4UCdbM/4gJFWJER+iWhKXUVQ36e2RfyCRXsh9ijO?=
+ =?us-ascii?Q?bXM9F/Un3zi5L0cLjiEGg0rjGJtb8Vj2/TozfkGcnzQkOyBAyRq+7v0SqHw+?=
+ =?us-ascii?Q?fXcuQNsuQeYUZVs80ioUzCbZLLEJkBr/aGHR2gyMxlAJ+CQ/UE3q7Wwu5vTZ?=
+ =?us-ascii?Q?RSf+byBK/W6p4LHBJ1GiyBbU4RspxA2RrtyjEisSqLVsCKi6L00G4l2wuoTy?=
+ =?us-ascii?Q?Fjt/I8hktzk4BZsS2AUjYntjEqZ7KhimrwYw/z4QrTEyYKSeIEVOJ9oc2B5i?=
+ =?us-ascii?Q?xTjjmxMSNcl+ieT/BfyRAhfbmmkZSK9o45gUilHAjlxZ4cCiuMW702mMga6n?=
+ =?us-ascii?Q?x+1TNFB3R9T1ew8Qoi+OqpJ3TjFprk74L7fBavAJpUY7/ku1D3dFJrn7D9aR?=
+ =?us-ascii?Q?1grSRRm1BF11rsCblB4gfQol6Dvp53oawC1of8d5CipzvXfS5dv2fzeGEkCl?=
+ =?us-ascii?Q?dl5i+wlJSsw/0aL3CO4aWub1/6nyZc5XDW/rywTnL4CUXh0ZvHR7e21NCn6D?=
+ =?us-ascii?Q?nShVZYWBHG8xDXehEfgv107pgGC1T2xrbSTwhxNqa+DNwJIjQcvRi3RJWAU2?=
+ =?us-ascii?Q?QoAnWHr8xE3JMKUalcAPon8EZq85aejLv0purM6d6F4STeg/tkCfuM4r+kwN?=
+ =?us-ascii?Q?Go08+At/rLagHEMcEdS4rJdKRjRZbxZofcT1WvuvJWR6MCl+njwUJDTv74pQ?=
+ =?us-ascii?Q?P1cV//tWx1ZGpzZsR5khSqzBURShky21v259eOUldV97RjyCznC4KHLNEYKC?=
+ =?us-ascii?Q?Dk7v9S8nfP2QO4lPj34wDr/9z0fEFbhZCJDg7G5td5JS/rIU0qhFwBGXbMdF?=
+ =?us-ascii?Q?IA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e89c5fe-1bc8-4296-e872-08db89397712
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 15:53:30.8367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1+96ONZHIynt7zXFpua3aPLbSimLh+gU5N7B6wxRTpCaet3OcigpH3ZvqvUhs+IqMOo3LkJJBEDqUeCm+A3+7UQbJ6Tfl7myuK5Ct5Yx5yc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR13MB4676
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a test case for the tracepoint of xdp attaching failure by bpf
-tracepoint when attach XDP to a device with invalid flags option.
+On Tue, Jul 18, 2023 at 09:57:06AM +0200, Markus Schneider-Pargmann wrote:
+> The network queue is currently always stopped in start_xmit and
+> continued in the interrupt handler. This is not possible anymore if we
+> want to keep multiple transmits in flight in parallel.
+> 
+> Use the previously introduced tx_fifo_in_flight counter to control the
+> network queue instead. This has the benefit of not needing to ask the
+> hardware about fifo status.
+> 
+> This patch stops the network queue in start_xmit if the number of
+> transmits in flight reaches the size of the fifo and wakes up the queue
+> from the interrupt handler once the transmits in flight drops below the
+> fifo size. This means any skbs over the limit will be rejected
+> immediately in start_xmit (it shouldn't be possible at all to reach that
+> state anyways).
+> 
+> The maximum number of transmits in flight is the size of the fifo.
+> 
+> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
 
-The bpf tracepoint retrieves error message from the tracepoint, and
-then put the error message to a perf buffer. The testing code receives
-error message from perf buffer, and then ASSERT "Invalid XDP flags for
-BPF link attachment".
-
-Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
----
- .../selftests/bpf/prog_tests/xdp_attach.c     | 65 +++++++++++++++++++
- .../bpf/progs/test_xdp_attach_fail.c          | 52 +++++++++++++++
- 2 files changed, 117 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
-index fa3cac5488f5d..99f8d03f3c8bd 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <test_progs.h>
-+#include "test_xdp_attach_fail.skel.h"
- 
- #define IFINDEX_LO 1
- #define XDP_FLAGS_REPLACE		(1U << 4)
-@@ -85,10 +86,74 @@ static void test_xdp_attach(const char *file)
- 	bpf_object__close(obj1);
- }
- 
-+struct xdp_errmsg {
-+	char msg[64];
-+};
-+
-+static void on_xdp_errmsg(void *ctx, int cpu, void *data, __u32 size)
-+{
-+	struct xdp_errmsg *ctx_errmg = ctx, *tp_errmsg = data;
-+
-+	memcpy(&ctx_errmg->msg, &tp_errmsg->msg, size);
-+}
-+
-+static const char tgt_errmsg[] = "Invalid XDP flags for BPF link attachment";
-+
-+static void test_xdp_attach_fail(const char *file)
-+{
-+	__u32 duration = 0;
-+	int err, fd_xdp, fd_link_xdp;
-+	struct bpf_object *obj = NULL;
-+	struct test_xdp_attach_fail *skel = NULL;
-+	struct bpf_link *link = NULL;
-+	struct perf_buffer *pb = NULL;
-+	struct xdp_errmsg errmsg = {};
-+
-+	LIBBPF_OPTS(bpf_link_create_opts, opts);
-+
-+	skel = test_xdp_attach_fail__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "test_xdp_attach_fail_skel"))
-+		goto out_close;
-+
-+	link = bpf_program__attach_tracepoint(skel->progs.tp__xdp__bpf_xdp_link_attach_failed,
-+					      "xdp", "bpf_xdp_link_attach_failed");
-+	if (!ASSERT_OK_PTR(link, "attach_tp"))
-+		goto out_close;
-+
-+	/* set up perf buffer */
-+	pb = perf_buffer__new(bpf_map__fd(skel->maps.xdp_errmsg_pb), 1,
-+			      on_xdp_errmsg, NULL, &errmsg, NULL);
-+
-+	err = bpf_prog_test_load(file, BPF_PROG_TYPE_XDP, &obj, &fd_xdp);
-+	if (CHECK_FAIL(err))
-+		goto out_close;
-+
-+	opts.flags = 0xFF; // invalid flags to fail to attach XDP prog
-+	fd_link_xdp = bpf_link_create(fd_xdp, IFINDEX_LO, BPF_XDP, &opts);
-+	if (CHECK(fd_link_xdp != -22, "bpf_link_create_failed",
-+		  "created link fd: %d\n", fd_link_xdp))
-+		goto out_close;
-+
-+	/* read perf buffer */
-+	err = perf_buffer__poll(pb, 100);
-+	if (CHECK(err < 0, "perf_buffer__poll", "err %d\n", err))
-+		goto out_close;
-+
-+	ASSERT_STRNEQ((const char *) errmsg.msg, tgt_errmsg,
-+		      42 /* strlen(tgt_errmsg) */, "check error message");
-+
-+out_close:
-+	perf_buffer__free(pb);
-+	bpf_object__close(obj);
-+	test_xdp_attach_fail__destroy(skel);
-+}
-+
- void serial_test_xdp_attach(void)
- {
- 	if (test__start_subtest("xdp_attach"))
- 		test_xdp_attach("./test_xdp.bpf.o");
- 	if (test__start_subtest("xdp_attach_dynptr"))
- 		test_xdp_attach("./test_xdp_dynptr.bpf.o");
-+	if (test__start_subtest("xdp_attach_failed"))
-+		test_xdp_attach_fail("./xdp_dummy.bpf.o");
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c b/tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
-new file mode 100644
-index 0000000000000..64baf73910a0e
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
-@@ -0,0 +1,52 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright Leon Hwang */
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+
-+struct xdp_errmsg {
-+	char msg[64];
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_PERF_EVENT_ARRAY);
-+	__uint(key_size, sizeof(__u32));
-+	__uint(value_size, sizeof(__u32));
-+} xdp_errmsg_pb SEC(".maps");
-+
-+struct xdp_attach_error_ctx {
-+	unsigned long unused;
-+
-+	/*
-+	 * bpf does not support tracepoint __data_loc directly.
-+	 *
-+	 * Actually, this field is a 32 bit integer whose value encodes
-+	 * information on where to find the actual data. The first 2 bytes is
-+	 * the size of the data. The last 2 bytes is the offset from the start
-+	 * of the tracepoint struct where the data begins.
-+	 * -- https://github.com/iovisor/bpftrace/pull/1542
-+	 */
-+	__u32 msg; // __data_loc char[] msg;
-+};
-+
-+/*
-+ * Catch up the error message at the tracepoint.
-+ */
-+
-+SEC("tp/xdp/bpf_xdp_link_attach_failed")
-+int tp__xdp__bpf_xdp_link_attach_failed(struct xdp_attach_error_ctx *ctx)
-+{
-+	struct xdp_errmsg errmsg;
-+	char *msg = (void *)(__u64) ((void *) ctx + (__u16) ctx->msg);
-+
-+	bpf_probe_read_kernel_str(&errmsg.msg, sizeof(errmsg.msg), msg);
-+	bpf_perf_event_output(ctx, &xdp_errmsg_pb, BPF_F_CURRENT_CPU, &errmsg,
-+			      sizeof(errmsg));
-+	return 0;
-+}
-+
-+/*
-+ * Reuse the XDP program in xdp_dummy.c.
-+ */
-+
-+char LICENSE[] SEC("license") = "GPL";
--- 
-2.41.0
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
