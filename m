@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-19407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13E375A977
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:41:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2513475A971
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F01D1C2105B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF906281C89
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6230D1E50A;
-	Thu, 20 Jul 2023 08:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FCC19BC2;
+	Thu, 20 Jul 2023 08:30:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A513182AA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937C6174DB
 	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:30:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 83AD6C581A1;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 930EBC4AF6E;
 	Thu, 20 Jul 2023 08:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1689841798;
-	bh=0O4XaD7hqsnlsi2+/cns72bJJxVQuyLr5nMDr7PCcE4=;
+	bh=12/I5mxTK2I183F2Uca3FzP5Zq+MwR1BSDbbTPa7mNU=;
 	h=From:Date:Subject:References:In-Reply-To:List-Id:To:Cc:Reply-To:
 	 From;
-	b=Ffr8aZl6rN3VojIRxQu1rgqtxKa152MaK5vBFG93QHd5nRs6crxfz2K57pmEKexC0
-	 WyQomccqujeqaF7jDSEsbUNE+E13KN727cR5pH0zpHMuV/b1XbnKmhtO0kjzBENvoL
-	 uOmk48vTJCnay4NZWLPPRV56O1hTQD0vUDyInGa8WAaDShAI61EiJ9y/6LTPJKzSyz
-	 qDMhudddE4J+kpUlKgGTp1MbCXMcLEXXU312sg36AqaFul5wrrUz88JoZSYgiL95Jc
-	 WZBbKW6wGnZtZrq8sBNaySuoFJhxkUpJzeUyLkh9VrWS5BN3MWVCyUZOx92e/RoErl
-	 50YEgXtGd7zRg==
+	b=SWq24cLFdmcHlrESY+25el1BtSug83/0tV/FxXtqLs0k81SGYYFiFnSmtpou6wLOT
+	 a8FGrWmBoEVM3ZBGBMBiHyIeF1N8hgnqbDXBpdwD3AHo9zlhB088xKiurgvLnrb34c
+	 Py8xoufQzOE5PqzEHXYrhw69gn+kBu0qNM/4T8TReFm6IsFRStFXfUG4FxzrXQG/k1
+	 va41I8AWj7/bBqofw7yNnjdPQnyzskkn5VY5zUGX4s8JvoBB6kXJmvP2tzVFv4B3gd
+	 N/RoPvBk6xY7jJv60GE8cMZvz698bkh/Fykut3SL9Xi7yd/OF2sMDra0DoCEvi97F/
+	 91sWsZNdCgA3w==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70207C25B5F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E321C3DA46;
 	Thu, 20 Jul 2023 08:29:58 +0000 (UTC)
 From:
  Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Thu, 20 Jul 2023 14:29:31 +0300
-Subject: [PATCH v3 31/42] dt-bindings: wdt: Add ts72xx
+Date: Thu, 20 Jul 2023 14:29:32 +0300
+Subject: [PATCH v3 32/42] wdt: ts72xx: add DT support for ts72xx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,7 +46,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230605-ep93xx-v3-31-3d63a5f1103e@maquefel.me>
+Message-Id: <20230605-ep93xx-v3-32-3d63a5f1103e@maquefel.me>
 References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
 In-Reply-To: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
 List-Id: <soc.lore.kernel.org>
@@ -88,11 +88,11 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
  linux-input@vger.kernel.org, alsa-devel@alsa-project.org
 X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689852591; l=1621;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689852591; l=1025;
  i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=+iYdXLpj952sAwmYjKp/GVeiFhMZU99T9LpFVI9aGx0=; =?utf-8?q?b=3DPYSrwjwZv3XM?=
- =?utf-8?q?UrmUJ9Az9NVYoHn7v8/AorkIYoItE7iogjVur0EJBmY3tfD/koJ6+KDVHoBUk+kM?=
- k0IoLxwnDZgB/qsuAZxmKuToLG10AKjeCt/JSJTZIho3VrzkJ2eT
+ bh=/pFUHJmR8DUvfiw1Xz02EuXbI462fkIA+hdLJYGTYiA=; =?utf-8?q?b=3DM3Wqmsi/7579?=
+ =?utf-8?q?i7J2GmgDeoutVdTKMlSiRw3XikhI9+UmnTQ6CCCyDOK5PkSYehbZgMpn5MdhjPKq?=
+ VG/8YZ6XC/Y39kKPNCogijp3J6krn6Z+WVWsRQFU1SEQBm3v0QSa
 X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
  pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
 X-Endpoint-Received:
@@ -102,65 +102,43 @@ Reply-To: <nikita.shubin@maquefel.me>
 
 From: Nikita Shubin <nikita.shubin@maquefel.me>
 
-Add DT binding for Technologic Systems TS-72xx watchdog.
+Add OF ID match table.
 
 Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
 ---
- .../bindings/watchdog/technologic,ts7200-wdt.yaml  | 46 ++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ drivers/watchdog/ts72xx_wdt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/watchdog/technologic,ts7200-wdt.yaml b/Documentation/devicetree/bindings/watchdog/technologic,ts7200-wdt.yaml
-new file mode 100644
-index 000000000000..4f7f004ffdd3
---- /dev/null
-+++ b/Documentation/devicetree/bindings/watchdog/technologic,ts7200-wdt.yaml
-@@ -0,0 +1,46 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/watchdog/technologic,ts7200-wdt.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/watchdog/ts72xx_wdt.c b/drivers/watchdog/ts72xx_wdt.c
+index 3d57670befe1..ac709dc31a65 100644
+--- a/drivers/watchdog/ts72xx_wdt.c
++++ b/drivers/watchdog/ts72xx_wdt.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include <linux/platform_device.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/watchdog.h>
+ #include <linux/io.h>
+@@ -160,10 +161,17 @@ static int ts72xx_wdt_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static const struct of_device_id ts72xx_wdt_of_ids[] = {
++	{ .compatible = "technologic,ts7200-wdt" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, ts72xx_wdt_of_ids);
 +
-+title: Technologic Systems TS-72xx based SBCs watchdog
-+
-+maintainers:
-+  - Nikita Shubin <nikita.shubin@maquefel.me>
-+
-+allOf:
-+  - $ref: watchdog.yaml#
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - const: technologic,ts7200-wdt
-+      - items:
-+          - enum:
-+              - technologic,ts7300-wdt
-+              - technologic,ts7260-wdt
-+              - technologic,ts7250-wdt
-+          - const: technologic,ts7200-wdt
-+
-+  reg:
-+    items:
-+      - description: control register
-+      - description: feed register
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    watchdog@23800000 {
-+      compatible = "technologic,ts7200-wdt";
-+      reg = <0x23800000 0x01>, <0x23c00000 0x01>;
-+      timeout-sec = <30>;
-+    };
-+
-+...
-+
+ static struct platform_driver ts72xx_wdt_driver = {
+ 	.probe		= ts72xx_wdt_probe,
+ 	.driver		= {
+ 		.name	= "ts72xx-wdt",
++		.of_match_table = ts72xx_wdt_of_ids,
+ 	},
+ };
+ 
 
 -- 
 2.39.2
