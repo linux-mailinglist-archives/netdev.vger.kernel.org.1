@@ -1,179 +1,133 @@
-Return-Path: <netdev+bounces-19683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A4075BA55
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 00:15:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5409575BA7D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 00:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A31DC1C21577
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 22:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9D0E2820A0
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 22:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3F51DDE6;
-	Thu, 20 Jul 2023 22:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A5E1DDDE;
+	Thu, 20 Jul 2023 22:20:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09CA168C3
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 22:14:38 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6DF1737
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:14:37 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-563396c1299so964330a12.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689891277; x=1690496077;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ntAPyIcMbj4x2RdnE4QWJ5FnaEQOtZId8qQ+eDe+suw=;
-        b=2+e4wlpBPGsDpkyw9CWHUhUURlWwywpD9mLf9/RBs1kZ8I0EHM8GFP0kqUHjLBcgnz
-         GFnq5AWj7J7LoL/lcihBMgvlTppJkp978bgwidS+pSzERqqVPAmvnYZ1OOqW6B53PHI2
-         a4PqOh82SNuR6MmQUuG7pjquwvMJYeyp2xYQ2/Z1XjWtTEwbz4n/SOBasMM4oQvuOxF8
-         L706QxaAyVlF9w+Ey+PMmd5QG7b5M4ASTxtsrm335ulibPXAOXznvyKyPxnj9GXEw0P8
-         w+Fxp4fl8CEj2VR+2GsBGpU5KuYDPb11xZ475wFcZTzvOGhKFSqmxcWJpsZVhmQy8EDI
-         Sd9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689891277; x=1690496077;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ntAPyIcMbj4x2RdnE4QWJ5FnaEQOtZId8qQ+eDe+suw=;
-        b=hAGhdMBzufTemLtKH2dAMMVFUNxPuIej2qPaPwCl5c3jWn180ZJl1dZDwtt1zWv5vo
-         heU2CswxxBzUdVJiE/s9C3DK4pq5oYdHM4b99t01uILuiPfu0CE+CnPJ5bkV+JUum/Bf
-         e1lhsFsL++CV0vQXAExjc/XVHPg+duRAzhzXaBycBR66BCTAMbS4HhPrxIvKxVZvD06K
-         lLHBQXdjoiQ8oA5wAbvrXCchYqaRAik5rtS1WKGphbP+joXH/1Sbvm65Ynr/GaOtmme8
-         IDimbJ6Kx/znPJdSaCVArQBIyGWcisybcJ0cvyK1nkkQgw1RU9KsEMQcqD0qgKKmztwk
-         /4Ww==
-X-Gm-Message-State: ABy/qLZY/4/ym76G9nrhESu5e2DTqL+xCsy36UONmrW8wuO/3faLBFFL
-	2dO1tsJgz4v7EBT70HJ7Mg0Gncc=
-X-Google-Smtp-Source: APBJJlEMcGX2ZkdXhS334WMXGI7SezRrsjD1b1FT17XrD7DpNm7fvdr043HoswPQetYExgcds8n3skw=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:7448:0:b0:557:531e:34c7 with SMTP id
- e8-20020a637448000000b00557531e34c7mr27pgn.11.1689891276612; Thu, 20 Jul 2023
- 15:14:36 -0700 (PDT)
-Date: Thu, 20 Jul 2023 15:14:34 -0700
-In-Reply-To: <20230719183734.21681-22-larysa.zaremba@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B70168C3
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 22:20:18 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1942D7D;
+	Thu, 20 Jul 2023 15:19:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1689891580;
+	bh=qdbWIDnRmwX5ckyQEWL+ZpWxc5wfAxXFPHqB4zGGG2E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rHg9YJwDHoxFI7lXN60mcAYn33qzI4U/9USAv0OQh2KDCI3cmgGMDj/hCbJ8xnjat
+	 Vha8JGwwKqgphyEbMr4OdUAScBsh54zoJhyh1dwduWtFodWosQJFf48mUzAYgDSyly
+	 leIyHzZDyoEjVMvwLR16GMhM/BbD9WEFgdjd/29bWgLGMtF1LLtqEG9V91sUDECu1k
+	 G/Lrh55gGib3e/fbvlaRLxHkZgt6qNrHNUf2P5OweBGiZKh+LXKv1BwuoezAVaMb6R
+	 PJ9ZRVL+KdfHQ9NCN8fRNlA2D+stJGZUNa/cIQjlY9Y8wa/2aUMptMfaTIQpFr/aw0
+	 1Yr3706w8uhqw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4R6Rtz6xFwz4wyH;
+	Fri, 21 Jul 2023 08:19:39 +1000 (AEST)
+Date: Fri, 21 Jul 2023 08:19:38 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "Von Dentz, Luiz"
+ <luiz.von.dentz@intel.com>, Marcel Holtmann <marcel@holtmann.org>, Johan
+ Hedberg <johan.hedberg@gmail.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, David Miller <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Kuniyuki
+ Iwashima <kuniyu@amazon.com>
+Subject: Re: linux-next: build failure after merge of the bluetooth tree
+Message-ID: <20230721081938.19ca4289@canb.auug.org.au>
+In-Reply-To: <CAJqdLron07dGuchjmPZcD6xe5af+qpgNMThz5G8=tR7n4=fU1A@mail.gmail.com>
+References: <PH0PR11MB51269B6805230AB8ED209B14D332A@PH0PR11MB5126.namprd11.prod.outlook.com>
+	<20230720105042.64ea23f9@canb.auug.org.au>
+	<20230719182439.7af84ccd@kernel.org>
+	<20230720130003.6137c50f@canb.auug.org.au>
+	<PH0PR11MB5126763E5913574B8ED6BDE4D33EA@PH0PR11MB5126.namprd11.prod.outlook.com>
+	<20230719202435.636dcc3a@kernel.org>
+	<20230720081430.1874b868@kernel.org>
+	<CAJqdLron07dGuchjmPZcD6xe5af+qpgNMThz5G8=tR7n4=fU1A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230719183734.21681-1-larysa.zaremba@intel.com> <20230719183734.21681-22-larysa.zaremba@intel.com>
-Message-ID: <ZLmxyqiAuLHUzztt@google.com>
-Subject: Re: [PATCH bpf-next v3 21/21] selftests/bpf: check checksum state in xdp_metadata
-From: Stanislav Fomichev <sdf@google.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
-	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
-	xdp-hints@xdp-project.net, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/VfHlyY9va_AYo3+=saPglHQ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 07/19, Larysa Zaremba wrote:
-> Verify, whether kfunc in xdp_metadata test correctly returns partial
-> checksum status and offsets.
-> 
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+--Sig_/VfHlyY9va_AYo3+=saPglHQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Stanislav Fomichev <sdf@google.com>
+Hi Alexander,
 
-> ---
->  .../selftests/bpf/prog_tests/xdp_metadata.c   | 30 +++++++++++++++++++
->  .../selftests/bpf/progs/xdp_metadata.c        |  6 ++++
->  2 files changed, 36 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> index 6665cf0c59cc..c0ce66703696 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> @@ -47,6 +47,7 @@
->  
->  #define XDP_RSS_TYPE_L4 BIT(3)
->  #define VLAN_VID_MASK 0xfff
-> +#define XDP_CHECKSUM_PARTIAL BIT(3)
->  
->  struct xsk {
->  	void *umem_area;
-> @@ -168,6 +169,32 @@ static void refill_rx(struct xsk *xsk, __u64 addr)
->  	}
->  }
->  
-> +struct partial_csum_info {
-> +	__u16 csum_start;
-> +	__u16 csum_offset;
-> +};
-> +
-> +static bool assert_checksum_ok(struct xdp_meta *meta)
-> +{
-> +	struct partial_csum_info *info;
-> +	u32 csum_start, csum_offset;
-> +
-> +	if (!ASSERT_EQ(meta->rx_csum_status, XDP_CHECKSUM_PARTIAL,
-> +		       "rx_csum_status"))
-> +		return false;
-> +
-> +	csum_start = sizeof(struct ethhdr) + sizeof(struct iphdr);
-> +	csum_offset = offsetof(struct udphdr, check);
-> +	info = (void *)&meta->rx_csum_info;
-> +
-> +	if (!ASSERT_EQ(info->csum_start, csum_start, "rx csum_start"))
-> +		return false;
-> +	if (!ASSERT_EQ(info->csum_offset, csum_offset, "rx csum_offset"))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  static int verify_xsk_metadata(struct xsk *xsk)
->  {
->  	const struct xdp_desc *rx_desc;
-> @@ -229,6 +256,9 @@ static int verify_xsk_metadata(struct xsk *xsk)
->  	if (!ASSERT_EQ(meta->rx_vlan_proto, VLAN_PID, "rx_vlan_proto"))
->  		return -1;
->  
-> +	if (!assert_checksum_ok(meta))
-> +		return -1;
-> +
->  	xsk_ring_cons__release(&xsk->rx, 1);
->  	refill_rx(xsk, comp_addr);
->  
-> diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> index d3111649170e..e79667a0726e 100644
-> --- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> +++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> @@ -26,6 +26,9 @@ extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
->  extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
->  					__u16 *vlan_tci,
->  					__be16 *vlan_proto) __ksym;
-> +extern int bpf_xdp_metadata_rx_csum(const struct xdp_md *ctx,
-> +				    enum xdp_csum_status *csum_status,
-> +				    union xdp_csum_info *csum_info) __ksym;
->  
->  SEC("xdp")
->  int rx(struct xdp_md *ctx)
-> @@ -62,6 +65,9 @@ int rx(struct xdp_md *ctx)
->  	bpf_xdp_metadata_rx_hash(ctx, &meta->rx_hash, &meta->rx_hash_type);
->  	bpf_xdp_metadata_rx_vlan_tag(ctx, &meta->rx_vlan_tci, &meta->rx_vlan_proto);
->  
-> +	bpf_xdp_metadata_rx_csum(ctx, &meta->rx_csum_status,
-> +				 (void *)&meta->rx_csum_info);
-> +
->  	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
->  }
->  
-> -- 
-> 2.41.0
-> 
+On Thu, 20 Jul 2023 17:21:54 +0200 Alexander Mikhalitsyn <alexander@mihalic=
+yn.com> wrote:
+>
+> On Thu, Jul 20, 2023 at 5:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Wed, 19 Jul 2023 20:24:35 -0700 Jakub Kicinski wrote: =20
+> > > On Thu, 20 Jul 2023 03:17:37 +0000 Von Dentz, Luiz wrote: =20
+> > > > Sorry for not replying inline, outlook on android, we use scm_recv
+> > > > not scm_recv_unix, so Id assume that change would return the initial
+> > > > behavior, if it did not then it is not fixing anything. =20
+> > >
+> > > Ack, that's what it seems like to me as well.
+> > >
+> > > I fired up an allmodconfig build of linux-next. I should be able
+> > > to get to the bottom of this in ~20min :) =20
+> >
+> > I kicked it off and forgot about it.
+> > allmodconfig on 352ce39a8bbaec04 (next-20230719) builds just fine :S =20
+>=20
+> Thanks for checking!
+>=20
+> As I can see linux-next tree contains both patches:
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?=
+h=3Dnext-20230719&qt=3Dgrep&q=3DForward+credentials+to+monitor
+>=20
+> So, the fix is working, right?
+
+I will remove the revert today.
+
+Thanks.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/VfHlyY9va_AYo3+=saPglHQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmS5svoACgkQAVBC80lX
+0GzBTwf9FXVnrPPdIATHjsk6uX3felA1BTBpCVY2Ai/8hVsJtTJSRUXMbGkgYZoM
+2P2OLCkJssu59cj1HDO/Ql61DpzwOjJ2u1nIs64joBRoJSDuqlHvIfJNlnXopy+Z
+dEqZLwV3eQhUiC1lhiBr7FrgxA07ZjhlsDnk+Fj/jsZbVXpgXRAMitcI9txtAo/C
+sduQMSOsCH4orSvwseR/07cUAZm+pemUWkHPyTUDfepm96J+QjEC9+OYqpW6gQ6q
+bovm4guPJKWnj16YsiCtwLGYR2C+1eV3nVb+QR6IxUhgOsr7jsvL+7Zuw3/qdkHr
+VCuUJy18sKsyBqJDYaguZprmJ2fiVQ==
+=RWug
+-----END PGP SIGNATURE-----
+
+--Sig_/VfHlyY9va_AYo3+=saPglHQ--
 
