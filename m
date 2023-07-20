@@ -1,89 +1,157 @@
-Return-Path: <netdev+bounces-19461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFEA675AC5D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:50:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C1175AC7C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:00:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AF62281D7C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF7E01C212E2
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E269A171CC;
-	Thu, 20 Jul 2023 10:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5B4174F3;
+	Thu, 20 Jul 2023 11:00:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9DD199ED
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DC98C433C9;
-	Thu, 20 Jul 2023 10:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689850222;
-	bh=Pbu6PsThcCjtA11Eu9h2+NnVNrCz4HVqEbnnSDw7XJM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pQcL4aC8dR2zJElQ39HdEW190q0o2uXxOVNQwPpwZoQOf+0LimQw8p77tb0lDD8V+
-	 sMJX5xpwB8LujcMSbBiuG0xHS4PTKSEdwmojLSsF9k1qI58IbB6iNrDdkRIp/O9h/d
-	 S72A7Gk0HUjwFh06agavciksJfx23nI9bddUbEL1juGRPQkq1PYVuyjPbSOBJZHn9X
-	 no229O/7l+Uhv/RkcdyDv1dSKNMKK1Udq/dz05nYDwe6Kv/JgSG+ut8uArZ0s85URH
-	 C+BNJUDbMpY8LKD9fbXV9VwhwrXZ9ADzxqrwkSD/pWnl9a0JgzeAY6JSsokoGz33XX
-	 TnTSSm+u1RGMQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E2E01E21EF6;
-	Thu, 20 Jul 2023 10:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC5719A0B
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:00:42 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABA63269E;
+	Thu, 20 Jul 2023 04:00:33 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36KAWS6l024554;
+	Thu, 20 Jul 2023 11:00:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type; s=pp1;
+ bh=bKRVm10txPy8lFnneUgBXuyHE9Mx1pg18Ovf6qqrVz0=;
+ b=m2BilA2KprhxFPcrszswc9JkY6gxSw0FkMWpBeNsCjIIRtLFLy+oUbzJGf5kjWttEFRO
+ CBJ2gA4tkCXnyvUScDdN9/ZoNuv8T/awPSOb/rkbvlCO9QdC+YPk0A6Wep4lFN7iYPim
+ LsEx6My6nfGSQqvcZDFao/7BDMQfPIKgmWAh0B8ymHp5TbytHLkTuTXJDeAMHXbrJmYt
+ ThBztMuUc5WG3dJJyW3vq+gwrYmaHren4fjWnoOe6WQAbxCTyzNzzJqgpfUPdMtyvgM7
+ ayHFlDfyxwYmxX03tISQF1C0yVaxkLU6x9g8mPo1Ce09mK0Iu2ElXjrYlbt/4WRnOpqq fQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rxwcgrkp7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Jul 2023 11:00:28 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36KAbq91032201;
+	Thu, 20 Jul 2023 11:00:27 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rxwcgrkna-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Jul 2023 11:00:27 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36K9H1GJ003390;
+	Thu, 20 Jul 2023 11:00:26 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3rv65xp8nw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Jul 2023 11:00:26 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36KB0NbG38338938
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 20 Jul 2023 11:00:24 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D56FB20049;
+	Thu, 20 Jul 2023 11:00:23 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A600020040;
+	Thu, 20 Jul 2023 11:00:23 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 20 Jul 2023 11:00:23 +0000 (GMT)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+ <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: AF_UNIX crash in bind() triggered by strace test
+Date: Thu, 20 Jul 2023 13:00:23 +0200
+Message-ID: <yt9dedl2rgoo.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/5] Add a driver for the Marvell 88Q2110 PHY
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168985022192.7083.10091007682016221915.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Jul 2023 10:50:21 +0000
-References: <20230719064258.9746-1-eichest@gmail.com>
-In-Reply-To: <20230719064258.9746-1-eichest@gmail.com>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, francesco.dolcini@toradex.com, kabel@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: E1cK2fdn4YFSv0Evtt5uph5Qj5By2Ykb
+X-Proofpoint-ORIG-GUID: I-vwR6ADdYzu6bsgRFPvuNbcMH0mvNAZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-20_04,2023-07-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 mlxlogscore=967 suspectscore=0 impostorscore=0 adultscore=0
+ spamscore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307200088
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+the following crash was reported in our CI on s390x with
+debug_defconfig, which enables FORTIFY_SOURCE:
 
-On Wed, 19 Jul 2023 08:42:53 +0200 you wrote:
-> Add support for 1000BASE-T1 to the phy-c45 helper and add a first
-> 1000BASE-T1 driver for the Marvell 88Q2110 PHY.
-> 
-> v4:
->   - Move PHY id to include/linux/marvell_phy.h (Marek)
->   - Use PHY id ending with 0, gets masked (Andrew)
-> 
-> [...]
+detected buffer overflow in __fortify_strlen
+------------[ cut here ]------------
+kernel BUG at lib/string_helpers.c:1031!
+monitor event: 0040 ilc:2 [#1] PREEMPT SMP 
+Modules linked in: [..]
+CPU: 0 PID: 243755 Comm: net-accept-conn Not tainted 6.5.0-20230719.rc2.git1.f1311c9e1695.300.fc38.s390x+debug #1
+Call Trace:
+ [<000000003465b7a2>] fortify_panic+0x2a/0x30 
+([<000000003465b79e>] fortify_panic+0x26/0x30)
+ [<0000000034a3a77e>] unix_bind_bsd+0x86/0x390 
+ [<00000000348839d0>] __sys_bind+0xe0/0xe8 
+ [<0000000034926270>] __do_compat_sys_socketcall+0x260/0x4d0 
+ [<0000000034be3b66>] __do_syscall+0x1de/0x208 
+ [<0000000034bfaf38>] system_call+0x70/0x98 
+INFO: lockdep is turned off.
+Last Breaking-Event-Address:
+ [<0000000034774880>] __s390_indirect_jump_r14+0x0/0x10
+Kernel panic - not syncing: Fatal exception: panic_on_oops
 
-Here is the summary with links:
-  - [net-next,v4,1/5] net: phy: add registers to support 1000BASE-T1
-    https://git.kernel.org/netdev/net-next/c/6f1c646d88c5
-  - [net-next,v4,2/5] net: phy: c45: add support for 1000BASE-T1 forced setup
-    https://git.kernel.org/netdev/net-next/c/25108a834e14
-  - [net-next,v4,3/5] net: phy: c45: add a separate function to read BASE-T1 abilities
-    https://git.kernel.org/netdev/net-next/c/eba2e4c2faef
-  - [net-next,v4,4/5] net: phy: c45: detect the BASE-T1 speed from the ability register
-    https://git.kernel.org/netdev/net-next/c/a60eb72066af
-  - [net-next,v4,5/5] net: phy: marvell-88q2xxx: add driver for the Marvell 88Q2110 PHY
-    https://git.kernel.org/netdev/net-next/c/00f11ac71708
+This is caused by a test case who sends an unterminated sun_path
+to the kernel in a bind() system call from the strace test suite.
+As a test i made the following quick fix, which "fixed" the issue:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 123b35ddfd71..c505edd74d8c 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1206,11 +1206,13 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
+ 	struct unix_address *addr;
+ 	struct dentry *dentry;
+ 	struct path parent;
+-	int err;
++	int pathlen, err;
+ 
+ 	unix_mkname_bsd(sunaddr, addr_len);
+-	addr_len = strlen(sunaddr->sun_path) +
+-		offsetof(struct sockaddr_un, sun_path) + 1;
++	pathlen = strnlen(sunaddr->sun_path, UNIX_PATH_MAX);
++	if (pathlen == UNIX_PATH_MAX)
++		return -EINVAL;
++	addr_len = pathlen + offsetof(struct sockaddr_un, sun_path) + 1;
+ 
+ 	addr = unix_create_addr(sunaddr, addr_len);
+ 	if (!addr)
 
-
+However, unix(7) says "The pathname in sun_path *should* be
+null-terminated." So this change might break userspace. I'm not sure
+whether we should return -EINVAL, or just truncate the name to
+UNIX_PATH_MAX. From a quick read, it looks like connect() would trigger
+the same problem. Any thoughts?
 
