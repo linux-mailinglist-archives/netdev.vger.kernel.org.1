@@ -1,216 +1,232 @@
-Return-Path: <netdev+bounces-19423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC1C75A99A
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:51:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B409075A9A0
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7C36281D30
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:51:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D783F1C20384
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE0B361;
-	Thu, 20 Jul 2023 08:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4891E19A03;
+	Thu, 20 Jul 2023 08:54:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19741643A
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:51:47 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C99B2699;
-	Thu, 20 Jul 2023 01:51:46 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6682909acadso307088b3a.3;
-        Thu, 20 Jul 2023 01:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689843105; x=1690447905;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cr2MXkR/4oA+OZ9ohluOM9ga2ihH9xMp4l0k03eWdbo=;
-        b=sedc5f30vbvHYbFa79fXH4b389O1kZdEm9F0Ejeb6/4GOpaRqS2lUH4QF+BTxcyiLl
-         HSxkOz/99Lutjas8xYEE8oBiNykx/VQckwCygC+zFpCw8ArlQKaIspek5czVrIpwJOU1
-         iDNrmpBUYd1erSYkDR14VoueWb42DkvYPV4b60TXQgGUzU1EPGJvnPmCF77nyFbW4afH
-         sXNU93owQx/ikrBtFDVIGO8fzsG/bh/ga/No0dr+FwTGAvhtWpsHE1nC5tTF4KClWgV3
-         03zx4D0QBs/QtEJ1lrolcxjiMzLE/12cGgejOMHXk6wvwpDtggo07cShANtsUVuho7IW
-         kZEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689843105; x=1690447905;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cr2MXkR/4oA+OZ9ohluOM9ga2ihH9xMp4l0k03eWdbo=;
-        b=f79S98ZVzK6OlHMKWUMp9Xuvtz7O97RdWbDJ9uxJMLJcngvI2SbrhYIBI/WnB4URij
-         6VrAaMFBij8DH4ToCT+n9fAnIsRNQVXH2kb5na1FmEDiIIHe3v5wU2qCIWI3EWIL4Pe6
-         srAmYKMqI1jjRxot5fcV+86EH7QCJ3/j8Lv8NNzmtZ8Yy+uqfDkT+yVhbaNF9YjLy+Lc
-         6HLyklMt3u3/+etd9P4Lxu99YYpttMa9ModSm/P1qFOoFyZufKyWfYBhxtP+wPnN52k1
-         OXvcNk+SUmTrEBlrlUlbf7dLdet4T5ZN9bG+gPf7fLOK+ifIi+YtQl1DTgW+HJ3+0TBg
-         Z9dg==
-X-Gm-Message-State: ABy/qLZIWMtgBDGmR45KjOnJJEN44M599Eg/gEB7zCzFMfI0sb1UQXmt
-	nIT4mBjwx3OrGBML0gUrU5E=
-X-Google-Smtp-Source: APBJJlFUVSmSAPqqBg05BO1nkV11VTbdpFR47JhyrCBZoXA3iOTRaDUVR70nACshlEY1PhiVXqBSXQ==
-X-Received: by 2002:a05:6a20:4291:b0:137:3224:16c1 with SMTP id o17-20020a056a20429100b00137322416c1mr4343315pzj.45.1689843105423;
-        Thu, 20 Jul 2023 01:51:45 -0700 (PDT)
-Received: from [192.168.123.101] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id g8-20020aa78188000000b00682a908949bsm657449pfi.92.2023.07.20.01.51.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jul 2023 01:51:44 -0700 (PDT)
-Message-ID: <8b67a05d-d1b2-e228-46ca-db4c3136c29e@gmail.com>
-Date: Thu, 20 Jul 2023 17:51:41 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC92F174D5;
+	Thu, 20 Jul 2023 08:54:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7CBDC433C8;
+	Thu, 20 Jul 2023 08:54:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689843264;
+	bh=nLUVvJJOl4QJGI6Kn3sQ8QCjl89R0J5mJFa8dm5XKOw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PuKy3faF1XLn+PHZ7cjaF0uhzIpt8UmxXHlCkcxcysHntuAtgxenMOR0jiqzOaym1
+	 WMWgGa+uRvXPjZrWBFBGv038GXrBCyQv80gd0Hc45CQIyyzeMQ82Xaq3ITNm+SYtxo
+	 7gvtuugiUYygCScpbVFonOTqCAun5VzD6KVdXP8kD65xKrylzVr11GmSFEDCzkxtVT
+	 Q5YLU8AzeJyj7oiLMJZZJ6aCwC/Qi2kX+Q8rqNd9QgbjenTCySbXtXzS2WeAv6NkFU
+	 XQgNFCeQsS6eP/C71+pUsdXl355/AKUAswk/sIPsN/gxf6FufuEDrrFaYRAvJ0ZCdI
+	 ibNd7XIk2nm/g==
+Date: Thu, 20 Jul 2023 11:53:52 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Kent Overstreet <kent.overstreet@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	loongarch@lists.linux.dev, netdev@vger.kernel.org,
+	sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 00/13] mm: jit/text allocator
+Message-ID: <20230720085352.GN1901145@kernel.org>
+References: <20230601101257.530867-1-rppt@kernel.org>
+ <ZHjDU/mxE+cugpLj@FVFF77S0Q05N.cambridge.arm.com>
+ <ZHjgIH3aX9dCvVZc@moria.home.lan>
+ <ZHm3zUUbwqlsZBBF@FVFF77S0Q05N>
+ <20230605092040.GB3460@kernel.org>
+ <ZH20XkD74prrdN4u@FVFF77S0Q05N>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.2
-Subject: Re: BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low! (2)
-To: syzbot <syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com>,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, yoshfuji@linux-ipv6.org
-References: <000000000000a054ee05bc4b2009@google.com>
-From: Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <000000000000a054ee05bc4b2009@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZH20XkD74prrdN4u@FVFF77S0Q05N>
 
+On Mon, Jun 05, 2023 at 11:09:34AM +0100, Mark Rutland wrote:
+> On Mon, Jun 05, 2023 at 12:20:40PM +0300, Mike Rapoport wrote:
+> > On Fri, Jun 02, 2023 at 10:35:09AM +0100, Mark Rutland wrote:
+> > > On Thu, Jun 01, 2023 at 02:14:56PM -0400, Kent Overstreet wrote:
+> > > > On Thu, Jun 01, 2023 at 05:12:03PM +0100, Mark Rutland wrote:
+> > > > > For a while I have wanted to give kprobes its own allocator so that it can work
+> > > > > even with CONFIG_MODULES=n, and so that it doesn't have to waste VA space in
+> > > > > the modules area.
+> > > > > 
+> > > > > Given that, I think these should have their own allocator functions that can be
+> > > > > provided independently, even if those happen to use common infrastructure.
+> > > > 
+> > > > How much memory can kprobes conceivably use? I think we also want to try
+> > > > to push back on combinatorial new allocators, if we can.
+> > > 
+> > > That depends on who's using it, and how (e.g. via BPF).
+> > > 
+> > > To be clear, I'm not necessarily asking for entirely different allocators, but
+> > > I do thinkg that we want wrappers that can at least pass distinct start+end
+> > > parameters to a common allocator, and for arm64's modules code I'd expect that
+> > > we'd keep the range falblack logic out of the common allcoator, and just call
+> > > it twice.
+> > > 
+> > > > > > Several architectures override module_alloc() because of various
+> > > > > > constraints where the executable memory can be located and this causes
+> > > > > > additional obstacles for improvements of code allocation.
+> > > > > > 
+> > > > > > This set splits code allocation from modules by introducing
+> > > > > > jit_text_alloc(), jit_data_alloc() and jit_free() APIs, replaces call
+> > > > > > sites of module_alloc() and module_memfree() with the new APIs and
+> > > > > > implements core text and related allocation in a central place.
+> > > > > > 
+> > > > > > Instead of architecture specific overrides for module_alloc(), the
+> > > > > > architectures that require non-default behaviour for text allocation must
+> > > > > > fill jit_alloc_params structure and implement jit_alloc_arch_params() that
+> > > > > > returns a pointer to that structure. If an architecture does not implement
+> > > > > > jit_alloc_arch_params(), the defaults compatible with the current
+> > > > > > modules::module_alloc() are used.
+> > > > > 
+> > > > > As above, I suspect that each of the callsites should probably be using common
+> > > > > infrastructure, but I don't think that a single jit_alloc_arch_params() makes
+> > > > > sense, since the parameters for each case may need to be distinct.
+> > > > 
+> > > > I don't see how that follows. The whole point of function parameters is
+> > > > that they may be different :)
+> > > 
+> > > What I mean is that jit_alloc_arch_params() tries to aggregate common
+> > > parameters, but they aren't actually common (e.g. the actual start+end range
+> > > for allocation).
+> > 
+> > jit_alloc_arch_params() tries to aggregate architecture constraints and
+> > requirements for allocations of executable memory and this exactly what
+> > the first 6 patches of this set do.
+> > 
+> > A while ago Thomas suggested to use a structure that parametrizes
+> > architecture constraints by the memory type used in modules [1] and Song
+> > implemented the infrastructure for it and x86 part [2].
+> > 
+> > I liked the idea of defining parameters in a single structure, but I
+> > thought that approaching the problem from the arch side rather than from
+> > modules perspective will be better starting point, hence these patches.
+> > 
+> > I don't see a fundamental reason why a single structure cannot describe
+> > what is needed for different code allocation cases, be it modules, kprobes
+> > or bpf. There is of course an assumption that the core allocations will be
+> > the same for all the users, and it seems to me that something like 
+> > 
+> > * allocate physical memory if allocator caches are empty
+> > * map it in vmalloc or modules address space
+> > * return memory from the allocator cache to the caller
+> > 
+> > will work for all usecases.
+> > 
+> > We might need separate caches for different cases on different
+> > architectures, and a way to specify what cache should be used in the
+> > allocator API, but that does not contradict a single structure for arch
+> > specific parameters, but only makes it more elaborate, e.g. something like
+> > 
+> > enum jit_type {
+> > 	JIT_MODULES_TEXT,
+> > 	JIT_MODULES_DATA,
+> > 	JIT_KPROBES,
+> > 	JIT_FTRACE,
+> > 	JIT_BPF,
+> > 	JIT_TYPE_MAX,
+> > };
+> > 
+> > struct jit_alloc_params {
+> > 	struct jit_range	ranges[JIT_TYPE_MAX];
+> > 	/* ... */
+> > };
+> > 
+> > > > Can you give more detail on what parameters you need? If the only extra
+> > > > parameter is just "does this allocation need to live close to kernel
+> > > > text", that's not that big of a deal.
+> > > 
+> > > My thinking was that we at least need the start + end for each caller. That
+> > > might be it, tbh.
+> > 
+> > Do you mean that modules will have something like
+> > 
+> > 	jit_text_alloc(size, MODULES_START, MODULES_END);
+> > 
+> > and kprobes will have
+> > 
+> > 	jit_text_alloc(size, KPROBES_START, KPROBES_END);
+> > ?
+> 
+> Yes.
+> 
+> > It sill can be achieved with a single jit_alloc_arch_params(), just by
+> > adding enum jit_type parameter to jit_text_alloc().
+> 
+> That feels backwards to me; it centralizes a bunch of information about
+> distinct users to be able to shove that into a static array, when the callsites
+> can pass that information. 
+> 
+> What's *actually* common after separating out the ranges? Is it just the
+> permissions?
 
+Even if for some architecture the only common thing are the permissions,
+having a definition for code allocations in a single place an improvement.
+The diffstat of the patches is indeed positive (even without comments), but
+having a single structure that specifies how the code should be allocated
+would IMHO actually reduce the maintenance burden.
 
-On 2021. 2. 27. 오후 3:02, syzbot wrote:
- > Hello,
- >
- > syzbot found the following issue on:
- >
- > HEAD commit:    557c223b selftests/bpf: No need to drop the packet 
-when th..
- > git tree:       bpf
- > console output: https://syzkaller.appspot.com/x/log.txt?x=156409a8d00000
- > kernel config: 
-https://syzkaller.appspot.com/x/.config?x=2b8307379601586a
- > dashboard link: 
-https://syzkaller.appspot.com/bug?extid=9bbbacfbf1e04d5221f7
- >
- > Unfortunately, I don't have any reproducer for this issue yet.
- >
- > IMPORTANT: if you fix the issue, please add the following tag to the 
-commit:
- > Reported-by: syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com
- >
- > netlink: 'syz-executor.4': attribute type 10 has an invalid length.
- > BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
- > turning off the locking correctness validator.
- > CPU: 1 PID: 22786 Comm: syz-executor.4 Not tainted 5.11.0-syzkaller #0
- > Hardware name: Google Google Compute Engine/Google Compute Engine, 
-BIOS Google 01/01/2011
- > Call Trace:
- >   __dump_stack lib/dump_stack.c:79 [inline]
- >   dump_stack+0xfa/0x151 lib/dump_stack.c:120
- >   add_chain_cache kernel/locking/lockdep.c:3540 [inline]
- >   lookup_chain_cache_add kernel/locking/lockdep.c:3621 [inline]
- >   validate_chain kernel/locking/lockdep.c:3642 [inline]
- >   __lock_acquire.cold+0x3af/0x3b4 kernel/locking/lockdep.c:4900
- >   lock_acquire kernel/locking/lockdep.c:5510 [inline]
- >   lock_acquire+0x1ab/0x730 kernel/locking/lockdep.c:5475
- >   do_write_seqcount_begin_nested include/linux/seqlock.h:520 [inline]
- >   do_write_seqcount_begin include/linux/seqlock.h:545 [inline]
- >   psi_group_change+0x123/0x8d0 kernel/sched/psi.c:707
- >   psi_task_change+0x142/0x220 kernel/sched/psi.c:807
- >   psi_enqueue kernel/sched/stats.h:82 [inline]
- >   enqueue_task kernel/sched/core.c:1590 [inline]
- >   activate_task kernel/sched/core.c:1613 [inline]
- >   ttwu_do_activate+0x25b/0x660 kernel/sched/core.c:2991
- >   ttwu_queue kernel/sched/core.c:3188 [inline]
- >   try_to_wake_up+0x60e/0x14a0 kernel/sched/core.c:3466
- >   wake_up_worker kernel/workqueue.c:837 [inline]
- >   insert_work+0x2a0/0x370 kernel/workqueue.c:1346
- >   __queue_work+0x5c1/0xf00 kernel/workqueue.c:1497
- >   __queue_delayed_work+0x1c8/0x270 kernel/workqueue.c:1644
- >   mod_delayed_work_on+0xdd/0x1e0 kernel/workqueue.c:1718
- >   mod_delayed_work include/linux/workqueue.h:537 [inline]
- >   addrconf_mod_dad_work net/ipv6/addrconf.c:328 [inline]
- >   addrconf_dad_start net/ipv6/addrconf.c:4013 [inline]
- >   addrconf_add_linklocal+0x321/0x590 net/ipv6/addrconf.c:3186
- >   addrconf_addr_gen+0x3a4/0x3e0 net/ipv6/addrconf.c:3313
- >   addrconf_dev_config+0x26c/0x410 net/ipv6/addrconf.c:3360
- >   addrconf_notify+0x362/0x23e0 net/ipv6/addrconf.c:3593
- >   notifier_call_chain+0xb5/0x200 kernel/notifier.c:83
- >   call_netdevice_notifiers_info+0xb5/0x130 net/core/dev.c:2063
- >   call_netdevice_notifiers_extack net/core/dev.c:2075 [inline]
- >   call_netdevice_notifiers net/core/dev.c:2089 [inline]
- >   dev_open net/core/dev.c:1592 [inline]
- >   dev_open+0x132/0x150 net/core/dev.c:1580
- >   team_port_add drivers/net/team/team.c:1210 [inline]
- >   team_add_slave+0xa53/0x1c20 drivers/net/team/team.c:1967
- >   do_set_master+0x1c8/0x220 net/core/rtnetlink.c:2519
- >   do_setlink+0x920/0x3a70 net/core/rtnetlink.c:2715
- >   __rtnl_newlink+0xdc6/0x1710 net/core/rtnetlink.c:3376
- >   rtnl_newlink+0x64/0xa0 net/core/rtnetlink.c:3491
- >   rtnetlink_rcv_msg+0x44e/0xad0 net/core/rtnetlink.c:5553
- >   netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
- >   netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- >   netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
- >   netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
- >   sock_sendmsg_nosec net/socket.c:652 [inline]
- >   sock_sendmsg+0xcf/0x120 net/socket.c:672
- >   ____sys_sendmsg+0x6e8/0x810 net/socket.c:2348
- >   ___sys_sendmsg+0xf3/0x170 net/socket.c:2402
- >   __sys_sendmsg+0xe5/0x1b0 net/socket.c:2435
- >   do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- >   entry_SYSCALL_64_after_hwframe+0x44/0xae
- > RIP: 0033:0x465ef9
- > Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 
-01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
- > RSP: 002b:00007f2db3282188 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
- > RAX: ffffffffffffffda RBX: 000000000056bf60 RCX: 0000000000465ef9
- > RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000004
- > RBP: 00000000004bcd1c R08: 0000000000000000 R09: 0000000000000000
- > R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf60
- > R13: 00007ffea3f3a6af R14: 00007f2db3282300 R15: 0000000000022000
- > team0: Device ipvlan0 failed to register rx_handler
- >
+And features like caching of large pages and sub-page size allocations are
+surely will be easier to opt-in this way.
+ 
+> If we want this to be able to share allocations and so on, why can't we do this
+> like a kmem_cache, and have the callsite pass a pointer to the allocator data?
+> That would make it easy for callsites to share an allocator or use a distinct
+> one.
 
-Hi,
+I've looked into doing this like a kmem_cache with call sites passing the
+allocator data, and this gets really hairy. For each user we need to pass
+the arch specific parameters to that user, create a cache there and only
+then the cache can be used. Since we don't have hooks to setup any of the
+users in the arch code, the initialization gets more complex than shoving
+everything into an array.
 
-This issue would occur by the commit 369f61bee0f5 ("team: fix nested 
-locking lockdep warning").
-This patch uses the dynamic lockdep key mechanism instead of the static 
-lockdep key to fix nested locking lockdep warnings.
+I think that jit_alloc(type, size) is the best way to move forward to let
+different users choose their ranges and potentially caches. Differentiation
+by the API name will explode even now and it'll get worse if/when new users
+will show up and we can't even force users to avoid using PC-relative
+addressing because, e.g. RISC-V explicitly switched their BPF JIT to use
+that.
+ 
+> Thanks,
+> Mark.
 
-The problem with the dynamic lockdep key mechanism is that each 
-interface registers its own lockdep key.
-If there are 4K interfaces, it uses 4K lockdep keys.
-So, the "BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!" splat occurs if there 
-are so many team interfaces.
-
-I think it should use the static lockdep key instead of the dynamic 
-lockdep key.
-If so, all team interfaces use only 8 lockdep keys, so this splat wil be 
-disappeared.
-The patch will be similar to the b3e80d44f5b1 ("bonding: fix lockdep 
-warning in bond_get_stats()")
-and e7511f560f5 ("bonding: remove useless stats_lock_key").
-I will send a patch for it.
-
-Thanks a lot!
-Taehee Yoo
-
- >
- > ---
- > This report is generated by a bot. It may contain errors.
- > See https://goo.gl/tpsmEJ for more information about syzbot.
- > syzbot engineers can be reached at syzkaller@googlegroups.com.
- >
- > syzbot will keep track of this issue. See:
- > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+-- 
+Sincerely yours,
+Mike.
 
