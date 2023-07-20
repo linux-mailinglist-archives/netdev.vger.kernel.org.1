@@ -1,62 +1,87 @@
-Return-Path: <netdev+bounces-19657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 318F175B97E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:25:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6BA75B97F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672C0281E89
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:25:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E69D11C21494
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A33719BBD;
-	Thu, 20 Jul 2023 21:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF4219BBE;
+	Thu, 20 Jul 2023 21:26:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1142E1BE66
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:25:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD44C433C8;
-	Thu, 20 Jul 2023 21:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4980A1BE66;
+	Thu, 20 Jul 2023 21:26:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DE5AC433C8;
+	Thu, 20 Jul 2023 21:26:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689888353;
-	bh=NFP685XN668i1Crn2t0Bt62w8dHk0p52c2Ko9JGGOCQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cNoDFFqTSXqybZpPEF/mONpPfTyPLW/y5LMo5AgSd2I4Vfxzhi+LsBGmgNcZz5x/e
-	 YVDXsHhirXMnUrDeeIYriuVXhu9e6crW42PACH93eBHjdGCBEcebe5MjWqq/6gDeWO
-	 QAgLR4343UdE5+HFczeLt9/qnP9rDoQPqXpD3ebJIJLKCX5lgg72fCEK4AOJOqElHc
-	 2hZm+3ZygyQL12WsM8obBF0cLKEUarlrBl0y/BfPYaL1olm7BKjFgvfoJHTDdAxtBj
-	 1F+bDEN+3CB+8Wz+USZ0aQZYetyo3x9FnoKCOsJRvJSgmTYYdDWeugEtM8R4aDnzbe
-	 HslYCZrg1k7xA==
-Date: Thu, 20 Jul 2023 14:25:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: pull-request: bluetooth 2023-07-20
-Message-ID: <20230720142552.78f3d477@kernel.org>
-In-Reply-To: <20230720190201.446469-1-luiz.dentz@gmail.com>
-References: <20230720190201.446469-1-luiz.dentz@gmail.com>
+	s=k20201202; t=1689888397;
+	bh=QXJ5DENNJsGYLk/GgQ5ri8+fy+kqaicG8P7w0hubSiA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=ft30HvzqWR5WHXm7TaNvcVag948O3BCdkDks7hXb9ryz+DWqTQOpzAhsQwMfCa6cl
+	 qenZi3I9pQvFRfUzI5Q3PSojIiAc3I5b4JZraDqplW1QEbFjYEG/x4iayE7gTMKERT
+	 22qjefFWZdTq8aYIJh8Ii3hIwHjBUu6w7nVpOSI/2Lpt/YG07E/FgV3FtW8fUR0m03
+	 BWlFsG8g8f5CW+s8rTZ5rXoTem2q/L4TvcjogEkZQ9WuV7JDI7/IwD/K5AxbTE93+b
+	 bRirKtx72SbwI1zoBZRXYD1P5U0SFmUQDo+hLTN+tdwq5fvnlfet+6PwO0J4/TnpxI
+	 oOmYfEj2X0Ipw==
+From: Eric Van Hensbergen <ericvh@kernel.org>
+To: Eric Van Hensbergen <ericvh@gmail.com>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Dominique Martinet <asmadeus@codewreck.org>
+Cc: Simon Horman <simon.horman@corigine.com>, v9fs@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <20230427-scan-build-v2-0-bb96a6e6a33b@codewreck.org>
+References: <20230427-scan-build-v2-0-bb96a6e6a33b@codewreck.org>
+Subject: Re: [PATCH v2 0/5] Fix scan-build warnings
+Message-Id: <168988839634.88307.10673257683695224856.b4-ty@kernel.org>
+Date: Thu, 20 Jul 2023 21:26:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.2
 
-On Thu, 20 Jul 2023 12:02:00 -0700 Luiz Augusto von Dentz wrote:
-> bluetooth pull request for net:
+
+On Wed, 03 May 2023 16:49:24 +0900, Dominique Martinet wrote:
+> I ran scan-build very crudly on our source files, and there was at least
+> one real bug so we might as well run it once in a while, in which case
+> we probably ought to also fix the less important things hence this
+> series.
+> In here the first patch is a real fix and the rest is low priority, the
+> last one is arguably not an improvement and can be discussed (happy to
+> just move the 0-initializations around to variable declaration which
+> would also silence scan-build afaict)
 > 
->  - Fix building with coredump disabled
->  - Fix use-after-free in hci_remove_adv_monitor
->  - Use RCU for hci_conn_params and iterate safely in hci_sync
->  - Fix locking issues on ISO and SCO
->  - Fix bluetooth on Intel Macbook 2014
+> [...]
 
-One bad fixes tag here, but good enough.
-Hopefully the big RCU-ifying patch won't blow up :)
+Applied, thanks!
+
+[1/5] 9p: fix ignored return value in v9fs_dir_release
+      commit: eee4a119e96c2f58cfd1b6d4de42095abc5f8877
+[2/5] 9p: virtio: fix unlikely null pointer deref in handle_rerror
+      commit: 13ade4ac5c28e8a014fa85278f5a4270b215f906
+[3/5] 9p: virtio: make sure 'offs' is initialized in zc_request
+      commit: 4a73edab69d3a6623f03817fe950a2d9585f80e4
+[4/5] 9p: virtio: skip incrementing unused variable
+      commit: f41b402d2572e93bee85669ed05eb5e1f3725704
+[5/5] 9p: remove dead stores (variable set again without being read)
+      commit: cf7c33d332ab67603f159123b691c61270b14c33
+
+Best regards,
+-- 
+Eric Van Hensbergen <ericvh@kernel.org>
+
 
