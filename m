@@ -1,96 +1,226 @@
-Return-Path: <netdev+bounces-19427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E6775AA5C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:03:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80E075AA5F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63609281D06
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:03:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC8B91C212FD
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333A8199FA;
-	Thu, 20 Jul 2023 09:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68667199FD;
+	Thu, 20 Jul 2023 09:08:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D04361
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:03:47 +0000 (UTC)
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55A3493FB
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:03:23 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5768a7e3adbso25666957b3.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689843740; x=1690448540;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E/vhm/jQR+pTUrXfHHmsjiZUpZ/0H8O95QB5uTV0BXA=;
-        b=pQ4ITB6jYHxFYCiQNkTWLLjTCWSE+nX9p5L0WiM5GAsAwJ5a8YizfSB2tRweGAouDt
-         njYyv2+YPUtBwwFial0g1YfkFjT4zliHGmeBSj7emOzZYdgfcbX3r37McO9Ju0ctB5jC
-         LAH/V/YNiINil5Ui82I+yk4+P1xPvPi9cwLQdJsXp5F5rb6hUhSfFygGfwsUa4mBRPfJ
-         YTTzUHCXKHX9ZIC2egAJgzUgPLp2aRqayV9ktiCm0p0ZdsjHN+/NFBCYl1qzCLczgEKP
-         DEyFHztcL8tAuT5ltTbj8NOVIehSc2QHjRHYkCEx3SLZHkTNmZakd61LbPkoNCcdlo1S
-         qJDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689843740; x=1690448540;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E/vhm/jQR+pTUrXfHHmsjiZUpZ/0H8O95QB5uTV0BXA=;
-        b=Sx8vhVMav/VKBJvG/gybGdDV9+M7z7qKYMMYKLN+SrKNgyH9GPDsduxgTMDMvpOG/E
-         5smKBto3CkW2wjS9MqDr9/kxKZcvcvQyWY2ZST/vDS/zdOv1Xkl0XP6kk45UhMpOvaT4
-         zO++yo+/PDxF9IHokrtwP3+a5xnJ6fnGdVdqH9kg53BXTXB+mgqzxIeDISeH0NKd+zx3
-         tMbCxDVNZvl+XZd4xo5CchUCL5D17Y3gwvtn6VRNYUeByx/Po+DcmrF94B26DBZQehfn
-         oTtu9rvUDvwxo7vr505dyaHDC1ULgOuIGX0GMYSEyX+wlVzoyPZuj/Am6+DDbvFU51gp
-         kG1Q==
-X-Gm-Message-State: ABy/qLYmTjuC1dQK4oAK+/kwKJyztFuiwz4XkTkJeR3gfxidRzwsMVWo
-	MMZlfEXL7dWMxm3DaKYNmvPk2YRFhRgcMDzfVcI=
-X-Google-Smtp-Source: APBJJlFAaFNJ42DtkR4LrSujYZbiwuQBDDE+KrIyFdcKcQuAbS1m+5aC7oHX53q4p5LAgRI/pIRZJkQiaPc7YSrC7sU=
-X-Received: by 2002:a0d:e602:0:b0:577:3d6d:a95 with SMTP id
- p2-20020a0de602000000b005773d6d0a95mr4856387ywe.6.1689843740262; Thu, 20 Jul
- 2023 02:02:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5264B361
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:08:27 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA7D2AA58
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689844004;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Gj694vQxBZgkwxlf1stwKV7KnWklxY0xcReeSVInAHg=;
+	b=WIs2nMxlzlDqMRSNut22TO+X21N6E0hXACX2rskxrYeG2QFn2SPiMSDFzpawhQ1TeHJcOU
+	tSTv8lXToVlVngItejjVG4mtr8zdwmCBA4opwT7Mdr1+Bcf+F2e6hPrveRAl+Ctv0jwRCg
+	IR0AIS6nw6Fh255h8epjt5T/BWfXm+g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-161-1jQJ5vFHNcKkHDMq1WNgrg-1; Thu, 20 Jul 2023 05:06:40 -0400
+X-MC-Unique: 1jQJ5vFHNcKkHDMq1WNgrg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B5859185A792;
+	Thu, 20 Jul 2023 09:06:39 +0000 (UTC)
+Received: from griffin.upir.cz (unknown [10.45.226.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AE146200B41D;
+	Thu, 20 Jul 2023 09:06:38 +0000 (UTC)
+From: Jiri Benc <jbenc@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eyal Birger <eyal.birger@gmail.com>
+Subject: [PATCH net v2] vxlan: calculate correct header length for GPE
+Date: Thu, 20 Jul 2023 11:05:56 +0200
+Message-Id: <544e8c6d0f48af2be49809877c05c0445c0b0c0b.1689843872.git.jbenc@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0699747bc9bd7aaf7dc87efd33aa6b95de7d793e.1689677201.git.jbenc@redhat.com>
- <CAHsH6GvCEusX1Uuy7tk7Do-V0xDQRB+Q45UCpCjOeUV0=GFfzQ@mail.gmail.com> <20230720105047.18dcc5e2@griffin>
-In-Reply-To: <20230720105047.18dcc5e2@griffin>
-From: Eyal Birger <eyal.birger@gmail.com>
-Date: Thu, 20 Jul 2023 12:02:08 +0300
-Message-ID: <CAHsH6Gu2XwmnjyvQy--2=2KGOpPgVCwyNeR5q3+vR_+m6yASkA@mail.gmail.com>
-Subject: Re: [PATCH net] vxlan: calculate correct header length for GPE
-To: Jiri Benc <jbenc@redhat.com>
-Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 11:50=E2=80=AFAM Jiri Benc <jbenc@redhat.com> wrote=
-:
->
-> On Thu, 20 Jul 2023 11:43:05 +0300, Eyal Birger wrote:
-> > From looking at the geneve code it appears geneve would also have this
-> > problem when inner_proto_inherit=3Dtrue as GENEVE_IPV4_HLEN includes
-> > ETH_HLEN.
-> >
-> > Would you consider adding a fix to it as part of a series?
->
-> I can look into that. I wouldn't call it a series, though :-) Let's do
-> both separately.
+VXLAN-GPE does not add an extra inner Ethernet header. Take that into
+account when calculating header length.
 
-SGTM. Thanks!
-Eyal.
+This causes problems in skb_tunnel_check_pmtu, where incorrect PMTU is
+cached.
+
+In the collect_md mode (which is the only mode that VXLAN-GPE
+supports), there's no magic auto-setting of the tunnel interface MTU.
+It can't be, since the destination and thus the underlying interface
+may be different for each packet.
+
+So, the administrator is responsible for setting the correct tunnel
+interface MTU. Apparently, the administrators are capable enough to
+calculate that the maximum MTU for VXLAN-GPE is (their_lower_MTU - 36).
+They set the tunnel interface MTU to 1464. If you run a TCP stream over
+such interface, it's then segmented according to the MTU 1464, i.e.
+producing 1514 bytes frames. Which is okay, this still fits the lower
+MTU.
+
+However, skb_tunnel_check_pmtu (called from vxlan_xmit_one) uses 50 as
+the header size and thus incorrectly calculates the frame size to be
+1528. This leads to ICMP too big message being generated (locally),
+PMTU of 1450 to be cached and the TCP stream to be resegmented.
+
+The fix is to use the correct actual header size, especially for
+skb_tunnel_check_pmtu calculation.
+
+Fixes: e1e5314de08ba ("vxlan: implement GPE")
+Signed-off-by: Jiri Benc <jbenc@redhat.com>
+---
+v2: more verbose patch description
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
+ drivers/net/vxlan/vxlan_core.c                | 23 ++++++++-----------
+ include/net/vxlan.h                           | 13 +++++++----
+ 3 files changed, 20 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 1726297f2e0d..8eb9839a3ca6 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -8479,7 +8479,7 @@ static void ixgbe_atr(struct ixgbe_ring *ring,
+ 		struct ixgbe_adapter *adapter = q_vector->adapter;
+ 
+ 		if (unlikely(skb_tail_pointer(skb) < hdr.network +
+-			     VXLAN_HEADROOM))
++			     vxlan_headroom(0)))
+ 			return;
+ 
+ 		/* verify the port is recognized as VXLAN */
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 78744549c1b3..42be8a26c171 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2516,7 +2516,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 		}
+ 
+ 		ndst = &rt->dst;
+-		err = skb_tunnel_check_pmtu(skb, ndst, VXLAN_HEADROOM,
++		err = skb_tunnel_check_pmtu(skb, ndst, vxlan_headroom(flags & VXLAN_F_GPE),
+ 					    netif_is_any_bridge_port(dev));
+ 		if (err < 0) {
+ 			goto tx_error;
+@@ -2577,7 +2577,8 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 				goto out_unlock;
+ 		}
+ 
+-		err = skb_tunnel_check_pmtu(skb, ndst, VXLAN6_HEADROOM,
++		err = skb_tunnel_check_pmtu(skb, ndst,
++					    vxlan_headroom((flags & VXLAN_F_GPE) | VXLAN_F_IPV6),
+ 					    netif_is_any_bridge_port(dev));
+ 		if (err < 0) {
+ 			goto tx_error;
+@@ -2989,14 +2990,12 @@ static int vxlan_change_mtu(struct net_device *dev, int new_mtu)
+ 	struct vxlan_rdst *dst = &vxlan->default_dst;
+ 	struct net_device *lowerdev = __dev_get_by_index(vxlan->net,
+ 							 dst->remote_ifindex);
+-	bool use_ipv6 = !!(vxlan->cfg.flags & VXLAN_F_IPV6);
+ 
+ 	/* This check is different than dev->max_mtu, because it looks at
+ 	 * the lowerdev->mtu, rather than the static dev->max_mtu
+ 	 */
+ 	if (lowerdev) {
+-		int max_mtu = lowerdev->mtu -
+-			      (use_ipv6 ? VXLAN6_HEADROOM : VXLAN_HEADROOM);
++		int max_mtu = lowerdev->mtu - vxlan_headroom(vxlan->cfg.flags);
+ 		if (new_mtu > max_mtu)
+ 			return -EINVAL;
+ 	}
+@@ -3644,11 +3643,11 @@ static void vxlan_config_apply(struct net_device *dev,
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+ 	struct vxlan_rdst *dst = &vxlan->default_dst;
+ 	unsigned short needed_headroom = ETH_HLEN;
+-	bool use_ipv6 = !!(conf->flags & VXLAN_F_IPV6);
+ 	int max_mtu = ETH_MAX_MTU;
++	u32 flags = conf->flags;
+ 
+ 	if (!changelink) {
+-		if (conf->flags & VXLAN_F_GPE)
++		if (flags & VXLAN_F_GPE)
+ 			vxlan_raw_setup(dev);
+ 		else
+ 			vxlan_ether_setup(dev);
+@@ -3673,8 +3672,7 @@ static void vxlan_config_apply(struct net_device *dev,
+ 
+ 		dev->needed_tailroom = lowerdev->needed_tailroom;
+ 
+-		max_mtu = lowerdev->mtu - (use_ipv6 ? VXLAN6_HEADROOM :
+-					   VXLAN_HEADROOM);
++		max_mtu = lowerdev->mtu - vxlan_headroom(flags);
+ 		if (max_mtu < ETH_MIN_MTU)
+ 			max_mtu = ETH_MIN_MTU;
+ 
+@@ -3685,10 +3683,9 @@ static void vxlan_config_apply(struct net_device *dev,
+ 	if (dev->mtu > max_mtu)
+ 		dev->mtu = max_mtu;
+ 
+-	if (use_ipv6 || conf->flags & VXLAN_F_COLLECT_METADATA)
+-		needed_headroom += VXLAN6_HEADROOM;
+-	else
+-		needed_headroom += VXLAN_HEADROOM;
++	if (flags & VXLAN_F_COLLECT_METADATA)
++		flags |= VXLAN_F_IPV6;
++	needed_headroom += vxlan_headroom(flags);
+ 	dev->needed_headroom = needed_headroom;
+ 
+ 	memcpy(&vxlan->cfg, conf, sizeof(*conf));
+diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+index 0be91ca78d3a..1648240c9668 100644
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -386,10 +386,15 @@ static inline netdev_features_t vxlan_features_check(struct sk_buff *skb,
+ 	return features;
+ }
+ 
+-/* IP header + UDP + VXLAN + Ethernet header */
+-#define VXLAN_HEADROOM (20 + 8 + 8 + 14)
+-/* IPv6 header + UDP + VXLAN + Ethernet header */
+-#define VXLAN6_HEADROOM (40 + 8 + 8 + 14)
++static inline int vxlan_headroom(u32 flags)
++{
++	/* VXLAN:     IP4/6 header + UDP + VXLAN + Ethernet header */
++	/* VXLAN-GPE: IP4/6 header + UDP + VXLAN */
++	return (flags & VXLAN_F_IPV6 ? sizeof(struct ipv6hdr) :
++				       sizeof(struct iphdr)) +
++	       sizeof(struct udphdr) + sizeof(struct vxlanhdr) +
++	       (flags & VXLAN_F_GPE ? 0 : ETH_HLEN);
++}
+ 
+ static inline struct vxlanhdr *vxlan_hdr(struct sk_buff *skb)
+ {
+-- 
+2.39.2
+
 
