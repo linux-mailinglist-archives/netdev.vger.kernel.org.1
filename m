@@ -1,102 +1,103 @@
-Return-Path: <netdev+bounces-19464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FE275AC87
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:04:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C9175AC91
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:07:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C85281DA7
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:04:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BFF5281C84
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D87017729;
-	Thu, 20 Jul 2023 11:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275AE17733;
+	Thu, 20 Jul 2023 11:07:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91584174EB
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:04:31 +0000 (UTC)
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5D0E47
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:04:30 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-401d1d967beso268181cf.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689851069; x=1690455869;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kaAbz+bg94X2dULJPby0h61EI3/s2cyflIACLy61V2M=;
-        b=JrXHu8liyiHa5+nabqFO0UGhDu4WlqFhU92GkoAcmcOXZaE6ajO6GhjwoZfZfO5EBM
-         Sfkg/qFqV4f7unsfYPca/aLwW+lm4YVC7qtyGcAyVcPzw5jeErU70ALGccBDPzK26As3
-         6VpPRZGADpjmZ+zloOT591Thso+gbO3nNyYcBDIuLFNxgqoJEhqnpNg/aRLZVhQWkudd
-         qQ3LamYOR58U9heID/QcUUV9ThWm0njSfM3v4j6OOvgthfRnjBM4L7G3/vA04Ga0N5nW
-         /QjhzWfei0Rq4ev8ldb0/xuXh8eidAR2Sze7ZHksd21vP8xBa4OS/o+MRtHtYsrFVJpY
-         7mqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689851069; x=1690455869;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kaAbz+bg94X2dULJPby0h61EI3/s2cyflIACLy61V2M=;
-        b=kH3MxA+ySEWzkEMmgTgTcBlWLJffmmqqU1MJmNML4V/rjvBe9kV5BwTvs8ToTs70GR
-         G2Dgxm0rfjnU+wh2oT+x85PzXl21ZO4bEnTBUcfp732oiG5oSM81Y7Mc7f7F0SDCe5mQ
-         KRil4EzaXGYD3Kt2vYlPcigzvZLNWieJbAF19HuDCpuJnXm5n/lJJXDgWiOl/sCLWz0F
-         wvNb1eHMgNTgddfnByrcMl1U9qmFL+hbPAnkl3Be6HNh6p8CV9ZHpfy8gN+L+P0St0Wy
-         TC31xJ/5jeOSngySc83DwhL0C2Ga7hsvLyHcXUjp9PWd7oRhBtwHU45g2oTQcIXb6pwS
-         wdOQ==
-X-Gm-Message-State: ABy/qLad/izCqIfAFFIFDQCew5wMidPf/3wr9pOf9eQjFhylR+ZREPCy
-	boxmLf2vgu1qNWJ72Qx5jLuVk8kDE6TGAJtk4UT44Q==
-X-Google-Smtp-Source: APBJJlGIongI2LyVBsB5n3TmUW0p+ouZF5H0ZTTH8sw831b5ebKrbTobCagtBz0Rek9ZFqj97WSgCF21OIP/bwC7+x8=
-X-Received: by 2002:a05:622a:1816:b0:3f5:2006:50f1 with SMTP id
- t22-20020a05622a181600b003f5200650f1mr237783qtc.12.1689851069162; Thu, 20 Jul
- 2023 04:04:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EEB14A9C;
+	Thu, 20 Jul 2023 11:07:35 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EAB268F;
+	Thu, 20 Jul 2023 04:07:34 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R68vq66JMztRZQ;
+	Thu, 20 Jul 2023 19:04:23 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 20 Jul
+ 2023 19:07:31 +0800
+Subject: Re: [PATCH net-next] page_pool: split types and declarations from
+ page_pool.h
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
+	<linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
+	<gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
+	<hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne
+ Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle
+ Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20230719121339.63331-1-linyunsheng@huawei.com>
+ <0838ed9e-8b5c-cc93-0175-9d6cbf695dda@intel.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <7e9c1276-9996-d9dd-c061-b1e66361c48b@huawei.com>
+Date: Thu, 20 Jul 2023 19:07:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230718202437.1788505-1-edumazet@google.com> <e839c959417f813444567556177c8d3a1ef83467.camel@redhat.com>
-In-Reply-To: <e839c959417f813444567556177c8d3a1ef83467.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 20 Jul 2023 13:04:18 +0200
-Message-ID: <CANn89iKY-s=9T_H2S9g2AWFG8YKG3DJj_WekXRRFHWqGqeKCLg@mail.gmail.com>
-Subject: Re: [PATCH net-next] ipv6: remove hard coded limitation on ipv6_pinfo
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>, 
-	Coco Li <lixiaoyan@google.com>, YiFei Zhu <zhuyifei@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <0838ed9e-8b5c-cc93-0175-9d6cbf695dda@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 11:44=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Tue, 2023-07-18 at 20:24 +0000, Eric Dumazet wrote:
-> > diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> > index 3613489eb6e3b0871da09f06561cc251fe2e0b80..b4d5cc0196c3d73f98c484b=
-01a61322926da2f14 100644
-> > --- a/net/mptcp/protocol.c
-> > +++ b/net/mptcp/protocol.c
-> > @@ -3988,6 +3988,7 @@ int __init mptcp_proto_v6_init(void)
-> >       strcpy(mptcp_v6_prot.name, "MPTCPv6");
-> >       mptcp_v6_prot.slab =3D NULL;
-> >       mptcp_v6_prot.obj_size =3D sizeof(struct mptcp6_sock);
-> > +     mptcp_v6_prot.ipv6_pinfo_offset =3D offsetof(struct mptcp6_sock, =
-np),
->
-> Checkpatch spotted that here ';'  is needed in place of ','. Yep, mptcp
-> is always a little special ;)
+On 2023/7/20 0:42, Alexander Lobakin wrote:
+> 
+> BTW, what do you think: is it better to have those two includes in the
+> root include/net/ folder or do something like
+> 
+> include/net/page_pool/
+>   * types.h
+>   * <some meaningful name>.h (let's say driver.h)
+> 
+> like it's done e.g. for GPIO (see include/linux/gpio/)?
 
-Oops, thanks, I will fix this in V2.
+It make more sense to add a new dir for page pool if there are
+more new headers added. As we are still keeping the page_pool.h
+mirroring include/linux/gpio.h, adding a new dir for only one
+header file only add another level of dir without abvious benefit.
+We can add a new dir for it if we turn out to be needing more header
+file for page pool in the future, does it make sense?
+
+> 
+> Thanks,
+> Olek
+> 
+> .
+> 
 
