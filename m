@@ -1,113 +1,72 @@
-Return-Path: <netdev+bounces-19544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2024375B24D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:18:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D7575B253
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFE72281F5B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:18:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC523281F27
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A1918C0C;
-	Thu, 20 Jul 2023 15:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2AC18B17;
+	Thu, 20 Jul 2023 15:19:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7C918C06
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:18:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE618C433CA;
-	Thu, 20 Jul 2023 15:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1AC18B0B
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:19:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C5B1C433C8;
+	Thu, 20 Jul 2023 15:19:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689866298;
-	bh=sa++SOpu0OOLby+nKZrbEuQPjr0iW/gaMnyzIgw8AIU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DXSLZmG9sH0SlU10hMwLPvpQ57q5vtc5mk3AOtculg3jPG/bzaG/46wihnNLqpBMY
-	 yIxcbT7DTFFZDQOfrHs48EqyD+YFZbAGdxgkLCqj+8CMxTBt3HQ++0NhH7u0iTVTx9
-	 x9NsVsjIEjoWKrgfh7HYIk/yjxAiADzoiff2n14ynez7axrZy1+OeL0bK/ZlHPv1in
-	 SUeHNo0McwOMg4p70PH1whla7mm4AVI8Fnsor4TXJYlo4AK5+fbA0gSA5g5JNf7dzL
-	 +98fyTCfeFq3OBJ+yj2bWcRfYyfQFTsn75Eu4WrGrp7Bh5nFmFeod55CvzgTXrmpWP
-	 rlxluoJWrdcyA==
-Message-ID: <dae3fc04-5e59-dff5-db77-ea7d0a3d154e@kernel.org>
-Date: Thu, 20 Jul 2023 09:18:17 -0600
+	s=k20201202; t=1689866387;
+	bh=VzuQfdcXhmSoUTwM4i0KWcI991yn6l0smL1PiDgs5tI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dwTRKEfMnIzLYa1RIKer17DnIERMlzp9u+gvqtr9ZX3/WlEQoaXy/pbLGp0vPd9iW
+	 9kOjlGCoAMjHtC0Zbj39/PzO0jeVY3gZwcoEvybwMo9BVzl3nFsJB+Ao74J9gLrU6T
+	 H2kHCHebrP/o/bo2mRz5waMdHKoHJM/wKoleBoXwBLl3TOLVpOnonEIbKI5XNuC3iS
+	 RC50QLDYzPV48o1iZbUEbHq696V4GJtCLosVcz3/ZLTBaj1lg53l8lmRxv+Z216RLN
+	 Sw442+1rCzgfOTuxBXl9R4WxvQDfBv2v/TVsuzqvMsCkiUrHm1LxDsvcftdJQKdO4c
+	 11NFS7RoMreiw==
+Date: Thu, 20 Jul 2023 08:19:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marco Felsch <m.felsch@pengutronix.de>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel@pengutronix.de, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 2/2] net: stmmac: add support for phy-supply
+Message-ID: <20230720081945.5cf783f0@kernel.org>
+In-Reply-To: <20230720064636.5l45ad64kwwgd2iw@pengutronix.de>
+References: <20230718132049.3028341-1-m.felsch@pengutronix.de>
+	<20230718132049.3028341-2-m.felsch@pengutronix.de>
+	<20230719211235.1758bbc0@kernel.org>
+	<20230720064636.5l45ad64kwwgd2iw@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v2 3/4] nexthop: Do not return invalid nexthop
- object during multipath selection
-Content-Language: en-US
-To: Benjamin Poirier <bpoirier@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- Ido Schimmel <idosch@nvidia.com>
-References: <20230719-nh_select-v2-0-04383e89f868@nvidia.com>
- <20230719-nh_select-v2-3-04383e89f868@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230719-nh_select-v2-3-04383e89f868@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/19/23 7:57 AM, Benjamin Poirier wrote:
-> With legacy nexthops, when net.ipv4.fib_multipath_use_neigh is set,
-> fib_select_multipath() will never set res->nhc to a nexthop that is not
-> good (as per fib_good_nh()). OTOH, with nexthop objects,
-> nexthop_select_path_hthr() may return a nexthop that failed the
-> nexthop_is_good_nh() test even if there was one that passed. Refactor
-> nexthop_select_path_hthr() to follow a selection logic more similar to
-> fib_select_multipath().
+On Thu, 20 Jul 2023 08:46:36 +0200 Marco Felsch wrote:
+> > Please fix and rebase because the current version does not apply to
+> > net-next/main.  
 > 
-> The issue can be demonstrated with the following sequence of commands. The
-> first block shows that things work as expected with legacy nexthops. The
-> last sequence of `ip rou get` in the second block shows the problem case -
-> some routes still use the .2 nexthop.
-> 
-> sysctl net.ipv4.fib_multipath_use_neigh=1
-> ip link add dummy1 up type dummy
-> ip rou add 198.51.100.0/24 nexthop via 192.0.2.1 dev dummy1 onlink nexthop via 192.0.2.2 dev dummy1 onlink
-> for i in {10..19}; do ip -o rou get 198.51.100.$i; done
-> ip neigh add 192.0.2.1 dev dummy1 nud failed
-> echo ".1 failed:"  # results should not use .1
-> for i in {10..19}; do ip -o rou get 198.51.100.$i; done
-> ip neigh del 192.0.2.1 dev dummy1
-> ip neigh add 192.0.2.2 dev dummy1 nud failed
-> echo ".2 failed:"  # results should not use .2
-> for i in {10..19}; do ip -o rou get 198.51.100.$i; done
-> ip link del dummy1
-> 
-> ip link add dummy1 up type dummy
-> ip nexthop add id 1 via 192.0.2.1 dev dummy1 onlink
-> ip nexthop add id 2 via 192.0.2.2 dev dummy1 onlink
-> ip nexthop add id 1001 group 1/2
-> ip rou add 198.51.100.0/24 nhid 1001
-> for i in {10..19}; do ip -o rou get 198.51.100.$i; done
-> ip neigh add 192.0.2.1 dev dummy1 nud failed
-> echo ".1 failed:"  # results should not use .1
-> for i in {10..19}; do ip -o rou get 198.51.100.$i; done
-> ip neigh del 192.0.2.1 dev dummy1
-> ip neigh add 192.0.2.2 dev dummy1 nud failed
-> echo ".2 failed:"  # results should not use .2
-> for i in {10..19}; do ip -o rou get 198.51.100.$i; done
-> ip link del dummy1
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
-> ---
->  net/ipv4/nexthop.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
+> Sure, I thought the changelog should be part of the commit message in
+> net-dev therefore I included it.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+Old rules, I think. Since started adding lore links to all patches you
+can put the changelog in the cut-off section. Adding a link to the
+previous revision there is highly encouraged, too!
+  
+There's a sample of the preferred format at:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#changes-requested
 
