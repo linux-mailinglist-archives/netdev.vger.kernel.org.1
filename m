@@ -1,86 +1,109 @@
-Return-Path: <netdev+bounces-19357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2457A75A70B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:58:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4571475A70F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2DF3281A8E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:58:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AC5D281AC7
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F221E15492;
-	Thu, 20 Jul 2023 06:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC9615492;
+	Thu, 20 Jul 2023 06:59:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D919414011;
-	Thu, 20 Jul 2023 06:58:00 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5FA5CC;
-	Wed, 19 Jul 2023 23:57:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=tpFZ9x/guiUwHSLCuwqhF00CriObkSLCrgFFWuig6CE=; b=vB2sfpF99Y6Hfs52IwYhy9ldql
-	ERLNEp2xxsdUaVRoJT10S6gTAPE5tnR+qAB7f7VfX0oX3cOvJqF8fo6g4mLDnd2PfYTu5xml5wpBL
-	iLd5oZCQhLBDRU1MM+/3xNT+ybh/tfavVoX8x9yRLTvtQCc0T+1YPbdWgG4AKB5pPD0xBiW5OseL1
-	/zQX9OQWGDorBtGNe64ykoJ5nN5nJnCXu0CXEEpu3OJ0vh3QZeCmjqqBdd2u9lp80cpW9EWIXxZmy
-	ZHJvBWVZHCkBYssiD6i2zCYMydZaLn0q9H/9vql01rlU702eUQirQH8MkQa+KhiTVGWXM1wZ3PRUf
-	qcvSFVfA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qMNbj-00A1hF-06;
-	Thu, 20 Jul 2023 06:57:51 +0000
-Date: Wed, 19 Jul 2023 23:57:51 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	virtualization@lists.linux-foundation.org,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce
- virtqueue_dma_dev()
-Message-ID: <ZLja73TJ1Ow19xdr@infradead.org>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
- <ZK/cxNHzI23I6efc@infradead.org>
- <20230713104805-mutt-send-email-mst@kernel.org>
- <ZLjSsmTfcpaL6H/I@infradead.org>
- <1689835514.217712-8-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3124914296
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 06:59:21 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E87CC
+	for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:59:19 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5216569f9e3so584572a12.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jul 2023 23:59:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1689836358; x=1690441158;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sBPg9spnNNWFJxd7KwqIFb1oekz8Y+eOtLWTg3sbO2g=;
+        b=V43OfzpBjPwR/D6O67wU9A8y/C0uMBh+4c5zA9+zKChqftRq0MtimYkzJUrcHt6AwG
+         xCOtN+E11kqL92hDlsJslDdDnlQLxXdCKBKqtHDm7qjR1zTWVbAmLGcKVRjOwLBwLoGr
+         eCorMuYIbiAuDeMYxlzYXi7nLWzR3p802cyho=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689836358; x=1690441158;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sBPg9spnNNWFJxd7KwqIFb1oekz8Y+eOtLWTg3sbO2g=;
+        b=C0Ge5FFuc+eFpvbbDuV/U9LJ30RsprdegTIieft5CK+pzF9gYx6Mwm1VwsgAcopnq3
+         LbJCn0Kz2o0sUKPJ7FomddEyFfVRDPo24NT6VvkrZ82xGDbaEsX4g0i1hcGiGL9+6jWf
+         MT7OvWKnVqKwW+8jJ4BHK087weCgfG/cooSStN/66gWGgtoWmyO6mqaq9ATnC6Luk86j
+         B00TrgOmgQc5yPoTEKYQrimrUJS/1vbU4NnDLZJc1B9Y3e6uDgcSJeshfwmajrsgei6k
+         bedHu+Rj6I4phMOmFGbNIQwd0UgwoeCm4sKs8LFXMZdRSGx8J7uEgzrAb31lArZbRrdX
+         1ohQ==
+X-Gm-Message-State: ABy/qLZ8uMREnTX3SlRcA/QBKIPfPaxX7qVUdhloFSr7N7RnJNe0o2tC
+	SGlqrOxZATPiFlV2ys0CYFk3VaWPG8Y7uRW0hgF4Am3qB0i1mD1N
+X-Google-Smtp-Source: APBJJlF7LGmgstGjec0E497gqFqBSlcA2il4tg+F4JyHpA9nx+HRL54S9PdvSzLr2JMkjBAQbcd1jdADTun+zpb/zPU=
+X-Received: by 2002:a50:fa97:0:b0:521:7ab6:b95d with SMTP id
+ w23-20020a50fa97000000b005217ab6b95dmr4140577edr.29.1689836357896; Wed, 19
+ Jul 2023 23:59:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1689835514.217712-8-xuanzhuo@linux.alibaba.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230720010440.1967136-1-kuba@kernel.org>
+In-Reply-To: <20230720010440.1967136-1-kuba@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 19 Jul 2023 23:59:06 -0700
+Message-ID: <CACKFLin6HPBCY_L_nEzvTzfuObB1modqfB3p8OXk1cH=f7U4HQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/3] eth: bnxt: handle invalid Tx completions
+ more gracefully
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 02:45:14PM +0800, Xuan Zhuo wrote:
->  virtqueue_dma_dev() return the device that working with the DMA APIs.
->  Then that can be used like other devices. So what is the problem.
-> 
->  I always think the code path without the DMA APIs is the trouble for you.
+On Wed, Jul 19, 2023 at 6:05=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> bnxt trusts the events generated by the device which may lead to kernel
+> crashes. These are extremely rare but they do happen. For a while
+> I thought crashing may be intentional, because device reporting invalid
+> completions should never happen, and having a core dump could be useful
+> if it does. But in practice I haven't found any clues in the core dumps,
+> and panic_on_warn exists.
+>
+> Series was tested by forcing the recovery path manually. Because of
+> how rare the real crashes are I can't confirm it works for the actual
+> device errors until it's been widely deployed.
+>
+> v2:
+>  - factor out the reset scheduling
+>  - also add a check on the XDP path
+> v1: https://lore.kernel.org/all/20230710205611.1198878-1-kuba@kernel.org/
+>
+> Jakub Kicinski (3):
+>   eth: bnxt: move and rename reset helpers
+>   eth: bnxt: take the bit to set as argument of bnxt_queue_sp_work()
+>   eth: bnxt: handle invalid Tx completions more gracefully
+>
 
-Because we now have an API where the upper level drivers sometimes
-see the dma device and sometimes not.  This will be abused and cause
-trouble sooner than you can say "layering".
+For the series,
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+
+I have already done the patches to preserve the ring error counters
+and it's being tested internally.  I will add the tx reset counter
+when I post the patches.  Thanks.
 
