@@ -1,111 +1,167 @@
-Return-Path: <netdev+bounces-19418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95C275A98F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:45:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 371A175A990
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:46:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A356B281DE0
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:45:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 689621C213B8
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151A0361;
-	Thu, 20 Jul 2023 08:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B9E19A06;
+	Thu, 20 Jul 2023 08:39:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA52171AF
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:38:59 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED1D26B0
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 01:38:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689842338;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2if8GUFmC1eD4optUaWK9NefEn7X4sNBFHPPoUxvNAg=;
-	b=OPKkakVEwj/ZE+mKCy8AYAThVtP4jvyWC5WKCD7vHkpMRey+jOIRfig1rHn/xAa96O20Tp
-	qVADvoDUv+vQDPNITA0E/J7mFmuLKw220o05frHytMlOfBRW90uAxvjvqZsYuDUO/sOuCM
-	oDhywIWzE+YWPvQX1t8a8sbSozrft00=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-127-0nX04BiMMru-iCGC6jqJJQ-1; Thu, 20 Jul 2023 04:38:56 -0400
-X-MC-Unique: 0nX04BiMMru-iCGC6jqJJQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1FACB3803926;
-	Thu, 20 Jul 2023 08:38:56 +0000 (UTC)
-Received: from dell-per430-12.lab.eng.pek2.redhat.com (dell-per430-12.lab.eng.pek2.redhat.com [10.73.196.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D0D5EF6CD8;
-	Thu, 20 Jul 2023 08:38:51 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alvaro.karsz@solid-run.com,
-	maxime.coquelin@redhat.com
-Subject: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the command waiting loop
-Date: Thu, 20 Jul 2023 04:38:39 -0400
-Message-Id: <20230720083839.481487-3-jasowang@redhat.com>
-In-Reply-To: <20230720083839.481487-1-jasowang@redhat.com>
-References: <20230720083839.481487-1-jasowang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0EC199E1
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:39:46 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2046.outbound.protection.outlook.com [40.107.22.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C55D26B2;
+	Thu, 20 Jul 2023 01:39:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AHG1d0tvM3M12epgai9F3h+d4qeUV9fzq39mQ1U9L/a7jCoRW+svpF8a7z57DZxQa3m014iJnEvRvAGb51RGhFhWamMDLpNPM9YsMTaAfgQNre539S99ht+wCgt0ElCOj5lH2y0FLJ+NkEyKq2RkiI9Dq3K8QLlQTySUZ42gXbvKden5iAWSbSQAztApkzi6DPtYbc9KKjibyZxpFJ35dqkT5Ph6aPN3K1t5pUiI2yIrF3sr5oVjE72VowjEaahh1ta3CiPRVdWAqZMk6gZ4Zu5vUy5StF2fKuxt2BjqTDcaguyiK6mMT1kzchkYC3/2umLj4dRoiXD1pKGLuXZjhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5LKbGVV3DPMavnaubobCv8Uliz4/wXdU/SC+PxFehGw=;
+ b=VJBPIh/mxrUyy8h24ezZnNBvkd7SFJMy0VLuuqWHz6F1hF6+bexQynXv4n2J0b7+cY9cnTN7H9JWJpt2IWGzZk3qh60lwN26tzOGSzjS2qnA1ZnZElcYCZDRmlpxM2SMGM6YQmmG3GMQzk5gg+xFpSS/BIxFiFi6H5a9+1tgSLHOq7ttqFX1rYr2VDSU6HGtcENkNzVcmPV+Wg+55t1ZrG+sY0XkdWs4YElEx9kdEVqGSJAC0BoJljvfo9IhqWpWUVpjZpydsJKq1AjSKiNDjWuI0umOr5FCUOMak/t1vf3sQGF6+u58adgAnSvCRs6PsIRHBmZHCzCBbRuW/9xHmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5LKbGVV3DPMavnaubobCv8Uliz4/wXdU/SC+PxFehGw=;
+ b=UjzWF5+Itttnc4xy36fGZ/H60vxRDXRmpI1aynxLjbQ1YTgtelKH9/dcQlrbaMUtIY3UqLUJHi2IFulX29mP9+1CjV2v8VpyD+oTRAQ4gZzKz0i/nYTz2AULOKnnrpNq41uYmLPyl3dbya9UeI0rfegoWpFMQJtkIL8+Nnu8LzVp5gsIzfAjWB7J+chR/doEA2xX1A8EJOLLHAiVWaCOTLyh7oSSwiLUMpT/Rf6V5OHLMQwlwk0pPaVEDWRoNcqstDKDrnp/ybNYLg4YLzZrgDJwcMwx2KrzgKuL+Mn6vyXilxwLriXxj0vM/LHqCiP/v/ID/i4cM57Ng/DNNS3ybA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from VI1PR04MB7104.eurprd04.prod.outlook.com (2603:10a6:800:126::9)
+ by AS8PR04MB8691.eurprd04.prod.outlook.com (2603:10a6:20b:42a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Thu, 20 Jul
+ 2023 08:39:43 +0000
+Received: from VI1PR04MB7104.eurprd04.prod.outlook.com
+ ([fe80::7ef4:97ef:66d5:f5b3]) by VI1PR04MB7104.eurprd04.prod.outlook.com
+ ([fe80::7ef4:97ef:66d5:f5b3%2]) with mapi id 15.20.6609.024; Thu, 20 Jul 2023
+ 08:39:42 +0000
+Message-ID: <0a706af0-8b19-25c5-1a76-0add28f5d214@suse.com>
+Date: Thu, 20 Jul 2023 10:39:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2] r8152: Suspend USB device before shutdown when WoL is
+ enabled
+To: Alexandru Gagniuc <alexandru.gagniuc@hp.com>, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, hayeswang@realtek.com, jflf_kernel@gmx.com,
+ bjorn@mork.no, svenva@chromium.org, linux-kernel@vger.kernel.org,
+ eniac-xw.zhang@hp.com, stable@vger.kernel.org
+References: <2c12d7a0-3edb-48b3-abf7-135e1a8838ca@rowland.harvard.edu>
+ <20230719173756.380829-1-alexandru.gagniuc@hp.com>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20230719173756.380829-1-alexandru.gagniuc@hp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0053.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:48::17) To VI1PR04MB7104.eurprd04.prod.outlook.com
+ (2603:10a6:800:126::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR04MB7104:EE_|AS8PR04MB8691:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd687252-275a-4b50-75e5-08db88fcdd22
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	kw4zRLpepjHsKqYKoB4Gyr68bWS638GXa1KHeX+tg2CvgIDM8cz6nwJKiDSB3WXEju8nyAheODvzgeoWa3Qb4A0wL4WUTdbN7MRBcXEjPTIXMp/y7REUXyWvlVIUcT8tBqy723RWjP9MJ5EyLo3N9nTeZlOe8PYcfvvqnq4vgwSDe0Llos6bQ27D3CCQAa0ZoXkuQXeo8zZ9R00mwOqpX/t+QpY69nY20MAdrQNvmFFzHbcr+17p8ZYf5f3RwiXAHr98aHdElamPcLrDIB7e88dKFFTvoqTIHpzrkG+i4FxtW57q2lEllJQ04w/sI00Q6PYPM1uUdfyYQ6+kg9h01PIfjYV8cLXfndmVdzyq8rKjRbEsjOM30CK6gljzNK04rGIIsua0IlN70LHhTmDHfw2eyhNtptD0n6IPuLO4vz9dU4PRUadvrKpJPNuUyEhDL7E83bqcxzVnzJN15bvVoMUoF7Ky6koXSsQiLsYUzrf+t4aFvUIs2bFfI8m95B+s7O7XA0asHU9tiPhtXEdw07e8uP0URTjxGCGdRYqKtYg4VafC/ZW+b0DYi8V70oUV7lBxNmoF2fYk/iQQwn2RgmBpYlKX+okmky79MNjOVjvLHHpETr3Isr882BEE7L20EausDVFG9wDK12KbxEOj3A==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB7104.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(376002)(136003)(39860400002)(346002)(451199021)(66556008)(7416002)(66946007)(4326008)(66476007)(478600001)(41300700001)(316002)(6512007)(31686004)(6486002)(86362001)(186003)(6666004)(8936002)(38100700002)(8676002)(5660300002)(6506007)(83380400001)(2906002)(2616005)(36756003)(31696002)(53546011)(4744005)(15650500001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VVlBNVYyek12cllpWjJlT0trNTRKV3IrQ0VzeWppVU5SNlkwUGJ5SWhpb1Nv?=
+ =?utf-8?B?L0FtYWcvTS8wRVhCUFF0eHdhdUEzR2szYUNoc0lkMHl4RVZvM1laSWU3T2p2?=
+ =?utf-8?B?N3ZZc1NjaDlzTW9tNTR4YUQ0OXI3akhFUnJtc3FWbWs4VDI0SEg1eUVVV1pX?=
+ =?utf-8?B?VHo3N0hwdnY2enVsZjY1dFR5R2VJcXZqOTZKYy9lRWlqVjZtTWtuMlJKM0V6?=
+ =?utf-8?B?Rm9CZWlVdktsNTdpQllGb29wdUU3bkcyOEVZRHM2MEhhNWtRdmRGRWFYb0FD?=
+ =?utf-8?B?d2o1TGtrRkpraWRJUXFMdlNYTkZCVnN6SUdyejlsSVlES290L3RQRzdxSk5x?=
+ =?utf-8?B?OHhxbXFqZjI4S1V6K0ZwcDNBaUdCaXh5aWxpaHErVTlEZEVXeVluU3Zuampv?=
+ =?utf-8?B?QS9vNFo2N0dRYzkxOVRtWEI1MC9NWTFvS2V5eEhMYkJ0TURFSHNpSDZqYm5D?=
+ =?utf-8?B?MTFUWU5FWDJWY0dBbkJjeFdpbWNMcnhzcjhYeVFpVGtzUmlXRkNxMWlSbzQy?=
+ =?utf-8?B?ZFV5bkMyYXZlQTdsOFpKVTYrVzRuR1psb0xCSGg5ZW10U05PYUdUTDNwZUZz?=
+ =?utf-8?B?QkhGdFg1SnpqV0w2OHNMUmpQcTJIdGlNd0ZOTlBOeDBmQ1RJeURhSzk5N0Fy?=
+ =?utf-8?B?NFhJTHY4RGdLRE1GcnIwNm5CZmhnei8yczNDc04wRUNDWVJMb0dxS1diRmZy?=
+ =?utf-8?B?QTVtUTdUdDg4RzJnY3pkcmVoekRtc3lEdU1MNUU2cUc3TXQzaUpoT1lMcnhV?=
+ =?utf-8?B?YkhnV2ZmODFiblpGMGZBTkNVTzJTOGJBTi9zQTVlaU94d2djN3FlSkhUeWg1?=
+ =?utf-8?B?YlF2ZjZSMGZtUU1iZzBKV3NKVmh2WXJWbW9ZVmlFVHZiblEvbE9wUmxNVjFS?=
+ =?utf-8?B?am90VU5NMVJKbmZ1UGNLZWk0TE10Mi9peTVKbGhzRmZIeG5lMkJzWDhBaWUv?=
+ =?utf-8?B?QnE0YU5xU3J2ZXdjcFRMQ0lzOTg4SDdUN3dMcFpyM1JPU3ZIQ2kwRWxhdjFO?=
+ =?utf-8?B?b1lXeC9zeXpnZGtUNVNZWkZWbzhxb09xa2ZRQXBidStoenRRTE5QNjJ5bTFu?=
+ =?utf-8?B?WnN6Wkp3ZmFYaXFydXl4QkdYejd2YlJTdDNnU3duUEJhRTkxcUVXVzZqTzJQ?=
+ =?utf-8?B?V04yVWJmT3dqVGhYV3BsMkFSQzFXMzQxL2dqcWk5TFJ1QlFzNktlTWhMaXJ5?=
+ =?utf-8?B?T1A5cmUvNm1GL3FycjJIeTBzaVo0dHIyOWNXNGlueE1VWHlOaVgzd2k0Tmda?=
+ =?utf-8?B?RXhsOEdSNVBUTitRbGlWNUdveXBnbTFEQlNsSURoRTByYzl5RVg0RTFhMWZt?=
+ =?utf-8?B?Ync0ak9NSnFGdmVScXRBbmlocXJlMjYrdWNnc1ZROUpOcS9ubG9wSW5OL3FU?=
+ =?utf-8?B?eFNtV01zcll3aldWcHltRVU1Q2laQ0pvMlN4THhRU2dvU2VsRWlPdWhNU05s?=
+ =?utf-8?B?cmpJOC8vbWVsOUlDWEVwRk9ydEFvNmVaNk0rL1hMTzV6NnAxMFlUS3FPd0Zj?=
+ =?utf-8?B?NEhPTG51QnVGU2xzc1A5d0I4dXdUeVB6TDZxK05mSWhaQktTT2VUUEUvd1Fi?=
+ =?utf-8?B?aU9PcVpzTlU1RDJEdTdjQytHd25DUW9hWTJuRGw5YTFTbHRIdytjWmpSMGdO?=
+ =?utf-8?B?TmczTDQxNFFMZk9naDBjN0xTYzNZVzRLMkw1emtINzFiK2JiaTJtbFVCL0VC?=
+ =?utf-8?B?NEViOEZmMVlNWjR0NkxRa1pWSlFTQjdmTCtkSHROYWlsR2xaMUo4eEZCMGtH?=
+ =?utf-8?B?M2taTUd3K1BUdmhBVkJ3RFVzcnNzQmFvMEVwNEs0TUc1UlV2UDQrZzEvenBo?=
+ =?utf-8?B?Rlc5ZzFLaExCb056c3hRZitQUXU3dW1EZUNRZ0U2TURudTMwZjJ1cDRpcC9o?=
+ =?utf-8?B?ZnlEdzNPNnFhc283aDBlYml0cE1ac09yYmYxeWgvTVZDKzZVZGZ3cXZ2aXdZ?=
+ =?utf-8?B?VFNNWFBUbXF1WGNIYXZSWmdnUVhCQ1h2YzE5dWJvSHMyQzZDQUsyWFpCbTZZ?=
+ =?utf-8?B?ZHp4b08xcUN2OWFKdlJwM25NNHY2QjhWVEpNbldmZmhGK05QeEtEdHh1c2pS?=
+ =?utf-8?B?dkIzakt0dTlQZmcyNFo4dDYweXlkT2FIaGQ3SGlNczBGeDdmdXd4YytkTE1I?=
+ =?utf-8?B?M0xrVnU4UmJCQUluUTY4bXphNG83aENjbk9SVmZNQzFYdTJZZHZQMlVHVUY3?=
+ =?utf-8?Q?ZS5q1MUfRclVuiS6DIHP4jo=3D?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd687252-275a-4b50-75e5-08db88fcdd22
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB7104.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 08:39:42.8260
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C1tiG1fZoCkWFARd/KpLVAiMukp4Osu/tRiVylHW3Fm/e6XJ/owD7TdPDysdhRzLCYIDLlgUlCK7t9tbJ/G1ig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8691
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Adding cond_resched() to the command waiting loop for a better
-co-operation with the scheduler. This allows to give CPU a breath to
-run other task(workqueue) instead of busy looping when preemption is
-not allowed on a device whose CVQ might be slow.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/net/virtio_net.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 9f3b1d6ac33d..e7533f29b219 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2314,8 +2314,10 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
- 	 * into the hypervisor, so the request should be handled immediately.
- 	 */
- 	while (!virtqueue_get_buf(vi->cvq, &tmp) &&
--	       !virtqueue_is_broken(vi->cvq))
-+	       !virtqueue_is_broken(vi->cvq)) {
-+		cond_resched();
- 		cpu_relax();
-+	}
- 
- 	return vi->ctrl->status == VIRTIO_NET_OK;
- }
--- 
-2.39.3
+On 19.07.23 19:37, Alexandru Gagniuc wrote:
+> For Wake-on-LAN to work from S5 (shutdown), the USB link must be put
+> in U3 state. If it is not, and the host "disappears", the chip will
+> no longer respond to WoL triggers.
+
+First, a question, does this also apply to S4?
+
+> To resolve this, add a notifier block and register it as a reboot
+> notifier. When WoL is enabled, work through the usb_device struct to
+> get to the suspend function. Calling this function puts the link in
+> the correct state for WoL to function.
+
+Second, do we really want this to be done for every driver with this issue
+or do we want a flag for core USB code to suspend devices when the system
+goes down? UAS at least does something similar.
+
+Third, what happens if the device is already suspended when the notifier runs?
+
+	Regards
+		Oliver
 
 
