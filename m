@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-19626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DDFD75B788
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:09:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF77D75B78B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:09:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF961C21508
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:09:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CAFB281C11
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C951BE67;
-	Thu, 20 Jul 2023 19:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179701BE7A;
+	Thu, 20 Jul 2023 19:08:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F721BE61
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:08:47 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2081.outbound.protection.outlook.com [40.107.223.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B973E75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A28A1BE78
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:08:48 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91E231731
 	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 12:08:45 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MAkWVEaPl8UbHgUplWq744Mrd08RAc7JQmzg5xcDWXvuMpXlsi9JwC+/+iKWgTH0MdsoPVo4gS8TTVCa2OG4h1IhS+xk6DAb0uyIXIK3PV/Ky8ZnNajB7igL7toaqCcl+/C2I7NX7m7L5vHnthGpM+QPT//5XJ7xndxEwIv05ull6YgroKZmRnaZBH3MTrD56FKeGlxOV9dfxQ2yKZPQSL/8IccojGMxctfjaHK8VUStLRhk8CO8kGS/oAjlgCHJwn0RAiWgNYmIbt05CGRh+ZnvH4n2mYna6Yu0BT+RWZSCRAPffz1SXoMOfyLLgJih1MP1aYqb7+EONcp3daUJUw==
+ b=kB52wpOtUUkw1ANn+GBys7fRm2fuiSul/sLtXcAIr5BAd25XB4MxFMI+MsMFjE2GX/TRpj7BYHMyqK1VLPlAgdap2+Ezdhp9fX8EFfvtqw7uc8eWI5u8xpwMN4wDSPJ3nMWVaSv5WzLGg+NElRfO88JKBJLr3rXjDqI72bpNGH09/8bD5vm6/QABa1OWiPjFiio3MGwAAvacDhbD2yU1yMxviSuRW7nwTBNq5rHbMukClU0x+BVyh/Dxgt7Wj5XwsWBYR1TPRXvFdTAGt4aX9Py3upseQu0MfbdnGlfdZD4eQk6fS7Zbwzt7HMLVx4xnz7IP9MSKyY6nJFS1KyxbrA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rWsuFpSKKhWHboZt7i1sp8iS/R9/5py/M4I2ag/aK8g=;
- b=cakPNBE9MycClkkPeF3kqsRwWSO6WWrA4EtYru6i6WyHhSXCKACNIdbKfZVj8TtVINY23gaZgDJ2IoZDXicPWoZAAYQ8rwbOEi0xXIIQgJsAKNXAzUgWFr68c3jRhDmXp6xlJbKIA3btKAtku7jpyIXhlONWFKVHaclU37wdBG/6c82rzdaMe+qgPEfYIONuzxXhv5+1wArl7VcnVGXkJp0iqUjtJ+vIPpPFbVrlTDc+Vk1Hj+HSPNo/WT/GzBYJ25aZSqkrwRZpbIm1U1gvy/1rSoqzTTL/OsY7eG3p0vPss38I+WGt/0m/qLGqbIYbxLZeOtWI1OGNjP9Kx41rHw==
+ bh=xgf8XHuID+V8m5lp2qUr1xdplpkPPnWhoe4FgH+cgEI=;
+ b=HxDDemxS1Avl/IuL15lLc835F6YnNPdzMBTKjPIb+CnaKTMzw1I/OPf3SCjzC6pDeQS3ODfPVn1gpxHa/JMKEzwXqaIsVh+cSqapGAl0qeiZjbyRuupaLnhVBdQdIptV3USNjUIgQzVu6gDgR661IJ99Wn3G9ek6d8osS3k9TVleVwhNeWMVqnF3j7ZGaJguFdhBZ+GP4cBSs6QscFR4mv1g2qcFKcciljKBhSwsV7aZymVTFg7VY53iTO7CQKGeIhZsDoiT99ohvxKtJCuDRCFj9S4IqcKpduDdRexrP+XzBFVtK4StQvt0wO8/P4d9E/+sX5tsQJEqYN41SLDpFw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rWsuFpSKKhWHboZt7i1sp8iS/R9/5py/M4I2ag/aK8g=;
- b=PEYMe+YL1DQagrVO8ZUXvnc+B/FHlrAiq2GPF/o6uYz4LOSgQQz7dpkAHpgVdFqHCzip6koka9/1DTD870Wyr9md4wuqshBjpSkWBdWTX7DDE3myJevN38yxbnFP1dx9AbWCcpkjB3fA4q4WL3fCoyOL+3ARR0SQO7UrzLUIIcE=
-Received: from DS7PR03CA0069.namprd03.prod.outlook.com (2603:10b6:5:3bb::14)
- by IA1PR12MB6066.namprd12.prod.outlook.com (2603:10b6:208:3ee::5) with
+ bh=xgf8XHuID+V8m5lp2qUr1xdplpkPPnWhoe4FgH+cgEI=;
+ b=RLLO5Z8TFaRJzAi6Zo+lQCFzvBX9frBD2uyzzw4XoenxGyFZhvJaT24IwV3rpNNTZM3ujk6h7zF0m/v9ZpDY6ZssrF7H1NjMYSll0s7x7IuU+aYJoNAAEZtIFzNIuXzgdNGGzoLs7/QZ45ruQltGF6wW3HWlw4aiAcVABcBCpBw=
+Received: from DS7PR03CA0072.namprd03.prod.outlook.com (2603:10b6:5:3bb::17)
+ by CH0PR12MB5297.namprd12.prod.outlook.com (2603:10b6:610:d4::24) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25; Thu, 20 Jul
- 2023 19:08:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Thu, 20 Jul
+ 2023 19:08:43 +0000
 Received: from DM6NAM11FT089.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3bb:cafe::84) by DS7PR03CA0069.outlook.office365.com
- (2603:10b6:5:3bb::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28 via Frontend
- Transport; Thu, 20 Jul 2023 19:08:40 +0000
+ (2603:10b6:5:3bb:cafe::cf) by DS7PR03CA0072.outlook.office365.com
+ (2603:10b6:5:3bb::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
+ Transport; Thu, 20 Jul 2023 19:08:43 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -55,19 +55,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DM6NAM11FT089.mail.protection.outlook.com (10.13.173.82) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6588.34 via Frontend Transport; Thu, 20 Jul 2023 19:08:40 +0000
+ 15.20.6588.34 via Frontend Transport; Thu, 20 Jul 2023 19:08:43 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 20 Jul
- 2023 14:08:38 -0500
+ 2023 14:08:39 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<simon.horman@corigine.com>, <idosch@idosch.org>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH v4 net-next 3/4] ionic: pull out common bits from fw_up
-Date: Thu, 20 Jul 2023 12:08:15 -0700
-Message-ID: <20230720190816.15577-4-shannon.nelson@amd.com>
+Subject: [PATCH v4 net-next 4/4] ionic: add FLR recovery support
+Date: Thu, 20 Jul 2023 12:08:16 -0700
+Message-ID: <20230720190816.15577-5-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230720190816.15577-1-shannon.nelson@amd.com>
 References: <20230720190816.15577-1-shannon.nelson@amd.com>
@@ -83,26 +83,26 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT089:EE_|IA1PR12MB6066:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa1ef2e2-8fe0-412a-51f3-08db8954ba93
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT089:EE_|CH0PR12MB5297:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1dfa3f6c-dd2f-4fcc-96d6-08db8954bc66
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	LSqy9gU6xradepiD0dugHcvorchWXVNjEcxUjKGUcGfkool8NHP+NiEc7Z7a4FYUAtQJfJjnrq1IUv5bh5Gpy8PsXW8SHziVc7BQf3ZQyqjq38wY8M//Zz9AKPcnPUL2DMVNLqQckGiUiH1Ehq/h8mGhhlCGWCI803Aw8DAvO+fs6FV8MM83QSqxqnGwFHb7W/hSwxN5ueQlkuicNBkx2yrqRigXcbJGPfp7g3V7T1ZAHMk8yLrDU4wEl6ZMUn3Hon0l2Y+6zfPKRW9upijnqNSmaJ1XSET2WuV7kS3RqwDAUQNK0Q0gOi2ePg/xUA2oAebF6adthQQdQ3MNegqVvPNegQmyNr952OSYC8LYBJ/jb+zFTV4LJ2co7hW7geVRXtFUqDC3fV/U/qNVlmG311l7E7tR/gzNZBpvq+oRn3oKqqw1OfBWkcwsCK3BLMCMQRvwe9VyTO0Kkg7L2LpKQ/+TgJP4lwLjLNZ8CwFHaTmESng7HNQ3Xl3ASJ4/Ci57KiIXLxY9BI+nQBuxoBMmEz+4DPwLRSnKF7zKu67lB2O98F9jTug7TNWRjm1GSPz3av0S8irxsC2AEYCcTYejQd7fbM8c5+oPvvQDDLThx/Ib7eXHH0P6GBWoCi75a4Vw+pJsmLIMMMfa7fHi4IxHr4rdYWZ6o8QdM2JL3FdCoDf5ktnAJneffIL2cFZtxLQNzhS4f03KN8nWQE5AZggRY2+Cozf6ZnQVRaoZy6QMaGPUWUac0KMIFkCzHxc7aBlyeaxfnSmfry2/mBK43RHmPw==
+	zB/WmRx+cH7hDGUzzt8GJjO5R8OagiIroSoXIcT7XeRL5wSEN1fsR09qkXwRVaz4bqsYVyTIcOJ94AGPUtYDO0zReYBE5kungT1Nh8zDmMFuItEFB7y0qlVlUsBkoc25qG06+//9JDZ1kVR09DrwNNtL8XwSYSNjy+Av95WbmlE/cIo9meIv8MMFjdWdMLWBvFHLMGnhsxGkspIuRFfU044ya/x38IStrcDkXkiTJ6Jcn2ww7g3Yt/rNAG8yKlBKBbKa1zPKTiADfs1K2Hp2lplKiEoPDrc0vOXhuKbcqY5QyzoG9vSiGUKjQFP3ITouNjNPEhQRxP9dTWpzXy7jL2X26H0K/9UWi/xYrzYgVHO6Lm+hw2ULOXwHwY8n8AIbQVcBwsPsRuaJo3HuotBPLUiQLvQ5tl2TQ3SFT2vf/rsc81rHtlk8Y2s8AgaGZ1Y9xYhXK+p9GyH5zUWEZfjNjDiGnBw2TW7KOwxQAOS4EO16qT8GEK7lJ629sJ710Tc9VBsTUFdRapmqKiBZz2OJRg/ax9qFDxRehT23WpGNdPvcFpP+d6E888HhweuUN7NDjqdxNUCYjo2MkvSgFKORWlHj3/vVpSSVPb4ebx+TFz1E2u6oww1/UVuWTw0E18HmEYsa9/AXnbIf0nNqV7D6bM0xoA7m4uQFKkjFvPE52iG5geYqEEJcF6AebWeidUv6fZ3gNZ7BUYcAR7JWrJf469w8XKqam9fX05K3zJHi/Wq7E+m+XvoWYM0sn3zAs/OpI1fy4iWkPB0rWrFGYSmG9w==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(396003)(346002)(136003)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(2906002)(36860700001)(83380400001)(40460700003)(2616005)(426003)(47076005)(356005)(81166007)(86362001)(36756003)(82740400003)(40480700001)(316002)(4326008)(70586007)(70206006)(336012)(26005)(1076003)(186003)(16526019)(41300700001)(110136005)(478600001)(6666004)(54906003)(8936002)(44832011)(8676002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(136003)(396003)(451199021)(82310400008)(36840700001)(46966006)(40470700004)(40480700001)(70586007)(356005)(82740400003)(86362001)(81166007)(83380400001)(2906002)(36860700001)(8936002)(478600001)(8676002)(2616005)(426003)(47076005)(70206006)(40460700003)(36756003)(1076003)(5660300002)(26005)(336012)(186003)(6666004)(16526019)(44832011)(4326008)(110136005)(54906003)(41300700001)(316002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:08:40.2751
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:08:43.3374
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa1ef2e2-8fe0-412a-51f3-08db8954ba93
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1dfa3f6c-dd2f-4fcc-96d6-08db8954bc66
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DM6NAM11FT089.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6066
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5297
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -110,108 +110,141 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Pull out some code from ionic_lif_handle_fw_up() that can be
-used in the coming FLR recovery patch.
+Add support for the PCI reset handlers in order to manage an FLR event.
 
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../net/ethernet/pensando/ionic/ionic_lif.c   | 64 ++++++++++++-------
- 1 file changed, 42 insertions(+), 22 deletions(-)
+ .../ethernet/pensando/ionic/ionic_bus_pci.c   | 53 +++++++++++++++++++
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |  8 +--
+ .../net/ethernet/pensando/ionic/ionic_lif.h   |  5 ++
+ 3 files changed, 62 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index 612b0015dc43..2d03c1b995bc 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -3266,27 +3266,11 @@ static void ionic_lif_handle_fw_down(struct ionic_lif *lif)
- 	dev_info(ionic->dev, "FW Down: LIFs stopped\n");
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+index bcce613449c2..d6ce113a4210 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+@@ -409,12 +409,65 @@ static void ionic_remove(struct pci_dev *pdev)
+ 	ionic_devlink_free(ionic);
  }
  
--static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
-+static int ionic_restart_lif(struct ionic_lif *lif)
- {
- 	struct ionic *ionic = lif->ionic;
- 	int err;
- 
--	if (!test_bit(IONIC_LIF_F_FW_RESET, lif->state))
--		return;
--
--	dev_info(ionic->dev, "FW Up: restarting LIFs\n");
--
--	ionic_init_devinfo(ionic);
--	err = ionic_identify(ionic);
--	if (err)
--		goto err_out;
--	err = ionic_port_identify(ionic);
--	if (err)
--		goto err_out;
--	err = ionic_port_init(ionic);
--	if (err)
--		goto err_out;
--
- 	mutex_lock(&lif->queue_lock);
- 
- 	if (test_and_clear_bit(IONIC_LIF_F_BROKEN, lif->state))
-@@ -3322,12 +3306,8 @@ static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
- 	clear_bit(IONIC_LIF_F_FW_RESET, lif->state);
- 	ionic_link_status_check_request(lif, CAN_SLEEP);
- 	netif_device_attach(lif->netdev);
--	dev_info(ionic->dev, "FW Up: LIFs restarted\n");
--
--	/* restore the hardware timestamping queues */
--	ionic_lif_hwstamp_replay(lif);
- 
--	return;
-+	return 0;
- 
- err_txrx_free:
- 	ionic_txrx_free(lif);
-@@ -3337,6 +3317,46 @@ static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
- 	ionic_qcqs_free(lif);
- err_unlock:
- 	mutex_unlock(&lif->queue_lock);
++static void ionic_reset_prepare(struct pci_dev *pdev)
++{
++	struct ionic *ionic = pci_get_drvdata(pdev);
++	struct ionic_lif *lif = ionic->lif;
 +
-+	return err;
++	dev_dbg(ionic->dev, "%s: device stopping\n", __func__);
++
++	del_timer_sync(&ionic->watchdog_timer);
++	cancel_work_sync(&lif->deferred.work);
++
++	mutex_lock(&lif->queue_lock);
++	ionic_stop_queues_reconfig(lif);
++	ionic_txrx_free(lif);
++	ionic_lif_deinit(lif);
++	ionic_qcqs_free(lif);
++	mutex_unlock(&lif->queue_lock);
++
++	ionic_dev_teardown(ionic);
++	ionic_clear_pci(ionic);
++	ionic_debugfs_del_dev(ionic);
 +}
 +
-+static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
++static void ionic_reset_done(struct pci_dev *pdev)
 +{
-+	struct ionic *ionic = lif->ionic;
++	struct ionic *ionic = pci_get_drvdata(pdev);
++	struct ionic_lif *lif = ionic->lif;
 +	int err;
 +
-+	if (!test_bit(IONIC_LIF_F_FW_RESET, lif->state))
-+		return;
++	err = ionic_setup_one(ionic);
++	if (err)
++		goto err_out;
 +
-+	dev_info(ionic->dev, "FW Up: restarting LIFs\n");
-+
-+	/* This is a little different from what happens at
-+	 * probe time because the LIF already exists so we
-+	 * just need to reanimate it.
-+	 */
-+	ionic_init_devinfo(ionic);
-+	err = ionic_identify(ionic);
-+	if (err)
-+		goto err_out;
-+	err = ionic_port_identify(ionic);
-+	if (err)
-+		goto err_out;
-+	err = ionic_port_init(ionic);
-+	if (err)
-+		goto err_out;
++	ionic_debugfs_add_sizes(ionic);
++	ionic_debugfs_add_lif(ionic->lif);
 +
 +	err = ionic_restart_lif(lif);
 +	if (err)
 +		goto err_out;
 +
-+	dev_info(ionic->dev, "FW Up: LIFs restarted\n");
++	mod_timer(&ionic->watchdog_timer, jiffies + 1);
 +
-+	/* restore the hardware timestamping queues */
-+	ionic_lif_hwstamp_replay(lif);
++err_out:
++	dev_dbg(ionic->dev, "%s: device recovery %s\n",
++		__func__, err ? "failed" : "done");
++}
 +
-+	return;
++static const struct pci_error_handlers ionic_err_handler = {
++	/* FLR handling */
++	.reset_prepare      = ionic_reset_prepare,
++	.reset_done         = ionic_reset_done,
++};
 +
- err_out:
- 	dev_err(ionic->dev, "FW Up: LIFs restart failed - err %d\n", err);
+ static struct pci_driver ionic_driver = {
+ 	.name = IONIC_DRV_NAME,
+ 	.id_table = ionic_id_table,
+ 	.probe = ionic_probe,
+ 	.remove = ionic_remove,
+ 	.sriov_configure = ionic_sriov_configure,
++	.err_handler = &ionic_err_handler
+ };
+ 
+ int ionic_bus_register_driver(void)
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+index 2d03c1b995bc..adc05f944c14 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+@@ -434,7 +434,7 @@ static void ionic_qcq_free(struct ionic_lif *lif, struct ionic_qcq *qcq)
+ 	}
  }
+ 
+-static void ionic_qcqs_free(struct ionic_lif *lif)
++void ionic_qcqs_free(struct ionic_lif *lif)
+ {
+ 	struct device *dev = lif->ionic->dev;
+ 	struct ionic_qcq *adminqcq;
+@@ -1754,7 +1754,7 @@ static int ionic_set_mac_address(struct net_device *netdev, void *sa)
+ 	return ionic_lif_addr_add(netdev_priv(netdev), mac);
+ }
+ 
+-static void ionic_stop_queues_reconfig(struct ionic_lif *lif)
++void ionic_stop_queues_reconfig(struct ionic_lif *lif)
+ {
+ 	/* Stop and clean the queues before reconfiguration */
+ 	netif_device_detach(lif->netdev);
+@@ -2009,7 +2009,7 @@ static void ionic_txrx_deinit(struct ionic_lif *lif)
+ 	}
+ }
+ 
+-static void ionic_txrx_free(struct ionic_lif *lif)
++void ionic_txrx_free(struct ionic_lif *lif)
+ {
+ 	unsigned int i;
+ 
+@@ -3266,7 +3266,7 @@ static void ionic_lif_handle_fw_down(struct ionic_lif *lif)
+ 	dev_info(ionic->dev, "FW Down: LIFs stopped\n");
+ }
+ 
+-static int ionic_restart_lif(struct ionic_lif *lif)
++int ionic_restart_lif(struct ionic_lif *lif)
+ {
+ 	struct ionic *ionic = lif->ionic;
+ 	int err;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.h b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+index fd2ea670e7d8..457c24195ca6 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+@@ -325,6 +325,11 @@ void ionic_lif_deinit(struct ionic_lif *lif);
+ int ionic_lif_addr_add(struct ionic_lif *lif, const u8 *addr);
+ int ionic_lif_addr_del(struct ionic_lif *lif, const u8 *addr);
+ 
++void ionic_stop_queues_reconfig(struct ionic_lif *lif);
++void ionic_txrx_free(struct ionic_lif *lif);
++void ionic_qcqs_free(struct ionic_lif *lif);
++int ionic_restart_lif(struct ionic_lif *lif);
++
+ int ionic_lif_register(struct ionic_lif *lif);
+ void ionic_lif_unregister(struct ionic_lif *lif);
+ int ionic_lif_identify(struct ionic *ionic, u8 lif_type,
 -- 
 2.17.1
 
