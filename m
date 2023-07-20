@@ -1,69 +1,199 @@
-Return-Path: <netdev+bounces-19673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38AA575B9E0
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:53:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C323F75B9EA
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E883D28207C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:53:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04D53282091
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8561BE99;
-	Thu, 20 Jul 2023 21:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D089B1BE9A;
+	Thu, 20 Jul 2023 21:58:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62E2168B0
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:53:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B6AAC433D9;
-	Thu, 20 Jul 2023 21:53:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689890024;
-	bh=Ks/7SzKUrQWpvpD7qyUupUycx9MQHR2Gx+74B3iJ7lQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=qy6zhdF3xa3LWBYitjL5iHR20cnNSmnnBAhYCC10PqjIUquz2oGRI+K/VNjWRSjmP
-	 zvt3uVlbem8aTgz/pTdsCb4EzHTJAwFIyqXuXSs2PHxzJoOEVpdH5einv1rQxLp+D+
-	 EbRpV9PhodWEkaRDMBITh56i7Y9Lsr4yvkZ+cdZfTUrUy4HYw4ArKPhE9w6xAXJBXm
-	 nuGpQdTlOZmvrEdckkM24Qhw0toUNvy+dSpKKhKpNn4twrS6F7fyaDa/S0LCKXU7SE
-	 6p/VEFTRpQyllwE9EOxSAC+bNwUn2Sswo4e6UvCb3IK4y7QTyRWlsVBT7ZxXpJVD/a
-	 MAAISpTppXTdQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 28AE2C595C4;
-	Thu, 20 Jul 2023 21:53:44 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.5-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20230720214559.163647-1-kuba@kernel.org>
-References: <20230720214559.163647-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230720214559.163647-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.5-rc3
-X-PR-Tracked-Commit-Id: 75d42b351f564b2568392a4e53cd74a3d9df4af2
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 57f1f9dd3abea322173ea75a15887ccf14bbbe51
-Message-Id: <168989002415.13899.12157867587483013615.pr-tracker-bot@kernel.org>
-Date: Thu, 20 Jul 2023 21:53:44 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13E71DDC0
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:58:38 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46423B4
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:58:37 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-573a92296c7so12146067b3.1
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:58:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689890316; x=1690495116;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tVqsKiDGGyRuOmTeLPncQrsFy4D8GwAEfz5C9fRML5g=;
+        b=53MZ45pv9s/lbOh54pc3nyaV2Fk3D490BFdzIDBeWLEJ+qsdUbG4czC40DQCJwZmeO
+         412GR8rQc/mMklzTVvXMd023lmISGCJzObcgDpw47jyVnRiJQWXGVOzafHt0E6z+jI7I
+         N1WHul0IUXzxtFV4WwKoNW/fEk5HNdOcuWfdsTl9r6iS/S3lf+EVd+mBzXQ+ZaXGc57s
+         Q1ghnAZujLXwDqGbjzl7332cQtVAVgiQN7lFpdUZIau9HrB9j5UtVGiz0PpCSFZuidTw
+         dGLQS87AYkWrwOnuh43puqDy60aT0rq2aBW10RyyK8IIdyQBSrsdurMW+DpWBNAEFFT1
+         dN2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689890316; x=1690495116;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tVqsKiDGGyRuOmTeLPncQrsFy4D8GwAEfz5C9fRML5g=;
+        b=OWCHXTmU7IJ9ogi3LKBlFb7wcUtoaGeKajlGT0Cdb7BG2zLYynPDsUS/x2bex3IXvz
+         KjWVQmSR82noUmnbO8mvfXnPw309rFT2fd5fBUK28PWJo6TT8Ae/3GefUnEDeIONxmUL
+         fvCCszOpao9fv88FnuCeztyxnVEZqKTko/LXlTfUTqwOpzh+h7vvaOf+v9lY4VprjPT6
+         lXI6yyxFD502vvndxX4Rh5hmIFbP2he+7uy0vHp5Wmr0oBMzpaJ43gD6zmuP//PX8eEk
+         /baUC9xUR6D7JzQqxIloat6+Gm973nICGphJ/vgLIPnlKdJbBlV6aDDQ/6iuvav2CEu/
+         OPjA==
+X-Gm-Message-State: ABy/qLbNw8GoFPpMVpzM9Spo/so7kZQq0B/7v7AlAJFRcpZ9eYT8uL04
+	+SHDwTS1rcNrPPKOgrmr8N6FGbs=
+X-Google-Smtp-Source: APBJJlFnPjif4P2ACv5CDhVcYza8zWcXqFfCqEwNexz05Y34bSM0nw25yn4DKKm0a7ShLcYdlhXcDYE=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:690c:72c:b0:56c:e2da:f440 with SMTP id
+ bt12-20020a05690c072c00b0056ce2daf440mr3839ywb.0.1689890316520; Thu, 20 Jul
+ 2023 14:58:36 -0700 (PDT)
+Date: Thu, 20 Jul 2023 14:58:35 -0700
+In-Reply-To: <ZLlUyJdj50UqFM0m@lincoln>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <20230719183734.21681-1-larysa.zaremba@intel.com>
+ <20230719183734.21681-14-larysa.zaremba@intel.com> <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
+ <64b85ad52d012_2849c1294df@willemb.c.googlers.com.notmuch>
+ <ZLkBrfex1ENbVDwF@lincoln> <CAADnVQKF3j-_qLM4MWkJKK=ZyPuWrLnmGfgf9BC4zm-4=1qSfw@mail.gmail.com>
+ <ZLlUyJdj50UqFM0m@lincoln>
+Message-ID: <ZLmstKiYO7LH9mXt@google.com>
+Subject: Re: [PATCH bpf-next v3 13/21] ice: Implement checksum hint
+From: Stanislav Fomichev <sdf@google.com>
+To: larysa.zaremba@intel.com
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "song@kernel.org" <song@kernel.org>, "yhs@fb.com" <yhs@fb.com>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, brouer@redhat.com, 
+	anatoly.burakov@intel.com, aleksander.lobakin@intel.com, 
+	Magnus Karlsson <magnus.karlsson@gmail.com>, mtahhan@redhat.com, 
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The pull request you sent on Thu, 20 Jul 2023 14:45:59 -0700:
+On 07/20, Zaremba, Larysa wrote:
+> On Thu, Jul 20, 2023 at 08:14:52AM -0700, Alexei Starovoitov wrote:
+> > On Thu, Jul 20, 2023 at 2:47=E2=80=AFAM Zaremba, Larysa
+> > <larysa.zaremba@intel.com> wrote:
+> > >
+> > > On Wed, Jul 19, 2023 at 05:51:17PM -0400, Willem de Bruijn wrote:
+> > > > Alexei Starovoitov wrote:
+> > > > > On Wed, Jul 19, 2023 at 08:37:26PM +0200, Larysa Zaremba wrote:
+> > > > > > Implement .xmo_rx_csum callback to allow XDP code to determine,
+> > > > > > whether HW has validated any checksums.
+> > > > > >
+> > > > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > > > > ---
+> > > > > >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 29 +++++++++++=
+++++++++
+> > > > > >  1 file changed, 29 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/dr=
+ivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > > > > index 54685d0747aa..6647a7e55ac8 100644
+> > > > > > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > > > > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > > > > @@ -660,8 +660,37 @@ static int ice_xdp_rx_vlan_tag(const struc=
+t xdp_md *ctx, u16 *vlan_tci,
+> > > > > >   return 0;
+> > > > > >  }
+> > > > > >
+> > > > > > +/**
+> > > > > > + * ice_xdp_rx_csum_lvl - Get level, at which HW has checked th=
+e checksum
+> > > > > > + * @ctx: XDP buff pointer
+> > > > > > + * @csum_status: destination address
+> > > > > > + * @csum_info: destination address
+> > > > > > + *
+> > > > > > + * Copy HW checksum level (if was checked) to the destination =
+address.
+> > > > > > + */
+> > > > > > +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
+> > > > > > +                    enum xdp_csum_status *csum_status,
+> > > > > > +                    union xdp_csum_info *csum_info)
+> > > > > > +{
+> > > > > > + const struct ice_xdp_buff *xdp_ext =3D (void *)ctx;
+> > > > > > + const union ice_32b_rx_flex_desc *eop_desc;
+> > > > > > + enum ice_rx_csum_status status;
+> > > > > > + u16 ptype;
+> > > > > > +
+> > > > > > + eop_desc =3D xdp_ext->pkt_ctx.eop_desc;
+> > > > > > + ptype =3D ice_get_ptype(eop_desc);
+> > > > > > +
+> > > > > > + status =3D ice_get_rx_csum_status(eop_desc, ptype);
+> > > > > > + if (status & ICE_RX_CSUM_NONE)
+> > > > > > +         return -ENODATA;
+> > > > > > +
+> > > > > > + *csum_status =3D ice_rx_csum_lvl(status) + 1;
+>=20
+> I'll duplicate an improved version of this line from another thread in ca=
+se it=20
+> could help with the comprehension during review:
+>=20
+> *csum_status =3D XDP_CHECKSUM_VALID_LVL0 + ice_rx_csum_lvl(status);
+>=20
+> > > > > > + return 0;
+> > > > > > +}
+> > > > >
+> > > > > and xdp_csum_info from previous patch left uninitialized?
+> > > > > What was the point adding it then?
+> > > >
+> > > > I suppose this driver only returns CHECKSUM_NONE or
+> > > > CHECKSUM_UNNECESSARY? Also based on a grep of the driver dir.
+> > > >
+> > >
+> > > Yes, correct, current ice HW cannot produce complete checksum,
+> > > so only CHECKSUM_UNNECESSARY for known protocols, CHECKSUM_NONE other=
+wise,
+> > > nothing to initialize csum_info with in either case.
+> > >
+> > > xdp_csum_info is initialized in veth implementation though, but only
+> > > csum_start/offset, so complete XDP checksum has no users in this patc=
+hset.
+> > > Is this a problem?
+> > >
+> > > In previous version I had CHECKSUM_UNNECESSARY-only kfunc, but I thin=
+k everyone
+> > > has agreed, csum hint kfunc should give more comprehensive output.
+> >=20
+> > csum kfunc supposed to be generic.
+> > If for ICE it fills in one argument and for veth another then the whole
+> > idea of generic api is not working.
+>=20
+> Both ice and veth fill in the csum_status, the need to fill in the csum_i=
+nfo is=20
+> determined by the status. I don not see a problem with that.
+>=20
+> Maybe you have an issue with putting a valid checksum number into a statu=
+s=20
+> instead of info? Please clarify.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.5-rc3
++1, that seems to match skb interface
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/57f1f9dd3abea322173ea75a15887ccf14bbbe51
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Regarding 'generic api not working' in general: I think we've discussed
+that with this 'flexible' kfunc format we can allow non-generic kfuncs for
+specific devices if we think that it makes sense to
+differentiate/experiment/etc. Do you think it makes sense to go
+non-generic route here?
 
