@@ -1,74 +1,172 @@
-Return-Path: <netdev+bounces-19539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31C375B223
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:14:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFC075B22B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:15:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F5421C2140C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:14:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD5111C214A3
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9575018B07;
-	Thu, 20 Jul 2023 15:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E5418B0E;
+	Thu, 20 Jul 2023 15:15:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D1B17722
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:14:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72A1FC433C8;
-	Thu, 20 Jul 2023 15:14:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689866071;
-	bh=GJYbKcpY5i1rE3HQg7v+Z0rHq1dJgc8tAI1aT38vmMM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Xzj4A5oZjfZR1QlwF1j9ldcfFMKATVzsrZm/jGEhjiw58KbrNq3L6MrwNQKBzbxLD
-	 2ZMSL8A3Q6mqnYzuPeCrBPk3H4ewOycuPJD2DrSQ9Zory3j4HEgnloBzwbOef8Zr/q
-	 /jose9HirYNlxyG863K1/sLIAmGe6wtKWrYSnPw98khHTj8Kq8aR8Qhpx8EIIPvDTK
-	 Df5xxnH+NsmIfK31+NRJnfJM0FbFeXSd8dLPcj9TkdVV0lcZ3pwuwtXuPeIKQSVrgA
-	 LP2YVQNGyS0pWa2XI7bdHw+Hqz1XojNyt/xW9zoOo9tQIANcwDwGojcIJbn5uLDzNN
-	 OXJkGk302y6eg==
-Date: Thu, 20 Jul 2023 08:14:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Marcel Holtmann
- <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, David Miller <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, "Alexander
- Mikhalitsyn" <alexander@mihalicyn.com>, Kuniyuki Iwashima
- <kuniyu@amazon.com>
-Subject: Re: linux-next: build failure after merge of the bluetooth tree
-Message-ID: <20230720081430.1874b868@kernel.org>
-In-Reply-To: <20230719202435.636dcc3a@kernel.org>
-References: <PH0PR11MB51269B6805230AB8ED209B14D332A@PH0PR11MB5126.namprd11.prod.outlook.com>
-	<20230720105042.64ea23f9@canb.auug.org.au>
-	<20230719182439.7af84ccd@kernel.org>
-	<20230720130003.6137c50f@canb.auug.org.au>
-	<PH0PR11MB5126763E5913574B8ED6BDE4D33EA@PH0PR11MB5126.namprd11.prod.outlook.com>
-	<20230719202435.636dcc3a@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F10B18B07;
+	Thu, 20 Jul 2023 15:15:08 +0000 (UTC)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A618A26BB;
+	Thu, 20 Jul 2023 08:15:05 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b74310566cso13949591fa.2;
+        Thu, 20 Jul 2023 08:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689866104; x=1690470904;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P1l5TEs8O2Bmwb7N0EKATA/T4FRIfe+wkS7cFTHp0KM=;
+        b=oRS5aKZcfXVjCO7ZDsB5uEJ8T9TgkgPinbYgMwGtd6jcRjrRzBnA+oJgYuOsWxk1Js
+         8hqrBFM9EcNaGhzZgFziWlqCOc7inL61Qvinauw2G54bFJSSmlmPY9oPS9K7lOi1rMgV
+         wiceWcw5gJI4MVuvjC2v45ZljaYc2XzHmTe3LGxUVN0DqR21kIQJqmCLlBXEzROSkGzJ
+         asfxqboqmfxdKbYyhV+KElm4VxB6LwZfjTk0Ogjrk66A5VGoLvT25oVDJ6MDu6zgGuvH
+         1kN+/e4NchMZc6QGOZIs031TSN53JgZJhxM5Cc8xmp0+FsRgT6fE3+wxTA8aNNJr4srY
+         nOMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689866104; x=1690470904;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P1l5TEs8O2Bmwb7N0EKATA/T4FRIfe+wkS7cFTHp0KM=;
+        b=BZjSbV2qMVYIiCkaqI9uBg9X8lyRIv1E2ThEdkzvsE//tF8mAITH+EeHPcKxqa1oXx
+         twC3/OGyG7BTZ02wvHUPMp3Fz5wlw+zsjSUPkM+Exwn/viUcEnKfrxehoYAI2CXMrc0S
+         yp2EoBWWy2i5HFeEn/13YoRPjeMkUF+DZ09pC5H7Cyr1FGQt8HzkIj18NkCupfwyb5xb
+         OyQU7i7EbFoGo3YjFMqUHa9mqcPspdLSuCPga5Xy6lGvmtt6OrNPvg/Ig6+EX8IQYWjw
+         Iu6eILzRXwRcUv6O1eKbKF73mXMzH9nDYA3nXnoyC+0T5JaXa7cLxYDDARa8x5M9wAff
+         UmWw==
+X-Gm-Message-State: ABy/qLZ+Pt08gR9P2JUAMa3o8/6nbgVP1iE8edKzWlGrvNh6jSH7Unwb
+	/FtuWsq0e5Z6ZqlxfN/TewNmPa7LQ52lRh1qyvE=
+X-Google-Smtp-Source: APBJJlGjV4ErpFCLAKQauNQbw4vr8ehpjn3LJbPIuBAZy8S/+6jqmNPLQ4fok1WXhYuSL3eRuUCe585RyimQLDsDmDA=
+X-Received: by 2002:a2e:8e85:0:b0:2b6:e13f:cfd7 with SMTP id
+ z5-20020a2e8e85000000b002b6e13fcfd7mr2781587ljk.4.1689866103479; Thu, 20 Jul
+ 2023 08:15:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230719183734.21681-1-larysa.zaremba@intel.com>
+ <20230719183734.21681-14-larysa.zaremba@intel.com> <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
+ <64b85ad52d012_2849c1294df@willemb.c.googlers.com.notmuch> <ZLkBrfex1ENbVDwF@lincoln>
+In-Reply-To: <ZLkBrfex1ENbVDwF@lincoln>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 20 Jul 2023 08:14:52 -0700
+Message-ID: <CAADnVQKF3j-_qLM4MWkJKK=ZyPuWrLnmGfgf9BC4zm-4=1qSfw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 13/21] ice: Implement checksum hint
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "song@kernel.org" <song@kernel.org>, "yhs@fb.com" <yhs@fb.com>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@google.com" <sdf@google.com>, "haoluo@google.com" <haoluo@google.com>, 
+	"jolsa@kernel.org" <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, "Brouer, Jesper" <brouer@redhat.com>, 
+	"Burakov, Anatoly" <anatoly.burakov@intel.com>, 
+	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>, 
+	"Tahhan, Maryam" <mtahhan@redhat.com>, 
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 19 Jul 2023 20:24:35 -0700 Jakub Kicinski wrote:
-> On Thu, 20 Jul 2023 03:17:37 +0000 Von Dentz, Luiz wrote:
-> > Sorry for not replying inline, outlook on android, we use scm_recv
-> > not scm_recv_unix, so Id assume that change would return the initial
-> > behavior, if it did not then it is not fixing anything.  
-> 
-> Ack, that's what it seems like to me as well.
-> 
-> I fired up an allmodconfig build of linux-next. I should be able 
-> to get to the bottom of this in ~20min :)
+On Thu, Jul 20, 2023 at 2:47=E2=80=AFAM Zaremba, Larysa
+<larysa.zaremba@intel.com> wrote:
+>
+> On Wed, Jul 19, 2023 at 05:51:17PM -0400, Willem de Bruijn wrote:
+> > Alexei Starovoitov wrote:
+> > > On Wed, Jul 19, 2023 at 08:37:26PM +0200, Larysa Zaremba wrote:
+> > > > Implement .xmo_rx_csum callback to allow XDP code to determine,
+> > > > whether HW has validated any checksums.
+> > > >
+> > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > > ---
+> > > >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 29 +++++++++++++++=
+++++
+> > > >  1 file changed, 29 insertions(+)
+> > > >
+> > > > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/driver=
+s/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > > index 54685d0747aa..6647a7e55ac8 100644
+> > > > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > > @@ -660,8 +660,37 @@ static int ice_xdp_rx_vlan_tag(const struct xd=
+p_md *ctx, u16 *vlan_tci,
+> > > >   return 0;
+> > > >  }
+> > > >
+> > > > +/**
+> > > > + * ice_xdp_rx_csum_lvl - Get level, at which HW has checked the ch=
+ecksum
+> > > > + * @ctx: XDP buff pointer
+> > > > + * @csum_status: destination address
+> > > > + * @csum_info: destination address
+> > > > + *
+> > > > + * Copy HW checksum level (if was checked) to the destination addr=
+ess.
+> > > > + */
+> > > > +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
+> > > > +                    enum xdp_csum_status *csum_status,
+> > > > +                    union xdp_csum_info *csum_info)
+> > > > +{
+> > > > + const struct ice_xdp_buff *xdp_ext =3D (void *)ctx;
+> > > > + const union ice_32b_rx_flex_desc *eop_desc;
+> > > > + enum ice_rx_csum_status status;
+> > > > + u16 ptype;
+> > > > +
+> > > > + eop_desc =3D xdp_ext->pkt_ctx.eop_desc;
+> > > > + ptype =3D ice_get_ptype(eop_desc);
+> > > > +
+> > > > + status =3D ice_get_rx_csum_status(eop_desc, ptype);
+> > > > + if (status & ICE_RX_CSUM_NONE)
+> > > > +         return -ENODATA;
+> > > > +
+> > > > + *csum_status =3D ice_rx_csum_lvl(status) + 1;
+> > > > + return 0;
+> > > > +}
+> > >
+> > > and xdp_csum_info from previous patch left uninitialized?
+> > > What was the point adding it then?
+> >
+> > I suppose this driver only returns CHECKSUM_NONE or
+> > CHECKSUM_UNNECESSARY? Also based on a grep of the driver dir.
+> >
+>
+> Yes, correct, current ice HW cannot produce complete checksum,
+> so only CHECKSUM_UNNECESSARY for known protocols, CHECKSUM_NONE otherwise=
+,
+> nothing to initialize csum_info with in either case.
+>
+> xdp_csum_info is initialized in veth implementation though, but only
+> csum_start/offset, so complete XDP checksum has no users in this patchset=
+.
+> Is this a problem?
+>
+> In previous version I had CHECKSUM_UNNECESSARY-only kfunc, but I think ev=
+eryone
+> has agreed, csum hint kfunc should give more comprehensive output.
 
-I kicked it off and forgot about it.
-allmodconfig on 352ce39a8bbaec04 (next-20230719) builds just fine :S
+csum kfunc supposed to be generic.
+If for ICE it fills in one argument and for veth another then the whole
+idea of generic api is not working.
 
