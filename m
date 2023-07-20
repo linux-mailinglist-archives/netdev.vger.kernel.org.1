@@ -1,117 +1,76 @@
-Return-Path: <netdev+bounces-19611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B44475B67F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 20:19:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 522EE75B679
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 20:19:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D28D1C214F9
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:19:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73EE31C214C3
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258B619BB6;
-	Thu, 20 Jul 2023 18:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80B419BB3;
+	Thu, 20 Jul 2023 18:19:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD5319BA6;
-	Thu, 20 Jul 2023 18:19:46 +0000 (UTC)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0BD2D4A;
-	Thu, 20 Jul 2023 11:19:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689877175; x=1721413175;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KKMCYCzDYgAQWtJcWkTOSu/4dLuYklirnMqLgBTOVPk=;
-  b=V0ThYGgBwdfMzgLwh9rnogR5mc+b0AvObT7sYgfy8f9xkNFoVuMSwSHt
-   HsW70dAaUQZnlABpuLcrwhK1Xq6YSASlDDLNeRHJqY/zfEeR06fKC9oL7
-   lEXX607n2UT8GywYCid8rItttx2h8T7QNVNOn04Ex1QVhOwDXK4Crl9FD
-   VGkZwSjuSmfLQOZ8P8YK/ewUgNplkvaz5tS5NnamEwKJOIhn223fZtPAa
-   +d1z0zrgdlMqL1gMyWcj32yCrylucODakgipKKNd5dS8rO+VU7mZIsY5r
-   RCyrecc150yB1inEeJ2CnG9V0flR5CF2byoQjzUgQJF21nGM0cXy/mOna
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="369499504"
-X-IronPort-AV: E=Sophos;i="6.01,219,1684825200"; 
-   d="scan'208";a="369499504"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 11:19:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="718529349"
-X-IronPort-AV: E=Sophos;i="6.01,219,1684825200"; 
-   d="scan'208";a="718529349"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga007.jf.intel.com with ESMTP; 20 Jul 2023 11:19:33 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 20 Jul 2023 11:19:32 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 20 Jul 2023 11:19:33 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 20 Jul 2023 11:19:31 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D497319BA6
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 18:19:20 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2095.outbound.protection.outlook.com [40.107.243.95])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0912D40;
+	Thu, 20 Jul 2023 11:19:17 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZHZ2uOjI/bWnApJX43ntFx8CQqPXmsPzZKU113rZdYzVST0n+ypDUbuQCwtZJ01Y1KjJvGBx+r4dOS+uUHszACXpjCzIZ58H5qA9bzFqHgwHk0ZxsCHk6INPtF3T9LN5LOxxcuUpQKr2TQJ0v9K35xMLpScCgHFb7Do5Ds2bB5Hf10TXfbM4rSueF/vtJxc9YxAq0urur+KHWOgRzbrr6ldCtcYlDH6CHP4QigeTU71NLd0jOd2ZKSTRHu69HQD7nT7soprFhKYDgsVGK0zB7FhwrhdCYQMfOtJ5zx3PXdVwbhQKE3SpUgt9KJCHDnOH6DtJsaoa1t7tY3BduKsMqg==
+ b=IjwqDMV72pzvfm7aDhp58lu25Vt/khHG512if65YAZTimAOT+q0v2QS0HnBoeMe5RxUnZwIxEfCqg7S0QsKP3VxKvf718dexR6mA9gXJuYCCelC8eQ34RK7hQxOhf6sGJ62SKWD37k7Jlo5CvU9OWo3UR14TPxlTRZI1e/hWG3j1x9N9sapbwVdRix0tzKKDhGL0wzaWHewkjLVPZFcDOhyxyhQfF0ByctDAopurg+NVIRfk/GGlWvcj3IIX3ga0pF6OGCcDW+v1MFHVHvXTWITMC49gCbRGvmW2Nztdq4iPjiB5Tb89ZJd/UqIUtfMTWYVxfWD6lKoF6B2HZ4t7tg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lC3QgDpzpLnXPoqFWYt5oEYlS/8PeUPYjB/kmW7F03I=;
- b=Lizc2F6yNzpkAQgh9NOPi1qdQjheOoq1pPtQjQVZhNQtYRklMjPry5yVN/gpk8ysmY0MjT7rs2hZ4OsBxLhcxwvjPaAX/zykQGmdw+idf7HUz0PwlCf73r/9qQTfCN8yyci2NB/w/0894iypFZrJNQYa5YQ5NQxPl1Q+AtNKNrONnnQqpJv93pZbiEtvxew7e4vf4b3OjxgFd83nCkcgPWHZ9+BpEU/5kjcfE1u0dKtWeok6gNFPyzBcmwMGVqqdUaAiXHr4TWT/T28P7y2x10a3Yu18KLj1fopd7p72FdhOqTyOwY4FNDTRrYJ6k4AriIondPW0f6GXJiXJQLNKuA==
+ bh=EaR8rJCQA5TUOOuZQFIXz8CJ1lqGguNQsOTOy1MMFB8=;
+ b=XZ084WZc/zMGIZo+ApWHsi/V/S7O1KMTfQa5MuVOP7nda+DSd7p3N5E+zFBJPRgZKzsEz1XCVlwbMwrRmadZKde0WGbQWyqQTbongP7vaczTExj7Rp6ZAVMI/0k3tziOFCByFKYPak35GNPz3lgopG6kLFgpQGQNeOQATt8K1sPiHt5rvpJVb+M/mUy18OEchD7o+GTZ45MKeM8yy6ACUo8VFtoB2OE6KkL++Mp/Q8J/WihvLxaAS8qPlEa7VVIfodu6Yp/eHhEUfYa/VDGy0wEiu7kRFbfQIwROsjLjQCzZpjT/TEU2F5S+WDztLgWMda2dPybfVjXLsOYiJrAQEg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EaR8rJCQA5TUOOuZQFIXz8CJ1lqGguNQsOTOy1MMFB8=;
+ b=BxQDwRmCInHTboBx52SDzOPINLJfkMqUQsZqp5CVk9QEpN4KzMlLZtixaeFPbqi7fFtj+B3uRWJxN0/MRTKnZOG0Gk9eRnUN+CESgtWjoG9nqQThUF0Bq4tKJWxGUAatVcXNOeYN1NfrPdh5VPR3zUPSC2TDfJiPF34etUVu9Rw=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by DM4PR11MB8201.namprd11.prod.outlook.com (2603:10b6:8:18a::5) with
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY5PR13MB3617.namprd13.prod.outlook.com (2603:10b6:a03:21b::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Thu, 20 Jul
- 2023 18:19:28 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6609.024; Thu, 20 Jul 2023
- 18:19:28 +0000
-Message-ID: <77b0bd8a-0168-f7c1-9aa0-a40359d2f075@intel.com>
-Date: Thu, 20 Jul 2023 20:18:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net-next] page_pool: split types and declarations from
- page_pool.h
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
-	<linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
-	<gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
-	<leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
- Fastabend" <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, "Lorenzo
- Bianconi" <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, "Shayne
- Chen" <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, "Kalle
- Valo" <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-References: <20230719121339.63331-1-linyunsheng@huawei.com>
- <0838ed9e-8b5c-cc93-0175-9d6cbf695dda@intel.com>
-In-Reply-To: <0838ed9e-8b5c-cc93-0175-9d6cbf695dda@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE1P281CA0347.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:7d::19) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25; Thu, 20 Jul
+ 2023 18:19:13 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Thu, 20 Jul 2023
+ 18:19:13 +0000
+Date: Thu, 20 Jul 2023 19:19:04 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Add partial ACL
+ support for ksz9477 switches
+Message-ID: <ZLl6mF8iKBD/OeHb@corigine.com>
+References: <20230719111930.515070-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719111930.515070-1-o.rempel@pengutronix.de>
+X-ClientProxiedBy: LO4P123CA0395.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18f::22) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,111 +78,255 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DM4PR11MB8201:EE_
-X-MS-Office365-Filtering-Correlation-Id: 55e49f74-eed5-47ae-7f93-08db894dda90
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB3617:EE_
+X-MS-Office365-Filtering-Correlation-Id: b0c49f2e-9014-4c71-cc4c-08db894dd1f0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hRb+ZVc+dk9LuaMfHmdpFc3U9KrWv0FeXQDTEjsKhDjzWiIvXa5aDGs/Ngl4Vyz4RbQy0VPBOtAjAyLJl/Jyo4B9zFjduSDtk/dc1fE2S2DphiItlipQ5+yd7ZiCUr6pwHxdpYXOiHK9zCrbrUbUdp9bgKV/+RViyywwH7vyRzuxXcVQXEmRJwtfT8XMiRbgaZKMsfx4FbZPPRGYGbcJX9kn/MFxwEm1PPFx1pTuu+QerBKCkGjmQLhyvidrRNWRNisA+UF0GJ0Yy0y0FaskFuvQ/3azCNVNsGqe8WcJypO4f5RG/OC/z+Utr9TaE+l4LN4SUbISLsJeT37sdjY3Ijv7l6MoNujYW4K1GC7MGWSvgTGRETKzlPb1GQN697vguUILW+g8xKMVg8ecHlEb2xrXe47nlWYEa97iBwnsWai/fHpGqhpAnWkMHfdMcpglpGTUYYlTQD2CamPUVgKa8HFfuGtMBCj3eLd8uc8pMd1qqyVhFNuPrYAYa3z4tga7kYfrXotgDvyb2i3TRUy3FiCbNAackx6G/roR2EZMvxiOX3qHOba2tIrDwmOijX3BDU73UVQCaxsbC2S9BJsdKY8gdJxAdhvtYOmq16at254jcU7wKHD6lUcV3Nlsbr4mC3n2+b4zLXMCKHqhAovJeA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(346002)(376002)(366004)(396003)(136003)(451199021)(478600001)(2906002)(6512007)(86362001)(82960400001)(26005)(6506007)(2616005)(38100700002)(31696002)(5660300002)(7416002)(54906003)(66556008)(7406005)(36756003)(8676002)(6486002)(6666004)(66476007)(66946007)(6916009)(8936002)(316002)(4326008)(41300700001)(186003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	valxGXFU5vNQNTSYCjPLsA8923Ag5Dq9z4ehsDpVXuzvPwJa/4UJsOBXZbD3jyB7TlGfRen8XzORYSJ0mmU2RsGHKla+6PZXw2TA7MMmx0ZghDnUf+kzdIvmoI1SBvTxmgTg6W7NhDEZ1RMpqeBZTP6wjRpSBZVzvr0lqbpmXHdxMkIYuhLzPeI9qw/KK8Xud4vBpE7dsytlTbzle5cLIM0w8pTqtkK1WyijaRBOlFzr5zAGxGLFd3AjGEtVZiSNnaIRhQpNOA8TXIgclbP09SrFgaLLgTe/W8++j+NlUx8KysgM2BU8JpwBwffQSmpUc7hkZZWbdQhyle3uPVhAlSlwIgZhWTojolQOt+Q4y/1t3jTUg1D12OkAE5/f/TBoqfYY34RqF7fDZ95Q53WfSbi22FEjl2R2LK8MSGFjtER5ExFgKvRsfSk+xULS2A5AAd366C97Ri3pSDBPLIDWw8v0mc12RoDO805XQ7rCSHe3Y4936jAPssMxFjkfogG4zJ7O1YIZ/uSSql6fkCPZH/eWgJkBWrMd60zUeBEIKY/fZ8mBmjRMs709lWzCbA6HRxfB17UiJez/VHFyvN9NSiZ+UWrIy+fxYg+vAh3Mjxk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(39830400003)(366004)(376002)(451199021)(6916009)(66476007)(26005)(55236004)(6506007)(4326008)(66946007)(478600001)(66556008)(54906003)(6486002)(6666004)(36756003)(86362001)(83380400001)(186003)(2616005)(316002)(8676002)(5660300002)(41300700001)(44832011)(6512007)(2906002)(8936002)(38100700002)(7416002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TkNmSnNMbWJUUmg5aHlsN0dPcjZvT1diUXhEWjY3S1Q2VDBUeXZkSVYvTE4z?=
- =?utf-8?B?T3p1NnlHZVdRYUIzeUp3SEpZWlpIakVUK2NOVUFqZkg5dFJOc1FMY0tWUHF3?=
- =?utf-8?B?RkgvTXpZaDVFNzZzcnNaQ1k4eDMzRVJTc3NOTlJaVzkybUpwSzBBeVd5YVR4?=
- =?utf-8?B?cVNuc3lLNmp1MytRZ3hsU2dsOWJGS2FiVE5HYUpHMGNmVDZ0eUFGYVJHRU9G?=
- =?utf-8?B?T3FEaFErcitPWjU0UWFNRi9uL3lPU0lNN1oweUlMK08wVVR4TisyQS8rN0xj?=
- =?utf-8?B?c1BoYWZ5MG5CNTljd2w4aGd6dnhCTEhZc3VMV2NRTjlXdDJVZUlNcitIREE1?=
- =?utf-8?B?NWpOREdkZHZtR2RhNHR1dVROZyt2dTl6aHROSkNqanlrc1dQUTZ5clppdUwr?=
- =?utf-8?B?K0ZsOXFLcVJqSUxydzFvRWNFTWRmbGR2RFVaUXpxaldYOWtvbldMWUFRR1lQ?=
- =?utf-8?B?V3JxOHdyeTduNWhrcFVVM25YMFE2Zmx5LzZzNldCazRDZWRJNkZ4WktEbkhJ?=
- =?utf-8?B?amQyNmJmaWswNkVGY3BNbkVIazBzVDhkblVQd3ZrUTdSVE5SZkNXRlAzUmhU?=
- =?utf-8?B?TmUweWVrTklUVXBCTFd3aU0vZS9MbFZKRWJ4eUgzYTF5R3JhSDFSbUM0RXpG?=
- =?utf-8?B?RFltaTRBSEFkWWdTbXFzMURjaG5rLzBTMlFIbFkwajZsTi9EdEZUK3lxYW05?=
- =?utf-8?B?ZVZmWnZVdDhsNm5DMTRPamJ3RUorN3lQSGt6aEJVVUFHNDVvOFJhTldDcXFI?=
- =?utf-8?B?VmYrUmlIMXE0T3Z0dytqUnM2SjRIOXhwRVJkeWZsejVQWE1rSTYyV1FvRXBM?=
- =?utf-8?B?TEQyb25rVDlkZ1Jldkt2aGtIWHdUSlpJL0VVNDhvNXlaQTk2eldINmg5Y0Fp?=
- =?utf-8?B?b25pWndMVmN0YmdTVnhPWjlLVDgyLzRRdm50MitUUGxUakpTR29qOGcwazNp?=
- =?utf-8?B?WU8wL3RROTE1ZzBmeFBhcVNSbmpnS1BPK2xlMGt4MkFVdXl3YWJaWWN4UWp3?=
- =?utf-8?B?T2UxTWR1VExjWkltQWVLSU9CbFhqdVRPRzJmbjVkU1dFQ3ZzYnExbWZ6dEc3?=
- =?utf-8?B?TFBReEVIcTBTbm96UGx1ZjF4N0hPc0taQjVVL0ZYUkdMdVM1aEpTcE44bnUz?=
- =?utf-8?B?cUk0QVhJOXg0SEc4TEJObEd1bWVYUHp5T2R2NmIrSE5zUUdyNGhsTS8rZnpM?=
- =?utf-8?B?dXoyYlk5bWZVTU1XRGY4RS9LeG5hRUFQa1pleElPVlpld3h1eUJxWlFRaUti?=
- =?utf-8?B?M1NUS0RFTnFDNkV2UDBRQ2x0RE4rcXBpcUVEMGVXaG4zc0xFTThPRkpJN3hI?=
- =?utf-8?B?MmUyeTJDRmE3cFplaUh2d2txUzlZS05NZWh6WVN2Y3Q2OFRsNitBZnlScEUy?=
- =?utf-8?B?MTUySWJvKzJDYUFMNGlmN3lmZ2F1UXhqUDc3dWlWZnR5azM4b1NxK0I4Ny9M?=
- =?utf-8?B?SURmTlQ5bWZ3Uk5nRHJRUEtqWDhpRk1MVW0yL3dpRkVTOU40WkVjZHVyVlZK?=
- =?utf-8?B?OXdQNmtEQXR4dTRHL1NpOEFlSW9sOVVkVGl2ZzVoTFNoSE1mS08yMEV0d1Ni?=
- =?utf-8?B?RWJaT1A3bnFsV3RFTGlSS0NKMmZpU2tZNFQxYkY0djNwdk42WVZ6NzZVaW5W?=
- =?utf-8?B?SVBBNGhMU3liTHZpWjVMMC9rYW5SRkgwWTlSTXhqU1c3NXJRZkI5RGJTbEVi?=
- =?utf-8?B?eU12OUt1T1RFcE5wVWkyZ09lK3JiS0ErK1I5MFhhVlRXM3pLd204N20rcVY1?=
- =?utf-8?B?OVdLeTVVeENHOFpJMnE1eWM3aHBGVG1Vb3BNMWR4d0FqMnpEbVlTWmVCRm5y?=
- =?utf-8?B?MFJZaVZ4T1RFQnhGa3E4Wkczc2ZoVGhRWk0xUWFRWER5d3B4Tk93WkxYMTl2?=
- =?utf-8?B?ZjhidWh4NFM0aGczNm1LMmI2eFA4djM2aE1GSllBakwzbER0VnNSMkFJWVd5?=
- =?utf-8?B?Rzd4N083Y2M5VElnWGhXbFk2cnpQbG1EL2tEbnJCVG12L3VVZGxwVVRWVlI5?=
- =?utf-8?B?UVdCcTFVVFl5V1JCTHhFZkNUQ2FJeUZBZ1UzME5qYTk3cUErT2dXZWI5OS93?=
- =?utf-8?B?a3dTS3RnSnFPUGZxYWFWeCtLbi91S2cxeWd4RUt3ZStYV2E2alRLMDd1Smxk?=
- =?utf-8?B?YVNYL1J5YUhhZzJMSVV5NEcwRHk5VGxjS2lmUVl6cFJiMTZVSFhWMTdIdll4?=
- =?utf-8?B?NWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55e49f74-eed5-47ae-7f93-08db894dda90
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?xs6MIFLC4PS9ySRFdonrXT5YFbUVtY5ZuS5sxnhNNfOxF9ri3Rsyc4v6GqxB?=
+ =?us-ascii?Q?/yIfCjvsycIAMm9D5WMFhQo8RTljGipQJs0ZEo/DAjFmkIErF53F8DxP7QWo?=
+ =?us-ascii?Q?jIDdps6epiXmAXIqi0uD+bnxBN2HrRDJxRSINd1Qbvx2TO8ReqUPF3iuDwJ/?=
+ =?us-ascii?Q?prHCBWjxOXfCNwYvv6kAXPlE4aKNU1Cbrhj/if7jP7pXA4XwvGTYjsjq4ca1?=
+ =?us-ascii?Q?rU52SeWHsXEgqw4v64sz4ytxGaHXt6aN+/9j4czkfngRbbweAFZREtoisfZ8?=
+ =?us-ascii?Q?RUYvPAjWpyYn/YbzfCCQe8Ll3ICOecVtMLRtfn7tEsqhp6KyP7F1UXFI1nPx?=
+ =?us-ascii?Q?rq1W7D7YRDjst8ZNJm0D2DbmfPz9SZAyYYzZyYVaoMWbdvsbqBWDL0+gDUCY?=
+ =?us-ascii?Q?RAH4OfnsbtcUgSK5kZHFugY/La0vOo40a1YnkvFY67ujgzB5Dmf+MPZ6qZns?=
+ =?us-ascii?Q?zolRJiZ4L+KhtNv+N4ipz2lQwT6M2oZvAjApw84bBlsFxaTwaEnss1T/UiQO?=
+ =?us-ascii?Q?ed2bywgrCwcq4h1QLH1+wevxG6A75gjB0yItdgme5Xol/BI1SDehWztyLU4g?=
+ =?us-ascii?Q?eisPErfPHUHSWvPCTN/7+W0NzWo21Dz6QZLve1aFhy+59RT3GxgIe7nArWs1?=
+ =?us-ascii?Q?d54s+8N9nErcpptD6Lr+nHtQbTAckWr041aarKOU1Mxfx3iddN89GuAlAidz?=
+ =?us-ascii?Q?f/wUHQPF9RZ1ZgbJuZMr2XtDIbJGGQ4G+gEBwks2ID5zhHM+sqtfIwVs7cDN?=
+ =?us-ascii?Q?dpWPzRYjARi0vy9dp0m3upcJ9mdNFsWAHpoGt/aEtZqE/E0Sc/cjcv/G+/mY?=
+ =?us-ascii?Q?L6Kop9oRH+3qmd6FjZKB0UdHscQp4fgqkIiLdmotxBFJZTAPTcyfxfpt0Nlz?=
+ =?us-ascii?Q?367vtd9ox2ltrG+v6MyAiHtgq6iSUN0QYzSYYqmhFKl8MgFFGSKc5RGi9piC?=
+ =?us-ascii?Q?HYSZivYbdK+lPyac6eVjms8E+7NzFB4VLWiQnfe1IsG7mWAmuuiFhWFtCv2/?=
+ =?us-ascii?Q?iqv4Z95qb8IwqQiudvIdvxfNDWoYosoDlpj+67fxzKiWa04faXf/JVvJJcZD?=
+ =?us-ascii?Q?bUcdde3ER1HGFvwdK8gdcCsGCYewzsz+wqg0z+a1DQA6JGdWYvE+BLjlnTiu?=
+ =?us-ascii?Q?eAyZDaMqVc0MCrCve9E0+xgekWu/Kzg5M29qu1okAKsio+c+dS7paw55CMlU?=
+ =?us-ascii?Q?2CdcDPOjrDv2X6TJD8yWI2RU0sEpW/d4fweXk9u2t/b06HQEJcJ8q5sxvLCm?=
+ =?us-ascii?Q?D7Ehr+cYTJ0Cscnx+pWXVej+BfXEop97rJaYlfimCWzbGo6RwjTMhCEN7Dnz?=
+ =?us-ascii?Q?XPLWxWF62PZNAOZVdi00ixwqKZdV8UBxGyZho1r6rcnYmuQVumph9qFwzmyD?=
+ =?us-ascii?Q?ECe8NT6jYmX5yzFHrLd+zEBKyx6hFvX4eKpaowm8/BiHy/PGVfn6WqHHBr88?=
+ =?us-ascii?Q?B2XYZZvKYiqmXT0AcD3kX7Et1g+d136qcPRF3xPm/gKxK12M3I4lmDFd7f0f?=
+ =?us-ascii?Q?XmIGSL6Rh5DW4jsNPah9/i3nD+tJSbwUFQ7KRDBRS7sd7vgfuVymgsNwVOgV?=
+ =?us-ascii?Q?Yvi/RmdEpujOkPUnPEVLczJg12gJavqiZj50kC/RH98cC6/FsFX0IxIEF/hj?=
+ =?us-ascii?Q?fg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0c49f2e-9014-4c71-cc4c-08db894dd1f0
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 18:19:27.9197
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 18:19:13.3992
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zAV6TQDCCyE7hmtUyPmYH7usq2TxYTTvEqJtktfa5xPcRwnL232Y0v70JP+sqbc9lUyMNJXUZxd1YCe3OMZZgSyBSRoLll/nHhAxQSz1Hqc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8201
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: poeMcFDkTim8C4uUy0P48mLSmUaOojiM/FalYsCGXVE0XLvsf9V2tngUAZavrCG2mcoQbUc4YzINCVFFIrLfv+HDNIaDBmlSRDdxknhFuBs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB3617
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Date: Wed, 19 Jul 2023 18:42:17 +0200
+On Wed, Jul 19, 2023 at 01:19:29PM +0200, Oleksij Rempel wrote:
 
-> From: Yunsheng Lin <linyunsheng@huawei.com>
-> Date: Wed, 19 Jul 2023 20:13:37 +0800
-> 
->> Split types and pure function declarations from page_pool.h
->> and add them in page_page_types.h, so that C sources can
->> include page_pool.h and headers should generally only include
->> page_pool_types.h as suggested by jakub.
->>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Nice!
-> 
-> Let me take it into my tree, I assume it's safe to say it will be
-> accepted sooner than my patches :D
+...
 
-FYI: it's already there (since yesterday), including your hybrid
-allocation series, so for the next revision you could take it from there
-to not rebase it one more time :)
-...except that seems like I have to rebase it once again now that you
-change the patch to add new folder as Jakub asked.
+Hi Oleksij,
 
-(it's still the same iavf-pp-frag)
+> +/**
+> + * ksz9477_acl_port_enable - Enables ACL functionality on a given port.
+> + * @dev: The ksz_device instance.
+> + * @port: The port number on which to enable ACL functionality.
+> + *
+> + * This function enables ACL functionality on the specified port by configuring
+> + * the appropriate control registers. It returns 0 if the operation is
+> + * successful, or a negative error code if an error occurs.
+> + *
+> + * 0xn801 - KSZ9477S 5.2.8.2 Port Priority Control Register
+> + *        Bit 7 - Highest Priority
+> + *        Bit 6 - OR'ed Priority
+> + *        Bit 4 - MAC Address Priority Classification
+> + *        Bit 3 - VLAN Priority Classification
+> + *        Bit 2 - 802.1p Priority Classification
+> + *        Bit 1 - Diffserv Priority Classification
+> + *        Bit 0 - ACL Priority Classification
+> + *
+> + * Note: current driver implementation sets 802.1p priority classification
+> + * by default. In this function we add ACL priority classification with OR'ed
+> + * priority. According to testing, priority set by ACL will supersede the
+> + * 802.1p priority.
+> + *
+> + * 0xn803 - KSZ9477S 5.2.8.4 Port Authentication Control Register
+> + *        Bit 2 - Access Control List (ACL) Enable
+> + *        Bits 1:0 - Authentication Mode
+> + *                00 = Reserved
+> + *                01 = Block Mode. Authentication is enabled. When ACL is
+> + *                     enabled, all traffic that misses the ACL rules is
+> + *                     blocked; otherwise ACL actions apply.
+> + *                10 = Pass Mode. Authentication is disabled. When ACL is
+> + *                     enabled, all traffic that misses the ACL rules is
+> + *                     forwarded; otherwise ACL actions apply.
+> + *                11 = Trap Mode. Authentication is enabled. All traffic is
+> + *                     forwarded to the host port. When ACL is enabled, all
+> + *                     traffic that misses the ACL rules is blocked; otherwise
+> + *                     ACL actions apply.
+> + *
+> + * Note: we are using Pass Mode here.
 
-> 
-> BTW, what do you think: is it better to have those two includes in the
-> root include/net/ folder or do something like
-> 
-> include/net/page_pool/
->   * types.h
->   * <some meaningful name>.h (let's say driver.h)
-> 
-> like it's done e.g. for GPIO (see include/linux/gpio/)?
-> 
-> Thanks,
-> Olek
+kernel-doc gcc-12 W=1 and clang-16 W=1 all complains
+that there is a duplicate Note section in the above.
 
-Thanks,
-Olek
+...
+
+> +/**
+> + * ksz9477_acl_matching_rule_cfg_l2 - Configure an ACL filtering entry to match
+> + *				      L2 types of Ethernet frames
+> + * @entry: Pointer to ACL entry buffer
+> + * @ethertype: Ethertype value
+> + * @eth_addr: Pointer to Ethernet address
+> + * @is_src: If true, match the source MAC address; if false, match the
+> + *	    destination MAC address
+> + *
+> + * This function configures an Access Control List (ACL) filtering
+> + * entry to match Layer 2 types of Ethernet frames based on the provided
+> + * ethertype and Ethernet address. Additionally, it can match either the source
+> + * or destination MAC address depending on the value of the is_src parameter.
+> + *
+> + * Register Descriptions for MD = 01 and ENB != 00 (Layer 2 MAC header
+> + * filtering)
+> + *
+> + * 0x01 - Mode and Enable
+> + *        Bits 5:4 - MD (Mode)
+> + *                01 = Layer 2 MAC header or counter filtering
+> + *        Bits 3:2 - ENB (Enable)
+> + *                01 = Comparison is performed only on the TYPE value
+> + *                10 = Comparison is performed only on the MAC Address value
+> + *                11 = Both the MAC Address and TYPE are tested
+> + *        Bit  1   - S/D (Source / Destination)
+> + *                0 = Destination address
+> + *                1 = Source address
+> + *        Bit  0   - EQ (Equal / Not Equal)
+> + *                0 = Not Equal produces true result
+> + *                1 = Equal produces true result
+> + *
+> + * 0x02-0x07 - MAC Address
+> + *        0x02 - MAC Address [47:40]
+> + *        0x03 - MAC Address [39:32]
+> + *        0x04 - MAC Address [31:24]
+> + *        0x05 - MAC Address [23:16]
+> + *        0x06 - MAC Address [15:8]
+> + *        0x07 - MAC Address [7:0]
+> + *
+> + * 0x08-0x09 - EtherType
+> + *        0x08 - EtherType [15:8]
+> + *        0x09 - EtherType [7:0]
+> + */
+> +static void ksz9477_acl_matching_rule_cfg_l2(u8 *entry, __be16 ethertype,
+> +					     u8 *eth_addr, bool is_src)
+> +{
+> +	u8 enb = 0;
+> +	u8 val;
+> +
+> +	if (ethertype)
+> +		enb |= KSZ9477_ACL_ENB_L2_TYPE;
+> +	if (eth_addr)
+> +		enb |= KSZ9477_ACL_ENB_L2_MAC;
+> +
+> +	val = FIELD_PREP(KSZ9477_ACL_MD_MASK, KSZ9477_ACL_MD_L2_MAC) |
+> +	      FIELD_PREP(KSZ9477_ACL_ENB_MASK, enb) |
+> +	      FIELD_PREP(KSZ9477_ACL_SD_SRC, is_src) | KSZ9477_ACL_EQ_EQUAL;
+> +	ksz9477_acl_set_reg(entry, KSZ9477_ACL_PORT_ACCESS_1, val);
+> +
+> +	if (eth_addr) {
+> +		int i;
+> +
+> +		for (i = 0; i < ETH_ALEN; i++) {
+> +			ksz9477_acl_set_reg(entry,
+> +					    KSZ9477_ACL_PORT_ACCESS_2 + i,
+> +					    eth_addr[i]);
+> +		}
+> +	}
+> +
+> +	ksz9477_acl_set_reg(entry, KSZ9477_ACL_PORT_ACCESS_8, ethertype & 0xff);
+> +	ksz9477_acl_set_reg(entry, KSZ9477_ACL_PORT_ACCESS_9, ethertype >> 8);
+
+ethertype is big endian.
+But host byte order math is done on it in the two lines above.
+This doesn't seem right.
+
+...
+
+> +/**
+> + * ksz9477_flower_parse_action - Parse flow rule actions for a specified port
+> + *				 on a ksz_device.
+> + * @dev: The ksz_device instance.
+> + * @port: The port number to parse the flow rule actions for.
+> + * @extack: The netlink extended ACK for reporting errors.
+> + * @cls: The flow_cls_offload instance containing the flow rule.
+> + * @entry_idx: The index of the ACL entry to store the action.
+> + *
+> + * This function checks if the actions in the flow rule are supported by
+> + * the device. Currently, only actions that change priorities are supported.
+> + * If unsupported actions are encountered, an error message is set in the
+> + * extended ACK.
+> + *
+> + * Returns 0 on success or a negative error code on failure.
+> + */
+> +static int ksz9477_flower_parse_action(struct ksz_device *dev, int port,
+> +				       struct netlink_ext_ack *extack,
+> +				       struct flow_cls_offload *cls,
+> +				       int entry_idx)
+> +{
+> +	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
+> +	struct ksz9477_acl_priv *acl = dev->ports[port].acl_priv;
+> +	const struct flow_action_entry *act;
+> +	struct ksz9477_acl_entry *entry;
+> +	bool prio_force = false;
+> +	u8 prio_val;
+> +	int i;
+> +
+> +	if (TC_H_MIN(cls->classid)) {
+> +		NL_SET_ERR_MSG_MOD(extack, "hw_tc is not supported. Use: action skbedit prio");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	flow_action_for_each(i, act, &rule->action) {
+> +		switch (act->id) {
+> +		case FLOW_ACTION_PRIORITY:
+> +			if (act->priority > KSZ9477_MAX_TC) {
+> +				NL_SET_ERR_MSG_MOD(extack, "Priority value is too high");
+> +				return -EOPNOTSUPP;
+> +			}
+> +			prio_force = true;
+> +			prio_val = act->priority;
+> +			break;
+> +		default:
+> +			NL_SET_ERR_MSG_MOD(extack, "action not supported");
+> +			return -EOPNOTSUPP;
+> +		}
+> +	}
+> +
+> +	/* pick entry to store action */
+> +	entry = &acl->acles.entries[entry_idx];
+> +
+> +	ksz9477_acl_action_rule_cfg(entry->entry, prio_force, prio_val);
+
+If the flow_action_for_each loop iterates zero times then
+prio_val will be uninitialised here. gcc-12 [-Wmaybe-uninitialized]
+and Smatch warn about this. But I'm unsure if it can actually happen.
+
+> +	ksz9477_acl_processing_rule_set_action(entry->entry, entry_idx);
+> +
+> +	return 0;
+> +}
+
+...
 
