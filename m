@@ -1,172 +1,136 @@
-Return-Path: <netdev+bounces-19540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BFC075B22B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:15:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A95175B230
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD5111C214A3
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:15:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A411C21450
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E5418B0E;
-	Thu, 20 Jul 2023 15:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6F018B0E;
+	Thu, 20 Jul 2023 15:15:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F10B18B07;
-	Thu, 20 Jul 2023 15:15:08 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A618A26BB;
-	Thu, 20 Jul 2023 08:15:05 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b74310566cso13949591fa.2;
-        Thu, 20 Jul 2023 08:15:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689866104; x=1690470904;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P1l5TEs8O2Bmwb7N0EKATA/T4FRIfe+wkS7cFTHp0KM=;
-        b=oRS5aKZcfXVjCO7ZDsB5uEJ8T9TgkgPinbYgMwGtd6jcRjrRzBnA+oJgYuOsWxk1Js
-         8hqrBFM9EcNaGhzZgFziWlqCOc7inL61Qvinauw2G54bFJSSmlmPY9oPS9K7lOi1rMgV
-         wiceWcw5gJI4MVuvjC2v45ZljaYc2XzHmTe3LGxUVN0DqR21kIQJqmCLlBXEzROSkGzJ
-         asfxqboqmfxdKbYyhV+KElm4VxB6LwZfjTk0Ogjrk66A5VGoLvT25oVDJ6MDu6zgGuvH
-         1kN+/e4NchMZc6QGOZIs031TSN53JgZJhxM5Cc8xmp0+FsRgT6fE3+wxTA8aNNJr4srY
-         nOMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689866104; x=1690470904;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P1l5TEs8O2Bmwb7N0EKATA/T4FRIfe+wkS7cFTHp0KM=;
-        b=BZjSbV2qMVYIiCkaqI9uBg9X8lyRIv1E2ThEdkzvsE//tF8mAITH+EeHPcKxqa1oXx
-         twC3/OGyG7BTZ02wvHUPMp3Fz5wlw+zsjSUPkM+Exwn/viUcEnKfrxehoYAI2CXMrc0S
-         yp2EoBWWy2i5HFeEn/13YoRPjeMkUF+DZ09pC5H7Cyr1FGQt8HzkIj18NkCupfwyb5xb
-         OyQU7i7EbFoGo3YjFMqUHa9mqcPspdLSuCPga5Xy6lGvmtt6OrNPvg/Ig6+EX8IQYWjw
-         Iu6eILzRXwRcUv6O1eKbKF73mXMzH9nDYA3nXnoyC+0T5JaXa7cLxYDDARa8x5M9wAff
-         UmWw==
-X-Gm-Message-State: ABy/qLZ+Pt08gR9P2JUAMa3o8/6nbgVP1iE8edKzWlGrvNh6jSH7Unwb
-	/FtuWsq0e5Z6ZqlxfN/TewNmPa7LQ52lRh1qyvE=
-X-Google-Smtp-Source: APBJJlGjV4ErpFCLAKQauNQbw4vr8ehpjn3LJbPIuBAZy8S/+6jqmNPLQ4fok1WXhYuSL3eRuUCe585RyimQLDsDmDA=
-X-Received: by 2002:a2e:8e85:0:b0:2b6:e13f:cfd7 with SMTP id
- z5-20020a2e8e85000000b002b6e13fcfd7mr2781587ljk.4.1689866103479; Thu, 20 Jul
- 2023 08:15:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82E11772A
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:15:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F333C433C7;
+	Thu, 20 Jul 2023 15:15:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689866131;
+	bh=04mRcNWXgjQaxb3drv8PqaZhrLgEK17mnXzAi5oyt+s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YZ7zi/YChc7USpnQSp5T0WNJP3whsLqNWbYH0AXGbZ+OPIel3HkL12V4RKtTgkT3q
+	 12cinlCgxfelVNBEDAe/C0Nug7zGF65Y84fptydiaXuEy/BOgWQmMqwP3Vk3usLG7u
+	 3miKCy4dtQr/lMDbN52RFCxGfNngX2QivUxp114Tc6xZ2qBGdMQLKmuJTze6tSUeSA
+	 t1s8ShqnRBSwyTwAM+xWRnykyxYYelnnPwhfWr7DhahqaYfd2teQXHFSN7bOVgrJj0
+	 z4jdKRMjh1U/oMSe6H9AvAsgbvJy/MGYoL5COk72Gbzu/sIgrRNmoJYLy53QDhrCSF
+	 aJNHRycL1Vrzg==
+Date: Thu, 20 Jul 2023 16:15:26 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: corbet@lwn.net, Andrew Lunn <andrew@lunn.ch>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux@leemhuis.info, kvalo@kernel.org,
+	benjamin.poirier@gmail.com
+Subject: Re: [PATCH docs v3] docs: maintainer: document expectations of small
+ time maintainers
+Message-ID: <20230720-proxy-smile-f1b882906ded@spud>
+References: <20230719183225.1827100-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230719183734.21681-1-larysa.zaremba@intel.com>
- <20230719183734.21681-14-larysa.zaremba@intel.com> <20230719185930.6adapqctxfdsfmye@macbook-pro-8.dhcp.thefacebook.com>
- <64b85ad52d012_2849c1294df@willemb.c.googlers.com.notmuch> <ZLkBrfex1ENbVDwF@lincoln>
-In-Reply-To: <ZLkBrfex1ENbVDwF@lincoln>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 20 Jul 2023 08:14:52 -0700
-Message-ID: <CAADnVQKF3j-_qLM4MWkJKK=ZyPuWrLnmGfgf9BC4zm-4=1qSfw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 13/21] ice: Implement checksum hint
-To: "Zaremba, Larysa" <larysa.zaremba@intel.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "song@kernel.org" <song@kernel.org>, "yhs@fb.com" <yhs@fb.com>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@google.com" <sdf@google.com>, "haoluo@google.com" <haoluo@google.com>, 
-	"jolsa@kernel.org" <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, "Brouer, Jesper" <brouer@redhat.com>, 
-	"Burakov, Anatoly" <anatoly.burakov@intel.com>, 
-	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>, 
-	"Tahhan, Maryam" <mtahhan@redhat.com>, 
-	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="d/z8QjQ7RZYLewHr"
+Content-Disposition: inline
+In-Reply-To: <20230719183225.1827100-1-kuba@kernel.org>
+
+
+--d/z8QjQ7RZYLewHr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 2:47=E2=80=AFAM Zaremba, Larysa
-<larysa.zaremba@intel.com> wrote:
->
-> On Wed, Jul 19, 2023 at 05:51:17PM -0400, Willem de Bruijn wrote:
-> > Alexei Starovoitov wrote:
-> > > On Wed, Jul 19, 2023 at 08:37:26PM +0200, Larysa Zaremba wrote:
-> > > > Implement .xmo_rx_csum callback to allow XDP code to determine,
-> > > > whether HW has validated any checksums.
-> > > >
-> > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > > > ---
-> > > >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 29 +++++++++++++++=
-++++
-> > > >  1 file changed, 29 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/driver=
-s/net/ethernet/intel/ice/ice_txrx_lib.c
-> > > > index 54685d0747aa..6647a7e55ac8 100644
-> > > > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > > > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > > > @@ -660,8 +660,37 @@ static int ice_xdp_rx_vlan_tag(const struct xd=
-p_md *ctx, u16 *vlan_tci,
-> > > >   return 0;
-> > > >  }
-> > > >
-> > > > +/**
-> > > > + * ice_xdp_rx_csum_lvl - Get level, at which HW has checked the ch=
-ecksum
-> > > > + * @ctx: XDP buff pointer
-> > > > + * @csum_status: destination address
-> > > > + * @csum_info: destination address
-> > > > + *
-> > > > + * Copy HW checksum level (if was checked) to the destination addr=
-ess.
-> > > > + */
-> > > > +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
-> > > > +                    enum xdp_csum_status *csum_status,
-> > > > +                    union xdp_csum_info *csum_info)
-> > > > +{
-> > > > + const struct ice_xdp_buff *xdp_ext =3D (void *)ctx;
-> > > > + const union ice_32b_rx_flex_desc *eop_desc;
-> > > > + enum ice_rx_csum_status status;
-> > > > + u16 ptype;
-> > > > +
-> > > > + eop_desc =3D xdp_ext->pkt_ctx.eop_desc;
-> > > > + ptype =3D ice_get_ptype(eop_desc);
-> > > > +
-> > > > + status =3D ice_get_rx_csum_status(eop_desc, ptype);
-> > > > + if (status & ICE_RX_CSUM_NONE)
-> > > > +         return -ENODATA;
-> > > > +
-> > > > + *csum_status =3D ice_rx_csum_lvl(status) + 1;
-> > > > + return 0;
-> > > > +}
-> > >
-> > > and xdp_csum_info from previous patch left uninitialized?
-> > > What was the point adding it then?
-> >
-> > I suppose this driver only returns CHECKSUM_NONE or
-> > CHECKSUM_UNNECESSARY? Also based on a grep of the driver dir.
-> >
->
-> Yes, correct, current ice HW cannot produce complete checksum,
-> so only CHECKSUM_UNNECESSARY for known protocols, CHECKSUM_NONE otherwise=
-,
-> nothing to initialize csum_info with in either case.
->
-> xdp_csum_info is initialized in veth implementation though, but only
-> csum_start/offset, so complete XDP checksum has no users in this patchset=
-.
-> Is this a problem?
->
-> In previous version I had CHECKSUM_UNNECESSARY-only kfunc, but I think ev=
-eryone
-> has agreed, csum hint kfunc should give more comprehensive output.
+Hey,
 
-csum kfunc supposed to be generic.
-If for ICE it fills in one argument and for veth another then the whole
-idea of generic api is not working.
+On Wed, Jul 19, 2023 at 11:32:25AM -0700, Jakub Kicinski wrote:
+> We appear to have a gap in our process docs. We go into detail
+> on how to contribute code to the kernel, and how to be a subsystem
+> maintainer. I can't find any docs directed towards the thousands
+> of small scale maintainers, like folks maintaining a single driver
+> or a single network protocol.
+>=20
+> Document our expectations and best practices. I'm hoping this doc
+> will be particularly useful to set expectations with HW vendors.
+
+Thanks for writing this up, it's great to have this stuff written down.
+
+I had one minor comment from reading through things...
+
+> +Responsibilities
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +The amount of maintenance work is usually proportional to the size
+> +and popularity of the code base. Small features and drivers should
+> +require relatively small amount of care and feeding. Nonetheless
+> +when the work does arrive (in form of patches which need review,
+> +user bug reports etc.) it has to be acted upon promptly.
+> +Even when a particular driver only sees one patch a month, or a quarter,
+> +a subsystem could well have a hundred such drivers. Subsystem
+> +maintainers cannot afford to wait a long time to hear from reviewers.
+> +
+> +The exact expectations on the response time will vary by subsystem.
+> +The patch review SLA the subsystem had set for itself can sometimes
+> +be found in the subsystem documentation. Failing that as a rule of thumb
+> +reviewers should try to respond quicker than what is the usual patch
+> +review delay of the subsystem maintainer. The resulting expectations
+> +may range from two working days for fast-paced subsystems (e.g. networki=
+ng)
+> +to as long as a few weeks in slower moving parts of the kernel.
+> +
+> +Mailing list participation
+> +--------------------------
+
+> +Reviews
+> +-------
+
+> +Refactoring and core changes
+> +----------------------------
+
+
+> +Bug reports
+> +-----------
+
+=2E.I noticed that none of these sections address actually testing the
+code they're responsible for on a (semi-)regular basis. Sure, that comes
+as part of reviewing the patches for their code, but changes to other
+subsystems that a driver/feature maintainer probably would not have been
+CCed on may cause problems for the code they maintain.
+If we are adding a doc about best-practice for maintainers, I think we
+should be encouraging people to test regularly.
+
+
+--d/z8QjQ7RZYLewHr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZLlPigAKCRB4tDGHoIJi
+0vo7AP9SiCGy+w1ylCijiSy5SGDnWjSKXk19XlvB6y46RGchEgD/eDPkXorZb8NH
+dbM/yc7dITacGo/AZysVMhOVCS2KYA4=
+=umN0
+-----END PGP SIGNATURE-----
+
+--d/z8QjQ7RZYLewHr--
 
