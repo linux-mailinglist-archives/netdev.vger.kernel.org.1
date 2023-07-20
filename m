@@ -1,93 +1,111 @@
-Return-Path: <netdev+bounces-19459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07CC675AC3B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:44:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C2D75AC4E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:48:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9478281DAF
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:44:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E971C2134A
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E2C171CC;
-	Thu, 20 Jul 2023 10:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4A6174E9;
+	Thu, 20 Jul 2023 10:48:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964EB19A0B
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:44:08 +0000 (UTC)
-Received: from mail.svario.it (mail.svario.it [84.22.98.252])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B830171B
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 03:44:07 -0700 (PDT)
-Received: from [192.168.1.35] (193-80-203-62.hdsl.highway.telekom.at [193.80.203.62])
-	by mail.svario.it (Postfix) with ESMTPSA id 1403CD90CA;
-	Thu, 20 Jul 2023 12:44:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
-	t=1689849843; bh=sgBAnX/bnW0smJ7IipIBHWNQ6NUGnkY1NoJygIKps5Y=;
-	h=Date:To:Cc:References:From:Subject:In-Reply-To:From;
-	b=w7l5LpPdsiWHPKKP3Ko2iXD88OG/ngfQOn4YRARx86/pQlBza4sThI/K8WRTdrXIz
-	 Qu+akTowh4NcAAmvM3lHxKxanFuyfFWjqRWRYNPXWR7DpVGmj0AAgNXqgljvbtl7B8
-	 XJN4fLQW42OJoNOBHHu2smsfdNvUOwwTgscGBSZUYow7Xm4lFOvm5KnLStZ/yoRMYk
-	 P0D6FYxwtya7LxxBeJlLRZknnP7qtKNY5PaqwBHTrukMPmTXsDH6qU+pjYs9Z7+C9W
-	 nm7PI452Y5I2Gh7MnJil7e3DsgPb2DawJ/VVnCagfnvrDKdm2yt+yM4NtHGq0dXpB3
-	 2t/0BsGb9osPQ==
-Message-ID: <88ab68eb-2ddd-50a7-a9ea-c3e213406373@svario.it>
-Date: Thu, 20 Jul 2023 12:44:02 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3E62F3F;
+	Thu, 20 Jul 2023 10:48:21 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2C71726;
+	Thu, 20 Jul 2023 03:48:18 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fbf1b82d9cso4904175e9.2;
+        Thu, 20 Jul 2023 03:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689850097; x=1690454897;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sz2Sq0S+RXTbDpe9ecyzrk2o3BfrHc1B7uV4sD294ak=;
+        b=loptYpAXNpFv0UzT4EsQ7SlIaYQ2/6hrwYsrM1Sv37QjPXVP/8jSQXbo2fVrM65g2A
+         xP8NDYXIM2oqX1KqnV92D5kQoQzFUgOdrPMQqkLCBElaCnLgPxkJAMW1t/Z1F3rIWDdj
+         /u0oTmwztDWwwhSxIvNdVr+OqiPuiDePJtFtLivNkw1BDh90ixVnbaq9R31M27+HUvdx
+         44AapSy4jete34LLVB4qSEMRZGPZtD1vTgdbYTkShl8DPKNI2piSJdlKnoPgqsy/Omfd
+         uEd65ZQqOpFvk0cN/oRBs9qUTaakYGpcTgsFMFxWmfczuxNazW34hHtizlTFk6CU7IjG
+         1E8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689850097; x=1690454897;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Sz2Sq0S+RXTbDpe9ecyzrk2o3BfrHc1B7uV4sD294ak=;
+        b=JsoXCdI75xU0kvM9b5KWsnAopMKbObaSUUAcGbzlbEWqFbAxcHfvMFcXxFmaTCBn8N
+         +Wj73moPC3Jkifg6QLoMMtMbnxeYLL8DsIWrDRk4t+dlY5WF+18Yns3ncszAySnpMba1
+         yJd4epQtBh5c6xsSmJ7ie2+kGkOjk5+oeGsTC7Nq1Log6Z4VvUC10JpNm31Y2p8H3TOX
+         3c5gC7c88STWIUkcFSE/AnBMJfb0Qq25L7AjEKsRdFH6AuWSi71fXtQGBoNHi/JOcj9d
+         keUcToSkj6XUeZEx/0X1k5b0YAO+pvCJQJjyj5sr8oQ6KuKELdyeB9jiEEyXmE/12J4Z
+         mabQ==
+X-Gm-Message-State: ABy/qLa+8UWYF3hU8GH1jarryEGEhbgnodriMJNeHhUt3PZtl8HLOxw6
+	8h+XaLjmXXA38B60bXGV3vM=
+X-Google-Smtp-Source: APBJJlFa2N27wsuW7LwOxH+2o4ECxN+x3FVslcpd52LhxX4ODZMoN3kZnKpZRv5TSJFEP1CssvKYQA==
+X-Received: by 2002:a05:600c:2150:b0:3fb:be07:5343 with SMTP id v16-20020a05600c215000b003fbbe075343mr4322704wml.27.1689850096684;
+        Thu, 20 Jul 2023 03:48:16 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id p26-20020a7bcc9a000000b003fbc0a49b57sm893454wma.6.2023.07.20.03.48.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 03:48:15 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] selftests/xsk: Fix spelling mistake "querrying" -> "querying"
+Date: Thu, 20 Jul 2023 11:48:15 +0100
+Message-Id: <20230720104815.123146-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>
-References: <20230719185106.17614-1-gioele@svario.it>
- <20230719185106.17614-5-gioele@svario.it> <878rba98fl.fsf@nvidia.com>
-Content-Language: en-US
-From: Gioele Barabucci <gioele@svario.it>
-Subject: Re: [iproute2 04/22] tc/tc_util: Read class names from provided path,
- /etc/, /usr
-In-Reply-To: <878rba98fl.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 20/07/23 12:10, Petr Machata wrote:
->> diff --git a/tc/tc_util.c b/tc/tc_util.c
->> index ed9efa70..e6235291 100644
->> --- a/tc/tc_util.c
->> +++ b/tc/tc_util.c
->> @@ -28,7 +28,8 @@
->>   
->>   static struct db_names *cls_names;
->>   
->> -#define NAMES_DB "/etc/iproute2/tc_cls"
->> +#define NAMES_DB_USR "/usr/lib/iproute2/tc_cls"
->> +#define NAMES_DB_ETC "/etc/iproute2/tc_cls"
-> 
-> Is there a reason that these don't use CONF_USR_DIR and CONF_ETC_DIR?
-> I thought maybe the caller uses those and this is just a hardcoded
-> fallback, but that's not the case.
+There is a spelling mistake in an error message. Fix it.
 
-Thanks for the review Petr.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ tools/testing/selftests/bpf/xskxceiver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The reason why I did not use CONF_USR_DIR in these patches is because I 
-wanted to minimize the number and amount of changes. But I asked myself 
-the same question when I first looked at this and other similar occurrences.
-
-Let me know if I should update the patches to use CONF_{USR,ETC}_DIR.
-
-Regards,
-
+diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+index 3ff436706640..2827f2d7cf30 100644
+--- a/tools/testing/selftests/bpf/xskxceiver.c
++++ b/tools/testing/selftests/bpf/xskxceiver.c
+@@ -2076,7 +2076,7 @@ static void init_iface(struct ifobject *ifobj, const char *dst_mac, const char *
+ 
+ 	err = bpf_xdp_query(ifobj->ifindex, XDP_FLAGS_DRV_MODE, &query_opts);
+ 	if (err) {
+-		ksft_print_msg("Error querrying XDP capabilities\n");
++		ksft_print_msg("Error querying XDP capabilities\n");
+ 		exit_with_error(-err);
+ 	}
+ 	if (query_opts.feature_flags & NETDEV_XDP_ACT_RX_SG)
 -- 
-Gioele Barabucci
+2.39.2
+
 
