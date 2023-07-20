@@ -1,367 +1,258 @@
-Return-Path: <netdev+bounces-19579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45CB875B421
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:26:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F1D75B425
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:26:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFE39281F3D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 16:26:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42FCF1C21409
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 16:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C489419BB1;
-	Thu, 20 Jul 2023 16:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E945319BB2;
+	Thu, 20 Jul 2023 16:26:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBF418C2D
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 16:26:09 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A0C1FC8;
-	Thu, 20 Jul 2023 09:26:02 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id A9A4A60171;
-	Thu, 20 Jul 2023 18:26:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689870360; bh=NEI6e7DDmJGQzGyTC+xQLiypOjyhxqGecFp3wbDma+U=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=vwPCbqQRi/hgnOAoSrGHI4y+TSkWpuE96w9EvRHl5vTkYLvp9/8HnCs4BhYe2chYE
-	 IjrwGWD028ylIcLHv8Y3uJEfCgCNYZFNIbFGFB1Ytr25CCeVeDGQ+ILvyJf/7ZMElI
-	 iUHoH2NeAFmzoLXJCMKaRbyjGkGNx4AJOIETrQMgERwEbhCEmQ/Fzs47lsSExYHVMV
-	 tbyl5s9jLArxsxgQdRQt3UQJLnYOETPnKW/xN28/G2ilz6pyloZ5FcKvCIHCDBQLZ4
-	 pv2a32t3C6QzMKW3uMgiVFGAtGgqdtsWrnkOULuAEWwGoSJPKXxdBBwlqF+9Me9j1C
-	 q8d9zC0rc+/cw==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CLOnXUoUF6be; Thu, 20 Jul 2023 18:25:57 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 924E86016E;
-	Thu, 20 Jul 2023 18:25:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689870357; bh=NEI6e7DDmJGQzGyTC+xQLiypOjyhxqGecFp3wbDma+U=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=T06xtu2TschfPuXRVCylOYeG2OeJra4PNhMl62B9qcq8Bjo5+K1oMfarLKsJdVNeb
-	 HSy27u+ngu3w2QhFWVzxftA7smrwIBrlOjnoeF9Bf8sGF66aoYSgv5Xhq7sjSPfnjk
-	 0mRamR4Cp5PAIdQGOrpdFv0l2VtTc2ih7jjN6YmncFe1boE5aOVyEgRYdgwtqwxpkj
-	 BMg4NViELHEbXtWFr9MZOrrHdOF5ZMJkUnBepMtOwwTtsn5WL4me8s3hiHgoovgTCg
-	 XmSTKqmMalkx4BR/UjnMySoIT4KKEam/e2MkqnIrSY01AW2IKHc/6U7isntLMc5lSW
-	 jDXVy9l5J1kCg==
-Message-ID: <6c871d89-390d-41ae-ef48-6cd12b99fd74@alu.unizg.hr>
-Date: Thu, 20 Jul 2023 18:25:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D845D19BA7
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 16:26:45 +0000 (UTC)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3391114;
+	Thu, 20 Jul 2023 09:26:43 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3fbfcc6daa9so7987235e9.3;
+        Thu, 20 Jul 2023 09:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689870402; x=1690475202;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:to:from:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3MBatkB8B/7dmkT4jPYHcJtlNDAH8uob1P4AD84IQBw=;
+        b=kNKqgGmtprt4qVSwqwHfSKWodkj79lkZACHQcW+pBUqWcLuiLpZ/Lfuubuo/n0gTFr
+         XY9FH1XmRsoA7/3CANPSADWBTawkBFncc+N9G4zI1HxYeNfUxY3oVyyoiS7smgFQ7vAj
+         2izo2C6Is2xVjTTm2sS3XPY4ioPz7v/Y9h1GUZWfhydqsSJy6woyHwxXOqiDoE2TV7OR
+         JE/AeJm32yAWABs1siajP6FOvgGZOptfMOtepkaCFuNwfe73pqY8KLBcCO3p8d6zvXaK
+         78jHlijrvdXVXVCZji3kGU+TYTn5xaCP96TNg13U+gIuk06MJcPJBp2ZKssoGKLlm5yu
+         Wurw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689870402; x=1690475202;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3MBatkB8B/7dmkT4jPYHcJtlNDAH8uob1P4AD84IQBw=;
+        b=YYucT2ipe/hc1mhl5RJ1lqWSQSMRvBRluor78A5KpjHzhVKZCgAN42I3ZYaZH2QKee
+         jLikX+PZpbr73rnT2YZvVD/227eGn9fy1VNinYahnsLKxl/3uDQA4dfq3PcQtpgpnuM7
+         EUWIjqDy3K7/T7S7nbrq+28yTOOMMxNdweFtDbf+I1eT/0czsV5OJsiq3KGey8IAGi2c
+         2TX/3Dklq66IoUciMwjQR328w4JPcZVZ9H0mv8NM2xFgmoaOH9qTVDA3zA2sGLMvbcfF
+         OYA9DNS/T4XuCkRotKF6M1PJa3kdA8S5NMRpwz/GfcJjkgvksYkQyWhhY5N5jmFT6JtF
+         NvLA==
+X-Gm-Message-State: ABy/qLYaTMGTDhUXOwFTD3y+7LxR+/nQw6w43mVe14h+P2uMsdJ7zlkh
+	D8iDBfpwlu3l+HRklMOCzY0=
+X-Google-Smtp-Source: APBJJlE4NNXje+fLTPJ3D3Np2ydW4a+kn24RXNVE7EER6t80YS8KUag+iXNCYxs8aYJvK2neo9UQBw==
+X-Received: by 2002:a7b:c84c:0:b0:3fc:8a:7c08 with SMTP id c12-20020a7bc84c000000b003fc008a7c08mr4873507wml.35.1689870401973;
+        Thu, 20 Jul 2023 09:26:41 -0700 (PDT)
+Received: from debian ([89.238.191.199])
+        by smtp.gmail.com with ESMTPSA id u9-20020a05600c210900b003fbcdba1a52sm4294282wml.3.2023.07.20.09.26.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 09:26:41 -0700 (PDT)
+Date: Thu, 20 Jul 2023 18:26:27 +0200
+From: Richard Gobert <richardbgobert@gmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
+	dsahern@kernel.org, tom@herbertland.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, gal@nvidia.com
+Subject: [PATCH v2 1/1] net: gro: fix misuse of CB in udp socket lookup
+Message-ID: <20230720162624.GA16428@debian>
+References: <20230720161322.GA16323@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PROBLEM] seltests: net/forwarding/sch_ets.sh [HANG]
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>
-References: <759fe934-2e43-e9ff-8946-4fd579c09b05@alu.unizg.hr>
- <87cz0m9a3n.fsf@nvidia.com>
- <580b9f28-7a68-e618-b2d5-b8663386aa12@alu.unizg.hr>
-Content-Language: en-US
-In-Reply-To: <580b9f28-7a68-e618-b2d5-b8663386aa12@alu.unizg.hr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230720161322.GA16323@debian>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/20/23 18:07, Mirsad Todorovac wrote:
-> On 7/20/23 11:43, Petr Machata wrote:
->>
->> Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr> writes:
->>
->>> Using the same config for 6.5-rc2 on Ubuntu 22.04 LTS and 22.10, the execution
->>> stop at the exact same line on both boxes (os I reckon it is more than an
->>> accident):
->>>
->>> # selftests: net/forwarding: sch_ets.sh
->>> # TEST: ping vlan 10                                                  [ OK ]
->>> # TEST: ping vlan 11                                                  [ OK ]
->>> # TEST: ping vlan 12                                                  [ OK ]
->>> # Running in priomap mode
->>> # Testing ets bands 3 strict 3, streams 0 1
->>> # TEST: band 0                                                        [ OK ]
->>> # INFO: Expected ratio >95% Measured ratio 100.00
->>> # TEST: band 1                                                        [ OK ]
->>> # INFO: Expected ratio <5% Measured ratio 0
->>> # Testing ets bands 3 strict 3, streams 1 2
->>> # TEST: band 1                                                        [ OK ]
->>> # INFO: Expected ratio >95% Measured ratio 100.00
->>> # TEST: band 2                                                        [ OK ]
->>> # INFO: Expected ratio <5% Measured ratio 0
->>> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
->>> # TEST: band 0                                                        [ OK ]
->>> # INFO: Expected ratio >95% Measured ratio 100.00
->>> # TEST: band 1                                                        [ OK ]
->>> # INFO: Expected ratio <5% Measured ratio 0
->>> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
->>> # TEST: bands 1:2                                                     [ OK ]
->>> # INFO: Expected ratio 2.00 Measured ratio 1.99
->>> # Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
->>> # TEST: bands 0:1                                                     [ OK ]
->>> # INFO: Expected ratio 1.00 Measured ratio .99
->>> # TEST: bands 0:2                                                     [ OK ]
->>> # INFO: Expected ratio 1.00 Measured ratio 1.00
->>> # Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
->>> # TEST: bands 0:1                                                     [ OK ]
->>> # INFO: Expected ratio 1.42 Measured ratio 1.42
->>> # TEST: bands 0:2                                                     [ OK ]
->>> # INFO: Expected ratio 3.33 Measured ratio 3.33
->>> # Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
->>> # TEST: bands 0:1                                                     [ OK ]
->>> # INFO: Expected ratio 1.60 Measured ratio 1.59
->>> # TEST: bands 0:2                                                     [ OK ]
->>> # INFO: Expected ratio 3.33 Measured ratio 3.33
->>> # Testing ets bands 2 quanta 5000 2500, streams 0 1
->>> # TEST: bands 0:1                                                     [ OK ]
->>> # INFO: Expected ratio 2.00 Measured ratio 1.99
->>> # Running in classifier mode
->>> # Testing ets bands 3 strict 3, streams 0 1
->>> # TEST: band 0                                                        [ OK ]
->>> # INFO: Expected ratio >95% Measured ratio 100.00
->>> # TEST: band 1                                                        [ OK ]
->>> # INFO: Expected ratio <5% Measured ratio 0
->>> # Testing ets bands 3 strict 3, streams 1 2
->>> # TEST: band 1                                                        [ OK ]
->>> # INFO: Expected ratio >95% Measured ratio 100.00
->>> # TEST: band 2                                                        [ OK ]
->>> # INFO: Expected ratio <5% Measured ratio 0
->>> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
->>>
->>> I tried to run 'set -x' enabled version standalone, but that one finished
->>> correctly (?).
->>>
->>> It could be something previous scripts left, but right now I don't have a clue.
->>> I can attempt to rerun all tests with sch_ets.sh bash 'set -x' enabled later today.
->>
->> If you run it standalone without set -x, does it finish as well?
-> 
-> Added that. Yes, standlone run finishes correctly, with or without 'set -x':
-> 
-> root@defiant:/home/marvin/linux/kernel/linux_torvalds/tools/testing/selftests/net/forwarding# ./sch_ets.sh
-> TEST: ping vlan 10                                                  [ OK ]
-> TEST: ping vlan 11                                                  [ OK ]
-> TEST: ping vlan 12                                                  [ OK ]
-> Running in priomap mode
-> Testing ets bands 3 strict 3, streams 0 1
-> TEST: band 0                                                        [ OK ]
-> INFO: Expected ratio >95% Measured ratio 100.00
-> TEST: band 1                                                        [ OK ]
-> INFO: Expected ratio <5% Measured ratio 0
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 strict 3, streams 1 2
-> TEST: band 1                                                        [ OK ]
-> INFO: Expected ratio >95% Measured ratio 100.00
-> TEST: band 2                                                        [ OK ]
-> INFO: Expected ratio <5% Measured ratio 0
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
-> TEST: band 0                                                        [ OK ]
-> INFO: Expected ratio >95% Measured ratio 100.00
-> TEST: band 1                                                        [ OK ]
-> INFO: Expected ratio <5% Measured ratio 0
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
-> TEST: bands 1:2                                                     [ OK ]
-> INFO: Expected ratio 2.00 Measured ratio 1.99
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 1.00 Measured ratio 1.00
-> TEST: bands 0:2                                                     [ OK ]
-> INFO: Expected ratio 1.00 Measured ratio .99
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 1.42 Measured ratio 1.42
-> TEST: bands 0:2                                                     [ OK ]
-> INFO: Expected ratio 3.33 Measured ratio 3.33
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 1.60 Measured ratio 1.59
-> TEST: bands 0:2                                                     [ OK ]
-> INFO: Expected ratio 3.33 Measured ratio 3.33
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 2 quanta 5000 2500, streams 0 1
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 2.00 Measured ratio 1.99
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Running in classifier mode
-> Testing ets bands 3 strict 3, streams 0 1
-> TEST: band 0                                                        [ OK ]
-> INFO: Expected ratio >95% Measured ratio 100.00
-> TEST: band 1                                                        [ OK ]
-> INFO: Expected ratio <5% Measured ratio 0
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 strict 3, streams 1 2
-> TEST: band 1                                                        [ OK ]
-> INFO: Expected ratio >95% Measured ratio 100.00
-> TEST: band 2                                                        [ OK ]
-> INFO: Expected ratio <5% Measured ratio 0
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
-> TEST: band 0                                                        [ OK ]
-> INFO: Expected ratio >95% Measured ratio 100.00
-> TEST: band 1                                                        [ OK ]
-> INFO: Expected ratio <5% Measured ratio 0
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
-> TEST: bands 1:2                                                     [ OK ]
-> INFO: Expected ratio 2.00 Measured ratio 1.99
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 1.00 Measured ratio .99
-> TEST: bands 0:2                                                     [ OK ]
-> INFO: Expected ratio 1.00 Measured ratio .99
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 1.42 Measured ratio 1.42
-> TEST: bands 0:2                                                     [ OK ]
-> INFO: Expected ratio 3.33 Measured ratio 3.33
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 1.60 Measured ratio 1.60
-> TEST: bands 0:2                                                     [ OK ]
-> INFO: Expected ratio 3.33 Measured ratio 3.33
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> Testing ets bands 2 quanta 5000 2500, streams 0 1
-> TEST: bands 0:1                                                     [ OK ]
-> INFO: Expected ratio 2.00 Measured ratio 2.00
-> killing MZ
-> killed MZ
-> killing MZ
-> killed MZ
-> root@defiant:/home/marvin/linux/kernel/linux_torvalds/tools/testing/selftests/net/forwarding#
-> 
->> That would imply that the reproducer needs to include the previous tests as
->> well.
-> 
-> This is entirely possible, as timeouts and CTRL+C events do not seem to be caught
-> and the cleanup is not done ...
-> 
-> sch_ets_core.sh:    trap cleanup EXIT
-> 
-> Some tests time out even after settings:timeout=240, so IMHO this should be taken into account.
-> 
-> Best regards,
-> Mirsad Todorovac
-> 
->> It looks like the test is stuck in ets_test_mixed in classifier_mode.
->> A way to run just this test would be:
->>
->>      TESTS="classifier_mode ets_test_mixed" ./sch_ets.sh
->>
->> Looking at the code, the only place that I can see that waits on
->> anything is the "{ kill %% && wait %%; } 2>/dev/null" line in
->> stop_traffic() (in lib.sh). Maybe something like this would let
->> us see if that's the case:
->>
->> modified   tools/testing/selftests/net/forwarding/lib.sh
->> @@ -1468,8 +1470,10 @@ start_tcp_traffic()
->>   stop_traffic()
->>   {
->> +    echo killing MZ
->>       # Suppress noise from killing mausezahn.
->>       { kill %% && wait %%; } 2>/dev/null
->> +    echo killed MZ
->>   }
+This patch fixes a misuse of IP{6}CB(skb) in GRO, while calling to
+`udp6_lib_lookup2` when handling udp tunnels. `udp6_lib_lookup2` fetch the
+device from CB. The fix changes it to fetch the device from `skb->dev`.
+l3mdev case requires special attention since it has a master and a slave
+device.
 
-FYI, this is the [incomplete] list of the tests that time out even after
-being assigned long timeout of 240s instead of default.
+Fixes: a6024562ffd7 ("udp: Add GRO functions to UDP socket")
+Reported-by: Gal Pressman <gal@nvidia.com>
+Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+---
+ include/net/udp.h      |  2 ++
+ net/ipv4/udp.c         | 28 ++++++++++++++++++++++++++--
+ net/ipv4/udp_offload.c |  7 +++++--
+ net/ipv6/udp.c         | 29 +++++++++++++++++++++++++++--
+ net/ipv6/udp_offload.c |  7 +++++--
+ 5 files changed, 65 insertions(+), 8 deletions(-)
 
-marvin@defiant:~/linux/kernel/linux_torvalds$ grep TIMEOUT ../kselftest-6.5-rc2-net-forwarding-8.log
-not ok 13 selftests: net/forwarding: custom_multipath_hash.sh # TIMEOUT 240 seconds
-not ok 18 selftests: net/forwarding: gre_custom_multipath_hash.sh # TIMEOUT 240 seconds
-not ok 19 selftests: net/forwarding: gre_inner_v4_multipath.sh # TIMEOUT 240 seconds
-not ok 21 selftests: net/forwarding: gre_multipath_nh_res.sh # TIMEOUT 240 seconds
-not ok 22 selftests: net/forwarding: gre_multipath_nh.sh # TIMEOUT 240 seconds
-not ok 27 selftests: net/forwarding: ip6gre_custom_multipath_hash.sh # TIMEOUT 240 seconds
-not ok 34 selftests: net/forwarding: ip6gre_inner_v4_multipath.sh # TIMEOUT 240 seconds
-not ok 58 selftests: net/forwarding: no_forwarding.sh # TIMEOUT 240 seconds
-not ok 67 selftests: net/forwarding: router_mpath_nh_res.sh # TIMEOUT 240 seconds
-not ok 68 selftests: net/forwarding: router_mpath_nh.sh # TIMEOUT 240 seconds
-not ok 70 selftests: net/forwarding: router_multipath.sh # TIMEOUT 240 seconds
-marvin@defiant:~/linux/kernel/linux_torvalds$
+diff --git a/include/net/udp.h b/include/net/udp.h
+index 4d13424f8f72..48af1479882f 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -299,6 +299,7 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+ 		       sockptr_t optval, unsigned int optlen,
+ 		       int (*push_pending_frames)(struct sock *));
++void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
+ struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
+ 			     __be32 daddr, __be16 dport, int dif);
+ struct sock *__udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
+@@ -310,6 +311,7 @@ struct sock *udp6_lib_lookup(struct net *net,
+ 			     const struct in6_addr *saddr, __be16 sport,
+ 			     const struct in6_addr *daddr, __be16 dport,
+ 			     int dif);
++void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
+ struct sock *__udp6_lib_lookup(struct net *net,
+ 			       const struct in6_addr *saddr, __be16 sport,
+ 			       const struct in6_addr *daddr, __be16 dport,
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 8c3ebd95f5b9..85eb9977db2c 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -550,15 +550,39 @@ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
+ 				 inet_sdif(skb), udptable, skb);
+ }
+ 
++/* This function is the alternative to 'inet_iif' and 'inet_sdif'
++ * functions in case we can not rely on fields of IPCB.
++ *
++ * The caller must verify skb_valid_dst(skb) is false and skb->dev is initialized.
++ * The caller must hold the RCU read lock.
++ */
++inline void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
++{
++	*iif = inet_iif(skb) ?: skb->dev->ifindex;
++	*sdif = 0;
++
++#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
++	if (netif_is_l3_slave(skb->dev)) {
++		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
++
++		*sdif = *iif;
++		*iif = master ? master->ifindex : 0;
++	}
++#endif
++}
++
+ struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
+ 				 __be16 sport, __be16 dport)
+ {
+ 	const struct iphdr *iph = ip_hdr(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	udp4_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp4_lib_lookup(net, iph->saddr, sport,
+-				 iph->daddr, dport, inet_iif(skb),
+-				 inet_sdif(skb), net->ipv4.udp_table, NULL);
++				 iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
+ 
+ /* Must be called under rcu_read_lock().
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 75aa4de5b731..70d760b271db 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -603,10 +603,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
+ {
+ 	const struct iphdr *iph = skb_gro_network_header(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	udp4_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp4_lib_lookup(net, iph->saddr, sport,
+-				 iph->daddr, dport, inet_iif(skb),
+-				 inet_sdif(skb), net->ipv4.udp_table, NULL);
++				 iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
+ 
+ INDIRECT_CALLABLE_SCOPE
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index b7c972aa09a7..6dbcadc3bf8f 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -295,15 +295,40 @@ static struct sock *__udp6_lib_lookup_skb(struct sk_buff *skb,
+ 				 inet6_sdif(skb), udptable, skb);
+ }
+ 
++/* This function is the alternative to 'inet6_iif' and 'inet6_sdif'
++ * functions in case we can not rely on fields of IP6CB.
++ *
++ * The caller must verify skb_valid_dst(skb) is false and skb->dev is initialized.
++ * The caller must hold the RCU read lock.
++ */
++inline void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
++{
++	/* using skb->dev->ifindex because skb_dst(skb) is not initialized */
++	*iif = skb->dev->ifindex;
++	*sdif = 0;
++
++#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
++	if (netif_is_l3_slave(skb->dev)) {
++		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
++
++		*sdif = *iif;
++		*iif = master ? master->ifindex : 0;
++	}
++#endif
++}
++
+ struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
+ 				 __be16 sport, __be16 dport)
+ {
+ 	const struct ipv6hdr *iph = ipv6_hdr(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	udp6_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp6_lib_lookup(net, &iph->saddr, sport,
+-				 &iph->daddr, dport, inet6_iif(skb),
+-				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
++				 &iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
+ 
+ /* Must be called under rcu_read_lock().
+diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+index ad3b8726873e..88191d79002e 100644
+--- a/net/ipv6/udp_offload.c
++++ b/net/ipv6/udp_offload.c
+@@ -119,10 +119,13 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
+ {
+ 	const struct ipv6hdr *iph = skb_gro_network_header(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	udp6_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp6_lib_lookup(net, &iph->saddr, sport,
+-				 &iph->daddr, dport, inet6_iif(skb),
+-				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
++				 &iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
+ 
+ INDIRECT_CALLABLE_SCOPE
+-- 
+2.36.1
 
-Hope this helps.
-
-Best regards,
-Mirsad Todorovac
 
