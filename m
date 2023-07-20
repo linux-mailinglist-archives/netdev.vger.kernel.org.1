@@ -1,82 +1,89 @@
-Return-Path: <netdev+bounces-19353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A83375A640
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:23:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB1675A6DA
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 08:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10C78281C2C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:23:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83A161C2131E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 06:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46737443E;
-	Thu, 20 Jul 2023 06:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD8E14AA2;
+	Thu, 20 Jul 2023 06:48:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03F9383;
-	Thu, 20 Jul 2023 06:23:38 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B95EC;
-	Wed, 19 Jul 2023 23:23:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/QvVdhn5LHQNczKlivYbrTWjk8x34Zhu2grRA8NWy1s=; b=AqSaRvK0xTUrt3RAYmXQVISJNF
-	9fpaZHhtQPK35TmTHM694ZKj5Mv5poxHf93oJ0wgkHh9vLBM6+g1KSIeXewLheB1mOgC7VlpjYULy
-	OvlGox3Oq14nNFTGcn0isyoM0WPWTGaQVLOrzdOm6pSFVOSEpCfiBLRWSO4jO1GbQcjynxdkCo93i
-	yR/g+TI8On5I+zW8no3+K71NZa4w59b176DmSyltc+0/ThU+WkRawesYEqLP+5eV4uhwqs3KJ3UKZ
-	Rts+zegC4dyjTWH1/eok0G1U2KYo4JmfP/UoVlQbBaIeUYf21p6UAElCJZjGMPd8ctG+UwzB2umo6
-	Rpi5Kcuw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qMN4S-009vVW-38;
-	Thu, 20 Jul 2023 06:23:28 +0000
-Date: Wed, 19 Jul 2023 23:23:28 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	virtualization@lists.linux-foundation.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH vhost v11 10/10] virtio_net: merge dma operation for one
- page
-Message-ID: <ZLjS4D7urgIK1MxV@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E5214298;
+	Thu, 20 Jul 2023 06:48:07 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F72CC;
+	Wed, 19 Jul 2023 23:48:05 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vnou-WY_1689835680;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vnou-WY_1689835680)
+          by smtp.aliyun-inc.com;
+          Thu, 20 Jul 2023 14:48:01 +0800
+Message-ID: <1689835514.217712-8-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
+Date: Thu, 20 Jul 2023 14:45:14 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ virtualization@lists.linux-foundation.org,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-11-xuanzhuo@linux.alibaba.com>
- <CACGkMEtoiHXese1sNJELeidmFc6nFR8rE1aA8MooaEKKUSw_eg@mail.gmail.com>
- <1689231087.0744615-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEsf4+56veqem1HMWiqYhiW5LVw-1CbWX-cQSN6Z0zYMRQ@mail.gmail.com>
+ <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+ <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org>
+ <ZLjSsmTfcpaL6H/I@infradead.org>
+In-Reply-To: <ZLjSsmTfcpaL6H/I@infradead.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEsf4+56veqem1HMWiqYhiW5LVw-1CbWX-cQSN6Z0zYMRQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi Jason,
+On Wed, 19 Jul 2023 23:22:42 -0700, Christoph Hellwig <hch@infradead.org> wrote:
+> On Thu, Jul 13, 2023 at 10:51:59AM -0400, Michael S. Tsirkin wrote:
+> > On Thu, Jul 13, 2023 at 04:15:16AM -0700, Christoph Hellwig wrote:
+> > > On Mon, Jul 10, 2023 at 11:42:32AM +0800, Xuan Zhuo wrote:
+> > > > Added virtqueue_dma_dev() to get DMA device for virtio. Then the
+> > > > caller can do dma operation in advance. The purpose is to keep memory
+> > > > mapped across multiple add/get buf operations.
+> > >
+> > > This is just poking holes into the abstraction..
+> >
+> > More specifically?
+>
+> Because now you expose a device that can't be used for the non-dma
+> mapping case and shoud be hidden.
 
-can you please resend your reply with proper quoting?  I had to give
-up after multiple pages of scrolling without finding anything that
-you added to the full quote.
+ Sorry I can not got.
+
+ virtqueue_dma_dev() return the device that working with the DMA APIs.
+ Then that can be used like other devices. So what is the problem.
+
+ I always think the code path without the DMA APIs is the trouble for you.
+
+ Thanks.
 
 
