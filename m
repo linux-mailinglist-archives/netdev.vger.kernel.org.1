@@ -1,116 +1,140 @@
-Return-Path: <netdev+bounces-19594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B3875B505
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:53:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E6A775B527
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02C94280E7C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 16:53:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38B331C2148B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B34D2FA3B;
-	Thu, 20 Jul 2023 16:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB662FA3C;
+	Thu, 20 Jul 2023 17:03:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F65A2FA35
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 16:53:10 +0000 (UTC)
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BB4911D
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:53:08 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-40371070eb7so5121cf.1
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:53:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38A82FA20
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 17:03:07 +0000 (UTC)
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93113119
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:03:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689871987; x=1690476787;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ytgbWjweJhYLCQkujVr9P7eLa6/0lY9GgfG60EKI2zs=;
-        b=RWJyFqCQ7De3mfUJyiPpq2IjUpaSQyv9O/ZpmA0wmgeui05ONMJHkRjqsOAo9gzJVy
-         NsaSwOzNInZdITcxaSN7+Y1BPtanop3nuXHkzM3ZUNyVBUsylpyNJk7s2YOUX4XOjHQB
-         400tLyccC9dGN6YEi5SEb6XsfpW9MZxtgqTBSJkabID9vgIbNOhvxBMn3WU3/XEwNMX/
-         hF4E0Xm95W91whakNXoqqGGiZqm4zQkJiv0iOcwMtl+IPbFM57yZq9NfWUoe1gdZN55T
-         jTUPc1XwSiXYnOFSEIWJ3pm0bFS6bjmXzJ8lPq/e1eeUBRMULLIAliVvzSvUscvWax4t
-         7B2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689871987; x=1690476787;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ytgbWjweJhYLCQkujVr9P7eLa6/0lY9GgfG60EKI2zs=;
-        b=bUFjvFW6y6e5LK/7otqMjDGWa0eHZCiBmBRBvu0YNFyiGgzCZxri3A3W41RhXDH8C3
-         Yga3mV5DO2PjWePtDID3YulhBMpgh6wzK1TfxDM+zXcotfcpWf9marokaoiEQFKwxHWk
-         0xKiefkJCDkRn8JCmopyFpJgLuLQQsND+M0wrbz6DSWiHXLujy111oxSlhCaxeU4aiKR
-         VmiFjziIjtVMqTpwmQcV8fsjXNPOlX7w0ex+jdg+IYvo71T9ogibewinlP6jtN2E8NUa
-         vdCJGG0X0Aassfkh8ZMiPf3bo5WFTkwW/EqxzESVMQd1ohmnS+qsDq5fsCZujNhm2fsV
-         PB1A==
-X-Gm-Message-State: ABy/qLYhReoZBAjFI4u2ZnIHH+HB3WtF7ABZwDF/MBQE5Lk8AmsJoKZz
-	3I68WxepGO0VykF/AKRxscF7E8tKgO/wBYV9jmcaYA==
-X-Google-Smtp-Source: APBJJlFmRcSNPu4MrIFrvRIWD/jS+5UxMfIsyTHoQK8XtD5RsDFwLgjDeD1xgF55SidTKvKV+MVmMU8uq4FemoC3ZD8=
-X-Received: by 2002:a05:622a:120c:b0:3f8:5b2:aef0 with SMTP id
- y12-20020a05622a120c00b003f805b2aef0mr307593qtx.24.1689871987542; Thu, 20 Jul
- 2023 09:53:07 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689872586; x=1721408586;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xQmJahfbWux03iWex/nMItH6A8UOTVyOFELiV1iV6u4=;
+  b=oRkeSIc4HCgyHkbui7S0QFDHX+ctL6IZvtGGDgLxBETBVMrENLsrzxda
+   2pg2/ldVkrWmo1/8McIjKsOeHbk4irOhta1hFlkvfLCaImvjnzttMlwn/
+   zr5d4jWO9lYuCVtT9Mj2Dge8/kXRMmSokf9mNSJPqzlVIOJoYe+5VioI9
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.01,219,1684800000"; 
+   d="scan'208";a="661011543"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 17:02:59 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id 60DF340DB0;
+	Thu, 20 Jul 2023 17:02:58 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 20 Jul 2023 17:02:49 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.12) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 20 Jul 2023 17:02:45 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <keescook@chromium.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <gustavoars@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<leitao@debian.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzkaller@googlegroups.com>, <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v2 net 2/2] af_packet: Fix warning of fortified memcpy() in packet_getname().
+Date: Thu, 20 Jul 2023 10:02:36 -0700
+Message-ID: <20230720170236.3939-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <202307200753.7B071AC7B@keescook>
+References: <202307200753.7B071AC7B@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f3e69ba8-2a20-f2ac-d4a0-3165065a6707@kernel.org>
- <20230720160022.1887942-1-maze@google.com> <20230720093423.5fe02118@kernel.org>
-In-Reply-To: <20230720093423.5fe02118@kernel.org>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Thu, 20 Jul 2023 09:52:55 -0700
-Message-ID: <CANP3RGexoRnp6PRX6OG8obxPhdTt74J-8yjr_hNJOhzHnv1Xsw@mail.gmail.com>
-Subject: Re: [PATCH net v2] ipv6 addrconf: fix bug where deleting a mngtmpaddr
- can create a new temporary address
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Thomas Haller <thaller@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Xiao Ma <xiaom@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.12]
+X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 9:34=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 20 Jul 2023 09:00:22 -0700 Maciej =C5=BBenczykowski wrote:
-> > currently on 6.4 net/main:
-> >
-> >   # ip link add dummy1 type dummy
-> >   # echo 1 > /proc/sys/net/ipv6/conf/dummy1/use_tempaddr
-> >   # ip link set dummy1 up
-> >   # ip -6 addr add 2000::1/64 mngtmpaddr dev dummy1
-> >   # ip -6 addr show dev dummy1
->
-> FTR resending the patch as part of the same thread is really counter
-> productive for the maintainers. We review patches in order, no MUA
-> I know can be told to order things correctly when new versions are sent
-> in reply.
+From: Kees Cook <keescook@chromium.org>
+Date: Thu, 20 Jul 2023 08:04:53 -0700
+> On Wed, Jul 19, 2023 at 05:44:10PM -0700, Kuniyuki Iwashima wrote:
+> > syzkaller found a warning in packet_getname() [0], where we try to
+> > copy 16 bytes to sockaddr_ll.sll_addr[8].
+> > 
+> > Some devices (ip6gre, vti6, ip6tnl) have 16 bytes address expressed
+> > by struct in6_addr.  Also, Infiniband has 32 bytes as MAX_ADDR_LEN.
+> > 
+> > The write seems to overflow, but actually not since we use struct
+> > sockaddr_storage defined in __sys_getsockname() and its size is 128
+> > (_K_SS_MAXSIZE) bytes.  Thus, we have sufficient room after sll_addr[]
+> > as __data[].
+> 
+> Ah, so the issue here is that the UAPI for sll_addr is lying about its
+> size. I think a better fix here is to fix the structure (without
+> breaking UAPI sizes or names):
 
-Sorry, but I'm afraid as a non-maintainer I have no idea what your
-work flows are like.
-(and it shows up just fine on patchwork.kernel.org which is what I
-thought you all used now...)
+Doesn't it forcify sll_addr here ?
 
-> Don't try too hard, be normal, please.
 
-What's considered 'normal' seems to depend on the list.
-
-I'm pretty sure I've been told to do --in-reply follow ups previously
-when I didn't
-(though it might not have been on netdev...).
-
-Email is really a very poor medium for code reviews in general.
+> 
+> diff --git a/include/uapi/linux/if_packet.h b/include/uapi/linux/if_packet.h
+> index 9efc42382fdb..4d0ad22f83b5 100644
+> --- a/include/uapi/linux/if_packet.h
+> +++ b/include/uapi/linux/if_packet.h
+> @@ -18,7 +18,11 @@ struct sockaddr_ll {
+>  	unsigned short	sll_hatype;
+>  	unsigned char	sll_pkttype;
+>  	unsigned char	sll_halen;
+> -	unsigned char	sll_addr[8];
+> +	union {
+> +		unsigned char	sll_addr[8];
+> +		/* Actual length is in sll_halen. */
+> +		__DECLARE_FLEX_ARRAY(unsigned char, sll_addr_flex);
+> +	};
+>  };
+>  
+>  /* Packet types */
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index 85ff90a03b0c..8e3ddec4c3d5 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -3601,7 +3601,7 @@ static int packet_getname(struct socket *sock, struct sockaddr *uaddr,
+>  	if (dev) {
+>  		sll->sll_hatype = dev->type;
+>  		sll->sll_halen = dev->addr_len;
+> -		memcpy(sll->sll_addr, dev->dev_addr, dev->addr_len);
+> +		memcpy(sll->sll_addr_flex, dev->dev_addr, dev->addr_len);
+>  	} else {
+>  		sll->sll_hatype = 0;	/* Bad: we have no ARPHRD_UNSPEC */
+>  		sll->sll_halen = 0;
+> 
+> We can't rename sll_data nor change it's size, as userspace uses it
+> pretty extensively:
+> https://codesearch.debian.net/search?q=sizeof.*sll_addr&literal=0
+> 
+> -- 
+> Kees Cook
 
