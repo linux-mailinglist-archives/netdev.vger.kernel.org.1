@@ -1,109 +1,166 @@
-Return-Path: <netdev+bounces-19542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A8575B241
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:17:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B514675B248
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C891C2145C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:17:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BCE8281EFA
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F0718B11;
-	Thu, 20 Jul 2023 15:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E77C18B15;
+	Thu, 20 Jul 2023 15:18:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9059C18AF6
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:17:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65510C433C9;
-	Thu, 20 Jul 2023 15:17:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689866263;
-	bh=qYHzhCAUIzF07jkVYTmVpGY6QuZJidrqSGysBgEQ+mg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P16yasElhZTEVFOLsqDGNj4lriTO6FsUW8YABCZuFpIMFix1NMiwqPaxeOXOJGNOk
-	 VfOItlUQjULagwjy03aN/moX4p0fVX1uyxELFFx7ST2p8Y2LanDjA80FYWJYqo902U
-	 B1dPtPEPCXdcO2vuWr+smF+q+CudYO+XVVfGf4muamAjCqLdYs5ly7RxarL53ghMO1
-	 c7z4tglFywO9GUJRvnBTv0bIV43yd7al05bkCq1t3oVmo4Q8veUrMy96QxeUPfZzHU
-	 5XBwXPyYA9MApwhmFlvKbYMA+lkCuL/2H3vC+cqcQMFlqFT90CDLJVT0Z8BkAASI1o
-	 Buaey1/Wipc4w==
-Date: Thu, 20 Jul 2023 08:17:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Md Danish Anwar <a0501179@ti.com>
-Cc: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
- <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>, Simon Horman
- <simon.horman@corigine.com>, Vignesh Raghavendra <vigneshr@ti.com>, Andrew
- Lunn <andrew@lunn.ch>, Richard Cochran <richardcochran@gmail.com>, Conor
- Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Rob Herring <robh+dt@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David
- S. Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
- <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v10 2/2] net: ti: icssg-prueth: Add ICSSG
- ethernet driver
-Message-ID: <20230720081741.0c32d5e6@kernel.org>
-In-Reply-To: <17cd1e70-73bc-78d5-7e9d-7b133d6f464b@ti.com>
-References: <20230719082755.3399424-1-danishanwar@ti.com>
-	<20230719082755.3399424-3-danishanwar@ti.com>
-	<20230719213543.0380e13e@kernel.org>
-	<17cd1e70-73bc-78d5-7e9d-7b133d6f464b@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330BF18C02
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:18:18 +0000 (UTC)
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267792733
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:18:16 -0700 (PDT)
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-56601c9a4feso1428517eaf.1
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 08:18:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689866295; x=1690471095;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rf376TlIa//4Lkn5N+iGROnwRF6E/So2idCDCzplRGs=;
+        b=DVwNV9DtB8sMpLbyLlm12RtzWYn4FQRQ2QMGL8Z7+adPekh2TTCSScIqR+/l6YF4v7
+         8x4okSJ8MP2B24FH7avGwuI85vUGuZbLwy6N4Igqh6Y9wpbif6U+Oo9pxqLA3tsMfy7H
+         4OJGqtEKvh1O1Xwv9/zHaJonBRpwotb3BV7IbBWHVsu+wW2McEZe5eLP27Moc4Ds2jWp
+         ZBaBmHPKXcaJ1RnC5tqcmZftpj+5UJeO8xsf/NR/eR9RUVKfM6q34M1BXIk6bfjgKVyy
+         QiOZDemW8XS08YPNfTGrtukT71GwZsN7dDbVqrvUoG1irQ9Qc8rlY+5le1eMzsqU/uNh
+         iA8A==
+X-Gm-Message-State: ABy/qLZQSDANeYc15/ScII7W6dB3FxPHTukKByOAGpodtoYAFKEeNV24
+	hqsz4cmAJCQvK9zJ6TbSbSJoXPRWneOIs7YWZer2jXNBJVi2
+X-Google-Smtp-Source: APBJJlF890SiMThQTbzlJQCFf+nI0YGszN2DWBJaxkZIfChDx0PehXUYCyyGH5KWUkl/KxXevMFwLYtuCRy2/GSXaP5d7g9RqH3L
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a4a:a707:0:b0:563:356f:5f91 with SMTP id
+ g7-20020a4aa707000000b00563356f5f91mr4192926oom.0.1689866295541; Thu, 20 Jul
+ 2023 08:18:15 -0700 (PDT)
+Date: Thu, 20 Jul 2023 08:18:15 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004386940600eca80d@google.com>
+Subject: [syzbot] [net?] WARNING: ODEBUG bug in ingress_destroy
+From: syzbot <syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 20 Jul 2023 17:12:50 +0530 Md Danish Anwar wrote:
-> Patch 1: Introduce Firmware mapping for the driver (icss_switch_map.h)
-> 
-> Patch 2: Introduce mii helper APIs. (icssg_mii_rt.h and icssg_mii_cfg.h). This
-> patch will also introduce basic prueth and emac structures in icssg_prueth.h as
-> these structures will be used by the helper APIs.
-> 
-> Patch 3: Introduce firmware configuration and classification APIs.
-> (icssg_classifier.c, icssg_config.h and icssg_config.c)
-> 
-> Patch 4: Introduce APIs for ICSSG Queues (icssg_queues.c)
-> 
-> Patch 5: Introduce ICSSG Ethernet driver. (icssg_prueth.c and icssg_prueth.h)
-> This patch will enable the driver and basic functionality can work after this
-> patch. This patch will be using all the APIs introduced earlier. This patch
-> will also include Kconfig and Makefile changes.
-> 
-> Patch 6: Enable standard statistics via ndo_get_stats64
-> 
-> Patch 7: Introduce ethtool ops for ICSSG
-> 
-> Patch 8: Introduce power management support (suspend / resume APIs)
-> 
-> However this structure of patches will introduce some APIs earlier (in patch
-> 2,3 and 4) which will be used later by patch 5. I hope it will be OK to
-> introduce APIs and macros earlier and use them later.
-> 
-> This restructuring will shorten all the individual patches. However patch 5
-> will still be a bit large as patch 5 introduces all the neccessary APIs as
-> driver probe / remove, ndo open / close, tx/rx etc.
-> 
-> Currnetly this single patch has close to 4000 insertion and is touching 12
-> files. After restructring patch 5 will have around 1800 insertions and will
-> touch only 4 files (icssg_prueth.c, icssg_prueth.h, Kconfig, Makefile). This is
-> still significant improvement.
-> 
-> Please let me know if this is OK.
+Hello,
 
-SGTM, thanks! One patch still being larger than others is a bit
-inevitable.
+syzbot found the following issue on:
 
-> Also this patch has Reviewed-By tag of Andrew. Can I carry forward his
-> Reviewed-By tag in all patches or do I need to drop it?
+HEAD commit:    03b123debcbc tcp: tcp_enter_quickack_mode() should be static
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=168e1baaa80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=32e3dcc11fd0d297
+dashboard link: https://syzkaller.appspot.com/bug?extid=bdcf141f362ef83335cf
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10bf2bf4a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12741e9aa80000
 
-If the code is identical I reckon you can carry it.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/348462fb61fa/disk-03b123de.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/33375730f77f/vmlinux-03b123de.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b6882fbac041/bzImage-03b123de.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: activate active (active state 1) object: ffff88807f28f000 object type: rcu_head hint: 0x0
+WARNING: CPU: 0 PID: 5029 at lib/debugobjects.c:514 debug_print_object+0x19e/0x2a0 lib/debugobjects.c:514
+Modules linked in:
+CPU: 0 PID: 5029 Comm: syz-executor389 Not tainted 6.5.0-rc1-syzkaller-00458-g03b123debcbc #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
+RIP: 0010:debug_print_object+0x19e/0x2a0 lib/debugobjects.c:514
+Code: 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 49 48 8b 14 dd c0 20 c8 8a 41 56 4c 89 e6 48 c7 c7 20 14 c8 8a e8 b2 fa 28 fd <0f> 0b 58 83 05 5c 8b 87 0a 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e
+RSP: 0018:ffffc90003a5f168 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000000000
+RDX: ffff8880269b1dc0 RSI: ffffffff814d4986 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffffffff8ac81a80
+R13: ffffffff8a6df720 R14: 0000000000000000 R15: ffff888017f63360
+FS:  0000555555f7f380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000007b9d8000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ debug_object_activate+0x32b/0x490 lib/debugobjects.c:733
+ debug_rcu_head_queue kernel/rcu/rcu.h:226 [inline]
+ kvfree_call_rcu+0x30/0xbe0 kernel/rcu/tree.c:3359
+ tcx_entry_free include/net/tcx.h:96 [inline]
+ ingress_destroy+0x39f/0x520 net/sched/sch_ingress.c:127
+ __qdisc_destroy+0xc4/0x450 net/sched/sch_generic.c:1063
+ qdisc_destroy+0x4f/0x60 net/sched/sch_generic.c:1078
+ qdisc_graft+0x6f9/0x1680 net/sched/sch_api.c:1132
+ tc_modify_qdisc+0xcd2/0x1bf0 net/sched/sch_api.c:1731
+ rtnetlink_rcv_msg+0x439/0xd30 net/core/rtnetlink.c:6423
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2546
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0x539/0x800 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x93c/0xe30 net/netlink/af_netlink.c:1911
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg+0xd9/0x180 net/socket.c:748
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2494
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2548
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2577
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f1232c17839
+Code: 48 83 c4 28 c3 e8 27 18 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc05125308 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 000000000000003f RCX: 00007f1232c17839
+RDX: 0000000000000000 RSI: 0000000020000080 RDI: 0000000000000003
+RBP: 00007f1232c8e0d0 R08: 00007ffc05125380 R09: 00007ffc05125380
+R10: 00007ffc05125380 R11: 0000000000000246 R12: 00007f1232c8a5f0
+R13: 00007ffc05125508 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
