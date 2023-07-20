@@ -1,91 +1,82 @@
-Return-Path: <netdev+bounces-19328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1C675A4D9
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 05:46:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D471975A4E2
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 05:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9A3F1C212AB
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 03:46:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8D1281C00
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 03:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6160B17E8;
-	Thu, 20 Jul 2023 03:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64BB10F5;
+	Thu, 20 Jul 2023 03:50:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC77137D;
-	Thu, 20 Jul 2023 03:45:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A2EC433C8;
-	Thu, 20 Jul 2023 03:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0F4A31
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 03:50:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A28EC433C9;
+	Thu, 20 Jul 2023 03:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689824754;
-	bh=z0i62JjuZ7ZlCOWbWdYwj78VlFeYhWN9ot1ReDkacAw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ky2dINi/AGQI0jKAECg1n2BYUJ8uk4hUBYBW4SzCHcMKYROrxiFVxazf9OL2VMrNP
-	 Tgc1Wv94Y+mKhMa8Mwm/EPHSlvJ4ktx4xD99UCujutg8jaK8i0KUR3DbzCJltUsDvz
-	 WTbJnDmH7pgx4tbBa7profEpRE1O+6PEhwbKLmclwpQAGtsfLsA+mN7PWhzAmlEBPl
-	 8d+WVRLU7ACijBa5G66YVkol8cYX7H5As5Cl0/FqzsK0zm3QC3SjOx4/sCLG1BZlAF
-	 7O0m/tFTMYdG3YqwJkBleaOSRAg7/8B/EYGy/sliPQmRa7QPfzr+ox02xnUxybv4J4
-	 JefDu/63+IWRw==
-Date: Wed, 19 Jul 2023 20:45:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, xiaoning.wang@nxp.com, shenwei.wang@nxp.com,
- netdev@vger.kernel.org, linux-imx@nxp.com, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net-next] net: fec: add XDP_TX feature support
-Message-ID: <20230719204553.46856b29@kernel.org>
-In-Reply-To: <20230717103709.2629372-1-wei.fang@nxp.com>
-References: <20230717103709.2629372-1-wei.fang@nxp.com>
+	s=k20201202; t=1689825020;
+	bh=2jgCgWh1deu9jf3CbJxs+XKpugIkwpfkYRmFyAF0vJY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=X8J7ZI2usMkyYUBTGA8xGs2WzGXh/eB9zDS2XGHAZWdxEJGcr29kgjZO/+JsExN6z
+	 dEYkNqZJMLXmerUKpn9vt6Z7wVZHyGI8RR9DDHbJ4pkyvFahSRkUtbGKSteOsekJep
+	 lX7BOTes2QacstZplh54v6UUzYy8YdsyBpt4B9gjNtbLwX4HgcSJwrQ/ABlsNu7dBJ
+	 31epCmG3gM8uCxYxx2bTfdKfq3hLm8QKDE8TkSk9U2yyvPJIHKIKDIz48XkAul77Bv
+	 u9ss59KX+RQfL3+Rc3PTL0x+MgmcXRcfyhHAemwRDGSRU32LiZ+vQG7uYo5svrQTSg
+	 +Tv0hINBiIEtA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6118CC6445A;
+	Thu, 20 Jul 2023 03:50:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] xfrm: delete not-needed clear to zero of encap_oa
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168982502039.32453.1486432439604353693.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jul 2023 03:50:20 +0000
+References: <20230719100228.373055-2-steffen.klassert@secunet.com>
+In-Reply-To: <20230719100228.373055-2-steffen.klassert@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
+ netdev@vger.kernel.org
 
-On Mon, 17 Jul 2023 18:37:09 +0800 Wei Fang wrote:
-> -			xdp_return_frame(xdpf);
-> +			if (txq->tx_buf[index].type == FEC_TXBUF_T_XDP_NDO)
-> +				xdp_return_frame(xdpf);
-> +			else
-> +				xdp_return_frame_rx_napi(xdpf);
+Hello:
 
-Are you taking budget into account? When NAPI is called with budget 
-of 0 we are *not* in napi / softirq context. You can't be processing
-any XDP tx under such conditions (it may be a netpoll call from IRQ
-context).
+This patch was applied to netdev/net-next.git (main)
+by Steffen Klassert <steffen.klassert@secunet.com>:
 
-> +static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
-> +				struct xdp_buff *xdp)
-> +{
-> +	struct xdp_frame *xdpf = xdp_convert_buff_to_frame(xdp);
-> +	struct fec_enet_private *fep = netdev_priv(ndev);
-> +	struct fec_enet_priv_tx_q *txq;
-> +	int cpu = smp_processor_id();
-> +	struct netdev_queue *nq;
-> +	int queue, ret;
-> +
-> +	queue = fec_enet_xdp_get_tx_queue(fep, cpu);
-> +	txq = fep->tx_queue[queue];
-> +	nq = netdev_get_tx_queue(fep->netdev, queue);
-> +
-> +	__netif_tx_lock(nq, cpu);
-> +
-> +	ret = fec_enet_txq_xmit_frame(fep, txq, xdpf, false);
-> +
-> +	__netif_tx_unlock(nq);
+On Wed, 19 Jul 2023 12:02:28 +0200 you wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> After commit 2f4796518315 ("af_key: Fix heap information leak"), there is
+> no need to clear encap_oa again as it is already initialized to zero.
+> 
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> 
+> [...]
 
-If you're reusing the same queues as the stack you need to call
-txq_trans_cond_update() at some point, otherwise the stack may
-print a splat complaining the queue got stuck.
+Here is the summary with links:
+  - xfrm: delete not-needed clear to zero of encap_oa
+    https://git.kernel.org/netdev/net-next/c/a94fd40a18ae
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
