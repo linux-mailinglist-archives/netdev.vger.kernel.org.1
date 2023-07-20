@@ -1,137 +1,345 @@
-Return-Path: <netdev+bounces-19455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4578B75ABCC
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:20:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8232A75ABE6
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D806A281D5E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:20:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B8961C21371
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1733174F1;
-	Thu, 20 Jul 2023 10:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1800174F3;
+	Thu, 20 Jul 2023 10:26:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35A4199E7
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:20:09 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55E5310CB
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 03:20:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689848407;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U9gHz/fFp0Gl9tgjEgz3BmVFVaQ9EGXgU4wCFul7DOo=;
-	b=VQBF3d4GTRMKhno4QbLKoQjAZXd+H3/Y+RLVbxZ4XzVqrS05YGVqpCxyytz6KUbNkSpQKo
-	ty+IK2NhfPFuy9zsDgKxIRBu98lUnDd6zeNUj/qloxfSlOm42QhViercRy2BQZWl2pIF84
-	pNbM4A6aHq0axLDXdQxcLONOShZLlwI=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-307-I_3BkyHzPNiamiVPOhRobw-1; Thu, 20 Jul 2023 06:20:06 -0400
-X-MC-Unique: I_3BkyHzPNiamiVPOhRobw-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-402fa256023so1894031cf.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 03:20:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689848405; x=1690453205;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U9gHz/fFp0Gl9tgjEgz3BmVFVaQ9EGXgU4wCFul7DOo=;
-        b=fOR6z3YMkF6Ot2HxVOvAkHBYOl1lJEKWe/GfgfDHtLtOfpc1iHDePjoWMr84V9OmJq
-         5yr4SH4Tb2ni3mMeGOefOBBHwqmhaPXTJW3ThWwh793zXjWNP+8yiteiRK1/n4Ds3RYU
-         UZOqQ453QlTaLuPvmqzKKy1IEh2oC3JV3N4M9vInhWUM3CQbaSzSGLgq8UNHtp85p+go
-         t+heGS/6pgWiw35IWeQ/GTw3tk7fBaTd4qJ3SRtWa8GiP0uNcV3T5M3kray+bm4KlX8F
-         hRKUB+cjHq7ZWhiyOW+Q73IGWhv4UetOv1H+zMUtAcAKtsNeQnVIV9a3AR8OjhwNpYko
-         c0hQ==
-X-Gm-Message-State: ABy/qLbRaiJWoU0nCgCJDuHN4tIvaCJt09N9DT2r82IyABwPscIPKNRB
-	KpL2uhlaHbq46FUGMDcFUx3IeLoTBjddQtceEhnVk20u0VCkk8uUjAi2ltsX4cQCby8rbV6eR3q
-	yvOXlpQihmVi675pF
-X-Received: by 2002:ac8:5905:0:b0:403:b11f:29f0 with SMTP id 5-20020ac85905000000b00403b11f29f0mr3026678qty.0.1689848405743;
-        Thu, 20 Jul 2023 03:20:05 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGE3+67AknhjLaEMWKEAymuZIBin5scI4dUP+C7OqKPViLquW0m6kc0lCdBPRL9n8Wj/zRBwg==
-X-Received: by 2002:ac8:5905:0:b0:403:b11f:29f0 with SMTP id 5-20020ac85905000000b00403b11f29f0mr3026655qty.0.1689848405474;
-        Thu, 20 Jul 2023 03:20:05 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
-        by smtp.gmail.com with ESMTPSA id k7-20020ac81407000000b003f6ac526568sm214341qtj.39.2023.07.20.03.20.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 03:20:05 -0700 (PDT)
-Message-ID: <47eb92888fa46315214ad921a9ac45b695355a36.camel@redhat.com>
-Subject: Re: [PATCH net v4] bonding: Fix error checking for
- debugfs_create_dir()
-From: Paolo Abeni <pabeni@redhat.com>
-To: =?UTF-8?Q?=E7=8E=8B=E6=98=8E-=E8=BD=AF=E4=BB=B6=E5=BA=95=E5=B1=82?=
- =?UTF-8?Q?=E6=8A=80=E6=9C=AF=E9=83=A8?= <machel@vivo.com>, Jay Vosburgh
- <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Taku Izumi <izumi.taku@jp.fujitsu.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "opensource.kernel" <opensource.kernel@vivo.com>, 
-	"ttoukan.linux@gmail.com"
-	 <ttoukan.linux@gmail.com>, "jay.vosburgh@canonical.com"
-	 <jay.vosburgh@canonical.com>
-Date: Thu, 20 Jul 2023 12:20:01 +0200
-In-Reply-To: <20230719020822.541-1-machel@vivo.com>
-References: <20230719020822.541-1-machel@vivo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BD1174E6
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:26:47 +0000 (UTC)
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95BE10D2
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 03:26:45 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id C42F25C0108;
+	Thu, 20 Jul 2023 06:26:42 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Thu, 20 Jul 2023 06:26:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1689848802; x=1689935202; bh=6utYKYW8xmsQh
+	LvS+tPHYhPT4tMcCVK/uYdc5KQBgvc=; b=A8fU3Zvs6YMjn73Cdl9nP6lldaexV
+	3vZ95gFokLo4gxwYsHKVp34QjwK3WPSyZh8zukhDSznlj7eVv8bUV2wD6ZlZhywv
+	rb3x99xupOQdTWNTuALLYch+uYvUUoIDTJ9JSt5q4nnEMrxc6okQ1pf0OtcgLi+p
+	JJTvuXs6wTScD3sbyfLxkN2UevIbaEibRCyej2zJeFxY9J3/9cW7AbgM8njE2vIl
+	mikf1W7rd9AE1u6Q+R6duAtz++KMljr0cPoLqTQ1X1PnaJgIudZaoago7Nw9Y9zC
+	0pduFr1RUfi58vMyQbb4cjVxoNFf+XmgtaPKzYVuw1FeS3YryB1hwrgRg==
+X-ME-Sender: <xms:4gu5ZEZUcnT4NkMBNSIHjUQGJmase360oK3r0sj0k3ALJfGgxu63wg>
+    <xme:4gu5ZPbh4vhMJkn61850ce9-Ij5O56CdZDEjdn8CLT3a-amoyFns1pxdY1O8_JJ92
+    xil-M8G-iQkzEM>
+X-ME-Received: <xmr:4gu5ZO-RxWnIVnXilbSIzXjcaRQGzXOgiCo4Azzyi865PNFBLpFsFe_DzQ8ZnenQnNgr7mMY90XsM3fFGvXawNm5-R8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrhedtgddvjecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
+    hoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:4gu5ZOpIc5ki4vlsQK5ZrosHrmAdAHSSb01HoeroCn0gUZibhZWeyw>
+    <xmx:4gu5ZPoLlEnbaopjWinbaotye3unRlPJTpt4RFry7E1N_bzYOXxmFA>
+    <xmx:4gu5ZMRRKq4O4AYN0xN1zLBloQnlVDh-TpU_5l8fYpK3uwC8yyOkwg>
+    <xmx:4gu5ZACGFidy9nsfL-kPpIPX6Ih6hoK_4VTtU4bl01hZU89d1axBxQ>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 20 Jul 2023 06:26:41 -0400 (EDT)
+Date: Thu, 20 Jul 2023 13:26:37 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Beniamino Galvani <bgalvani@redhat.com>
+Subject: Re: [PATCHv2 net-next] IPv6: add extack info for inet6_addr_add/del
+Message-ID: <ZLkL3eNVNfzZbaBv@shredder>
+References: <20230719135644.3011570-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719135644.3011570-1-liuhangbin@gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-07-19 at 02:10 +0000, =E7=8E=8B=E6=98=8E-=E8=BD=AF=E4=BB=B6=E5=
-=BA=95=E5=B1=82=E6=8A=80=E6=9C=AF=E9=83=A8 wrote:
-> The debugfs_create_dir() function returns error pointers,
-> it never returns NULL. Most incorrect error checks were fixed,
-> but the one in bond_create_debugfs() was forgotten.
->=20
-> Fixes: f073c7ca29a4 ("bonding: add the debugfs facility to the bonding dr=
-iver")
-> Signed-off-by: Wang Ming <machel@vivo.com>
-> ---
->  drivers/net/bonding/bond_debugfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bon=
-d_debugfs.c
-> index 594094526648..d4a82f276e87 100644
-> --- a/drivers/net/bonding/bond_debugfs.c
-> +++ b/drivers/net/bonding/bond_debugfs.c
-> @@ -88,7 +88,7 @@ void bond_create_debugfs(void)
->  {
->  	bonding_debug_root =3D debugfs_create_dir("bonding", NULL);
-> =20
-> -	if (!bonding_debug_root)
-> +	if (IS_ERR(bonding_debug_root))
->  		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
+On Wed, Jul 19, 2023 at 09:56:44PM +0800, Hangbin Liu wrote:
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index e5213e598a04..4e0836d90e65 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -1027,7 +1027,8 @@ static bool ipv6_chk_same_addr(struct net *net, const struct in6_addr *addr,
+>  	return false;
 >  }
-> =20
+>  
+> -static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa)
+> +static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa,
+> +			      struct netlink_ext_ack *extack)
+>  {
+>  	struct net *net = dev_net(dev);
+>  	unsigned int hash = inet6_addr_hash(net, &ifa->addr);
+> @@ -1037,7 +1038,7 @@ static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa)
+>  
+>  	/* Ignore adding duplicate addresses on an interface */
+>  	if (ipv6_chk_same_addr(net, &ifa->addr, dev, hash)) {
+> -		netdev_dbg(dev, "ipv6_add_addr: already assigned\n");
+> +		NL_SET_ERR_MSG(extack, "ipv6_add_addr: already assigned");
 
-Does not apply cleanly to -net. To be more accurate, the patch is
-base64 encoded and git is quite unhappy to decode it.
+How do you trigger it?
 
-Possibly your mail server is doing something funny in between?!?
+# ip link add name dummy10 up type dummy
+# ip address add 2001:db8:1::1/64 dev dummy10
+# ip address add 2001:db8:1::1/64 dev dummy10
+RTNETLINK answers: File exists
 
-Please solve the above before reposting.
+Better to add extack in inet6_rtm_newaddr():
 
-/P
+if (nlh->nlmsg_flags & NLM_F_EXCL || 
+    !(nlh->nlmsg_flags & NLM_F_REPLACE))
+	err = -EEXIST;
+else
+	err = inet6_addr_modify(net, ifa, &cfg)
 
+>  		err = -EEXIST;
+>  	} else {
+>  		hlist_add_head_rcu(&ifa->addr_lst, &net->ipv6.inet6_addr_lst[hash]);
+> @@ -1066,15 +1067,19 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>  	     !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) ||
+>  	    (!(idev->dev->flags & IFF_LOOPBACK) &&
+>  	     !netif_is_l3_master(idev->dev) &&
+> -	     addr_type & IPV6_ADDR_LOOPBACK))
+> +	     addr_type & IPV6_ADDR_LOOPBACK)) {
+> +		NL_SET_ERR_MSG(extack, "Cannot assign requested address");
+>  		return ERR_PTR(-EADDRNOTAVAIL);
+> +	}
+>  
+>  	if (idev->dead) {
+> -		err = -ENODEV;			/*XXX*/
+> +		NL_SET_ERR_MSG(extack, "Device marked as dead");
+
+This seems to be a transient state when IPv6 device is being deleted. See
+addrconf_ifdown(). Maybe "IPv6 device is going away".
+
+> +		err = -ENODEV;
+>  		goto out;
+>  	}
+>  
+>  	if (idev->cnf.disable_ipv6) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
+>  		err = -EACCES;
+>  		goto out;
+>  	}
+> @@ -1103,6 +1108,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>  
+>  	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags);
+>  	if (IS_ERR(f6i)) {
+> +		NL_SET_ERR_MSG(extack, "Dest allocate failed");
+
+The only thing that can fail in this function is ip6_route_info_create()
+which already has an extack argument. Better to pass extack to
+addrconf_f6i_alloc() and get a more accurate error message.
+
+>  		err = PTR_ERR(f6i);
+>  		f6i = NULL;
+>  		goto out;
+> @@ -1140,7 +1146,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>  
+>  	rcu_read_lock();
+>  
+> -	err = ipv6_add_addr_hash(idev->dev, ifa);
+> +	err = ipv6_add_addr_hash(idev->dev, ifa, extack);
+>  	if (err < 0) {
+>  		rcu_read_unlock();
+>  		goto out;
+> @@ -2488,18 +2494,22 @@ static void addrconf_add_mroute(struct net_device *dev)
+>  	ip6_route_add(&cfg, GFP_KERNEL, NULL);
+>  }
+>  
+> -static struct inet6_dev *addrconf_add_dev(struct net_device *dev)
+> +static struct inet6_dev *addrconf_add_dev(struct net_device *dev, struct netlink_ext_ack *extack)
+>  {
+>  	struct inet6_dev *idev;
+>  
+>  	ASSERT_RTNL();
+>  
+>  	idev = ipv6_find_idev(dev);
+> -	if (IS_ERR(idev))
+> +	if (IS_ERR(idev)) {
+> +		NL_SET_ERR_MSG(extack, "No such device");
+
+This is not very accurate. See comment below regarding __in6_dev_get().
+
+>  		return idev;
+> +	}
+>  
+> -	if (idev->cnf.disable_ipv6)
+> +	if (idev->cnf.disable_ipv6) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
+>  		return ERR_PTR(-EACCES);
+> +	}
+>  
+>  	/* Add default multicast route */
+>  	if (!(dev->flags & IFF_LOOPBACK) && !netif_is_l3_master(dev))
+> @@ -2919,21 +2929,29 @@ static int inet6_addr_add(struct net *net, int ifindex,
+>  
+>  	ASSERT_RTNL();
+>  
+> -	if (cfg->plen > 128)
+> +	if (cfg->plen > 128) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 address prefix length larger than 128");
+
+For RTM_NEWROUTE IPv6 code just says "Invalid prefix length", so might
+as well be consistent with it. Also, I see IPv4 doesn't have such
+messages for its RTM_{NEW,DEL}ADDR messages. If you think it's useful
+for IPv6, then I suggest also adding it to IPv4.
+
+Same comment for delete path.
+
+>  		return -EINVAL;
+> +	}
+>  
+>  	/* check the lifetime */
+> -	if (!cfg->valid_lft || cfg->preferred_lft > cfg->valid_lft)
+> +	if (!cfg->valid_lft || cfg->preferred_lft > cfg->valid_lft) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 address lifetime invalid");
+>  		return -EINVAL;
+> +	}
+>  
+> -	if (cfg->ifa_flags & IFA_F_MANAGETEMPADDR && cfg->plen != 64)
+> +	if (cfg->ifa_flags & IFA_F_MANAGETEMPADDR && cfg->plen != 64) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 address with mngtmpaddr flag must have prefix length 64");
+
+\"mngtmpaddr\"
+a prefix length of
+
+>  		return -EINVAL;
+> +	}
+>  
+>  	dev = __dev_get_by_index(net, ifindex);
+> -	if (!dev)
+> +	if (!dev) {
+> +		NL_SET_ERR_MSG(extack, "Unable to find the interface");
+
+This is already checked in the netlink path (see inet6_rtm_newaddr()),
+so this message will never be displayed. If you want to see it, then add
+it in inet6_rtm_newaddr().
+
+>  		return -ENODEV;
+> +	}
+>  
+> -	idev = addrconf_add_dev(dev);
+> +	idev = addrconf_add_dev(dev, extack);
+>  	if (IS_ERR(idev))
+>  		return PTR_ERR(idev);
+>  
+> @@ -2941,8 +2959,10 @@ static int inet6_addr_add(struct net *net, int ifindex,
+>  		int ret = ipv6_mc_config(net->ipv6.mc_autojoin_sk,
+>  					 true, cfg->pfx, ifindex);
+>  
+> -		if (ret < 0)
+> +		if (ret < 0) {
+> +			NL_SET_ERR_MSG(extack, "Multicast auto join failed");
+>  			return ret;
+> +		}
+>  	}
+>  
+>  	cfg->scope = ipv6_addr_scope(cfg->pfx);
+> @@ -2999,22 +3019,29 @@ static int inet6_addr_add(struct net *net, int ifindex,
+>  }
+>  
+>  static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+> -			  const struct in6_addr *pfx, unsigned int plen)
+> +			  const struct in6_addr *pfx, unsigned int plen,
+> +			  struct netlink_ext_ack *extack)
+>  {
+>  	struct inet6_ifaddr *ifp;
+>  	struct inet6_dev *idev;
+>  	struct net_device *dev;
+>  
+> -	if (plen > 128)
+> +	if (plen > 128) {
+> +		NL_SET_ERR_MSG(extack, "IPv6 address prefix length larger than 128");
+>  		return -EINVAL;
+> +	}
+>  
+>  	dev = __dev_get_by_index(net, ifindex);
+> -	if (!dev)
+> +	if (!dev) {
+> +		NL_SET_ERR_MSG(extack, "Unable to find the interface");
+>  		return -ENODEV;
+> +	}
+>  
+>  	idev = __in6_dev_get(dev);
+> -	if (!idev)
+> +	if (!idev) {
+> +		NL_SET_ERR_MSG(extack, "No such address on the device");
+
+A more accurate message would be "IPv6 is disabled on this device". See
+ndisc_allow_add().
+
+>  		return -ENXIO;
+> +	}
+>  
+>  	read_lock_bh(&idev->lock);
+>  	list_for_each_entry(ifp, &idev->addr_list, if_list) {
+> @@ -3037,6 +3064,8 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+>  		}
+>  	}
+>  	read_unlock_bh(&idev->lock);
+> +
+> +	NL_SET_ERR_MSG(extack, "IPv6 address not found");
+>  	return -EADDRNOTAVAIL;
+>  }
+>  
+> @@ -3079,7 +3108,7 @@ int addrconf_del_ifaddr(struct net *net, void __user *arg)
+>  
+>  	rtnl_lock();
+>  	err = inet6_addr_del(net, ireq.ifr6_ifindex, 0, &ireq.ifr6_addr,
+> -			     ireq.ifr6_prefixlen);
+> +			     ireq.ifr6_prefixlen, NULL);
+>  	rtnl_unlock();
+>  	return err;
+>  }
+> @@ -3378,7 +3407,7 @@ static void addrconf_dev_config(struct net_device *dev)
+>  		return;
+>  	}
+>  
+> -	idev = addrconf_add_dev(dev);
+> +	idev = addrconf_add_dev(dev, NULL);
+>  	if (IS_ERR(idev))
+>  		return;
+>  
+> @@ -4692,7 +4721,7 @@ inet6_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
+>  	ifa_flags &= IFA_F_MANAGETEMPADDR;
+>  
+>  	return inet6_addr_del(net, ifm->ifa_index, ifa_flags, pfx,
+> -			      ifm->ifa_prefixlen);
+> +			      ifm->ifa_prefixlen, extack);
+>  }
+>  
+>  static int modify_prefix_route(struct inet6_ifaddr *ifp,
+> -- 
+> 2.38.1
+> 
 
