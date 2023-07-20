@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-19651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD25875B920
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 22:59:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC41375B929
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 894C5282026
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 20:59:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1812D1C209F1
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3176168A9;
-	Thu, 20 Jul 2023 20:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC82168AF;
+	Thu, 20 Jul 2023 21:03:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C26156FE
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 20:58:34 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F81273F
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 13:58:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D912FA49
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:03:10 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 559F0196
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:03:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689886705;
+	s=mimecast20190719; t=1689886988;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4dqf8Jjm5t/QS+Vt8DTpJf/dAD7LQ0qakHIdy8mWAJw=;
-	b=UmnmSsDSkxAsM+SRlaAfp6nq3cW26g1IopSZYBJyqvSOoIYwIt4k9LceIX0ML1rESVaaQp
-	xmPBtSVHcjCr9X1hYMX9HY37Lxr/2YJ/nu3va33RJGa1kObWvE0IGpMscKqAaaBSFvrsb1
-	Mdsm6fEcigpUid0I8ii5giOVydu5+y8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QxbwNNsUJXE4WSdo9/9FQ7rzSbFKTC0HO55OeJQjfDA=;
+	b=S5Ro2M267SuvvPwrbyE2THyQ7lXPkJIpQvDcl7HmZm6OK4B8Y4f2/I+BEVsylfXLBVzUeQ
+	l0kcFeHF77YTNeBMKd9xoZw3GZDlPMDyEqQkYGR6JwT+09PI5Iw7MTBI4Et4ekS2pP2VB7
+	atzMkB3ku8Vmczw+ShHCNN0nXZAHL2s=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-CVPTjCyXODiaBfyveZ-r-Q-1; Thu, 20 Jul 2023 16:58:24 -0400
-X-MC-Unique: CVPTjCyXODiaBfyveZ-r-Q-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-315a03cae87so1067884f8f.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 13:58:24 -0700 (PDT)
+ us-mta-647-bH45IXY6NnOXcHfoBxoH_Q-1; Thu, 20 Jul 2023 17:03:07 -0400
+X-MC-Unique: bH45IXY6NnOXcHfoBxoH_Q-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b93f4c300bso12897721fa.0
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:03:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689886703; x=1690491503;
+        d=1e100.net; s=20221208; t=1689886985; x=1690491785;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4dqf8Jjm5t/QS+Vt8DTpJf/dAD7LQ0qakHIdy8mWAJw=;
-        b=QgHa3jKx3EMvmEcVSq8lMzAwneA6ptZEJNhIPJD8T77IPWXMdG6yvyGHLGY+odgvah
-         hGqJlRaWtbmkIXFPXqwpwp0hXn3HXFRpTVKFlTcqC1a8fn326LgZrVrtSZLXnXhekRjs
-         6IOiv7ikrcG3W0Fg73jZ1DPnUnKZlr+pfL4WeNF4GiP8T3jw7mnL3+fuMjpNivpcr5EO
-         iZowDFAhxkQxx7U6y4camUvAeyfVAyMiG0IKeSuec3MNBzREI/kLITPQQuOVuVk5IeWT
-         xGCluIa2FCnefhn6r3yEeg4svxPo7lNGHoJ1ago6BbCELP4O32gVPzG6kzVzmpstp3Kj
-         X/iw==
-X-Gm-Message-State: ABy/qLZwKfnF2m+ykSY42xCVyCEl9tFn98bo1n4PzklGg4NverQN9xAM
-	ZhwEniRh5Xk6UNRMQQ73z0Gj+z9m3tVAkw+8RIaa5blI3dCVMkFa4gCHTsvp2vP4aNXu48sUUbb
-	b+8jrmQKqUAf4V9gO
-X-Received: by 2002:adf:fc48:0:b0:314:77a:c2a6 with SMTP id e8-20020adffc48000000b00314077ac2a6mr24898wrs.25.1689886703220;
-        Thu, 20 Jul 2023 13:58:23 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGGGVPES+OLvpID+VHOy6r8D1EwH01kkL+pN8O6wPgr+LrofdyHrBq3n7dIj/lcIXZPoNV3xA==
-X-Received: by 2002:adf:fc48:0:b0:314:77a:c2a6 with SMTP id e8-20020adffc48000000b00314077ac2a6mr24892wrs.25.1689886702902;
-        Thu, 20 Jul 2023 13:58:22 -0700 (PDT)
+        bh=QxbwNNsUJXE4WSdo9/9FQ7rzSbFKTC0HO55OeJQjfDA=;
+        b=cHyyHwsVgdCkh/ufN3UIKPPNW3k/yM7IsmihFedQpnVnIGaK5K0We4/D/wT8C5nZuE
+         MzSgk66GtPadJv0qV1PqframmYqEob7D+evKopLJykXZXXIG7brhoCM9zX4lIiw67lAY
+         opCNHZxy96eT2blR6/edCdez+N4DvfYyFelPTUpJH0u8PlnRN8HwrACy7zspyF/eRNVd
+         uuFjamPMPoc1dzuvSERyUdmqkk6syBaDDYcsO6G3lcLEthIM9QbBPeUa2czAW0tds/1g
+         ArgvzjByn6bUk/jw1at3etyUUYE2Eq400xFXeSnTcjdAPLPuz60h05KT4j9n98DnT7GJ
+         11cA==
+X-Gm-Message-State: ABy/qLZxClM8m4CKSAgA0SfllOhDC+RTnPl2N3cIWLUp7ODC+IqWk6zL
+	uGWYaLz50mD1F9Vguwhw7RhwB8RMnI5RvD67NFGR1mjGUnhR30LDqG9O/k4fv/NXYVrVOFzZvms
+	WENJVP9b02S1YPEOR
+X-Received: by 2002:a2e:9dcf:0:b0:2b6:dbc5:5ca4 with SMTP id x15-20020a2e9dcf000000b002b6dbc55ca4mr86347ljj.16.1689886985702;
+        Thu, 20 Jul 2023 14:03:05 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGkO9895VB0oEJzz7Mt1u7LjrPYNqoemBmNFeHR6tqktWs0kblZ6OrDWTCIs6FgX5K3EX736g==
+X-Received: by 2002:a2e:9dcf:0:b0:2b6:dbc5:5ca4 with SMTP id x15-20020a2e9dcf000000b002b6dbc55ca4mr86325ljj.16.1689886985355;
+        Thu, 20 Jul 2023 14:03:05 -0700 (PDT)
 Received: from redhat.com ([2.52.16.41])
-        by smtp.gmail.com with ESMTPSA id h9-20020a5d6889000000b0031432c2fb95sm2275327wru.88.2023.07.20.13.58.20
+        by smtp.gmail.com with ESMTPSA id 9-20020a05600c248900b003fbb618f7adsm1982153wms.15.2023.07.20.14.03.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 13:58:22 -0700 (PDT)
-Date: Thu, 20 Jul 2023 16:58:18 -0400
+        Thu, 20 Jul 2023 14:03:04 -0700 (PDT)
+Date: Thu, 20 Jul 2023 17:02:58 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Shannon Nelson <shannon.nelson@amd.com>
 Cc: Jason Wang <jasowang@redhat.com>, xuanzhuo@linux.alibaba.com,
@@ -71,10 +71,10 @@ Cc: Jason Wang <jasowang@redhat.com>, xuanzhuo@linux.alibaba.com,
 	davem@davemloft.net
 Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
  command waiting loop
-Message-ID: <20230720164930-mutt-send-email-mst@kernel.org>
+Message-ID: <20230720170001-mutt-send-email-mst@kernel.org>
 References: <20230720083839.481487-1-jasowang@redhat.com>
  <20230720083839.481487-3-jasowang@redhat.com>
- <b949697e-319a-7cc1-84d8-1391713fa645@amd.com>
+ <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,16 +83,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b949697e-319a-7cc1-84d8-1391713fa645@amd.com>
+In-Reply-To: <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 08:31:13AM -0700, Shannon Nelson wrote:
+On Thu, Jul 20, 2023 at 01:26:20PM -0700, Shannon Nelson wrote:
 > On 7/20/23 1:38 AM, Jason Wang wrote:
 > > 
 > > Adding cond_resched() to the command waiting loop for a better
@@ -101,6 +100,18 @@ On Thu, Jul 20, 2023 at 08:31:13AM -0700, Shannon Nelson wrote:
 > > not allowed on a device whose CVQ might be slow.
 > > 
 > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> 
+> This still leaves hung processes, but at least it doesn't pin the CPU any
+> more.  Thanks.
+> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> 
+
+I'd like to see a full solution
+1- block until interrupt
+2- still handle surprise removal correctly by waking in that case
+
+
+
 > > ---
 > >   drivers/net/virtio_net.c | 4 +++-
 > >   1 file changed, 3 insertions(+), 1 deletion(-)
@@ -118,19 +129,6 @@ On Thu, Jul 20, 2023 at 08:31:13AM -0700, Shannon Nelson wrote:
 > > +               cond_resched();
 > >                  cpu_relax();
 > > +       }
-> 
-> The cover letter suggests that this addresses the infinite poll for buggy
-> devices, but I don't see how that is resolved here.  This should make it a
-> little nicer to the system, but it still is going to poll forever on a
-> device that has gone catatonic.  Is there a reason that I'm missing that we
-> don't have a polling limit here?
-> 
-> sln
-
-we don't know what the limit would be. but given it's a workqueue
-now, why does it still have to poll as opposed to blocking?
-
-
 > > 
 > >          return vi->ctrl->status == VIRTIO_NET_OK;
 > >   }
