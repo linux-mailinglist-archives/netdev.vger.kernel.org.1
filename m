@@ -1,136 +1,109 @@
-Return-Path: <netdev+bounces-19541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A95175B230
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:15:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08A8575B241
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 17:17:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A411C21450
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:15:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C891C2145C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 15:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6F018B0E;
-	Thu, 20 Jul 2023 15:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F0718B11;
+	Thu, 20 Jul 2023 15:17:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82E11772A
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:15:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F333C433C7;
-	Thu, 20 Jul 2023 15:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9059C18AF6
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 15:17:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65510C433C9;
+	Thu, 20 Jul 2023 15:17:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689866131;
-	bh=04mRcNWXgjQaxb3drv8PqaZhrLgEK17mnXzAi5oyt+s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YZ7zi/YChc7USpnQSp5T0WNJP3whsLqNWbYH0AXGbZ+OPIel3HkL12V4RKtTgkT3q
-	 12cinlCgxfelVNBEDAe/C0Nug7zGF65Y84fptydiaXuEy/BOgWQmMqwP3Vk3usLG7u
-	 3miKCy4dtQr/lMDbN52RFCxGfNngX2QivUxp114Tc6xZ2qBGdMQLKmuJTze6tSUeSA
-	 t1s8ShqnRBSwyTwAM+xWRnykyxYYelnnPwhfWr7DhahqaYfd2teQXHFSN7bOVgrJj0
-	 z4jdKRMjh1U/oMSe6H9AvAsgbvJy/MGYoL5COk72Gbzu/sIgrRNmoJYLy53QDhrCSF
-	 aJNHRycL1Vrzg==
-Date: Thu, 20 Jul 2023 16:15:26 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: corbet@lwn.net, Andrew Lunn <andrew@lunn.ch>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux@leemhuis.info, kvalo@kernel.org,
-	benjamin.poirier@gmail.com
-Subject: Re: [PATCH docs v3] docs: maintainer: document expectations of small
- time maintainers
-Message-ID: <20230720-proxy-smile-f1b882906ded@spud>
-References: <20230719183225.1827100-1-kuba@kernel.org>
+	s=k20201202; t=1689866263;
+	bh=qYHzhCAUIzF07jkVYTmVpGY6QuZJidrqSGysBgEQ+mg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P16yasElhZTEVFOLsqDGNj4lriTO6FsUW8YABCZuFpIMFix1NMiwqPaxeOXOJGNOk
+	 VfOItlUQjULagwjy03aN/moX4p0fVX1uyxELFFx7ST2p8Y2LanDjA80FYWJYqo902U
+	 B1dPtPEPCXdcO2vuWr+smF+q+CudYO+XVVfGf4muamAjCqLdYs5ly7RxarL53ghMO1
+	 c7z4tglFywO9GUJRvnBTv0bIV43yd7al05bkCq1t3oVmo4Q8veUrMy96QxeUPfZzHU
+	 5XBwXPyYA9MApwhmFlvKbYMA+lkCuL/2H3vC+cqcQMFlqFT90CDLJVT0Z8BkAASI1o
+	 Buaey1/Wipc4w==
+Date: Thu, 20 Jul 2023 08:17:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Md Danish Anwar <a0501179@ti.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>, Simon Horman
+ <simon.horman@corigine.com>, Vignesh Raghavendra <vigneshr@ti.com>, Andrew
+ Lunn <andrew@lunn.ch>, Richard Cochran <richardcochran@gmail.com>, Conor
+ Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Rob Herring <robh+dt@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David
+ S. Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
+ <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [EXTERNAL] Re: [PATCH v10 2/2] net: ti: icssg-prueth: Add ICSSG
+ ethernet driver
+Message-ID: <20230720081741.0c32d5e6@kernel.org>
+In-Reply-To: <17cd1e70-73bc-78d5-7e9d-7b133d6f464b@ti.com>
+References: <20230719082755.3399424-1-danishanwar@ti.com>
+	<20230719082755.3399424-3-danishanwar@ti.com>
+	<20230719213543.0380e13e@kernel.org>
+	<17cd1e70-73bc-78d5-7e9d-7b133d6f464b@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="d/z8QjQ7RZYLewHr"
-Content-Disposition: inline
-In-Reply-To: <20230719183225.1827100-1-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 20 Jul 2023 17:12:50 +0530 Md Danish Anwar wrote:
+> Patch 1: Introduce Firmware mapping for the driver (icss_switch_map.h)
+> 
+> Patch 2: Introduce mii helper APIs. (icssg_mii_rt.h and icssg_mii_cfg.h). This
+> patch will also introduce basic prueth and emac structures in icssg_prueth.h as
+> these structures will be used by the helper APIs.
+> 
+> Patch 3: Introduce firmware configuration and classification APIs.
+> (icssg_classifier.c, icssg_config.h and icssg_config.c)
+> 
+> Patch 4: Introduce APIs for ICSSG Queues (icssg_queues.c)
+> 
+> Patch 5: Introduce ICSSG Ethernet driver. (icssg_prueth.c and icssg_prueth.h)
+> This patch will enable the driver and basic functionality can work after this
+> patch. This patch will be using all the APIs introduced earlier. This patch
+> will also include Kconfig and Makefile changes.
+> 
+> Patch 6: Enable standard statistics via ndo_get_stats64
+> 
+> Patch 7: Introduce ethtool ops for ICSSG
+> 
+> Patch 8: Introduce power management support (suspend / resume APIs)
+> 
+> However this structure of patches will introduce some APIs earlier (in patch
+> 2,3 and 4) which will be used later by patch 5. I hope it will be OK to
+> introduce APIs and macros earlier and use them later.
+> 
+> This restructuring will shorten all the individual patches. However patch 5
+> will still be a bit large as patch 5 introduces all the neccessary APIs as
+> driver probe / remove, ndo open / close, tx/rx etc.
+> 
+> Currnetly this single patch has close to 4000 insertion and is touching 12
+> files. After restructring patch 5 will have around 1800 insertions and will
+> touch only 4 files (icssg_prueth.c, icssg_prueth.h, Kconfig, Makefile). This is
+> still significant improvement.
+> 
+> Please let me know if this is OK.
 
---d/z8QjQ7RZYLewHr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+SGTM, thanks! One patch still being larger than others is a bit
+inevitable.
 
-Hey,
+> Also this patch has Reviewed-By tag of Andrew. Can I carry forward his
+> Reviewed-By tag in all patches or do I need to drop it?
 
-On Wed, Jul 19, 2023 at 11:32:25AM -0700, Jakub Kicinski wrote:
-> We appear to have a gap in our process docs. We go into detail
-> on how to contribute code to the kernel, and how to be a subsystem
-> maintainer. I can't find any docs directed towards the thousands
-> of small scale maintainers, like folks maintaining a single driver
-> or a single network protocol.
->=20
-> Document our expectations and best practices. I'm hoping this doc
-> will be particularly useful to set expectations with HW vendors.
-
-Thanks for writing this up, it's great to have this stuff written down.
-
-I had one minor comment from reading through things...
-
-> +Responsibilities
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The amount of maintenance work is usually proportional to the size
-> +and popularity of the code base. Small features and drivers should
-> +require relatively small amount of care and feeding. Nonetheless
-> +when the work does arrive (in form of patches which need review,
-> +user bug reports etc.) it has to be acted upon promptly.
-> +Even when a particular driver only sees one patch a month, or a quarter,
-> +a subsystem could well have a hundred such drivers. Subsystem
-> +maintainers cannot afford to wait a long time to hear from reviewers.
-> +
-> +The exact expectations on the response time will vary by subsystem.
-> +The patch review SLA the subsystem had set for itself can sometimes
-> +be found in the subsystem documentation. Failing that as a rule of thumb
-> +reviewers should try to respond quicker than what is the usual patch
-> +review delay of the subsystem maintainer. The resulting expectations
-> +may range from two working days for fast-paced subsystems (e.g. networki=
-ng)
-> +to as long as a few weeks in slower moving parts of the kernel.
-> +
-> +Mailing list participation
-> +--------------------------
-
-> +Reviews
-> +-------
-
-> +Refactoring and core changes
-> +----------------------------
-
-
-> +Bug reports
-> +-----------
-
-=2E.I noticed that none of these sections address actually testing the
-code they're responsible for on a (semi-)regular basis. Sure, that comes
-as part of reviewing the patches for their code, but changes to other
-subsystems that a driver/feature maintainer probably would not have been
-CCed on may cause problems for the code they maintain.
-If we are adding a doc about best-practice for maintainers, I think we
-should be encouraging people to test regularly.
-
-
---d/z8QjQ7RZYLewHr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZLlPigAKCRB4tDGHoIJi
-0vo7AP9SiCGy+w1ylCijiSy5SGDnWjSKXk19XlvB6y46RGchEgD/eDPkXorZb8NH
-dbM/yc7dITacGo/AZysVMhOVCS2KYA4=
-=umN0
------END PGP SIGNATURE-----
-
---d/z8QjQ7RZYLewHr--
+If the code is identical I reckon you can carry it.
 
