@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-19627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C2C75B78A
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:09:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DDFD75B788
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B3071C214AC
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:09:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF961C21508
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9D31BE73;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C951BE67;
 	Thu, 20 Jul 2023 19:08:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CFF1BE6F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F721BE61
 	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:08:47 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7BA1BC1
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 12:08:44 -0700 (PDT)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2081.outbound.protection.outlook.com [40.107.223.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B973E75
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 12:08:45 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PMSqKBCdcoGPCMWl+/Xplrs0WWg9LiazDf1s/nEPmfNDnnDCwwPiNNgG9bAYWYRyZChekyF7ek5AV1Pdss2/QMFPXsAbPhjtYc4G9VZsqDsKMTxeH2DbiGK0qkl2NhBbQNKB6hNOiPBkTcg9LDVbI2C/QDY9XeAQHTMKANWlRpL1yzoLT+xn1yP7hnU7XhSdDD9MFC2S3J0gvTcKinF6FEk6YMWhKLu8YrxjTYpkdApHzvfbpSCqMGJlPpuxe++Qb0BUVoRrlDt/PLdxAF8O6PQXEuSNKZI2UVIjbg+VV3DRctgkE3r+7rduP7xPLRJx7ZA2DfulHFSdk2DESCjusw==
+ b=MAkWVEaPl8UbHgUplWq744Mrd08RAc7JQmzg5xcDWXvuMpXlsi9JwC+/+iKWgTH0MdsoPVo4gS8TTVCa2OG4h1IhS+xk6DAb0uyIXIK3PV/Ky8ZnNajB7igL7toaqCcl+/C2I7NX7m7L5vHnthGpM+QPT//5XJ7xndxEwIv05ull6YgroKZmRnaZBH3MTrD56FKeGlxOV9dfxQ2yKZPQSL/8IccojGMxctfjaHK8VUStLRhk8CO8kGS/oAjlgCHJwn0RAiWgNYmIbt05CGRh+ZnvH4n2mYna6Yu0BT+RWZSCRAPffz1SXoMOfyLLgJih1MP1aYqb7+EONcp3daUJUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=etMMNfcLcrUdufIV1PkhmTmjmvo0YKUU3ANWeNFwX0E=;
- b=A9cmkxfdEk06n3XaMXnJGYj2SDxoU8VItbm9J66oL2r0IVu6UJHfYjK4i0UWX6aK9+OJ53DLYjRLmTi+xlacJamR0jkQz9Vr95ijWEKWWXQN3roy4PLP6p8almtYe9Sw3KfkA3wHVXfrMfoi137osZ6+Rx52FxxGp7CcecJMGkz1OGTvrTAOMtIY5amdIccZ8fUfbZ29KrkIi7q+CvqLtwQiJFtuQClwt/CMijnzNkEoKQ3EO9Kr295EmN0l+p2o79QnaDtu2iWCA5NU9ay0f4X3EgEAIx0ME/06wmqpEXY6MMxqyQOVSpRsXEaJO95e8ONb2uxzUP67Ot15Nn+urQ==
+ bh=rWsuFpSKKhWHboZt7i1sp8iS/R9/5py/M4I2ag/aK8g=;
+ b=cakPNBE9MycClkkPeF3kqsRwWSO6WWrA4EtYru6i6WyHhSXCKACNIdbKfZVj8TtVINY23gaZgDJ2IoZDXicPWoZAAYQ8rwbOEi0xXIIQgJsAKNXAzUgWFr68c3jRhDmXp6xlJbKIA3btKAtku7jpyIXhlONWFKVHaclU37wdBG/6c82rzdaMe+qgPEfYIONuzxXhv5+1wArl7VcnVGXkJp0iqUjtJ+vIPpPFbVrlTDc+Vk1Hj+HSPNo/WT/GzBYJ25aZSqkrwRZpbIm1U1gvy/1rSoqzTTL/OsY7eG3p0vPss38I+WGt/0m/qLGqbIYbxLZeOtWI1OGNjP9Kx41rHw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=etMMNfcLcrUdufIV1PkhmTmjmvo0YKUU3ANWeNFwX0E=;
- b=GTuS9ip05iAxlDYAWeKUlOHVCTGej6LsxVBqeIR/UCNmwYbsSFK7p2ol3SziHR2m0eWPchGpPfAMlPXdhjzS60oYUQXKqUyQO8wNUeDZUV7HFxuUQx1QVE4xYvfid9kn0EnKsiYLGUKH5GnYqsIG61lY5QRZc6mZWmfuqJ+AaHk=
-Received: from DS7PR03CA0028.namprd03.prod.outlook.com (2603:10b6:5:3b8::33)
- by IA1PR12MB6017.namprd12.prod.outlook.com (2603:10b6:208:3d7::8) with
+ bh=rWsuFpSKKhWHboZt7i1sp8iS/R9/5py/M4I2ag/aK8g=;
+ b=PEYMe+YL1DQagrVO8ZUXvnc+B/FHlrAiq2GPF/o6uYz4LOSgQQz7dpkAHpgVdFqHCzip6koka9/1DTD870Wyr9md4wuqshBjpSkWBdWTX7DDE3myJevN38yxbnFP1dx9AbWCcpkjB3fA4q4WL3fCoyOL+3ARR0SQO7UrzLUIIcE=
+Received: from DS7PR03CA0069.namprd03.prod.outlook.com (2603:10b6:5:3bb::14)
+ by IA1PR12MB6066.namprd12.prod.outlook.com (2603:10b6:208:3ee::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Thu, 20 Jul
- 2023 19:08:39 +0000
-Received: from DM6NAM11FT029.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b8:cafe::25) by DS7PR03CA0028.outlook.office365.com
- (2603:10b6:5:3b8::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
- Transport; Thu, 20 Jul 2023 19:08:39 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25; Thu, 20 Jul
+ 2023 19:08:42 +0000
+Received: from DM6NAM11FT089.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3bb:cafe::84) by DS7PR03CA0069.outlook.office365.com
+ (2603:10b6:5:3bb::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28 via Frontend
+ Transport; Thu, 20 Jul 2023 19:08:40 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -53,21 +53,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT029.mail.protection.outlook.com (10.13.173.23) with Microsoft SMTP
+ DM6NAM11FT089.mail.protection.outlook.com (10.13.173.82) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6609.28 via Frontend Transport; Thu, 20 Jul 2023 19:08:39 +0000
+ 15.20.6588.34 via Frontend Transport; Thu, 20 Jul 2023 19:08:40 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 20 Jul
- 2023 14:08:37 -0500
+ 2023 14:08:38 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<simon.horman@corigine.com>, <idosch@idosch.org>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH v4 net-next 2/4] ionic: extract common bits from ionic_probe
-Date: Thu, 20 Jul 2023 12:08:14 -0700
-Message-ID: <20230720190816.15577-3-shannon.nelson@amd.com>
+Subject: [PATCH v4 net-next 3/4] ionic: pull out common bits from fw_up
+Date: Thu, 20 Jul 2023 12:08:15 -0700
+Message-ID: <20230720190816.15577-4-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230720190816.15577-1-shannon.nelson@amd.com>
 References: <20230720190816.15577-1-shannon.nelson@amd.com>
@@ -83,26 +83,26 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT029:EE_|IA1PR12MB6017:EE_
-X-MS-Office365-Filtering-Correlation-Id: 63679935-5636-43b8-404b-08db8954b9f4
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT089:EE_|IA1PR12MB6066:EE_
+X-MS-Office365-Filtering-Correlation-Id: aa1ef2e2-8fe0-412a-51f3-08db8954ba93
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	dgFGgwpHA0FUvnFaRTt96znvV++uMgpWb2UWYL3Mr0XpjIBDAjbDqXri8Z11If1U6RZlzfM6kqpLV+DfNDNWFLu1fkYsPXr4gQsLgdOuyF+uTR5BNJgUGoHvymb918lvkpRwkTE2T+8IWmKCREBvhhqBEX2fGoQwxNRtkdH8jZGB2dLO7oqnZrMBPIjx5egdKIWL6gtMBV+xgHiP6NIRok18VQp77YM8e9kOWR7/OPwwoZp5cEA5fj4R3+4y3CIGDIq7f5ytsSAq1Hx7d4+my+dKG2gcBh3pwZBay/oyt+vPdEXRYINhM3+C/izoY/2E4J6jSC6NauOvEBf+DSmgAi147YDqWz4DZ6loU4cGBS8DJTPWMtvgddXv8RvhFvvO2PxmnHAQSo8XxO1Xsd39c8rOIVLQCzPr4JxdYQi5V56iRn09I2z8mPEeYhFccmH92hvt7PJqYFqdjw3gu1dvVIvfyqfQJTlPYFOpVB9hBdXGLwSLT1zoxvXkn9TbaptW786HMMrQdic3wD5J5Wj2EghqE+XzyJjRt/tnKZ3OWD81YZVwPJBp0fr1wHMzraB2GrmLbwFDOGSWNDxkn/uqhS3LJClx9Uz00gS1x3LQ9FSEVAOSJ3tUBLhf/KAyMRhF/FoKj9jUQIrGAWUdgRBD3q0NClH2cYDMrQ0/i7rLL4zo23cCEiWwP7JHZFx3PlIkEahM1Uld4dNMHKjBfnZ29XQDXR6OFqiyT2vmD5WL3pGryCLKsKEANJUGlRCOEaOirXc4slP0Ng8rU6j+RljKxw==
+	LSqy9gU6xradepiD0dugHcvorchWXVNjEcxUjKGUcGfkool8NHP+NiEc7Z7a4FYUAtQJfJjnrq1IUv5bh5Gpy8PsXW8SHziVc7BQf3ZQyqjq38wY8M//Zz9AKPcnPUL2DMVNLqQckGiUiH1Ehq/h8mGhhlCGWCI803Aw8DAvO+fs6FV8MM83QSqxqnGwFHb7W/hSwxN5ueQlkuicNBkx2yrqRigXcbJGPfp7g3V7T1ZAHMk8yLrDU4wEl6ZMUn3Hon0l2Y+6zfPKRW9upijnqNSmaJ1XSET2WuV7kS3RqwDAUQNK0Q0gOi2ePg/xUA2oAebF6adthQQdQ3MNegqVvPNegQmyNr952OSYC8LYBJ/jb+zFTV4LJ2co7hW7geVRXtFUqDC3fV/U/qNVlmG311l7E7tR/gzNZBpvq+oRn3oKqqw1OfBWkcwsCK3BLMCMQRvwe9VyTO0Kkg7L2LpKQ/+TgJP4lwLjLNZ8CwFHaTmESng7HNQ3Xl3ASJ4/Ci57KiIXLxY9BI+nQBuxoBMmEz+4DPwLRSnKF7zKu67lB2O98F9jTug7TNWRjm1GSPz3av0S8irxsC2AEYCcTYejQd7fbM8c5+oPvvQDDLThx/Ib7eXHH0P6GBWoCi75a4Vw+pJsmLIMMMfa7fHi4IxHr4rdYWZ6o8QdM2JL3FdCoDf5ktnAJneffIL2cFZtxLQNzhS4f03KN8nWQE5AZggRY2+Cozf6ZnQVRaoZy6QMaGPUWUac0KMIFkCzHxc7aBlyeaxfnSmfry2/mBK43RHmPw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(136003)(396003)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(6666004)(478600001)(54906003)(110136005)(36756003)(83380400001)(426003)(36860700001)(2616005)(40460700003)(40480700001)(86362001)(2906002)(82740400003)(26005)(1076003)(336012)(47076005)(186003)(356005)(16526019)(81166007)(8676002)(5660300002)(70586007)(316002)(44832011)(4326008)(8936002)(70206006)(41300700001)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(396003)(346002)(136003)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(2906002)(36860700001)(83380400001)(40460700003)(2616005)(426003)(47076005)(356005)(81166007)(86362001)(36756003)(82740400003)(40480700001)(316002)(4326008)(70586007)(70206006)(336012)(26005)(1076003)(186003)(16526019)(41300700001)(110136005)(478600001)(6666004)(54906003)(8936002)(44832011)(8676002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:08:39.2326
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:08:40.2751
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63679935-5636-43b8-404b-08db8954b9f4
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa1ef2e2-8fe0-412a-51f3-08db8954ba93
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DM6NAM11FT029.eop-nam11.prod.protection.outlook.com
+	DM6NAM11FT089.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6017
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6066
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -110,149 +110,108 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Pull out some chunks of code from ionic_probe() that will
-be common in rebuild paths.
+Pull out some code from ionic_lif_handle_fw_up() that can be
+used in the coming FLR recovery patch.
 
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../ethernet/pensando/ionic/ionic_bus_pci.c   | 84 +++++++++++--------
- 1 file changed, 49 insertions(+), 35 deletions(-)
+ .../net/ethernet/pensando/ionic/ionic_lif.c   | 64 ++++++++++++-------
+ 1 file changed, 42 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index 2bc3cab3967d..bcce613449c2 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -220,30 +220,12 @@ static void ionic_clear_pci(struct ionic *ionic)
- 	pci_disable_device(ionic->pdev);
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+index 612b0015dc43..2d03c1b995bc 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+@@ -3266,27 +3266,11 @@ static void ionic_lif_handle_fw_down(struct ionic_lif *lif)
+ 	dev_info(ionic->dev, "FW Down: LIFs stopped\n");
  }
  
--static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-+static int ionic_setup_one(struct ionic *ionic)
+-static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
++static int ionic_restart_lif(struct ionic_lif *lif)
  {
--	struct device *dev = &pdev->dev;
--	struct ionic *ionic;
--	int num_vfs;
-+	struct pci_dev *pdev = ionic->pdev;
-+	struct device *dev = ionic->dev;
+ 	struct ionic *ionic = lif->ionic;
  	int err;
  
--	ionic = ionic_devlink_alloc(dev);
--	if (!ionic)
--		return -ENOMEM;
+-	if (!test_bit(IONIC_LIF_F_FW_RESET, lif->state))
+-		return;
 -
--	ionic->pdev = pdev;
--	ionic->dev = dev;
--	pci_set_drvdata(pdev, ionic);
--	mutex_init(&ionic->dev_cmd_lock);
+-	dev_info(ionic->dev, "FW Up: restarting LIFs\n");
 -
--	/* Query system for DMA addressing limitation for the device. */
--	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(IONIC_ADDR_LEN));
--	if (err) {
--		dev_err(dev, "Unable to obtain 64-bit DMA for consistent allocations, aborting.  err=%d\n",
--			err);
--		goto err_out_clear_drvdata;
--	}
+-	ionic_init_devinfo(ionic);
+-	err = ionic_identify(ionic);
+-	if (err)
+-		goto err_out;
+-	err = ionic_port_identify(ionic);
+-	if (err)
+-		goto err_out;
+-	err = ionic_port_init(ionic);
+-	if (err)
+-		goto err_out;
 -
- 	ionic_debugfs_add_dev(ionic);
+ 	mutex_lock(&lif->queue_lock);
  
- 	/* Setup PCI device */
-@@ -258,7 +240,6 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		dev_err(dev, "Cannot request PCI regions: %d, aborting\n", err);
- 		goto err_out_clear_pci;
- 	}
+ 	if (test_and_clear_bit(IONIC_LIF_F_BROKEN, lif->state))
+@@ -3322,12 +3306,8 @@ static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
+ 	clear_bit(IONIC_LIF_F_FW_RESET, lif->state);
+ 	ionic_link_status_check_request(lif, CAN_SLEEP);
+ 	netif_device_attach(lif->netdev);
+-	dev_info(ionic->dev, "FW Up: LIFs restarted\n");
 -
- 	pcie_print_link_status(pdev);
+-	/* restore the hardware timestamping queues */
+-	ionic_lif_hwstamp_replay(lif);
  
- 	err = ionic_map_bars(ionic);
-@@ -286,24 +267,64 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out_teardown;
- 	}
- 
--	/* Configure the ports */
-+	/* Configure the port */
- 	err = ionic_port_identify(ionic);
- 	if (err) {
- 		dev_err(dev, "Cannot identify port: %d, aborting\n", err);
--		goto err_out_reset;
-+		goto err_out_teardown;
- 	}
- 
- 	err = ionic_port_init(ionic);
- 	if (err) {
- 		dev_err(dev, "Cannot init port: %d, aborting\n", err);
--		goto err_out_reset;
-+		goto err_out_teardown;
-+	}
-+
+-	return;
 +	return 0;
-+
-+err_out_teardown:
-+	ionic_dev_teardown(ionic);
-+err_out_clear_pci:
-+	ionic_clear_pci(ionic);
-+err_out_debugfs_del_dev:
-+	ionic_debugfs_del_dev(ionic);
+ 
+ err_txrx_free:
+ 	ionic_txrx_free(lif);
+@@ -3337,6 +3317,46 @@ static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
+ 	ionic_qcqs_free(lif);
+ err_unlock:
+ 	mutex_unlock(&lif->queue_lock);
 +
 +	return err;
 +}
 +
-+static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
 +{
-+	struct device *dev = &pdev->dev;
-+	struct ionic *ionic;
-+	int num_vfs;
++	struct ionic *ionic = lif->ionic;
 +	int err;
 +
-+	ionic = ionic_devlink_alloc(dev);
-+	if (!ionic)
-+		return -ENOMEM;
++	if (!test_bit(IONIC_LIF_F_FW_RESET, lif->state))
++		return;
 +
-+	ionic->pdev = pdev;
-+	ionic->dev = dev;
-+	pci_set_drvdata(pdev, ionic);
-+	mutex_init(&ionic->dev_cmd_lock);
++	dev_info(ionic->dev, "FW Up: restarting LIFs\n");
 +
-+	/* Query system for DMA addressing limitation for the device. */
-+	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(IONIC_ADDR_LEN));
-+	if (err) {
-+		dev_err(dev, "Unable to obtain 64-bit DMA for consistent allocations, aborting.  err=%d\n",
-+			err);
++	/* This is a little different from what happens at
++	 * probe time because the LIF already exists so we
++	 * just need to reanimate it.
++	 */
++	ionic_init_devinfo(ionic);
++	err = ionic_identify(ionic);
++	if (err)
 +		goto err_out;
- 	}
- 
-+	err = ionic_setup_one(ionic);
++	err = ionic_port_identify(ionic);
++	if (err)
++		goto err_out;
++	err = ionic_port_init(ionic);
 +	if (err)
 +		goto err_out;
 +
- 	/* Allocate and init the LIF */
- 	err = ionic_lif_size(ionic);
- 	if (err) {
- 		dev_err(dev, "Cannot size LIF: %d, aborting\n", err);
--		goto err_out_port_reset;
-+		goto err_out_pci;
- 	}
- 
- 	err = ionic_lif_alloc(ionic);
-@@ -354,17 +375,10 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	ionic->lif = NULL;
- err_out_free_irqs:
- 	ionic_bus_free_irq_vectors(ionic);
--err_out_port_reset:
--	ionic_port_reset(ionic);
--err_out_reset:
--	ionic_reset(ionic);
--err_out_teardown:
-+err_out_pci:
- 	ionic_dev_teardown(ionic);
--err_out_clear_pci:
- 	ionic_clear_pci(ionic);
--err_out_debugfs_del_dev:
--	ionic_debugfs_del_dev(ionic);
--err_out_clear_drvdata:
-+err_out:
- 	mutex_destroy(&ionic->dev_cmd_lock);
- 	ionic_devlink_free(ionic);
- 
++	err = ionic_restart_lif(lif);
++	if (err)
++		goto err_out;
++
++	dev_info(ionic->dev, "FW Up: LIFs restarted\n");
++
++	/* restore the hardware timestamping queues */
++	ionic_lif_hwstamp_replay(lif);
++
++	return;
++
+ err_out:
+ 	dev_err(ionic->dev, "FW Up: LIFs restart failed - err %d\n", err);
+ }
 -- 
 2.17.1
 
