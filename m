@@ -1,211 +1,113 @@
-Return-Path: <netdev+bounces-19452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB5875AB94
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 12:00:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAA9075AB26
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:44:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B83D928117D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 10:00:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79727281CA1
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956B8174E6;
-	Thu, 20 Jul 2023 10:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2600D168D2;
+	Thu, 20 Jul 2023 09:44:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F80174D5
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 10:00:21 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A54ED;
-	Thu, 20 Jul 2023 03:00:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xv4d8S2hsGwUu91eD1a3AYXVYp2V+KbTyHT4YJGVHLu0jowOXg+eKSkMUJhyvQl5uB0syaYsmYQE8qn4v06GIBZYzvNEZZycOF3fgBs8jKSeupYJmlpjBfG3eyu36+lk3VreLIjI0UGQxMIcr7NcVSALKCaU6Dw+6Sj7wks17OpGt/CdfFdBqEVCjr4HKMrp52nX3xLnBTJD+1bFBTzFDBm+yq++TRoRPEiCQ8+/wSiDX9aenbxJEGK9C3jWUTz8xos2G9s40yu5tLSKMpSiITHMDVq6HaJKolFfr+ezEjOOPpLA3dHcnNnFStIxoDWDBrmZVq2WBTd6vf/VWJ/EoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FZVYTtLQzoVhZgX3JBXnNFLor5nC7WRuUJfDIjiZ7xw=;
- b=kvQH+VUjt3kGUeGfB2ySjUMRnoFCAxvJXAIjfvDVEMbWoag5J8hoFLx5xijHJLRrYbJ5DN83v6fAFOVb7y4aBgkNneKvFGWSSt8Lueb3EyBhZqJS6qhGRUCUbkCihjmjSyyZuXt82JJpRxI5+YuzoHi+NXJRqMTLEZ1QX+YfN6towUI5EmlDKOBJL9b0dvZiZphkULfPV/SLhPkR0kpQoALoA5BFJZ86eGnoVXtVmu4UPe7TuWTdxWG+Ni4Gz56ELnusJPE3/HQm3F6I63HGmURO3KSSd4tm+8zhJGArCrWvc/W11HuQ1OOUdAb0lrXJA5/3cdBCfOhLb9cQHR36Nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FZVYTtLQzoVhZgX3JBXnNFLor5nC7WRuUJfDIjiZ7xw=;
- b=ErZm9FxAgrW37vEw4SbBU1XQRFG8mXoU0SF57VWvP7Q75+4eKbagTYz3lgQ00ltSGR1VrmTkttGbUh559wlPLQfm4JY/XDcBHtJDN5f8QFU3j17wO56yfNsfO0SZ4i77l3DWP9lxAYAHdKALnJwMTdv1174DqYw1dU4ctvQqxPobZL2aTL5ARw6Kr0OTTOs46vk1bkrmamOkMHuPxEWWokyXi3drioQQ6dGMf9Swn7iRMzveNvik0Cu6I14JppAT2ugB5usSJ/s8zM6gG8tvBfMzlr+4eX/vg1N3VO00JRiQEy0YblDT7O6CIyatEzUwJ5CJlrXANOPsmD37HJLe5A==
-Received: from BN9PR03CA0180.namprd03.prod.outlook.com (2603:10b6:408:f4::35)
- by CH3PR12MB7665.namprd12.prod.outlook.com (2603:10b6:610:14a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Thu, 20 Jul
- 2023 10:00:14 +0000
-Received: from BN8NAM11FT074.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:f4:cafe::86) by BN9PR03CA0180.outlook.office365.com
- (2603:10b6:408:f4::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
- Transport; Thu, 20 Jul 2023 10:00:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN8NAM11FT074.mail.protection.outlook.com (10.13.176.154) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.34 via Frontend Transport; Thu, 20 Jul 2023 10:00:14 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 20 Jul 2023
- 03:00:01 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 20 Jul
- 2023 02:59:58 -0700
-References: <759fe934-2e43-e9ff-8946-4fd579c09b05@alu.unizg.hr>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>, Ido Schimmel
-	<idosch@nvidia.com>
-Subject: Re: [PROBLEM] seltests: net/forwarding/sch_ets.sh [HANG]
-Date: Thu, 20 Jul 2023 11:43:45 +0200
-In-Reply-To: <759fe934-2e43-e9ff-8946-4fd579c09b05@alu.unizg.hr>
-Message-ID: <87cz0m9a3n.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB1219A04
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:44:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48712111
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:44:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689846240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QBu9TkbzMOCSD1eOi7WHPZMb2sgit8YCwrw/vhRzZt4=;
+	b=NjhA5ivea08H2hUbgsFBx/15WFMitOQUJbGKsz0ILMMvCWL5Tcq02kmNe3aNCMjMaQflho
+	IuHLhE6dwfliQhcNMylfhfs0+pVXeGsELEX3qrrlZcefsSQ/tB3dpF/xqvujFz8brOQ3bS
+	ojmCa8D25uWaNt5M23pB1kE/k8wyp6s=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-187-tj-Z9c9iPVORVGLOCpeCkg-1; Thu, 20 Jul 2023 05:43:59 -0400
+X-MC-Unique: tj-Z9c9iPVORVGLOCpeCkg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-639d9eaf37aso1750886d6.0
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:43:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689846239; x=1690451039;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QBu9TkbzMOCSD1eOi7WHPZMb2sgit8YCwrw/vhRzZt4=;
+        b=FSlFQbyw1OkKcEiKIeuVTP0YJneXMqpl0pa0iG+BL5J9t23w/afwr38TO8b7fvtkxw
+         mCFY+FXhlixs0Tu4KkmVnlGYCIQU4LRftBv+twzDRWR74R+CeVV5zqu+2RFwC+utNRmQ
+         +U7ddT6RG0F/ueS+Y9tiGxJzHJhzG91YgiYGdPbAYLsb5LT+UZ2DIK22HD7WNGDu+93w
+         HkMs5wN4wdpOe0UTixwoO8xu/mAo3Z5Q4kauyDLWtcKeqW/g7O2IDPKz49VJbBC4A2eC
+         l31XKUWEKw4XINZpjhULNu/FvKwaZLvrkyjXr/Ucb3YNi6eIbk6TI8k7Dqmc3yPFkVsa
+         92KQ==
+X-Gm-Message-State: ABy/qLa+34EC6amQ9MVwTL25Hpev92WkCAMH8Wh+N7pOPVWeqhJ/pj8M
+	g+NZBM4+uUzGY6uRIfg1VDonV3s0fdi2lzKlLUYuQC5nFyvAHMjTt5Q7tbdsF7jQGCeDW4vRiGK
+	N2uiDt3swmNQg7Y+3
+X-Received: by 2002:a05:622a:1811:b0:403:c2fa:83b with SMTP id t17-20020a05622a181100b00403c2fa083bmr2914714qtc.4.1689846238952;
+        Thu, 20 Jul 2023 02:43:58 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG6adGPSviX9fvdcZEGW3p8Vwn5iHiFTcF1R8oieFqEBc6y7+ycrNqyaQuwRaGY5bZ/xT8YgA==
+X-Received: by 2002:a05:622a:1811:b0:403:c2fa:83b with SMTP id t17-20020a05622a181100b00403c2fa083bmr2914706qtc.4.1689846238661;
+        Thu, 20 Jul 2023 02:43:58 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id w10-20020ac86b0a000000b003f9c6a311e1sm193610qts.47.2023.07.20.02.43.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 02:43:58 -0700 (PDT)
+Message-ID: <e839c959417f813444567556177c8d3a1ef83467.camel@redhat.com>
+Subject: Re: [PATCH net-next] ipv6: remove hard coded limitation on
+ ipv6_pinfo
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, Chao Wu
+ <wwchao@google.com>,  Wei Wang <weiwan@google.com>, Coco Li
+ <lixiaoyan@google.com>, YiFei Zhu <zhuyifei@google.com>
+Date: Thu, 20 Jul 2023 11:43:55 +0200
+In-Reply-To: <20230718202437.1788505-1-edumazet@google.com>
+References: <20230718202437.1788505-1-edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT074:EE_|CH3PR12MB7665:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8291cb39-7641-4ae3-03e7-08db89081d05
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	HHkFj46amgQ6gw0lnIRqsC1mrd8FBCUJ69hssrAniAwC1ePf+LnLO/LiEC37rKwWiAbR0pz6aPR4c4KoNxTj104rPufCa1Ihax2YFn+9ACq/jLrdrmfqozoFQG31irZXyaB1sUMBPwfQC4/t5qu1jlFV/SVOAdPnIp/FAFERwNra6hFv3pwL2CGiTta0qRclSZczDNx7z+ggXsE9KhJxK5ERcLIcHMZT5HbRZEKteyAOe4a/eKU8IQ7iXqFyGYdyJEhc+z+aCgg2HV7EuaG/4iWgmoSRe4psnDgwpBbo35vNyCJoKQeXwExfaMPMGn2U1VjG0gvNt8fIssWDNvVv2c51MUlOeWqXae9/d8Wwv4ZBRtr3a50v20w0kbNesA5q28RY+efJW+/qirq1wgBOd9Pys1ywRhUnqcnqXieY48gikMrg70QTq9ahYdb+UW9UpBLkEHF37V/JoHoskpLOWtOIwSichQcQELWjHnyXBpr4R1bprtt9vYKiPkz33b2F0EHRkVnOVFKB0YIAoGc7YdLbKJlMUv6v0GmHF3+fVvnEzzxxgiIo9LIVV4f6CeDm7bMwD3ZfN8dv56r3Qi2LCAL3T3U9WKrEvXukVjIIlEU7ydL3hI12DnhOYMDR4sjvLA6p4C8STax0HSY385qKc3CPZ9fyBmMzqn/OFTzH6DdUHxrH0LqiY26XLUphfGAoSE3FgegDFj+0XOQFqxip9eNLe1T5Jnw8GdokZBq4lMduSb0Ocu6N5vtkcWL1BVFq
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(136003)(396003)(82310400008)(451199021)(46966006)(40470700004)(36840700001)(8676002)(8936002)(5660300002)(316002)(41300700001)(6916009)(70206006)(4326008)(70586007)(107886003)(54906003)(478600001)(2906002)(6666004)(40460700003)(7636003)(82740400003)(356005)(40480700001)(26005)(186003)(2616005)(426003)(36860700001)(336012)(47076005)(36756003)(16526019)(86362001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 10:00:14.0637
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8291cb39-7641-4ae3-03e7-08db89081d05
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN8NAM11FT074.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7665
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, 2023-07-18 at 20:24 +0000, Eric Dumazet wrote:
+> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> index 3613489eb6e3b0871da09f06561cc251fe2e0b80..b4d5cc0196c3d73f98c484b01=
+a61322926da2f14 100644
+> --- a/net/mptcp/protocol.c
+> +++ b/net/mptcp/protocol.c
+> @@ -3988,6 +3988,7 @@ int __init mptcp_proto_v6_init(void)
+>  	strcpy(mptcp_v6_prot.name, "MPTCPv6");
+>  	mptcp_v6_prot.slab =3D NULL;
+>  	mptcp_v6_prot.obj_size =3D sizeof(struct mptcp6_sock);
+> +	mptcp_v6_prot.ipv6_pinfo_offset =3D offsetof(struct mptcp6_sock, np),
 
-Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr> writes:
+Checkpatch spotted that here ';'  is needed in place of ','. Yep, mptcp
+is always a little special ;)
 
-> Using the same config for 6.5-rc2 on Ubuntu 22.04 LTS and 22.10, the execution
-> stop at the exact same line on both boxes (os I reckon it is more than an
-> accident):
->
-> # selftests: net/forwarding: sch_ets.sh
-> # TEST: ping vlan 10                                                  [ OK ]
-> # TEST: ping vlan 11                                                  [ OK ]
-> # TEST: ping vlan 12                                                  [ OK ]
-> # Running in priomap mode
-> # Testing ets bands 3 strict 3, streams 0 1
-> # TEST: band 0                                                        [ OK ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 1                                                        [ OK ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 3 strict 3, streams 1 2
-> # TEST: band 1                                                        [ OK ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 2                                                        [ OK ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
-> # TEST: band 0                                                        [ OK ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 1                                                        [ OK ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
-> # TEST: bands 1:2                                                     [ OK ]
-> # INFO: Expected ratio 2.00 Measured ratio 1.99
-> # Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
-> # TEST: bands 0:1                                                     [ OK ]
-> # INFO: Expected ratio 1.00 Measured ratio .99
-> # TEST: bands 0:2                                                     [ OK ]
-> # INFO: Expected ratio 1.00 Measured ratio 1.00
-> # Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
-> # TEST: bands 0:1                                                     [ OK ]
-> # INFO: Expected ratio 1.42 Measured ratio 1.42
-> # TEST: bands 0:2                                                     [ OK ]
-> # INFO: Expected ratio 3.33 Measured ratio 3.33
-> # Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
-> # TEST: bands 0:1                                                     [ OK ]
-> # INFO: Expected ratio 1.60 Measured ratio 1.59
-> # TEST: bands 0:2                                                     [ OK ]
-> # INFO: Expected ratio 3.33 Measured ratio 3.33
-> # Testing ets bands 2 quanta 5000 2500, streams 0 1
-> # TEST: bands 0:1                                                     [ OK ]
-> # INFO: Expected ratio 2.00 Measured ratio 1.99
-> # Running in classifier mode
-> # Testing ets bands 3 strict 3, streams 0 1
-> # TEST: band 0                                                        [ OK ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 1                                                        [ OK ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 3 strict 3, streams 1 2
-> # TEST: band 1                                                        [ OK ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 2                                                        [ OK ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
->
-> I tried to run 'set -x' enabled version standalone, but that one finished
-> correctly (?).
->
-> It could be something previous scripts left, but right now I don't have a clue.
-> I can attempt to rerun all tests with sch_ets.sh bash 'set -x' enabled later today.
+Cheers,
 
-If you run it standalone without set -x, does it finish as well? That
-would imply that the reproducer needs to include the previous tests as
-well.
+Paolo
 
-It looks like the test is stuck in ets_test_mixed in classifier_mode.
-A way to run just this test would be:
-
-    TESTS="classifier_mode ets_test_mixed" ./sch_ets.sh
-
-Looking at the code, the only place that I can see that waits on
-anything is the "{ kill %% && wait %%; } 2>/dev/null" line in
-stop_traffic() (in lib.sh). Maybe something like this would let
-us see if that's the case:
-
-modified   tools/testing/selftests/net/forwarding/lib.sh
-@@ -1468,8 +1470,10 @@ start_tcp_traffic()
- 
- stop_traffic()
- {
-+	echo killing MZ
- 	# Suppress noise from killing mausezahn.
- 	{ kill %% && wait %%; } 2>/dev/null
-+	echo killed MZ
- }
 
