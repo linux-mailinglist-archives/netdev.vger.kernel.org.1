@@ -1,58 +1,54 @@
-Return-Path: <netdev+bounces-19428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80E075AA5F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:08:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F1975AA7C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:19:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC8B91C212FD
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AF782819F4
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68667199FD;
-	Thu, 20 Jul 2023 09:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E1438D;
+	Thu, 20 Jul 2023 09:19:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5264B361
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:08:27 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA7D2AA58
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:07:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689844004;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39E3361
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:19:53 +0000 (UTC)
+Received: from out-52.mta0.migadu.com (out-52.mta0.migadu.com [91.218.175.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C038C558B
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:19:50 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1689844787;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=Gj694vQxBZgkwxlf1stwKV7KnWklxY0xcReeSVInAHg=;
-	b=WIs2nMxlzlDqMRSNut22TO+X21N6E0hXACX2rskxrYeG2QFn2SPiMSDFzpawhQ1TeHJcOU
-	tSTv8lXToVlVngItejjVG4mtr8zdwmCBA4opwT7Mdr1+Bcf+F2e6hPrveRAl+Ctv0jwRCg
-	IR0AIS6nw6Fh255h8epjt5T/BWfXm+g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-161-1jQJ5vFHNcKkHDMq1WNgrg-1; Thu, 20 Jul 2023 05:06:40 -0400
-X-MC-Unique: 1jQJ5vFHNcKkHDMq1WNgrg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B5859185A792;
-	Thu, 20 Jul 2023 09:06:39 +0000 (UTC)
-Received: from griffin.upir.cz (unknown [10.45.226.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AE146200B41D;
-	Thu, 20 Jul 2023 09:06:38 +0000 (UTC)
-From: Jiri Benc <jbenc@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eyal Birger <eyal.birger@gmail.com>
-Subject: [PATCH net v2] vxlan: calculate correct header length for GPE
-Date: Thu, 20 Jul 2023 11:05:56 +0200
-Message-Id: <544e8c6d0f48af2be49809877c05c0445c0b0c0b.1689843872.git.jbenc@redhat.com>
+	bh=J2hundmgcOEV2+xcO9cmfAsABoHmkZbs1aEBX+WqDhc=;
+	b=Y4XtTiy6T9gn9LALWML3gGW5QmeUT5WFQXe1R/PC+xzjkx9agP6SjEG4uVrbmXsztiBfE3
+	L9Hh7tTeqUxUG00jsCZWIfxoLKA7IKbTRw/Y8vYMX1/LIuqHxnqY57THPT4SsosCthC8p2
+	Ejx07Ez/DnyIFWU4h53U9cd+0Jq5RDU=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Milena Olech <milena.olech@intel.com>,
+	Michal Michalik <michal.michalik@intel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	poros@redhat.com,
+	mschmidt@redhat.com,
+	netdev@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH net-next 00/11] Create common DPLL configuration API
+Date: Thu, 20 Jul 2023 10:18:52 +0100
+Message-Id: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,167 +56,493 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-VXLAN-GPE does not add an extra inner Ethernet header. Take that into
-account when calculating header length.
+Implement common API for clock/DPLL configuration and status reporting.
+The API utilises netlink interface as transport for commands and event
+notifications. This API aim to extend current pin configuration and
+make it flexible and easy to cover special configurations.
 
-This causes problems in skb_tunnel_check_pmtu, where incorrect PMTU is
-cached.
+Netlink interface is based on ynl spec, it allows use of in-kernel
+tools/net/ynl/cli.py application to control the interface with properly
+formated command and json attribute strings. Here are few command
+examples of how it works with `ice` driver on supported NIC:
 
-In the collect_md mode (which is the only mode that VXLAN-GPE
-supports), there's no magic auto-setting of the tunnel interface MTU.
-It can't be, since the destination and thus the underlying interface
-may be different for each packet.
+- dump dpll devices
+$# ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
+--dump device-get
+[{'clock-id': 282574471561216,
+  'id': 0,
+  'lock-status': 'unlocked',
+  'mode': 'automatic',
+  'module-name': 'ice',
+  'type': 'eec'},
+ {'clock-id': 282574471561216,
+  'id': 1,
+  'lock-status': 'unlocked',
+  'mode': 'automatic',
+  'module-name': 'ice',
+  'type': 'pps'}]
 
-So, the administrator is responsible for setting the correct tunnel
-interface MTU. Apparently, the administrators are capable enough to
-calculate that the maximum MTU for VXLAN-GPE is (their_lower_MTU - 36).
-They set the tunnel interface MTU to 1464. If you run a TCP stream over
-such interface, it's then segmented according to the MTU 1464, i.e.
-producing 1514 bytes frames. Which is okay, this still fits the lower
-MTU.
+- get single pin info:
+$# ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
+--do pin-get --json '{"pin-id":2}'
+{'clock-id': 282574471561216,
+ 'module-name': 'ice',
+ 'pin-board-label': 'C827_0-RCLKA',
+ 'pin-dpll-caps': 6,
+ 'pin-frequency': 1953125,
+ 'pin-id': 2,
+ 'pin-parenti-device': [{'id': 0,
+                         'pin-direction': 'input',
+                         'pin-prio': 11,
+                         'pin-state': 'selectable'},
+                        {'id': 1,
+                         'pin-direction': 'input',
+                         'pin-prio': 9,
+                         'pin-state': 'selectable'}],
+ 'pin-type': 'mux'}
 
-However, skb_tunnel_check_pmtu (called from vxlan_xmit_one) uses 50 as
-the header size and thus incorrectly calculates the frame size to be
-1528. This leads to ICMP too big message being generated (locally),
-PMTU of 1450 to be cached and the TCP stream to be resegmented.
+- set pin's state on dpll:
+$# ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
+--do pin-set --json '{"pin-id":2, "pin-parent-device":{"id":1, "pin-state":2}}'
 
-The fix is to use the correct actual header size, especially for
-skb_tunnel_check_pmtu calculation.
+- set pin's prio on dpll:
+$# ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
+--do pin-set --json '{"pin-id":2, "pin-parent-device":{"id":1, "pin-prio":4}}'
 
-Fixes: e1e5314de08ba ("vxlan: implement GPE")
-Signed-off-by: Jiri Benc <jbenc@redhat.com>
----
-v2: more verbose patch description
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
- drivers/net/vxlan/vxlan_core.c                | 23 ++++++++-----------
- include/net/vxlan.h                           | 13 +++++++----
- 3 files changed, 20 insertions(+), 18 deletions(-)
+- set pin's state on parent pin:
+$# ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
+--do pin-set --json '{"pin-id":13, \
+                      "pin-parent-pin":{"pin-id":2, "pin-state":1}}'
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 1726297f2e0d..8eb9839a3ca6 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -8479,7 +8479,7 @@ static void ixgbe_atr(struct ixgbe_ring *ring,
- 		struct ixgbe_adapter *adapter = q_vector->adapter;
- 
- 		if (unlikely(skb_tail_pointer(skb) < hdr.network +
--			     VXLAN_HEADROOM))
-+			     vxlan_headroom(0)))
- 			return;
- 
- 		/* verify the port is recognized as VXLAN */
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 78744549c1b3..42be8a26c171 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -2516,7 +2516,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- 		}
- 
- 		ndst = &rt->dst;
--		err = skb_tunnel_check_pmtu(skb, ndst, VXLAN_HEADROOM,
-+		err = skb_tunnel_check_pmtu(skb, ndst, vxlan_headroom(flags & VXLAN_F_GPE),
- 					    netif_is_any_bridge_port(dev));
- 		if (err < 0) {
- 			goto tx_error;
-@@ -2577,7 +2577,8 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- 				goto out_unlock;
- 		}
- 
--		err = skb_tunnel_check_pmtu(skb, ndst, VXLAN6_HEADROOM,
-+		err = skb_tunnel_check_pmtu(skb, ndst,
-+					    vxlan_headroom((flags & VXLAN_F_GPE) | VXLAN_F_IPV6),
- 					    netif_is_any_bridge_port(dev));
- 		if (err < 0) {
- 			goto tx_error;
-@@ -2989,14 +2990,12 @@ static int vxlan_change_mtu(struct net_device *dev, int new_mtu)
- 	struct vxlan_rdst *dst = &vxlan->default_dst;
- 	struct net_device *lowerdev = __dev_get_by_index(vxlan->net,
- 							 dst->remote_ifindex);
--	bool use_ipv6 = !!(vxlan->cfg.flags & VXLAN_F_IPV6);
- 
- 	/* This check is different than dev->max_mtu, because it looks at
- 	 * the lowerdev->mtu, rather than the static dev->max_mtu
- 	 */
- 	if (lowerdev) {
--		int max_mtu = lowerdev->mtu -
--			      (use_ipv6 ? VXLAN6_HEADROOM : VXLAN_HEADROOM);
-+		int max_mtu = lowerdev->mtu - vxlan_headroom(vxlan->cfg.flags);
- 		if (new_mtu > max_mtu)
- 			return -EINVAL;
- 	}
-@@ -3644,11 +3643,11 @@ static void vxlan_config_apply(struct net_device *dev,
- 	struct vxlan_dev *vxlan = netdev_priv(dev);
- 	struct vxlan_rdst *dst = &vxlan->default_dst;
- 	unsigned short needed_headroom = ETH_HLEN;
--	bool use_ipv6 = !!(conf->flags & VXLAN_F_IPV6);
- 	int max_mtu = ETH_MAX_MTU;
-+	u32 flags = conf->flags;
- 
- 	if (!changelink) {
--		if (conf->flags & VXLAN_F_GPE)
-+		if (flags & VXLAN_F_GPE)
- 			vxlan_raw_setup(dev);
- 		else
- 			vxlan_ether_setup(dev);
-@@ -3673,8 +3672,7 @@ static void vxlan_config_apply(struct net_device *dev,
- 
- 		dev->needed_tailroom = lowerdev->needed_tailroom;
- 
--		max_mtu = lowerdev->mtu - (use_ipv6 ? VXLAN6_HEADROOM :
--					   VXLAN_HEADROOM);
-+		max_mtu = lowerdev->mtu - vxlan_headroom(flags);
- 		if (max_mtu < ETH_MIN_MTU)
- 			max_mtu = ETH_MIN_MTU;
- 
-@@ -3685,10 +3683,9 @@ static void vxlan_config_apply(struct net_device *dev,
- 	if (dev->mtu > max_mtu)
- 		dev->mtu = max_mtu;
- 
--	if (use_ipv6 || conf->flags & VXLAN_F_COLLECT_METADATA)
--		needed_headroom += VXLAN6_HEADROOM;
--	else
--		needed_headroom += VXLAN_HEADROOM;
-+	if (flags & VXLAN_F_COLLECT_METADATA)
-+		flags |= VXLAN_F_IPV6;
-+	needed_headroom += vxlan_headroom(flags);
- 	dev->needed_headroom = needed_headroom;
- 
- 	memcpy(&vxlan->cfg, conf, sizeof(*conf));
-diff --git a/include/net/vxlan.h b/include/net/vxlan.h
-index 0be91ca78d3a..1648240c9668 100644
---- a/include/net/vxlan.h
-+++ b/include/net/vxlan.h
-@@ -386,10 +386,15 @@ static inline netdev_features_t vxlan_features_check(struct sk_buff *skb,
- 	return features;
- }
- 
--/* IP header + UDP + VXLAN + Ethernet header */
--#define VXLAN_HEADROOM (20 + 8 + 8 + 14)
--/* IPv6 header + UDP + VXLAN + Ethernet header */
--#define VXLAN6_HEADROOM (40 + 8 + 8 + 14)
-+static inline int vxlan_headroom(u32 flags)
-+{
-+	/* VXLAN:     IP4/6 header + UDP + VXLAN + Ethernet header */
-+	/* VXLAN-GPE: IP4/6 header + UDP + VXLAN */
-+	return (flags & VXLAN_F_IPV6 ? sizeof(struct ipv6hdr) :
-+				       sizeof(struct iphdr)) +
-+	       sizeof(struct udphdr) + sizeof(struct vxlanhdr) +
-+	       (flags & VXLAN_F_GPE ? 0 : ETH_HLEN);
-+}
- 
- static inline struct vxlanhdr *vxlan_hdr(struct sk_buff *skb)
- {
+v8 RFC -> v0:
+- Merge header patch into the patches where the actual functions are
+  implemented
+- Address comments from previous reviews
+- Per patch change log contains more details
+
+v8 -> v9:
+[00/10] Create common DPLL configuration API
+- update examples to reflect new pin-parent nest split
+
+[01/10] dpll: documentation on DPLL subsystem interface
+- fix docs build warnings
+- separate netlink command/attribute list
+- replace enum description with uapi header
+- add brief explanation what is a DPLL
+- fix EOPNOTSUPP typo
+- fix typo .state_get -> .state_on_dpll_get
+
+[02/10] dpll: spec: Add Netlink spec in YAML
+- regenerate policy max values
+- add missing enum descriptions
+- split pin-parent nest:
+  - pin-parent-device - for configuration of pin-device tuple
+  - pin-parent-pin - for configuration od pin-pin tuple
+- fix typos:
+  - s/working-modes/working modes/
+  - s/differentiate/differentiates/
+  - s/valid input, auto selected by dpll/input pin auto selected by dpll/
+- remove FREERUN and HOLDOVER modes
+
+[03/10] dpll: core: Add DPLL framework base functions
+- fix description in spdx header.
+- remove refcount check if refcount was already set
+- do not validate dpll ptr in dpll_device_put(..)
+- fix return -ENOMEM on failed memory alloc
+- do not validate pin ptr in dpll_pin_put(..)
+- return -EINVAL in case of module/clock_id mismatch
+- do not {} around one-line xa_for_each() macro
+- move dpll_<x>_registration structs to dpll_core.c
+- rephrase doc comment on device and pin id struct members
+- remove ref in case of memory allocation fail
+- check for required ops on pin/device registration
+- mark pin with DPLL_REGISTERED once pin is registered with dpll
+
+[04/10] dpll: netlink: Add DPLL framework base functions
+- fix pin-id-get/device-id-get behavior
+- reshuffle order of functions
+- avoid forward declarations
+- functions for adding pin/device handle next to each other
+- pass ops callback return values to the user
+- remove dpll_cmd_pin_fill_details(..) function, merge the code into
+  __dpll_cmd_pin_dump_one(..)
+- rename __dpll_cmd_pin_dump_one() to dpll_cmd_pin_get_one()
+- use WARN_ON macro when dpll ref is missing
+- remove redundant pin's dpll list not empty check
+- remove double spaces inside if statement
+- add extack message when set command is not possible
+- do not return error when callback is not required
+- WARN_ON missing ops moved to dpll_core.c
+- use DPLL_REGISTERED if pin was registered with dpll
+- fix pin-id-get return and add extack errors
+- fix device-id-get return and add extack errors
+- drop pointless init of variables
+- add macro for iterating over marked pins/devices
+- move dpll_set_from_nlattr() for consistent order
+- use GENL_REQ_ATTR_CHECK() for checking attibute presence
+- fill extack if pin/device was not found
+- drop pointless init of variables
+- WARN_ON if dpll not registered on send event
+- rename goto labels to indicate error path
+- fix docs
+- drop pointless init of variables
+- verify pin in notify with a mark
+- prevent ops->mode_set call if missing callback
+- move static dpll_msg_add_pin_handle() from pin<->netdev patch
+- split pin-parent nest:
+  - pin-parent-device - for configuration of pin-device tuple
+  - pin-parent-pin - for configuration od pin-pin tuple
+
+[06/10] netdev: expose DPLL pin handle for netdevice
+- net_device->dpll_pin is only valid if IS_ENABLED(CONFIG_DPLL) fix the
+  code in net/core/rtnetlink.c to respect that.
+- move dpll_msg_add_pin_handle to "dpll: netlink" patch + export the
+  function with this patch
+
+[07/10] ice: add admin commands to access cgu configuration
+- rename MAX_NETLIST_SIZE -> ICE_MAX_NETLIST_SIZE
+- simplify function: s64 convert_s48_to_s64(s64 signed_48)
+- do not assign 0 to field that is already 0
+
+[08/10] ice: implement dpll interface to control cgu
+- drop pointless 0 assignement
+- ice_dpll_init(..) returns void instead of int
+- fix context description of the functions
+- fix ice_dpll_init(..) traces
+- fix use package_label instead pf board_label for rclk pin
+- be consistent on cgu presence naming
+- remove indent in ice_dpll_deinit(..)
+- remove unused struct field lock_err_num
+- fix kworker resched behavior
+- remove debug log from ice_dpll_deinit_worker(..)
+- reorder ice internal functions
+- release resources directly on error path
+- remove redundant NULL checks when releasing resources
+- do not assign NULL to pointers after releasing resources
+- simplify variable assignement
+- fix 'int ret;' declarations across the ice_dpll.c
+- remove leftover ice_dpll_find(..)
+- get pf pointer from dpll_priv without type cast
+- improve error reporting
+- fix documentation
+- fix ice_dpll_update_state(..) flow
+- fix return in case out of range prio set
+
+
+v7 -> v8:
+[0/10] Create common DPLL configuration API
+- reorder the patches in patch series
+- split patch "[RFC PATCH v7 2/8] dpll: Add DPLL framework base functions"
+  into 3 smaller patches for easier review:
+  - [03/10] dpll: core: Add DPLL framework base functions
+  - [04/10] dpll: netlink: Add DPLL framework base functions
+  - [05/10] dpll: api header: Add DPLL framework base
+- add cli.py usage examples in commit message
+
+[01/10] dpll: documentation on DPLL subsystem interface
+- fix DPLL_MODE_MANUAL documentation
+- remove DPLL_MODE_NCO
+- remove DPLL_LOCK_STATUS_CALIBRATING
+- add grepability Use full names of commands, attributes and values of
+  dpll subsystem in the documentation
+- align documentation with changes introduced in v8
+- fix typos
+- fix phrases to better show the intentions
+- move dpll.rst to Documentation/driver-api/
+
+[02/10] dpll: spec: Add Netlink spec in YAML
+- remove unspec attribute values
+- add 10 KHZ and 77,5 KHZ frequency defines
+- fix documentation
+- remove assigned values from subset attributes
+- reorder dpll attributes
+- fix `device` nested attribute usage, device get is not used on pin-get
+- temperature with 3 digit float precision
+- remove enum from subset definitions
+- move pin-direction to pin-dpll tuple/subset
+- remove DPLL_MODE_NCO
+- remove DPLL_LOCK_STATUS_CALIBRATING
+- fix naming scheme od notification interface functions
+- separate notifications for pins
+- rename attribute enum name: dplla -> dpll_a
+- rename pin-idx to pin-id
+- remove attributes: pin-parent-idx, device
+- replace bus-name and dev-name attributes with module-name
+- replace pin-label with 3 new attributes: pin-board-label,
+  pin-panel-label, pin-package-label
+- add device-id-get and pin-id-get commands
+- remove rclk-dev-name atribute
+- rename DPLL_PIN_DIRECTION_SOURCE -> DPLL_PIN_DIRECTION_INPUT
+
+[03/10] dpll: core: Add DPLL framework base functions
+[04/10] dpll: netlink: Add DPLL framework base functions
+[05/10] dpll: api header: Add DPLL framework base
+- remove unspec attributes after removing from dpll netlink spec
+- move pin-direction to pin-dpll tuple
+- pass parent_priv on state_on_pin_<get/set>
+- align with new notification definitions from netlink spec
+- use separated notifications for dpll pins and devices
+- format notification messages as corresponding get netlink commands
+- rename pin-idx to pin-id
+- remove attributes pin-parent-idx, device
+- use DPLL_A_PIN_PARENT to hold information on parent pin or dpll device
+- refactor lookup for pins and dplls for dpll subsystem
+- replace bus-name, dev-name with module-name
+- replace pin-label with 3 new attributes: pin-board-label,
+  pin-panel-label, pin-package-label
+- add device-id-get and pin-id-get commands
+- rename dpll_xa_lock to dpll_lock
+- improve doxygen in dpll_core.c
+- remove unused parent and dev fields from dpll_device struct
+- use u32 for pin_idx in dpll_pin_alloc
+- use driver provided pin properties struct
+- verify pin/dpll owner on registering pin
+- remove const arg modifier for helper _priv functions
+- remove function declaration _get_by_name()
+- update SPDX headers
+- parse netlink set attributes with nlattr array
+- remove rclk-dev-name attribute
+- remove device pointer from dpll_pin_register/dpll_device_register
+- remove redundant doxygen from dpll header
+- use module_name() to get name of module
+- add missing/remove outdated kdocs
+- fix call frequency_set only if available
+- fix call direction_set only for pin-dpll tuple
+
+[06/10] netdev: expose DPLL pin handle for netdevice
+- rebased on top of v8 changes
+  - use dpll_msg_add_pin_handle() in dpll_pin_find_from_nlattr()
+    and dpll_msg_add_pin_parents()
+  - fixed handle to use DPLL_A_PIN_ID and removed temporary comments
+- added documentation record for dpll_pin pointer
+- fixed compilation of net/core/dev.c when CONFIG_DPLL is not enabled
+- adjusted patch description a bit
+
+[07/10] ice: add admin commands to access cgu configuration
+- Remove unspec attributes after removing from dpll netlink spec.
+
+[08/10] ice: implement dpll interface to control cgu
+- remove unspec attributes
+- do not store pin flags received in set commands
+- use pin state field to provide pin state to the caller
+- remove include of uapi header
+- remove redundant check against null arguments
+- propagate lock function return value to the caller
+- use switch case instead of if statements
+- fix dev_dbg to dev_err for error cases
+- fix dpll/pin lookup on dpll subsytem callbacks
+- fix extack of dpll subsystem callbacks
+- remove double negation and variable cast
+- simplify ice_dpll_pin_state_set function
+- pass parent_priv on state_on_pin_<get/set>
+- remove parent hw_idx lookup
+- fix use const qualifier for dpll/dpll_pin ops
+- fix IS_ERR macros usage in ice_dpll
+- add notify previous source state change
+- fix mutex locking on releasing pins
+- use '|=' instead of '+=' when modifing capabilities field
+- rename ice_dpll_register_pins function
+- clock_id function to return clock ID on the stack instead of using
+  an output variable
+- DPLL_LOCK_STATUS_CALIBRATING was removed, return:
+  DPLL_LOCK_STATUS_LOCKED - if dpll was locked
+  DPLL_LOCK_STATUS_LOCKED_HO_ACQ - if dpll was locked and holdover is
+  acquired
+- propagate and use dpll_priv to obtain pf pointer in corresponding
+  functions.
+- remove null check for pf pointer
+- adapt to `dpll: core: fix notification scheme`
+- expose pf related pin to corresponding netdevice
+- fix dpll init error path
+- fix dpll pins naming scheme `source` -> `input`
+- replace pin-label with pin-board-label
+- dpll remove parent and dev fields from dpll_device
+- remove device pointer from dpll_pin_register/dpll_device_register
+- rename DPLL_PIN_DIRECTION_SOURCE -> DPLL_PIN_DIRECTION_INPUT
+
+[09/10] ptp_ocp: implement DPLL ops
+- replace pin-label with pin-board-label
+- dpll remove parent and dev fields from dpll_device
+- remove device pointer from dpll_pin_register/dpll_device_register
+- rename DPLL_PIN_DIRECTION_SOURCE -> DPLL_PIN_DIRECTION_INPUT
+
+[10/10] mlx5: Implement SyncE support using DPLL infrastructure
+- rebased on top of v8 changes:
+  - changed notification scheme
+  - no need to fill pin label
+  - implemented locked_ho_acq status
+  - rename DPLL_PIN_DIRECTION_SOURCE -> DPLL_PIN_DIRECTION_INPUT
+  - remove device pointer from dpll_pin_register/dpll_device_register
+- fixed MSEES register writes
+- adjusted pin state and lock state values reported
+- fixed a white space issue
+
+v6 -> v7:
+ * YAML spec:
+   - remove nested 'pin' attribute
+   - clean up definitions on top of the latest changes
+ * pin object:
+   - pin xarray uses id provided by the driver
+   - remove usage of PIN_IDX_INVALID in set function
+   - source_pin_get() returns object instead of idx
+   - fixes in frequency support API
+ * device and pin operations are const now
+ * small fixes in naming in Makefile and in the functions
+ * single mutex for the subsystem to avoid possible ABBA locks
+ * no special *_priv() helpers anymore, private data is passed as void*
+ * no netlink filters by name anymore, only index is supported
+ * update ptp_ocp and ice drivers to follow new API version
+ * add mlx5e driver as a new customer of the subsystem
+v5 -> v6:
+ * rework pin part to better fit shared pins use cases
+ * add YAML spec to easy generate user-space apps
+ * simple implementation in ptp_ocp is back again
+v4 -> v5:
+ * fix code issues found during last reviews:
+   - replace cookie with clock id
+   - follow one naming schema in dpll subsys
+   - move function comments to dpll_core.c, fix exports
+   - remove single-use helper functions
+   - merge device register with alloc
+   - lock and unlock mutex on dpll device release
+   - move dpll_type to uapi header
+   - rename DPLLA_DUMP_FILTER to DPLLA_FILTER
+   - rename dpll_pin_state to dpll_pin_mode
+   - rename DPLL_MODE_FORCED to DPLL_MODE_MANUAL
+   - remove DPLL_CHANGE_PIN_TYPE enum value
+ * rewrite framework once again (Arkadiusz)
+   - add clock class:
+     Provide userspace with clock class value of DPLL with dpll device
+     dump netlink request. Clock class is assigned by driver allocating
+     a dpll device. Clock class values are defined as specified in:
+     ITU-T G.8273.2/Y.1368.2 recommendation.
+   - dpll device naming schema use new pattern:
+     "dpll_%s_%d_%d", where:
+       - %s - dev_name(parent) of parent device,
+       - %d (1) - enum value of dpll type,
+       - %d (2) - device index provided by parent device.
+   - new muxed/shared pin registration:
+     Let the kernel module to register a shared or muxed pin without
+     finding it or its parent. Instead use a parent/shared pin
+     description to find correct pin internally in dpll_core, simplifing
+     a dpll API
+ * Implement complex DPLL design in ice driver (Arkadiusz)
+ * Remove ptp_ocp driver from the series for now
+v3 -> v4:
+ * redesign framework to make pins dynamically allocated (Arkadiusz)
+ * implement shared pins (Arkadiusz)
+v2 -> v3:
+ * implement source select mode (Arkadiusz)
+ * add documentation
+ * implementation improvements (Jakub)
+v1 -> v2:
+ * implement returning supported input/output types
+ * ptp_ocp: follow suggestions from Jonathan
+ * add linux-clk mailing list
+v0 -> v1:
+ * fix code style and errors
+ * add linux-arm mailing list
+
+Arkadiusz Kubalewski (3):
+  dpll: spec: Add Netlink spec in YAML
+  ice: add admin commands to access cgu configuration
+  ice: implement dpll interface to control cgu
+
+Jiri Pirko (2):
+  netdev: expose DPLL pin handle for netdevice
+  mlx5: Implement SyncE support using DPLL infrastructure
+
+Vadim Fedorenko (5):
+  dpll: documentation on DPLL subsystem interface
+  dpll: core: Add DPLL framework base functions
+  dpll: netlink: Add DPLL framework base functions
+  dpll: api header: Add DPLL framework base functions
+  ptp_ocp: implement DPLL ops
+Arkadiusz Kubalewski (4):
+  tools: ynl-gen: fix enum index in _decode_enum(..)
+  tools: ynl-gen: fix parse multi-attr enum attribute
+  ice: add admin commands to access cgu configuration
+  ice: implement dpll interface to control cgu
+
+Jiri Pirko (2):
+  netdev: expose DPLL pin handle for netdevice
+  mlx5: Implement SyncE support using DPLL infrastructure
+
+Vadim Fedorenko (5):
+  dpll: documentation on DPLL subsystem interface
+  dpll: spec: Add Netlink spec in YAML
+  dpll: core: Add DPLL framework base functions
+  dpll: netlink: Add DPLL framework base functions
+  ptp_ocp: implement DPLL ops
+
+ Documentation/driver-api/dpll.rst             |  431 ++++
+ Documentation/driver-api/index.rst            |    1 +
+ Documentation/netlink/specs/dpll.yaml         |  475 ++++
+ MAINTAINERS                                   |   11 +
+ drivers/Kconfig                               |    2 +
+ drivers/Makefile                              |    1 +
+ drivers/dpll/Kconfig                          |    7 +
+ drivers/dpll/Makefile                         |    9 +
+ drivers/dpll/dpll_core.c                      |  799 +++++++
+ drivers/dpll/dpll_core.h                      |   90 +
+ drivers/dpll/dpll_netlink.c                   | 1286 +++++++++++
+ drivers/dpll/dpll_netlink.h                   |   17 +
+ drivers/dpll/dpll_nl.c                        |  163 ++
+ drivers/dpll/dpll_nl.h                        |   51 +
+ drivers/net/ethernet/intel/Kconfig            |    1 +
+ drivers/net/ethernet/intel/ice/Makefile       |    3 +-
+ drivers/net/ethernet/intel/ice/ice.h          |    5 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  245 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |  467 ++++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   44 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 2053 +++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  104 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   17 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |    7 +
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  419 ++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  231 ++
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ .../net/ethernet/mellanox/mlx5/core/Kconfig   |    8 +
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |    3 +
+ drivers/net/ethernet/mellanox/mlx5/core/dev.c |   17 +
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  432 ++++
+ drivers/ptp/Kconfig                           |    1 +
+ drivers/ptp/ptp_ocp.c                         |  366 ++-
+ include/linux/dpll.h                          |  160 ++
+ include/linux/mlx5/driver.h                   |    2 +
+ include/linux/mlx5/mlx5_ifc.h                 |   59 +-
+ include/linux/netdevice.h                     |   20 +
+ include/uapi/linux/dpll.h                     |  186 ++
+ include/uapi/linux/if_link.h                  |    2 +
+ net/core/dev.c                                |   22 +
+ net/core/rtnetlink.c                          |   35 +
+ tools/net/ynl/lib/ynl.py                      |   18 +-
+ 42 files changed, 8194 insertions(+), 77 deletions(-)
+ create mode 100644 Documentation/driver-api/dpll.rst
+ create mode 100644 Documentation/netlink/specs/dpll.yaml
+ create mode 100644 drivers/dpll/Kconfig
+ create mode 100644 drivers/dpll/Makefile
+ create mode 100644 drivers/dpll/dpll_core.c
+ create mode 100644 drivers/dpll/dpll_core.h
+ create mode 100644 drivers/dpll/dpll_netlink.c
+ create mode 100644 drivers/dpll/dpll_netlink.h
+ create mode 100644 drivers/dpll/dpll_nl.c
+ create mode 100644 drivers/dpll/dpll_nl.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_dpll.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_dpll.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/dpll.c
+ create mode 100644 include/linux/dpll.h
+ create mode 100644 include/uapi/linux/dpll.h
+
 -- 
-2.39.2
+2.27.0
 
 
