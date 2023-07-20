@@ -1,114 +1,115 @@
-Return-Path: <netdev+bounces-19634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC6E75B82C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:41:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6C2D75B83E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 258A8281FB7
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:41:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 197DB281FD0
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119F61BE64;
-	Thu, 20 Jul 2023 19:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17111BE67;
+	Thu, 20 Jul 2023 19:46:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE6C1BE63
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:41:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B477C433C7;
-	Thu, 20 Jul 2023 19:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C563218C33
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:46:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABE4DC433C8;
+	Thu, 20 Jul 2023 19:46:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689882073;
-	bh=Tjl37HbgJReCne8I9oWLUfLMWMECxjVNTak6ZTPLD0k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lRLa1IQ2fIZXFzrU2LGJtKathN3AJ8fJkaqg5gRtECfS38ZteMIEE4cy7vCYCLa1C
-	 909IPOW4fQ0PhUH7THSkWlqiJVpG1JRQValVj7jYN+CCvOsvldsUC5Ghu31NS8qPqT
-	 a3jSc3h4GrV3Jx61+Qfr5ALLtkruufVQDLOTvraN7NQcpRlMY1x5mhgb3Bxwm/jHS2
-	 Ed7YlxnTp/sGlPLYpkVQojT63Gpm9Rg/dB8VaRKg7S0+GJUotOmukuQaooWDGVgss9
-	 p4spWm6L3uyhs+om/T20UtcdwMJbMcDDYNnKOfYS/SBeOCX4+vcETKAEk/Y6w0lR1m
-	 uJWw5YOZlZnGw==
-Message-ID: <2c9f7a88-1a99-73ce-e924-0effef399719@kernel.org>
-Date: Thu, 20 Jul 2023 22:41:05 +0300
+	s=k20201202; t=1689882409;
+	bh=u8Lr+3WeqKvD4svXmrwr31VT12gwAWyndJkuUoaFWe4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dgUAImpkQX2xyyBOB386xmAqsmG8JYcFPL94qeMMMyIzU+M7Bz7oO9cPYeYJVlHmn
+	 en5+cHaudEko4aDipf061qdfcOutcy+GR57a88hjjE2MnoLvOndXX/cDxL7kbGxj+S
+	 O3oOlp9cgL+f/YgyOqQsRQ38YRq2TXckOaK9lLyFQRyfWvCE/UBwYeQkLWuFACZsF6
+	 ibTtRutI6YKw4nINr+L4k9m+xiPXdgVxcYYI331zVu9zfAQJblX0w2x/eTZ7OEqedG
+	 rrsxCq5nr+6DsOePN8mX8gExOMrW/cHI8e79Ovq10GgKJmbXgzl1ION/quv3EFRAZW
+	 XPwPl48H6ul0A==
+Date: Thu, 20 Jul 2023 12:46:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
+ <alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC net-next v2 7/7] net: skbuff: always try to recycle
+ PP pages directly when in softirq
+Message-ID: <20230720124647.413363d5@kernel.org>
+In-Reply-To: <e542f6b5-4eea-5ac6-a034-47e9f92dbf7e@intel.com>
+References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
+	<20230714170853.866018-10-aleksander.lobakin@intel.com>
+	<20230718174042.67c02449@kernel.org>
+	<d7cd1903-de0e-0fe3-eb15-0146b589c7b0@intel.com>
+	<20230719135150.4da2f0ff@kernel.org>
+	<48c1d70b-d4bd-04c0-ab46-d04eaeaf4af0@intel.com>
+	<20230720101231.7a5ff6cd@kernel.org>
+	<8e65c3d3-c628-2176-2fc2-a1bc675ad607@intel.com>
+	<20230720110027.4bd43ee7@kernel.org>
+	<988fc62d-2329-1560-983a-79ff5653a6a6@intel.com>
+	<b3884ff9-d903-948d-797a-1830a39b1e71@intel.com>
+	<20230720122015.1e7efc21@kernel.org>
+	<e542f6b5-4eea-5ac6-a034-47e9f92dbf7e@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [EXTERNAL] Re: [PATCH v10 2/2] net: ti: icssg-prueth: Add ICSSG
- ethernet driver
-Content-Language: en-US
-To: Md Danish Anwar <a0501179@ti.com>, Jakub Kicinski <kuba@kernel.org>,
- MD Danish Anwar <danishanwar@ti.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>,
- Simon Horman <simon.horman@corigine.com>,
- Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
- Richard Cochran <richardcochran@gmail.com>,
- Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20230719082755.3399424-1-danishanwar@ti.com>
- <20230719082755.3399424-3-danishanwar@ti.com>
- <20230719213543.0380e13e@kernel.org>
- <17cd1e70-73bc-78d5-7e9d-7b133d6f464b@ti.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <17cd1e70-73bc-78d5-7e9d-7b133d6f464b@ti.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hi Danish,
+On Thu, 20 Jul 2023 21:33:40 +0200 Alexander Lobakin wrote:
+> > We can as well check
+> > 	(in_softirq() && !irqs_disabled() && !in_hardirq())
+> > ?  
+> 
+> Yes, something like that. Messy, but I see no other options...
+> 
+> So, I guess you want to add an assertion to make sure that we're *not*
+> in this:
+> 
+> in_hardirq() || irqs_disabled()
+> 
+> Does this mean that after it's added, my patch is sane? :p
 
-On 20/07/2023 14:42, Md Danish Anwar wrote:
-> Hi Jakub,
-> 
-> On 20/07/23 10:05 am, Jakub Kicinski wrote:
->> The patch is too big to review.
->>
->> Please break it apart separating into individual features, targeting
->> around 10 patches in the series. That will make it easier for reviewers
->> to take a look at the features in which they have expertise.
->>
-> 
-> Sure Jakub. I will try to break this patch in multiple patches as below.
-> 
-> Patch 1: Introduce Firmware mapping for the driver (icss_switch_map.h)
-> 
-> Patch 2: Introduce mii helper APIs. (icssg_mii_rt.h and icssg_mii_cfg.h). This
-> patch will also introduce basic prueth and emac structures in icssg_prueth.h as
-> these structures will be used by the helper APIs.
-> 
-> Patch 3: Introduce firmware configuration and classification APIs.
-> (icssg_classifier.c, icssg_config.h and icssg_config.c)
-> 
-> Patch 4: Introduce APIs for ICSSG Queues (icssg_queues.c)
-> 
-> Patch 5: Introduce ICSSG Ethernet driver. (icssg_prueth.c and icssg_prueth.h)
-> This patch will enable the driver and basic functionality can work after this
-> patch. This patch will be using all the APIs introduced earlier. This patch
-> will also include Kconfig and Makefile changes.
+Well... it's acceptable. Make sure you add a good, informative
+but concise comment :)
 
-DT binding documentation patch can come here.
+> > The interrupt_context_level() thing is fairly new, I think.
+> > Who knows what happens to it going forward...  
+> 
+> Well, it counts the number of active hard interrupts, but doesn't take
+> into account that if there are no hardirqs we can still disable them
+> manually. Meh.
+> Should I try to send a patch for it? :D
 
-> 
-> Patch 6: Enable standard statistics via ndo_get_stats64
-> 
-> Patch 7: Introduce ethtool ops for ICSSG
-> 
-> Patch 8: Introduce power management support (suspend / resume APIs)
-> 
+Depends on how you like to send your time :)
 
-<snip>
+> > netcons or anyone who freed socket-less skbs from hardirq.
+> > Until pp recycling was added freeing an skb from hardirq was legal,
+> > AFAICT.  
+> 
+> I don't think so. Why do we have dev_kfree_skb_any() then? It checks for
+> 
+> in_hardirq() || irqs_disabled()
+> 
+> and if it's true, defers the skb to process it by backlog task.
+> "Regular" skb freeing functions don't do that. The _any() variant lives
+> here for a long time IIRC, so it's not something recent.
 
--- 
-cheers,
--roger
+Drivers (or any other users of dev_kfree_skb_any()) should be fine. 
+I'm only paranoid about some unknown bits of code which thought they
+can be clever and call kfree_skb() directly, as long as !skb->sk.
+
+But if you add the hard irq checks to your patch then you're strictly
+safer than the existing code. Hopefully the checks are not too
+expensive.
 
