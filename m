@@ -1,127 +1,131 @@
-Return-Path: <netdev+bounces-19474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C58F75AD0C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:34:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FBE75AD0A
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07119281DE3
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:34:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65976281D09
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E274217AAB;
-	Thu, 20 Jul 2023 11:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A13217747;
+	Thu, 20 Jul 2023 11:34:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53C717AA8
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:34:36 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF368123
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:34:34 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b852785a65so5281675ad.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:34:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1689852874; x=1690457674;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0RmeowStXIEPULQOAaOWZp78vxjHDoSNjkADxM9sQfc=;
-        b=M0DrMvL74mRRIv17Hv8ig5J7sQWnEZTZf84dLaKCQsXxQtcIgMlfIxVoaUskKOWIQp
-         fc302CL33o59MSl/yZvbZ3cRlyAqQ9Kh0p54L4s336jjQljCzQbPmPNSghHWbn49o8Ql
-         nQIvdHMaKpDxF1KLMqkeUTAACQaYlmmEtxaIsbMJ5xyfdUTgLnJEACez6gA4w3gnEy1b
-         ILbyO3KvZmyrBsyIkE4hD01a9/9tAVPHEyBG1j5r2rIVFiUjio2hrkrjITfr0xQYaSJY
-         53iJT35RsFQW7KN5Czi4n0AEmfUDUCTM9PP9fUG9bs9UyQrpj0H+HtBmSr/2nv9oXdjM
-         EPaA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4202F3F
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:34:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090BA110
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:34:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689852871;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=INVLotxR7rulzehcHDFDyfVuMU2gu/OWtsospBFTyJ4=;
+	b=LvV8mmx/RuS0XG/v8fUunPRD4Nm6O9HPMtOj2YvqYDavN/B/P/wG/bdW0NNBEUqr2V+hzi
+	sC+Mqg+WTZv1kjkZH+J7JLMdoLtUhAVFCfQD42sV336yhmQ2qvCV3GtK48MlBtVCZLNBdH
+	k2ibL53M+JAejf3c+tNZzZeLYAetu74=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-266-3gqMAGtlM96q_Cez2umYPA-1; Thu, 20 Jul 2023 07:34:30 -0400
+X-MC-Unique: 3gqMAGtlM96q_Cez2umYPA-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4034b144d3bso2107811cf.0
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:34:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689852874; x=1690457674;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0RmeowStXIEPULQOAaOWZp78vxjHDoSNjkADxM9sQfc=;
-        b=XQMFpz8QCXZ0kW8RwjdsoVUzX+q3srjZFnbC+UNEDexBa5A0XgUZfkNAwH3BclxKT7
-         9wSOaOmOy8ro5jsdQ4+YYB6AscxymHbmdU3GgUEmG4+rSiKanS15eR63MyYtUOuPFYWe
-         aBtxfKLfKE3YQFv9JsB+X/AwCgWShg+Y9p1bCa35qoz93D/B52cUyN9rlc4jECj3fSiD
-         LKXI3HCKk7t3xVn3g2B6kfoXJ4uf0n9U6fCvdr9HIElHbF3kfHjtKdbISzDkFS9LZ4wC
-         jZkChgV/oLEwUhAfd8WP+4+PZ5L+WZeRiwa4QKEWnnibk+Cg9q2G+WWZGlu5DiSnQ5Nz
-         c32Q==
-X-Gm-Message-State: ABy/qLYvN7LbRVZG6cROwhmBUZDa+rKG004fkj6dPaZObnd9BWWMg2BG
-	raY0p89AzKIsg3Qr0IMfM86/PA==
-X-Google-Smtp-Source: APBJJlEm8W4mnf+mF4gI7WktAlJnS5x7bFKZNwTAJEow8jjEkLt3J+3pVRZGBlItCxEzfFEMbMdYiQ==
-X-Received: by 2002:a17:902:ea04:b0:1b9:ea60:cd89 with SMTP id s4-20020a170902ea0400b001b9ea60cd89mr7763594plg.7.1689852874310;
-        Thu, 20 Jul 2023 04:34:34 -0700 (PDT)
-Received: from [10.4.72.29] ([139.177.225.238])
-        by smtp.gmail.com with ESMTPSA id j8-20020a170902da8800b001b891259eddsm1105151plx.197.2023.07.20.04.34.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jul 2023 04:34:33 -0700 (PDT)
-Message-ID: <be65ab74-8ee4-9ae5-f0ff-88c9fd2fbeb5@bytedance.com>
-Date: Thu, 20 Jul 2023 19:34:20 +0800
+        d=1e100.net; s=20221208; t=1689852869; x=1690457669;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=INVLotxR7rulzehcHDFDyfVuMU2gu/OWtsospBFTyJ4=;
+        b=ZaccLeDe007UyZ5nq04lSsnaYRyFqjI7jD/2CEAvBulJFmhlugUdo7bImeYXsOB87N
+         hNXaVxPZ4qPRhzY5aXJbmjgCXq0ZOIN+xGGbdiZ8fEZHOoBsUWz3rUXtgLgA5YppYhbU
+         +zHXGnAWO+6IpiobRU6Ednqex2tkJJPAOZIAy8mZrwJkSpelpIoSH8cRaStznG05W9ER
+         R/O0g7Lz7OMYH0n5gmEHgiCMuQZqPV4ikSc1QXUlxiilAJsr7Mx+VOcwPuGsxWddH1xu
+         tetvmu9kS4PMS3+66+yqQJv/z68GuyXKJ0TrRCqyPc7pspFKo2ik1fZz1Ypk1a22hGgC
+         cHHQ==
+X-Gm-Message-State: ABy/qLYg+suFKX1er6GWvvYgEQULNjtTO4oLNOHjbPRuBPv0PYb/ygpD
+	cgOMEVdtKLxqut3DN42vWHGG7IujILrtUAteZusVL4M9vn80j3vuqxCes/kh8NcfR+dJEx/7C7e
+	txrJYMIJxjdvQatMJ
+X-Received: by 2002:ac8:7d89:0:b0:403:b4da:71ff with SMTP id c9-20020ac87d89000000b00403b4da71ffmr18498156qtd.0.1689852869551;
+        Thu, 20 Jul 2023 04:34:29 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHEtNN1/bTL9rfEQ/BzcuEhh95dR8kDaox95dn5k/EFXJotUlw105+Hs1TNhw9ETP0ucJ7l1g==
+X-Received: by 2002:ac8:7d89:0:b0:403:b4da:71ff with SMTP id c9-20020ac87d89000000b00403b4da71ffmr18498145qtd.0.1689852869267;
+        Thu, 20 Jul 2023 04:34:29 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id ff20-20020a05622a4d9400b00403f1a7be90sm237135qtb.88.2023.07.20.04.34.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 04:34:28 -0700 (PDT)
+Message-ID: <5781d16d42ae02742af5ebaaf29875a0779b2d92.camel@redhat.com>
+Subject: Re: [PATCH net v2] net: phy: marvell10g: fix 88x3310 power up
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>, linux@armlinux.org.uk, 
+ kabel@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org
+Date: Thu, 20 Jul 2023 13:34:25 +0200
+In-Reply-To: <20230719092233.137844-1-jiawenwu@trustnetic.com>
+References: <20230719092233.137844-1-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: Re: [PATCH RESEND net-next 1/2] net-memcg: Scopify the indicators
- of sockmem pressure
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, Johannes Weiner <hannes@cmpxchg.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeelb@google.com>, Muchun Song <muchun.song@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, David Ahern <dsahern@kernel.org>,
- Yosry Ahmed <yosryahmed@google.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Yu Zhao
- <yuzhao@google.com>, Kefeng Wang <wangkefeng.wang@huawei.com>,
- Yafang Shao <laoar.shao@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Breno Leitao <leitao@debian.org>, David Howells <dhowells@redhat.com>,
- Jason Xing <kernelxing@tencent.com>, Xin Long <lucien.xin@gmail.com>,
- Michal Hocko <mhocko@suse.com>, Alexei Starovoitov <ast@kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)"
- <cgroups@vger.kernel.org>,
- "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)"
- <linux-mm@kvack.org>
-References: <20230711124157.97169-1-wuyun.abel@bytedance.com>
- <d114834c-2336-673f-f200-87fc6efb411f@bytedance.com>
- <CANn89iLBLBO0CK-9r-eZiQL+h2bwTHL2nR6az5Az6W_-pBierw@mail.gmail.com>
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <CANn89iLBLBO0CK-9r-eZiQL+h2bwTHL2nR6az5Az6W_-pBierw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/20/23 4:57 PM, Eric Dumazet wrote:
-> On Thu, Jul 20, 2023 at 9:59 AM Abel Wu <wuyun.abel@bytedance.com> wrote:
->>
->> Gentle ping :)
-> 
-> I was hoping for some feedback from memcg experts.
+On Wed, 2023-07-19 at 17:22 +0800, Jiawen Wu wrote:
+> Clear MV_V2_PORT_CTRL_PWRDOWN bit to set power up for 88x3310 PHY,
+> it sometimes does not take effect immediately. And a read of this
+> register causes the bit not to clear. This will cause mv3310_reset()
+> to time out, which will fail the config initialization. So add a delay
+> before the next access.
+>=20
+> Fixes: c9cc1c815d36 ("net: phy: marvell10g: place in powersave mode at pr=
+obe")
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+> v1 -> v2:
+> - change poll-bit-clear to time delay
+> ---
+>  drivers/net/phy/marvell10g.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/drivers/net/phy/marvell10g.c b/drivers/net/phy/marvell10g.c
+> index 55d9d7acc32e..d4bb90d76881 100644
+> --- a/drivers/net/phy/marvell10g.c
+> +++ b/drivers/net/phy/marvell10g.c
+> @@ -328,6 +328,13 @@ static int mv3310_power_up(struct phy_device *phydev=
+)
+>  	ret =3D phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MV_V2_PORT_CTRL,
+>  				 MV_V2_PORT_CTRL_PWRDOWN);
+> =20
+> +	/* Sometimes, the power down bit doesn't clear immediately, and
+> +	 * a read of this register causes the bit not to clear. Delay
+> +	 * 100us to allow the PHY to come out of power down mode before
+> +	 * the next access.
+> +	 */
+> +	udelay(100);
 
-Me too :)
-
-> 
-> You claim to fix a bug, please provide a Fixes: tag so that we can
-> involve original patch author.
-
-Sorry for missing that part, will be added in next version.
-
-Fixes: 8e8ae645249b ("mm: memcontrol: hook up vmpressure to socket 
-pressure")
+Out of sheer ignorance, would an usleep_range(...) be more appropriate
+here?
 
 Thanks!
-	Abel
+
+Paolo
+
 
