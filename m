@@ -1,208 +1,140 @@
-Return-Path: <netdev+bounces-19445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E8A75AB09
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:38:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB1C75AB14
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5F73281A9A
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:38:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C7911C21308
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 09:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC82719A1C;
-	Thu, 20 Jul 2023 09:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A8719A1F;
+	Thu, 20 Jul 2023 09:40:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AC2174C7
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:38:41 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2374686
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:38:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689845919;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0AWjVLpAonFx6U+jLEFc+D84W41RKV7H4k3WlbmwTbU=;
-	b=ND+YOTLgkgX7xS9QUiehiWMoPPJw6+G371sEKZjh5bK8oucB9YBErRzFsAW16C/KgSHA3Y
-	baidvD7seWBOC80NcWPml2KoHrfLZLZt2ycFH4P23rUGGALqv1atUnhl67kxxhvcpjp3fN
-	ZRc1DslpAHBP4v/xuUtj3kLHX5f6SrI=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-271-AE4wikp6NNezmPtybOZwfg-1; Thu, 20 Jul 2023 05:38:37 -0400
-X-MC-Unique: AE4wikp6NNezmPtybOZwfg-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7672918d8a4so20711385a.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 02:38:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689845917; x=1690450717;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0AWjVLpAonFx6U+jLEFc+D84W41RKV7H4k3WlbmwTbU=;
-        b=kr7YVM5MCkzqe5rS/pE5topKMhDK0QTo0+Up5ykSpIbNxlggP6ToFAvpFE/ucy9Z1t
-         84vjt+dSNXBQ6JQzw6rz9qK/Tfx6WPgo498V5du77lZnN77DfXaW6AstcUfYmB0rjYbM
-         fyy52+nWCo+CtWxtKNwPrwKmY20ESKnVQVwn0bTN7vEV48GOxo9IPP5sjxJ5Innub8oa
-         OwCzijn+armXMqgc9z9yJb1rkesdMeDLOzhtzgUifEjRyVFpfvkIKPM/OHwqIYF6DPWL
-         cNXZRFLyqhHOi/xvtTU0jTAN3fPciT+kPxjmhF75OxXRPWIunVm0Gz8cMgSDYDdC7nM6
-         A4pA==
-X-Gm-Message-State: ABy/qLYrxqmondBJOV8sjuVvvHskFkXxpBYfW0kRiz9bbfK0LxN1gWde
-	zZVqszb4S0M3nNZIwULMX89C+6yG2puFn7i46q6YPG5QBfEQADYuRLhU4fNERblGdKLyxEgYkg+
-	gjTf8RuuNps73T6yN
-X-Received: by 2002:a05:6214:1305:b0:626:2305:6073 with SMTP id pn5-20020a056214130500b0062623056073mr2253701qvb.4.1689845917355;
-        Thu, 20 Jul 2023 02:38:37 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFZNpelH74SlrM5sHH5r/FZh0EFlX2FFsKs2gMRUKLjx/oalUJ5qqgnEu5Vyih99V+yhGmD8A==
-X-Received: by 2002:a05:6214:1305:b0:626:2305:6073 with SMTP id pn5-20020a056214130500b0062623056073mr2253684qvb.4.1689845917017;
-        Thu, 20 Jul 2023 02:38:37 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
-        by smtp.gmail.com with ESMTPSA id x14-20020a0ce0ce000000b00623813aa1d5sm211068qvk.89.2023.07.20.02.38.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 02:38:36 -0700 (PDT)
-Message-ID: <348f3a7ba5477170f81660acb6a3f0c71295f9db.camel@redhat.com>
-Subject: Re: [PATCH net-next v3 0/2] Remove expired routes with a separated
- list of routes.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Kui-Feng Lee <thinker.li@gmail.com>, dsahern@kernel.org, 
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org,  martin.lau@linux.dev, kernel-team@meta.com,
- yhs@meta.com
-Cc: Kui-Feng Lee <kuifeng@meta.com>
-Date: Thu, 20 Jul 2023 11:38:33 +0200
-In-Reply-To: <20230718183351.297506-1-kuifeng@meta.com>
-References: <20230718183351.297506-1-kuifeng@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496F4199EF
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 09:40:28 +0000 (UTC)
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E66A12D68;
+	Thu, 20 Jul 2023 02:40:21 -0700 (PDT)
+Received: from [192.168.1.103] (178.176.74.113) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Thu, 20 Jul
+ 2023 12:40:10 +0300
+Subject: Re: [PATCH v3 38/42] ata: pata_ep93xx: remove legacy pinctrl use
+To: <nikita.shubin@maquefel.me>, Hartley Sweeten
+	<hsweeten@visionengravers.com>, Lennert Buytenhek <kernel@wantstofly.org>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King
+	<linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, Linus Walleij
+	<linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Rob Herring
+	<robh+dt@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Alessandro Zummo <a.zummo@towertech.it>, Alexandre
+ Belloni <alexandre.belloni@bootlin.com>, Wim Van Sebroeck
+	<wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, Sebastian
+ Reichel <sre@kernel.org>, Thierry Reding <thierry.reding@gmail.com>,
+	=?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>, Mark
+ Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Miquel Raynal
+	<miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, Vignesh
+ Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, Dmitry
+ Torokhov <dmitry.torokhov@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Olof
+ Johansson <olof@lixom.net>, <soc@kernel.org>, Liam Girdwood
+	<lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+	<tiwai@suse.com>, Andy Shevchenko <andy@kernel.org>, Michael Peters
+	<mpeters@embeddedTS.com>, Kris Bahnsen <kris@embeddedTS.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-gpio@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-clk@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+	<linux-watchdog@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+	<linux-pwm@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+	<linux-mtd@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+	<linux-input@vger.kernel.org>, <alsa-devel@alsa-project.org>
+References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
+ <20230605-ep93xx-v3-38-3d63a5f1103e@maquefel.me>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <6316072a-f055-166d-df27-5e3ceb0e68a1@omp.ru>
+Date: Thu, 20 Jul 2023 12:40:06 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230605-ep93xx-v3-38-3d63a5f1103e@maquefel.me>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.74.113]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 07/20/2023 09:02:28
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 178740 [Jul 20 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.113 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.74.113:7.4.1,7.7.3
+X-KSE-AntiSpam-Info: {iprep_blacklist}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.113
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/20/2023 09:10:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/20/2023 4:32:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-07-18 at 11:33 -0700, Kui-Feng Lee wrote:
-> FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tr=
-ee
-> can be expensive if the number of routes in a table is big, even if most =
-of
-> them are permanent. Checking routes in a separated list of routes having
-> expiration will avoid this potential issue.
->=20
-> Background
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> The size of a Linux IPv6 routing table can become a big problem if not
-> managed appropriately.  Now, Linux has a garbage collector to remove
-> expired routes periodically.  However, this may lead to a situation in th=
-e routing path is blocked for a long period due to an
-> excessive number of routes.
->=20
-> For example, years ago, there is a commit c7bb4b89033b ("ipv6: tcp: drop
-> silly ICMPv6 packet too big messages") about "ICMPv6 Packet too big
-> messages". The root cause is that malicious ICMPv6 packets were sent back
-> for every small packet sent to them. These packets add routes with an
-> expiration time that prompts the GC to periodically check all routes in t=
-he
-> tables, including permanent ones.
->=20
-> Why Route Expires
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Users can add IPv6 routes with an expiration time manually. However,
-> the Neighbor Discovery protocol may also generate routes that can
-> expire.  For example, Router Advertisement (RA) messages may create a
-> default route with an expiration time. [RFC 4861] For IPv4, it is not
-> possible to set an expiration time for a route, and there is no RA, so
-> there is no need to worry about such issues.
->=20
-> Create Routes with Expires
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->=20
-> You can create routes with expires with the  command.
->=20
-> For example,
->=20
->     ip -6 route add 2001:b000:591::3 via fe80::5054:ff:fe12:3457 \=20
->         dev enp0s3 expires 30
->=20
-> The route that has been generated will be deleted automatically in 30
-> seconds.
->=20
-> GC of FIB6
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> The function called fib6_run_gc() is responsible for performing
-> garbage collection (GC) for the Linux IPv6 stack. It checks for the
-> expiration of every route by traversing the trees of routing
-> tables. The time taken to traverse a routing table increases with its
-> size. Holding the routing table lock during traversal is particularly
-> undesirable. Therefore, it is preferable to keep the lock for the
-> shortest possible duration.
->=20
-> Solution
-> =3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> The cause of the issue is keeping the routing table locked during the
-> traversal of large trees. To solve this problem, we can create a separate
-> list of routes that have expiration. This will prevent GC from checking
-> permanent routes.
->=20
-> Result
-> =3D=3D=3D=3D=3D=3D
->=20
-> We conducted a test to measure the execution times of fib6_gc_timer_cb()
-> and observed that it enhances the GC of FIB6. During the test, we added
-> permanent routes with the following numbers: 1000, 3000, 6000, and
-> 9000. Additionally, we added a route with an expiration time.
->=20
-> Here are the average execution times for the kernel without the patch.
->  - 120020 ns with 1000 permanent routes
->  - 308920 ns with 3000 ...
->  - 581470 ns with 6000 ...
->  - 855310 ns with 9000 ...
->=20
-> The kernel with the patch consistently takes around 14000 ns to execute,
-> regardless of the number of permanent routes that are installed.
->=20
-> Major changes from v2:
->=20
->  - Remove unnecessary and incorrect sysctl restoring in the test case.
->=20
-> Major changes from v1:
->=20
->  - Moved gc_link to avoid creating a hole in fib6_info.
->=20
->  - Moved fib6_set_expires*() and fib6_clean_expires*() to the header
->    file and inlined. And removed duplicated lines.
->=20
->  - Added a test case.
->=20
-> ---
-> v1: https://lore.kernel.org/all/20230710203609.520720-1-kuifeng@meta.com/
-> v2: https://lore.kernel.org/all/20230718180321.294721-1-kuifeng@meta.com/
+Hello!
 
-Too bad I did not notice v3 before starting reviewing v2.
+On 7/20/23 2:29 PM, Nikita Shubin via B4 Relay wrote:
 
-When posting a new version you must wait the 24h quarantine period,
-see:
+> From: Nikita Shubin <nikita.shubin@maquefel.me>
+> 
+> Drop legacy acquire/release since we are using pinctrl for this now.
+> 
+> Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
 
-https://elixir.bootlin.com/linux/v6.4/source/Documentation/process/maintain=
-er-netdev.rst#L15
+   I think I've already given you my:
 
-I assume this does not cope with the feedback on previous version ;)
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-/P
+[...]
 
+MBR, Sergey
 
