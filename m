@@ -1,165 +1,145 @@
-Return-Path: <netdev+bounces-19623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 934AE75B771
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:07:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0686075B77A
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EEE1281F71
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:07:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 374281C214D7
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B58619BD0;
-	Thu, 20 Jul 2023 19:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C771E1BB29;
+	Thu, 20 Jul 2023 19:08:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4A919BCD
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:07:55 +0000 (UTC)
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46EA41984
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 12:07:52 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-40371070eb7so63471cf.1
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 12:07:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689880071; x=1690484871;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y4XG/fB8WpES5L9ZA04wwj/o6tX3jA1gLNRCsTQHJyI=;
-        b=lHLZY3Ewd8Ty/3BcHCByP7EV4tgjVjwB9NSqtCgVqzs95PgXPyLDBRvrA7C2uJBnGP
-         lnOwzsq3sqNxj9jEUP2/aVqPJFk4I9QWp/z+Uq+fI+Q/Xyh2zcO8BYvF+8gNYwhis8GX
-         BcjfAYa+Wcnti46YaH3C+G45A79yR7/YR7di4XdREX7pbNR7g8dpW59GmEYKhigkvZqz
-         wL+MHGGVgKLRUShoM6vlJaxdJqkMF673n+jvCweu6jJrujfqJzsmD+J9ZPlDlzbJr/zU
-         g4nMAhm5+VYavMaJC1CbD3XFAMMGqv8i6cTVzbOBmhRKKID7TIERIAvYG/wyX6RgT2yn
-         PQpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689880071; x=1690484871;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y4XG/fB8WpES5L9ZA04wwj/o6tX3jA1gLNRCsTQHJyI=;
-        b=FsMe25qwCsea3R0TNzFZuteqem1CCAu5Xsi5ibaYc1zUicNPyR1fd1rhG1QFKF2fA/
-         T9vuu7DbOrRJRiRbQPCs44cK9sawSYQsfvgere+SWXX9HyVmCP3NmnmmS9M+yyS+oqDQ
-         qb7xRK6c8L2n8a8y68bbPF77JorA83qWYTrxeElYHxOLUW1u7/Zme9VAJ9CLa2QCCYs3
-         SK8FbuJ0ORmFMhoEjEVbEkGx+VrKHm1PRQM3BfJFlSfyhzUsjAx0l8BjWm/MpJnTnCpU
-         NXoSrhZWsFhz3SzXgtNvJeb3e9eFkgHkq1hkqxaRv/avQJwx3RcizyJjQU7G5ZIehuLc
-         Xhtw==
-X-Gm-Message-State: ABy/qLYIF5WxHt2HqxKTkDOqVAJ72otSCqCPLIttlk83HYYlONqIHjg0
-	5ESBv3oUjGW/v9ksrspLlsmqpvczY4+PIBZOFPIfug==
-X-Google-Smtp-Source: APBJJlEur6cHnlzJHXbLUn2GBZ0Ah3NwAqthv5DSX4rSx/tBDaSx89c7j31E72vgVfMeFIXZvzcYQK3D0t4u03+tbqk=
-X-Received: by 2002:a05:622a:1a87:b0:3f9:56c:1129 with SMTP id
- s7-20020a05622a1a8700b003f9056c1129mr31665qtc.5.1689880071131; Thu, 20 Jul
- 2023 12:07:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B3A19BD6
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:08:45 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2089.outbound.protection.outlook.com [40.107.94.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1CCA10E5
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 12:08:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R4Mp1uv0fVzHysEMq6O7WjcFDM8w6nIE4xQ2V0icR0B+qtq90KBomuuiJvTBqEsIl7dEW4QCkbZoedM1DuDsWCmDxGhvxmkn5WOj14vXfxwcKD3W4yYSQ2lS6IqAz+LJFIyeKBJf9xIOUhS68kAHsoLdeuJB93rMW3L4E5Sa5gv5nshaQcpI/EjtZ3uncdxmv19Uh1KEkxpJQjqSu0F3n7aRI+u4JNq4jN63dFgSz8k10sHeYsyYVpKMKdvnQJ2LmnFF521oTdILuIDt3WaI2uPy7AufjZZ91M0SurgS+xjfd1zpd/woPgBjS6sktaPEcYxXwMEAfEEkQry8oJ0P+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T2qEJw9j7tk22KSqs6RHX8UQUxOyyEYzJe88fkhRodY=;
+ b=nNGIC178vLQsN7/eUDn80v8fG6ncDCFKbjMmRVpGVMPsQZg1st/oTk/mKrnZeOed6ZJG7OUgLzFZBAOnF/bVoa0DUMOKexRTKBBIYY5buHZUkblSiFnhxYFXp5/DVIt86Bt4D0WViCseqgJWlJ6EyLlSl2ihHcBGvYOwt+1lqmuCX81afjzA/PJWjD00amRiIBaPC5KpJlD03hPmSSKOAGfkQ9o1j8cpU6Mkn4dmS1c63tVafI/K9DzVxiFWsPhrIcZqt8/6LN3m0Y27QCYkXU//csj9gh4JzC4GHja5OGllMWFs0WMgp0y6Lc3I7ZR77GjDxNV0wp33Rc8dn1pcFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T2qEJw9j7tk22KSqs6RHX8UQUxOyyEYzJe88fkhRodY=;
+ b=0I3aoI9Ic8ms7GX+2MBHqOIHPvSFM78bpr6G1fPxtp1AaEupczOKO4jWRlpl/v7KVDJFYg9/T82Fh/0DxA8gZrttpi4IeUxgJLThLShQDGFtdUG6ktkuwry+Wr1o0G0xB46CcSCMitsH7R9TSoJddklgL6zNoVrhhzZLp1ZbPbs=
+Received: from DM6PR02CA0053.namprd02.prod.outlook.com (2603:10b6:5:177::30)
+ by CH3PR12MB8969.namprd12.prod.outlook.com (2603:10b6:610:17c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Thu, 20 Jul
+ 2023 19:08:37 +0000
+Received: from DM6NAM11FT030.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:177:cafe::9d) by DM6PR02CA0053.outlook.office365.com
+ (2603:10b6:5:177::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25 via Frontend
+ Transport; Thu, 20 Jul 2023 19:08:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT030.mail.protection.outlook.com (10.13.172.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6609.28 via Frontend Transport; Thu, 20 Jul 2023 19:08:37 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 20 Jul
+ 2023 14:08:35 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<simon.horman@corigine.com>, <idosch@idosch.org>
+CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
+	<shannon.nelson@amd.com>
+Subject: [PATCH v4 net-next 0/4] ionic: add FLR support
+Date: Thu, 20 Jul 2023 12:08:12 -0700
+Message-ID: <20230720190816.15577-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230720-upstream-net-next-20230720-mptcp-fix-rcv-buffer-auto-tuning-v1-1-175ef12b8380@tessares.net>
-In-Reply-To: <20230720-upstream-net-next-20230720-mptcp-fix-rcv-buffer-auto-tuning-v1-1-175ef12b8380@tessares.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 20 Jul 2023 21:07:39 +0200
-Message-ID: <CANn89iL-tLZwjYPqmXx9-DbSHV9=epEK9iahqjwu=nsyW_tVrg@mail.gmail.com>
-Subject: Re: [PATCH net-next] mptcp: fix rcv buffer auto-tuning
-To: Matthieu Baerts <matthieu.baerts@tessares.net>
-Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Mat Martineau <martineau@kernel.org>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT030:EE_|CH3PR12MB8969:EE_
+X-MS-Office365-Filtering-Correlation-Id: 604f48e8-d50e-4bc6-3054-08db8954b8c0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4+UjZff64j02V0jMILr58n7gxieSs62kP0EQow9qg4D9HQGoOrC0qI+gOXuHeCpjQZPSY8BG3NMaPkRFqRVdn3hk6lHD4IFDhUbZDXjU9PR0jBoS8xiWxFK+6SHreKINfI/U+gU+u2kS0Z0nOxlSuovd9pio2aAzHPceUVLQLvNpRKhQvAFnXFbBWP1F2ZLC68ddw95dT2+iLGXmydW+mKldtRZCWD+0PgveeotGEUGbPe6UwxiiOmS43/H1qkm7sqMzdLg33sRy7Gn3ilFcaYI+77n1qc89Lvk7E0EnWFDsRRQDH9pzgu3XlfqeupdjAsb3a/rNioRjiIp5z85ZsGyHv0lsE1WnQOKEUrrGKYXdccqDljgvN56BxPDfWMI33rRX7JEct/XU6aSS3gU6jU79XvHfPzXtnTVSzlFR8HfS0aCZ3pAGAmenwJuZv3PLv8Pf5dN/Q3I9TrSaGeLNMETINw2AtZ/968yHPNEAyMgphf7irwHRPYG2gBVuqqndon3xidEYKfmC9ch4WHJYGiBFAqn4GniPVig54/7//KjYBsBHQAD355t/6CIhtnLIr3g9q4zLbNXY8ZNQm1EAd5ClwP07pGWRtlupsaiWyjq/rg5i01t1KXpJBjfTikZ/4J6Y4S76RJrtte1cuV6tRIUFkl5G5nA+sJjC6/mCgYuBoT3xHplJBEUYh7TDhVAMmmLlv4/iDVrRIqFkaoltacN2AFw+UWXxWpkDe+6OnzoolvhE9n6163f0nyl9sdsvV0GQh4R8P2ed4tWUTCDiFOvSyeDKiRiEfV/4OhGxD1o=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39860400002)(376002)(451199021)(82310400008)(36840700001)(40470700004)(46966006)(40460700003)(426003)(47076005)(16526019)(26005)(1076003)(41300700001)(336012)(2616005)(186003)(83380400001)(8936002)(36860700001)(44832011)(5660300002)(4326008)(70206006)(8676002)(70586007)(54906003)(316002)(2906002)(966005)(6666004)(110136005)(478600001)(40480700001)(82740400003)(356005)(81166007)(36756003)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:08:37.2137
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 604f48e8-d50e-4bc6-3054-08db8954b8c0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DM6NAM11FT030.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8969
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 8:48=E2=80=AFPM Matthieu Baerts
-<matthieu.baerts@tessares.net> wrote:
->
-> From: Paolo Abeni <pabeni@redhat.com>
->
-> The MPTCP code uses the assumption that the tcp_win_from_space() helper
-> does not use any TCP-specific field, and thus works correctly operating
-> on an MPTCP socket.
->
-> The commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> broke such assumption, and as a consequence most MPTCP connections stall
-> on zero-window event due to auto-tuning changing the rcv buffer size
-> quite randomly.
->
-> Address the issue syncing again the MPTCP auto-tuning code with the TCP
-> one. To achieve that, factor out the windows size logic in socket
-> independent helpers, and reuse them in mptcp_rcv_space_adjust(). The
-> MPTCP level scaling_ratio is selected as the minimum one from the all
-> the subflows, as a worst-case estimate.
->
-> Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> Co-developed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-> Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-> ---
->  include/net/tcp.h    | 20 +++++++++++++++-----
->  net/mptcp/protocol.c | 15 +++++++--------
->  net/mptcp/protocol.h |  8 +++++++-
->  net/mptcp/subflow.c  |  2 +-
->  4 files changed, 30 insertions(+), 15 deletions(-)
->
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index c5fb90079920..794642fbd724 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -1430,22 +1430,32 @@ void tcp_select_initial_window(const struct sock =
-*sk, int __space,
->                                __u32 *window_clamp, int wscale_ok,
->                                __u8 *rcv_wscale, __u32 init_rcv_wnd);
->
-> -static inline int tcp_win_from_space(const struct sock *sk, int space)
-> +static inline int __tcp_win_from_space(u8 scaling_ratio, int space)
->  {
-> -       s64 scaled_space =3D (s64)space * tcp_sk(sk)->scaling_ratio;
-> +       s64 scaled_space =3D (s64)space * scaling_ratio;
->
->         return scaled_space >> TCP_RMEM_TO_WIN_SCALE;
->  }
->
-> -/* inverse of tcp_win_from_space() */
-> -static inline int tcp_space_from_win(const struct sock *sk, int win)
-> +static inline int tcp_win_from_space(const struct sock *sk, int space)
+Add support for handing and recovering from a PCI FLR event.
+This patchset first moves some code around to make it usable
+from multiple paths, then adds the PCI error handler callbacks
+for reset_prepare and reset_done.
 
-Maybe in a follow up patch we could change the prototype of this helper
-to avoid future mis use :)
+Example test:
+    echo 1 > /sys/bus/pci/devices/0000:2a:00.0/reset
 
-static inline int tcp_win_from_space(const struct tcp_sock *tp, int space)
-{
-}
+v4:
+ - don't remove ionic_dev_teardown() in ionic_probe() in patch 2/4
+ - remove clear_bit() change from patch 3/4
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+v3:
+Link: https://lore.kernel.org/netdev/20230717170001.30539-1-shannon.nelson@amd.com/
+ - removed first patch, it is already merged into net
 
+v2:
+Link: https://lore.kernel.org/netdev/20230713192936.45152-1-shannon.nelson@amd.com/
+ - removed redundant pci_save/restore_state() calls
 
-> +{
-> +       return __tcp_win_from_space(tcp_sk(sk)->scaling_ratio, space);
-> +}
-> +
-> +/* inverse of __tcp_win_from_space() */
-> +static inline int __tcp_space_from_win(u8 scaling_ratio, int win)
->  {
->         u64 val =3D (u64)win << TCP_RMEM_TO_WIN_SCALE;
->
-> -       do_div(val, tcp_sk(sk)->scaling_ratio);
-> +       do_div(val, scaling_ratio);
->         return val;
->  }
->
-> +static inline int tcp_space_from_win(const struct sock *sk, int win
+Shannon Nelson (4):
+  ionic: extract common bits from ionic_remove
+  ionic: extract common bits from ionic_probe
+  ionic: pull out common bits from fw_up
+  ionic: add FLR recovery support
 
-Same remark here.
+ .../ethernet/pensando/ionic/ionic_bus_pci.c   | 160 +++++++++++++-----
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |  70 +++++---
+ .../net/ethernet/pensando/ionic/ionic_lif.h   |   5 +
+ 3 files changed, 164 insertions(+), 71 deletions(-)
 
-Thanks for the fix !
+-- 
+2.17.1
+
 
