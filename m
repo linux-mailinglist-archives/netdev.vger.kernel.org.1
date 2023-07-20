@@ -1,115 +1,100 @@
-Return-Path: <netdev+bounces-19635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C2D75B83E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:46:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1527C75B848
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 197DB281FD0
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:46:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45F0C1C21442
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 19:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17111BE67;
-	Thu, 20 Jul 2023 19:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9D21BE6E;
+	Thu, 20 Jul 2023 19:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C563218C33
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:46:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABE4DC433C8;
-	Thu, 20 Jul 2023 19:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953361BE67
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 19:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0829BC433C8;
+	Thu, 20 Jul 2023 19:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689882409;
-	bh=u8Lr+3WeqKvD4svXmrwr31VT12gwAWyndJkuUoaFWe4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dgUAImpkQX2xyyBOB386xmAqsmG8JYcFPL94qeMMMyIzU+M7Bz7oO9cPYeYJVlHmn
-	 en5+cHaudEko4aDipf061qdfcOutcy+GR57a88hjjE2MnoLvOndXX/cDxL7kbGxj+S
-	 O3oOlp9cgL+f/YgyOqQsRQ38YRq2TXckOaK9lLyFQRyfWvCE/UBwYeQkLWuFACZsF6
-	 ibTtRutI6YKw4nINr+L4k9m+xiPXdgVxcYYI331zVu9zfAQJblX0w2x/eTZ7OEqedG
-	 rrsxCq5nr+6DsOePN8mX8gExOMrW/cHI8e79Ovq10GgKJmbXgzl1ION/quv3EFRAZW
-	 XPwPl48H6ul0A==
-Date: Thu, 20 Jul 2023 12:46:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
- <alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next v2 7/7] net: skbuff: always try to recycle
- PP pages directly when in softirq
-Message-ID: <20230720124647.413363d5@kernel.org>
-In-Reply-To: <e542f6b5-4eea-5ac6-a034-47e9f92dbf7e@intel.com>
-References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
-	<20230714170853.866018-10-aleksander.lobakin@intel.com>
-	<20230718174042.67c02449@kernel.org>
-	<d7cd1903-de0e-0fe3-eb15-0146b589c7b0@intel.com>
-	<20230719135150.4da2f0ff@kernel.org>
-	<48c1d70b-d4bd-04c0-ab46-d04eaeaf4af0@intel.com>
-	<20230720101231.7a5ff6cd@kernel.org>
-	<8e65c3d3-c628-2176-2fc2-a1bc675ad607@intel.com>
-	<20230720110027.4bd43ee7@kernel.org>
-	<988fc62d-2329-1560-983a-79ff5653a6a6@intel.com>
-	<b3884ff9-d903-948d-797a-1830a39b1e71@intel.com>
-	<20230720122015.1e7efc21@kernel.org>
-	<e542f6b5-4eea-5ac6-a034-47e9f92dbf7e@intel.com>
+	s=k20201202; t=1689882625;
+	bh=NQ8PIZhjuCDudL31yUq+49oMBQMpdrPLXCaG7bR5yHY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G0telbMXzVZfi2b8iORR05YVqO03QZ1bvj1CSTGmE6X8g3rc/vfFTDVriGFh0reLM
+	 ayiHoE95qfocCQjsqdy+Y2TterDw/WdvQOVk4V+GLc46aMTKyj/cAl4rcFKlLq6/Gm
+	 m2LtKc/2jtl1opna5akGTag4QpzIJDj5NsqU9Rg3xbMMVsLXrgnspxZzRDEwe+G5km
+	 82ZT/LqpTkTDXv19YzVJ0MhDJtECZKeJrAr7IH/X7D/yXT9n1ip7/Rk+ILHv8ZjgnX
+	 /DboZsByy7Y8ZrQ3nVdc1dYe6OrKe1gG69SiX128cVoEr51iQ7LR5ssey9quQz7lec
+	 iNaa+TY9NURrg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E6798E21EF6;
+	Thu, 20 Jul 2023 19:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 00/11] tcp: add missing annotations
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168988262493.8271.7964075962351926642.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jul 2023 19:50:24 +0000
+References: <20230719212857.3943972-1-edumazet@google.com>
+In-Reply-To: <20230719212857.3943972-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-On Thu, 20 Jul 2023 21:33:40 +0200 Alexander Lobakin wrote:
-> > We can as well check
-> > 	(in_softirq() && !irqs_disabled() && !in_hardirq())
-> > ?  
-> 
-> Yes, something like that. Messy, but I see no other options...
-> 
-> So, I guess you want to add an assertion to make sure that we're *not*
-> in this:
-> 
-> in_hardirq() || irqs_disabled()
-> 
-> Does this mean that after it's added, my patch is sane? :p
+Hello:
 
-Well... it's acceptable. Make sure you add a good, informative
-but concise comment :)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> > The interrupt_context_level() thing is fairly new, I think.
-> > Who knows what happens to it going forward...  
+On Wed, 19 Jul 2023 21:28:46 +0000 you wrote:
+> This series was inspired by one syzbot (KCSAN) report.
 > 
-> Well, it counts the number of active hard interrupts, but doesn't take
-> into account that if there are no hardirqs we can still disable them
-> manually. Meh.
-> Should I try to send a patch for it? :D
-
-Depends on how you like to send your time :)
-
-> > netcons or anyone who freed socket-less skbs from hardirq.
-> > Until pp recycling was added freeing an skb from hardirq was legal,
-> > AFAICT.  
+> do_tcp_getsockopt() does not lock the socket, we need to
+> annotate most of the reads there (and other places as well).
 > 
-> I don't think so. Why do we have dev_kfree_skb_any() then? It checks for
+> This is a first round, another series will come later.
 > 
-> in_hardirq() || irqs_disabled()
-> 
-> and if it's true, defers the skb to process it by backlog task.
-> "Regular" skb freeing functions don't do that. The _any() variant lives
-> here for a long time IIRC, so it's not something recent.
+> [...]
 
-Drivers (or any other users of dev_kfree_skb_any()) should be fine. 
-I'm only paranoid about some unknown bits of code which thought they
-can be clever and call kfree_skb() directly, as long as !skb->sk.
+Here is the summary with links:
+  - [net,01/11] tcp: annotate data-races around tp->tcp_tx_delay
+    https://git.kernel.org/netdev/net/c/348b81b68b13
+  - [net,02/11] tcp: annotate data-races around tp->tsoffset
+    https://git.kernel.org/netdev/net/c/dd23c9f1e8d5
+  - [net,03/11] tcp: annotate data-races around tp->keepalive_time
+    https://git.kernel.org/netdev/net/c/4164245c76ff
+  - [net,04/11] tcp: annotate data-races around tp->keepalive_intvl
+    https://git.kernel.org/netdev/net/c/5ecf9d4f52ff
+  - [net,05/11] tcp: annotate data-races around tp->keepalive_probes
+    https://git.kernel.org/netdev/net/c/6e5e1de616bf
+  - [net,06/11] tcp: annotate data-races around icsk->icsk_syn_retries
+    https://git.kernel.org/netdev/net/c/3a037f0f3c4b
+  - [net,07/11] tcp: annotate data-races around tp->linger2
+    https://git.kernel.org/netdev/net/c/9df5335ca974
+  - [net,08/11] tcp: annotate data-races around rskq_defer_accept
+    https://git.kernel.org/netdev/net/c/ae488c74422f
+  - [net,09/11] tcp: annotate data-races around tp->notsent_lowat
+    https://git.kernel.org/netdev/net/c/1aeb87bc1440
+  - [net,10/11] tcp: annotate data-races around icsk->icsk_user_timeout
+    https://git.kernel.org/netdev/net/c/26023e91e12c
+  - [net,11/11] tcp: annotate data-races around fastopenq.max_qlen
+    https://git.kernel.org/netdev/net/c/70f360dd7042
 
-But if you add the hard irq checks to your patch then you're strictly
-safer than the existing code. Hopefully the checks are not too
-expensive.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
