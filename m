@@ -1,326 +1,118 @@
-Return-Path: <netdev+bounces-19466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B8C75AC97
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:09:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B4275AC9C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 13:14:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DFE5281C6F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:09:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 037821C20E02
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 11:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CDE17733;
-	Thu, 20 Jul 2023 11:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BC617739;
+	Thu, 20 Jul 2023 11:14:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C55CA5C
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:09:06 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0C5268F
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:09:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c4f27858e4eso585087276.1
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:09:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A297C174EB
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 11:14:00 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D20BE
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:13:58 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-992acf67388so107314466b.1
+        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 04:13:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689851343; x=1690456143;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kZ/uT84dJdZNFLugauA38+ypOQoDq/O3+1F7wzLyPE8=;
-        b=NblDY+i712KfcyQKGLSEP0wm61ROYfk+N3wUg7ZzSMahky1MOsIXbpTVbgje9MHX2T
-         HrRU5lWAyKNDEA5tJYdYx7v/+f9pFr+gh9Kj3S4MZrIHVDwCN+/FjbCJtfMtpOmEDd0c
-         0PDoxsjHkmy3TUSh62sn8O+RHSyWkzMkkexGnOSOFr0E739e6n+FxB4GDyTiIvUd8j3A
-         gmnxDyzPP4uOwrV3N7EhgYGmx5lQEevAxRzagmbxVNP/6F9CDIIa7xrlKMp+SYjQ+lWI
-         pUhMGKswuyeCadO7KY0o4qsjyAEXQupoQMEO2An/nowRp/t01NWBdU0mA7I6MvlZO4HM
-         o4sA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689851636; x=1690456436;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HFayAkK3ZGNt+PHGBSqJcT4IrarmvetwbqO2i9Q0l+s=;
+        b=fJBxCPO8e2ZkRwuazlDWxi77pgoryBOB0bhfsemIsUZnE01nzMbNVkV7PyC4OSoEdW
+         W09Kq0aDMs+Mll4CNvmbGsMul4yjnWo1iO6SAOEF4fKmDGzAUZfi9McxUJoOgl6b/Bxv
+         9PP40sSIZjC0Chn7DZrD1kXWfAg5birX9oNas1vgjvWJUVDF9zhqdkIjOimbLcC+3K8Z
+         VnHQSK9D+Nr8TDrXzROOIzA2/AUfhkTpITN2gyVMCdAR8L01EaYSJlaLu63G+v2CYHKK
+         xhReIu8zIgwaTK3NrDLbxcBeizT0yVmOE7yVcuCXYG4cWrzHBNtkIiGbit3ta+TjhzYa
+         MU7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689851343; x=1690456143;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kZ/uT84dJdZNFLugauA38+ypOQoDq/O3+1F7wzLyPE8=;
-        b=O74haYNRyJlSgVyPGDh1BH5bkdoti/ruKKRCnaVMZNYEW0X3Glalz+gpnWmcsVLUGw
-         ZpoEW8o9smoboBC3EU96nrzbC0YDr7Aii3SOnpSkPF6Umug2tzhw477XhvRjpbFmDPad
-         oU6ZBW1Nv7ETKTxmU2akkEAXzfOVJ+6pfOUGT9TTnKdJaRRB3Yutln4FYtHrtA/3LcUp
-         gHYt8x8sI1V1s3mwCbynEmoCvNV7jXva9w7tca2ULtu8Kj9fM4iAXJ1HbUKu8E3GH94M
-         4mN6Dew/bjIZPtH3v95bfVIAbt6U1wVh+RqkjFtQ+lx8mBmQuuFY1c/GVTr61VATbr+4
-         SnPw==
-X-Gm-Message-State: ABy/qLZABuKMH24UEvEdIKnadQ/Mo/zzlh+1upwKB7HwZot9TphNld6K
-	arOpgUaDGUpiOOKAF/yyqUcTsTC+TjZBDQ==
-X-Google-Smtp-Source: APBJJlFOU/AfATyKeP5vQ62Ozg+wsnvhqiQv3QtW5aydmB8OLb/RKcPQRthnPJpZi4/QULx+EaYRIUW847Jrbg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:db83:0:b0:c78:c530:6345 with SMTP id
- g125-20020a25db83000000b00c78c5306345mr39851ybf.7.1689851343555; Thu, 20 Jul
- 2023 04:09:03 -0700 (PDT)
-Date: Thu, 20 Jul 2023 11:09:01 +0000
+        d=1e100.net; s=20221208; t=1689851636; x=1690456436;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HFayAkK3ZGNt+PHGBSqJcT4IrarmvetwbqO2i9Q0l+s=;
+        b=leIfBqhD/OcFKw4byo49v7xqSc+pYTLRWh+N9Wlgm1Y5oS2xUzzEQWIi96iL2N09xr
+         DBYOaO84ofYO9t5ENEYcET3mrT5MfzsrvsL1l6yD/Mk59WYKZU9hP/3u72N3H6QTV03A
+         io25pjNjpbeIyGwCcWHLGpbVlNnl7oJoSihKVl2Lr++GJVGV1uAU5j2pHXl3ffvEwlgW
+         n75m+cBTRJmDMs/3OtP2X78iw0IhV9I4ofR9OuOmOvi1HfAm2pRZa84yvYmE8UdJdFI9
+         WqXe0Yaow16Svo5PX9ph5L+PO8WZUj1CPldnDkgMMgFdbEPDmZu649I9NHNolmNnGeHX
+         rdXQ==
+X-Gm-Message-State: ABy/qLZWlbjbMQZbN9ev6DCKGfbvV9GB9U9VnFCz00rNNkBCH++8FPSW
+	emZ7X2ymta3GhtOIxxZEiiDePO3YdumvzYUy4Nk=
+X-Google-Smtp-Source: APBJJlEfdRmswU0FprNl1D2wPgdo2uk3cur8POaXP+poeZQc25upYIvyreeOJ/JCHkb92cXZd2uFSA==
+X-Received: by 2002:a17:906:218:b0:993:6382:6e34 with SMTP id 24-20020a170906021800b0099363826e34mr4663547ejd.72.1689851636454;
+        Thu, 20 Jul 2023 04:13:56 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id h12-20020a170906854c00b0099315454e76sm542149ejy.211.2023.07.20.04.13.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 04:13:55 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jacob.e.keller@intel.com
+Subject: [patch net-next] genetlink: add explicit ordering break check for split ops
+Date: Thu, 20 Jul 2023 13:13:54 +0200
+Message-ID: <20230720111354.562242-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230720110901.83207-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] ipv6: remove hard coded limitation on ipv6_pinfo
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>, 
-	Coco Li <lixiaoyan@google.com>, YiFei Zhu <zhuyifei@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-IPv6 inet sockets are supposed to have a "struct ipv6_pinfo"
-field at the end of their definition, so that inet6_sk_generic()
-can derive from socket size the offset of the "struct ipv6_pinfo".
+From: Jiri Pirko <jiri@nvidia.com>
 
-This is very fragile, and prevents adding bigger alignment
-in sockets, because inet6_sk_generic() does not work
-if the compiler adds padding after the ipv6_pinfo component.
+Currently, if cmd in the split ops array is of lower value than the
+previous one, genl_validate_ops() continues to do the checks as if
+the values are equal. This may result in non-obvious WARN_ON() hit in
+these check.
 
-We are currently working on a patch series to reorganize
-TCP structures for better data locality and found issues
-similar to the one fixed in commit f5d547676ca0
-("tcp: fix tcp_inet6_sk() for 32bit kernels")
+Instead, check the incorrect ordering explicitly and put a WARN_ON()
+in case it is broken.
 
-Alternative would be to force an alignment on "struct ipv6_pinfo",
-greater or equal to __alignof__(any ipv6 sock) to ensure there is
-no padding. This does not look great.
-
-v2: fix typo in mptcp_proto_v6_init() (Paolo)
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Chao Wu <wwchao@google.com>
-Cc: Wei Wang <weiwan@google.com>
-Cc: Coco Li <lixiaoyan@google.com>
-Cc: YiFei Zhu <zhuyifei@google.com>
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- include/linux/ipv6.h | 15 ++++-----------
- include/net/sock.h   |  1 +
- net/dccp/ipv6.c      |  1 +
- net/dccp/ipv6.h      |  4 ----
- net/ipv6/af_inet6.c  |  4 ++--
- net/ipv6/ping.c      |  1 +
- net/ipv6/raw.c       |  1 +
- net/ipv6/tcp_ipv6.c  |  1 +
- net/ipv6/udp.c       |  1 +
- net/ipv6/udplite.c   |  1 +
- net/l2tp/l2tp_ip6.c  |  4 +---
- net/mptcp/protocol.c |  1 +
- net/sctp/socket.c    |  1 +
- 13 files changed, 16 insertions(+), 20 deletions(-)
+ net/netlink/genetlink.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 839247a4f48ea76b5d6daa9a54a7b87627635066..660012997f54ca12274f3c61e2ef1f42a7655ce9 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -199,14 +199,7 @@ struct inet6_cork {
- 	u8 tclass;
- };
+diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
+index a157247a1e45..6bd2ce51271f 100644
+--- a/net/netlink/genetlink.c
++++ b/net/netlink/genetlink.c
+@@ -593,8 +593,12 @@ static int genl_validate_ops(const struct genl_family *family)
+ 			return -EINVAL;
  
--/**
-- * struct ipv6_pinfo - ipv6 private area
-- *
-- * In the struct sock hierarchy (tcp6_sock, upd6_sock, etc)
-- * this _must_ be the last member, so that inet6_sk_generic
-- * is able to calculate its offset from the base struct sock
-- * by using the struct proto->slab_obj_size member. -acme
-- */
-+/* struct ipv6_pinfo - ipv6 private area */
- struct ipv6_pinfo {
- 	struct in6_addr 	saddr;
- 	struct in6_pktinfo	sticky_pktinfo;
-@@ -306,19 +299,19 @@ struct raw6_sock {
- 	__u32			offset;		/* checksum offset  */
- 	struct icmp6_filter	filter;
- 	__u32			ip6mr_table;
--	/* ipv6_pinfo has to be the last member of raw6_sock, see inet6_sk_generic */
-+
- 	struct ipv6_pinfo	inet6;
- };
+ 		/* Check sort order */
+-		if (a->cmd < b->cmd)
++		if (a->cmd < b->cmd) {
+ 			continue;
++		} else if (a->cmd > b->cmd) {
++			WARN_ON(1);
++			return -EINVAL;
++		}
  
- struct udp6_sock {
- 	struct udp_sock	  udp;
--	/* ipv6_pinfo has to be the last member of udp6_sock, see inet6_sk_generic */
-+
- 	struct ipv6_pinfo inet6;
- };
- 
- struct tcp6_sock {
- 	struct tcp_sock	  tcp;
--	/* ipv6_pinfo has to be the last member of tcp6_sock, see inet6_sk_generic */
-+
- 	struct ipv6_pinfo inet6;
- };
- 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 2eb916d1ff64866671a2197965eb857b47b810d9..7ae44bf866af5cd788ff10021a441d96b1f8d937 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1339,6 +1339,7 @@ struct proto {
- 
- 	struct kmem_cache	*slab;
- 	unsigned int		obj_size;
-+	unsigned int		ipv6_pinfo_offset;
- 	slab_flags_t		slab_flags;
- 	unsigned int		useroffset;	/* Usercopy region offset */
- 	unsigned int		usersize;	/* Usercopy region size */
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index 7249ef218178743ce7936fcf2f605616a419370e..e03b5331df6d71722dd4ab0a444ada7b06958ee6 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -1056,6 +1056,7 @@ static struct proto dccp_v6_prot = {
- 	.orphan_count	   = &dccp_orphan_count,
- 	.max_header	   = MAX_DCCP_HEADER,
- 	.obj_size	   = sizeof(struct dccp6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct dccp6_sock, inet6),
- 	.slab_flags	   = SLAB_TYPESAFE_BY_RCU,
- 	.rsk_prot	   = &dccp6_request_sock_ops,
- 	.twsk_prot	   = &dccp6_timewait_sock_ops,
-diff --git a/net/dccp/ipv6.h b/net/dccp/ipv6.h
-index 7e4c2a3b322b51377ebf7575cfae49aeb51510a2..c5d14c48def179958207c8c3d62b83176183ef74 100644
---- a/net/dccp/ipv6.h
-+++ b/net/dccp/ipv6.h
-@@ -13,10 +13,6 @@
- 
- struct dccp6_sock {
- 	struct dccp_sock  dccp;
--	/*
--	 * ipv6_pinfo has to be the last member of dccp6_sock,
--	 * see inet6_sk_generic.
--	 */
- 	struct ipv6_pinfo inet6;
- };
- 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 5d593ddc0347ebd13788b1319990f167de833d9a..9f9c4b838664a76cb4d7efbeb16056e22f12b358 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -102,9 +102,9 @@ bool ipv6_mod_enabled(void)
- }
- EXPORT_SYMBOL_GPL(ipv6_mod_enabled);
- 
--static __inline__ struct ipv6_pinfo *inet6_sk_generic(struct sock *sk)
-+static struct ipv6_pinfo *inet6_sk_generic(struct sock *sk)
- {
--	const int offset = sk->sk_prot->obj_size - sizeof(struct ipv6_pinfo);
-+	const int offset = sk->sk_prot->ipv6_pinfo_offset;
- 
- 	return (struct ipv6_pinfo *)(((u8 *)sk) + offset);
- }
-diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
-index f804c11e2146cba9e9b8c10337341dc3fb4e0143..2a0e8bc0739831e744bcbf47c3777f793fe710ac 100644
---- a/net/ipv6/ping.c
-+++ b/net/ipv6/ping.c
-@@ -215,6 +215,7 @@ struct proto pingv6_prot = {
- 	.get_port =	ping_get_port,
- 	.put_port =	ping_unhash,
- 	.obj_size =	sizeof(struct raw6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct raw6_sock, inet6),
- };
- EXPORT_SYMBOL_GPL(pingv6_prot);
- 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index ac1cef094c5f200d34a45eeb06f2f7356c87ad6d..0fcf1b8908079d459e2a29822a116ff7eac06b67 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -1216,6 +1216,7 @@ struct proto rawv6_prot = {
- 	.hash		   = raw_hash_sk,
- 	.unhash		   = raw_unhash_sk,
- 	.obj_size	   = sizeof(struct raw6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct raw6_sock, inet6),
- 	.useroffset	   = offsetof(struct raw6_sock, filter),
- 	.usersize	   = sizeof_field(struct raw6_sock, filter),
- 	.h.raw_hash	   = &raw_v6_hashinfo,
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 40dd92a2f4807960c7939a19adccdd1b493c30b1..c9d41c77d39392a3f1f0e5c256e379cf92fc4a9e 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -2175,6 +2175,7 @@ struct proto tcpv6_prot = {
- 	.sysctl_rmem_offset	= offsetof(struct net, ipv4.sysctl_tcp_rmem),
- 	.max_header		= MAX_TCP_HEADER,
- 	.obj_size		= sizeof(struct tcp6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct tcp6_sock, inet6),
- 	.slab_flags		= SLAB_TYPESAFE_BY_RCU,
- 	.twsk_prot		= &tcp6_timewait_sock_ops,
- 	.rsk_prot		= &tcp6_request_sock_ops,
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index b7c972aa09a75404e0edb33f0354c53702c991f8..95c75d8f73d5144a0e8b024fc42b3d78b5d4e00b 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1798,6 +1798,7 @@ struct proto udpv6_prot = {
- 	.sysctl_wmem_offset     = offsetof(struct net, ipv4.sysctl_udp_wmem_min),
- 	.sysctl_rmem_offset     = offsetof(struct net, ipv4.sysctl_udp_rmem_min),
- 	.obj_size		= sizeof(struct udp6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct udp6_sock, inet6),
- 	.h.udp_table		= NULL,
- 	.diag_destroy		= udp_abort,
- };
-diff --git a/net/ipv6/udplite.c b/net/ipv6/udplite.c
-index 8e010d07917a7a0e20cce05251a1c49605bba757..267d491e970753a1bb16babb8fbe85cd67cd7062 100644
---- a/net/ipv6/udplite.c
-+++ b/net/ipv6/udplite.c
-@@ -67,6 +67,7 @@ struct proto udplitev6_prot = {
- 	.sysctl_wmem_offset = offsetof(struct net, ipv4.sysctl_udp_wmem_min),
- 	.sysctl_rmem_offset = offsetof(struct net, ipv4.sysctl_udp_rmem_min),
- 	.obj_size	   = sizeof(struct udp6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct udp6_sock, inet6),
- 	.h.udp_table	   = &udplite_table,
- };
- 
-diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
-index b1623f9c4f921791ab541ecf93695ea19addaa5a..2eee95a00c0534b69c0e5170800ff2dedda8c5bc 100644
---- a/net/l2tp/l2tp_ip6.c
-+++ b/net/l2tp/l2tp_ip6.c
-@@ -36,9 +36,6 @@ struct l2tp_ip6_sock {
- 	u32			conn_id;
- 	u32			peer_conn_id;
- 
--	/* ipv6_pinfo has to be the last member of l2tp_ip6_sock, see
--	 * inet6_sk_generic
--	 */
- 	struct ipv6_pinfo	inet6;
- };
- 
-@@ -730,6 +727,7 @@ static struct proto l2tp_ip6_prot = {
- 	.hash		   = l2tp_ip6_hash,
- 	.unhash		   = l2tp_ip6_unhash,
- 	.obj_size	   = sizeof(struct l2tp_ip6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct l2tp_ip6_sock, inet6),
- };
- 
- static const struct proto_ops l2tp_ip6_ops = {
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 3613489eb6e3b0871da09f06561cc251fe2e0b80..22323b1fa18427069e9c2443fd53f70fb0f2d26d 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3988,6 +3988,7 @@ int __init mptcp_proto_v6_init(void)
- 	strcpy(mptcp_v6_prot.name, "MPTCPv6");
- 	mptcp_v6_prot.slab = NULL;
- 	mptcp_v6_prot.obj_size = sizeof(struct mptcp6_sock);
-+	mptcp_v6_prot.ipv6_pinfo_offset = offsetof(struct mptcp6_sock, np);
- 
- 	err = proto_register(&mptcp_v6_prot, 1);
- 	if (err)
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 9388d98aebc033f195e56d5295fd998996d41f7e..6e3d28aa587cdb64f7a1ac384fa28a34d4c6739c 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -9732,6 +9732,7 @@ struct proto sctpv6_prot = {
- 	.unhash		= sctp_unhash,
- 	.no_autobind	= true,
- 	.obj_size	= sizeof(struct sctp6_sock),
-+	.ipv6_pinfo_offset = offsetof(struct sctp6_sock, inet6),
- 	.useroffset	= offsetof(struct sctp6_sock, sctp.subscribe),
- 	.usersize	= offsetof(struct sctp6_sock, sctp.initmsg) -
- 				offsetof(struct sctp6_sock, sctp.subscribe) +
+ 		if (a->internal_flags != b->internal_flags ||
+ 		    ((a->flags ^ b->flags) & ~(GENL_CMD_CAP_DO |
 -- 
-2.41.0.255.g8b1d071c50-goog
+2.41.0
 
 
