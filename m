@@ -1,345 +1,95 @@
-Return-Path: <netdev+bounces-19574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1677275B3CF
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:07:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0390875B3ED
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 18:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF7282819E4
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 16:07:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E581C212CE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 16:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89A819BA1;
-	Thu, 20 Jul 2023 16:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECF219BA4;
+	Thu, 20 Jul 2023 16:13:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A099218C19
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 16:07:24 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64FECE47;
-	Thu, 20 Jul 2023 09:07:21 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 7E38460171;
-	Thu, 20 Jul 2023 18:07:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689869228; bh=8hV6k4hJ/hPCHyUdlhZQjxzzgl5BuECH6T0mUmObz/A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=00looCrQqz2H65GHYlx0abgubMpyVsyXyp8IA1zNRwsB0amyJp4cPTFbKgeWAVwRQ
-	 a/dbt8V/55BEkBBkwDflqNa+ItbhgoiOtBCgYkg5ylb2NXvFOTjRp9dhtfMXUFjAYJ
-	 sc6zv46T0thScF12thE3Daj7AXyKToqADPQiTWG7PAgoDATwHTO43rI4gH50vcmBQa
-	 1g+6t/XIU8WMFAtR0yEcoTH+PcFcAoajKZqr50r6P+bBhx3GKTieiPcJADHgLZd+sR
-	 KdxpZKOoTu6uF7BG0SuYcoJQPrQyZcCssHk6vZZkDIocx3iEruebI4TG58KIM/E1VP
-	 c/9sXmZP6wR2g==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DL_4EscF3azY; Thu, 20 Jul 2023 18:07:05 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 1AB616016E;
-	Thu, 20 Jul 2023 18:07:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689869225; bh=8hV6k4hJ/hPCHyUdlhZQjxzzgl5BuECH6T0mUmObz/A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=N45t8GTcMB6u4PW17PfN3VhDIMRi8lha73l/YKkRW4JePy1Oq3Z2JsCcWdGFiI3YM
-	 vSakh+4ES7dj9PIa9ZWPWIskx79Cs3xMXGKnEJPJny8gYp/dP0NAcvFRmJqGY5Ev8Q
-	 HOWlXTH4rGaf9Rp5Acg7uQSPbrMHOjpT613CZ5bEDZnaOFPz+G88SfQ9ZDRtIS7qmZ
-	 LuHserd8HZqlRzu6fMycpON481vztwneyqHMXtH+g4DsWr0cu+BMZk9VJadtV5UiBS
-	 5UoHMn/+x/QUC16UsCx5H98MqtMWTdAFkrvV9idd7RnlHLLupamS66ly/Zd1NcQQ4t
-	 i+FxehVeD8e6Q==
-Message-ID: <580b9f28-7a68-e618-b2d5-b8663386aa12@alu.unizg.hr>
-Date: Thu, 20 Jul 2023 18:07:00 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807A318C32
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 16:13:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFF70C433C8;
+	Thu, 20 Jul 2023 16:13:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689869605;
+	bh=7ge2fOsjLfpNMD9+tTxQ3+5s+AaPVGRq3Y7BqSfrG8A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eDKJNB981Uy6+xAEBWEc69nBD6AXCer0/6bchvFbh9wf9ru8vQtjt/8jbwvkAHiIZ
+	 IDSpqZm7ZU8eLNBtOWEi6KYCWDjl5ehNiVJXD9fC+9styReQdSQt74mI1hCvq0hCya
+	 l7GKrR6/oBe9+hfn2ynagLi7c5q2OhWT6ClmDdwe35q9bytKUBqV4hHDq0Nsl8U6+Y
+	 o4kY3p+k6paIMCd+EKM0rr/wt1xzC/4Bbfs2V0/oPjS5F1l8W/hiyv+l7KEgsJ8Swn
+	 ky2MUv7+dsvmaBWRZ4ib/xmTkQdoCc+7Xef5nqyHvNam00LGiWgbjFTFRO7akfPiO0
+	 E55R0gHBwi7gA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	corbet@lwn.net,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net] docs: net: clarify the NAPI rules around XDP Tx
+Date: Thu, 20 Jul 2023 09:13:23 -0700
+Message-ID: <20230720161323.2025379-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PROBLEM] seltests: net/forwarding/sch_ets.sh [HANG]
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>
-References: <759fe934-2e43-e9ff-8946-4fd579c09b05@alu.unizg.hr>
- <87cz0m9a3n.fsf@nvidia.com>
-Content-Language: en-US
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <87cz0m9a3n.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On 7/20/23 11:43, Petr Machata wrote:
-> 
-> Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr> writes:
-> 
->> Using the same config for 6.5-rc2 on Ubuntu 22.04 LTS and 22.10, the execution
->> stop at the exact same line on both boxes (os I reckon it is more than an
->> accident):
->>
->> # selftests: net/forwarding: sch_ets.sh
->> # TEST: ping vlan 10                                                  [ OK ]
->> # TEST: ping vlan 11                                                  [ OK ]
->> # TEST: ping vlan 12                                                  [ OK ]
->> # Running in priomap mode
->> # Testing ets bands 3 strict 3, streams 0 1
->> # TEST: band 0                                                        [ OK ]
->> # INFO: Expected ratio >95% Measured ratio 100.00
->> # TEST: band 1                                                        [ OK ]
->> # INFO: Expected ratio <5% Measured ratio 0
->> # Testing ets bands 3 strict 3, streams 1 2
->> # TEST: band 1                                                        [ OK ]
->> # INFO: Expected ratio >95% Measured ratio 100.00
->> # TEST: band 2                                                        [ OK ]
->> # INFO: Expected ratio <5% Measured ratio 0
->> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
->> # TEST: band 0                                                        [ OK ]
->> # INFO: Expected ratio >95% Measured ratio 100.00
->> # TEST: band 1                                                        [ OK ]
->> # INFO: Expected ratio <5% Measured ratio 0
->> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
->> # TEST: bands 1:2                                                     [ OK ]
->> # INFO: Expected ratio 2.00 Measured ratio 1.99
->> # Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
->> # TEST: bands 0:1                                                     [ OK ]
->> # INFO: Expected ratio 1.00 Measured ratio .99
->> # TEST: bands 0:2                                                     [ OK ]
->> # INFO: Expected ratio 1.00 Measured ratio 1.00
->> # Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
->> # TEST: bands 0:1                                                     [ OK ]
->> # INFO: Expected ratio 1.42 Measured ratio 1.42
->> # TEST: bands 0:2                                                     [ OK ]
->> # INFO: Expected ratio 3.33 Measured ratio 3.33
->> # Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
->> # TEST: bands 0:1                                                     [ OK ]
->> # INFO: Expected ratio 1.60 Measured ratio 1.59
->> # TEST: bands 0:2                                                     [ OK ]
->> # INFO: Expected ratio 3.33 Measured ratio 3.33
->> # Testing ets bands 2 quanta 5000 2500, streams 0 1
->> # TEST: bands 0:1                                                     [ OK ]
->> # INFO: Expected ratio 2.00 Measured ratio 1.99
->> # Running in classifier mode
->> # Testing ets bands 3 strict 3, streams 0 1
->> # TEST: band 0                                                        [ OK ]
->> # INFO: Expected ratio >95% Measured ratio 100.00
->> # TEST: band 1                                                        [ OK ]
->> # INFO: Expected ratio <5% Measured ratio 0
->> # Testing ets bands 3 strict 3, streams 1 2
->> # TEST: band 1                                                        [ OK ]
->> # INFO: Expected ratio >95% Measured ratio 100.00
->> # TEST: band 2                                                        [ OK ]
->> # INFO: Expected ratio <5% Measured ratio 0
->> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
->>
->> I tried to run 'set -x' enabled version standalone, but that one finished
->> correctly (?).
->>
->> It could be something previous scripts left, but right now I don't have a clue.
->> I can attempt to rerun all tests with sch_ets.sh bash 'set -x' enabled later today.
-> 
-> If you run it standalone without set -x, does it finish as well?
+page pool and XDP should not be accessed from IRQ context
+which may happen if drivers try to clean up XDP TX with
+NAPI budget of 0.
 
-Added that. Yes, standlone run finishes correctly, with or without 'set -x':
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: corbet@lwn.net
+CC: linux-doc@vger.kernel.org
+---
+ Documentation/networking/napi.rst | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-root@defiant:/home/marvin/linux/kernel/linux_torvalds/tools/testing/selftests/net/forwarding# ./sch_ets.sh
-TEST: ping vlan 10                                                  [ OK ]
-TEST: ping vlan 11                                                  [ OK ]
-TEST: ping vlan 12                                                  [ OK ]
-Running in priomap mode
-Testing ets bands 3 strict 3, streams 0 1
-TEST: band 0                                                        [ OK ]
-INFO: Expected ratio >95% Measured ratio 100.00
-TEST: band 1                                                        [ OK ]
-INFO: Expected ratio <5% Measured ratio 0
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 strict 3, streams 1 2
-TEST: band 1                                                        [ OK ]
-INFO: Expected ratio >95% Measured ratio 100.00
-TEST: band 2                                                        [ OK ]
-INFO: Expected ratio <5% Measured ratio 0
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
-TEST: band 0                                                        [ OK ]
-INFO: Expected ratio >95% Measured ratio 100.00
-TEST: band 1                                                        [ OK ]
-INFO: Expected ratio <5% Measured ratio 0
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
-TEST: bands 1:2                                                     [ OK ]
-INFO: Expected ratio 2.00 Measured ratio 1.99
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 1.00 Measured ratio 1.00
-TEST: bands 0:2                                                     [ OK ]
-INFO: Expected ratio 1.00 Measured ratio .99
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 1.42 Measured ratio 1.42
-TEST: bands 0:2                                                     [ OK ]
-INFO: Expected ratio 3.33 Measured ratio 3.33
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 1.60 Measured ratio 1.59
-TEST: bands 0:2                                                     [ OK ]
-INFO: Expected ratio 3.33 Measured ratio 3.33
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 2 quanta 5000 2500, streams 0 1
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 2.00 Measured ratio 1.99
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Running in classifier mode
-Testing ets bands 3 strict 3, streams 0 1
-TEST: band 0                                                        [ OK ]
-INFO: Expected ratio >95% Measured ratio 100.00
-TEST: band 1                                                        [ OK ]
-INFO: Expected ratio <5% Measured ratio 0
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 strict 3, streams 1 2
-TEST: band 1                                                        [ OK ]
-INFO: Expected ratio >95% Measured ratio 100.00
-TEST: band 2                                                        [ OK ]
-INFO: Expected ratio <5% Measured ratio 0
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
-TEST: band 0                                                        [ OK ]
-INFO: Expected ratio >95% Measured ratio 100.00
-TEST: band 1                                                        [ OK ]
-INFO: Expected ratio <5% Measured ratio 0
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
-TEST: bands 1:2                                                     [ OK ]
-INFO: Expected ratio 2.00 Measured ratio 1.99
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 1.00 Measured ratio .99
-TEST: bands 0:2                                                     [ OK ]
-INFO: Expected ratio 1.00 Measured ratio .99
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 1.42 Measured ratio 1.42
-TEST: bands 0:2                                                     [ OK ]
-INFO: Expected ratio 3.33 Measured ratio 3.33
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 1.60 Measured ratio 1.60
-TEST: bands 0:2                                                     [ OK ]
-INFO: Expected ratio 3.33 Measured ratio 3.33
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-Testing ets bands 2 quanta 5000 2500, streams 0 1
-TEST: bands 0:1                                                     [ OK ]
-INFO: Expected ratio 2.00 Measured ratio 2.00
-killing MZ
-killed MZ
-killing MZ
-killed MZ
-root@defiant:/home/marvin/linux/kernel/linux_torvalds/tools/testing/selftests/net/forwarding#
-
-> That would imply that the reproducer needs to include the previous tests as
-> well.
-
-This is entirely possible, as timeouts and CTRL+C events do not seem to be caught
-and the cleanup is not done ...
-
-sch_ets_core.sh:	trap cleanup EXIT
-
-Some tests time out even after settings:timeout=240, so IMHO this should be taken into account.
-
-Best regards,
-Mirsad Todorovac
-
-> It looks like the test is stuck in ets_test_mixed in classifier_mode.
-> A way to run just this test would be:
-> 
->      TESTS="classifier_mode ets_test_mixed" ./sch_ets.sh
-> 
-> Looking at the code, the only place that I can see that waits on
-> anything is the "{ kill %% && wait %%; } 2>/dev/null" line in
-> stop_traffic() (in lib.sh). Maybe something like this would let
-> us see if that's the case:
-> 
-> modified   tools/testing/selftests/net/forwarding/lib.sh
-> @@ -1468,8 +1470,10 @@ start_tcp_traffic()
->   
->   stop_traffic()
->   {
-> +	echo killing MZ
->   	# Suppress noise from killing mausezahn.
->   	{ kill %% && wait %%; } 2>/dev/null
-> +	echo killed MZ
->   }
+diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
+index a7a047742e93..7bf7b95c4f7a 100644
+--- a/Documentation/networking/napi.rst
++++ b/Documentation/networking/napi.rst
+@@ -65,15 +65,16 @@ argument - drivers can process completions for any number of Tx
+ packets but should only process up to ``budget`` number of
+ Rx packets. Rx processing is usually much more expensive.
+ 
+-In other words, it is recommended to ignore the budget argument when
+-performing TX buffer reclamation to ensure that the reclamation is not
+-arbitrarily bounded; however, it is required to honor the budget argument
+-for RX processing.
++In other words for Rx processing the ``budget`` argument limits how many
++packets driver can process in a single poll. Rx specific APIs like page
++pool or XDP cannot be used at all when ``budget`` is 0.
++skb Tx processing should happen regardless of the ``budget``, but if
++the argument is 0 driver cannot call any XDP (or page pool) APIs.
+ 
+ .. warning::
+ 
+-   The ``budget`` argument may be 0 if core tries to only process Tx completions
+-   and no Rx packets.
++   The ``budget`` argument may be 0 if core tries to only process
++   skb Tx completions and no Rx or XDP packets.
+ 
+ The poll method returns the amount of work done. If the driver still
+ has outstanding work to do (e.g. ``budget`` was exhausted)
+-- 
+2.41.0
 
 
