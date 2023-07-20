@@ -1,96 +1,62 @@
-Return-Path: <netdev+bounces-19656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485F875B979
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:23:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 318F175B97E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 23:25:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 030A1281EE9
-	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:23:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672C0281E89
+	for <lists+netdev@lfdr.de>; Thu, 20 Jul 2023 21:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F9D19BBD;
-	Thu, 20 Jul 2023 21:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A33719BBD;
+	Thu, 20 Jul 2023 21:25:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5804154B1
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:23:36 +0000 (UTC)
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBCC12123
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:23:34 -0700 (PDT)
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a1c2d69709so2605051b6e.1
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 14:23:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689888214; x=1690493014;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r7KWzfTm0PGl9M6f8vdarv2h59an/fU44lp1Ve8prEo=;
-        b=lOgkWbyE7asTEfHBVBB99Ldn6SSm+O5YiEEk0KMMvcEZKvdW0FzNX60FUhav+48Oao
-         wiwPmBbu0H/1MjuR3sAyKTn2fjIOl/JX8O4DCFYpXqroOXTdwZ6GdODScyKAjm3cDfKt
-         OgwDmBf7Wmi+cr2cQz+2GFSN+SWH2bXp2Js7tXDyGtwOUYBXaQ61czKorvWW7uBPJymF
-         x9rmpJJBCJucJMibUgGL4FvdmuSTpGXZfTjImdl3YVT2uV3PeP45V4dufmZ0pjNjyn54
-         gzrOUWwJBri9Lcbo0RLzGH7z1jIWacnqilf0PduxwdRkRLgJ3nUbEOVGOtp22B39R4Cy
-         Y+8g==
-X-Gm-Message-State: ABy/qLaRV9WaRRs37As3d8sKbbyoyGf8sJLj/e91F5TjEjTwtXTK8QlK
-	+SuWlAnnMCrGq+J1R/iNu3/HjMab/nokKQcIA0Kw98UUqTyp
-X-Google-Smtp-Source: APBJJlGHzbDOfITCcrazhMrBDL0FHHT9WhSmJ+/AhhtZeN8BLt+YJtpO7j2pEEsEzEmOk5iQQdWIwFqCs47N01yTHFwM18ZTC47y
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1142E1BE66
+	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 21:25:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD44C433C8;
+	Thu, 20 Jul 2023 21:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689888353;
+	bh=NFP685XN668i1Crn2t0Bt62w8dHk0p52c2Ko9JGGOCQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cNoDFFqTSXqybZpPEF/mONpPfTyPLW/y5LMo5AgSd2I4Vfxzhi+LsBGmgNcZz5x/e
+	 YVDXsHhirXMnUrDeeIYriuVXhu9e6crW42PACH93eBHjdGCBEcebe5MjWqq/6gDeWO
+	 QAgLR4343UdE5+HFczeLt9/qnP9rDoQPqXpD3ebJIJLKCX5lgg72fCEK4AOJOqElHc
+	 2hZm+3ZygyQL12WsM8obBF0cLKEUarlrBl0y/BfPYaL1olm7BKjFgvfoJHTDdAxtBj
+	 1F+bDEN+3CB+8Wz+USZ0aQZYetyo3x9FnoKCOsJRvJSgmTYYdDWeugEtM8R4aDnzbe
+	 HslYCZrg1k7xA==
+Date: Thu, 20 Jul 2023 14:25:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: pull-request: bluetooth 2023-07-20
+Message-ID: <20230720142552.78f3d477@kernel.org>
+In-Reply-To: <20230720190201.446469-1-luiz.dentz@gmail.com>
+References: <20230720190201.446469-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1590:b0:3a3:8cf6:5edf with SMTP id
- t16-20020a056808159000b003a38cf65edfmr153990oiw.9.1689888214048; Thu, 20 Jul
- 2023 14:23:34 -0700 (PDT)
-Date: Thu, 20 Jul 2023 14:23:33 -0700
-In-Reply-To: <94eb2c059ce01f643c0569a228ee@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b566c50600f1c206@google.com>
-Subject: Re: [syzbot] [net?] KMSAN: uninit-value in __netif_receive_skb_core
-From: syzbot <syzbot+b202b7208664142954fa@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, alaaemadhossney.ae@gmail.com, ast@kernel.org, 
-	bp@alien8.de, bpoirier@suse.com, daniel@iogearbox.net, 
-	dave.hansen@linux.intel.com, davem@davemloft.net, dvyukov@google.com, 
-	edumazet@google.com, elena.reshetova@intel.com, glider@google.com, 
-	hpa@zytor.com, ishkamiel@gmail.com, keescook@chromium.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	makita.toshiaki@lab.ntt.co.jp, maloney@google.com, mingo@redhat.com, 
-	netdev@vger.kernel.org, rami.rosen@intel.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, tonymarislogistics@yandex.com, willemb@google.com, 
-	x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
-	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On Thu, 20 Jul 2023 12:02:00 -0700 Luiz Augusto von Dentz wrote:
+> bluetooth pull request for net:
+> 
+>  - Fix building with coredump disabled
+>  - Fix use-after-free in hci_remove_adv_monitor
+>  - Use RCU for hci_conn_params and iterate safely in hci_sync
+>  - Fix locking issues on ISO and SCO
+>  - Fix bluetooth on Intel Macbook 2014
 
-commit e420bed025071a623d2720a92bc2245c84757ecb
-Author: Daniel Borkmann <daniel@iogearbox.net>
-Date:   Wed Jul 19 14:08:52 2023 +0000
-
-    bpf: Add fd-based tcx multi-prog infra with link support
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13dfaae6a80000
-start commit:   03b123debcbc tcp: tcp_enter_quickack_mode() should be static
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=103faae6a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17dfaae6a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=32e3dcc11fd0d297
-dashboard link: https://syzkaller.appspot.com/bug?extid=b202b7208664142954fa
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15cc32e6a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16aace14a80000
-
-Reported-by: syzbot+b202b7208664142954fa@syzkaller.appspotmail.com
-Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+One bad fixes tag here, but good enough.
+Hopefully the big RCU-ifying patch won't blow up :)
 
