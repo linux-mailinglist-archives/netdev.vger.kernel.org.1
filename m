@@ -1,164 +1,215 @@
-Return-Path: <netdev+bounces-19988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C366A75D304
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:06:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A41575D39B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:12:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73E96282425
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 19:06:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 490101C21789
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 19:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F0220F88;
-	Fri, 21 Jul 2023 19:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1ACB20F8E;
+	Fri, 21 Jul 2023 19:12:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A7C200AE
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 19:06:15 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2050.outbound.protection.outlook.com [40.107.237.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F36C3A98
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:06:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i3LKtVLOvZbSJ4EVPRdc17/9VD27pGJHV+Xpnq00Eq+MpEucaA5wnPh7zc73RL+kkh7tXfBRamwYb+dKjYySoUM2av7thOPW2JJe90mCINrFPQkq27BS5Xyx4wFZAx/yUHEhV7kZUsSH0yAL2hOyCUwY1y4+UqGHBGwhortuBGs5ayKAkLlhPmCzGsqE1+ToSpPf+QKjO2TZAomYKnndKiPSkrvu0+qFdgkJQmkkM9qtirx9HXWbJlD0TWu6UViUhL9vw6ZyKFI8qJZeqAhMxoJUD2TDWOQ+ueFKHa8vDZi825Ho3FQpKjeyaiU5d8MI/8+Y39v0xVOmp5b/ZEE6LA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2TnXq64Q8cFjs661WHpdDNoxQ9IahO7l/M90zT6fpNw=;
- b=oYYfY9lSk1OXETw9wgEBnede9J6e2Vu6QhRDpCotBbMNmh0vCpq0/PyGtCJeCrCoLfTO/aQ2wbTqAGahZLcIbtlwNeMfXoG20Rp+R9wr3bxHQXsuqppJHqplggpBKjenxU7GDvc77ZEUffX4FG7nkiU/Z3Uk/ca0JywaostuzO5+E1j/cnPA2Gru+ZPGCO4oAtR9wcCRP1ODf9MmDUp2V31KdkWumIoMS87O8g2OVujmN4RALRZ5NQDRYlbR9n8fdolHNcypPlb+EB26sGMHRQrNdpWArZgbMBUKbl3NtVwB5qmlpJpNgVmszKyypKUJe61nomTU7aPuVh0p6bSM3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2TnXq64Q8cFjs661WHpdDNoxQ9IahO7l/M90zT6fpNw=;
- b=NVlIkjl9r10g8x8lyEqPd6nWQTpAuDCvNpTonDeWpM4bs8KZJ0KnQa2VXV4exbe2D5I6AUfcCJO87zHgORiCvXQgyrU5OWGOgR5zsQCubQN+OMedQ9XcawPAWA+yyRYHNBrWYyCFO9DnPqXRJ4UmPLJnUBWNucrLkpa0px0//VKC+DRahFsdIsMBYPAq5540o32wtRo2qeAN+NSloBuzwX54gxtW4ZEC/8KIqw7leLYHjbLJL6Nysm+5p/gz0zvGzjvk7u7Ex2chqU447+FumvriFZM++wYFy6kX/eKvETD0ojq3OOwJvpi+DbhYIkgMtYhJZt2vdqci4zI64XdbtQ==
-Received: from CH2PR12MB3895.namprd12.prod.outlook.com (2603:10b6:610:2a::13)
- by DS7PR12MB5861.namprd12.prod.outlook.com (2603:10b6:8:78::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Fri, 21 Jul
- 2023 19:06:03 +0000
-Received: from CH2PR12MB3895.namprd12.prod.outlook.com
- ([fe80::e3bb:fca5:70a7:9d25]) by CH2PR12MB3895.namprd12.prod.outlook.com
- ([fe80::e3bb:fca5:70a7:9d25%7]) with mapi id 15.20.6609.024; Fri, 21 Jul 2023
- 19:06:03 +0000
-From: Asmaa Mnebhi <asmaa@nvidia.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "sridhar.samudrala@intel.com"
-	<sridhar.samudrala@intel.com>, "maciej.fijalkowski@intel.com"
-	<maciej.fijalkowski@intel.com>, David Thompson <davthompson@nvidia.com>
-Subject: RE: [PATCH net v4 1/1] mlxbf_gige: Fix kernel panic at shutdown
-Thread-Topic: [PATCH net v4 1/1] mlxbf_gige: Fix kernel panic at shutdown
-Thread-Index: AQHZu95yT+g5xckp7kqGosWbtpbJ16/EUPJfgABDz1A=
-Date: Fri, 21 Jul 2023 19:06:03 +0000
-Message-ID:
- <CH2PR12MB3895C55CC77385622898BCADD73FA@CH2PR12MB3895.namprd12.prod.outlook.com>
-References: <20230721141956.29842-1-asmaa@nvidia.com>
- <20230721141956.29842-1-asmaa@nvidia.com>
- <20230721150212.h4vg6ueugifnfss6@skbuf>
-In-Reply-To: <20230721150212.h4vg6ueugifnfss6@skbuf>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH2PR12MB3895:EE_|DS7PR12MB5861:EE_
-x-ms-office365-filtering-correlation-id: 823e6609-1c7f-4915-9c37-08db8a1d873b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- k1IAqDZSe5fyoOheiyxEFvMIi2pVgtoVXM/TUoUlVrpg0VIBkIN0jlCTNSFu04VJtyB/fqy/Te202HfAUoHKV4apLZkTSr3dCtyYjNwfi3EGQdO0QknBAsEE0TzNxJN0XHnUDQ+NAFvaYU+X6yHm7uEIH8HJ9OK/O51puYpTV3OXltevzrPE5Dy7ee3iYL0EigRQWKCrWh1SMWNqgS0RwXa8NWcbD9EwqCYJyX4xeYto4yiXhJJy92OQ/JqGVYDqAPbSHrVSnLqMOGbo1l6OLcHfCWyzS7pCMl85m0RMdMozO63+2nHRQgtBlu+XTY9rpQ+PKxigYv6sJHtqetL4ZpEMAyUDPElMrp02uw4Vo521cV983BLkTSo4DOfr0h6aWlo+FqoeUHlMtL2ZegLS9zphIXnCO9m8Z6+puedK69Awg3E5y1EKBkH7/+2Z0h1qI4e55qBarxRZj4IZmMqnPUInfJIbMDU8Z3XLCsxE4336dOgJ2TYEh+jTzpdCvQIab4gFUSs6BDYJfVR0seapCfPeO+FEK1SPDd16wsOVDDp1Zzjwme1kwlyAbX27gPlHNJt83IY3OqkpM9E7YtOj2NEb5orMklL3TRzWIsPvCvKP49R7uIrcF5I94Pj48B4p
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB3895.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(366004)(39860400002)(396003)(346002)(451199021)(9686003)(55016003)(107886003)(6506007)(64756008)(66946007)(122000001)(38100700002)(66556008)(66476007)(76116006)(38070700005)(52536014)(66446008)(5660300002)(2906002)(316002)(8936002)(4744005)(33656002)(86362001)(4326008)(41300700001)(7696005)(71200400001)(26005)(6916009)(54906003)(8676002)(478600001)(186003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?NQoDyGDEPDe+pwWd4U0mLD0MpkhUP6L4Xhko0UuDCmB5eih/TBMhgBJWXxyO?=
- =?us-ascii?Q?+CB0+n9GNrR8Gr3Zh/g6OB/RX9lEo/+xpP/Q2Icf+GSHvWCBlhyoKv54/AkE?=
- =?us-ascii?Q?WLWLPKYeqS7JZRtj7r/+D7z04KiKRHvgFIGtoqsMAvkfvqhy8BsKxkbTx8tL?=
- =?us-ascii?Q?2HKqC/QgqvDE9YkEyg5ASw324IQso+q2UgzeSdpqzYGKkwUQlYGezr69q7Rp?=
- =?us-ascii?Q?qAbj1RTBzCmVHhQs8GkQc7KDg7mG09ELxRs5vOkrPUMKyiVSsNOPq78RHpiO?=
- =?us-ascii?Q?crzzhmd0A/OXtrjPzCbhcvUH24ivAufThWVOgC7jAtedznTSjNz5n+L5hUOx?=
- =?us-ascii?Q?uKBabS7cA+Nq+pGE1iEpO3j5Of6WWxqUoBXh2YCRUReJRrvblhEfqzu9w619?=
- =?us-ascii?Q?Lw7lO+epANlBQQhuP6IE3GHf+uc/UfxOOhwTdKwbGFcld68xzFUJp/ZfYDLZ?=
- =?us-ascii?Q?37CR45StzyUMI6QIoAAijPOqabGUDf89MkbF8uEvQqGwaMLdFkh6OQFTSVFb?=
- =?us-ascii?Q?63Zfb8iIgPeeTI11O7ID+ilydj78p29J6Td4SFzVgzpEB3gZGxXnZIpkIzRu?=
- =?us-ascii?Q?TV7+uIR85Oo/lP3eK2vmoCjiHwmXwyfehzAE6h7cDrJXEndzZfWtJegehHYE?=
- =?us-ascii?Q?ISzXSxuEJTg3fVRBzcn76yizYb9mJjYfX3HMFSEzySRNla/ByVXJa+dublIj?=
- =?us-ascii?Q?kpvd435MyoDVS2bMJina7JernnXLrvA5tWepI1RDlN4wwCyeGS6LyD9qImKH?=
- =?us-ascii?Q?/BxGW4yVNGNZ1hreDZe7FSYZvNum56cF/OrWEe31G0/oeDeFXBlWXXLwlQ7J?=
- =?us-ascii?Q?o1GdUpyp8oBSqpOnsoVXGSJculZ4BozOfFEPGVpLKDb9r8CtjABrNFHiaBuY?=
- =?us-ascii?Q?N8aapwVCpClQ1pa2ucalX9md2tH7yb55Cyt29s1y3zLI6tevS8CU48dSmLNY?=
- =?us-ascii?Q?N36n4KjwqleRv5UP5E8bImrk/I98BMcgcSGXxfU3BiKCzQ6BAZAxpWWE4CqG?=
- =?us-ascii?Q?baUBEw7IlJyINZr4G7jVSB+6ay7hgzfe3XIDRfs+o/eHeDV6qGc8vULFZE5V?=
- =?us-ascii?Q?zxzuJY3Ru3VubECyMRy565S0x467zgMRMf52YvZ9mz3KK7BQrp3SAKKucTTD?=
- =?us-ascii?Q?Eg2B7PuibR83P2pP7ldgKKE4JSIXWLfXD2/CEptM8/EfRFrea+V1hFtfDXmB?=
- =?us-ascii?Q?ODndEGuB8I8/Bw6RcoR5GOC/OUd3ob6uA+BJL3sBV12kFsgIv2G2tJNaq3wc?=
- =?us-ascii?Q?TgVXVdnuPhDUpoZcOKHD/0aSXWkWrga5l8RIctSuLwMst8Kfep02SIqedKEj?=
- =?us-ascii?Q?GDLUBGwjX8GegkJXBf6yk9+xXrAHE7eJo5U/YLX3HLTaAFPsmpDtcE6UiEof?=
- =?us-ascii?Q?/QzyoMdTZyRzB+qBNPB1Arm6bkAQnWbupjUJBe0bYD6xa7FcgfyrbLOsfn8y?=
- =?us-ascii?Q?J59S9CbzaZe7Bhp0+pldLrt4tQydqR41cjgW5tmAPWUDs8cT5LjBn30DyXET?=
- =?us-ascii?Q?TQRt2TgYYryTqtFpFYdKt7aXRUJJ4ASghCS6dDjwP79d5x3cTZ7MWfCg/AiH?=
- =?us-ascii?Q?7O40i7F9COUYjo1sKgg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C7320F88
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 19:12:32 +0000 (UTC)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9AD30E4
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:12:30 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-40371070eb7so50561cf.1
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:12:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689966749; x=1690571549;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BPXE2RFBTgaJuQU46MbmD6OM9XeAOcQXgpYH0j2iei4=;
+        b=bgnb8f9DOxhRa9RSUvSNWqsGSNA2NIh/cQk1sMl0N8bzCLDunpRng93TisNd7CO6Ds
+         q1oZE+U/N6tJDaBLyLCNwbkJ7UJ2PSJc625k9M7qeZRhx/oocT4rs6FAlUt8WJjvkZgB
+         nSYKmzj1XEPlk3Vx8wglDjLusQ5Ttwfq26W6OHIGCWWPlRymCGV7dZlH5OavwXpoUj0H
+         K+ycYYA6iLiIbdKWX2fiuZdza97e8Lzc2BWv9AQ6OnElaYKj7V3eRreDkcydfkv9WGNw
+         hTL2lHGqgjJ5r8xbKEeLrpm+WdyhdNCq2zyaahCM9AD1u9ypUPsSAFc65d0ahdmTBKN/
+         7Cgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689966749; x=1690571549;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BPXE2RFBTgaJuQU46MbmD6OM9XeAOcQXgpYH0j2iei4=;
+        b=RVhet78Fc4S5Q4SA6lZfaCzvDnOli/tz+qfyVhCi7UTF2ZhoOP/1nJvayd9zLll7VR
+         ZOV6L+wT1/HhpFvgYVpLZeTY7h1kWIJGnA4for7XUxqcG8DqofjK27HeGJkprYh9S5fb
+         UF3RhoGldJ6GQQERlOZs5lG9UrktF+k9N+dZLCQ6BGU4Esf/YZbk2LpwaZ0NLHUla/h4
+         QpOaVbwfYDuZK9jdUh8JQRK+a/eaSvrp6KpHMcrHO9U3WuhatoainDeAL5TyIKyzz8G7
+         2Brl2ypciij/vb35FSQaATsxNgOoceb45wbEEV5IVBclWD1zK9qCBMME8dzE7Vl6jxv5
+         mEsg==
+X-Gm-Message-State: ABy/qLaGjB+21A0fPCXJIEszU3sn/PE1Wv2wGR47ebr8BLv8rDtRNNRX
+	avuBRouVEhj0CfdkeBOlmZFBUcv7TKG6bknz93eAZHzq2kQEDV7Q2RFvNw==
+X-Google-Smtp-Source: APBJJlG7pScVNIqi1GF3eiN5kdUpMuImycTLDl3yQl8Ck5uu4fTo+piW+Za2UFzbGjRkLJqnE9OxwUn77zMoGCLHyNw=
+X-Received: by 2002:ac8:5bc2:0:b0:403:ac17:c18a with SMTP id
+ b2-20020ac85bc2000000b00403ac17c18amr45996qtb.14.1689966749183; Fri, 21 Jul
+ 2023 12:12:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB3895.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 823e6609-1c7f-4915-9c37-08db8a1d873b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2023 19:06:03.0399
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UZcZtOAyD2CNIHHKiAYM09k1mtB3OFFZPh4Ad/jcNLvdi2qkAPkL4W56wTNpJdIUUcfjtlN3tPgLD9rJsdOfwA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5861
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+References: <CANP3RGfRA3yfom8GOxUBZD4sBxiU2dWn9TKdR50d55WgENrGnQ@mail.gmail.com>
+ <CANn89iJ+iWS_d3Vwg6k03mp4v_6OXHB1oS76A+9p1U7hGKdFng@mail.gmail.com>
+ <CAKH8qBvm9ZPdn3+yifnGay726rKhA-+OAjyQjffYzo0iqoOmJg@mail.gmail.com>
+ <CANP3RGfFAjEDWbLAcmMcz63XUV6=djqZNsMikrqvA-i9K-4pAg@mail.gmail.com> <64bad4e5d4e18_2f85252944f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <64bad4e5d4e18_2f85252944f@willemb.c.googlers.com.notmuch>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Fri, 21 Jul 2023 21:12:17 +0200
+Message-ID: <CANP3RGccKpZSpJOAUd0ui3+jCLGLGg19FCcxeyzLuNuAqkAm-w@mail.gmail.com>
+Subject: Re: Performance question: af_packet with bpf filter vs TX path skb_clone
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Stanislav Fomichev <sdf@google.com>, Eric Dumazet <edumazet@google.com>, 
+	Linux NetDev <netdev@vger.kernel.org>, Jesper Dangaard Brouer <brouer@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Willem Bruijn <willemb@google.com>, Xiao Ma <xiaom@google.com>, 
+	Patrick Rohr <prohr@google.com>, Alexei Starovoitov <ast@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> What is the race condition; what does the stack trace of the NPD look lik=
-e?
+On Fri, Jul 21, 2023 at 8:56=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Maciej =C5=BBenczykowski wrote:
+> > On Fri, Jul 21, 2023 at 8:18=E2=80=AFPM Stanislav Fomichev <sdf@google.=
+com> wrote:
+> > >
+> > > On Fri, Jul 21, 2023 at 11:14=E2=80=AFAM Eric Dumazet <edumazet@googl=
+e.com> wrote:
+> > > >
+> > > > On Fri, Jul 21, 2023 at 7:55=E2=80=AFPM Maciej =C5=BBenczykowski <m=
+aze@google.com> wrote:
+> > > > >
+> > > > > I've been asked to review:
+> > > > >   https://android-review.googlesource.com/c/platform/packages/mod=
+ules/NetworkStack/+/2648779
+> > > > >
+> > > > > where it comes to light that in Android due to background debuggi=
+ng of
+> > > > > connectivity problems
+> > > > > (of which there are *plenty* due to various types of buggy [prima=
+rily]
+> > > > > wifi networks)
+> > > > > we have a permanent AF_PACKET, ETH_P_ALL socket with a cBPF filte=
+r:
+> > > > >
+> > > > >    arp or (ip and udp port 68) or (icmp6 and ip6[40] >=3D 133 and=
+ ip6[40] <=3D 136)
+> > > > >
+> > > > > ie. it catches ARP, IPv4 DHCP and IPv6 ND (NS/NA/RS/RA)
+> > > > >
+> > > > > If I'm reading the kernel code right this appears to cause skb_cl=
+one()
+> > > > > to be called on *every* outgoing packet,
+> > > > > even though most packets will not be accepted by the filter.
+> > > > >
+> > > > > (In the TX path the filter appears to get called *after* the clon=
+e,
+> > > > > I think that's unlike the RX path where the filter is called firs=
+t)
+> > > > >
+> > > > > Unfortunately, I don't think it's possible to eliminate the
+> > > > > functionality this socket provides.
+> > > > > We need to be able to log RX & TX of ARP/DHCP/ND for debugging /
+> > > > > bugreports / etc.
+> > > > > and they *really* should be in order wrt. to each other.
+> > > > > (and yeah, that means last few minutes history when an issue happ=
+ens,
+> > > > > so not possible to simply enable it on demand)
+> > > > >
+> > > > > We could of course split the socket into 3 separate ones:
+> > > > > - ETH_P_ARP
+> > > > > - ETH_P_IP + cbpf udp dport=3Ddhcp
+> > > > > - ETH_P_IPV6 + cbpf icmpv6 type=3DNS/NA/RS/RA
+> > > > >
+> > > > > But I don't think that will help - I believe we'll still get
+> > > > > skb_clone() for every outbound ipv4/ipv6 packet.
+> > > > >
+> > > > > I have some ideas for what could be done to avoid the clone (with
+> > > > > existing kernel functionality)... but none of it is pretty...
+> > > > > Anyone have any smart ideas?
+> > > > >
+> > > > > Perhaps a way to move the clone past the af_packet packet_rcv run=
+_filter?
+> > > > > Unfortunately packet_rcv() does a little bit of 'setup' before it
+> > > > > calls the filter - so this may be hard.
+> > > >
+> > > >
+> > > > dev_queue_xmit_nit() also does some 'setup':
+> > > >
+> > > > net_timestamp_set(skb2);  (This one could probably be moved into
+> > > > af_packet, if packet is not dropped ?)
+> > > > <sanitize mac, network, transport headers>
+> > > >
+> > > > >
+> > > > > Or an 'extra' early pre-filter hook [prot_hook.prefilter()] that =
+has
+> > > > > very minimal
+> > > > > functionality... like match 2 bytes at an offset into the packet?
+> > > > > Maybe even not a hook at all, just adding a
+> > > > > prot_hook.prefilter{1,2}_u64_{offset,mask,value}
+> > > > > It doesn't have to be perfect, but if it could discard 99% of the
+> > > > > packets we don't care about...
+> > > > > (and leave filtering of the remaining 1% to the existing cbpf pro=
+gram)
+> > > > > that would already be a huge win?
+> > > >
+> > > > Maybe if we can detect a cBPF filter does not access mac, network,
+> > > > transport header,
+> > > > we could run it earlier, before the clone().
+> > > >
+> > > > So we could add
+> > > > prot_hook.filter_can_run_from_dev_queue_xmit_nit_before_the_clone
+> > > >
+> > > > Or maybe we can remove sanitization, because BPF should not do bad
+> > > > things if these headers are garbage ?
+> > >
+> > > eBPF is already doing those sorts of checks, so maybe another option
+> > > is to convert this filter to ebpf tc/egress program?
+> >
+> > Yeah, I've considered tc ingress/egress + bpf ring buffer.
+> >
+> > This unfortunately is a fair bit of pain to do:
+> >
+> > - it requires a new enough kernel (5.~8 ifirc), so we'd have to keep
+> > the old code
+> > around for 4.9 which we still have to support for a few (5?) more years=
+.
+>
+> Wouldn't any kernel patch to net-next have the same issue?
+>
+> Another hack might be to use tc egress bpf or even u32 plus tc_mirred to
+> redirect only interesting packets to an ifb virtual device, and only
+> attach the packet socket there.
 
-Hi Vladimir,
+Not if it's an 'improvement' that would either work automatically
+on any devices that take the kernel fix,
 
-[  OK  ] Reached target Shutdown.
-[  OK  ] Reached target Final Step.
-[  OK  ] Started Reboot.
-[  OK  ] Reached target Reboot.
-...
-[  285.126250] mlxbf_gige MLNXBF17:00: shutdown
-[  285.130669] Unable to handle kernel NULL pointer dereference at virtual =
-address 0000000000000070
-[  285.139447] Mem abort info:
-[  285.142228]   ESR =3D 0x0000000096000004
-[  285.145964]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
-[  285.151261]   SET =3D 0, FnV =3D 0
-[  285.154303]   EA =3D 0, S1PTW =3D 0
-[  285.157430]   FSC =3D 0x04: level 0 translation fault
-[  285.162293] Data abort info:
-[  285.165159]   ISV =3D 0, ISS =3D 0x00000004
-[  285.168980]   CM =3D 0, WnR =3D 0
-[  285.171932] user pgtable: 4k pages, 48-bit VAs, pgdp=3D000000011d373000
-[  285.178358] [0000000000000070] pgd=3D0000000000000000, p4d=3D00000000000=
-00000
-[  285.185134] Internal error: Oops: 96000004 [#1] SMP
+Or a feature that we could enable via some setsockopt() and just ignore fai=
+lures
+(for older kernels that don't support it)
+
+Sure older kernels/devices wouldn't get the benefit, but whatever...
+they wouldn't regress, just wouldn't improve.
+
+> > - it needs to be done on a per device basis...
+> > (devices have dynamic lifetimes on Android, and we don't necessarily
+> > even know about all of them,
+> > though perhaps it would be ok to not receive packets on those...)
 
