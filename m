@@ -1,160 +1,140 @@
-Return-Path: <netdev+bounces-19699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CDC575BBE9
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:44:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B87575BC1D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 04:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DE831C2159F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 01:44:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 478F41C2142D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 02:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435B7386;
-	Fri, 21 Jul 2023 01:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F9F38F;
+	Fri, 21 Jul 2023 02:09:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E58363
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 01:44:36 +0000 (UTC)
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99ED72106;
-	Thu, 20 Jul 2023 18:44:32 -0700 (PDT)
-Received: from localhost.localdomain (unknown [39.174.92.167])
-	by mail-app4 (Coremail) with SMTP id cS_KCgBHTQ3s4rlksajGCQ--.42906S4;
-	Fri, 21 Jul 2023 09:44:13 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v1] xfrm: add NULL check in xfrm_update_ae_params
-Date: Fri, 21 Jul 2023 09:44:11 +0800
-Message-Id: <20230721014411.2407082-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cS_KCgBHTQ3s4rlksajGCQ--.42906S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZFyrGF1rGr1fWF4Dtr4fXwb_yoWrGF1UpF
-	W5Kw4jkr4rXr1UZr4UJr1aqr1jvF48ZF1DCr93Xr1FyFy5Grn5WFyUJ3yUurykArWDAFy7
-	J3W5tr18tw1YkaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBD6363
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 02:09:33 +0000 (UTC)
+Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBFC19B3;
+	Thu, 20 Jul 2023 19:09:31 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+	by ex01.ufhost.com (Postfix) with ESMTP id CA85424E2EB;
+	Fri, 21 Jul 2023 10:09:23 +0800 (CST)
+Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 21 Jul
+ 2023 10:09:23 +0800
+Received: from [192.168.120.43] (171.223.208.138) by EXMBX062.cuchost.com
+ (172.16.6.62) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 21 Jul
+ 2023 10:09:21 +0800
+Message-ID: <42beaf41-947e-f585-5ec1-f1710830e556@starfivetech.com>
+Date: Fri, 21 Jul 2023 10:09:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH7110 SoC
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley
+	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+	<aou@eecs.berkeley.edu>, Hal Feng <hal.feng@starfivetech.com>,
+	<linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: Conor Dooley <conor.dooley@microchip.com>, Emil Renner Berthing
+	<emil.renner.berthing@canonical.com>, Emil Renner Berthing <kernel@esmil.dk>,
+	Richard Cochran <richardcochran@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jose Abreu
+	<joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Peter Geis <pgwipeout@gmail.com>, Yanhong Wang
+	<yanhong.wang@starfivetech.com>, Tommaso Merciai <tomm.merciai@gmail.com>
+References: <20230714104521.18751-1-samin.guo@starfivetech.com>
+ <20230720-cardstock-annoying-27b3b19e980a@spud>
+From: Guo Samin <samin.guo@starfivetech.com>
+In-Reply-To: <20230720-cardstock-annoying-27b3b19e980a@spud>
+Content-Type: text/plain; charset="UTF-8"
+X-Originating-IP: [171.223.208.138]
+X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX062.cuchost.com
+ (172.16.6.62)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Normally, x->replay_esn and x->preplay_esn should be allocated at
-xfrm_alloc_replay_state_esn(...) in xfrm_state_construct(..), hence the
-frm_update_ae_params(...) is okay to update them. However, the current
-impelementation of xfrm_new_ae(...) allows a malicious user to directly
-dereference a NULL pointer and crash the kernel like below.
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-PGD 8253067 P4D 8253067 PUD 8e0e067 PMD 0
-Oops: 0002 [#1] PREEMPT SMP KASAN NOPTI
-CPU: 0 PID: 98 Comm: poc.npd Not tainted 6.4.0-rc7-00072-gdad9774deaf1 #8
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.o4
-RIP: 0010:memcpy_orig+0xad/0x140
-Code: e8 4c 89 5f e0 48 8d 7f e0 73 d2 83 c2 20 48 29 d6 48 29 d7 83 fa 10 72 34 4c 8b 06 4c 8b 4e 08 c
-RSP: 0018:ffff888008f57658 EFLAGS: 00000202
-RAX: 0000000000000000 RBX: ffff888008bd0000 RCX: ffffffff8238e571
-RDX: 0000000000000018 RSI: ffff888007f64844 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff888008f57818
-R13: ffff888007f64aa4 R14: 0000000000000000 R15: 0000000000000000
-FS:  00000000014013c0(0000) GS:ffff88806d600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000054d8000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- ? __die+0x1f/0x70
- ? page_fault_oops+0x1e8/0x500
- ? __pfx_is_prefetch.constprop.0+0x10/0x10
- ? __pfx_page_fault_oops+0x10/0x10
- ? _raw_spin_unlock_irqrestore+0x11/0x40
- ? fixup_exception+0x36/0x460
- ? _raw_spin_unlock_irqrestore+0x11/0x40
- ? exc_page_fault+0x5e/0xc0
- ? asm_exc_page_fault+0x26/0x30
- ? xfrm_update_ae_params+0xd1/0x260
- ? memcpy_orig+0xad/0x140
- ? __pfx__raw_spin_lock_bh+0x10/0x10
- xfrm_update_ae_params+0xe7/0x260
- xfrm_new_ae+0x298/0x4e0
- ? __pfx_xfrm_new_ae+0x10/0x10
- xfrm_user_rcv_msg+0x25a/0x410
- ? __pfx_xfrm_user_rcv_msg+0x10/0x10
- ? __alloc_skb+0xcf/0x210
- ? stack_trace_save+0x90/0xd0
- ? filter_irq_stacks+0x1c/0x70
- ? __stack_depot_save+0x39/0x4e0
- ? __kasan_slab_free+0x10a/0x190
- ? kmem_cache_free+0x9c/0x340
- ? netlink_recvmsg+0x23c/0x660
- ? sock_recvmsg+0xeb/0xf0
- ? __sys_recvfrom+0x13c/0x1f0
- ? __x64_sys_recvfrom+0x71/0x90
- ? do_syscall_64+0x3f/0x90
- ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
- ? copyout+0x3e/0x50
- netlink_rcv_skb+0xd6/0x210
- ? __pfx_xfrm_user_rcv_msg+0x10/0x10
- ? __pfx_netlink_rcv_skb+0x10/0x10
- ? __pfx_sock_has_perm+0x10/0x10
- ? mutex_lock+0x8d/0xe0
- ? __pfx_mutex_lock+0x10/0x10
- xfrm_netlink_rcv+0x44/0x50
- netlink_unicast+0x36f/0x4c0
- ? __pfx_netlink_unicast+0x10/0x10
- ? netlink_recvmsg+0x500/0x660
- netlink_sendmsg+0x3b7/0x700
 
-This Null-ptr-deref bug is assigned CVE-2023-3772. And this commit
-adds additional NULL check in xfrm_update_ae_params to fix the NPD.
+-------- =E5=8E=9F=E5=A7=8B=E4=BF=A1=E6=81=AF --------
+=E4=B8=BB=E9=A2=98: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH=
+7110 SoC
+From: Conor Dooley <conor@kernel.org>
+=E6=94=B6=E4=BB=B6=E4=BA=BA: Conor Dooley <conor@kernel.org>, Rob Herring=
+ <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro=
+.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@d=
+abbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Hal Feng <hal.feng@starfi=
+vetech.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.or=
+g, devicetree@vger.kernel.org, netdev@vger.kernel.org, Samin Guo <samin.g=
+uo@starfivetech.com>
+=E6=97=A5=E6=9C=9F: 2023/7/21
 
-Fixes: d8647b79c3b7 ("xfrm: Add user interface for esn and big anti-replay windows")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
- net/xfrm/xfrm_user.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> From: Conor Dooley <conor.dooley@microchip.com>
+>=20
+> On Fri, 14 Jul 2023 18:45:19 +0800, Samin Guo wrote:
+>> This series adds ethernet nodes for StarFive JH7110 RISC-V SoC,
+>> and has been tested on StarFive VisionFive-2 v1.2A and v1.3B SBC board=
+s.
+>>
+>> The first patch adds ethernet nodes for jh7110 SoC, the second patch
+>> adds ethernet nodes for visionfive 2 SBCs.
+>>
+>> This series relies on xingyu's syscon patch[1].
+>> For more information and support, you can visit RVspace wiki[2].
+>>
+>> [...]
+>=20
+> Applied to riscv-dt-for-next, thanks!
+>=20
+> [1/2] riscv: dts: starfive: jh7110: Add ethernet device nodes
+>       https://git.kernel.org/conor/c/1ff166c97972
+> [2/2] riscv: dts: starfive: visionfive 2: Add configuration of gmac and=
+ phy
+>       https://git.kernel.org/conor/c/b15a73c358d1
+>=20
+> Thanks,
+> Conor.
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index c34a2a06ca94..bf2564967501 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -628,7 +628,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
- 	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
- 	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
- 
--	if (re) {
-+	if (re && x->replay_esn && x->preplay_esn) {
- 		struct xfrm_replay_state_esn *replay_esn;
- 		replay_esn = nla_data(re);
- 		memcpy(x->replay_esn, replay_esn,
--- 
-2.17.1
 
+Hi Conor=EF=BC=8C
+
+Thank you so much=EF=BC=81=20
+
+There is a question about the configuration of phy that I would like to c=
+onsult you.
+
+Latest on motorcomm PHY V5[1]: Follow Rob Herring's advice
+motorcomm,rx-xxx-driver-strength Changed to motorcomm,rx-xxx-drv-microamp=
+ .
+V5 has already received a reviewed-by from Andrew Lunn, and it should not=
+ change again.
+
+Should I submit another pacthes based on riscv-dt-for-next?=20
+
+[1] https://patchwork.kernel.org/project/netdevbpf/cover/20230720111509.2=
+1843-1-samin.guo@starfivetech.com
+
+=20
+Best regards,
+Samin
 
