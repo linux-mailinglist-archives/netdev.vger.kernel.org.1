@@ -1,319 +1,296 @@
-Return-Path: <netdev+bounces-19746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DBA675C053
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:47:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 566E875C055
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70DB21C2152E
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C8842821A4
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4141211F;
-	Fri, 21 Jul 2023 07:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0653D75;
+	Fri, 21 Jul 2023 07:47:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEA32102
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:47:13 +0000 (UTC)
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83D9359C;
-	Fri, 21 Jul 2023 00:46:22 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fbc656873eso14673895e9.1;
-        Fri, 21 Jul 2023 00:46:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689925580; x=1690530380;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SQ0t8tKCY40a32zHbfbDa1TpUg7wE+dfip+LGmkLnbA=;
-        b=mdPmT6BZdkaQy+/LaareGweR1SBId4RNzXRFrcfEnI7XZOPU+/I1kowzrII1DSGQs3
-         nblCC/vwzNFG/vRXMzWO+3a8bIFPcmenUlVmfMs8GMF6xTVZsdQoZQzrEuzkR9FqevVk
-         VqBH6UgptflpQmaZNl7DN4rfX4NDECUBBMDexh6o4zj62aQp50vu2U3SvgDLrTktMlHk
-         0oI46aqKGWKm+hLcJ8wBSv0/oXUoNnnza+kQ8zgYVtRvwLLQtwjxPdWEnTrDzO8raDbW
-         aMHH0u/VbS8Z43zMzSSobcnyKH+4mqd3np+SqcUfnDNT3eHTdTL3lX+Gus6THbnPVKTx
-         d4Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689925580; x=1690530380;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SQ0t8tKCY40a32zHbfbDa1TpUg7wE+dfip+LGmkLnbA=;
-        b=k1PpF+XX0UV6VdZSF07TvX+7Tw4niEGZbfhRVpAWZ9VX5G33ItRQWfhep66xuKzaw7
-         ODXhzKSp7y/03+h1TKtK3XkLbolrZtZzDbg6p9AQ2cFsWhdKLFN4Blj9oEqFMufvYwj/
-         M6grYYURsW4nOLMXjnd8wjBj0+QjplJkmsHkrkbLSSoi+oLz/qDaahGNgwLKeeqkVGDj
-         lLUuEoEpZ/PE8k+6HjiJNxOC8cMCaXGGroowyUAo5tKTqCvOUnJTHPxs69tbBnWlYL3Q
-         Q48TKy6rjNyMgjGidiGJVkqQzTdvxaBhiHHnXF5k1+YH8y3i6E56HNInJCdBU/TUNneL
-         AFLA==
-X-Gm-Message-State: ABy/qLYixc21QXiF3db0aq//x4TTPQLgvc7ZNWLk/4r7IiwfVk7nLH0z
-	S7rbL9PKrm7PuCw5k1C132A=
-X-Google-Smtp-Source: APBJJlH77Wp95qPDMbHLmHjtVlZbRmHw4naW1VDuJs9u4M3+PTHGN5a2K0SWksJS5cZ9Z8n+QyBphQ==
-X-Received: by 2002:a7b:c405:0:b0:3fa:97ad:2b9f with SMTP id k5-20020a7bc405000000b003fa97ad2b9fmr876126wmi.16.1689925579913;
-        Fri, 21 Jul 2023 00:46:19 -0700 (PDT)
-Received: from gmail.com ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id p3-20020a05600c204300b003fc3b03e41esm5881060wmg.1.2023.07.21.00.46.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 00:46:19 -0700 (PDT)
-Date: Fri, 21 Jul 2023 08:46:16 +0100
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: corbet@lwn.net, Andrew Lunn <andrew@lunn.ch>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux@leemhuis.info, kvalo@kernel.org,
-	benjamin.poirier@gmail.com
-Subject: Re: [PATCH docs v3] docs: maintainer: document expectations of small
- time maintainers
-Message-ID: <ZLo3yDUue5b6kD8P@gmail.com>
-Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>, corbet@lwn.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux@leemhuis.info, kvalo@kernel.org,
-	benjamin.poirier@gmail.com
-References: <20230719183225.1827100-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6798D2102;
+	Fri, 21 Jul 2023 07:47:52 +0000 (UTC)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D66B4E0;
+	Fri, 21 Jul 2023 00:47:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689925633; x=1721461633;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=I+u1JZP6QGe8S4cNYG1BeDoKNnweQ5fMlWnxynY0gyA=;
+  b=EC6jT1+TqHTC2Q8mQDz+ctghh/1/EKSPC0v86/JezMHaPce54lhZACV+
+   4gr2ILr70ng53QMj4Zn/DkFeFt3K7n6SijjqyMADXH9YjDExJ7prxFe/1
+   ryAawhhQMbaF4i38ZxNK02tjPaAkrehzEijReNm1ApnMe5nocAUAfVq0b
+   ++L9yQYoqCRNNtqqqLoSO6TW82DvdTyXpMUZ8zK996UDotxkulqkmL0xY
+   AROFjHnN0cdgQrNmsQsFrmzxY+qw3A93oSdGN7H8eOQFvXoM0i1HZIHlP
+   JRS/d6e3q8g3xaTAPnsZpmk6eYn8a6QLScade/8oQDsP/4YGydUwjEz6d
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="356950155"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="356950155"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 00:47:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="898619865"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="898619865"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga005.jf.intel.com with ESMTP; 21 Jul 2023 00:47:05 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 21 Jul 2023 00:47:05 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 21 Jul 2023 00:47:04 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 21 Jul 2023 00:47:04 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 21 Jul 2023 00:47:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bskH2Nn8WDfMfozspvnf71DTVzQEJRQWkJN3ko3UV3u0XFG9d9xHwJraIz+AfxpoV9pNSo5BsVwBrGSZJrtHEFW3G411kejrwnS3HuZPZAqwv5fqEibfNlL0nLYUBYmIW++yHZcjoKqnk7NU9QpWnNCNIyym9DuYAoanhPnTpEg/Y6HCsS9LQLOKbTpixprD4xbtTWUZ2SnAshxQpUeMGh6WD24jUVKffsTSzaov8Hzpjrh0TBcytIY/ZGhuLSHwRrKE2gosrJs4L5jcOWHhRkkY2VwSDgxwz3Eb/m+475nt60Mbi7ybL6OQ1SB0QhdB+3myt/IfZT53hAZCPnrMoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3bKoZGLUnrb6x0ykEHBNwchYNVPVr+dzOaZ+An9OZxw=;
+ b=YIruCNcocJ0FbHAGSym8SM52+oJeQjaRRXrsKzsI6GIKKoIV9vWu0jIVbDvD6FpLmULGvg7KyWPzIrNB+k8yL9YbTKv3Z4pjBIRooLDz+QSj1UEAgyFx1Z78SqUzkw2FLyHlxwwd2RNK8zRqsHgp6u89MYTy3Uf3tHi3BQ3fAr3or9Y3U6qPTQsjqF0pMiXJN941HoWHwaNsDw8KgKac1651mZCBkwEiHBRukz8JE8pHddtq2X8riZLRSyhKPf/L5BHBTyqoFF0ZkMY8rkwe7SOUYKy30E1jDObJg7A2Hb4YLprUdc9a6yxPQIN2GRL3pQjQ9+fML0eXA+fkLcvzkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by CY8PR11MB7292.namprd11.prod.outlook.com (2603:10b6:930:9c::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Fri, 21 Jul
+ 2023 07:46:57 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2e3b:2384:e6ce:698a]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2e3b:2384:e6ce:698a%7]) with mapi id 15.20.6609.022; Fri, 21 Jul 2023
+ 07:46:56 +0000
+From: "Zaremba, Larysa" <larysa.zaremba@intel.com>
+To: Stanislav Fomichev <sdf@google.com>
+CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org"
+	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
+	<martin.lau@linux.dev>, "song@kernel.org" <song@kernel.org>, "yhs@fb.com"
+	<yhs@fb.com>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>, "haoluo@google.com"
+	<haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, David Ahern
+	<dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn
+	<willemb@google.com>, "Brouer, Jesper" <brouer@redhat.com>, "Burakov,
+ Anatoly" <anatoly.burakov@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>,
+	"Tahhan, Maryam" <mtahhan@redhat.com>, "xdp-hints@xdp-project.net"
+	<xdp-hints@xdp-project.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH bpf-next v3 20/21] selftests/bpf: Check VLAN tag and proto
+ in xdp_metadata
+Thread-Topic: [PATCH bpf-next v3 20/21] selftests/bpf: Check VLAN tag and
+ proto in xdp_metadata
+Thread-Index: Adm7p4XrvVIDs6/Llk+tMbC8E5LCrg==
+Date: Fri, 21 Jul 2023 07:46:56 +0000
+Message-ID: <ZLo29C1kpx99+u6G@lincoln>
+References: <20230719183734.21681-1-larysa.zaremba@intel.com>
+ <20230719183734.21681-21-larysa.zaremba@intel.com>
+ <ZLmxt3744Q1e42pT@google.com>
+In-Reply-To: <ZLmxt3744Q1e42pT@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-clientproxiedby: FR3P281CA0197.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a5::7) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR11MB7540:EE_|CY8PR11MB7292:EE_
+x-ms-office365-filtering-correlation-id: 9281a571-b3f9-415a-d52a-08db89bea86b
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: NcQo/Y4gZLXC3QCaS67I0XmZYb2NpPs0F4nbZGEFtRAfomxKGGbR0x7WTzg1HYKDFhntSlHG3YeEykpsMdir2EssAO4bIci5jKtRjvz5uMZxiP9JDtkXBUMRw7ALIjf2QwtkHETQTNLDK+TuulsdTOAVc7gcSsgIktfjRTneyT2eveCTRuSGlYpwDubU11tASOHZ49B0unvMXlPbpOKfViknWGx0Bn2i66LhDsPx5tEwRsF8umHxcJk6OpYAIijlinnowPGjU8Z9Tl1W0xY0m5nZcMtAfZwZeZACRJ2R9Km3bDbrPuQKD+SoxR7S9jxlVMqXIw5c6t3a0ZMqk1mULo+sZvMl91ptB9RtJvKXUelKnC4Hf4mCGBXBDta7nRJr9yxB4tuolrKw6upQ2P/W9Batp9Oll5dBQVaoXG78HJjjZkIcJtom6n+0wYeYlcZvTnEkn5kl4ZyX5rFBPNE4bEbHBzWMx22aDNzMbuoyCJZ+h8LyjKj8Pb+59rd12I6RaW7cAlRjn0fYtab2IVIqnlQ9m65wg8qqgP8Xz7+5umCTPJxmp3nzvkbOvnUrVoyiSOL2mwOxEuMSRubI5YiEmb04HAGZOaj7gaGbKxdUTZo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(39860400002)(346002)(376002)(366004)(396003)(136003)(451199021)(26005)(41300700001)(316002)(6506007)(6512007)(9686003)(186003)(83380400001)(82960400001)(478600001)(6916009)(71200400001)(54906003)(122000001)(6486002)(66556008)(4326008)(66446008)(64756008)(66946007)(66476007)(38100700002)(7416002)(86362001)(8676002)(5660300002)(2906002)(33716001)(8936002)(67856001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DSLopnbODLMwJZGsnvGdqng4+pr2r7Hdd9fZwsz+QhVOTojXdLQ4i8YYIgA5?=
+ =?us-ascii?Q?ZuyMfMpUPugPdgSlph6rxGQuGGzFET+5OtnheWkvTBRf79zLQaF7tEAMv/cR?=
+ =?us-ascii?Q?PL9swQXMpyhu9f1TXevbupsbJQbD5rIMLiPKSE1qWeVMaeHQFWz4kldAJi+W?=
+ =?us-ascii?Q?Lg7bRiLInD2y6o+f8egMHUHwPRkVu0MxOntHB3+KMoD7BK1IZSSU3p7amOD6?=
+ =?us-ascii?Q?GLhjiGtr2bqNJfSfnv5PmRiWIcvTPFhqMpJ90bdyHQFo3ckr+z9skLqqW411?=
+ =?us-ascii?Q?9HAdZWDVFMeZM+S9MGcf8MbjceXjDnNAkm9tTRvvEyxNClSfVt2qUnIw6YCx?=
+ =?us-ascii?Q?to1izqaM1fdR6I7sQII7+3OzHEIEWXr8OBqqSo+Z+K0QTOjqs6edGx6zyR+J?=
+ =?us-ascii?Q?Yc9dHXiKbVZKkdHpnopD4ipecsvuwhJ6+pZOnTKe5UkVGPDDG0AEVYvppgt5?=
+ =?us-ascii?Q?f+GAEtqLl6qxPB5nRKNjP6q+NQ5WRtGsxihBoP1tcg4h9Ts3J5EXhpNfqGPQ?=
+ =?us-ascii?Q?vtPwn0gmVVie0/i6XzZ+E81IXpQkBlr5Lcv2W6TPNHAX61fC+/RIxZBzTPZc?=
+ =?us-ascii?Q?nlRVJGoh8GGXzDiSU5VgUlvn6SAnYHLWSGI+XvxDuZIMwLBpgXhmwA7S2Rwv?=
+ =?us-ascii?Q?rBlLwIIUGXbOGRM9SUEmwlFUfgFS6V1h5oi7FWqHZHEZFE4/9rEIKvxpCyPm?=
+ =?us-ascii?Q?hL4AfEit+becwA0p7PqGAVsvLSp+c34M0ve1nfbY3Tta8rNWABqwC+XZZ9xb?=
+ =?us-ascii?Q?cIsR02V5D6YEk4dzSfr5DVpXXcD4Y3CkXh6BBfuOTsXhefUoZnwfZT6iVBSP?=
+ =?us-ascii?Q?8nmvBIbem4drA5xeao/5DvhwMQWrdeoS9V1aWXgddoLHEmvh1k7fsfG+kTQp?=
+ =?us-ascii?Q?FR/wputBCbmt2qBXyuTCfgh7GBaIeJJw00N+d3dVxlRLe3kt/8VbZM95n7rl?=
+ =?us-ascii?Q?vPlUDxWSMcehnL+4Mj3n6FTfyjAhRJXR1cQ0hxK2FLH91x8Q0u0vkElLw8Hs?=
+ =?us-ascii?Q?78YVuITUVFCniozqeDYTbAPoCj05yT4vXU3pYkdca569APw7HKbTf5eDSVxt?=
+ =?us-ascii?Q?g5gAnThlQ4npp2ZHz1ZpZNg4Gnoq3GsyKfEq4BnN+fw4v349ZE5diFLdUakw?=
+ =?us-ascii?Q?Yq3l43ai6yH/2c579TRjZaLoezbWMHMvTF7ig1Q0TuU7Q/8/33YEwGC3Jqj+?=
+ =?us-ascii?Q?Pe9rbgtzuyJbRJGpMBt7GAcoAyWORsJUeVliLQ8GQVRS1vVGq25ZimFmkMN1?=
+ =?us-ascii?Q?SSr0OKLLwrPEWdgP86oNmc+XrVe7bn63oh9bp/8O/hBGUbTyNeZxM9Y93rPS?=
+ =?us-ascii?Q?jXF8nG0nHeiB2lTZa5aHgDTWTx7HYMaGfbQwBmHJ7SzKy6r/6l3pIkr1DsQY?=
+ =?us-ascii?Q?J6MiVC39NCRzpOaalfr22z7+7Co1FEQDjEZvqgzdoc/4IUYDt63pBqpKnBbl?=
+ =?us-ascii?Q?MYoBkWfYj6y45YpTyOTEny2tY15pshvSnp8ZlQLZ2zjLJn2XVLQolJ1y67+z?=
+ =?us-ascii?Q?4QjWbWQ0OCkmlJ1xCcinJt5WA5iUSUWrtS3VqxM/hPPCOmyJqjeub6ru7TJu?=
+ =?us-ascii?Q?RzuPtW++apGdgBcs9WPoG5szgpBhCobvMQIn5+AKv4Wglr04tPolC0S9nwGb?=
+ =?us-ascii?Q?JQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <583F53258A9DE447B4302837B7DC2435@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230719183225.1827100-1-kuba@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FSL_HELO_FAKE,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9281a571-b3f9-415a-d52a-08db89bea86b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2023 07:46:56.5133
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kJ3O/kNvZGriE/BirkcBTE2Yq/CdO5/p4YxdrrL0e6BZpsQbCDX1106jfPMab7f/4cF9BSOeIWCWYVGRQHyemIa/SAONA0GmDjR6KWGjELU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7292
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 11:32:25AM -0700, Jakub Kicinski wrote:
-> We appear to have a gap in our process docs. We go into detail
-> on how to contribute code to the kernel, and how to be a subsystem
-> maintainer. I can't find any docs directed towards the thousands
-> of small scale maintainers, like folks maintaining a single driver
-> or a single network protocol.
-> 
-> Document our expectations and best practices. I'm hoping this doc
-> will be particularly useful to set expectations with HW vendors.
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Thu, Jul 20, 2023 at 03:14:15PM -0700, Stanislav Fomichev wrote:
+> On 07/19, Larysa Zaremba wrote:
+> > Verify, whether VLAN tag and proto are set correctly.
+> >=20
+> > To simulate "stripped" VLAN tag on veth, send test packet from VLAN
+> > interface.
+> >=20
+> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+>=20
+> Acked-by: Stanislav Fomichev <sdf@google.com>
+>=20
+> > ---
+> >  .../selftests/bpf/prog_tests/xdp_metadata.c   | 22 +++++++++++++++++--
+> >  .../selftests/bpf/progs/xdp_metadata.c        |  4 ++++
+> >  2 files changed, 24 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/to=
+ols/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> > index 1877e5c6d6c7..6665cf0c59cc 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> > @@ -38,7 +38,15 @@
+> >  #define TX_MAC "00:00:00:00:00:01"
+> >  #define RX_MAC "00:00:00:00:00:02"
+> > =20
+> > +#define VLAN_ID 59
+> > +#define VLAN_ID_STR "59"
+>=20
+> I was looking whether we have some str(x) macro in the selftests,
+> but doesn't look like we have any...
+>=20
 
-Looks good. Thanks!
-Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+I could add one, if you could hint me at the file, where it would need to g=
+o.
+Or just add it locally for now?
 
-> ---
-> v3:
->  - clarify that mailings list in addition to humans is fine (Mark)
->  - reword the "review from one maintainer is enough" (Benjamin)
->  - grammar fixes (Benjamin, Shannon)
->  - typos (Andrew, Shannon)
-> v2: https://lore.kernel.org/all/20230718155814.1674087-1-kuba@kernel.org/
->  - use Thorsten's wording for bug fixing requirements
->  - put more words into the review/response timeline expectations
-> v1: https://lore.kernel.org/all/20230713223432.1501133-1-kuba@kernel.org/
-> 
-> CC: workflows@vger.kernel.org
-> CC: linux-doc@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux@leemhuis.info
-> Cc: kvalo@kernel.org
-> Cc: benjamin.poirier@gmail.com
-> ---
->  .../feature-and-driver-maintainers.rst        | 155 ++++++++++++++++++
->  Documentation/maintainer/index.rst            |   1 +
->  2 files changed, 156 insertions(+)
->  create mode 100644 Documentation/maintainer/feature-and-driver-maintainers.rst
-> 
-> diff --git a/Documentation/maintainer/feature-and-driver-maintainers.rst b/Documentation/maintainer/feature-and-driver-maintainers.rst
-> new file mode 100644
-> index 000000000000..f04cc183e1de
-> --- /dev/null
-> +++ b/Documentation/maintainer/feature-and-driver-maintainers.rst
-> @@ -0,0 +1,155 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +==============================
-> +Feature and driver maintainers
-> +==============================
-> +
-> +The term "maintainer" spans a very wide range of levels of engagement
-> +from people handling patches and pull requests as almost a full time job
-> +to people responsible for a small feature or a driver.
-> +
-> +Unlike most of the chapter, this section is meant for the latter (more
-> +populous) group. It provides tips and describes the expectations and
-> +responsibilities of maintainers of a small(ish) section of the code.
-> +
-> +Drivers and alike most often do not have their own mailing lists and
-> +git trees but instead send and review patches on the list of a larger
-> +subsystem.
-> +
-> +Responsibilities
-> +================
-> +
-> +The amount of maintenance work is usually proportional to the size
-> +and popularity of the code base. Small features and drivers should
-> +require relatively small amount of care and feeding. Nonetheless
-> +when the work does arrive (in form of patches which need review,
-> +user bug reports etc.) it has to be acted upon promptly.
-> +Even when a particular driver only sees one patch a month, or a quarter,
-> +a subsystem could well have a hundred such drivers. Subsystem
-> +maintainers cannot afford to wait a long time to hear from reviewers.
-> +
-> +The exact expectations on the response time will vary by subsystem.
-> +The patch review SLA the subsystem had set for itself can sometimes
-> +be found in the subsystem documentation. Failing that as a rule of thumb
-> +reviewers should try to respond quicker than what is the usual patch
-> +review delay of the subsystem maintainer. The resulting expectations
-> +may range from two working days for fast-paced subsystems (e.g. networking)
-> +to as long as a few weeks in slower moving parts of the kernel.
-> +
-> +Mailing list participation
-> +--------------------------
-> +
-> +Linux kernel uses mailing lists as the primary form of communication.
-> +Maintainers must be subscribed and follow the appropriate subsystem-wide
-> +mailing list. Either by subscribing to the whole list or using more
-> +modern, selective setup like
-> +`lei <https://people.kernel.org/monsieuricon/lore-lei-part-1-getting-started>`_.
-> +
-> +Maintainers must know how to communicate on the list (plain text, no invasive
-> +legal footers, no top posting, etc.)
-> +
-> +Reviews
-> +-------
-> +
-> +Maintainers must review *all* patches touching exclusively their drivers,
-> +no matter how trivial. If the patch is a tree wide change and modifies
-> +multiple drivers - whether to provide a review is left to the maintainer.
-> +
-> +When there are multiple maintainers for a piece of code an ``Acked-by``
-> +or ``Reviewed-by`` tag (or review comments) from a single maintainer is
-> +enough to satisfy this requirement.
-> +
-> +If the review process or validation for a particular change will take longer
-> +than the expected review timeline for the subsystem, maintainer should
-> +reply to the submission indicating that the work is being done, and when
-> +to expect full results.
-> +
-> +Refactoring and core changes
-> +----------------------------
-> +
-> +Occasionally core code needs to be changed to improve the maintainability
-> +of the kernel as a whole. Maintainers are expected to be present and
-> +help guide and test changes to their code to fit the new infrastructure.
-> +
-> +Bug reports
-> +-----------
-> +
-> +Maintainers must ensure severe problems in their code reported to them
-> +are resolved in a timely manner: regressions, kernel crashes, kernel warnings,
-> +compilation errors, lockups, data loss, and other bugs of similar scope.
-> +
-> +Maintainers furthermore should respond to reports about other kinds of
-> +bugs as well, if the report is of reasonable quality or indicates a
-> +problem that might be severe -- especially if they have *Supported*
-> +status of the codebase in the MAINTAINERS file.
-> +
-> +Selecting the maintainer
-> +========================
-> +
-> +The previous section described the expectations of the maintainer,
-> +this section provides guidance on selecting one and describes common
-> +misconceptions.
-> +
-> +The author
-> +----------
-> +
-> +Most natural and common choice of a maintainer is the author of the code.
-> +The author is intimately familiar with the code, so it is the best person
-> +to take care of it on an ongoing basis.
-> +
-> +That said, being a maintainer is an active role. The MAINTAINERS file
-> +is not a list of credits (in fact a separate CREDITS file exists),
-> +it is a list of those who will actively help with the code.
-> +If the author does not have the time, interest or ability to maintain
-> +the code, a different maintainer must be selected.
-> +
-> +Multiple maintainers
-> +--------------------
-> +
-> +Modern best practices dictate that there should be at least two maintainers
-> +for any piece of code, no matter how trivial. It spreads the burden, helps
-> +people take vacations and prevents burnout, trains new members of
-> +the community etc. etc. Even when there is clearly one perfect candidate,
-> +another maintainer should be found.
-> +
-> +Maintainers must be human, therefore, it is not acceptable to add a mailing
-> +list or a group email as a maintainer. Trust and understanding are the
-> +foundation of kernel maintenance and one cannot build trust with a mailing
-> +list. Having a mailing list *in addition* to humans is perfectly fine.
-> +
-> +Corporate structures
-> +--------------------
-> +
-> +To an outsider the Linux kernel may resemble a hierarchical organization
-> +with Linus as the CEO. While the code flows in a hierarchical fashion,
-> +the corporate template does not apply here. Linux is an anarchy held
-> +together by (rarely expressed) mutual respect, trust and convenience.
-> +
-> +All that is to say that managers almost never make good maintainers.
-> +The maintainer position more closely matches an on-call rotation
-> +than a position of power.
-> +
-> +The following characteristics of a person selected as a maintainer
-> +are clear red flags:
-> +
-> + - unknown to the community, never sent an email to the list before
-> + - did not author any of the code
-> + - (when development is contracted) works for a company which paid
-> +   for the development rather than the company which did the work
-> +
-> +Non compliance
-> +==============
-> +
-> +Subsystem maintainers may remove inactive maintainers from the MAINTAINERS
-> +file. If the maintainer was a significant author or played an important
-> +role in the development of the code, they should be moved to the CREDITS file.
-> +
-> +Removing an inactive maintainer should not be seen as a punitive action.
-> +Having an inactive maintainer has a real cost as all developers have
-> +to remember to include the maintainers in discussions and subsystem
-> +maintainers spend brain power figuring out how to solicit feedback.
-> +
-> +Subsystem maintainers may remove code for lacking maintenance.
-> +
-> +Subsystem maintainers may refuse accepting code from companies
-> +which repeatedly neglected their maintainership duties.
-> diff --git a/Documentation/maintainer/index.rst b/Documentation/maintainer/index.rst
-> index 3e03283c144e..eeee27f8b18c 100644
-> --- a/Documentation/maintainer/index.rst
-> +++ b/Documentation/maintainer/index.rst
-> @@ -9,6 +9,7 @@ additions to this manual.
->  .. toctree::
->     :maxdepth: 2
->  
-> +   feature-and-driver-maintainers
->     configure-git
->     rebasing-and-merging
->     pull-requests
-> -- 
-> 2.41.0
-> 
+> > +#define VLAN_PROTO "802.1Q"
+> > +#define VLAN_PID htons(ETH_P_8021Q)
+> > +#define TX_NAME_VLAN TX_NAME "." VLAN_ID_STR
+> > +#define RX_NAME_VLAN RX_NAME "." VLAN_ID_STR
+> > +
+> >  #define XDP_RSS_TYPE_L4 BIT(3)
+> > +#define VLAN_VID_MASK 0xfff
+> > =20
+> >  struct xsk {
+> >  	void *umem_area;
+> > @@ -215,6 +223,12 @@ static int verify_xsk_metadata(struct xsk *xsk)
+> >  	if (!ASSERT_NEQ(meta->rx_hash_type & XDP_RSS_TYPE_L4, 0, "rx_hash_typ=
+e"))
+> >  		return -1;
+> > =20
+> > +	if (!ASSERT_EQ(meta->rx_vlan_tci & VLAN_VID_MASK, VLAN_ID, "rx_vlan_t=
+ci"))
+> > +		return -1;
+> > +
+> > +	if (!ASSERT_EQ(meta->rx_vlan_proto, VLAN_PID, "rx_vlan_proto"))
+> > +		return -1;
+> > +
+> >  	xsk_ring_cons__release(&xsk->rx, 1);
+> >  	refill_rx(xsk, comp_addr);
+> > =20
+> > @@ -248,10 +262,14 @@ void test_xdp_metadata(void)
+> > =20
+> >  	SYS(out, "ip link set dev " TX_NAME " address " TX_MAC);
+> >  	SYS(out, "ip link set dev " TX_NAME " up");
+> > -	SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME);
+> > +
+> > +	SYS(out, "ip link add link " TX_NAME " " TX_NAME_VLAN
+> > +		 " type vlan proto " VLAN_PROTO " id " VLAN_ID_STR);
+> > +	SYS(out, "ip link set dev " TX_NAME_VLAN " up");
+> > +	SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME_VLAN);
+> > =20
+> >  	/* Avoid ARP calls */
+> > -	SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_NAME=
+);
+> > +	SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_NAME=
+_VLAN);
+> >  	close_netns(tok);
+> > =20
+> >  	tok =3D open_netns(RX_NETNS_NAME);
+> > diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/t=
+esting/selftests/bpf/progs/xdp_metadata.c
+> > index d151d406a123..d3111649170e 100644
+> > --- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
+> > +++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
+> > @@ -23,6 +23,9 @@ extern int bpf_xdp_metadata_rx_timestamp(const struct=
+ xdp_md *ctx,
+> >  					 __u64 *timestamp) __ksym;
+> >  extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *h=
+ash,
+> >  				    enum xdp_rss_hash_type *rss_type) __ksym;
+> > +extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
+> > +					__u16 *vlan_tci,
+> > +					__be16 *vlan_proto) __ksym;
+> > =20
+> >  SEC("xdp")
+> >  int rx(struct xdp_md *ctx)
+> > @@ -57,6 +60,7 @@ int rx(struct xdp_md *ctx)
+> >  		meta->rx_timestamp =3D 1;
+> > =20
+> >  	bpf_xdp_metadata_rx_hash(ctx, &meta->rx_hash, &meta->rx_hash_type);
+> > +	bpf_xdp_metadata_rx_vlan_tag(ctx, &meta->rx_vlan_tci, &meta->rx_vlan_=
+proto);
+> > =20
+> >  	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
+> >  }
+> > --=20
+> > 2.41.0
+> >=20
+>=20
 
