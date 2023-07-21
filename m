@@ -1,75 +1,90 @@
-Return-Path: <netdev+bounces-19709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D6675BCC1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 05:21:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3109B75BCCD
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 05:30:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F94281049
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:21:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78D6282141
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACD6638;
-	Fri, 21 Jul 2023 03:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B253801;
+	Fri, 21 Jul 2023 03:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFD67F
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 03:21:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8188DC433C9;
-	Fri, 21 Jul 2023 03:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3317F
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 03:30:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84A23C433CA;
+	Fri, 21 Jul 2023 03:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689909693;
-	bh=w1Cp3E/fFhoJ3GjRoiK/c7WGdFlU03uhB7BUSWdwMyQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gaXU04sE9jtk39nE9jyUQRfeJGzvlCgsq4HRsFA69lpLHj5Al69giAZ/LeRymfhbq
-	 5hBgX4IkdgeBZqDNG6TfzHyXu5GBsEsWPNL/LMKtB5de/9NPWwircoRXkK8vjY38zw
-	 4zzK9qjpvKskRFT8cX45eQIlir+vUMDXUN6PMoAJC/ovLoalkPauWGhSDEYYhU/9hn
-	 Y7dAEXnSOg52mhdtUZ1cKqAedPbeTnIqtOPCmg9kZy+hOZ3bJydO4sXhbkHR/zGpA8
-	 7c+QcbxnpbNTUzoT2oQDjITQ4uufFA504HGpXxLfV9U6yuX6PZ4Ct8shWMbg4K8OOQ
-	 4ggIlKQ3lFgNA==
-Date: Thu, 20 Jul 2023 20:21:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Asmaa Mnebhi <asmaa@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
- "maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
- "olteanv@gmail.com" <olteanv@gmail.com>, David Thompson
- <davthompson@nvidia.com>
-Subject: Re: [PATCH net v3 1/1] mlxbf_gige: Fix kernel panic at shutdown
-Message-ID: <20230720202132.268dd1fd@kernel.org>
-In-Reply-To: <CH2PR12MB389598B6D2C1EFA43F7B8936D73EA@CH2PR12MB3895.namprd12.prod.outlook.com>
-References: <20230720205620.7019-1-asmaa@nvidia.com>
-	<CH2PR12MB389598B6D2C1EFA43F7B8936D73EA@CH2PR12MB3895.namprd12.prod.outlook.com>
+	s=k20201202; t=1689910223;
+	bh=UAskOFtaZ+TaZ2/xO+ZiGvJ2EWkR0CxM8zJi0SrkADU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=agwpxmdPttVsCQyM7MND/000TMAOFOo7V5oRqxEaVolkfsLcPH4CnRf7z1bCSk2kC
+	 Qfe1cngTCpiH+Y0Pr/IHoktM6seCA7KPLjTrbaD+m9gi7m9AiPOnVOIoyNab3HpMHv
+	 IrkGK3xz9riRF5qffNGkuUGFvCuj3QHDBn8c4jEGc/j3E0aR0OftNk3SwsKf7uhGfe
+	 KSEE1BlbK/kTzRSsZHXJ1vuDdXcJK6LDBwLxy/7/WJ/ZjEUH+MMpHbIjATWmjQJur3
+	 ER9ND27Ow3EJET4FqRTNNbpYv89AuGO7iLVVzmZCrqmJnmxK0qCGJ+YtWyYx6zffkJ
+	 e9uHa6uhdUUng==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65A00C595C5;
+	Fri, 21 Jul 2023 03:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/4] nexthop: Refactor and fix nexthop selection
+ for multipath routes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168991022341.12176.7087140976082292516.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Jul 2023 03:30:23 +0000
+References: <20230719-nh_select-v2-0-04383e89f868@nvidia.com>
+In-Reply-To: <20230719-nh_select-v2-0-04383e89f868@nvidia.com>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ idosch@nvidia.com
 
-On Thu, 20 Jul 2023 21:11:53 +0000 Asmaa Mnebhi wrote:
-> >  	.probe = mlxbf_gige_probe,
-> >  	.remove = mlxbf_gige_remove,
-> > -	.shutdown = mlxbf_gige_shutdown,
-> > +	.shutdown = mlxbf_gige_remove,  
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 19 Jul 2023 13:57:06 +0000 you wrote:
+> In order to select a nexthop for multipath routes, fib_select_multipath()
+> is used with legacy nexthops and nexthop_select_path_hthr() is used with
+> nexthop objects. Those two functions perform a validity test on the
+> neighbor related to each nexthop but their logic is structured differently.
+> This causes a divergence in behavior and nexthop_select_path_hthr() may
+> return a nexthop that failed the neighbor validity test even if there was
+> one that passed.
 > 
-> Actually, apologies for this commit in response to Sridhar's comment
-> on v2. This will not work. Mlxbf_gige_remove() returns void while
-> ".shutdown" expects to return an int. Please advise on how to
-> proceed. Should I send a v4 with the same patch as v2?
+> [...]
 
-You can make it work, there is a new version of remove upstream:
+Here is the summary with links:
+  - [net-next,v2,1/4] nexthop: Factor out hash threshold fdb nexthop selection
+    https://git.kernel.org/netdev/net-next/c/eedd47a6ec9f
+  - [net-next,v2,2/4] nexthop: Factor out neighbor validity check
+    https://git.kernel.org/netdev/net-next/c/4bb5239b4334
+  - [net-next,v2,3/4] nexthop: Do not return invalid nexthop object during multipath selection
+    https://git.kernel.org/netdev/net-next/c/75f5f04c7bd2
+  - [net-next,v2,4/4] selftests: net: Add test cases for nexthop groups with invalid neighbors
+    https://git.kernel.org/netdev/net-next/c/c7e95bbda822
 
-https://elixir.bootlin.com/linux/v6.5-rc2/source/include/linux/platform_device.h#L220
-
-You can make them both void.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
