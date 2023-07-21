@@ -1,75 +1,58 @@
-Return-Path: <netdev+bounces-19748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBC0675C05A
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:48:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A094F75C066
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7763C281967
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:48:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB6A1C21602
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C8B3D75;
-	Fri, 21 Jul 2023 07:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7D33D84;
+	Fri, 21 Jul 2023 07:50:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D1420E4
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:48:35 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636C611D
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 00:48:33 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4fa48b5dc2eso2588325e87.1
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 00:48:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689925711; x=1690530511;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gp5//cguHLYjw2SPD+mbFWg9HVuK6b37FH3cK//qGJg=;
-        b=hLtlrdlqzqF1rmhouHJVIM2/ulU5yZ6OhVUodGV3dB5sCGxEi03qj8IVodoF3VgjdE
-         xT9OOucItuQ02RdRTF1Nr4yjGteCB8TfFGZ4pgJLwGtw1QI20sM+qsEC83h0dkhtSKvF
-         AWJj1hmtJ8q36jijCclAjenQOU7/DkMM7XApHLQ32PCHCGOox4y8l4yCoNlA8MGOK35R
-         +ztb4wj9z1+JOe8edDF7s3ss/MFjidhe9ieYwM2IfvClWJT/obF+9tOoK7TjlRYe6LU4
-         kTy2uRmx9yCLA714T/i/xPpFtC8ELXM0Xbs5o8EkAhozds1zMemX5V5GB8l8SYEVxP+1
-         qdMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689925711; x=1690530511;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gp5//cguHLYjw2SPD+mbFWg9HVuK6b37FH3cK//qGJg=;
-        b=XXDGIMgAMmJce8ai7B8gt3C6kqLWe0mCuOZpQFYBvDt4ozit2rW2Y2DR2pRrOWKOqV
-         SdJBeJXABEQdJ+cceQVkqz027oaDVV34nb2oinHbfVMORnsjCsgJy7M96iZTm109G+MP
-         yzaGAWKV/9AbkaO2wLr0gFZYQ9M2MnJT4MTiGNHUg0cxXQME8W33aUt8oIdPhc5GbJ0D
-         kWGANnRBcuvM5g9XcND0OmjGP4nWOMH9scfOMfhNfJEFQqribq9GbYJ+oYk7rKV4U3hL
-         SJCOkbt5fnNnoaI+yVWvxT59aWJJt8H8lFsHP6ZXb85z+ebDUxV5MGITJy1dU/mjyh37
-         LsYw==
-X-Gm-Message-State: ABy/qLYoAf9/s6MBBt26N2Kpt1fh4gOqxASI/+R9aRvwWSxdwcuenWNO
-	R5ykpncwbJm2oHXDZFyUU39zXA==
-X-Google-Smtp-Source: APBJJlFOxnjBRmg+6z6oUJTZxyE5vxzlIUhVGdh6m0Y3/2JEb2QyN+bCyEfgV1Jg78je61sknpUG+w==
-X-Received: by 2002:a05:6512:2252:b0:4f8:6d54:72f9 with SMTP id i18-20020a056512225200b004f86d5472f9mr1039485lfu.61.1689925711564;
-        Fri, 21 Jul 2023 00:48:31 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id 15-20020a05600c028f00b003fc06169ab3sm5598995wmk.20.2023.07.21.00.48.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 00:48:31 -0700 (PDT)
-Date: Fri, 21 Jul 2023 09:48:29 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Michal Michalik <michal.michalik@intel.com>,
-	linux-arm-kernel@lists.infradead.org, poros@redhat.com,
-	mschmidt@redhat.com, netdev@vger.kernel.org,
-	linux-clk@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH net-next 00/11] Create common DPLL configuration API
-Message-ID: <ZLo4TfaDKlgBVD2N@nanopsycho>
-References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C38D535
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:50:31 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E2A273C;
+	Fri, 21 Jul 2023 00:50:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=HOiv+39EOXGpElZBXI8YgqXUZyvnMCEbsPfiee135uY=; b=RBp85clNByjxwHzfoqKSuFnxxx
+	7cxPu1xhm0BdOZm8YD1Z+MUoviUoZT4Qym4uRVqJvi2Th71naE1H/gpTHyLaGfY91BSIfAERjaNiu
+	OziGSWUhFZcD1fpskYH62YljGekFoFaeUscjcCxlLqz1tWEQtCBcXtB3lawXamH3fFuoc6/BVs26P
+	vz6KhNNi07+HtgNqqBonivL1YqyHAHNtq1jtbYWspdPgk7vlgVHdial79r1zDhDLvUCOJfR/cV1iI
+	P31qHdNniS+mzXAau9K28EjUvzMdM7vSiryJZCHTWgDtROuJrsJuyNjlsPPvb7R7NewrN24uU1ZpU
+	lK8mMaeA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41390)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qMku7-0003Nh-1J;
+	Fri, 21 Jul 2023 08:50:23 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qMku6-0005wi-B5; Fri, 21 Jul 2023 08:50:22 +0100
+Date: Fri, 21 Jul 2023 08:50:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, andrew@lunn.ch,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next 2/2] net: sfp: add quirk for FS's DAC10G SFP
+ (SFPP-PC01)
+Message-ID: <ZLo4vvAPXNy51ZRi@shell.armlinux.org.uk>
+References: <20230721060057.2998-1-Raju.Lakkaraju@microchip.com>
+ <20230721060057.2998-3-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,17 +61,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230721060057.2998-3-Raju.Lakkaraju@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thu, Jul 20, 2023 at 11:18:52AM CEST, vadim.fedorenko@linux.dev wrote:
+On Fri, Jul 21, 2023 at 11:30:57AM +0530, Raju Lakkaraju wrote:
+> Add a quirk for a DAC10G SFP that identifies itself as "FS" "SFPP-PC01".
+> Add a quirk to enable the SGMII interface, modes 2500base-T, 1000base-T,
+> 100base-T/Full and 100base-T/Half support.
+> 
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> ---
+>  drivers/net/phy/sfp.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+> index ee049efdf71b..80d2680f08ab 100644
+> --- a/drivers/net/phy/sfp.c
+> +++ b/drivers/net/phy/sfp.c
+> @@ -421,6 +421,18 @@ static void sfp_quirk_oem_2_5g(const struct sfp_eeprom_id *id,
+>  	sfp_quirk_disable_autoneg(id, modes, interfaces);
+>  }
+>  
+> +static void sfp_quirk_fs_dac(const struct sfp_eeprom_id *id,
+> +			     unsigned long *modes,
+> +			     unsigned long *interfaces)
+> +{
+> +	/* Fiberstore(FS)'s DAC SFP (SFPP-PC01) */
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, modes);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, modes);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, modes);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, modes);
 
->v8 RFC -> v0:
+No. A DAC cable does _not_ give you twisted-pair ethernet which is what
+baseT linkmodes are.
 
-Just to avoid future confusion: In netdev, the count goes from 1.
-So this is v1. Next submission will be v2.
+The description on fs.com states:
+
+"The 10G SFP+ Passive Direct Attach Copper Twinax Cable is designed for
+use in 10GBASE Ethernet."
+
+That means it supports 10GBASE-CR, which is the link mode for 10 Gigabit
+ethernet over a direct attach cable.
+
+If it does work at 2.5G speeds, then the protocol that will be used for
+that will be 2500base-X.
+
+If it does work at 1G speeds, then the protocol that will be used for
+that will be 1000base-X (which is the "standard" protocol for the host
+connection for 1G SFPs.)
+
+Going below that isn't technically possible, but can be done with SGMII
+by forcing the link settings, but is there really any need to support
+slower speeds? What possible valid reason could there be? A host not
+supporting 1G speeds with a SFP cage would be utterly insane.
+
+> +	__set_bit(PHY_INTERFACE_MODE_SGMII, interfaces);
+
+I also disagree with this. Unless there is a PHY present, you can _not_
+connect two hosts together that are using the SGMII protocol. The SGMII
+"negotiation" protocol is _asymetric_, and it relies upon a PHY telling
+the host what the link speed and duplex settings are. A host never
+sends that information, so this will not "negotiate".
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
