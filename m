@@ -1,122 +1,80 @@
-Return-Path: <netdev+bounces-20001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5173475D545
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:56:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F39475D54D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B1A41C216C1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 19:56:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0E67282455
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECB822F17;
-	Fri, 21 Jul 2023 19:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA78423BC3;
+	Fri, 21 Jul 2023 20:01:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1134620FA0
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 19:56:30 +0000 (UTC)
-Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE4D171A
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:56:29 -0700 (PDT)
-Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-579ef51428eso25862627b3.2
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:56:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689969389; x=1690574189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2WvGq0MYBWXaNr+el50jQy906imQ6eE05h3UFyIJnR0=;
-        b=xaZgLXHxXDY/D9efXYW4S2fipcQqU8WCRvdtq+VH3+HREfgjTveyPIY0/0HURIvOmW
-         aGwk1TiUqH52SufsxfnU57gUDQAvjE5hA58iMyRfikJVRqLwT0gfhK070pdEuS6Z5mX4
-         /A+wpcfBwH3c1VrF09R3D2KjjU/dAx62EUF+ZbKOY11zaT0nUgt8nS80J7Uvz0SRhhsF
-         6k6NQfagAUEsGhA4zhO60aNbTshZ3G3XgL4NL8Xr/MEWlhNmQDRcrk9rSGGuf7Ja76Jd
-         Gz2UCQr94qgeGgLZkGiYTSyzDnXs7rMinI8VcKnY7Uc9lIn4dvrjJKgkPrIGp39ttupk
-         tPvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689969389; x=1690574189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2WvGq0MYBWXaNr+el50jQy906imQ6eE05h3UFyIJnR0=;
-        b=JvTc4R9ab1ZW6llN+3xhMUYPIEZZTqRriuahWirhXmV6oH2WBjCQ47VJDDBK47lcO2
-         mDWxDbrwRNTXi/fqhDXFao0SnC9NLviEwZkPBGS4Dmg8PlGCi/yV8/CIP2cx53J4JtgY
-         1UGIRtsODNCNNu82UTZ0GV6KDzsq8J8IzBXj4tYn+he58OBZjozctEpMUcLJXljPmfFB
-         hx3a98EqPkb7ihAGPOnox/atecb+WEtm8hrLv5M9/O2jtGoW6whO6uRhU+mRyuzUa2lM
-         0diqs6LKRZ4UE952pufRSyqUeY9PlKgSSO/T98C8SLap0cm+xbzo3plE3QV0+ovo2YKV
-         CGYw==
-X-Gm-Message-State: ABy/qLbJyzw3X6lDc8tqpdceJFtDm0QcJ7F74PT3Lw2Pd5QkY2BsA27u
-	kE3XUSTFDYRShL+NGtH12fjjiu8fuc3zCgTuUaBZuA==
-X-Google-Smtp-Source: APBJJlFndBSOJMgmxXs7gmzGM/CdpZEnGJwU1TKBBQ55vf0xfW2enpkQy88qJphd2zx+4cS0RRxmIFuWXLSoLdsReOM=
-X-Received: by 2002:a0d:c8c1:0:b0:56d:9b15:72a with SMTP id
- k184-20020a0dc8c1000000b0056d9b15072amr1007691ywd.33.1689969389023; Fri, 21
- Jul 2023 12:56:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE3122F1E
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 20:01:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5900BC433C9;
+	Fri, 21 Jul 2023 20:01:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689969665;
+	bh=EqrevjWJXEX2uI/wWrGnSTIWi02WPnapbwsT0JNyJtU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hFOM/dq1sc7GRhffeqkQrd74tuUbxxYNR5D8VNYWSuA5ycodclel9klwkNZcZbt5d
+	 M81YKkBTge4RhKQJUVZed1JFvp0oOcPgc5b/NyjkncVn0fzD6ugPRgW1P0kjirt5QU
+	 64QgrRQKQ348NDz84ktfXXv+KSE+RnSCTo/AyrRB9L6b4XKHHtwKqr607WnhCKCzCm
+	 WGnVCS4lBAczbVIyGizrRlTj5Jg0aiSmV61tA9QA0RNUDZ/hkY5RExHk4KWkfdvHxM
+	 WmAQXMUjglb/1HEfI/iiGpwQ3QGHB3cQdr1t45boI40ENztKk5yqIAvBsTIjQgYpFt
+	 UOP+WXsxVme6Q==
+Message-ID: <0b992d26-f22d-7310-308a-339300628690@kernel.org>
+Date: Fri, 21 Jul 2023 14:01:04 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230721174856.3045-1-sec@valis.email> <9a51c82f-6884-4853-8e8a-3796c9051ca8@mojatatu.com>
-In-Reply-To: <9a51c82f-6884-4853-8e8a-3796c9051ca8@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 21 Jul 2023 15:56:17 -0400
-Message-ID: <CAM0EoMkVVdHjU1aUxmjN7ah_iE2Beuwgf4r6ddxCWN5d77t-=A@mail.gmail.com>
-Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
- and cls_route
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: valis <sec@valis.email>, netdev@vger.kernel.org, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, victor@mojatatu.com, ramdhan@starlabs.sg, 
-	billy@starlabs.sg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH net-next v2 2/2] selftests: fib_tests: Add a test case for
+ IPv6 garbage collection
+Content-Language: en-US
+To: Kui-Feng Lee <sinquersw@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Kui-Feng Lee <thinker.li@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ martin.lau@linux.dev, kernel-team@meta.com, yhs@meta.com
+Cc: Kui-Feng Lee <kuifeng@meta.com>
+References: <20230718180321.294721-1-kuifeng@meta.com>
+ <20230718180321.294721-3-kuifeng@meta.com>
+ <9743a6cc267276bfeba5b0fdcf7ba9a4077c67e1.camel@redhat.com>
+ <3057afe9-ac48-84e2-bd39-b227d2dcbc2f@gmail.com>
+ <239ca679597a10b6bc00245c66419f4bdedaff83.camel@redhat.com>
+ <03ef2491-6087-4fd4-caf7-a589d0dfda13@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <03ef2491-6087-4fd4-caf7-a589d0dfda13@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 21, 2023 at 3:00=E2=80=AFPM Pedro Tammela <pctammela@mojatatu.c=
-om> wrote:
->
-> On 21/07/2023 14:48, valis wrote:
-> > Three classifiers (cls_fw, cls_u32 and cls_route) always copy
-> > tcf_result struct into the new instance of the filter on update.
-> >
-> > This causes a problem when updating a filter bound to a class,
-> > as tcf_unbind_filter() is always called on the old instance in the
-> > success path, decreasing filter_cnt of the still referenced class
-> > and allowing it to be deleted, leading to a use-after-free.
-> >
-> > This patch set fixes this issue in all affected classifiers by no longe=
-r
-> > copying the tcf_result struct from the old filter.
-> >
-> > valis (3):
-> >    net/sched: cls_u32: No longer copy tcf_result on update to avoid
-> >      use-after-free
-> >    net/sched: cls_fw: No longer copy tcf_result on update to avoid
-> >      use-after-free
-> >    net/sched: cls_route: No longer copy tcf_result on update to avoid
-> >      use-after-free
-> >
-> >   net/sched/cls_fw.c    | 1 -
-> >   net/sched/cls_route.c | 1 -
-> >   net/sched/cls_u32.c   | 1 -
-> >   3 files changed, 3 deletions(-)
-> >
->
-> For the series,
->
-> Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-> Tested-by: Pedro Tammela <pctammela@mojatatu.com>
+On 7/21/23 12:31 PM, Kui-Feng Lee wrote:
+>>
+>> sysctl -wq net.ipv6.route.flush=1
+>>
+>> # add routes
+>> #...
+>>
+>> # delete expired routes synchronously
+>> sysctl -wq net.ipv6.route.flush=1
+>>
+>> Note that the net.ipv6.route.flush handler uses the 'old' flush value.
+> 
+> May I use bpftrace to measure time spending on writing to procfs?
+> It is in the order of microseconds. time command doesn't work.
+> 
 
-For the series:
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Both before this patch and after this patch are in microseconds?
 
-cheers,
-jamal
 
