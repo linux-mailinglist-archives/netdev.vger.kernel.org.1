@@ -1,172 +1,202 @@
-Return-Path: <netdev+bounces-20005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D55F575D573
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:19:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5753975D5A0
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02A38282455
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:19:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6738A1C21783
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D2623BD4;
-	Fri, 21 Jul 2023 20:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D53623BDA;
+	Fri, 21 Jul 2023 20:24:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B806827F17
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 20:19:09 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51493C1D
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:18:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689970695;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0RGmyz1YClWe5oeSPHTFZ5N1VM0OIPODLNu2thu5Rsg=;
-	b=XDa2jenFeQrBdfolA+hI+SVrI0ojuj2sxRdBdBaKGb0oBMbDGNWWRSYiuiuDb2JuHWmhPj
-	hJe68M/KaBxjBxFeadGZ5EK4xL3JW7MrxEo0RmZKhF12q32CJ4YOKmx6GxEYcT2KD4u7GF
-	G3xEeUaV6IVFs8kVli3QA7e/U7HEG/8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-473-W1m1jmxPN9eDPWD0u3VPmg-1; Fri, 21 Jul 2023 16:18:08 -0400
-X-MC-Unique: W1m1jmxPN9eDPWD0u3VPmg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3CD16101A528;
-	Fri, 21 Jul 2023 20:18:07 +0000 (UTC)
-Received: from [10.39.208.41] (unknown [10.39.208.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 218531121314;
-	Fri, 21 Jul 2023 20:18:04 +0000 (UTC)
-Message-ID: <e3490755-35ac-89b4-b0fa-b63720a9a5c9@redhat.com>
-Date: Fri, 21 Jul 2023 22:18:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E402A23BD5;
+	Fri, 21 Jul 2023 20:24:30 +0000 (UTC)
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 998CF3C3A;
+	Fri, 21 Jul 2023 13:24:00 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id 16E5D320095B;
+	Fri, 21 Jul 2023 16:23:03 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Fri, 21 Jul 2023 16:23:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm2; t=1689970982; x=1690057382; bh=qK4jETCPwl
+	HuZUy6Z7D6ph2KKy80jTJkS86PaPy+M2k=; b=Mwd7FNw1jZulDdy4QAGnqC0ea6
+	m/G8sexiL+8han3C77hisHdCHDNdYWJSUwQVDqjCDEzw3hKxVNXwVZdp9/QXTeV0
+	erDTFmCLKIyuEwioA7IE10wr4l1/mpjmyCZO31g93S3XNmRqE4aWhu5NAnUwUSnG
+	rpnDyrAP6ZQNUb84CoWA9O6Nj65znaWHR17JO6p/cmQf2LUaMpqrZrzOil+Eo6aM
+	cfR7bI3unWf+EfPHnBw9wQWjYeNhXRZIg/vl1ko4TWwi3+eL0vyyzrhHS3ulsd6X
+	qwohVpU6K6HLCIr7vFd9eXaxjxBZ9rrSdGu0UqIWuh85USVHWrQ/4Mz2VnBA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1689970982; x=1690057382; bh=qK4jETCPwlHuZ
+	Uy6Z7D6ph2KKy80jTJkS86PaPy+M2k=; b=nTHbZwehYvAsOEG0+arS2do0FDV4e
+	06UZU64VQesI3cbI7yoCd14Bf8Zo3SoAY/QkXJvPyJT9nVAFiWotio6EgrTzVQj3
+	X2tHHN7Sn9o9S4bAHuDSAyqIlgYefD417e+JyUgR62KRP1OO29nJE1zCb1ujUOjB
+	P49I97AtvVWKxtkNfhdBJUdToA3VSpoJ4y/E78T3WNVucPISaEJLDosc0AZBzPl2
+	FHpiH9dLfGFhdP6kQeM6XmnpUf5VOhyeOzyHdxdhIuBL/7NIt/Wj6myCsI3OrqTx
+	Y2kY9BLVWv3+mL9tw9ZeDAcFU9SGURx34elnNiCKCjKCqebZt99sAComQ==
+X-ME-Sender: <xms:Jum6ZDCclyWe9CdazcyRsD2k512N2SJqeAA0NeAHfnOfG6w3-BQ8pQ>
+    <xme:Jum6ZJi8FhyqbiKhcRG-EkMyHLWDlUBFJIVQqgI0ZsQnKtAvZhXnHB6oCIGglubV6
+    VACsq8qEv1iJkAd9Q>
+X-ME-Received: <xmr:Jum6ZOk0nwbagzNn8iXRP9nnm_zJA-0X6fjlOMWdvtx702VJTcGOuZP31t3yHR01MX_Ka-IXil1ONhpIVpgFxAQEGNlP4D_D08OMK2NCBSM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrhedvgddugedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlfeehmdenucfjughrpefhvf
+    evufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceougig
+    uhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepteeghffhiefgjedtvdetfe
+    ffgfetkeetudeitdekveeluddvjeeugefgtdefgeefnecuffhomhgrihhnpehivghtfhdr
+    ohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:Jum6ZFxJAvWJKwewgmgjMqILCWqeDBAGaH1oNj6mpwmG9cOdPe7uqg>
+    <xmx:Jum6ZISo9QRpiE8NNizh0csXfPvIGg2cckgOGAfHdgIRXXYL_Lbdrw>
+    <xmx:Jum6ZIb0lSTcs_7W02ifOCpyn5FPCTYVTOznXaZkamrZCzVFexjf2g>
+    <xmx:Jum6ZLEpGX4b-ImWApIBhlfkjFpG3JxQ1D2l7vThZbH8co_Q3kEdAw>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 21 Jul 2023 16:23:01 -0400 (EDT)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: linux-kernel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netfilter-devel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	fw@strlen.de,
+	daniel@iogearbox.net
+Cc: dsahern@kernel.org
+Subject: [PATCH bpf-next v6 0/5] Support defragmenting IPv(4|6) packets in BPF
+Date: Fri, 21 Jul 2023 14:22:44 -0600
+Message-ID: <cover.1689970773.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
- command waiting loop
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Shannon Nelson <shannon.nelson@amd.com>, Jason Wang
- <jasowang@redhat.com>, xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net
-References: <20230720083839.481487-1-jasowang@redhat.com>
- <20230720083839.481487-3-jasowang@redhat.com>
- <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com>
- <20230720170001-mutt-send-email-mst@kernel.org>
- <263a5ad7-1189-3be3-70de-c38a685bebe0@redhat.com>
- <20230721104445-mutt-send-email-mst@kernel.org>
- <6278a4aa-8901-b0e3-342f-5753a4bf32af@redhat.com>
- <20230721110925-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-In-Reply-To: <20230721110925-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+=== Context ===
+
+In the context of a middlebox, fragmented packets are tricky to handle.
+The full 5-tuple of a packet is often only available in the first
+fragment which makes enforcing consistent policy difficult. There are
+really only two stateless options, neither of which are very nice:
+
+1. Enforce policy on first fragment and accept all subsequent fragments.
+   This works but may let in certain attacks or allow data exfiltration.
+
+2. Enforce policy on first fragment and drop all subsequent fragments.
+   This does not really work b/c some protocols may rely on
+   fragmentation. For example, DNS may rely on oversized UDP packets for
+   large responses.
+
+So stateful tracking is the only sane option. RFC 8900 [0] calls this
+out as well in section 6.3:
+
+    Middleboxes [...] should process IP fragments in a manner that is
+    consistent with [RFC0791] and [RFC8200]. In many cases, middleboxes
+    must maintain state in order to achieve this goal.
+
+=== BPF related bits ===
+
+Policy has traditionally been enforced from XDP/TC hooks. Both hooks
+run before kernel reassembly facilities. However, with the new
+BPF_PROG_TYPE_NETFILTER, we can rather easily hook into existing
+netfilter reassembly infra.
+
+The basic idea is we bump a refcnt on the netfilter defrag module and
+then run the bpf prog after the defrag module runs. This allows bpf
+progs to transparently see full, reassembled packets. The nice thing
+about this is that progs don't have to carry around logic to detect
+fragments.
+
+=== Changelog ===
+
+Changes from v5:
+
+* Fix defrag disable codepaths
+
+Changes from v4:
+
+* Refactor module handling code to not sleep in rcu_read_lock()
+* Also unify the v4 and v6 hook structs so they can share codepaths
+* Fixed some checkpatch.pl formatting warnings
+
+Changes from v3:
+
+* Correctly initialize `addrlen` stack var for recvmsg()
+
+Changes from v2:
+
+* module_put() if ->enable() fails
+* Fix CI build errors
+
+Changes from v1:
+
+* Drop bpf_program__attach_netfilter() patches
+* static -> static const where appropriate
+* Fix callback assignment order during registration
+* Only request_module() if callbacks are missing
+* Fix retval when modprobe fails in userspace
+* Fix v6 defrag module name (nf_defrag_ipv6_hooks -> nf_defrag_ipv6)
+* Simplify priority checking code
+* Add warning if module doesn't assign callbacks in the future
+* Take refcnt on module while defrag link is active
 
 
-On 7/21/23 17:10, Michael S. Tsirkin wrote:
-> On Fri, Jul 21, 2023 at 04:58:04PM +0200, Maxime Coquelin wrote:
->>
->>
->> On 7/21/23 16:45, Michael S. Tsirkin wrote:
->>> On Fri, Jul 21, 2023 at 04:37:00PM +0200, Maxime Coquelin wrote:
->>>>
->>>>
->>>> On 7/20/23 23:02, Michael S. Tsirkin wrote:
->>>>> On Thu, Jul 20, 2023 at 01:26:20PM -0700, Shannon Nelson wrote:
->>>>>> On 7/20/23 1:38 AM, Jason Wang wrote:
->>>>>>>
->>>>>>> Adding cond_resched() to the command waiting loop for a better
->>>>>>> co-operation with the scheduler. This allows to give CPU a breath to
->>>>>>> run other task(workqueue) instead of busy looping when preemption is
->>>>>>> not allowed on a device whose CVQ might be slow.
->>>>>>>
->>>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>>>>
->>>>>> This still leaves hung processes, but at least it doesn't pin the CPU any
->>>>>> more.  Thanks.
->>>>>> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
->>>>>>
->>>>>
->>>>> I'd like to see a full solution
->>>>> 1- block until interrupt
->>>>
->>>> Would it make sense to also have a timeout?
->>>> And when timeout expires, set FAILED bit in device status?
->>>
->>> virtio spec does not set any limits on the timing of vq
->>> processing.
->>
->> Indeed, but I thought the driver could decide it is too long for it.
->>
->> The issue is we keep waiting with rtnl locked, it can quickly make the
->> system unusable.
-> 
-> if this is a problem we should find a way not to keep rtnl
-> locked indefinitely.
+[0]: https://datatracker.ietf.org/doc/html/rfc8900
 
- From the tests I have done, I think it is. With OVS, a reconfiguration 
-is performed when the VDUSE device is added, and when a MLX5 device is
-in the same bridge, it ends up doing an ioctl() that tries to take the
-rtnl lock. In this configuration, it is not possible to kill OVS because
-it is stuck trying to acquire rtnl lock for mlx5 that is held by virtio-
-net.
 
-> 
->>>>> 2- still handle surprise removal correctly by waking in that case
->>>>>
->>>>>
->>>>>
->>>>>>> ---
->>>>>>>      drivers/net/virtio_net.c | 4 +++-
->>>>>>>      1 file changed, 3 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>>>>> index 9f3b1d6ac33d..e7533f29b219 100644
->>>>>>> --- a/drivers/net/virtio_net.c
->>>>>>> +++ b/drivers/net/virtio_net.c
->>>>>>> @@ -2314,8 +2314,10 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
->>>>>>>              * into the hypervisor, so the request should be handled immediately.
->>>>>>>              */
->>>>>>>             while (!virtqueue_get_buf(vi->cvq, &tmp) &&
->>>>>>> -              !virtqueue_is_broken(vi->cvq))
->>>>>>> +              !virtqueue_is_broken(vi->cvq)) {
->>>>>>> +               cond_resched();
->>>>>>>                     cpu_relax();
->>>>>>> +       }
->>>>>>>
->>>>>>>             return vi->ctrl->status == VIRTIO_NET_OK;
->>>>>>>      }
->>>>>>> --
->>>>>>> 2.39.3
->>>>>>>
->>>>>>> _______________________________________________
->>>>>>> Virtualization mailing list
->>>>>>> Virtualization@lists.linux-foundation.org
->>>>>>> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
->>>>>
->>>
-> 
+Daniel Xu (5):
+  netfilter: defrag: Add glue hooks for enabling/disabling defrag
+  netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link
+  bpf: selftests: Support not connecting client socket
+  bpf: selftests: Support custom type and proto for client sockets
+  bpf: selftests: Add defrag selftests
+
+ include/linux/netfilter.h                     |  10 +
+ include/uapi/linux/bpf.h                      |   5 +
+ net/ipv4/netfilter/nf_defrag_ipv4.c           |  17 +-
+ net/ipv6/netfilter/nf_defrag_ipv6_hooks.c     |  11 +
+ net/netfilter/core.c                          |   6 +
+ net/netfilter/nf_bpf_link.c                   | 123 +++++++-
+ tools/include/uapi/linux/bpf.h                |   5 +
+ tools/testing/selftests/bpf/Makefile          |   4 +-
+ .../selftests/bpf/generate_udp_fragments.py   |  90 ++++++
+ .../selftests/bpf/ip_check_defrag_frags.h     |  57 ++++
+ tools/testing/selftests/bpf/network_helpers.c |  26 +-
+ tools/testing/selftests/bpf/network_helpers.h |   3 +
+ .../bpf/prog_tests/ip_check_defrag.c          | 283 ++++++++++++++++++
+ .../selftests/bpf/progs/ip_check_defrag.c     | 104 +++++++
+ 14 files changed, 718 insertions(+), 26 deletions(-)
+ create mode 100755 tools/testing/selftests/bpf/generate_udp_fragments.py
+ create mode 100644 tools/testing/selftests/bpf/ip_check_defrag_frags.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/ip_check_defrag.c
+ create mode 100644 tools/testing/selftests/bpf/progs/ip_check_defrag.c
+
+-- 
+2.41.0
 
 
