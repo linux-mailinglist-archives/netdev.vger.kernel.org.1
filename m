@@ -1,231 +1,206 @@
-Return-Path: <netdev+bounces-19907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A9C75CCA7
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:52:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 228D575CCBE
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D7D01C216BF
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:52:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52CF71C216E8
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8D01ED2D;
-	Fri, 21 Jul 2023 15:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF891ED37;
+	Fri, 21 Jul 2023 15:55:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1731ED2C
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:52:22 +0000 (UTC)
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26ADD3C34;
-	Fri, 21 Jul 2023 08:51:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689954718; x=1721490718;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=iAJ1nHNnCKZNUH34gcXM0QFm+0pDD+og0LXL4lHRpds=;
-  b=QbValAu6qxgMqXjjpeGiva9Zc5BJ5PdAmBdDYDBOELFr5PPybnF4CoUC
-   ZXmq/yfEehRPDlD/vKJ/Oh+wii/OCxcZHbG6KKw8JIQ+/1cTsktuxI/CO
-   kQoSiBB8+r8fFIxZb/kf+IHFg1DvrW/d5EJjfAUyXt2Uk//4T6ZxIoCBL
-   2cYPGuB7q88yJVbyDBp64Ce7GdNxRE+NsfBCzQxXNkT6cn7kgm/bbrnqM
-   fmv0hTMGJ3L2QkWkibe27GFe0KHdywxumagj7FVArah15LSNLBJwOsTHF
-   l4BcmTn2lUjsnij/qY37ThiwGQir6CUpWOGbct4wFNTHfOsI6+tRf54c3
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="365945091"
-X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
-   d="scan'208";a="365945091"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 08:51:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="754502419"
-X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
-   d="scan'208";a="754502419"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga008.jf.intel.com with ESMTP; 21 Jul 2023 08:51:40 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 21 Jul 2023 08:51:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 21 Jul 2023 08:51:40 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 21 Jul 2023 08:51:39 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.172)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 21 Jul 2023 08:51:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kEheEje+mbUYy5SaxShNb3n5JMfk1flnw6tQdTeOUWPHr5JFGpqQ648Y5P9/rGHxo/Ks9lTMA74fhiJU8lQUjdERV8IdL90P8ZmKPOgCrQrkM5ylcmcLZFDDMYnsQSfx9P9GDqfjKIZfnhETmRI/y1hUZbIg1fy7CO28s1PexfsW2g2eXD/IjioSXIFKrhPdCpyQLKccIbExRtQIZOAY+XCjEBkxeBuWa+zJHrJT0s2rKAaEl+9pc/9gJvCQZhozFN+uUIuM9MPE5JnSximeJBsHSP5xkXjaZbkoJvEkoDfFhy2qKmL6+IPRMjbVcNFUTsUnJGB2dYzvBR5OPWu6fA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dfA4NTHRzi5tqzcutZFAH4mejHQ3RwY9P2NQOPTUsBw=;
- b=SHLemqg+o+LjYJBuvGRV2t/WJ97+O9mBF2aDOlgvUqp9ADAhW3ZK+iYrqTVsokHlaMmTWkJ6+NJ+Qm37YAb7A2yjWpUa3CDVNAWKb4mWnKtYHs4uDGvjBpmj1vm5PYYhszD/BV9GYYdPSMCUFMJybL4iWTsdW2/RxXHD7iDnSLcMKl8BrTmm5GP7h5IsvYNtDnV+AmGYTZGDf7uDl4aCj745q7PYxvt+/tEBKib20Vz65erUtl567bKYip4T27Ctaoog0sENXZjiMNtAWSz04xy/GjMw2i8oViyGIBAXuIhkvalrmf72wJLOBYd+pHRn7BHTwXH0+Kwpuw7oQ16RxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM8PR11MB5751.namprd11.prod.outlook.com (2603:10b6:8:12::16) by
- PH0PR11MB5783.namprd11.prod.outlook.com (2603:10b6:510:128::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Fri, 21 Jul
- 2023 15:51:36 +0000
-Received: from DM8PR11MB5751.namprd11.prod.outlook.com
- ([fe80::542d:f32a:14b:1531]) by DM8PR11MB5751.namprd11.prod.outlook.com
- ([fe80::542d:f32a:14b:1531%3]) with mapi id 15.20.6609.025; Fri, 21 Jul 2023
- 15:51:36 +0000
-From: "Ng, Boon Khai" <boon.khai.ng@intel.com>
-To: "Shevchenko, Andriy" <andriy.shevchenko@intel.com>
-CC: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Tham, Mun Yew" <mun.yew.tham@intel.com>,
-	"Swee, Leong Ching" <leong.ching.swee@intel.com>, "G Thomas, Rohan"
-	<rohan.g.thomas@intel.com>
-Subject: RE: [Enable Designware XGMAC VLAN Stripping Feature 1/2] dt-bindings:
- net: snps,dwmac: Add description for rx-vlan-offload
-Thread-Topic: [Enable Designware XGMAC VLAN Stripping Feature 1/2]
- dt-bindings: net: snps,dwmac: Add description for rx-vlan-offload
-Thread-Index: AQHZu5xgG1a+wZGOqU+EmB1OiRdona/EAemAgABXzQCAAAS/gIAAAF2w
-Date: Fri, 21 Jul 2023 15:51:36 +0000
-Message-ID: <DM8PR11MB575174D30E383667BCD4F3F1C13FA@DM8PR11MB5751.namprd11.prod.outlook.com>
-References: <20230721062617.9810-1-boon.khai.ng@intel.com>
- <20230721062617.9810-2-boon.khai.ng@intel.com>
- <ZLpbPxy4XHEGyU6I@smile.fi.intel.com>
- <DM8PR11MB5751E1290649A690A0B50F7AC13FA@DM8PR11MB5751.namprd11.prod.outlook.com>
- <ZLqo4SL+OAovs2In@smile.fi.intel.com>
-In-Reply-To: <ZLqo4SL+OAovs2In@smile.fi.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR11MB5751:EE_|PH0PR11MB5783:EE_
-x-ms-office365-filtering-correlation-id: 91aa0bc9-cdec-42d2-8f79-08db8a025d76
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dJ1PUDWfiQpcCWWpcHLX/VtmSvp9OjFSgS/IaFJdXl3Jvo9sJEHp2DSTEoWwxiOWG0JCJAoS+OP55ur/R9iOdgL8Uiz3sdzsfWzU8j5/ne/FbVbj9BJZXnZ6eRmz5h3vliBVhEDK3xW7lXMB9aTPtVXEDEOrLuFg08rWkaz2Ohkd1ryWnFOGrh4PPRxF+997KJ40QMI4H6BWXsuaslde3rbpLoyS9LSvpbnLNdeVThLuva7TsWNB/4FC8coPyV2Rx99mBJHYN84GNCumXpOGzHKjzRTNT3faiA/+4tzth20j8V/2Qq6Uc5OLvTAp1Qvix5DTOtCwVrq5jvnaeIkv+OfY8CP+CpV6Ufm8moqZg70EwYoadBO3bc6Jt0KyevVRkRRLfpF6HHPcFVi4d2xxck4Lcvz+1Vp8uu0GgMrVVSLmfkb/yGNU0o8WeWkwTSkudNHAPQU/FA8RD8TV7IgHMcku4GxGVOsILQswzZm+drlKpievg0k7DQru2lGWw2BVTT8lYaBoIDDGsuAAtsRUQ0XtbZZJN9DUF4eZvLxTk33+jni7slFPnvvNvGYWG1yKquDQl7p1pWMiUB90Sxj8NMxuE6AvjId9hD+TobSoc8G7PQZxAdy8FE0aDlecpYWeF7MkkvK1L2idF0J3JP4VgA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5751.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(39860400002)(346002)(366004)(376002)(136003)(451199021)(122000001)(55016003)(6506007)(53546011)(26005)(186003)(107886003)(2906002)(64756008)(66476007)(66556008)(66446008)(4326008)(6636002)(316002)(76116006)(33656002)(8676002)(66946007)(52536014)(8936002)(6862004)(7416002)(5660300002)(41300700001)(9686003)(7696005)(71200400001)(54906003)(478600001)(83380400001)(86362001)(38100700002)(82960400001)(38070700005)(168613001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?epvCdvgfDB2POCmXhFiUR/mBtHUlEHz9Z4VHA4MUfpWYrLaDMtDyALB5mERt?=
- =?us-ascii?Q?fBuQ4uIKzI2X403jooX1hBexAdaj63TPQIxXmfnjnFCMDktldd0No1LusZtN?=
- =?us-ascii?Q?S3Ft61bw3qKfbn7Kg2OfeBRVV4Y1kqYeyD/YrMyALk9UkD7VUTaGDV43SfVv?=
- =?us-ascii?Q?hXvxSo9d5xqbwdjebgBbOzTXDk1NApuevayuQgen/yDVqGfhNd0UT7gKFcYi?=
- =?us-ascii?Q?xa05q/3CrAZqHpa+TZ4pH6lD+eqYn5MSWpmhKxN9REBgRSqNdcZHKYdvKXNv?=
- =?us-ascii?Q?ayDxfFt0YZzzCeupNqBDX/oQVzbCVnc9b30wnFKlYYGTiz6/Uy4L9+anGH6Y?=
- =?us-ascii?Q?GXtI8LTKw3T4rcXGWRgAoMTPB94OLz6M3/WwmvOq2I+qbL316YO9bcdHukxl?=
- =?us-ascii?Q?oB5eh/MwQ6SWbAG1/FLVwiNhfB7RCOBITiK/rGZhaZp6IxN8aazWCUFlQdAs?=
- =?us-ascii?Q?J0ZO77EUAxj9vvI4+2/Cqc06ZpVm9ag//gYuslTyqAIroulakhykdWcVeq/I?=
- =?us-ascii?Q?ciBZbyRdwvVL5QLHQb7FwARN0Ll8mxTwjxaRRU8MRVEhBO8MJLMcDwxir1Mr?=
- =?us-ascii?Q?qxvJF+tnz5ioGk7M1V0p8iaV5buJO/jfFki69HJ64FT4liU9kDCezqELBPpV?=
- =?us-ascii?Q?9JiqqYUc4jyHN4xjfv/6BCf5ZttBbdlnAHn+Tu+6+YAq6VVgQIpKLrYATYl8?=
- =?us-ascii?Q?fSwjxxr4Fr/uoLTxsAKregpCGTNIEFLnNUSpNCoL5r5rxjXqNGG7fg6XbsXU?=
- =?us-ascii?Q?XroI8VYQPOadtrFFg55wz4uOjYqYG4OdZqsLRDf01ERefIpASn8qQMUuBYOC?=
- =?us-ascii?Q?X5p4R3pbGWX2ncxRROS2kvZAB1BxQ9t4ORrWtbwGrxmLU3MconkAeTUqa52H?=
- =?us-ascii?Q?GZ1Rw6jF7/XEvWY5o4clLiC/0afMLdvvXmzU1cICiuvC8CGu6H+DL8hWEjyv?=
- =?us-ascii?Q?/XI6WCuuZR761qJVHpU2yAfIa914tVgAfBgwrhOfQ3Bnq52dhNbva1Ga5o+x?=
- =?us-ascii?Q?IcKsg70pwoHToVDyfh7340DJnvZRlZ9R4AfiBGUQnttOib3/J26y09cPwev6?=
- =?us-ascii?Q?hrhDbN6OQw1EdKZ13oSWJWqzPW6XUgSlCeOq04qEkpWBpeuvdzLyrnRoeRXy?=
- =?us-ascii?Q?SMtj0+dDY9SoNdLCnIGz54RiQrlhsqYjjpoeNc8hJouppUsZXYRJKSOtVz91?=
- =?us-ascii?Q?Znl6ZS/JvvEGNlgSOTWBFjqMzsAcjZS6FyC1uQV6T3uQncm3O02k8oFPMkOh?=
- =?us-ascii?Q?GgcRoOLcY6RvtS/ejKjT48xigk9wffTkMi+0BPcdv+pQzScQNNsDVyx5iOjl?=
- =?us-ascii?Q?xAZD+cPo8uSaNGsBU/iGc55kJiU6mDAa+t48HwWz2uFL05w0Xwpq78Gp98cu?=
- =?us-ascii?Q?JT43hSgU2AN4+Ui3QDLjRDp5nq0oKTFqiGFzjJcSvfkJAY1wqh1BYYioE1pI?=
- =?us-ascii?Q?/IpICoxyUNiAy2gXbW6SahAI9LWlR6pxiYntuSjC8EY4JQct5hCC8x2nt2Gl?=
- =?us-ascii?Q?AAfkl9donHWduabc4TlGBGvm55WlTdUzQWT30rU1z0OzmZnutX87VnQw4b7E?=
- =?us-ascii?Q?6hGZQAe35O0HqEGt0gqXwqHFdbHyUy6ru0lz6WTV?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F8D27F33
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:55:26 +0000 (UTC)
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D06403AB0;
+	Fri, 21 Jul 2023 08:55:00 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6686708c986so1835723b3a.0;
+        Fri, 21 Jul 2023 08:55:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689954900; x=1690559700;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WZxER7TIVhSnV+xmwfN9+r3oqw1Tk9t+HVETN8trMAE=;
+        b=g6An1sIieyGlOOXL0byEVOlxStzgXllu0/T3IHHvZl3AOiLqUirmU8/1199okGG8Id
+         V406almeeph/BKkxzAq4PljPPSekH/bRwJWwHaEQa/ECD3rrze5dj2zOio2U9nlrpJAx
+         NQQmghecokjVtq/pVlCydE5CQk3eDjvgoXEXEVqZ5XzEbMcoq9qA9BP5+qamQCwBBstX
+         +PJpabN+2nHM8flz9SW1T6IKoHgpgUlk85Q1cGPxZ5S1efOchFzMNEaThb7RmmQz9yFB
+         jWzwR+KgArxD33F7id2ZLpEgc1Rrc1+xTOCm8ye2U/hkA3oS3rRBvJx9rFQwBKflGb/z
+         mK9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689954900; x=1690559700;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WZxER7TIVhSnV+xmwfN9+r3oqw1Tk9t+HVETN8trMAE=;
+        b=UHe4nU8JrEnfRsOiLp2dl7y5vg+z7poq5DKErv0Sqd+4iT+MS5yW4b7PHw33P8wpUj
+         KnXsplfKVoa6dUdI8/h82YX0U1J7jQ3dWvlJ1i+TWK8UM2zWwhneXkk121bckoxfrKYA
+         y+gg8Aj8ajYjZR64IOKvX2OahOD99Wi6CpcuyhFKIBJ9mjnm84ARpo+Vo9IkiORZPB+l
+         6yG5fF/+JXhFIValIs3LO65X4WB1vhcSJBndNJuRIKSDul2o72k+NjczlMsbZyrfE7Pn
+         waFJyZBjfmuoFnsgQRz/fZyS/pnFdtvyl5vCLDu7HyqP82Np7it2yJN4NgghGJZFh0D1
+         3U1g==
+X-Gm-Message-State: ABy/qLZwr9wd1WK9e9yfo6pJcZiVaajMmB3Y+dbJft9yWnlRBlEhdNWu
+	wuAtBHBxa62810KJl+HBXPA=
+X-Google-Smtp-Source: APBJJlFJr0PyxT/oCciTOu848MpX3AkcC/p4TwSFmWdXXKpcqAuJF7tp36NbCVrN4CWWBAGfqne3gA==
+X-Received: by 2002:a05:6a20:1585:b0:137:2b6f:4307 with SMTP id h5-20020a056a20158500b001372b6f4307mr2994999pzj.27.1689954899988;
+        Fri, 21 Jul 2023 08:54:59 -0700 (PDT)
+Received: from smtpclient.apple ([2402:d0c0:2:a2a::1])
+        by smtp.gmail.com with ESMTPSA id y8-20020a62b508000000b00663b712bfbdsm3145756pfe.57.2023.07.21.08.54.55
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 21 Jul 2023 08:54:59 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5751.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91aa0bc9-cdec-42d2-8f79-08db8a025d76
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2023 15:51:36.5591
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: h+Sj5Obf71gKV/kzJRI/EzWQwO1EdYa7HlQfV6biT5JzgSifo+K9Bc51CgRrjJocltgSAZrDfjjS6b+A+efYaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5783
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
+Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
+From: Alan Huang <mmpgouride@gmail.com>
+In-Reply-To: <cc9b292c-99b1-bec9-ba8e-9c202b5835cd@joelfernandes.org>
+Date: Fri, 21 Jul 2023 23:54:34 +0800
+Cc: Eric Dumazet <edumazet@google.com>,
+ linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org,
+ rcu@vger.kernel.org,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ roman.gushchin@linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7D269BDF-102C-46B8-B31C-A559D2E410E0@gmail.com>
+References: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
+ <1E0741E0-2BD9-4FA3-BA41-4E83315A10A8@joelfernandes.org>
+ <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
+ <cc9b292c-99b1-bec9-ba8e-9c202b5835cd@joelfernandes.org>
+To: Joel Fernandes <joel@joelfernandes.org>
+X-Mailer: Apple Mail (2.3731.400.51.1.1)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Shevchenko, Andriy <andriy.shevchenko@intel.com>
-> Sent: Friday, July 21, 2023 11:49 PM
-> To: Ng, Boon Khai <boon.khai.ng@intel.com>
-> Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
-> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
-> David S . Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>;
-> netdev@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com;
-> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org; Tham,
-> Mun Yew <mun.yew.tham@intel.com>; Swee, Leong Ching
-> <leong.ching.swee@intel.com>; G Thomas, Rohan
-> <rohan.g.thomas@intel.com>
-> Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 1/2] dt-
-> bindings: net: snps,dwmac: Add description for rx-vlan-offload
->=20
-> On Fri, Jul 21, 2023 at 06:35:44PM +0300, Ng, Boon Khai wrote:
-> > > From: Shevchenko, Andriy <andriy.shevchenko@intel.com>
-> > > Sent: Friday, July 21, 2023 6:18 PM
-> > > On Fri, Jul 21, 2023 at 02:26:16PM +0800, Boon@ecsmtp.png.intel.com
-> wrote:
-> > > > From: Boon Khai Ng <boon.khai.ng@intel.com>
->=20
-> ...
->=20
-> > > > Reviewed-by: Shevchenko Andriy <andriy.shevchenko@linux.intel.com>
-> > >
-> > > This is wrong:
-> > > - I never reviewed DT bindings in all your series.
-> > > - My name for the patches is also wrong.
-> > >
-> > > P.S. What I mentioned in the internal mail is that you can add my tag=
- to
-> > >     the code, and not to the DT. Sorry, I probably hadn't been clear.
-> >
-> > My bad, sorry for interpreting the meaning wrongly, I will remove all
-> > the "Reviewed-by" stamp from all the DT patches on the next update.
-> >
-> > However I copied the Reviewed-by: from the previous email, your name
-> > Shouldn't be wrong.
->=20
-> Oh, this is a bit messy. The address for the kernel work should be Andy
-> Shevchenko <andriy.shevchenko@linux.intel.com>
->=20
 
-Ah okay, got it. Will update that in the next patch.
-
-> --
-> With Best Regards,
-> Andy Shevchenko
+> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 23:21=EF=BC=8CJoel Fernandes =
+<joel@joelfernandes.org> =E5=86=99=E9=81=93=EF=BC=9A
 >=20
+> On 7/21/23 10:27, Alan Huang wrote:
+>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 20:54=EF=BC=8CJoel Fernandes =
+<joel@joelfernandes.org> =E5=86=99=E9=81=93=EF=BC=9A
+>>>=20
+>>>=20
+>>>=20
+>>>> On Jul 20, 2023, at 4:00 PM, Alan Huang <mmpgouride@gmail.com> =
+wrote:
+>>>>=20
+>>>> =EF=BB=BF
+>>>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 03:22=EF=BC=8CEric Dumazet =
+<edumazet@google.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>>>=20
+>>>>>> On Thu, Jul 20, 2023 at 8:54=E2=80=AFPM Alan Huang =
+<mmpgouride@gmail.com> wrote:
+>>>>>>=20
+>>>>>> Hi,
+>>>>>>=20
+>>>>>> I noticed a commit c87a124a5d5e(=E2=80=9Cnet: force a reload of =
+first item in hlist_nulls_for_each_entry_rcu=E2=80=9D)
+>>>>>> and a related discussion [1].
+>>>>>>=20
+>>>>>> After reading the whole discussion, it seems like that ptr->field =
+was cached by gcc even with the deprecated
+>>>>>> ACCESS_ONCE(), so my question is:
+>>>>>>=20
+>>>>>>      Is that a compiler bug? If so, has this bug been fixed =
+today, ten years later?
+>>>>>>=20
+>>>>>>      What about READ_ONCE(ptr->field)?
+>>>>>=20
+>>>>> Make sure sparse is happy.
+>>>>=20
+>>>> It caused a problem without barrier(), and the deprecated =
+ACCESS_ONCE() didn=E2=80=99t help:
+>>>>=20
+>>>>   https://lore.kernel.org/all/519D19DA.50400@yandex-team.ru/
+>>>>=20
+>>>> So, my real question is: With READ_ONCE(ptr->field), are there =
+still some unusual cases where gcc
+>>>> decides not to reload ptr->field?
+>>>=20
+>>> I am a bit doubtful there will be strong (any?) interest in =
+replacing the barrier() with READ_ONCE() without any tangible reason, =
+regardless of whether a gcc issue was fixed.
+>>>=20
+>>> But hey, if you want to float the idea=E2=80=A6
+>> We already had the READ_ONCE() in rcu_deference_raw().
+>> The barrier() here makes me think we need write code like below:
+>>=20
+>> READ_ONCE(head->first);
+>> barrier();
+>> READ_ONCE(head->first);
+>> With READ_ONCE (or the deprecated ACCESS_ONCE),
+>> I don=E2=80=99t think a compiler should cache the value of =
+head->first.
+>=20
+>=20
+> Right, it shouldn't need to cache. To Eric's point it might be risky =
+to remove the barrier() and someone needs to explain that issue first =
+(or IMO there needs to be another tangible reason like performance etc). =
+Anyway, FWIW I wrote a simple program and I am not seeing the =
+head->first cached with the pattern you shared above:
+>=20
+> #include <stdlib.h>
+>=20
+> #define READ_ONCE(x) (*(volatile typeof(x) *)&(x))
+> #define barrier() __asm__ __volatile__("": : :"memory")
+>=20
+> typedef struct list_head {
+>    int first;
+>    struct list_head *next;
+> } list_head;
+>=20
+> int main() {
+>    list_head *head =3D (list_head *)malloc(sizeof(list_head));
+>    head->first =3D 1;
+>    head->next =3D 0;
+>=20
+>    READ_ONCE(head->first);
+>    barrier();
+
+Thanks for your time!
+
+However, what I'm trying to say here is that without this barrier(), GCC =
+wouldn't cache this value either.
+
+So, I removed the barrier() and tested, GCC didn=E2=80=99t cache the =
+value of head->first.
+(Only tested on x86-64 (all the possible versions of gcc that Compiler =
+Explorer has) where the original issue occurred [1].)
+
+Therefore, the commit message and the related discussion ten years ago =
+is misleading.
+
+Thanks again!
+
+[1] https://lkml.org/lkml/2013/4/16/371
+
+
+>    READ_ONCE(head->first);
+>=20
+>    free(head);
+>    return 0;
+> }
+>=20
+> On ARM 32-bit, 64-bit and x86_64, with -Os and then another experiment =
+with -O2 on new gcc versions.
+
 
 
