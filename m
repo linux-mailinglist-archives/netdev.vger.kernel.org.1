@@ -1,49 +1,77 @@
-Return-Path: <netdev+bounces-20045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2194175D783
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:30:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C95075D786
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:32:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5365B1C216D7
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:30:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D3F28254F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70062174CA;
-	Fri, 21 Jul 2023 22:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C3B1BE6D;
+	Fri, 21 Jul 2023 22:32:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFCA23BE4
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 22:30:04 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F983580;
-	Fri, 21 Jul 2023 15:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=C8fEyR6DUQfXgOM0p1YiWdaEkdPVBpeQx8+D3HYE7dc=; b=jNi9sTf2xFFKdj+nwpGqo1nlP+
-	C+V6PqmcLnvmDzrC0QyG6qPQPSS5EkdbEvCptj0lgfhAx5balaA2lbyag/POrp5U3/zWs6VnvNS3D
-	3b0e6ISi0uuv7uu5mLeops9zoycBKBJfTs37rmLvJBncdmYEJLnZzz6r0wbXuz+FhgHY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qMydB-001uQp-EJ; Sat, 22 Jul 2023 00:29:49 +0200
-Date: Sat, 22 Jul 2023 00:29:49 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: nick.hawkins@hpe.com
-Cc: verdun@hpe.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 4/5] net: hpe: Add GXP UMAC Driver
-Message-ID: <2eb21dff-d650-43b6-a29d-b15598b1f87d@lunn.ch>
-References: <20230721212044.59666-1-nick.hawkins@hpe.com>
- <20230721212044.59666-5-nick.hawkins@hpe.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C361EAF6
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 22:32:42 +0000 (UTC)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE823583
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:32:40 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-307d20548adso1917159f8f.0
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689978759; x=1690583559;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c1C61anelbuHVBz160KtCowrhvBVRAfuba/IwKLv9mI=;
+        b=Qxt5hcPGHtPiQw8dP9Xf2H7N481R/l9r3Ii3gnxK6zhEKPMrLLLz62D6SFkR2oCJQ/
+         QtvowVF2+i075NmMDnsLSK7iZxkbEJhRbREYwc2vHzLEYykmcnXKi3rhnLdxG7958SOh
+         UWuyRILrzKkM8n3umtaoWox+PMF7j1f3LbocEkh821XXqFg5WZwdQIle/76n6Uq2xCRV
+         I2/hprA7CuOrRf+sOxoXqzysPwEop3DoLCrj/FCYh2nw7LqgWp/eWflvAh3e8lbZSmr4
+         vbXX9ejhLx3vMy/b6lRCLL29oKKoZn1HpOSD6sZQt63IKr+PsJwnYOUq5piKJnI6FYBc
+         hpow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689978759; x=1690583559;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c1C61anelbuHVBz160KtCowrhvBVRAfuba/IwKLv9mI=;
+        b=BIyU38hur6gLb+6dMAM6a+F5sJ+EJ6Cno0nqR5a+dZPecO6VisNKt6j7W1GLzPPTgX
+         wvuNXfPFvNHCMvou52x5nEcdk4kdoEYcVggPIDFpJc101VjiJzYWm2a2285ZoCB1bemf
+         Feym+uus7V8yCbmDu3ikaV+AyFs7iO+E7sYmhdlGsJKtEHhC1f611JIbQhm0SoOfKT3L
+         RLzvWLQLwcnUNkbi/Ju71GSWoofNoDQCKmJRdJMvsASMsVRhjQkmoDPyYCfN1LW8j0cu
+         8Ot2mNLPN2GdmhrA9x/4CdczFrlwO4S3vT9kTpXJR4eHSZmccGtD1hHu1ulrMJxXqc6o
+         3CHg==
+X-Gm-Message-State: ABy/qLZqB34eoKB/yd9VjZ3XHzGeMhAYMXTP2ZHLxUQTlepYwgUxWR99
+	X07lINJZ7V4PrQmKPp63N/g=
+X-Google-Smtp-Source: APBJJlGKyTzO1yNl+tHvQ3sQv7IixBhKOYYzKmiJP5IQSLPFXFGQUnABB9tJreUlPNt6qGLbO0txFw==
+X-Received: by 2002:a5d:4244:0:b0:30e:590f:78d1 with SMTP id s4-20020a5d4244000000b0030e590f78d1mr2176632wrr.63.1689978758864;
+        Fri, 21 Jul 2023 15:32:38 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id j9-20020a5d4529000000b0030fd03e3d25sm5283311wra.75.2023.07.21.15.32.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 15:32:38 -0700 (PDT)
+Date: Sat, 22 Jul 2023 01:32:36 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Asmaa Mnebhi <asmaa@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
+	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
+	David Thompson <davthompson@nvidia.com>
+Subject: Re: [PATCH net v4 1/1] mlxbf_gige: Fix kernel panic at shutdown
+Message-ID: <20230721223236.kgdjzl7unfbuenzm@skbuf>
+References: <20230721141956.29842-1-asmaa@nvidia.com>
+ <20230721141956.29842-1-asmaa@nvidia.com>
+ <20230721150212.h4vg6ueugifnfss6@skbuf>
+ <CH2PR12MB3895C55CC77385622898BCADD73FA@CH2PR12MB3895.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,323 +80,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230721212044.59666-5-nick.hawkins@hpe.com>
+In-Reply-To: <CH2PR12MB3895C55CC77385622898BCADD73FA@CH2PR12MB3895.namprd12.prod.outlook.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +#define PHY_88E1514_COPPER_CONTROL_REG		0
-> +#define PHY_88E1514_PAGE_ADDRESS		22
-> +
-> +#define PHY_88E1514_GENERAL_CONTROL_REG1	20
+Hi Asmaa,
 
-This looks wrong. A MAC driver should never access the PHY directly.
+On Fri, Jul 21, 2023 at 07:06:03PM +0000, Asmaa Mnebhi wrote:
+> > What is the race condition; what does the stack trace of the NPD look like?
+> 
+> Hi Vladimir,
+> 
+> [  OK  ] Reached target Shutdown.
+> [  OK  ] Reached target Final Step.
+> [  OK  ] Started Reboot.
+> [  OK  ] Reached target Reboot.
+> ...
+> [  285.126250] mlxbf_gige MLNXBF17:00: shutdown
+> [  285.130669] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000070
+> [  285.139447] Mem abort info:
+> [  285.142228]   ESR = 0x0000000096000004
+> [  285.145964]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [  285.151261]   SET = 0, FnV = 0
+> [  285.154303]   EA = 0, S1PTW = 0
+> [  285.157430]   FSC = 0x04: level 0 translation fault
+> [  285.162293] Data abort info:
+> [  285.165159]   ISV = 0, ISS = 0x00000004
+> [  285.168980]   CM = 0, WnR = 0
+> [  285.171932] user pgtable: 4k pages, 48-bit VAs, pgdp=000000011d373000
+> [  285.178358] [0000000000000070] pgd=0000000000000000, p4d=0000000000000000
+> [  285.185134] Internal error: Oops: 96000004 [#1] SMP
 
-> +
-> +#define DRV_MODULE_NAME		"gxp-umac"
-> +#define DRV_MODULE_VERSION	"0.1"
+That is not a stack trace. The stack trace is what appears between the
+lines "Call trace:" and "---[ end trace 0000000000000000 ]---", and it
+is missing from what you've posted.
 
-Versions are pointless. Please remove.
+It would be nice if you could also post-process the stack trace you get
+through the command below (run in a kernel tree):
 
-> +
-> +#define NUMBER_OF_PORTS 2
-> +#define EXTERNAL_PORT 1
-> +#define INTERNAL_PORT 0
-> +
-> +struct umac_priv {
-> +	void __iomem *base;
-> +	int irq;
-> +	struct platform_device *pdev;
-> +	struct umac_tx_descs *tx_descs;
-> +	struct umac_rx_descs *rx_descs;
-> +	dma_addr_t tx_descs_dma_addr;
-> +	dma_addr_t rx_descs_dma_addr;
-> +	unsigned int tx_cur;
-> +	unsigned int tx_done;
-> +	unsigned int rx_cur;
-> +	struct napi_struct napi;
-> +	struct net_device *ndev;
-> +	struct phy_device *phy_dev;
-> +	struct phy_device *int_phy_dev;
-> +	struct ncsi_dev *ncsidev;
-> +	bool use_ncsi;
-> +};
-> +
-> +static void umac_get_drvinfo(struct net_device *ndev,
-> +			     struct ethtool_drvinfo *info)
-> +{
-> +	strscpy(info->driver, DRV_MODULE_NAME, sizeof(info->driver));
-> +	strscpy(info->version, DRV_MODULE_VERSION, sizeof(info->version));
+cat stack_trace | scripts/decode_stacktrace.sh path/to/vmlinux .
 
-If you leave the version empty, you get the kernel version, and i
-think hash. That is actually meaningful.
-
-> +static int umac_get_link_ksettings(struct net_device *ndev,
-> +				   struct ethtool_link_ksettings *cmd)
-> +{
-> +	phy_ethtool_ksettings_get(ndev->phydev, cmd);
-> +	return 0;
-
-return whatever phy_ethtool_ksettings_get() returns.
-
-phy_ethtool_get_link_ksettings() is better here. You then don't even
-need a function, you can reference it directly.
-
-> +}
-> +
-> +static int umac_set_link_ksettings(struct net_device *ndev,
-> +				   const struct ethtool_link_ksettings *cmd)
-> +{
-> +	return phy_ethtool_ksettings_set(ndev->phydev, cmd);
-
-phy_ethtool_set_link_ksettings().
-
-> +static int umac_nway_reset(struct net_device *ndev)
-> +{
-> +	return genphy_restart_aneg(ndev->phydev);
-
-You locking is broken here. Use phy_ethtool_nway_reset()
-
-> +static u32 umac_get_link(struct net_device *ndev)
-> +{
-> +	int err;
-> +
-> +	err = genphy_update_link(ndev->phydev);
-> +	if (err)
-> +		return ethtool_op_get_link(ndev);
-> +
-> +	return ndev->phydev->link;
-> +}
-
-You have something really wrong if you are doing this.
-
-> +static int umac_ioctl(struct net_device *ndev, struct ifreq *ifr, int cmd)
-> +{
-> +	if (!netif_running(ndev))
-> +		return -EINVAL;
-> +
-> +	if (!ndev->phydev)
-> +		return -ENODEV;
-> +
-> +	return phy_mii_ioctl(ndev->phydev, ifr, cmd);
-> +}
-
-> +static int umac_int_phy_init(struct umac_priv *umac)
-> +{
-> +	struct phy_device *phy_dev = umac->int_phy_dev;
-> +	unsigned int value;
-> +
-> +	value = phy_read(phy_dev, 0);
-> +	if (value & 0x4000)
-> +		pr_info("Internal PHY loopback is enabled - clearing\n");
-
-The MAC driver never access the PHY directly.
-
-What is putting it into loopback? The bootloader?
-
-> +
-> +	value &= ~0x4000; /* disable loopback */
-> +	phy_write(phy_dev, 0, value);
-> +
-> +	value = phy_read(phy_dev, 0);
-> +	value |= 0x1000; /* set aneg enable */
-> +	value |= 0x8000; /* SW reset */
-> +	phy_write(phy_dev, 0, value);
-> +
-> +	do {
-> +		value = phy_read(phy_dev, 0);
-> +	} while (value & 0x8000);
-
-phy_start() will do this for you.
-
-> +static int umac_phy_fixup(struct phy_device *phy_dev)
-> +{
-> +	unsigned int value;
-> +
-> +	/* set phy mode to SGMII to copper */
-> +	/* set page to 18 by writing 18 to register 22 */
-> +	phy_write(phy_dev, PHY_88E1514_PAGE_ADDRESS, 18);
-> +	value = phy_read(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1);
-> +	value &= ~0x07;
-> +	value |= 0x01;
-> +	phy_write(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1, value);
-> +
-> +	/* perform mode reset by setting bit 15 in general_control_reg1 */
-> +	phy_write(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1, value | 0x8000);
-> +
-> +	do {
-> +		value = phy_read(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1);
-> +	} while (value & 0x8000);
-> +
-> +	/* after setting the mode, must perform a SW reset */
-> +	phy_write(phy_dev, PHY_88E1514_PAGE_ADDRESS, 0); /* set page to 0 */
-> +
-> +	value = phy_read(phy_dev, PHY_88E1514_COPPER_CONTROL_REG);
-> +	value |= 0x8000;
-> +	phy_write(phy_dev, PHY_88E1514_COPPER_CONTROL_REG, value);
-> +
-> +	do {
-> +		value = phy_read(phy_dev, PHY_88E1514_COPPER_CONTROL_REG);
-> +	} while (value & 0x8000);
-
-Please extend the PHY driver to do this. You can pass SGMII as the
-interface, and have the PHY driver act on it.
-
-> +static int umac_init_hw(struct net_device *ndev)
-> +{
-> +	if (umac->use_ncsi) {
-> +		/* set correct tx clock */
-> +		value &= UMAC_CFG_TX_CLK_EN;
-> +		value &= ~UMAC_CFG_GTX_CLK_EN;
-> +		value &= ~UMAC_CFG_GIGABIT_MODE; /* RMII mode */
-> +		value |= UMAC_CFG_FULL_DUPLEX; /* full duplex */
-> +	} else {
-> +		if (ndev->phydev->duplex)
-> +			value |= UMAC_CFG_FULL_DUPLEX;
-> +		else
-> +			value &= ~UMAC_CFG_FULL_DUPLEX;
-> +
-> +		if (ndev->phydev->speed == SPEED_1000) {
-
-The MAC driver should only access phydev members inside the
-adjust_link callback. Outside of that, these members can in
-inconsistent.
-
-> +static int umac_open(struct net_device *ndev)
-> +{
-
-...
-
-> +	netdev_info(ndev, "%s is OPENED\n", ndev->name);
-
-Please don't spam the kernel log.
-
-> +static int umac_init_mac_address(struct net_device *ndev)
-> +{
-> +	struct umac_priv *umac = netdev_priv(ndev);
-> +	struct platform_device *pdev = umac->pdev;
-> +	char addr[ETH_ALEN];
-> +	int err;
-> +
-> +	err = of_get_mac_address(pdev->dev.of_node, addr);
-> +	if (err)
-> +		netdev_err(ndev, "Failed to get address from device-tree: %d\n",
-> +			   err);
-> +
-> +	if (is_valid_ether_addr(addr)) {
-> +		dev_addr_set(ndev, addr);
-> +		netdev_info(ndev,
-> +			    "Read MAC address %pM from DTB\n", ndev->dev_addr);
-
-netdev_dbg()
-
-> +static void umac_adjust_link(struct net_device *ndev)
-> +{
-> +	struct umac_priv *umac = netdev_priv(ndev);
-> +	int value;
-> +
-> +	if (ndev->phydev->link) {
-> +		/* disable both clock */
-> +		value = readl(umac->base + UMAC_CONFIG_STATUS);
-> +		value &= 0xfffff9ff;
-> +		writel(value, umac->base + UMAC_CONFIG_STATUS);
-> +		udelay(2);
-> +
-> +		if (ndev->phydev->duplex)
-> +			value |= UMAC_CFG_FULL_DUPLEX;
-> +		else
-> +			value &= ~UMAC_CFG_FULL_DUPLEX;
-> +
-> +		switch (ndev->phydev->speed) {
-> +		case SPEED_1000:
-> +			value &= ~UMAC_CFG_TX_CLK_EN;
-> +			value |= UMAC_CFG_GTX_CLK_EN;
-> +			value |= UMAC_CFG_GIGABIT_MODE;
-> +			break;
-> +		case SPEED_100:
-> +			value |= UMAC_CFG_TX_CLK_EN;
-> +			value &= ~UMAC_CFG_GTX_CLK_EN;
-> +			value &= ~UMAC_CFG_GIGABIT_MODE;
-> +			break;
-> +		}
-> +		/* update duplex and gigabit_mode to umac */
-> +		writel(value, umac->base + UMAC_CONFIG_STATUS);
-> +		udelay(2);
-> +
-> +		netif_carrier_on(ndev);
-
-phylib will do this for you.
-
-> +static int umac_setup_phy(struct net_device *ndev)
-> +{
-> +	struct umac_priv *umac = netdev_priv(ndev);
-> +	struct platform_device *pdev = umac->pdev;
-> +	struct device_node *phy_handle;
-> +	phy_interface_t interface;
-> +	struct device_node *eth_ports_np;
-> +	struct device_node *port_np;
-> +	int ret;
-> +	int err;
-> +	int i;
-> +
-> +	/* Get child node ethernet-ports. */
-> +	eth_ports_np = of_get_child_by_name(pdev->dev.of_node, "ethernet-ports");
-> +	if (!eth_ports_np) {
-> +		dev_err(&pdev->dev, "No ethernet-ports child node found!\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	for (i = 0; i < NUMBER_OF_PORTS; i++) {
-> +		/* Get port@i of node ethernet-ports */
-> +		port_np = gxp_umac_get_eth_child_node(eth_ports_np, i);
-> +		if (!port_np)
-> +			break;
-> +
-> +		if (i == INTERNAL_PORT) {
-> +			phy_handle = of_parse_phandle(port_np, "phy-handle", 0);
-> +			if (phy_handle) {
-> +				umac->int_phy_dev = of_phy_find_device(phy_handle);
-> +				if (!umac->int_phy_dev)
-> +					return -ENODEV;
-> +
-> +				umac_int_phy_init(umac);
-> +			} else {
-> +				return dev_err_probe(&pdev->dev, PTR_ERR(phy_handle),
-> +						     "Failed to map phy-handle for port %d", i);
-> +			}
-> +		}
-> +
-> +		if (i == EXTERNAL_PORT) {
-> +			phy_handle = of_parse_phandle(port_np, "phy-handle", 0);
-> +			if (phy_handle) {
-> +				/* register the phy board fixup */
-> +				ret = phy_register_fixup_for_uid(0x01410dd1, 0xffffffff,
-> +								 umac_phy_fixup);
-> +				if (ret)
-> +					dev_err(&pdev->dev, "cannot register phy board fixup\n");
-> +
-> +				err = of_get_phy_mode(phy_handle, &interface);
-> +				if (err)
-> +					interface = PHY_INTERFACE_MODE_NA;
-> +
-> +				umac->phy_dev = of_phy_connect(ndev, phy_handle,
-> +							       &umac_adjust_link,
-> +							       0, interface);
-> +
-> +				if (!umac->phy_dev)
-> +					return -ENODEV;
-
-It looks like you MAC does not support 10Mbps. At some point you need
-to remove the two link modes using phy_remove_link_mode().
-
-> +
-> +				/* If the specified phy-handle has a fixed-link declaration, use the
-> +				 * fixed-link properties to set the configuration for the PHY
-
-This is wrong. Look at other MAC drivers using fixed-link.
-
-     Andrew
+so that we could see the actual C code line numbers, and not just the
+offsets within your particular binary image.
 
