@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-20014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD55E75D608
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:57:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CE8975D679
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 23:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E669E1C21739
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:57:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF4532823D1
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A462BDF4E;
-	Fri, 21 Jul 2023 20:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44537EAF6;
+	Fri, 21 Jul 2023 21:24:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96930DDDA
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 20:57:53 +0000 (UTC)
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9762733
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:57:52 -0700 (PDT)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-583b019f1cbso3147097b3.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:57:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689973071; x=1690577871;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y+ejcHLhVMNgmOooBwJpkbt4FpPS4HFmK5yXkFI2jSQ=;
-        b=cE+5ulYb8M03HTAVhZ3TLVVy19C1eq9Jr9+z/4MLk4YgDBiNTxMdNiFek/6jQyo8QO
-         wfaRw3Om4szvVkCtvCvsXpyLB7Kiyt81aZH7mRNsaJJ4Jym8RUwzemmWcBPN6AmHj7RX
-         o7ZwiSFaEEIRlYC2Y3BksaXUPttjQP3OQT+5Bhc5DMhJXJqlwpjIlpLBeP4BCmh4r1AG
-         gX1GxKzlo+2l7GCDGvQGS15qAn9cvQNvWjZ7a0pvEKdULjKKJaPKycTxhQQFaHP+I+2W
-         AEXp23aD0NbnkKnKc2GJVwHz5kS0mh58MSVgNU/Lha4aqt3cjI7iiIIsf/sb33f0Ggx3
-         fNvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689973071; x=1690577871;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y+ejcHLhVMNgmOooBwJpkbt4FpPS4HFmK5yXkFI2jSQ=;
-        b=VQnvdYXta27dDXE1hm0o3JmUnfo42bNUYIHOdP0yHc+RNVqPGDS2RbN3MUlPZby7g2
-         1zC4gMV7FdnuJyj2H7RgWpQJnkKMjpu5woJbhV4Dumikn98duP+iyDQhuMZ/r9/ggIMo
-         VlxsOlIwr4RelEVTwVUnHLT+TsNpJrGWmHsozPHppq+Ms2fqI1kV6XKTXD9+J8vEPln+
-         goC745TPgF8//HrFJ0bP1P5Zp5wot9KbexMRz05n69sOAwWyEXZXxsP0jTMSQX+O4ln1
-         n9CNsqq/YCtbYvlau6BpQE/9Sc1PqsXnWLw3SHi86PI9a8WYIDA3BTBjDNpzjV5Q/Q+i
-         0KOQ==
-X-Gm-Message-State: ABy/qLZCr8oexC0mOw2T/QkJBeqbczr6Ds4bBuYb2TVh68yZhjowzzdl
-	B0qa90Z3Ci/1jt/j72tCGuw=
-X-Google-Smtp-Source: APBJJlHbBRlgSxUV2VhxP7dTpuvoIFKzexbfZ77PSM+VQWuoAfnfR6ABxMMTJhvaysODQ2rEXi8bqg==
-X-Received: by 2002:a81:4e55:0:b0:579:dde6:d32e with SMTP id c82-20020a814e55000000b00579dde6d32emr1143196ywb.28.1689973071485;
-        Fri, 21 Jul 2023 13:57:51 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:a927:bf54:acf2:ee0a? ([2600:1700:6cf8:1240:a927:bf54:acf2:ee0a])
-        by smtp.gmail.com with ESMTPSA id t64-20020a818343000000b005832ca42ba6sm1155102ywf.3.2023.07.21.13.57.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jul 2023 13:57:51 -0700 (PDT)
-Message-ID: <5537f391-681f-1107-c838-b045f0482b3a@gmail.com>
-Date: Fri, 21 Jul 2023 13:57:48 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B06EAF4
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 21:24:42 +0000 (UTC)
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8C930D2;
+	Fri, 21 Jul 2023 14:24:41 -0700 (PDT)
+Received: from pps.filterd (m0148664.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36LICQxF014910;
+	Fri, 21 Jul 2023 21:24:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : subject :
+ date : message-id; s=pps0720;
+ bh=nKGvPBx2yFBX7COtgnGBjTxJ1k51VWFzz7cx9JV3PLg=;
+ b=Iqzc0WNIPrfc7wnDa62+LcxS7RQZFs7dmkj9QekyLZMwtRKyVcoJxqvamLDu6AxKWX1F
+ 1nVzI72/oXvpPT+IqBtb50ekI3E8CBZAZrv8UBs5OBHQB13ly//QfrPZgLZv0AunwqIe
+ 1/dThq3sDGnRkPnq39RdpMh4QWcgymL7SuCGXeK8hmETpOHnpiOUZGHA/44bVsYk0gZu
+ ivNVx89e6SN9UF3d7UJsh0duhr6eZQRHo1svk5cLW6wEBlqlLZSmOK6vNqwIWOIwxSFA
+ fPRtQn6LSH84gK2K/PJNKkIk3uPAlHIVmO9I57cOwCggWQ2W3VN2PekCE5PnDSfdRJQS Rw== 
+Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3ryw2ft9t6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Jul 2023 21:24:27 +0000
+Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id C0F3F8047B2;
+	Fri, 21 Jul 2023 21:24:26 +0000 (UTC)
+Received: from hpe.com (unknown [16.231.227.36])
+	by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id ACDD0809FDC;
+	Fri, 21 Jul 2023 21:24:25 +0000 (UTC)
+From: nick.hawkins@hpe.com
+To: verdun@hpe.com, nick.hawkins@hpe.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v1 0/5] ARM: Add GXP UMAC Support
+Date: Fri, 21 Jul 2023 16:20:39 -0500
+Message-Id: <20230721212044.59666-1-nick.hawkins@hpe.com>
+X-Mailer: git-send-email 2.17.1
+X-Proofpoint-GUID: FHhWNBQ5bGc6_iRzHglAskMVV9-IQxT_
+X-Proofpoint-ORIG-GUID: FHhWNBQ5bGc6_iRzHglAskMVV9-IQxT_
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-21_12,2023-07-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 mlxlogscore=924 impostorscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 bulkscore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307210189
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v2 2/2] selftests: fib_tests: Add a test case for
- IPv6 garbage collection
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Kui-Feng Lee <thinker.li@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- martin.lau@linux.dev, kernel-team@meta.com, yhs@meta.com
-Cc: Kui-Feng Lee <kuifeng@meta.com>
-References: <20230718180321.294721-1-kuifeng@meta.com>
- <20230718180321.294721-3-kuifeng@meta.com>
- <9743a6cc267276bfeba5b0fdcf7ba9a4077c67e1.camel@redhat.com>
- <3057afe9-ac48-84e2-bd39-b227d2dcbc2f@gmail.com>
- <239ca679597a10b6bc00245c66419f4bdedaff83.camel@redhat.com>
- <03ef2491-6087-4fd4-caf7-a589d0dfda13@gmail.com>
- <0b992d26-f22d-7310-308a-339300628690@kernel.org>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <0b992d26-f22d-7310-308a-339300628690@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
+From: Nick Hawkins <nick.hawkins@hpe.com>
 
+The GXP contains two Ethernet MACs that can be
+connected externally to several physical devices. From an external
+interface perspective the BMC provides two SERDES interface connections
+capable of either SGMII or 1000Base-X operation. The BMC also provides
+a RMII interface for sideband connections to external Ethernet controllers.
 
-On 7/21/23 13:01, David Ahern wrote:
-> On 7/21/23 12:31 PM, Kui-Feng Lee wrote:
->>>
->>> sysctl -wq net.ipv6.route.flush=1
->>>
->>> # add routes
->>> #...
->>>
->>> # delete expired routes synchronously
->>> sysctl -wq net.ipv6.route.flush=1
->>>
->>> Note that the net.ipv6.route.flush handler uses the 'old' flush value.
->>
->> May I use bpftrace to measure time spending on writing to procfs?
->> It is in the order of microseconds. time command doesn't work.
->>
-> 
-> Both before this patch and after this patch are in microseconds?
-> 
+The primary MAC (umac0) can be mapped to either SGMII/1000-BaseX
+SERDES interface.  The secondary MAC (umac1) can be mapped to only
+the second SGMII/1000-Base X Serdes interface or it can be mapped for
+RMII sideband.
 
-The test case includes two parts. First part, add 1k temporary routes
-only. Second part, add 5k permanent routes before adding 1k temporary
-routes. In both cases, they wait for a few second and run sysctl -wq
-net.ipv6.route.flush=1 to force gc. I use bpftrace to measure the time
-the syscalls that write to procfs. Following are the numbers (5 times 
-average) I got.
+The MDIO(mdio0) interface from the primary MAC (umac0) is used for
+external PHY status and configuration. The MDIO(mdio1) interface from
+the secondary MAC (umac1) is routed to the SGMII/100Base-X IP blocks
+on the two SERDES interface connections.
 
-Without the patch
-  1k temp w/o 5k perm: ~588us
-  1k temp w/  5k perm: ~1055us
-With the patch
-  1k temp w/o 5k perm: ~550us
-  1k temp w/  5k perm: ~561us
+Nick Hawkins (5):
+  dt-bindings: net: Add HPE GXP UMAC MDIO
+  net: hpe: Add GXP UMAC MDIO
+  dt-bindings: net: Add HPE GXP UMAC
+  net: hpe: Add GXP UMAC Driver
+  MAINTAINERS: HPE: Add GXP UMAC Networking Files
+
+ .../bindings/net/hpe,gxp-umac-mdio.yaml       |  51 +
+ .../devicetree/bindings/net/hpe,gxp-umac.yaml | 111 +++
+ MAINTAINERS                                   |   3 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/hpe/Kconfig              |  43 +
+ drivers/net/ethernet/hpe/Makefile             |   2 +
+ drivers/net/ethernet/hpe/gxp-umac-mdio.c      | 158 +++
+ drivers/net/ethernet/hpe/gxp-umac.c           | 911 ++++++++++++++++++
+ drivers/net/ethernet/hpe/gxp-umac.h           |  89 ++
+ 10 files changed, 1370 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/hpe,gxp-umac-mdio.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/hpe,gxp-umac.yaml
+ create mode 100644 drivers/net/ethernet/hpe/Kconfig
+ create mode 100644 drivers/net/ethernet/hpe/Makefile
+ create mode 100644 drivers/net/ethernet/hpe/gxp-umac-mdio.c
+ create mode 100644 drivers/net/ethernet/hpe/gxp-umac.c
+ create mode 100644 drivers/net/ethernet/hpe/gxp-umac.h
+
+-- 
+2.17.1
+
 
