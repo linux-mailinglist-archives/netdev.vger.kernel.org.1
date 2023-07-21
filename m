@@ -1,153 +1,160 @@
-Return-Path: <netdev+bounces-19698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9034175BBD5
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:34:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CDC575BBE9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81EAA1C21539
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 01:34:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DE831C2159F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 01:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E5A386;
-	Fri, 21 Jul 2023 01:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435B7386;
+	Fri, 21 Jul 2023 01:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174B2363
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 01:34:23 +0000 (UTC)
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C2BE52
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 18:34:22 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1b89d47ffb6so8619255ad.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 18:34:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689903262; x=1690508062;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0BOF2G2EDfQyAQ0VqC7/myG88I7Vh/DV+pD5JO+qIUQ=;
-        b=dxZtYovTYrqh4iLWd5CN+rc9fdR7y0Aq+CWnS+LpQPGfyLs0LNpIQLKZCRQErZvJOR
-         QYuSAp1qwoWJTiyvADNqtPHvUNSHMVRkBUJJVWqAAxD5U6kTqE7UQQjvda+ZbJ+tin49
-         YZXjw8QNLXz2HQVUI6lw0IKcc0HU15ItieT9kg+hIa1vPa9N56xMQ3YxFC9tN45FUWqx
-         biNxvBNPSowBp9DyleJr5+evhPH+SuDokQJiVRDX0GS5kYQQIXMnt1ARCfltwtEo1aCv
-         IOSQaistrsF+FnAfKlNjagNovmywa58f4KhzPHbbKhd3vB1ATmG1K6VXmEKSvswYqP+h
-         Z9HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689903262; x=1690508062;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0BOF2G2EDfQyAQ0VqC7/myG88I7Vh/DV+pD5JO+qIUQ=;
-        b=MD3UPotwOrYtbb/wsBtMMFJlp1Iy5MgyQzSi+DiQW3aW2A17OL/qGhdhnI+dv/5Cdh
-         gOmOgnLJXnAsMndpJoWKgkU9IoSeobqiqfssjCDbW5KlXPdsbBSt6wfdHiqyi7eHCuyv
-         770F4CZFqjJ4nyHKVN9evj9SkSyLodpiYMUJqRgSdJ3xwZqn5heRqIaxxFXU4zLaLkll
-         eI/H4aU2JMOCc4WUdaE3lBASYAdy1HH0LrKqDWsUiLTR9uMT4T1JPOK4y2Ayk0bFkb6D
-         VOrkmnYTSxqMm5STX25Jm8goIHETmVlsDbAiAkxiPkqgjwmb0tOkGfFbx5iNMOoCzmdZ
-         FLmQ==
-X-Gm-Message-State: ABy/qLYnAbwvXIlo5fgf7frYD+wOR1AYfv/10GL0WU9Xvwp2njolIrj/
-	/yiVYsN24ZMDQ70d1XL8Ko8=
-X-Google-Smtp-Source: APBJJlEm7yGV0tvcFtBte4XEWyJF68jm5GxcwJM9BEDq3OVvU8CLAxkHhH8REKDEcTF3ZVcuneOJNA==
-X-Received: by 2002:a17:903:234d:b0:1b8:77b3:6be2 with SMTP id c13-20020a170903234d00b001b877b36be2mr733306plh.39.1689903261706;
-        Thu, 20 Jul 2023 18:34:21 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id l14-20020a170902f68e00b001b7e63cfa19sm2055199plg.234.2023.07.20.18.34.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 18:34:20 -0700 (PDT)
-Date: Fri, 21 Jul 2023 09:34:16 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Message-ID: <ZLngmOaz24y5yLz8@Laptop-X1>
-References: <20230718080044.2738833-1-liuhangbin@gmail.com>
- <ZLZnGkMxI+T8gFQK@shredder>
- <20230718085814.4301b9dd@hermes.local>
- <ZLjncWOL+FvtaHcP@Laptop-X1>
- <ZLlE5of1Sw1pMPlM@shredder>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E58363
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 01:44:36 +0000 (UTC)
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99ED72106;
+	Thu, 20 Jul 2023 18:44:32 -0700 (PDT)
+Received: from localhost.localdomain (unknown [39.174.92.167])
+	by mail-app4 (Coremail) with SMTP id cS_KCgBHTQ3s4rlksajGCQ--.42906S4;
+	Fri, 21 Jul 2023 09:44:13 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH v1] xfrm: add NULL check in xfrm_update_ae_params
+Date: Fri, 21 Jul 2023 09:44:11 +0800
+Message-Id: <20230721014411.2407082-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgBHTQ3s4rlksajGCQ--.42906S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZFyrGF1rGr1fWF4Dtr4fXwb_yoWrGF1UpF
+	W5Kw4jkr4rXr1UZr4UJr1aqr1jvF48ZF1DCr93Xr1FyFy5Grn5WFyUJ3yUurykArWDAFy7
+	J3W5tr18tw1YkaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLlE5of1Sw1pMPlM@shredder>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 05:29:58PM +0300, Ido Schimmel wrote:
-> > > > IMO, the number of routes being flushed because a preferred source
-> > > > address is deleted is significantly lower compared to interface down /
-> > > > deletion, so generating notifications in this case is probably OK. It
-> > 
-> > How about ignore route deletion for link down? e.g.
-> > 
-> > diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-> > index 74d403dbd2b4..11c0f325e887 100644
-> > --- a/net/ipv4/fib_trie.c
-> > +++ b/net/ipv4/fib_trie.c
-> > @@ -2026,6 +2026,7 @@ void fib_table_flush_external(struct fib_table *tb)
-> >  int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
-> >  {
-> >         struct trie *t = (struct trie *)tb->tb_data;
-> > +       struct nl_info info = { .nl_net = net };
-> >         struct key_vector *pn = t->kv;
-> >         unsigned long cindex = 1;
-> >         struct hlist_node *tmp;
-> > @@ -2088,6 +2089,11 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
-> > 
-> >                         fib_notify_alias_delete(net, n->key, &n->leaf, fa,
-> >                                                 NULL);
-> > +                       if (!(fi->fib_flags & RTNH_F_LINKDOWN)) {
-> > +                               rtmsg_fib(RTM_DELROUTE, htonl(n->key), fa,
-> > +                                         KEYLENGTH - fa->fa_slen, tb->tb_id, &info, 0);
-> > +                       }
-> 
-> Will you get a notification in this case for 198.51.100.0/24?
+Normally, x->replay_esn and x->preplay_esn should be allocated at
+xfrm_alloc_replay_state_esn(...) in xfrm_state_construct(..), hence the
+frm_update_ae_params(...) is okay to update them. However, the current
+impelementation of xfrm_new_ae(...) allows a malicious user to directly
+dereference a NULL pointer and crash the kernel like below.
 
-No. Do you think it is expected with this patch or not?
-> 
-> # ip link add name dummy1 up type dummy
-> # ip link add name dummy2 up type dummy
-> # ip address add 192.0.2.1/24 dev dummy1
-> # ip route add 198.51.100.0/24 dev dummy2 src 192.0.2.1
-> # ip link set dev dummy2 carrier off
-> # ip -4 r s
-> 192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1 
-> 198.51.100.0/24 dev dummy2 scope link src 192.0.2.1 linkdown 
-> # ip address del 192.0.2.1/24 dev dummy1
-> # ip -4 r s
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+PGD 8253067 P4D 8253067 PUD 8e0e067 PMD 0
+Oops: 0002 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 0 PID: 98 Comm: poc.npd Not tainted 6.4.0-rc7-00072-gdad9774deaf1 #8
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.o4
+RIP: 0010:memcpy_orig+0xad/0x140
+Code: e8 4c 89 5f e0 48 8d 7f e0 73 d2 83 c2 20 48 29 d6 48 29 d7 83 fa 10 72 34 4c 8b 06 4c 8b 4e 08 c
+RSP: 0018:ffff888008f57658 EFLAGS: 00000202
+RAX: 0000000000000000 RBX: ffff888008bd0000 RCX: ffffffff8238e571
+RDX: 0000000000000018 RSI: ffff888007f64844 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888008f57818
+R13: ffff888007f64aa4 R14: 0000000000000000 R15: 0000000000000000
+FS:  00000000014013c0(0000) GS:ffff88806d600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000000054d8000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ ? __die+0x1f/0x70
+ ? page_fault_oops+0x1e8/0x500
+ ? __pfx_is_prefetch.constprop.0+0x10/0x10
+ ? __pfx_page_fault_oops+0x10/0x10
+ ? _raw_spin_unlock_irqrestore+0x11/0x40
+ ? fixup_exception+0x36/0x460
+ ? _raw_spin_unlock_irqrestore+0x11/0x40
+ ? exc_page_fault+0x5e/0xc0
+ ? asm_exc_page_fault+0x26/0x30
+ ? xfrm_update_ae_params+0xd1/0x260
+ ? memcpy_orig+0xad/0x140
+ ? __pfx__raw_spin_lock_bh+0x10/0x10
+ xfrm_update_ae_params+0xe7/0x260
+ xfrm_new_ae+0x298/0x4e0
+ ? __pfx_xfrm_new_ae+0x10/0x10
+ xfrm_user_rcv_msg+0x25a/0x410
+ ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+ ? __alloc_skb+0xcf/0x210
+ ? stack_trace_save+0x90/0xd0
+ ? filter_irq_stacks+0x1c/0x70
+ ? __stack_depot_save+0x39/0x4e0
+ ? __kasan_slab_free+0x10a/0x190
+ ? kmem_cache_free+0x9c/0x340
+ ? netlink_recvmsg+0x23c/0x660
+ ? sock_recvmsg+0xeb/0xf0
+ ? __sys_recvfrom+0x13c/0x1f0
+ ? __x64_sys_recvfrom+0x71/0x90
+ ? do_syscall_64+0x3f/0x90
+ ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+ ? copyout+0x3e/0x50
+ netlink_rcv_skb+0xd6/0x210
+ ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+ ? __pfx_netlink_rcv_skb+0x10/0x10
+ ? __pfx_sock_has_perm+0x10/0x10
+ ? mutex_lock+0x8d/0xe0
+ ? __pfx_mutex_lock+0x10/0x10
+ xfrm_netlink_rcv+0x44/0x50
+ netlink_unicast+0x36f/0x4c0
+ ? __pfx_netlink_unicast+0x10/0x10
+ ? netlink_recvmsg+0x500/0x660
+ netlink_sendmsg+0x3b7/0x700
 
-+ ip link set dev dummy2 carrier off
-+ sleep 1
-+ ip -4 r s
-default via 10.73.131.254 dev eth0 proto dhcp src 10.73.131.181 metric 100
-10.73.130.0/23 dev eth0 proto kernel scope link src 10.73.131.181 metric 100
-192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1
-198.51.100.0/24 dev dummy2 scope link src 192.0.2.1 linkdown
-+ sleep 1
-+ ip address del 192.0.2.1/24 dev dummy1
-Deleted 192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1
-Deleted broadcast 192.0.2.255 dev dummy1 table local proto kernel scope link src 192.0.2.1
-Deleted local 192.0.2.1 dev dummy1 table local proto kernel scope host src 192.0.2.1
-+ sleep 1
-+ ip -4 r s
-default via 10.73.131.254 dev eth0 proto dhcp src 10.73.131.181 metric 100
-10.73.130.0/23 dev eth0 proto kernel scope link src 10.73.131.181 metric 100
+This Null-ptr-deref bug is assigned CVE-2023-3772. And this commit
+adds additional NULL check in xfrm_update_ae_params to fix the NPD.
 
-Thanks
-Hangbin
+Fixes: d8647b79c3b7 ("xfrm: Add user interface for esn and big anti-replay windows")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+ net/xfrm/xfrm_user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index c34a2a06ca94..bf2564967501 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -628,7 +628,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+ 	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
+ 	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
+ 
+-	if (re) {
++	if (re && x->replay_esn && x->preplay_esn) {
+ 		struct xfrm_replay_state_esn *replay_esn;
+ 		replay_esn = nla_data(re);
+ 		memcpy(x->replay_esn, replay_esn,
+-- 
+2.17.1
+
 
