@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-19752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C73E75C0B7
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:04:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EA7275C0E6
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 286B62821C4
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 08:04:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8550C2821A4
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 08:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28005D314;
-	Fri, 21 Jul 2023 08:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAEB14F60;
+	Fri, 21 Jul 2023 08:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1361520E4
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:04:11 +0000 (UTC)
-Received: from nbd.name (nbd.name [46.4.11.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831E82706;
-	Fri, 21 Jul 2023 01:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5aObg4Rh5qEJeJ8tTIo3XUeRpbH8XsDqwD/4y5QHoas=; b=ePWcXIwzt+RNEgOZKYQH8qXMiO
-	4KnaWZdeCy3jTxoOndr8CECc1s7RsE20nrWnYyEWsLK1Eoz3t6kNLKxugTA4+YRjIlGMIE6Fp2lKa
-	mq1kKxzsPU6Etd6cMHVyPiVEIIh8fMIOSWOTE1E4+22B8nb7SBKr9t2A9iFHBY67HgJU=;
-Received: from [217.114.218.24] (helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <nbd@nbd.name>)
-	id 1qMl78-003Cex-6Z; Fri, 21 Jul 2023 10:03:50 +0200
-Message-ID: <00a2f5ba-7f46-641c-2c0e-e8ecb1356df8@nbd.name>
-Date: Fri, 21 Jul 2023 10:03:49 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C186B3D84
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:10:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 322BEC433C8;
+	Fri, 21 Jul 2023 08:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689927027;
+	bh=avPFUNEVLFSj0cHNmDVlwIb59Q3Iy0pyos4wLzwDhx0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mA5//XFeHZTzFuNXPMtXVJdmBec58Y8gQdUjdDS4QadBAAvjM2xvlak/2GcYXRIoV
+	 bkm7B11FfIdsKWvCw/IXknMquIIPOMW7IDNA4KOdhXAMSQjFNtxe4kt/Xf5dPAiWOO
+	 d5XRaeVYZVBz9F5iBvDLVuwGC5nEZxWgi6Rj4hWZWH7P6bwKR63NlgUEc2WhH13Kh7
+	 OQMCwjqAT1VETn3nlIxpxUet7krsiBL5cd7lUqsYiSHdhSaA4BFD4MhHo8N+lGovV6
+	 8FWWMRfytE4Ue8sa436L3OGCL4GYxGCexiXhRQGl5Yov02B7g21e8y3aXAYwukp7zz
+	 xq8IugiB2EciQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18B61E21EF5;
+	Fri, 21 Jul 2023 08:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mt76: mt7615: do not advertise 5 GHz on first phy of
- MT7615D (DBDC)
-To: Paul Fertser <fercerpav@gmail.com>, linux-wireless@vger.kernel.org
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee
- <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>,
- Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Rani Hod <rani.hod@gmail.com>, stable@vger.kernel.org
-References: <20230605073408.8699-1-fercerpav@gmail.com>
-Content-Language: en-US
-From: Felix Fietkau <nbd@nbd.name>
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <20230605073408.8699-1-fercerpav@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/17] mlxsw: Permit enslavement to netdevices with
+ uppers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168992702709.18964.17425993748953523147.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Jul 2023 08:10:27 +0000
+References: <cover.1689763088.git.petrm@nvidia.com>
+In-Reply-To: <cover.1689763088.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
+ danieller@nvidia.com, mlxsw@nvidia.com
 
-On 05.06.23 09:34, Paul Fertser wrote:
-> On DBDC devices the first (internal) phy is only capable of using
-> 2.4 GHz band, and the 5 GHz band is exposed via a separate phy object,
-> so avoid the false advertising.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 19 Jul 2023 13:01:15 +0200 you wrote:
+> The mlxsw driver currently makes the assumption that the user applies
+> configuration in a bottom-up manner. Thus netdevices need to be added to
+> the bridge before IP addresses are configured on that bridge or SVI added
+> on top of it. Enslaving a netdevice to another netdevice that already has
+> uppers is in fact forbidden by mlxsw for this reason. Despite this safety,
+> it is rather easy to get into situations where the offloaded configuration
+> is just plain wrong.
 > 
-> Reported-by: Rani Hod <rani.hod@gmail.com>
-> Closes: https://github.com/openwrt/openwrt/pull/12361
-> Fixes: 7660a1bd0c22 ("mt76: mt7615: register ext_phy if DBDC is detected")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paul Fertser <fercerpav@gmail.com>
-Acked-by: Felix Fietkau <nbd@nbd.name>
+> [...]
 
-Jakub, could you please pick this one up for 6.5?
+Here is the summary with links:
+  - [net-next,01/17] net: bridge: br_switchdev: Tolerate -EOPNOTSUPP when replaying MDB
+    https://git.kernel.org/netdev/net-next/c/989280d6ea70
+  - [net-next,02/17] net: switchdev: Add a helper to replay objects on a bridge port
+    https://git.kernel.org/netdev/net-next/c/f2e2857b3522
+  - [net-next,03/17] selftests: mlxsw: rtnetlink: Drop obsolete tests
+    https://git.kernel.org/netdev/net-next/c/d7eb1f175153
+  - [net-next,04/17] mlxsw: spectrum_router: Allow address handlers to run on bridge ports
+    https://git.kernel.org/netdev/net-next/c/6bbc9ca6a3a7
+  - [net-next,05/17] mlxsw: spectrum_router: Extract a helper to schedule neighbour work
+    https://git.kernel.org/netdev/net-next/c/96c3e45c0130
+  - [net-next,06/17] mlxsw: spectrum: Split a helper out of mlxsw_sp_netdevice_event()
+    https://git.kernel.org/netdev/net-next/c/721717fafdc4
+  - [net-next,07/17] mlxsw: spectrum: Allow event handlers to check unowned bridges
+    https://git.kernel.org/netdev/net-next/c/40b7b4236c1f
+  - [net-next,08/17] mlxsw: spectrum: Add a replay_deslavement argument to event handlers
+    https://git.kernel.org/netdev/net-next/c/1c47e65b8c0b
+  - [net-next,09/17] mlxsw: spectrum: On port enslavement to a LAG, join upper's bridges
+    https://git.kernel.org/netdev/net-next/c/987c7782f062
+  - [net-next,10/17] mlxsw: spectrum_switchdev: Replay switchdev objects on port join
+    https://git.kernel.org/netdev/net-next/c/ec4643ca3d98
+  - [net-next,11/17] mlxsw: spectrum_router: Join RIFs of LAG upper VLANs
+    https://git.kernel.org/netdev/net-next/c/ef59713c26b1
+  - [net-next,12/17] mlxsw: spectrum_router: Offload ethernet nexthops when RIF is made
+    https://git.kernel.org/netdev/net-next/c/cfc01a92eaff
+  - [net-next,13/17] mlxsw: spectrum_router: Replay MACVLANs when RIF is made
+    https://git.kernel.org/netdev/net-next/c/49c3a615d382
+  - [net-next,14/17] mlxsw: spectrum_router: Replay neighbours when RIF is made
+    https://git.kernel.org/netdev/net-next/c/8fdb09a7674c
+  - [net-next,15/17] mlxsw: spectrum_router: Replay IP NETDEV_UP on device enslavement
+    https://git.kernel.org/netdev/net-next/c/31618b22f2c4
+  - [net-next,16/17] mlxsw: spectrum_router: Replay IP NETDEV_UP on device deslavement
+    https://git.kernel.org/netdev/net-next/c/4560cf408eca
+  - [net-next,17/17] mlxsw: spectrum: Permit enslavement to netdevices with uppers
+    https://git.kernel.org/netdev/net-next/c/2c5ffe8d7226
 
-Thanks,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-- Felix
+
 
