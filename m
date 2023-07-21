@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-19985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCD8375D265
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:59:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410C275D288
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81C021C2173A
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:59:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F1AF282431
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 19:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B0C1ED41;
-	Fri, 21 Jul 2023 18:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F621F94E;
+	Fri, 21 Jul 2023 19:00:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565BE200A6
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 18:59:06 +0000 (UTC)
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC90830D4
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:59:04 -0700 (PDT)
-Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-55e1ae72dceso1474870eaf.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:59:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6626B200A6
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 19:00:37 +0000 (UTC)
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC9A30CA
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:00:35 -0700 (PDT)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1b06da65bdbso1727865fac.1
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 12:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689965944; x=1690570744;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689966035; x=1690570835;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1TqtGRqPzEClXiGoZuDKD2HGaQA0OCMScbfC2N+jNqg=;
-        b=3k8oQD3BRe50/tV1gw9uKPNWB4hQ+s/vG8gD9kHSu7qJgAkfq+E9nxDXlon2uY1A96
-         oIl63S8btvR2N07ijyunpTXC/A+Wfq+kNo8FScr5WU7JxJ0Ws9wq4UiwbX42DBmgcjte
-         tQSLpZ0OGTwul6Yc5fWnfJwLtg9raUAX00fj/Zfo4dERAKY1Fw3ODMvgziJJx8JJIMmr
-         /X5doUfCbb1RVf/MqblpIkMca46vAS9ioLuyYHzSonxne0Te6N6gn1p/53l7LMfL/QIE
-         GwzCdN+YD760KZQztK1aTsRf9l5a43Yr1h6L0qE7nD0l67E+WLHqsbvh0QQ0xrv85zJt
-         uYDw==
+        bh=5XhtG4Y2kO5rS6l5vQHzM1NAJh8YwewgAgkX8X27UC0=;
+        b=tzlgXv6yUXqTbbFJ+5klqBhXgP9TSnQMw/mLJOP/bS6QrFcG6egeuYQvvOv+xQp7gt
+         SiUHqOMHx5NVdEy2Ft7uJfPR5YNYUqF7s8uP0fiJJyjHdHICXNUK3HWkU4zMQwT/mRl+
+         sNLEa5rsMRiWyPZCm1UtvYW3tC2c/dgj5I/MwpN2XBWISnuVqgCu+j9ws3SAqZ+6ZFHc
+         DVTGiImQnSKXcLZsToHemtwl+wXbdAmT0DvjqdxVEYyNcIf3qSckN93QCtqIDKtqcuSi
+         xfuruAsCAnPNlTylGIrz8y71KLE9uzew0GUS8QzEVH3DMo9B4brYDT+DBbJVjONWE8AK
+         6qjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689965944; x=1690570744;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1689966035; x=1690570835;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1TqtGRqPzEClXiGoZuDKD2HGaQA0OCMScbfC2N+jNqg=;
-        b=IwWsN/1mletpZ5/jPkqTDJfE7HBWAHyZeEoGssHVGJv+3o7SpvyCQmVOkvTfWzOCbe
-         bsz0Lucx4g3bmFiWHMELu2P7n4wcCa7YQTP30nLivNLr0rO0aPIzadq6GHkfuYZ8su8o
-         tOin+v93TFEe67DcQFlVtCvdbdU7//jOPUWuaKGzzh6OdmdXfDgnF/UBOkY6Pn2sFpa3
-         fZ56eKkAiIKYftl68HNmqhivkBjONxHOJcHWZsCjd58B9EmDgOs4QV2/0ADBIb5OXwPB
-         w4RQTJz/9iRFbeuSwVq5Kg1LW6cLbIjni9Hw1dQX3Q7xFbEmpdUKrz7Ld6GEvlPDLmr5
-         Marw==
-X-Gm-Message-State: ABy/qLb9FKpcklIGavhUVpvuQSkQxSsOKONaQj9OX9fAF4xZw4edI9yF
-	bu/vRskSZnP7JV1dLBWhK2pL3g==
-X-Google-Smtp-Source: APBJJlF+mswcQA1pGbAnjnFmGJDQiLi4xgKlPvhD5IHwafBXrPM+otSO3K14cZQSyiviiaL9L8HiJw==
-X-Received: by 2002:a05:6808:10c2:b0:398:5d57:3d08 with SMTP id s2-20020a05680810c200b003985d573d08mr4139031ois.37.1689965943852;
-        Fri, 21 Jul 2023 11:59:03 -0700 (PDT)
+        bh=5XhtG4Y2kO5rS6l5vQHzM1NAJh8YwewgAgkX8X27UC0=;
+        b=CR+eNLx1mAuQmtdnOO4TJd1hPvO2EpJCW33GO0rM3CbNEPSEC0eMaYvzARku0UhivN
+         DS1g1ZLcckhqnlQgE6Y2Qt3SOuLOldEuWRmQnJE2QOdS70Q8B8qnCiif8JXf/1aypm05
+         gQNhlfngst3Ac9Ydv7I+QMZvoNLixIkLi3wblWjO4nhxYinReb7eDHQ13mnuz1zxr3kj
+         F5tMnAVzGamF1IBygxv9xbE4cUwrnsyoG3oDcd2uzwxY+fBo6a9csLp/8KkuqDJibz6e
+         dcbAopetjvziFCwicB+QBrSfVpXmE6hw13aK6EiJ3GdUusqVtx8S6nkizbT4b62INaJq
+         w+2Q==
+X-Gm-Message-State: ABy/qLYRIr3npH84vWEdfxDrx/sgy8HxC+H8EvPuLw+fGNsmmZfmpX4u
+	67UIMor0vOSA0m3yzaBUnEqTVw==
+X-Google-Smtp-Source: APBJJlGF6JWo1AM6OZ+da9GwPrs4JI9ZBKp/vW80pvPdfv2aMdr2Xhpx7nNfvYGNSCVQcoKisPVffQ==
+X-Received: by 2002:a05:6870:c884:b0:1ba:6180:ff47 with SMTP id er4-20020a056870c88400b001ba6180ff47mr3137797oab.21.1689966035105;
+        Fri, 21 Jul 2023 12:00:35 -0700 (PDT)
 Received: from ?IPV6:2804:14d:5c5e:44fb:2414:7bdd:b686:c769? ([2804:14d:5c5e:44fb:2414:7bdd:b686:c769])
-        by smtp.gmail.com with ESMTPSA id q11-20020a056808200b00b0039ee0778048sm1716872oiw.37.2023.07.21.11.59.00
+        by smtp.gmail.com with ESMTPSA id u47-20020a4a8c32000000b00569c7121bf5sm263990ooj.4.2023.07.21.12.00.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jul 2023 11:59:03 -0700 (PDT)
-Message-ID: <39d1a433-d44f-1a90-e943-8e9f046bdf80@mojatatu.com>
-Date: Fri, 21 Jul 2023 15:58:58 -0300
+        Fri, 21 Jul 2023 12:00:34 -0700 (PDT)
+Message-ID: <9a51c82f-6884-4853-8e8a-3796c9051ca8@mojatatu.com>
+Date: Fri, 21 Jul 2023 16:00:29 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,84 +66,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH net 1/3] net/sched: cls_u32: No longer copy tcf_result on
- update to avoid use-after-free
-To: M A Ramdhan <ramdhan@starlabs.sg>, valis <sec@valis.email>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, victor@mojatatu.com, billy@starlabs.sg
-References: <20230721174856.3045-1-sec@valis.email>
- <20230721174856.3045-2-sec@valis.email>
- <CACSEBQQdOJAX1yqDMLb_yQMpU2yoUShhS_pCSDndWepxfw3Rsw@mail.gmail.com>
+Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
+ and cls_route
 Content-Language: en-US
+To: valis <sec@valis.email>, netdev@vger.kernel.org
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, victor@mojatatu.com, ramdhan@starlabs.sg,
+ billy@starlabs.sg
+References: <20230721174856.3045-1-sec@valis.email>
 From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <CACSEBQQdOJAX1yqDMLb_yQMpU2yoUShhS_pCSDndWepxfw3Rsw@mail.gmail.com>
+In-Reply-To: <20230721174856.3045-1-sec@valis.email>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 21/07/2023 15:04, M A Ramdhan wrote:
-> On Sat, Jul 22, 2023 at 12:51 AM valis <sec@valis.email> wrote:
->>
->> When u32_change() is called on an existing filter, the whole
->> tcf_result struct is always copied into the new instance of the filter.
->>
->> This causes a problem when updating a filter bound to a class,
->> as tcf_unbind_filter() is always called on the old instance in the
->> success path, decreasing filter_cnt of the still referenced class
->> and allowing it to be deleted, leading to a use-after-free.
->>
->> Fix this by no longer copying the tcf_result struct from the old filter.
->>
->> Fixes: de5df63228fc ("net: sched: cls_u32 changes to knode must appear atomic to readers")
->> Reported-by: valis <sec@valis.email>
->> Reported-by: M A Ramdhan <ramdhan@starlabs.sg>
->> Signed-off-by: valis <sec@valis.email>
->> Cc: stable@vger.kernel.org
->> ---
->>   net/sched/cls_u32.c | 1 -
->>   1 file changed, 1 deletion(-)
->>
->> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
->> index 5abf31e432ca..19aa60d1eea7 100644
->> --- a/net/sched/cls_u32.c
->> +++ b/net/sched/cls_u32.c
->> @@ -826,7 +826,6 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
->>
->>          new->ifindex = n->ifindex;
->>          new->fshift = n->fshift;
->> -       new->res = n->res;
->>          new->flags = n->flags;
->>          RCU_INIT_POINTER(new->ht_down, ht);
->>
->> --
->> 2.30.2
->>
-> Hi,
+On 21/07/2023 14:48, valis wrote:
+> Three classifiers (cls_fw, cls_u32 and cls_route) always copy
+> tcf_result struct into the new instance of the filter on update.
 > 
-> We also thought it's also the correct fixes,
-> but we're not sure because it will always remove the already bound
-> qdisc class when we change the filter, even tho we never specify
-> the new TCA_U32_CLASSID in the new filter.
-
-The user should always explicitly tell the classid. Some other 
-classifiers are already behaving like this, these were just wrong.
-
+> This causes a problem when updating a filter bound to a class,
+> as tcf_unbind_filter() is always called on the old instance in the
+> success path, decreasing filter_cnt of the still referenced class
+> and allowing it to be deleted, leading to a use-after-free.
 > 
-> I also look at the implementation of cls_tcindex and cls_rsvp which still copy
-> the old tcf_result, but don't call the tcf_unbind_filter when changing
-> the filter.
-
-Both were deprecated and removed as they were beyond saving.
-
+> This patch set fixes this issue in all affected classifiers by no longer
+> copying the tcf_result struct from the old filter.
 > 
-> If it's the intended behaviour, then I'm good with this patch.
+> valis (3):
+>    net/sched: cls_u32: No longer copy tcf_result on update to avoid
+>      use-after-free
+>    net/sched: cls_fw: No longer copy tcf_result on update to avoid
+>      use-after-free
+>    net/sched: cls_route: No longer copy tcf_result on update to avoid
+>      use-after-free
 > 
-> Thanks & Regards,
-> M A Ramdhan
+>   net/sched/cls_fw.c    | 1 -
+>   net/sched/cls_route.c | 1 -
+>   net/sched/cls_u32.c   | 1 -
+>   3 files changed, 3 deletions(-)
+> 
 
+For the series,
+
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+Tested-by: Pedro Tammela <pctammela@mojatatu.com>
 
