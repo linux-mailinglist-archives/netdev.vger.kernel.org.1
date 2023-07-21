@@ -1,115 +1,144 @@
-Return-Path: <netdev+bounces-19753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA7275C0E6
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:10:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF1175C15E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:21:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8550C2821A4
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 08:10:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B077B2821B0
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 08:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAEB14F60;
-	Fri, 21 Jul 2023 08:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C8414F64;
+	Fri, 21 Jul 2023 08:21:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C186B3D84
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 322BEC433C8;
-	Fri, 21 Jul 2023 08:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689927027;
-	bh=avPFUNEVLFSj0cHNmDVlwIb59Q3Iy0pyos4wLzwDhx0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mA5//XFeHZTzFuNXPMtXVJdmBec58Y8gQdUjdDS4QadBAAvjM2xvlak/2GcYXRIoV
-	 bkm7B11FfIdsKWvCw/IXknMquIIPOMW7IDNA4KOdhXAMSQjFNtxe4kt/Xf5dPAiWOO
-	 d5XRaeVYZVBz9F5iBvDLVuwGC5nEZxWgi6Rj4hWZWH7P6bwKR63NlgUEc2WhH13Kh7
-	 OQMCwjqAT1VETn3nlIxpxUet7krsiBL5cd7lUqsYiSHdhSaA4BFD4MhHo8N+lGovV6
-	 8FWWMRfytE4Ue8sa436L3OGCL4GYxGCexiXhRQGl5Yov02B7g21e8y3aXAYwukp7zz
-	 xq8IugiB2EciQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18B61E21EF5;
-	Fri, 21 Jul 2023 08:10:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6FC8463
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:21:18 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC0B272E
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 01:21:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JunJu1HnKfJPRpiI3By8eTshatBlR+3bpOkiYrdvZY98k36YfOKSAgPSnxKTHUEprZ2iAmS2kJapRbOP+6WDzYTiWuCUdn/X624QspoxW5fMHRXtEWrH3viJZum3wB+AO0vyRfWgkO6/5SlFYJhac8qKubJ7v4/qQaH0pUFRGz4/F3q6NHQQTVEiqFmri1f17Zj/GfIuBgP6C1ffOrkqUV3sqimgEByJWbeQnif089ov2zl/A90oD2S8XEx4hKS9/IRuJrm3vJBVVyLv5CWT+uTP7CGUNdEZpjBdr3qu4+E9xr/GPObve5JoQ23jpdayygdWwfB6HI/P4BTiPzsyJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GRylgYJufE/wRI/ts29TKS+I0vxoxDo/rvQ4h90MsJk=;
+ b=VK78wCE0MDzHDLCqvOLY+97sOa9QyUz2t+c4Z4A2eJipKug9/Zuq6JYO+gH2iYwXN4Mo0fJd13I9wIlGnqOsOGCIOhzyf/k5wUs9Y7gyrPzk37bfHInWjAjZuz3lSXVGgB465MLNofcOQmJOh8ZQTKbyPHAcJPE3e6C2LuxNwt0N8RG7Oz65NpQA+Tdat6Suf4xDyn0D6msh0L5fWSQxuD3eSnYk2WKMvf/zXj7MvF/49EAcKZhOl/0zYwUPSWdT6GZQg4VcgVCFAlRvaQBWLaxsfEWIcRS4DFxzQSuHfHYptbMvCuM57P3SHTMXh+jusCIQRdulAEznwEueLEeefg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GRylgYJufE/wRI/ts29TKS+I0vxoxDo/rvQ4h90MsJk=;
+ b=p6fTP9RM6Xr20PGKLNnjO6cWHjl4cx4c+66ExXlQAdsEqQUi2B8psIUYxnQi7mQU9QSndGdhgpLHnaIdYNBVV2AY/EkXFIx627AolbmzcjEhGvkGPIWQ3pLRQQ+Lu4/zOnCKJ+AfofsfzjRvh8o+VeKIYY0zTZLN7f8zy5oLOtA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SA0PR13MB4014.namprd13.prod.outlook.com (2603:10b6:806:73::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Fri, 21 Jul
+ 2023 08:21:09 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Fri, 21 Jul 2023
+ 08:21:09 +0000
+Date: Fri, 21 Jul 2023 09:21:02 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	idosch@idosch.org, brett.creeley@amd.com, drivers@pensando.io
+Subject: Re: [PATCH v4 net-next 0/4] ionic: add FLR support
+Message-ID: <ZLo/7vTAx9RPaNlQ@corigine.com>
+References: <20230720190816.15577-1-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230720190816.15577-1-shannon.nelson@amd.com>
+X-ClientProxiedBy: LNXP265CA0064.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:5d::28) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/17] mlxsw: Permit enslavement to netdevices with
- uppers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168992702709.18964.17425993748953523147.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Jul 2023 08:10:27 +0000
-References: <cover.1689763088.git.petrm@nvidia.com>
-In-Reply-To: <cover.1689763088.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
- danieller@nvidia.com, mlxsw@nvidia.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA0PR13MB4014:EE_
+X-MS-Office365-Filtering-Correlation-Id: c118255d-293c-459a-76f7-08db89c36fb0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TWuLXQmakWgPgfpvF6qLA1N2oXfEetBKxUWlpoQjA03olAKHfB2A1TW/UP/Bokmi2NYi1RbKPA/4bOHCQeEsyKLrrPqLJWafWy7Zne/WFX984uVYSvr2PFod9dObpIMjtLbvHqGnt8zlj6st6U39+oRFKRAT0MGUuOKPdT/2WwtT5cTokxqVh24EaTUk6Bg+rEGGx6iFJO1copl6Edc9YKWQJ42EIMc79oHt5bjM6C0xuVSzQLX66cjB2RRgB7NdggQQ1UIfgAw9LZwm6GEf5pJeD8BUNz0NPkkymbG3VO1HGHpptyQMApNtdLnTbRsQ/F9H1HGr4IRoG1X1CtzIarcp38XsA5b8K7l0sYemyDMVNGAukV71AboNH4EoidKf5UcNye/AU0QX7LhNJpzCYw7wwNillq8VHuQ6x1QVKBdGM3t1XhhmF6zKxvBOmAeKvNgVaJLMW2JL6S06FdHxl/2pk/qVn2Wz+fNshjcUEtLVjwZS0PjLX6GejQNgzXRqzRnV9lvlFpVJsrOKp3U4UYUWUAkVrY34x0uzQFv9DrH+71V3RttIiFWzOrBO9orVZArkGSqRMb9dOX32Od+S5prOS3P48xMdKL9fAgM6nzE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(39840400004)(366004)(396003)(346002)(451199021)(186003)(478600001)(6666004)(2616005)(83380400001)(55236004)(6506007)(5660300002)(8676002)(8936002)(44832011)(41300700001)(26005)(4744005)(2906002)(86362001)(38100700002)(66476007)(66556008)(66946007)(6486002)(4326008)(6916009)(316002)(36756003)(6512007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kf4/qksrqFQcgUzOHiP70kIxbix129e4SeGOfiyyMS9TKnZ0XSjPgy4IkQ6h?=
+ =?us-ascii?Q?405Jqgif8XAAx94d+208N7nPv9e/R+l+5LreKPc+P6ia5Mvpbe2ZjAljq+iz?=
+ =?us-ascii?Q?56sOu4JojYW7cu8HE4Pgt9JjvRaA6dQKJX0CfCVynPBCmC2s8IeO9CUecG8m?=
+ =?us-ascii?Q?Mp2kqJY8/nRJQZiBfxGhM6EBZHqt8GygFNXqdL1Tix3EIbN45xTlSRnRd3Ry?=
+ =?us-ascii?Q?OConJqS7juVJAB+IqYI7czc1h5+MT+T/PQiH6wcQMvP6YjJYi5I4BpL1uwfq?=
+ =?us-ascii?Q?kujwPPPlwjMZ7bfBktahDsEvLCfjYcVKjceCo2rHGivpWOhETqTBlv6xRldt?=
+ =?us-ascii?Q?awIAJyODK/SsYi5FHit997xxWtMjTWNDtXzO2UzCl9tPzbyZ1oWjz5j020wI?=
+ =?us-ascii?Q?iDbT5fErpxz9rcTdf2MDudWyMFa0OpayOPnqzaIvt6KU0Trxwda2C+/Oy4Vz?=
+ =?us-ascii?Q?IlifvB6K4Hoiue4gOnDfRgqdS3N+eCOkvwV7JCLd6aAGcP7/Yilu9+IUE2aV?=
+ =?us-ascii?Q?pC2A5sfLtya3u3n3ja3nrDrQXgX5W7wgPYAChkrKM7E+i/mMveCYHmF5G7Wp?=
+ =?us-ascii?Q?b4ShzVzQeJZw3yJ1eAmkpevhyrt0kE6fbIM/5sFQvHkUGP/DOLs2c0l9Umx8?=
+ =?us-ascii?Q?/Gswd/xNcSAJqO7h/BKWjAtoNTrpeceOCby7QaqnJHgyr9iDoX+TIrUeVv8q?=
+ =?us-ascii?Q?QGOTDjDHicBdQRWEsM1wcogBl+nomLa9COHrvZqFDn7XT9ukkEeFZCYJRj9K?=
+ =?us-ascii?Q?MN1TnzWGHI1R5NHWhohTBcm1FGLFivFxMVOB1VlmqgWS8d0whXDavKCVqGRq?=
+ =?us-ascii?Q?RdegVcos4EVK45BnbAd0aUojh9wAfC5Juv9wEafrMlsCXnJQ8oR+4yk3W4EW?=
+ =?us-ascii?Q?DVWClym2TNG+l4AZ8zyg2DLbJt2EVIU/FTLHoLBYErgkIec/0mUE38w8KmIM?=
+ =?us-ascii?Q?av2+Eomk+aJDg/80KLHYPI6ugF8m6Nl3XoCowl/bxlgRWZhP1yVcE/0MjMsO?=
+ =?us-ascii?Q?Epq1bth7ITdSwIXx6ZO895fR7y9wH5qXMEsqObW4oI35aR661Eb0DeHiReP5?=
+ =?us-ascii?Q?slMw9c56FFyQRRN1EXJCdWi5jntlRiykGVVwIetr7zcYEQFSUogjQ55F+Ary?=
+ =?us-ascii?Q?Ds2By+ixd9YWnKRMUwh84rtH2ehZH2kbaFFrd4u+owY86QN/s87QiqH0ydrP?=
+ =?us-ascii?Q?ZsQRdhh+XZ1lFPGUS5sq+MDEGQDtikSWZWCOQegQSAo7UxY7PXqL5ktTotBA?=
+ =?us-ascii?Q?qKpqp/QPOF56BBzyV3OxhUJmt1sNRmnOuKTLGsFqyzWEkVpY8eKCVx+5Biz5?=
+ =?us-ascii?Q?lt/yvrh55t0+HwyKxrUoOwI2g8MZ4A813JQqweHL4mfo11HXH/tpVyy6dpBg?=
+ =?us-ascii?Q?wuskhNPsYoyOIv0Kh0U7lL1wWaTRwvWdaJc2zIEmdUQTrWvdYN0nWg3X3L44?=
+ =?us-ascii?Q?dZsO9OQ3J85AOLl3l0ShPx2SilIMPLBQspmbm7qAqXvHQFTYTX2P9vREwlVK?=
+ =?us-ascii?Q?1w833n+/GcMqPmkbSVJ//V3rX73RkJALGIIyMtK5Wm6VYPrK0smDgw1tmaRm?=
+ =?us-ascii?Q?Swtkzdn/mI0WhKSBj0S9gN62z0/9zhrySnU3onWIDOi0U9i5iV+KuY60FY6X?=
+ =?us-ascii?Q?qw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c118255d-293c-459a-76f7-08db89c36fb0
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2023 08:21:09.0410
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pY9+Orkn6zBOTwdP5GgSVqU0PLpEgUecgaCkYOklIUP1kk+Z2GDNa0ErVf7D5pXuHCvYwPpkHt1NNP3zaIV41QHy2aHvzbXgoDWzYyh8UJk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR13MB4014
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 19 Jul 2023 13:01:15 +0200 you wrote:
-> The mlxsw driver currently makes the assumption that the user applies
-> configuration in a bottom-up manner. Thus netdevices need to be added to
-> the bridge before IP addresses are configured on that bridge or SVI added
-> on top of it. Enslaving a netdevice to another netdevice that already has
-> uppers is in fact forbidden by mlxsw for this reason. Despite this safety,
-> it is rather easy to get into situations where the offloaded configuration
-> is just plain wrong.
+On Thu, Jul 20, 2023 at 12:08:12PM -0700, Shannon Nelson wrote:
+> Add support for handing and recovering from a PCI FLR event.
+> This patchset first moves some code around to make it usable
+> from multiple paths, then adds the PCI error handler callbacks
+> for reset_prepare and reset_done.
 > 
-> [...]
+> Example test:
+>     echo 1 > /sys/bus/pci/devices/0000:2a:00.0/reset
+> 
+> v4:
+>  - don't remove ionic_dev_teardown() in ionic_probe() in patch 2/4
+>  - remove clear_bit() change from patch 3/4
 
-Here is the summary with links:
-  - [net-next,01/17] net: bridge: br_switchdev: Tolerate -EOPNOTSUPP when replaying MDB
-    https://git.kernel.org/netdev/net-next/c/989280d6ea70
-  - [net-next,02/17] net: switchdev: Add a helper to replay objects on a bridge port
-    https://git.kernel.org/netdev/net-next/c/f2e2857b3522
-  - [net-next,03/17] selftests: mlxsw: rtnetlink: Drop obsolete tests
-    https://git.kernel.org/netdev/net-next/c/d7eb1f175153
-  - [net-next,04/17] mlxsw: spectrum_router: Allow address handlers to run on bridge ports
-    https://git.kernel.org/netdev/net-next/c/6bbc9ca6a3a7
-  - [net-next,05/17] mlxsw: spectrum_router: Extract a helper to schedule neighbour work
-    https://git.kernel.org/netdev/net-next/c/96c3e45c0130
-  - [net-next,06/17] mlxsw: spectrum: Split a helper out of mlxsw_sp_netdevice_event()
-    https://git.kernel.org/netdev/net-next/c/721717fafdc4
-  - [net-next,07/17] mlxsw: spectrum: Allow event handlers to check unowned bridges
-    https://git.kernel.org/netdev/net-next/c/40b7b4236c1f
-  - [net-next,08/17] mlxsw: spectrum: Add a replay_deslavement argument to event handlers
-    https://git.kernel.org/netdev/net-next/c/1c47e65b8c0b
-  - [net-next,09/17] mlxsw: spectrum: On port enslavement to a LAG, join upper's bridges
-    https://git.kernel.org/netdev/net-next/c/987c7782f062
-  - [net-next,10/17] mlxsw: spectrum_switchdev: Replay switchdev objects on port join
-    https://git.kernel.org/netdev/net-next/c/ec4643ca3d98
-  - [net-next,11/17] mlxsw: spectrum_router: Join RIFs of LAG upper VLANs
-    https://git.kernel.org/netdev/net-next/c/ef59713c26b1
-  - [net-next,12/17] mlxsw: spectrum_router: Offload ethernet nexthops when RIF is made
-    https://git.kernel.org/netdev/net-next/c/cfc01a92eaff
-  - [net-next,13/17] mlxsw: spectrum_router: Replay MACVLANs when RIF is made
-    https://git.kernel.org/netdev/net-next/c/49c3a615d382
-  - [net-next,14/17] mlxsw: spectrum_router: Replay neighbours when RIF is made
-    https://git.kernel.org/netdev/net-next/c/8fdb09a7674c
-  - [net-next,15/17] mlxsw: spectrum_router: Replay IP NETDEV_UP on device enslavement
-    https://git.kernel.org/netdev/net-next/c/31618b22f2c4
-  - [net-next,16/17] mlxsw: spectrum_router: Replay IP NETDEV_UP on device deslavement
-    https://git.kernel.org/netdev/net-next/c/4560cf408eca
-  - [net-next,17/17] mlxsw: spectrum: Permit enslavement to netdevices with uppers
-    https://git.kernel.org/netdev/net-next/c/2c5ffe8d7226
+Thanks for the updates in v4.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
