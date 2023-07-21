@@ -1,216 +1,129 @@
-Return-Path: <netdev+bounces-19869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19EB75CA0F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:32:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0777D75CA27
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E22F51C2167F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 14:32:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ABC71C21771
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 14:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8251EA93;
-	Fri, 21 Jul 2023 14:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0068527F2D;
+	Fri, 21 Jul 2023 14:35:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1E823BF7
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:31:31 +0000 (UTC)
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C98B92D51;
-	Fri, 21 Jul 2023 07:31:29 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-5577900c06bso1358243a12.2;
-        Fri, 21 Jul 2023 07:31:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689949889; x=1690554689;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nq7yoJPxdCpRcPNPemoFiyQn39JZwO5mSUTsStV/p0s=;
-        b=HmWJMVpBx+a8gA5lztX8VEHw8K7zNgC8/Kx97dGfQSuyT2eB/oSiGX9rIagVyAx8x5
-         0gne7LKRZKARdM7mJKC4eobhCD11Z/D2weZS2whTOaGvamJpm1CuEjlBbG9xwkK+uGZS
-         wQ6/wsiUnQZ3kZLdXfzf2tbvD0+yC4Fo1jqrNd4PsUPu/SSfeEe9qIUDeAN1aR3kew7L
-         lpBsZJTWt0gxveBbpKFBNel5BIRCEIBId+Hs13i1cphFCB7x44vdIkoG2/s2VZuuGs0r
-         CMc2dJUq1FptUXFJkjInRYPNqFvoU08wAEssjlE1ekbb9Ko9xSr5rXrUqmuvIypyTtIe
-         mnvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689949889; x=1690554689;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nq7yoJPxdCpRcPNPemoFiyQn39JZwO5mSUTsStV/p0s=;
-        b=A0kCDqX6QSSNb1aaGovghfaFpbWR7t9QXkqyyry0XYj4gWF6krwYiXZoMrOG011orm
-         FtgcjCrUt0Dgw6H3zL9JsZDNS1OeWf/xmREEi3NYNjmn0Of/7sr3l97Bqcdf7wZs1NyY
-         7dqUO7MlH/GmVDBzc5PA0tApzSASV47y7P4Gy+CUvEemfKuCgvgLh/7DPbUqTh64WtzK
-         tcrRpKhPYAk17tem5Ck7SScwnVwjIZTNk9GUG6I32msGnX+PcuUaeWIsFcsoIFPR1oUF
-         yti1N3U42eOc2V28j7vCuuGmJ0Mdila8b8e+3pRCkhZLRQG2PB/IsZEiifnlgDNCH/jv
-         m/Uw==
-X-Gm-Message-State: ABy/qLZ6mWtNRb7zlONUsjveiN0azrTCNhbwXa1+X5+Qe6C4U2y1N5L0
-	ougKS++11CXabCYsdDpjVpc=
-X-Google-Smtp-Source: APBJJlEzpiHUM3fh6dGeDvxYMh6dMlRTyHCd9VOnRyIic7rI7vv4UcmDLFSqSJosST7EZq8t6YtqmA==
-X-Received: by 2002:a17:90a:a65:b0:263:62ae:37aa with SMTP id o92-20020a17090a0a6500b0026362ae37aamr1920718pjo.47.1689949889223;
-        Fri, 21 Jul 2023 07:31:29 -0700 (PDT)
-Received: from smtpclient.apple ([2402:d0c0:2:a2a::1])
-        by smtp.gmail.com with ESMTPSA id w1-20020a17090a6b8100b00265cdfa3628sm4607007pjj.6.2023.07.21.07.31.25
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Jul 2023 07:31:28 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F061ED2D
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:35:46 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B9610C3
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:35:37 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+	by smtp-out2.suse.de (Postfix) with ESMTP id 599201F88E;
+	Fri, 21 Jul 2023 14:35:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1689950136; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=qKgen87lnA9actSHJ1Y5WsBzgRVxm/VtELwSTcMaw7o=;
+	b=1LSJ2itWu+ovjrk1zPbRjd3i/ATYkJ5OU1btpYVA14RzpF/l5m5tiQUPQf6709S5Egzwnd
+	+ZH+O/0bGDclgrL0E2jtj4N5GffRGOECO+VwmmkMPRuKRAU55kXEDZN9VXr3vO/klX0r0K
+	tfK+DbLs/IgLBb5JFBrZa5NhwLXbGQA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1689950136;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=qKgen87lnA9actSHJ1Y5WsBzgRVxm/VtELwSTcMaw7o=;
+	b=dFVu/+wEthKDw0+G4K2D6oYuV/ob5m8q6iPppqiyN0FeLgV4LhIXwiqc2krX3/mJxQf/IV
+	8Ciqo934AL1awZBg==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+	by relay2.suse.de (Postfix) with ESMTP id 3345E2C142;
+	Fri, 21 Jul 2023 14:35:36 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+	id 2177551CA01A; Fri, 21 Jul 2023 16:35:36 +0200 (CEST)
+From: Hannes Reinecke <hare@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	linux-nvme@lists.infradead.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv8 0/6] net/tls: fixes for NVMe-over-TLS
+Date: Fri, 21 Jul 2023 16:35:17 +0200
+Message-Id: <20230721143523.56906-1-hare@suse.de>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
-Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-From: Alan Huang <mmpgouride@gmail.com>
-In-Reply-To: <CANn89iLqU=huOuCt2kXmrXf68TUU-N90aQnMykkYcZ+Arx9-aA@mail.gmail.com>
-Date: Fri, 21 Jul 2023 22:31:13 +0800
-Cc: linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org,
- rcu@vger.kernel.org,
- "Paul E. McKenney" <paulmck@kernel.org>,
- roman.gushchin@linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <EDE1C0AE-B479-49F9-995D-DA9CC1A6EA57@gmail.com>
-References: <04C1E631-725C-47AD-9914-25D5CE04DFF4@gmail.com>
- <CANn89iKJWw7zUP-E_d=Yhaz=Qw0R3Ae7ULaGgrtsi1yf2pfpGg@mail.gmail.com>
- <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
- <CANn89iLqU=huOuCt2kXmrXf68TUU-N90aQnMykkYcZ+Arx9-aA@mail.gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-X-Mailer: Apple Mail (2.3731.400.51.1.1)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi all,
 
-> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 05:11=EF=BC=8CEric Dumazet =
-<edumazet@google.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Thu, Jul 20, 2023 at 10:00=E2=80=AFPM Alan Huang =
-<mmpgouride@gmail.com> wrote:
->>=20
->>=20
->>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 03:22=EF=BC=8CEric Dumazet =
-<edumazet@google.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>=20
->>> On Thu, Jul 20, 2023 at 8:54=E2=80=AFPM Alan Huang =
-<mmpgouride@gmail.com> wrote:
->>>>=20
->>>> Hi,
->>>>=20
->>>> I noticed a commit c87a124a5d5e(=E2=80=9Cnet: force a reload of =
-first item in hlist_nulls_for_each_entry_rcu=E2=80=9D)
->>>> and a related discussion [1].
->>>>=20
->>>> After reading the whole discussion, it seems like that ptr->field =
-was cached by gcc even with the deprecated
->>>> ACCESS_ONCE(), so my question is:
->>>>=20
->>>>       Is that a compiler bug? If so, has this bug been fixed today, =
-ten years later?
->>>>=20
->>>>       What about READ_ONCE(ptr->field)?
->>>=20
->>> Make sure sparse is happy.
->>=20
->> It caused a problem without barrier(), and the deprecated =
-ACCESS_ONCE() didn=E2=80=99t help:
->>=20
->>        https://lore.kernel.org/all/519D19DA.50400@yandex-team.ru/
->>=20
->> So, my real question is: With READ_ONCE(ptr->field), are there still =
-some unusual cases where gcc
->> decides not to reload ptr->field?
->=20
-> I can not really answer without seeing an actual patch...
+here are some small fixes to get NVMe-over-TLS up and running.
+The first set are just minor modifications to have MSG_EOR handled
+for TLS, but the second set implements the ->read_sock() callback for tls_sw
+which I guess could do with some reviews.
 
-The content of the potential patch:
+As usual, comments and reviews are welcome.
 
-diff --git a/include/linux/rculist_nulls.h =
-b/include/linux/rculist_nulls.h
-index 89186c499dd4..bcd39670f359 100644
---- a/include/linux/rculist_nulls.h
-+++ b/include/linux/rculist_nulls.h
-@@ -158,15 +158,9 @@ static inline void hlist_nulls_add_fake(struct =
-hlist_nulls_node *n)
-  * @pos:       the &struct hlist_nulls_node to use as a loop cursor.
-  * @head:      the head of the list.
-  * @member:    the name of the hlist_nulls_node within the struct.
-- *
-- * The barrier() is needed to make sure compiler doesn't cache first =
-element [1],
-- * as this loop can be restarted [2]
-- * [1] Documentation/memory-barriers.txt around line 1533
-- * [2] Documentation/RCU/rculist_nulls.rst around line 146
-  */
- #define hlist_nulls_for_each_entry_rcu(tpos, pos, head, member)         =
-               \
--       for (({barrier();}),                                             =
-       \
--            pos =3D rcu_dereference_raw(hlist_nulls_first_rcu(head));   =
-         \
-+       for (pos =3D rcu_dereference_raw(hlist_nulls_first_rcu(head));   =
-         \
-                (!is_a_nulls(pos)) &&                                    =
-       \
-                ({ tpos =3D hlist_nulls_entry(pos, typeof(*tpos), =
-member); 1; }); \
-                pos =3D rcu_dereference_raw(hlist_nulls_next_rcu(pos)))
-@@ -180,8 +174,7 @@ static inline void hlist_nulls_add_fake(struct =
-hlist_nulls_node *n)
-  * @member:    the name of the hlist_nulls_node within the struct.
-  */
- #define hlist_nulls_for_each_entry_safe(tpos, pos, head, member)        =
-       \
--       for (({barrier();}),                                             =
-       \
--            pos =3D rcu_dereference_raw(hlist_nulls_first_rcu(head));   =
-         \
-+       for (pos =3D rcu_dereference_raw(hlist_nulls_first_rcu(head));   =
-         \
-                (!is_a_nulls(pos)) &&                                    =
-       \
-                ({ tpos =3D hlist_nulls_entry(pos, typeof(*tpos), =
-member);        \
-                   pos =3D =
-rcu_dereference_raw(hlist_nulls_next_rcu(pos)); 1; });)
+Changes to the original submission:
+- Add a testcase for MSG_EOR handling
 
+Changes to v2:
+- Bail out on conflicting message flags
+- Rework flag handling
 
->=20
-> Why are you asking ? Are you tracking compiler bug fixes ?
+Changes to v3:
+- Return -EINVAL on conflicting flags
+- Rebase on top of net-next
 
-The barrier() here makes me confused.
-=20
-If we really need that, do we need:
+Changes to v4:
+- Add tlx_rx_reader_lock() to read_sock
+- Add MSG_EOR handling to tls_sw_readpages()
 
-	READ_ONCE(head->first);
-	barrier();
-	READ_ONCE(head->first);
+Changes to v5:
+- Rebase to latest upstream
+- Split tls_rx_reader_lock() as suggested by Sagi
 
-?
+Changes to v6:
+- Fixup tls_strp_read_copyin() to avoid infinite recursion
+  in tls_read_sock()
+- Rework tls_read_sock() to read all available data
 
->=20
->>=20
->>>=20
->>> Do you have a patch for review ?
->>=20
->> Possibly next month. :)
->>=20
->>>=20
->>>=20
->>>>=20
->>>>=20
->>>> [1] =
-https://lore.kernel.org/all/1369699930.3301.494.camel@edumazet-glaptop/
->>>>=20
->>>> Thanks,
->>>> Alan
+Changes to v7:
+- Include reviews from Jakub
 
+Hannes Reinecke (6):
+  net/tls: handle MSG_EOR for tls_sw TX flow
+  net/tls: handle MSG_EOR for tls_device TX flow
+  selftests/net/tls: add test for MSG_EOR
+  net/tls: Use tcp_read_sock() instead of ops->read_sock()
+  net/tls: split tls_rx_reader_lock
+  net/tls: implement ->read_sock()
+
+ net/tls/tls.h                     |   2 +
+ net/tls/tls_device.c              |   6 +-
+ net/tls/tls_main.c                |   2 +
+ net/tls/tls_strp.c                |   3 +-
+ net/tls/tls_sw.c                  | 132 ++++++++++++++++++++++++++----
+ tools/testing/selftests/net/tls.c |  11 +++
+ 6 files changed, 136 insertions(+), 20 deletions(-)
+
+-- 
+2.35.3
 
 
