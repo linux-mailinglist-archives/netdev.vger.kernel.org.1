@@ -1,134 +1,225 @@
-Return-Path: <netdev+bounces-19962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FF075CFE3
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CED8275CFF5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AE18282379
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:43:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FB4F28235F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF8E1EA97;
-	Fri, 21 Jul 2023 16:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CFB200B5;
+	Fri, 21 Jul 2023 16:44:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029681E526
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 16:43:24 +0000 (UTC)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689E3273E;
-	Fri, 21 Jul 2023 09:43:13 -0700 (PDT)
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="351946345"
-X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
-   d="scan'208";a="351946345"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 09:42:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="728169179"
-X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
-   d="scan'208";a="728169179"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Jul 2023 09:42:45 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andy@kernel.org>)
-	id 1qMtDF-00Cx3r-2P;
-	Fri, 21 Jul 2023 19:42:41 +0300
-Date: Fri, 21 Jul 2023 19:42:41 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Nikita Shubin <nikita.shubin@maquefel.me>
-Cc: Hartley Sweeten <hsweeten@visionengravers.com>,
-	Lennert Buytenhek <kernel@wantstofly.org>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Lukasz Majewski <lukma@denx.de>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Sebastian Reichel <sre@kernel.org>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Mark Brown <broonie@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
-	soc@kernel.org, Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Michael Peters <mpeters@embeddedts.com>,
-	Kris Bahnsen <kris@embeddedts.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
-	netdev@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
-	linux-input@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 18/42] spi: ep93xx: add DT support for Cirrus EP93xx
-Message-ID: <ZLq1gQKWWE/2WCYd@smile.fi.intel.com>
-References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
- <20230605-ep93xx-v3-18-3d63a5f1103e@maquefel.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9395F200B1
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 16:44:39 +0000 (UTC)
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE322727
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:44:29 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-3463de183b0so10116865ab.2
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689957869; x=1690562669;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V4OProLwa1HBsCbSYEasskJSriVq6OZzQbg8GckWVaw=;
+        b=mPrQK5Y3TwhUK0ThN4Jk2VHYg6uJxld5kkrt77HnmDbGjnA/6+yVY1PMnYBViHNexJ
+         yBcdUFmia72m/UkL0qM2PuGiK6/tNarHCQ88f138vL1b6HdiC9T0kKFzKtblVMjcQJ6F
+         aSTJj/So3ncOWlKabQiDB3Z2M0OFnse0LemYP+nGIUb1F/bNryeQmVVsZg/KBDVuJvNS
+         n7LwAGwSUGyaTJDy0ikdvFhFKevCNonJDgiiFTDrvAIMnbGbAPRVFcVWTvJFzNPF3XQn
+         yuFkjhSIWWfJOyov7ztZg4apNm8mclf9Qhz41oK80SaLFOh+khEaCjpeTjQHv2nLzb7K
+         v3Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689957869; x=1690562669;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V4OProLwa1HBsCbSYEasskJSriVq6OZzQbg8GckWVaw=;
+        b=guK9/ot9Km2KDXAg3IspTyonT7Vh2edrj/xKs3KntHEXQOj27RLnjmQuZWAP/wNS3E
+         HU8AivNmOuogoRsVPHLukkVM5KquLV0qaJNz1gYwh0QBjIwhYXFPYKaOf8BiS07QdEhc
+         g64Qs7NBCZlz6PqWlJuZ1k5v1CJ3ckWYf9u5mohYsScjoRJBJkq4atSOpsi4fDV5VF6o
+         BzuR8wbPMfAHUBCwG0mHub8ppkUe5Q/jqvUN2LeqNctMUtiXNcJqchebP5OKyWrF9Epk
+         3A3ryYFRRbvw0zU8cUvBgrF9lU9L610qa+gRXPnWj6W90UiINg7r9rgRXE0UWg+zYevD
+         yH9A==
+X-Gm-Message-State: ABy/qLaxXKTobAvAn5MQMxfJAMEVdqv9tZY7adjCxoXo9x9O+t2I7TFc
+	SrIlZXEHLiXMmbqjbb4wrtmohcHItXKuD4d0Mc5ZrQ==
+X-Google-Smtp-Source: APBJJlHiHToCKJWM9rth8/IfAfW5ySm0aJOdUu3O0OXip58+wsj8VD+/EygYvpU+NnZ1V7pWWzJXxib5ErH3P1cA63Q=
+X-Received: by 2002:a05:6e02:1d88:b0:348:90c2:ba0a with SMTP id
+ h8-20020a056e021d8800b0034890c2ba0amr502473ila.32.1689957868798; Fri, 21 Jul
+ 2023 09:44:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230605-ep93xx-v3-18-3d63a5f1103e@maquefel.me>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20230719183734.21681-1-larysa.zaremba@intel.com>
+ <20230719183734.21681-21-larysa.zaremba@intel.com> <ZLmxt3744Q1e42pT@google.com>
+ <ZLo29C1kpx99+u6G@lincoln>
+In-Reply-To: <ZLo29C1kpx99+u6G@lincoln>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Fri, 21 Jul 2023 09:44:17 -0700
+Message-ID: <CAKH8qBtqCnewzcn_rfgNYPYD3oWSaDbf0ws6bDKL3H6gK7x6cg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 20/21] selftests/bpf: Check VLAN tag and proto
+ in xdp_metadata
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>
+Cc: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "song@kernel.org" <song@kernel.org>, "yhs@fb.com" <yhs@fb.com>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	"Brouer, Jesper" <brouer@redhat.com>, "Burakov, Anatoly" <anatoly.burakov@intel.com>, 
+	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>, 
+	"Tahhan, Maryam" <mtahhan@redhat.com>, 
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 02:29:18PM +0300, Nikita Shubin via B4 Relay wrote:
-> From: Nikita Shubin <nikita.shubin@maquefel.me>
-> 
-> - add OF ID match table
-> 
-> Instead of platform use_dma flag - check if DT dmas property is present to
-> decide to use dma ot not.
+On Fri, Jul 21, 2023 at 12:47=E2=80=AFAM Zaremba, Larysa
+<larysa.zaremba@intel.com> wrote:
+>
+> On Thu, Jul 20, 2023 at 03:14:15PM -0700, Stanislav Fomichev wrote:
+> > On 07/19, Larysa Zaremba wrote:
+> > > Verify, whether VLAN tag and proto are set correctly.
+> > >
+> > > To simulate "stripped" VLAN tag on veth, send test packet from VLAN
+> > > interface.
+> > >
+> > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> >
+> > Acked-by: Stanislav Fomichev <sdf@google.com>
+> >
+> > > ---
+> > >  .../selftests/bpf/prog_tests/xdp_metadata.c   | 22 +++++++++++++++++=
+--
+> > >  .../selftests/bpf/progs/xdp_metadata.c        |  4 ++++
+> > >  2 files changed, 24 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/=
+tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> > > index 1877e5c6d6c7..6665cf0c59cc 100644
+> > > --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> > > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> > > @@ -38,7 +38,15 @@
+> > >  #define TX_MAC "00:00:00:00:00:01"
+> > >  #define RX_MAC "00:00:00:00:00:02"
+> > >
+> > > +#define VLAN_ID 59
+> > > +#define VLAN_ID_STR "59"
+> >
+> > I was looking whether we have some str(x) macro in the selftests,
+> > but doesn't look like we have any...
+> >
+>
+> I could add one, if you could hint me at the file, where it would need to=
+ go.
+> Or just add it locally for now?
 
-...
+Up to you. I feel like it's fine as is.
 
-> +#ifdef CONFIG_OF
+I was expecting to find something like the following in
+tools/testing/selftests/bpf/testing_helpers.h:
 
-Why ifdeffery?
+#define __TO_STR(x) #x
+#define TO_STR(x) __TO_STR(x)
 
-Can't it be first checked for firmware provided info and fell back to platdata?
+We have similar patterns in:
+tools/testing/selftests/bpf/sdt.h (_SDT_ARG_CONSTRAINT_STRING)
+tools/testing/selftests/kvm/x86_64/smm_test.c (XSTR)
+tools/tracing/rtla/src/utils.c (STR)
 
-> +static struct ep93xx_spi_info dt_spi_info;
+But nothing "generic" it seems...
 
-...
-
-> +#endif
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+> > > +#define VLAN_PROTO "802.1Q"
+> > > +#define VLAN_PID htons(ETH_P_8021Q)
+> > > +#define TX_NAME_VLAN TX_NAME "." VLAN_ID_STR
+> > > +#define RX_NAME_VLAN RX_NAME "." VLAN_ID_STR
+> > > +
+> > >  #define XDP_RSS_TYPE_L4 BIT(3)
+> > > +#define VLAN_VID_MASK 0xfff
+> > >
+> > >  struct xsk {
+> > >     void *umem_area;
+> > > @@ -215,6 +223,12 @@ static int verify_xsk_metadata(struct xsk *xsk)
+> > >     if (!ASSERT_NEQ(meta->rx_hash_type & XDP_RSS_TYPE_L4, 0, "rx_hash=
+_type"))
+> > >             return -1;
+> > >
+> > > +   if (!ASSERT_EQ(meta->rx_vlan_tci & VLAN_VID_MASK, VLAN_ID, "rx_vl=
+an_tci"))
+> > > +           return -1;
+> > > +
+> > > +   if (!ASSERT_EQ(meta->rx_vlan_proto, VLAN_PID, "rx_vlan_proto"))
+> > > +           return -1;
+> > > +
+> > >     xsk_ring_cons__release(&xsk->rx, 1);
+> > >     refill_rx(xsk, comp_addr);
+> > >
+> > > @@ -248,10 +262,14 @@ void test_xdp_metadata(void)
+> > >
+> > >     SYS(out, "ip link set dev " TX_NAME " address " TX_MAC);
+> > >     SYS(out, "ip link set dev " TX_NAME " up");
+> > > -   SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME);
+> > > +
+> > > +   SYS(out, "ip link add link " TX_NAME " " TX_NAME_VLAN
+> > > +            " type vlan proto " VLAN_PROTO " id " VLAN_ID_STR);
+> > > +   SYS(out, "ip link set dev " TX_NAME_VLAN " up");
+> > > +   SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME_VL=
+AN);
+> > >
+> > >     /* Avoid ARP calls */
+> > > -   SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_=
+NAME);
+> > > +   SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_=
+NAME_VLAN);
+> > >     close_netns(tok);
+> > >
+> > >     tok =3D open_netns(RX_NETNS_NAME);
+> > > diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools=
+/testing/selftests/bpf/progs/xdp_metadata.c
+> > > index d151d406a123..d3111649170e 100644
+> > > --- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
+> > > +++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
+> > > @@ -23,6 +23,9 @@ extern int bpf_xdp_metadata_rx_timestamp(const stru=
+ct xdp_md *ctx,
+> > >                                      __u64 *timestamp) __ksym;
+> > >  extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 =
+*hash,
+> > >                                 enum xdp_rss_hash_type *rss_type) __k=
+sym;
+> > > +extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
+> > > +                                   __u16 *vlan_tci,
+> > > +                                   __be16 *vlan_proto) __ksym;
+> > >
+> > >  SEC("xdp")
+> > >  int rx(struct xdp_md *ctx)
+> > > @@ -57,6 +60,7 @@ int rx(struct xdp_md *ctx)
+> > >             meta->rx_timestamp =3D 1;
+> > >
+> > >     bpf_xdp_metadata_rx_hash(ctx, &meta->rx_hash, &meta->rx_hash_type=
+);
+> > > +   bpf_xdp_metadata_rx_vlan_tag(ctx, &meta->rx_vlan_tci, &meta->rx_v=
+lan_proto);
+> > >
+> > >     return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
+> > >  }
+> > > --
+> > > 2.41.0
+> > >
+> >
 
