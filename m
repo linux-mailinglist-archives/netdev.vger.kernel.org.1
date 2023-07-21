@@ -1,221 +1,149 @@
-Return-Path: <netdev+bounces-19984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C99DC75D22D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:56:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD8375D265
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:59:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B19D1C21745
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:56:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81C021C2173A
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49331F956;
-	Fri, 21 Jul 2023 18:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B0C1ED41;
+	Fri, 21 Jul 2023 18:59:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04161F94B
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 18:56:52 +0000 (UTC)
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E963A97
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:56:39 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-7656652da3cso191454185a.1
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:56:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565BE200A6
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 18:59:06 +0000 (UTC)
+Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC90830D4
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:59:04 -0700 (PDT)
+Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-55e1ae72dceso1474870eaf.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:59:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689965798; x=1690570598;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LEoarqksgl75xEDFaodgyfxS93gI1OdMyPsmzD0gfkg=;
-        b=XL6BH/Rz9VcjP6fZnDMByRgM1UiPw2y1ur+kk0wCCPOoR6ukVgtaTCqcvMCGQ9E2zL
-         REc4l70rWoth3fQqDWO6s/QaYzU3RQHzUamxiTyRRKG2GxnlZrqkg4k+l0+jYTJzoU1a
-         qmvnPH3IctLw9TVD6ryiy79yubsBFG7RwbuCXlNWJ5SontXJxI7B6rFnQkLaV7seqKg9
-         S1wmpDMCmn65zfSPX5MELi4tVdzkOqKp6sw1xKmEzR2M1jHVtpzvX4Pu/ka8dWeuHssE
-         cM3ri5KEpnWXn7ne1+PkXyRLRLwilk3LQD++qQvSulJM2JUN2EBAgVxviz/wEGI5xjYs
-         EYOQ==
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1689965944; x=1690570744;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1TqtGRqPzEClXiGoZuDKD2HGaQA0OCMScbfC2N+jNqg=;
+        b=3k8oQD3BRe50/tV1gw9uKPNWB4hQ+s/vG8gD9kHSu7qJgAkfq+E9nxDXlon2uY1A96
+         oIl63S8btvR2N07ijyunpTXC/A+Wfq+kNo8FScr5WU7JxJ0Ws9wq4UiwbX42DBmgcjte
+         tQSLpZ0OGTwul6Yc5fWnfJwLtg9raUAX00fj/Zfo4dERAKY1Fw3ODMvgziJJx8JJIMmr
+         /X5doUfCbb1RVf/MqblpIkMca46vAS9ioLuyYHzSonxne0Te6N6gn1p/53l7LMfL/QIE
+         GwzCdN+YD760KZQztK1aTsRf9l5a43Yr1h6L0qE7nD0l67E+WLHqsbvh0QQ0xrv85zJt
+         uYDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689965798; x=1690570598;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LEoarqksgl75xEDFaodgyfxS93gI1OdMyPsmzD0gfkg=;
-        b=UdTSa7v0W2LCFWz7YqeHCZ65gIVj0JBfmnkR3KGdMtLQzPog3xV9fdKTFU/gAbDJhH
-         2IuTH21sMW5eDVoOnqjGSvOzM1scIw+NCDh8TRQFkcFxKhGNddLjTM1feeXUm/NoLeOp
-         Lr0o5/4isODypvI5Nt8etHGRmJPlWNuDlNpo3K9mH52P3cxmfbMuddHy6XeqTg9a9cZZ
-         CPmys5+OY8YPQvNY7Bv3Ug04SekDVmwClrjGQqAzWnI3elJDR0n4KYMg1X/If3gDMQf5
-         fn/2ariM/Y6Ho4RrOlfIMl5K+UhcyoEqhyzaC5/tvu0SXGP9rNra0/5bQ7zr9cZ5lcjt
-         fOBg==
-X-Gm-Message-State: ABy/qLah7pf2ufFW4b6GN4k7fVeXy+iMKtgVB/1OHQND7X12rC+d0H6k
-	olVJH0ydFzsY4FR9b8tC4bE=
-X-Google-Smtp-Source: APBJJlF1eiS1xCQjO2vxcQsH+oxpoOfl1hHx6+/J49IlqnuZ/tLzp2bUScSeE0x9gwCLwqB4ogp7PQ==
-X-Received: by 2002:a37:5a02:0:b0:763:aa49:bd3f with SMTP id o2-20020a375a02000000b00763aa49bd3fmr878003qkb.43.1689965798454;
-        Fri, 21 Jul 2023 11:56:38 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id b27-20020a05620a119b00b007678973eaa1sm1301429qkk.127.2023.07.21.11.56.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 11:56:38 -0700 (PDT)
-Date: Fri, 21 Jul 2023 14:56:37 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: =?UTF-8?B?TWFjaWVqIMW7ZW5jenlrb3dza2k=?= <maze@google.com>, 
- Stanislav Fomichev <sdf@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, 
- Linux NetDev <netdev@vger.kernel.org>, 
- Jesper Dangaard Brouer <brouer@redhat.com>, 
- Pengtao He <hepengtao@xiaomi.com>, 
- Willem Bruijn <willemb@google.com>, 
- Xiao Ma <xiaom@google.com>, 
- Patrick Rohr <prohr@google.com>, 
- Alexei Starovoitov <ast@kernel.org>
-Message-ID: <64bad4e5d4e18_2f85252944f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CANP3RGfFAjEDWbLAcmMcz63XUV6=djqZNsMikrqvA-i9K-4pAg@mail.gmail.com>
-References: <CANP3RGfRA3yfom8GOxUBZD4sBxiU2dWn9TKdR50d55WgENrGnQ@mail.gmail.com>
- <CANn89iJ+iWS_d3Vwg6k03mp4v_6OXHB1oS76A+9p1U7hGKdFng@mail.gmail.com>
- <CAKH8qBvm9ZPdn3+yifnGay726rKhA-+OAjyQjffYzo0iqoOmJg@mail.gmail.com>
- <CANP3RGfFAjEDWbLAcmMcz63XUV6=djqZNsMikrqvA-i9K-4pAg@mail.gmail.com>
-Subject: Re: Performance question: af_packet with bpf filter vs TX path
- skb_clone
+        d=1e100.net; s=20221208; t=1689965944; x=1690570744;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1TqtGRqPzEClXiGoZuDKD2HGaQA0OCMScbfC2N+jNqg=;
+        b=IwWsN/1mletpZ5/jPkqTDJfE7HBWAHyZeEoGssHVGJv+3o7SpvyCQmVOkvTfWzOCbe
+         bsz0Lucx4g3bmFiWHMELu2P7n4wcCa7YQTP30nLivNLr0rO0aPIzadq6GHkfuYZ8su8o
+         tOin+v93TFEe67DcQFlVtCvdbdU7//jOPUWuaKGzzh6OdmdXfDgnF/UBOkY6Pn2sFpa3
+         fZ56eKkAiIKYftl68HNmqhivkBjONxHOJcHWZsCjd58B9EmDgOs4QV2/0ADBIb5OXwPB
+         w4RQTJz/9iRFbeuSwVq5Kg1LW6cLbIjni9Hw1dQX3Q7xFbEmpdUKrz7Ld6GEvlPDLmr5
+         Marw==
+X-Gm-Message-State: ABy/qLb9FKpcklIGavhUVpvuQSkQxSsOKONaQj9OX9fAF4xZw4edI9yF
+	bu/vRskSZnP7JV1dLBWhK2pL3g==
+X-Google-Smtp-Source: APBJJlF+mswcQA1pGbAnjnFmGJDQiLi4xgKlPvhD5IHwafBXrPM+otSO3K14cZQSyiviiaL9L8HiJw==
+X-Received: by 2002:a05:6808:10c2:b0:398:5d57:3d08 with SMTP id s2-20020a05680810c200b003985d573d08mr4139031ois.37.1689965943852;
+        Fri, 21 Jul 2023 11:59:03 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:2414:7bdd:b686:c769? ([2804:14d:5c5e:44fb:2414:7bdd:b686:c769])
+        by smtp.gmail.com with ESMTPSA id q11-20020a056808200b00b0039ee0778048sm1716872oiw.37.2023.07.21.11.59.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 11:59:03 -0700 (PDT)
+Message-ID: <39d1a433-d44f-1a90-e943-8e9f046bdf80@mojatatu.com>
+Date: Fri, 21 Jul 2023 15:58:58 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net 1/3] net/sched: cls_u32: No longer copy tcf_result on
+ update to avoid use-after-free
+To: M A Ramdhan <ramdhan@starlabs.sg>, valis <sec@valis.email>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, victor@mojatatu.com, billy@starlabs.sg
+References: <20230721174856.3045-1-sec@valis.email>
+ <20230721174856.3045-2-sec@valis.email>
+ <CACSEBQQdOJAX1yqDMLb_yQMpU2yoUShhS_pCSDndWepxfw3Rsw@mail.gmail.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <CACSEBQQdOJAX1yqDMLb_yQMpU2yoUShhS_pCSDndWepxfw3Rsw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Maciej =C5=BBenczykowski wrote:
-> On Fri, Jul 21, 2023 at 8:18=E2=80=AFPM Stanislav Fomichev <sdf@google.=
-com> wrote:
-> >
-> > On Fri, Jul 21, 2023 at 11:14=E2=80=AFAM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> > >
-> > > On Fri, Jul 21, 2023 at 7:55=E2=80=AFPM Maciej =C5=BBenczykowski <m=
-aze@google.com> wrote:
-> > > >
-> > > > I've been asked to review:
-> > > >   https://android-review.googlesource.com/c/platform/packages/mod=
-ules/NetworkStack/+/2648779
-> > > >
-> > > > where it comes to light that in Android due to background debuggi=
-ng of
-> > > > connectivity problems
-> > > > (of which there are *plenty* due to various types of buggy [prima=
-rily]
-> > > > wifi networks)
-> > > > we have a permanent AF_PACKET, ETH_P_ALL socket with a cBPF filte=
-r:
-> > > >
-> > > >    arp or (ip and udp port 68) or (icmp6 and ip6[40] >=3D 133 and=
- ip6[40] <=3D 136)
-> > > >
-> > > > ie. it catches ARP, IPv4 DHCP and IPv6 ND (NS/NA/RS/RA)
-> > > >
-> > > > If I'm reading the kernel code right this appears to cause skb_cl=
-one()
-> > > > to be called on *every* outgoing packet,
-> > > > even though most packets will not be accepted by the filter.
-> > > >
-> > > > (In the TX path the filter appears to get called *after* the clon=
-e,
-> > > > I think that's unlike the RX path where the filter is called firs=
-t)
-> > > >
-> > > > Unfortunately, I don't think it's possible to eliminate the
-> > > > functionality this socket provides.
-> > > > We need to be able to log RX & TX of ARP/DHCP/ND for debugging /
-> > > > bugreports / etc.
-> > > > and they *really* should be in order wrt. to each other.
-> > > > (and yeah, that means last few minutes history when an issue happ=
-ens,
-> > > > so not possible to simply enable it on demand)
-> > > >
-> > > > We could of course split the socket into 3 separate ones:
-> > > > - ETH_P_ARP
-> > > > - ETH_P_IP + cbpf udp dport=3Ddhcp
-> > > > - ETH_P_IPV6 + cbpf icmpv6 type=3DNS/NA/RS/RA
-> > > >
-> > > > But I don't think that will help - I believe we'll still get
-> > > > skb_clone() for every outbound ipv4/ipv6 packet.
-> > > >
-> > > > I have some ideas for what could be done to avoid the clone (with=
+On 21/07/2023 15:04, M A Ramdhan wrote:
+> On Sat, Jul 22, 2023 at 12:51 AM valis <sec@valis.email> wrote:
+>>
+>> When u32_change() is called on an existing filter, the whole
+>> tcf_result struct is always copied into the new instance of the filter.
+>>
+>> This causes a problem when updating a filter bound to a class,
+>> as tcf_unbind_filter() is always called on the old instance in the
+>> success path, decreasing filter_cnt of the still referenced class
+>> and allowing it to be deleted, leading to a use-after-free.
+>>
+>> Fix this by no longer copying the tcf_result struct from the old filter.
+>>
+>> Fixes: de5df63228fc ("net: sched: cls_u32 changes to knode must appear atomic to readers")
+>> Reported-by: valis <sec@valis.email>
+>> Reported-by: M A Ramdhan <ramdhan@starlabs.sg>
+>> Signed-off-by: valis <sec@valis.email>
+>> Cc: stable@vger.kernel.org
+>> ---
+>>   net/sched/cls_u32.c | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+>> index 5abf31e432ca..19aa60d1eea7 100644
+>> --- a/net/sched/cls_u32.c
+>> +++ b/net/sched/cls_u32.c
+>> @@ -826,7 +826,6 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
+>>
+>>          new->ifindex = n->ifindex;
+>>          new->fshift = n->fshift;
+>> -       new->res = n->res;
+>>          new->flags = n->flags;
+>>          RCU_INIT_POINTER(new->ht_down, ht);
+>>
+>> --
+>> 2.30.2
+>>
+> Hi,
+> 
+> We also thought it's also the correct fixes,
+> but we're not sure because it will always remove the already bound
+> qdisc class when we change the filter, even tho we never specify
+> the new TCA_U32_CLASSID in the new filter.
 
-> > > > existing kernel functionality)... but none of it is pretty...
-> > > > Anyone have any smart ideas?
-> > > >
-> > > > Perhaps a way to move the clone past the af_packet packet_rcv run=
-_filter?
-> > > > Unfortunately packet_rcv() does a little bit of 'setup' before it=
+The user should always explicitly tell the classid. Some other 
+classifiers are already behaving like this, these were just wrong.
 
-> > > > calls the filter - so this may be hard.
-> > >
-> > >
-> > > dev_queue_xmit_nit() also does some 'setup':
-> > >
-> > > net_timestamp_set(skb2);  (This one could probably be moved into
-> > > af_packet, if packet is not dropped ?)
-> > > <sanitize mac, network, transport headers>
-> > >
-> > > >
-> > > > Or an 'extra' early pre-filter hook [prot_hook.prefilter()] that =
-has
-> > > > very minimal
-> > > > functionality... like match 2 bytes at an offset into the packet?=
+> 
+> I also look at the implementation of cls_tcindex and cls_rsvp which still copy
+> the old tcf_result, but don't call the tcf_unbind_filter when changing
+> the filter.
 
-> > > > Maybe even not a hook at all, just adding a
-> > > > prot_hook.prefilter{1,2}_u64_{offset,mask,value}
-> > > > It doesn't have to be perfect, but if it could discard 99% of the=
+Both were deprecated and removed as they were beyond saving.
 
-> > > > packets we don't care about...
-> > > > (and leave filtering of the remaining 1% to the existing cbpf pro=
-gram)
-> > > > that would already be a huge win?
-> > >
-> > > Maybe if we can detect a cBPF filter does not access mac, network,
-> > > transport header,
-> > > we could run it earlier, before the clone().
-> > >
-> > > So we could add
-> > > prot_hook.filter_can_run_from_dev_queue_xmit_nit_before_the_clone
-> > >
-> > > Or maybe we can remove sanitization, because BPF should not do bad
-> > > things if these headers are garbage ?
-> >
-> > eBPF is already doing those sorts of checks, so maybe another option
-> > is to convert this filter to ebpf tc/egress program?
-> =
-
-> Yeah, I've considered tc ingress/egress + bpf ring buffer.
-> =
-
-> This unfortunately is a fair bit of pain to do:
-> =
-
-> - it requires a new enough kernel (5.~8 ifirc), so we'd have to keep
-> the old code
-> around for 4.9 which we still have to support for a few (5?) more years=
-.
-
-Wouldn't any kernel patch to net-next have the same issue?
- =
-
-Another hack might be to use tc egress bpf or even u32 plus tc_mirred to
-redirect only interesting packets to an ifb virtual device, and only
-attach the packet socket there.
-
-> - it needs to be done on a per device basis...
-> (devices have dynamic lifetimes on Android, and we don't necessarily
-> even know about all of them,
-> though perhaps it would be ok to not receive packets on those...)
-
+> 
+> If it's the intended behaviour, then I'm good with this patch.
+> 
+> Thanks & Regards,
+> M A Ramdhan
 
 
