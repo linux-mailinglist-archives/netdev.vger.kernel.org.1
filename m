@@ -1,100 +1,81 @@
-Return-Path: <netdev+bounces-19889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA59775CADB
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:02:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D15F675CADA
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B694C1C21743
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:02:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F847281F53
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5642F27F37;
-	Fri, 21 Jul 2023 15:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4CA27F2C;
+	Fri, 21 Jul 2023 15:02:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B90619BC5
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:02:19 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404DA2727
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:02:17 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3fc02a92dcfso17490635e9.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:02:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689951736; x=1690556536;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RHTZrJjv5WqndLGnL7DVBJ2n68L3K3xFvi3X7ULZFK0=;
-        b=J51+SQr/vsPd39jfRgoynZuapCWMVSNvinSJ0y1WxOnMCrW3ur4+SVyyPY1KRBF/pG
-         GUPWcc6iX6UbmXc7JTYvV1Jtl72jFIV5fnP0Y+sZxvGxmTmu17erS5UTKmm1hm00iDY2
-         og9Njmd2LNpd0yMNFlZ/GQD87Gc5DoWYQPDCYQsho7PeKEki3bOsS3he8yaBvhbmiYeS
-         AXASpnutteh+qETiLKWHyJDk5a46LWprnXKMSOXK50jGhQcfQsBvoBRaptOi+ki9oRKb
-         1OO3EAJdt2c5P7JGq76u7Kj6j9Kr0jQO8K6hGmLjEMr++cIggfz7bMeSakJBCwRG+I30
-         p2Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689951736; x=1690556536;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RHTZrJjv5WqndLGnL7DVBJ2n68L3K3xFvi3X7ULZFK0=;
-        b=E297E7MqT39t1oHVShkW37ndCwf3fI6zHxi4tpx2fcNaLsOT4wEFo34x0Lr9jQYTku
-         Nlsh1hCbCpuyDljxU2uzUMOLtCNIx0T7BrHiIx4NQ5D/LUDmnf/KROxic0Y2TnvJsMyX
-         sIa3JOBpITuTQFlD3ysT/RCo5pbSrM65C0fmtQwWwnDweQEMe6Wrj4PjvuzvAJ6L4fuH
-         zoIrWp0ZKXWf2UrkVX2y9i7uxGB4w8392fGINJz+i//GXMUz3LftAvFADsZ00HPdEYcD
-         9rgvTBqdHJdIiHc3Q4amgRQLPB5Yt2wm/BL2o6b+nT0HfJLCp5z1Bi0u0iqbT8GdM4V7
-         RaZw==
-X-Gm-Message-State: ABy/qLb3sbsvyUPGfQq2ZFsc0qOBfpI2SYQlaUgUJNBgUaOs+Qwy4jqH
-	Xq7tx8b1xksTWoN+V4OQlns=
-X-Google-Smtp-Source: APBJJlHF+Qk0zdorUygC5TOwJeGNBmHYzwISvkvHUiWKI7N2xlsVPsBXVd2G/Bsc3roHSCEIzk3g7g==
-X-Received: by 2002:a1c:770b:0:b0:3f9:b30f:a013 with SMTP id t11-20020a1c770b000000b003f9b30fa013mr1647808wmi.6.1689951735313;
-        Fri, 21 Jul 2023 08:02:15 -0700 (PDT)
-Received: from skbuf ([188.25.175.105])
-        by smtp.gmail.com with ESMTPSA id y9-20020a7bcd89000000b003fbb1a9586esm6314286wmj.15.2023.07.21.08.02.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 08:02:14 -0700 (PDT)
-Date: Fri, 21 Jul 2023 18:02:12 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Asmaa Mnebhi <asmaa@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	sridhar.samudrala@intel.com, maciej.fijalkowski@intel.com,
-	davthompson@nvidia.com
-Subject: Re: [PATCH net v4 1/1] mlxbf_gige: Fix kernel panic at shutdown
-Message-ID: <20230721150212.h4vg6ueugifnfss6@skbuf>
-References: <20230721141956.29842-1-asmaa@nvidia.com>
- <20230721141956.29842-1-asmaa@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B852627F27
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:02:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B3AC433C7;
+	Fri, 21 Jul 2023 15:02:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689951736;
+	bh=Vu3NoQAurmhoPH+A8AWZ9sXwoUG6CYqYH5VY6+sTzic=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Br6U7oE+b75Pv50b/TwGXZtlgGcV8YRZ4eoswooeUU0xfkbZCJIw8n5t9iIF9TF8c
+	 CNJIaR+RMArVkktWthvFAI5CrEKM6ILHBy3sXqcpMh89SSUq0kut8Ezt6JzcWhKbHN
+	 EIqUTBqHdaH3xCnxveWLzHqkSOcRpenPaCTrA3a7/CmGWwW8ByA0NKJteMIjmKOf6x
+	 wAioMvO4EO9cX7BxUdIQOAHaeaLw9VLoHmmoHyn64pGfgMO3gRg/EQYIzjv5OeOY6h
+	 RiWPaRtlS1qwoSWi2WN6sRVuWKZH7s26pYX8RilslIs1GVTdfMRDf2V9mCBToqJwIH
+	 Uh4LcXLvHPswQ==
+Date: Fri, 21 Jul 2023 08:02:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <peterz@infradead.org>, <mingo@redhat.com>,
+ <will@kernel.org>, <longman@redhat.com>, <boqun.feng@gmail.com>,
+ <hawk@kernel.org>, <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH net-next] page_pool: add a lockdep check for recycling
+ in hardirq
+Message-ID: <20230721080215.01b29a5a@kernel.org>
+In-Reply-To: <382d00e5-87af-6a6b-17e2-6640fdd01db5@huawei.com>
+References: <20230720173752.2038136-1-kuba@kernel.org>
+	<382d00e5-87af-6a6b-17e2-6640fdd01db5@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230721141956.29842-1-asmaa@nvidia.com>
- <20230721141956.29842-1-asmaa@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Asmaa,
-
-On Fri, Jul 21, 2023 at 10:19:56AM -0400, Asmaa Mnebhi wrote:
-> There is a race condition happening during shutdown due to pending
-> napi transactions. Since mlxbf_gige_poll is still running, it tries
-> to access a NULL pointer and as a result causes a kernel panic.
-> To fix this during shutdown, invoke mlxbf_gige_remove to disable and
-> dequeue napi.
+On Fri, 21 Jul 2023 19:53:30 +0800 Yunsheng Lin wrote:
+> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > index a3e12a61d456..3ac760fcdc22 100644
+> > --- a/net/core/page_pool.c
+> > +++ b/net/core/page_pool.c
+> > @@ -536,6 +536,8 @@ static void page_pool_return_page(struct page_pool *pool, struct page *page)
+> >  static bool page_pool_recycle_in_ring(struct page_pool *pool, struct page *page)
+> >  {
+> >  	int ret;
+> > +
+> > +	lockdep_assert_no_hardirq();  
 > 
-> Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
-> Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
-> ---
+> Is there any reason not to put it in page_pool_put_defragged_page() to
+> catch the case with allow_direct being true when page_pool_recycle_in_ring()
+> may not be called?
 
-What is the race condition; what does the stack trace of the NPD look like?
+I was trying to stick it into places which make an assumption about
+the calling context, rather than cover the full API.
+I don't have a strong preference either way, but I hope it's good
+enough. The benefit I see is that it should be fairly obvious to
+a seasoned kernel code reader why this warning is here.
+A warning that fires from page_pool_put_defragged_page() would need
+a comment to explain the reason and may go stale.
+
+> >  	/* BH protection not needed if current is softirq */
+> >  	if (in_softirq())
 
