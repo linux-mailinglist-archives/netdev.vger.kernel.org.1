@@ -1,71 +1,55 @@
-Return-Path: <netdev+bounces-20032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D747975D6B0
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 23:39:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 118C275D6BA
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 23:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACFAF1C217E9
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:39:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B81582823CC
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60906F9E4;
-	Fri, 21 Jul 2023 21:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AF4100A3;
+	Fri, 21 Jul 2023 21:45:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBD2F9DB
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 21:39:55 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CBB3A85
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:39:52 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id Mxqmq5keRulAmMxqmqA5x4; Fri, 21 Jul 2023 23:39:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1689975590;
-	bh=+AI3+XsUJI+ulF08I406IDbECh2Ii2X/RJj/A5FZuTo=;
-	h=Date:Subject:To:References:From:In-Reply-To;
-	b=LPXWIPHiJfZKAb1Aiz4HQrkMhAa1jNbjXrfkxxrPpnnXhkK9QKbc3DTltOhIHc3BU
-	 Offx+DFuN9pwJM81Ie9Nhufi7RDelWRMJ260rHjnXSngCS19h6Rg9ZCNJBFaLFGdT0
-	 ET0IJlPORPM7THSVv5+CmKznQYOBewPXjOFDLpD2hHBgiCKfZ4u5cLtRuHhqMRPd3/
-	 Iy2B6Bv7RZu6NUkKHi4Fk0Eit0trLJgUCbY4ibuRl1YTqVipcgqod/VHmbpmZPSv19
-	 pSAij0uQjbXU1NMoYm2X7a1rRYPT+pTN8YYIvKbNqldgvlSuW+QWpn7oVTGrqVICCP
-	 Dph9gUBF9Veog==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 21 Jul 2023 23:39:50 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <d53ae62c-b5e3-d543-d7e9-93cd59d43415@wanadoo.fr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976A7F9E4
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 21:45:01 +0000 (UTC)
+X-Greylist: delayed 302 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 21 Jul 2023 14:45:00 PDT
+Received: from ciao.gmane.io (ciao.gmane.io [116.202.254.214])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E6E3A86
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:45:00 -0700 (PDT)
+Received: from list by ciao.gmane.io with local (Exim 4.92)
+	(envelope-from <gl-netdev-2@m.gmane-mx.org>)
+	id 1qMxqt-0002Kf-2d
+	for netdev@vger.kernel.org; Fri, 21 Jul 2023 23:39:55 +0200
+X-Injected-Via-Gmane: http://gmane.org/
+To: netdev@vger.kernel.org
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v1 2/5] net: hpe: Add GXP UMAC MDIO
 Date: Fri, 21 Jul 2023 23:39:47 +0200
+Message-ID: <d53ae62c-b5e3-d543-d7e9-93cd59d43415@wanadoo.fr>
+References: <20230721212044.59666-1-nick.hawkins@hpe.com>
+ <20230721212044.59666-3-nick.hawkins@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v1 2/5] net: hpe: Add GXP UMAC MDIO
-Content-Language: fr
-To: nick.hawkins@hpe.com, verdun@hpe.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Newsgroups: gmane.linux.network,gmane.linux.drivers.devicetree,gmane.linux.kernel
-References: <20230721212044.59666-1-nick.hawkins@hpe.com>
- <20230721212044.59666-3-nick.hawkins@hpe.com>
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20230721212044.59666-3-nick.hawkins@hpe.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Content-Language: fr
+In-Reply-To: <20230721212044.59666-3-nick.hawkins@hpe.com>
+Cc: devicetree@vger.kernel.org,linux-kernel@vger.kernel.org
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
@@ -178,5 +162,6 @@ CJ
 > +MODULE_AUTHOR("Nick Hawkins <nick.hawkins@hpe.com>");
 > +MODULE_DESCRIPTION("HPE GXP UMAC MDIO driver");
 > +MODULE_LICENSE("GPL");
+
 
 
