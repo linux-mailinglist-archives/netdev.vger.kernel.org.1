@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-19705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2D075BC9F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 05:02:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07AF975BCA1
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 05:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23DC91C215CD
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:02:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34DC91C215AB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 03:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B8E39F;
-	Fri, 21 Jul 2023 03:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E779539F;
+	Fri, 21 Jul 2023 03:07:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8B77F
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 03:02:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB334C433C8;
-	Fri, 21 Jul 2023 03:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0EF7F
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 03:07:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15380C433C7;
+	Fri, 21 Jul 2023 03:07:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689908538;
-	bh=iKUuOMZQqYBSqB9J+CgVXxUr5qGvS6AiXjXlER6cU8o=;
+	s=k20201202; t=1689908821;
+	bh=YN6tDx5wsRGuEcokfNJHCbM2RckvcZCwq4ECiC9RWKk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I/nfmOZEBdGC8dqweIX3zxGJbrQfeAcrU9OzsJEwnfb6i/ItjzEPP40QeqaztfXe7
-	 NY0qJ4lVXlEfYF0JOyJOPtkAOZbweLE+hQa5zcUqOnXTlZKTlvkbm8NdPeyQ0m4p+W
-	 Mq6kzBo74F0agoT6coPvoqCgQpGyU3z5rfu/IrwjkOPPHSvfbOkd6pRzc6P8mo68Ve
-	 lvUrPjUB/ygEuGDgJEIADl04/keCYvBG8eStkhl2JVr0FpbYcji8BTGLowxfvsVTYJ
-	 AV+tEjKLpVOPyymf5tTGd44qMOv7tF4PS8j1FswEYJ2qKd8L1S2z8Z4TzGX4TvMEto
-	 /NzWN0/0ivSzw==
-Date: Thu, 20 Jul 2023 20:02:16 -0700
+	b=R1mcRaFVwcA4851mIKSc6Vrnngfrcezgzho4OXKVbWndIYYbTSLAtz5kGJlBvIVsO
+	 lhj6TZ6uNUdmg0iIvBkxMKW0wmKOChPmmJlZPY5zy/dcXbSdAs6GJNE2LKWYl/UjYG
+	 7qCISGrRzWV1xJYkIWr5CqH+J+t3TV6Jz9fgbQglDjw032aTxOb7a46/TYbFWocVDv
+	 NEfc2D+6HGjaa9cE5okjw/xcz1PfXp6h4IZiQKi7cfyXz5OxiKPTn582Dz93/jXLeR
+	 meolMgGOlacEqj8IW+Iy7UswY0K8GP7xNeVFx4mMXBQrylOMtpTOr3U7JjynoB29Q7
+	 31TCYr3tUVVVg==
+Date: Thu, 20 Jul 2023 20:07:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Keith
- Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Boris Pismenny <boris.pismenny@gmail.com>
-Subject: Re: [PATCH 6/6] net/tls: implement ->read_sock()
-Message-ID: <20230720200216.4bf1bf4b@kernel.org>
-In-Reply-To: <20230719113836.68859-7-hare@suse.de>
-References: <20230719113836.68859-1-hare@suse.de>
-	<20230719113836.68859-7-hare@suse.de>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH net] docs: net: clarify the NAPI rules around XDP Tx
+Message-ID: <20230720200700.162b29c6@kernel.org>
+In-Reply-To: <AM5PR04MB3139FC41B234823EE28424E2883FA@AM5PR04MB3139.eurprd04.prod.outlook.com>
+References: <20230720161323.2025379-1-kuba@kernel.org>
+	<AM5PR04MB3139FC41B234823EE28424E2883FA@AM5PR04MB3139.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,140 +51,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 19 Jul 2023 13:38:36 +0200 Hannes Reinecke wrote:
-> Implement ->read_sock() function for use with nvme-tcp.
+On Fri, 21 Jul 2023 02:35:41 +0000 Wei Fang wrote:
+> > -In other words, it is recommended to ignore the budget argument when
+> > -performing TX buffer reclamation to ensure that the reclamation is not
+> > -arbitrarily bounded; however, it is required to honor the budget argument -for
+> > RX processing.
+> > +In other words for Rx processing the ``budget`` argument limits how
+> > +many packets driver can process in a single poll. Rx specific APIs like
+> > +page pool or XDP cannot be used at all when ``budget`` is 0.
+> > +skb Tx processing should happen regardless of the ``budget``, but if
+> > +the argument is 0 driver cannot call any XDP (or page pool) APIs.
+> >   
+> Can I ask a stupid question why tx processing cannot call any XDP (or page pool)
+> APIs if the "budget" is 0?
 
-> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-> +		     sk_read_actor_t read_actor)
-> +{
-> +	struct tls_context *tls_ctx = tls_get_ctx(sk);
-> +	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
-> +	struct strp_msg *rxm = NULL;
-> +	struct tls_msg *tlm;
-> +	struct sk_buff *skb;
-> +	struct sk_psock *psock;
-> +	ssize_t copied = 0;
-> +	bool bpf_strp_enabled;
-
-bubble up the longer lines, like this:
-
-+	struct tls_context *tls_ctx = tls_get_ctx(sk);
-+	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
-+	struct strp_msg *rxm = NULL;
-+	struct sk_psock *psock;
-+	bool bpf_strp_enabled;
-+	struct tls_msg *tlm;
-+	struct sk_buff *skb;
-+	ssize_t copied = 0;
-+	int err, used;
-
-> +	int err, used;
-> +
-> +	psock = sk_psock_get(sk);
-> +	err = tls_rx_reader_acquire(sk, ctx, true);
-> +	if (err < 0)
-> +		goto psock_put;
-> +	bpf_strp_enabled = sk_psock_strp_enabled(psock);
-
-You're not servicing the BPF out of band queue, just error out if
-the BPF psock is enabled. It's barely used and endlessly buggy anyway.
-
-> +	/* If crypto failed the connection is broken */
-> +	err = ctx->async_wait.err;
-> +	if (err)
-> +		goto read_sock_end;
-> +
-> +	do {
-> +		if (!skb_queue_empty(&ctx->rx_list)) {
-> +			skb = __skb_dequeue(&ctx->rx_list);
-> +			rxm = strp_msg(skb);
-> +		} else {
-> +			struct tls_decrypt_arg darg;
-> +
-> +			err = tls_rx_rec_wait(sk, psock, true, true);
-> +			if (err <= 0)
-> +				goto read_sock_end;
-> +
-> +			memset(&darg.inargs, 0, sizeof(darg.inargs));
-> +			darg.zc = !bpf_strp_enabled && ctx->zc_capable;
-
-And what are you zero-copying into my friend? zc == zero copy.
-Leave the zc be 0, like splice does, otherwise passing msg=NULL
-to tls_rx_one_record() may explode. Testing with TLS 1.2 should
-show that.
-
-> +			rxm = strp_msg(tls_strp_msg(ctx));
-> +			tlm = tls_msg(tls_strp_msg(ctx));
-> +
-> +			/* read_sock does not support reading control messages */
-> +			if (tlm->control != TLS_RECORD_TYPE_DATA) {
-> +				err = -EINVAL;
-> +				goto read_sock_requeue;
-> +			}
-> +
-> +			if (!bpf_strp_enabled)
-> +				darg.async = ctx->async_capable;
-> +			else
-> +				darg.async = false;
-
-Also don't bother with async. TLS 1.3 can't do async, anyway,
-and I don't think you wait for the completion :S
-
-> +			err = tls_rx_one_record(sk, NULL, &darg);
-> +			if (err < 0) {
-> +				tls_err_abort(sk, -EBADMSG);
-> +				goto read_sock_end;
-> +			}
-> +
-> +			sk_flush_backlog(sk);
-
-Hm, could be a bit often but okay.
-
-> +			skb = darg.skb;
-> +			rxm = strp_msg(skb);
-> +
-> +			tls_rx_rec_done(ctx);
-> +		}
-> +
-> +		used = read_actor(desc, skb, rxm->offset, rxm->full_len);
-> +		if (used <= 0) {
-> +			if (!copied)
-> +				err = used;
-> +			goto read_sock_end;
-
-You have to requeue on error.
-
-> +		}
-> +		copied += used;
-> +		if (used < rxm->full_len) {
-> +			rxm->offset += used;
-> +			rxm->full_len -= used;
-> +			if (!desc->count)
-> +				goto read_sock_requeue;
-
-And here. Like splice_read does. Otherwise you leak the skb.
-
-> +		} else {
-> +			consume_skb(skb);
-> +			if (!desc->count)
-> +				skb = NULL;
-> +		}
-> +	} while (skb);
-> +
-> +read_sock_end:
-> +	tls_rx_reader_release(sk, ctx);
-> +psock_put:
-> +	if (psock)
-> +		sk_psock_put(sk, psock);
-> +	return copied ? : err;
-> +
-> +read_sock_requeue:
-> +	__skb_queue_head(&ctx->rx_list, skb);
-> +	goto read_sock_end;
-> +}
-> +
->  bool tls_sw_sock_is_readable(struct sock *sk)
->  {
->  	struct tls_context *tls_ctx = tls_get_ctx(sk);
+Because in that case we may be in an interrupt context, and page pool
+assumes it's either in process or softirq context. See commit
+afbed3f74830 ("net/mlx5e: do as little as possible in napi poll when
+budget is 0") for an example stack trace.
 
 
