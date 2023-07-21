@@ -1,114 +1,175 @@
-Return-Path: <netdev+bounces-19784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DBD75C480
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 12:19:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EA175C4A4
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 12:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C204A1C2164A
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:19:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6E25282219
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569FD1BE6D;
-	Fri, 21 Jul 2023 10:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D81B1BE7A;
+	Fri, 21 Jul 2023 10:26:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47ACC18C2D
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:19:34 +0000 (UTC)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A03B26A2;
-	Fri, 21 Jul 2023 03:19:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689934754; x=1721470754;
-  h=date:from:cc:subject:message-id:references:mime-version:
-   in-reply-to;
-  bh=C6wVBmCZeZFNIMXqGKN2Zjs/KW8YVqteA5G+zqzpIaw=;
-  b=EQZ7ArONq/FCr+NAp8ZNxOyvMJxbZhM4LVpJcjBZ9bAILZgS3nzQRltx
-   bSiHGFyCK9QbYsCd/jQW1urPFQ0qc59w5HLf+pcUivxfFb8gvOezRxn+4
-   Sv3B6OrEoK9O/rASpB2eb5fPUb1JmJ+TkF42/YTNi+60gkEeTLNaCHc+U
-   7RGsEWFAlVXAtGAtza4NLKf3wAplrEmlMwXfVcj5+2ogXV9+bV77MdBOM
-   GUPqJtXdave3uz4JHfUrXotTT+DKqIC5gKOjfl1aQ3hVyWBCJSMMZptOK
-   sRw967G3Kzhg9wl/y/9dtMu8F0DQP431CQJoQRn2JtWSL7+9UMroBFG2U
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="433219663"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="433219663"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 03:17:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848786020"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="848786020"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga004.jf.intel.com with ESMTP; 21 Jul 2023 03:17:38 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1qMnCZ-00HFw5-2w;
-	Fri, 21 Jul 2023 13:17:35 +0300
-Date: Fri, 21 Jul 2023 13:17:35 +0300
-From: Shevchenko Andriy <andriy.shevchenko@intel.com>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Boon Khai Ng <boon.khai.ng@intel.com>,
-	Mun Yew Tham <mun.yew.tham@intel.com>,
-	Leong Ching Swee <leong.ching.swee@intel.com>,
-	G Thomas Rohan <rohan.g.thomas@intel.com>
-Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 1/2]
- dt-bindings: net: snps,dwmac: Add description for rx-vlan-offload
-Message-ID: <ZLpbPxy4XHEGyU6I@smile.fi.intel.com>
-References: <20230721062617.9810-1-boon.khai.ng@intel.com>
- <20230721062617.9810-2-boon.khai.ng@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015371BE6D
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:26:57 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A3251986
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 03:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
+	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=4DKJJPARmxLKlgkNjc664F0ozs9IfyrogZCNq6AQT2o=; b=IAiuftl/MhC/5obEyxZ8NDXaAB
+	zyseibrSWp6S1KIwJvojMn38nd8vSI0UUiV+pBJOtFpQ9pRe91rfGsjiUvlKxQENpzttvxiQKQ9tS
+	R81mw/NKasBvV6sAVWNCNvi3pZ6bvgyYBa1Im5d4M7bpSK8MMEC/8Bq3YxAqCcV3KC5k0yy7PMp/z
+	hAIcKgvzmZMtUnR0K5Cba3wkTrLHCwONRt3ulKQN/wMVuAornbUyzbTjkby4SQvNBr1y4SQCgqy2h
+	ipu7ULSFgD7WyCgL1UEWEpV5/ScKMPpH8KAEs8EF7TzwASkvkRIq8es3q4K9p24mIhhvQVOjvtk5S
+	oFvMTO3Q==;
+Received: from [192.168.1.4] (port=63172 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qMnLM-0004ef-08;
+	Fri, 21 Jul 2023 12:26:40 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Fri, 21 Jul 2023 12:26:39 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <netdev@vger.kernel.org>
+CC: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, Ante Knezic
+	<ante.knezic@helmholz.de>
+Subject: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
+Date: Fri, 21 Jul 2023 12:26:18 +0200
+Message-ID: <20230721102618.13408-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230721062617.9810-2-boon.khai.ng@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_HEADERS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 02:26:16PM +0800, Boon@ecsmtp.png.intel.com wrote:
-> From: Boon Khai Ng <boon.khai.ng@intel.com>
-> 
-> This patch is to add the dts setting for the MAC controller on
-> synopsys 10G Ethernet MAC which allow the 10G MAC to turn on
-> hardware accelerated VLAN stripping. Once the hardware accelerated
-> VLAN stripping is turn on, the VLAN tag will be stripped by the
-> 10G Ethernet MAC.
+Fixes XAUI/RXAUI lane alignment errors.
+Issue causes dropped packets when trying to communicate over
+fiber via SERDES lanes of port 9 and 10.
+Errata document applies only to 88E6190X and 88E6390X devices.
+Requires poking in undocumented registers.
 
-...
+Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+---
+V3 : Rework to fit the new phylink_pcs infrastructure
+V2 : Rework as suggested by Andrew Lunn <andrew@lun.ch> 
+ * make int lanes[] const 
+ * reorder prod_nums
+ * update commit message to indicate we are dealing with
+   undocumented Marvell registers and magic values
+---
+ drivers/net/dsa/mv88e6xxx/pcs-639x.c | 42 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-> Reviewed-by: Shevchenko Andriy <andriy.shevchenko@linux.intel.com>
-
-This is wrong:
-- I never reviewed DT bindings in all your series.
-- My name for the patches is also wrong.
-
-P.S. What I mentioned in the internal mail is that you can add my tag to
-    the code, and not to the DT. Sorry, I probably hadn't been clear.
-
+diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+index 98dd49dac421..50b14804c360 100644
+--- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
++++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+@@ -20,6 +20,7 @@ struct mv88e639x_pcs {
+ 	struct mdio_device mdio;
+ 	struct phylink_pcs sgmii_pcs;
+ 	struct phylink_pcs xg_pcs;
++	struct mv88e6xxx_chip *chip;
+ 	bool supports_5g;
+ 	phy_interface_t interface;
+ 	unsigned int irq;
+@@ -205,13 +206,52 @@ static void mv88e639x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
+ 	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
+ }
+ 
++static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
++{
++	const int lanes[] = { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
++		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
++		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
++		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
++	struct mdio_device mdio;
++	int err, i;
++
++	/* 88e6190x and 88e6390x errata 3.14:
++	 * After chip reset, SERDES reconfiguration or SERDES core
++	 * Software Reset, the SERDES lanes may not be properly aligned
++	 * resulting in CRC errors
++	 */
++
++	mdio.bus = mpcs->mdio.bus;
++
++	for (i = 0; i < ARRAY_SIZE(lanes); i++) {
++		mdio.addr = lanes[i];
++
++		err = mdiodev_c45_write(&mdio, MDIO_MMD_PHYXS,
++					0xf054, 0x400C);
++		if (err)
++			return err;
++
++		err = mdiodev_c45_write(&mdio, MDIO_MMD_PHYXS,
++					0xf054, 0x4000);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
+ static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
+ 					   phy_interface_t interface)
+ {
+ 	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
++	struct mv88e6xxx_chip *chip = mpcs->chip;
+ 
+ 	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
+ 
++	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
++	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
++		mv88e6390_erratum_3_14(mpcs);
++
+ 	return 0;
+ }
+ 
+@@ -523,6 +563,7 @@ static int mv88e6390_pcs_init(struct mv88e6xxx_chip *chip, int port)
+ 	mpcs->sgmii_pcs.neg_mode = true;
+ 	mpcs->xg_pcs.ops = &mv88e6390_xg_pcs_ops;
+ 	mpcs->xg_pcs.neg_mode = true;
++	mpcs->chip = chip;
+ 
+ 	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
+ 	if (err)
+@@ -873,6 +914,7 @@ static int mv88e6393x_pcs_init(struct mv88e6xxx_chip *chip, int port)
+ 	mpcs->xg_pcs.ops = &mv88e6393x_xg_pcs_ops;
+ 	mpcs->xg_pcs.neg_mode = true;
+ 	mpcs->supports_5g = true;
++	mpcs->chip = chip;
+ 
+ 	err = mv88e6393x_erratum_4_6(mpcs);
+ 	if (err)
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.11.0
 
 
