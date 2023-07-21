@@ -1,51 +1,63 @@
-Return-Path: <netdev+bounces-19845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D5975C93F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:10:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 186EA75C949
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41EF61C2098E
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 14:10:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7F60282273
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 14:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318CD1E53A;
-	Fri, 21 Jul 2023 14:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84041EA6F;
+	Fri, 21 Jul 2023 14:12:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269061EA66
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:10:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9DCF2D50
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689948638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lLR1KIDJDJPKL5gVajVFRvk+rmdQhGE0FkmlDu8zRd0=;
-	b=I86FuqM4Kdfnj3LSgPK8QKJWSENeJv4YZoar58s4N3OGcjXUjDtzfK3eXh2J5VS8VnpVz/
-	I1W/RuoeQunndXDY9O9M7oyCxwgEBKvKB9ArlYj/AlPsQv7iVtp/CnLHPkUus+xD4qM5aw
-	SmCJ0Eqrk2aJOSVJUt/ujDdpWAL4OT4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-635-d0hHnyTdMru7up4omFgDcg-1; Fri, 21 Jul 2023 10:10:35 -0400
-X-MC-Unique: d0hHnyTdMru7up4omFgDcg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F3FBF858EED;
-	Fri, 21 Jul 2023 14:10:34 +0000 (UTC)
-Received: from [10.45.225.111] (unknown [10.45.225.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1000BC584E0;
-	Fri, 21 Jul 2023 14:10:33 +0000 (UTC)
-Message-ID: <a9cdd1b9-c10d-ace1-7d60-ab98d24d1eb7@redhat.com>
-Date: Fri, 21 Jul 2023 16:10:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4DF1E53A
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:12:51 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AD930CF
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:12:48 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fbea14700bso16481395e9.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:12:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689948767; x=1690553567;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OglWMXk0Y4Go+Z7ASGVUZDhO5twiAsCsGhAeu+lIpcA=;
+        b=r5Lp4rMJnn5eIKyD1NIqsg5BJW/qu3+FjJO8B3q8gjwG/SSLpHM9ldbFstWdggN0Lp
+         +wTkC+HzclMKhPXnJlcoIVPJMjhaSSQETNuyvyG8i86fFrBYypOc/9ZSTFW29pKIiWVQ
+         YbblClTDb5x/UMbDwhzym7VHIjAs7iDQ2iiioKpCd1Gi4LWybp18Uz9KkUDHsHUMv0si
+         i00ljiBLH6bvs8afILzI1jXC8ebG0g8mLIp997cecl3ofYyoUzRFuTtUlzn+c4VR0YR1
+         X47E5xuCPcxrk3KSxZ1ZoKOsGy5+qkr6bUzKjcJZVNjh/r+4VHnsvmOge8W81+QVTLZo
+         w1VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689948767; x=1690553567;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OglWMXk0Y4Go+Z7ASGVUZDhO5twiAsCsGhAeu+lIpcA=;
+        b=PUMkWCoG75jkPLQG//dEMN5swojftCXMcIJ9jGoioCr6VccGYvrkZLlkivK3y+9BG/
+         +FfDBLAnj/8rxK+AzM8Xnsk9XuxA3ImPBXKfDX6Akr9U6Ap/+t81YH8imPbg/uDmMp4Y
+         5EJRFRIXUGTKovoBXVsz+NUV+Vw05YY/576Gls1hDJCnO7YpHIdg/algyyhkXAM164xJ
+         cHcc0RQ4ro0UGJQoghGDlxsa0q1FE1oCMwd7MWvNOb4kiV4PWaZ6JbS5LnwJXegeIOlT
+         s8NpcqjECPefHkpxf3ya3ZNG/p4X6A0A5uyRxia6VeyiOpnWC8Ty8zaLPcjinW/Hfbq7
+         0tlA==
+X-Gm-Message-State: ABy/qLb8AAZ+fRUkzdPBsVb5WkYmhD1Px+NN17OiCISGovsii9ybHy1W
+	4LMnjy9f+PGsW6MxIbi3uaalNg==
+X-Google-Smtp-Source: APBJJlEStVaia+3u6ayM56SyBeTVqjBg5h0ggV22D2IH/aXxEJBn1QpA5N4d2Ym3PU3h7h5Cn6Wiig==
+X-Received: by 2002:a1c:e902:0:b0:3fc:521:8492 with SMTP id q2-20020a1ce902000000b003fc05218492mr1495617wmc.5.1689948766712;
+        Fri, 21 Jul 2023 07:12:46 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id f14-20020a7bcd0e000000b003fc01f7b415sm6205183wmj.39.2023.07.21.07.12.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 07:12:46 -0700 (PDT)
+Message-ID: <68f52a83-ac01-ff68-1eee-20713ae8eb26@linaro.org>
+Date: Fri, 21 Jul 2023 16:12:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,61 +66,273 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v2 0/2][pull request] Intel Wired LAN Driver
- Updates 2023-07-14 (i40e)
-To: Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, netdev@vger.kernel.org
-References: <20230714201253.1717957-1-anthony.l.nguyen@intel.com>
- <8261532fc0923d3cd9a8937e66c2e8c7e2e1d3b2.camel@redhat.com>
+Subject: Re: [PATCH v3 34/42] ARM: dts: add Cirrus EP93XX SoC .dtsi
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <8261532fc0923d3cd9a8937e66c2e8c7e2e1d3b2.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: nikita.shubin@maquefel.me, Hartley Sweeten
+ <hsweeten@visionengravers.com>, Lennert Buytenhek <kernel@wantstofly.org>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Alessandro Zummo
+ <a.zummo@towertech.it>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck
+ <linux@roeck-us.net>, Sebastian Reichel <sre@kernel.org>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+ Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Olof Johansson <olof@lixom.net>, soc@kernel.org,
+ Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Andy Shevchenko <andy@kernel.org>,
+ Michael Peters <mpeters@embeddedTS.com>, Kris Bahnsen <kris@embeddedTS.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
+ netdev@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
+ linux-input@vger.kernel.org, alsa-devel@alsa-project.org
+References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
+ <20230605-ep93xx-v3-34-3d63a5f1103e@maquefel.me>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230605-ep93xx-v3-34-3d63a5f1103e@maquefel.me>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 18. 07. 23 12:14, Paolo Abeni wrote:
-> Hi,
+On 20/07/2023 13:29, Nikita Shubin via B4 Relay wrote:
+> From: Nikita Shubin <nikita.shubin@maquefel.me>
 > 
-> On Fri, 2023-07-14 at 13:12 -0700, Tony Nguyen wrote:
->> This series contains updates to i40e driver only.
->>
->> Ivan Vecera adds waiting for VF to complete initialization on VF related
->> configuration callbacks.
->>
->> The following are changes since commit 68af900072c157c0cdce0256968edd15067e1e5a:
->>    gve: trivial spell fix Recive to Receive
->> and are available in the git repository at:
->>    git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
->>
->> Ivan Vecera (2):
->>    i40e: Add helper for VF inited state check with timeout
->>    i40e: Wait for pending VF reset in VF set callbacks
->>
->>   .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 65 +++++++++++--------
->>   1 file changed, 38 insertions(+), 27 deletions(-)
->>
-> The series LGTM, but is targeting net-next while it looks like -net
-> material to me (except for the missing Fixes tag ;). Am I missing
-> something? Could you please clarify?
+> Add support for Cirrus Logic EP93XX SoC's family.
 > 
-> Thanks!
+> Co-developed-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+> Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
+> ---
+>  arch/arm/boot/dts/cirrus/ep93xx.dtsi | 449 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 449 insertions(+)
 > 
-> Paolo
+> diff --git a/arch/arm/boot/dts/cirrus/ep93xx.dtsi b/arch/arm/boot/dts/cirrus/ep93xx.dtsi
+> new file mode 100644
+> index 000000000000..1e04f39d7b80
+> --- /dev/null
+> +++ b/arch/arm/boot/dts/cirrus/ep93xx.dtsi
+> @@ -0,0 +1,449 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Device Tree file for Cirrus Logic systems EP93XX SoC
+> + */
+> +#include <dt-bindings/gpio/gpio.h>
+> +#include <dt-bindings/leds/common.h>
+> +#include <dt-bindings/input/input.h>
+> +#include <dt-bindings/clock/cirrus,ep93xx-clock.h>
+> +/ {
+> +	soc: soc {
+> +		compatible = "simple-bus";
+> +		ranges;
+> +		#address-cells = <1>;
+> +		#size-cells = <1>;
+> +
+> +		syscon: syscon@80930000 {
+> +			compatible = "cirrus,ep9301-syscon",
+> +						 "syscon", "simple-mfd";
 
-Next is the fine... You are right there are no Fixes tags as there are 
-no such commits. So I have selected -next.
+Fix alignment.
 
-Ivan
+> +			reg = <0x80930000 0x1000>;
+> +
+> +			eclk: clock-controller {
+> +				compatible = "cirrus,ep9301-clk";
+> +				#clock-cells = <1>;
+> +				clocks = <&xtali>;
+> +				status = "okay";
+
+Drop statuses when not needed.
+
+> +			};
+> +
+> +			pinctrl: pinctrl {
+> +				compatible = "cirrus,ep9301-pinctrl";
+> +
+> +				spi_default_pins: pins-spi {
+> +					function = "spi";
+> +					groups = "ssp";
+> +				};
+> +
+
+...
+
+> +
+> +		keypad: keypad@800f0000 {
+> +			compatible = "cirrus,ep9307-keypad";
+> +			reg = <0x800f0000 0x0c>;
+> +			interrupt-parent = <&vic0>;
+> +			interrupts = <29>;
+> +			clocks = <&eclk EP93XX_CLK_KEYPAD>;
+> +			pinctrl-names = "default";
+> +			pinctrl-0 = <&keypad_default_pins>;
+> +			linux,keymap =
+
+No need for line break.
+
+> +					<KEY_UP>,
+> +					<KEY_DOWN>,
+> +					<KEY_VOLUMEDOWN>,
+> +					<KEY_HOME>,
+> +					<KEY_RIGHT>,
+> +					<KEY_LEFT>,
+> +					<KEY_ENTER>,
+> +					<KEY_VOLUMEUP>,
+> +					<KEY_F6>,
+> +					<KEY_F8>,
+> +					<KEY_F9>,
+> +					<KEY_F10>,
+> +					<KEY_F1>,
+> +					<KEY_F2>,
+> +					<KEY_F3>,
+> +					<KEY_POWER>;
+> +		};
+> +
+> +		pwm0: pwm@80910000 {
+> +			compatible = "cirrus,ep9301-pwm";
+> +			reg = <0x80910000 0x10>;
+> +			clocks = <&eclk EP93XX_CLK_PWM>;
+> +			status = "disabled";
+> +		};
+> +
+> +		pwm1: pwm@80910020 {
+> +			compatible = "cirrus,ep9301-pwm";
+> +			reg = <0x80910020 0x10>;
+> +			clocks = <&eclk EP93XX_CLK_PWM>;
+> +			pinctrl-names = "default";
+> +			pinctrl-0 = <&pwm1_default_pins>;
+> +			status = "disabled";
+> +		};
+> +
+> +		rtc0: rtc@80920000 {
+> +			compatible = "cirrus,ep9301-rtc";
+> +			reg = <0x80920000 0x100>;
+> +		};
+> +
+> +		spi0: spi@808a0000 {
+> +			compatible = "cirrus,ep9301-spi";
+> +			reg = <0x808a0000 0x18>;
+> +			#address-cells = <1>;
+> +			#size-cells = <0>;
+> +			interrupt-parent = <&vic1>;
+> +			interrupts = <21>;
+> +			clocks = <&eclk EP93XX_CLK_SPI>;
+> +			pinctrl-names = "default";
+> +			pinctrl-0 = <&spi_default_pins>;
+> +			status = "disabled";
+> +		};
+> +
+> +		timer: timer@80810000 {
+> +			compatible = "cirrus,ep9301-timer";
+> +			reg = <0x80810000 0x100>;
+> +			interrupt-parent = <&vic1>;
+> +			interrupts = <19>;
+> +		};
+> +
+> +		uart0: uart@808c0000 {
+> +			compatible = "arm,primecell";
+
+This looks incomplete.
+
+> +			reg = <0x808c0000 0x1000>;
+> +			arm,primecell-periphid = <0x00041010>;
+> +			clocks = <&eclk EP93XX_CLK_UART1>, <&eclk EP93XX_CLK_UART>;
+> +			clock-names = "apb:uart1", "apb_pclk";
+
+It does not look like you tested the DTS against bindings. Please run
+`make dtbs_check` (see
+Documentation/devicetree/bindings/writing-schema.rst or
+https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+for instructions).
+
+> +			interrupt-parent = <&vic1>;
+> +			interrupts = <20>;
+> +			status = "disabled";
+> +		};
+> +
+> +		uart1: uart@808d0000 {
+> +			compatible = "arm,primecell";
+> +			reg = <0x808d0000 0x1000>;
+> +			arm,primecell-periphid = <0x00041010>;
+> +			clocks = <&eclk EP93XX_CLK_UART2>, <&eclk EP93XX_CLK_UART>;
+> +			clock-names = "apb:uart2", "apb_pclk";
+
+It does not look like you tested the DTS against bindings. Please run
+`make dtbs_check` (see
+Documentation/devicetree/bindings/writing-schema.rst or
+https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+for instructions).
+
+> +			interrupt-parent = <&vic1>;
+> +			interrupts = <22>;
+> +			status = "disabled";
+> +		};
+> +
+> +		uart2: uart@808b0000 {
+> +			compatible = "arm,primecell";
+> +			reg = <0x808b0000 0x1000>;
+> +			arm,primecell-periphid = <0x00041010>;
+> +			clocks = <&eclk EP93XX_CLK_UART3>, <&eclk EP93XX_CLK_UART>;
+> +			clock-names = "apb:uart3", "apb_pclk";
+> +			interrupt-parent = <&vic1>;
+> +			interrupts = <23>;
+> +			status = "disabled";
+> +		};
+> +
+> +		usb0: usb@80020000 {
+> +			compatible = "generic-ohci";
+> +			reg = <0x80020000 0x10000>;
+> +			interrupt-parent = <&vic1>;
+> +			interrupts = <24>;
+> +			clocks = <&eclk EP93XX_CLK_USB>;
+> +			status = "disabled";
+> +		};
+> +
+> +		watchdog0: watchdog@80940000 {
+> +			compatible = "cirrus,ep9301-wdt";
+> +			reg = <0x80940000 0x08>;
+> +		};
+> +	};
+> +
+> +	xtali: oscillator {
+> +		compatible = "fixed-clock";
+> +		#clock-cells = <0>;
+> +		clock-frequency = <14745600>;
+> +		clock-output-names = "xtali";
+> +	};
+> +
+> +	i2c0: i2c {
+> +		compatible = "i2c-gpio";
+> +		sda-gpios = <&gpio6 1 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+> +		scl-gpios = <&gpio6 0 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+
+Are you sure this is part of SoC? It is rather unusual... I would say
+this would be the first SoC, where GPIO pins must be an I2C.
+
+
+
+Best regards,
+Krzysztof
 
 
