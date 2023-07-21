@@ -1,140 +1,194 @@
-Return-Path: <netdev+bounces-19837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E92D75C8A8
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:58:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFD6F75C8C4
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4593B28226C
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:58:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC3E2813F2
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807F81E539;
-	Fri, 21 Jul 2023 13:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0661E522;
+	Fri, 21 Jul 2023 13:58:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC221ED22
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:56:50 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2105.outbound.protection.outlook.com [40.107.237.105])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1D135A3
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 06:56:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ECyS0DLI7A1JDmolBXMGTNuNi5diaLHOmf/D8Ejp7LihIRt7J2rFWyy09B+/TafE8dpkc8FtnUiJi5OslgvglyP0kuQRX4kyDIZp1fAVG3nF3QbDRHiOZ0oxRK34g4SNvgC8tb3HtDJpC7t+2Xxj+tp5LWP0nAYUhutm6/lr/uvO95bxefTQ9UOG5JvYQ+iAiyC0r7wT7yuwO0gWEnyRcJiHwLkJVZx9ug1Bonhc8X3Yg/NG+dJS7ljk9qERb/CTR9NySCY4empRpdrIJlY7FB9iiTbkK+IV1PLF5y+MpQz5IyG1h1G/kLDPbSeMdiv5kuBuvzGpBF4QH2RWTN8VPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4IIxmLdwc8HWkXwDBH6blQOmeWuz/a7ZkjjOgaAShHA=;
- b=fnlsEOTkZqhMEB8kqO3yLPXeaEWl95aeqb1UDvZJAfzwOhSTVWpypxee6kGsQX2c4A60Jy0yH5pf/HyTQAz33yUe5vjUGu8mjoIevVar4wbc2bR7ieFaA0EuGKAXhk3HFMW0CTenr1pG11jN1kK4T2oacUY4ETbI88GgG26eGjafidEZHU3qTZlFR13XAmBHjWmHSm7GnPET1IBllP8OPObLA52RWn8UYD5DKWnWB+v6fRokyjFIxxJciTmA+/gbwocsTgr5gAfTGnlWhzVdcyHlcPbA8oHSttN/pCSnkUre/k2sHsw9NXunqTXxdU7/0BbgohzJ9Z6ScAhEuSURYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C800E1DDDB
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:58:51 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5373B3AA0
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 06:58:29 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fb761efa7aso3285054e87.0
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 06:58:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4IIxmLdwc8HWkXwDBH6blQOmeWuz/a7ZkjjOgaAShHA=;
- b=WbhmlucXSZiyIhsjKwn0OReH63l8v4NWSvSHUGOtJjxrL9j/EXLWoadmlNl+goHqazdNk129yFDm3GkMyPya2VT+ctqdAZYBL21WoTSani6feqoSZ69hUIcQoXt4linuw+b6Z3hLG6UTftBqO8WHB+q9LXrzFCNS91UEq3dEfYM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SJ0PR13MB5674.namprd13.prod.outlook.com (2603:10b6:a03:401::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25; Fri, 21 Jul
- 2023 13:56:06 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Fri, 21 Jul 2023
- 13:56:06 +0000
-Date: Fri, 21 Jul 2023 14:55:59 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Yuanjun Gong <ruc_gongyuanjun@163.com>
-Cc: Chris Snook <chris.snook@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] ethernet: atheros: fix return value check in
- atl1e_tso_csum()
-Message-ID: <ZLqOb2giDzKrrP9J@corigine.com>
-References: <20230720144219.39285-1-ruc_gongyuanjun@163.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230720144219.39285-1-ruc_gongyuanjun@163.com>
-X-ClientProxiedBy: CWLP123CA0259.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:1d5::7) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=linaro.org; s=google; t=1689947907; x=1690552707;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Uoi5Y4jjgnWGfQC+MA3PSzDO/nJ69a0U86XqjtM9qm4=;
+        b=hovoUSXRq28HNft26oRNivk53rfhvkFzFlsE+3eJGaPu6W9o4Hh4e/ClQ4euEk52Lc
+         Ek5BSaAroh2dCUY6scEF0qTX6SJCRLeM3gAKGHAwhgN2TXx3tl8zBKhqZNypY/tWkFHc
+         oe7SRYPVtulOU518is+mkTPudusWNGrbXpmSCwGn9SIS+3Qdck423+6xju48zvzmYRLu
+         SrCXzGzyT5RKNGORyZpIV27gIbAKSA970kJAUEzrStzCaI6yIn2cD69S96IGPnLOrWz9
+         MC4iNZlM1SAONUv1Jf8RdW+s5o5HTVZUOtOFBP3reutBNZI02r+6aCCx7r231ZzUbq/y
+         Rnqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689947907; x=1690552707;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uoi5Y4jjgnWGfQC+MA3PSzDO/nJ69a0U86XqjtM9qm4=;
+        b=Cr7NXHr2Z0KXadcP4KX0kDvtiGZZPlNqNlZq2RChcNxBeLkZls1fBFkByHnWC0jbQN
+         nQ8AaZTrqZZLoZHv4I47OTs9dvDkvstGQDlWZJgTNB+HmOhY1rL2zcZtmfXzp3PyVrr4
+         8TBZOrmXMH9a8tyI/ecBgyPj0A6NqYuWw/UrLY7vASEq+J60zevBC/jG2u5OaMAMIdFk
+         awHstduW1SKDgeclD9CGedxbIVE+ncWZ7XnYGPnO8VX7AZv9yKvKxouk/eoaDpwW0cmP
+         OLcL3esYBDrVB3jLX1fplIq0lDEVzmk7ygQn5qvqArBu5yWStm/0AiFW9DVeQrXCLgUj
+         A61w==
+X-Gm-Message-State: ABy/qLZxuNHZSAzeIWyVJq4PTI6xuIYKJmCJISQqCECgeBr+Io4hPMLA
+	zYimTnysC5QMiZZ+GSpZ50CIhg==
+X-Google-Smtp-Source: APBJJlFJQPGeO+dM+/CogGYGFX3IbIoIu/R+CmmEzNoP5XS6uM+gVvd5Uqi6hxrOAM8nRxnGkKL4wA==
+X-Received: by 2002:a05:6512:1095:b0:4f8:cd67:88e6 with SMTP id j21-20020a056512109500b004f8cd6788e6mr1382568lfg.44.1689947907244;
+        Fri, 21 Jul 2023 06:58:27 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.104])
+        by smtp.gmail.com with ESMTPSA id h15-20020aa7c94f000000b0051d890b2407sm2111001edt.81.2023.07.21.06.58.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 06:58:26 -0700 (PDT)
+Message-ID: <53c26a74-3374-cbc4-57cf-3b1cc0904300@linaro.org>
+Date: Fri, 21 Jul 2023 15:58:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5674:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d495682-fea0-4577-d86b-08db89f23a6f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	6ar2N7Pyqr5m3sQqU9CmfTMXA6bh3qcGl4CuHFIH7QbTvcE/pFr+7MNrjxLhvw0uI/xcGlqRxYOzRkzuQFN3C13xMeNBaIMYVnMsbv4Wt8ELsnCjIBSMDEzvWw8RNXJhikJsmr0ORtFAwqyNIJ7XdMjy5w+CeJZWOVnARh5telXy0bxLpmWCDXwxg8YPKwuo1yCVMDDmpvw1mzcr65wDPODHsDDpLJEZsYyklcvHJJ0X0SIJZo8x1ZuxNxR4UdMDP1Ju8khjpnKSWlb3I8dg6RvgzAFup2eaFYfzp1u6Tgjy6FF62AT6aYZZcAsIx83Dt7o4jp+rF1MJXzZQ0TXRNL6dmZe6yUtN8h2CWDH+gVpuafeUtvbaR5NhexfSGCZyKCpsBJlAnxuMTsc7g/I+0dn0ZI2KL98n+Brh9ufU+gLjVk8dHaxhHFDbbvSZfWpDukEIL9Saq/1lKT1xYquoaFHlzev3Bk4EDnjbbSL13lQmHIjBhoqnC0SaIPJYDUJDYnDaksM7riAzmlzjWfV9+O/sQSksZkx7H0Vo6FBPtAxXBkyUYyS7SP0k0GVOtWSGvtCmjqpgoN7U1nzLQmWG6ZFvnABF/oFcQg7jSDlc50Q=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(366004)(376002)(346002)(136003)(396003)(451199021)(66476007)(36756003)(86362001)(6486002)(6666004)(54906003)(66946007)(478600001)(66556008)(6916009)(4326008)(26005)(6506007)(55236004)(6512007)(8936002)(4744005)(2906002)(41300700001)(8676002)(44832011)(5660300002)(316002)(38100700002)(2616005)(186003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?f9U4sQ7W5nhnxrMCP/EPDrkmJCLP5Y/qS7y4amuhp7eM/tF827+5Ksd3xey/?=
- =?us-ascii?Q?30i7zP6LDYI+QIxJkLlTzf/rn0x9grz2oy2w3150vJEg8sZcyIk118WY6pCh?=
- =?us-ascii?Q?fZaYZg0tn+GKtJu15r0vtKXkG22coOXMtumb6Sw/fGyITexK+KAo7BzMW+k5?=
- =?us-ascii?Q?NO9D72fuoGlCl83euqHKGBw+36Ueeq6tC47ehuRsSVJbqzkCWHiigfQESjsm?=
- =?us-ascii?Q?RiriD8fCPysHo5oVptY7iYiXqsCD4ejze1ay74/xq0Gs6tta0C5y5UdQtItX?=
- =?us-ascii?Q?Qz1+QWYCNQuDZ4qz6GyaDJ9oE0VHi33c+kWp8wZfvYISbc0Fa75p9IzyodrQ?=
- =?us-ascii?Q?XKJDGfWabzwDC/kHANcpuxGskq0NTudCbIwQ8+bBwqSAechr2gaYy/SLenN3?=
- =?us-ascii?Q?o8XgL5dBxK78r2PTHTB9fOJxxI6g3ABPNjDqaL4Lu66GdFSb5dC+9nrz8OLF?=
- =?us-ascii?Q?aHS3v+FqgLj9KwtkXeynQHPePg+Wq+yF4GfED/j+jL8V/IcFFdUsDZHCx2mb?=
- =?us-ascii?Q?wFfWLNC4PYRWHYMm/w6MRT6QtwSHjAOfhrgKX/AH2xGjxH8CZ3/Nm49TYQZ9?=
- =?us-ascii?Q?OnFDtiZ1Z9aFiUEtmg3bHfI8n98EHbfmQmkiigAFwT9N/agyDoEln3g4kBrl?=
- =?us-ascii?Q?QuW+VZdVVe0JTjExjBwOf+m1Ab5LcY9V5pd7LV5K9Lb3HQIYf5w29APiK8i9?=
- =?us-ascii?Q?jZOrxeeczBIzNV/JY8wRFtkFBlEqK0KX4Jg+w+qig5MtsO2ARH9p7OKSDU7F?=
- =?us-ascii?Q?2wXXd+eFm6dLYIAIU/Bmen2ns2CZ3Ce7D+ANPbgtVTrAm1DjWHnWAQfWYVF1?=
- =?us-ascii?Q?a6i1NvaJcJUjPqadJA4uUSPKtDWXHRBV+sLwf1jaYNHSh25eQf9pGvinHfSH?=
- =?us-ascii?Q?i5scFwClakWMyz5uiXJl43YF7XGWiMSY5NC+ZG5NID4mq3M+/0Av4HoffnP/?=
- =?us-ascii?Q?EvOEnE0SFCIuCTGkG1EzMkTtGrh4I34dIPwX/hi3bWe25D+rjHjgIVPHlkT+?=
- =?us-ascii?Q?Pvbbix1CSPawCVlOkSW5C6uYHdbxqkSk1v2/iZltJ2xRxY+SLvxpDKEnH7/Z?=
- =?us-ascii?Q?U1cbeDJDF7Q2f2NUXkAyVEFEijn7pZD0V71j4pqiPvk+7N8ZU/9S2qCfBIqo?=
- =?us-ascii?Q?v5NmCZLxq+g4qVkscMSEgTNfmOMCtmEWq6PE87W/D79V+CiDcZZnWP+EWtD3?=
- =?us-ascii?Q?C1dVU5NU5CPhs1P3dWaBWnDImzoPsi0joBFonotBkGNCDi5CsW0uLVVmzHrY?=
- =?us-ascii?Q?d6vUfi4ql4ohRNIpyU4bGnh0JNiuuf4934EXwAbuERBpPa4Dp+fNsFB1vnHr?=
- =?us-ascii?Q?affNYjwf4SIalFRuQQIpG6h/OWB8+N5U8ZVoU97hv03b5oIZ6tFV2kFlJZ34?=
- =?us-ascii?Q?pAhkn6uxqYSZfarqYebtzCHWOhN8FCG76mO2sOE2DPzIJqLYyv3HccnXcNpD?=
- =?us-ascii?Q?pDebXQGaF32uvmcF3xzw9ieSO+9nXG+AJGTjM6e2fSGv4XRYsvBPehhHBqrM?=
- =?us-ascii?Q?amXu8Ez92qZcY13eddjo+CpSIGoo8pCwyqv+X97iastHqXe8fikT5fIhINEG?=
- =?us-ascii?Q?7yBegvKuKZ166QewQkT77RnLG/PAsZqX5b9w4LeasDXyRHwJqhs5QJ8iT7Ef?=
- =?us-ascii?Q?6A=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d495682-fea0-4577-d86b-08db89f23a6f
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2023 13:56:05.9917
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0t7CAb0mz1l45zRjFZylCkxEyfAtFehMHuYBRhwkJXmRX7A8jTS9HTFaG0+O/8gn4g+APhDNxjyB/eV9bLlpLAEG7IWY8m337o1GdkyhKJI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5674
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 02/42] dt-bindings: clock: Add Cirrus EP93xx
+To: nikita.shubin@maquefel.me, Hartley Sweeten
+ <hsweeten@visionengravers.com>, Lennert Buytenhek <kernel@wantstofly.org>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Alessandro Zummo
+ <a.zummo@towertech.it>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck
+ <linux@roeck-us.net>, Sebastian Reichel <sre@kernel.org>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+ Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Olof Johansson <olof@lixom.net>, soc@kernel.org,
+ Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Andy Shevchenko <andy@kernel.org>,
+ Michael Peters <mpeters@embeddedTS.com>, Kris Bahnsen <kris@embeddedTS.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
+ netdev@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
+ linux-input@vger.kernel.org, alsa-devel@alsa-project.org
+References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
+ <20230605-ep93xx-v3-2-3d63a5f1103e@maquefel.me>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230605-ep93xx-v3-2-3d63a5f1103e@maquefel.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 10:42:19PM +0800, Yuanjun Gong wrote:
-> in atl1e_tso_csum, it should check the return value of pskb_trim(),
-> and return an error code if an unexpected value is returned
-> by pskb_trim().
+On 20/07/2023 13:29, Nikita Shubin via B4 Relay wrote:
+> From: Nikita Shubin <nikita.shubin@maquefel.me>
 > 
-> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
+> This adds device tree bindings for the Cirrus Logic EP93xx
+> clock block used in these SoCs.
+> 
+> Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
+> ---
+>  .../bindings/clock/cirrus,ep9301-clk.yaml          | 46 ++++++++++++++++++++++
+>  include/dt-bindings/clock/cirrus,ep93xx-clock.h    | 41 +++++++++++++++++++
+>  2 files changed, 87 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/clock/cirrus,ep9301-clk.yaml b/Documentation/devicetree/bindings/clock/cirrus,ep9301-clk.yaml
+> new file mode 100644
+> index 000000000000..111e016601fb
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/cirrus,ep9301-clk.yaml
+> @@ -0,0 +1,46 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/clock/cirrus,ep9301-clk.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Cirrus Logic ep93xx SoC's clock controller
+> +
+> +maintainers:
+> +  - Nikita Shubin <nikita.shubin@maquefel.me>
+> +  - Alexander Sverdlin <alexander.sverdlin@gmail.com>
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - const: cirrus,ep9301-clk
+> +      - items:
+> +          - enum:
+> +              - cirrus,ep9302-clk
+> +              - cirrus,ep9307-clk
+> +              - cirrus,ep9312-clk
+> +              - cirrus,ep9315-clk
+> +          - const: cirrus,ep9301-clk
+> +
+> +  "#clock-cells":
+> +    const: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: reference clock
+> +
+> +required:
+> +  - compatible
+> +  - "#clock-cells"
+> +  - clocks
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    clock-controller {
+> +      compatible = "cirrus,ep9301-clk";
+> +      #clock-cells = <1>;
+> +      clocks = <&xtali>;
+> +    };
+> +...
+> diff --git a/include/dt-bindings/clock/cirrus,ep93xx-clock.h b/include/dt-bindings/clock/cirrus,ep93xx-clock.h
+> new file mode 100644
+> index 000000000000..3cd053c0fdea
+> --- /dev/null
+> +++ b/include/dt-bindings/clock/cirrus,ep93xx-clock.h
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Keep the same filename as bindings file.
+
+Best regards,
+Krzysztof
 
 
