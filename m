@@ -1,86 +1,98 @@
-Return-Path: <netdev+bounces-19805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C40475C615
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:51:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B81A75C61B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:53:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D12D1C21666
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:51:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C93D1C21644
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462C51DDCE;
-	Fri, 21 Jul 2023 11:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5A71DDDA;
+	Fri, 21 Jul 2023 11:53:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C7C14F68
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:51:46 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83AB930C1
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 04:51:43 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-148-z_DqXMMUPVCfSx5Bf5_Iew-1; Fri, 21 Jul 2023 12:51:40 +0100
-X-MC-Unique: z_DqXMMUPVCfSx5Bf5_Iew-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 21 Jul
- 2023 12:51:39 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 21 Jul 2023 12:51:39 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Alan Huang' <mmpgouride@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "rcu@vger.kernel.org" <rcu@vger.kernel.org>
-CC: "Paul E. McKenney" <paulmck@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, "roman.gushchin@linux.dev" <roman.gushchin@linux.dev>
-Subject: RE: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-Thread-Topic: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-Thread-Index: AQHZuzuWW9UBwZmf30GL9p6MGC4yBq/EGshg
-Date: Fri, 21 Jul 2023 11:51:39 +0000
-Message-ID: <fedf0448966b44d5b9146508265874fd@AcuMS.aculab.com>
-References: <04C1E631-725C-47AD-9914-25D5CE04DFF4@gmail.com>
-In-Reply-To: <04C1E631-725C-47AD-9914-25D5CE04DFF4@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D5917758
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:53:34 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE162D4D
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 04:53:33 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R6nx83MSqz18Lt7;
+	Fri, 21 Jul 2023 19:52:44 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 21 Jul
+ 2023 19:53:30 +0800
+Subject: Re: [PATCH net-next] page_pool: add a lockdep check for recycling in
+ hardirq
+To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<peterz@infradead.org>, <mingo@redhat.com>, <will@kernel.org>,
+	<longman@redhat.com>, <boqun.feng@gmail.com>, <hawk@kernel.org>,
+	<ilias.apalodimas@linaro.org>
+References: <20230720173752.2038136-1-kuba@kernel.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <382d00e5-87af-6a6b-17e2-6640fdd01db5@huawei.com>
+Date: Fri, 21 Jul 2023 19:53:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+In-Reply-To: <20230720173752.2038136-1-kuba@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RnJvbTogQWxhbiBIdWFuZw0KPiBTZW50OiAyMCBKdWx5IDIwMjMgMTk6NTQNCj4gDQo+IEkgbm90
-aWNlZCBhIGNvbW1pdCBjODdhMTI0YTVkNWUo4oCcbmV0OiBmb3JjZSBhIHJlbG9hZCBvZiBmaXJz
-dCBpdGVtIGluIGhsaXN0X251bGxzX2Zvcl9lYWNoX2VudHJ5X3JjdeKAnSkNCj4gYW5kIGEgcmVs
-YXRlZCBkaXNjdXNzaW9uIFsxXS4NCg0KSG1tbS4uLiB0aGF0IHdhcyBhbGwgYWJvdXQgdGhlIHJl
-dHJ5IGxvb3AgaW4gaXB2NC91ZHAuYw0KDQpBRkFJQ1QgdGhhdCByZXRyeSBnb3QgZGVsZXRlZCBi
-eSBjYTA2NWQwYy4NCg0KVGhhdCBhbHNvIGNoYW5nZXMgdGhlIGxpc3QgZnJvbSBobGlzdF9udWxs
-c194eHggdG8gaGxpc3RfeHh4Lg0KKEknbSBub3Qgc3VyZSBvZiB0aGUgZGlmZmVyZW5jZSkNCg0K
-VGhpcyBtaWdodCBiZSB3aHkgd2UncmUgc2VlaW5nIHVuZXhwZWN0ZWQgJ3BvcnQgdW5yZWFjaGFi
-bGUnIG1lc3NhZ2VzPw0KDQpRdWl0ZSB3aHkgdGhhdCBoYXMganVzdCBzdGFydGVkIGhhcHBlbmlu
-ZyBpcyBhbm90aGVyIGlzc3VlLg0KTW9zdCBvZiB0aGUgVURQIHNvY2tldHMgd2UgY3JlYXRlIGFy
-ZW4ndCAnY29ubmVjdGVkJyBzbyBJIGRvbid0DQpiZWxpZXZlIHRoZXkgZ2V0IG1vdmVkIGJldHdl
-ZW4gaGFzaCBjaGFpbnMgLSBqdXN0IGRlbGV0ZWQuDQpUaGUgZGVsZXRpb24gc2hvdWxkIGxlYXZl
-IHRoZSBoYXNoIGNoYWluIGludGFjdC4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVz
-cyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEg
-MVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+On 2023/7/21 1:37, Jakub Kicinski wrote:
 
+...
+
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index a3e12a61d456..3ac760fcdc22 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -536,6 +536,8 @@ static void page_pool_return_page(struct page_pool *pool, struct page *page)
+>  static bool page_pool_recycle_in_ring(struct page_pool *pool, struct page *page)
+>  {
+>  	int ret;
+> +
+> +	lockdep_assert_no_hardirq();
+
+Is there any reason not to put it in page_pool_put_defragged_page() to
+catch the case with allow_direct being true when page_pool_recycle_in_ring()
+may not be called?
+
+
+>  	/* BH protection not needed if current is softirq */
+>  	if (in_softirq())
+>  		ret = ptr_ring_produce(&pool->ring, page);
+> @@ -642,6 +644,8 @@ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
+>  	int i, bulk_len = 0;
+>  	bool in_softirq;
+>  
+> +	lockdep_assert_no_hardirq();
+> +
+>  	for (i = 0; i < count; i++) {
+>  		struct page *page = virt_to_head_page(data[i]);
+>  
+> 
 
