@@ -1,117 +1,265 @@
-Return-Path: <netdev+bounces-20017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869AD75D67B
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 23:25:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FF3D75D686
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 23:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40970282469
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:25:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AC4C2823E5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 21:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F346EAF4;
-	Fri, 21 Jul 2023 21:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E22F9C6;
+	Fri, 21 Jul 2023 21:25:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73682F9D5
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 21:24:44 +0000 (UTC)
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07B6130D0;
-	Fri, 21 Jul 2023 14:24:42 -0700 (PDT)
-Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36LJ1s2Y031028;
-	Fri, 21 Jul 2023 21:24:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : subject :
- date : message-id : in-reply-to : references; s=pps0720;
- bh=3qFbs7ny735Se8n+zekA1xfETEDp1cFK+SaOIyzWAhg=;
- b=Bkb1a2zCHDwf/8Exym+IiFrKI87IrgZAEuW7hE4+2qRcwQOrj2wG6YMBxaTW7hrqihLr
- 2ZB6wcWkdqhMfDDrE758r8lKXq0ZhdlLKX9xhwg0bYBlv6cXcQkRxOh4+MfyuCQWCpFN
- WLGkS3e4DuyHnqh3nnoY5zjoQr6iO6/JefPzWBLyv7lj4xao2XcchcOecBQwmG2D2RKJ
- YSsC/5DUyKBuu3oF5+oaZZbxSm4Cv8qNudxH4aKAHNL+DI+c08KUizSnFjeFnvxYxecD
- YGMGIIGhYh1W9ocorfQuxHrTu3AsooZ1H+RhQqLpdq3qGVeOF84YZvCty6Z3CChuTyRC GQ== 
-Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3ryacpbwwt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Jul 2023 21:24:30 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id E604AD2D2;
-	Fri, 21 Jul 2023 21:24:29 +0000 (UTC)
-Received: from hpe.com (unknown [16.231.227.36])
-	by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 41FEA809FDC;
-	Fri, 21 Jul 2023 21:24:29 +0000 (UTC)
-From: nick.hawkins@hpe.com
-To: verdun@hpe.com, nick.hawkins@hpe.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v1 5/5] MAINTAINERS: HPE: Add GXP UMAC Networking Files
-Date: Fri, 21 Jul 2023 16:20:44 -0500
-Message-Id: <20230721212044.59666-6-nick.hawkins@hpe.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230721212044.59666-1-nick.hawkins@hpe.com>
-References: <20230721212044.59666-1-nick.hawkins@hpe.com>
-X-Proofpoint-ORIG-GUID: OcWqRi7nCqDrzVPQvsG7gQUKHY1vudSp
-X-Proofpoint-GUID: OcWqRi7nCqDrzVPQvsG7gQUKHY1vudSp
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-21_12,2023-07-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- spamscore=0 malwarescore=0 adultscore=0 phishscore=0 mlxlogscore=932
- impostorscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307210189
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636E910941
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 21:25:31 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3EBC3A97;
+	Fri, 21 Jul 2023 14:25:10 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bb81809ca8so367515ad.3;
+        Fri, 21 Jul 2023 14:25:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689974710; x=1690579510;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WTGORxsrxN9RZGG729FMXCa8oJ9OGght7Ge2MF78D6E=;
+        b=QWoW73AGyL+cYA1lbcR1wddOXTnugG27xBKAgMhBCbr88SyFmCZlEt+RYpWiheqZi8
+         i/KnW9kO/XER3UVk0CUW++nCN1/SuYGSs2DMkXeAb8Zf01KPobvuGZOuhOtYWWrlzn9b
+         cvL1gPAEiilUL1IiIxbr5CfkxsuXSFBxLOrftMIeUOgOZbQpUVubp9t+jMWw4ZzJ4YA7
+         GH+6S74PP0jL8wNqrZpyuWYze01BBX50Luvf5hfu6U9yryZNnk3zmoHfcis9qhm7oAQL
+         3QkLJnmmkObAhz6WiLEUHQfJlXm5P7yL6LBpRlqTncQ0mK7Bz77RRNAbNjV7HS2jIQ4s
+         IRJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689974710; x=1690579510;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WTGORxsrxN9RZGG729FMXCa8oJ9OGght7Ge2MF78D6E=;
+        b=gysDeEV/7WZfk9swY0p7aKu4EEtKJgxgxlQnlG+F9XhGvFs7neztDem2JZ7qaKVvG7
+         mvYdBTNO95chj/M6eBswYkFeMLnnQdjBCmuV4D3fjiDAe2Q1pAQKAmvD4L2dMxBBiJuY
+         xibeJ4No8fJX6Ea5QqIop+YD0sxOe+tZb3blXTzC6U9JHoGkpVCrkps/GSAVwvVS2Pye
+         FX8sFY+TNDYIy+f9JsRd/cx0vGOgNeUfuyRSJ11RGZVM+hH1pBWxfOBO/jvNW+PaOogF
+         QsD8guS1SPpAv/kqpv0NQ+SbCGte6YLEYoIc2pHroB36CoJl6kUUN/BduUoimInLDNrW
+         JYVg==
+X-Gm-Message-State: ABy/qLZ41fLkjVGv9oUV2h5J7u8uZrYC2vxR6EOKYStSbVredfsxsRG+
+	TwUqnkGJNhfH6Xdj100bkVcloPIVQ3TPtg==
+X-Google-Smtp-Source: APBJJlEpJqXCl9FEtpk+Z2mPIi7Fr+gWrcSB3P6dwJ6tsz2QsUmNFJ22BZwIZmkGmRQFGZmVQei2aA==
+X-Received: by 2002:a17:903:4285:b0:1b9:db3d:9f22 with SMTP id ju5-20020a170903428500b001b9db3d9f22mr3062056plb.48.1689974710313;
+        Fri, 21 Jul 2023 14:25:10 -0700 (PDT)
+Received: from [127.0.0.1] ([2402:d0c0:2:a2a::1])
+        by smtp.gmail.com with ESMTPSA id ja21-20020a170902efd500b001b8a3a0c928sm3963820plb.181.2023.07.21.14.25.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 21 Jul 2023 14:25:09 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
+Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
+From: Alan Huang <mmpgouride@gmail.com>
+In-Reply-To: <ED5C700E-0C63-41E5-8A46-F7BC93B2FD42@gmail.com>
+Date: Sat, 22 Jul 2023 05:25:02 +0800
+Cc: linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org,
+ rcu@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <25321527-3040-434D-80EC-82DFD17C710C@gmail.com>
+References: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
+ <1E0741E0-2BD9-4FA3-BA41-4E83315A10A8@joelfernandes.org>
+ <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
+ <cc9b292c-99b1-bec9-ba8e-9c202b5835cd@joelfernandes.org>
+ <ED9F14A2-533B-471E-9B79-F75CEEE9A216@gmail.com>
+ <ED5C700E-0C63-41E5-8A46-F7BC93B2FD42@gmail.com>
+To: Joel Fernandes <joel@joelfernandes.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ roman.gushchin@linux.dev,
+ "David.Laight@aculab.com" <David.Laight@ACULAB.COM>
+X-Mailer: Apple Mail (2.3654.60.0.2.21)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Nick Hawkins <nick.hawkins@hpe.com>
 
-List the files added for supporting the UMAC networking on GXP.
+> 2023=E5=B9=B47=E6=9C=8822=E6=97=A5 =E4=B8=8A=E5=8D=884:40=EF=BC=8CAlan =
+Huang <mmpgouride@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>=20
+>> 2023=E5=B9=B47=E6=9C=8822=E6=97=A5 =E4=B8=8A=E5=8D=884:08=EF=BC=8CAlan =
+Huang <mmpgouride@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>=20
+>>=20
+>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 =E4=B8=8B=E5=8D=8811:21=EF=BC=8CJoe=
+l Fernandes <joel@joelfernandes.org> =E5=86=99=E9=81=93=EF=BC=9A
+>>>=20
+>>> On 7/21/23 10:27, Alan Huang wrote:
+>>>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 20:54=EF=BC=8CJoel Fernandes =
+<joel@joelfernandes.org> =E5=86=99=E9=81=93=EF=BC=9A
+>>>>>=20
+>>>>>=20
+>>>>>=20
+>>>>>> On Jul 20, 2023, at 4:00 PM, Alan Huang <mmpgouride@gmail.com> =
+wrote:
+>>>>>>=20
+>>>>>> =EF=BB=BF
+>>>>>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 03:22=EF=BC=8CEric Dumazet =
+<edumazet@google.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>>>>>=20
+>>>>>>>> On Thu, Jul 20, 2023 at 8:54=E2=80=AFPM Alan Huang =
+<mmpgouride@gmail.com> wrote:
+>>>>>>>>=20
+>>>>>>>> Hi,
+>>>>>>>>=20
+>>>>>>>> I noticed a commit c87a124a5d5e(=E2=80=9Cnet: force a reload of =
+first item in hlist_nulls_for_each_entry_rcu=E2=80=9D)
+>>>>>>>> and a related discussion [1].
+>>>>>>>>=20
+>>>>>>>> After reading the whole discussion, it seems like that =
+ptr->field was cached by gcc even with the deprecated
+>>>>>>>> ACCESS_ONCE(), so my question is:
+>>>>>>>>=20
+>>>>>>>>    Is that a compiler bug? If so, has this bug been fixed =
+today, ten years later?
+>>>>>>>>=20
+>>>>>>>>    What about READ_ONCE(ptr->field)?
+>>>>>>>=20
+>>>>>>> Make sure sparse is happy.
+>>>>>>=20
+>>>>>> It caused a problem without barrier(), and the deprecated =
+ACCESS_ONCE() didn=E2=80=99t help:
+>>>>>>=20
+>>>>>> https://lore.kernel.org/all/519D19DA.50400@yandex-team.ru/
+>>>>>>=20
+>>>>>> So, my real question is: With READ_ONCE(ptr->field), are there =
+still some unusual cases where gcc
+>>>>>> decides not to reload ptr->field?
+>>>>>=20
+>>>>> I am a bit doubtful there will be strong (any?) interest in =
+replacing the barrier() with READ_ONCE() without any tangible reason, =
+regardless of whether a gcc issue was fixed.
+>>>>>=20
+>>>>> But hey, if you want to float the idea=E2=80=A6
+>>>> We already had the READ_ONCE() in rcu_deference_raw().
+>>>> The barrier() here makes me think we need write code like below:
+>>>> =09
+>>>> 	READ_ONCE(head->first);
+>>>> 	barrier();
+>>>> 	READ_ONCE(head->first);
+>>>> With READ_ONCE (or the deprecated ACCESS_ONCE),
+>>>> I don=E2=80=99t think a compiler should cache the value of =
+head->first.
+>>>=20
+>>>=20
+>>> Right, it shouldn't need to cache. To Eric's point it might be risky =
+to remove the barrier() and someone needs to explain that issue first =
+(or IMO there needs to be another tangible reason like performance etc). =
+Anyway, FWIW I wrote a simple program and I am not seeing the =
+head->first cached with the pattern you shared above:
+>>>=20
+>>> #include <stdlib.h>
+>>>=20
+>>> #define READ_ONCE(x) (*(volatile typeof(x) *)&(x))
+>>> #define barrier() __asm__ __volatile__("": : :"memory")
+>>>=20
+>>> typedef struct list_head {
+>>>  int first;
+>>>  struct list_head *next;
+>>> } list_head;
+>>>=20
+>>> int main() {
+>>>  list_head *head =3D (list_head *)malloc(sizeof(list_head));
+>>>  head->first =3D 1;
+>>>  head->next =3D 0;
+>>>=20
+>>>  READ_ONCE(head->first);
+>>>  barrier();
+>>>  READ_ONCE(head->first);
+>>>=20
+>>>  free(head);
+>>>  return 0;
+>>> }
+>>>=20
+>>> On ARM 32-bit, 64-bit and x86_64, with -Os and then another =
+experiment with -O2 on new gcc versions.
+>>=20
+>> Well, when I change the code as below:
+>>=20
+>> #include <stdlib.h>
+>>=20
+>> #define READ_ONCE(x) (*(volatile typeof(x) *)&(x))
+>> #define barrier() __asm__ __volatile__("": : :"memory")
+>>=20
+>> typedef struct list_head {
+>>  struct list_head *next;
+>>  int first;					// difference here
+>> } list_head;
+>>=20
+>> int main() {
+>>  list_head *head =3D (list_head *)malloc(sizeof(list_head));
+>>  head->first =3D 1;
+>>  head->next =3D 0;
+>>=20
+>>  READ_ONCE(head->first);
+>>  READ_ONCE(head->first);
+>>=20
+>>  free(head);
+>>  return 0;
+>> }
+>>=20
+>> GCC 8, GCC 10, GCC 11 generate the following code (with -O2):
+>>=20
+>> main:
+>>       subq    $8, %rsp
+>>       movl    $16, %edi
+>>       call    malloc
+>>       movl    $1, 8(%rax)
+>>       movq    %rax, %rdi
+>>       call    free
+>>       xorl    %eax, %eax
+>>       addq    $8, %rsp
+>>       ret
+>>=20
+>>=20
+>> The READ_ONCE has been optimized away. The difference in the source =
+code is that I put ->first to the second member.
+>>=20
+>> That means, GCC 8, 10, 11 have the bug!
+>>=20
+>>=20
+>=20
+> Found a related discussion:
+>=20
+> 	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D102714
 
-Signed-off-by: Nick Hawkins <nick.hawkins@hpe.com>
----
- MAINTAINERS | 3 +++
- 1 file changed, 3 insertions(+)
+And this:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 27ef11624748..4f1c3fa27f7f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2243,6 +2243,8 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/arm/hpe,gxp.yaml
- F:	Documentation/devicetree/bindings/hwmon/hpe,gxp-fan-ctrl.yaml
- F:	Documentation/devicetree/bindings/i2c/hpe,gxp-i2c.yaml
-+F:	Documentation/devicetree/bindings/net/hpe,gxp-umac-mdio.yaml
-+F:	Documentation/devicetree/bindings/net/hpe,gxp-umac.yaml
- F:	Documentation/devicetree/bindings/spi/hpe,gxp-spifi.yaml
- F:	Documentation/devicetree/bindings/timer/hpe,gxp-timer.yaml
- F:	Documentation/hwmon/gxp-fan-ctrl.rst
-@@ -2252,6 +2254,7 @@ F:	arch/arm/mach-hpe/
- F:	drivers/clocksource/timer-gxp.c
- F:	drivers/hwmon/gxp-fan-ctrl.c
- F:	drivers/i2c/busses/i2c-gxp.c
-+F:	drivers/net/ethernet/hpe/
- F:	drivers/spi/spi-gxp.c
- F:	drivers/watchdog/gxp-wdt.c
- 
--- 
-2.17.1
+	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D47409
+
+So, the compiler had the bug ten years ago.
+
+>=20
+> Looks like GCC 10, 11 have been backported, not sure whether GCC 8 has =
+been backported.
+>=20
+> So, I have the following questions:
+>=20
+> Given that some people might not update their GCC, do they need to be =
+notified?
+>=20
+> Do we need to CC Linus?
+>=20
+>=20
 
 
