@@ -1,278 +1,151 @@
-Return-Path: <netdev+bounces-20038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D885475D74B
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:17:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA2875D772
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E54D2822CF
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:17:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C05DF1C21832
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95142100B6;
-	Fri, 21 Jul 2023 22:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C291EA93;
+	Fri, 21 Jul 2023 22:24:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893DA27F12
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 22:17:23 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C453AB1;
-	Fri, 21 Jul 2023 15:17:09 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 12A6B6016E;
-	Sat, 22 Jul 2023 00:17:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689977827; bh=TyfslZjfylAlfLVJYBGUmYyDqZRI4hQ8bFlIqzvjNxo=;
-	h=Date:To:Cc:From:Subject:From;
-	b=Pr4zKEDz8kFfzxMAKHCTppd9HobjOkVZRHjekphc3e/zYh5xnn/LMyzF5PVlrgPVw
-	 HsstG0m9tqws75R5QKxSZgRkzOp5dA6cV8g9fwG5MdPzMj+fxorZ60iN3dFrOpND8G
-	 MF1ntgOGjlJvQgeDrk5x+qM5OF8+i3RazIsu1Wi9fba0WZciZVsH4EpVREn0U4x64c
-	 Lsr+IA9zuAD4SjElp335oXcaPoMyByWq3z9ttkxBL1qGDaTxUvm3SfHgopACdi2gWH
-	 lq+IbIMM3mJZNJXjrQQkhuYI3u0OLJnqUQKHGAJZZsrXPDpCFef2/mkrsV6DmiB1gY
-	 mOgrMWZth3GYQ==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id woRg7Yp1sh6r; Sat, 22 Jul 2023 00:17:04 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id B9C176015F;
-	Sat, 22 Jul 2023 00:17:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689977824; bh=TyfslZjfylAlfLVJYBGUmYyDqZRI4hQ8bFlIqzvjNxo=;
-	h=Date:To:Cc:From:Subject:From;
-	b=f4gGkO9wbAbGLHklMpsQ3n0KU23YOyJuZSj+tAYQV2Qv2//UJSxflpfYep4i0m4Sh
-	 WLdNgw7jncBscIk/oMPcuyMVs4QKLXjV+ucZqSfFo0lFK7B9eQ/d2nk/GgFDyd6sVZ
-	 rTqmDRo5CS5z4g+BdF4ervBvswZ5g78RkAigZYmR4uoQ+rn7XVROrgXG4N45wUxxYO
-	 Q2VgbuW5gj+e37oB2YOpAdEcwpSXFCPpzCNH/93kWuda1TBDXGb0qf+u/2D54qDGWe
-	 p/ZiW//9oPHXAR1ykaki4EdL+t8e7q+SFw+/rFWliTmZV+egVOENCZ6nPbIJ4XE6FZ
-	 zPrGwY4OFXI7w==
-Message-ID: <829bc9a0-8b6a-f799-8434-7f42e6d7757e@alu.unizg.hr>
-Date: Sat, 22 Jul 2023 00:16:59 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9FB27F12
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 22:24:38 +0000 (UTC)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A182830ED
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:24:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689978276; x=1721514276;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8iUkVOhpK/uHIGC1jP2vtRrIdrhv0hm25wJ7mkr9jTo=;
+  b=GJz32ejbcfyxouw6mT4yKWyyYuUfXXzN8eI3UflMfyvxl+IQusJWmUgu
+   pHWAoqjp5vKDT21cwWDy63kams0fn7wQ2g7EmMZHDmS6LbLP/D7El7c0f
+   Oyh06hKW85qQpGzyJmJ8aAecTKBcB8tHMAzzvNjCN73BlcyJOv8v3L5HY
+   w=;
+X-IronPort-AV: E=Sophos;i="6.01,222,1684800000"; 
+   d="scan'208";a="17919741"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 22:24:34 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com (Postfix) with ESMTPS id 55FD7A0A14;
+	Fri, 21 Jul 2023 22:24:34 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 21 Jul 2023 22:24:33 +0000
+Received: from 88665a182662.ant.amazon.com (10.135.225.135) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 21 Jul 2023 22:24:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Amit Klein <aksecurity@gmail.com>, Benjamin Herrenschmidt
+	<benh@amazon.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Stewart Smith
+	<trawets@amazon.com>, Samuel Mendoza-Jonas <samjonas@amazon.com>
+Subject: [PATCH v2 net] tcp: Reduce chance of collisions in inet6_hashfn().
+Date: Fri, 21 Jul 2023 15:24:10 -0700
+Message-ID: <20230721222410.17914-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Amit Cohen <amcohen@nvidia.com>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Subject: [BUG] sefltests: forwarding: gre_custom_multipath_hash.sh: [FAIL] and
- syntax errors
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.135.225.135]
+X-ClientProxiedBy: EX19D043UWC003.ant.amazon.com (10.13.139.240) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+From: Stewart Smith <trawets@amazon.com>
 
-It's me again.
+For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
+table with a hash over the source & destination addresses and ports.
+However, the IPv6 hash is insufficient and can lead to a high rate of
+collisions.
 
-Don't throw things at me, but it is the same old vanilla torvalds tree kernel 6.5-rc2
-kselftest run, and after applying the patches I ran into the new problems:
+The IPv6 hash used an XOR to fit everything into the 96 bits for the
+fast jenkins hash, meaning it is possible for an external entity to
+ensure the hash collides, thus falling back to a linear search in the
+bucket, which is slow.
 
-I have been free to add the timeout SIGTERM trap to the test, and this is the only
-change, save for the Ido's lib.sh patch (for filling the veth NETIFS array in default
-execution case).
+We take the approach of hash the full length of IPv6 address in
+__ipv6_addr_jhash() so that all users can benefit from a more secure
+version.
 
-Here is the command output:
+While this may look like it adds overhead, the reality of modern CPUs
+means that this is unmeasurable in real world scenarios.
 
-# selftests: net/forwarding: gre_custom_multipath_hash.sh
-# TEST: ping                                                          [ OK ]
-# TEST: ping6                                                         [ OK ]
-# INFO: Running IPv4 overlay custom multipath hash tests
-# TEST: Multipath hash field: Inner source IP (balanced)              [ OK ]
-# INFO: Packets sent on path1 / path2: 6760 / 5859
-# TEST: Multipath hash field: Inner source IP (unbalanced)            [ OK ]
-# INFO: Packets sent on path1 / path2: 2 / 12603
-# TEST: Multipath hash field: Inner destination IP (balanced)         [ OK ]
-# INFO: Packets sent on path1 / path2: 5850 / 6750
-# TEST: Multipath hash field: Inner destination IP (unbalanced)       [ OK ]
-# INFO: Packets sent on path1 / path2: 12602 / 1
-# TEST: Multipath hash field: Inner source port (balanced)            [ OK ]
-# INFO: Packets sent on path1 / path2: 16411 / 16364
-# TEST: Multipath hash field: Inner source port (unbalanced)          [ OK ]
-# INFO: Packets sent on path1 / path2: 32773 / 3
-# TEST: Multipath hash field: Inner destination port (balanced)       [ OK ]
-# INFO: Packets sent on path1 / path2: 16410 / 16362
-# TEST: Multipath hash field: Inner destination port (unbalanced)     [ OK ]
-# INFO: Packets sent on path1 / path2: 32770 / 0
-# INFO: Running IPv6 overlay custom multipath hash tests
-# TEST: Multipath hash field: Inner source IP (balanced)              [ OK ]
-# INFO: Packets sent on path1 / path2: 6150 / 6452
-# TEST: Multipath hash field: Inner source IP (unbalanced)            [ OK ]
-# INFO: Packets sent on path1 / path2: 0 / 12600
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# TEST: Multipath hash field: Inner destination IP (balanced)         [FAIL]
-# 	Expected traffic to be balanced, but it is not
-# INFO: Packets sent on path1 / path2: -129763 / -77050
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Invalid VRF name
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner destination IP (unbalanced)       [ OK ]
-# INFO: Packets sent on path1 / path2: 0 / 0
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner flowlabel (balanced)              [FAIL]
-# 	Expected traffic to be balanced, but it is not
-# INFO: Packets sent on path1 / path2: 0 / 0
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Invalid VRF name
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner flowlabel (unbalanced)            [ OK ]
-# INFO: Packets sent on path1 / path2: 0 / 0
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Invalid VRF name
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner source port (balanced)            [FAIL]
-# 	Expected traffic to be balanced, but it is not
-# INFO: Packets sent on path1 / path2: 0 / 0
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Invalid VRF name
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner source port (unbalanced)          [ OK ]
-# INFO: Packets sent on path1 / path2: 0 / 0
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Invalid VRF name
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner destination port (balanced)       [FAIL]
-# 	Expected traffic to be balanced, but it is not
-# INFO: Packets sent on path1 / path2: 0 / 0
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Invalid VRF name
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# jq: error (at <stdin>:1): Cannot iterate over null (null)
-# Runtime error (func=(main), adr=3): Divide by zero
-# (standard_in) 1: syntax error
-# TEST: Multipath hash field: Inner destination port (unbalanced)     [ OK ]
-# INFO: Packets sent on path1 / path2: 0 / 0
-# Error: argument "vveth9" is wrong: Invalid VRF
-#
-# Error: argument "vveth9" is wrong: Invalid VRF
-#
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: No such process
-# RTNETLINK answers: No such process
-# Cannot find device "vveth9"
-# Error: argument "vveth8" is wrong: Invalid VRF
-#
-# Error: argument "vveth8" is wrong: Invalid VRF
-#
-# Error: argument "vveth8" is wrong: Invalid VRF
-#
-# Cannot find device "g2"
-# Cannot find device "g2"
-# Cannot find device "g2"
-# Cannot find device "g2"
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: No such process
-# RTNETLINK answers: No such process
-# Cannot find device "vveth8"
-# Error: Invalid handle.
-# Error: argument "vveth6" is wrong: Invalid VRF
-#
-# Error: argument "vveth6" is wrong: Invalid VRF
-#
-# Cannot find device "veth5.222"
-# Cannot find device "veth5.111"
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: No such process
-# RTNETLINK answers: No such process
-# Cannot find device "vveth6"
-# Error: argument "vveth3" is wrong: Invalid VRF
-#
-# Error: argument "vveth3" is wrong: Invalid VRF
-#
-# Cannot find device "veth4.222"
-# Cannot find device "veth4.111"
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: No such process
-# RTNETLINK answers: No such process
-# Cannot find device "vveth3"
-# Error: argument "vveth1" is wrong: Invalid VRF
-#
-# Error: argument "vveth1" is wrong: Invalid VRF
-#
-# Error: argument "vveth1" is wrong: Invalid VRF
-#
-# Cannot find device "g1"
-# Cannot find device "g1"
-# Cannot find device "g1"
-# Cannot find device "g1"
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: No such process
-# RTNETLINK answers: No such process
-# Cannot find device "vveth1"
-# Error: argument "vveth0" is wrong: Invalid VRF
-#
-# Error: argument "vveth0" is wrong: Invalid VRF
-#
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: Cannot assign requested address
-# RTNETLINK answers: No such process
-# RTNETLINK answers: No such process
-# Cannot find device "vveth0"
-# RTNETLINK answers: File exists
-# RTNETLINK answers: No such file or directory
-# RTNETLINK answers: File exists
-# RTNETLINK answers: No such file or directory
-#
-not ok 18 selftests: net/forwarding: gre_custom_multipath_hash.sh # TIMEOUT 240 seconds
+In simulating with llvm-mca, the increase in cycles for the hashing
+code was ~16 cycles on Skylake (from a base of ~155), and an extra ~9
+on Nehalem (base of ~173).
 
-Those things like RTNETLINK errors probably mess up things beyond what cleanup
-does, so the reproducer might not be that easy to devise.
+In commit dd6d2910c5e0 ("netfilter: conntrack: switch to siphash")
+netfilter switched from a jenkins hash to a siphash, but even the faster
+hsiphash is a more significant overhead (~20-30%) in some preliminary
+testing.  So, in this patch, we keep to the more conservative approach to
+ensure we don't add much overhead per SYN.
 
-I have tried to reduce the complexity by adding:
+In testing, this results in a consistently even spread across the
+connection buckets.  In both testing and real-world scenarios, we have
+not found any measurable performance impact.
 
-trap cleanup INT TERM EXIT
+Fixes: 08dcdbf6a7b9 ("ipv6: use a stronger hash for tcp")
+Signed-off-by: Stewart Smith <trawets@amazon.com>
+Signed-off-by: Samuel Mendoza-Jonas <samjonas@amazon.com>
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+v2:
+  * Hash all IPv6 bytes once in __ipv6_addr_jhash() instead of reusing
+    some bytes twice.
 
-to the tests that timed out.
+v1: https://lore.kernel.org/netdev/20230629015844.800280-1-samjonas@amazon.com/
+---
+ include/net/ipv6.h | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Kind regards,
-Mirsad
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 7332296eca44..2acc4c808d45 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -752,12 +752,8 @@ static inline u32 ipv6_addr_hash(const struct in6_addr *a)
+ /* more secured version of ipv6_addr_hash() */
+ static inline u32 __ipv6_addr_jhash(const struct in6_addr *a, const u32 initval)
+ {
+-	u32 v = (__force u32)a->s6_addr32[0] ^ (__force u32)a->s6_addr32[1];
+-
+-	return jhash_3words(v,
+-			    (__force u32)a->s6_addr32[2],
+-			    (__force u32)a->s6_addr32[3],
+-			    initval);
++	return jhash2((__force const u32 *)a->s6_addr32,
++		      ARRAY_SIZE(a->s6_addr32), initval);
+ }
+ 
+ static inline bool ipv6_addr_loopback(const struct in6_addr *a)
+-- 
+2.30.2
+
 
