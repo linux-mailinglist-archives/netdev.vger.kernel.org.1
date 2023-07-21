@@ -1,127 +1,145 @@
-Return-Path: <netdev+bounces-19820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B4375C823
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:46:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A17A075C839
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF6761C21567
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:46:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D18281C215FB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33BC1DDF9;
-	Fri, 21 Jul 2023 13:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869AC1DDFE;
+	Fri, 21 Jul 2023 13:50:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74A019A1F
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:46:50 +0000 (UTC)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCBD41986;
-	Fri, 21 Jul 2023 06:46:48 -0700 (PDT)
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="433255150"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="433255150"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 06:46:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="728103153"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="728103153"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Jul 2023 06:46:34 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andy@kernel.org>)
-	id 1qMqSj-006s0v-2p;
-	Fri, 21 Jul 2023 16:46:29 +0300
-Date: Fri, 21 Jul 2023 16:46:29 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Alessandro Zummo <a.zummo@towertech.it>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bartosz Golaszewski <brgl@bgdev.pl>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Hartley Sweeten <hsweeten@visionengravers.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Kris Bahnsen <kris@embeddedts.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Lennert Buytenhek <kernel@wantstofly.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Lukasz Majewski <lukma@denx.de>, Mark Brown <broonie@kernel.org>,
-	Michael Peters <mpeters@embeddedts.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Nikita Shubin <nikita.shubin@maquefel.me>,
-	Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>,
-	Olof Johansson <olof@lixom.net>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799A619A1F
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 13:50:17 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC6F2D45
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 06:50:14 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fd190065a8so17599785e9.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 06:50:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1689947413; x=1690552213;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jzDN3rUK7N/Nj7i2zhkTUZdxm+FjSAWAWWXiJ9jyKGM=;
+        b=t0IebwfVFX4TVylqwkakMpBgBQh87vfKWrGUNUOGzIH2q68bgsJqzbgWODqFiL5QC/
+         GXytADzQh9cplYCNSC9D5prSf/1AEcCeatSWoiyF6fknD0eumdfEUHRT+hzeG+AdzV/f
+         5xQfu/G5kZGC25X5FnDvQsmDrXCjscvOBE0x7rAMq2ACs1wETCZcnTsGCipAqDD/9FPw
+         729xvuAyF72IckCzZP7K3eoIw9VYgDr1fJ8GB+Xs6xvAd8gCrwC7RPJG9M+dggiT+GRE
+         PF2smvKCVgnflYNGw2XkTflHg1wuq2EH5oYSHjucXpwjJnM6KdCk/TKcKlTrjN0DSTf5
+         HuTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689947413; x=1690552213;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jzDN3rUK7N/Nj7i2zhkTUZdxm+FjSAWAWWXiJ9jyKGM=;
+        b=cX/E0Rsh5OB7G2ExAfKAvKHqQpinSWRuxlA+lkMlLRchdx/G8yPSJBlxYW+1MlRpag
+         o6VOvf93FAjABU8XO1zIEe9hYB2dKFnhnQLg8o3cM59lUmGiTvJFX/YK/7RrMoYrJaCf
+         50e8r/QIa59FTLlYyKdTMPR81q+JopwV+U2ATUoHbnB54A+a4N39J1f25zX/MhrLM7Do
+         9Z4qenhvo2JfjD6p/pL891H1v8GDIGVOijSrFll6H6b2AlmrCkHde8EEHHnhaUb5o6pM
+         l2EPnHaKSFzdL4YpABhd9qrFK0KIVoJ/RlFhtnZ5KafahzRLV1i/Dr1gljvUDsXpdB7h
+         FrIg==
+X-Gm-Message-State: ABy/qLZJRZvGku5uXTj+R3ZwkI68rNE16c5RDc1mo7XDK9yWZ3QAKAjJ
+	+RF6e2Vim0kIrDHulkGmvaERVQ==
+X-Google-Smtp-Source: APBJJlEIRmsAY46OfrfXA0DVxMEDacjRJS458pI9GfBHW1DQAPi+8ykOPdPJDZ9Z1VWRe3AYrj7QiQ==
+X-Received: by 2002:a1c:f313:0:b0:3fc:855:db42 with SMTP id q19-20020a1cf313000000b003fc0855db42mr1573194wmq.34.1689947412657;
+        Fri, 21 Jul 2023 06:50:12 -0700 (PDT)
+Received: from blmsp.fritz.box ([2001:4091:a247:82fa:b762:4f68:e1ed:5041])
+        by smtp.gmail.com with ESMTPSA id c14-20020adfed8e000000b00313e4d02be8sm4233980wro.55.2023.07.21.06.50.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 06:50:12 -0700 (PDT)
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Rob Herring <robh+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Sebastian Reichel <sre@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>, Takashi Iwai <tiwai@suse.com>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>, soc@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
-	netdev@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
-	linux-input@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 03/42] clk: ep93xx: add DT support for Cirrus EP93xx
-Message-ID: <ZLqMNU6XtTEO2a1R@smile.fi.intel.com>
-References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
- <20230605-ep93xx-v3-3-3d63a5f1103e@maquefel.me>
- <3fcb760c101c5f7081235290362f5c02.sboyd@kernel.org>
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Vivek Yadav <vivek.2311@samsung.com>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Simon Horman <simon.horman@corigine.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>
+Subject: [PATCH v3 0/6] can: tcan4x5x: Introduce tcan4552/4553
+Date: Fri, 21 Jul 2023 15:50:03 +0200
+Message-Id: <20230721135009.1120562-1-msp@baylibre.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3fcb760c101c5f7081235290362f5c02.sboyd@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 04:27:45PM -0700, Stephen Boyd wrote:
-> Quoting Nikita Shubin via B4 Relay (2023-07-20 04:29:03)
+Hi everyone,
 
-...
+This series introduces two new chips tcan-4552 and tcan-4553. The
+generic driver works in general but needs a few small changes. These are
+caused by the removal of wake and state pins.
 
-> > +static bool is_best(unsigned long rate, unsigned long now,
-> > +                    unsigned long best)
-> > +{
-> > +       return abs(rate - now) < abs(rate - best);
-> 
-> Another case where we need abs_diff() so that it doesn't get confused
-> when trying to do signed comparison.
+v3 removes the check of the devicetree compatible and completely relies
+on the ID2 register.
 
-Here you are: Message-Id: <20230721134235.15517-1-andriy.shevchenko@linux.intel.com>
+Based on v6.5-rc1.
 
+Best,
+Markus
+
+Changes in v3:
+- Rebased to v6.5-rc1
+- Removed devicetree compatible check in tcan driver. The device version
+  is now unconditionally detected using the ID2 register
+
+Changes in v2:
+- Update the binding documentation to specify tcan4552 and tcan4553 with
+  the tcan4x5x as fallback
+- Update the driver to use auto detection as well. If compatible differs
+  from the ID2 register, use the ID2 register and print a warning.
+- Small style changes
+
+Previous versions:
+v2 - https://lore.kernel.org/lkml/20230621093103.3134655-1-msp@baylibre.com/
+v1 - https://lore.kernel.org/lkml/20230314151201.2317134-1-msp@baylibre.com
+
+Markus Schneider-Pargmann (6):
+  dt-bindings: can: tcan4x5x: Add tcan4552 and tcan4553 variants
+  can: tcan4x5x: Remove reserved register 0x814 from writable table
+  can: tcan4x5x: Check size of mram configuration
+  can: tcan4x5x: Rename ID registers to match datasheet
+  can: tcan4x5x: Add support for tcan4552/4553
+  can: tcan4x5x: Add error messages in probe
+
+ .../devicetree/bindings/net/can/tcan4x5x.txt  |  11 +-
+ drivers/net/can/m_can/m_can.c                 |  16 ++
+ drivers/net/can/m_can/m_can.h                 |   1 +
+ drivers/net/can/m_can/tcan4x5x-core.c         | 139 +++++++++++++++---
+ drivers/net/can/m_can/tcan4x5x-regmap.c       |   1 -
+ 5 files changed, 142 insertions(+), 26 deletions(-)
+
+
+base-commit: 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.40.1
 
 
