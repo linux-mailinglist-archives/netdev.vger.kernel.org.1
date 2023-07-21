@@ -1,125 +1,240 @@
-Return-Path: <netdev+bounces-19910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 387B575CCC2
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:55:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6087C75CCE5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68A861C21091
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:55:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 912471C216C3
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B99B1ED3D;
-	Fri, 21 Jul 2023 15:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05711F93C;
+	Fri, 21 Jul 2023 15:59:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4037927F3D
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:55:40 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B9C35A0;
-	Fri, 21 Jul 2023 08:55:23 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6862842a028so1405319b3a.0;
-        Fri, 21 Jul 2023 08:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689954923; x=1690559723;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F9Nkz09J0OWI8g55rIWxy1NKC5S7asE7sS8B85Det4w=;
-        b=Tuv9oN/LT9x0NGtgdwqfgzNpbSMdVfxcVtV2YUFxa5Lnf7p0nkDaGoMM0CHpt/4rlb
-         c5rQ1zZyK5Tar0Q2eTbyuKQFZAcXfMwZEnIFXeFQ9OSEXLvYNzcPAcrCp5+NohdmF9PX
-         5UJdxpqzSEpbqsBN6Vt1opak5tnVfFqfms0JbBvu5xDIGxR0fBAcR5N0GMmHwHFYMkXw
-         zxJwds8Rdvcv5MfF7W4sGuArBm4OUYiejAdhd7pKJ1IGZ+n0A1ZUmiCJ/q3dVM4/y1kz
-         Lmg93CxUIpdD2+gMb1SQZGmJQLy3vmAaCjITR4AeKMmJ3bC6BpDBvdq9Sx0Wsc5KupGd
-         gLyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689954923; x=1690559723;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F9Nkz09J0OWI8g55rIWxy1NKC5S7asE7sS8B85Det4w=;
-        b=G/7222/oYsEzMKPO5PX/6CulUYZql34oGBsrgqvLyjQgTlLJGY7aK2vPIlAJyWIA7J
-         oSh3UylvpNb+bq4QINcKg2Oew6BFceeqRsSeISa05QrRJnxy7fOGOjoFhM77qUrf59K9
-         BEcxVo0k5A5D/tGcO/89ZllSLmJLWkcDIzv2yVDwBRZ+y2SR2Pm2amVDYj6pqtTIFT7e
-         1HMQYZI9JFL6UZGOU0LJLwSQTdREo4LzobltBpNvantZm+PkV7QUB4wFu3s4Gpqa30It
-         7uBELQeKFPhTXmVb2duxXo00aIbTD643QZPSPevgk3tcEb00Y5S6G4ZRmDD4htdNmy4w
-         O7Ew==
-X-Gm-Message-State: ABy/qLaSPGPkYccr3uFVJ8d+EwW9Rm+PdPcfYMXs7KMbfqjf8HzD7enB
-	EuqLInL9QJaWjmfONmdFELc=
-X-Google-Smtp-Source: APBJJlFPtxydAoiHWHkJISTHNoF9Jsw9EbnmsgBFnnI9ZibNZVSsa6Iv55dcnAUzUA0ld3ftX4P6pw==
-X-Received: by 2002:a05:6a00:b45:b0:676:20f8:be41 with SMTP id p5-20020a056a000b4500b0067620f8be41mr484404pfo.16.1689954923244;
-        Fri, 21 Jul 2023 08:55:23 -0700 (PDT)
-Received: from smtpclient.apple ([2402:d0c0:2:a2a::1])
-        by smtp.gmail.com with ESMTPSA id y8-20020a62b508000000b00663b712bfbdsm3145756pfe.57.2023.07.21.08.55.17
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Jul 2023 08:55:22 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FBE1F93B
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:59:14 +0000 (UTC)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014492D47;
+	Fri, 21 Jul 2023 08:59:12 -0700 (PDT)
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="397947175"
+X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
+   d="scan'208";a="397947175"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 08:59:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="1055599368"
+X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
+   d="scan'208";a="1055599368"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga005.fm.intel.com with ESMTP; 21 Jul 2023 08:58:59 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andy@kernel.org>)
+	id 1qMsWt-00BQxg-0w;
+	Fri, 21 Jul 2023 18:58:55 +0300
+Date: Fri, 21 Jul 2023 18:58:55 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: nikita.shubin@maquefel.me
+Cc: Hartley Sweeten <hsweeten@visionengravers.com>,
+	Lennert Buytenhek <kernel@wantstofly.org>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Lukasz Majewski <lukma@denx.de>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Sebastian Reichel <sre@kernel.org>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
+	soc@kernel.org, Liam Girdwood <lgirdwood@gmail.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Michael Peters <mpeters@embeddedts.com>,
+	Kris Bahnsen <kris@embeddedts.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
+	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
+	netdev@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
+	linux-input@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH v3 09/42] clocksource: ep93xx: Add driver for Cirrus
+ Logic EP93xx
+Message-ID: <ZLqrPw933NOv1J8v@smile.fi.intel.com>
+References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
+ <20230605-ep93xx-v3-9-3d63a5f1103e@maquefel.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
-Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-From: Alan Huang <mmpgouride@gmail.com>
-In-Reply-To: <fedf0448966b44d5b9146508265874fd@AcuMS.aculab.com>
-Date: Fri, 21 Jul 2023 23:55:07 +0800
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Eric Dumazet <edumazet@google.com>,
- "roman.gushchin@linux.dev" <roman.gushchin@linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FA8E8B15-A0B4-4EE1-B01E-FB1532103E17@gmail.com>
-References: <04C1E631-725C-47AD-9914-25D5CE04DFF4@gmail.com>
- <fedf0448966b44d5b9146508265874fd@AcuMS.aculab.com>
-To: David Laight <David.Laight@ACULAB.COM>
-X-Mailer: Apple Mail (2.3731.400.51.1.1)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230605-ep93xx-v3-9-3d63a5f1103e@maquefel.me>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_SOFTFAIL,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Jul 20, 2023 at 02:29:09PM +0300, Nikita Shubin via B4 Relay wrote:
+> From: Nikita Shubin <nikita.shubin@maquefel.me>
+> 
+> This us a rewrite of EP93xx timer driver in
+> arch/arm/mach-ep93xx/timer-ep93xx.c trying to do everything
+> the device tree way:
+> 
+> - Make every IO-access relative to a base address and dynamic
+>   so we can do a dynamic ioremap and get going.
+> - Find register range and interrupt from the device tree.
 
-> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 19:51=EF=BC=8CDavid Laight =
-<David.Laight@ACULAB.COM> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> From: Alan Huang
->> Sent: 20 July 2023 19:54
->>=20
->> I noticed a commit c87a124a5d5e(=E2=80=9Cnet: force a reload of first =
-item in hlist_nulls_for_each_entry_rcu=E2=80=9D)
->> and a related discussion [1].
->=20
-> Hmmm... that was all about the retry loop in ipv4/udp.c
->=20
-> AFAICT that retry got deleted by ca065d0c.
->=20
-> That also changes the list from hlist_nulls_xxx to hlist_xxx.
-> (I'm not sure of the difference)
->=20
-> This might be why we're seeing unexpected 'port unreachable' messages?
->=20
-> Quite why that has just started happening is another issue.
-> Most of the UDP sockets we create aren't 'connected' so I don't
-> believe they get moved between hash chains - just deleted.
-> The deletion should leave the hash chain intact.
+...
 
-Thanks for the information! :)
++ bits.h
 
->=20
-> David
->=20
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, =
-MK1 1PT, UK
-> Registration No: 1397386 (Wales)
+> +#include <linux/clockchips.h>
+> +#include <linux/clocksource.h>
+> +#include <linux/init.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/io.h>
+> +#include <linux/io-64-nonatomic-lo-hi.h>
+> +#include <linux/irq.h>
+> +#include <linux/kernel.h>
+> +#include <linux/of_address.h>
+> +#include <linux/of_irq.h>
+> +#include <linux/sched_clock.h>
+
+...
+
+> +/*************************************************************************
+
+Won't you marc it as a DOC: section?
+
+> + * Timer handling for EP93xx
+> + *************************************************************************
+> + * The ep93xx has four internal timers.  Timers 1, 2 (both 16 bit) and
+> + * 3 (32 bit) count down at 508 kHz, are self-reloading, and can generate
+> + * an interrupt on underflow.  Timer 4 (40 bit) counts down at 983.04 kHz,
+> + * is free-running, and can't generate interrupts.
+> + *
+> + * The 508 kHz timers are ideal for use for the timer interrupt, as the
+> + * most common values of HZ divide 508 kHz nicely.  We pick the 32 bit
+> + * timer (timer 3) to get as long sleep intervals as possible when using
+> + * CONFIG_NO_HZ.
+> + *
+> + * The higher clock rate of timer 4 makes it a better choice than the
+> + * other timers for use as clock source and for sched_clock(), providing
+> + * a stable 40 bit time base.
+> + *************************************************************************
+> + */
+
+...
+
+> +/*
+> + * This read-only register contains the low word of the time stamp debug timer
+> + * ( Timer4). When this register is read, the high byte of the Timer4 counter is
+
+One too many spaces.
+
+> + * saved in the Timer4ValueHigh register.
+> + */
+
+...
+
+> +static irqreturn_t ep93xx_timer_interrupt(int irq, void *dev_id)
+> +{
+> +	struct ep93xx_tcu *tcu = ep93xx_tcu;
+> +	struct clock_event_device *evt = dev_id;
+> +
+> +	/* Writing any value clears the timer interrupt */
+> +	writel(1, tcu->base + EP93XX_TIMER3_CLEAR);
+
+Would 0 suffice?
+
+> +	evt->event_handler(evt);
+> +
+> +	return IRQ_HANDLED;
+> +}
+
+...
+
+> +static int __init ep93xx_timer_of_init(struct device_node *np)
+> +{
+> +	int irq;
+> +	unsigned long flags = IRQF_TIMER | IRQF_IRQPOLL;
+> +	struct ep93xx_tcu *tcu;
+> +	int ret;
+> +
+> +	tcu = kzalloc(sizeof(*tcu), GFP_KERNEL);
+> +	if (!tcu)
+> +		return -ENOMEM;
+> +
+> +	tcu->base = of_iomap(np, 0);
+
+fwnode_iomap()?
+See below why it might make sense.
+
+> +	if (!tcu->base) {
+
+> +		pr_err("Can't remap registers\n");
+
+First of all, you may utilize pr_fmt().
+Second, you may add %pOF for better user experience.
+
+> +		ret = -ENXIO;
+> +		goto out_free;
+> +	}
+
+> +	irq = irq_of_parse_and_map(np, 0);
+
+fwnode_irq_get() which is better in terms of error handling.
+
+> +	if (irq == 0)
+> +		irq = -EINVAL;
+> +	if (irq < 0) {
+
+> +		pr_err("EP93XX Timer Can't parse IRQ %d", irq);
+
+As per above.
+
+> +		goto out_free;
+> +	}
+
+...
+
+> +}
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
 
