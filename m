@@ -1,223 +1,210 @@
-Return-Path: <netdev+bounces-19740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D46E75BF1C
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 08:53:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E0E575BF60
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22515282186
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 06:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 404691C2160B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D96280D;
-	Fri, 21 Jul 2023 06:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C821F1FDA;
+	Fri, 21 Jul 2023 07:14:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1915B7FB
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 06:53:03 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2128.outbound.protection.outlook.com [40.107.220.128])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A9562709
-	for <netdev@vger.kernel.org>; Thu, 20 Jul 2023 23:53:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=glwdQKwVsyk0g9A2Z+AnePjZmYgzdECb6KFTeXB8HBF8KVDeE3uvIyT/GtcacUe2iPuqhlg6FfJBuYRbUHUR90QTeSRg9NrvmssucbPuAiA/9ZOWEFZkSqr/dufH5n1QdM2U84biq26BUkXJtpq/dqQusydl42sDFZ69HRqoUdJZqAOUVMhLbE3S/V0zSiFhRkkmeJU+NyaTZ84evgD12gehHAzx8+oCE1itPy9SJpAWEXDdh+gocmpnDpZTYAwA6lvZkvzirX1QSKwKkcx42VRqAEf+P23P+x1WSovC8mDsfWBvPkG6K8rE9QnGecICLpHu93i745wPG9c/ilzDWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OaX9PJvuC8SjZPNNGOnHO/QFTMCsz6YOZkcDTkc/haY=;
- b=GH/h5Gci8MZOTdNggKz93U1MBj7E+8acJ9uz+3l+58p0376luvUNWuT5PiLy7D5/5ekiDSG06er0RkD0K/4d6PPNdcO1HckWUeQKvnT/7Giay7+55swExaxtOxhj9s5ygsLYCS0mMCi8JkcO16RJpQroenHsP3iupXoyfuBo+gLCvjKIZE77Bw/1tTX6DzuIwcfNTI78XD1uaJk+KWseqIg6Ve1GPgY3PTKvfWFSF63mQq5hCeyUF/v4N5gKj3+xoCjzRUuTISmKZJn4nlTwQT0s9clVyRZGN0z5YEQqO/XTuOpZXPTB8DdBUopnOhU3Xo8GI5znM619YgZMAL8rjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OaX9PJvuC8SjZPNNGOnHO/QFTMCsz6YOZkcDTkc/haY=;
- b=OwC0kVjw/LsOxwEbxwRNMb+2aw4LLUyNdK+oYRPB1cPPQBI8QhHycRNWvXdhfhjrOX5BMmxxDheGOhXmoBEvGk9jU9T8zmRrdwHmr9zcqpxwFr4vbHfj+xMZ+FreIAxL7GwgetiTvREmjhYWluDXh696RMvEz3AMOQS/1cV7nxM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH2PR13MB4474.namprd13.prod.outlook.com (2603:10b6:610:6d::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25; Fri, 21 Jul
- 2023 06:53:00 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Fri, 21 Jul 2023
- 06:53:00 +0000
-Date: Fri, 21 Jul 2023 07:52:51 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, nbd@nbd.name, john@phrozen.org,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	lorenzo.bianconi@redhat.com, daniel@makrotopia.org
-Subject: Re: [PATCH net-next] net: ethernet: mtk_ppe: add
- MTK_FOE_ENTRY_V{1,2}_SIZE macros
-Message-ID: <ZLorQxf958WaB4Hw@corigine.com>
-References: <725aa4b427e8ae2384ff1c8a32111fb24ceda231.1689762482.git.lorenzo@kernel.org>
- <ZLl1Le1JiuoC8DIc@corigine.com>
- <ZLmefyZCTwbXtZ/i@lore-desk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLmefyZCTwbXtZ/i@lore-desk>
-X-ClientProxiedBy: LO2P265CA0059.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:60::23) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A791FA4
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:14:26 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8FE2710
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 00:14:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1689923664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/AnczGmBaDpEC/mrw6DL/jbYDlBQdesMdQKC85X6GUc=;
+	b=BPRJ1eUiMBOl0C4x4NKHXdOuXrLfOhqY60jpqXpbeP3NK1MKlPuEs5aGRq9Pgp7I8ZrYWE
+	I6rbVhVHTYmmBHeu0jXrMfOeH1pBU0OLTKTvUfmWlvLViFA7UltBtMafwtSvLj26RDGbCQ
+	//mTFz0q1Z1U30pAgkQF4Uz7R1BW/GY=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-398-l8bgjS7mOqa0cNV5pmH4IQ-1; Fri, 21 Jul 2023 03:14:21 -0400
+X-MC-Unique: l8bgjS7mOqa0cNV5pmH4IQ-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4053d3613f9so4227911cf.0
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 00:14:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689923661; x=1690528461;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/AnczGmBaDpEC/mrw6DL/jbYDlBQdesMdQKC85X6GUc=;
+        b=d/B0RmHNe4JAlolFoyLA0dpW3SM0eN0Rrg2nFJkI9YQX586/FLUkU12CcWv0BiLxcd
+         SOKvXs1ORHRmZAKku3Ie0aWf0/xvHprOZ4/ejA41Pe0HNoN9tBXJcNcEBuZ0T9KdGac9
+         f33SNpakVv75SQoF1N+3TEP7ij2k679AvsZFywRAbgp56QKo/R/jT8K0jssa/0OZZ0M4
+         chFQITZCUDjq/GErNYs9gcJst+dsoqsB924h5wWHnW7Swyr8IVCP10Ccdv34ab27mk5n
+         Nh5tW6ilfvl2W7Wxssrqktzlnaq+wIe2XZyNrkpZu09MFlc611+auz0jqV8vr52zWu8I
+         mprA==
+X-Gm-Message-State: ABy/qLa4dSXX/WLTL03bdkuln28AKznRM3BgKCoMNN4UblobWN2+1/x7
+	+QwAmUkA3CoXc0I7qrNrWOEVL6ZbIHkU0zPl81zMj4V/dMvOveW7mE2Ynk/xuIqLbmNgo9KwShN
+	yl7ArApxOGKBkCZFI
+X-Received: by 2002:a05:622a:5ca:b0:400:84a9:a09c with SMTP id d10-20020a05622a05ca00b0040084a9a09cmr1387875qtb.6.1689923661026;
+        Fri, 21 Jul 2023 00:14:21 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHcTxMfWh8U3TsW7FsJDZOOjuyLUm4Si+u2u3TyBdTWKcmvonYzga5+n5XqWXo9H/pbuU6L/A==
+X-Received: by 2002:a05:622a:5ca:b0:400:84a9:a09c with SMTP id d10-20020a05622a05ca00b0040084a9a09cmr1387868qtb.6.1689923660714;
+        Fri, 21 Jul 2023 00:14:20 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id y7-20020ac87087000000b00400aa16bf38sm1009635qto.82.2023.07.21.00.14.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 00:14:20 -0700 (PDT)
+Message-ID: <239ca679597a10b6bc00245c66419f4bdedaff83.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 2/2] selftests: fib_tests: Add a test case
+ for IPv6 garbage collection
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kui-Feng Lee <sinquersw@gmail.com>, Kui-Feng Lee <thinker.li@gmail.com>,
+  dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org,  netdev@vger.kernel.org, martin.lau@linux.dev,
+ kernel-team@meta.com, yhs@meta.com
+Cc: Kui-Feng Lee <kuifeng@meta.com>
+Date: Fri, 21 Jul 2023 09:14:16 +0200
+In-Reply-To: <3057afe9-ac48-84e2-bd39-b227d2dcbc2f@gmail.com>
+References: <20230718180321.294721-1-kuifeng@meta.com>
+	 <20230718180321.294721-3-kuifeng@meta.com>
+	 <9743a6cc267276bfeba5b0fdcf7ba9a4077c67e1.camel@redhat.com>
+	 <3057afe9-ac48-84e2-bd39-b227d2dcbc2f@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB4474:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2fb2f09a-0f26-4732-c483-08db89b71f20
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Fww+iy1Ak3NbXsaLqkzl5ouaGWiwzlSrcZkta0smL3GakISuXQ0WJ4TEv8Kk9RizTA9PKMlZC79jmziZkQL6mzVQIY0F4lbX6nPnR9NwD7ADFI5lROv3E+Rbz2+99BHdex/ftr8haEjtWCDIIzVaquJk6fZkyyRa6tT/tdLHnfIPI9jX/YWXiLTsCFjRCgL0glVZjdTQNXEdmXRDOnYTd6UREMTRtkTNGygFJJ7Zoiix5gOH6SrPTlp4i3z8gj9n0/SUAkPTFz2bHA3cbb4hW3bn2nu3mTpJ4rLV232ywp1LyCOR7Ngolp8iz5imPSDjJ8Nzjb0Owgtu307guHtTxU5TuQoCEcqtJtA8Plj9vayFsbQxlh01IGqshTjimYkwEW77anu2oPReftW31s7EZuVql5kGOxwK6znjz8kAjG8l0ghsFUeRh2YzvMJezx3hb+eklkODxOgPqnxzrfrQXaqr34gyKO7Zq/3VmvHAW9G68UcptC4PDk6QHt7rkicjVDTFYY3TvSiVgAGPkj7rcqxsCEwLJMg6NjXwPmAD6bR5jlTM9QyxbRGQdoiBUQQXJdQ+PVG87oPYaIn7JV+PpcP6l/RuFDoZEUdkpyzNdLg=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(39830400003)(376002)(366004)(346002)(451199021)(6666004)(6486002)(6512007)(66946007)(41300700001)(478600001)(5660300002)(8676002)(8936002)(38100700002)(6916009)(4326008)(66556008)(66476007)(2616005)(316002)(186003)(83380400001)(55236004)(6506007)(26005)(2906002)(44832011)(86362001)(7416002)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?gPMy0x+3leEKtJNo9rmYqIMbE3R5Gun2WiZB2iKqAYulX6qFk8zSPqLxGDTY?=
- =?us-ascii?Q?TGG91EpbQK9vkJ16BNl/I3TSTDxbWBDUXO+JaiE51s9+P86bfLo5b/ywhuko?=
- =?us-ascii?Q?hQiXeziDKaK4wu03bOsksMCKvCqH10wzIBDVVos//+nptFJzGwgT/+e7zA/D?=
- =?us-ascii?Q?GKnQDOAlw3rPDG6ofVjG1LZoOcVFUzONTsyMSI9g7oow4Y/E6joTlMjuegt/?=
- =?us-ascii?Q?xBTrSTREg8ArZiEiI9j5Vp604ot2X5Uip4eZtsT56r1m/lsKhSh4EB69Tquy?=
- =?us-ascii?Q?q1N8e+LDR3EyZppKT9XjJasmHfBKsFtVoOC6NTxpR1VKqL/0Ya71c1AKdPjl?=
- =?us-ascii?Q?zHxvFMcAFjgcTAVBmca+nYurQJyaP1BKLtJGJ2MdxXAYaWf4c3EZC7vgR5Cj?=
- =?us-ascii?Q?XakFrHGAGE8kI+DgaKEihyPPmRA78qdgDmty//+UnluMQVqrZdfpaNq0xxJm?=
- =?us-ascii?Q?5bPqv9Y1JGrDxfyswlEIX+JAiYPwDx7gsXOs519H0QepMY9FO4Ot/Heso/Fj?=
- =?us-ascii?Q?2++Ry/9sXqc479lFL0tk9bp512JdDFXp7UAFw/AHqPdvQjhLiKMffdue2e5n?=
- =?us-ascii?Q?SbIPF2mcnScTUFaYa01re0XAXX10LUCc/UZ/tBWS+DTN8YKEfJaVoQpoYQlU?=
- =?us-ascii?Q?yLLEOT+SCqqE9nznIzoAMhwmQC/Y7/6aX688jIIhcxrPCxENnAG4rMIej3tY?=
- =?us-ascii?Q?tN8UC/pjPvSyAe6/Tn4jQk7SkEW4YhtepQCDVu4bnwZlgR/dusdmz6SLMLop?=
- =?us-ascii?Q?0165DIR/3gWuf+jPMt8gYz4N/lNwGzccGOkb+0N5ynYwWmmUx8/nlYsM+p5X?=
- =?us-ascii?Q?yF5WSRDHM1YreXdqL8pl4OMFl7vkoM+MEwalgGjESWVCv4pv28Ve7e+nMi74?=
- =?us-ascii?Q?T2PuzH3zpcObqu1I7+hLqQvlOmHwSagi/183QMEr7yHf7HLDB+PZz97dGe2f?=
- =?us-ascii?Q?/DMJTqF3KiJvtSM+RWO9SKmqAQsuVNZ6mr6l0hPkA+ifv2/aN68tBmOPL5HT?=
- =?us-ascii?Q?2mjFsdcA/8Ayvc88WGZ0ppeaHyhCq4XfYQ/8jVlp629I2+yudMwWseo/Eq2q?=
- =?us-ascii?Q?m3s7bb+xmEt+ZmH5y2rg4EMC0H7YKcVJu4HV0y3acj0Q65/U3rO3QjHSQiE4?=
- =?us-ascii?Q?TStIB3ZGCLLHWQVVi4EVcO+exPzCh5VM0Lafxup00AXmLydZXRk0qNMxx76K?=
- =?us-ascii?Q?0RRHroHD4LH3Ye0gJYFaP6sqdAmG4T9tAXyaohaJYPF6SrvOnPuijRWG69up?=
- =?us-ascii?Q?sO3JIKY31ZrR72BAy/BYT+QHbcwP0gfBKp5RtPbh2ZuRVkm9Qo8xoHo8nPrp?=
- =?us-ascii?Q?LbWnHO3LeMFDleaYahcoeRi5gBAN6bVzTz55kVTPFjTGXQVhl2KWuEBBdYhX?=
- =?us-ascii?Q?EfxV9u6xEJmMah4zkG2G9BBBksOyoKzXO8fRa/hD3Hx2llm08byUXZa2eFFb?=
- =?us-ascii?Q?XTu/SdPrJtuhK+aL70te3X0SzYJF2ND/KGa07vOEyM1w0yINPqN6FQKV59Yc?=
- =?us-ascii?Q?MJFWXxNMtSqrbisGF9GPHWzp7PTXBLnpkODA4KV1EkiDZmHWtXZsDSDgadbz?=
- =?us-ascii?Q?S11kobx30FC6vMVLoHPPed/1Z54jlIfoKymiewQEyRVl+ruqnYRNJnj+nOi7?=
- =?us-ascii?Q?Qw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2fb2f09a-0f26-4732-c483-08db89b71f20
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2023 06:52:59.9915
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mpbwbw0BS8Sh0mZkSH+oe8OT5hUVZ8AT5XEVWbOunSsHx65i8TC3mleKuhzAAGoWGDk2nERQfeLio7cizTQz5KezFvKvI54FM+eE+hWtNjk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB4474
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 10:52:15PM +0200, Lorenzo Bianconi wrote:
-> > On Wed, Jul 19, 2023 at 12:29:49PM +0200, Lorenzo Bianconi wrote:
-> > > Introduce MTK_FOE_ENTRY_V{1,2}_SIZE macros in order to make more
-> > > explicit foe_entry size for different chipset revisions.
-> > > 
-> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+On Thu, 2023-07-20 at 14:36 -0700, Kui-Feng Lee wrote:
+>=20
+> On 7/20/23 02:32, Paolo Abeni wrote:
+> > On Tue, 2023-07-18 at 11:03 -0700, Kui-Feng Lee wrote:
+> > > Add 10 IPv6 routes with expiration time.  Wait for a few seconds
+> > > to make sure they are removed correctly.
+> > >=20
+> > > Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
+> >=20
+> > Same thing as the previous patch.
+> >=20
 > > > ---
-> > >  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 10 +++++-----
-> > >  drivers/net/ethernet/mediatek/mtk_ppe.h     |  3 +++
-> > >  2 files changed, 8 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > > index 834c644b67db..7f9e23ddb3c4 100644
-> > > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > > @@ -4811,7 +4811,7 @@ static const struct mtk_soc_data mt7621_data = {
-> > >  	.required_pctl = false,
-> > >  	.offload_version = 1,
-> > >  	.hash_offset = 2,
-> > > -	.foe_entry_size = sizeof(struct mtk_foe_entry) - 16,
-> > > +	.foe_entry_size = MTK_FOE_ENTRY_V1_SIZE,
-> > >  	.txrx = {
-> > >  		.txd_size = sizeof(struct mtk_tx_dma),
-> > >  		.rxd_size = sizeof(struct mtk_rx_dma),
-> > 
-> > ...
-> > 
-> > > @@ -4889,8 +4889,8 @@ static const struct mtk_soc_data mt7981_data = {
-> > >  	.required_pctl = false,
-> > >  	.offload_version = 2,
-> > >  	.hash_offset = 4,
-> > > -	.foe_entry_size = sizeof(struct mtk_foe_entry),
-> > >  	.has_accounting = true,
-> > > +	.foe_entry_size = MTK_FOE_ENTRY_V2_SIZE,
-> > >  	.txrx = {
-> > >  		.txd_size = sizeof(struct mtk_tx_dma_v2),
-> > >  		.rxd_size = sizeof(struct mtk_rx_dma_v2),
-> > 
-> > ...
-> > 
-> > > diff --git a/drivers/net/ethernet/mediatek/mtk_ppe.h b/drivers/net/ethernet/mediatek/mtk_ppe.h
-> > > index e51de31a52ec..fb6bf58172d9 100644
-> > > --- a/drivers/net/ethernet/mediatek/mtk_ppe.h
-> > > +++ b/drivers/net/ethernet/mediatek/mtk_ppe.h
-> > > @@ -216,6 +216,9 @@ struct mtk_foe_ipv6_6rd {
-> > >  	struct mtk_foe_mac_info l2;
-> > >  };
-> > >  
-> > > +#define MTK_FOE_ENTRY_V1_SIZE	80
-> > > +#define MTK_FOE_ENTRY_V2_SIZE	96
-> > 
-> > Hi Lorenzo,
-> > 
-> > Would it make sense to define these in terms of sizeof(struct mtk_foe_entry) ?
-> > 
-> 
-> Hi Simon,
-> 
-> I was discussing with Felix to have something like:
-> 
-> struct mtk_foe_entry_v1 {
-> 	u32 data[19];
-> };
-> 
-> struct mtk_foe_entry_v2 {
-> 	u32 data[23];
-> };
-> 
-> struct mtk_foe_entry {
-> 	u32 ib1;
-> 
-> 	union {
-> 		...
-> 		struct mtk_foe_entry_v1 e;
-> 		struct mtk_foe_entry_v2 e2;
-> 	};
-> };
-> 
-> and then relying on sizeof of struct mtk_foe_entry_v1/mtk_foe_entry_v2
-> but then we decided to have a simpler approach. What do you think?
+> > >   tools/testing/selftests/net/fib_tests.sh | 49 +++++++++++++++++++++=
+++-
+> > >   1 file changed, 48 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing=
+/selftests/net/fib_tests.sh
+> > > index 35d89dfa6f11..55bc6897513a 100755
+> > > --- a/tools/testing/selftests/net/fib_tests.sh
+> > > +++ b/tools/testing/selftests/net/fib_tests.sh
+> > > @@ -9,7 +9,7 @@ ret=3D0
+> > >   ksft_skip=3D4
+> > >  =20
+> > >   # all tests in this script. Can be overridden with -t option
+> > > -TESTS=3D"unregister down carrier nexthop suppress ipv6_notify ipv4_n=
+otify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics =
+ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv=
+6_mangle ipv4_bcast_neigh"
+> > > +TESTS=3D"unregister down carrier nexthop suppress ipv6_notify ipv4_n=
+otify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics =
+ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv=
+6_mangle ipv4_bcast_neigh fib6_gc_test"
+> >=20
+> > At this point is likely worthy splitting the above line in multiple
+> > ones, something alike:
+> >=20
+> > TESTS=3D"unregister down carrier nexthop suppress ipv6_notify \
+> > 	ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric
+> > \
+> > 	ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw \
+> > 	rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh \
+> > 	fib6_gc_test"
+> >=20
+> > >  =20
+> > >   VERBOSE=3D0
+> > >   PAUSE_ON_FAIL=3Dno
+> > > @@ -747,6 +747,52 @@ fib_notify_test()
+> > >   	cleanup &> /dev/null
+> > >   }
+> > >  =20
+> > > +fib6_gc_test()
+> > > +{
+> > > +	setup
+> > > +
+> > > +	echo
+> > > +	echo "Fib6 garbage collection test"
+> > > +	set -e
+> > > +
+> > > +	OLD_INTERVAL=3D$(sysctl -n net.ipv6.route.gc_interval)
+> > > +	# Check expiration of routes every 3 seconds (GC)
+> > > +	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=3D3
+> > > +
+> > > +	$IP link add dummy_10 type dummy
+> > > +	$IP link set dev dummy_10 up
+> > > +	$IP -6 address add 2001:10::1/64 dev dummy_10
+> > > +
+> > > +	for i in 0 1 2 3 4 5 6 7 8 9; do
+> > 		$(seq 0 9)
+> >=20
+> > > +	    # Expire route after 2 seconds
+> > > +	    $IP -6 route add 2001:20::1$i \
+> > > +		via 2001:10::2 dev dummy_10 expires 2
+> > > +	done
+> > > +	N_EXP=3D$($IP -6 route list |grep expires|wc -l)
+> > > +	if [ $N_EXP -ne 10 ]; then
+> > > +		echo "FAIL: expected 10 routes with expires, got $N_EXP"
+> > > +		ret=3D1
+> > > +	else
+> > > +	    sleep 4
+> > > +	    N_EXP_s20=3D$($IP -6 route list |grep expires|wc -l)
+> > > +
+> > > +	    if [ $N_EXP_s20 -ne 0 ]; then
+> > > +		echo "FAIL: expected 0 routes with expires, got $N_EXP_s20"
+> > > +		ret=3D1
+> > > +	    else
+> > > +		ret=3D0
+> > > +	    fi
+> > > +	fi
+> >=20
+> > Possibly also worth trying with a few K of permanent routes, and dump
+> > the time required in both cases?
+>=20
+> I just realized that I don't know how to measure the time required to do=
+=20
+> GC without providing additional APIs or exposing numbers to procfs or=20
+> sysfs. Do you have any idea about this?
 
-Hi Lorenzo,
+Something like this should do the trick
 
-I do see some value in something like what you have above.
-But I also appreciate the value of simplicity.
+sysctl -wq net.ipv6.route.flush=3D1
 
-So I have no objections if you prefer the patch in it's current form.
+# add routes=20
+#...
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+# delete expired routes synchronously
+sysctl -wq net.ipv6.route.flush=3D1
+
+Note that the net.ipv6.route.flush handler uses the 'old' flush value.
+
+Cheers,
+
+Paolo
 
 
