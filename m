@@ -1,152 +1,278 @@
-Return-Path: <netdev+bounces-20043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1260A75D76F
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:24:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D885475D74B
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42CB01C21612
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:24:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E54D2822CF
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 22:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8B324168;
-	Fri, 21 Jul 2023 22:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95142100B6;
+	Fri, 21 Jul 2023 22:17:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA1B24162
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 22:23:27 +0000 (UTC)
-Received: from out-49.mta1.migadu.com (out-49.mta1.migadu.com [95.215.58.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ED743A8E
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:23:18 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jookia.org; s=key1;
-	t=1689977827;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gyIMbXR0OMPT1XfXDY8rkRHULGyYtVbg/Gm0FnqZe2E=;
-	b=AWarFzCbMDr3V+FB5IMpmHCu4/bKtqmJHKflB6ecOCwKj8g9ppLPEcfmBz1Cs8u4yaag7v
-	1e3VSEHJZloDKB48cg9i7Q1ZCAWpNum+64+bFnBxzZwb4IoaCH7rnuAgtAKZCibRG0mV8O
-	V2FdUT0XsFd5hYPU237fRpc7AS8izdzk1HAGacUele2kU+35IiGP5O0ej/F4WYXof6q2pw
-	pZeh3PvbEhsZsh3UrCSifndCtbRW3Na1Pd2b/J+Wgz8wXg0WGy3jA5Dg9YFN3j9xaS4eJK
-	PR9WvWIVOj4ygevxAmOQEOmFQk6xjIflat/QcjnuFz7fou/KVXXk3wSaqks36g==
-From: John Watts <contact@jookia.org>
-To: linux-sunxi@lists.linux.dev
-Cc: Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	John Watts <contact@jookia.org>
-Subject: [PATCH v2 4/4] can: sun4i_can: Add support for the Allwinner D1
-Date: Sat, 22 Jul 2023 08:15:53 +1000
-Message-ID: <20230721221552.1973203-6-contact@jookia.org>
-In-Reply-To: <20230721221552.1973203-2-contact@jookia.org>
-References: <20230721221552.1973203-2-contact@jookia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893DA27F12
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 22:17:23 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C453AB1;
+	Fri, 21 Jul 2023 15:17:09 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 12A6B6016E;
+	Sat, 22 Jul 2023 00:17:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689977827; bh=TyfslZjfylAlfLVJYBGUmYyDqZRI4hQ8bFlIqzvjNxo=;
+	h=Date:To:Cc:From:Subject:From;
+	b=Pr4zKEDz8kFfzxMAKHCTppd9HobjOkVZRHjekphc3e/zYh5xnn/LMyzF5PVlrgPVw
+	 HsstG0m9tqws75R5QKxSZgRkzOp5dA6cV8g9fwG5MdPzMj+fxorZ60iN3dFrOpND8G
+	 MF1ntgOGjlJvQgeDrk5x+qM5OF8+i3RazIsu1Wi9fba0WZciZVsH4EpVREn0U4x64c
+	 Lsr+IA9zuAD4SjElp335oXcaPoMyByWq3z9ttkxBL1qGDaTxUvm3SfHgopACdi2gWH
+	 lq+IbIMM3mJZNJXjrQQkhuYI3u0OLJnqUQKHGAJZZsrXPDpCFef2/mkrsV6DmiB1gY
+	 mOgrMWZth3GYQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id woRg7Yp1sh6r; Sat, 22 Jul 2023 00:17:04 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id B9C176015F;
+	Sat, 22 Jul 2023 00:17:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1689977824; bh=TyfslZjfylAlfLVJYBGUmYyDqZRI4hQ8bFlIqzvjNxo=;
+	h=Date:To:Cc:From:Subject:From;
+	b=f4gGkO9wbAbGLHklMpsQ3n0KU23YOyJuZSj+tAYQV2Qv2//UJSxflpfYep4i0m4Sh
+	 WLdNgw7jncBscIk/oMPcuyMVs4QKLXjV+ucZqSfFo0lFK7B9eQ/d2nk/GgFDyd6sVZ
+	 rTqmDRo5CS5z4g+BdF4ervBvswZ5g78RkAigZYmR4uoQ+rn7XVROrgXG4N45wUxxYO
+	 Q2VgbuW5gj+e37oB2YOpAdEcwpSXFCPpzCNH/93kWuda1TBDXGb0qf+u/2D54qDGWe
+	 p/ZiW//9oPHXAR1ykaki4EdL+t8e7q+SFw+/rFWliTmZV+egVOENCZ6nPbIJ4XE6FZ
+	 zPrGwY4OFXI7w==
+Message-ID: <829bc9a0-8b6a-f799-8434-7f42e6d7757e@alu.unizg.hr>
+Date: Sat, 22 Jul 2023 00:16:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Amit Cohen <amcohen@nvidia.com>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Subject: [BUG] sefltests: forwarding: gre_custom_multipath_hash.sh: [FAIL] and
+ syntax errors
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The controllers present in the D1 are extremely similar to the R40
-and require the same reset quirks, but An extra quirk is needed to support
-receiving packets.
+Hi,
 
-Signed-off-by: John Watts <contact@jookia.org>
----
- drivers/net/can/Kconfig     |  4 ++--
- drivers/net/can/sun4i_can.c | 12 +++++++++++-
- 2 files changed, 13 insertions(+), 3 deletions(-)
+It's me again.
 
-diff --git a/drivers/net/can/Kconfig b/drivers/net/can/Kconfig
-index a5c5036dfb94..e626de33e735 100644
---- a/drivers/net/can/Kconfig
-+++ b/drivers/net/can/Kconfig
-@@ -185,10 +185,10 @@ config CAN_SLCAN
- 
- config CAN_SUN4I
- 	tristate "Allwinner A10 CAN controller"
--	depends on MACH_SUN4I || MACH_SUN7I || COMPILE_TEST
-+	depends on MACH_SUN4I || MACH_SUN7I || RISCV || COMPILE_TEST
- 	help
- 	  Say Y here if you want to use CAN controller found on Allwinner
--	  A10/A20 SoCs.
-+	  A10/A20/D1 SoCs.
- 
- 	  To compile this driver as a module, choose M here: the module will
- 	  be called sun4i_can.
-diff --git a/drivers/net/can/sun4i_can.c b/drivers/net/can/sun4i_can.c
-index 1f90fe6dbb8b..c508a328e38d 100644
---- a/drivers/net/can/sun4i_can.c
-+++ b/drivers/net/can/sun4i_can.c
-@@ -91,6 +91,8 @@
- #define SUN4I_REG_BUF12_ADDR	0x0070	/* CAN Tx/Rx Buffer 12 */
- #define SUN4I_REG_ACPC_ADDR	0x0040	/* CAN Acceptance Code 0 */
- #define SUN4I_REG_ACPM_ADDR	0x0044	/* CAN Acceptance Mask 0 */
-+#define SUN4I_REG_ACPC_ADDR_D1	0x0028	/* CAN Acceptance Code 0 on the D1 */
-+#define SUN4I_REG_ACPM_ADDR_D1	0x002C	/* CAN Acceptance Mask 0 on the D1 */
- #define SUN4I_REG_RBUF_RBACK_START_ADDR	0x0180	/* CAN transmit buffer start */
- #define SUN4I_REG_RBUF_RBACK_END_ADDR	0x01b0	/* CAN transmit buffer end */
- 
-@@ -779,6 +781,11 @@ static const struct sun4ican_quirks sun4ican_quirks_r40 = {
- 	.acp_offset = 0,
- };
- 
-+static const struct sun4ican_quirks sun4ican_quirks_d1 = {
-+	.has_reset = true,
-+	.acp_offset = (SUN4I_REG_ACPC_ADDR_D1 - SUN4I_REG_ACPC_ADDR),
-+};
-+
- static const struct of_device_id sun4ican_of_match[] = {
- 	{
- 		.compatible = "allwinner,sun4i-a10-can",
-@@ -789,6 +796,9 @@ static const struct of_device_id sun4ican_of_match[] = {
- 	}, {
- 		.compatible = "allwinner,sun8i-r40-can",
- 		.data = &sun4ican_quirks_r40
-+	}, {
-+		.compatible = "allwinner,sun20i-d1-can",
-+		.data = &sun4ican_quirks_d1
- 	}, {
- 		/* sentinel */
- 	},
-@@ -913,4 +923,4 @@ module_platform_driver(sun4i_can_driver);
- MODULE_AUTHOR("Peter Chen <xingkongcp@gmail.com>");
- MODULE_AUTHOR("Gerhard Bertelsmann <info@gerhard-bertelsmann.de>");
- MODULE_LICENSE("Dual BSD/GPL");
--MODULE_DESCRIPTION("CAN driver for Allwinner SoCs (A10/A20)");
-+MODULE_DESCRIPTION("CAN driver for Allwinner SoCs (A10/A20/D1)");
--- 
-2.41.0
+Don't throw things at me, but it is the same old vanilla torvalds tree kernel 6.5-rc2
+kselftest run, and after applying the patches I ran into the new problems:
 
+I have been free to add the timeout SIGTERM trap to the test, and this is the only
+change, save for the Ido's lib.sh patch (for filling the veth NETIFS array in default
+execution case).
+
+Here is the command output:
+
+# selftests: net/forwarding: gre_custom_multipath_hash.sh
+# TEST: ping                                                          [ OK ]
+# TEST: ping6                                                         [ OK ]
+# INFO: Running IPv4 overlay custom multipath hash tests
+# TEST: Multipath hash field: Inner source IP (balanced)              [ OK ]
+# INFO: Packets sent on path1 / path2: 6760 / 5859
+# TEST: Multipath hash field: Inner source IP (unbalanced)            [ OK ]
+# INFO: Packets sent on path1 / path2: 2 / 12603
+# TEST: Multipath hash field: Inner destination IP (balanced)         [ OK ]
+# INFO: Packets sent on path1 / path2: 5850 / 6750
+# TEST: Multipath hash field: Inner destination IP (unbalanced)       [ OK ]
+# INFO: Packets sent on path1 / path2: 12602 / 1
+# TEST: Multipath hash field: Inner source port (balanced)            [ OK ]
+# INFO: Packets sent on path1 / path2: 16411 / 16364
+# TEST: Multipath hash field: Inner source port (unbalanced)          [ OK ]
+# INFO: Packets sent on path1 / path2: 32773 / 3
+# TEST: Multipath hash field: Inner destination port (balanced)       [ OK ]
+# INFO: Packets sent on path1 / path2: 16410 / 16362
+# TEST: Multipath hash field: Inner destination port (unbalanced)     [ OK ]
+# INFO: Packets sent on path1 / path2: 32770 / 0
+# INFO: Running IPv6 overlay custom multipath hash tests
+# TEST: Multipath hash field: Inner source IP (balanced)              [ OK ]
+# INFO: Packets sent on path1 / path2: 6150 / 6452
+# TEST: Multipath hash field: Inner source IP (unbalanced)            [ OK ]
+# INFO: Packets sent on path1 / path2: 0 / 12600
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# TEST: Multipath hash field: Inner destination IP (balanced)         [FAIL]
+# 	Expected traffic to be balanced, but it is not
+# INFO: Packets sent on path1 / path2: -129763 / -77050
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Invalid VRF name
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner destination IP (unbalanced)       [ OK ]
+# INFO: Packets sent on path1 / path2: 0 / 0
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner flowlabel (balanced)              [FAIL]
+# 	Expected traffic to be balanced, but it is not
+# INFO: Packets sent on path1 / path2: 0 / 0
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Invalid VRF name
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner flowlabel (unbalanced)            [ OK ]
+# INFO: Packets sent on path1 / path2: 0 / 0
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Invalid VRF name
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner source port (balanced)            [FAIL]
+# 	Expected traffic to be balanced, but it is not
+# INFO: Packets sent on path1 / path2: 0 / 0
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Invalid VRF name
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner source port (unbalanced)          [ OK ]
+# INFO: Packets sent on path1 / path2: 0 / 0
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Invalid VRF name
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner destination port (balanced)       [FAIL]
+# 	Expected traffic to be balanced, but it is not
+# INFO: Packets sent on path1 / path2: 0 / 0
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Invalid VRF name
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# jq: error (at <stdin>:1): Cannot iterate over null (null)
+# Runtime error (func=(main), adr=3): Divide by zero
+# (standard_in) 1: syntax error
+# TEST: Multipath hash field: Inner destination port (unbalanced)     [ OK ]
+# INFO: Packets sent on path1 / path2: 0 / 0
+# Error: argument "vveth9" is wrong: Invalid VRF
+#
+# Error: argument "vveth9" is wrong: Invalid VRF
+#
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: No such process
+# RTNETLINK answers: No such process
+# Cannot find device "vveth9"
+# Error: argument "vveth8" is wrong: Invalid VRF
+#
+# Error: argument "vveth8" is wrong: Invalid VRF
+#
+# Error: argument "vveth8" is wrong: Invalid VRF
+#
+# Cannot find device "g2"
+# Cannot find device "g2"
+# Cannot find device "g2"
+# Cannot find device "g2"
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: No such process
+# RTNETLINK answers: No such process
+# Cannot find device "vveth8"
+# Error: Invalid handle.
+# Error: argument "vveth6" is wrong: Invalid VRF
+#
+# Error: argument "vveth6" is wrong: Invalid VRF
+#
+# Cannot find device "veth5.222"
+# Cannot find device "veth5.111"
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: No such process
+# RTNETLINK answers: No such process
+# Cannot find device "vveth6"
+# Error: argument "vveth3" is wrong: Invalid VRF
+#
+# Error: argument "vveth3" is wrong: Invalid VRF
+#
+# Cannot find device "veth4.222"
+# Cannot find device "veth4.111"
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: No such process
+# RTNETLINK answers: No such process
+# Cannot find device "vveth3"
+# Error: argument "vveth1" is wrong: Invalid VRF
+#
+# Error: argument "vveth1" is wrong: Invalid VRF
+#
+# Error: argument "vveth1" is wrong: Invalid VRF
+#
+# Cannot find device "g1"
+# Cannot find device "g1"
+# Cannot find device "g1"
+# Cannot find device "g1"
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: No such process
+# RTNETLINK answers: No such process
+# Cannot find device "vveth1"
+# Error: argument "vveth0" is wrong: Invalid VRF
+#
+# Error: argument "vveth0" is wrong: Invalid VRF
+#
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: Cannot assign requested address
+# RTNETLINK answers: No such process
+# RTNETLINK answers: No such process
+# Cannot find device "vveth0"
+# RTNETLINK answers: File exists
+# RTNETLINK answers: No such file or directory
+# RTNETLINK answers: File exists
+# RTNETLINK answers: No such file or directory
+#
+not ok 18 selftests: net/forwarding: gre_custom_multipath_hash.sh # TIMEOUT 240 seconds
+
+Those things like RTNETLINK errors probably mess up things beyond what cleanup
+does, so the reproducer might not be that easy to devise.
+
+I have tried to reduce the complexity by adding:
+
+trap cleanup INT TERM EXIT
+
+to the tests that timed out.
+
+Kind regards,
+Mirsad
 
