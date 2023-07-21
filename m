@@ -1,101 +1,114 @@
-Return-Path: <netdev+bounces-19783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9DA75C41C
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 12:11:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DBD75C480
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 12:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EFD12821E7
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:11:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C204A1C2164A
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 10:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9199318C2D;
-	Fri, 21 Jul 2023 10:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569FD1BE6D;
+	Fri, 21 Jul 2023 10:19:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2378A3234
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:11:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4389C433C8;
-	Fri, 21 Jul 2023 10:11:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689934295;
-	bh=k8eV/3qHdnbYgcZI2X9fFCwH8gqs3YzalZZPqB9YJ08=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K7zk8MwQYLqclUypLaTrXMCzvlgETP5wEUWYH0H/6hRQCVlJ2XF8oY1b2h0EY0uRn
-	 qGH6fUjQz9xO3zkx9Ef4VLHWU8jiD9CtFogqDBwrTdIrA2rlAiF7t0sLqGfWMBJ06N
-	 sd+tv+6e6gLU0xZZ7K+kl5RSz3I8Gk1mR36ZRrVUKpER3jHGaJu7uPgtzFJqSbRt9u
-	 24aHlOVN+bmSPukO3e79iQUiANVgAdvct/SgdK88yqoVHlphiDOJJjTpODhfz6Z/6e
-	 4MoV3J7h8ISpE3hwy0qAl4T2Dm+rguLoiTFK/keQqTv5crxgOCzcqv7SwLKYj6E/vA
-	 jd/LUNYKARcLQ==
-Message-ID: <cfba8fa4-47e5-7553-f40e-9e34b25d1405@kernel.org>
-Date: Fri, 21 Jul 2023 12:11:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47ACC18C2D
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:19:34 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A03B26A2;
+	Fri, 21 Jul 2023 03:19:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689934754; x=1721470754;
+  h=date:from:cc:subject:message-id:references:mime-version:
+   in-reply-to;
+  bh=C6wVBmCZeZFNIMXqGKN2Zjs/KW8YVqteA5G+zqzpIaw=;
+  b=EQZ7ArONq/FCr+NAp8ZNxOyvMJxbZhM4LVpJcjBZ9bAILZgS3nzQRltx
+   bSiHGFyCK9QbYsCd/jQW1urPFQ0qc59w5HLf+pcUivxfFb8gvOezRxn+4
+   Sv3B6OrEoK9O/rASpB2eb5fPUb1JmJ+TkF42/YTNi+60gkEeTLNaCHc+U
+   7RGsEWFAlVXAtGAtza4NLKf3wAplrEmlMwXfVcj5+2ogXV9+bV77MdBOM
+   GUPqJtXdave3uz4JHfUrXotTT+DKqIC5gKOjfl1aQ3hVyWBCJSMMZptOK
+   sRw967G3Kzhg9wl/y/9dtMu8F0DQP431CQJoQRn2JtWSL7+9UMroBFG2U
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="433219663"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="433219663"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 03:17:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848786020"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="848786020"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga004.jf.intel.com with ESMTP; 21 Jul 2023 03:17:38 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1qMnCZ-00HFw5-2w;
+	Fri, 21 Jul 2023 13:17:35 +0300
+Date: Fri, 21 Jul 2023 13:17:35 +0300
+From: Shevchenko Andriy <andriy.shevchenko@intel.com>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Boon Khai Ng <boon.khai.ng@intel.com>,
+	Mun Yew Tham <mun.yew.tham@intel.com>,
+	Leong Ching Swee <leong.ching.swee@intel.com>,
+	G Thomas Rohan <rohan.g.thomas@intel.com>
+Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 1/2]
+ dt-bindings: net: snps,dwmac: Add description for rx-vlan-offload
+Message-ID: <ZLpbPxy4XHEGyU6I@smile.fi.intel.com>
+References: <20230721062617.9810-1-boon.khai.ng@intel.com>
+ <20230721062617.9810-2-boon.khai.ng@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 2/2] net: stmmac:
- dwxgmac2: Add support for HW-accelerated VLAN Stripping
-Content-Language: en-US
-To: Boon@ecsmtp.png.intel.com, Khai@ecsmtp.png.intel.com,
- "Ng <boon.khai.ng"@intel.com, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Boon Khai Ng <boon.khai.ng@intel.com>,
- Shevchenko Andriy <andriy.shevchenko@intel.com>,
- Mun Yew Tham <mun.yew.tham@intel.com>,
- Leong Ching Swee <leong.ching.swee@intel.com>,
- G Thomas Rohan <rohan.g.thomas@intel.com>,
- Shevchenko Andriy <andriy.shevchenko@linux.intel.com>
-References: <20230721062617.9810-1-boon.khai.ng@intel.com>
- <20230721062617.9810-3-boon.khai.ng@intel.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-In-Reply-To: <20230721062617.9810-3-boon.khai.ng@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230721062617.9810-2-boon.khai.ng@intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_HEADERS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 21/07/2023 08:26, Boon@ecsmtp.png.intel.com wrote:
+On Fri, Jul 21, 2023 at 02:26:16PM +0800, Boon@ecsmtp.png.intel.com wrote:
 > From: Boon Khai Ng <boon.khai.ng@intel.com>
 > 
-> Currently, VLAN tag stripping is done by software driver in
-> stmmac_rx_vlan(). This patch is to Add support for VLAN tag
-> stripping by the MAC hardware and MAC drivers to support it.
-> This is done by adding rx_hw_vlan() and set_hw_vlan_mode()
-> callbacks at stmmac_ops struct which are called from upper
-> software layer.
+> This patch is to add the dts setting for the MAC controller on
+> synopsys 10G Ethernet MAC which allow the 10G MAC to turn on
+> hardware accelerated VLAN stripping. Once the hardware accelerated
+> VLAN stripping is turn on, the VLAN tag will be stripped by the
+> 10G Ethernet MAC.
+
 ...
 
->  	if (priv->dma_cap.vlhash) {
->  		ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
->  		ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index 23d53ea04b24..bd7f3326a44c 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -543,6 +543,12 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
->  			plat->flags |= STMMAC_FLAG_TSO_EN;
->  	}
->  
-> +	/* Rx VLAN HW Stripping */
-> +	if (of_property_read_bool(np, "snps,rx-vlan-offload")) {
-> +		dev_info(&pdev->dev, "RX VLAN HW Stripping\n");
+> Reviewed-by: Shevchenko Andriy <andriy.shevchenko@linux.intel.com>
 
-Why? Drop.
+This is wrong:
+- I never reviewed DT bindings in all your series.
+- My name for the patches is also wrong.
 
+P.S. What I mentioned in the internal mail is that you can add my tag to
+    the code, and not to the DT. Sorry, I probably hadn't been clear.
 
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Best regards,
-Krzysztof
 
 
