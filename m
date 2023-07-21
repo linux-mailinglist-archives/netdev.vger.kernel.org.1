@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-19970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 751D975D0EA
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 19:51:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD7B875D0EE
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 19:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5EA51C21776
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:51:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74C5A2823F8
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B22D200D9;
-	Fri, 21 Jul 2023 17:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3293A20F84;
+	Fri, 21 Jul 2023 17:51:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFE71F95D
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 17:51:44 +0000 (UTC)
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F9F30FF
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:51:42 -0700 (PDT)
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-9926623e367so356565166b.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:51:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A7C1F95D
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 17:51:48 +0000 (UTC)
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61FDD3583
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:51:47 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-992ace062f3so347594866b.2
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 10:51:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689961901; x=1690566701;
+        d=1e100.net; s=20221208; t=1689961906; x=1690566706;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Qsue7q3KeO/R7eub1Ra03WnPj1VH7Ba7p54G2z6hqSg=;
-        b=HHEIdoPNpIB2IsMwtzh8uMTIyv/FbrVcJKQIWtKehwssITRTPAp2hWU4fZ/ozaGW0E
-         sk1LuTwET0GoQM66UGV3VHxMKjweJ8Oyu1Mf+RxeGZMGdICXrWJo/DuLsXaKrCCoYyXq
-         gGWC1lwLqkQLFHilUzrEqawNmcKsPD5x61CBf4h245+37h7xuhbJt/oAQwIn0ZQGa8Xa
-         aNdw7cJqtNaJ8zhTMS8V7ZsAZrtb3PjLtqETa2QGIk2nOdFMXvZVzXhtGMuGThEcHYlA
-         nx8H7jV3SKVMeD7YnKpAOSTcd1JoNRDGRtbgZZ5RE/odHXM6QyuotVg/Z/CVs5lSZ4+F
-         9kJQ==
-X-Gm-Message-State: ABy/qLbL6wTzqtJb9iemFHlVKdll66g9IcldkS6ZeqEn6Rwac0RsOWji
-	6M37asm8LVvixBWBCaJrUu3NPxJ6vCtjIhhq8nKi6M9n
-X-Google-Smtp-Source: APBJJlFnitYnAsVMhi75TmNjXz79NR3xkB0MQZ393aIY035GJEywTCPgGz6X0GdM5XgaXpz1FIcsUw==
-X-Received: by 2002:a17:906:5a5d:b0:99b:5a73:4d06 with SMTP id my29-20020a1709065a5d00b0099b5a734d06mr2039981ejc.20.1689961900994;
-        Fri, 21 Jul 2023 10:51:40 -0700 (PDT)
+        bh=zSijvnszXhE3b49+Y3EXbvfDOtBUeH5bGFxEhu9ubiE=;
+        b=SZoRImxpSGYZZtnj05Wibq95btTc3goh5/E2+lZ8nfJlyOyAyeWjZHurSWzdkSidVr
+         4PcXa/QpPeoBsH9JiiPBrLQdEWG2cWgRaDi+q2hLrN9MsM8/JTqkC8yNaNpJpWbfzoQz
+         ULNpxuO0YnOce4NpogAuXhcN5nvaTqA/LrRi0Uf//KywrsbvsRvdPtUxRt2FkWWPzRza
+         jbM9TSHAWFtKcIz9d5owEy6+3vZFzKdg5AAe3Wwyge9nup08p1A7xVq6fQhhLJXW4LS5
+         hiNLgDnKSyoOcEcoY2Vj0uk8PxL+kdX+iY06Ls1ARgS4R+Zg7lJGrf82QF38yyq75xEa
+         2ggg==
+X-Gm-Message-State: ABy/qLbNmCfAMeJxAolIyD2/ZbzyjqTyBzEvvNL5suK0EYqD6iO5TS87
+	259QTUogaXE2NCZrHErea+qlBvwgttlv/EDdtW81kiE/
+X-Google-Smtp-Source: APBJJlEZ+TydG6NTi8Vd58b5mUky/i6/GfdgaLfS6m4vlCcnFXzzOMISWRUyz/WWu5PvYoj2a3ObRg==
+X-Received: by 2002:a17:906:11a:b0:991:fef4:bb9 with SMTP id 26-20020a170906011a00b00991fef40bb9mr2222822eje.58.1689961905884;
+        Fri, 21 Jul 2023 10:51:45 -0700 (PDT)
 Received: from localhost.members.linode.com ([2a01:7e01::f03c:93ff:fead:d776])
-        by smtp.gmail.com with ESMTPSA id oy11-20020a170907104b00b0098822e05539sm2460669ejb.191.2023.07.21.10.51.40
+        by smtp.gmail.com with ESMTPSA id oy11-20020a170907104b00b0098822e05539sm2460669ejb.191.2023.07.21.10.51.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 10:51:40 -0700 (PDT)
+        Fri, 21 Jul 2023 10:51:45 -0700 (PDT)
 From: valis <sec@valis.email>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -57,9 +57,9 @@ Cc: jhs@mojatatu.com,
 	victor@mojatatu.com,
 	ramdhan@starlabs.sg,
 	billy@starlabs.sg
-Subject: [PATCH net 1/3] net/sched: cls_u32: No longer copy tcf_result on update to avoid use-after-free
-Date: Fri, 21 Jul 2023 17:48:54 +0000
-Message-Id: <20230721174856.3045-2-sec@valis.email>
+Subject: [PATCH net 2/3] net/sched: cls_fw: No longer copy tcf_result on update to avoid use-after-free
+Date: Fri, 21 Jul 2023 17:48:55 +0000
+Message-Id: <20230721174856.3045-3-sec@valis.email>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230721174856.3045-1-sec@valis.email>
 References: <20230721174856.3045-1-sec@valis.email>
@@ -78,7 +78,7 @@ X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When u32_change() is called on an existing filter, the whole
+When fw_change() is called on an existing filter, the whole
 tcf_result struct is always copied into the new instance of the filter.
 
 This causes a problem when updating a filter bound to a class,
@@ -88,26 +88,26 @@ and allowing it to be deleted, leading to a use-after-free.
 
 Fix this by no longer copying the tcf_result struct from the old filter.
 
-Fixes: de5df63228fc ("net: sched: cls_u32 changes to knode must appear atomic to readers")
+Fixes: e35a8ee5993b ("net: sched: fw use RCU")
 Reported-by: valis <sec@valis.email>
-Reported-by: M A Ramdhan <ramdhan@starlabs.sg>
+Reported-by: Bing-Jhong Billy Jheng <billy@starlabs.sg>
 Signed-off-by: valis <sec@valis.email>
 Cc: stable@vger.kernel.org
 ---
- net/sched/cls_u32.c | 1 -
+ net/sched/cls_fw.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index 5abf31e432ca..19aa60d1eea7 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -826,7 +826,6 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
+diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+index 8641f8059317..c49d6af0e048 100644
+--- a/net/sched/cls_fw.c
++++ b/net/sched/cls_fw.c
+@@ -267,7 +267,6 @@ static int fw_change(struct net *net, struct sk_buff *in_skb,
+ 			return -ENOBUFS;
  
- 	new->ifindex = n->ifindex;
- 	new->fshift = n->fshift;
--	new->res = n->res;
- 	new->flags = n->flags;
- 	RCU_INIT_POINTER(new->ht_down, ht);
+ 		fnew->id = f->id;
+-		fnew->res = f->res;
+ 		fnew->ifindex = f->ifindex;
+ 		fnew->tp = f->tp;
  
 -- 
 2.30.2
