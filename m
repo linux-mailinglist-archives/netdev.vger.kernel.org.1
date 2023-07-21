@@ -1,154 +1,100 @@
-Return-Path: <netdev+bounces-19886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF55E75CAD1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:58:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6971075CAD4
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:58:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98FE62822E1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 14:58:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 249DC2822F0
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 14:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC40827F26;
-	Fri, 21 Jul 2023 14:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51CD27F26;
+	Fri, 21 Jul 2023 14:58:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9B327F09
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:58:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657EA2130
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1689951495;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U1qQ37MMJd6MivrcwkUnYSPTqHJ5IN0DRXHoCePfwTc=;
-	b=V1rnVa3omVXnU9mqgApN9lxf11nkdV4OhwnrQJwkF+KgdqaGJ0JgwhWl0DHrX504HH18hX
-	IdwXqxPf2iP6/t/hm0JdAQmtxn051svF0zlzOep6oEFgfID+zbrDAv3QihVRxTNh0tsJta
-	J5biX/LFOpF8lOQSyvj9imGqjT+V7a4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-80--sJhcl7SMfaUKSuhATyG2A-1; Fri, 21 Jul 2023 10:58:10 -0400
-X-MC-Unique: -sJhcl7SMfaUKSuhATyG2A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CE9A2800B35;
-	Fri, 21 Jul 2023 14:58:09 +0000 (UTC)
-Received: from [10.39.208.41] (unknown [10.39.208.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B43304094DC0;
-	Fri, 21 Jul 2023 14:58:07 +0000 (UTC)
-Message-ID: <6278a4aa-8901-b0e3-342f-5753a4bf32af@redhat.com>
-Date: Fri, 21 Jul 2023 16:58:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63D719BC5
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 14:58:22 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381002735
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689951501; x=1721487501;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CqDJKbSP60EYkLj7qrC49RcCekoGw+rz+RZFFzaAk3w=;
+  b=fzm0SDhRNOAEK8WYAL2vuqCjTZZPxkcPXUgiZN4Y/Fgzu7RRqXs2Qthn
+   qiwONIjlhXBjS4xpNOcf8GcXuuNqb6hlWqGFWcWWISajLrbUvVQpY6ngU
+   UQuIaUK1dg0vWFJvj/VhQsJjkEbZC1aN1suWJ4mXNouy2WN66XAU7ZBWt
+   LXMV9yN+A7tyQdumhll12JCtin+wytjIz/VG4/djn5rT7j1BXP3RTE98M
+   u/fHvePiGO/kTXbKF6YK4js3R5vyiXi8FAyM2tRnS8MrDvIOESyZ1YLZZ
+   x+dXY4DXEzP3Qf18COxsFciZlkSkZKhRpCS6YEVwt3rH99CUopkj1Tt3o
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="433273025"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="433273025"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 07:58:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="1055586101"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="1055586101"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmsmga005.fm.intel.com with ESMTP; 21 Jul 2023 07:58:18 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: netdev@vger.kernel.org,
+	kuba@kernel.org
+Cc: magnus.karlsson@intel.com,
+	davem@davemloft.net,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [PATCH net-next] net: add missing net_device::xdp_zc_max_segs description
+Date: Fri, 21 Jul 2023 16:58:08 +0200
+Message-Id: <20230721145808.596298-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
- command waiting loop
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Shannon Nelson <shannon.nelson@amd.com>, Jason Wang
- <jasowang@redhat.com>, xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net
-References: <20230720083839.481487-1-jasowang@redhat.com>
- <20230720083839.481487-3-jasowang@redhat.com>
- <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com>
- <20230720170001-mutt-send-email-mst@kernel.org>
- <263a5ad7-1189-3be3-70de-c38a685bebe0@redhat.com>
- <20230721104445-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-In-Reply-To: <20230721104445-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Cited commit under 'Fixes' tag introduced new member to struct
+net_device without providing description of it - fix it.
 
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Closes: https://lore.kernel.org/all/20230720141613.61488b9e@canb.auug.org.au/
+Fixes: 13ce2daa259a ("xsk: add new netlink attribute dedicated for ZC max frags")
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+---
+ include/linux/netdevice.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 7/21/23 16:45, Michael S. Tsirkin wrote:
-> On Fri, Jul 21, 2023 at 04:37:00PM +0200, Maxime Coquelin wrote:
->>
->>
->> On 7/20/23 23:02, Michael S. Tsirkin wrote:
->>> On Thu, Jul 20, 2023 at 01:26:20PM -0700, Shannon Nelson wrote:
->>>> On 7/20/23 1:38 AM, Jason Wang wrote:
->>>>>
->>>>> Adding cond_resched() to the command waiting loop for a better
->>>>> co-operation with the scheduler. This allows to give CPU a breath to
->>>>> run other task(workqueue) instead of busy looping when preemption is
->>>>> not allowed on a device whose CVQ might be slow.
->>>>>
->>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>>
->>>> This still leaves hung processes, but at least it doesn't pin the CPU any
->>>> more.  Thanks.
->>>> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
->>>>
->>>
->>> I'd like to see a full solution
->>> 1- block until interrupt
->>
->> Would it make sense to also have a timeout?
->> And when timeout expires, set FAILED bit in device status?
-> 
-> virtio spec does not set any limits on the timing of vq
-> processing.
-
-Indeed, but I thought the driver could decide it is too long for it.
-
-The issue is we keep waiting with rtnl locked, it can quickly make the
-system unusable.
-
->>> 2- still handle surprise removal correctly by waking in that case
->>>
->>>
->>>
->>>>> ---
->>>>>     drivers/net/virtio_net.c | 4 +++-
->>>>>     1 file changed, 3 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>>> index 9f3b1d6ac33d..e7533f29b219 100644
->>>>> --- a/drivers/net/virtio_net.c
->>>>> +++ b/drivers/net/virtio_net.c
->>>>> @@ -2314,8 +2314,10 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
->>>>>             * into the hypervisor, so the request should be handled immediately.
->>>>>             */
->>>>>            while (!virtqueue_get_buf(vi->cvq, &tmp) &&
->>>>> -              !virtqueue_is_broken(vi->cvq))
->>>>> +              !virtqueue_is_broken(vi->cvq)) {
->>>>> +               cond_resched();
->>>>>                    cpu_relax();
->>>>> +       }
->>>>>
->>>>>            return vi->ctrl->status == VIRTIO_NET_OK;
->>>>>     }
->>>>> --
->>>>> 2.39.3
->>>>>
->>>>> _______________________________________________
->>>>> Virtualization mailing list
->>>>> Virtualization@lists.linux-foundation.org
->>>>> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
->>>
-> 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 3800d0479698..11652e464f5d 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2043,6 +2043,8 @@ enum netdev_ml_priv_type {
+  *			receive offload (GRO)
+  * 	@gro_ipv4_max_size:	Maximum size of aggregated packet in generic
+  * 				receive offload (GRO), for IPv4.
++ *	@xdp_zc_max_segs:	Maximum number of segments supported by AF_XDP
++ *				zero copy driver
+  *
+  *	@dev_addr_shadow:	Copy of @dev_addr to catch direct writes.
+  *	@linkwatch_dev_tracker:	refcount tracker used by linkwatch.
+-- 
+2.34.1
 
 
