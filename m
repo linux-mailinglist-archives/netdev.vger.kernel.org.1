@@ -1,210 +1,286 @@
-Return-Path: <netdev+bounces-19742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 844A475BFB2
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:27:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F1975BFC5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39D301C215EC
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:27:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 497FB2821A9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 07:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B4D20EE;
-	Fri, 21 Jul 2023 07:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3F220F2;
+	Fri, 21 Jul 2023 07:33:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF44E20E4
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:27:50 +0000 (UTC)
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC64189;
-	Fri, 21 Jul 2023 00:27:47 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-	by fd01.gateway.ufhost.com (Postfix) with ESMTP id 3FD3C24DD54;
-	Fri, 21 Jul 2023 15:27:38 +0800 (CST)
-Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 21 Jul
- 2023 15:27:36 +0800
-Received: from [192.168.120.43] (171.223.208.138) by EXMBX062.cuchost.com
- (172.16.6.62) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 21 Jul
- 2023 15:27:34 +0800
-Message-ID: <ce3e0ffb-abcd-2392-8767-db460bce4b4b@starfivetech.com>
-Date: Fri, 21 Jul 2023 15:27:33 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0951520E4
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 07:33:21 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6496E270A
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 00:33:18 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fba86f069bso2529638e87.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 00:33:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1689924796; x=1690529596;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZYK3IrQCwIlRKnidHAZyFhY83ge+Okh3eSN0zwEW7aI=;
+        b=T/kWxas2KxG5t6m1LECmvOW0hLTn7ZtkhiqoHsk+sd5n2C6vEmrM/W71W0+KqCfSqr
+         kZu5bQvvltUKqh3faY5Z+e5JVo0ytLnVZmmJRDyckz7A8pM7C7u6YHtRfCnKWdinBgM5
+         39JiaKhx35YVLwNcOcsjzaBplIMac4jtBgFFnzvFIOhQuivyzys4yQ1sp7/UpXVrYKsa
+         I66ClMJGTOKAyny6jHaqanUYb9Uj2s9KqThtr6093IPedP5VPWObz6/kk8JqvlMr06yW
+         LKmpd6faKQQSKdPHN4oqnS5E0WEig3/+hQY4CPfYirLvoSVDvkSO8rmDcqKGuBNZ+Els
+         GNXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689924796; x=1690529596;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZYK3IrQCwIlRKnidHAZyFhY83ge+Okh3eSN0zwEW7aI=;
+        b=JgO6Ruh8Apor/8XAw/K8VMx9wFWZ3tVb7kqwtvHyFNy47Mkc1rDO3udMlpR8T4xMm6
+         pJRQ2EDZqz25v5Q7LfTZTZASQ4X0Fe3nDxRGKMszFlmtZ8w/WWnpEBLYvbng4oliQtDv
+         ULcCeu64vZMp4q9UofFGknz9sKcfUY1zY8oJ535n8Rnsa8zRydGOiqChXektj+YM6HvT
+         AzEON95ynUbdkvs+m1nyd5CNl5gSd3CKdzmLyNHxkSpiT3fcXH+MDiev/csRqQHXKi3u
+         /ZR55Zwx7UpGGzNRo2EaJ3CaSV4ntc4CFYiATrBTTCnp8/u0ErLRUXESao3LxxY6P92j
+         9Q/w==
+X-Gm-Message-State: ABy/qLY64L0aG8Xz16JSJer04Vc881uYGENz8Gg8aSSr6s8wzbn7UcB9
+	bLub+n1i8O67CtmO1wFU1LGr9w==
+X-Google-Smtp-Source: APBJJlEQqkNu5OMsSGxZu2OgY+YB7ZPg1GE94FcV4r3WbogJGl5e3IrmaZ8+7oYeVhHc3bq/gsNjJA==
+X-Received: by 2002:ac2:4f05:0:b0:4f8:5696:6bbc with SMTP id k5-20020ac24f05000000b004f856966bbcmr956672lfr.29.1689924796481;
+        Fri, 21 Jul 2023 00:33:16 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id w10-20020adfd4ca000000b003140f47224csm3394956wrk.15.2023.07.21.00.33.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 00:33:15 -0700 (PDT)
+Date: Fri, 21 Jul 2023 09:33:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+	kuba@kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 09/11] ice: implement dpll interface to control cgu
+Message-ID: <ZLo0ujuLMF2NrMog@nanopsycho>
+References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
+ <20230720091903.297066-10-vadim.fedorenko@linux.dev>
+ <ZLk/9zwbBHgs+rlb@nanopsycho>
+ <DM6PR11MB46572F438AADB5801E58227A9B3EA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH7110 SoC
-Content-Language: en-US
-To: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Hal Feng <hal.feng@starfivetech.com>,
-	<linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: Conor Dooley <conor.dooley@microchip.com>, Emil Renner Berthing
-	<emil.renner.berthing@canonical.com>, Emil Renner Berthing <kernel@esmil.dk>,
-	Richard Cochran <richardcochran@gmail.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jose Abreu
-	<joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
-	<hkallweit1@gmail.com>, Peter Geis <pgwipeout@gmail.com>, Yanhong Wang
-	<yanhong.wang@starfivetech.com>, Tommaso Merciai <tomm.merciai@gmail.com>
-References: <20230714104521.18751-1-samin.guo@starfivetech.com>
- <20230720-cardstock-annoying-27b3b19e980a@spud>
- <42beaf41-947e-f585-5ec1-f1710830e556@starfivetech.com>
- <A0012BE7-8947-49C8-8697-1F879EE7B0B7@kernel.org>
-From: Guo Samin <samin.guo@starfivetech.com>
-In-Reply-To: <A0012BE7-8947-49C8-8697-1F879EE7B0B7@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [171.223.208.138]
-X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX062.cuchost.com
- (172.16.6.62)
-X-YovoleRuleAgent: yovoleflag
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB46572F438AADB5801E58227A9B3EA@DM6PR11MB4657.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
--------- =E5=8E=9F=E5=A7=8B=E4=BF=A1=E6=81=AF --------
-=E4=B8=BB=E9=A2=98: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH=
-7110 SoC
-From: Conor Dooley <conor@kernel.org>
-=E6=94=B6=E4=BB=B6=E4=BA=BA: Guo Samin <samin.guo@starfivetech.com>, Rob =
-Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt=
-@linaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <p=
-almer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Hal Feng <hal.feng=
-@starfivetech.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infra=
-dead.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
-=E6=97=A5=E6=9C=9F: 2023/7/21
-
->=20
->=20
-> On 21 July 2023 03:09:19 IST, Guo Samin <samin.guo@starfivetech.com> wr=
-ote:
+Thu, Jul 20, 2023 at 07:31:14PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Thursday, July 20, 2023 4:09 PM
+>>
+>>Thu, Jul 20, 2023 at 11:19:01AM CEST, vadim.fedorenko@linux.dev wrote:
+>>>From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>
+>>[...]
 >>
 >>
->> -------- =E5=8E=9F=E5=A7=8B=E4=BF=A1=E6=81=AF --------
->> =E4=B8=BB=E9=A2=98: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive=
- JH7110 SoC
->> From: Conor Dooley <conor@kernel.org>
->> =E6=94=B6=E4=BB=B6=E4=BA=BA: Conor Dooley <conor@kernel.org>, Rob Herr=
-ing <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@lin=
-aro.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palme=
-r@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Hal Feng <hal.feng@sta=
-rfivetech.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead=
-.org, devicetree@vger.kernel.org, netdev@vger.kernel.org, Samin Guo <sami=
-n.guo@starfivetech.com>
->> =E6=97=A5=E6=9C=9F: 2023/7/21
->>
->>> From: Conor Dooley <conor.dooley@microchip.com>
->>>
->>> On Fri, 14 Jul 2023 18:45:19 +0800, Samin Guo wrote:
->>>> This series adds ethernet nodes for StarFive JH7110 RISC-V SoC,
->>>> and has been tested on StarFive VisionFive-2 v1.2A and v1.3B SBC boa=
-rds.
->>>>
->>>> The first patch adds ethernet nodes for jh7110 SoC, the second patch
->>>> adds ethernet nodes for visionfive 2 SBCs.
->>>>
->>>> This series relies on xingyu's syscon patch[1].
->>>> For more information and support, you can visit RVspace wiki[2].
->>>>
->>>> [...]
->>>
->>> Applied to riscv-dt-for-next, thanks!
->>>
->>> [1/2] riscv: dts: starfive: jh7110: Add ethernet device nodes
->>>       https://git.kernel.org/conor/c/1ff166c97972
->>> [2/2] riscv: dts: starfive: visionfive 2: Add configuration of gmac a=
-nd phy
->>>       https://git.kernel.org/conor/c/b15a73c358d1
->>>
->>> Thanks,
->>> Conor.
+>>>+/**
+>>>+ * ice_dpll_pin_enable - enable a pin on dplls
+>>>+ * @hw: board private hw structure
+>>>+ * @pin: pointer to a pin
+>>>+ * @pin_type: type of pin being enabled
+>>>+ * @extack: error reporting
+>>>+ *
+>>>+ * Enable a pin on both dplls. Store current state in pin->flags.
+>>>+ *
+>>>+ * Context: Called under pf->dplls.lock
+>>>+ * Return:
+>>>+ * * 0 - OK
+>>>+ * * negative - error
+>>>+ */
+>>>+static int
+>>>+ice_dpll_pin_enable(struct ice_hw *hw, struct ice_dpll_pin *pin,
+>>>+		    enum ice_dpll_pin_type pin_type,
+>>>+		    struct netlink_ext_ack *extack)
+>>>+{
+>>>+	u8 flags = 0;
+>>>+	int ret;
+>>>+
 >>
 >>
->> Hi Conor=EF=BC=8C
 >>
->> Thank you so much=EF=BC=81=20
+>>I don't follow. Howcome you don't check if the mode is freerun here or
+>>not? Is it valid to enable a pin when freerun mode? What happens?
 >>
->> There is a question about the configuration of phy that I would like t=
-o consult you.
->>
->> Latest on motorcomm PHY V5[1]: Follow Rob Herring's advice
->> motorcomm,rx-xxx-driver-strength Changed to motorcomm,rx-xxx-drv-micro=
-amp .
->> V5 has already received a reviewed-by from Andrew Lunn, and it should =
-not change again.
->>
->> Should I submit another pacthes based on riscv-dt-for-next?=20
->=20
-> Huh, dtbs_check passed for these patches,
-> I didn't realise changes to the motorcomm stuff
-> were a dep. for this. I'll take a look later.
 >
-Hi Conor,
+>Because you are probably still thinking the modes are somehow connected
+>to the state of the pin, but it is the other way around.
+>The dpll device mode is a state of DPLL before pins are even considered.
+>If the dpll is in mode FREERUN, it shall not try to synchronize or monitor
+>any of the pins.
+>
+>>Also, I am probably slow, but I still don't see anywhere in this
+>>patchset any description about why we need the freerun mode. What is
+>>diffrerent between:
+>>1) freerun mode
+>>2) automatic mode & all pins disabled?
+>
+>The difference:
+>Case I:
+>1. set dpll to FREERUN and configure the source as if it would be in
+>AUTOMATIC
+>2. switch to AUTOMATIC
+>3. connecting to the valid source takes ~50 seconds
+>
+>Case II:
+>1. set dpll to AUTOMATIC, set all the source to disconnected
+>2. switch one valid source to SELECTABLE
+>3. connecting to the valid source takes ~10 seconds
+>
+>Basically in AUTOMATIC mode the sources are still monitored even when they
+>are not in SELECTABLE state, while in FREERUN there is no such monitoring,
+>so in the end process of synchronizing with the source takes much longer as
+>dpll need to start the process from scratch.
 
-Thanks for taking the time to follow this.
-
-After discussing with HAL, I have prepared the code and considered adding=
- the following patch to=20
-Motorcomm's patchsetes v6. (To fix some spelling errors in v5[1])
-which will then send patches based on linux-next. What do you think? @And=
-rew @Conor
-
-[1] https://patchwork.kernel.org/project/netdevbpf/cover/20230720111509.2=
-1843-1-samin.guo@starfivetech.com
-
-
-
---- a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2-v1.3b.dts
-+++ b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2-v1.3b.dts
-@@ -28,8 +28,8 @@
-        motorcomm,tx-clk-adj-enabled;
-        motorcomm,tx-clk-100-inverted;
-        motorcomm,tx-clk-1000-inverted;
--       motorcomm,rx-clk-driver-strength =3D <3970>;
--       motorcomm,rx-data-driver-strength =3D <2910>;
-+       motorcomm,rx-clk-drv-microamp =3D <3970>;
-+       motorcomm,rx-data-drv-microamp =3D <2910>;
-        rx-internal-delay-ps =3D <1500>;
-        tx-internal-delay-ps =3D <1500>;
- };
-@@ -37,8 +37,8 @@
- &phy1 {
-        motorcomm,tx-clk-adj-enabled;
-        motorcomm,tx-clk-100-inverted;
--       motorcomm,rx-clk-driver-strength =3D <3970>;
--       motorcomm,rx-data-driver-strength =3D <2910>;
-+       motorcomm,rx-clk-drv-microamp =3D <3970>;
-+       motorcomm,rx-data-drv-microamp =3D <2910>;
-        rx-internal-delay-ps =3D <300>;
-        tx-internal-delay-ps =3D <0>;
- };
+I believe this is implementation detail of your HW. How you do it is up
+to you. User does not have any visibility to this behaviour, therefore
+makes no sense to expose UAPI that is considering it. Please drop it at
+least for the initial patchset version. If you really need it later on
+(which I honestly doubt), you can send it as a follow-up patchset.
 
 
-Best regards,
-Samin
 
+>
 >>
->> [1] https://patchwork.kernel.org/project/netdevbpf/cover/2023072011150=
-9.21843-1-samin.guo@starfivetech.com
+>>Isn't the behaviour of 1) and 2) exactly the same? If no, why? This
+>>needs to be documented, please.
 >>
->>
->> Best regards,
->> Samin
+>
+>Sure will add the description of FREERUN to the docs.
 
+No, please drop it from this patchset. I have no clue why you readded
+it in the first place in the last patchset version.
+
+
+>
+>>
+>>
+>>Another question, I asked the last time as well, but was not heard:
+>>Consider example where you have 2 netdevices, eth0 and eth1, each
+>>connected with a single DPLL pin:
+>>eth0 - DPLL pin 10 (DPLL device id 2)
+>>eth1 - DPLL pin 11 (DPLL device id 2)
+>>
+>>You have a SyncE daemon running on top eth0 and eth1.
+>>
+>>Could you please describe following 2 flows?
+>>
+>>1) SyncE daemon selects eth0 as a source of clock
+>>2) SyncE daemon selects eth1 as a source of clock
+>>
+>>
+>>For mlx5 it goes like:
+>>
+>>DPLL device mode is MANUAL.
+>>1)
+>> SynceE daemon uses RTNetlink to obtain DPLL pin number of eth0
+>>    -> pin_id: 10
+>> SenceE daemon will use PIN_GET with pin_id 10 to get DPLL device id
+>>    -> device_id: 2
+>
+>Not sure if it needs to obtain the dpll id in this step, but it doesn't
+>relate to the dpll interface..
+
+Sure it has to. The PIN_SET accepts pin_id and device_id attrs as input.
+You need to set the state on a pin on a certain DPLL device.
+
+
+>
+>> SynceE daemon does PIN_SET cmd on pin_id 10, device_id 2 -> state =
+>>CONNECTED
+>>
+>>2)
+>> SynceE daemon uses RTNetlink to obtain DPLL pin number of eth1
+>>    -> pin_id: 11
+>> SenceE daemon will use PIN_GET with pin_id 11 to get DPLL device id
+>>    -> device_id: 2
+>> SynceE daemon does PIN_SET cmd on pin_id 10, device_id 2 -> state =
+>>CONNECTED
+>> (that will in HW disconnect previously connected pin 10, there will be
+>>  notification of pin_id 10, device_id -> state DISCONNECT)
+>>
+>
+>This flow is similar for ice, but there are some differences, although
+>they come from the fact, the ice is using AUTOMATIC mode and recovered
+>clock pins which are not directly connected to a dpll (connected through
+>the MUX pin).
+>
+>1) 
+>a) SyncE daemon uses RTNetlink to obtain DPLL pin number of eth0 -> pin_id: 13
+>b) SyncE daemon uses PIN_GET to find a parent MUX type pin -> pin_id: 2
+>   (in case of dpll_id is needed, would be find in this response also)
+>c) SyncE daemon uses PIN_SET to set parent MUX type pin (pin_id: 2) to
+>   pin-state: SELECTABLE and highest priority (i.e. pin-prio:0, while all the
+>   other pins shall be lower prio i.e. pin-prio:1)
+
+Yeah, for this you need pin_id 2 and device_id. Because you are setting
+state on DPLL device.
+
+
+>d) SyncE daemon uses PIN_SET to set state of pin_id:13 to CONNECTED with
+>   parent pin (pin-id:2)
+
+For this you need pin_id and pin_parent_id because you set the state on
+a parent pin.
+
+
+Yeah, this is exactly why I initially was in favour of hiding all the
+muxes and magic around it hidden from the user. Now every userspace app
+working with this has to implement a logic of tracking pin and the mux
+parents (possibly multiple levels) and configure everything. But it just
+need a simple thing: "select this pin as a source" :/
+
+
+Jakub, isn't this sort of unnecessary HW-details complexicity exposure
+in UAPI you were against in the past? Am I missing something?
+
+
+
+> 
+>2) (basically the same, only eth1 would get different pin_id.)
+>a) SyncE daemon uses RTNetlink to obtain DPLL pin number of eth0 -> pin_id: 14
+>b) SyncE daemon uses PIN_GET to find parent MUX type pin -> pin_id: 2
+>c) SyncE daemon uses PIN_SET to set parent MUX type pin (pin_id: 2) to
+>   pin-state: SELECTABLE and highest priority (i.e. pin-prio:0, while all the
+>   other pins shall be lower prio i.e. pin-prio:1)
+>d) SyncE daemon uses PIN_SET to set state of pin_id:14 to CONNECTED with
+>   parent pin (pin-id:2)
+>
+>Where step c) is required due to AUTOMATIC mode, and step d) required due to
+>phy recovery clock pin being connected through the MUX type pin.
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>Thanks!
+>>
+>>
+>>[...]
 
