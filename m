@@ -1,211 +1,171 @@
-Return-Path: <netdev+bounces-19952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA28075CF3D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:29:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3064075CF29
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 037DA1C216CE
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:29:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF32D2826F6
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2368A20F8D;
-	Fri, 21 Jul 2023 16:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CAB1F95E;
+	Fri, 21 Jul 2023 16:21:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16ABD1F953
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 16:23:53 +0000 (UTC)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D090F46A1;
-	Fri, 21 Jul 2023 09:23:24 -0700 (PDT)
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="453435610"
-X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
-   d="scan'208";a="453435610"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 09:21:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="848870377"
-X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
-   d="scan'208";a="848870377"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga004.jf.intel.com with ESMTP; 21 Jul 2023 09:21:03 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andy@kernel.org>)
-	id 1qMssF-00CCBV-0a;
-	Fri, 21 Jul 2023 19:20:59 +0300
-Date: Fri, 21 Jul 2023 19:20:58 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: nikita.shubin@maquefel.me
-Cc: Hartley Sweeten <hsweeten@visionengravers.com>,
-	Lennert Buytenhek <kernel@wantstofly.org>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Lukasz Majewski <lukma@denx.de>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Sebastian Reichel <sre@kernel.org>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Mark Brown <broonie@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
-	soc@kernel.org, Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Michael Peters <mpeters@embeddedts.com>,
-	Kris Bahnsen <kris@embeddedts.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
-	netdev@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
-	linux-input@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 22/42] dma: cirrus: add DT support for Cirrus EP93xx
-Message-ID: <ZLqwajir6kFLgbcm@smile.fi.intel.com>
-References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
- <20230605-ep93xx-v3-22-3d63a5f1103e@maquefel.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3051F942
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 16:21:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8891C433C7;
+	Fri, 21 Jul 2023 16:21:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689956500;
+	bh=rqY2poUz63yjLOJ55oXMpkn/XJdCG6+xqHNdcLUoepI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OssVYj7mosdQAKg5FblQyX3u6Xjc+ZUww3jNi3i1wgDMkZG1dcuck5NKrWBWdHWup
+	 ghHxW2s8/Ow30XqgJ3q+nFyWTZ04k105d0vmMMUaVyzIE+gUW9skdFyjs6++n90K4K
+	 HZDxUMagyb42BZ4Zz/R1O4ayI/7VwWKNoms3w0n3s1d6Hi+ljryzI1KUrhylmsgA6U
+	 K/xrhmqXxz+lJhxF/PkbZCA3RNtufYKBLb3mYd37MN7Q5qFxne2tFTGy6tHkf0FBgu
+	 W/Hz8OXbySuew5gRASwnoMuSfIZ1IHGDdRhcwg+YzPjMzKy33RHCzwYPDwkZI3RHOn
+	 5b8OoFiXDsDvA==
+Message-ID: <8e2f9c5f-6249-4325-58b2-a14549eb105d@kernel.org>
+Date: Fri, 21 Jul 2023 18:21:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230605-ep93xx-v3-22-3d63a5f1103e@maquefel.me>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 1/2] dt-bindings:
+ net: snps,dwmac: Add description for rx-vlan-offload
+To: "Ng, Boon Khai" <boon.khai.ng@intel.com>,
+ "Boon@ecsmtp.png.intel.com" <Boon@ecsmtp.png.intel.com>,
+ "Khai@ecsmtp.png.intel.com" <Khai@ecsmtp.png.intel.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: "Shevchenko, Andriy" <andriy.shevchenko@intel.com>,
+ "Tham, Mun Yew" <mun.yew.tham@intel.com>,
+ "Swee, Leong Ching" <leong.ching.swee@intel.com>,
+ "G Thomas, Rohan" <rohan.g.thomas@intel.com>,
+ Shevchenko Andriy <andriy.shevchenko@linux.intel.com>
+References: <20230721062617.9810-1-boon.khai.ng@intel.com>
+ <20230721062617.9810-2-boon.khai.ng@intel.com>
+ <e552cea3-abbb-93e3-4167-aebe979aac6b@kernel.org>
+ <DM8PR11MB5751EAB220E28AECF6153522C13FA@DM8PR11MB5751.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <DM8PR11MB5751EAB220E28AECF6153522C13FA@DM8PR11MB5751.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 20, 2023 at 02:29:22PM +0300, Nikita Shubin via B4 Relay wrote:
-> From: Nikita Shubin <nikita.shubin@maquefel.me>
+On 21/07/2023 17:28, Ng, Boon Khai wrote:
+>> -----Original Message-----
+>> From: Krzysztof Kozlowski <krzk@kernel.org>
+>> Sent: Friday, July 21, 2023 6:11 PM
+>> To: Boon@ecsmtp.png.intel.com; Khai@ecsmtp.png.intel.com; "Ng
+>> <boon.khai.ng"@intel.com; Giuseppe Cavallaro <peppe.cavallaro@st.com>;
+>> Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu
+>> <joabreu@synopsys.com>; David S . Miller <davem@davemloft.net>; Eric
+>> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+>> Abeni <pabeni@redhat.com>; Maxime Coquelin
+>> <mcoquelin.stm32@gmail.com>; netdev@vger.kernel.org; linux-stm32@st-md-
+>> mailman.stormreply.com; linux-arm-kernel@lists.infradead.org; linux-
+>> kernel@vger.kernel.org
+>> Cc: Ng, Boon Khai <boon.khai.ng@intel.com>; Shevchenko, Andriy
+>> <andriy.shevchenko@intel.com>; Tham, Mun Yew <mun.yew.tham@intel.com>;
+>> Swee, Leong Ching <leong.ching.swee@intel.com>; G Thomas, Rohan
+>> <rohan.g.thomas@intel.com>; Shevchenko Andriy
+>> <andriy.shevchenko@linux.intel.com>
+>> Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 1/2] dt-bindings:
+>> net: snps,dwmac: Add description for rx-vlan-offload
+>>
+>> On 21/07/2023 08:26, Boon@ecsmtp.png.intel.com wrote:
+>>> From: Boon Khai Ng <boon.khai.ng@intel.com>
+>>>
+>>> This patch is to add the dts setting for the MAC controller on
+>>> synopsys 10G Ethernet MAC which allow the 10G MAC to turn on hardware
+>>> accelerated VLAN stripping. Once the hardware accelerated VLAN
+>>> stripping is turn on, the VLAN tag will be stripped by the
+>>
+>> Subject prefix is totally bogus.
+>>
 > 
-> - drop subsys_initcall code
-> - add OF ID match table with data
-> - add of_probe for device tree
+> Which part? It's a 10G Ethernet IP from Sysnopsys, in Roman character it is X (mean 10), so XGMAC.
+> Even the driver file I'm editing it is dw"xgmac".
 
-...
+Everything in [].
 
-> +#include <linux/of_device.h>
+> 
+>>
+>>> 10G Ethernet MAC.
+>>>
+>>> Signed-off-by: Boon Khai Ng <boon.khai.ng@intel.com>
+>>> Reviewed-by: Shevchenko Andriy <andriy.shevchenko@linux.intel.com>
+>>
+>> Please use scripts/get_maintainers.pl to get a list of necessary people and lists
+>> to CC. It might happen, that command when run on an older kernel, gives you
+>> outdated entries. Therefore please be sure you base your patches on recent
+>> Linux kernel.
+>>
+> 
+> This is based on net-next repository suggested by the get maintainer script.
+> 
+> I got the latest net-next just now at the Commit-id b44693495af8 
+> which just committed yesterday.
+> 
+> $ ./scripts/get_maintainer.pl  --scm  -f drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
 
-Why?
+That's not how you run it. get_maintainers.pl should be run on patches
+or on all files, not just some selection.
 
-...
+> Giuseppe Cavallaro <peppe.cavallaro@st.com> (supporter:STMMAC ETHERNET DRIVER)
+> Alexandre Torgue <alexandre.torgue@foss.st.com> (supporter:STMMAC ETHERNET DRIVER)
+> Jose Abreu <joabreu@synopsys.com> (supporter:STMMAC ETHERNET DRIVER)
+> "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
+> Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
+> Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
+> Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
+> Maxime Coquelin <mcoquelin.stm32@gmail.com> (maintainer:ARM/STM32 ARCHITECTURE)
+> Richard Cochran <richardcochran@gmail.com> (maintainer:PTP HARDWARE CLOCK SUPPORT)
+> netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER)
+> linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE)
+> linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE)
+> linux-kernel@vger.kernel.org (open list)
+> git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
+> git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+> git git://git.kernel.org/pub/scm/linux/kernel/git/atorgue/stm32.git stm32-next
+> git git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> 
+>> You missed at least DT list (maybe more), so this won't be tested by automated
+>> tooling. Performing review on untested code might be a waste of time, thus I
+>> will skip this patch entirely till you follow the process allowing the patch to be
+>> tested.
+>>
+> 
+> This is a new device bringup, thus the DT is not available yet. The DTS will be upstreamed
+> by my another colleague, unless, if I can upstream only my part on the setting? 
 
-> +#ifdef CONFIG_OF
+You are mixing now DTS and DT bindings. Sorry, we do not talk about DTS.
 
-Why this ugly ifdeffery?
+Follow our process of submitting patches. For sure there are folks in
+Intel which can explain it to you.
 
-...
 
-> +	data = of_device_get_match_data(&pdev->dev);
-
-device_get_match_data()
-
-> +	if (!data)
-> +		return ERR_PTR(dev_err_probe(&pdev->dev, -ENODEV, "No device match found\n"));
-
-...
-
-> +	edma = devm_kzalloc(&pdev->dev,
-> +					  struct_size(edma, channels, data->num_channels),
-> +				      GFP_KERNEL);
-
-Something wrong with indentation. Not the first time, please check all your
-patches for this kind of issues.
-
-> +		return ERR_PTR(-ENOMEM);
-
-...
-
-> +		edmac->regs = devm_platform_ioremap_resource(pdev, i);
-
-No check?
-
-> +		edmac->irq = platform_get_irq(pdev, i);
-
-No check?
-
-> +		edmac->edma = edma;
-> +
-> +		edmac->clk = of_clk_get(np, i);
-
-> +
-
-Redundant blank line.
-
-Why one of devm_clk_get*() can't be called?
-
-> +		if (IS_ERR(edmac->clk)) {
-> +			dev_warn(&pdev->dev, "failed to get clock\n");
-> +			continue;
-> +		}
-
-...
-
-> +	if (platform_get_device_id(pdev))
-> +		edma = ep93xx_init_from_pdata(pdev);
-> +	else
-> +		edma = ep93xx_dma_of_probe(pdev);
-
-> +
-
-Unneeded blank line.
-
-> +	if (!edma)
-> +		return PTR_ERR(edma);
-
-...
-
-> --- a/include/linux/platform_data/dma-ep93xx.h
-> +++ b/include/linux/platform_data/dma-ep93xx.h
-
->  #include <linux/types.h>
->  #include <linux/dmaengine.h>
->  #include <linux/dma-mapping.h>
-
-> +#include <linux/of.h>
-
-property.h.
-
-...
-
-> +	if (of_device_is_compatible(dev_of_node(chan->device->dev), "cirrus,ep9301-dma-m2p"))
-> +		return true;
-> +
-
-device_is_compatible()
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+Best regards,
+Krzysztof
 
 
