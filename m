@@ -1,209 +1,95 @@
-Return-Path: <netdev+bounces-19914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F15A75CCEE
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:00:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D8C75CCFA
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDC972820F1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2954728233D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 16:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EA21ED47;
-	Fri, 21 Jul 2023 16:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D621ED49;
+	Fri, 21 Jul 2023 16:01:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49B614F68
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 16:00:31 +0000 (UTC)
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F392D47
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:00:30 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-767ca28fb32so150367785a.1
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:00:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1689955229; x=1690560029;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cL2Q32PhNXRdScnQT0em97lodS45ZR022eb9UobD11w=;
-        b=uyVAkm4gzZW/4vJAsm10ROTMOlhoWqrMqcDR+qVre6Ttr8RjN9V/28wYVq86J6uupX
-         iOgcyqyJthPejjx8dqiMTVglx9r3K7xoZSdP7RlvV7OnG7W1zxa5fIj3wOFrTan1eByn
-         Vs8zWS7PkE1upMDE/NndWg67YgIBjsrhdIAOQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689955229; x=1690560029;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cL2Q32PhNXRdScnQT0em97lodS45ZR022eb9UobD11w=;
-        b=PkaO4eMdhub24Pw+z3h17/Yf72zPliKUP+RfxqLMGEoEXrEsrrq4zq7jZSYUjhgOjN
-         DFdRxsKDtH3ErCsHhinKkLsEe95g2xeHXF8AGYkmOoc1eHrmK1DVcHj9o5UTvA+7u2Si
-         iOfbAdrL1c97XW7Sn7PY6esb743OqaRLKytqUvA1QWsvm6gAHKRqRcwzyXI1m2XTi2PX
-         +V12bDaiBWB9ydDsKlCkD32t37bAGpsgb5WMHN0BmUMgS0YkakloI964OGLngHEPyYjw
-         2tqpzX0uaV+HHnBQyPz/1tqm6I2O/IESsow8pkI/GHGz08UjaOCiaLCoLmfSmctXiNFH
-         D0Aw==
-X-Gm-Message-State: ABy/qLahztDv/kar+Z51gU9cZg1/K1t0CQn2jqltBnlA/OB/iWJWCLTL
-	gGWA8yR7PQY11ba0EqbSdwOqbCpi+1tycguo0bk=
-X-Google-Smtp-Source: APBJJlG3f6Ore0qvAvU7CtWKldN/iuoMI+r8ahFclMMCRNdbBLJSvBrDfqPgbPA17HhquA6Q9rOCRA==
-X-Received: by 2002:a05:620a:4501:b0:765:467e:133a with SMTP id t1-20020a05620a450100b00765467e133amr379433qkp.23.1689955229104;
-        Fri, 21 Jul 2023 09:00:29 -0700 (PDT)
-Received: from smtpclient.apple ([45.88.220.68])
-        by smtp.gmail.com with ESMTPSA id ow4-20020a05620a820400b007682af2c8aasm1185169qkn.126.2023.07.21.09.00.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jul 2023 09:00:28 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Joel Fernandes <joel@joelfernandes.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBF81ED47
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 16:01:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDDA6C433C7;
+	Fri, 21 Jul 2023 16:01:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1689955290;
+	bh=PA8mIgj50fgfgrMmzr5lfjZFBWvQfHEld71JX4l0vVw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ApAy324Isd9NkMwHiREvXxaFH9gl3vLG53CvMG2D5xH2Qp1tl7DI+Vsm77Y077GXX
+	 9o4KMZKE5dVK3YEWO0FxBiI971ZmKeEAGuzLxLrbitRq5DjKpfoVQ1p0tfitMnwU3g
+	 M3kjLl9nwy0tPuDc8NJdUgmdJHBPyi79psylyw+gEvznThbSsxSGD+Ay6nh5ZzGHg+
+	 pZ9tsTBH7mI8RDI+dTVM9ctjiXsVpdJR26EVxahTnhQcxtpxQe0jt9msdvMUBXnqJZ
+	 lFLbtOd3ekcSfi4h8NS/Q7VpmnjhDii+aBVkaahbn9jKDIozAa2WfXR1wwbwC5e5a0
+	 6dYEzHJBaUvrg==
+Date: Fri, 21 Jul 2023 09:01:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Yunsheng Lin
+ <linyunsheng@huawei.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC net-next v2 7/7] net: skbuff: always try to recycle
+ PP pages directly when in softirq
+Message-ID: <20230721090129.4a61033b@kernel.org>
+In-Reply-To: <ebd284ad-5fa9-2269-c40e-f385420b27c3@intel.com>
+References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
+	<20230714170853.866018-10-aleksander.lobakin@intel.com>
+	<20230718174042.67c02449@kernel.org>
+	<d7cd1903-de0e-0fe3-eb15-0146b589c7b0@intel.com>
+	<20230719135150.4da2f0ff@kernel.org>
+	<48c1d70b-d4bd-04c0-ab46-d04eaeaf4af0@intel.com>
+	<20230720101231.7a5ff6cd@kernel.org>
+	<8e65c3d3-c628-2176-2fc2-a1bc675ad607@intel.com>
+	<20230720110027.4bd43ee7@kernel.org>
+	<988fc62d-2329-1560-983a-79ff5653a6a6@intel.com>
+	<b3884ff9-d903-948d-797a-1830a39b1e71@intel.com>
+	<20230720122015.1e7efc21@kernel.org>
+	<e542f6b5-4eea-5ac6-a034-47e9f92dbf7e@intel.com>
+	<20230720124647.413363d5@kernel.org>
+	<406885ee-8dd0-1654-ec13-914ed8986c24@huawei.com>
+	<ebd284ad-5fa9-2269-c40e-f385420b27c3@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-Date: Fri, 21 Jul 2023 12:00:17 -0400
-Message-Id: <8EE165A3-B6C9-4FE7-8C50-F6D75E250B8B@joelfernandes.org>
-References: <7D269BDF-102C-46B8-B31C-A559D2E410E0@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, rcu@vger.kernel.org,
- "Paul E. McKenney" <paulmck@kernel.org>, roman.gushchin@linux.dev
-In-Reply-To: <7D269BDF-102C-46B8-B31C-A559D2E410E0@gmail.com>
-To: Alan Huang <mmpgouride@gmail.com>
-X-Mailer: iPhone Mail (20B101)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Fri, 21 Jul 2023 17:37:57 +0200 Alexander Lobakin wrote:
+> > Does it mean ptr_ring_produce_any() is needed in
+> > page_pool_recycle_in_ring() too?
+> > 
+> > As it is assumed that page pool API can be called in the context with
+> > irqs_disabled() || in_hardirq(), and force recylcling happens in the
+> > prt_ring.
+> > 
+> > Isn't it conflit with the below patch? as the below patch assume page
+> > pool API can not be called in the context with irqs_disabled() || in_hardirq():
+> > [PATCH net-next] page_pool: add a lockdep check for recycling in hardirq
+> > 
+> > Or am I missing something obvious here?  
+> 
+> No, Page Pool is *not* intended to be called when IRQs are disabled,
+> hence the fix Jakub's posted in the separate thread.
 
+Yeah, it's just a bandaid / compromise, since Olek really wants his
+optimization and I really don't want to spend a month debugging
+potential production crashes :)
 
-> On Jul 21, 2023, at 11:55 AM, Alan Huang <mmpgouride@gmail.com> wrote:
->=20
-> =EF=BB=BF
->> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 23:21=EF=BC=8CJoel Fernandes <joel@joe=
-lfernandes.org> =E5=86=99=E9=81=93=EF=BC=9A
->>=20
->> On 7/21/23 10:27, Alan Huang wrote:
->>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 20:54=EF=BC=8CJoel Fernandes <joel@j=
-oelfernandes.org> =E5=86=99=E9=81=93=EF=BC=9A
->>>>=20
->>>>=20
->>>>=20
->>>>> On Jul 20, 2023, at 4:00 PM, Alan Huang <mmpgouride@gmail.com> wrote:
->>>>>=20
->>>>> =EF=BB=BF
->>>>>> 2023=E5=B9=B47=E6=9C=8821=E6=97=A5 03:22=EF=BC=8CEric Dumazet <edumaz=
-et@google.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>>>>=20
->>>>>>>> On Thu, Jul 20, 2023 at 8:54=E2=80=AFPM Alan Huang <mmpgouride@gmai=
-l.com> wrote:
->>>>>>>>=20
->>>>>>>> Hi,
->>>>>>>>=20
->>>>>>>> I noticed a commit c87a124a5d5e(=E2=80=9Cnet: force a reload of fir=
-st item in hlist_nulls_for_each_entry_rcu=E2=80=9D)
->>>>>>>> and a related discussion [1].
->>>>>>>>=20
->>>>>>>> After reading the whole discussion, it seems like that ptr->field w=
-as cached by gcc even with the deprecated
->>>>>>>> ACCESS_ONCE(), so my question is:
->>>>>>>>=20
->>>>>>>>     Is that a compiler bug? If so, has this bug been fixed today, t=
-en years later?
->>>>>>>>=20
->>>>>>>>     What about READ_ONCE(ptr->field)?
->>>>>>>=20
->>>>>>> Make sure sparse is happy.
->>>>>>=20
->>>>>> It caused a problem without barrier(), and the deprecated ACCESS_ONCE=
-() didn=E2=80=99t help:
->>>>>>=20
->>>>>>  https://lore.kernel.org/all/519D19DA.50400@yandex-team.ru/
->>>>>>=20
->>>>>> So, my real question is: With READ_ONCE(ptr->field), are there still s=
-ome unusual cases where gcc
->>>>>> decides not to reload ptr->field?
->>>>>=20
->>>>> I am a bit doubtful there will be strong (any?) interest in replacing t=
-he barrier() with READ_ONCE() without any tangible reason, regardless of whe=
-ther a gcc issue was fixed.
->>>>>=20
->>>>> But hey, if you want to float the idea=E2=80=A6
->>> We already had the READ_ONCE() in rcu_deference_raw().
->>> The barrier() here makes me think we need write code like below:
->>>=20
->>> READ_ONCE(head->first);
->>> barrier();
->>> READ_ONCE(head->first);
->>> With READ_ONCE (or the deprecated ACCESS_ONCE),
->>> I don=E2=80=99t think a compiler should cache the value of head->first.
->>=20
->>=20
->> Right, it shouldn't need to cache. To Eric's point it might be risky to r=
-emove the barrier() and someone needs to explain that issue first (or IMO th=
-ere needs to be another tangible reason like performance etc). Anyway, FWIW I=
- wrote a simple program and I am not seeing the head->first cached with the p=
-attern you shared above:
->>=20
->> #include <stdlib.h>
->>=20
->> #define READ_ONCE(x) (*(volatile typeof(x) *)&(x))
->> #define barrier() __asm__ __volatile__("": : :"memory")
->>=20
->> typedef struct list_head {
->>   int first;
->>   struct list_head *next;
->> } list_head;
->>=20
->> int main() {
->>   list_head *head =3D (list_head *)malloc(sizeof(list_head));
->>   head->first =3D 1;
->>   head->next =3D 0;
->>=20
->>   READ_ONCE(head->first);
->>   barrier();
->=20
-> Thanks for your time!
->=20
-> However, what I'm trying to say here is that without this barrier(), GCC w=
-ouldn't cache this value either.
->=20
-
-Yes that is what I tried too, removing the barrier.
-
-Apologies for confusing, the code I shared did have it but I had also tried r=
-emoving it.
-
-Thanks,
-
- - Joel
-
-
-> So, I removed the barrier() and tested, GCC didn=E2=80=99t cache the value=
- of head->first.
-> (Only tested on x86-64 (all the possible versions of gcc that Compiler Exp=
-lorer has) where the original issue occurred [1].)
->=20
-> Therefore, the commit message and the related discussion ten years ago is m=
-isleading.
->=20
-> Thanks again!
->=20
-> [1] https://lkml.org/lkml/2013/4/16/371
->=20
->=20
->>   READ_ONCE(head->first);
->>=20
->>   free(head);
->>   return 0;
->> }
->>=20
->> On ARM 32-bit, 64-bit and x86_64, with -Os and then another experiment wi=
-th -O2 on new gcc versions.
->=20
->=20
+On the ptr ring the use may still be incorrect but there is a spin lock
+so things will explode in much more obvious way, if they do.
 
