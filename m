@@ -1,64 +1,55 @@
-Return-Path: <netdev+bounces-19772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E930775C2C3
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:16:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7694375C2CD
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 254A21C21656
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:16:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A714A1C2160A
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FF314F81;
-	Fri, 21 Jul 2023 09:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3BC14F82;
+	Fri, 21 Jul 2023 09:18:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FABB14F80
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:16:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 112C9C433C9;
-	Fri, 21 Jul 2023 09:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D16614F80
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:18:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E8A0C433C8;
+	Fri, 21 Jul 2023 09:18:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689931008;
-	bh=7Nr2A3s+7x1dmfoTrYBQ8x3KxtQ72YCiKrx22ldOFGU=;
+	s=k20201202; t=1689931102;
+	bh=0bzriDPWcVl5IAQAULm4Fy/3jSBYKjLgbMXVXAKk0jw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sFHdka10pBwiuXAvP+N2q3HaSlqy5pN61gGLufjyM0xxLslEgcNBdiuZEpnntHmRv
-	 r/GJuGteKUpWiltxbrt1Tilc83yguiN198hkM3992vCWmZY8wbRVItBWn+ls3moF5g
-	 hTDqsEoZIU81elyflfK9zmItNgyWfse9s0c69zUk+HcpSngGAFOhYGtRST79pLj9DN
-	 yJe5/EHzfrxA3ziLf6f5QVC02gc3eBXSmyoqr9hurp0DfLePKV20MuJyZf7QBAQdRh
-	 ePuC3JJKTbigOA/xzLZ3pHeqATi/uj2fYH4ygVKaSiRLG0I9tYpYpBIm69R3ohWdmv
-	 wldvuiAufGPKg==
-Date: Fri, 21 Jul 2023 10:16:41 +0100
+	b=K43FWKeFEWCJjMNwex7JRXm8/raM/g4hBc/eugX8W614rnt3RiH2UsL1yYaGb5sce
+	 M3sn/aE2exI7+aIte6kPaOP/MKr1wnxd5dZMSlqjrpp8elvYHw9rTkQDG2OpuL1aZD
+	 HB8vmA+5wEnhvlA2G4+o4Ci3NvXq2aP/wOO8OOREdXKX0jelW5SnxiMNGVgVLfOBsh
+	 OMqVvxwRr9c4w4yypNWDjWi9ZrJt3KwDskmV/hmv3vx8gcB+39xD/+jl1ZKE2CFAH0
+	 nbr+X7tSQ6jebokMGnbu1V0dSTuMGghIusKbdL82qZCAfg9NQi1pEdiKQKIrk7atdw
+	 +3iILHUqzKxdA==
+Date: Fri, 21 Jul 2023 10:18:17 +0100
 From: Conor Dooley <conor@kernel.org>
-To: Guo Samin <samin.guo@starfivetech.com>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Hal Feng <hal.feng@starfivetech.com>, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Richard Cochran <richardcochran@gmail.com>,
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Samin Guo <samin.guo@starfivetech.com>, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	Peter Geis <pgwipeout@gmail.com>, Frank <Frank.Sae@motor-comm.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Peter Geis <pgwipeout@gmail.com>,
-	Yanhong Wang <yanhong.wang@starfivetech.com>,
-	Tommaso Merciai <tomm.merciai@gmail.com>
-Subject: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH7110 SoC
-Message-ID: <20230721-passive-smoked-d02c88721754@spud>
-References: <20230714104521.18751-1-samin.guo@starfivetech.com>
- <20230720-cardstock-annoying-27b3b19e980a@spud>
- <42beaf41-947e-f585-5ec1-f1710830e556@starfivetech.com>
- <A0012BE7-8947-49C8-8697-1F879EE7B0B7@kernel.org>
- <ce3e0ffb-abcd-2392-8767-db460bce4b4b@starfivetech.com>
+	Russell King <linux@armlinux.org.uk>,
+	Yanhong Wang <yanhong.wang@starfivetech.com>
+Subject: Re: [PATCH v5 1/2] dt-bindings: net: motorcomm: Add pad driver
+ strength cfg
+Message-ID: <20230721-liquid-stench-3721d2483433@spud>
+References: <20230720111509.21843-1-samin.guo@starfivetech.com>
+ <20230720111509.21843-2-samin.guo@starfivetech.com>
+ <0cd8b154-d255-4c16-b76d-9d3b036f3093@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,77 +57,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nLLwIQv8s4nvN5n3"
+	protocol="application/pgp-signature"; boundary="nX7BpCsPop1fJgk1"
 Content-Disposition: inline
-In-Reply-To: <ce3e0ffb-abcd-2392-8767-db460bce4b4b@starfivetech.com>
+In-Reply-To: <0cd8b154-d255-4c16-b76d-9d3b036f3093@lunn.ch>
 
 
---nLLwIQv8s4nvN5n3
-Content-Type: text/plain; charset=utf-8
+--nX7BpCsPop1fJgk1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 21, 2023 at 03:27:33PM +0800, Guo Samin wrote:
+On Thu, Jul 20, 2023 at 06:00:15PM +0200, Andrew Lunn wrote:
+> > +  motorcomm,rx-clk-drv-microamp:
+> > +    description: |
+> > +      drive strength of rx_clk rgmii pad.
+> > +      The YT8531 RGMII LDO voltage supports 1.8V/3.3V, and the LDO vol=
+tage can
+> > +      be configured with hardware pull-up resistors to match the SOC v=
+oltage
+> > +      (usually 1.8V).
+> > +      The software can read the registers to obtain the LDO voltage an=
+d configure
+> > +      the legal drive strength(curren).
+> > +      =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+> > +      | voltage |        curren Available (uA)            |
+>=20
+> current has a t.
+>=20
+> > +      =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+> > +      | voltage |        curren Available (uA)            |
+>=20
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> -------- =E5=8E=9F=E5=A7=8B=E4=BF=A1=E6=81=AF --------
-> =E4=B8=BB=E9=A2=98: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH=
-7110 SoC
-> From: Conor Dooley <conor@kernel.org>
+With the fixup,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-> =E6=94=B6=E4=BB=B6=E4=BA=BA: Guo Samin <samin.guo@starfivetech.com>, Rob =
-Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@l=
-inaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palme=
-r@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Hal Feng <hal.feng@starf=
-ivetech.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org=
-, devicetree@vger.kernel.org, netdev@vger.kernel.org
-> =E6=97=A5=E6=9C=9F: 2023/7/21
+Thanks,
+Conor.
 
-btw, please try and remove this stuff from your mails.
 
-> > On 21 July 2023 03:09:19 IST, Guo Samin <samin.guo@starfivetech.com> wr=
-ote:
-
-> >> There is a question about the configuration of phy that I would like t=
-o consult you.
-> >>
-> >> Latest on motorcomm PHY V5[1]: Follow Rob Herring's advice
-> >> motorcomm,rx-xxx-driver-strength Changed to motorcomm,rx-xxx-drv-micro=
-amp .
-> >> V5 has already received a reviewed-by from Andrew Lunn, and it should =
-not change again.
-> >>
-> >> Should I submit another pacthes based on riscv-dt-for-next?=20
-> >=20
-> > Huh, dtbs_check passed for these patches,
-> > I didn't realise changes to the motorcomm stuff
-> > were a dep. for this. I'll take a look later.
-
-> After discussing with HAL, I have prepared the code and considered adding=
- the following patch to=20
-> Motorcomm's patchsetes v6. (To fix some spelling errors in v5[1])
-> which will then send patches based on linux-next. What do you think? @And=
-rew @Conor
-
-I think you are better off just sending the dts patch to me, adding a
-dts patch that will not apply to net-next to your motorcomm driver series
-will only really cause problems for the netdev patchwork automation.
-
-> [1] https://patchwork.kernel.org/project/netdevbpf/cover/20230720111509.2=
-1843-1-samin.guo@starfivetech.com
-
-I meant to ack this yesterday, but it wasn't in my dt-binding review
-queue. I'll go do that now.
-
---nLLwIQv8s4nvN5n3
+--nX7BpCsPop1fJgk1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZLpM+QAKCRB4tDGHoIJi
-0sgZAQD0dSzvCgT6QBV4QteZEHj8xk6HSmskaiafKuzZBSHOCAEA91aMVNeLutXk
-+GHuhA9YiiDTsg4DYMZ+HD318oah9Q0=
-=SUU7
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZLpNWQAKCRB4tDGHoIJi
+0nTzAP0ckflSUS82Xtk5G/0CSY+mIXDKdGQzxx8RPffLo59tfAD+LNoSTLxCZ9iB
+x31NhCi8qO6X88lBOMyPXJgPGlkeLg0=
+=Z4dn
 -----END PGP SIGNATURE-----
 
---nLLwIQv8s4nvN5n3--
+--nX7BpCsPop1fJgk1--
 
