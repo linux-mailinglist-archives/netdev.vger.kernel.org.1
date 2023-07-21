@@ -1,294 +1,199 @@
-Return-Path: <netdev+bounces-19768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E83D75C2A0
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:11:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C39E75C2AB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C2622820A7
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E64281B68
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A8D14F7D;
-	Fri, 21 Jul 2023 09:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B39C14F7D;
+	Fri, 21 Jul 2023 09:11:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80678DDC1;
-	Fri, 21 Jul 2023 09:11:40 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73251359B;
-	Fri, 21 Jul 2023 02:11:17 -0700 (PDT)
-Received: from kwepemi500020.china.huawei.com (unknown [172.30.72.55])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R6kK72bNTz18MJ8;
-	Fri, 21 Jul 2023 17:09:47 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemi500020.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 21 Jul 2023 17:10:32 +0800
-Message-ID: <0d5195c1-779c-ef2d-7bb9-e3ce570d4e92@huawei.com>
-Date: Fri, 21 Jul 2023 17:10:31 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1625F14F7C
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:11:54 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2102.outbound.protection.outlook.com [40.107.223.102])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B50F730C2;
+	Fri, 21 Jul 2023 02:11:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gLgPhihFb46UTnX6umWxqdBwKK2wZ10U72XwVCl8kZfOEulzo/GMtfA0JVvm9XqAyp944opOsaqpa+P2vDHOBNMPZ0HMM8CY+1I1yn1CJ+d9JlvPG6vOMskymIfmyUDylSlpCbwW1FiRWSYYDiJUx5TjmQ4NZEZhVIGAuRIYJSyxSCUaijyQDpfN3uzrXTWyGcBkAQjOzY5nuIcbI8l0kxlMdLQrTfx169cIrK2/q7xUR26gPngU16UZie+rk2XqMulWz1cuJRiMYECDrg5uUmgizqootrjGT9z4Kb/gizyWmH86SC9S9GmGSJ0Zg2xyeNtkkaOkFWsPAzrh7LKV8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SPeo7niqCvYYeGv0178HaOPaMz1/1PEUYlcsPVgF++c=;
+ b=UvjVvyM5sm9YV+Iy3BOu3gAAf/rJmw4UAvSQXe/3ww8unlKGOtxG/lNQgNgmeaf+MGWmd1opD0CcFOSZLN6ZlueHWJvfOBLI5gkl41GPTko92bP02Poz55/dbwKU/o0tumTzctokhugitLx4juMsC1rBn4hWa3xoW9YJ9qL0ZdL1N6w8Tcd3NkeYX9hCcNEByAJVtp6ezAtkRledyr2NHZi9cp3hgKJkRc7AfiwykqlgsrlCxQ0RUPqTbPDnu5/kQTKGRjehIWLbVn0dizSEREzODJtpQxXPYMdT0kSs3uuZYikZz1xtB6ROA1g8w10MZB3id3ah4+87eUASbYkVEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SPeo7niqCvYYeGv0178HaOPaMz1/1PEUYlcsPVgF++c=;
+ b=gNsayK3sE4KdvyXAsPVAFwnK6oRMZkPCKCEIgSMdtgNx3wc39Bf2cE6M/NFPOp6tgPvPyU8foNH7+WiazjeintsePpXOCNSLYPSNQhqmHhuPa3OiKGWeyJ9I/bcxM+lmsu3323pZ4IsG8J+aFmeHiKQKb9WzWup6MhHofQFQ50I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY5PR13MB4437.namprd13.prod.outlook.com (2603:10b6:a03:1de::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Fri, 21 Jul
+ 2023 09:11:05 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Fri, 21 Jul 2023
+ 09:11:04 +0000
+Date: Fri, 21 Jul 2023 10:10:55 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Kees Cook <keescook@chromium.org>, Haren Myneni <haren@us.ibm.com>,
+	Nick Terrell <terrelln@fb.com>, Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Richard Weinberger <richard@nod.at>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
+	linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for
+ deflate rfc1950 (zlib)"
+Message-ID: <ZLpLnx4vtdYPuxrH@corigine.com>
+References: <20230718125847.3869700-1-ardb@kernel.org>
+ <20230718125847.3869700-2-ardb@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718125847.3869700-2-ardb@kernel.org>
+X-ClientProxiedBy: LO4P265CA0086.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2bd::19) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH bpf] riscv, bpf: Adapt bpf trampoline to optimized riscv
- ftrace framework
-Content-Language: en-US
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Pu Lehui
-	<pulehui@huaweicloud.com>, <bpf@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
-	<martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
-	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Guo Ren <guoren@kernel.org>, Song Shuai
-	<suagrfillet@gmail.com>
-References: <20230715090137.2141358-1-pulehui@huaweicloud.com>
- <87lefdougi.fsf@all.your.base.are.belong.to.us>
- <63986ef9-10a4-bcef-369d-0bad28b192d1@huawei.com>
- <87o7k8udzj.fsf@all.your.base.are.belong.to.us>
- <b5977c5d-c434-7b4c-89f3-d575ee5d04e8@huawei.com>
- <87o7k5fxwx.fsf@all.your.base.are.belong.to.us>
-From: Pu Lehui <pulehui@huawei.com>
-In-Reply-To: <87o7k5fxwx.fsf@all.your.base.are.belong.to.us>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.109.184]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500020.china.huawei.com (7.221.188.8)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB4437:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ced8cd5-32b5-449a-331e-08db89ca6935
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	YAp4qMA+UIP2w/m7e+mdHyuO/BVVQlw1C+f5fXu48cOhszkfLSbfis5mmoYXlqr6Wc36oRdrnVD7/nhvssRahPt2Iueuwu7aoA/NjJQ5eCz+K8N5NH8n4kGWyobKnhwwCtje3j1vXS4YdkHF79/PG8XZ2+Lk/31IkGajkaufd10vYtS9k3vYxvRuokS+ZGWR1YItPSpcyCAemnL3GiIKqzjbSIzMnsf8wlLsuECsaR+uAZkorgCnUjg8X0M1k6vUCT1EE2OBvjR8ebbWVZTdGXW7RZ8GgS8fJJ4M3fZpG+PqbrfEoCnaRKj+ZScpasuqaAUtoqJ56gPPScjdNo/ybr5At6iHv+0fQr26+pQNKh3kYdoG5yD2djm2aRPlXy7fim8f5zbdRfKTTtEp1tbaNh/ZWD9IzadAN837/Dm/Amb8Y/ht/64LUV4h8qY5c3G1m7QcjeQiabbmuOd0ZMJiUwAaMwJIbpW5mpgO+UblZICnJPqMv9eeMPrx2BiQtoZlLg21DmgEk/CBGlOvwx0i8/SYv9dCjaWx7gEtSolA6EftDUjrdlI3CaLGXaZusbSWc0XQzQH914qDQHB31Ti6O5rwCZKGrj1BfNtyNP0kP8o=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(396003)(346002)(39830400003)(376002)(451199021)(86362001)(36756003)(6666004)(478600001)(66556008)(66476007)(54906003)(6916009)(26005)(55236004)(4326008)(6506007)(6486002)(66946007)(6512007)(2906002)(44832011)(41300700001)(316002)(5660300002)(8676002)(7416002)(38100700002)(2616005)(186003)(83380400001)(8936002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?zQblw/bQw51fmROv7tDJNln+3IUqWID30UIPh+Ztoec+383ff4xzezVDRE5u?=
+ =?us-ascii?Q?iVwS1jLyw08fM+x7Xjm2LnwawLDjOAUm2WLr8FBubO0ynQc0pE7fJAv1PSUI?=
+ =?us-ascii?Q?nxsmMljyuxP2fQ0b0fagnX7r/VMipPcrY1Q0nnLao5fjLX/E4TJ3n6b+DMUv?=
+ =?us-ascii?Q?PsYpRaNzUTFA6Amtu0WGdbYWKLONkJQTD/zPI+1rEYHLnHgyrwNebAJHsFbC?=
+ =?us-ascii?Q?qqQwoBreWvFvBLSYCMb7m5kRLkmRgNafL47u1vsmSbUfMufNieezegvZhCOv?=
+ =?us-ascii?Q?jL9LKklJzblgSoKZHkw9e4jrLxslPb+dQqdOABTnZTFsU40LRifmFB5X9HH0?=
+ =?us-ascii?Q?QoICcVhrP++mWAnAHkhsqVuAwL9uh8fcCrN3p5df3rJZ+wqzW1XDb5znFlWM?=
+ =?us-ascii?Q?F6BZknWRwueOFN6Y/C0Hf320FMwUSwlKwqe/PmxRS9v66MGArXZJwEq3NFRF?=
+ =?us-ascii?Q?KxrhY/T9DXQDu1J83GwNZ8c6MSw5VmJTjx4BCTqv3/LWEn6v3XUDXTP4tm6D?=
+ =?us-ascii?Q?3ZzyqzQadVpWxe17Yy7yHWoXfZ036ZjJAYhk9l4qbr+/LIF2rg6vx9LrRW1W?=
+ =?us-ascii?Q?c5A0GecH7jZWDKMC6/hhKX+bolatMXn2ckzCOSs/zkCVBKjLu6tW/Jh6gnM1?=
+ =?us-ascii?Q?HFq2GT/CLGnJLwClbk2Wd6GELMah4O8Y4Wzjw5i+ZqceyjXxYg2Wii5iKzPX?=
+ =?us-ascii?Q?y16ZUyqvHxP1oGMTV+R56tkRsCLS5ESbuXka/DsIqQLzC+6/evuk1Sq2bXCl?=
+ =?us-ascii?Q?URfJ+4Oz92m7xoHZCOt9vp5WicEacSrebqA/U/aaHxoDAUArkO4RsGPZb/XQ?=
+ =?us-ascii?Q?THURTOKEaK46VHV7ziEctZVhnTTcgMRsvgq+7htJZHZWBP4Agx1CuiIzRK1t?=
+ =?us-ascii?Q?FCC9xSvNIDVEXa77HAkHDbQKExQhk9fdrgHwilWUof2u5WEfLVTyuRYdiYQs?=
+ =?us-ascii?Q?mitz71Joqj6n2hXHIeMNsiX/j/BgtHjl5fzgptleeOeAQxUbg6MnMJwuRkmf?=
+ =?us-ascii?Q?hl2U3plAFymsLBW8Ml2xh+gUJI+atNmO1wFVfiFUldWE+GXbUJOeLvtuHp/o?=
+ =?us-ascii?Q?B4nzvsIfjlTXkpMIpxTX73R9Zte+f3AnfMlGTH/bjMhkMGOAmBB6/2NIuKjj?=
+ =?us-ascii?Q?pmq/2G7YL3JN+bIcS43jPb51aRfKztdai9w4/OTW5pyR0HJ8oBrGJkj96TUv?=
+ =?us-ascii?Q?WsFihB05NR378+PPAs+ryRnc37YwaiylogKoyvtddO6yJ7YOh0R5paBF8VC7?=
+ =?us-ascii?Q?RS8emYrVqcVLyuZRIk5/YWocuo75tWY81u4RxQoOUFF/8MWZsUUWU/QQqNvq?=
+ =?us-ascii?Q?ByPm6cg8VVDcQbQ6MniXINS1fXo5BqwnI7qbJ+oQeBT0SglqE6mE900COBho?=
+ =?us-ascii?Q?mYoo/FjK6ds4QZzhUR41ToNN0gyojf09EQV+GSCXa1CfgUL46YD5xcshDBtM?=
+ =?us-ascii?Q?yXyYp4v46PVZECckt/VW4IGIAFhgBvAkCiz+oFEIehbqkJOuGMn765MINOKg?=
+ =?us-ascii?Q?Wo2t49o/GOeM08tQ6Vuk63mhHsud1VUJ5wgBuxv/Y7p8yxDtnBvE5BSCOa0V?=
+ =?us-ascii?Q?R9PuxhQq4czZGi43tgVgf4nzzAyBMFBPT2ayaFWdeRbr4QIm1I6++oSAOueI?=
+ =?us-ascii?Q?XQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ced8cd5-32b5-449a-331e-08db89ca6935
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2023 09:11:04.7827
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tlK+HylJSvJreeg1sn4yeWime7V1tP1Vr4k3SRLWJ2r8ni9H2VglORLH9LlBfrfJ5m6xC5D2b9T+oeh4KaoVvTTb1Cjvpi5mJNJVd2p0Law=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB4437
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, Jul 18, 2023 at 02:58:27PM +0200, Ard Biesheuvel wrote:
+> This reverts commit a368f43d6e3a001e684e9191a27df384fbff12f5.
+> 
+> "zlib-deflate" was introduced 6 years ago, but it does not have any
+> users. So let's remove the generic implementation and the test vectors,
+> but retain the "zlib-deflate" entry in the testmgr code to avoid
+> introducing warning messages on systems that implement zlib-deflate in
+> hardware.
+> 
+> Note that RFC 1950 which forms the basis of this algorithm dates back to
+> 1996, and predates RFC 1951, on which the existing IPcomp is based and
+> which we have supported in the kernel since 2003. So it seems rather
+> unlikely that we will ever grow the need to support zlib-deflate.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  crypto/deflate.c | 61 +++++-----------
+>  crypto/testmgr.c |  8 +--
+>  crypto/testmgr.h | 75 --------------------
+>  3 files changed, 18 insertions(+), 126 deletions(-)
+> 
+> diff --git a/crypto/deflate.c b/crypto/deflate.c
+> index b2a46f6dc961e71d..f4f127078fe2a5aa 100644
+> --- a/crypto/deflate.c
+> +++ b/crypto/deflate.c
+> @@ -39,24 +39,20 @@ struct deflate_ctx {
+>  	struct z_stream_s decomp_stream;
+>  };
+>  
+> -static int deflate_comp_init(struct deflate_ctx *ctx, int format)
+> +static int deflate_comp_init(struct deflate_ctx *ctx)
+>  {
+>  	int ret = 0;
+>  	struct z_stream_s *stream = &ctx->comp_stream;
+>  
+>  	stream->workspace = vzalloc(zlib_deflate_workspacesize(
+> -				    MAX_WBITS, MAX_MEM_LEVEL));
+> +				-DEFLATE_DEF_WINBITS, DEFLATE_DEF_MEMLEVEL));
+>  	if (!stream->workspace) {
+>  		ret = -ENOMEM;
+>  		goto out;
+>  	}
+> -	if (format)
+> -		ret = zlib_deflateInit(stream, 3);
+> -	else
+> -		ret = zlib_deflateInit2(stream, DEFLATE_DEF_LEVEL, Z_DEFLATED,
+> -					-DEFLATE_DEF_WINBITS,
+> -					DEFLATE_DEF_MEMLEVEL,
+> -					Z_DEFAULT_STRATEGY);
+> +	ret = zlib_deflateInit2(stream, DEFLATE_DEF_LEVEL, Z_DEFLATED,
+> +	                        -DEFLATE_DEF_WINBITS, DEFLATE_DEF_MEMLEVEL,
+> +	                        Z_DEFAULT_STRATEGY);
 
+nit: The two lines above partially use spaces instead of tabs for
+      indentation.
 
-On 2023/7/21 16:53, Björn Töpel wrote:
-> Pu Lehui <pulehui@huawei.com> writes:
-> 
->> On 2023/7/19 23:18, Björn Töpel wrote:
->>> Pu Lehui <pulehui@huawei.com> writes:
->>>
->>>> On 2023/7/19 4:06, Björn Töpel wrote:
->>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
->>>>>
->>>>>> From: Pu Lehui <pulehui@huawei.com>
->>>>>>
->>>>>> Commit 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to
->>>>>> half") optimizes the detour code size of kernel functions to half with
->>>>>> T0 register and the upcoming DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv
->>>>>> is based on this optimization, we need to adapt riscv bpf trampoline
->>>>>> based on this. One thing to do is to reduce detour code size of bpf
->>>>>> programs, and the second is to deal with the return address after the
->>>>>> execution of bpf trampoline. Meanwhile, add more comments and rename
->>>>>> some variables to make more sense. The related tests have passed.
->>>>>>
->>>>>> This adaptation needs to be merged before the upcoming
->>>>>> DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv, otherwise it will crash due
->>>>>> to a mismatch in the return address. So we target this modification to
->>>>>> bpf tree and add fixes tag for locating.
->>>>>
->>>>> Thank you for working on this!
->>>>>
->>>>>> Fixes: 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to half")
->>>>>
->>>>> This is not a fix. Nothing is broken. Only that this patch much come
->>>>> before or as part of the ftrace series.
->>>>
->>>> Yep, it's really not a fix. I have no idea whether this patch target to
->>>> bpf-next tree can be ahead of the ftrace series of riscv tree?
->>>
->>> For this patch, I'd say it's easier to take it via the RISC-V tree, IFF
->>> the ftrace series is in for-next.
->>>
->>
->> alright, so let's make it target to riscv-tree to avoid that cracsh.
->>
->>> [...]
->>>
->>>>>> +#define DETOUR_NINSNS	2
->>>>>
->>>>> Better name? Maybe call this patchable function entry something? Also,
->>>>
->>>> How about RV_FENTRY_NINSNS?
->>>
->>> Sure. And more importantly that it's actually used in the places where
->>> nops/skips are done.
->>
->> the new one is suited up.
->>
->>>
->>>>> to catch future breaks like this -- would it make sense to have a
->>>>> static_assert() combined with something tied to
->>>>> -fpatchable-function-entry= from arch/riscv/Makefile?
->>>>
->>>> It is very necessary, but it doesn't seem to be easy. I try to find GCC
->>>> related functions, something like __builtin_xxx, but I can't find it so
->>>> far. Also try to make it as a CONFIG_PATCHABLE_FUNCTION_ENTRY=4 in
->>>> Makefile and then static_assert, but obviously it shouldn't be done.
->>>> Maybe we can deal with this later when we have a solution?
->>>
->>> Ok!
->>>
->>> [...]
->>>
->>>>>> @@ -787,20 +762,19 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
->>>>>>     	int i, ret, offset;
->>>>>>     	int *branches_off = NULL;
->>>>>>     	int stack_size = 0, nregs = m->nr_args;
->>>>>> -	int retaddr_off, fp_off, retval_off, args_off;
->>>>>> -	int nregs_off, ip_off, run_ctx_off, sreg_off;
->>>>>> +	int fp_off, retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_off;
->>>>>>     	struct bpf_tramp_links *fentry = &tlinks[BPF_TRAMP_FENTRY];
->>>>>>     	struct bpf_tramp_links *fexit = &tlinks[BPF_TRAMP_FEXIT];
->>>>>>     	struct bpf_tramp_links *fmod_ret = &tlinks[BPF_TRAMP_MODIFY_RETURN];
->>>>>>     	void *orig_call = func_addr;
->>>>>> -	bool save_ret;
->>>>>> +	bool save_retval, traced_ret;
->>>>>>     	u32 insn;
->>>>>>     
->>>>>>     	/* Generated trampoline stack layout:
->>>>>>     	 *
->>>>>>     	 * FP - 8	    [ RA of parent func	] return address of parent
->>>>>>     	 *					  function
->>>>>> -	 * FP - retaddr_off [ RA of traced func	] return address of traced
->>>>>> +	 * FP - 16	    [ RA of traced func	] return address of
->>>>>>     	traced
->>>>>
->>>>> BPF code uses frame pointers. Shouldn't the trampoline frame look like a
->>>>> regular frame [1], i.e. start with return address followed by previous
->>>>> frame pointer?
->>>>>
->>>>
->>>> oops, will fix it. Also we need to consider two types of trampoline
->>>> stack layout, that is:
->>>>
->>>> * 1. trampoline called from function entry
->>>> * --------------------------------------
->>>> * FP + 8           [ RA of parent func ] return address of parent
->>>> *                                        function
->>>> * FP + 0           [ FP                ]
->>>> *
->>>> * FP - 8           [ RA of traced func ] return address of traced
->>>> *                                        function
->>>> * FP - 16          [ FP                ]
->>>> * --------------------------------------
->>>> *
->>>> * 2. trampoline called directly
->>>> * --------------------------------------
->>>> * FP - 8           [ RA of caller func ] return address of caller
->>>> *                                        function
->>>> * FP - 16          [ FP                ]
->>>> * --------------------------------------
->>>
->>> Hmm, could you expand a bit on this? The stack frame top 16B (8+8)
->>> should follow what the psabi suggests, regardless of the call site?
->>>
->>
->> Maybe I've missed something important! Or maybe I'm misunderstanding
->> what you mean. But anyway there is something to show. In my perspective,
->> we should construct a complete stack frame, otherwise one layer of stack
->> will be lost in calltrace when enable CONFIG_FRAME_POINTER.
->>
->> We can verify it by `echo 1 >
->> /sys/kernel/debug/tracing/options/stacktrace`, and the results as show
->> below:
->>
->> 1. complete stack frame
->> * --------------------------------------
->> * FP + 8           [ RA of parent func ] return address of parent
->> *                                        function
->> * FP + 0           [ FP                ]
->> *
->> * FP - 8           [ RA of traced func ] return address of traced
->> *                                        function
->> * FP - 16          [ FP                ]
->> * --------------------------------------
->> the stacktrace is:
->>
->>    => trace_event_raw_event_bpf_trace_printk
->>    => bpf_trace_printk
->>    => bpf_prog_ad7f62a5e7675635_bpf_prog
->>    => bpf_trampoline_6442536643
->>    => do_empty
->>    => meminfo_proc_show
->>    => seq_read_iter
->>    => proc_reg_read_iter
->>    => copy_splice_read
->>    => vfs_splice_read
->>    => splice_direct_to_actor
->>    => do_splice_direct
->>    => do_sendfile
->>    => sys_sendfile64
->>    => do_trap_ecall_u
->>    => ret_from_exception
->>
->> 2. omit one FP
->> * --------------------------------------
->> * FP + 0           [ RA of parent func ] return address of parent
->> *                                        function
->> * FP - 8           [ RA of traced func ] return address of traced
->> *                                        function
->> * FP - 16          [ FP                ]
->> * --------------------------------------
->> the stacktrace is:
->>
->>    => trace_event_raw_event_bpf_trace_printk
->>    => bpf_trace_printk
->>    => bpf_prog_ad7f62a5e7675635_bpf_prog
->>    => bpf_trampoline_6442491529
->>    => do_empty
->>    => seq_read_iter
->>    => proc_reg_read_iter
->>    => copy_splice_read
->>    => vfs_splice_read
->>    => splice_direct_to_actor
->>    => do_splice_direct
->>    => do_sendfile
->>    => sys_sendfile64
->>    => do_trap_ecall_u
->>    => ret_from_exception
->>
->> it lost the layer of 'meminfo_proc_show'.
-> 
-> (Lehui was friendly enough to explain the details for me offlist.)
-> 
-> Aha, now I get what you mean! When we're getting into the trampoline
-> from the fentry-side, an additional stack frame needs to be
-> created. Otherwise, the unwinding will be incorrect.
-> 
-> So (for the rest of the readers ;-)), the BPF trampoline can be called
-> from:
-> 
-> A. A tracing point of view; Here, we're calling into the trampoline via
->     the fentry/patchable entry. In this scenario, an additional stack
->     frame needs to be constructed for proper unwinding.
-> 
-> B. For kfuncs. Here, the call into the trampoline is just a "regular
->     call", and no additional stack frame is needed.
-> 
-> @Guo @Song Is the RISC-V ftrace code creating an additional stack frame,
-> or is the stack unwinding incorrect when the fentry is patched?
-> 
-> 
-> Thanks for clearing it up for me, Lehui!
-> 
-
-It's my honor, will keep push riscv-bpf.
-
-> 
-> Björn
+...
 
