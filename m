@@ -1,81 +1,153 @@
-Return-Path: <netdev+bounces-19888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15F675CADA
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:02:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0162F75CADC
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 17:03:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F847281F53
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:02:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31B5F1C216D9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 15:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4CA27F2C;
-	Fri, 21 Jul 2023 15:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52DD27F30;
+	Fri, 21 Jul 2023 15:03:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B852627F27
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:02:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B3AC433C7;
-	Fri, 21 Jul 2023 15:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689951736;
-	bh=Vu3NoQAurmhoPH+A8AWZ9sXwoUG6CYqYH5VY6+sTzic=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Br6U7oE+b75Pv50b/TwGXZtlgGcV8YRZ4eoswooeUU0xfkbZCJIw8n5t9iIF9TF8c
-	 CNJIaR+RMArVkktWthvFAI5CrEKM6ILHBy3sXqcpMh89SSUq0kut8Ezt6JzcWhKbHN
-	 EIqUTBqHdaH3xCnxveWLzHqkSOcRpenPaCTrA3a7/CmGWwW8ByA0NKJteMIjmKOf6x
-	 wAioMvO4EO9cX7BxUdIQOAHaeaLw9VLoHmmoHyn64pGfgMO3gRg/EQYIzjv5OeOY6h
-	 RiWPaRtlS1qwoSWi2WN6sRVuWKZH7s26pYX8RilslIs1GVTdfMRDf2V9mCBToqJwIH
-	 Uh4LcXLvHPswQ==
-Date: Fri, 21 Jul 2023 08:02:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <peterz@infradead.org>, <mingo@redhat.com>,
- <will@kernel.org>, <longman@redhat.com>, <boqun.feng@gmail.com>,
- <hawk@kernel.org>, <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next] page_pool: add a lockdep check for recycling
- in hardirq
-Message-ID: <20230721080215.01b29a5a@kernel.org>
-In-Reply-To: <382d00e5-87af-6a6b-17e2-6640fdd01db5@huawei.com>
-References: <20230720173752.2038136-1-kuba@kernel.org>
-	<382d00e5-87af-6a6b-17e2-6640fdd01db5@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA31F27F0C
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 15:03:10 +0000 (UTC)
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6CDB19B6
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 08:03:09 -0700 (PDT)
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="370648085"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="370648085"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 08:02:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="702082394"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="702082394"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga006.jf.intel.com with ESMTP; 21 Jul 2023 08:02:33 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andy@kernel.org>)
+	id 1qMreJ-009UVe-1h;
+	Fri, 21 Jul 2023 18:02:31 +0300
+Date: Fri, 21 Jul 2023 18:02:31 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	wojciech.drewek@intel.com, michal.swiatkowski@linux.intel.com,
+	aleksander.lobakin@intel.com, davem@davemloft.net, kuba@kernel.org,
+	jiri@resnulli.us, pabeni@redhat.com, jesse.brandeburg@intel.com,
+	simon.horman@corigine.com, idosch@nvidia.com
+Subject: Re: [PATCH iwl-next v3 4/6] pfcp: always set pfcp metadata
+Message-ID: <ZLqeB/0aoe6GQUVi@smile.fi.intel.com>
+References: <20230721071532.613888-1-marcin.szycik@linux.intel.com>
+ <20230721071532.613888-5-marcin.szycik@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230721071532.613888-5-marcin.szycik@linux.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 21 Jul 2023 19:53:30 +0800 Yunsheng Lin wrote:
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index a3e12a61d456..3ac760fcdc22 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -536,6 +536,8 @@ static void page_pool_return_page(struct page_pool *pool, struct page *page)
-> >  static bool page_pool_recycle_in_ring(struct page_pool *pool, struct page *page)
-> >  {
-> >  	int ret;
-> > +
-> > +	lockdep_assert_no_hardirq();  
+On Fri, Jul 21, 2023 at 09:15:30AM +0200, Marcin Szycik wrote:
+> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 > 
-> Is there any reason not to put it in page_pool_put_defragged_page() to
-> catch the case with allow_direct being true when page_pool_recycle_in_ring()
-> may not be called?
+> In PFCP receive path set metadata needed by flower code to do correct
+> classification based on this metadata.
 
-I was trying to stick it into places which make an assumption about
-the calling context, rather than cover the full API.
-I don't have a strong preference either way, but I hope it's good
-enough. The benefit I see is that it should be fairly obvious to
-a seasoned kernel code reader why this warning is here.
-A warning that fires from page_pool_put_defragged_page() would need
-a comment to explain the reason and may go stale.
+...
 
-> >  	/* BH protection not needed if current is softirq */
-> >  	if (in_softirq())
++ bits.h
++ types.h
+
+> +#include <net/udp_tunnel.h>
+> +#include <net/dst_metadata.h>
+> +
+>  #define PFCP_PORT 8805
+>  
+> +/* PFCP protocol header */
+> +struct pfcphdr {
+> +	u8	flags;
+> +	u8	message_type;
+> +	__be16	message_length;
+> +};
+> +
+> +/* PFCP header flags */
+> +#define PFCP_SEID_FLAG		BIT(0)
+> +#define PFCP_MP_FLAG		BIT(1)
+> +
+> +#define PFCP_VERSION_SHIFT	5
+> +#define PFCP_VERSION_MASK	((1 << PFCP_VERSION_SHIFT) - 1)
+
+GENMASK() since you already use BIT()
+
+> +#define PFCP_HLEN (sizeof(struct udphdr) + sizeof(struct pfcphdr))
+> +
+> +/* PFCP node related messages */
+> +struct pfcphdr_node {
+> +	u8	seq_number[3];
+> +	u8	reserved;
+> +};
+> +
+> +/* PFCP session related messages */
+> +struct pfcphdr_session {
+> +	__be64	seid;
+> +	u8	seq_number[3];
+> +#ifdef __LITTLE_ENDIAN_BITFIELD
+> +	u8	message_priority:4,
+> +		reserved:4;
+> +#elif defined(__BIG_ENDIAN_BITFIELD)
+> +	u8	reserved:4,
+> +		message_priprity:4;
+> +#else
+> +#error "Please fix <asm/byteorder>"
+> +#endif
+> +};
+> +
+> +struct pfcp_metadata {
+> +	u8 type;
+> +	__be64 seid;
+> +} __packed;
+> +
+> +enum {
+> +	PFCP_TYPE_NODE		= 0,
+> +	PFCP_TYPE_SESSION	= 1,
+> +};
+
+...
+
+> +/* IP header + UDP + PFCP + Ethernet header */
+> +#define PFCP_HEADROOM (20 + 8 + 4 + 14)
+
+Instead of comment like above, just use defined sizes.
+
+> +/* IPv6 header + UDP + PFCP + Ethernet header */
+> +#define PFCP6_HEADROOM (40 + 8 + 4 + 14)
+
+sizeof(ipv6hdr)
+sizeof(updhdr)
+...
+
+Don't forget to include respective headers.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
