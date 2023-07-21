@@ -1,163 +1,131 @@
-Return-Path: <netdev+bounces-19777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C81175C2EC
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:22:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93C9E75C31D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1E2D1C21656
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:22:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6976D1C21658
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 09:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BE414F95;
-	Fri, 21 Jul 2023 09:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF7E14F99;
+	Fri, 21 Jul 2023 09:35:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629BD3234
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:22:56 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2139.outbound.protection.outlook.com [40.107.244.139])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D2330DF;
-	Fri, 21 Jul 2023 02:22:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jgpjep5uFJZfewKYL0GX4o0iTFDJ0V6lrbz8dpM8N1flAT6wl7xruYg3fWRqB2bRqiHt9jOrQuJD6UXfVkgVNNwwjtGhVHjcAbkmRwN8vA/5BFAKa6Zt6Dn7e2TTjq0meUzV1JI41lL1MCqVVxy1V78v9aAGDUkUkUfLzNmZ9HbcSsctGfXADmp5KBTeSMm/sb4nWhbxt2v4GgQ1HAQeOoPynz+tUT5hle3fs16J3zx5Tuopuj84+0RplqG+fkXnQZ1TLatmF/jLHA/j+DAdPThuVRtiGPbUrOIPB2iQyTZR6ZF3ilMl9qT6z9ogwVAonkE3Qeiia+3dIMGKt+5AEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gz8mHqC2Ef19wexneXnyjbdqZZ4oeLZvyePTfyC6xqM=;
- b=WXBvz4ZeoJ0egJp30EQYXz/EXMMd5erWGhe19wC3rNBi97sMq3eE/yAVqedSmCBbAxVOUGNI9t8z5nLt/R4M2XRPOvyGqs4N40F15fqKVVhD/X03CIjVId4CAzUPO9pwM83kPphDeCYEKKW141NKsm9/f89Vrqbw3cKGfgEhmMzTFQbRP8vePFYGasRnWZn6QjugMs0gWbZaP1vByX2V52XO1VlppuilTuyrqyJ5L526A3AJmG8boXgUQwpL1oWqiz7RrI0tBelt3leNY8Ro9UWcvoVIWV5udKJ7NnBkGOrrBYuv/Yy67pnabu/NvfkY4if8wmLVOnjaI7fYAbWg/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gz8mHqC2Ef19wexneXnyjbdqZZ4oeLZvyePTfyC6xqM=;
- b=dMhwNnSXQUv1rIZBpV3cEPglo253verT4CYvC5j4BjLqsv6vem8IwkqoWkQ+jyNomgS5ITuNtRRmEJ3nCpEEg+lfB/Sr9XA3KR5xOaOgyTV4CQUUR8/SNvrNmlnYovwRNS4mbzxyLLBITmEAGgZ+DIJTcEM0zZdgM+jepDuq8JU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH3PR13MB6337.namprd13.prod.outlook.com (2603:10b6:610:196::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.25; Fri, 21 Jul
- 2023 09:22:33 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.025; Fri, 21 Jul 2023
- 09:22:33 +0000
-Date: Fri, 21 Jul 2023 10:22:21 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Kees Cook <keescook@chromium.org>, Haren Myneni <haren@us.ibm.com>,
-	Nick Terrell <terrelln@fb.com>, Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Richard Weinberger <richard@nod.at>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-	linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 08/21] zram: Migrate to acomp compression API
-Message-ID: <ZLpOTTrYTxfMqYen@corigine.com>
-References: <20230718125847.3869700-1-ardb@kernel.org>
- <20230718125847.3869700-9-ardb@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718125847.3869700-9-ardb@kernel.org>
-X-ClientProxiedBy: LO4P123CA0643.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:296::10) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2377B14F7A
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 09:35:30 +0000 (UTC)
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CF62D7F;
+	Fri, 21 Jul 2023 02:35:24 -0700 (PDT)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+	by fd01.gateway.ufhost.com (Postfix) with ESMTP id 69B5980B2;
+	Fri, 21 Jul 2023 17:35:18 +0800 (CST)
+Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 21 Jul
+ 2023 17:35:18 +0800
+Received: from [192.168.120.43] (171.223.208.138) by EXMBX062.cuchost.com
+ (172.16.6.62) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 21 Jul
+ 2023 17:35:16 +0800
+Message-ID: <46663f3b-44b8-f2b6-df4b-9d639b3aff66@starfivetech.com>
+Date: Fri, 21 Jul 2023 17:35:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH3PR13MB6337:EE_
-X-MS-Office365-Filtering-Correlation-Id: a4c1034c-aaed-4420-c1da-08db89cc036d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	G3sOJBMejdX1zakfvc+13yXfwwWfhkSlDMvZylT1ILKt5nsmH5nfY8blpM4FkImPb8US/2wZIiufv4g16r2THEwTASNmJWZGlKxFhtc+oWs0JDoUpv4kA40fAozdnz7Xz7EFaVz052k/J0TYAYtECsDnR42280XOSc0tmN0kMXtzvX/W3UAtMyvXmFJGmkdF80YjShiC8WHj+iuCrGTBguyYlKbEKuxjdp1vwbuS+b90lO860zbtGP46Ehbx5QVEQpBANn+Gd52G2DjyRzRVqt5QXfJ5ssr3a73tZvWLHgzk5FP6l0lCsQQvW/IlH8Fc1jxmvkF3rHA1yS3i9v1kk/YncVMGSF4mjUr9gaHQ/uxZDryXcFFo59fV/hlv9QzD1iSjjmWneCDrO7PxIr3VsetxwXlzCJG5QF9m1zzn/w6/ouGS330RPNPXLFEV2ER1ZsXayCHMhc9Ptqo5JJv5HEi57ufnHu3m4M/pY19kAP1YDKBWSeilu3/scyFPGEkiMVMVKWIwfprUKHNQlidlnYGhioW8PmTtQqYC0EEXtuJDyK/+52b5HwDKafTlFa9innIKD2MkIak4of+ggVBAsfYgyXtf7p0JNBkwv4VTHco=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39840400004)(366004)(136003)(396003)(451199021)(36756003)(54906003)(478600001)(66946007)(66476007)(86362001)(66556008)(26005)(4326008)(6916009)(6506007)(55236004)(6486002)(6666004)(6512007)(8676002)(4744005)(8936002)(44832011)(5660300002)(2906002)(41300700001)(7416002)(316002)(38100700002)(186003)(2616005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Jrxi+iTtHL87U5yNuPxCTOpAq78+AtuvDK69MTZxnDvcs5sfuh9TNi5iQus+?=
- =?us-ascii?Q?ji5LIZyqyPP2LkqHMIVQUj1QYxyOI+9sM5d/GzXSyFulbpXhL6/Ftdi5FAWg?=
- =?us-ascii?Q?YPsQpNzXQvCHS4zXHjlCyQCKvYeX9Govt5tMWFJktwDmMwTFYVfZhGXeAeCU?=
- =?us-ascii?Q?qJunbZcX1St8Aj0mgUnsmpc3HSDjfT0Xmw2+L/8jy6W7U627XLkmSDDtDWk4?=
- =?us-ascii?Q?aa9DvRtY7M8JdRMe3/ebIahi8sMN6tA6PnPpXo0H74BybqiD4wKW5CFl5bZH?=
- =?us-ascii?Q?RLtPDOX5Q+gwfntY7Cfo7UZlLaHhAg9Ex1X4aj3BjJFYdrRoveJ1qgmahhzv?=
- =?us-ascii?Q?XQt5yumAB8P51gfBqbrtnF9XKk7OB9VWYQAjtvQ5sMdIyQrwWDAQiCtUYfxQ?=
- =?us-ascii?Q?RHJV23/SxFHOVfvTCZuij9pqbC8HHhP1NuFgAEGBUr2Cm0MhARzfWpSBsj6o?=
- =?us-ascii?Q?bl6r816JJ9jgF2FBZAoG5vmRZeXfi3fQZf/FuuLQ5fgxGsUwMl4Dc+1nIXVw?=
- =?us-ascii?Q?P7a0WAIPYxBRo71KnW/7WCFrcbgXgkNUnaeK834EIkt0jidjCE81O1yyXjqG?=
- =?us-ascii?Q?2jax/m7aL/CROS7XCGi02ih2qmqsg/bbkqwbsrOm8HKR2/ubJygo6UxhP/RS?=
- =?us-ascii?Q?rPAtrq09WTTVaIiy2UkFS3j5+3rACsHrPlQepJkSh8ezWzDi7JpStRLF3Sg0?=
- =?us-ascii?Q?RZO3uvdb3Zr3P5IDCX1Eqd9oNBb0CGwtiecIRCVry4DV5ZtrzOyCX5GVigvQ?=
- =?us-ascii?Q?xeVdjHaDK1U+UmIY4wEQShikb4TVK4P/lwwu4+uHQiJrAxq47BviZ/zVQmyQ?=
- =?us-ascii?Q?aibI/aWXdDIuwL//RNk1fvGDuKv9IjsMlop2abm5HL3ecvH0J0+Wo2ULodl4?=
- =?us-ascii?Q?xXpPsHH9O8w1iGipBPhANQWBP58TV/sQgnoCNjWk5VBZKGOPkVjT/dXjGbNP?=
- =?us-ascii?Q?JdKUFQu8yY9AY2VzfqbZzsQmPREGJtcL/nz48OzK3nro+QDTPkD6qloe9weu?=
- =?us-ascii?Q?DkFqQls2bDKxlqSBafv5WZx9BdYsP5WCykLA66ttYpAqfhEztX0ZAE7GXYrY?=
- =?us-ascii?Q?p3mI4HMqTTNxThr9I0iHau5EZgxw5tGZe6H05jKyhpVtULK7+SryR9n8R15d?=
- =?us-ascii?Q?zclj4xR+VQP/3EM31RxqKaEwEc+RnK0dAbnvJILdWPUmuoeHVV/NEiIXpiHn?=
- =?us-ascii?Q?8e9zS3SIIuhxsD5hUe9T+FE7dnpsTBsc9+tEcP0KrrW+iLvrbUiJ55GsUSk6?=
- =?us-ascii?Q?yH1KlfniUyUsNMpmLCaa3VXNbRXqqtrA5Luzorhy7YDvbcar9eU7U4wrI4eT?=
- =?us-ascii?Q?GE7FSir0Dt6T90zfvpw8oZ6srcT9jswRLsYEIcHNRwUFfK0lfFOk14/r/9Jv?=
- =?us-ascii?Q?5XLqHd0DwU2YrxmY+zLAkfB1UagUY/3taKF48iimNuCr7bTJgJ2YC9h1tond?=
- =?us-ascii?Q?j9K9oEkLxg/0njT5Mv8q/29oIue00t01MENWPW/B4H35AUENQ1VnfqRLthlg?=
- =?us-ascii?Q?vO+W6g4JUm1yuqKnXesPATHuRSEZB2h7N7/0gCPRi+IGazv4KFoz4bMSYGCY?=
- =?us-ascii?Q?BHC+BeBgaAmPaWoKNvOnA+fkGjG1H7PiSHhI/LwEbPXkyhzdLB+QZVRlDNUC?=
- =?us-ascii?Q?0Q=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4c1034c-aaed-4420-c1da-08db89cc036d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2023 09:22:32.9107
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MjiOPs83ASTe0WAUkXDMSkQV36rMnfIALN9EvAMsRxPKFpMRY+NSkRcYuO/4oRapKFd4/RHP5CRl2KtUrZLgYTpUPTuEFWjGWt0HKJVuSDE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6337
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH7110 SoC
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+CC: Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley
+	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+	<aou@eecs.berkeley.edu>, Hal Feng <hal.feng@starfivetech.com>,
+	<linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>, Conor Dooley
+	<conor.dooley@microchip.com>, Emil Renner Berthing
+	<emil.renner.berthing@canonical.com>, Emil Renner Berthing <kernel@esmil.dk>,
+	Richard Cochran <richardcochran@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jose Abreu
+	<joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Peter Geis <pgwipeout@gmail.com>, Yanhong Wang
+	<yanhong.wang@starfivetech.com>, Tommaso Merciai <tomm.merciai@gmail.com>
+References: <20230714104521.18751-1-samin.guo@starfivetech.com>
+ <20230720-cardstock-annoying-27b3b19e980a@spud>
+ <42beaf41-947e-f585-5ec1-f1710830e556@starfivetech.com>
+ <A0012BE7-8947-49C8-8697-1F879EE7B0B7@kernel.org>
+ <ce3e0ffb-abcd-2392-8767-db460bce4b4b@starfivetech.com>
+ <20230721-passive-smoked-d02c88721754@spud>
+From: Guo Samin <samin.guo@starfivetech.com>
+In-Reply-To: <20230721-passive-smoked-d02c88721754@spud>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [171.223.208.138]
+X-ClientProxiedBy: EXCAS064.cuchost.com (172.16.6.24) To EXMBX062.cuchost.com
+ (172.16.6.62)
+X-YovoleRuleAgent: yovoleflag
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 18, 2023 at 02:58:34PM +0200, Ard Biesheuvel wrote:
 
-...
 
-> @@ -1618,9 +1614,7 @@ static int zram_recompress(struct zram *zram, u32 index, struct page *page,
->  
->  		num_recomps++;
->  		zstrm = zcomp_stream_get(zram->comps[prio]);
-> -		src = kmap_atomic(page);
-> -		ret = zcomp_compress(zstrm, src, &comp_len_new);
-> -		kunmap_atomic(src);
-> +		ret = zcomp_compress(zstrm, page, &comp_len_new);
+on 2023/7/21 17:16:41, Conor Dooley wrote:
+> On Fri, Jul 21, 2023 at 03:27:33PM +0800, Guo Samin wrote:
+> 
+>> Re: [PATCH v1 0/2] Add ethernet nodes for StarFive JH7110 SoC
+>> From: Conor Dooley <conor@kernel.org>
+> 
+>> to: Guo Samin <samin.guo@starfivetech.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Hal Feng <hal.feng@starfivetech.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
+>> data: 2023/7/21
+> 
+> btw, please try and remove this stuff from your mails.
+>
 
-Hi Ard,
+Sure
+ 
+>>> On 21 July 2023 03:09:19 IST, Guo Samin <samin.guo@starfivetech.com> wrote:
+> 
+>>>> There is a question about the configuration of phy that I would like to consult you.
+>>>>
+>>>> Latest on motorcomm PHY V5[1]: Follow Rob Herring's advice
+>>>> motorcomm,rx-xxx-driver-strength Changed to motorcomm,rx-xxx-drv-microamp .
+>>>> V5 has already received a reviewed-by from Andrew Lunn, and it should not change again.
+>>>>
+>>>> Should I submit another pacthes based on riscv-dt-for-next? 
+>>>
+>>> Huh, dtbs_check passed for these patches,
+>>> I didn't realise changes to the motorcomm stuff
+>>> were a dep. for this. I'll take a look later.
+> 
+>> After discussing with HAL, I have prepared the code and considered adding the following patch to 
+>> Motorcomm's patchsetes v6. (To fix some spelling errors in v5[1])
+>> which will then send patches based on linux-next. What do you think? @Andrew @Conor
+> 
+> I think you are better off just sending the dts patch to me, adding a
+> dts patch that will not apply to net-next to your motorcomm driver series
+> will only really cause problems for the netdev patchwork automation.
+>
 
-src appears to be unused in this function with this change.
+Okay, I'll send you DTS separately.
+ 
+>> [1] https://patchwork.kernel.org/project/netdevbpf/cover/20230720111509.21843-1-samin.guo@starfivetech.com
+> 
+> I meant to ack this yesterday, but it wasn't in my dt-binding review
+> queue. I'll go do that now.
 
->  
->  		if (ret) {
->  			zcomp_stream_put(zram->comps[prio]);
 
-...
+Best regards,
+Samin
 
