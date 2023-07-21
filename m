@@ -1,187 +1,205 @@
-Return-Path: <netdev+bounces-19981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3362D75D153
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:25:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DEC775D168
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 20:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ED841C217B6
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:25:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC5A6282442
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 18:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B423020F99;
-	Fri, 21 Jul 2023 18:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0484427F07;
+	Fri, 21 Jul 2023 18:31:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14E21FB50
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 18:25:11 +0000 (UTC)
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7849D35AB
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:25:01 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-40550136e54so37221cf.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:25:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81D220F9D
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 18:31:25 +0000 (UTC)
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52ADDEB
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:31:24 -0700 (PDT)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5704fce0f23so25281067b3.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689963900; x=1690568700;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UwAgqXKAfR/8duPNE3HxljitAwh1l/C5+PhjchX4zgE=;
-        b=YpKpjqhkkia/8kZwmDLqg7jdlLI4AODzWyaUCtfQHY4GpEVJ0CyXlsy5fl0XhuUtnP
-         sxPKw4Q8MnKlZjhf9jvX03tQGOj8EkhZhrTs2XzO8Q/SCLPxzEknOySe2TCyjVwxoLPu
-         ByEihtH4MmITiGjh0KZrfLsjzvRAOWlH8NGK59x+GhnDQN9+CXhB2dtNw8kh0nh+e74D
-         cDX7moamoAsEwzLBDZ8XJDiuuLBDx68rAimDnzgJVA06X+R0lpxpjq1QIb8JdKx1b13g
-         BoKBC35FjvXhuRwF0v6rbV9bVp8hjIAnhWZBUe0tX5hxhoIfEY0aEH2S5rdGAyG3JpI3
-         Nu4g==
+        d=gmail.com; s=20221208; t=1689964283; x=1690569083;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W5Ugko7jInqQ+PCW7kY+jzt5lNOyilAlEnL7Ws8qAus=;
+        b=BNFjhuzObWKjQBRq65QRpnttTp2lbyQRWwXhoYwUqcRE6G/15LzXeFjRm16CjLNjTL
+         bEs/A3XVMXpKYkGzaUlfuJNpLg5O/uu30I5bBdjRiMQTT8LVCERsmoagZj1ThIKOF1te
+         YRiVTLs6z+jOLxnIMhOtnZ+KAA3+LLq0i2e9EUVnVy8u5AQ6M+kCw00nm/Cq2YVpVSfE
+         2QP+RLxOnxNFNcpKB0CYoEVjYRc+4SUHrBZOR4La9XQ97/KLhnMRvxdw9yeNJbIovLvX
+         FDhZBeFaLQQLVLWNw8BV6FqbgnabFBzxbmGIBRV4wroSfLuA3y9B5gJD5Hvzr4o0puPW
+         zzHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689963900; x=1690568700;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UwAgqXKAfR/8duPNE3HxljitAwh1l/C5+PhjchX4zgE=;
-        b=WiEp8ens+K8y/jPhSMzlx/W98oOdUCXRHeAqphn3foJq1hU0szV7PnEh63chGaJecT
-         MmkJDlDNwHRCvzisDwgtgf0g+KJNdxlbyWuMQmW5Vv+aFXmKpcTTzMNq2F8kWaYQ/TW8
-         YBySglgixPpZ89mVMxl9o3IVYHqSpam/qHNARaK7yPpkxJKF+H8w5SUrXO+gx3p4sqeI
-         dtsz9ooojrJsffgYDmGaPV9487HAk1nfF403SLw2TCr06o1acLJh+pqHXpb1toEtaug9
-         ksCi2Q2wwudwGFLJTC01RQaOd7tIDvyAioY0VIDkPse+N2YtsKdy+vea6c370HGnCa7K
-         BJgg==
-X-Gm-Message-State: ABy/qLauqWiGSl2alqISiMVnuDf5CrFAj72WRyZk7actGP+VQN5N+UO5
-	oUVAZWGZdFlEObrFm88RPl7Abpy6Li58ABgIkXngjw==
-X-Google-Smtp-Source: APBJJlEHAvsK2Q8B0XKSku3IFj/WjSWYJme1Gq7k0IHfq7Y9BeTErXMAJ+/MCBL+bf6WevUaBOS2Um6staIYeR10MgM=
-X-Received: by 2002:a05:622a:181b:b0:403:caaa:1f9b with SMTP id
- t27-20020a05622a181b00b00403caaa1f9bmr30481qtc.2.1689963900301; Fri, 21 Jul
- 2023 11:25:00 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689964283; x=1690569083;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W5Ugko7jInqQ+PCW7kY+jzt5lNOyilAlEnL7Ws8qAus=;
+        b=UsdGTaTyXMGjMv4n5Bq+dX3fnfyiRzL5vfHkzQgxOzHlYVvANii6iBdA4nBPk6VjpT
+         NKigIi7oCbQ7fkC4MkqxQh3qWSVdJvJngihxvvLqifU5B/hQnbmEI9NR4hxhRLUd5UYv
+         A4SsN4grsMVNp7SFRGD+5RZzk5v8hwC8KpIjwEsXIutlQ7DnA/wnw5924sUkTl+Gj0Uh
+         RRvKoUIAZclIFjuhzwzX5hh1Z40atJTyUWNOsElOf9YcjLvEcpwyn0cODOOezzn4ZCbb
+         lKPa7IpMpV4HQ55boCht+XbucA5pOGt46izDCjN2D97VtQwtVWGUyV6HhU11/GYPpNiG
+         b17A==
+X-Gm-Message-State: ABy/qLb0z06QqPdTDRhO10p3Xlqrb5DVI9XjEusgQUYnw+u20xOVgilz
+	RMylmGf9GB9a0T0UUeIJtHk=
+X-Google-Smtp-Source: APBJJlE9CjDjczysCndikK4KHruRlfRKbs6R/4OpgdFd9PZj4DFyd/0KR0P7Feg2LJNYNDHV+FJbCA==
+X-Received: by 2002:a81:9242:0:b0:579:f163:db3f with SMTP id j63-20020a819242000000b00579f163db3fmr893893ywg.5.1689964283448;
+        Fri, 21 Jul 2023 11:31:23 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:afbb:9b17:f42e:320f? ([2600:1700:6cf8:1240:afbb:9b17:f42e:320f])
+        by smtp.gmail.com with ESMTPSA id d205-20020a0ddbd6000000b00577139f85dfsm1048343ywe.22.2023.07.21.11.31.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 11:31:23 -0700 (PDT)
+Message-ID: <03ef2491-6087-4fd4-caf7-a589d0dfda13@gmail.com>
+Date: Fri, 21 Jul 2023 11:31:21 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANP3RGfRA3yfom8GOxUBZD4sBxiU2dWn9TKdR50d55WgENrGnQ@mail.gmail.com>
- <CANn89iJ+iWS_d3Vwg6k03mp4v_6OXHB1oS76A+9p1U7hGKdFng@mail.gmail.com> <CAKH8qBvm9ZPdn3+yifnGay726rKhA-+OAjyQjffYzo0iqoOmJg@mail.gmail.com>
-In-Reply-To: <CAKH8qBvm9ZPdn3+yifnGay726rKhA-+OAjyQjffYzo0iqoOmJg@mail.gmail.com>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Fri, 21 Jul 2023 20:24:48 +0200
-Message-ID: <CANP3RGfFAjEDWbLAcmMcz63XUV6=djqZNsMikrqvA-i9K-4pAg@mail.gmail.com>
-Subject: Re: Performance question: af_packet with bpf filter vs TX path skb_clone
-To: Stanislav Fomichev <sdf@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, Linux NetDev <netdev@vger.kernel.org>, 
-	Jesper Dangaard Brouer <brouer@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, 
-	Willem Bruijn <willemb@google.com>, Xiao Ma <xiaom@google.com>, Patrick Rohr <prohr@google.com>, 
-	Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next v2 2/2] selftests: fib_tests: Add a test case for
+ IPv6 garbage collection
+To: Paolo Abeni <pabeni@redhat.com>, Kui-Feng Lee <thinker.li@gmail.com>,
+ dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
+ kernel-team@meta.com, yhs@meta.com
+Cc: Kui-Feng Lee <kuifeng@meta.com>
+References: <20230718180321.294721-1-kuifeng@meta.com>
+ <20230718180321.294721-3-kuifeng@meta.com>
+ <9743a6cc267276bfeba5b0fdcf7ba9a4077c67e1.camel@redhat.com>
+ <3057afe9-ac48-84e2-bd39-b227d2dcbc2f@gmail.com>
+ <239ca679597a10b6bc00245c66419f4bdedaff83.camel@redhat.com>
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <239ca679597a10b6bc00245c66419f4bdedaff83.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 8:18=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
- wrote:
->
-> On Fri, Jul 21, 2023 at 11:14=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Fri, Jul 21, 2023 at 7:55=E2=80=AFPM Maciej =C5=BBenczykowski <maze@=
-google.com> wrote:
-> > >
-> > > I've been asked to review:
-> > >   https://android-review.googlesource.com/c/platform/packages/modules=
-/NetworkStack/+/2648779
-> > >
-> > > where it comes to light that in Android due to background debugging o=
-f
-> > > connectivity problems
-> > > (of which there are *plenty* due to various types of buggy [primarily=
-]
-> > > wifi networks)
-> > > we have a permanent AF_PACKET, ETH_P_ALL socket with a cBPF filter:
-> > >
-> > >    arp or (ip and udp port 68) or (icmp6 and ip6[40] >=3D 133 and ip6=
-[40] <=3D 136)
-> > >
-> > > ie. it catches ARP, IPv4 DHCP and IPv6 ND (NS/NA/RS/RA)
-> > >
-> > > If I'm reading the kernel code right this appears to cause skb_clone(=
-)
-> > > to be called on *every* outgoing packet,
-> > > even though most packets will not be accepted by the filter.
-> > >
-> > > (In the TX path the filter appears to get called *after* the clone,
-> > > I think that's unlike the RX path where the filter is called first)
-> > >
-> > > Unfortunately, I don't think it's possible to eliminate the
-> > > functionality this socket provides.
-> > > We need to be able to log RX & TX of ARP/DHCP/ND for debugging /
-> > > bugreports / etc.
-> > > and they *really* should be in order wrt. to each other.
-> > > (and yeah, that means last few minutes history when an issue happens,
-> > > so not possible to simply enable it on demand)
-> > >
-> > > We could of course split the socket into 3 separate ones:
-> > > - ETH_P_ARP
-> > > - ETH_P_IP + cbpf udp dport=3Ddhcp
-> > > - ETH_P_IPV6 + cbpf icmpv6 type=3DNS/NA/RS/RA
-> > >
-> > > But I don't think that will help - I believe we'll still get
-> > > skb_clone() for every outbound ipv4/ipv6 packet.
-> > >
-> > > I have some ideas for what could be done to avoid the clone (with
-> > > existing kernel functionality)... but none of it is pretty...
-> > > Anyone have any smart ideas?
-> > >
-> > > Perhaps a way to move the clone past the af_packet packet_rcv run_fil=
-ter?
-> > > Unfortunately packet_rcv() does a little bit of 'setup' before it
-> > > calls the filter - so this may be hard.
-> >
-> >
-> > dev_queue_xmit_nit() also does some 'setup':
-> >
-> > net_timestamp_set(skb2);  (This one could probably be moved into
-> > af_packet, if packet is not dropped ?)
-> > <sanitize mac, network, transport headers>
-> >
-> > >
-> > > Or an 'extra' early pre-filter hook [prot_hook.prefilter()] that has
-> > > very minimal
-> > > functionality... like match 2 bytes at an offset into the packet?
-> > > Maybe even not a hook at all, just adding a
-> > > prot_hook.prefilter{1,2}_u64_{offset,mask,value}
-> > > It doesn't have to be perfect, but if it could discard 99% of the
-> > > packets we don't care about...
-> > > (and leave filtering of the remaining 1% to the existing cbpf program=
-)
-> > > that would already be a huge win?
-> >
-> > Maybe if we can detect a cBPF filter does not access mac, network,
-> > transport header,
-> > we could run it earlier, before the clone().
-> >
-> > So we could add
-> > prot_hook.filter_can_run_from_dev_queue_xmit_nit_before_the_clone
-> >
-> > Or maybe we can remove sanitization, because BPF should not do bad
-> > things if these headers are garbage ?
->
-> eBPF is already doing those sorts of checks, so maybe another option
-> is to convert this filter to ebpf tc/egress program?
 
-Yeah, I've considered tc ingress/egress + bpf ring buffer.
 
-This unfortunately is a fair bit of pain to do:
+On 7/21/23 00:14, Paolo Abeni wrote:
+> On Thu, 2023-07-20 at 14:36 -0700, Kui-Feng Lee wrote:
+>>
+>> On 7/20/23 02:32, Paolo Abeni wrote:
+>>> On Tue, 2023-07-18 at 11:03 -0700, Kui-Feng Lee wrote:
+>>>> Add 10 IPv6 routes with expiration time.  Wait for a few seconds
+>>>> to make sure they are removed correctly.
+>>>>
+>>>> Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
+>>>
+>>> Same thing as the previous patch.
+>>>
+>>>> ---
+>>>>    tools/testing/selftests/net/fib_tests.sh | 49 +++++++++++++++++++++++-
+>>>>    1 file changed, 48 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+>>>> index 35d89dfa6f11..55bc6897513a 100755
+>>>> --- a/tools/testing/selftests/net/fib_tests.sh
+>>>> +++ b/tools/testing/selftests/net/fib_tests.sh
+>>>> @@ -9,7 +9,7 @@ ret=0
+>>>>    ksft_skip=4
+>>>>    
+>>>>    # all tests in this script. Can be overridden with -t option
+>>>> -TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh"
+>>>> +TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test"
+>>>
+>>> At this point is likely worthy splitting the above line in multiple
+>>> ones, something alike:
+>>>
+>>> TESTS="unregister down carrier nexthop suppress ipv6_notify \
+>>> 	ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric
+>>> \
+>>> 	ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw \
+>>> 	rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh \
+>>> 	fib6_gc_test"
+>>>
+>>>>    
+>>>>    VERBOSE=0
+>>>>    PAUSE_ON_FAIL=no
+>>>> @@ -747,6 +747,52 @@ fib_notify_test()
+>>>>    	cleanup &> /dev/null
+>>>>    }
+>>>>    
+>>>> +fib6_gc_test()
+>>>> +{
+>>>> +	setup
+>>>> +
+>>>> +	echo
+>>>> +	echo "Fib6 garbage collection test"
+>>>> +	set -e
+>>>> +
+>>>> +	OLD_INTERVAL=$(sysctl -n net.ipv6.route.gc_interval)
+>>>> +	# Check expiration of routes every 3 seconds (GC)
+>>>> +	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=3
+>>>> +
+>>>> +	$IP link add dummy_10 type dummy
+>>>> +	$IP link set dev dummy_10 up
+>>>> +	$IP -6 address add 2001:10::1/64 dev dummy_10
+>>>> +
+>>>> +	for i in 0 1 2 3 4 5 6 7 8 9; do
+>>> 		$(seq 0 9)
+>>>
+>>>> +	    # Expire route after 2 seconds
+>>>> +	    $IP -6 route add 2001:20::1$i \
+>>>> +		via 2001:10::2 dev dummy_10 expires 2
+>>>> +	done
+>>>> +	N_EXP=$($IP -6 route list |grep expires|wc -l)
+>>>> +	if [ $N_EXP -ne 10 ]; then
+>>>> +		echo "FAIL: expected 10 routes with expires, got $N_EXP"
+>>>> +		ret=1
+>>>> +	else
+>>>> +	    sleep 4
+>>>> +	    N_EXP_s20=$($IP -6 route list |grep expires|wc -l)
+>>>> +
+>>>> +	    if [ $N_EXP_s20 -ne 0 ]; then
+>>>> +		echo "FAIL: expected 0 routes with expires, got $N_EXP_s20"
+>>>> +		ret=1
+>>>> +	    else
+>>>> +		ret=0
+>>>> +	    fi
+>>>> +	fi
+>>>
+>>> Possibly also worth trying with a few K of permanent routes, and dump
+>>> the time required in both cases?
+>>
+>> I just realized that I don't know how to measure the time required to do
+>> GC without providing additional APIs or exposing numbers to procfs or
+>> sysfs. Do you have any idea about this?
+> 
+> Something like this should do the trick
+> 
+> sysctl -wq net.ipv6.route.flush=1
+> 
+> # add routes
+> #...
+> 
+> # delete expired routes synchronously
+> sysctl -wq net.ipv6.route.flush=1
+> 
+> Note that the net.ipv6.route.flush handler uses the 'old' flush value.
 
-- it requires a new enough kernel (5.~8 ifirc), so we'd have to keep
-the old code
-around for 4.9 which we still have to support for a few (5?) more years.
+May I use bpftrace to measure time spending on writing to procfs?
+It is in the order of microseconds. time command doesn't work.
 
-- it needs to be done on a per device basis...
-(devices have dynamic lifetimes on Android, and we don't necessarily
-even know about all of them,
-though perhaps it would be ok to not receive packets on those...)
+> 
+> Cheers,
+> 
+> Paolo
+> 
 
