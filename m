@@ -1,111 +1,108 @@
-Return-Path: <netdev+bounces-19807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-19808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4DB675C61D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:53:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B86875C62E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 13:57:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61831C2167F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:53:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91AC2282214
+	for <lists+netdev@lfdr.de>; Fri, 21 Jul 2023 11:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203051E511;
-	Fri, 21 Jul 2023 11:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0521DDF0;
+	Fri, 21 Jul 2023 11:57:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1551E1E50F
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:53:38 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56262130;
-	Fri, 21 Jul 2023 04:53:36 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4R6nvC73z1zHqR9;
-	Fri, 21 Jul 2023 19:51:03 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 21 Jul
- 2023 19:53:33 +0800
-Subject: Re: [PATCH RFC net-next v2 7/7] net: skbuff: always try to recycle PP
- pages directly when in softirq
-To: Jakub Kicinski <kuba@kernel.org>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
- <20230714170853.866018-10-aleksander.lobakin@intel.com>
- <20230718174042.67c02449@kernel.org>
- <d7cd1903-de0e-0fe3-eb15-0146b589c7b0@intel.com>
- <20230719135150.4da2f0ff@kernel.org>
- <48c1d70b-d4bd-04c0-ab46-d04eaeaf4af0@intel.com>
- <20230720101231.7a5ff6cd@kernel.org>
- <8e65c3d3-c628-2176-2fc2-a1bc675ad607@intel.com>
- <20230720110027.4bd43ee7@kernel.org>
- <988fc62d-2329-1560-983a-79ff5653a6a6@intel.com>
- <b3884ff9-d903-948d-797a-1830a39b1e71@intel.com>
- <20230720122015.1e7efc21@kernel.org>
- <e542f6b5-4eea-5ac6-a034-47e9f92dbf7e@intel.com>
- <20230720124647.413363d5@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <406885ee-8dd0-1654-ec13-914ed8986c24@huawei.com>
-Date: Fri, 21 Jul 2023 19:53:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA5E3D75
+	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 11:57:04 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194EC2130;
+	Fri, 21 Jul 2023 04:57:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=DuaxoszqcDy6m6GIyAZxffUkYx6a4MOf8Tdr9C+qdMo=; b=PcDg7xHyCdW+6u3XgD5Oov1oGs
+	VxmWWh6LQUoq/9BFjT4AjfSsFguIOoDOIrriM6RmIqeCRfv5aU5zSOlttG4Uddd+fwNxn+XX4pQ13
+	TJ/pSp0UMKzAbHnNpG9nbSlQjXBH/ayqFEf5EhEX8/dWB1itFFvmBxWJ/aMV/hFJ3SS5YgWZ+0fxF
+	zfK1JD7Py5UafUIAk9YPVXFvkqbdvt8ZzOtV/jMBBwKBgoVmVz5jLYi1oJHxnqCPjoVjfprZ+WPbw
+	qhhBsqTC0606IfyTMKgNs1kFVXVhHXnOmYerT9KNIJymIhJJQURePa83r6a46I2KpTm+YeNcILBLv
+	S6lKdyCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48510)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qMokm-0003ry-2D;
+	Fri, 21 Jul 2023 12:57:00 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qMokm-00066i-CJ; Fri, 21 Jul 2023 12:57:00 +0100
+Date: Fri, 21 Jul 2023 12:57:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
+	andrew@lunn.ch, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next 5/7] net: lan743x: Add support to the Phylink
+ framework
+Message-ID: <ZLpyjNJsQjOw2hfj@shell.armlinux.org.uk>
+References: <20230721060019.2737-1-Raju.Lakkaraju@microchip.com>
+ <20230721060019.2737-6-Raju.Lakkaraju@microchip.com>
+ <ZLpGgV6FXmvjqeOi@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230720124647.413363d5@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLpGgV6FXmvjqeOi@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/21 3:46, Jakub Kicinski wrote:
-> On Thu, 20 Jul 2023 21:33:40 +0200 Alexander Lobakin wrote:
->>> We can as well check
->>> 	(in_softirq() && !irqs_disabled() && !in_hardirq())
->>> ?  
->>
->> Yes, something like that. Messy, but I see no other options...
->>
->> So, I guess you want to add an assertion to make sure that we're *not*
->> in this:
->>
->> in_hardirq() || irqs_disabled()
->>
->> Does this mean that after it's added, my patch is sane? :p
+On Fri, Jul 21, 2023 at 09:49:06AM +0100, Russell King (Oracle) wrote:
+> On Fri, Jul 21, 2023 at 11:30:17AM +0530, Raju Lakkaraju wrote:
+> > +static void lan743x_phylink_mac_config(struct phylink_config *config,
+> > +				       unsigned int link_an_mode,
+> > +				       const struct phylink_link_state *state)
+> > +{
+> > +	struct net_device *netdev = to_net_dev(config->dev);
+> > +	struct lan743x_adapter *adapter = netdev_priv(netdev);
+> > +	bool status;
+> > +	int ret;
+> > +
+> > +	lan743x_mac_cfg_update(adapter, state->link, state->speed,
+> > +			       state->advertising);
 > 
-> Well... it's acceptable. Make sure you add a good, informative
-> but concise comment :)
+> Please, no new state->speed users in mac_config().
+
+I have just submitted a patch series that results in state->speed always
+being set to SPEED_UNKNOWN when this function is called to prevent
+future uses of this struct member.
+
+> > +	adapter->phylink_config.dev = &netdev->dev;
+> > +	adapter->phylink_config.type = PHYLINK_NETDEV;
+> > +	adapter->phylink_config.mac_managed_pm = true;
+> > +	/* This driver makes use of state->speed in mac_config */
+> > +	adapter->phylink_config.legacy_pre_march2020 = true;
 > 
+> Sorry, but no new users of legacy features.
 
-Does it mean ptr_ring_produce_any() is needed in
-page_pool_recycle_in_ring() too?
+... and which totally strips out the legacy phylink code, which I've
+been wanting to remove for the last three years.
 
-As it is assumed that page pool API can be called in the context with
-irqs_disabled() || in_hardirq(), and force recylcling happens in the
-prt_ring.
-
-Isn't it conflit with the below patch? as the below patch assume page
-pool API can not be called in the context with irqs_disabled() || in_hardirq():
-[PATCH net-next] page_pool: add a lockdep check for recycling in hardirq
-
-Or am I missing something obvious here?
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
