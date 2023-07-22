@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-20152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 226A975DE7E
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 22:24:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CFDE75DE85
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 22:27:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39120281E7E
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 20:24:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A100E1C20A41
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 20:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3312D658;
-	Sat, 22 Jul 2023 20:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B2C65F;
+	Sat, 22 Jul 2023 20:27:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5B963A
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 20:24:25 +0000 (UTC)
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2121.outbound.protection.outlook.com [40.107.100.121])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84BEFE53;
-	Sat, 22 Jul 2023 13:24:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D313648
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 20:27:45 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2116.outbound.protection.outlook.com [40.107.220.116])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16356E6E;
+	Sat, 22 Jul 2023 13:27:44 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rs0DxD4ZhD/DAx+9N9a/0iN2s50sTFunGzrA+monZEiMM/AxCArxOrN3E421li1z0So0Ofsud90/ItYmA6ljP3Tv6hn4ZIoRk9F5gXQD+0rVO8oYGGSCgJQwLHkLy+mcHFoA45s+/po2ANcI1m2r3819wMHRgYAj95gjehpYv0idcjBMshtYx6/DosnLHLsb+BnVjtMr4zOkuotubOLf9A7gdGrEfYHOVE9JFhoi/kYLDqL3l28m3FWBNeKg6YPN3w7N5iHK0Lbep8nA+UgawKQAVH9iup2fMRd/tqh+cdPV9y7NmOVgLVRo+cRHhWZWTbjsIdkDc5EjcfwolCxFIg==
+ b=Y8apI6C99qVxYwt6BfxRve8QrJTuockd4HqeZqtJAwm7sZeFaZCvRowOphbsCq9/M2zFbGA/DPNGZDWhJzRIlbzzonD0qVjLUxfapbpGqtElWtdQ3PnK+yTC2hA0Zuo5j3yEfBmkaHjy0NducgioRtHUmyzkqbctszS9shQE7O6goV2rukhCiQ9hwyweaRLn1R43e1t3kDPhC/RBvynFH5JqKYWoXG7qtVI8Rs35bn5vkYcyIO8wsk2urrZZA69w3IkmAwegHNunjuxLDIjItbM5wE42Vsmn5Kx/ykaIIjzUS0hWK6swSq2RV6ZnfQOpktwN2JQvT8Qx15K8pzgp6g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jdnXSPKymYJBSOaixCa9Qcfv71Z2eZMoQGKPdomLNp0=;
- b=IbIfhXJeRxJRt3xy0F/714HfYMdXFj0GbCpBYGxI9bc4UHP3P7srmqLVaqraRDdakRsFMA7MPJMEnCzZn487elva5IFffcjJwr5NsmxQ4d8IQkYANdb7dEXGiZw+Qzh7HQv/Ovcextm1WAvEMlL2pwes23PuI6BxvLfMMYHwZ/a6L4++5HrSjE33XL2vjeEgTnscWME+aatU1C58QrGfr9Jk6qzz9xR6egu5z/Fzc6aIjdy6fzgfkvcRtp1AJgXIa/5tOwDL7kVcetBO+R6VmLgRbcPPRv6IKF36cNYNrHW67tGUxIyqNk5yXujJe5qhuas+KORdyv9RM5D13JybZg==
+ bh=/50JlhsDWpo98egp8gr+A04vwJVYUcgz+95NAH1SZCw=;
+ b=ItEAVEs7cPCjr+JxWpiCSCAHCLqMijqYz5X6GnpLrbs8xc5Q1t5jAMlAdvDYDBdU651zIL84uhcgu42uvJ+oMdbGgcPiLeYIDHkLFBPtSGjUxzAY4BRLh6PORL8NUzkHI4bVLrCe7G7L6CpegMWg2i+OS8BIy8xhDYEUcvhZHAxv8illO/8HrsNXQH/G7i0dCi5t7fRxpI9n6+MAuUYVo8FPDxdXq4usgACC1dFdUAZ/q+5fgVnmROvFm0UQhwb7FxvCm87wLyxli2c02jOpgvFGC2vy4ZT46ufX8QjxDnOot0Y/1tpZ4z1aTJZ9pEoZ0cGlGJCk8zg6DgT9zpK/oQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jdnXSPKymYJBSOaixCa9Qcfv71Z2eZMoQGKPdomLNp0=;
- b=L+20JhwLHQlhR0c9lFbIx2QIW2EFT9aFNqw7+HqqcRwxBr83WQzNzy+L8KNcq7vHizZaHO9hESTjeEnSn+1fW3Z/teIZv8mjs+m2o/Z4Rph3LUYVRHPyAynfC8N5gKbGRNTrMH2UXDYQSQ/5ec+9Q0cn+QXWYclv3udsLpXP53U=
+ bh=/50JlhsDWpo98egp8gr+A04vwJVYUcgz+95NAH1SZCw=;
+ b=K58le5fKkb/woTliNBXOm5tKNWtR9Ypy7hC13F6IEyVZYLPJYy8OVZl0yooSieqAw8tIg2qA14DQEnF3yRuxb8RV9XGqZo0Cr2CK3QcO6z3KcvU+CnUccSaiTVAr3VnBLxpJS/XXmE73MBLctU8aSsQ33a3j6QijR0T2XE2WbiQ=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY5PR13MB3730.namprd13.prod.outlook.com (2603:10b6:a03:225::24) with
+ by SN7PR13MB6278.namprd13.prod.outlook.com (2603:10b6:806:2df::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.30; Sat, 22 Jul
- 2023 20:24:20 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Sat, 22 Jul
+ 2023 20:27:41 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.029; Sat, 22 Jul 2023
- 20:24:20 +0000
-Date: Sat, 22 Jul 2023 21:24:13 +0100
+ 20:27:41 +0000
+Date: Sat, 22 Jul 2023 21:27:33 +0100
 From: Simon Horman <simon.horman@corigine.com>
 To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
 	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
 	andrew@lunn.ch, linux@armlinux.org.uk, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next 1/7] net: lan743x: Create separate PCS power
- reset function
-Message-ID: <ZLw67dun2790l+9D@corigine.com>
+Subject: Re: [PATCH net-next 5/7] net: lan743x: Add support to the Phylink
+ framework
+Message-ID: <ZLw7tVV0vs9CRiZs@corigine.com>
 References: <20230721060019.2737-1-Raju.Lakkaraju@microchip.com>
- <20230721060019.2737-2-Raju.Lakkaraju@microchip.com>
+ <20230721060019.2737-6-Raju.Lakkaraju@microchip.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230721060019.2737-2-Raju.Lakkaraju@microchip.com>
-X-ClientProxiedBy: LO4P123CA0619.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:294::19) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230721060019.2737-6-Raju.Lakkaraju@microchip.com>
+X-ClientProxiedBy: LO2P265CA0242.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:8a::14) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,122 +71,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB3730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9200fa93-c6eb-433c-f533-08db8af1a16a
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN7PR13MB6278:EE_
+X-MS-Office365-Filtering-Correlation-Id: 643eee27-5109-4554-60d2-08db8af21919
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	uhQf/s99tiBUSOclvkI2/nelJxbHFlUYXNVbH864Cl5RrwVMxncmaCdDnAOm7OXFHZucNVQK1Oiogy6s5gfWNZM7fcRqfcNP3IRpK5NFUWAsb5lr1qTkIUyrqc8+5XNhkeCzvhFHEg1/Z/1XuyjrE9FAii+dyjTePg6uaYQqzEGOC/bcox7jCYWR//oW4c9UK01lhsbfppwr7FHx28rwFjeNfobT2QAlcQTjXpNL7zg+AJE+AyFbFNZJiVufyyocwBcJeloHbdTbxHNfbgN/cBiVVlKKRKP63y0DoFJioekAqd9K4NIJNU6UlDAf2sDWAig3vUDJUFSbmRyg5xqIS6R+55IPe5i7owU3qJ0xgrv/w2ww7e09AJwbYQhO6t+KT1D1MhHD1F35br2h1POcSJED9Kv5pY7XkS0MmRuDC3ORGcvpg5YZY7PaX8VCVFsGzs3PQR7oFMG8rUl09zN7GSgSDh37+9b9KRMsdG6EmwpOdeCzbxCdKfLwyFN8ZXDCO5yqN5TRx9ERFLje1JOdnL704t6XmmNojqCWhDzJ/oDLGYSwBozoYEbCqojNddCw4keD/QYJJwaxkkYThAT0g+uROcdhySogW51m3m0ma8yyEt/anv8oJnScgaV9C/ko4NDq9QX1GE+PBO108VfFEkbEBEoiOEn/vBKZW8dSD0Y=
+	gJj8vkgmspyPWJNPUyYjYgxsorak14u+dcm2l64/A29uy309K0mGWqT//ZrHxIWsNaOC5gyQlNRKYgicv8BjecWHWCGdXdpU5/cdQ5GcJCUq+5VOGCby6AIYR9nCG6wduHKbPYhB/KuFu4AHIuOI1TfvU3YvVxhoOlvuVazMQJOd4/SE2GX8J0TPV9ZPsrqoXR2otPO1wb43BvWOPyhwMaseGvuOpFijSxR3DxbXWlLjM7dflY4cpLA/qrH8itA7b6JN1VvfFf6oWNw9f5uNYgXV5Ogp5+6av055nGeLSn4MpZhcsjdcxdMA/zJexxfejcbzFMaY9M3xtS4Y9eDJAHJdKRj0rGWJ/pXe+GcCAPFqGuO6CgudQ1dFm9akwIWbqbM6ZO6DBIh6rBZ+F/Iu31x17iFhTS3HzH6P7AKV4cZbwOJ0Sf1uUklehSzzNyCA/fpLsDA/T16L7hljqaWI6Q5HoI0geuGlM58x+X68fGd6Brp90uRfa3x2oeFiItQ6sFbwcWQyeIyYeJyRYlzrM7budvwVy96eP1xgCDAL/2Pi7E97zf93K9q4QumQBzsHjNS1R//K3RPnz7XIyjADKPxV8T6gBpHelLwIIawhuHo=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39830400003)(396003)(376002)(346002)(136003)(366004)(451199021)(6666004)(6486002)(6512007)(478600001)(55236004)(186003)(2616005)(6506007)(26005)(2906002)(44832011)(316002)(41300700001)(66946007)(66556008)(66476007)(6916009)(4326008)(5660300002)(8676002)(8936002)(38100700002)(36756003)(86362001)(83380400001)(67856001);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(366004)(39830400003)(376002)(346002)(451199021)(6512007)(6486002)(6666004)(186003)(83380400001)(36756003)(2616005)(86362001)(38100700002)(55236004)(26005)(6506007)(2906002)(6916009)(4326008)(66476007)(66946007)(66556008)(8676002)(8936002)(316002)(478600001)(5660300002)(44832011)(41300700001)(4744005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?DwJc0U7O/9qukU5oGOZngzKTMJCFUl1lR1M+rI7uvi2gI7y6hxK7nrGdr5hX?=
- =?us-ascii?Q?Hlg5RF8lVzkgTXZ9Vrka/i695OVA8h6wBrbu1E94AK9m5BhLxWk98VpDP3G3?=
- =?us-ascii?Q?9WGNfh6xXaiyt0HC8CT9KVETEjet9nd2Myx36XacCbtrXsl11kFHCJ4bDDGb?=
- =?us-ascii?Q?Tkx0M25e0WNHvLNdoiyXSJYPWtlpWQwFUgLbfFj11F6hdDxYeQP2JCcnHYmI?=
- =?us-ascii?Q?/wZe6nYEv9H05ouIWLwIpJMHkeiPpOjpxptGdi7ewRodvOTwtGeoTxEr4rLi?=
- =?us-ascii?Q?mzgLTiIECMXJ0pifAFrZDdGYSTUL8d1rMI7hzi4oMLfUkkObmKDKOKRmbZRK?=
- =?us-ascii?Q?FvGe8sYNOk/LoTw1fTPj+Cd6AqmGM0sFOQN8xnQiDci0lWg4rsVW0xBECAv6?=
- =?us-ascii?Q?9YMHKFxaWpqegH+P/v/HQYSjq5ZGny70hUFHUNjPc3obDwJFSVBOS43VpkRU?=
- =?us-ascii?Q?Ry1eyT157KaRwSGF5hQ2MbTxMYmiPq2CnRKFr24sPFXunrUeqUXnAJMOWd6A?=
- =?us-ascii?Q?G1FqP4Kx9syAEM+l0qLcuDHSWNApXCl2U5KBmyQqU2ZkHuvfpSvgvp5pA+Xw?=
- =?us-ascii?Q?9q8CPSAvAH87JlCdpdqv7oLWyoKOH6VFpACt+6ZKDaUKydnCIQEm0r4p79qW?=
- =?us-ascii?Q?wcP9ANBpF30OpJ2C3qAlyrxpR3x1DMRIAZa+YXe80ErS3EIN49AKOUgkwpbg?=
- =?us-ascii?Q?cigFo+TvELl7VrWvRLnVTk6cAHQAiJaHOofsOb+GJPpufIGNbVZqUar0lOI0?=
- =?us-ascii?Q?D4yWMFgde1lbV04zk+7cJeYCDYlbJQrzotiU6OmxGnaQ2JxI32Hh9IJcSNoA?=
- =?us-ascii?Q?Kr/YhnD8MVDOodgEgDIdI5DvGHSTgzUnT9SavtUB7xlEoQOVAG+wBtXUqVjs?=
- =?us-ascii?Q?r6uVy3U4LaC39eVEEdbaURnf87MtZVABMiqBdSqXL//GFfszoHEd608dayAa?=
- =?us-ascii?Q?J96sxMifZ/5sOPSsd0vG0uncWNAQDDVdcrb1sAD8ni42DX/HDNblOosnINLn?=
- =?us-ascii?Q?mW6KX2+RC/Kh8WYnhLEUlPlY4Vnk5zelzaaC9QkE6kJo8nYSv8Xa+TcFkZJM?=
- =?us-ascii?Q?Ug+80pJZC59JBGcycwyM8wPlQhdTVLd+qxmlYt+jwqsLlZuT9DZpmOiUDlNe?=
- =?us-ascii?Q?ve1b/IeBFsuO1n8BCcakuJvVkMsqdF9KJPmJjHSJWnJ0XAf0kTFbtBmm1uNX?=
- =?us-ascii?Q?SOFTm6iCLH5PIDBcvpG9W4O6r360YSfGa2vwxykx5UyUAtzNaDbSmkXx3nNv?=
- =?us-ascii?Q?9UIYt9vrajpJOnDNthhR9La1n8lhQEZzNpNBGgC57b/guyjp5L70aQRShw93?=
- =?us-ascii?Q?r0sZDrVYJJF0l1ZYmw6cF/tcrY2muDfHEIIkCm+OxBoCYLeloqKVqZdM3AZ4?=
- =?us-ascii?Q?7tGdzEZUPrNDT0TswLky9yTXOmlmC0bSPqaN5IKXI0RG9yWHN4G3QpJbBFOi?=
- =?us-ascii?Q?BDW8ECBdeBfOjokewh9b+59ALTKGK+XH5tHxzz8j0W55ptmjYw58/LVq5HKj?=
- =?us-ascii?Q?BGpX7BD1EzsfuPxMed4Q5kEd2rnGuN0/slzU8HX1nVoTpy1CrjhnhD56EsjP?=
- =?us-ascii?Q?QUU+AgCQktZGau9llq28VrCwkNHmeVOkUA0lONZ+8ZIAnu7Z/8caqk6Ltd0I?=
- =?us-ascii?Q?nQ=3D=3D?=
+	=?us-ascii?Q?K9KkN7jyIYdRhcI+J1Vv0V+zZv+R81EVA7TpBxUA6DJvN/EohD5sTaEb0gqp?=
+ =?us-ascii?Q?WYzSCMStnL0u8ceBipMX3OnOhBUc+XP98Li7rkIf+oBbG+x32pr7fkMK9i4f?=
+ =?us-ascii?Q?Z99EXLHNyUl7sc4jtA0EP6mUpmDfmw7pTpFhyWq79ObR1iculzIDciPxgjrk?=
+ =?us-ascii?Q?hy3oIhncOKxLpVTXcsPkmcUWiqrX46BeXUYvbN3SGw2EJ0xpQCHnv274R0Mw?=
+ =?us-ascii?Q?lowDVjrv+w5tRkYpN9yZ7Kt2f8tJ3lfzETuQ6Vr17X4Yn/uyPNnHRIMyloEm?=
+ =?us-ascii?Q?RKuy+F9s3urLM6nuorGG0X+F776IiOz1Y04nfX9xDswEbuI3We7CMuCgeVUF?=
+ =?us-ascii?Q?06yzm8KHYobzvHB3Ag/9vOe3WZ41qoNznyMN1KfDbXEITFf7VMw2rMChBKWH?=
+ =?us-ascii?Q?143aB2fM/YAgUwmf4tA7gJqtw6+xjTvLhFJbqJlylukpQuQw3SKS+G+HXesd?=
+ =?us-ascii?Q?zAPgMf0hDAamZaI1VIyRqwCMdTNHY6/uwiRtNce0xrSV3CKwtBq41DmLKGKG?=
+ =?us-ascii?Q?I+UmocHD+NBId5YpXzy5agv3qbD4BLXHt8N8P/lYjk+xEy2mlytnMTRf40lA?=
+ =?us-ascii?Q?KiN1TD3Y0pSMnxiDdF8TrJOM/mzpq3+mpIPooNGMdqsxDnKFrpZx5uB1cYDF?=
+ =?us-ascii?Q?oRXbaF11XjdgXZpXgP5nIhMXkKM+HTxudbb687xzgpAbM1ZeVAfTXXO3/noA?=
+ =?us-ascii?Q?sbv+wDl8EGikPrhOjfpsA/VWRPN2fKOb8FcnFfD6VCXM08iHbkxJagu5xFY7?=
+ =?us-ascii?Q?JsE2k5EGUxPPHUowYs1tmNT44CaAKJ/Wb7FGam6yQ/63l4asPUe/j1ey05mU?=
+ =?us-ascii?Q?5+69jUfH6TLvvfBTAgz5IDiuTYFl0d63Vii89bmYuaX6wwXjtGTs8V8MeGcE?=
+ =?us-ascii?Q?d1JkgfteyRbluSsr48WHH2ht20pJzrwQ+VYyHDFSoQT1oYZxxKHXHOolcZ0s?=
+ =?us-ascii?Q?8Q+svVluaYdykhXvYVCpBzOibFK890Mhjdg4xdh4Gcx56EBF9ZsBTRQyS2Cb?=
+ =?us-ascii?Q?LCfVVZiQcRxhGMvyD9BViS92toPVdZ+sC/0iXRtal5tBwpSSKq9zhio09Chm?=
+ =?us-ascii?Q?vwmEXEW5Jp6jZEHUbo3RkWdpX9sJf4KhDz1v1zglYvuQ/nWOkUKy1mmTJDM3?=
+ =?us-ascii?Q?B5H+isRkbSJu4Y9+B2XxK3R2rRgmnwoy5Yl8qVuvPBo4UN8XOa+9kCZzjO6U?=
+ =?us-ascii?Q?rUmeBPGTgWyXiXXswNqDB9ipxAbTTIPvm+JHS/7/8vEG1IzJe8dWB7xapr2B?=
+ =?us-ascii?Q?EC0iK/DtuUC7Z/0mP6W45hMC3u3nm9w9Mw8DxjrWiIvbsYx27Ac31TfCT6zQ?=
+ =?us-ascii?Q?WfiyOqh+XiUnNCOAomwOaZw5ku1P8MB/J4jtN6eQtc6m61W/fXrq3DZP5gA4?=
+ =?us-ascii?Q?LBXnqEZTvg0pECb0/Y1+aFNbMDG1xYIK0RkalMBSzbitaRUCppc4Ig1Xso9k?=
+ =?us-ascii?Q?q+ygQgo2oXgc8AM0Hug9loaQo142UZ7NqVybqayQf9tIJDopO8936q2rAVwp?=
+ =?us-ascii?Q?DOPUYKm0rBai8td2Swm1Ub9W3Hyo2NKa0hpHFMnUQhXViGvY38Q07EholGrB?=
+ =?us-ascii?Q?2HoGlN+1Hf0zYCXHHwHJQPjIsEWhhPzd9y+92nPRpa+0ZtEXs7aGAibT+TUT?=
+ =?us-ascii?Q?Bw=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9200fa93-c6eb-433c-f533-08db8af1a16a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 643eee27-5109-4554-60d2-08db8af21919
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 20:24:20.5319
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 20:27:41.2641
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rnwReROnbqZ/uX58EEoAUnGxs+HavYeFrg6f/vs6h2n2sMy7fT7svS6TgsGamQGTBgrteaI6XckHRXOpwI9x+tQasc5sS3JazZ3Vh/8LAoU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB3730
+X-MS-Exchange-CrossTenant-UserPrincipalName: oMASgUg4Kijw/9xT9kQ0iEOHee35C8OT4CQoDVIBP/96b6C+q2JfOktYQiWlSlNeyJhqKU8TvMFpvLz88clsa9FGnhEeHrKVuBx/W/22aYA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR13MB6278
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 11:30:13AM +0530, Raju Lakkaraju wrote:
-> Create separate PCS power reset function from lan743x_sgmii_config () to use
-> as subroutine.
-> 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
->  drivers/net/ethernet/microchip/lan743x_main.c | 54 ++++++++++---------
->  1 file changed, 29 insertions(+), 25 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index a36f6369f132..dba5576a933b 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+On Fri, Jul 21, 2023 at 11:30:17AM +0530, Raju Lakkaraju wrote:
 
 ...
 
->  static int lan743x_sgmii_config(struct lan743x_adapter *adapter)
->  {
->  	struct net_device *netdev = adapter->netdev;
-> @@ -1207,31 +1235,7 @@ static int lan743x_sgmii_config(struct lan743x_adapter *adapter)
->  		netif_dbg(adapter, drv, adapter->netdev,
->  			  "SGMII 1G mode enable\n");
->  
-> -	/* SGMII/1000/2500BASE-X PCS power down */
-> -	mii_ctl = lan743x_sgmii_read(adapter, MDIO_MMD_VEND2, MII_BMCR);
-> -	if (mii_ctl < 0)
-> -		return mii_ctl;
-> -
-> -	mii_ctl |= BMCR_PDOWN;
-> -	ret = lan743x_sgmii_write(adapter, MDIO_MMD_VEND2, MII_BMCR, mii_ctl);
-> -	if (ret < 0)
-> -		return ret;
-> -
-> -	ret = lan743x_pcs_seq_state(adapter, PCS_POWER_STATE_DOWN);
-> -	if (ret < 0)
-> -		return ret;
-> -
-> -	/* SGMII/1000/2500BASE-X PCS power up */
-> -	mii_ctl &= ~BMCR_PDOWN;
-> -	ret = lan743x_sgmii_write(adapter, MDIO_MMD_VEND2, MII_BMCR, mii_ctl);
-> -	if (ret < 0)
-> -		return ret;
-> -
-> -	ret = lan743x_pcs_seq_state(adapter, PCS_POWER_STATE_UP);
-> -	if (ret < 0)
-> -		return ret;
-> -
-> -	return 0;
-> +	return lan743x_pcs_power_reset(adapter);
+> +static void lan743x_phylink_mac_config(struct phylink_config *config,
+> +				       unsigned int link_an_mode,
+> +				       const struct phylink_link_state *state)
+> +{
+> +	struct net_device *netdev = to_net_dev(config->dev);
+> +	struct lan743x_adapter *adapter = netdev_priv(netdev);
+> +	bool status;
+> +	int ret;
+> +
+> +	lan743x_mac_cfg_update(adapter, state->link, state->speed,
+> +			       state->advertising);
+> +
+> +	if (!state->link && adapter->is_sgmii_en) {
+> +		ret = lan743x_sgmii_aneg_update(adapter);
+> +		if (ret < 0) {
+> +			netif_err(adapter, drv, adapter->netdev,
+> +				  "error %d SGMII cfg failed\n", ret);
 
 Hi Raju,
 
-It appears that the local variable mii_ctl is now unused
-in lan743x_sgmii_config() and can be removed.
+Maybe "error" is appropriate here and in other similar error messages
+in this patch.
 
->  }
->  
->  static void lan743x_mac_set_address(struct lan743x_adapter *adapter,
-> -- 
-> 2.25.1
-> 
-> 
+> +			return;
+> +		}
+
+...
 
