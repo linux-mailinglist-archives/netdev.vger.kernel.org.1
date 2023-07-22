@@ -1,307 +1,179 @@
-Return-Path: <netdev+bounces-20133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E96A375DC9D
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:40:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B1075DC8A
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:32:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21F5F1C20ED5
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 12:40:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7536C1C20F1E
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 12:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A087B1D2EF;
-	Sat, 22 Jul 2023 12:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8EBC19BDB;
+	Sat, 22 Jul 2023 12:32:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7DC4431
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 12:40:18 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2081.outbound.protection.outlook.com [40.107.101.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33321FF9;
-	Sat, 22 Jul 2023 05:40:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i+Ta15BcxTrGJw21sE65Ow7FoSk8kUX3JByO/q1Foz0rOQ8hnV8ZBoCm4sdzF+gQxAEMqrmBE5wzC6Wuydjf+INI9Wa2MlLx9e64dE9KbQ2bClN4rRSgGyNfL6siHs7kHwe5gezXsSjGyPFiU6gxq5TmqLqxpPejG0VykHmXI+0wIXg6ygdXfNHyu1zpY5fHidD28YaiGzxCNG5Ejyt0TbQof1jkOK58OFP4bIyjJZctyNs8UCp0xzGxWH/Fv6IWtydISOYf8rgdaHSEUu9irsohMUmjjuhKEiJfctrDBdTKxkkPGcMgNmZeOuY0yCCUOsVAqEW1QX9z8CXKLN/kWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v3hqmXH7ARYr74l1DP7BtsOKn/dC2Q3OWX8NPjkgTiw=;
- b=HfKxHO8tmsXFOVXkeE43U0D/efyWVyPWQb03GeyVbnmqixkBwZvOBDT4eR8AklLog09BsKDtYR3/LuODjvVot+q4I0ZPC197UD9qXd7WOuSh1kCoa6TVVJWIQkHrBkSlAjNMuZ7nE3l0ndT2eRf97yKNaFgiutOajuB+Rn3D8dLgksaV8z5QRiDu2xi1XjIXQYFUV4qhuINb5dTBrYlj7yjxh6gaEV+LUJMCNV1pt+QJQan5twUH6LBjUhvWvPqST0FiqfkMv3tUd7vzyye5ME0ib/Q+z51zF3XF8WahBH1dTo0bGaf7xMnEcTH1vE5YCUuCYaXbWpUYPhz1YMwyKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v3hqmXH7ARYr74l1DP7BtsOKn/dC2Q3OWX8NPjkgTiw=;
- b=cZCHhJ40YbrekYoxpIqwnuRSoIzeErF6iC5k5XPHu0wvn5Y3ZFuJ69byJOQRwTenFpYDF+kA2jVmtYIB8TY+px8qpTdCPrIkPgDMua1nKUFF7VG+ObWu+eP+cFnjFRUt9WpP20o5kY25a1+9DgMIXKV77Tk1qH7xDVFBV6sLnDg76abaJBWFj+jBUYvOEKXyAUsXlOa9yOSyfnOIQeQOn5EJZQ2UO703mRcRpZyy/xibAaSSi6+1SjC1EfaPDdejJ5t3kFHmAnVUaGVMggq/GwBIQzTa1TlZNVPQ55MPlLExCaMp7uzOqIHCJWuutyePrax/fWBTIBJEbVsPlXMsNg==
-Received: from MW4PR04CA0156.namprd04.prod.outlook.com (2603:10b6:303:85::11)
- by SA1PR12MB8724.namprd12.prod.outlook.com (2603:10b6:806:38b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Sat, 22 Jul
- 2023 12:40:08 +0000
-Received: from CO1NAM11FT043.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:85:cafe::c) by MW4PR04CA0156.outlook.office365.com
- (2603:10b6:303:85::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.30 via Frontend
- Transport; Sat, 22 Jul 2023 12:40:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1NAM11FT043.mail.protection.outlook.com (10.13.174.193) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6609.28 via Frontend Transport; Sat, 22 Jul 2023 12:40:07 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Sat, 22 Jul 2023
- 05:40:02 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Sat, 22 Jul
- 2023 05:39:59 -0700
-References: <759fe934-2e43-e9ff-8946-4fd579c09b05@alu.unizg.hr>
- <87cz0m9a3n.fsf@nvidia.com>
- <580b9f28-7a68-e618-b2d5-b8663386aa12@alu.unizg.hr>
- <6c871d89-390d-41ae-ef48-6cd12b99fd74@alu.unizg.hr>
- <c9a9856b-4a86-3f32-b6e5-d89af4a46048@alu.unizg.hr>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-CC: Petr Machata <petrm@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	<linux-kselftest@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [PROBLEM] [ADDITIONAL DIAG] seltests: net/forwarding/sch_ets.sh
- [HANG]
-Date: Sat, 22 Jul 2023 14:29:32 +0200
-In-Reply-To: <c9a9856b-4a86-3f32-b6e5-d89af4a46048@alu.unizg.hr>
-Message-ID: <87351g6rxf.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD530DF44
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 12:32:23 +0000 (UTC)
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FEB5E0
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 05:32:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=public-files.de;
+ s=s31663417; t=1690029105; x=1690633905; i=frank-w@public-files.de;
+ bh=rvO3syQy8p2eF0WNoTmES9a/lxxiAQ0F3RORzZidV/A=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
+ b=mBtI/5RpZrvQPPlOCFyKZzPGnjq+OLOgS7RYVmQAP/OvhJijbIR5NzMHyE1mHQPYITvwsZk
+ qQI2SSVT4aZprIgWFI0bFSEdd8oN8tM8/m3M/Gl/4tPqo0OpXIjkXwcWotP+VSf1n4EGBKDa0
+ 8NBd+INESIYJtlD0tqyM7GsoU8P5MTk9BpZafdd10PVYZqLLSpJNzPko+GsVbmIYgNIV6wGPa
+ MI3xR8R+tikS1/VovN+UpKrsk3zOIW76Hk79ly9kXda3e/joadAjJ6WNFmos2U22sTzwpDo23
+ PbY8qzbHa+NlPFqQ+CaAEfK8F5my8MziMe8fErb638sAA/DubDPw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [80.245.78.13] ([80.245.78.13]) by web-mail.gmx.net
+ (3c-app-gmx-bs12.server.lan [172.19.170.63]) (via HTTP); Sat, 22 Jul 2023
+ 14:31:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <trinity-d3292c8a-89e4-4d5e-838f-cdf1f65ff58b-1690029105348@3c-app-gmx-bs12>
+From: Frank Wunderlich <frank-w@public-files.de>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ =?UTF-8?Q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, David
+ Woodhouse <dwmw@amazon.co.uk>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Felix Fietkau
+ <nbd@nbd.name>, Jakub Kicinski <kuba@kernel.org>, John Crispin
+ <john@phrozen.org>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Mark Lee <Mark-MC.Lee@mediatek.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>
+Subject: Aw: Re: [PATCH net-next 0/4] Remove legacy phylink behaviour
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 22 Jul 2023 14:31:45 +0200
+Importance: normal
+Sensitivity: Normal
+In-Reply-To: <ZLsJWXyFJ0oKLkEq@makrotopia.org>
+References: <ZLptIKEb7qLY5LmS@shell.armlinux.org.uk>
+ <ZLsJWXyFJ0oKLkEq@makrotopia.org>
+X-UI-Message-Type: mail
+X-Priority: 3
+X-Provags-ID: V03:K1:FnS5gDkMzYIQdXsIBbt3U8OtC9v3S7ceUa6YEWbss5Uaquf3VQO93KSSQL++J1XtkwlDT
+ Jk6B/EYF6IsYrQ0EdZTY9yWzv5FQt3kC2OszjU6Po/DFHYuenqw3Q419uvTTetn5lqAog99X6KZ9
+ kGMCzr9ZrRqKSI/h36wUvxuE4NVqBKr6DDSkibk4zRZbAEvNjTFjlFVoyx2bPJpgLKVS/A1cMudw
+ yWRM8vxT6CwzUPEPMnCbkFZGpL9Y867p2uhaDsZiUutpv/vFcn0H3P88bz/zysaLkwAcr3LWHfP5
+ ck=
+UI-OutboundReport: notjunk:1;M01:P0:9nB3fUsKP2U=;ozWUwmE2EsqZM/7jmqJykWNGVQO
+ A5bfnWipOw/j/k9aH3UPdFBPzdzFDEJgy2DI2zUJEgGewpzB9hjdGpaYiaAmkBPgQyNYkMzLg
+ rbdz7KSKNPfHKMp8WkPIP7ruibNFydltW3s2nbsVJtkQxJfjKf12jIAnBPcY6ggiQAYpxfg0b
+ tHXyL5XAUXgNz+gzT42FrnKlGEoeHaknbKIA/GJ/jRNu4o8RTIi15Y71ArEAhWq5InLV2okmA
+ hXNHcvEoD01vs/6MZr2o5IKrZbCMt0oiiV6L9HA69jePO5b9NzBjCLEdAbqMu5SAbvpTbikrK
+ T2s4BJi6WJS7+VQXX93yoy1/YrmWNaIFJiN/19w3lyOeXCuwJFqsNZDnF6vXjSqZHr5S+A4up
+ dE3dkRUFbkZVEae0pS+iSQlSSjipiTjm7oY5U6L+/nX11egyKOBKL8aMdgxK591VmO5e5lW8G
+ 1Dcp2ucK26lTUEAzVtSQYLucOOcmYamnLSj9yemjBVeTk8hT8jhbP7t3q+NOgBHjFN7yaG5dy
+ dNq3DdYk1fq42w+IZ4++7Y869/D/jOwk0Xw0aW03ZHsbq3g9jr5EK+p4I4vMVbjUU1SIDik2g
+ V3GBU9xQScLRGiLYItxgr5YuJBcaD09TjW//7Y7pyfeGYKHRyC0OctLh2xpBI75S/Q5wdWT3k
+ 081g6OH1ciaFxOIHAfwoqRG/eyIV0bqur+DIWcfNejiwsAH0/tE3tPBPSffMs3cWB8+TZRK36
+ hgomKW/vcHUE1sSMtK5tWkTEq+wM3w3n1kgVjSM+u6585j2sjqwNnQnBMkzc6CIncwwKZGyAg
+ RhcEZ4Ph4WlAWMiwxhgtCJpA==
 Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT043:EE_|SA1PR12MB8724:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b5ae3c6-51bc-4d13-4360-08db8ab0c824
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	T599hcnUSOYCItONpWcDtu5RDZpc8pG3GEj5iVSEtb4YfHs87pdRYZaMkaYLXcjVEPiO1MBjHyj3lgdOP2TOyI8b5Djgl3bIKRqMEq8fHkVFmVBaL8CsufZLsM9cZw65/YFd3PAn6vpn/CgtPpPqDv2O3kgLIxGujCCSXKol6voui0pzwwRzyd/GL4DSn6TBEbTwmyk9bVMFhA38ndv45yewvpFBC0FIRU9Rc1Ibp2xag7HoyTgk3gJ5gsucVIwRH5GiMx1K5qe1PL0fPVFkPRRJc9jFqVLNjyDVgyjeIyGl1eKFLj1Ayi7CjRqeS2jfnVZ/ArkgvhOZf1J+d3qxHCTRoq09H/kXFMcnx9zy05DoDK8bUWJEK3ygnukrK4vfGwz2uaZvo45M6OKXtVi20Z6lc1PNUZlrpCeTCD60ely4RBXkpc2AhptqwX6y9v7I0iAwypWgApXb3gL8D83m9Ze/fM3i2209Ao765A4nb4H+qlT7RE/2Ma4wYrT7WGNZ26meft4+x2GabtFHYmzvv2BVkfoCFGt2ZYwnZLlEUX83ItU01Yw4usFUKgeNYGlxemjcqSAhZ4xVciY19wzTFUocId9DwuggNuz5cxT91m87b0Pyv3COD4ZVIzEwCwKKThj/IlBLSGroXVJrQRjZyH4MhRK1nC1mo3yJedLEtsqElmC6Oh8AhyBtDwD0l7YSFSsWlXBJ+8etgOrLRZh0J03YmaUteWBUabAR/lb9V1U8gB/ar6kfeQmesMomOlCT
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(39860400002)(376002)(451199021)(82310400008)(36840700001)(46966006)(40470700004)(356005)(40480700001)(40460700003)(7636003)(6666004)(82740400003)(54906003)(5660300002)(316002)(8936002)(8676002)(41300700001)(4326008)(478600001)(70206006)(6916009)(70586007)(36860700001)(83380400001)(336012)(16526019)(426003)(2616005)(186003)(47076005)(53546011)(107886003)(26005)(66574015)(86362001)(36756003)(2906002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 12:40:07.8816
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b5ae3c6-51bc-4d13-4360-08db8ab0c824
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1NAM11FT043.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8724
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi
 
-Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr> writes:
-
-> On 7/20/23 18:25, Mirsad Todorovac wrote:
->> On 7/20/23 18:07, Mirsad Todorovac wrote:
->>> root@defiant:/home/marvin/linux/kernel/linux_torvalds/tools/testing/sel=
-ftests/net/forwarding#
->>>
->>>> That would imply that the reproducer needs to include the previous tes=
-ts as
->>>> well.
->>>
->>> This is entirely possible, as timeouts and CTRL+C events do not seem to=
- be caught
->>> and the cleanup is not done ...
->>>
->>> sch_ets_core.sh:=C2=A0=C2=A0=C2=A0 trap cleanup EXIT
->>>
->>> Some tests time out even after settings:timeout=3D240, so IMHO this sho=
-uld be taken into account.
->>>
->>> Best regards,
->>> Mirsad Todorovac
->>>
->>>> It looks like the test is stuck in ets_test_mixed in classifier_mode.
->>>> A way to run just this test would be:
->>>>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 TESTS=3D"classifier_mode ets_test_mixed" ./sc=
-h_ets.sh
->>>>
->>>> Looking at the code, the only place that I can see that waits on
->>>> anything is the "{ kill %% && wait %%; } 2>/dev/null" line in
->>>> stop_traffic() (in lib.sh). Maybe something like this would let
->>>> us see if that's the case:
->>>>
->>>> modified=C2=A0=C2=A0 tools/testing/selftests/net/forwarding/lib.sh
->>>> @@ -1468,8 +1470,10 @@ start_tcp_traffic()
->>>> =C2=A0 stop_traffic()
->>>> =C2=A0 {
->>>> +=C2=A0=C2=A0=C2=A0 echo killing MZ
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Suppress noise from killing mausezahn.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { kill %% && wait %%; } 2>/dev/null
->>>> +=C2=A0=C2=A0=C2=A0 echo killed MZ
->>>> =C2=A0 }
->> FYI, this is the [incomplete] list of the tests that time out even after
->> being assigned long timeout of 240s instead of default.
->> marvin@defiant:~/linux/kernel/linux_torvalds$ grep TIMEOUT
->> ../kselftest-6.5-rc2-net-forwarding-8.log
->> not ok 13 selftests: net/forwarding: custom_multipath_hash.sh # TIMEOUT =
-240 seconds
->> not ok 18 selftests: net/forwarding: gre_custom_multipath_hash.sh # TIME=
-OUT 240 seconds
->> not ok 19 selftests: net/forwarding: gre_inner_v4_multipath.sh # TIMEOUT=
- 240 seconds
->> not ok 21 selftests: net/forwarding: gre_multipath_nh_res.sh # TIMEOUT 2=
-40 seconds
->> not ok 22 selftests: net/forwarding: gre_multipath_nh.sh # TIMEOUT 240 s=
-econds
->> not ok 27 selftests: net/forwarding: ip6gre_custom_multipath_hash.sh # T=
-IMEOUT 240 seconds
->> not ok 34 selftests: net/forwarding: ip6gre_inner_v4_multipath.sh # TIME=
-OUT 240 seconds
->> not ok 58 selftests: net/forwarding: no_forwarding.sh # TIMEOUT 240 seco=
-nds
->> not ok 67 selftests: net/forwarding: router_mpath_nh_res.sh # TIMEOUT 24=
-0 seconds
->> not ok 68 selftests: net/forwarding: router_mpath_nh.sh # TIMEOUT 240 se=
-conds
->> not ok 70 selftests: net/forwarding: router_multipath.sh # TIMEOUT 240 s=
-econds
->> marvin@defiant:~/linux/kernel/linux_torvalds$
+> Gesendet: Samstag, 22. Juli 2023 um 00:40 Uhr
+> Von: "Daniel Golle" <daniel@makrotopia.org>
 >
-> The test seem to be stuck despite adding SIGTERM cleanup to all tests
-> that timed out:
+> Hi Russell,
 >
-> # selftests: net/forwarding: sch_ets.sh
-> # TEST: ping vlan 10                                                  [ O=
-K ]
-> # TEST: ping vlan 11                                                  [ O=
-K ]
-> # TEST: ping vlan 12                                                  [ O=
-K ]
-> # Running in priomap mode
-> # Testing ets bands 3 strict 3, streams 0 1
-> # TEST: band 0                                                        [ O=
-K ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 1                                                        [ O=
-K ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 3 strict 3, streams 1 2
-> # TEST: band 1                                                        [ O=
-K ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 2                                                        [ O=
-K ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
-> # TEST: band 0                                                        [ O=
-K ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 1                                                        [ O=
-K ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 1 2
-> # TEST: bands 1:2                                                     [ O=
-K ]
-> # INFO: Expected ratio 2.00 Measured ratio 2.00
-> # Testing ets bands 3 quanta 3300 3300 3300, streams 0 1 2
-> # TEST: bands 0:1                                                     [ O=
-K ]
-> # INFO: Expected ratio 1.00 Measured ratio .99
-> # TEST: bands 0:2                                                     [ O=
-K ]
-> # INFO: Expected ratio 1.00 Measured ratio .99
-> # Testing ets bands 3 quanta 5000 3500 1500, streams 0 1 2
-> # TEST: bands 0:1                                                     [ O=
-K ]
-> # INFO: Expected ratio 1.42 Measured ratio 1.42
-> # TEST: bands 0:2                                                     [ O=
-K ]
-> # INFO: Expected ratio 3.33 Measured ratio 3.33
-> # Testing ets bands 3 quanta 5000 8000 1500, streams 0 1 2
-> # TEST: bands 0:1                                                     [ O=
-K ]
-> # INFO: Expected ratio 1.60 Measured ratio 1.59
-> # TEST: bands 0:2                                                     [ O=
-K ]
-> # INFO: Expected ratio 3.33 Measured ratio 3.33
-> # Testing ets bands 2 quanta 5000 2500, streams 0 1
-> # TEST: bands 0:1                                                     [ O=
-K ]
-> # INFO: Expected ratio 2.00 Measured ratio 1.99
-> # Running in classifier mode
-> # Testing ets bands 3 strict 3, streams 0 1
-> # TEST: band 0                                                        [ O=
-K ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 1                                                        [ O=
-K ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 3 strict 3, streams 1 2
-> # TEST: band 1                                                        [ O=
-K ]
-> # INFO: Expected ratio >95% Measured ratio 100.00
-> # TEST: band 2                                                        [ O=
-K ]
-> # INFO: Expected ratio <5% Measured ratio 0
-> # Testing ets bands 4 strict 1 quanta 5000 2500 1500, streams 0 1
+> On Fri, Jul 21, 2023 at 12:33:52PM +0100, Russell King (Oracle) wrote:
+> > Hi,
+> >
+> > This series removes the - as far as I can tell - unreachable code in
+> > mtk_eth_soc that relies upon legacy phylink behaviour, and then remove=
+s
+> > the support in phylink for this legacy behaviour.
+> >
+> > Patch 1 removes the clocking configuration from mtk_eth_soc for non-
+> > TRGMII, non-serdes based interface modes, and disables those interface
+> > modes prior to phylink configuration.
+> >
+> > Patch 2 removes the mac_pcs_get_state() method from mtk_eth_soc which
+> > I believe is also not used - mtk_eth_soc appears not to be used with
+> > SFPs (which would use a kind of in-band mode) nor does any DT appear
+> > to specify in-band mode for any non-serdes based interface mode.
+> >
+> > With both of those dealt with, the kernel is now free of any driver
+> > relying on the phylink legacy mode. Therefore, patch 3 removes support
+> > for this.
+> >
+> > Finally, with the advent of a new driver being submitted today that
+> > makes use of state->speed in the mac_config() path, patch 4 ensures th=
+at
+> > any phylink_link_state member that should not be used in mac_config is
+> > either cleared or set to an invalid value.
 >
-> What is happening is a stuck mousezahn loop:
+> Thank you for taking care of this!
+
+> For the whole series:
 >
-> root      558266    2732  0 01:17 pts/2    00:00:23 mausezahn veth0.10 -p=
- 8000 -A 192.0.2.1 -B 192.0.2.2 -c 0 -a own -b ba:33:37:81:dc:5
-> root      558273    2732  0 01:17 pts/2    00:00:23 mausezahn veth0.11 -p=
- 8000 -A 192.0.2.17 -B 192.0.2.18 -c 0 -a own -b ba:33:37:81:dc
-
-Sure, the test is stuck and therefore didn't reap its MZ invocations.
-The test is supposed to invoke stop_traffic(), which then does { kill %%
-&& wait %%; }, which should do it.
-
-The question is, does it reach that statement? If yes, the wait is
-likely where it's stuck, but why? If not, where else could it be stuck?
-I don't see any other place where the test loops endlessly or waits.
-
-> I am not sure if this will ever complete, or is it a runaway loop?
-
-It won't, that's what the "-c 0" on the command like does.
-
-> Probably it is stuck, for nothing was written to the test log for 71 minu=
-tes.
+> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+> Tested-by: Daniel Golle <daniel@makrotopia.org>
 >
-> I hope we are coming closer to the cause.
->
-> Previously I didn't figure out what hanged.
+> Tested on BPi-R2 (MT7623N), BPi-R3 (MT7986A) and BPi-R64 (MT7622A).
+> All works fine as expected.
 
-The script did :)
+have you changed anything?
 
-The fact that there's mausezahn running alongside is relevant, but not
-the cause.
+in my test with bpi-r2 i see boot hangs after link-up on my wan-port (stil=
+l trgmii-mode configured), no access to userspace.
+
+[   10.881844] mtk_soc_eth 1b100000.ethernet eth0: configuring for fixed/t=
+rgmii link mode
+[   10.891611] mtk_soc_eth 1b100000.ethernet eth0: Link is Up - 1Gbps/Full=
+ - flow control rx/tx
+[   11.005814] mt7530-mdio mdio-bus:1f wan: configuring for phy/gmii link =
+mode
+[   11.016654] mt7530-mdio mdio-bus:1f lan3: configuring for phy/gmii link=
+ mode
+[   11.025685] mt7530-mdio mdio-bus:1f lan2: configuring for phy/gmii link=
+ mode
+[   11.035122] mt7530-mdio mdio-bus:1f lan1: configuring for phy/gmii link=
+ mode
+[   11.045370] mt7530-mdio mdio-bus:1f lan0: configuring for phy/gmii link=
+ mode
+
+[   15.144255] mt7530-mdio mdio-bus:1f wan: Link is Up - 1Gbps/Full - flow=
+ control rx/tx
+
+removing the cable does not show link down so it looks like completely sta=
+lled...but also no panic/crash or similar.
+When booting without cable it hangs too (without the up-message of course)=
+.
+
+> To apply the series I needed to resolve a minor conflict due to
+> net: ethernet: mtk_ppe: add MTK_FOE_ENTRY_V{1,2}_SIZE macros
+> being applied in the meantime.
+
+i used yesterdays net-next (6.5-rc2) and put series on top (also needed to=
+ do one hunk of first patch manually) and
+then my defconfig,buildscript etc. maybe i miss anything?
+
+afair trgmii is basicly rgmii only with higher clock-setting...and if this=
+ is dropped from mac-driver but switch is still using it it cannot work, b=
+ut i'm sure you know this ;)
+
+regards Frank
 
