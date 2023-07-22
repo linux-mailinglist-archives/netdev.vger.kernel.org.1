@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-20080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440BF75D8CD
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 03:43:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60B7A75D8CE
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 03:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0CC1C2187B
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 01:43:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9162A1C21870
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 01:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9115B63C4;
-	Sat, 22 Jul 2023 01:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493B66AA9;
+	Sat, 22 Jul 2023 01:42:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A601D613E
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 01:42:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ADE4C433CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862FE613F
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 01:42:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4124C433CD;
 	Sat, 22 Jul 2023 01:42:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1689990160;
-	bh=fJ+KPGLB2q+JwcvPJyRD9MmisAb09A+r2473QVucLCU=;
+	s=k20201202; t=1689990161;
+	bh=iooMBmB0ljs0AntvKmjJ8Aaq9xp+5rxb0ZchwG/lHiI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SNbHnIKT/HuabNYvdSHSnXyM8iu+6nxfyQ+Tvqf1+FBp2SObjelL+fXsd9KCjIscQ
-	 +yytRWE6+O1zAO0BM59jzDHAOotcSU+5o9hRMBGXYKt1lntC3TTWHaZY0cDKGtbTNU
-	 wMV6HIjdSSWI6ANlk7g/YHa5SQqgDylkD8uqk5dxR3pTHDNhOzJVOR8sMqT3PenpKq
-	 +liVI81PV3uIgijVaEDs2cqymZ0H/pllzOY5iq9qT7qI5SR/t2RAWVLAowPepVz73m
-	 lOknZbgQatoKJpb6LauJC8of6qa2HtL7GgQoszDVVvKfOYlknNY+TbWtp2q+Zm+RTI
-	 cRkFsZhWiauJQ==
+	b=N9//Ma7nUq2oppvb20oZ/3eFuGFjBki/8IaHTiRzwSbtYOF701HYSlqBnV9arqZx+
+	 mTO3cQcQc11KwnhhFM12R/10ZnqU94EfARs8zO0jhWFiI1pr/hGER0RIgBjzGM56u7
+	 M+lryLOAQhqdtX5wpzbpiHnImGYuuDyFbz79oXl5OUMMUSUZksM0X8x3xJSONjaz/X
+	 1eOV6BYpJNJSZOZ0lhVGvPV1qdS7qwSlsYFy+ABTjbWQ9D6Q3TXSNxxQuXVJ2hzjgs
+	 6sOTd9KNul1mQnsoO4t5HdXhn1EI290z8qni4xr0KvUjTZHJrvRtdvIyyR1XIjzWoN
+	 mxgVIJ5eL1Gdg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: netdev@vger.kernel.org,
 	mkubecek@suse.cz,
 	lorenzo@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/2] net: store netdevs in an xarray
-Date: Fri, 21 Jul 2023 18:42:36 -0700
-Message-ID: <20230722014237.4078962-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/2] net: convert some netlink netdev iterators to depend on the xarray
+Date: Fri, 21 Jul 2023 18:42:37 -0700
+Message-ID: <20230722014237.4078962-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230722014237.4078962-1-kuba@kernel.org>
 References: <20230722014237.4078962-1-kuba@kernel.org>
@@ -52,263 +52,285 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Iterating over the netdev hash table for netlink dumps is hard.
-Dumps are done in "chunks" so we need to save the position
-after each chunk, so we know where to restart from. Because
-netdevs are stored in a hash table we remember which bucket
-we were in and how many devices we dumped.
-
-Since we don't hold any locks across the "chunks" - devices may
-come and go while we're dumping. If that happens we may miss
-a device (if device is deleted from the bucket we were in).
-We indicate to user space that this may have happened by setting
-NLM_F_DUMP_INTR. User space is supposed to dump again (I think)
-if it sees that. Somehow I doubt most user space gets this right..
-
-To illustrate let's look at an example:
-
-               System state:
-  start:       # [A, B, C]
-  del:  B      # [A, C]
-
-with the hash table we may dump [A, B], missing C completely even
-tho it existed both before and after the "del B".
-
-Add an xarray and use it to allocate ifindexes. This way we
-can iterate ifindexes in order, without the worry that we'll
-skip one. We may still generate a dump of a state which "never
-existed", for example for a set of values and sequence of ops:
-
-               System state:
-  start:       # [A, B]
-  add:  C      # [A, C, B]
-  del:  B      # [A, C]
-
-we may generate a dump of [A], if C got an index between A and B.
-System has never been in such state. But I'm 90% sure that's perfectly
-fine, important part is that we can't _miss_ devices which exist before
-and after. User space which wants to mirror kernel's state subscribes
-to notifications and does periodic dumps so it will know that C exists
-from the notification about its creation or from the next dump
-(next dump is _guaranteed_ to include C, if it doesn't get removed).
-
-To avoid any perf regressions keep the hash table for now. Most
-net namespaces have very few devices and microbenchmarking 1M lookups
-on Skylake I get the following results (not counting loopback
-to number of devs):
-
- #devs | hash |  xa  | delta
-    2  | 18.3 | 20.1 | + 9.8%
-   16  | 18.3 | 20.1 | + 9.5%
-   64  | 18.3 | 26.3 | +43.8%
-  128  | 20.4 | 26.3 | +28.6%
-  256  | 20.0 | 26.4 | +32.1%
- 1024  | 26.6 | 26.7 | + 0.2%
- 8192  |541.3 | 33.5 | -93.8%
-
-No surprises since the hash table has 256 entries.
-The microbenchmark scans indexes in order, if the pattern is more
-random xa starts to win at 512 devices already. But that's a lot
-of devices, in practice.
+Reap the benefits of easier iteration thanks to the xarray.
+Convert just the genetlink ones, those are easier to test.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/net/net_namespace.h |  4 +-
- net/core/dev.c              | 82 ++++++++++++++++++++++++-------------
- 2 files changed, 57 insertions(+), 29 deletions(-)
+ include/linux/netdevice.h |  3 ++
+ net/core/netdev-genl.c    | 37 +++++---------------
+ net/ethtool/netlink.c     | 59 ++++++++-----------------------
+ net/ethtool/tunnels.c     | 73 +++++++++++++++------------------------
+ 4 files changed, 52 insertions(+), 120 deletions(-)
 
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index 78beaa765c73..9f6add96de2d 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -42,6 +42,7 @@
- #include <linux/idr.h>
- #include <linux/skbuff.h>
- #include <linux/notifier.h>
-+#include <linux/xarray.h>
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 3800d0479698..1159ca17e246 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3014,6 +3014,9 @@ extern rwlock_t				dev_base_lock;		/* Device list lock */
+ 			if (netdev_master_upper_dev_get_rcu(slave) == (bond))
+ #define net_device_entry(lh)	list_entry(lh, struct net_device, dev_list)
  
- struct user_namespace;
- struct proc_dir_entry;
-@@ -69,7 +70,7 @@ struct net {
- 	atomic_t		dev_unreg_count;
- 
- 	unsigned int		dev_base_seq;	/* protected by rtnl_mutex */
--	int			ifindex;
-+	u32			ifindex;
- 
- 	spinlock_t		nsid_lock;
- 	atomic_t		fnhe_genid;
-@@ -110,6 +111,7 @@ struct net {
- 
- 	struct hlist_head 	*dev_name_head;
- 	struct hlist_head	*dev_index_head;
-+	struct xarray		dev_by_index;
- 	struct raw_notifier_head	netdev_chain;
- 
- 	/* Note that @hash_mix can be read millions times per second,
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 8e7d0cb540cd..3c22a1691dc7 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -388,6 +388,8 @@ static void list_netdevice(struct net_device *dev)
- 	hlist_add_head_rcu(&dev->index_hlist,
- 			   dev_index_hash(net, dev->ifindex));
- 	write_unlock(&dev_base_lock);
-+	/* We reserved the ifindex, this can't fail */
-+	WARN_ON(xa_store(&net->dev_by_index, dev->ifindex, dev, GFP_KERNEL));
- 
- 	dev_base_seq_inc(net);
- }
-@@ -397,8 +399,12 @@ static void list_netdevice(struct net_device *dev)
-  */
- static void unlist_netdevice(struct net_device *dev, bool lock)
++#define for_each_netdev_dump(net, d, ifindex)				\
++	xa_for_each_start(&(net)->dev_by_index, (ifindex), (d), (ifindex))
++
+ static inline struct net_device *next_net_device(struct net_device *dev)
  {
-+	struct net *net = dev_net(dev);
-+
- 	ASSERT_RTNL();
+ 	struct list_head *lh;
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 65ef4867fc49..797c813c7c77 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -101,43 +101,22 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+ 	struct net *net = sock_net(skb->sk);
+ 	struct net_device *netdev;
+-	int idx = 0, s_idx;
+-	int h, s_h;
+-	int err;
+-
+-	s_h = cb->args[0];
+-	s_idx = cb->args[1];
++	int err = 0;
  
-+	xa_erase(&net->dev_by_index, dev->ifindex);
-+
- 	/* Unlink dev from the device chain */
- 	if (lock)
- 		write_lock(&dev_base_lock);
-@@ -9566,23 +9572,35 @@ int dev_change_xdp_fd(struct net_device *dev, struct netlink_ext_ack *extack,
+ 	rtnl_lock();
+-
+-	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
+-		struct hlist_head *head;
+-
+-		idx = 0;
+-		head = &net->dev_index_head[h];
+-		hlist_for_each_entry(netdev, head, index_hlist) {
+-			if (idx < s_idx)
+-				goto cont;
+-			err = netdev_nl_dev_fill(netdev, skb,
+-						 NETLINK_CB(cb->skb).portid,
+-						 cb->nlh->nlmsg_seq, 0,
+-						 NETDEV_CMD_DEV_GET);
+-			if (err < 0)
+-				break;
+-cont:
+-			idx++;
+-		}
++	for_each_netdev_dump(net, netdev, cb->args[0]) {
++		err = netdev_nl_dev_fill(netdev, skb,
++					 NETLINK_CB(cb->skb).portid,
++					 cb->nlh->nlmsg_seq, 0,
++					 NETDEV_CMD_DEV_GET);
++		if (err < 0)
++			break;
+ 	}
+-
+ 	rtnl_unlock();
+ 
+ 	if (err != -EMSGSIZE)
+ 		return err;
+ 
+-	cb->args[1] = idx;
+-	cb->args[0] = h;
+-	cb->seq = net->dev_base_seq;
+-
+ 	return skb->len;
  }
  
- /**
-- *	dev_new_index	-	allocate an ifindex
-- *	@net: the applicable net namespace
-+ * dev_index_reserve() - allocate an ifindex in a namespace
-+ * @net: the applicable net namespace
-+ * @ifindex: requested ifindex, pass %0 to get one allocated
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index 39a459b0111b..ae344f1b0bbd 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -252,8 +252,7 @@ int ethnl_multicast(struct sk_buff *skb, struct net_device *dev)
+  * @ops:        request ops of currently processed message type
+  * @req_info:   parsed request header of processed request
+  * @reply_data: data needed to compose the reply
+- * @pos_hash:   saved iteration position - hashbucket
+- * @pos_idx:    saved iteration position - index
++ * @pos_ifindex: saved iteration position - ifindex
   *
-- *	Returns a suitable unique value for a new device interface
-- *	number.  The caller must hold the rtnl semaphore or the
-- *	dev_base_lock to be sure it remains unique.
-+ * Allocate a ifindex for a new device. Caller must either use the ifindex
-+ * to store the device (via list_netdevice()) or call dev_index_release()
-+ * to give the index up.
-+ *
-+ * Return: a suitable unique value for a new device interface number or -errno.
-  */
--static int dev_new_index(struct net *net)
-+static int dev_index_reserve(struct net *net, u32 ifindex)
- {
--	int ifindex = net->ifindex;
-+	int err;
+  * These parameters are kept in struct netlink_callback as context preserved
+  * between iterations. They are initialized by ethnl_default_start() and used
+@@ -263,8 +262,7 @@ struct ethnl_dump_ctx {
+ 	const struct ethnl_request_ops	*ops;
+ 	struct ethnl_req_info		*req_info;
+ 	struct ethnl_reply_data		*reply_data;
+-	int				pos_hash;
+-	int				pos_idx;
++	unsigned long			pos_ifindex;
+ };
  
--	for (;;) {
--		if (++ifindex <= 0)
--			ifindex = 1;
--		if (!__dev_get_by_index(net, ifindex))
--			return net->ifindex = ifindex;
--	}
-+	if (!ifindex)
-+		err = xa_alloc_cyclic(&net->dev_by_index, &ifindex, NULL,
-+				      xa_limit_31b, &net->ifindex, GFP_KERNEL);
-+	else
-+		err = xa_insert(&net->dev_by_index, ifindex, NULL, GFP_KERNEL);
-+	if (err)
-+		return err;
-+
-+	return ifindex;
-+}
-+
-+static void dev_index_release(struct net *net, int ifindex)
-+{
-+	/* Expect only unused indexes, unlist_netdevice() removes the used */
-+	WARN_ON(xa_erase(&net->dev_by_index, ifindex));
+ static const struct ethnl_request_ops *
+@@ -490,55 +488,27 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
+ {
+ 	struct ethnl_dump_ctx *ctx = ethnl_dump_context(cb);
+ 	struct net *net = sock_net(skb->sk);
+-	int s_idx = ctx->pos_idx;
+-	int h, idx = 0;
++	struct net_device *dev;
+ 	int ret = 0;
+ 
+ 	rtnl_lock();
+-	for (h = ctx->pos_hash; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
+-		struct hlist_head *head;
+-		struct net_device *dev;
+-		unsigned int seq;
++	for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
++		dev_hold(dev);
++		rtnl_unlock();
+ 
+-		head = &net->dev_index_head[h];
++		ret = ethnl_default_dump_one(skb, dev, ctx, cb);
+ 
+-restart_chain:
+-		seq = net->dev_base_seq;
+-		cb->seq = seq;
+-		idx = 0;
+-		hlist_for_each_entry(dev, head, index_hlist) {
+-			if (idx < s_idx)
+-				goto cont;
+-			dev_hold(dev);
+-			rtnl_unlock();
++		rtnl_lock();
++		dev_put(dev);
+ 
+-			ret = ethnl_default_dump_one(skb, dev, ctx, cb);
+-			dev_put(dev);
+-			if (ret < 0) {
+-				if (ret == -EOPNOTSUPP)
+-					goto lock_and_cont;
+-				if (likely(skb->len))
+-					ret = skb->len;
+-				goto out;
+-			}
+-lock_and_cont:
+-			rtnl_lock();
+-			if (net->dev_base_seq != seq) {
+-				s_idx = idx + 1;
+-				goto restart_chain;
+-			}
+-cont:
+-			idx++;
++		if (ret < 0 && ret != -EOPNOTSUPP) {
++			if (likely(skb->len))
++				ret = skb->len;
++			break;
+ 		}
+-
+ 	}
+ 	rtnl_unlock();
+ 
+-out:
+-	ctx->pos_hash = h;
+-	ctx->pos_idx = idx;
+-	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
+-
+ 	return ret;
  }
  
- /* Delayed registration/unregisteration */
-@@ -10052,11 +10070,10 @@ int register_netdevice(struct net_device *dev)
- 		goto err_uninit;
- 	}
- 
--	ret = -EBUSY;
--	if (!dev->ifindex)
--		dev->ifindex = dev_new_index(net);
--	else if (__dev_get_by_index(net, dev->ifindex))
-+	ret = dev_index_reserve(net, dev->ifindex);
-+	if (ret < 0)
- 		goto err_uninit;
-+	dev->ifindex = ret;
- 
- 	/* Transfer changeable features to wanted_features and enable
- 	 * software offloads (GSO and GRO).
-@@ -10103,7 +10120,7 @@ int register_netdevice(struct net_device *dev)
- 	ret = call_netdevice_notifiers(NETDEV_POST_INIT, dev);
- 	ret = notifier_to_errno(ret);
- 	if (ret)
--		goto err_uninit;
-+		goto err_ifindex_release;
- 
- 	ret = netdev_register_kobject(dev);
- 	write_lock(&dev_base_lock);
-@@ -10159,6 +10176,8 @@ int register_netdevice(struct net_device *dev)
- 
- err_uninit_notify:
- 	call_netdevice_notifiers(NETDEV_PRE_UNINIT, dev);
-+err_ifindex_release:
-+	dev_index_release(net, dev->ifindex);
- err_uninit:
- 	if (dev->netdev_ops->ndo_uninit)
- 		dev->netdev_ops->ndo_uninit(dev);
-@@ -11036,9 +11055,19 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	}
- 
- 	/* Check that new_ifindex isn't used yet. */
--	err = -EBUSY;
--	if (new_ifindex && __dev_get_by_index(net, new_ifindex))
--		goto out;
-+	if (new_ifindex) {
-+		err = dev_index_reserve(net, new_ifindex);
-+		if (err < 0)
-+			goto out;
-+	} else {
-+		/* If there is an ifindex conflict assign a new one */
-+		err = dev_index_reserve(net, dev->ifindex);
-+		if (err == -EBUSY)
-+			err = dev_index_reserve(net, 0);
-+		if (err < 0)
-+			goto out;
-+		new_ifindex = err;
-+	}
- 
- 	/*
- 	 * And now a mini version of register_netdevice unregister_netdevice.
-@@ -11066,13 +11095,6 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	rcu_barrier();
- 
- 	new_nsid = peernet2id_alloc(dev_net(dev), net, GFP_KERNEL);
--	/* If there is an ifindex conflict assign a new one */
--	if (!new_ifindex) {
--		if (__dev_get_by_index(net, dev->ifindex))
--			new_ifindex = dev_new_index(net);
--		else
--			new_ifindex = dev->ifindex;
--	}
- 
- 	rtmsg_ifinfo_newnet(RTM_DELLINK, dev, ~0U, GFP_KERNEL, &new_nsid,
- 			    new_ifindex);
-@@ -11250,6 +11272,9 @@ static int __net_init netdev_init(struct net *net)
- 	if (net->dev_index_head == NULL)
- 		goto err_idx;
- 
-+	net->ifindex = 1;
-+	xa_init_flags(&net->dev_by_index, XA_FLAGS_ALLOC);
-+
- 	RAW_INIT_NOTIFIER_HEAD(&net->netdev_chain);
+@@ -584,8 +554,7 @@ static int ethnl_default_start(struct netlink_callback *cb)
+ 	ctx->ops = ops;
+ 	ctx->req_info = req_info;
+ 	ctx->reply_data = reply_data;
+-	ctx->pos_hash = 0;
+-	ctx->pos_idx = 0;
++	ctx->pos_ifindex = 0;
  
  	return 0;
-@@ -11347,6 +11372,7 @@ static void __net_exit netdev_exit(struct net *net)
+ 
+diff --git a/net/ethtool/tunnels.c b/net/ethtool/tunnels.c
+index 67fb414ca859..05f752557b5e 100644
+--- a/net/ethtool/tunnels.c
++++ b/net/ethtool/tunnels.c
+@@ -212,8 +212,7 @@ int ethnl_tunnel_info_doit(struct sk_buff *skb, struct genl_info *info)
+ 
+ struct ethnl_tunnel_info_dump_ctx {
+ 	struct ethnl_req_info	req_info;
+-	int			pos_hash;
+-	int			pos_idx;
++	unsigned long		ifindex;
+ };
+ 
+ int ethnl_tunnel_info_start(struct netlink_callback *cb)
+@@ -243,56 +242,38 @@ int ethnl_tunnel_info_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
  {
- 	kfree(net->dev_name_head);
- 	kfree(net->dev_index_head);
-+	xa_destroy(&net->dev_by_index);
- 	if (net != &init_net)
- 		WARN_ON_ONCE(!list_empty(&net->dev_base_head));
- }
+ 	struct ethnl_tunnel_info_dump_ctx *ctx = (void *)cb->ctx;
+ 	struct net *net = sock_net(skb->sk);
+-	int s_idx = ctx->pos_idx;
+-	int h, idx = 0;
++	struct net_device *dev;
+ 	int ret = 0;
+ 	void *ehdr;
+ 
+ 	rtnl_lock();
+-	cb->seq = net->dev_base_seq;
+-	for (h = ctx->pos_hash; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
+-		struct hlist_head *head;
+-		struct net_device *dev;
+-
+-		head = &net->dev_index_head[h];
+-		idx = 0;
+-		hlist_for_each_entry(dev, head, index_hlist) {
+-			if (idx < s_idx)
+-				goto cont;
+-
+-			ehdr = ethnl_dump_put(skb, cb,
+-					      ETHTOOL_MSG_TUNNEL_INFO_GET_REPLY);
+-			if (!ehdr) {
+-				ret = -EMSGSIZE;
+-				goto out;
+-			}
+-
+-			ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_TUNNEL_INFO_HEADER);
+-			if (ret < 0) {
+-				genlmsg_cancel(skb, ehdr);
+-				goto out;
+-			}
+-
+-			ctx->req_info.dev = dev;
+-			ret = ethnl_tunnel_info_fill_reply(&ctx->req_info, skb);
+-			ctx->req_info.dev = NULL;
+-			if (ret < 0) {
+-				genlmsg_cancel(skb, ehdr);
+-				if (ret == -EOPNOTSUPP)
+-					goto cont;
+-				goto out;
+-			}
+-			genlmsg_end(skb, ehdr);
+-cont:
+-			idx++;
++	for_each_netdev_dump(net, dev, ctx->ifindex) {
++		ehdr = ethnl_dump_put(skb, cb,
++				      ETHTOOL_MSG_TUNNEL_INFO_GET_REPLY);
++		if (!ehdr) {
++			ret = -EMSGSIZE;
++			break;
+ 		}
+-	}
+-out:
+-	rtnl_unlock();
+ 
+-	ctx->pos_hash = h;
+-	ctx->pos_idx = idx;
+-	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
++		ret = ethnl_fill_reply_header(skb, dev,
++					      ETHTOOL_A_TUNNEL_INFO_HEADER);
++		if (ret < 0) {
++			genlmsg_cancel(skb, ehdr);
++			break;
++		}
++
++		ctx->req_info.dev = dev;
++		ret = ethnl_tunnel_info_fill_reply(&ctx->req_info, skb);
++		ctx->req_info.dev = NULL;
++		if (ret < 0) {
++			genlmsg_cancel(skb, ehdr);
++			if (ret == -EOPNOTSUPP)
++				continue;
++			break;
++		}
++		genlmsg_end(skb, ehdr);
++	}
++	rtnl_unlock();
+ 
+ 	if (ret == -EMSGSIZE && skb->len)
+ 		return skb->len;
 -- 
 2.41.0
 
