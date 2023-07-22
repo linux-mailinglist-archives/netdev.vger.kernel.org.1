@@ -1,69 +1,68 @@
-Return-Path: <netdev+bounces-20151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DAB075DE65
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 22:00:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226A975DE7E
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 22:24:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6423281EB6
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 20:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39120281E7E
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 20:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F66C650;
-	Sat, 22 Jul 2023 20:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3312D658;
+	Sat, 22 Jul 2023 20:24:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B993648
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 20:00:02 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2132.outbound.protection.outlook.com [40.107.92.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871AA10C3;
-	Sat, 22 Jul 2023 13:00:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5B963A
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 20:24:25 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2121.outbound.protection.outlook.com [40.107.100.121])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84BEFE53;
+	Sat, 22 Jul 2023 13:24:24 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X+31PJHk1sqd8WOdHuIxHrLfyS7tfvKoAAaxuwHSQkZxR2wtrMFsnF1IAcQzm0o6C+McmyzTn6xeRXGyZQmlLaWFrCWZF6J3gaT4sIFvX4CysrkWYmZ9fDjBouZ9sxTJ/Lm3rFnMlrO+P//XzMWByPibuBmMIo8wegZKoSsm8HKkfXTa5zZ6hbeAkOWdBjZAvE7+sZTBhXwyZywzh3lYBNvKnGHzqcYx4Nss1M3j8J2Iyyn8WR0oQrLY3IKXVzw7t4USkPHuLBmL/5Gg64jR9UKLoZciwldwwoz/wtYRhSNH1vnn1xrYRky0KEgOuuwiGL5yFVeIEGSxUjVOr3YvzA==
+ b=Rs0DxD4ZhD/DAx+9N9a/0iN2s50sTFunGzrA+monZEiMM/AxCArxOrN3E421li1z0So0Ofsud90/ItYmA6ljP3Tv6hn4ZIoRk9F5gXQD+0rVO8oYGGSCgJQwLHkLy+mcHFoA45s+/po2ANcI1m2r3819wMHRgYAj95gjehpYv0idcjBMshtYx6/DosnLHLsb+BnVjtMr4zOkuotubOLf9A7gdGrEfYHOVE9JFhoi/kYLDqL3l28m3FWBNeKg6YPN3w7N5iHK0Lbep8nA+UgawKQAVH9iup2fMRd/tqh+cdPV9y7NmOVgLVRo+cRHhWZWTbjsIdkDc5EjcfwolCxFIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=57alvt58r9TyS655zMEts/nipV2TAKnN1QkncZJbzeE=;
- b=LD2NcG+YSQkNXUMVhW5Rjuoh/N3JvVV+3Qm2+VI3qoRFgdb6HcxJorvCvqKbDescmO6DvYfzxyWmb08/R++K9ip8YDVwvVpRrDs7DzXPQ9V2ocpMhhofMD1kIxJJekUtYK8KYb48WR6SiqMN04piOKR9NRKCyiM7Q/s/VfK6MS9hZ0Sy/Ywh0xvxBhREMKNiDvjAfJ5w/4u3g3nzqpGcSJreLSzN0XsMt7STT2X9E8WFKURjJJHpPVZDua3QtAQ/Gxmhm5pW5UkOaXnCO7yhJHAZMYq3NrWbJn7OYh79g9KqY6dg3xsMzuPEJJxCHTzncs+leThjwlYNCSfuQJfaRg==
+ bh=jdnXSPKymYJBSOaixCa9Qcfv71Z2eZMoQGKPdomLNp0=;
+ b=IbIfhXJeRxJRt3xy0F/714HfYMdXFj0GbCpBYGxI9bc4UHP3P7srmqLVaqraRDdakRsFMA7MPJMEnCzZn487elva5IFffcjJwr5NsmxQ4d8IQkYANdb7dEXGiZw+Qzh7HQv/Ovcextm1WAvEMlL2pwes23PuI6BxvLfMMYHwZ/a6L4++5HrSjE33XL2vjeEgTnscWME+aatU1C58QrGfr9Jk6qzz9xR6egu5z/Fzc6aIjdy6fzgfkvcRtp1AJgXIa/5tOwDL7kVcetBO+R6VmLgRbcPPRv6IKF36cNYNrHW67tGUxIyqNk5yXujJe5qhuas+KORdyv9RM5D13JybZg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=57alvt58r9TyS655zMEts/nipV2TAKnN1QkncZJbzeE=;
- b=fZGR2o3WVJzvt3KdNjhQj55vbJFN+pNlbbuWDzmI/XAAwp2+xNQlY+233ByEKkPXcV43sDpKzbl9Vx0F1pcaEve37K9TzoWqCKHGCriJqoBr3IZpto9bSdo6sKhapb6cOwL/Vv81hDXEXnZy4tZxgWMnFzymPdlYmu/4DImDeuc=
+ bh=jdnXSPKymYJBSOaixCa9Qcfv71Z2eZMoQGKPdomLNp0=;
+ b=L+20JhwLHQlhR0c9lFbIx2QIW2EFT9aFNqw7+HqqcRwxBr83WQzNzy+L8KNcq7vHizZaHO9hESTjeEnSn+1fW3Z/teIZv8mjs+m2o/Z4Rph3LUYVRHPyAynfC8N5gKbGRNTrMH2UXDYQSQ/5ec+9Q0cn+QXWYclv3udsLpXP53U=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MN2PR13MB4086.namprd13.prod.outlook.com (2603:10b6:208:26f::7) with
+ by BY5PR13MB3730.namprd13.prod.outlook.com (2603:10b6:a03:225::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.30; Sat, 22 Jul
- 2023 19:59:56 +0000
+ 2023 20:24:20 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.029; Sat, 22 Jul 2023
- 19:59:56 +0000
-Date: Sat, 22 Jul 2023 20:59:46 +0100
+ 20:24:20 +0000
+Date: Sat, 22 Jul 2023 21:24:13 +0100
 From: Simon Horman <simon.horman@corigine.com>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com
-Subject: Re: [net PATCH V4] octeontx2-af: Fix hash extraction enable
- configuration
-Message-ID: <ZLw1MstJYEwAWRoa@corigine.com>
-References: <20230721061222.2632521-1-sumang@marvell.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
+	andrew@lunn.ch, linux@armlinux.org.uk, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next 1/7] net: lan743x: Create separate PCS power
+ reset function
+Message-ID: <ZLw67dun2790l+9D@corigine.com>
+References: <20230721060019.2737-1-Raju.Lakkaraju@microchip.com>
+ <20230721060019.2737-2-Raju.Lakkaraju@microchip.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230721061222.2632521-1-sumang@marvell.com>
-X-ClientProxiedBy: LO4P265CA0022.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ae::14) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230721060019.2737-2-Raju.Lakkaraju@microchip.com>
+X-ClientProxiedBy: LO4P123CA0619.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:294::19) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,74 +71,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB4086:EE_
-X-MS-Office365-Filtering-Correlation-Id: f0b2fdde-062b-404c-e742-08db8aee389d
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB3730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9200fa93-c6eb-433c-f533-08db8af1a16a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	X5aMxAxajlXU+GcfI0FYN38W9NFmQ5cekabERMrjlmkXedffZR8o76No2c8eHgaF9APwojCcs04UV7x++Td96JsCa2t16vOUp7fkdeiexKiCO/Aywxj3KeaudlDnY/gD5ucOxs2HT7A7b4SYDN0MjqglChvqRqaQ/otEileovDxkRpSCAmDR54Nvwxz2BFuH8lubejrtgcGm44vEH3taVV3ruVtUANrJP3Okm3kiO6U/348yxPVSTXkkb0Ux/agIwP0inBwvDVdm0qzs59mplW+TU5amHrFYIW5Z15ImQOqQrqA4PDcxuFwMVwUVeQAuv3XHYOprvmifoKhR+0HNlqGptS0SW0ExgQZ8quVGgU8gjJUmbJmJI0SUieoBHpmAUoyx5HIj62MxGjurUQOoR+gBgWs/DA8IDVuSSjg1jtLDID+X+tSc5NchMHnf1atuMj/PvH8RPdOSbbCX+7Gr5x+iMiltsH4uvT7BM5PLU13iAQA1yzo3OLuJ8/C+GWoe4p/5aTkMKlw/wfeWrqqVUZMqgsyThwGsJl7N980rBNwe+mq+7mj+KCD4xHa5zXxlslkvXZ5qD0J477DF5RTeCdqwFDQRoWlf33x0dwAMyWI=
+	uhQf/s99tiBUSOclvkI2/nelJxbHFlUYXNVbH864Cl5RrwVMxncmaCdDnAOm7OXFHZucNVQK1Oiogy6s5gfWNZM7fcRqfcNP3IRpK5NFUWAsb5lr1qTkIUyrqc8+5XNhkeCzvhFHEg1/Z/1XuyjrE9FAii+dyjTePg6uaYQqzEGOC/bcox7jCYWR//oW4c9UK01lhsbfppwr7FHx28rwFjeNfobT2QAlcQTjXpNL7zg+AJE+AyFbFNZJiVufyyocwBcJeloHbdTbxHNfbgN/cBiVVlKKRKP63y0DoFJioekAqd9K4NIJNU6UlDAf2sDWAig3vUDJUFSbmRyg5xqIS6R+55IPe5i7owU3qJ0xgrv/w2ww7e09AJwbYQhO6t+KT1D1MhHD1F35br2h1POcSJED9Kv5pY7XkS0MmRuDC3ORGcvpg5YZY7PaX8VCVFsGzs3PQR7oFMG8rUl09zN7GSgSDh37+9b9KRMsdG6EmwpOdeCzbxCdKfLwyFN8ZXDCO5yqN5TRx9ERFLje1JOdnL704t6XmmNojqCWhDzJ/oDLGYSwBozoYEbCqojNddCw4keD/QYJJwaxkkYThAT0g+uROcdhySogW51m3m0ma8yyEt/anv8oJnScgaV9C/ko4NDq9QX1GE+PBO108VfFEkbEBEoiOEn/vBKZW8dSD0Y=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(376002)(396003)(39830400003)(346002)(451199021)(6486002)(6512007)(478600001)(6666004)(86362001)(4744005)(44832011)(2906002)(2616005)(186003)(55236004)(26005)(6506007)(38100700002)(36756003)(66946007)(66556008)(66476007)(6916009)(4326008)(316002)(41300700001)(8676002)(8936002)(5660300002)(7416002);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39830400003)(396003)(376002)(346002)(136003)(366004)(451199021)(6666004)(6486002)(6512007)(478600001)(55236004)(186003)(2616005)(6506007)(26005)(2906002)(44832011)(316002)(41300700001)(66946007)(66556008)(66476007)(6916009)(4326008)(5660300002)(8676002)(8936002)(38100700002)(36756003)(86362001)(83380400001)(67856001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6KcJQcxBhayJtLiMkBJa3xd0AqwC7SQm+8xdysXYXyISqOyXFLSJ4TO1C3Zr?=
- =?us-ascii?Q?3Bd/paAM3XwB0W/bRynHGBpfrgioCZOHYvAciqRfZJf77/nIhkWBlSbjX3b6?=
- =?us-ascii?Q?1u2RRgNX3XGy8IQE2AGqjLBX7nMKaP3jNF35Jhrhnnmi7RN5o0kbcWdI7B2e?=
- =?us-ascii?Q?SZUfAZDKwNW5D/5u83uezr8lHS0fY5rdV3gO6dbmQg53Q+1pT8HRNbJHxj3k?=
- =?us-ascii?Q?OMr1c1lCa60Y+u7U1QFTmP6xRuDeKZmX6RhCDWNGV8TxIg+KZxUTyPCLL9Ky?=
- =?us-ascii?Q?hidhdV0+N2RCKLMl9UhwwBTLsgH+w0MZpw5w7qM76utd1rls4rSzVZwRZe2p?=
- =?us-ascii?Q?HaPCe2bw2ql32V1nlMg41DHPe5PrSOEzV+PGwKhdLHbezFLNVOP57jh8+fuy?=
- =?us-ascii?Q?E0fu9oqKR/kEqJpjwQhgosMTzQB69qdTo4t6EHsf0m4gRTXG5auOaRq8XKR2?=
- =?us-ascii?Q?1TKqQVmH70L2W74vNWEFBTNv462Tjkfcb55BzaZhXqsSl+ynh6qvOCH+jFn/?=
- =?us-ascii?Q?GxbOW2xPDTfsU+e86Wr4dBbqslFhZBiRNUBWcUisyOm5RPW4lHGpSuApmEJI?=
- =?us-ascii?Q?CfBHCslb7UVACtGaWeATRosGuU+kkKQnbzMxlhapuYYFhvGrDyKiolwaqxPS?=
- =?us-ascii?Q?2kikF2Gn5WFAK0WUEvk+zhTt+kSsQTK+KYz8mHPS4F5ZpMl96CIju4Kp1Zg8?=
- =?us-ascii?Q?tEsH61s22qGYmgE3WG8utvYziMKMjZIzehSxbzsa5Az52vHu0yDJyktAsA8s?=
- =?us-ascii?Q?LEmDvhSDHIOobtFeNH477dkbzzerUtbRdGminm9ptFzkX+F7iRO+zCkev/Qs?=
- =?us-ascii?Q?NcOAtPpT03vKFExmBG/n5xl4OGtz17BlMzs7EeKi9d2RVsDJ5qZpx4QNoE7M?=
- =?us-ascii?Q?KMHBF8ZKpJUKzjKT9R5pYWtn8sLPK/T7qLfy+oRR2Ap6PIpkUmYOaKx0o+89?=
- =?us-ascii?Q?B7eRytcywiy3qTOWgtSezehZvuYsyxNhQ3ALBjgQNTUb/rhp2KbgatbDrmxZ?=
- =?us-ascii?Q?D8wbjnubrnX1dhLBxP91KkFgxhau081HouGZ9yPGwPHXGojSCyA/WMj1qUsg?=
- =?us-ascii?Q?aMTyOAX9SsJMx1Etn6vC4jcd5KffeHt19LNS3U09KgYnmaEmBjW5QeUWciCQ?=
- =?us-ascii?Q?TY95xaSWRM2E7NRH4fKQpU/rNwgoAJbVDyvfH63ByHpiUYh2rscJZwAgBbh/?=
- =?us-ascii?Q?SdX63rMOLC9lR/CYjwA/k5fvMBghuR7iRR2+l500dk1xkv31sXYjeV35zJbf?=
- =?us-ascii?Q?ivGJXRrscT1vyAX9ybGYxV1A8Ppca+jNy2PlHSmrmjeGC49FJh1/L9h4wG51?=
- =?us-ascii?Q?rd36FGfw6/pvFBRSeUyJdhOUiBglBFhMGj4vISBInGxbcvt7x2S1r6rIng+b?=
- =?us-ascii?Q?JjX3xjRf+tPzq5EvQikZ2W+tgPAGY2MMN8hnaWjpr6l5hUrmDhpWM738i774?=
- =?us-ascii?Q?P1emJHcr9Og5ZASmZjVA45lNhkeyxpAEW0tPL9OjI+0zBbBGkp6OEbrs30uQ?=
- =?us-ascii?Q?TK7jnfuLXtKEIkTkZqsRWnbAYXst4ZohFE7rw/zPPmYVz3z/WjTjtxxrQ6FC?=
- =?us-ascii?Q?zNF4C4PaCPdRt3Pg4sX1U6HrGaTr2zpRVS9ievaAcySzBJFIZ/N9xmeyYkdZ?=
- =?us-ascii?Q?zA=3D=3D?=
+	=?us-ascii?Q?DwJc0U7O/9qukU5oGOZngzKTMJCFUl1lR1M+rI7uvi2gI7y6hxK7nrGdr5hX?=
+ =?us-ascii?Q?Hlg5RF8lVzkgTXZ9Vrka/i695OVA8h6wBrbu1E94AK9m5BhLxWk98VpDP3G3?=
+ =?us-ascii?Q?9WGNfh6xXaiyt0HC8CT9KVETEjet9nd2Myx36XacCbtrXsl11kFHCJ4bDDGb?=
+ =?us-ascii?Q?Tkx0M25e0WNHvLNdoiyXSJYPWtlpWQwFUgLbfFj11F6hdDxYeQP2JCcnHYmI?=
+ =?us-ascii?Q?/wZe6nYEv9H05ouIWLwIpJMHkeiPpOjpxptGdi7ewRodvOTwtGeoTxEr4rLi?=
+ =?us-ascii?Q?mzgLTiIECMXJ0pifAFrZDdGYSTUL8d1rMI7hzi4oMLfUkkObmKDKOKRmbZRK?=
+ =?us-ascii?Q?FvGe8sYNOk/LoTw1fTPj+Cd6AqmGM0sFOQN8xnQiDci0lWg4rsVW0xBECAv6?=
+ =?us-ascii?Q?9YMHKFxaWpqegH+P/v/HQYSjq5ZGny70hUFHUNjPc3obDwJFSVBOS43VpkRU?=
+ =?us-ascii?Q?Ry1eyT157KaRwSGF5hQ2MbTxMYmiPq2CnRKFr24sPFXunrUeqUXnAJMOWd6A?=
+ =?us-ascii?Q?G1FqP4Kx9syAEM+l0qLcuDHSWNApXCl2U5KBmyQqU2ZkHuvfpSvgvp5pA+Xw?=
+ =?us-ascii?Q?9q8CPSAvAH87JlCdpdqv7oLWyoKOH6VFpACt+6ZKDaUKydnCIQEm0r4p79qW?=
+ =?us-ascii?Q?wcP9ANBpF30OpJ2C3qAlyrxpR3x1DMRIAZa+YXe80ErS3EIN49AKOUgkwpbg?=
+ =?us-ascii?Q?cigFo+TvELl7VrWvRLnVTk6cAHQAiJaHOofsOb+GJPpufIGNbVZqUar0lOI0?=
+ =?us-ascii?Q?D4yWMFgde1lbV04zk+7cJeYCDYlbJQrzotiU6OmxGnaQ2JxI32Hh9IJcSNoA?=
+ =?us-ascii?Q?Kr/YhnD8MVDOodgEgDIdI5DvGHSTgzUnT9SavtUB7xlEoQOVAG+wBtXUqVjs?=
+ =?us-ascii?Q?r6uVy3U4LaC39eVEEdbaURnf87MtZVABMiqBdSqXL//GFfszoHEd608dayAa?=
+ =?us-ascii?Q?J96sxMifZ/5sOPSsd0vG0uncWNAQDDVdcrb1sAD8ni42DX/HDNblOosnINLn?=
+ =?us-ascii?Q?mW6KX2+RC/Kh8WYnhLEUlPlY4Vnk5zelzaaC9QkE6kJo8nYSv8Xa+TcFkZJM?=
+ =?us-ascii?Q?Ug+80pJZC59JBGcycwyM8wPlQhdTVLd+qxmlYt+jwqsLlZuT9DZpmOiUDlNe?=
+ =?us-ascii?Q?ve1b/IeBFsuO1n8BCcakuJvVkMsqdF9KJPmJjHSJWnJ0XAf0kTFbtBmm1uNX?=
+ =?us-ascii?Q?SOFTm6iCLH5PIDBcvpG9W4O6r360YSfGa2vwxykx5UyUAtzNaDbSmkXx3nNv?=
+ =?us-ascii?Q?9UIYt9vrajpJOnDNthhR9La1n8lhQEZzNpNBGgC57b/guyjp5L70aQRShw93?=
+ =?us-ascii?Q?r0sZDrVYJJF0l1ZYmw6cF/tcrY2muDfHEIIkCm+OxBoCYLeloqKVqZdM3AZ4?=
+ =?us-ascii?Q?7tGdzEZUPrNDT0TswLky9yTXOmlmC0bSPqaN5IKXI0RG9yWHN4G3QpJbBFOi?=
+ =?us-ascii?Q?BDW8ECBdeBfOjokewh9b+59ALTKGK+XH5tHxzz8j0W55ptmjYw58/LVq5HKj?=
+ =?us-ascii?Q?BGpX7BD1EzsfuPxMed4Q5kEd2rnGuN0/slzU8HX1nVoTpy1CrjhnhD56EsjP?=
+ =?us-ascii?Q?QUU+AgCQktZGau9llq28VrCwkNHmeVOkUA0lONZ+8ZIAnu7Z/8caqk6Ltd0I?=
+ =?us-ascii?Q?nQ=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0b2fdde-062b-404c-e742-08db8aee389d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9200fa93-c6eb-433c-f533-08db8af1a16a
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 19:59:56.3223
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 20:24:20.5319
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CETsqHQqFGCONoVQ5NHrcKnRKf7U01FULPUHH9vQ6SiRhpK120z0e98rR7tQdDoFITG9zuDeZC0Og/zEuT+Obw+1//9uST2fhldi9iQc7WM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB4086
+X-MS-Exchange-CrossTenant-UserPrincipalName: rnwReROnbqZ/uX58EEoAUnGxs+HavYeFrg6f/vs6h2n2sMy7fT7svS6TgsGamQGTBgrteaI6XckHRXOpwI9x+tQasc5sS3JazZ3Vh/8LAoU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB3730
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 11:42:22AM +0530, Suman Ghosh wrote:
-> As of today, hash extraction support is enabled for all the silicons.
-> Because of which we are facing initialization issues when the silicon
-> does not support hash extraction. During creation of the hardware
-> parsing table for IPv6 address, we need to consider if hash extraction
-> is enabled then extract only 32 bit, otherwise 128 bit needs to be
-> extracted. This patch fixes the issue and configures the hardware parser
-> based on the availability of the feature.
+On Fri, Jul 21, 2023 at 11:30:13AM +0530, Raju Lakkaraju wrote:
+> Create separate PCS power reset function from lan743x_sgmii_config () to use
+> as subroutine.
 > 
-> Fixes: a95ab93550d3 ("octeontx2-af: Use hashed field in MCAM key")
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> ---
+>  drivers/net/ethernet/microchip/lan743x_main.c | 54 ++++++++++---------
+>  1 file changed, 29 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+> index a36f6369f132..dba5576a933b 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+...
 
+>  static int lan743x_sgmii_config(struct lan743x_adapter *adapter)
+>  {
+>  	struct net_device *netdev = adapter->netdev;
+> @@ -1207,31 +1235,7 @@ static int lan743x_sgmii_config(struct lan743x_adapter *adapter)
+>  		netif_dbg(adapter, drv, adapter->netdev,
+>  			  "SGMII 1G mode enable\n");
+>  
+> -	/* SGMII/1000/2500BASE-X PCS power down */
+> -	mii_ctl = lan743x_sgmii_read(adapter, MDIO_MMD_VEND2, MII_BMCR);
+> -	if (mii_ctl < 0)
+> -		return mii_ctl;
+> -
+> -	mii_ctl |= BMCR_PDOWN;
+> -	ret = lan743x_sgmii_write(adapter, MDIO_MMD_VEND2, MII_BMCR, mii_ctl);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	ret = lan743x_pcs_seq_state(adapter, PCS_POWER_STATE_DOWN);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	/* SGMII/1000/2500BASE-X PCS power up */
+> -	mii_ctl &= ~BMCR_PDOWN;
+> -	ret = lan743x_sgmii_write(adapter, MDIO_MMD_VEND2, MII_BMCR, mii_ctl);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	ret = lan743x_pcs_seq_state(adapter, PCS_POWER_STATE_UP);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	return 0;
+> +	return lan743x_pcs_power_reset(adapter);
+
+Hi Raju,
+
+It appears that the local variable mii_ctl is now unused
+in lan743x_sgmii_config() and can be removed.
+
+>  }
+>  
+>  static void lan743x_mac_set_address(struct lan743x_adapter *adapter,
+> -- 
+> 2.25.1
+> 
+> 
 
