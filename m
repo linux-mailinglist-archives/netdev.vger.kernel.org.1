@@ -1,126 +1,96 @@
-Return-Path: <netdev+bounces-20137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73AF775DCD8
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 16:06:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBA9775DCDE
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 16:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 979BE28207B
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:06:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1F01C20A99
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C4F1D31A;
-	Sat, 22 Jul 2023 14:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225571D31C;
+	Sat, 22 Jul 2023 14:10:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E36D1D316
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 14:06:55 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FBC02D79
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 07:06:51 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-122-J7OFbQsWNqyfCrR826JB4A-1; Sat, 22 Jul 2023 15:06:48 +0100
-X-MC-Unique: J7OFbQsWNqyfCrR826JB4A-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 22 Jul
- 2023 15:06:47 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sat, 22 Jul 2023 15:06:47 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Alan Huang' <mmpgouride@gmail.com>, Joel Fernandes
-	<joel@joelfernandes.org>, "Paul E. McKenney" <paulmck@kernel.org>, "Eric
- Dumazet" <edumazet@google.com>, "roman.gushchin@linux.dev"
-	<roman.gushchin@linux.dev>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "rcu@vger.kernel.org"
-	<rcu@vger.kernel.org>
-Subject: RE: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-Thread-Topic: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-Thread-Index: AQHZvKDlW9UBwZmf30GL9p6MGC4yBq/F0Gvg
-Date: Sat, 22 Jul 2023 14:06:47 +0000
-Message-ID: <8e1885b62d124cca9198ff6cdb52c7f5@AcuMS.aculab.com>
-References: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
- <1E0741E0-2BD9-4FA3-BA41-4E83315A10A8@joelfernandes.org>
- <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
- <cc9b292c-99b1-bec9-ba8e-9c202b5835cd@joelfernandes.org>
- <ED9F14A2-533B-471E-9B79-F75CEEE9A216@gmail.com>
- <ED5C700E-0C63-41E5-8A46-F7BC93B2FD42@gmail.com>
- <76552616-5DF1-4A05-BA5A-AE0677F861FC@gmail.com>
-In-Reply-To: <76552616-5DF1-4A05-BA5A-AE0677F861FC@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160A81D31A
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 14:10:58 +0000 (UTC)
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB4F2D77
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 07:10:57 -0700 (PDT)
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a1e869ed0aso5374080b6e.2
+        for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 07:10:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690035057; x=1690639857;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jE88Sg/HkvkvrZgXmJzjM5EFv0iGLJWGouDm2D6gBG0=;
+        b=lZchDfoCNfBN3pAZfZ1ssbvZTsxbnsfuJ71gGDDSl6WPZLriFL/BeBeFjj2hZBFwVW
+         tz3GfVSkKz5N0EUT9ICJvbkpt/R1zrKJbD6fPEEIBF2iYuGdnqDK6ABAJle3+reqV+Qw
+         Q3WAKFMJgELQuSelr1yvK0+Ahlqg97JrVp+YmdnXkTeTNFu8OkmNdYUex4KFVRM4lBXf
+         Yub1lpKiBcJ5dq72EU7zzDCwLXQEyiK1HqBBC3fqk5ujWrb9UCD6hfZya0LAQiT7PIR6
+         Gkmh9sIbHGO/5wg+0j8+zV1AOW3f93I14pk9ooVkLjBboolebiBmUt+bmR15PIu9O1sp
+         Vwkg==
+X-Gm-Message-State: ABy/qLaoyrQKxX3EPaGqvd0/hXWcnDXO2NN6/zJRYL4YQaSLKW2brMqG
+	KktYx4pb5e/DAsvlc1eAeSSR7Jwx4skkfMHazNw55jQdTrud
+X-Google-Smtp-Source: APBJJlHNcjzpmR2IYLssdl8GbcS097gsETsQPbM2yG7animODfDOsG8U/I/F8z/rynn2gmwAZpRYWKSmMXAhkleVkG598/twLkZ7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:a05:6808:f11:b0:3a1:f3ed:e9e with SMTP id
+ m17-20020a0568080f1100b003a1f3ed0e9emr9991915oiw.3.1690035057187; Sat, 22 Jul
+ 2023 07:10:57 -0700 (PDT)
+Date: Sat, 22 Jul 2023 07:10:57 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003de1ad060113f3d3@google.com>
+Subject: [syzbot] Monthly dccp report (Jul 2023)
+From: syzbot <syzbot+listd0be519e02c69d098715@syzkaller.appspotmail.com>
+To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Li4uLg0KPiA+IEZvdW5kIGEgcmVsYXRlZCBkaXNjdXNzaW9uOg0KPiA+DQo+ID4gaHR0cHM6Ly9n
-Y2MuZ251Lm9yZy9idWd6aWxsYS9zaG93X2J1Zy5jZ2k/aWQ9MTAyNzE0DQo+ID4NCj4gPiBMb29r
-cyBsaWtlIEdDQyAxMCwgMTEgaGF2ZSBiZWVuIGJhY2twb3J0ZWQsIG5vdCBzdXJlIHdoZXRoZXIg
-R0NDIDggaGFzIGJlZW4gYmFja3BvcnRlZC4NCj4gPg0KPiA+IFNvLCBJIGhhdmUgdGhlIGZvbGxv
-d2luZyBxdWVzdGlvbnM6DQo+ID4NCj4gPiBHaXZlbiB0aGF0IHNvbWUgcGVvcGxlIG1pZ2h0IG5v
-dCB1cGRhdGUgdGhlaXIgR0NDLCBkbyB0aGV5IG5lZWQgdG8gYmUgbm90aWZpZWQ/DQo+ID4NCj4g
-PiBEbyB3ZSBuZWVkIHRvIENDIExpbnVzPw0KPiANCj4gTm8gbmVlZC4NCj4gDQo+IEkgcHV0IHRo
-ZSBmb2xsb3dpbmcgY29kZSBpbnRvIGEga2VybmVsIG1vZHVsZToNCj4gDQo+IHR5cGVkZWYgc3Ry
-dWN0IGxpc3RfaGVhZF9zaGl0IHsNCj4gCWludCBuZXh0Ow0KPiAJc3RydWN0IGxpc3RfaGVhZCAq
-Zmlyc3Q7DQo+IH0gbGlzdF9oZWFkX3NoaXQ7DQo+IA0KPiBzdGF0aWMgdm9pZCBub2lubGluZSBz
-b19zaGl0KHZvaWQpIHsNCj4gCWxpc3RfaGVhZF9zaGl0ICpoZWFkID0gKGxpc3RfaGVhZF9zaGl0
-ICopa21hbGxvYyhzaXplb2YobGlzdF9oZWFkX3NoaXQpLCBHRlBfS0VSTkVMKTsNCj4gCWhlYWQt
-PmZpcnN0ID0gMDsNCj4gCWhlYWQtPm5leHQgPSAxOw0KPiANCj4gCVJFQURfT05DRShoZWFkLT5m
-aXJzdCk7DQo+IAlSRUFEX09OQ0UoaGVhZC0+Zmlyc3QpOw0KPiANCj4gCWtmcmVlKGhlYWQpOw0K
-PiB9DQo+IA0KPiB4ODZfNjQtbGludXgtZ251LWdjYy0xMSBnZW5lcmF0ZSB0aGUgZm9sbG93aW5n
-IGNvZGU6DQo+IA0KPiAwMDAwMDAwMDAwMDAwMDAwIDxzb19zaGl0PjoNCj4gICAgMDoJNDggOGIg
-M2QgMDAgMDAgMDAgMDAgCW1vdiAgICAweDAoJXJpcCksJXJkaSAgICAgICAgIyA3IDxzb19zaGl0
-KzB4Nz4NCj4gICAgNzoJYmEgMTAgMDAgMDAgMDAgICAgICAgCQltb3YgICAgJDB4MTAsJWVkeA0K
-PiAgICBjOgliZSBjMCAwYyAwMCAwMCAgICAgIAkgCW1vdiAgICAkMHhjYzAsJWVzaQ0KPiAgIDEx
-OgllOCAwMCAwMCAwMCAwMCAgICAgIAkgCWNhbGwgICAxNiA8c29fc2hpdCsweDE2Pg0KPiAgIDE2
-Ogk0OCBjNyA0MCAwOCAwMCAwMCAwMCAJbW92cSAgICQweDAsMHg4KCVyYXgpDQo+ICAgMWQ6CTAw
-DQo+ICAgMWU6CTQ4IDg5IGM3ICAgICAgICAgICAgIAkJbW92ICAgICVyYXgsJXJkaQ0KPiAgIDIx
-OgljNyAwMCAwMSAwMCAwMCAwMCAgICAJbW92bCAgICQweDEsKCVyYXgpDQo+ICAgMjc6CTQ4IDhi
-IDQ3IDA4ICAgICAgICAgIAkJbW92ICAgIDB4OCglcmRpKSwlcmF4CSAgIyBSRUFEX09OQ0UgaGVy
-ZQ0KPiAgIDJiOgk0OCA4YiA0NyAwOCAgICAgICAgICAJCW1vdiAgICAweDgoJXJkaSksJXJheAkg
-ICMgUkVBRF9PTkNFIGhlcmUNCj4gICAyZjoJZTkgMDAgMDAgMDAgMDAgICAgICAJIAlqbXAgICAg
-MzQgPHNvX3NoaXQrMHgzND4NCj4gICAzNDoJNjYgNjYgMmUgMGYgMWYgODQgMDAgCWRhdGExNiBj
-cyBub3B3IDB4MCglcmF4LCVyYXgsMSkNCj4gICAzYjoJMDAgMDAgMDAgMDANCj4gICAzZjoJOTAg
-ICAgICAgICAgICAgICAgICAgCQkJbm9wDQo+IA0KPiBUaGUgY29uY2x1c2lvbiBpcyB0aGF0IHdl
-IGNhbiByZWx5IG9uIFJFQURfT05DRSB3aGVuIHdyaXRpbmcga2VybmVsIGNvZGUuDQo+IA0KPiBU
-aGUga2VybmVs4oCZcyBSRUFEX09OQ0UgaXMgZGlmZmVyZW50IHdpdGggdGhlIG9uZSBKb2VsIHdy
-b3RlIHllc3RlcmRheS4gKEpvZWzigJlzIGlzIHRoZSBzYW1lIGFzIHRoZSBvbGQNCj4gQUNDRVNT
-X09OQ0UpDQoNCllvdSBkbyBuZWVkIHRvIHJlcHJvZHVjZSB0aGUgZXJyb3Igd2l0aCBjb2RlIHRo
-YXQgbG9va3MgbGlrZQ0KdGhlIGxvb3AgaW4gdGhlIChvbGQpIHVkcC5jIGNvZGUuDQoNClRoZW4g
-c2VlIGlmIGNoYW5naW5nIHRoZSBpbXBsZW1lbnRhdGlvbiBvZiBSRUFEX09OQ0UoKSBmcm9tDQph
-IHNpbXBsZSAndm9sYXRpbGUnIGFjY2VzcyB0aGUgbmV3ZXIgdmFyaWFudCBtYWtlcyBhIGRpZmZl
-cmVuY2UuDQoNCllvdSBhbHNvIG5lZWQgdG8gY2hlY2sgd2l0aCB0aGUgb2xkZXN0IHZlcnNpb24g
-b2YgZ2NjIHRoYXQgaXMNCnN0aWxsIHN1cHBvcnRlZCAtIHRoYXQgaXMgbXVjaCBvbGRlciB0aGFu
-IGdjYyAxMS4NCg0KSW4gdGhlIHVkcCBjb2RlIHRoZSB2b2xhdGlsZSBhY2Nlc3Mgd2FzIG9uIGEg
-cG9pbnRlciAod2hpY2ggc2hvdWxkDQpxdWFsaWZ5IGFzIGEgc2NhbGVyIHR5cGUpIHNvIGl0IG1h
-eSB3ZWxsIGJlIHRoZSBpbmxpbmluZyBidWcgeW91DQptZW50aW9uZWQgZWFybGllciwgbm90IHRo
-ZSAndm9sYXRpbGUgb24gbm9uLXNjYWxlcicgZmVhdHVyZSB0aGF0DQpSRUFEX09OQ0UoKSBmaXhl
-ZC4NClRoYXQgZml4IGhhc24ndCBiZWVuIGJhY2stcG9ydGVkIHRvIGFsbCB0aGUgdmVyc2lvbnMg
-b2YgZ2NjDQp0aGF0IHRoZSBrZXJuZWwgYnVpbGQgc3VwcG9ydHMuDQoNCglEYXZpZA0KDQotDQpS
-ZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWls
-dG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMp
-DQo=
+Hello dccp maintainers/developers,
 
+This is a 31-day syzbot report for the dccp subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/dccp
+
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 4 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
+                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
+<2> 47      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
+                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
+<3> 9       Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
+                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
