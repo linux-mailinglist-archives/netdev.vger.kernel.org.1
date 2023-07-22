@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-20123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3481375DB80
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 11:43:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612B875DB83
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 11:44:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 653911C21411
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 09:43:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BDA52823B2
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 09:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BC2182DF;
-	Sat, 22 Jul 2023 09:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA901D31B;
+	Sat, 22 Jul 2023 09:43:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DF91D2E3
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 09:42:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B873B90
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 02:42:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D431217FFF
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 09:43:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836A590
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 02:43:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690018976;
+	s=mimecast20190719; t=1690018979;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=si4WaF2sUyhoMyrfKiqoRDshGh+L0l5KU+SrDtNbIjA=;
-	b=g5wVU4bQtRZf7lDgibAy/ubrT5NmN7fFxPJahCH1SZomO0u7UVfXbAw4axF0LQ52wFzKih
-	kOVp6bjrGw3+C7F5a9gtBF/NP99m9JERilYfWeClAJXZT/S8iYqVveO+2Pt5LRdjjicMrd
-	szusoTrgL+YDkwx6DpbxxWLs56dqqtw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-588-2Kjui3_7NZqN5877V0y4WQ-1; Sat, 22 Jul 2023 05:42:51 -0400
-X-MC-Unique: 2Kjui3_7NZqN5877V0y4WQ-1
+	bh=lsTenUSU2FyfhBT7UWgtI9Ilemz2ojQYKvA+bjTcAyA=;
+	b=enVw16IWu8iddpMSoafg30BnyXaWynreIOTWoWJCMxYqU8j3uzz7k+C5LTOzNwVUEGuBaA
+	kFVR1JyJiPuL4Y7UuWnNrC5GlIAd9r4znxYCnEFaWCWPlfTBjGcYeguddAXQ2YjKbWkYBb
+	6g0QLssn5shEwxr5qkGzaViXWAI2Zq8=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-573-uT0eCamMOhOJko8G-p96aA-1; Sat, 22 Jul 2023 05:42:53 -0400
+X-MC-Unique: uT0eCamMOhOJko8G-p96aA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 720BD800159;
-	Sat, 22 Jul 2023 09:42:51 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4B71638025F5;
+	Sat, 22 Jul 2023 09:42:53 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.192.19])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E021840C6F4C;
-	Sat, 22 Jul 2023 09:42:49 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D25D840C6F4C;
+	Sat, 22 Jul 2023 09:42:51 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Adrian Moreno <amorenoz@redhat.com>,
@@ -51,9 +51,9 @@ Cc: Adrian Moreno <amorenoz@redhat.com>,
 	aconole@redhat.com,
 	i.maximets@ovn.org,
 	eric@garver.life
-Subject: [PATCH net-next 4/7] net: openvswitch: add misc error drop reasons
-Date: Sat, 22 Jul 2023 11:42:34 +0200
-Message-ID: <20230722094238.2520044-5-amorenoz@redhat.com>
+Subject: [PATCH net-next 5/7] selftests: openvswitch: support key masks
+Date: Sat, 22 Jul 2023 11:42:35 +0200
+Message-ID: <20230722094238.2520044-6-amorenoz@redhat.com>
 In-Reply-To: <20230722094238.2520044-1-amorenoz@redhat.com>
 References: <20230722094238.2520044-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -67,143 +67,188 @@ X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use drop reasons from include/net/dropreason-core.h when a reasonable
-candidate exists.
+The default value for the mask actually depends on the value (e.g: if
+the value is non-null, the default is full-mask), so change the convert
+functions to accept the full, possibly masked string and let them figure
+out how to parse the differnt values.
+
+Also, implement size-aware int parsing.
+
+With this patch we can now express flows such as the following:
+"eth(src=0a:ca:fe:ca:fe:0a/ff:ff:00:00:ff:00)"
+"eth(src=0a:ca:fe:ca:fe:0a)" -> mask = ff:ff:ff:ff:ff:ff
+"ipv4(src=192.168.1.1)" -> mask = 255.255.255.255
+"ipv4(src=192.168.1.1/24)"
+"ipv4(src=192.168.1.1/255.255.255.0)"
+"tcp(src=8080)" -> mask = 0xffff
+"tcp(src=8080/0xf0f0)"
 
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- net/openvswitch/actions.c   | 17 ++++++++++-------
- net/openvswitch/conntrack.c |  3 ++-
- net/openvswitch/drop.h      |  6 ++++++
- 3 files changed, 18 insertions(+), 8 deletions(-)
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 96 ++++++++++++-------
+ 1 file changed, 64 insertions(+), 32 deletions(-)
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 9279bb186e9f..42fa1e7eb912 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -782,7 +782,7 @@ static int ovs_vport_output(struct net *net, struct sock *sk,
- 	struct vport *vport = data->vport;
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index 61c4d7b75261..0bc944f36e02 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -169,25 +169,45 @@ def parse_ct_state(statestr):
+     return parse_flags(statestr, ct_flags)
  
- 	if (skb_cow_head(skb, data->l2_len) < 0) {
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, SKB_DROP_REASON_NOMEM);
- 		return -ENOMEM;
- 	}
  
-@@ -853,6 +853,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 			 struct sk_buff *skb, u16 mru,
- 			 struct sw_flow_key *key)
- {
-+	enum ovs_drop_reason reason;
- 	u16 orig_network_offset = 0;
+-def convert_mac(mac_str, mask=False):
+-    if mac_str is None or mac_str == "":
+-        mac_str = "00:00:00:00:00:00"
+-    if mask is True and mac_str != "00:00:00:00:00:00":
+-        mac_str = "FF:FF:FF:FF:FF:FF"
+-    mac_split = mac_str.split(":")
+-    ret = bytearray([int(i, 16) for i in mac_split])
+-    return bytes(ret)
++def convert_mac(data):
++    def to_bytes(mac):
++        mac_split = mac.split(":")
++        ret = bytearray([int(i, 16) for i in mac_split])
++        return bytes(ret)
  
- 	if (eth_p_mpls(skb->protocol)) {
-@@ -862,6 +863,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
++    mac_str, _, mask_str = data.partition('/')
  
- 	if (skb_network_offset(skb) > MAX_L2_LEN) {
- 		OVS_NLERR(1, "L2 header too long to fragment");
-+		reason = OVS_DROP_FRAG_L2_TOO_LONG;
- 		goto err;
- 	}
+-def convert_ipv4(ip, mask=False):
+-    if ip is None:
+-        ip = 0
+-    if mask is True:
+-        if ip != 0:
+-            ip = int(ipaddress.IPv4Address(ip)) & 0xFFFFFFFF
++    if not mac_str:
++        mac_str = mask_str = "00:00:00:00:00:00"
++    elif not mask_str:
++        mask_str = "FF:FF:FF:FF:FF:FF"
  
-@@ -902,12 +904,13 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 		WARN_ONCE(1, "Failed fragment ->%s: eth=%04x, MRU=%d, MTU=%d.",
- 			  ovs_vport_name(vport), ntohs(key->eth.type), mru,
- 			  vport->dev->mtu);
-+		reason = OVS_DROP_FRAG_INVALID_PROTO;
- 		goto err;
- 	}
+-    return int(ipaddress.IPv4Address(ip))
++    return to_bytes(mac_str), to_bytes(mask_str)
  
- 	return;
- err:
--	kfree_skb(skb);
-+	kfree_skb_reason(skb, reason);
- }
++def convert_ipv4(data):
++    ip, _, mask = data.partition('/')
++
++    if not ip:
++        ip = mask = 0
++    elif not mask:
++        mask = 0xFFFFFFFF
++    elif mask.isdigit():
++        mask = (0xFFFFFFFF << (32 - int(mask))) & 0xFFFFFFFF
++
++    return int(ipaddress.IPv4Address(ip)), int(ipaddress.IPv4Address(mask))
++
++def convert_int(size):
++    def convert_int_sized(data):
++        value, _, mask = data.partition('/')
++
++        if not value:
++            return 0, 0
++        elif not mask:
++            return int(value, 0), pow(2, size) - 1
++        else:
++            return int(value, 0), int(mask, 0)
++
++    return convert_int_sized
  
- static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
-@@ -934,10 +937,10 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+ def parse_starts_block(block_str, scanstr, returnskipped, scanregex=False):
+     if scanregex:
+@@ -628,8 +648,10 @@ class ovskey(nla):
+         )
  
- 			ovs_fragment(net, vport, skb, mru, key);
- 		} else {
--			kfree_skb(skb);
-+			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 		}
- 	} else {
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, SKB_DROP_REASON_DEV_READY);
- 	}
- }
+         fields_map = (
+-            ("src", "src", "%d", lambda x: int(x) if x is not None else 0),
+-            ("dst", "dst", "%d", lambda x: int(x) if x is not None else 0),
++            ("src", "src", "%d", lambda x: int(x) if x else 0,
++                convert_int(16)),
++            ("dst", "dst", "%d", lambda x: int(x) if x else 0,
++                convert_int(16)),
+         )
  
-@@ -1011,7 +1014,7 @@ static int dec_ttl_exception_handler(struct datapath *dp, struct sk_buff *skb,
- 		return clone_execute(dp, skb, key, 0, nla_data(actions),
- 				     nla_len(actions), true, false);
+         def __init__(
+@@ -678,17 +700,13 @@ class ovskey(nla):
+                     data = flowstr[:splitchar]
+                     flowstr = flowstr[splitchar:]
+                 else:
+-                    data = None
++                    data = ""
  
--	consume_skb(skb);
-+	kfree_skb_reason(skb, OVS_DROP_IP_TTL);
- 	return 0;
- }
+                 if len(f) > 4:
+-                    func = f[4]
+-                else:
+-                    func = f[3]
+-                k[f[0]] = func(data)
+-                if len(f) > 4:
+-                    m[f[0]] = func(data, True)
++                    k[f[0]], m[f[0]] = f[4](data)
+                 else:
+-                    m[f[0]] = func(data)
++                    k[f[0]] = f[3](data)
++                    m[f[0]] = f[3](data)
  
-@@ -1564,7 +1567,7 @@ static int clone_execute(struct datapath *dp, struct sk_buff *skb,
- 		/* Out of per CPU action FIFO space. Drop the 'skb' and
- 		 * log an error.
- 		 */
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, OVS_DROP_DEFERRED_LIMIT);
+                 flowstr = flowstr[strspn(flowstr, ", ") :]
+                 if len(flowstr) == 0:
+@@ -792,10 +810,14 @@ class ovskey(nla):
+                 int,
+                 convert_ipv4,
+             ),
+-            ("proto", "proto", "%d", lambda x: int(x) if x is not None else 0),
+-            ("tos", "tos", "%d", lambda x: int(x) if x is not None else 0),
+-            ("ttl", "ttl", "%d", lambda x: int(x) if x is not None else 0),
+-            ("frag", "frag", "%d", lambda x: int(x) if x is not None else 0),
++            ("proto", "proto", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("tos", "tos", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("ttl", "ttl", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("frag", "frag", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
+         )
  
- 		if (net_ratelimit()) {
- 			if (actions) { /* Sample action */
-@@ -1616,7 +1619,7 @@ int ovs_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 	if (unlikely(level > OVS_RECURSION_LIMIT)) {
- 		net_crit_ratelimited("ovs: recursion limit reached on datapath %s, probable configuration error\n",
- 				     ovs_dp_name(dp));
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, OVS_DROP_RECURSION_LIMIT);
- 		err = -ENETDOWN;
- 		goto out;
- 	}
-diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-index fa955e892210..b03ebd4a8fae 100644
---- a/net/openvswitch/conntrack.c
-+++ b/net/openvswitch/conntrack.c
-@@ -29,6 +29,7 @@
- #include <net/netfilter/nf_conntrack_act_ct.h>
+         def __init__(
+@@ -931,8 +953,8 @@ class ovskey(nla):
+         )
  
- #include "datapath.h"
-+#include "drop.h"
- #include "conntrack.h"
- #include "flow.h"
- #include "flow_netlink.h"
-@@ -1035,7 +1036,7 @@ int ovs_ct_execute(struct net *net, struct sk_buff *skb,
+         fields_map = (
+-            ("type", "type", "%d", int),
+-            ("code", "code", "%d", int),
++            ("type", "type", "%d", lambda x: int(x) if x else 0),
++            ("code", "code", "%d", lambda x: int(x) if x else 0),
+         )
  
- 	skb_push_rcsum(skb, nh_ofs);
- 	if (err)
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, OVS_DROP_CONNTRACK);
- 	return err;
- }
- 
-diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
-index 2440c836727f..744b8d1b93a3 100644
---- a/net/openvswitch/drop.h
-+++ b/net/openvswitch/drop.h
-@@ -12,6 +12,12 @@
- 	R(OVS_DROP_EXPLICIT_ACTION)		\
- 	R(OVS_DROP_EXPLICIT_ACTION_ERROR)	\
- 	R(OVS_DROP_METER)			\
-+	R(OVS_DROP_RECURSION_LIMIT)		\
-+	R(OVS_DROP_DEFERRED_LIMIT)		\
-+	R(OVS_DROP_FRAG_L2_TOO_LONG)		\
-+	R(OVS_DROP_FRAG_INVALID_PROTO)		\
-+	R(OVS_DROP_CONNTRACK)			\
-+	R(OVS_DROP_IP_TTL)			\
- 	/* deliberate comment for trailing \ */
- 
- enum ovs_drop_reason {
+         def __init__(
+@@ -997,7 +1019,7 @@ class ovskey(nla):
+                 int,
+                 convert_ipv4,
+             ),
+-            ("op", "op", "%d", lambda x: int(x) if x is not None else 0),
++            ("op", "op", "%d", lambda x: int(x) if x else 0),
+             (
+                 "sha",
+                 "sha",
+@@ -1201,6 +1223,16 @@ class ovskey(nla):
+                 "tcp",
+                 ovskey.ovs_key_tcp,
+             ),
++            (
++                "OVS_KEY_ATTR_UDP",
++                "udp",
++                ovskey.ovs_key_udp,
++            ),
++            (
++                "OVS_KEY_ATTR_ICMP",
++                "icmp",
++                ovskey.ovs_key_icmp,
++            ),
+             (
+                 "OVS_KEY_ATTR_TCP_FLAGS",
+                 "tcp_flags",
 -- 
 2.41.0
 
