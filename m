@@ -1,219 +1,162 @@
-Return-Path: <netdev+bounces-20143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ED6275DD0C
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 17:00:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B651B75DD3A
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 17:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B884D282235
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 15:00:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B44D81C20A9E
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 15:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB771EA64;
-	Sat, 22 Jul 2023 15:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699831EA96;
+	Sat, 22 Jul 2023 15:32:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11E12908
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 15:00:38 +0000 (UTC)
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2321999;
-	Sat, 22 Jul 2023 08:00:37 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b895a06484so17703785ad.1;
-        Sat, 22 Jul 2023 08:00:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C59DF44
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 15:32:07 +0000 (UTC)
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADB9180;
+	Sat, 22 Jul 2023 08:32:05 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-583b0637c04so11554067b3.1;
+        Sat, 22 Jul 2023 08:32:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690038036; x=1690642836;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1690039925; x=1690644725;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g5ncd2/FYlQXl3gknimMlFI7PpI0cGxp5I6NZ5Y7HdA=;
-        b=L9By1tZdT51hCmdH+qnCO3iGNJzJo8BA5SYDM1YZz1SUPZJQsIA6WvILJzSwc2YE9A
-         XgIa88CtNrKlyXwMMrlJ5pO8SjWXdydWAE1F8Lw/L6brPvZDe/DuLMskOqB7J7RXl1m7
-         1V76i4eiP6fZ579XAkfpPU7jkSxOI8PBZK4253JhEbzSCZBXoygEtOXViY1w1a0M8g9B
-         DM137/2sBGNhaYyqjB1aWAi9QYQi8GHFhz/GlgNO4RLN01DkUf00l5NoU96hwlAraogG
-         oPA9grrsApXZZQlYYutq1M04Dwg2a86Kpg35NHFmhldqC+s3ArjOic3l5LHKBBq1Rayr
-         dDBA==
+        bh=xbpV6zrUHG8SdjGolBGW4dWv/S5zkyyPWk5MkCluUbo=;
+        b=RpPgAF1lhWexMTysOBzurLtSzdzy+xM+jbHOz83ohbaB7h60L1/zct2DptEO66+Xq6
+         sYGf6vjbzu7rwmz8wfskwygY/fm7372NR32ioVu9c8t6hc02EGdMIaprav5gGZtJjr7F
+         N6kEyd5Q+Via0DZDmNQaDmD9yXLKvx0qNjVUS+wDgz5VhOgwJPOP7qk4h9vY8bfpqAtl
+         Q9iBzz4W4G2zNpcy+9tBnr93DRQBDnvoFtJNMdZ7ztDDhXejDlK8CyQi3edlWXPt5+Uf
+         tVEzXQGwaU+UHE4iNx0MZbR35cgvGOk/SIUo0oZZySpbOGWouudloF9GuR48bwrY8VHV
+         h4kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690038036; x=1690642836;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1690039925; x=1690644725;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g5ncd2/FYlQXl3gknimMlFI7PpI0cGxp5I6NZ5Y7HdA=;
-        b=OLLhtuUySVfqO9hBbWAUd/BOBQl8EdbbgSFtsOZ8H/wBw3Ak90NQr0bRXpPRyJ6KXu
-         87S9QXcbMqpDAZuthbn3Kp8AZotrwD3TM93UrqHC2dmT0Xtq8zIQpElZh8FR7IJ1mWeO
-         A1oD6bEzzMnB2EVAmVs9TMXyMVeYj09Jl1oTKg84h9pauqcvZmge8Go5c8b3NifGmSse
-         0b9WrutYyyPw940EWEnzmcN77nf0BhKdjLWBxwIDVnyi0K+6uxDQxmyiRhcg8RuDxMnm
-         5h/Z9noBXD8GD+feiyIShlRv2VRAqqLS47P1Bg0tdpJRSkdpR7oq8PNdAbgeq03B1PV1
-         87jg==
-X-Gm-Message-State: ABy/qLb4lvlOkNhIsAbmIbdKc2jOl0JmL0V5o1mPcMQHkog/DXCKIq2X
-	balDu01A0QNRiHAU6LJdS5w=
-X-Google-Smtp-Source: APBJJlGB32DeYkZGjAgUQzkgfP2HLV5uPfInt0sXrdM/oeZ2D89nZVdHfPKFKqLffAtbIXjA0G0M+Q==
-X-Received: by 2002:a17:903:2349:b0:1b7:f611:a66b with SMTP id c9-20020a170903234900b001b7f611a66bmr4836866plh.31.1690038035837;
-        Sat, 22 Jul 2023 08:00:35 -0700 (PDT)
-Received: from smtpclient.apple ([2402:d0c0:2:a2a::1])
-        by smtp.gmail.com with ESMTPSA id w4-20020a170902a70400b001aaf2e8b1eesm5449520plq.248.2023.07.22.08.00.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 22 Jul 2023 08:00:35 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        bh=xbpV6zrUHG8SdjGolBGW4dWv/S5zkyyPWk5MkCluUbo=;
+        b=PbrJn2zY8G348ad3qMo0RQfRVl8zJFD0hIC+WUlvm1CQOgsOOrwhbjVIXKCp4g1zzI
+         mryoowL9DBaJNha1zNxSVz+U2hf7enGKz54bRD63nlsPI7PDH9MjMnHYOBMPlVQFxgDL
+         lNFqNzqfDNnzLBHgKc1SjhRYzVe9x2V8f+Q6ubSmVCGz1AKVhr81PjounVd1YzysgPzq
+         8wx4WMaSCT+2LztYHBvlt26vX6LhJInK92ldvqZmC38z68fb7klN6qLwxg30rni11JVG
+         PKw4RKCAewaFAIcGiq8OdkahAjhwFLkdRHVWoHzs3x8iD6p4iXVhmvaSOP/gDchBjxFT
+         UhnA==
+X-Gm-Message-State: ABy/qLZXe1sqeVGMbLfPWtsRB39cCMCQUywqgKzmD3hDczzxxuuyqVNS
+	3azJlVU/hsXPkr94eIMtBJCF9qaopIWILA==
+X-Google-Smtp-Source: APBJJlEB74OxIodsmCzM9hVWD8Gg4T50Xi8Elz9dTJYoBt9R3uCxrzPnTXf3p/kG0BIXbQpCRuaGNA==
+X-Received: by 2002:a81:52cd:0:b0:583:9935:b8ba with SMTP id g196-20020a8152cd000000b005839935b8bamr2237867ywb.6.1690039924711;
+        Sat, 22 Jul 2023 08:32:04 -0700 (PDT)
+Received: from firmament.home.arpa (c-73-106-204-164.hsd1.ga.comcast.net. [73.106.204.164])
+        by smtp.gmail.com with ESMTPSA id n7-20020a0de407000000b005773babc3cdsm1635300ywe.83.2023.07.22.08.32.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Jul 2023 08:32:04 -0700 (PDT)
+From: Matthew House <mattlloydhouse@gmail.com>
+To: Askar Safin <safinaskar@gmail.com>
+Cc: Alejandro Colomar <alx@kernel.org>,
+	linux-man@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: shutdown(2) is underdocumented
+Date: Sat, 22 Jul 2023 11:30:55 -0400
+Message-ID: <20230722153131.1156360-1-mattlloydhouse@gmail.com>
+In-Reply-To: <CAPnZJGCoHfwngQe5B1PgZ6kO7UK+GU7+G4vfVXxNpBZ6n-nB2g@mail.gmail.com>
+References: <CAPnZJGCoHfwngQe5B1PgZ6kO7UK+GU7+G4vfVXxNpBZ6n-nB2g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
-Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-From: Alan Huang <mmpgouride@gmail.com>
-In-Reply-To: <8e1885b62d124cca9198ff6cdb52c7f5@AcuMS.aculab.com>
-Date: Sat, 22 Jul 2023 23:00:18 +0800
-Cc: Joel Fernandes <joel@joelfernandes.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Eric Dumazet <edumazet@google.com>,
- "roman.gushchin@linux.dev" <roman.gushchin@linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "rcu@vger.kernel.org" <rcu@vger.kernel.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <04197578-4FD6-48B7-A132-2A8539E35E56@gmail.com>
-References: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
- <1E0741E0-2BD9-4FA3-BA41-4E83315A10A8@joelfernandes.org>
- <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
- <cc9b292c-99b1-bec9-ba8e-9c202b5835cd@joelfernandes.org>
- <ED9F14A2-533B-471E-9B79-F75CEEE9A216@gmail.com>
- <ED5C700E-0C63-41E5-8A46-F7BC93B2FD42@gmail.com>
- <76552616-5DF1-4A05-BA5A-AE0677F861FC@gmail.com>
- <8e1885b62d124cca9198ff6cdb52c7f5@AcuMS.aculab.com>
-To: David Laight <David.Laight@ACULAB.COM>
-X-Mailer: Apple Mail (2.3731.400.51.1.1)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Sat, Jul 22, 2023 at 8:40 AM Askar Safin <safinaskar@gmail.com> wrote:
+> shutdown(2) is underdocumented. Here is a lot of more details on
+> shutdown(2): https://github.com/WebAssembly/WASI/issues/547 . I
+> discovered them by experiment. So, please, document them
+>
+> --
+> Askar Safin
 
-> 2023=E5=B9=B47=E6=9C=8822=E6=97=A5 22:06=EF=BC=8CDavid Laight =
-<David.Laight@ACULAB.COM> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> ....
->>> Found a related discussion:
->>>=20
->>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D102714
->>>=20
->>> Looks like GCC 10, 11 have been backported, not sure whether GCC 8 =
-has been backported.
->>>=20
->>> So, I have the following questions:
->>>=20
->>> Given that some people might not update their GCC, do they need to =
-be notified?
->>>=20
->>> Do we need to CC Linus?
->>=20
->> No need.
->>=20
->> I put the following code into a kernel module:
->>=20
->> typedef struct list_head_shit {
->> int next;
->> struct list_head *first;
->> } list_head_shit;
->>=20
->> static void noinline so_shit(void) {
->> list_head_shit *head =3D (list_head_shit =
-*)kmalloc(sizeof(list_head_shit), GFP_KERNEL);
->> head->first =3D 0;
->> head->next =3D 1;
->>=20
->> READ_ONCE(head->first);
->> READ_ONCE(head->first);
->>=20
->> kfree(head);
->> }
->>=20
->> x86_64-linux-gnu-gcc-11 generate the following code:
->>=20
->> 0000000000000000 <so_shit>:
->>   0: 48 8b 3d 00 00 00 00 mov    0x0(%rip),%rdi        # 7 =
-<so_shit+0x7>
->>   7: ba 10 00 00 00        mov    $0x10,%edx
->>   c: be c0 0c 00 00       mov    $0xcc0,%esi
->>  11: e8 00 00 00 00       call   16 <so_shit+0x16>
->>  16: 48 c7 40 08 00 00 00 movq   $0x0,0x8(%rax)
->>  1d: 00
->>  1e: 48 89 c7              mov    %rax,%rdi
->>  21: c7 00 01 00 00 00     movl   $0x1,(%rax)
->>  27: 48 8b 47 08           mov    0x8(%rdi),%rax  # READ_ONCE here
->>  2b: 48 8b 47 08           mov    0x8(%rdi),%rax  # READ_ONCE here
->>  2f: e9 00 00 00 00       jmp    34 <so_shit+0x34>
->>  34: 66 66 2e 0f 1f 84 00 data16 cs nopw 0x0(%rax,%rax,1)
->>  3b: 00 00 00 00
->>  3f: 90                    nop
->>=20
->> The conclusion is that we can rely on READ_ONCE when writing kernel =
-code.
->>=20
->> The kernel=E2=80=99s READ_ONCE is different with the one Joel wrote =
-yesterday. (Joel=E2=80=99s is the same as the old
->> ACCESS_ONCE)
->=20
-> You do need to reproduce the error with code that looks like
-> the loop in the (old) udp.c code.
->=20
-> Then see if changing the implementation of READ_ONCE() from
-> a simple 'volatile' access the newer variant makes a difference.
->=20
-> You also need to check with the oldest version of gcc that is
-> still supported - that is much older than gcc 11.
->=20
-> In the udp code the volatile access was on a pointer (which should
-> qualify as a scaler type) so it may well be the inlining bug you
-> mentioned earlier, not the 'volatile on non-scaler' feature that
-> READ_ONCE() fixed.
-> That fix hasn't been back-ported to all the versions of gcc
-> that the kernel build supports.
+Documenting the asymmetry is probably a good idea: the TCP protocol only
+defines the equivalent of shutdown(SHUT_WR) and shutdown(SHUT_RDWR), and
+there's no natural equivalent of a shutdown(SHUT_RD), so I don't think the
+semantics themselves can easily be made more symmetric.
 
-Well, the same compiler, the kernel=E2=80=99s READ_ONCE:
+To expand, the current behavior, where shutdown(SHUT_RD) by itself silently
+drops incoming data received before a shutdown(SHUT_WR), but replies with a
+RST to data received after a shutdown(SHUT_WR), is definitely pretty weird,
+even looking at the relevant RFCs. tcp_rcv_state_process() in
+net/ipv4/tcp_input.c implements this behavior: a RST is sent back if and
+only if the connection is in the FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT,
+CLOSING, or LAST-ACK state (i.e., not in the ESTABLISHED state), data is
+received on the socket, and shutdown(SHUT_RD) has previously been called.
+The logic is accompanied by the comment:
 
-static int noinline foo(int a, int b, int c) {
-	b =3D a + 1;
-	c =3D READ_ONCE(b) + 1;
-	a =3D c + 1;
-	return a;
-}
+/*
+ * RFC 793 says to queue data in these states,
+ * RFC 1122 says we MUST send a reset.
+ * BSD 4.4 also does reset.
+ */
 
-0000000000000040 <foo.constprop.0>:
-  40:	b8 04 00 00 00       	mov    $0x4,%eax
-  45:	c3                   		ret
+Looking at RFC 793 Section 3.5, it defines the CLOSE operation in a
+"simplex fashion": a FIN is sent and further SENDs are no longer allowed,
+but RECEIVEs are allowed until a FIN is sent from the remote host. This
+clearly corresponds to the shutdown(SHUT_WR) operation, so it doesn't
+appear to define any particular behavior for shutdown(SHUT_RD).
 
-Example from:
+Instead, the entire justification for this behavior lies in RFC 1122
+Section 4.2.2.13:
 
-	=
-https://stackoverflow.com/questions/70380510/non-conforming-optimizations-=
-of-volatile-in-gcc-11-1
+> A host MAY implement a "half-duplex" TCP close sequence, so
+> that an application that has called CLOSE cannot continue to
+> read data from the connection.  If such a host issues a
+> CLOSE call while received data is still pending in TCP, or
+> if new data is received after CLOSE is called, its TCP
+> SHOULD send a RST to show that data was lost.
 
-Change the code to:
+And in its Discussion:
 
-static int noinline foo(int a, volatile int b, int c) {
-	b =3D a + 1;
-	c =3D b + 1;
-	a =3D c + 1;
-	return a;
-}
+> Some systems have not implemented half-closed
+> connections, presumably because they do not fit into
+> the I/O model of their particular operating system.  On
+> these systems, once an application has called CLOSE, it
+> can no longer read input data from the connection; this
+> is referred to as a "half-duplex" TCP close sequence.
 
-Doesn=E2=80=99t help.
+First off, this isn't a MUST but a SHOULD; I don't know where that idea
+came from. Second off, we reach a bit of a conflict (IMO) between the
+wording and intent of this clause. It defines the RST behavior only
+following a CLOSE operation by the application, and a CLOSE still always
+implies a shutdown(SHUT_WR). So at best, by a strict interpretation, the
+application can be given a choice between shutdown(SHUT_WR) and
+shutdown(SHUT_RDWR). Thus, Linux doesn't send any RSTs until after a
+shutdown(SHUT_WR).
 
-BTW, Clang works fine, even the function is inlined.
+However, the whole point here is "to show that data was lost", and silently
+dropping incoming data prior to a shutdown(SHUT_WR) is clearly contrary to
+this goal. Clearly, a RST isn't very nice to either host, but neither is
+lost data. So it seems at least defensible for a TCP implementation to
+unconditionally reply with a RST to data received after a
+shutdown(SHUT_RD). (As far as I know, this wouldn't break TCP itself from
+the remote host's end, since it allows hosts to send a RST whenever they
+feel like it. Higher-level protocols might be unhappy with it, though.)
 
->=20
-> David
->=20
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, =
-MK1 1PT, UK
-> Registration No: 1397386 (Wales)
+But of course, the current behavior is ancient, dating back to
+Linux 2.3.41pre2 from 2000. (Before then, a RST would only be sent after a
+full close(2).) So there's no changing it at this point in Linux, at least
+not without an explicit option. I do wonder if there are any other OSes
+that have a shutdown(SHUT_RD) with different behavior, though.
 
+Matthew House
 
