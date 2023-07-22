@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-20121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E834075DB7E
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 11:43:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051BA75DB7F
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 11:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F27CF1C210CC
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 09:43:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3EB52823ED
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 09:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EA818AF8;
-	Sat, 22 Jul 2023 09:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBB518AF5;
+	Sat, 22 Jul 2023 09:42:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D823218AF5
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 09:42:51 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 377C990
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 02:42:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A425B1D2E3
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 09:42:55 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4059390
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 02:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690018969;
+	s=mimecast20190719; t=1690018973;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m2LnNkhh+RTHSqq8pimBYYhGai6H6pMx9YKl4o2gDUY=;
-	b=TT84k9Rheoplt1iJFnpNbdBAtuGjxb5QDtU5i1SJ+MRhPtTbTpCNhbTomG+MT0201I/YZ5
-	XhG+68u9DKoYIxMJSVFcM6CG7D/JvmMIgzc+Eje6ZQScjVv22W6hj9ZTIdzQOhI4w41Bam
-	tWgVYmjxZGC55jb/8xTuu1aNV8FWS3c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-524-7a26fphiMMunP5zkyjzUZg-1; Sat, 22 Jul 2023 05:42:46 -0400
-X-MC-Unique: 7a26fphiMMunP5zkyjzUZg-1
+	bh=QytpfplDXe3dVPWGZe3l/UMpiXMk7s1GRYXiXaAWgos=;
+	b=gqoSbYgNGo9EJqKFrTCThNZuPFG3zLpS/zr81gOFIw1A9ZlhbG6OYi7fa5/q3ydSqpgcsV
+	XTUZ9nyDGrOXzBzqqvLG6NbHfDA4CH6fEplGzcMdzoCEjF7NAavobnvRDrv3SX8bFCfCQO
+	UIvUOEoXjFqCswQOVz466tQXpC6wuaE=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-527-OjVcPQbtMuWy2wce9nFwQw-1; Sat, 22 Jul 2023 05:42:48 -0400
+X-MC-Unique: OjVcPQbtMuWy2wce9nFwQw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9959D8007CE;
-	Sat, 22 Jul 2023 09:42:45 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8BA1F3C0D847;
+	Sat, 22 Jul 2023 09:42:47 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.192.19])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2C14240C6F4C;
-	Sat, 22 Jul 2023 09:42:43 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 062AC40C6F4C;
+	Sat, 22 Jul 2023 09:42:45 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Adrian Moreno <amorenoz@redhat.com>,
+Cc: Eric Garver <eric@garver.life>,
 	dev@openvswitch.org,
 	aconole@redhat.com,
 	i.maximets@ovn.org,
-	eric@garver.life
-Subject: [PATCH net-next 1/7] net: openvswitch: add datapath flow drop reason
-Date: Sat, 22 Jul 2023 11:42:31 +0200
-Message-ID: <20230722094238.2520044-2-amorenoz@redhat.com>
+	Adrian Moreno <amorenoz@redhat.com>
+Subject: [PATCH net-next 2/7] net: openvswitch: add explicit drop action
+Date: Sat, 22 Jul 2023 11:42:32 +0200
+Message-ID: <20230722094238.2520044-3-amorenoz@redhat.com>
 In-Reply-To: <20230722094238.2520044-1-amorenoz@redhat.com>
 References: <20230722094238.2520044-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -67,177 +67,165 @@ X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Create a new drop reason subsystem for openvswitch and add the first
-drop reason to represent flow drops.
+From: Eric Garver <eric@garver.life>
 
-A flow drop happens when a flow has an empty action-set or there is no
-action that consumes the packet (output, userspace, recirc, etc).
+This adds an explicit drop action. This is used by OVS to drop packets
+for which it cannot determine what to do. An explicit action in the
+kernel allows passing the reason _why_ the packet is being dropped or
+zero to indicate no particular error happened (i.e: OVS intentionally
+dropped the packet).
 
-Implementation-wise, most of these skb-consuming actions already call
-"consume_skb" internally and return directly from within the
-do_execute_actions() loop so with minimal changes we can assume that
-any skb that exits the loop normally is a packet drop.
+Since the error codes coming from userspace mean nothing for the kernel,
+we squash all of them into only two drop reasons:
+- OVS_DROP_EXPLICIT_ACTION_ERROR to indicate a non-zero value was passed
+- OVS_DROP_EXPLICIT_ACTION to indicate a zero value was passed (no
+  error)
 
+e.g. trace all OVS dropped skbs
+
+ # perf trace -e skb:kfree_skb --filter="reason >= 0x30000"
+ [..]
+ 106.023 ping/2465 skb:kfree_skb(skbaddr: 0xffffa0e8765f2000, \
+  location:0xffffffffc0d9b462, protocol: 2048, reason: 196610)
+
+reason: 196610 --> 0x30002 (OVS_DROP_EXPLICIT_ACTION)
+
+Signed-off-by: Eric Garver <eric@garver.life>
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- include/net/dropreason.h   |  6 ++++++
- net/openvswitch/actions.c  | 12 ++++++++++--
- net/openvswitch/datapath.c | 16 ++++++++++++++++
- net/openvswitch/drop.h     | 24 ++++++++++++++++++++++++
- 4 files changed, 56 insertions(+), 2 deletions(-)
- create mode 100644 net/openvswitch/drop.h
+ include/uapi/linux/openvswitch.h                     | 2 ++
+ net/openvswitch/actions.c                            | 9 +++++++++
+ net/openvswitch/drop.h                               | 2 ++
+ net/openvswitch/flow_netlink.c                       | 8 +++++++-
+ tools/testing/selftests/net/openvswitch/ovs-dpctl.py | 3 +++
+ 5 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/dropreason.h b/include/net/dropreason.h
-index 685fb37df8e8..56cb7be92244 100644
---- a/include/net/dropreason.h
-+++ b/include/net/dropreason.h
-@@ -23,6 +23,12 @@ enum skb_drop_reason_subsys {
- 	 */
- 	SKB_DROP_REASON_SUBSYS_MAC80211_MONITOR,
+diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+index e94870e77ee9..efc82c318fa2 100644
+--- a/include/uapi/linux/openvswitch.h
++++ b/include/uapi/linux/openvswitch.h
+@@ -965,6 +965,7 @@ struct check_pkt_len_arg {
+  * start of the packet or at the start of the l3 header depending on the value
+  * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
+  * argument.
++ * @OVS_ACTION_ATTR_DROP: Explicit drop action.
+  *
+  * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  Not all
+  * fields within a header are modifiable, e.g. the IPv4 protocol and fragment
+@@ -1002,6 +1003,7 @@ enum ovs_action_attr {
+ 	OVS_ACTION_ATTR_CHECK_PKT_LEN, /* Nested OVS_CHECK_PKT_LEN_ATTR_*. */
+ 	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
+ 	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
++	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
  
-+	/**
-+	 * @SKB_DROP_REASON_SUBSYS_OPENVSWITCH: openvswitch drop reasons,
-+	 * see net/openvswitch/drop.h
-+	 */
-+	SKB_DROP_REASON_SUBSYS_OPENVSWITCH,
-+
- 	/** @SKB_DROP_REASON_SUBSYS_NUM: number of subsystems defined */
- 	SKB_DROP_REASON_SUBSYS_NUM
- };
+ 	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+ 				       * from userspace. */
 diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index cab1e02b63e0..af676dcac2b4 100644
+index af676dcac2b4..194379d58b62 100644
 --- a/net/openvswitch/actions.c
 +++ b/net/openvswitch/actions.c
-@@ -27,6 +27,7 @@
- #include <net/sctp/checksum.h>
+@@ -1485,6 +1485,15 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+ 				return dec_ttl_exception_handler(dp, skb,
+ 								 key, a);
+ 			break;
++
++		case OVS_ACTION_ATTR_DROP: {
++			enum ovs_drop_reason reason = nla_get_u32(a)
++				? OVS_DROP_EXPLICIT_ACTION_ERROR
++				: OVS_DROP_EXPLICIT_ACTION;
++
++			kfree_skb_reason(skb, reason);
++			return 0;
++		}
+ 		}
  
- #include "datapath.h"
+ 		if (unlikely(err)) {
+diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
+index cdd10629c6be..f9e9c1610f6b 100644
+--- a/net/openvswitch/drop.h
++++ b/net/openvswitch/drop.h
+@@ -9,6 +9,8 @@
+ 
+ #define OVS_DROP_REASONS(R)			\
+ 	R(OVS_DROP_FLOW)		        \
++	R(OVS_DROP_EXPLICIT_ACTION)		\
++	R(OVS_DROP_EXPLICIT_ACTION_ERROR)	\
+ 	/* deliberate comment for trailing \ */
+ 
+ enum ovs_drop_reason {
+diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+index 41116361433d..244280922a14 100644
+--- a/net/openvswitch/flow_netlink.c
++++ b/net/openvswitch/flow_netlink.c
+@@ -38,6 +38,7 @@
+ #include <net/tun_proto.h>
+ #include <net/erspan.h>
+ 
 +#include "drop.h"
- #include "flow.h"
- #include "conntrack.h"
- #include "vport.h"
-@@ -1036,7 +1037,7 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
- 	if ((arg->probability != U32_MAX) &&
- 	    (!arg->probability || get_random_u32() > arg->probability)) {
- 		if (last)
--			consume_skb(skb);
-+			kfree_skb_reason(skb, OVS_DROP_FLOW);
- 		return 0;
- 	}
+ #include "flow_netlink.h"
  
-@@ -1297,6 +1298,9 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 		if (trace_ovs_do_execute_action_enabled())
- 			trace_ovs_do_execute_action(dp, skb, key, a, rem);
- 
-+		/* Actions that rightfully have to consume the skb should do it
-+		 * and return directly.
-+		 */
- 		switch (nla_type(a)) {
- 		case OVS_ACTION_ATTR_OUTPUT: {
- 			int port = nla_get_u32(a);
-@@ -1332,6 +1336,10 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 			output_userspace(dp, skb, key, a, attr,
- 						     len, OVS_CB(skb)->cutlen);
- 			OVS_CB(skb)->cutlen = 0;
-+			if (nla_is_last(a, rem)) {
-+				consume_skb(skb);
-+				return 0;
-+			}
+ struct ovs_len_tbl {
+@@ -61,6 +62,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
+ 		case OVS_ACTION_ATTR_RECIRC:
+ 		case OVS_ACTION_ATTR_TRUNC:
+ 		case OVS_ACTION_ATTR_USERSPACE:
++		case OVS_ACTION_ATTR_DROP:
  			break;
  
- 		case OVS_ACTION_ATTR_HASH:
-@@ -1485,7 +1493,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 		}
- 	}
+ 		case OVS_ACTION_ATTR_CT:
+@@ -2394,7 +2396,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
+ 	/* Whenever new actions are added, the need to update this
+ 	 * function should be considered.
+ 	 */
+-	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 23);
++	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
  
--	consume_skb(skb);
-+	kfree_skb_reason(skb, OVS_DROP_FLOW);
- 	return 0;
- }
+ 	if (!actions)
+ 		return;
+@@ -3182,6 +3184,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+ 			[OVS_ACTION_ATTR_CHECK_PKT_LEN] = (u32)-1,
+ 			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
+ 			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
++			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
+ 		};
+ 		const struct ovs_action_push_vlan *vlan;
+ 		int type = nla_type(a);
+@@ -3453,6 +3456,9 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+ 			skip_copy = true;
+ 			break;
  
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index a6d2a0b1aa21..f21ee771a4b3 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -41,6 +41,7 @@
- #include <net/pkt_cls.h>
++		case OVS_ACTION_ATTR_DROP:
++			break;
++
+ 		default:
+ 			OVS_NLERR(log, "Unknown Action type %d", type);
+ 			return -EINVAL;
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index 12ba5265b88f..61c4d7b75261 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -280,6 +280,7 @@ class ovsactions(nla):
+         ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
+         ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
+         ("OVS_ACTION_ATTR_DEC_TTL", "none"),
++        ("OVS_ACTION_ATTR_DROP", "uint32"),
+     )
  
- #include "datapath.h"
-+#include "drop.h"
- #include "flow.h"
- #include "flow_table.h"
- #include "flow_netlink.h"
-@@ -2702,6 +2703,17 @@ static struct pernet_operations ovs_net_ops = {
- 	.size = sizeof(struct ovs_net),
- };
- 
-+static const char * const ovs_drop_reasons[] = {
-+#define S(x)	#x,
-+	OVS_DROP_REASONS(S)
-+#undef S
-+};
-+
-+static struct drop_reason_list drop_reason_list_ovs = {
-+	.reasons = ovs_drop_reasons,
-+	.n_reasons = ARRAY_SIZE(ovs_drop_reasons),
-+};
-+
- static int __init dp_init(void)
- {
- 	int err;
-@@ -2743,6 +2755,9 @@ static int __init dp_init(void)
- 	if (err < 0)
- 		goto error_unreg_netdev;
- 
-+	drop_reasons_register_subsys(SKB_DROP_REASON_SUBSYS_OPENVSWITCH,
-+				     &drop_reason_list_ovs);
-+
- 	return 0;
- 
- error_unreg_netdev:
-@@ -2769,6 +2784,7 @@ static void dp_cleanup(void)
- 	ovs_netdev_exit();
- 	unregister_netdevice_notifier(&ovs_dp_device_notifier);
- 	unregister_pernet_device(&ovs_net_ops);
-+	drop_reasons_unregister_subsys(SKB_DROP_REASON_SUBSYS_OPENVSWITCH);
- 	rcu_barrier();
- 	ovs_vport_exit();
- 	ovs_flow_exit();
-diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
-new file mode 100644
-index 000000000000..cdd10629c6be
---- /dev/null
-+++ b/net/openvswitch/drop.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * OpenvSwitch drop reason list.
-+ */
-+
-+#ifndef OPENVSWITCH_DROP_H
-+#define OPENVSWITCH_DROP_H
-+#include <net/dropreason.h>
-+
-+#define OVS_DROP_REASONS(R)			\
-+	R(OVS_DROP_FLOW)		        \
-+	/* deliberate comment for trailing \ */
-+
-+enum ovs_drop_reason {
-+	__OVS_DROP_REASON = SKB_DROP_REASON_SUBSYS_OPENVSWITCH <<
-+				SKB_DROP_REASON_SUBSYS_SHIFT,
-+#define ENUM(x) x,
-+	OVS_DROP_REASONS(ENUM)
-+#undef ENUM
-+
-+	OVS_DROP_MAX,
-+};
-+
-+#endif /* OPENVSWITCH_DROP_H */
+     class ctact(nla):
+@@ -426,6 +427,8 @@ class ovsactions(nla):
+                     print_str += "recirc(0x%x)" % int(self.get_attr(field[0]))
+                 elif field[0] == "OVS_ACTION_ATTR_TRUNC":
+                     print_str += "trunc(%d)" % int(self.get_attr(field[0]))
++                elif field[0] == "OVS_ACTION_ATTR_DROP":
++                    print_str += "drop"
+             elif field[1] == "flag":
+                 if field[0] == "OVS_ACTION_ATTR_CT_CLEAR":
+                     print_str += "ct_clear"
 -- 
 2.41.0
 
