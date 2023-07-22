@@ -1,122 +1,219 @@
-Return-Path: <netdev+bounces-20142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4C075DCFC
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 16:45:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ED6275DD0C
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 17:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719901C20A01
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:45:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B884D282235
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 15:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B101E515;
-	Sat, 22 Jul 2023 14:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB771EA64;
+	Sat, 22 Jul 2023 15:00:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F621D2FD
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 14:45:44 +0000 (UTC)
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DDF9B;
-	Sat, 22 Jul 2023 07:45:43 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-635ddf49421so15943186d6.2;
-        Sat, 22 Jul 2023 07:45:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11E12908
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 15:00:38 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2321999;
+	Sat, 22 Jul 2023 08:00:37 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b895a06484so17703785ad.1;
+        Sat, 22 Jul 2023 08:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690037142; x=1690641942;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mqIzWQIELt1M29KP7P5oujEwHJFaetYOs/+klZpSQx4=;
-        b=RK8jwytlqDCMYR7DAgQlFOPgz7ZSUk9yowDalHVAkF1SqVZHI7iZ+KGKQ1yO2EqoI4
-         40U+i132HQbzSa8u/YHuXXLlkiIt4BfL1vukBpQmnnY84XgUQhZ+qNGv3zc3tu5xiSfC
-         2VwJphHgH72PCCSR51oP4D0/J4UytCvaE/JWAzJpE8RAXddUNFiEIDk1DG/KtMjym0R3
-         RhoP5njuk5nhyTVS9wE4+zgcetJQJ0SDJwerT22cHB9WNSw8SfsIVHwVhr4m3lOSsmHU
-         i125jBVVk1aTEge62OA+pCkOw8jQQTKnF2q/eH3meyfBFDn3KrLIp/WDvSvMd7NglqP/
-         vF4Q==
+        d=gmail.com; s=20221208; t=1690038036; x=1690642836;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g5ncd2/FYlQXl3gknimMlFI7PpI0cGxp5I6NZ5Y7HdA=;
+        b=L9By1tZdT51hCmdH+qnCO3iGNJzJo8BA5SYDM1YZz1SUPZJQsIA6WvILJzSwc2YE9A
+         XgIa88CtNrKlyXwMMrlJ5pO8SjWXdydWAE1F8Lw/L6brPvZDe/DuLMskOqB7J7RXl1m7
+         1V76i4eiP6fZ579XAkfpPU7jkSxOI8PBZK4253JhEbzSCZBXoygEtOXViY1w1a0M8g9B
+         DM137/2sBGNhaYyqjB1aWAi9QYQi8GHFhz/GlgNO4RLN01DkUf00l5NoU96hwlAraogG
+         oPA9grrsApXZZQlYYutq1M04Dwg2a86Kpg35NHFmhldqC+s3ArjOic3l5LHKBBq1Rayr
+         dDBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690037142; x=1690641942;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mqIzWQIELt1M29KP7P5oujEwHJFaetYOs/+klZpSQx4=;
-        b=EE3YDWwog1/s0XKrc+1MFdIJTwX4VbLKMgatwTy/9WwnQvnF2PYxW+oWVJLVDId+Vp
-         hpcvDFGHhDgmOKb2o1JSlaWl7xuWcGBjjGSsRegbCbNAiBGDnHvTgI7zTYrR45SmsCxN
-         lbFjtfNRDDczqKQzRVwDmMw0iIPmrhofbN/gqRrmUJ6KIXdDwpwOWhQERHFAQg028/vn
-         091PCkF8AOyRzJj0NMZ+u9KVDr10oliB9jVr/XxDJ8ch12VTE2LRmkYfZ+gotWLM8LJ7
-         KmUnoITeJ+E02+9mZTlEbyYoa3zdY5Iz+tEiOkT9qDAhbJrQ9NMXBj4d51W9FfhQNpgM
-         aZWg==
-X-Gm-Message-State: ABy/qLY96kxlBJP21/8JIqM6ql2s5ZcWD1x2lS6bp1lIL1JNIErnAzur
-	90uUegZijiR66614eLsASXg=
-X-Google-Smtp-Source: APBJJlErq+eRGzlcgBN48vqeyOo9IGrUh9BQBxnfTMGubwltp7kE48GP+Eoj0stwnEeM1xlAJThRkQ==
-X-Received: by 2002:a0c:8e07:0:b0:635:eff8:2b9d with SMTP id v7-20020a0c8e07000000b00635eff82b9dmr2401408qvb.27.1690037142515;
-        Sat, 22 Jul 2023 07:45:42 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id k9-20020a0cf289000000b006263a9e7c63sm61438qvl.104.2023.07.22.07.45.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Jul 2023 07:45:41 -0700 (PDT)
-Message-ID: <d40d5a96-e0af-388e-9fd5-c068b0d2896e@gmail.com>
-Date: Sat, 22 Jul 2023 07:45:35 -0700
+        d=1e100.net; s=20221208; t=1690038036; x=1690642836;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g5ncd2/FYlQXl3gknimMlFI7PpI0cGxp5I6NZ5Y7HdA=;
+        b=OLLhtuUySVfqO9hBbWAUd/BOBQl8EdbbgSFtsOZ8H/wBw3Ak90NQr0bRXpPRyJ6KXu
+         87S9QXcbMqpDAZuthbn3Kp8AZotrwD3TM93UrqHC2dmT0Xtq8zIQpElZh8FR7IJ1mWeO
+         A1oD6bEzzMnB2EVAmVs9TMXyMVeYj09Jl1oTKg84h9pauqcvZmge8Go5c8b3NifGmSse
+         0b9WrutYyyPw940EWEnzmcN77nf0BhKdjLWBxwIDVnyi0K+6uxDQxmyiRhcg8RuDxMnm
+         5h/Z9noBXD8GD+feiyIShlRv2VRAqqLS47P1Bg0tdpJRSkdpR7oq8PNdAbgeq03B1PV1
+         87jg==
+X-Gm-Message-State: ABy/qLb4lvlOkNhIsAbmIbdKc2jOl0JmL0V5o1mPcMQHkog/DXCKIq2X
+	balDu01A0QNRiHAU6LJdS5w=
+X-Google-Smtp-Source: APBJJlGB32DeYkZGjAgUQzkgfP2HLV5uPfInt0sXrdM/oeZ2D89nZVdHfPKFKqLffAtbIXjA0G0M+Q==
+X-Received: by 2002:a17:903:2349:b0:1b7:f611:a66b with SMTP id c9-20020a170903234900b001b7f611a66bmr4836866plh.31.1690038035837;
+        Sat, 22 Jul 2023 08:00:35 -0700 (PDT)
+Received: from smtpclient.apple ([2402:d0c0:2:a2a::1])
+        by smtp.gmail.com with ESMTPSA id w4-20020a170902a70400b001aaf2e8b1eesm5449520plq.248.2023.07.22.08.00.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 22 Jul 2023 08:00:35 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net-next v2 5/6] net: dsa: microchip: use wakeup-source DT
- property to enable PME output
-Content-Language: en-US
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Rob Herring <robh+dt@kernel.org>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
-References: <20230721135501.1464455-1-o.rempel@pengutronix.de>
- <20230721135501.1464455-6-o.rempel@pengutronix.de>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230721135501.1464455-6-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
+Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
+From: Alan Huang <mmpgouride@gmail.com>
+In-Reply-To: <8e1885b62d124cca9198ff6cdb52c7f5@AcuMS.aculab.com>
+Date: Sat, 22 Jul 2023 23:00:18 +0800
+Cc: Joel Fernandes <joel@joelfernandes.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ "roman.gushchin@linux.dev" <roman.gushchin@linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "rcu@vger.kernel.org" <rcu@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <04197578-4FD6-48B7-A132-2A8539E35E56@gmail.com>
+References: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
+ <1E0741E0-2BD9-4FA3-BA41-4E83315A10A8@joelfernandes.org>
+ <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
+ <cc9b292c-99b1-bec9-ba8e-9c202b5835cd@joelfernandes.org>
+ <ED9F14A2-533B-471E-9B79-F75CEEE9A216@gmail.com>
+ <ED5C700E-0C63-41E5-8A46-F7BC93B2FD42@gmail.com>
+ <76552616-5DF1-4A05-BA5A-AE0677F861FC@gmail.com>
+ <8e1885b62d124cca9198ff6cdb52c7f5@AcuMS.aculab.com>
+To: David Laight <David.Laight@ACULAB.COM>
+X-Mailer: Apple Mail (2.3731.400.51.1.1)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+> 2023=E5=B9=B47=E6=9C=8822=E6=97=A5 22:06=EF=BC=8CDavid Laight =
+<David.Laight@ACULAB.COM> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> ....
+>>> Found a related discussion:
+>>>=20
+>>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D102714
+>>>=20
+>>> Looks like GCC 10, 11 have been backported, not sure whether GCC 8 =
+has been backported.
+>>>=20
+>>> So, I have the following questions:
+>>>=20
+>>> Given that some people might not update their GCC, do they need to =
+be notified?
+>>>=20
+>>> Do we need to CC Linus?
+>>=20
+>> No need.
+>>=20
+>> I put the following code into a kernel module:
+>>=20
+>> typedef struct list_head_shit {
+>> int next;
+>> struct list_head *first;
+>> } list_head_shit;
+>>=20
+>> static void noinline so_shit(void) {
+>> list_head_shit *head =3D (list_head_shit =
+*)kmalloc(sizeof(list_head_shit), GFP_KERNEL);
+>> head->first =3D 0;
+>> head->next =3D 1;
+>>=20
+>> READ_ONCE(head->first);
+>> READ_ONCE(head->first);
+>>=20
+>> kfree(head);
+>> }
+>>=20
+>> x86_64-linux-gnu-gcc-11 generate the following code:
+>>=20
+>> 0000000000000000 <so_shit>:
+>>   0: 48 8b 3d 00 00 00 00 mov    0x0(%rip),%rdi        # 7 =
+<so_shit+0x7>
+>>   7: ba 10 00 00 00        mov    $0x10,%edx
+>>   c: be c0 0c 00 00       mov    $0xcc0,%esi
+>>  11: e8 00 00 00 00       call   16 <so_shit+0x16>
+>>  16: 48 c7 40 08 00 00 00 movq   $0x0,0x8(%rax)
+>>  1d: 00
+>>  1e: 48 89 c7              mov    %rax,%rdi
+>>  21: c7 00 01 00 00 00     movl   $0x1,(%rax)
+>>  27: 48 8b 47 08           mov    0x8(%rdi),%rax  # READ_ONCE here
+>>  2b: 48 8b 47 08           mov    0x8(%rdi),%rax  # READ_ONCE here
+>>  2f: e9 00 00 00 00       jmp    34 <so_shit+0x34>
+>>  34: 66 66 2e 0f 1f 84 00 data16 cs nopw 0x0(%rax,%rax,1)
+>>  3b: 00 00 00 00
+>>  3f: 90                    nop
+>>=20
+>> The conclusion is that we can rely on READ_ONCE when writing kernel =
+code.
+>>=20
+>> The kernel=E2=80=99s READ_ONCE is different with the one Joel wrote =
+yesterday. (Joel=E2=80=99s is the same as the old
+>> ACCESS_ONCE)
+>=20
+> You do need to reproduce the error with code that looks like
+> the loop in the (old) udp.c code.
+>=20
+> Then see if changing the implementation of READ_ONCE() from
+> a simple 'volatile' access the newer variant makes a difference.
+>=20
+> You also need to check with the oldest version of gcc that is
+> still supported - that is much older than gcc 11.
+>=20
+> In the udp code the volatile access was on a pointer (which should
+> qualify as a scaler type) so it may well be the inlining bug you
+> mentioned earlier, not the 'volatile on non-scaler' feature that
+> READ_ONCE() fixed.
+> That fix hasn't been back-ported to all the versions of gcc
+> that the kernel build supports.
 
-On 7/21/2023 6:55 AM, Oleksij Rempel wrote:
-> KSZ switches with WoL support signals wake event over PME pin. If this
-> pin is attached to some external PMIC or System Controller can't be
-> described as GPIO, the only way to describe it in the devicetree is to
-> use wakeup-source property.
+Well, the same compiler, the kernel=E2=80=99s READ_ONCE:
 
-There is a word missing in the above sentence between "System 
-Controller" and "can't be", and I believe the word is "that".
+static int noinline foo(int a, int b, int c) {
+	b =3D a + 1;
+	c =3D READ_ONCE(b) + 1;
+	a =3D c + 1;
+	return a;
+}
 
-> So, add support for this property and enable
-> PME switch output if this property is present.
+0000000000000040 <foo.constprop.0>:
+  40:	b8 04 00 00 00       	mov    $0x4,%eax
+  45:	c3                   		ret
 
-A property that "enables" something means that you are using Device Tree 
-as a way to encode some sort of policy, maybe this is  just the wording 
-here and what you would want to say is that describing the node with a 
-'wakeup-source' property indicates that the device is wake-up capable, 
-regardless of the presence/absence of an interrupt parent?
+Example from:
 
-With the commit message reworded:
+	=
+https://stackoverflow.com/questions/70380510/non-conforming-optimizations-=
+of-volatile-in-gcc-11-1
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Change the code to:
+
+static int noinline foo(int a, volatile int b, int c) {
+	b =3D a + 1;
+	c =3D b + 1;
+	a =3D c + 1;
+	return a;
+}
+
+Doesn=E2=80=99t help.
+
+BTW, Clang works fine, even the function is inlined.
+
+>=20
+> David
+>=20
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, =
+MK1 1PT, UK
+> Registration No: 1397386 (Wales)
+
 
