@@ -1,78 +1,82 @@
-Return-Path: <netdev+bounces-20129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665E275DC16
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 13:53:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D45D75DC3C
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 13:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A22C7281F69
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 11:53:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597FE28212F
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 11:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8750C18B12;
-	Sat, 22 Jul 2023 11:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D48918B16;
+	Sat, 22 Jul 2023 11:58:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7982862A
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 11:53:08 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7D93AB8;
-	Sat, 22 Jul 2023 04:52:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gpMai+RGZVHO11XO50XWI3/EZ38TmKbr58h9zhvA2Ng=; b=wLJ2lxgjKeS0A5E5folJrJ1QmX
-	ENdR+hijE1xMd2fkD0roQAMmMydabk+nSI7LKbibanWBfivtAqYdo2MPw2uXJS7Xi1zL+bi3nQCvr
-	SfZt/5QFdOl4ZT+uNXsALE4jOzaFpKUEcrtH3xBCKQJMn5RoLiGx4IWeF28Li2DxgUaY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qNBA9-001vyL-VK; Sat, 22 Jul 2023 13:52:41 +0200
-Date: Sat, 22 Jul 2023 13:52:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: o.rempel@pengutronix.de, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Woojung.Huh@microchip.com,
-	linux@armlinux.org.uk, devicetree@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net,
-	Arun.Ramadoss@microchip.com, edumazet@google.com,
-	f.fainelli@gmail.com, conor+dt@kernel.org, olteanv@gmail.com,
-	krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
-Subject: Re: [PATCH net-next v2 6/6] net: dsa: microchip: ksz9477: make
- switch MAC address configurable
-Message-ID: <95007aa6-a09b-4a05-93cb-65db405a2549@lunn.ch>
-References: <20230721135501.1464455-1-o.rempel@pengutronix.de>
- <20230721135501.1464455-7-o.rempel@pengutronix.de>
- <BYAPR11MB3558A296C1D1830F15AC6BEFEC3FA@BYAPR11MB3558.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEDD182DF
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 11:58:23 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C459735B8
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 04:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=P1sjWBAvljF5q+O7gvEynTlvQ0SC/wqvCzvqNcVGTF4=; b=PemB6vZ8LdWdkra5cYqb/K5IRP
+	N9iAFlg77WV7DFc3PdFOkUKERTBeVzhhDzeKeZcNP7H0gyM7Bmu/NatSX4JCnzk3qBzRF8IZ/WP77
+	moQeDbiAgwuKy9h2tU/8Wl1aTtcZlaoKjm5k2NLUE/hX9QnhSqDUj6CSRTdm/4iJX7xI1bSXrCXwY
+	9PyfweFT1CdGSwRwmcYaMjqPBPkz7GrM/lX2m6qIRKodF7lNB3+Y9nldaFhfQ2QUI3Ljt9wUxqHT8
+	SV/IlP1NpUFeO0cEZ39zNz8Od73vGEUVCJQ1CY3GZ1oj8XWHtf7mkpgbFQKwM+FJuew7lyfqotNYZ
+	3XXy01ng==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qNBEj-000ED1-56; Sat, 22 Jul 2023 13:57:25 +0200
+Received: from [123.243.13.99] (helo=192-168-1-114.tpgi.com.au)
+	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qNBEi-000EUD-Jz; Sat, 22 Jul 2023 13:57:25 +0200
+Subject: Re: [PATCH iproute2] include: dual license the bpf helper includes
+To: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
+References: <20230722024120.6036-1-stephen@networkplumber.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <bd1ecb37-d0bb-fc37-3036-8d57c8211e85@iogearbox.net>
+Date: Sat, 22 Jul 2023 13:57:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR11MB3558A296C1D1830F15AC6BEFEC3FA@BYAPR11MB3558.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230722024120.6036-1-stephen@networkplumber.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26977/Sat Jul 22 09:27:56 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The DSA driver used to have an API to set the MAC address to the switch,
-> but it was removed because nobody used it.
+On 7/22/23 4:41 AM, Stephen Hemminger wrote:
+> The files bpf_api.h and bpf_elf.h are useful for TC BPF programs
+> to use. And there is no requirement that those be GPL only;
+> we intend to allow BSD licensed BPF helpers as well.
+> 
+> This makes the file license same as libbpf.
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 
-That is a long time ago, when Marvell was about the only supported
-vendor. As far as i understood, it was used to set the MAC source
-address used when sending pause frames. But since pause frames are
-link local by definition, and the switches had a reasonable default,
-it was removed.
-
-    Andrew
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
