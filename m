@@ -1,77 +1,86 @@
-Return-Path: <netdev+bounces-20053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE6F75D807
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 02:08:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF0175D820
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 02:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1FE21C21850
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17CC51C21814
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748C27E;
-	Sat, 22 Jul 2023 00:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B56364;
+	Sat, 22 Jul 2023 00:19:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6928F7C
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 00:08:04 +0000 (UTC)
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF0A12F
-	for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 17:08:01 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3a1e6022b93so1732715b6e.1
-        for <netdev@vger.kernel.org>; Fri, 21 Jul 2023 17:08:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5417C
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 00:19:16 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F222106;
+	Fri, 21 Jul 2023 17:19:15 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99b78fda9a8so38276466b.1;
+        Fri, 21 Jul 2023 17:19:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689984481; x=1690589281;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jNbRoszOX00Y5Vkyqq2FIMf3+maY7HtNoM/rZH9xcMo=;
-        b=Tcl0cRKOox4/q7uVgPclGBG/JseEPng7ICuJhgg6pWA9dqFD2UQ50jqJJ55QIDu0s7
-         GI+8CvNcfEYR/Qb6lkrDr6Ox+wt1ZPEkuAEszEsUA18d80LP7or9bEGHQODhxYnRt7MQ
-         w4S0QrI7jmbeF2wthmUeqZWBV4DYX+F1Wu41ZMsjYxJOBVrB5ULtn1brTjH37nwTB6zb
-         4ly3l4b7oRG8ChlfEz5betssmeqH3sqjqkN/YKVQQT3C8CYwf2IDU1tviIumlF8nf0zF
-         inDwp8a/U2jJEFG4cV4ouhW44x362SQ8FpaZXqJcTBO0PPDxTkmspJzitLEwEmhvGSrk
-         uBRw==
+        d=gmail.com; s=20221208; t=1689985153; x=1690589953;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nTWd98NKQlQOLclRLEDjQKi8Er2TDZ8yqcwVYaUBRF4=;
+        b=g8stHENCkeGch1fB3tUCKiHvRabXfdsjLeLptdr0BrbbyAdtZt4I9bXC/FavTzCJJS
+         SRw1zCnJTCNWePs/lA379VCwb0XzmJ4fmB5n2k/qRQFrDUwvyNt+AZlkBs+A3k5sf//b
+         VXYvt5/hUzfO7MkpDVmXYfLRTDe63Ho17/57XcvIgHkX7E/ijPrjjZuwZhJmLNPZfLXt
+         hcUJIFr5pzXjKZQjbB4/xl/AASZFqEOnY+4zsG79UPpH6TDyEDZxhoIqG1ypIl1zHF6+
+         pyUwBQ29NRaLt6LJjx9WdIeEgbuGPiqDUO0JMYVNcZgew/hOYwYvVhVdCBxEbxex7+pp
+         cDRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689984481; x=1690589281;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jNbRoszOX00Y5Vkyqq2FIMf3+maY7HtNoM/rZH9xcMo=;
-        b=Hrkjw6ZpxzI3oqAajikJMrE5h72H8Df/X+7D4aRX46JfbGgI2t6p/1wQwlRQpKpxkn
-         tT/dvbX5ufw9Lak+3Jblk+vRHdXrRUXLMF3exHVQ/8YbIL70qBNx7e8K5p6nGzDayCok
-         +nzDsFyLacXEs87kxt1BhL0+/2lHlfRYZiZEW6YPs3Mcn8Vic8E9XRBoBuHPG7Xml+ps
-         e+UNfmuXnLwWlgcYr3gwK8hflyKAG1g1xtH5Jh/gu6sPTVbTixqqF5mPXNYUQXctDtpo
-         dm5XsCbTKW4b/YAyXru7/Z2MQDE2BYbGweH/ROAlhWFfgiCrvmZ8BLWJJQzWHyF5krSR
-         8/Nw==
-X-Gm-Message-State: ABy/qLZ5hqjlB0QXUodum7YQ4psczEzrSPueU/I+D46Me822Xqu9SBjv
-	Jn9q2SEOSuvBYh3BR72DT0IUri5BAXOLp7oq+MY=
-X-Google-Smtp-Source: APBJJlEKZldcZ0yN0iR7xhCvPD66e+8kFr/vSoGAYvdVoDlDgniywaHvMWEcDJ9TzVALNrYFcZuZON3Si8sjhvIB/9s=
-X-Received: by 2002:a05:6808:144d:b0:3a3:6d2a:5c4a with SMTP id
- x13-20020a056808144d00b003a36d2a5c4amr4847449oiv.35.1689984480716; Fri, 21
- Jul 2023 17:08:00 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689985153; x=1690589953;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nTWd98NKQlQOLclRLEDjQKi8Er2TDZ8yqcwVYaUBRF4=;
+        b=GE6IufzofPq57zLjeVQOBTfnl+Zg46mw8ozwBcQZlTqVtp+N/wMUiry0C1ifkjyelZ
+         BCmgPEW/369lURDvqgqq+yxT16hDc+ED+fluyI5tOIlJIXR6S8SMpfFOw9pUK7D62XQW
+         a1EGQeCdMqUPGM+1D+9kL7Tx0lDLQQShvBt3GN4tRxf3NSYgXkm4sI5DWvgbW1ENzOTK
+         RwD9tfWXzuBk5PXrkZwm6KAU0ElKKsb5rhLwobAx+VEb11en6cmb53rqFQrHFplyLpDJ
+         aRhn06QVYX81dNCnLM0wsfbXDUV3sHszYNXxRBclWWGXhA+TBzjvyL9hWeXQtfqBY2OP
+         elsw==
+X-Gm-Message-State: ABy/qLY20/bTvaTxHMwHOFVJ9Iy+rzj++ulFFq52A0wiBIsPGx5AcLcr
+	XKeYwOGvrsc8Z8GgyonEp8A=
+X-Google-Smtp-Source: APBJJlHi9BozvtizXPg1DpR0mzRtvmTtiRgsPjjjuMl3wYgM7YLVjIPj7YOOEA2UTXPHjMV80DNFrA==
+X-Received: by 2002:a17:906:10dd:b0:99b:48b9:8e45 with SMTP id v29-20020a17090610dd00b0099b48b98e45mr2994966ejv.76.1689985153306;
+        Fri, 21 Jul 2023 17:19:13 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id dk20-20020a170906f0d400b00992ab0262c9sm2817763ejb.147.2023.07.21.17.19.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 17:19:13 -0700 (PDT)
+Date: Sat, 22 Jul 2023 03:19:10 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tristram.Ha@microchip.com
+Cc: o.rempel@pengutronix.de, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Woojung.Huh@microchip.com,
+	andrew@lunn.ch, linux@armlinux.org.uk, devicetree@vger.kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net,
+	Arun.Ramadoss@microchip.com, edumazet@google.com,
+	f.fainelli@gmail.com, conor+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
+Subject: Re: [PATCH net-next v2 6/6] net: dsa: microchip: ksz9477: make
+ switch MAC address configurable
+Message-ID: <20230722001910.fst7vmvi4ktob4lt@skbuf>
+References: <20230721135501.1464455-1-o.rempel@pengutronix.de>
+ <20230721135501.1464455-7-o.rempel@pengutronix.de>
+ <BYAPR11MB3558A296C1D1830F15AC6BEFEC3FA@BYAPR11MB3558.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230721222410.17914-1-kuniyu@amazon.com>
-In-Reply-To: <20230721222410.17914-1-kuniyu@amazon.com>
-From: Amit Klein <aksecurity@gmail.com>
-Date: Sat, 22 Jul 2023 03:07:49 +0300
-Message-ID: <CANEQ_+KSPSy3cQmVf_WdkdHMaNdCh-Qyo_7M8p+qFXXqbeZWgw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: Reduce chance of collisions in inet6_hashfn().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Benjamin Herrenschmidt <benh@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Stewart Smith <trawets@amazon.com>, Samuel Mendoza-Jonas <samjonas@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR11MB3558A296C1D1830F15AC6BEFEC3FA@BYAPR11MB3558.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -79,109 +88,71 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Resending because some recipients require plaintext email. Sorry.
-Original message:
+On Fri, Jul 21, 2023 at 10:09:57PM +0000, Tristram.Ha@microchip.com wrote:
+> > The switch MAC address is used for sending pause frames and for Wake on Magic
+> > Packet. So, make use of local-mac-address property in the switch node
+> > root and configure it in the HW.
+> >
+> 
+> > @@ -1211,6 +1211,14 @@ int ksz9477_setup(struct dsa_switch *ds)
+> >         if (dev->wakeup_source)
+> >                 ksz_write8(dev, REG_SW_PME_CTRL, PME_ENABLE);
+> > 
+> > +       if (is_valid_ether_addr(dev->mac_addr)) {
+> > +               int i;
+> > +
+> > +               for (i = 0; i < ETH_ALEN; i++)
+> > +                       ksz_write8(dev, REG_SW_MAC_ADDR_0 + i,
+> > +                                  dev->mac_addr[i]);
+> > +       }
+> > +
+> 
+> > +
+> > +               mac = of_get_property(dev->dev->of_node, "local-mac-address",
+> > +                                     NULL);
+> > +               if (mac)
+> > +                       memcpy(dev->mac_addr, mac, ETH_ALEN);
+>  
+> So the Magic Packet uses the same MAC address for all KSZ9477 switches
+> if local-mac-address is not defined.  Is that practical in real operating
+> environment?
 
-This is certainly better than the original code.
+"same address" which is 00:00:00:00:00:00 AFAIU.
 
-Two remarks:
+Do you mean to ask "what do we do for systems without this device tree
+property, don't we want to support Magic Packet for them too?". If so,
+I agree, it is a valid concern (although we need to modify it anyway,
+to add "wakeup-source", apparently).
 
-1. In general, using SipHash is more secure, even if only for its
-longer key (128 bits, cf. jhash's 32 bits), which renders simple
-enumeration attacks infeasible. I understand that in a different
-context, switching from jhash to siphash incurred some overhead, but
-maybe here it won't.
+Additionally, "local-mac-address" would be overloaded with a secondary
+meaning compared to what ethernet-controller.yaml says:
 
-2. Taking a more holistic approach to __ipv6_addr_jhash(), I surveyed
-where and how it's used. In most cases, it is used for hashing
-together the IPv6 local address, foreign address and optionally some
-more data (e.g. layer 4 protocol number, layer 4 ports).
-Security-wise, it makes more sense to hash all data together once, and
-not piecewise as it's done today (i.e. today it's
-jhash(....,jhash(faddr),...), which cases the faddr into 32 bits,
-whereas the recommended way is to hash all items in their entirety,
-i.e. jhash(...,faddr,...)). This requires scrutinizing all 6
-invocations of __ipv6_addr_jhash() one by one and modifying the
-calling code accordingly.
+      Specifies the MAC address that was assigned to the network device.
 
-Thanks,
--Amit
+...which this is not.
 
-On Sat, Jul 22, 2023 at 1:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> From: Stewart Smith <trawets@amazon.com>
->
-> For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
-> table with a hash over the source & destination addresses and ports.
-> However, the IPv6 hash is insufficient and can lead to a high rate of
-> collisions.
->
-> The IPv6 hash used an XOR to fit everything into the 96 bits for the
-> fast jenkins hash, meaning it is possible for an external entity to
-> ensure the hash collides, thus falling back to a linear search in the
-> bucket, which is slow.
->
-> We take the approach of hash the full length of IPv6 address in
-> __ipv6_addr_jhash() so that all users can benefit from a more secure
-> version.
->
-> While this may look like it adds overhead, the reality of modern CPUs
-> means that this is unmeasurable in real world scenarios.
->
-> In simulating with llvm-mca, the increase in cycles for the hashing
-> code was ~16 cycles on Skylake (from a base of ~155), and an extra ~9
-> on Nehalem (base of ~173).
->
-> In commit dd6d2910c5e0 ("netfilter: conntrack: switch to siphash")
-> netfilter switched from a jenkins hash to a siphash, but even the faster
-> hsiphash is a more significant overhead (~20-30%) in some preliminary
-> testing.  So, in this patch, we keep to the more conservative approach to
-> ensure we don't add much overhead per SYN.
->
-> In testing, this results in a consistently even spread across the
-> connection buckets.  In both testing and real-world scenarios, we have
-> not found any measurable performance impact.
->
-> Fixes: 08dcdbf6a7b9 ("ipv6: use a stronger hash for tcp")
-> Signed-off-by: Stewart Smith <trawets@amazon.com>
-> Signed-off-by: Samuel Mendoza-Jonas <samjonas@amazon.com>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
-> v2:
->   * Hash all IPv6 bytes once in __ipv6_addr_jhash() instead of reusing
->     some bytes twice.
->
-> v1: https://lore.kernel.org/netdev/20230629015844.800280-1-samjonas@amazo=
-n.com/
-> ---
->  include/net/ipv6.h | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
->
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index 7332296eca44..2acc4c808d45 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -752,12 +752,8 @@ static inline u32 ipv6_addr_hash(const struct in6_ad=
-dr *a)
->  /* more secured version of ipv6_addr_hash() */
->  static inline u32 __ipv6_addr_jhash(const struct in6_addr *a, const u32 =
-initval)
->  {
-> -       u32 v =3D (__force u32)a->s6_addr32[0] ^ (__force u32)a->s6_addr3=
-2[1];
-> -
-> -       return jhash_3words(v,
-> -                           (__force u32)a->s6_addr32[2],
-> -                           (__force u32)a->s6_addr32[3],
-> -                           initval);
-> +       return jhash2((__force const u32 *)a->s6_addr32,
-> +                     ARRAY_SIZE(a->s6_addr32), initval);
->  }
->
->  static inline bool ipv6_addr_loopback(const struct in6_addr *a)
-> --
-> 2.30.2
->
+Since the switch hardware doesn't have a register per user port that
+could be kept in sync with the MAC address of the Linux interface, it
+means that the address for WOL and for flow control will always require
+a special way for the user to find out about it.
+
+I'm thinking, would it be simpler to just program the hardware with the
+MAC address of the DSA master? Every DSA master has one; we can track
+changes to it; no special device tree properties are needed; it also
+kinda makes sense as a MAC SA for flow control as well; DSA user ports
+also inherit it if they don't have a local-mac-address of their own.
+If there needs to be an override for that auto-selected MAC address, a
+device tree property can be added later, in the "microchip," namespace.
+
+But "how does the user find out what MAC address to use for WOL" still
+remains a concern, when it's stuffed in the device tree. Is there going
+to be a BIOS customized for the KSZ9477 which always fixes up the
+local-mac-address of the switch node with what's set there?
+
+> The DSA driver used to have an API to set the MAC address to the switch,
+> but it was removed because nobody used it.
+> 
+
+Which API is that? "git log -GREG_SW_MAC_ADDR_0 drivers/net/dsa/" came
+up with nothing.
 
