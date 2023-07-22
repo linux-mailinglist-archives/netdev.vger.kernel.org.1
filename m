@@ -1,96 +1,97 @@
-Return-Path: <netdev+bounces-20138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA9775DCDE
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 16:11:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2560C75DCE9
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 16:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1F01C20A99
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:11:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 585E9282014
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 14:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225571D31C;
-	Sat, 22 Jul 2023 14:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274991DDFB;
+	Sat, 22 Jul 2023 14:26:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160A81D31A
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 14:10:58 +0000 (UTC)
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB4F2D77
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 07:10:57 -0700 (PDT)
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a1e869ed0aso5374080b6e.2
-        for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 07:10:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690035057; x=1690639857;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jE88Sg/HkvkvrZgXmJzjM5EFv0iGLJWGouDm2D6gBG0=;
-        b=lZchDfoCNfBN3pAZfZ1ssbvZTsxbnsfuJ71gGDDSl6WPZLriFL/BeBeFjj2hZBFwVW
-         tz3GfVSkKz5N0EUT9ICJvbkpt/R1zrKJbD6fPEEIBF2iYuGdnqDK6ABAJle3+reqV+Qw
-         Q3WAKFMJgELQuSelr1yvK0+Ahlqg97JrVp+YmdnXkTeTNFu8OkmNdYUex4KFVRM4lBXf
-         Yub1lpKiBcJ5dq72EU7zzDCwLXQEyiK1HqBBC3fqk5ujWrb9UCD6hfZya0LAQiT7PIR6
-         Gkmh9sIbHGO/5wg+0j8+zV1AOW3f93I14pk9ooVkLjBboolebiBmUt+bmR15PIu9O1sp
-         Vwkg==
-X-Gm-Message-State: ABy/qLaoyrQKxX3EPaGqvd0/hXWcnDXO2NN6/zJRYL4YQaSLKW2brMqG
-	KktYx4pb5e/DAsvlc1eAeSSR7Jwx4skkfMHazNw55jQdTrud
-X-Google-Smtp-Source: APBJJlHNcjzpmR2IYLssdl8GbcS097gsETsQPbM2yG7animODfDOsG8U/I/F8z/rynn2gmwAZpRYWKSmMXAhkleVkG598/twLkZ7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DE44431
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 14:26:11 +0000 (UTC)
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 461ED2727
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 07:26:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=uY0o/yYycp9/jc2nXJ
+	Kgr8NSJVhRM/y4Mb9iUJRnOck=; b=EBxTk8Ocl9Yyb1eWJSKwn2YoyA2MJUTRQ5
+	iti+mxGUxczmAIwlRKaHaAovZoTBeUOykPz98WrEz6JZTYTTKDIvGOJSejvBLyFO
+	mIgQSQT1+R7ohJvP31QS3SjYhULGx1Re/jXadxL4tutUelRbTWm2LbjsNgVIIeZx
+	tgCgeqhHE=
+Received: from localhost.localdomain (unknown [202.112.113.212])
+	by zwqz-smtp-mta-g4-2 (Coremail) with SMTP id _____wAnZ4nI5rtkpTQZBA--.54732S4;
+	Sat, 22 Jul 2023 22:25:18 +0800 (CST)
+From: Yuanjun Gong <ruc_gongyuanjun@163.com>
+To: kuniyu@amazon.com
+Cc: chris.snook@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	ruc_gongyuanjun@163.com
+Subject: [PATCH net v2 1/1] atheros: fix return value check in atl1_tso()
+Date: Sat, 22 Jul 2023 22:25:11 +0800
+Message-Id: <20230722142511.12448-1-ruc_gongyuanjun@163.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230720220820.40712-1-kuniyu@amazon.com>
+References: <20230720220820.40712-1-kuniyu@amazon.com>
+X-CM-TRANSID:_____wAnZ4nI5rtkpTQZBA--.54732S4
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZFy5ZFykur1xXw4kXFWkWFg_yoWDurXEg3
+	4Ig3Z7JF4UWw15tr4UGr4UurWj9ws7WFykZFW8KFZxGrZxGry8Zw1v9FZ7AryDGr4UJr9x
+	Gw13uayUA345KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNF4iUUUUUU==
+X-Originating-IP: [202.112.113.212]
+X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/xtbBiA+05VaEF4OtXwAAsi
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:f11:b0:3a1:f3ed:e9e with SMTP id
- m17-20020a0568080f1100b003a1f3ed0e9emr9991915oiw.3.1690035057187; Sat, 22 Jul
- 2023 07:10:57 -0700 (PDT)
-Date: Sat, 22 Jul 2023 07:10:57 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003de1ad060113f3d3@google.com>
-Subject: [syzbot] Monthly dccp report (Jul 2023)
-From: syzbot <syzbot+listd0be519e02c69d098715@syzkaller.appspotmail.com>
-To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hello dccp maintainers/developers,
+in atl1_tso(), it should check the return value of pskb_trim(),
+and return an error code if an unexpected value is returned
+by pskb_trim().
 
-This is a 31-day syzbot report for the dccp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/dccp
-
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 4 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
-                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
-<2> 47      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
-                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
-<3> 9       Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
-                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
-
+Fixes: 401c0aabec4b ("atl1: simplify tx packet descriptor")
+Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/atheros/atlx/atl1.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
+index c8444bcdf527..02aa6fd8ebc2 100644
+--- a/drivers/net/ethernet/atheros/atlx/atl1.c
++++ b/drivers/net/ethernet/atheros/atlx/atl1.c
+@@ -2113,8 +2113,11 @@ static int atl1_tso(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 
+ 			real_len = (((unsigned char *)iph - skb->data) +
+ 				ntohs(iph->tot_len));
+-			if (real_len < skb->len)
+-				pskb_trim(skb, real_len);
++			if (real_len < skb->len) {
++				err = pskb_trim(skb, real_len);
++				if (err)
++					return err;
++			}
+ 			hdr_len = skb_tcp_all_headers(skb);
+ 			if (skb->len == hdr_len) {
+ 				iph->check = 0;
+-- 
+2.17.1
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
