@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-20061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C4B75D851
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 02:37:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EED975D84B
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 02:37:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0C361C21869
-	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:37:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDDD1282564
+	for <lists+netdev@lfdr.de>; Sat, 22 Jul 2023 00:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ED562D;
-	Sat, 22 Jul 2023 00:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD45A365;
+	Sat, 22 Jul 2023 00:37:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1D062B
-	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 00:37:26 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F245E35AC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FEC7F
+	for <netdev@vger.kernel.org>; Sat, 22 Jul 2023 00:37:25 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D529135AB;
 	Fri, 21 Jul 2023 17:37:22 -0700 (PDT)
 Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 461976018D;
+	by domac.alu.hr (Postfix) with ESMTP id 520BB6015F;
 	Sat, 22 Jul 2023 02:37:21 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689986241; bh=GyTx+in0QuEFu64I6/v5X/cdAZdpOWmLIok82+GgJl4=;
+	t=1689986241; bh=Bc0dIUG/XF3GLflgprZ9fOJOZFSZr/NOgaX0ho+Cj8E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m57OF3cEwRXSUI+sZv3oBxK91/5ZhUthMvF/Jujj5s4mKzjmIweTiIcgoBcfRkdsL
-	 ooFcUlVsWOltfOp9Y+d3Kg6++guHNP8N2KZcNGa9C/jAGwb8tYFsGRLEhtkI4eb1WA
-	 V+pZ40ceSK6fu62R24iVN7wwQDymQDimeNTA5KyWEd50PPgyfJXckTA1qr1mx7a9kb
-	 6r5YiA9Dsnet9UiBZT+Oc1Dx1Vh+5G23OQHVTnM41IppZdMAq5jqJn1yD6xVGLHrxm
-	 CAIq2RWeUowD682IZ2v7ulBpXzxrDUuLtfsI0mp37Zy426xEr0cS7O0ZRvO23m2lEd
-	 YKzs6ADinwjTw==
+	b=MfDNSlaUJsXJ6zY4IWcQDHeJ6wCBFZdlFx8QyQm8Jwjf/odNvPQHc8+zm/ToOzK/Y
+	 xxbR/+GlqEtt9LmKmKscUQxHUZU5DVxKlSkUAKZNrAL1XkjLq97bK386wcXJbqAyNZ
+	 v9uewOSYiMyXq8dir1+bee1yvtx4eIN7ak9muDrYn7jKwXtOeG64CAx7AjRtO8X61B
+	 Jpl6Or0Ps2XxtggyE4Z9Q67MII2dqvl3l/9xLdZrJYGZ6VCN7yelPi4YAuUDoLY/7h
+	 B8knHFMaP5r5FJl2FJOxsAFbCl8uGQZ4GUeFBCjnoMITIWBvhPkfV9TLFDZUaDCfYS
+	 cfm36jflKDwBA==
 X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
 Received: from domac.alu.hr ([127.0.0.1])
 	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id plxVHBFTzZ2k; Sat, 22 Jul 2023 02:37:19 +0200 (CEST)
+	with ESMTP id MvLS1Q3DjMCb; Sat, 22 Jul 2023 02:37:19 +0200 (CEST)
 Received: from defiant.. (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 246816015F;
+	by domac.alu.hr (Postfix) with ESMTPSA id 33E0960171;
 	Sat, 22 Jul 2023 02:37:19 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1689986239; bh=GyTx+in0QuEFu64I6/v5X/cdAZdpOWmLIok82+GgJl4=;
+	t=1689986239; bh=Bc0dIUG/XF3GLflgprZ9fOJOZFSZr/NOgaX0ho+Cj8E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=yOcoyZ5LT17jGebiILXBb4YY/in8ro87VP97TSC7RjcJfn6GIkQ82e1V7ZtVBvL+Y
-	 DohthD1Rh2+inXFdmA/3sk+hRu++i1ONjVurkltvmsZYkn1vz+6Ofk64E2WsTDP2v2
-	 uFX7zQNOIwcRuQvzygfECoXt3EbQpP2gopSPURlevv/R9YvktPSi2mVimpo7DScKNF
-	 MpktvnmOoRF/jvWWBke0SKM6ASpiSNJ+SDN77sYbNiH6ll9iXYNKf3RHWp9fOOYCl6
-	 iTJFm130YbV6NeQ2Tvq4seFgRA+Jxt2KjkZTVWOQmW0v9awjZ8ywLvDvyck186oZTv
-	 FVAT8Gi84s1ug==
+	b=bN0Huft29JSlT6o255gAqANu1pKkw9Ur3Ecin+WVVnr0CPlq8zm7SpFhMk3fIJmCI
+	 BlbbEMnz3mZBKRFJDSDoWhoCPpmS6C0gW+iWoTvDU0qC6tY5qAQ2e+TJKmp07DFhQx
+	 8N5G9TWyZAgtWFftFN+/fQNkBNjGp1O3MveE+prUi8zqwul5RtHUFVlr9o86cxLlNd
+	 b3av7367F9cezDPOuYBYrwebHScDcQXcmLO3h3UMBy9RV+MugXtNBPlvOX3oDydWc4
+	 hv2e7JusywHbzLEcbQbBnzbFjTiQXAapkdU9lBWMmqGV6gujkJkec/2k4Y/zZ5Guof
+	 qdJq0/Umd1c/w==
 From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
 To: Ido Schimmel <idosch@nvidia.com>,
 	"GitAuthor: Mirsad Todorovac" <mirsad.todorovac@alu.unizg.hr>,
@@ -59,11 +59,10 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Stephen Suryaputra <ssuryaextr@gmail.com>
-Subject: [PATCH v1 03/11] selftests: forwarding: gre_inner_v4_multipath.sh: add cleanup for SIGTERM sent by timeout
-Date: Sat, 22 Jul 2023 02:36:02 +0200
-Message-Id: <20230722003609.380549-3-mirsad.todorovac@alu.unizg.hr>
+	Shuah Khan <shuah@kernel.org>
+Subject: [PATCH v1 04/11] selftests: forwarding: gre_multipath_nh_res.sh: add cleanup for SIGTERM sent by timeout
+Date: Sat, 22 Jul 2023 02:36:03 +0200
+Message-Id: <20230722003609.380549-4-mirsad.todorovac@alu.unizg.hr>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
 References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
@@ -84,20 +83,19 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 Add trap and cleanup for SIGTERM sent by timeout and SIGINT from
 keyboard, for the test times out and leaves incoherent network stack.
 
-Fixes: 2800f2485417a ("selftests: forwarding: Test multipath hashing on inner IP pkts for GRE tunnel")
-Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+Fixes: 902280cacc036 ("selftests: forwarding: Add resilient multipath tunneling nexthop test")
 Cc: Ido Schimmel <idosch@nvidia.com>
 Cc: netdev@vger.kernel.org
 ---
- .../testing/selftests/net/forwarding/gre_inner_v4_multipath.sh  | 2 +-
+ tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh b/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh
-index e4009f658003..3b2941b9e89b 100755
---- a/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh
-+++ b/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh
-@@ -296,7 +296,7 @@ multipath_ipv4()
- 	multipath4_test "Weighted MP 11:45" 11 45
+diff --git a/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh b/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
+index 088b65e64d66..83032c165c65 100755
+--- a/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
++++ b/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
+@@ -352,7 +352,7 @@ multipath_ipv6_l4()
+ 	multipath6_l4_test "Weighted MP 11:45" 11 45
  }
  
 -trap cleanup EXIT
