@@ -1,76 +1,71 @@
-Return-Path: <netdev+bounces-20203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C3875E407
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 19:28:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA0875E41E
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 20:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC3631C20A14
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 17:28:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF30C2816A1
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F7F2114;
-	Sun, 23 Jul 2023 17:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A088C46A0;
+	Sun, 23 Jul 2023 18:10:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D711870
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 17:28:00 +0000 (UTC)
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225511B3;
-	Sun, 23 Jul 2023 10:27:59 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.west.internal (Postfix) with ESMTP id 1EC4032004AE;
-	Sun, 23 Jul 2023 13:27:55 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Sun, 23 Jul 2023 13:27:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690133274; x=1690219674; bh=9pS/poHVY3gKi
-	EOMsPaEtsBloR1fdynWZkvZgdvRBgw=; b=C8rKzsFr2XmR44yoaGMA1zaUV+5/e
-	+K4DKSax0LmJnfIPGe3KjT2Zqe+NLze9qyLEkVSA17WbzeG9bRNAOa8L9w07J5Bv
-	Egpoe/pltHkmiYjl7QOIYknO24wzxmbyewbikFZlZzG/XNI2vJE10BItijf0Ukzb
-	V1Gg2xHrkjZpRiw4SnYDbNbWIeustV4whOqKd/bFGE4AJrbNt4C+x2Mb42OY1Pgh
-	SEBM6mFy+Er8FlBjBNrVfZagZ1IYgCKk1aa2mUkCXJLhTKLYnl5zVeeaR0/m9r+q
-	Ixx5ZqDwoogER7YyAdp2IMszPz9X4dD5D+Fxb2O4Y2zzfr9++yCEdMZoQ==
-X-ME-Sender: <xms:GmO9ZDmv7LyBV8FVTU8rjLNzDsm2GN7lQ-K5tnbeDrkVABFpHFExvA>
-    <xme:GmO9ZG3ttVRAlchkVrVMBpNQCnEa2SOGRh7ud3Jt9pWkfQdZkCnaDtFpLX_FKFvPU
-    zognaKQDzatVo8>
-X-ME-Received: <xmr:GmO9ZJpdouL2b4QnQ5tf-pqyohzWCMRKxDLaAXZXKQuKpV7AUs5wdGbf00Ko>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrheeigdduuddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhephfffjeeghfejheejveehvefhteevveefgfeuudeuiedvieejiefhgeehleej
-    gfeunecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:GmO9ZLmiFXqV4OhDSySxY9u4F_mUnWbXptlKTqhDqVPmFi2dfJVzsQ>
-    <xmx:GmO9ZB1DOBgcnuk-kOLjEixcZRBAk-Wqy42J0N7QKAJlsQXJ0U7WgA>
-    <xmx:GmO9ZKs942FvFUaAkfUj3QuX0SV5CR-Xl7WGJOKS6J-3FS5uXK5T5Q>
-    <xmx:GmO9ZOms2VV35dkSkmglS2Q32iZW1huD5yJm-7PPAZyukkhfqc7C0A>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 23 Jul 2023 13:27:53 -0400 (EDT)
-Date: Sun, 23 Jul 2023 20:27:50 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH v1 01/11] selftests: forwarding:
- custom_multipath_hash.sh: add cleanup for SIGTERM sent by timeout
-Message-ID: <ZL1jFk1z3zDH7dUM@shredder>
-References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
- <ZLzj5oYrbHGvCMkq@shredder>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9475C2108
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 18:10:35 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDAFDE54
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 11:10:33 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-583f837054eso2659207b3.3
+        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 11:10:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690135833; x=1690740633;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dprTtuffGOX9oj2WDT3zrtBf8IoHwtXKeYwbtaPyTqM=;
+        b=mB62wRwRzloAk9DDOgrx2w4WlS43L0lvyaawK6Msa4HAI0zP+eTQhck0ZilbnCiN6f
+         /hnRDI2jyqy/F0z5ozaq5XeZf3Ay6749UW+nOLgRR0FKqrvJMHP7p++9KgbrXxrHTnHP
+         M1CZnNhka0bQUg26Rif8WWQnJdIEKeHGGJ8e9ODqlyoI/cKjCYoBMsd20pv5zGylfuwM
+         f8Bfux6trGJRjyXjERo3M7n3GBXOLnEzJ+h9eV0Y0YSQkuTiQgL0HeV2Ujn0Ya+zosD1
+         bhjqSioay3i8ZVmEYwmICjeovLIEWHP6V9o7Wi6MpbxY65L3HoTM9tPSHenVOgpnhffC
+         r61w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690135833; x=1690740633;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dprTtuffGOX9oj2WDT3zrtBf8IoHwtXKeYwbtaPyTqM=;
+        b=PS/Qyo5+dTFDUVl25B1gyazBmyzb1K3Rn2u2BxNJyzVPgLYrLvabS46xjXmfFiiBEW
+         0npUMQyDFs9ELGtB/QpTB+M1VvoHWnnvVJCKRi9wDhyK9lYAoWzs9nBVcWhQNHnzH0p6
+         RAOVDumX3/XwmbtTf6AynRCFe0lx2aJBsbwpmKAK2Me6dBvEwBLgYxTIUSkYruXiqDfW
+         BM4drRpHO3N+K/uFJZwTjnRtkt/U2oDiFKetcsqGhsRL122CVgex6QMbjcStiKs54PRE
+         5kEv1O3lSPycaqH71VmFOcAX5X5Vfa/eiX5BJ7Hi2UwZzlfQA+HHNoXyB6Zz8uR+JLk7
+         /RmQ==
+X-Gm-Message-State: ABy/qLZK2lh6RndlkOwwi3xKz6C5h1HKkBxuVTqHP0lnHZQUx66qf1lP
+	J288qegcLhdDWJzj2+cxnCQ=
+X-Google-Smtp-Source: APBJJlF10zg82pY1b6pZqizTXXr5sxDKh85jehCO62nICCNk2kAzsVtADpWPtEkngvWJJFbfcs+07g==
+X-Received: by 2002:a0d:ef42:0:b0:583:9018:29ec with SMTP id y63-20020a0def42000000b00583901829ecmr6374854ywe.32.1690135833167;
+        Sun, 23 Jul 2023 11:10:33 -0700 (PDT)
+Received: from localhost ([2600:1700:65a0:ab60:7684:b87a:afde:8ec6])
+        by smtp.gmail.com with ESMTPSA id u1-20020a0deb01000000b0054bfc94a10dsm2308861ywe.47.2023.07.23.11.10.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Jul 2023 11:10:32 -0700 (PDT)
+Date: Sun, 23 Jul 2023 11:10:31 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+	jiri@resnulli.us
+Subject: Re: [PATCH net-next 1/5] net/sched: wrap open coded Qdics class
+ filter counter
+Message-ID: <ZL1tF6QB2jhy1cjw@pop-os.localdomain>
+References: <20230721191332.1424997-1-pctammela@mojatatu.com>
+ <20230721191332.1424997-2-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,29 +74,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZLzj5oYrbHGvCMkq@shredder>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230721191332.1424997-2-pctammela@mojatatu.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 23, 2023 at 11:25:16AM +0300, Ido Schimmel wrote:
-> On Sat, Jul 22, 2023 at 02:36:00AM +0200, Mirsad Todorovac wrote:
-> > Add trap and cleanup for SIGTERM sent by timeout and SIGINT from
-> > keyboard, for the test times out and leaves incoherent network stack.
-> > 
-> > Fixes: 511e8db54036c ("selftests: forwarding: Add test for custom multipath hash")
-> > Cc: Ido Schimmel <idosch@nvidia.com>
-> > Cc: netdev@vger.kernel.org
-> > ---
+On Fri, Jul 21, 2023 at 04:13:28PM -0300, Pedro Tammela wrote:
+> The 'filter_cnt' counter is used to control a Qdisc class lifetime.
+> Each filter referecing this class by its id will eventually
+> increment/decrement this counter in their respective
+> 'add/update/delete' routines.
+> As these operations are always serialized under rtnl lock, we don't
+> need an atomic type like 'refcount_t'.
 > 
-> The patches are missing your Signed-off-by and a cover letter. Anyway,
-> please don't send a new version just yet. I'm not sure this is the
-> correct approach and I'm looking into it.
+> It also means that we lose the overflow/underflow checks already
+> present in refcount_t, which are valuable to hunt down bugs
+> where the unsigned counter wraps around as it aids automated tools
+> like syzkaller to scream in such situations.
+> 
+> Wrap the open coded increment/decrement into helper functions and
+> add overflow checks to the operations.
 
-Please test with the following four patches on top of net.git:
+So what's the concern of using refcount_t here? Since we have RTNL lock,
+I don't think performance is a concern.
 
-https://github.com/idosch/linux/commits/submit/sefltests_fix_v1
+I'd prefer to reuse the overflow/underflow with refcount_t than
+open-coding new ones.
+
+
+> diff --git a/include/net/tc_class.h b/include/net/tc_class.h
+> new file mode 100644
+> index 000000000000..2ab4aa2dba30
+> --- /dev/null
+> +++ b/include/net/tc_class.h
+
+Why not put these helpers togethre with other qdisc class helpers in
+include/net/sch_generic.h?
+
+Thanks.
 
