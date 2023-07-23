@@ -1,134 +1,107 @@
-Return-Path: <netdev+bounces-20164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFA4B75E041
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 09:25:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C96975E046
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 09:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF58281D4F
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 07:25:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2006281D18
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 07:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A747AECF;
-	Sun, 23 Jul 2023 07:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF053ECF;
+	Sun, 23 Jul 2023 07:31:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCA0EBD
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 07:25:50 +0000 (UTC)
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B9D1BE2
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 00:25:44 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4fdd515cebcso4891327e87.0
-        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 00:25:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=starlabs-sg.20221208.gappssmtp.com; s=20221208; t=1690097143; x=1690701943;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r0iffa6uW+CBPzOMt7qh5A0ZCk4wrtyQIY4miIwW/+0=;
-        b=At3alvTPhq5F4Y0D4mtTD6nDvaI5DBPUUD0Q2zmSotWqGMEcsSA+lhc8YPfLeeJida
-         jjnxjqM45JtjHblVJUcA57UNzbKU+M64y6ExbThwK4iAvVLMTRbONLG8DX01eyLUdKlh
-         VUpCdtXk2/rDoyezlJWMQP825DubM6mLBwQEQDRRaKrKRgT7o0kMpR8MeYZA/Ue8HBTt
-         RBR63HrJSUG1QvP5q0MDIINmxfuQvg1Nj+xqtJ5nGdjK6aiTvGQsfcxVnkgV+r5N8pd2
-         A3gDdprtegE7G8XqDS6ZI4OT7pEhzeyi2xi54KB2mqqBdYKwAoKKqbLo3SGqcO86qjaX
-         5gFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690097143; x=1690701943;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r0iffa6uW+CBPzOMt7qh5A0ZCk4wrtyQIY4miIwW/+0=;
-        b=Awk37MF2VpDZS/vKVg01QYyLLT+bMbJyGardH5qZZ55xKrPr8IurlOZNAFI8vdMMoy
-         +t+16jFepZavmHx2Kze1IRXyuchPUT/2jyEdUh9omSqf2n0n68UoF1A/i4hy9DLru9KJ
-         0ZgW5j0AC5GM7Xxb9E/h+KUxCS9WjTWxXGya4XBI+sx2VwKFg3vkjLMLiiw4nBzJ5ZDY
-         xCTi5HqNbCwkcCcYVCMAPyX32t0Zkg5ezII/RvxFN7b9/uitoRj1eDrPxJwc2U0Feccl
-         +VvJdjtoktCYbODQ+w/Z+O9jdBHQjSYM8gBmTOev6HasBgWQ0CXQ6UGnmgcvINd0Yw2q
-         IT5Q==
-X-Gm-Message-State: ABy/qLb28efzM4IJVeYc0Mh15rEANj9kdIooztLiMn9319fahRHOqxc6
-	EkhgqbjK503PcCkFVUEDxEzjYbPoLWMasnR8biNVqdfLRCfW0huFaA==
-X-Google-Smtp-Source: APBJJlE5pHWAGpA+sg4ahURxMh1Bn4nRh3BbzkFEY5cm8aoKoq3IglVu0SZaAl3Q2eVMakWjlhv0EKT/D9a1Gp1pWew=
-X-Received: by 2002:ac2:4213:0:b0:4f9:5ca0:9334 with SMTP id
- y19-20020ac24213000000b004f95ca09334mr3030974lfh.34.1690097142890; Sun, 23
- Jul 2023 00:25:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AB0EBD
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 07:31:14 +0000 (UTC)
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33B7410FA
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 00:31:13 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailout.west.internal (Postfix) with ESMTP id BA8EA320024A;
+	Sun, 23 Jul 2023 03:31:09 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Sun, 23 Jul 2023 03:31:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690097469; x=1690183869; bh=IEx9sUvXOPDDb
+	jS6gWKWNJhZ2Zyy7Nv1QdpeRBUBZeE=; b=oT07vgZDg03WvQ3D3gYPMkec4Yvdm
+	xLErGj6FTFgWDNxTjQmRalmVLQhfb8tZRMl2d8z3+n9vaVxzIYe1GshNOq79fGGX
+	hSssznMs+GxqvFSKFymnxlUBN+9mMwqD8UQu9LnOn3M8KTKcbVEylpn1foWXsMbJ
+	2ZMPax2m1cSwdX58zl2GeM26Cdhisg77fpQeXqWui/bjtlTyRhPP2bQnsRxLXjJ9
+	BN+mRhTwFLjJezjrirZ2N+zxm+28/oyGVzAwjLO5b2f7QzokG5lwlkLICZ+l+x7m
+	oPrb0u6rhHtjEC9xGyyerWNEtgTAkP/+t5O2Ztsb0c28ObcPh9TRCh9Vg==
+X-ME-Sender: <xms:Pde8ZMcrJeqUYf_ujHM022qq8VcgTQtOH71FBHzGDVVHpJLrTYZOVg>
+    <xme:Pde8ZOOJkkwIBbm9NU2G1dxYfh7DnPdIseSWMHy5flx7wPW23xR_bP952EXraVXX1
+    qvCodubtc11phI>
+X-ME-Received: <xmr:Pde8ZNj_6jB8lFCDxD5m-96X0e0R7yS74kf2xqwdOFLop-VPBL9IRPsLVAYu>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrheehgdduudelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepudevgfefffetieekffelieejjeefgfekheegveffheelhefgteejvddugeej
+    hfetnecuffhomhgrihhnpegrlhhpihhnvghlihhnuhigrdhorhhgnecuvehluhhsthgvrh
+    fuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgt
+    hhdrohhrgh
+X-ME-Proxy: <xmx:Pde8ZB9r7mUpjOyXxt4ok3R_-D1gmpmmNCkrsDBrnmjPmNWJvAfXjw>
+    <xmx:Pde8ZIs6mXnt3JFmySomcS0qjwHFj1voLaqCPldSpU8L9qubwLbYBA>
+    <xmx:Pde8ZIFr4XPXWnA6r0rLaGE3TcD6u8bRQmU4GerNgTW6txVJWQHXrg>
+    <xmx:Pde8ZB72Gj3FLaxno-LNpfesz9S2eZof2tVT6T9Sg4omAe0L5jWCbw>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 23 Jul 2023 03:31:08 -0400 (EDT)
+Date: Sun, 23 Jul 2023 10:31:05 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Trevor Gamblin <tgamblin@baylibre.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] bridge/mdb.c: include limits.h
+Message-ID: <ZLzXOR6pS/2P+BUX@shredder>
+References: <20230720203726.2316251-1-tgamblin@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230721174856.3045-1-sec@valis.email> <9a51c82f-6884-4853-8e8a-3796c9051ca8@mojatatu.com>
- <CAM0EoMkVVdHjU1aUxmjN7ah_iE2Beuwgf4r6ddxCWN5d77t-=A@mail.gmail.com>
-In-Reply-To: <CAM0EoMkVVdHjU1aUxmjN7ah_iE2Beuwgf4r6ddxCWN5d77t-=A@mail.gmail.com>
-From: M A Ramdhan <ramdhan@starlabs.sg>
-Date: Sun, 23 Jul 2023 14:25:07 +0700
-Message-ID: <CACSEBQTamxnS0w=TTJObV8f_X=9oLBWEv2xtkzWhYqWb_w+gWA@mail.gmail.com>
-Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
- and cls_route
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Pedro Tammela <pctammela@mojatatu.com>, valis <sec@valis.email>, netdev@vger.kernel.org, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, victor@mojatatu.com, 
-	billy@starlabs.sg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230720203726.2316251-1-tgamblin@baylibre.com>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 22, 2023 at 2:56=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Fri, Jul 21, 2023 at 3:00=E2=80=AFPM Pedro Tammela <pctammela@mojatatu=
-.com> wrote:
-> >
-> > On 21/07/2023 14:48, valis wrote:
-> > > Three classifiers (cls_fw, cls_u32 and cls_route) always copy
-> > > tcf_result struct into the new instance of the filter on update.
-> > >
-> > > This causes a problem when updating a filter bound to a class,
-> > > as tcf_unbind_filter() is always called on the old instance in the
-> > > success path, decreasing filter_cnt of the still referenced class
-> > > and allowing it to be deleted, leading to a use-after-free.
-> > >
-> > > This patch set fixes this issue in all affected classifiers by no lon=
-ger
-> > > copying the tcf_result struct from the old filter.
-> > >
-> > > valis (3):
-> > >    net/sched: cls_u32: No longer copy tcf_result on update to avoid
-> > >      use-after-free
-> > >    net/sched: cls_fw: No longer copy tcf_result on update to avoid
-> > >      use-after-free
-> > >    net/sched: cls_route: No longer copy tcf_result on update to avoid
-> > >      use-after-free
-> > >
-> > >   net/sched/cls_fw.c    | 1 -
-> > >   net/sched/cls_route.c | 1 -
-> > >   net/sched/cls_u32.c   | 1 -
-> > >   3 files changed, 3 deletions(-)
-> > >
-> >
-> > For the series,
-> >
-> > Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-> > Tested-by: Pedro Tammela <pctammela@mojatatu.com>
->
-> For the series:
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+On Thu, Jul 20, 2023 at 04:37:26PM -0400, Trevor Gamblin wrote:
+> While building iproute2 6.4.0 with musl using Yocto Project, errors such
+> as the following were encountered:
+> 
+> | mdb.c: In function 'mdb_parse_vni':
+> | mdb.c:666:47: error: 'ULONG_MAX' undeclared (first use in this function)
+> |   666 |         if ((endptr && *endptr) || vni_num == ULONG_MAX)
+> |       |                                               ^~~~~~~~~
+> | mdb.c:666:47: note: 'ULONG_MAX' is defined in header '<limits.h>'; did you forget to '#include <limits.h>'?
+> 
+> Include limits.h in bridge/mdb.c to fix this issue. This change is based
+> on one in Alpine Linux, but the author there had no plans to submit:
+> https://git.alpinelinux.org/aports/commit/main/iproute2/include.patch?id=bd46efb8a8da54948639cebcfa5b37bd608f1069
+> 
+> Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 
-For the series:
-Reviewed-by: M A Ramdhan <ramdhan@starlabs.sg>
-Tested-by: M A Ramdhan <ramdhan@starlabs.sg>
+Fixes: c5b327e5707b ("bridge: mdb: Add destination VNI support")
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-Regards,
-M A Ramdhan
+Similar change was done in commit dd9cc0ee81a6 ("iproute2: various
+header include fixes for compiling with musl libc").
 
->
-> cheers,
-> jamal
+Thanks
 
