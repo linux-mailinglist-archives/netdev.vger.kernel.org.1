@@ -1,75 +1,62 @@
-Return-Path: <netdev+bounces-20174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFCE375E080
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 10:25:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E152475E0AB
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 11:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 989C01C209F4
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 08:25:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9778C281C25
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 09:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C706ED8;
-	Sun, 23 Jul 2023 08:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B1B1103;
+	Sun, 23 Jul 2023 09:19:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6C3EBD
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 08:25:17 +0000 (UTC)
-Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919A9E46;
-	Sun, 23 Jul 2023 01:25:16 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.west.internal (Postfix) with ESMTP id 48EEA32003CE;
-	Sun, 23 Jul 2023 04:25:15 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Sun, 23 Jul 2023 04:25:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690100714; x=1690187114; bh=dIPYdFitpP50L
-	KtnnhqPZLbAi743uFQ8ZFjL77pDtNg=; b=x5ojDjWGPP5b52vypHfJD9zieinRr
-	VXSxGDT/7UvF7hD81HdzESl9x23kwCFWs4gTL0HXet5lLcTQqakuCH6yjr42f1UK
-	6m57sifK3luK2DSuo+ZH4Cfz1QymGSqmKe76xI3MgVgeAVzy8JPyBY2YwPlj9mPH
-	7UjMh7Euo0LsnfcbvL6IGAuk4lWm1Sv2BJ/79WcuB1YPqMgAIyKr1+IUHg4vtgrL
-	95tsh6mAoCtRMcblMICfnXP5+XpU24ZRuUI+I8K67jUmIV3pxdUec8T45F8870OU
-	wuZ8qiVZzn16hEE+yeL8cBO4CbNSsh5DGbJBcmnkQPRjXR0LFWKX1aMPQ==
-X-ME-Sender: <xms:6uO8ZL1QXcu1UCGWBvtY9TvXPFOGHPSTIgJMccDTw2q0oeZH5iLIJg>
-    <xme:6uO8ZKFKdwlCr8oCd5g_iYDWMuQazOH7B9WO5gbc98eJYcbWAuCEqus2wRn3GSQTg
-    1iSBGwK41INVok>
-X-ME-Received: <xmr:6uO8ZL7Eo5YdZHZkGxXzM10TmgDQ0iLySct2jXnJkk4BgP4mbzt96O6dP-j1>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrheeigddtfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:6uO8ZA3liK6dp5j5ODaIwRmp8l7LFlkvytvenOmjVKsz86DmBzyqiw>
-    <xmx:6uO8ZOH4Uvi4IoYIOCq7buaKmZm_E74wmcgnERsN5eqwPElXI9YXMA>
-    <xmx:6uO8ZB-6QFUaxFSdL5A8QDlqguoTcv008IzpthmyBwL9qaVareP4CA>
-    <xmx:6uO8ZB2_PHn0Mz_1zXeOTvZLWuuHuIuujDBb2lbmUO7DzEfYiAu0Vg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 23 Jul 2023 04:25:13 -0400 (EDT)
-Date: Sun, 23 Jul 2023 11:25:10 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965C01100
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 09:19:03 +0000 (UTC)
+Received: from out-34.mta1.migadu.com (out-34.mta1.migadu.com [95.215.58.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA6A1A1
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 02:19:00 -0700 (PDT)
+Date: Sun, 23 Jul 2023 19:18:33 +1000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jookia.org; s=key1;
+	t=1690103938;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IO21JPPuUrj/PlAXDeK+XBpU+sX32D1I5JxlNyZ8yxY=;
+	b=mcwgGlOY5K72c1mv4IEZ+ALhpmQdPQLC1UgX47qkA5/+JSNYwpY8Cbd4NhspuL3PWggka9
+	+Tp2jHAzGIGtZ+JuagzBwKyIzPP4siFbdcgs9wfpdyem9y9iriwEX2r/aqTGuhjvxzxVc8
+	ffa1A5ycZ+NBiAjPiudgTs4V6MapEdVyYxclJ00yN+6eNL1aELb4lfhWFJ1WSBK6Ym3pvX
+	iHirF0aGQHxKYK4bD6TTz55DuI0c8aHiu3JIsxqxZyBIlO4uLbCcLECpeLw+D+a9YodbAA
+	1kEm/i/2HNZZMAsB1qWQpVcPCfX4wgOS3u0c0vrGCvo+vo7rBRMASZjEesF1ow==
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: John Watts <contact@jookia.org>
+To: linux-sunxi@lists.linux.dev
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH v1 01/11] selftests: forwarding:
- custom_multipath_hash.sh: add cleanup for SIGTERM sent by timeout
-Message-ID: <ZLzj5oYrbHGvCMkq@shredder>
-References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 2/4] riscv: dts: allwinner: d1: Add CAN controller
+ nodes
+Message-ID: <ZLzwaQlS-l_KKpUX@titan>
+References: <20230721221552.1973203-2-contact@jookia.org>
+ <20230721221552.1973203-4-contact@jookia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,26 +65,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230721221552.1973203-4-contact@jookia.org>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 22, 2023 at 02:36:00AM +0200, Mirsad Todorovac wrote:
-> Add trap and cleanup for SIGTERM sent by timeout and SIGINT from
-> keyboard, for the test times out and leaves incoherent network stack.
-> 
-> Fixes: 511e8db54036c ("selftests: forwarding: Add test for custom multipath hash")
-> Cc: Ido Schimmel <idosch@nvidia.com>
-> Cc: netdev@vger.kernel.org
-> ---
+On Sat, Jul 22, 2023 at 08:15:51AM +1000, John Watts wrote:
+> ...
+> +			/omit-if-no-ref/
+> +			can0_pins: can0-pins {
+> +				pins = "PB2", "PB3";
+> +				function = "can0";
+> +			};
+> ...
+> +		can0: can@2504000 {
+> +			compatible = "allwinner,sun20i-d1-can";
+> +			reg = <0x02504000 0x400>;
+> +			interrupts = <SOC_PERIPHERAL_IRQ(21) IRQ_TYPE_LEVEL_HIGH>;
+> +			clocks = <&ccu CLK_BUS_CAN0>;
+> +			resets = <&ccu RST_BUS_CAN0>;
+> +			status = "disabled";
+> +		};
 
-The patches are missing your Signed-off-by and a cover letter. Anyway,
-please don't send a new version just yet. I'm not sure this is the
-correct approach and I'm looking into it.
+Just a quick late night question to people with more knowledge than me:
 
-Thanks
+These chips only have one pinctrl configuration for can0 and can1. Should the
+can nodes have this pre-set instead of the board dts doing this?
+
+I see this happening in sun4i-a10.dtsi for instance, but it also seems like it
+could become a problem when it comes to re-using the dtsi for newer chip variants.
+
+John.
 
