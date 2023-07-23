@@ -1,322 +1,142 @@
-Return-Path: <netdev+bounces-20162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E284475DF75
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 02:07:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56FF475E01C
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 08:36:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91898281DA2
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 00:07:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85413281C87
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 06:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E81536F;
-	Sun, 23 Jul 2023 00:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6FAA28;
+	Sun, 23 Jul 2023 06:36:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA4C36C;
-	Sun, 23 Jul 2023 00:06:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE215C433C8;
-	Sun, 23 Jul 2023 00:06:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690070819;
-	bh=lqNI3FthrxzR4UIE2SkVJyrmDez/g/Je8RwOANooSwU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gBAq2jfyXsJdxFNkJpod2uhwIgYgwTT4+ob/wsHXtF5u/9cikSXGr4pMbXt4O5fYE
-	 XMoImsj73V4v/j0Qq9JrRiXgXpawyyHeBet6sEGQ+bZC7RhTmO7gCduFnmzFX8G58/
-	 Ujp1L1Y7QdMGzhx2nuukUGng//TXW7bfLFHuVN2N/nLC317aen7UuETWRCOJsGmp+c
-	 9HJeIou4jyBxbmGjLhw7Ts4t9u8eQfAeNRC/JNv2k+kz8GGbzDJnBxIwpg1pBU2aB/
-	 q6VZ7LuskT7B1134vM/CbGPXqwJixp2v+AabulVJotgvWxBGqgTi4aRoBuPOvkCJl6
-	 DQEiyUPSAqthw==
-Date: Sat, 22 Jul 2023 17:06:57 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Juergen Gross <jgross@suse.com>, Jan Beulich <jbeulich@suse.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	sander44 <ionut_n2001@yahoo.com>,
-	Linux Xen <xen-devel@lists.xenproject.org>,
-	Linux BPF <bpf@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	keescook@chromium.org, gustavoars@kernel.org
-Subject: Re: Fwd: UBSAN: index 1 is out of range for type
- 'xen_netif_rx_sring_entry [1]'
-Message-ID: <20230723000657.GA878540@dev-arch.thelio-3990X>
-References: <7e3841ce-011d-5ba6-9dae-7b14e07b5c4b@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCDB373
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 06:36:04 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE3591BC7;
+	Sat, 22 Jul 2023 23:36:02 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3172144c084so2835685f8f.1;
+        Sat, 22 Jul 2023 23:36:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690094161; x=1690698961;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fWULp1Z09v1+2fHlAakWzwZrv/VdXoRTMrsIIP2c9oM=;
+        b=GTulg8USXbVDXXRM6ly4eKBRjjUBfUEIVWlNI8PKgXWaF81SmwvQ3xUOMUPN79twjE
+         PyhA+aDv6joI6cbOn3fpU5e60He7zvn/DPAXkjxUF04dckmsJbWn/msqwJi9mEhDdmdi
+         +OyHavZLtbf9/EGalrXeGtkQOBBjudFBaU2KOcDHEEoF8rNsRCx07bv1+5H6/xcf3A8Q
+         SRopIWfL22SC3foYcxFeeEuh9sqaD6tVDxE6UMZkfKXeIO1by5ejKRmV7kwtWWCztSFk
+         4gKny5d0AOLGZoCU9YGlBhOjujE/MExGCudC0mh4ldTuBVUxyD9zy8h7gxMtKGAt+rvP
+         Oc5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690094161; x=1690698961;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fWULp1Z09v1+2fHlAakWzwZrv/VdXoRTMrsIIP2c9oM=;
+        b=QMsZYtpwwYamxTLJVdZezes5IPc5SfNoQ84smJjKnh8WDpyXa5V5kr+gmnIkXKwECG
+         npYpvb7gevWrlu6XzJa56dIs3TbwtWVqzHzXe4aWghkJpBAcFGboo2X1HBvSrnzdMrMF
+         0/bLmwpwM3GuTRL9C3q5FxrbRw+Zj1Weq+6SRbppAXydbAV8qTgmqnpYx1Spdn/SQxTj
+         gbsQb9pGCwY2/m7KjSB6UbfKnJavG089ho1VQQtVSi1/r8eeGClW5+En8Frwod+Ke8vo
+         sqGHEVhHwktxeX2tFIXobFLZpTwZskvAvJ7Iys6yi237STZQCuQvlx2kv5DdNk3OD2MV
+         0MgA==
+X-Gm-Message-State: ABy/qLbJd0g0aiFV8RSaEF1MUtEeetpbwZVnHlMwGqFOQU6Wo85RpjkE
+	sLN0M9m71U/C/Vzyw9Ds+B8=
+X-Google-Smtp-Source: APBJJlG9YNmkLBeWnc+pvI9ph5YB4yCi6YR54SPLj6YxVXPOdHaAUQOZNPWzSS10tg0VPFD/q0GcGw==
+X-Received: by 2002:adf:e106:0:b0:315:8a80:329e with SMTP id t6-20020adfe106000000b003158a80329emr4470506wrz.40.1690094160991;
+        Sat, 22 Jul 2023 23:36:00 -0700 (PDT)
+Received: from [192.168.0.110] ([77.126.88.184])
+        by smtp.gmail.com with ESMTPSA id l8-20020a7bc448000000b003fb40ec9475sm6963768wmi.11.2023.07.22.23.35.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Jul 2023 23:36:00 -0700 (PDT)
+Message-ID: <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
+Date: Sun, 23 Jul 2023 09:35:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e3841ce-011d-5ba6-9dae-7b14e07b5c4b@gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
+ Christian Brauner <brauner@kernel.org>,
+ Chuck Lever III <chuck.lever@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Gal Pressman <gal@nvidia.com>,
+ ranro@nvidia.com, samiram@nvidia.com, drort@nvidia.com,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
+ <4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
+ <20230522121125.2595254-1-dhowells@redhat.com>
+ <20230522121125.2595254-9-dhowells@redhat.com>
+ <2267272.1686150217@warthog.procyon.org.uk>
+ <5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
+ <776549.1687167344@warthog.procyon.org.uk>
+ <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
+ <20230630102143.7deffc30@kernel.org>
+ <f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
+ <20230705091914.5bee12f8@kernel.org>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20230705091914.5bee12f8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,WEIRD_PORT autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Jul 22, 2023 at 07:21:05AM +0700, Bagas Sanjaya wrote:
-> Hi,
-> 
-> I notice a regression report on Bugzilla [1]. Quoting from it:
-> 
-> > Hi Kernel Team,
-> > 
-> > I rebuild today latest version from mainline repo.
-> > And i notice issue regarding xen-netfront.c.
-> > 
-> > Error:
-> > [    3.477400] ================================================================================
-> > [    3.477633] UBSAN: array-index-out-of-bounds in drivers/net/xen-netfront.c:1291:3
-> > [    3.477858] index 1 is out of range for type 'xen_netif_rx_sring_entry [1]'
-> > [    3.478085] CPU: 0 PID: 700 Comm: NetworkManager Not tainted 6.5.0-rc2-1-generation1 #3
-> > [    3.478088] Hardware name: Intel Corporation W2600CR/W2600CR, BIOS SE5C600.86B.02.06.0007.082420181029 01/13/2022
-> > [    3.478090] Call Trace:
-> > [    3.478092]  <IRQ>
-> > [    3.478097]  dump_stack_lvl+0x48/0x70
-> > [    3.478105]  dump_stack+0x10/0x20
-> > [    3.478107]  __ubsan_handle_out_of_bounds+0xc6/0x110
-> > [    3.478114]  xennet_poll+0xa94/0xac0
-> > [    3.478118]  ? generic_smp_call_function_single_interrupt+0x13/0x20
-> > [    3.478125]  __napi_poll+0x33/0x200
-> > [    3.478131]  net_rx_action+0x181/0x2e0
-> > [    3.478135]  __do_softirq+0xd9/0x346
-> > [    3.478139]  do_softirq.part.0+0x41/0x80
-> > [    3.478144]  </IRQ>
-> > [    3.478145]  <TASK>
-> > [    3.478146]  __local_bh_enable_ip+0x72/0x80
-> > [    3.478149]  _raw_spin_unlock_bh+0x1d/0x30
-> > [    3.478151]  xennet_open+0x75/0x160
-> > [    3.478154]  __dev_open+0x105/0x1d0
-> > [    3.478156]  __dev_change_flags+0x1b5/0x230
-> > [    3.478158]  dev_change_flags+0x27/0x80
-> > [    3.478160]  do_setlink+0x3d2/0x12b0
-> > [    3.478164]  ? __nla_validate_parse+0x5b/0xdb0
-> > [    3.478169]  __rtnl_newlink+0x6f6/0xb10
-> > [    3.478173]  ? rtnl_newlink+0x2f/0x80
-> > [    3.478177]  rtnl_newlink+0x48/0x80
-> > [    3.478180]  rtnetlink_rcv_msg+0x170/0x430
-> > [    3.478183]  ? fib6_clean_node+0xad/0x190
-> > [    3.478188]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-> > [    3.478191]  netlink_rcv_skb+0x5d/0x110
-> > [    3.478195]  rtnetlink_rcv+0x15/0x30
-> > [    3.478198]  netlink_unicast+0x247/0x390
-> > [    3.478200]  netlink_sendmsg+0x25e/0x4e0
-> > [    3.478202]  sock_sendmsg+0xaf/0xc0
-> > [    3.478204]  ____sys_sendmsg+0x2a9/0x350
-> > [    3.478206]  ___sys_sendmsg+0x9a/0xf0
-> > [    3.478212]  ? _copy_from_iter+0x80/0x4a0
-> > [    3.478217]  __sys_sendmsg+0x89/0xf0
-> > [    3.478220]  __x64_sys_sendmsg+0x1d/0x30
-> > [    3.478222]  do_syscall_64+0x5c/0x90
-> > [    3.478226]  ? do_syscall_64+0x68/0x90
-> > [    3.478228]  ? ksys_write+0xe6/0x100
-> > [    3.478232]  ? exit_to_user_mode_prepare+0x49/0x220
-> > [    3.478236]  ? syscall_exit_to_user_mode+0x1b/0x50
-> > [    3.478240]  ? do_syscall_64+0x68/0x90
-> > [    3.478242]  ? do_syscall_64+0x68/0x90
-> > [    3.478243]  ? irqentry_exit_to_user_mode+0x9/0x30
-> > [    3.478246]  ? irqentry_exit+0x43/0x50
-> > [    3.478248]  ? sysvec_xen_hvm_callback+0x4b/0xd0
-> > [    3.478250]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> > [    3.478253] RIP: 0033:0x7f973c244e4d
-> > [    3.478268] Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 ca ee ff ff 8b 54 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 33 44 89 c7 48 89 44 24 08 e8 fe ee ff ff 48
-> > [    3.478270] RSP: 002b:00007fff4777f470 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
-> > [    3.478273] RAX: ffffffffffffffda RBX: 00005583087c6480 RCX: 00007f973c244e4d
-> > [    3.478274] RDX: 0000000000000000 RSI: 00007fff4777f4c0 RDI: 000000000000000c
-> > [    3.478276] RBP: 00007fff4777f4c0 R08: 0000000000000000 R09: 0000000000000000
-> > [    3.478277] R10: 0000000000000000 R11: 0000000000000293 R12: 00005583087c6480
-> > [    3.478279] R13: 00007fff4777f668 R14: 00007fff4777f65c R15: 0000000000000000
-> > [    3.478283]  </TASK>
-> > [    3.478284] ================================================================================
-> > [    3.685513] ================================================================================
-> > [    3.685751] UBSAN: array-index-out-of-bounds in drivers/net/xen-netfront.c:485:7
-> > [    3.686111] index 1 is out of range for type 'xen_netif_tx_sring_entry [1]'
-> > [    3.686379] CPU: 1 PID: 697 Comm: avahi-daemon Not tainted 6.5.0-rc2-1-generation1 #3
-> > [    3.686381] Hardware name: Intel Corporation W2600CR/W2600CR, BIOS SE5C600.86B.02.06.0007.082420181029 01/13/2022
-> > [    3.686385] Call Trace:
-> > [    3.686388]  <TASK>
-> > [    3.686391]  dump_stack_lvl+0x48/0x70
-> > [    3.686399]  dump_stack+0x10/0x20
-> > [    3.686399]  __ubsan_handle_out_of_bounds+0xc6/0x110
-> > [    3.686403]  xennet_tx_setup_grant+0x1f7/0x230
-> > [    3.686403]  ? __pfx_xennet_tx_setup_grant+0x10/0x10
-> > [    3.686403]  gnttab_foreach_grant_in_range+0x5c/0x100
-> > [    3.686415]  xennet_start_xmit+0x428/0x990
-> > [    3.686415]  ? kmem_cache_alloc_node+0x1b1/0x3b0
-> > [    3.686415]  dev_hard_start_xmit+0x68/0x1e0
-> > [    3.686415]  sch_direct_xmit+0x10b/0x350
-> > [    3.686415]  __dev_queue_xmit+0x512/0xda0
-> > [    3.686439]  ? ___neigh_create+0x6cb/0x970
-> > [    3.686439]  neigh_resolve_output+0x118/0x1e0
-> > [    3.686446]  ip_finish_output2+0x181/0x540
-> > [    3.686450]  ? netif_rx_internal+0x46/0x140
-> > [    3.686456]  __ip_finish_output+0xb6/0x180
-> > [    3.686456]  ? dev_loopback_xmit+0x86/0x110
-> > [    3.686456]  ip_finish_output+0x29/0x100
-> > [    3.686456]  ip_mc_output+0x95/0x2e0
-> > [    3.686456]  ? __pfx_ip_finish_output+0x10/0x10
-> > [    3.686456]  ip_send_skb+0x9f/0xb0
-> > [    3.686456]  udp_send_skb+0x158/0x380
-> > [    3.686475]  udp_sendmsg+0xb84/0xf20
-> > [    3.686475]  ? do_sys_poll+0x3a1/0x5f0
-> > [    3.686483]  ? __pfx_ip_generic_getfrag+0x10/0x10
-> > [    3.686483]  inet_sendmsg+0x76/0x80
-> > [    3.686483]  ? inet_sendmsg+0x76/0x80
-> > [    3.686483]  sock_sendmsg+0xa8/0xc0
-> > [    3.686483]  ? _copy_from_user+0x30/0xa0
-> > [    3.686483]  ____sys_sendmsg+0x2a9/0x350
-> > [    3.686483]  ___sys_sendmsg+0x9a/0xf0
-> > [    3.686483]  __sys_sendmsg+0x89/0xf0
-> > [    3.686483]  __x64_sys_sendmsg+0x1d/0x30
-> > [    3.686483]  do_syscall_64+0x5c/0x90
-> > [    3.686483]  ? exit_to_user_mode_prepare+0x49/0x220
-> > [    3.686483]  ? syscall_exit_to_user_mode+0x1b/0x50
-> > [    3.686483]  ? do_syscall_64+0x68/0x90
-> > [    3.686483]  ? syscall_exit_to_user_mode+0x1b/0x50
-> > [    3.686483]  ? do_syscall_64+0x68/0x90
-> > [    3.686483]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> > [    3.686483] RIP: 0033:0x7ff365942e13
-> > [    3.686483] Code: 8b 15 b9 a1 00 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 64 8b 04 25 18 00 00 00 85 c0 75 14 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 55 c3 0f 1f 40 00 48 83 ec 28 89 54 24 1c 48
-> > [    3.686483] RSP: 002b:00007ffc7bf1ca78 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> > [    3.686483] RAX: ffffffffffffffda RBX: 00005596bd24c900 RCX: 00007ff365942e13
-> > [    3.686483] RDX: 0000000000000000 RSI: 00007ffc7bf1cb30 RDI: 000000000000000c
-> > [    3.686483] RBP: 000000000000000c R08: 0000000000000004 R09: 0000000000000019
-> > [    3.686483] R10: 00007ff365a1ca94 R11: 0000000000000246 R12: 00007ffc7bf1cb30
-> > [    3.686483] R13: 0000000000000002 R14: 00005596bd235f9c R15: 0000000000000000
-> > [    3.686483]  </TASK>
-> > [    3.686483] ================================================================================
-> > [    3.686858] ================================================================================
-> > [    3.687190] UBSAN: array-index-out-of-bounds in drivers/net/xen-netfront.c:413:4
-> > [    3.687501] index 1 is out of range for type 'xen_netif_tx_sring_entry [1]'
-> > [    3.687800] CPU: 18 PID: 0 Comm: swapper/18 Not tainted 6.5.0-rc2-1-generation1 #3
-> > [    3.687804] Hardware name: Intel Corporation W2600CR/W2600CR, BIOS SE5C600.86B.02.06.0007.082420181029 01/13/2022
-> > [    3.687806] Call Trace:
-> > [    3.687808]  <IRQ>
-> > [    3.687812]  dump_stack_lvl+0x48/0x70
-> > [    3.687819]  dump_stack+0x10/0x20
-> > [    3.687821]  __ubsan_handle_out_of_bounds+0xc6/0x110
-> > [    3.687827]  xennet_tx_buf_gc+0x34a/0x440
-> > [    3.687831]  xennet_handle_tx.constprop.0+0x49/0x90
-> > [    3.687834]  xennet_tx_interrupt+0x32/0x70
-> > [    3.687837]  __handle_irq_event_percpu+0x4f/0x1b0
-> > [    3.687842]  handle_irq_event+0x39/0x80
-> > [    3.687846]  handle_edge_irq+0x8c/0x230
-> > [    3.687849]  handle_irq_desc+0x40/0x60
-> > [    3.687851]  generic_handle_irq+0x1f/0x30
-> > [    3.687854]  handle_irq_for_port+0x8e/0x180
-> > [    3.687858]  ? _raw_spin_unlock_irqrestore+0x11/0x60
-> > [    3.687861]  __evtchn_fifo_handle_events+0x221/0x330
-> > [    3.687866]  evtchn_fifo_handle_events+0xe/0x20
-> > [    3.687869]  __xen_evtchn_do_upcall+0x72/0xd0
-> > [    3.687873]  xen_hvm_evtchn_do_upcall+0xe/0x20
-> > [    3.687876]  __sysvec_xen_hvm_callback+0x53/0x70
-> > [    3.687880]  sysvec_xen_hvm_callback+0x8d/0xd0
-> > [    3.687884]  </IRQ>
-> > [    3.687885]  <TASK>
-> > [    3.687886]  asm_sysvec_xen_hvm_callback+0x1b/0x20
-> > [    3.687891] RIP: 0010:pv_native_safe_halt+0xb/0x10
-> > [    3.687896] Code: 0b 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 eb 07 0f 00 2d 49 cc 33 00 fb f4 <c3> cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 55
-> > [    3.687898] RSP: 0000:ffffad85c0147e08 EFLAGS: 00000246
-> > [    3.687901] RAX: ffffffffa00d39a0 RBX: 0000000000000002 RCX: 0000000000000000
-> > [    3.687902] RDX: 0000000000000002 RSI: ffffffffa14d28e0 RDI: ffff920446abda00
-> > [    3.687904] RBP: ffffad85c0147e18 R08: 0000000000000000 R09: 0000000000000000
-> > [    3.687905] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
-> > [    3.687906] R13: 0000000000000002 R14: 0000000000000002 R15: ffffffffa14d29c8
-> > [    3.687909]  ? __pfx_intel_idle_hlt+0x10/0x10
-> > [    3.687913]  ? intel_idle_hlt+0xc/0x40
-> > [    3.687916]  cpuidle_enter_state+0xa0/0x730
-> > [    3.687920]  cpuidle_enter+0x2e/0x50
-> > [    3.687924]  call_cpuidle+0x23/0x60
-> > [    3.687928]  do_idle+0x207/0x260
-> > [    3.687932]  cpu_startup_entry+0x1d/0x20
-> > [    3.687934]  start_secondary+0x129/0x160
-> > [    3.687939]  secondary_startup_64_no_verify+0x17e/0x18b
-> > [    3.687945]  </TASK>
-> > [    3.687946] ================================================================================
-> > [    4.624607] bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
-> > [    4.629153] Bridge firewalling registered
-> > [    4.745355] Initializing XFRM netlink socket
-> > [    4.794107] loop8: detected capacity change from 0 to 8
-> > [    7.104544] rfkill: input handler disabled
-> > [   26.445163] ================================================================================
-> > [   26.445171] UBSAN: array-index-out-of-bounds in drivers/net/xen-netfront.c:807:4
-> > [   26.445175] index 109 is out of range for type 'xen_netif_tx_sring_entry [1]'
-> > [   26.445178] CPU: 8 PID: 1729 Comm: sshd Not tainted 6.5.0-rc2-1-generation1 #3
-> > [   26.445180] Hardware name: Intel Corporation W2600CR/W2600CR, BIOS SE5C600.86B.02.06.0007.082420181029 01/13/2022
-> > [   26.445181] Call Trace:
-> > [   26.445185]  <TASK>
-> > [   26.445185]  dump_stack_lvl+0x48/0x70
-> > [   26.445185]  dump_stack+0x10/0x20
-> > [   26.445200]  __ubsan_handle_out_of_bounds+0xc6/0x110
-> > [   26.445206]  xennet_start_xmit+0x932/0x990
-> > [   26.445211]  dev_hard_start_xmit+0x68/0x1e0
-> > [   26.445216]  sch_direct_xmit+0x10b/0x350
-> > [   26.445220]  __dev_queue_xmit+0x512/0xda0
-> > [   26.445224]  ip_finish_output2+0x261/0x540
-> > [   26.445225]  __ip_finish_output+0xb6/0x180
-> > [   26.445225]  ip_finish_output+0x29/0x100
-> > [   26.445234]  ip_output+0x73/0x120
-> > [   26.445234]  ? __pfx_ip_finish_output+0x10/0x10
-> > [   26.445238]  ip_local_out+0x61/0x70
-> > [   26.445238]  __ip_queue_xmit+0x18d/0x470
-> > [   26.445238]  ip_queue_xmit+0x15/0x30
-> > [   26.445238]  __tcp_transmit_skb+0xb39/0xcc0
-> > [   26.445238]  tcp_write_xmit+0x595/0x1570
-> > [   26.445238]  ? _copy_from_iter+0x80/0x4a0
-> > [   26.445256]  __tcp_push_pending_frames+0x37/0x110
-> > [   26.445259]  tcp_push+0x123/0x190
-> > [   26.445260]  tcp_sendmsg_locked+0xafe/0xed0
-> > [   26.445264]  tcp_sendmsg+0x2c/0x50
-> > [   26.445268]  inet_sendmsg+0x42/0x80
-> > [   26.445268]  sock_write_iter+0x160/0x180
-> > [   26.445274]  vfs_write+0x397/0x440
-> > [   26.445274]  ksys_write+0xc9/0x100
-> > [   26.445274]  __x64_sys_write+0x19/0x30
-> > [   26.445274]  do_syscall_64+0x5c/0x90
-> > [   26.445287]  ? syscall_exit_to_user_mode+0x1b/0x50
-> > [   26.445290]  ? do_syscall_64+0x68/0x90
-> > [   26.445290]  ? do_syscall_64+0x68/0x90
-> > [   26.445294]  ? do_syscall_64+0x68/0x90
-> > [   26.445294]  ? syscall_exit_to_user_mode+0x1b/0x50
-> > [   26.445298]  ? do_syscall_64+0x68/0x90
-> > [   26.445300]  ? exc_page_fault+0x94/0x1b0
-> > [   26.445302]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> > [   26.445306] RIP: 0033:0x7f26c4c3d473
-> > [   26.445318] Code: 8b 15 21 2a 0e 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 64 8b 04 25 18 00 00 00 85 c0 75 14 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 55 c3 0f 1f 40 00 48 83 ec 28 48 89 54 24 18
-> > [   26.445321] RSP: 002b:00007ffdee7b5528 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> > [   26.445321] RAX: ffffffffffffffda RBX: 0000000000000700 RCX: 00007f26c4c3d473
-> > [   26.445321] RDX: 0000000000000700 RSI: 000055567032e230 RDI: 0000000000000004
-> > [   26.445321] RBP: 0000555670313d70 R08: fffffffffffffff0 R09: 0000000000000000
-> > [   26.445321] R10: 0000000000000000 R11: 0000000000000246 R12: 000055566fcb2768
-> > [   26.445321] R13: 0000000000000000 R14: 0000000000000004 R15: 000055566fc67a80
-> > [   26.445332]  </TASK>
-> > [   26.445333] ================================================================================
-> 
-> See Bugzilla for the full thread and attached dmesg.
-> 
-> Anyway, I'm adding it to regzbot:
-> 
-> #regzbot introduced: 8446066bf8c1f9f https://bugzilla.kernel.org/show_bug.cgi?id=217693
-> 
-> Thanks.
-> 
-> [1]: https://bugzilla.kernel.org/show_bug.cgi?id=217693
 
-I doubt it is 8446066bf8c1f9f that causes this. Based on the comment
-next to the 'ring[1]' in DEFINE_RING_TYPES() in
-include/xen/interface/io/ring.h, this is probably caused/exposed by
-commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") in
-6.5-rc1, which causes that array to no longer be a flexible array but an
-array with one element, which would cause UBSAN to complain about an
-array access past index one. Adding Kees and Gustavo.
 
-Unfortunately, it seems this file is vendored from Xen, so I assume it
-would need to be fixed there then pulled into Linux:
+On 05/07/2023 19:19, Jakub Kicinski wrote:
+> On Tue, 4 Jul 2023 23:06:02 +0300 Tariq Toukan wrote:
+>> Unfortunately, it still repros for us.
+>>
+>> We are collecting more info on how the repro is affected by the
+>> different parameters.
+> 
+> Consider configuring kdump for your test env. Debugging is super easy
+> if one has the vmcore available.
 
-https://github.com/xen-project/xen/tree/master/xen/include/public/io/ring.h
+Hi Jakub, David,
 
-Cheers,
-Nathan
+We repro the issue on the server side using this client command:
+$ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s 
+https://2.2.2.3:20443/256000b.img
+
+Port 20443 is configured with:
+     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256;
+     sendfile    off;
+
+
+Important:
+1. Couldn't repro with files smaller than 40KB.
+2. Couldn't repro with "sendfile    on;"
+
+In addition, we collected the vmcore (forced by panic_on_warn), it can 
+be downloaded from here:
+https://drive.google.com/file/d/1Fi2dzgq6k2hb2L_kwyntRjfLF6_RmbxB/view?usp=sharing
+
+Regards,
+Tariq
 
