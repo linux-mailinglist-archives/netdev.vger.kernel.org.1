@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-20169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122DA75E059
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 09:53:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E595875E05C
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 09:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7159281D45
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 07:53:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A30C281D4B
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 07:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26BEED2;
-	Sun, 23 Jul 2023 07:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC53ED2;
+	Sun, 23 Jul 2023 07:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E730DEBD
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 07:53:08 +0000 (UTC)
-Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18E62B1
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 00:53:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11BE5EBD
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 07:55:18 +0000 (UTC)
+Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D85BCB1;
+	Sun, 23 Jul 2023 00:55:16 -0700 (PDT)
 Received: from localhost.localdomain (unknown [39.174.92.167])
-	by mail-app3 (Coremail) with SMTP id cC_KCgA3P79J3LxkwFN_Cw--.18699S4;
-	Sun, 23 Jul 2023 15:52:41 +0800 (CST)
+	by mail-app3 (Coremail) with SMTP id cC_KCgDX3w_O3LxkGlx_Cw--.18759S4;
+	Sun, 23 Jul 2023 15:54:54 +0800 (CST)
 From: Lin Ma <linma@zju.edu.cn>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	richardcochran@gmail.com,
 	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	intel-wired-lan@lists.osuosl.org,
+	martin.lau@kernel.org,
+	yhs@fb.com,
+	andrii@kernel.org,
+	void@manifault.com,
+	houtao1@huawei.com,
+	laoar.shao@gmail.com,
+	inwardvessel@gmail.com,
+	kuniyu@amazon.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
 Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v1] ice: Add length check for IFLA_AF_SPEC parsing
-Date: Sun, 23 Jul 2023 15:52:39 +0800
-Message-Id: <20230723075239.3710086-1-linma@zju.edu.cn>
+Subject: [PATCH v1] bpf: Add length check for SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
+Date: Sun, 23 Jul 2023 15:54:52 +0800
+Message-Id: <20230723075452.3711158-1-linma@zju.edu.cn>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgA3P79J3LxkwFN_Cw--.18699S4
-X-Coremail-Antispam: 1UD129KBjvJXoWrZw4DGFy5WFW5Cr4DKr1kAFb_yoW8JF45pa
-	4Dta4Ivry8Xr4fWayfXa18Zr98Wa9xtr90gF43tws5ZwnYqFn8Jr9FkF909ry8AFWYkF1a
-	yF4UCFyfZasrXFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+X-CM-TRANSID:cC_KCgDX3w_O3LxkGlx_Cw--.18759S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw43WF17XFyDXr4UGFyrXrb_yoWDtrg_ua
+	1UXa48Z3WjgFWUX3W5Gay3Xr1xKr15ZFn5C3s8tFW7Kws0vay8XF48ArZIvFy7Gr4YvF17
+	Jr98ZFyxXa1a9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbVkFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
 	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUbEksDUUUUU==
+	nxnUUI43ZEXa7VUbqNt7UUUUU==
 X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,36 +75,36 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-The nla_for_each_nested parsing in function ice_bridge_setlink() does
-not check the length of the nested attribute. This can lead to an
+The nla_for_each_nested parsing in function bpf_sk_storage_diag_alloc
+does not check the length of the nested attribute. This can lead to an
 out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
-be viewed as a 2 byte integer.
+be viewed as a 4 byte integer.
 
-This patch adds the check based on nla_len() just as other code does,
-see how bnxt_bridge_setlink (drivers/net/ethernet/broadcom/bnxt/bnxt.c)
-parses IFLA_AF_SPEC: type checking plus length checking.
+This patch adds additional check before the execution of nla_get_u32 to
+make sure the attribute has enough length.
 
-Fixes: b1edc14a3fbf ("ice: Implement ice_bridge_getlink and ice_bridge_setlink")
+Fixes: 1ed4d92458a9 ("bpf: INET_DIAG support in bpf_sk_storage")
 Signed-off-by: Lin Ma <linma@zju.edu.cn>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/core/bpf_sk_storage.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 19a5e7f3a075..85730075dcb4 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7701,6 +7701,10 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 
- 		if (nla_type(attr) != IFLA_BRIDGE_MODE)
+diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+index d4172534dfa8..6f1afbb394a6 100644
+--- a/net/core/bpf_sk_storage.c
++++ b/net/core/bpf_sk_storage.c
+@@ -511,6 +511,11 @@ bpf_sk_storage_diag_alloc(const struct nlattr *nla_stgs)
+ 		if (nla_type(nla) != SK_DIAG_BPF_STORAGE_REQ_MAP_FD)
  			continue;
+ 
++		if (nla_len(nla) < sizeof(map_fd)) {
++			err = -EINVAL;
++			goto err_free;
++		}
 +
-+		if (nla_len(attr) < sizeof(mode))
-+			return -EINVAL;
-+
- 		mode = nla_get_u16(attr);
- 		if (mode != BRIDGE_MODE_VEPA && mode != BRIDGE_MODE_VEB)
- 			return -EINVAL;
+ 		map_fd = nla_get_u32(nla);
+ 		map = bpf_map_get(map_fd);
+ 		if (IS_ERR(map)) {
 -- 
 2.17.1
 
