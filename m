@@ -1,70 +1,110 @@
-Return-Path: <netdev+bounces-20205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB8275E420
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 20:12:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A586875E437
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 20:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2B181C209D4
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:12:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 989B01C209D6
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EB446A2;
-	Sun, 23 Jul 2023 18:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD49442C;
+	Sun, 23 Jul 2023 18:50:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953001870
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 18:12:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C00EDC433C7;
-	Sun, 23 Jul 2023 18:12:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690135922;
-	bh=z9fwCDLVqEZLhDZ6M7kG674CcSknVTlUQ8OY4587WZU=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3741869
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 18:50:47 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5E13F3;
+	Sun, 23 Jul 2023 11:50:45 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id EEF6460171;
+	Sun, 23 Jul 2023 20:50:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690138231; bh=eNrWuD560AZswhvCgLs7uptVHWEPszV5AXkZsEm1AFc=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=E7EKzAn8p4FSQwCBmg6whEu3NVS5loCHf0tsQq5uN4cEhIMBHhdmnljXyG8ijQCIo
-	 tUvCTK6BzKYw0qFBPPyu8GPwp2ez+ES9flVuqcoeI0aNoRsHw8ADp3kDEcUjwUyrLt
-	 rleiV7S0Q0gHmNVY8abW3hbJ1cCz33MCbsNqps0rZ4QTxmeLDeB07bBgGG0PkC1alv
-	 BV8iVcv9misXSyjNKsSsCT3mZVeIm/FN6txnDm0/EMKsj3R26Hv3BqwxW5aBEbvMbe
-	 MBuMCnkDQeg2ZsdD6zAIAJ5kLvCE/QwmCtgkCAISve6RnrsykcChm63eNSSeAq6+50
-	 4mAJTixccoQOQ==
-Message-ID: <8c8ba9bd-875f-fe2c-caf1-6621f1ecbb92@kernel.org>
-Date: Sun, 23 Jul 2023 12:12:00 -0600
+	b=kKtW7zkPlbVYiEjfq2pAyG9eTvXD/dWqB/mgDKPn5grVXsvg1pj/XFfGqBgpgsR+y
+	 N/62sf7AOkcvHooutHKix2yXbdfjEDXbdXfW27hDJRQ0qjWis8qb9buthEXVx8mSsV
+	 jt02bHWDdNTjO57PQuGxmBbqi74QU/V73L2pr4L4mYMgFj1IqPg5s86Y59CN/fX++p
+	 q9cXBGoccxd+DY6f/wPcze/U8GT6eZGlG5/shi8clMXmL8HMpXCSPpEYNab8jouJwW
+	 lkQ6zxPE4g+9gNwa/pGZNJE7f9U9L6s0YkB7iUcW/rkiflIgMn0b6xMmEgucpLuYus
+	 QcP27dxQET2YQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id oBXA4NpgkQJv; Sun, 23 Jul 2023 20:50:29 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 3B3406015F;
+	Sun, 23 Jul 2023 20:50:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690138229; bh=eNrWuD560AZswhvCgLs7uptVHWEPszV5AXkZsEm1AFc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OB5bpdEebStwgkNUwbQbvwyYjaNk2cxHv0UmILS6m2DSDFp7ALM9qZFAbejPhRy6C
+	 2etVBk8UGrY1+gWFUBJIRJVnWd5uRyLn63lb4/PKNiIATHs6W5I36jOhV1dw5GdrWL
+	 RR3IfSTFTg2bxjy7fFYnZQkmen+t+b2mXeU0OqOfgT8dvwCeiEohkve8IHhFCMurud
+	 OvD6ptdv8uQ4/ciiAzn/puBTbbrEf71BEGVNNmkiOmQ0+J5/2C4Hp5Am+oerLT00VZ
+	 wsop0c950e/OqgDVAPp5D/BW+AjaXEN8PZnFn6wNdsmSAEjvRyaVWKR6j1ZWGa5ZNU
+	 uUmHfKYHE3Clw==
+Message-ID: <2004b5c6-6bff-88a8-a3f2-cfe95f12996b@alu.unizg.hr>
+Date: Sun, 23 Jul 2023 20:50:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCHv3 net] ipv6: do not match device when remove source route
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
+ add cleanup for SIGTERM sent by timeout
 Content-Language: en-US
-To: Ido Schimmel <idosch@idosch.org>, Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>
-References: <20230720065941.3294051-1-liuhangbin@gmail.com>
- <ZLk0/f82LfebI5OR@shredder> <ZLlJi7OUy3kwbBJ3@shredder>
- <ZLpI6YZPjmVD4r39@Laptop-X1> <ZLzhMDIayD2z4szG@shredder>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <ZLzhMDIayD2z4szG@shredder>
-Content-Type: text/plain; charset=UTF-8
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder> <ZL1jFk1z3zDH7dUM@shredder>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZL1jFk1z3zDH7dUM@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/23/23 2:13 AM, Ido Schimmel wrote:
+On 7/23/23 19:27, Ido Schimmel wrote:
+> On Sun, Jul 23, 2023 at 11:25:16AM +0300, Ido Schimmel wrote:
+>> On Sat, Jul 22, 2023 at 02:36:00AM +0200, Mirsad Todorovac wrote:
+>>> Add trap and cleanup for SIGTERM sent by timeout and SIGINT from
+>>> keyboard, for the test times out and leaves incoherent network stack.
+>>>
+>>> Fixes: 511e8db54036c ("selftests: forwarding: Add test for custom multipath hash")
+>>> Cc: Ido Schimmel <idosch@nvidia.com>
+>>> Cc: netdev@vger.kernel.org
+>>> ---
+>>
+>> The patches are missing your Signed-off-by and a cover letter. Anyway,
+>> please don't send a new version just yet. I'm not sure this is the
+>> correct approach and I'm looking into it.
 > 
-> I don't know, but when I checked the code and tested it I noticed that
-> the kernel doesn't care on which interface the address is configured.
-> Therefore, in order for deletion to be consistent with addition and with
-> IPv4, the preferred source address shouldn't be removed from routes in
-> the VRF table as long as the address is configured on one of the
-> interfaces in the VRF.
+> Please test with the following four patches on top of net.git:
 > 
+> https://github.com/idosch/linux/commits/submit/sefltests_fix_v1
 
-Deleting routes associated with device 2 when an address is deleted from
-device 1 is going to introduce as many problems as it solves. The VRF
-use case is one example.
+Will do. Just applying.
+
+However, I have upgraded to iproute2-next, maybe the error message should
+give a hint on that, too ... That might relieve the pressure on developers
+answering always the same questions ...
+
+Kind regards,
+Mirsad
 
