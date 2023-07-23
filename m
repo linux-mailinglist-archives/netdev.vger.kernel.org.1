@@ -1,112 +1,283 @@
-Return-Path: <netdev+bounces-20207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C464175E43C
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 20:54:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7749E75E472
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 21:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 077002814C5
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:54:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20EBE281557
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 19:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BC046AD;
-	Sun, 23 Jul 2023 18:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E498046B7;
+	Sun, 23 Jul 2023 19:20:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67252108
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 18:54:16 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E4ADD;
-	Sun, 23 Jul 2023 11:54:15 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id B85CC60171;
-	Sun, 23 Jul 2023 20:54:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690138453; bh=HE8dH2TxQcCO0dn0F5uZh3uzgF6puo8d0Es9W0bVdxA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ESZiSEXsSZ8GX0wjE2dPEynswzqG5bnTzdktFz4uBugZUNUbivOuua2l4HkVg7s7P
-	 C4VXht2g6Nnjs0kTLlfW83qESwv797Nm7OFd7kHMNY/+Z/wJwEda0yg6aIvMguhhoT
-	 v98EqxkTboyPgR1YplUijS3uexK7VEZnCaCruTIeyn+GfdJgFYWlFq6Gf8tkMzSsc+
-	 spuyiq26aIdRrSYqi2EuO7dqYVevPtTwg1xM4+b9gGdWdJrxjgZ11VMzm+ObuPTaTt
-	 6uY4vttihIGjwx8wezTqXFNr9jDJ2//yLXBlFHNbwTTFaJUVjdxUpiW30AILACiny+
-	 rvwvEkStFxzwg==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3F3czHrlMqIT; Sun, 23 Jul 2023 20:54:11 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 052746015F;
-	Sun, 23 Jul 2023 20:54:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690138451; bh=HE8dH2TxQcCO0dn0F5uZh3uzgF6puo8d0Es9W0bVdxA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gs4+JUeuK/JAKEj5nSXmcwg6nLBUC/DkvNNdlGQWMv7nSyTURfvQuHYtyyaHqnpyA
-	 5l/3YqykSvYjUOeYmqA5Q39WjjauTojI6+bniYb+DOb0Dhfb8CjF60yqiQhr64oPsF
-	 2H9sriEbd+1Lb6rkBbT3XZCDomMdOWdIFO+i6SNwnDnq6tJNvIsA5k/9jLru622PlP
-	 np6WtK4UkC15YyJlhvIGUivO2Am1n5lnJ8FlUIaIGLikaPk2bo00u/3Fnmhfie0Fdp
-	 GPxKqaZ2RdUkuZFoxutuDf1A3LhitPJfg7ojHpEu9yotZZb2fJlojFRK3hNI35Ut42
-	 3mr78NSzxDfFA==
-Message-ID: <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
-Date: Sun, 23 Jul 2023 20:54:10 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82922F51
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 19:20:40 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305DE1BC;
+	Sun, 23 Jul 2023 12:20:39 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b703a0453fso51372151fa.3;
+        Sun, 23 Jul 2023 12:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690140037; x=1690744837;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k4aytIQn94twcjyotrD+oqBf+KXoIbhRWHt21ZbgVkA=;
+        b=NLIoC0HdDwhnOq/2MGCe7NKNvlaDjuy1kJ+zaXbBsYxD+92/+X2ucmIL5TvHe/DjRa
+         XFOn1u0epuH+Uwgo8JAP4uxrAKp99TIM4/iVUbVM5mvmDtZUz2rLyacdozI2RHWL8W88
+         rfYoT1KLt0fTQUO4csPqpAwssF9D6/NRwN8TR6yGuespxOZ2/rOibs81lrXwnCT5+dex
+         EnXrEuvNoDSKa6BeCtqGPg8ZBG8Jjh8LoIrNcvPpdrjJ21Iv/1oIc60JB0j2Qlg2pOaV
+         Bqs8bl1u9koVljId4Ha0viIfYqYnwJbJP8+RIrYTRDUZ1j1eC3qaN/5cfFk0OaLbrTpu
+         A8Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690140037; x=1690744837;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k4aytIQn94twcjyotrD+oqBf+KXoIbhRWHt21ZbgVkA=;
+        b=b0eBWbw+ocA4AAIhXdV+UPUqHCkVq+4nEUGgx2EZC8/nInrSH2BLol4r55eUs/9T8X
+         BN2pjnurHOziEBSJ9yzTV8RIrELOd1FOtUISQNbYFwnIKyiY/UujWAhjkOrKidMZWWfD
+         2o0n6qz7HqhhOheK7O20dZ9wF6PGc24KpDvEn/BjKDPG/yUjG4Y4w78SrVXLvGZcQE5H
+         bG+o3OOs9BZxDvZ/k44nBBS4k3X0BwEDzEde34gZYZBhSpIwt5dDAZORGwezVC3ui2R9
+         H1fLbXwI+H2KX14BBzgQwX2mBJUnGQ7nePe7WpWL1Qw1441QTOsTss1tK/4VwMi0WRZn
+         mHWw==
+X-Gm-Message-State: ABy/qLbn6loDZoDzju6aXGNs4pZxWZqzB/pps0TI/wKXOOkp1d1Romot
+	ySf8XkZP/UmvOJIMNGvhU/Y+B1dIDHfVUT1f
+X-Google-Smtp-Source: APBJJlG96kkoAL2pjuWgX3xVE8F8hsZ//4boP8R3WgU2DoYazDce8oqYb7elEGBXFu19JeNWWzC0Mg==
+X-Received: by 2002:a05:6512:3d93:b0:4fb:9d61:db44 with SMTP id k19-20020a0565123d9300b004fb9d61db44mr4745078lfv.12.1690140037029;
+        Sun, 23 Jul 2023 12:20:37 -0700 (PDT)
+Received: from localhost.localdomain (95-24-145-175.broadband.corbina.ru. [95.24.145.175])
+        by smtp.googlemail.com with ESMTPSA id q7-20020ac24a67000000b004fde831f86esm1139687lfp.142.2023.07.23.12.20.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Jul 2023 12:20:36 -0700 (PDT)
+From: Ivan Mikhaylov <fr0st61te@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Po-Yu Chuang <ratbert@faraday-tech.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Ivan Mikhaylov <fr0st61te@gmail.com>
+Subject: [PATCH v2] dt-bindings: net: ftgmac100: convert to yaml version from txt
+Date: Sun, 23 Jul 2023 22:20:30 +0300
+Message-ID: <20230723192030.33642-1-fr0st61te@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
- add cleanup for SIGTERM sent by timeout
-Content-Language: en-US
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>
-References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
- <ZLzj5oYrbHGvCMkq@shredder>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <ZLzj5oYrbHGvCMkq@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Conversion from ftgmac100.txt to yaml format version.
 
+Signed-off-by: Ivan Mikhaylov <fr0st61te@gmail.com>
+---
+ .../bindings/net/faraday,ftgmac100.yaml       | 103 ++++++++++++++++++
+ .../devicetree/bindings/net/ftgmac100.txt     |  67 ------------
+ 2 files changed, 103 insertions(+), 67 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/ftgmac100.txt
 
-On 7/23/23 10:25, Ido Schimmel wrote:
-> On Sat, Jul 22, 2023 at 02:36:00AM +0200, Mirsad Todorovac wrote:
->> Add trap and cleanup for SIGTERM sent by timeout and SIGINT from
->> keyboard, for the test times out and leaves incoherent network stack.
->>
->> Fixes: 511e8db54036c ("selftests: forwarding: Add test for custom multipath hash")
->> Cc: Ido Schimmel <idosch@nvidia.com>
->> Cc: netdev@vger.kernel.org
->> ---
-> 
-> The patches are missing your Signed-off-by and a cover letter. Anyway,
-> please don't send a new version just yet. I'm not sure this is the
-> correct approach and I'm looking into it.
-> 
-> Thanks
+diff --git a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+new file mode 100644
+index 000000000000..92686caf251f
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+@@ -0,0 +1,103 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/faraday,ftgmac100.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Faraday Technology FTGMAC100 gigabit ethernet controller
++
++allOf:
++  - $ref: ethernet-controller.yaml#
++
++maintainers:
++  - Po-Yu Chuang <ratbert@faraday-tech.com>
++
++properties:
++  compatible:
++    oneOf:
++      - const: faraday,ftgmac100
++      - items:
++          - enum:
++              - aspeed,ast2400-mac
++              - aspeed,ast2500-mac
++              - aspeed,ast2600-mac
++          - const: faraday,ftgmac100
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    minItems: 1
++    items:
++      - description: MAC IP clock
++      - description: RMII RCLK gate for AST2500/2600
++
++  clock-names:
++    minItems: 1
++    maxItems: 2
++    contains:
++      enum:
++        - MACCLK
++        - RCLK
++
++  phy-mode:
++    enum:
++      - rgmii
++      - rmii
++
++  phy-handle: true
++
++  use-ncsi:
++    description:
++      Use the NC-SI stack instead of an MDIO PHY. Currently assumes
++      rmii (100bT) but kept as a separate property in case NC-SI grows support
++      for a gigabit link.
++    type: boolean
++
++  no-hw-checksum:
++    description:
++      Used to disable HW checksum support. Here for backward
++      compatibility as the driver now should have correct defaults based on
++      the SoC.
++    type: boolean
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mac0: ethernet@1e660000 {
++        compatible = "aspeed,ast2500-mac", "faraday,ftgmac100";
++        reg = <0x1e660000 0x180>;
++        interrupts = <2>;
++        use-ncsi;
++    };
++
++    mac1: ethernet@1e680000 {
++        compatible = "aspeed,ast2500-mac", "faraday,ftgmac100";
++        reg = <0x1e680000 0x180>;
++        interrupts = <2>;
++
++        phy-handle = <&phy>;
++        phy-mode = "rgmii";
++
++        mdio {
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            phy: ethernet-phy@1 {
++                compatible = "ethernet-phy-ieee802.3-c22";
++                reg = <1>;
++            };
++        };
++    };
+diff --git a/Documentation/devicetree/bindings/net/ftgmac100.txt b/Documentation/devicetree/bindings/net/ftgmac100.txt
+deleted file mode 100644
+index 29234021f601..000000000000
+--- a/Documentation/devicetree/bindings/net/ftgmac100.txt
++++ /dev/null
+@@ -1,67 +0,0 @@
+-* Faraday Technology FTGMAC100 gigabit ethernet controller
+-
+-Required properties:
+-- compatible: "faraday,ftgmac100"
+-
+-  Must also contain one of these if used as part of an Aspeed AST2400
+-  or 2500 family SoC as they have some subtle tweaks to the
+-  implementation:
+-
+-     - "aspeed,ast2400-mac"
+-     - "aspeed,ast2500-mac"
+-     - "aspeed,ast2600-mac"
+-
+-- reg: Address and length of the register set for the device
+-- interrupts: Should contain ethernet controller interrupt
+-
+-Optional properties:
+-- phy-handle: See ethernet.txt file in the same directory.
+-- phy-mode: See ethernet.txt file in the same directory. If the property is
+-  absent, "rgmii" is assumed. Supported values are "rgmii*" and "rmii" for
+-  aspeed parts. Other (unknown) parts will accept any value.
+-- use-ncsi: Use the NC-SI stack instead of an MDIO PHY. Currently assumes
+-  rmii (100bT) but kept as a separate property in case NC-SI grows support
+-  for a gigabit link.
+-- no-hw-checksum: Used to disable HW checksum support. Here for backward
+-  compatibility as the driver now should have correct defaults based on
+-  the SoC.
+-- clocks: In accordance with the generic clock bindings. Must describe the MAC
+-  IP clock, and optionally an RMII RCLK gate for the AST2500/AST2600. The
+-  required MAC clock must be the first cell.
+-- clock-names:
+-
+-      - "MACCLK": The MAC IP clock
+-      - "RCLK": Clock gate for the RMII RCLK
+-
+-Optional subnodes:
+-- mdio: See mdio.txt file in the same directory.
+-
+-Example:
+-
+-	mac0: ethernet@1e660000 {
+-		compatible = "aspeed,ast2500-mac", "faraday,ftgmac100";
+-		reg = <0x1e660000 0x180>;
+-		interrupts = <2>;
+-		use-ncsi;
+-	};
+-
+-Example with phy-handle:
+-
+-	mac1: ethernet@1e680000 {
+-		compatible = "aspeed,ast2500-mac", "faraday,ftgmac100";
+-		reg = <0x1e680000 0x180>;
+-		interrupts = <2>;
+-
+-		phy-handle = <&phy>;
+-		phy-mode = "rgmii";
+-
+-		mdio {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-
+-			phy: ethernet-phy@1 {
+-				compatible = "ethernet-phy-ieee802.3-c22";
+-				reg = <1>;
+-			};
+-		};
+-	};
+-- 
+2.41.0
 
-Sure thing. What a blunder, just when I thought I had the perfect patches.
-
-Still, I think it is the way da go for all the test programs, to catch the
-SIGINT and SIGTERM ...
-
-This way, I need to reboot the system before running the tests on a clean
-slate ...
-
-Kind regards,
-Mirsad
 
