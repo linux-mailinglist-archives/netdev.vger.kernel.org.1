@@ -1,265 +1,244 @@
-Return-Path: <netdev+bounces-20184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6639E75E2CF
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 17:08:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1399675E2E5
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 17:41:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734821C2099F
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 15:08:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683492817B7
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 15:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494A11879;
-	Sun, 23 Jul 2023 15:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B451877;
+	Sun, 23 Jul 2023 15:41:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DEF1C35
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 15:07:35 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B802FA
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 08:07:33 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-52227884855so913198a12.1
-        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 08:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1690124851; x=1690729651;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GEc9euFEeaN2LOx71f0ruznOJAiMTwjsoaciaFbgqt0=;
-        b=cj3NZzAiM9ofKEZ0Mvd0r8MPdICmm1gpUfdlfHdiGZzsP5ZWhqtWLG6xjIFUtyvZU2
-         FvXax1CjYYcRYhXXhqkcyw4Pht0DLLlfRcRAfFKGBrTdNGtH1bRIoW8emVafpD17JgYR
-         acikaMwq3ztfl7CSVb63XCkw1Ow/zbUkre8ao=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690124851; x=1690729651;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GEc9euFEeaN2LOx71f0ruznOJAiMTwjsoaciaFbgqt0=;
-        b=amkn3SHhBR8xsPl227Vw+hVJxs1Cv/BFkA1LWEi3aJZVox4PM1khlTLZMNpAzJ7IlV
-         7Lk0i9Roa+H9NS8pc3piCU8lIAb78fAxuuyQtaiEZQFcNZZ/fwwViNPsHCD6c7cvGEHw
-         9sME5Fu89tHYZ68/RM/1Z9EyLuz9ou0VcB7D0ODvh3H7F1itfhBmn6+Gapz9Dua0EAhM
-         +ZRIO3UX82d3sSNNHWlTuP7Kyf9t3+wOlIsD/xEBHiyjQN4FGi2f+uScnpZjZdgFr0ie
-         +rszP7y6NVyrMIgiVr6kdaf6WxV6zlzCYGQTyctTban+PcBq9xEv/wBNkHA7tlt5TK17
-         JVFw==
-X-Gm-Message-State: ABy/qLatmIdM89tK3OcZ2fZK6CC+r974PS8hsKvNsDO+0BrK5m+ATDza
-	glaQ0GcPZNMXAs3gwWbMfA7XIPxG0ezT4VVgBr5eq84MsUXtrtK19r1OoZnGQdCJYxpJMHnsVJA
-	xoHTkq6g1NyIz6yxIXX6wlffoOmk1Ol9qMeFt0HfySzWB0p4dEp+HW7sf3lYpEPZVryvhwCsC3x
-	3d
-X-Google-Smtp-Source: APBJJlGzbZcbLgL11cNMQhdBE0LOVo6Nzm3pFcfi0GArBOrvnGw4LOVoD0Sy4HUnyFvcRjyhsHvcSA==
-X-Received: by 2002:a17:906:1098:b0:982:a454:6d20 with SMTP id u24-20020a170906109800b00982a4546d20mr7326815eju.54.1690124851416;
-        Sun, 23 Jul 2023 08:07:31 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id t10-20020a1709064f0a00b009929d998abcsm5227691eju.209.2023.07.23.08.07.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jul 2023 08:07:31 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	ecree@solarflare.com,
-	andrew@lunn.ch,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	leon@kernel.org,
-	pabeni@redhat.com,
-	bhutchings@solarflare.com,
-	arnd@arndb.de
-Cc: linux-kernel@vger.kernel.org,
-	Joe Damato <jdamato@fastly.com>
-Subject: [net 2/2] net/mlx5: Fix flowhash key set/get for custom RSS
-Date: Sun, 23 Jul 2023 15:06:58 +0000
-Message-Id: <20230723150658.241597-3-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230723150658.241597-1-jdamato@fastly.com>
-References: <20230723150658.241597-1-jdamato@fastly.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AB71858
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 15:41:50 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70D7E4A
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 08:41:48 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qNbCn-0000p7-Na; Sun, 23 Jul 2023 17:41:09 +0200
+Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qNbCj-0005tl-ST; Sun, 23 Jul 2023 17:41:05 +0200
+Date: Sun, 23 Jul 2023 17:41:05 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Ziqi Zhao <astrajoan@yahoo.com>
+Cc: davem@davemloft.net, edumazet@google.com, ivan.orlov0322@gmail.com,
+	kernel@pengutronix.de, kuba@kernel.org, linux@rempel-privat.de,
+	linux-can@vger.kernel.org, mkl@pengutronix.de, pabeni@redhat.com,
+	robin@protonic.nl, skhan@linuxfoundation.org,
+	socketcan@hartkopp.net, arnd@arndb.de,
+	bridge@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+	mudongliangabcd@gmail.com, netdev@vger.kernel.org,
+	nikolay@nvidia.com, roopa@nvidia.com,
+	syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com
+Subject: Re: [PATCH] can: j1939: prevent deadlock by changing
+ j1939_socks_lock to rwlock
+Message-ID: <20230723154105.GB17320@pengutronix.de>
+References: <20230704064710.3189-1-astrajoan@yahoo.com>
+ <20230721162226.8639-1-astrajoan@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230721162226.8639-1-astrajoan@yahoo.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-mlx5 flow hash field retrieval and set only worked on the default
-RSS context, not custom RSS contexts.
+Hi,
 
-For example, before this patch attempting to retrieve the flow hash fields
-for RSS context 1 fails:
+Thank you for you patch. Right now I'm on vacation, I'll to take a look
+on it as soon as possible. If i do not response for more then 3 weeks,
+please ping me.
 
-$ sudo ethtool -u eth1 rx-flow-hash tcp4 context 1
-Cannot get RX network flow hashing options: Invalid argument
+On Fri, Jul 21, 2023 at 09:22:26AM -0700, Ziqi Zhao wrote:
+> The following 3 locks would race against each other, causing the
+> deadlock situation in the Syzbot bug report:
+> 
+> - j1939_socks_lock
+> - active_session_list_lock
+> - sk_session_queue_lock
+> 
+> A reasonable fix is to change j1939_socks_lock to an rwlock, since in
+> the rare situations where a write lock is required for the linked list
+> that j1939_socks_lock is protecting, the code does not attempt to
+> acquire any more locks. This would break the circular lock dependency,
+> where, for example, the current thread already locks j1939_socks_lock
+> and attempts to acquire sk_session_queue_lock, and at the same time,
+> another thread attempts to acquire j1939_socks_lock while holding
+> sk_session_queue_lock.
+> 
+> NOTE: This patch along does not fix the unregister_netdevice bug
+> reported by Syzbot; instead, it solves a deadlock situation to prepare
+> for one or more further patches to actually fix the Syzbot bug, which
+> appears to be a reference counting problem within the j1939 codebase.
+> 
+> Reported-by: syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com
+> Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
+> ---
+>  net/can/j1939/j1939-priv.h |  2 +-
+>  net/can/j1939/main.c       |  2 +-
+>  net/can/j1939/socket.c     | 25 +++++++++++++------------
+>  3 files changed, 15 insertions(+), 14 deletions(-)
+> 
+> diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
+> index 16af1a7f80f6..74f15592d170 100644
+> --- a/net/can/j1939/j1939-priv.h
+> +++ b/net/can/j1939/j1939-priv.h
+> @@ -86,7 +86,7 @@ struct j1939_priv {
+>  	unsigned int tp_max_packet_size;
+>  
+>  	/* lock for j1939_socks list */
+> -	spinlock_t j1939_socks_lock;
+> +	rwlock_t j1939_socks_lock;
+>  	struct list_head j1939_socks;
+>  
+>  	struct kref rx_kref;
+> diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
+> index ecff1c947d68..a6fb89fa6278 100644
+> --- a/net/can/j1939/main.c
+> +++ b/net/can/j1939/main.c
+> @@ -274,7 +274,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
+>  		return ERR_PTR(-ENOMEM);
+>  
+>  	j1939_tp_init(priv);
+> -	spin_lock_init(&priv->j1939_socks_lock);
+> +	rwlock_init(&priv->j1939_socks_lock);
+>  	INIT_LIST_HEAD(&priv->j1939_socks);
+>  
+>  	mutex_lock(&j1939_netdev_lock);
+> diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
+> index feaec4ad6d16..a8b981dc2065 100644
+> --- a/net/can/j1939/socket.c
+> +++ b/net/can/j1939/socket.c
+> @@ -80,16 +80,16 @@ static void j1939_jsk_add(struct j1939_priv *priv, struct j1939_sock *jsk)
+>  	jsk->state |= J1939_SOCK_BOUND;
+>  	j1939_priv_get(priv);
+>  
+> -	spin_lock_bh(&priv->j1939_socks_lock);
+> +	write_lock_bh(&priv->j1939_socks_lock);
+>  	list_add_tail(&jsk->list, &priv->j1939_socks);
+> -	spin_unlock_bh(&priv->j1939_socks_lock);
+> +	write_unlock_bh(&priv->j1939_socks_lock);
+>  }
+>  
+>  static void j1939_jsk_del(struct j1939_priv *priv, struct j1939_sock *jsk)
+>  {
+> -	spin_lock_bh(&priv->j1939_socks_lock);
+> +	write_lock_bh(&priv->j1939_socks_lock);
+>  	list_del_init(&jsk->list);
+> -	spin_unlock_bh(&priv->j1939_socks_lock);
+> +	write_unlock_bh(&priv->j1939_socks_lock);
+>  
+>  	j1939_priv_put(priv);
+>  	jsk->state &= ~J1939_SOCK_BOUND;
+> @@ -329,13 +329,13 @@ bool j1939_sk_recv_match(struct j1939_priv *priv, struct j1939_sk_buff_cb *skcb)
+>  	struct j1939_sock *jsk;
+>  	bool match = false;
+>  
+> -	spin_lock_bh(&priv->j1939_socks_lock);
+> +	read_lock_bh(&priv->j1939_socks_lock);
+>  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
+>  		match = j1939_sk_recv_match_one(jsk, skcb);
+>  		if (match)
+>  			break;
+>  	}
+> -	spin_unlock_bh(&priv->j1939_socks_lock);
+> +	read_unlock_bh(&priv->j1939_socks_lock);
+>  
+>  	return match;
+>  }
+> @@ -344,11 +344,11 @@ void j1939_sk_recv(struct j1939_priv *priv, struct sk_buff *skb)
+>  {
+>  	struct j1939_sock *jsk;
+>  
+> -	spin_lock_bh(&priv->j1939_socks_lock);
+> +	read_lock_bh(&priv->j1939_socks_lock);
+>  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
+>  		j1939_sk_recv_one(jsk, skb);
+>  	}
+> -	spin_unlock_bh(&priv->j1939_socks_lock);
+> +	read_unlock_bh(&priv->j1939_socks_lock);
+>  }
+>  
+>  static void j1939_sk_sock_destruct(struct sock *sk)
+> @@ -484,6 +484,7 @@ static int j1939_sk_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+>  
+>  		priv = j1939_netdev_start(ndev);
+>  		dev_put(ndev);
+> +
+>  		if (IS_ERR(priv)) {
+>  			ret = PTR_ERR(priv);
+>  			goto out_release_sock;
+> @@ -1078,12 +1079,12 @@ void j1939_sk_errqueue(struct j1939_session *session,
+>  	}
+>  
+>  	/* spread RX notifications to all sockets subscribed to this session */
+> -	spin_lock_bh(&priv->j1939_socks_lock);
+> +	read_lock_bh(&priv->j1939_socks_lock);
+>  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
+>  		if (j1939_sk_recv_match_one(jsk, &session->skcb))
+>  			__j1939_sk_errqueue(session, &jsk->sk, type);
+>  	}
+> -	spin_unlock_bh(&priv->j1939_socks_lock);
+> +	read_unlock_bh(&priv->j1939_socks_lock);
+>  };
+>  
+>  void j1939_sk_send_loop_abort(struct sock *sk, int err)
+> @@ -1271,7 +1272,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
+>  	struct j1939_sock *jsk;
+>  	int error_code = ENETDOWN;
+>  
+> -	spin_lock_bh(&priv->j1939_socks_lock);
+> +	read_lock_bh(&priv->j1939_socks_lock);
+>  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
+>  		jsk->sk.sk_err = error_code;
+>  		if (!sock_flag(&jsk->sk, SOCK_DEAD))
+> @@ -1279,7 +1280,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
+>  
+>  		j1939_sk_queue_drop_all(priv, jsk, error_code);
+>  	}
+> -	spin_unlock_bh(&priv->j1939_socks_lock);
+> +	read_unlock_bh(&priv->j1939_socks_lock);
+>  }
+>  
+>  static int j1939_sk_no_ioctlcmd(struct socket *sock, unsigned int cmd,
+> -- 
+> 2.34.1
+> 
+> 
+> 
 
-This patch fixes getting and setting the flow hash fields for contexts
-other than the default context.
-
-Getting the flow hash fields for RSS context 1:
-
-sudo ethtool -u eth1 rx-flow-hash tcp4 context 1
-For RSS context 1:
-TCP over IPV4 flows use these fields for computing Hash flow key:
-IP DA
-
-Now, setting the flash hash fields to a custom value:
-
-sudo ethtool -U eth1 rx-flow-hash tcp4 sdfn context 1
-
-And retrieving them again:
-
-sudo ethtool -u eth1 rx-flow-hash tcp4 context 1
-For RSS context 1:
-TCP over IPV4 flows use these fields for computing Hash flow key:
-IP SA
-IP DA
-L4 bytes 0 & 1 [TCP/UDP src port]
-L4 bytes 2 & 3 [TCP/UDP dst port]
-
-Fixes: f01cc58c18d6 ("net/mlx5e: Support multiple RSS contexts")
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- .../ethernet/mellanox/mlx5/core/en/rx_res.c   | 23 ++++++++++---
- .../ethernet/mellanox/mlx5/core/en/rx_res.h   |  5 +--
- .../mellanox/mlx5/core/en_fs_ethtool.c        | 33 ++++++++++++++-----
- 3 files changed, 46 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
-index e1095bc36543..bb189c92e4c0 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
-@@ -218,17 +218,32 @@ int mlx5e_rx_res_rss_set_rxfh(struct mlx5e_rx_res *res, u32 rss_idx,
- 	return mlx5e_rss_set_rxfh(rss, indir, key, hfunc, res->rss_rqns, res->rss_nch);
- }
- 
--u8 mlx5e_rx_res_rss_get_hash_fields(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt)
-+int mlx5e_rx_res_rss_get_hash_fields(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt,
-+				     u32 rss_idx)
- {
--	struct mlx5e_rss *rss = res->rss[0];
-+	struct mlx5e_rss *rss;
-+
-+	if (rss_idx >= MLX5E_MAX_NUM_RSS)
-+		return -EINVAL;
-+
-+	rss = res->rss[rss_idx];
-+	if (!rss)
-+		return -EINVAL;
- 
- 	return mlx5e_rss_get_hash_fields(rss, tt);
- }
- 
- int mlx5e_rx_res_rss_set_hash_fields(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt,
--				     u8 rx_hash_fields)
-+				     u8 rx_hash_fields, u32 rss_idx)
- {
--	struct mlx5e_rss *rss = res->rss[0];
-+	struct mlx5e_rss *rss;
-+
-+	if (rss_idx >= MLX5E_MAX_NUM_RSS)
-+		return -EINVAL;
-+
-+	rss = res->rss[rss_idx];
-+	if (!rss)
-+		return -EINVAL;
- 
- 	return mlx5e_rss_set_hash_fields(rss, tt, rx_hash_fields);
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
-index 5d5f64fab60f..8ac9d67a9603 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
-@@ -48,9 +48,10 @@ int mlx5e_rx_res_rss_get_rxfh(struct mlx5e_rx_res *res, u32 rss_idx,
- int mlx5e_rx_res_rss_set_rxfh(struct mlx5e_rx_res *res, u32 rss_idx,
- 			      const u32 *indir, const u8 *key, const u8 *hfunc);
- 
--u8 mlx5e_rx_res_rss_get_hash_fields(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt);
-+int mlx5e_rx_res_rss_get_hash_fields(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt,
-+				     u32 rss_idx);
- int mlx5e_rx_res_rss_set_hash_fields(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt,
--				     u8 rx_hash_fields);
-+				     u8 rx_hash_fields, u32 rss_idx);
- int mlx5e_rx_res_packet_merge_set_param(struct mlx5e_rx_res *res,
- 					struct mlx5e_packet_merge_param *pkt_merge_param);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-index aac32e505c14..50b8f3da4db1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-@@ -902,8 +902,14 @@ static int mlx5e_set_rss_hash_opt(struct mlx5e_priv *priv,
- 	u8 rx_hash_field = 0;
- 	int err;
- 	int tt;
-+	u32 flow_type = 0;
-+	u32 rss_idx = 0;
- 
--	tt = flow_type_to_traffic_type(nfc->flow_type);
-+	if (nfc->flow_type & FLOW_RSS)
-+		rss_idx = nfc->rss_context;
-+
-+	flow_type = flow_type_mask(nfc->flow_type);
-+	tt = flow_type_to_traffic_type(flow_type);
- 	if (tt < 0)
- 		return tt;
- 
-@@ -911,10 +917,10 @@ static int mlx5e_set_rss_hash_opt(struct mlx5e_priv *priv,
- 	 *  on src IP, dest IP, TCP/UDP src port and TCP/UDP dest
- 	 *  port.
- 	 */
--	if (nfc->flow_type != TCP_V4_FLOW &&
--	    nfc->flow_type != TCP_V6_FLOW &&
--	    nfc->flow_type != UDP_V4_FLOW &&
--	    nfc->flow_type != UDP_V6_FLOW)
-+	if (flow_type != TCP_V4_FLOW &&
-+	    flow_type != TCP_V6_FLOW &&
-+	    flow_type != UDP_V4_FLOW &&
-+	    flow_type != UDP_V6_FLOW)
- 		return -EOPNOTSUPP;
- 
- 	if (nfc->data & ~(RXH_IP_SRC | RXH_IP_DST |
-@@ -931,7 +937,7 @@ static int mlx5e_set_rss_hash_opt(struct mlx5e_priv *priv,
- 		rx_hash_field |= MLX5_HASH_FIELD_SEL_L4_DPORT;
- 
- 	mutex_lock(&priv->state_lock);
--	err = mlx5e_rx_res_rss_set_hash_fields(priv->rx_res, tt, rx_hash_field);
-+	err = mlx5e_rx_res_rss_set_hash_fields(priv->rx_res, tt, rx_hash_field, rss_idx);
- 	mutex_unlock(&priv->state_lock);
- 
- 	return err;
-@@ -940,14 +946,23 @@ static int mlx5e_set_rss_hash_opt(struct mlx5e_priv *priv,
- static int mlx5e_get_rss_hash_opt(struct mlx5e_priv *priv,
- 				  struct ethtool_rxnfc *nfc)
- {
--	u32 hash_field = 0;
-+	int hash_field = 0;
- 	int tt;
-+	u32 flow_type = 0;
-+	u32 rss_idx = 0;
-+
-+	if (nfc->flow_type & FLOW_RSS)
-+		rss_idx = nfc->rss_context;
- 
--	tt = flow_type_to_traffic_type(nfc->flow_type);
-+	flow_type = flow_type_mask(nfc->flow_type);
-+	tt = flow_type_to_traffic_type(flow_type);
- 	if (tt < 0)
- 		return tt;
- 
--	hash_field = mlx5e_rx_res_rss_get_hash_fields(priv->rx_res, tt);
-+	hash_field = mlx5e_rx_res_rss_get_hash_fields(priv->rx_res, tt, rss_idx);
-+	if (hash_field < 0)
-+		return hash_field;
-+
- 	nfc->data = 0;
- 
- 	if (hash_field & MLX5_HASH_FIELD_SEL_SRC_IP)
 -- 
-2.25.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
