@@ -1,92 +1,124 @@
-Return-Path: <netdev+bounces-20201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E2875E3E4
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86BDF75E402
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 19:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72E2B2818BE
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 16:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 386B3281603
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 17:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E790E440C;
-	Sun, 23 Jul 2023 16:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F7220E2;
+	Sun, 23 Jul 2023 17:20:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC84F3FC8
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:43:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68DA191
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 09:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690130593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KdeGeOcVLF93TH3NgCUThdyqzPa68siEzyDXX/sfSA8=;
-	b=adAS1mPx6UDi1hv9JcBp3GRaRHBztJfsT0GQ7TdDolnAQLGp8F8OhIaSqavWgBUeTQpYiS
-	PXn72v7YrZBEd+Vs8rxgOMqsJ8tQxZ8Hsz73oqB9Bgr7tGvGGwwviPCz6qypBa7ssCO4fp
-	++tEaNDmhC+Mr+9lqq4tUKaVtbXHFFI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-125-AojQB1jpNZSqHSw7-C_LdQ-1; Sun, 23 Jul 2023 12:43:11 -0400
-X-MC-Unique: AojQB1jpNZSqHSw7-C_LdQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C9CCF856F66
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:43:10 +0000 (UTC)
-Received: from dev64.localdomain.com (unknown [10.64.240.13])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 21B0A46A3A9;
-	Sun, 23 Jul 2023 16:43:09 +0000 (UTC)
-From: Masatake YAMATO <yamato@redhat.com>
-To: netdev@vger.kernel.org
-Cc: yamato@redhat.com
-Subject: [PATCH 2/2] man: (ss) fix wrong margin
-Date: Mon, 24 Jul 2023 01:42:57 +0900
-Message-ID: <20230723164257.1262759-2-yamato@redhat.com>
-In-Reply-To: <20230723164257.1262759-1-yamato@redhat.com>
-References: <20230723164257.1262759-1-yamato@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F701C17
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 17:20:11 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE41DF;
+	Sun, 23 Jul 2023 10:20:09 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id E03031EF7A;
+	Sun, 23 Jul 2023 20:20:05 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id C5FA91EF79;
+	Sun, 23 Jul 2023 20:20:05 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id DEBC93C0439;
+	Sun, 23 Jul 2023 20:20:01 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1690132803; bh=YrVeEtTivAdP2fxw9gd4b9AW6XhLSsJtD12xMtYk0Ko=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=vvWvHfFCa+NSSrT/PIHNLWy+7Kj0snPJa0hUdEfXgNrMayTvUtxktkFIa6awNoW3m
+	 dlz0zO40oQMA50f+HkwSiExYDhZEJSwsDDVsjtsyOZ27tYkfLbxSmg99vgxMxfi3+p
+	 x8K+sUZ/LngP1QD9keNQXTZzMsszBpR+gyO7tMjY=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 36NHJskN090004;
+	Sun, 23 Jul 2023 20:19:55 +0300
+Date: Sun, 23 Jul 2023 20:19:54 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Dust Li <dust.li@linux.alibaba.com>
+cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jiejian Wu <jiejian@linux.alibaba.com>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH v2 net-next] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table
+ per netns
+In-Reply-To: <20230723154426.81242-1-dust.li@linux.alibaba.com>
+Message-ID: <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg>
+References: <20230723154426.81242-1-dust.li@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Signed-off-by: Masatake YAMATO <yamato@redhat.com>
----
- man/man8/ss.8 | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/man/man8/ss.8 b/man/man8/ss.8
-index d413e570..073e9f03 100644
---- a/man/man8/ss.8
-+++ b/man/man8/ss.8
-@@ -301,8 +301,6 @@ Cgroup v2 pathname. This pathname is relative to the mount point of the hierarch
- .TP
- .B \-\-tipcinfo
- Show internal tipc socket information.
--.RS
--.P
- .TP
- .B \-K, \-\-kill
- Attempts to forcibly close sockets. This option displays sockets that are
--- 
-2.41.0
+	Hello,
+
+On Sun, 23 Jul 2023, Dust Li wrote:
+
+> From: Jiejian Wu <jiejian@linux.alibaba.com>
+> 
+> Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
+> "ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
+> tens of thousands of services from different netns in the table, it
+> takes a long time to look up the table, for example, using "ipvsadm
+> -ln" from different netns simultaneously.
+> 
+> We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
+> add "service_mutex" per netns to keep these two tables safe instead of
+> the global "__ip_vs_mutex" in current version. To this end, looking up
+> services from different netns simultaneously will not get stuck,
+> shortening the time consumption in large-scale deployment. It can be
+> reproduced using the simple scripts below.
+> 
+> init.sh: #!/bin/bash
+> for((i=1;i<=4;i++));do
+>         ip netns add ns$i
+>         ip netns exec ns$i ip link set dev lo up
+>         ip netns exec ns$i sh add-services.sh
+> done
+> 
+> add-services.sh: #!/bin/bash
+> for((i=0;i<30000;i++)); do
+>         ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
+> done
+> 
+> runtest.sh: #!/bin/bash
+> for((i=1;i<4;i++));do
+>         ip netns exec ns$i ipvsadm -ln > /dev/null &
+> done
+> ip netns exec ns4 ipvsadm -ln > /dev/null
+> 
+> Run "sh init.sh" to initiate the network environment. Then run "time
+> ./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
+> Intel Xeon ECS. The result of the original version is around 8 seconds,
+> while the result of the modified version is only 0.8 seconds.
+> 
+> Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
+> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+
+	Changes look good to me, thanks! But checkpatch is reporting
+for some cosmetic changes that you have to do in v3:
+
+scripts/checkpatch.pl --strict /tmp/file.patch
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
