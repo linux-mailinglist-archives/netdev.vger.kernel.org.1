@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-20195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FB975E3BA
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:24:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 084AE75E3BE
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:24:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF03281864
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 16:24:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3917E1C20A06
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 16:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D23120F6;
-	Sun, 23 Jul 2023 16:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C2220FB;
+	Sun, 23 Jul 2023 16:22:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244B05256
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:22:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3181EC433C8;
-	Sun, 23 Jul 2023 16:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD6E539F
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:22:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2245C433C9;
+	Sun, 23 Jul 2023 16:22:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690129351;
-	bh=ucsnwmWqR4ajtwvJh+GfJymKYMLxktOm7tZoJmtvJZc=;
+	s=k20201202; t=1690129354;
+	bh=M4Eba7JQy2lgUhZ/eOWiOdfCqNDYEzVkATepNOkg4FI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AyDfYmJwoGoanHp/xBxMzNwo/cJheiN1a66a5+JT/+JbxfvGeZbhY0WcLEh9sp2xZ
-	 iMoHU4LlaESiLdQ4GU548+FHQ1ch6rj47ps7a0E3uW39U6fLpUI8vOQilzLMM9JsMy
-	 Ao1UbrGhMqQdh5+1NtBCkLIOSiWAMBqg5YaHNYcaaTYIuylOJwtVP5ybVdA1uFQzJU
-	 WNGM9nZUF7W6/aJ1PiwEW56ikB3CqahcjajRukn9f4pPPEsFXWaWLLhb5A+UcgSHyD
-	 dxc9+5L0mYd8HXYzekvLkWO9U7MVdU0fXkmC8NXQZq+ESXf4TiKufJj3eOO0/B53zg
-	 YeVY7AfuNmLSw==
+	b=jOvbnl2BUJle/h5pYPzr+kYVhkMejvSw3/GGZqULllNFjpbhOMDD1SMaVNkTB9fhj
+	 TozGaLLcoKo23M+pz7O9iiz6EvOKeMlWszMxYcHFUBdH+efkSbQrg6Guale3QRTVez
+	 0EJVtpGFJJSZFcnTzGHeAOj4BqFpIZ4jYNrzF9sp0p2N2uDjAbzjNCJl/TfJzcoyYQ
+	 HzGoZ+V2wDZKYuJQbTMRBltvJ4DrYUFvFHWSKr3S7xcal9Txjw3M2u13KL6Xu/Tu3G
+	 A0ULSwyzR36AYWwvKsKFbSdosjkAHWCcCmO5m7RSxXcoKA2b6tJY4vaeg285pA+u3y
+	 FfPCLgeoLv42g==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -46,9 +46,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next 06/10] net: stmmac: xgmac: support per-channel irq
-Date: Mon, 24 Jul 2023 00:10:25 +0800
-Message-Id: <20230723161029.1345-7-jszhang@kernel.org>
+Subject: [PATCH net-next 07/10] dt-bindings: net: snps,dwmac: add safety irq support
+Date: Mon, 24 Jul 2023 00:10:26 +0800
+Message-Id: <20230723161029.1345-8-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230723161029.1345-1-jszhang@kernel.org>
 References: <20230723161029.1345-1-jszhang@kernel.org>
@@ -60,79 +60,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The IP supports per channel interrupt, add support for this usage case.
+The snps dwmac IP support safety features, and those Safety Feature
+Correctible Error and Uncorrectible Error irqs may be separate irqs.
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 ++
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 33 +++++++++++--------
- 2 files changed, 22 insertions(+), 13 deletions(-)
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 81cbb13a101d..12e1228ccf2a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -327,6 +327,8 @@
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index ddf9522a5dc2..bb80ca205d26 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -107,6 +107,8 @@ properties:
+       - description: Combined signal for various interrupt events
+       - description: The interrupt to manage the remote wake-up packet detection
+       - description: The interrupt that occurs when Rx exits the LPI state
++      - description: The interrupt that occurs when Safety Feature Correctible Errors happen
++      - description: The interrupt that occurs when Safety Feature Uncorrectible Errors happen
  
- /* DMA Registers */
- #define XGMAC_DMA_MODE			0x00003000
-+#define XGMAC_INTM			GENMASK(13, 12)
-+#define XGMAC_INTM_MODE1		0x1
- #define XGMAC_SWR			BIT(0)
- #define XGMAC_DMA_SYSBUS_MODE		0x00003004
- #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-index b5ba4e0cca55..ef25af92d6cc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-@@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
- 		value |= XGMAC_EAME;
+   interrupt-names:
+     minItems: 1
+@@ -114,6 +116,8 @@ properties:
+       - const: macirq
+       - enum: [eth_wake_irq, eth_lpi]
+       - const: eth_lpi
++      - const: sfty_ce_irq
++      - const: sfty_ue_irq
  
- 	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-+
-+	if (dma_cfg->perch_irq_en) {
-+		value = readl(ioaddr + XGMAC_DMA_MODE);
-+		value &= ~XGMAC_INTM;
-+		value |= FIELD_PREP(XGMAC_INTM, XGMAC_INTM_MODE1);
-+		writel(value, ioaddr + XGMAC_DMA_MODE);
-+	}
- }
- 
- static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
-@@ -365,20 +372,20 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
- 	}
- 
- 	/* TX/RX NORMAL interrupts */
--	if (likely(intr_status & XGMAC_NIS)) {
--		if (likely(intr_status & XGMAC_RI)) {
--			u64_stats_update_begin(&rx_q->rxq_stats.syncp);
--			rx_q->rxq_stats.rx_normal_irq_n++;
--			u64_stats_update_end(&rx_q->rxq_stats.syncp);
--			ret |= handle_rx;
--		}
--		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
--			u64_stats_update_begin(&tx_q->txq_stats.syncp);
--			tx_q->txq_stats.tx_normal_irq_n++;
--			u64_stats_update_end(&tx_q->txq_stats.syncp);
--			ret |= handle_tx;
--		}
-+	if (likely(intr_status & XGMAC_RI)) {
-+		u64_stats_update_begin(&rx_q->rxq_stats.syncp);
-+		rx_q->rxq_stats.rx_normal_irq_n++;
-+		u64_stats_update_end(&rx_q->rxq_stats.syncp);
-+		ret |= handle_rx;
-+	}
-+	if (likely(intr_status & XGMAC_TI)) {
-+		u64_stats_update_begin(&tx_q->txq_stats.syncp);
-+		tx_q->txq_stats.tx_normal_irq_n++;
-+		u64_stats_update_end(&tx_q->txq_stats.syncp);
-+		ret |= handle_tx;
- 	}
-+	if (unlikely(intr_status & XGMAC_TBU))
-+		ret |= handle_tx;
- 
- 	/* Clear interrupts */
- 	writel(intr_en & intr_status, ioaddr + XGMAC_DMA_CH_STATUS(chan));
+   clocks:
+     minItems: 1
 -- 
 2.40.1
 
