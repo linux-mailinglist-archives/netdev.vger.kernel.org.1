@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-20178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0E675E17E
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 12:50:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF18975E187
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 13:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45A122814F7
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 10:50:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E01E2819B7
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 11:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BCD41113;
-	Sun, 23 Jul 2023 10:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FD6111A;
+	Sun, 23 Jul 2023 11:00:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB007F
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 10:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 33437C433C9;
-	Sun, 23 Jul 2023 10:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDDD7F
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 11:00:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BEA6C433C7;
+	Sun, 23 Jul 2023 11:00:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690109421;
-	bh=9HWp+aCILxMD6jDD8IMj4CYI865B54wN4mwjOv6/Zt8=;
+	s=k20201202; t=1690110019;
+	bh=BTXNIM1+AbMVXtHBxaAzRFAkUP6IKSsEckZSmiEoKr0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sb0waR8y5YCr26aL0BhuGRbpaGE8Od1fKoeCrLFpNLS1BJgZFTBPpaiK7RaENXX30
-	 6vkZjn9h2a+4Pz3Dni7smbye/8iInBNWXP4XpUwCEVtPa/A9zNL5F2EdtuQzb9AoPt
-	 5e+hpOOFxKFuPj367bku9gn3lh6lth9zMGhJ2hXI8JSn+9k9//ykwsgb9sJzSIh3s5
-	 aBHNNVKMvCXBmvQ/gO2ylF1SmUvlTicunHfQkZjfFodYEvV00SQxRshPaFccrdQhsJ
-	 2B+b8bVovGyOcD3JKMlOGVY6m1opWZcFa5Ng3UFEqW85gp9nvCkrekvakDYOwfhHPz
-	 EWSc1mxE+YI0Q==
+	b=kMWqmdnQFCeKadohJqWT5aoLPTcYvg3+AaFVxq3/6LO6pHwJOIYG1ZfLRvni1ymkZ
+	 5PI8pt9h0oAcjZrO7gbEQ/jEDy2XrlcWhxAUr54sNIC3t927/KVGl2BC790uVtPppx
+	 vHSBWxJSJEdDxc6ECucptGQmN055YW1ud8VTCmh83bWs42PmnEsL8TCq0+2cmiqUKJ
+	 FUSWt3boUdWr1SyWaUDioOpZWNELlhHVB8ELnnbvi04ffBE4Qn7VGAUBrRcqSe6c/f
+	 hGPbZEUixm5DpUq8+HThnWQd8ktTIafgGyt/A640Kfwz25b5X2vDS8LAhX2Gx+sd6S
+	 +K0I3CErvbpNg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05F7DC595C2;
-	Sun, 23 Jul 2023 10:50:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E5FFC595C2;
+	Sun, 23 Jul 2023 11:00:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,38 +41,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: phy: marvell10g: fix 88x3310 power up
+Subject: Re: [net-next v2] net: add sysctl accept_ra_min_rtr_lft
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169010942101.21900.16629915424532297852.git-patchwork-notify@kernel.org>
-Date: Sun, 23 Jul 2023 10:50:21 +0000
-References: <20230719092233.137844-1-jiawenwu@trustnetic.com>
-In-Reply-To: <20230719092233.137844-1-jiawenwu@trustnetic.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: linux@armlinux.org.uk, kabel@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+ <169011001944.25900.13362860842205014637.git-patchwork-notify@kernel.org>
+Date: Sun, 23 Jul 2023 11:00:19 +0000
+References: <20230719145213.888494-1-prohr@google.com>
+In-Reply-To: <20230719145213.888494-1-prohr@google.com>
+To: Patrick Rohr <prohr@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, maze@google.com,
+ lorenzo@google.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 19 Jul 2023 17:22:33 +0800 you wrote:
-> Clear MV_V2_PORT_CTRL_PWRDOWN bit to set power up for 88x3310 PHY,
-> it sometimes does not take effect immediately. And a read of this
-> register causes the bit not to clear. This will cause mv3310_reset()
-> to time out, which will fail the config initialization. So add a delay
-> before the next access.
-> 
-> Fixes: c9cc1c815d36 ("net: phy: marvell10g: place in powersave mode at probe")
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+On Wed, 19 Jul 2023 07:52:13 -0700 you wrote:
+> This change adds a new sysctl accept_ra_min_rtr_lft to specify the
+> minimum acceptable router lifetime in an RA. If the received RA router
+> lifetime is less than the configured value (and not 0), the RA is
+> ignored.
+> This is useful for mobile devices, whose battery life can be impacted
+> by networks that configure RAs with a short lifetime. On such networks,
+> the device should never gain IPv6 provisioning and should attempt to
+> drop RAs via hardware offload, if available.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: phy: marvell10g: fix 88x3310 power up
-    https://git.kernel.org/netdev/net/c/c7b75bea853d
+  - [net-next,v2] net: add sysctl accept_ra_min_rtr_lft
+    https://git.kernel.org/netdev/net-next/c/1671bcfd76fd
 
 You are awesome, thank you!
 -- 
