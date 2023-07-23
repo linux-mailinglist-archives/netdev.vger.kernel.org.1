@@ -1,95 +1,88 @@
-Return-Path: <netdev+bounces-20188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A58B575E38B
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:22:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37B9275E3E3
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 18:43:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B8E9281775
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 16:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 418231C209B7
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 16:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 041521C31;
-	Sun, 23 Jul 2023 16:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01891C2E;
+	Sun, 23 Jul 2023 16:43:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1401879
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:22:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F25C433C7;
-	Sun, 23 Jul 2023 16:22:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690129321;
-	bh=VlKwicQ1FtbfywJIZNn75dqLhDSkbzEV7/AeiOVrpgw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=URS+/Gvavy5vkLcIuROrDFd772aHbPjyncKjtpUQHIiYm//H7ORNBfZlIV+wdTCMa
-	 GSKKS1gevOYD9f8ZkPmcjwwEIrJGNWAmGiQlxNqSJpLMjrvY0u7JGu2E1om6IAk/SD
-	 OaM5EpMxcZZdTXwzfbN+6glk63IUPUBb+qvu9koTTQ0gSVbeL9SM74Ls8f/6E1LkE4
-	 r0H/FfykHBAgMO7o3exeJAyN/7opYVKh/u14S1qFKOkq5VRUs8m6qj2LIvh0h3fgrg
-	 ORp22IrmYh7VU2y7ATVJ0+h0M12stfi4sBETVHhJTjz7Cde5NkE/pEWYQ28tqzx+Qe
-	 1Z293/STzQTnA==
-Received: (nullmailer pid 915352 invoked by uid 1000);
-	Sun, 23 Jul 2023 16:21:59 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57531841
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:43:13 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A88EA
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 09:43:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690130591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i/3NqLhtV4YkQ84XyD4TvQ4HMCOm8Xi1er7lAKYELG4=;
+	b=Dw3gD6ZATSC4OfY7OYUV4bJIfdNWipPsNqQNZe0GEr4vO4sx0HU46aWil9M63Wbj46dqeh
+	CRf5WWm+aUlhAae3FowofxBYIwjAcZmf6FGYmrTRPkJnlgXE2KSsIKWzYEqjq3EE1sa8wo
+	3zmMz9y6WmI7GypxHPuB4iqPriaDwUY=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-561-7dWad6MnPPmpiivGJaKudw-1; Sun, 23 Jul 2023 12:43:05 -0400
+X-MC-Unique: 7dWad6MnPPmpiivGJaKudw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 85CED3801BE0
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 16:43:05 +0000 (UTC)
+Received: from dev64.localdomain.com (unknown [10.64.240.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CC4F546A3A9;
+	Sun, 23 Jul 2023 16:43:04 +0000 (UTC)
+From: Masatake YAMATO <yamato@redhat.com>
+To: netdev@vger.kernel.org
+Cc: yamato@redhat.com
+Subject: [PATCH 1/2] tc: fix a wrong file name in comment
+Date: Mon, 24 Jul 2023 01:42:56 +0900
+Message-ID: <20230723164257.1262759-1-yamato@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Ivan Mikhaylov <fr0st61te@gmail.com>
-Cc: devicetree@vger.kernel.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Abeni <pabeni@redhat.com>, Po-Yu Chuang <ratbert@faraday-tech.com>, netdev@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org
-In-Reply-To: <20230723155107.4498-1-fr0st61te@gmail.com>
-References: <20230723155107.4498-1-fr0st61te@gmail.com>
-Message-Id: <169012931925.915323.851405439785815833.robh@kernel.org>
-Subject: Re: [PATCH] dt-bindings: net: ftgmac100: convert to yaml version
- from txt
-Date: Sun, 23 Jul 2023 10:21:59 -0600
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+---
+ tc/q_plug.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Sun, 23 Jul 2023 18:51:07 +0300, Ivan Mikhaylov wrote:
-> Conversion from ftgmac100.txt to yaml format version.
-> 
-> Signed-off-by: Ivan Mikhaylov <fr0st61te@gmail.com>
-> ---
->  .../bindings/net/faraday,ftgmac100.yaml       | 102 ++++++++++++++++++
->  .../devicetree/bindings/net/ftgmac100.txt     |  67 ------------
->  2 files changed, 102 insertions(+), 67 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/ftgmac100.txt
-> 
-
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml: properties:clock-names: 'oneOf' conditional failed, one must be fixed:
-	[{'enum': ['MACCLK', 'RCLK']}] is too short
-	False schema does not allow 1
-	hint: "minItems" is only needed if less than the "items" list length
-	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230723155107.4498-1-fr0st61te@gmail.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+diff --git a/tc/q_plug.c b/tc/q_plug.c
+index 2c1c1a0b..8adf9b96 100644
+--- a/tc/q_plug.c
++++ b/tc/q_plug.c
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /*
+- * q_log.c		plug scheduler
++ * q_plug.c		plug scheduler
+  *
+  * Copyright (C) 2019	Paolo Abeni <pabeni@redhat.com>
+  */
+-- 
+2.41.0
 
 
