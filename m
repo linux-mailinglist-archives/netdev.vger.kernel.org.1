@@ -1,124 +1,107 @@
-Return-Path: <netdev+bounces-20202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86BDF75E402
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 19:20:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C3875E407
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 19:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 386B3281603
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 17:20:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC3631C20A14
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 17:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F7220E2;
-	Sun, 23 Jul 2023 17:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F7F2114;
+	Sun, 23 Jul 2023 17:28:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F701C17
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 17:20:11 +0000 (UTC)
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE41DF;
-	Sun, 23 Jul 2023 10:20:09 -0700 (PDT)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id E03031EF7A;
-	Sun, 23 Jul 2023 20:20:05 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id C5FA91EF79;
-	Sun, 23 Jul 2023 20:20:05 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id DEBC93C0439;
-	Sun, 23 Jul 2023 20:20:01 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1690132803; bh=YrVeEtTivAdP2fxw9gd4b9AW6XhLSsJtD12xMtYk0Ko=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=vvWvHfFCa+NSSrT/PIHNLWy+7Kj0snPJa0hUdEfXgNrMayTvUtxktkFIa6awNoW3m
-	 dlz0zO40oQMA50f+HkwSiExYDhZEJSwsDDVsjtsyOZ27tYkfLbxSmg99vgxMxfi3+p
-	 x8K+sUZ/LngP1QD9keNQXTZzMsszBpR+gyO7tMjY=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 36NHJskN090004;
-	Sun, 23 Jul 2023 20:19:55 +0300
-Date: Sun, 23 Jul 2023 20:19:54 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Dust Li <dust.li@linux.alibaba.com>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jiejian Wu <jiejian@linux.alibaba.com>, netdev@vger.kernel.org,
-        lvs-devel@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH v2 net-next] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table
- per netns
-In-Reply-To: <20230723154426.81242-1-dust.li@linux.alibaba.com>
-Message-ID: <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg>
-References: <20230723154426.81242-1-dust.li@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D711870
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 17:28:00 +0000 (UTC)
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225511B3;
+	Sun, 23 Jul 2023 10:27:59 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id 1EC4032004AE;
+	Sun, 23 Jul 2023 13:27:55 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Sun, 23 Jul 2023 13:27:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690133274; x=1690219674; bh=9pS/poHVY3gKi
+	EOMsPaEtsBloR1fdynWZkvZgdvRBgw=; b=C8rKzsFr2XmR44yoaGMA1zaUV+5/e
+	+K4DKSax0LmJnfIPGe3KjT2Zqe+NLze9qyLEkVSA17WbzeG9bRNAOa8L9w07J5Bv
+	Egpoe/pltHkmiYjl7QOIYknO24wzxmbyewbikFZlZzG/XNI2vJE10BItijf0Ukzb
+	V1Gg2xHrkjZpRiw4SnYDbNbWIeustV4whOqKd/bFGE4AJrbNt4C+x2Mb42OY1Pgh
+	SEBM6mFy+Er8FlBjBNrVfZagZ1IYgCKk1aa2mUkCXJLhTKLYnl5zVeeaR0/m9r+q
+	Ixx5ZqDwoogER7YyAdp2IMszPz9X4dD5D+Fxb2O4Y2zzfr9++yCEdMZoQ==
+X-ME-Sender: <xms:GmO9ZDmv7LyBV8FVTU8rjLNzDsm2GN7lQ-K5tnbeDrkVABFpHFExvA>
+    <xme:GmO9ZG3ttVRAlchkVrVMBpNQCnEa2SOGRh7ud3Jt9pWkfQdZkCnaDtFpLX_FKFvPU
+    zognaKQDzatVo8>
+X-ME-Received: <xmr:GmO9ZJpdouL2b4QnQ5tf-pqyohzWCMRKxDLaAXZXKQuKpV7AUs5wdGbf00Ko>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrheeigdduuddvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhephfffjeeghfejheejveehvefhteevveefgfeuudeuiedvieejiefhgeehleej
+    gfeunecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:GmO9ZLmiFXqV4OhDSySxY9u4F_mUnWbXptlKTqhDqVPmFi2dfJVzsQ>
+    <xmx:GmO9ZB1DOBgcnuk-kOLjEixcZRBAk-Wqy42J0N7QKAJlsQXJ0U7WgA>
+    <xmx:GmO9ZKs942FvFUaAkfUj3QuX0SV5CR-Xl7WGJOKS6J-3FS5uXK5T5Q>
+    <xmx:GmO9ZOms2VV35dkSkmglS2Q32iZW1huD5yJm-7PPAZyukkhfqc7C0A>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 23 Jul 2023 13:27:53 -0400 (EDT)
+Date: Sun, 23 Jul 2023 20:27:50 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH v1 01/11] selftests: forwarding:
+ custom_multipath_hash.sh: add cleanup for SIGTERM sent by timeout
+Message-ID: <ZL1jFk1z3zDH7dUM@shredder>
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLzj5oYrbHGvCMkq@shredder>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-	Hello,
-
-On Sun, 23 Jul 2023, Dust Li wrote:
-
-> From: Jiejian Wu <jiejian@linux.alibaba.com>
+On Sun, Jul 23, 2023 at 11:25:16AM +0300, Ido Schimmel wrote:
+> On Sat, Jul 22, 2023 at 02:36:00AM +0200, Mirsad Todorovac wrote:
+> > Add trap and cleanup for SIGTERM sent by timeout and SIGINT from
+> > keyboard, for the test times out and leaves incoherent network stack.
+> > 
+> > Fixes: 511e8db54036c ("selftests: forwarding: Add test for custom multipath hash")
+> > Cc: Ido Schimmel <idosch@nvidia.com>
+> > Cc: netdev@vger.kernel.org
+> > ---
 > 
-> Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
-> "ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
-> tens of thousands of services from different netns in the table, it
-> takes a long time to look up the table, for example, using "ipvsadm
-> -ln" from different netns simultaneously.
-> 
-> We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
-> add "service_mutex" per netns to keep these two tables safe instead of
-> the global "__ip_vs_mutex" in current version. To this end, looking up
-> services from different netns simultaneously will not get stuck,
-> shortening the time consumption in large-scale deployment. It can be
-> reproduced using the simple scripts below.
-> 
-> init.sh: #!/bin/bash
-> for((i=1;i<=4;i++));do
->         ip netns add ns$i
->         ip netns exec ns$i ip link set dev lo up
->         ip netns exec ns$i sh add-services.sh
-> done
-> 
-> add-services.sh: #!/bin/bash
-> for((i=0;i<30000;i++)); do
->         ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
-> done
-> 
-> runtest.sh: #!/bin/bash
-> for((i=1;i<4;i++));do
->         ip netns exec ns$i ipvsadm -ln > /dev/null &
-> done
-> ip netns exec ns4 ipvsadm -ln > /dev/null
-> 
-> Run "sh init.sh" to initiate the network environment. Then run "time
-> ./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
-> Intel Xeon ECS. The result of the original version is around 8 seconds,
-> while the result of the modified version is only 0.8 seconds.
-> 
-> Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
-> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
-> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+> The patches are missing your Signed-off-by and a cover letter. Anyway,
+> please don't send a new version just yet. I'm not sure this is the
+> correct approach and I'm looking into it.
 
-	Changes look good to me, thanks! But checkpatch is reporting
-for some cosmetic changes that you have to do in v3:
+Please test with the following four patches on top of net.git:
 
-scripts/checkpatch.pl --strict /tmp/file.patch
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+https://github.com/idosch/linux/commits/submit/sefltests_fix_v1
 
