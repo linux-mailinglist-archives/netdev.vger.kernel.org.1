@@ -1,142 +1,134 @@
-Return-Path: <netdev+bounces-20163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56FF475E01C
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 08:36:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA4B75E041
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 09:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85413281C87
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 06:36:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF58281D4F
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 07:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6FAA28;
-	Sun, 23 Jul 2023 06:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A747AECF;
+	Sun, 23 Jul 2023 07:25:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCDB373
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 06:36:04 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE3591BC7;
-	Sat, 22 Jul 2023 23:36:02 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3172144c084so2835685f8f.1;
-        Sat, 22 Jul 2023 23:36:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCA0EBD
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 07:25:50 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B9D1BE2
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 00:25:44 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4fdd515cebcso4891327e87.0
+        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 00:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690094161; x=1690698961;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fWULp1Z09v1+2fHlAakWzwZrv/VdXoRTMrsIIP2c9oM=;
-        b=GTulg8USXbVDXXRM6ly4eKBRjjUBfUEIVWlNI8PKgXWaF81SmwvQ3xUOMUPN79twjE
-         PyhA+aDv6joI6cbOn3fpU5e60He7zvn/DPAXkjxUF04dckmsJbWn/msqwJi9mEhDdmdi
-         +OyHavZLtbf9/EGalrXeGtkQOBBjudFBaU2KOcDHEEoF8rNsRCx07bv1+5H6/xcf3A8Q
-         SRopIWfL22SC3foYcxFeeEuh9sqaD6tVDxE6UMZkfKXeIO1by5ejKRmV7kwtWWCztSFk
-         4gKny5d0AOLGZoCU9YGlBhOjujE/MExGCudC0mh4ldTuBVUxyD9zy8h7gxMtKGAt+rvP
-         Oc5g==
+        d=starlabs-sg.20221208.gappssmtp.com; s=20221208; t=1690097143; x=1690701943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r0iffa6uW+CBPzOMt7qh5A0ZCk4wrtyQIY4miIwW/+0=;
+        b=At3alvTPhq5F4Y0D4mtTD6nDvaI5DBPUUD0Q2zmSotWqGMEcsSA+lhc8YPfLeeJida
+         jjnxjqM45JtjHblVJUcA57UNzbKU+M64y6ExbThwK4iAvVLMTRbONLG8DX01eyLUdKlh
+         VUpCdtXk2/rDoyezlJWMQP825DubM6mLBwQEQDRRaKrKRgT7o0kMpR8MeYZA/Ue8HBTt
+         RBR63HrJSUG1QvP5q0MDIINmxfuQvg1Nj+xqtJ5nGdjK6aiTvGQsfcxVnkgV+r5N8pd2
+         A3gDdprtegE7G8XqDS6ZI4OT7pEhzeyi2xi54KB2mqqBdYKwAoKKqbLo3SGqcO86qjaX
+         5gFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690094161; x=1690698961;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fWULp1Z09v1+2fHlAakWzwZrv/VdXoRTMrsIIP2c9oM=;
-        b=QMsZYtpwwYamxTLJVdZezes5IPc5SfNoQ84smJjKnh8WDpyXa5V5kr+gmnIkXKwECG
-         npYpvb7gevWrlu6XzJa56dIs3TbwtWVqzHzXe4aWghkJpBAcFGboo2X1HBvSrnzdMrMF
-         0/bLmwpwM3GuTRL9C3q5FxrbRw+Zj1Weq+6SRbppAXydbAV8qTgmqnpYx1Spdn/SQxTj
-         gbsQb9pGCwY2/m7KjSB6UbfKnJavG089ho1VQQtVSi1/r8eeGClW5+En8Frwod+Ke8vo
-         sqGHEVhHwktxeX2tFIXobFLZpTwZskvAvJ7Iys6yi237STZQCuQvlx2kv5DdNk3OD2MV
-         0MgA==
-X-Gm-Message-State: ABy/qLbJd0g0aiFV8RSaEF1MUtEeetpbwZVnHlMwGqFOQU6Wo85RpjkE
-	sLN0M9m71U/C/Vzyw9Ds+B8=
-X-Google-Smtp-Source: APBJJlG9YNmkLBeWnc+pvI9ph5YB4yCi6YR54SPLj6YxVXPOdHaAUQOZNPWzSS10tg0VPFD/q0GcGw==
-X-Received: by 2002:adf:e106:0:b0:315:8a80:329e with SMTP id t6-20020adfe106000000b003158a80329emr4470506wrz.40.1690094160991;
-        Sat, 22 Jul 2023 23:36:00 -0700 (PDT)
-Received: from [192.168.0.110] ([77.126.88.184])
-        by smtp.gmail.com with ESMTPSA id l8-20020a7bc448000000b003fb40ec9475sm6963768wmi.11.2023.07.22.23.35.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Jul 2023 23:36:00 -0700 (PDT)
-Message-ID: <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
-Date: Sun, 23 Jul 2023 09:35:56 +0300
+        d=1e100.net; s=20221208; t=1690097143; x=1690701943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r0iffa6uW+CBPzOMt7qh5A0ZCk4wrtyQIY4miIwW/+0=;
+        b=Awk37MF2VpDZS/vKVg01QYyLLT+bMbJyGardH5qZZ55xKrPr8IurlOZNAFI8vdMMoy
+         +t+16jFepZavmHx2Kze1IRXyuchPUT/2jyEdUh9omSqf2n0n68UoF1A/i4hy9DLru9KJ
+         0ZgW5j0AC5GM7Xxb9E/h+KUxCS9WjTWxXGya4XBI+sx2VwKFg3vkjLMLiiw4nBzJ5ZDY
+         xCTi5HqNbCwkcCcYVCMAPyX32t0Zkg5ezII/RvxFN7b9/uitoRj1eDrPxJwc2U0Feccl
+         +VvJdjtoktCYbODQ+w/Z+O9jdBHQjSYM8gBmTOev6HasBgWQ0CXQ6UGnmgcvINd0Yw2q
+         IT5Q==
+X-Gm-Message-State: ABy/qLb28efzM4IJVeYc0Mh15rEANj9kdIooztLiMn9319fahRHOqxc6
+	EkhgqbjK503PcCkFVUEDxEzjYbPoLWMasnR8biNVqdfLRCfW0huFaA==
+X-Google-Smtp-Source: APBJJlE5pHWAGpA+sg4ahURxMh1Bn4nRh3BbzkFEY5cm8aoKoq3IglVu0SZaAl3Q2eVMakWjlhv0EKT/D9a1Gp1pWew=
+X-Received: by 2002:ac2:4213:0:b0:4f9:5ca0:9334 with SMTP id
+ y19-20020ac24213000000b004f95ca09334mr3030974lfh.34.1690097142890; Sun, 23
+ Jul 2023 00:25:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@infradead.org>,
- Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
- Christian Brauner <brauner@kernel.org>,
- Chuck Lever III <chuck.lever@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Gal Pressman <gal@nvidia.com>,
- ranro@nvidia.com, samiram@nvidia.com, drort@nvidia.com,
- Tariq Toukan <tariqt@nvidia.com>
-References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
- <4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
- <20230522121125.2595254-1-dhowells@redhat.com>
- <20230522121125.2595254-9-dhowells@redhat.com>
- <2267272.1686150217@warthog.procyon.org.uk>
- <5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
- <776549.1687167344@warthog.procyon.org.uk>
- <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
- <20230630102143.7deffc30@kernel.org>
- <f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
- <20230705091914.5bee12f8@kernel.org>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20230705091914.5bee12f8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,WEIRD_PORT autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230721174856.3045-1-sec@valis.email> <9a51c82f-6884-4853-8e8a-3796c9051ca8@mojatatu.com>
+ <CAM0EoMkVVdHjU1aUxmjN7ah_iE2Beuwgf4r6ddxCWN5d77t-=A@mail.gmail.com>
+In-Reply-To: <CAM0EoMkVVdHjU1aUxmjN7ah_iE2Beuwgf4r6ddxCWN5d77t-=A@mail.gmail.com>
+From: M A Ramdhan <ramdhan@starlabs.sg>
+Date: Sun, 23 Jul 2023 14:25:07 +0700
+Message-ID: <CACSEBQTamxnS0w=TTJObV8f_X=9oLBWEv2xtkzWhYqWb_w+gWA@mail.gmail.com>
+Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
+ and cls_route
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>, valis <sec@valis.email>, netdev@vger.kernel.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, victor@mojatatu.com, 
+	billy@starlabs.sg
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Sat, Jul 22, 2023 at 2:56=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Fri, Jul 21, 2023 at 3:00=E2=80=AFPM Pedro Tammela <pctammela@mojatatu=
+.com> wrote:
+> >
+> > On 21/07/2023 14:48, valis wrote:
+> > > Three classifiers (cls_fw, cls_u32 and cls_route) always copy
+> > > tcf_result struct into the new instance of the filter on update.
+> > >
+> > > This causes a problem when updating a filter bound to a class,
+> > > as tcf_unbind_filter() is always called on the old instance in the
+> > > success path, decreasing filter_cnt of the still referenced class
+> > > and allowing it to be deleted, leading to a use-after-free.
+> > >
+> > > This patch set fixes this issue in all affected classifiers by no lon=
+ger
+> > > copying the tcf_result struct from the old filter.
+> > >
+> > > valis (3):
+> > >    net/sched: cls_u32: No longer copy tcf_result on update to avoid
+> > >      use-after-free
+> > >    net/sched: cls_fw: No longer copy tcf_result on update to avoid
+> > >      use-after-free
+> > >    net/sched: cls_route: No longer copy tcf_result on update to avoid
+> > >      use-after-free
+> > >
+> > >   net/sched/cls_fw.c    | 1 -
+> > >   net/sched/cls_route.c | 1 -
+> > >   net/sched/cls_u32.c   | 1 -
+> > >   3 files changed, 3 deletions(-)
+> > >
+> >
+> > For the series,
+> >
+> > Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+> > Tested-by: Pedro Tammela <pctammela@mojatatu.com>
+>
+> For the series:
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-
-On 05/07/2023 19:19, Jakub Kicinski wrote:
-> On Tue, 4 Jul 2023 23:06:02 +0300 Tariq Toukan wrote:
->> Unfortunately, it still repros for us.
->>
->> We are collecting more info on how the repro is affected by the
->> different parameters.
-> 
-> Consider configuring kdump for your test env. Debugging is super easy
-> if one has the vmcore available.
-
-Hi Jakub, David,
-
-We repro the issue on the server side using this client command:
-$ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s 
-https://2.2.2.3:20443/256000b.img
-
-Port 20443 is configured with:
-     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256;
-     sendfile    off;
-
-
-Important:
-1. Couldn't repro with files smaller than 40KB.
-2. Couldn't repro with "sendfile    on;"
-
-In addition, we collected the vmcore (forced by panic_on_warn), it can 
-be downloaded from here:
-https://drive.google.com/file/d/1Fi2dzgq6k2hb2L_kwyntRjfLF6_RmbxB/view?usp=sharing
+For the series:
+Reviewed-by: M A Ramdhan <ramdhan@starlabs.sg>
+Tested-by: M A Ramdhan <ramdhan@starlabs.sg>
 
 Regards,
-Tariq
+M A Ramdhan
+
+>
+> cheers,
+> jamal
 
