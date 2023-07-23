@@ -1,101 +1,163 @@
-Return-Path: <netdev+bounces-20172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BB0475E06D
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 10:02:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0010775E070
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 10:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0DC1C20A6D
-	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 08:02:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CB68281C68
+	for <lists+netdev@lfdr.de>; Sun, 23 Jul 2023 08:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDD2ED3;
-	Sun, 23 Jul 2023 08:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5B1ED6;
+	Sun, 23 Jul 2023 08:13:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B31EBD
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 08:02:24 +0000 (UTC)
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 948B4191;
-	Sun, 23 Jul 2023 01:02:21 -0700 (PDT)
-Received: from localhost.localdomain (unknown [39.174.92.167])
-	by mail-app3 (Coremail) with SMTP id cC_KCgDn759_3rxkanx_Cw--.19008S4;
-	Sun, 23 Jul 2023 16:02:07 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v1] macvlan: add forgotten nla_policy for IFLA_MACVLAN_BC_CUTOFF
-Date: Sun, 23 Jul 2023 16:02:05 +0800
-Message-Id: <20230723080205.3715164-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgDn759_3rxkanx_Cw--.19008S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr1DZr13KFWDCF4DXw15XFb_yoW8Gry7pF
-	W7Cry5CF4UtFW3A3WUta1kXa4vgas7XFWUGr9rC34ruanxWry8C34S9FWIyryfKFZ5JFW7
-	AF1jy343GFn8GrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc2xSY4AK67AK6r43
-	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJV
-	W8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUeTmhUUUUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92137EBD
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 08:13:44 +0000 (UTC)
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EE8E41
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 01:13:42 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.west.internal (Postfix) with ESMTP id 7486432003C0;
+	Sun, 23 Jul 2023 04:13:41 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Sun, 23 Jul 2023 04:13:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690100020; x=1690186420; bh=ptgadqpyzBQEh
+	AKCgvZ/HGi5Nhzh2eNlEkKFO/giR7o=; b=gYtPvgCPHFxD6WGiJVlPSsePOz2W7
+	6G2QMZDuNPcUE3zVHOqQDhVIdTMNO6+EYpsktxGkUuXd21OsLiAhONnwm2Rk/UFl
+	6VG11j4UnzjiZ10Fn+Pg8JNBCoEDb9AWp0X0/BQlcOyvbPXnTocJyKhNfqnl0zx8
+	P705DIw+xOoUxkq8Bw1D4KQGH9eHLhxcA1pXym8KVzqcf3eAfcZHiFFXjO2XzuWY
+	1PN+XI7t7NjsN/+VUj7X0MUXAUGumyZcg85qqjeVl5/lUq3NstL2rliQv3Om81hZ
+	ackbDXTsc5U8aKIPBKChqf1BMpQZFRrK/X9kNhPFonEYlIFeSNBAhA42g==
+X-ME-Sender: <xms:NOG8ZBgvaRNZSvo6E-2yzOg9O6fPl3fuOtK_PAYIT5ylLm9VKpiokA>
+    <xme:NOG8ZGC5Lkb-cynuXQkSZ0zEqG9fpsT5DBAxlpk4H1H44B4SMt9_ZlpLold0B7l2t
+    HYa9Tx0r5SvuUA>
+X-ME-Received: <xmr:NOG8ZBGGUfi5XUe2h74TQQ1O0IoU6SX5ClYr0fS-F3aDFT-btrDPx-y4AXQS>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrheeigddtudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
+    hoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:NOG8ZGTHuJODhwC7tzoiZhQqgb2WfB-x8UDeTy67Toi463lQLaNpng>
+    <xmx:NOG8ZOyBRK1HVZXSoQM-8HGRL6-AIM59c5nyZ1AGrBEMsgEislIOTA>
+    <xmx:NOG8ZM71W0H4TFI4O8HIqii5LmTqy7Hy25X9mfcUplIIFVa_Idxjpg>
+    <xmx:NOG8ZFrb1t83hyCwgz3OTuoIkUmeWBAuQ75Resb-r5u1OlyLoaFzqA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 23 Jul 2023 04:13:39 -0400 (EDT)
+Date: Sun, 23 Jul 2023 11:13:36 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCHv3 net] ipv6: do not match device when remove source route
+Message-ID: <ZLzhMDIayD2z4szG@shredder>
+References: <20230720065941.3294051-1-liuhangbin@gmail.com>
+ <ZLk0/f82LfebI5OR@shredder>
+ <ZLlJi7OUy3kwbBJ3@shredder>
+ <ZLpI6YZPjmVD4r39@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLpI6YZPjmVD4r39@Laptop-X1>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The previous commit 954d1fa1ac93 ("macvlan: Add netlink attribute for
-broadcast cutoff") added one additional attribute named
-IFLA_MACVLAN_BC_CUTOFF to allow broadcast cutfoff.
+On Fri, Jul 21, 2023 at 04:59:21PM +0800, Hangbin Liu wrote:
+> Hi Ido,
+> 
+> On Thu, Jul 20, 2023 at 05:49:47PM +0300, Ido Schimmel wrote:
+> > Actually, there is another problem here. IPv4 checks that the address is
+> > indeed gone (it can be assigned to more than one interface):
+> > 
+> > + ip link add name dummy1 up type dummy
+> > + ip link add name dummy2 up type dummy
+> > + ip link add name dummy3 up type dummy
+> > + ip address add 192.0.2.1/24 dev dummy1
+> > + ip address add 192.0.2.1/24 dev dummy2
+> > + ip route add 198.51.100.0/24 dev dummy3 src 192.0.2.1
+> > + ip address del 192.0.2.1/24 dev dummy2
+> > + ip -4 r s
+> > 192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1 
+> > 198.51.100.0/24 dev dummy3 scope link src 192.0.2.1 
+> > 
+> > But it doesn't happen for IPv6:
+> > 
+> > + ip link add name dummy1 up type dummy
+> > + ip link add name dummy2 up type dummy
+> > + ip link add name dummy3 up type dummy
+> > + ip address add 2001:db8:1::1/64 dev dummy1
+> > + ip address add 2001:db8:1::1/64 dev dummy2
+> > + ip route add 2001:db8:2::/64 dev dummy3 src 2001:db8:1::1
+> > + ip address del 2001:db8:1::1/64 dev dummy2
+> > + ip -6 r s
+> > 2001:db8:1::/64 dev dummy1 proto kernel metric 256 pref medium
+> > 2001:db8:2::/64 dev dummy3 metric 1024 pref medium
+> > fe80::/64 dev dummy1 proto kernel metric 256 pref medium
+> > fe80::/64 dev dummy2 proto kernel metric 256 pref medium
+> > fe80::/64 dev dummy3 proto kernel metric 256 pref medium
+> 
+> Hmm, what kind of usage that need to add same address on different interfaces?
 
-However, it forgot to describe the nla_policy at macvlan_policy
-(drivers/net/macvlan.c). Hence, this suppose NLA_S32 (4 bytes) integer
-can be faked as empty (0 bytes) by a malicious user, which could leads
-to OOB in heap just like CVE-2023-3773.
+I don't know, but when I checked the code and tested it I noticed that
+the kernel doesn't care on which interface the address is configured.
+Therefore, in order for deletion to be consistent with addition and with
+IPv4, the preferred source address shouldn't be removed from routes in
+the VRF table as long as the address is configured on one of the
+interfaces in the VRF.
 
-To fix it, this commit just completes the nla_policy description for
-IFLA_MACVLAN_BC_CUTOFF. This enforces the length check and avoids the
-potential OOB read.
+> BTW, to fix it, how about check if the IPv6 addr still exist. e.g.
+> 
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -4590,10 +4590,11 @@ static int fib6_remove_prefsrc(struct fib6_info *rt, void *arg)
+>         struct net_device *dev = ((struct arg_dev_net_ip *)arg)->dev;
+>         struct net *net = ((struct arg_dev_net_ip *)arg)->net;
+>         struct in6_addr *addr = ((struct arg_dev_net_ip *)arg)->addr;
+> +       u32 tb6_id = l3mdev_fib_table(dev) ? : RT_TABLE_MAIN;
+> 
+> -       if (!rt->nh &&
+> -           ((void *)rt->fib6_nh->fib_nh_dev == dev || !dev) &&
+> -           rt != net->ipv6.fib6_null_entry &&
+> +       if (rt != net->ipv6.fib6_null_entry &&
+> +           rt->fib6_table->tb6_id == tb6_id &&
+> +           !ipv6_chk_addr_and_flags(net, addr, NULL, true, 0, IFA_F_TENTATIVE) &&
+>             ipv6_addr_equal(addr, &rt->fib6_prefsrc.addr)) {
 
-Fixes: 954d1fa1ac93 ("macvlan: Add netlink attribute for broadcast cutoff")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
- drivers/net/macvlan.c | 1 +
- 1 file changed, 1 insertion(+)
+ipv6_chk_addr_and_flags() is more expensive than ipv6_addr_equal() so
+better to first check that route indeed uses the address as the
+preferred source address and only then check if it exists.
 
-diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
-index 4a53debf9d7c..ed908165a8b4 100644
---- a/drivers/net/macvlan.c
-+++ b/drivers/net/macvlan.c
-@@ -1746,6 +1746,7 @@ static const struct nla_policy macvlan_policy[IFLA_MACVLAN_MAX + 1] = {
- 	[IFLA_MACVLAN_MACADDR_COUNT] = { .type = NLA_U32 },
- 	[IFLA_MACVLAN_BC_QUEUE_LEN] = { .type = NLA_U32 },
- 	[IFLA_MACVLAN_BC_QUEUE_LEN_USED] = { .type = NLA_REJECT },
-+	[IFLA_MACVLAN_BC_CUTOFF] = { .type = NLA_S32 },
- };
- 
- int macvlan_link_register(struct rtnl_link_ops *ops)
--- 
-2.17.1
+Maybe you can even do it in rt6_remove_prefsrc(). That would be similar
+to what IPv4 is doing.
 
+>                 spin_lock_bh(&rt6_exception_lock);
+>                 /* remove prefsrc entry */
+> 
+> Thanks
+> Hangbin
 
