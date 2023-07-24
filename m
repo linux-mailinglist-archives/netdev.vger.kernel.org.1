@@ -1,102 +1,112 @@
-Return-Path: <netdev+bounces-20555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27B3F760130
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 23:30:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63FA76013D
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 23:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D75FD2813DE
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:29:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F37F11C208E5
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217CF111A2;
-	Mon, 24 Jul 2023 21:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E7A111AB;
+	Mon, 24 Jul 2023 21:34:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163072FB6
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 21:29:57 +0000 (UTC)
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0FF10D8;
-	Mon, 24 Jul 2023 14:29:56 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1bb69c0070dso1160023fac.1;
-        Mon, 24 Jul 2023 14:29:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8750E10978
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 21:34:49 +0000 (UTC)
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B52110D8
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 14:34:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690234195; x=1690838995;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OM539phS9aOw031TgelZO+437tA64R65GJ/+pU084Fo=;
-        b=cIvNzaDL15Y2eJENk2IVN4J0bKT6f6H2oF/ENGE8oooYUcE/gVEuLZxvMvopRMg3FR
-         D6ziP5esaI+bTzaqZbLu/FainqT+ue3Lko5myqvd5JkwmVDAEWCdc5sneS0qJWph7imm
-         btuD3dG7tJqRSLBw5/KNdtEMiU025haUuf+1PTiUltBnyccZId4+gLlIYVaHtALglyxO
-         hEBkVInmYGxeqWvuwPmPF3DjVCvkjNPKbUfCkiOSwYaoZ3WApzYylOQssUJc8D0iqDQs
-         SM5q6rgLL2K3XQO5WNuiy0iYhZz2n+ejE5a5QU46PXZco/PKJTsVTCWitiwCrR3Pmn+d
-         phRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690234195; x=1690838995;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OM539phS9aOw031TgelZO+437tA64R65GJ/+pU084Fo=;
-        b=SoRk0nmEW3cPOnPVFGIvlSjuf2yqvG+gvzU3jEi2aayWeGzDGZazA3R3hNvyhY9QBB
-         /Y8btU4P3Xnb5oh3r481pwcpbVAYnV7/6FIj8XPsuPK6MXvSQFpwZpP/YlvLTMMxB+6l
-         Y7DpyMY2f5PgpltDjijMuu8UWGZmQyevJPmVIan4Up9+45bB0c7eu1910W8+NLhDFA+X
-         ccciYaR9q6C6qwzaXVYs2mQZc1E2dIh2xfH88Wkz4Fs37Z0HiHwWVpGq5ZPF7ScHkmrE
-         L4EnlZ6Ub8lgQXPYJX7I29KeEfiuBk/sfabqNtktjj6b05SKe+knum04bQpHrSyx0c3B
-         KkZA==
-X-Gm-Message-State: ABy/qLa2dUVap5pkwwMfDeer1rpD2fw83lBD4vl3T2jOoaWIUgwZEmjT
-	8sMCpRxUjaxBwepN8FXQrJ4=
-X-Google-Smtp-Source: APBJJlF3grPO7B7w46vrT2F2ZY060k90j9nUiLzaAItdGqiTBwkCSbnTHVk/om5uOI4wGUkgUeLLQw==
-X-Received: by 2002:a05:6870:4394:b0:1ba:4815:ee64 with SMTP id r20-20020a056870439400b001ba4815ee64mr12563283oah.1.1690234195652;
-        Mon, 24 Jul 2023 14:29:55 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c1:6d75:166e:2197:2c44:331b? ([2804:7f1:e2c1:6d75:166e:2197:2c44:331b])
-        by smtp.gmail.com with ESMTPSA id i5-20020a9d6245000000b006b9443ce478sm4358572otk.27.2023.07.24.14.29.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 14:29:55 -0700 (PDT)
-From: Victor Nogueira <victor.nogueira.rio@gmail.com>
-X-Google-Original-From: Victor Nogueira <vnogueira@user.com>
-Message-ID: <2d346050-3b6f-e9ec-10bb-99447c88fdf7@user.com>
-Date: Mon, 24 Jul 2023 18:29:50 -0300
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690234489; x=1721770489;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vaRxenrkUPEUABvAFjDdwimN8CPg98ngU5PWFLGC3Wk=;
+  b=rTxsUc/tptgafY32Le/3vTYx7kxwmnYSHapToCqnW2BlcVsbuZoc5Ks5
+   oxp8H8NMIda40Siul3KgS5mRlaeYz7C20yUMakIC8T/VFrZ8raRtCFAc/
+   VMx+dBgtPDz5fnKqQ99+HpSTKYnY5nosGuBrOEfiMOLCtDL4U/CKFoC/i
+   8=;
+X-IronPort-AV: E=Sophos;i="6.01,228,1684800000"; 
+   d="scan'208";a="296967578"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 21:34:41 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com (Postfix) with ESMTPS id 37C7E60A89;
+	Mon, 24 Jul 2023 21:34:39 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 24 Jul 2023 21:34:38 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 24 Jul 2023 21:34:35 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kees Cook
+	<keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	"Breno Leitao" <leitao@debian.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"Kuniyuki Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 net 0/2] net: Fix error/warning by -fstrict-flex-arrays=3.
+Date: Mon, 24 Jul 2023 14:34:23 -0700
+Message-ID: <20230724213425.22920-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2] net/sched: mqprio: Add length check for
- TCA_MQPRIO_{MAX/MIN}_RATE64
-Content-Language: en-US
-To: Lin Ma <linma@zju.edu.cn>, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230724014625.4087030-1-linma@zju.edu.cn>
-In-Reply-To: <20230724014625.4087030-1-linma@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.100.36]
+X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 23/07/2023 22:46, Lin Ma wrote:
-> The nla_for_each_nested parsing in function mqprio_parse_nlattr() does
-> not check the length of the nested attribute. This can lead to an
-> out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
-> be viewed as 8 byte integer and passed to priv->max_rate/min_rate.
-> 
-> This patch adds the check based on nla_len() when check the nla_type(),
-> which ensures that the length of these two attribute must equals
-> sizeof(u64).
-> 
-> Fixes: 4e8b86c06269 ("mqprio: Introduce new hardware offload mode and shaper in mqprio")
-> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") started applying
+strict rules for standard string functions (strlen(), memcpy(), etc.) if
+CONFIG_FORTIFY_SOURCE=y.
 
-Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+This series fixes two false positives caught by syzkaller.
+
+
+Changes:
+  v3:
+    * Drop Reviewed-by
+    * Patch 1: Use strnlen()
+    * Patch 2: Add a new flex array member
+
+  v2: https://lore.kernel.org/netdev/20230720004410.87588-1-kuniyu@amazon.com/
+    * Patch 2: Fix offset calc.
+
+  v1: https://lore.kernel.org/netdev/20230719185322.44255-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (2):
+  af_unix: Fix fortify_panic() in unix_bind_bsd().
+  af_packet: Fix warning of fortified memcpy() in packet_getname().
+
+ include/uapi/linux/if_packet.h | 6 +++++-
+ net/packet/af_packet.c         | 2 +-
+ net/unix/af_unix.c             | 6 ++----
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+-- 
+2.30.2
+
 
