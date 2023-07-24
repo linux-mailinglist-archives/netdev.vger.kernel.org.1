@@ -1,72 +1,44 @@
-Return-Path: <netdev+bounces-20250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5749275EA4E
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:59:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B76F75EAC7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:18:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 200361C2099C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:59:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D58F281479
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A761DEDA;
-	Mon, 24 Jul 2023 03:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CABFEBB;
+	Mon, 24 Jul 2023 05:18:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C222EC5
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:59:36 +0000 (UTC)
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C828B0
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 20:59:35 -0700 (PDT)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-583b3939521so22411687b3.0
-        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 20:59:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690171174; x=1690775974;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VHAPnnSZKvMt5Lg/QwwUMZiuW3NABbsBjEppktwmZ5s=;
-        b=s6QlQkeGDbg4NtN0K1dDPke7OouHeeljrgct8fibCP+/nASOksiruIbML3WWZIQ2BX
-         8+nZO2WoxzcGf0FmY1fsAPAdCldnIpftIkU40XnkqYdxu1oCe97jN5nqlBvrBk+E0d33
-         h0/m9cVF5M/dDAXTZop9LUiZIO1ZfOb/QWVz57K6rUbCBqiqe/uxDjrDQVsp+wJGfUlV
-         rztbYuNHNUZPGM7l1VPKEkmPtVzTB7v3RbIY0x/H7G+rYrCv++1lyA8amyJJGIkTEGv5
-         +aIDdcCOs9htUlcyu1YxRXCws1H68NZ2+nq/f62cyLrAXrNa4sp7/mL5cvggPeb2oAA+
-         lgUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690171174; x=1690775974;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VHAPnnSZKvMt5Lg/QwwUMZiuW3NABbsBjEppktwmZ5s=;
-        b=EFgnosCpRFlUOysTReTZMGxZzPQjxGW6MmUNylHXTsSjrrwthKx4Gwq+vA6CN+fen0
-         de1jEg6vHPGEQ3A16Vd+AwqI876bum6xio6+pMDbWbexG/FNwi8r1LtuvMfUT/BQbZbg
-         pN4wK+K1gjipYK3zw0p95dqRqjTr8/8a+y7RxecY/LSPSwE87RmAGB46xz3eMLFJqBef
-         ZcDz7lgcIR1QBAgbg1nrbATy566OAF5OhSzwQOiquYfNHGp6eIJM3AK6ZlYIVf/P6hlm
-         dR6vFRms7XxPpZ3A33JRud1pAX9+ootE+vNbBo/frBnQkU6OQF1B6r1wX8SSYlyeiV0u
-         FpvQ==
-X-Gm-Message-State: ABy/qLZiMN9QxbaSEatpaXbxC5EaSM99XcvFD/Vs7wU35TMZR1HPAscp
-	FfG7ETta4J54O+NOTxeKpG6bhHHx76XacKXo
-X-Google-Smtp-Source: APBJJlFTv5haGrkOIdYByCil8F+KVUqqmN0jiUzmmVkUEAHj4wfsVdkLcENFThFXnLFuwxiUj0XwZQ==
-X-Received: by 2002:a81:9143:0:b0:573:7f55:a40e with SMTP id i64-20020a819143000000b005737f55a40emr4764334ywg.49.1690171174347;
-        Sun, 23 Jul 2023 20:59:34 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id jh6-20020a170903328600b001aad714400asm7671560plb.229.2023.07.23.20.59.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jul 2023 20:59:33 -0700 (PDT)
-Date: Mon, 24 Jul 2023 11:59:28 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Beniamino Galvani <bgalvani@redhat.com>
-Subject: Re: [PATCHv2 net-next] IPv6: add extack info for inet6_addr_add/del
-Message-ID: <ZL33IPUcU3bmpO82@Laptop-X1>
-References: <20230719135644.3011570-1-liuhangbin@gmail.com>
- <ZLkL3eNVNfzZbaBv@shredder>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF127C;
+	Mon, 24 Jul 2023 05:18:26 +0000 (UTC)
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD84FF;
+	Sun, 23 Jul 2023 22:18:24 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R741e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0Vo0kKJZ_1690175900;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vo0kKJZ_1690175900)
+          by smtp.aliyun-inc.com;
+          Mon, 24 Jul 2023 13:18:21 +0800
+Date: Mon, 24 Jul 2023 13:18:20 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Gavin Li <gavinl@nvidia.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, jiri@nvidia.com,
+	dtatulea@nvidia.com, gavi@nvidia.com,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next V3 0/4] virtio_net: add per queue interrupt
+ coalescing support
+Message-ID: <20230724051820.GA53686@h68b04307.sqa.eu95>
+References: <20230724034048.51482-1-gavinl@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,70 +47,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZLkL3eNVNfzZbaBv@shredder>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+In-Reply-To: <20230724034048.51482-1-gavinl@nvidia.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 20, 2023 at 01:26:37PM +0300, Ido Schimmel wrote:
-> > -static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa)
-> > +static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa,
-> > +			      struct netlink_ext_ack *extack)
-> >  {
-> >  	struct net *net = dev_net(dev);
-> >  	unsigned int hash = inet6_addr_hash(net, &ifa->addr);
-> > @@ -1037,7 +1038,7 @@ static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa)
-> >  
-> >  	/* Ignore adding duplicate addresses on an interface */
-> >  	if (ipv6_chk_same_addr(net, &ifa->addr, dev, hash)) {
-> > -		netdev_dbg(dev, "ipv6_add_addr: already assigned\n");
-> > +		NL_SET_ERR_MSG(extack, "ipv6_add_addr: already assigned");
+On Mon, Jul 24, 2023 at 06:40:44AM +0300, Gavin Li wrote:
+> Currently, coalescing parameters are grouped for all transmit and receive
+> virtqueues. This patch series add support to set or get the parameters for
+> a specified virtqueue.
 > 
-> How do you trigger it?
+> When the traffic between virtqueues is unbalanced, for example, one virtqueue
+> is busy and another virtqueue is idle, then it will be very useful to
+> control coalescing parameters at the virtqueue granularity.
 > 
-> # ip link add name dummy10 up type dummy
-> # ip address add 2001:db8:1::1/64 dev dummy10
-> # ip address add 2001:db8:1::1/64 dev dummy10
-> RTNETLINK answers: File exists
+
+For series:
+
+Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
+
+After this set is merged, I will issue the netdim patchset on top of this.
+
+Thanks.
+
+> Example command:
+> $ ethtool -Q eth5 queue_mask 0x1 --coalesce tx-packets 10
+> Would set max_packets=10 to VQ 1.
+> $ ethtool -Q eth5 queue_mask 0x1 --coalesce rx-packets 10
+> Would set max_packets=10 to VQ 0.
+> $ ethtool -Q eth5 queue_mask 0x1 --show-coalesce
+>  Queue: 0
+>  Adaptive RX: off  TX: off
+>  stats-block-usecs: 0
+>  sample-interval: 0
+>  pkt-rate-low: 0
+>  pkt-rate-high: 0
 > 
-> Better to add extack in inet6_rtm_newaddr():
+>  rx-usecs: 222
+>  rx-frames: 0
+>  rx-usecs-irq: 0
+>  rx-frames-irq: 256
 > 
-> if (nlh->nlmsg_flags & NLM_F_EXCL || 
->     !(nlh->nlmsg_flags & NLM_F_REPLACE))
-> 	err = -EEXIST;
-> else
-> 	err = inet6_addr_modify(net, ifa, &cfg)
-
-Thanks. Since the dup addr checking will be done on inet6_rtm_newaddr(). I
-will remove the extack msg in ipv6_add_addr_hash().
-
-> > @@ -1103,6 +1108,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
-> >  
-> >  	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags);
-> >  	if (IS_ERR(f6i)) {
-> > +		NL_SET_ERR_MSG(extack, "Dest allocate failed");
+>  tx-usecs: 222
+>  tx-frames: 0
+>  tx-usecs-irq: 0
+>  tx-frames-irq: 256
 > 
-> The only thing that can fail in this function is ip6_route_info_create()
-> which already has an extack argument. Better to pass extack to
-> addrconf_f6i_alloc() and get a more accurate error message.
-
-OK, I will update the patch.
-
-> > -	if (cfg->plen > 128)
-> > +	if (cfg->plen > 128) {
-> > +		NL_SET_ERR_MSG(extack, "IPv6 address prefix length larger than 128");
+>  rx-usecs-low: 0
+>  rx-frame-low: 0
+>  tx-usecs-low: 0
+>  tx-frame-low: 0
 > 
-> For RTM_NEWROUTE IPv6 code just says "Invalid prefix length", so might
-> as well be consistent with it. Also, I see IPv4 doesn't have such
-> messages for its RTM_{NEW,DEL}ADDR messages. If you think it's useful
-> for IPv6, then I suggest also adding it to IPv4.
-
-OK. But since this patch is for IPv6. I will post another patch for IPv4
-specifically.
-
-Thanks
-Hangbin
+>  rx-usecs-high: 0
+>  rx-frame-high: 0
+>  tx-usecs-high: 0
+>  tx-frame-high: 0
+> 
+> Gavin Li (4):
+>   virtio_net: extract interrupt coalescing settings to a structure
+>   virtio_net: extract get/set interrupt coalesce to a function
+>   virtio_net: support per queue interrupt coalesce command
+> ---
+> changelog:
+> v1->v2
+> - Addressed the comment from Xuan Zhuo
+> - Allocate memory from heap instead of using stack memory for control vq
+> 	messages
+> v2->v3
+> - Addressed the comment from Heng Qi
+> - Use control_buf for control vq messages
+> ---
+>   virtio_net: enable per queue interrupt coalesce feature
+> 
+>  drivers/net/virtio_net.c        | 172 ++++++++++++++++++++++++++------
+>  include/uapi/linux/virtio_net.h |  14 +++
+>  2 files changed, 157 insertions(+), 29 deletions(-)
+> 
+> -- 
+> 2.39.1
+> 
 
