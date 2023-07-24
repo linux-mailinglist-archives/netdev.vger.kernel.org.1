@@ -1,291 +1,261 @@
-Return-Path: <netdev+bounces-20420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE7EE75F65A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:29:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F55575F7D1
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:07:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E78EE1C20B1A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7D6628102F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5CD79FE;
-	Mon, 24 Jul 2023 12:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103FE7486;
+	Mon, 24 Jul 2023 13:07:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE9C7498
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 12:29:30 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550AFE73;
-	Mon, 24 Jul 2023 05:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AHqDFUOrJ20UvzLrK9n3xHMPBmD1RBvHYTAfsudz+sM=; b=sncFEc5TAZYLg+bmxmXrDe8SWg
-	Ik/Xzn6NhOKwbsHW+AwNvEpZuzSgIW0fYJYlSd3UZS7jcQH+780v9Bik3sQ6CyyLopHncv/iJlXDj
-	oswvlDXQoMoVNp6iXByWWrnA1QcS83VOfxCznWe/knzr5JkvaQAIYcgtPCXVp/t6SjvDF46D/wGUU
-	Y14U8WPXL+EX+GLYL8ZaNEUEd5tDMErLrIw/azTOzlje2YphQ5AD4/oN3mBvdi1CH+V6DAwWUDWNO
-	8OccGlQT6Z5a7R4PtBRmQbw+s/ktShT7rcnKY/tgNW2KOf2g2gBxrOPL1yaWEuCmI3NrgPQ/lJjo4
-	U42bF2MA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49146)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qNuga-0008Ue-3A;
-	Mon, 24 Jul 2023 13:29:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qNuga-0000nc-Hx; Mon, 24 Jul 2023 13:29:12 +0100
-Date: Mon, 24 Jul 2023 13:29:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Revanth Kumar Uppala <ruppala@nvidia.com>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	Narayan Reddy <narayanr@nvidia.com>
-Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
-Message-ID: <ZL5umEYxNHWxhrXm@shell.armlinux.org.uk>
-References: <20230628124326.55732-1-ruppala@nvidia.com>
- <20230628124326.55732-4-ruppala@nvidia.com>
- <ZJw48a4eH0em8kjW@shell.armlinux.org.uk>
- <BL3PR12MB64507235FB47CDF03C4C5669C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A2E6D38
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:07:40 +0000 (UTC)
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74857A1;
+	Mon, 24 Jul 2023 06:07:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1690202975; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=A6sv8Ota3r8O8Emel6Vf1E8BIoqPa7jSolHG+nADyffKyQzSZZOJNkcI/NLl1xnKog
+    rp+IS4GnM2Erlj9RG0tBUiujlFNkOBYcDUtsfigo0pVD0zDlMxTX3PFbCvzmaadGqkAk
+    lbuFm82/cMuGSxOc3jDbSrvPPgGSMhiSHY/N/YPyGSoFm6bQZ7GESsaX624N4yWTw3Lf
+    B5Pir8hKnSStkeL+NtKTSBSQJlbHPjjtoGXMIj0lvcuMpumtICz8RMUDcsWExR1lw+l1
+    KzmxopEXWQUkLB1fb3S2nN40kFzKXjqik3OUCFg+3+7xES5lO5TO7dxZqUw8zI8sTY2Y
+    eDTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1690202975;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=5/p8Gwj164g7ViZ92+oJe08m2FRlX46uTBb/CAy2e7I=;
+    b=oYtfXOxdYjDiDTDWNo4NNRXNLC8kSr8v6A7s5Poz/PJOQK1w6/5mNY+X6ysgOHSEva
+    qh6PCCg/yj3hWeKet49dE3jifxdOYXpgX0d6U3YUdEYgP6nanY3GTyoBxU0HxYpF3p9G
+    PPZuJSqzEj2LEDncwN3Or0Oeui1usha87JCN+3NKgQuNrRduKrxA+TvIiFb2IQXnBpkf
+    uoG+VRmTuvbtWIvh0IEUngovV9hOIwL0f76FG/0X+vin3KgkrAPZ282XYr/Uyg/uqEwi
+    hgmIIGz84BM/pSVmCyG8fZjghlbeMUzkmdeZ1Arp5O6fC718ovfcyyKR+9R+3/r35Yto
+    KN4A==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1690202975;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=5/p8Gwj164g7ViZ92+oJe08m2FRlX46uTBb/CAy2e7I=;
+    b=TNSYzcqw0bMfKIYdPNNIBopNr/GSktLX14LnkVis7aLuGm1zw4aILK9TPJ8vrrH465
+    PRVfv6BbFWclX+97n89p5ikrjvFGB/eWXBD+GLa/hAWVvsqc8nvPfakR6bJhvZ/+TskU
+    dGJCEYNGLDehT0yqoqF5TWsaNRgS3eaHWuyLkKjDZMAYC3wAiXDIEICHfPCViS9O9Hll
+    Fhhd0FiMcOkQYaXbF4Z5cSGyEmlf5uv4wzguMhZjr9tVO8zqNpxiNjzcF3ISPV8bzCEg
+    WM+gnWoqDAUl1e5eWhbIQzLicjluSLrydNFXlhl10ZIVObWXdZsYE45kKnViOPfivaxg
+    4Opg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1690202975;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=5/p8Gwj164g7ViZ92+oJe08m2FRlX46uTBb/CAy2e7I=;
+    b=+QQsYL/fkrxdU3HwTkMY58l5jAIU7FxBlHa0e6GmdGMo3uw5GsIQ3g6iGL7l8nJhIW
+    tfKZtlSaLom1EB/M7fBQ==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1q3jXdVqE32oRVrGn+2FyPw=="
+Received: from [100.81.8.108]
+    by smtp.strato.de (RZmta 49.6.4 AUTH)
+    with ESMTPSA id K77cfez6OCnXCwt
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 24 Jul 2023 14:49:33 +0200 (CEST)
+Message-ID: <35c85eb5-24aa-d948-516a-72fa7db28c88@hartkopp.net>
+Date: Mon, 24 Jul 2023 14:49:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL3PR12MB64507235FB47CDF03C4C5669C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net] can: raw: fix lockdep issue in raw_release()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-can@vger.kernel.org,
+ eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>,
+ Ziyang Xuan <william.xuanziyang@huawei.com>, stable@vger.kernel.org,
+ Marc Kleine-Budde <mkl@pengutronix.de>
+References: <20230720114438.172434-1-edumazet@google.com>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20230720114438.172434-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 11:29:39AM +0000, Revanth Kumar Uppala wrote:
+Hello Eric, Jakub,
+
+the patch that needs to be fixed here is currently already on its way 
+into the stable trees:
+
+ > Fixes: ee8b94c8510c ("can: raw: fix receiver memory leak")
+
+Should this patch go through the linux-can tree or would somebody like 
+to apply it directly to the net tree?
+
+Many thanks,
+Oliver
+
+On 20.07.23 13:44, Eric Dumazet wrote:
+> syzbot complained about a lockdep issue [1]
 > 
+> Since raw_bind() and raw_setsockopt() first get RTNL
+> before locking the socket, we must adopt the same order in raw_release()
 > 
-> > -----Original Message-----
-> > From: Russell King <linux@armlinux.org.uk>
-> > Sent: Wednesday, June 28, 2023 7:13 PM
-> > To: Revanth Kumar Uppala <ruppala@nvidia.com>
-> > Cc: andrew@lunn.ch; hkallweit1@gmail.com; netdev@vger.kernel.org; linux-
-> > tegra@vger.kernel.org; Narayan Reddy <narayanr@nvidia.com>
-> > Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
-> > 
-> > External email: Use caution opening links or attachments
-> > 
-> > 
-> > On Wed, Jun 28, 2023 at 06:13:26PM +0530, Revanth Kumar Uppala wrote:
-> > > @@ -109,6 +134,10 @@
-> > >  #define VEND1_GLOBAL_CFG_10M                 0x0310
-> > >  #define VEND1_GLOBAL_CFG_100M                        0x031b
-> > >  #define VEND1_GLOBAL_CFG_1G                  0x031c
-> > > +#define VEND1_GLOBAL_SYS_CONFIG_SGMII   (BIT(0) | BIT(1))
-> > > +#define VEND1_GLOBAL_SYS_CONFIG_AN      BIT(3)
-> > > +#define VEND1_GLOBAL_SYS_CONFIG_XFI     BIT(8)
-> > 
-> > My understanding is that bits 2:0 are a _bitfield_ and not individual bits, which
-> > contain the following values:
-> I will define bitfield instead of defining individual bits in V2 series
-> > 
-> > 0 - 10GBASE-R (XFI if you really want to call it that)
-> > 3 - SGMII
-> > 4 - OCSGMII (2.5G)
-> > 6 - 5GBASE-R (XFI5G if you really want to call it that)
-> > 
-> > Bit 3 controls whether the SGMII control word is used, and this is the only
-> > applicable mode.
-> > 
-> > Bit 8 is already defined - it's part of the rate adaption mode field, see
-> > VEND1_GLOBAL_CFG_RATE_ADAPT and
-> > VEND1_GLOBAL_CFG_RATE_ADAPT_PAUSE.
-> Sure, I will use above mentioned macros and will set the register values with help of FIELD_PREP in V2 series
-> > 
-> > These bits apply to all the VEND1_GLOBAL_CFG_* registers, so these should be
-> > defined after the last register (0x031f).
-> Will take care of this.
-> > 
-> > > +static int aqr113c_wol_enable(struct phy_device *phydev) {
-> > > +     struct aqr107_priv *priv = phydev->priv;
-> > > +     u16 val;
-> > > +     int ret;
-> > > +
-> > > +     /* Disables all advertised speeds except for the WoL
-> > > +      * speed (100BASE-TX FD or 1000BASE-T)
-> > > +      * This is set as per the APP note from Marvel
-> > > +      */
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_AN,
-> > MDIO_AN_10GBT_CTRL,
-> > > +                            MDIO_AN_LD_LOOP_TIMING_ABILITY);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_VEND_PROV);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     val = (ret & MDIO_AN_VEND_MASK) |
-> > > +           (MDIO_AN_VEND_PROV_AQRATE_DWN_SHFT_CAP |
-> > MDIO_AN_VEND_PROV_1000BASET_FULL);
-> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_VEND_PROV,
-> > val);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* Enable the magic frame and wake up frame detection for the PHY */
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
-> > MDIO_C22EXT_GBE_PHY_RSI1_CTRL6,
-> > > +                            MDIO_C22EXT_RSI_WAKE_UP_FRAME_DETECTION);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
-> > MDIO_C22EXT_GBE_PHY_RSI1_CTRL7,
-> > > +                            MDIO_C22EXT_RSI_MAGIC_PKT_FRAME_DETECTION);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* Set the WoL enable bit */
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_AN,
-> > MDIO_AN_RSVD_VEND_PROV1,
-> > > +                            MDIO_MMD_AN_WOL_ENABLE);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* Set the WoL INT_N trigger bit */
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
-> > MDIO_C22EXT_GBE_PHY_RSI1_CTRL8,
-> > > +                            MDIO_C22EXT_RSI_WOL_FCS_MONITOR_MODE);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* Enable Interrupt INT_N Generation at pin level */
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
-> > MDIO_C22EXT_GBE_PHY_SGMII_TX_INT_MASK1,
-> > > +                            MDIO_C22EXT_SGMII0_WAKE_UP_FRAME_MASK |
-> > > +                            MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
-> > VEND1_GLOBAL_INT_STD_MASK,
-> > > +                            VEND1_GLOBAL_INT_STD_MASK_ALL);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
-> > VEND1_GLOBAL_INT_VEND_MASK,
-> > > +                            VEND1_GLOBAL_INT_VEND_MASK_GBE);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* Set the system interface to SGMII */
-> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> > > +                         VEND1_GLOBAL_CFG_100M,
-> > VEND1_GLOBAL_SYS_CONFIG_SGMII |
-> > > +                         VEND1_GLOBAL_SYS_CONFIG_AN);
-> > 
-> > How do you know that SGMII should be used for 100M?
-> > 
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> > > +                         VEND1_GLOBAL_CFG_1G,
-> > VEND1_GLOBAL_SYS_CONFIG_SGMII |
-> > > +                         VEND1_GLOBAL_SYS_CONFIG_AN);
-> > 
-> > How do you know that SGMII should be used for 1G?
-> > 
-> > Doesn't this depend on the configuration of the host MAC and the capabilities of
-> > it? If the host MAC only supports 10G, doesn't this break stuff?
-> > 
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* restart auto-negotiation */
-> > > +     genphy_c45_restart_aneg(phydev);
-> > > +     priv->wol_status = 1;
-> > > +
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +static int aqr113c_wol_disable(struct phy_device *phydev) {
-> > > +     struct aqr107_priv *priv = phydev->priv;
-> > > +     int ret;
-> > > +
-> > > +     /* Disable the WoL enable bit */
-> > > +     ret = phy_clear_bits_mmd(phydev, MDIO_MMD_AN,
-> > MDIO_AN_RSVD_VEND_PROV1,
-> > > +                              MDIO_MMD_AN_WOL_ENABLE);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     /* Restore the SERDES/System Interface back to the XFI mode */
-> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> > > +                         VEND1_GLOBAL_CFG_100M,
-> > VEND1_GLOBAL_SYS_CONFIG_XFI);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > > +
-> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> > > +                         VEND1_GLOBAL_CFG_1G, VEND1_GLOBAL_SYS_CONFIG_XFI);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > 
-> > Conversely, how do you know that configuring 100M/1G to use 10GBASE-R on
-> > the host interface is how the PHY was provisioned in firmware? I think at the
-> > very least, you should be leaving these settings alone until you know that the
-> > system is entering a low power mode, saving the settings, and restoring them
-> > when you wake up.
+> [1]
+> WARNING: possible circular locking dependency detected
+> 6.5.0-rc1-syzkaller-00192-g78adb4bcf99e #0 Not tainted
+> ------------------------------------------------------
+> syz-executor.0/14110 is trying to acquire lock:
+> ffff88804e4b6130 (sk_lock-AF_CAN){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1708 [inline]
+> ffff88804e4b6130 (sk_lock-AF_CAN){+.+.}-{0:0}, at: raw_bind+0xb1/0xab0 net/can/raw.c:435
 > 
-> Regarding all the above comments ,
-> We are following the app note AN-N4209 by Marvell semiconductors for enabling and disabling of WOL.
-> Below are the steps in brief as mentioned in app note
-
-So basically what I gather is that the answer to "how do you know that
-configuring 100M/1G to use 10GBASE-R the host interface is how the PHY
-was provisioned in firmware?" is that you don't know, and you're just
-blindly following what someone's thrown into an application note but
-haven't thought enough about it.
-
-> For remote WAKEUP via magic packet,
-> 1.MAC detects INT from PHY and confirm Wake request.
-> 2. Disable the WoL mode by unsetting the WoL enable bit.
-> 3. Restore the SERDES/System Interface back to the original mode before WoL was initialized using SGMII mode i.e; back to XFI mode.
-> MDIO write 1e.31b = 0x100 (Reverts the 100M setup to original mode)
-> MDIO write 1e.31c = 0x100 (Reverts the 1G setup to original mode
-
-I think you have misunderstood step 3. "Restore ... back to the
-original mode" when interpreting the application note.
-
-Since these registers are set during the provisioning on the PHY,
-there is *no* guarantee that they were originally in XFI mode before
-WoL was enabled. Hence, in order to "restore" their state, you need
-to "save" their state at some point, and it would probably be a good
-idea to do that when:
-
-1) the PHY is probed to get the power-up status.
-2) update the saved registers whenever the driver reconfigures the PHY
-   for a different interface mode (I don't think it does this.)
-3) use this saved information to restore these registers when WoL is
-   disabled, _or_ when the PHY device is detached from the PHY driver
-   i.o.w. when the ->remove method is called, so that if the driver
-   re-probes, it can get at the _original_ information.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> but task is already holding lock:
+> ffffffff8e3df368 (rtnl_mutex){+.+.}-{3:3}, at: raw_bind+0xa7/0xab0 net/can/raw.c:434
+> 
+> which lock already depends on the new lock.
+> 
+> the existing dependency chain (in reverse order) is:
+> 
+> -> #1 (rtnl_mutex){+.+.}-{3:3}:
+> __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+> __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
+> raw_release+0x1c6/0x9b0 net/can/raw.c:391
+> __sock_release+0xcd/0x290 net/socket.c:654
+> sock_close+0x1c/0x20 net/socket.c:1386
+> __fput+0x3fd/0xac0 fs/file_table.c:384
+> task_work_run+0x14d/0x240 kernel/task_work.c:179
+> resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+> exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+> exit_to_user_mode_prepare+0x210/0x240 kernel/entry/common.c:204
+> __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+> syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+> do_syscall_64+0x44/0xb0 arch/x86/entry/common.c:86
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> -> #0 (sk_lock-AF_CAN){+.+.}-{0:0}:
+> check_prev_add kernel/locking/lockdep.c:3142 [inline]
+> check_prevs_add kernel/locking/lockdep.c:3261 [inline]
+> validate_chain kernel/locking/lockdep.c:3876 [inline]
+> __lock_acquire+0x2e3d/0x5de0 kernel/locking/lockdep.c:5144
+> lock_acquire kernel/locking/lockdep.c:5761 [inline]
+> lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
+> lock_sock_nested+0x3a/0xf0 net/core/sock.c:3492
+> lock_sock include/net/sock.h:1708 [inline]
+> raw_bind+0xb1/0xab0 net/can/raw.c:435
+> __sys_bind+0x1ec/0x220 net/socket.c:1792
+> __do_sys_bind net/socket.c:1803 [inline]
+> __se_sys_bind net/socket.c:1801 [inline]
+> __x64_sys_bind+0x72/0xb0 net/socket.c:1801
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> other info that might help us debug this:
+> 
+> Possible unsafe locking scenario:
+> 
+> CPU0 CPU1
+> ---- ----
+> lock(rtnl_mutex);
+>          lock(sk_lock-AF_CAN);
+>          lock(rtnl_mutex);
+> lock(sk_lock-AF_CAN);
+> 
+> *** DEADLOCK ***
+> 
+> 1 lock held by syz-executor.0/14110:
+> 
+> stack backtrace:
+> CPU: 0 PID: 14110 Comm: syz-executor.0 Not tainted 6.5.0-rc1-syzkaller-00192-g78adb4bcf99e #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
+> Call Trace:
+> <TASK>
+> __dump_stack lib/dump_stack.c:88 [inline]
+> dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+> check_noncircular+0x311/0x3f0 kernel/locking/lockdep.c:2195
+> check_prev_add kernel/locking/lockdep.c:3142 [inline]
+> check_prevs_add kernel/locking/lockdep.c:3261 [inline]
+> validate_chain kernel/locking/lockdep.c:3876 [inline]
+> __lock_acquire+0x2e3d/0x5de0 kernel/locking/lockdep.c:5144
+> lock_acquire kernel/locking/lockdep.c:5761 [inline]
+> lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
+> lock_sock_nested+0x3a/0xf0 net/core/sock.c:3492
+> lock_sock include/net/sock.h:1708 [inline]
+> raw_bind+0xb1/0xab0 net/can/raw.c:435
+> __sys_bind+0x1ec/0x220 net/socket.c:1792
+> __do_sys_bind net/socket.c:1803 [inline]
+> __se_sys_bind net/socket.c:1801 [inline]
+> __x64_sys_bind+0x72/0xb0 net/socket.c:1801
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7fd89007cb29
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fd890d2a0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
+> RAX: ffffffffffffffda RBX: 00007fd89019bf80 RCX: 00007fd89007cb29
+> RDX: 0000000000000010 RSI: 0000000020000040 RDI: 0000000000000003
+> RBP: 00007fd8900c847a R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000000000000000b R14: 00007fd89019bf80 R15: 00007ffebf8124f8
+> </TASK>
+> 
+> Fixes: ee8b94c8510c ("can: raw: fix receiver memory leak")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Ziyang Xuan <william.xuanziyang@huawei.com>
+> Cc: Oliver Hartkopp <socketcan@hartkopp.net>
+> Cc: stable@vger.kernel.org
+> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+> ---
+>   net/can/raw.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/can/raw.c b/net/can/raw.c
+> index 2302e48829677334f8b2d74a479e5a9cbb5ce03c..ba6b52b1d7767fdd7b57d1b8e5519495340c572c 100644
+> --- a/net/can/raw.c
+> +++ b/net/can/raw.c
+> @@ -386,9 +386,9 @@ static int raw_release(struct socket *sock)
+>   	list_del(&ro->notifier);
+>   	spin_unlock(&raw_notifier_lock);
+>   
+> +	rtnl_lock();
+>   	lock_sock(sk);
+>   
+> -	rtnl_lock();
+>   	/* remove current filters & unregister */
+>   	if (ro->bound) {
+>   		if (ro->dev)
+> @@ -405,12 +405,13 @@ static int raw_release(struct socket *sock)
+>   	ro->dev = NULL;
+>   	ro->count = 0;
+>   	free_percpu(ro->uniq);
+> -	rtnl_unlock();
+>   
+>   	sock_orphan(sk);
+>   	sock->sk = NULL;
+>   
+>   	release_sock(sk);
+> +	rtnl_unlock();
+> +
+>   	sock_put(sk);
+>   
+>   	return 0;
 
