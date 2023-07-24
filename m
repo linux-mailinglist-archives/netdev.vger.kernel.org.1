@@ -1,214 +1,214 @@
-Return-Path: <netdev+bounces-20473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 891E075FA94
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:19:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F9F575FAB6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:23:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7228A1C20B36
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518E51C20B3D
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104C3DDA3;
-	Mon, 24 Jul 2023 15:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F719DDB6;
+	Mon, 24 Jul 2023 15:23:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C5A8839
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:19:04 +0000 (UTC)
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22C3199B
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 08:19:02 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-403b3273074so20694251cf.1
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 08:19:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690211941; x=1690816741;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTgcwHv6tNn2n8tPdtjRBBt5SS53NoEtTVDGTyM7kRU=;
-        b=wn3IRKQmi/999MP9kMy7ITASrDrcM/3crXdiRJqDimRV6O+GNXf/jAyMI9u4gisV4+
-         8Gftns7PCrlsS8enwhe4g2TPziB1YAnZ3bEk8BvN9f20BnM2wY198uwo65KDL1KuJKyR
-         +e1fJ4r2tIof5rJTCfcnoTQB4MR7d/E9I9S7lFb5kIDq/fWiqpYu9mRM97myFLHqvqNl
-         d0dU4vR2u02lqgAAqPWtCt9qwnE+AxadMD4PZObybVV44Fhjn30xwUE9M36ytvppQY3X
-         sbcPmaju5OL7K/sruO+vDRbT4C7ryPapas/XKTLJ1z1jKGK1Y2/b8zh73L1LQVHw+30J
-         kgXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690211941; x=1690816741;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JTgcwHv6tNn2n8tPdtjRBBt5SS53NoEtTVDGTyM7kRU=;
-        b=N4qxdyDY+RGmopI4wF+rkqjpFaqLGuCE8Z5cZoVOVAJRXlbf9oGBbsrWmL630ImeqT
-         a7hFizhkfgukRYnZr5+qNdaXJObxlsEs5edtrph2+1k84wA/1ek5s67J63sarqm3TnYH
-         WB9dz92AGNbYlFI+KOnqXU9NVleq2WFd+EDwfeASQmg5zI3Um7b5s7HDlwBeyGtcCFgh
-         wKS3sXP0jfZCD/cu/WBAdKVZGfrjBfcLTiFHIgGbHc7OC6jqryULy/13fUxoVqlA5e7d
-         J8CjfU2nxNOTou6GFGr7WRJY72R6Sy83pJVXjnuxnY5bTnateOT2FjkGM3a3OMibW0EA
-         AJCQ==
-X-Gm-Message-State: ABy/qLYHnys0Vj0pTSB67faT/BG/WyrOikLR1vxH0+kvxWPBXXMqFzlj
-	3xyq3ilFqdaiQMPOJLOEY1tE1Q==
-X-Google-Smtp-Source: APBJJlE4pe1nW5vyKnoJKJ66ljCs4An90weRKv6lGbFEtws4aEG4rD64SBY7lIj5rTqx547DWB31Kw==
-X-Received: by 2002:a05:622a:185:b0:3fd:ed14:6eb9 with SMTP id s5-20020a05622a018500b003fded146eb9mr94671qtw.11.1690211941501;
-        Mon, 24 Jul 2023 08:19:01 -0700 (PDT)
-Received: from mbili.waya ([142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id r26-20020ac8521a000000b00402ed9adfa1sm3381643qtn.87.2023.07.24.08.19.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 08:19:00 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	netdev@vger.kernel.org,
-	mgcho.minic@gmail.com,
-	security@kernel.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net 1/1] net: sched: cls_u32: Fix match key mis-addressing
-Date: Mon, 24 Jul 2023 11:18:49 -0400
-Message-Id: <20230724151849.323497-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AA28839
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:23:48 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F534E57
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 08:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690212225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ytLMoP/npcxxhxeVQxkd3GLmDI++qSW8yF2vJW6Ep9k=;
+	b=ZZgntlXXU5ypRTknNCj5B9olgQO9Ql3g4KP7y5b7a8TJUmmiJiqIn7MLPnY3n/cvYbH4sF
+	wiZVez0i631w/THgh00oJUga5Cxw+vqzybkz/rVWeHXC7nKA/bNx9WaUfC5iQ1TTkLMV/Q
+	pXJUvu80k8HFs0mIqAnOEm38BNPI6vw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-503-28ZiyXuuNkqZ17LzhKCIgQ-1; Mon, 24 Jul 2023 11:23:44 -0400
+X-MC-Unique: 28ZiyXuuNkqZ17LzhKCIgQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4A928030AC;
+	Mon, 24 Jul 2023 15:23:43 +0000 (UTC)
+Received: from RHTPC1VM0NT (unknown [10.22.33.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F485C2C856;
+	Mon, 24 Jul 2023 15:23:43 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  i.maximets@ovn.org,
+  eric@garver.life
+Subject: Re: [PATCH net-next 4/7] net: openvswitch: add misc error drop reasons
+References: <20230722094238.2520044-1-amorenoz@redhat.com>
+	<20230722094238.2520044-5-amorenoz@redhat.com>
+Date: Mon, 24 Jul 2023 11:23:42 -0400
+In-Reply-To: <20230722094238.2520044-5-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Sat, 22 Jul 2023 11:42:34 +0200")
+Message-ID: <f7t4jltl4e9.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-A match entry is uniquely identified with an "address" or "path" in the
-form of: hashtable ID(12b):bucketid(8b):nodeid(12b).
-A table on which the entry is inserted assumes the address with nodeid of
-zero.
+Adrian Moreno <amorenoz@redhat.com> writes:
 
-When creating table match entries all of hash table id, bucket id and
-node (match entry id) are needed to be either specified by the user or
-via reasonable in-kernel defaults. The in-kernel default for a table
-id is 0x800(omnipresent root table); for bucketid it is 0x0. Prior to
-this fix there was none for a nodeid i.e. the code assumed that the
-user passed the correct nodeid and if the user passes a nodeid of 0
-(as Mingi Cho did) then that is what was assumed. But nodeid of 0
-is reserved for identifying the table. This is not a problem until
-we dump. The dump code notices that the nodeid is zero and assumes
-it is referencing a table and therefore table struct tc_u_hnode instead
-of what was created i.e match entry struct tc_u_knode.
+> Use drop reasons from include/net/dropreason-core.h when a reasonable
+> candidate exists.
+>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
+>  net/openvswitch/actions.c   | 17 ++++++++++-------
+>  net/openvswitch/conntrack.c |  3 ++-
+>  net/openvswitch/drop.h      |  6 ++++++
+>  3 files changed, 18 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> index 9279bb186e9f..42fa1e7eb912 100644
+> --- a/net/openvswitch/actions.c
+> +++ b/net/openvswitch/actions.c
 
-Ming does an equivalent of:
-tc filter add dev dummy0 parent 10: prio 1 handle 0x1000 \
-protocol ip u32 match ip src 10.0.0.1/32 classid 10:1 action ok
+Did you consider putting in a drop reason when one of the actions fails
+setting err?  For example, if dec_ttl fails with some error other than
+EHOSTUNREACH, it will drop into the kfree_skb() case... maybe we should
+have an action_failed drop reason that can be passed there.
 
-Essentially specifying a table id 0, bucketid 1 and nodeid of zero
-Tableid 0 is remapped to the default of 0x800.
-Bucketid 1 is ignored and defaults to 0x00.
-Nodeid was assumed to be what Ming passed - 0x000
-
-dumping before fix shows:
-~$ tc filter ls dev dummy0 parent 10:
-filter protocol ip pref 1 u32 chain 0
-filter protocol ip pref 1 u32 chain 0 fh 800: ht divisor 1
-filter protocol ip pref 1 u32 chain 0 fh 800: ht divisor -30591
-
-Note that the last line reports a table instead of a match entry
-(you can tell this because it says "ht divisor...").
-As a result of reporting the wrong data type (misinterpretting of struct
-tc_u_knode as being struct tc_u_hnode) the divisor is reported with value
-of -30591. Ming identified this as part of the heap address
-(physmap_base is 0xffff8880 (-30591 - 1)).
-
-The fix is to ensure that when table entry matches are added and no
-nodeid is specified (i.e nodeid == 0) then we get the next available
-nodeid from the table's pool.
-
-After the fix, this is what the dump shows:
-$ tc filter ls dev dummy0 parent 10:
-filter protocol ip pref 1 u32 chain 0
-filter protocol ip pref 1 u32 chain 0 fh 800: ht divisor 1
-filter protocol ip pref 1 u32 chain 0 fh 800::800 order 2048 key ht 800 bkt 0 flowid 10:1 not_in_hw
-  match 0a000001/ffffffff at 12
-	action order 1: gact action pass
-	 random type none pass val 0
-	 index 1 ref 1 bind 1
-
-Reported-by: Mingi Cho <mgcho.minic@gmail.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/cls_u32.c | 48 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 6 deletions(-)
-
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index 5abf31e432ca..e0eabbcce9d4 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -1024,18 +1024,54 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
- 		return -EINVAL;
- 	}
- 
-+	/* If we got this far _we have the table(ht)_ with its matching htid.
-+	 * Note that earlier the ht selection is a result of either a) the user
-+	 * providing the htid specified via TCA_U32_HASH attribute or b) when
-+	 * no such attribute is passed then a default ht, typically root at
-+	 * 0x80000000, is chosen.
-+	 * The passed htid will also hold the bucketid. 0 is fine. For example
-+	 * of the root ht, 0x80000000 is indicating bucketid 0, whereas a user
-+	 * passed htid may have 0x60001000 indicating hash bucketid 1.
-+	 *
-+	 * We may also have a handle, if the user passed one. The handle carries
-+	 * annotation of htid(12b):bucketid(8b):node/entryid(12b).
-+	 * The value of bucketid on the handle is ignored even if one was passed;
-+	 * rather the value on the htid is always assumed to be the bucketid.
-+	 */
- 	if (handle) {
-+		/* The tableid from handle and tableid from htid must match */
- 		if (TC_U32_HTID(handle) && TC_U32_HTID(handle ^ htid)) {
- 			NL_SET_ERR_MSG_MOD(extack, "Handle specified hash table address mismatch");
- 			return -EINVAL;
- 		}
--		handle = htid | TC_U32_NODE(handle);
--		err = idr_alloc_u32(&ht->handle_idr, NULL, &handle, handle,
--				    GFP_KERNEL);
--		if (err)
--			return err;
--	} else
-+		/* Ok, so far we have a valid htid(12b):bucketid(8b) but we
-+		 * need to finalize our handle to point to the entry as well
-+		 * (with a proper node/entryid(12b)). Nodeid _cannot be 0_ for
-+		 * entries since it is reserved only for tables(see earlier
-+		 * code which processes TC_U32_DIVISOR attribute).
-+		 * if the handle did not specify a non-zero nodeid (example
-+		 * passed 0x60000000) then pick a new one from the pool of IDs
-+		 * this hash table has been allocating from.
-+		 * If OTOH it is specified (i.e for example the user passed a
-+		 * handle such as 0x60000123), then we use it generate our final
-+		 * handle which is used to uniquely identify the match entry.
-+		 */
-+		if (!TC_U32_NODE(handle)) {
-+			handle = gen_new_kid(ht, htid);
-+		} else {
-+			handle = htid | TC_U32_NODE(handle);
-+			err = idr_alloc_u32(&ht->handle_idr, NULL, &handle,
-+					    handle, GFP_KERNEL);
-+			if (err)
-+				return err;
-+		}
-+	} else {
-+		/* we dont have a handle lets just generate one based on htid
-+		 * recall that htid has both the table and bucket ids already
-+		 * encoded, only missing piece is the nodeid.
-+		 */
- 		handle = gen_new_kid(ht, htid);
-+	}
- 
- 	if (tb[TCA_U32_SEL] == NULL) {
- 		NL_SET_ERR_MSG_MOD(extack, "Selector not specified");
--- 
-2.34.1
+> @@ -782,7 +782,7 @@ static int ovs_vport_output(struct net *net, struct sock *sk,
+>  	struct vport *vport = data->vport;
+>  
+>  	if (skb_cow_head(skb, data->l2_len) < 0) {
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_NOMEM);
+>  		return -ENOMEM;
+>  	}
+>  
+> @@ -853,6 +853,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
+>  			 struct sk_buff *skb, u16 mru,
+>  			 struct sw_flow_key *key)
+>  {
+> +	enum ovs_drop_reason reason;
+>  	u16 orig_network_offset = 0;
+>  
+>  	if (eth_p_mpls(skb->protocol)) {
+> @@ -862,6 +863,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
+>  
+>  	if (skb_network_offset(skb) > MAX_L2_LEN) {
+>  		OVS_NLERR(1, "L2 header too long to fragment");
+> +		reason = OVS_DROP_FRAG_L2_TOO_LONG;
+>  		goto err;
+>  	}
+>  
+> @@ -902,12 +904,13 @@ static void ovs_fragment(struct net *net, struct vport *vport,
+>  		WARN_ONCE(1, "Failed fragment ->%s: eth=%04x, MRU=%d, MTU=%d.",
+>  			  ovs_vport_name(vport), ntohs(key->eth.type), mru,
+>  			  vport->dev->mtu);
+> +		reason = OVS_DROP_FRAG_INVALID_PROTO;
+>  		goto err;
+>  	}
+>  
+>  	return;
+>  err:
+> -	kfree_skb(skb);
+> +	kfree_skb_reason(skb, reason);
+>  }
+>  
+>  static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+> @@ -934,10 +937,10 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+>  
+>  			ovs_fragment(net, vport, skb, mru, key);
+>  		} else {
+> -			kfree_skb(skb);
+> +			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
+>  		}
+>  	} else {
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_DEV_READY);
+>  	}
+>  }
+>  
+> @@ -1011,7 +1014,7 @@ static int dec_ttl_exception_handler(struct datapath *dp, struct sk_buff *skb,
+>  		return clone_execute(dp, skb, key, 0, nla_data(actions),
+>  				     nla_len(actions), true, false);
+>  
+> -	consume_skb(skb);
+> +	kfree_skb_reason(skb, OVS_DROP_IP_TTL);
+>  	return 0;
+>  }
+>  
+> @@ -1564,7 +1567,7 @@ static int clone_execute(struct datapath *dp, struct sk_buff *skb,
+>  		/* Out of per CPU action FIFO space. Drop the 'skb' and
+>  		 * log an error.
+>  		 */
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, OVS_DROP_DEFERRED_LIMIT);
+>  
+>  		if (net_ratelimit()) {
+>  			if (actions) { /* Sample action */
+> @@ -1616,7 +1619,7 @@ int ovs_execute_actions(struct datapath *dp, struct sk_buff *skb,
+>  	if (unlikely(level > OVS_RECURSION_LIMIT)) {
+>  		net_crit_ratelimited("ovs: recursion limit reached on datapath %s, probable configuration error\n",
+>  				     ovs_dp_name(dp));
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, OVS_DROP_RECURSION_LIMIT);
+>  		err = -ENETDOWN;
+>  		goto out;
+>  	}
+> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+> index fa955e892210..b03ebd4a8fae 100644
+> --- a/net/openvswitch/conntrack.c
+> +++ b/net/openvswitch/conntrack.c
+> @@ -29,6 +29,7 @@
+>  #include <net/netfilter/nf_conntrack_act_ct.h>
+>  
+>  #include "datapath.h"
+> +#include "drop.h"
+>  #include "conntrack.h"
+>  #include "flow.h"
+>  #include "flow_netlink.h"
+> @@ -1035,7 +1036,7 @@ int ovs_ct_execute(struct net *net, struct sk_buff *skb,
+>  
+>  	skb_push_rcsum(skb, nh_ofs);
+>  	if (err)
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, OVS_DROP_CONNTRACK);
+>  	return err;
+>  }
+>  
+> diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
+> index 2440c836727f..744b8d1b93a3 100644
+> --- a/net/openvswitch/drop.h
+> +++ b/net/openvswitch/drop.h
+> @@ -12,6 +12,12 @@
+>  	R(OVS_DROP_EXPLICIT_ACTION)		\
+>  	R(OVS_DROP_EXPLICIT_ACTION_ERROR)	\
+>  	R(OVS_DROP_METER)			\
+> +	R(OVS_DROP_RECURSION_LIMIT)		\
+> +	R(OVS_DROP_DEFERRED_LIMIT)		\
+> +	R(OVS_DROP_FRAG_L2_TOO_LONG)		\
+> +	R(OVS_DROP_FRAG_INVALID_PROTO)		\
+> +	R(OVS_DROP_CONNTRACK)			\
+> +	R(OVS_DROP_IP_TTL)			\
+>  	/* deliberate comment for trailing \ */
+>  
+>  enum ovs_drop_reason {
 
 
