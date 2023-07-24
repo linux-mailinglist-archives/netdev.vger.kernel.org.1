@@ -1,245 +1,291 @@
-Return-Path: <netdev+bounces-20419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2119175F646
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:27:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE7EE75F65A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:29:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9FF828103E
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:27:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E78EE1C20B1A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F997487;
-	Mon, 24 Jul 2023 12:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5CD79FE;
+	Mon, 24 Jul 2023 12:29:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B828BE3
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 12:27:28 +0000 (UTC)
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85ECD10CB;
-	Mon, 24 Jul 2023 05:27:23 -0700 (PDT)
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2AD0A61E5FE01;
-	Mon, 24 Jul 2023 14:26:44 +0200 (CEST)
-Message-ID: <75dea485-9bdf-355f-0aff-a26de0998b80@molgen.mpg.de>
-Date: Mon, 24 Jul 2023 14:26:43 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE9C7498
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 12:29:30 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550AFE73;
+	Mon, 24 Jul 2023 05:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AHqDFUOrJ20UvzLrK9n3xHMPBmD1RBvHYTAfsudz+sM=; b=sncFEc5TAZYLg+bmxmXrDe8SWg
+	Ik/Xzn6NhOKwbsHW+AwNvEpZuzSgIW0fYJYlSd3UZS7jcQH+780v9Bik3sQ6CyyLopHncv/iJlXDj
+	oswvlDXQoMoVNp6iXByWWrnA1QcS83VOfxCznWe/knzr5JkvaQAIYcgtPCXVp/t6SjvDF46D/wGUU
+	Y14U8WPXL+EX+GLYL8ZaNEUEd5tDMErLrIw/azTOzlje2YphQ5AD4/oN3mBvdi1CH+V6DAwWUDWNO
+	8OccGlQT6Z5a7R4PtBRmQbw+s/ktShT7rcnKY/tgNW2KOf2g2gBxrOPL1yaWEuCmI3NrgPQ/lJjo4
+	U42bF2MA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49146)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qNuga-0008Ue-3A;
+	Mon, 24 Jul 2023 13:29:13 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qNuga-0000nc-Hx; Mon, 24 Jul 2023 13:29:12 +0100
+Date: Mon, 24 Jul 2023 13:29:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Revanth Kumar Uppala <ruppala@nvidia.com>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	Narayan Reddy <narayanr@nvidia.com>
+Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
+Message-ID: <ZL5umEYxNHWxhrXm@shell.armlinux.org.uk>
+References: <20230628124326.55732-1-ruppala@nvidia.com>
+ <20230628124326.55732-4-ruppala@nvidia.com>
+ <ZJw48a4eH0em8kjW@shell.armlinux.org.uk>
+ <BL3PR12MB64507235FB47CDF03C4C5669C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v1] Bluetooth: Add timeout in disconnect when power off
-Content-Language: en-US
-To: Howard Chung <howardchung@google.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- Archie Pusaka <apusaka@google.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20230724111206.3067352-1-howardchung@google.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230724111206.3067352-1-howardchung@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL3PR12MB64507235FB47CDF03C4C5669C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Dear Howard,
-
-
-Thank you for your patch. Some minor nits.
-
-Am 24.07.23 um 13:12 schrieb Howard Chung:
-> For some controllers, it is known that when the HCI disconnect and HCI
-> Reset are too close to each other, the LMP disconnect command might not
-> been sent out yet and the command will be dropped by the controoler when
-
-1.  s/been/be/ or *have been*?
-2.  controller
-
-> it is asked to reset itself. This could happen on powering off adapter.
+On Mon, Jul 24, 2023 at 11:29:39AM +0000, Revanth Kumar Uppala wrote:
 > 
-> One possible issue is that if a connection exists, and then powering off
-> and on adapter within a short time, then our host stack assumes the
-
-I do not understand the part of the first comma.
-
-> conntection was disconnected but this might not be true, so if we issue
-
-connection
-
-> a connection to the peer, it will fail with ACL Already Connected error.
 > 
-> This CL makes the host stack to wait for |HCI_EV_DISCONN_COMPLETE| when
-> powering off with a configurable timeout unless the timeout is set to 0.
+> > -----Original Message-----
+> > From: Russell King <linux@armlinux.org.uk>
+> > Sent: Wednesday, June 28, 2023 7:13 PM
+> > To: Revanth Kumar Uppala <ruppala@nvidia.com>
+> > Cc: andrew@lunn.ch; hkallweit1@gmail.com; netdev@vger.kernel.org; linux-
+> > tegra@vger.kernel.org; Narayan Reddy <narayanr@nvidia.com>
+> > Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
+> > 
+> > External email: Use caution opening links or attachments
+> > 
+> > 
+> > On Wed, Jun 28, 2023 at 06:13:26PM +0530, Revanth Kumar Uppala wrote:
+> > > @@ -109,6 +134,10 @@
+> > >  #define VEND1_GLOBAL_CFG_10M                 0x0310
+> > >  #define VEND1_GLOBAL_CFG_100M                        0x031b
+> > >  #define VEND1_GLOBAL_CFG_1G                  0x031c
+> > > +#define VEND1_GLOBAL_SYS_CONFIG_SGMII   (BIT(0) | BIT(1))
+> > > +#define VEND1_GLOBAL_SYS_CONFIG_AN      BIT(3)
+> > > +#define VEND1_GLOBAL_SYS_CONFIG_XFI     BIT(8)
+> > 
+> > My understanding is that bits 2:0 are a _bitfield_ and not individual bits, which
+> > contain the following values:
+> I will define bitfield instead of defining individual bits in V2 series
+> > 
+> > 0 - 10GBASE-R (XFI if you really want to call it that)
+> > 3 - SGMII
+> > 4 - OCSGMII (2.5G)
+> > 6 - 5GBASE-R (XFI5G if you really want to call it that)
+> > 
+> > Bit 3 controls whether the SGMII control word is used, and this is the only
+> > applicable mode.
+> > 
+> > Bit 8 is already defined - it's part of the rate adaption mode field, see
+> > VEND1_GLOBAL_CFG_RATE_ADAPT and
+> > VEND1_GLOBAL_CFG_RATE_ADAPT_PAUSE.
+> Sure, I will use above mentioned macros and will set the register values with help of FIELD_PREP in V2 series
+> > 
+> > These bits apply to all the VEND1_GLOBAL_CFG_* registers, so these should be
+> > defined after the last register (0x031f).
+> Will take care of this.
+> > 
+> > > +static int aqr113c_wol_enable(struct phy_device *phydev) {
+> > > +     struct aqr107_priv *priv = phydev->priv;
+> > > +     u16 val;
+> > > +     int ret;
+> > > +
+> > > +     /* Disables all advertised speeds except for the WoL
+> > > +      * speed (100BASE-TX FD or 1000BASE-T)
+> > > +      * This is set as per the APP note from Marvel
+> > > +      */
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_AN,
+> > MDIO_AN_10GBT_CTRL,
+> > > +                            MDIO_AN_LD_LOOP_TIMING_ABILITY);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_VEND_PROV);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     val = (ret & MDIO_AN_VEND_MASK) |
+> > > +           (MDIO_AN_VEND_PROV_AQRATE_DWN_SHFT_CAP |
+> > MDIO_AN_VEND_PROV_1000BASET_FULL);
+> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_VEND_PROV,
+> > val);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* Enable the magic frame and wake up frame detection for the PHY */
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
+> > MDIO_C22EXT_GBE_PHY_RSI1_CTRL6,
+> > > +                            MDIO_C22EXT_RSI_WAKE_UP_FRAME_DETECTION);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
+> > MDIO_C22EXT_GBE_PHY_RSI1_CTRL7,
+> > > +                            MDIO_C22EXT_RSI_MAGIC_PKT_FRAME_DETECTION);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* Set the WoL enable bit */
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_AN,
+> > MDIO_AN_RSVD_VEND_PROV1,
+> > > +                            MDIO_MMD_AN_WOL_ENABLE);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* Set the WoL INT_N trigger bit */
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
+> > MDIO_C22EXT_GBE_PHY_RSI1_CTRL8,
+> > > +                            MDIO_C22EXT_RSI_WOL_FCS_MONITOR_MODE);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* Enable Interrupt INT_N Generation at pin level */
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT,
+> > MDIO_C22EXT_GBE_PHY_SGMII_TX_INT_MASK1,
+> > > +                            MDIO_C22EXT_SGMII0_WAKE_UP_FRAME_MASK |
+> > > +                            MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
+> > VEND1_GLOBAL_INT_STD_MASK,
+> > > +                            VEND1_GLOBAL_INT_STD_MASK_ALL);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
+> > VEND1_GLOBAL_INT_VEND_MASK,
+> > > +                            VEND1_GLOBAL_INT_VEND_MASK_GBE);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* Set the system interface to SGMII */
+> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > > +                         VEND1_GLOBAL_CFG_100M,
+> > VEND1_GLOBAL_SYS_CONFIG_SGMII |
+> > > +                         VEND1_GLOBAL_SYS_CONFIG_AN);
+> > 
+> > How do you know that SGMII should be used for 100M?
+> > 
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > > +                         VEND1_GLOBAL_CFG_1G,
+> > VEND1_GLOBAL_SYS_CONFIG_SGMII |
+> > > +                         VEND1_GLOBAL_SYS_CONFIG_AN);
+> > 
+> > How do you know that SGMII should be used for 1G?
+> > 
+> > Doesn't this depend on the configuration of the host MAC and the capabilities of
+> > it? If the host MAC only supports 10G, doesn't this break stuff?
+> > 
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* restart auto-negotiation */
+> > > +     genphy_c45_restart_aneg(phydev);
+> > > +     priv->wol_status = 1;
+> > > +
+> > > +     return 0;
+> > > +}
+> > > +
+> > > +static int aqr113c_wol_disable(struct phy_device *phydev) {
+> > > +     struct aqr107_priv *priv = phydev->priv;
+> > > +     int ret;
+> > > +
+> > > +     /* Disable the WoL enable bit */
+> > > +     ret = phy_clear_bits_mmd(phydev, MDIO_MMD_AN,
+> > MDIO_AN_RSVD_VEND_PROV1,
+> > > +                              MDIO_MMD_AN_WOL_ENABLE);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     /* Restore the SERDES/System Interface back to the XFI mode */
+> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > > +                         VEND1_GLOBAL_CFG_100M,
+> > VEND1_GLOBAL_SYS_CONFIG_XFI);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > > +
+> > > +     ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > > +                         VEND1_GLOBAL_CFG_1G, VEND1_GLOBAL_SYS_CONFIG_XFI);
+> > > +     if (ret < 0)
+> > > +             return ret;
+> > 
+> > Conversely, how do you know that configuring 100M/1G to use 10GBASE-R on
+> > the host interface is how the PHY was provisioned in firmware? I think at the
+> > very least, you should be leaving these settings alone until you know that the
+> > system is entering a low power mode, saving the settings, and restoring them
+> > when you wake up.
 > 
-> Reviewed-by: Archie Pusaka <apusaka@google.com>
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> ---
-> Hi upstream maintainers, this is tested with an AX211 device and Logi
-> K580 keyboard by the following procedures:
-> 1. pair the peer and stay connected.
-> 2. power off and on immediately
-> 3. observe that the btsnoop log is consistent with the configured
->     timeout.
+> Regarding all the above comments ,
+> We are following the app note AN-N4209 by Marvell semiconductors for enabling and disabling of WOL.
+> Below are the steps in brief as mentioned in app note
 
-It’d be great to have this in the commit message.
+So basically what I gather is that the answer to "how do you know that
+configuring 100M/1G to use 10GBASE-R the host interface is how the PHY
+was provisioned in firmware?" is that you don't know, and you're just
+blindly following what someone's thrown into an application note but
+haven't thought enough about it.
 
->   include/net/bluetooth/hci_core.h |  1 +
->   net/bluetooth/hci_core.c         |  2 +-
->   net/bluetooth/hci_sync.c         | 38 +++++++++++++++++++++++---------
->   net/bluetooth/mgmt_config.c      |  6 +++++
->   4 files changed, 35 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 8200a6689b39..ce44f9c60059 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -432,6 +432,7 @@ struct hci_dev {
->   	__u16		advmon_allowlist_duration;
->   	__u16		advmon_no_filter_duration;
->   	__u8		enable_advmon_interleave_scan;
-> +	__u16		discon_on_poweroff_timeout;
+> For remote WAKEUP via magic packet,
+> 1.MAC detects INT from PHY and confirm Wake request.
+> 2. Disable the WoL mode by unsetting the WoL enable bit.
+> 3. Restore the SERDES/System Interface back to the original mode before WoL was initialized using SGMII mode i.e; back to XFI mode.
+> MDIO write 1e.31b = 0x100 (Reverts the 100M setup to original mode)
+> MDIO write 1e.31c = 0x100 (Reverts the 1G setup to original mode
 
-I’d append the unit to the variable name: `discon_on_poweroff_timeout_ms`.
+I think you have misunderstood step 3. "Restore ... back to the
+original mode" when interpreting the application note.
 
->   
->   	__u16		devid_source;
->   	__u16		devid_vendor;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 0fefa6788911..769865494f45 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2479,7 +2479,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
->   	hdev->adv_instance_cnt = 0;
->   	hdev->cur_adv_instance = 0x00;
->   	hdev->adv_instance_timeout = 0;
-> -
-> +	hdev->discon_on_poweroff_timeout = 0;	/* Default to no timeout */
->   	hdev->advmon_allowlist_duration = 300;
->   	hdev->advmon_no_filter_duration = 500;
->   	hdev->enable_advmon_interleave_scan = 0x00;	/* Default to disable */
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 3348a1b0e3f7..260e9f05359c 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -5250,6 +5250,8 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
->   			       u8 reason)
->   {
->   	struct hci_cp_disconnect cp;
-> +	unsigned long timeout;
+Since these registers are set during the provisioning on the PHY,
+there is *no* guarantee that they were originally in XFI mode before
+WoL was enabled. Hence, in order to "restore" their state, you need
+to "save" their state at some point, and it would probably be a good
+idea to do that when:
 
-Ditto.
+1) the PHY is probed to get the power-up status.
+2) update the saved registers whenever the driver reconfigures the PHY
+   for a different interface mode (I don't think it does this.)
+3) use this saved information to restore these registers when WoL is
+   disabled, _or_ when the PHY device is detached from the PHY driver
+   i.o.w. when the ->remove method is called, so that if the driver
+   re-probes, it can get at the _original_ information.
 
-> +	int err;
->   
->   	if (conn->type == AMP_LINK)
->   		return hci_disconnect_phy_link_sync(hdev, conn->handle, reason);
-> @@ -5258,19 +5260,33 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
->   	cp.handle = cpu_to_le16(conn->handle);
->   	cp.reason = reason;
->   
-> -	/* Wait for HCI_EV_DISCONN_COMPLETE, not HCI_EV_CMD_STATUS, when the
-> -	 * reason is anything but HCI_ERROR_REMOTE_POWER_OFF. This reason is
-> -	 * used when suspending or powering off, where we don't want to wait
-> -	 * for the peer's response.
-> +	/* The HCI_ERROR_REMOTE_POWER_OFF is used when suspending or powering off,
-> +	 * so we don't want to waste time waiting for the reply of the peer.
-> +	 * However, if the configuration specified, we'll wait some time to give the
-
-“if the configuration specified” sounds strange to me.
-
-
-Kind regards,
-
-Paul
-
-
-> +	 * controller chance to actually send the disconnect command.
->   	 */
-> -	if (reason != HCI_ERROR_REMOTE_POWER_OFF)
-> -		return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
-> -						sizeof(cp), &cp,
-> -						HCI_EV_DISCONN_COMPLETE,
-> -						HCI_CMD_TIMEOUT, NULL);
-> +	if (reason == HCI_ERROR_REMOTE_POWER_OFF && !hdev->discon_on_poweroff_timeout) {
-> +		return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT,
-> +					     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +	}
->   
-> -	return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp,
-> -				     HCI_CMD_TIMEOUT);
-> +	if (reason == HCI_ERROR_REMOTE_POWER_OFF)
-> +		timeout = msecs_to_jiffies(hdev->discon_on_poweroff_timeout);
-> +	else
-> +		timeout = HCI_CMD_TIMEOUT;
-> +
-> +	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
-> +				       sizeof(cp), &cp,
-> +				       HCI_EV_DISCONN_COMPLETE,
-> +				       timeout, NULL);
-> +
-> +	/* Ignore the error in suspending or powering off case to avoid the procedure being
-> +	 * aborted.
-> +	 */
-> +	if (reason == HCI_ERROR_REMOTE_POWER_OFF)
-> +		return 0;
-> +
-> +	return err;
->   }
->   
->   static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
-> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index 6ef701c27da4..f3194e3642d9 100644
-> --- a/net/bluetooth/mgmt_config.c
-> +++ b/net/bluetooth/mgmt_config.c
-> @@ -78,6 +78,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->   		HDEV_PARAM_U16(advmon_allowlist_duration);
->   		HDEV_PARAM_U16(advmon_no_filter_duration);
->   		HDEV_PARAM_U8(enable_advmon_interleave_scan);
-> +		HDEV_PARAM_U16(discon_on_poweroff_timeout);
->   	} __packed rp = {
->   		TLV_SET_U16(0x0000, def_page_scan_type),
->   		TLV_SET_U16(0x0001, def_page_scan_int),
-> @@ -111,6 +112,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->   		TLV_SET_U16(0x001d, advmon_allowlist_duration),
->   		TLV_SET_U16(0x001e, advmon_no_filter_duration),
->   		TLV_SET_U8(0x001f, enable_advmon_interleave_scan),
-> +		TLV_SET_U16(0x0020, discon_on_poweroff_timeout),
->   	};
->   
->   	bt_dev_dbg(hdev, "sock %p", sk);
-> @@ -186,6 +188,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->   		case 0x001b:
->   		case 0x001d:
->   		case 0x001e:
-> +		case 0x0020:
->   			exp_type_len = sizeof(u16);
->   			break;
->   		case 0x001f:
-> @@ -314,6 +317,9 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->   		case 0x0001f:
->   			hdev->enable_advmon_interleave_scan = TLV_GET_U8(buffer);
->   			break;
-> +		case 0x00020:
-> +			hdev->discon_on_poweroff_timeout = TLV_GET_LE16(buffer);
-> +			break;
->   		default:
->   			bt_dev_warn(hdev, "unsupported parameter %u", type);
->   			break;
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
