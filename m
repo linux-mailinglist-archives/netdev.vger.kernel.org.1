@@ -1,127 +1,118 @@
-Return-Path: <netdev+bounces-20269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05E8275ED67
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:25:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A16E75ED8B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:28:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1FAA2814E2
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 08:25:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0B012814B3
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 08:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819941FBF;
-	Mon, 24 Jul 2023 08:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B141FC4;
+	Mon, 24 Jul 2023 08:28:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B8C186D
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 08:25:09 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F029134;
-	Mon, 24 Jul 2023 01:25:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1690187107; x=1721723107;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eo4QhChgz1OMrGIR/dw/gfJ7BnsxpgOAO4aD+hGA1Pg=;
-  b=lQQUhOI0OlbMHzXjpQMT1g9X49qmVQENtsoNrrWz8VJPMgHfTyFmDCY+
-   YDiAfKWt0O7RECwVIFLuzsWbow9K8lxA0WlOb2Kp3chnpOJ3rViEc36QK
-   nsczfy+nanXJqJU7Q2DJ2199+ZT8h5Usw4vyg2tWIfKnFgElK7phTwCG6
-   faJ1JXKDPyjBGEvIKgSJ3Qssj0mlG6iGfjk7Bm0/zDVRbN+WHWwCjpWxj
-   cl0sp8gW7IYY0JzZpVlkJz0tsQWbAnw3Sg6wG+zHgJ8eEjyV0hk80MQkj
-   JDHUxwk65MgqeT9WJDU9mmY1hljjMlq2kJdlW2rBS8d+frYKGa/MFkJ6z
-   w==;
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="225495427"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 24 Jul 2023 01:25:06 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 24 Jul 2023 01:25:04 -0700
-Received: from localhost (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
- Transport; Mon, 24 Jul 2023 01:25:04 -0700
-Date: Mon, 24 Jul 2023 13:54:49 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bryan.whitehead@microchip.com>,
-	<andrew@lunn.ch>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next 5/7] net: lan743x: Add support to the Phylink
- framework
-Message-ID: <20230724082449.GA17358@raju-project-pc>
-References: <20230721060019.2737-1-Raju.Lakkaraju@microchip.com>
- <20230721060019.2737-6-Raju.Lakkaraju@microchip.com>
- <ZLpGgV6FXmvjqeOi@shell.armlinux.org.uk>
- <ZLpyjNJsQjOw2hfj@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BE9186D
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 08:28:27 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EAEE76
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:28:20 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qNquo-0007RN-JQ; Mon, 24 Jul 2023 10:27:38 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 53E021F8389;
+	Mon, 24 Jul 2023 08:27:33 +0000 (UTC)
+Date: Mon, 24 Jul 2023 10:27:32 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: John Watts <contact@jookia.org>
+Cc: linux-sunxi@lists.linux.dev, Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 0/4] Add support for Allwinner D1 CAN controllers
+Message-ID: <20230724-paving-pep-4c3ca2fae261-mkl@pengutronix.de>
+References: <20230721221552.1973203-2-contact@jookia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bzzg2zjmqpjfr7ls"
 Content-Disposition: inline
-In-Reply-To: <ZLpyjNJsQjOw2hfj@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230721221552.1973203-2-contact@jookia.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Russell King,
 
-Thank you for review comments.
+--bzzg2zjmqpjfr7ls
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The 07/21/2023 12:57, Russell King (Oracle) wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> 
-> On Fri, Jul 21, 2023 at 09:49:06AM +0100, Russell King (Oracle) wrote:
-> > On Fri, Jul 21, 2023 at 11:30:17AM +0530, Raju Lakkaraju wrote:
-> > > +static void lan743x_phylink_mac_config(struct phylink_config *config,
-> > > +                                  unsigned int link_an_mode,
-> > > +                                  const struct phylink_link_state *state)
-> > > +{
-> > > +   struct net_device *netdev = to_net_dev(config->dev);
-> > > +   struct lan743x_adapter *adapter = netdev_priv(netdev);
-> > > +   bool status;
-> > > +   int ret;
-> > > +
-> > > +   lan743x_mac_cfg_update(adapter, state->link, state->speed,
-> > > +                          state->advertising);
-> >
-> > Please, no new state->speed users in mac_config().
-> 
-> I have just submitted a patch series that results in state->speed always
-> being set to SPEED_UNKNOWN when this function is called to prevent
-> future uses of this struct member.
+On 22.07.2023 08:15:49, John Watts wrote:
+> This patch series adds support for the Allwinner D1 CAN controllers.
+> It requires adding a new device tree compatible and driver support to
+> work around some hardware quirks.
+>=20
+> This has been tested on the Mango Pi MQ Dual running a T113 and a Lichee
+> Panel 86 running a D1.
 
-Still, these changes are not available in "net-next" branch.
-I will check and fix.
+Applied to linux-can-next/testing.
 
-> 
-> > > +   adapter->phylink_config.dev = &netdev->dev;
-> > > +   adapter->phylink_config.type = PHYLINK_NETDEV;
-> > > +   adapter->phylink_config.mac_managed_pm = true;
-> > > +   /* This driver makes use of state->speed in mac_config */
-> > > +   adapter->phylink_config.legacy_pre_march2020 = true;
-> >
-> > Sorry, but no new users of legacy features.
-> 
-> ... and which totally strips out the legacy phylink code, which I've
-> been wanting to remove for the last three years.
-> 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+regards,
+Marc
 
--- 
-Thanks,
-Raju
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--bzzg2zjmqpjfr7ls
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmS+NfAACgkQvlAcSiqK
+BOg8Kgf/eJt24Ndvcmh6L+eNtFLgI9sT0zZeRNAKl9MJzbRclkN9kj5PSwfjjXt9
+UyBuvnxjyHDs81oanjq0yLh673plo1Q+PH2S9bx2q0GuWxudK8fIS7K6C3FBO5EI
+cvoAK6cyy33+7LUR7X7w0/0cs8jPUS8znJh7iw3fhr+R9fW+uTzoMDxQsDi9duf7
+OPTBCOiiAnBajqy16/sxFHIyUFAHWYGs0RCgGEu1g4oW8JyPAr4lznp2wEYAPVeX
+oNjCnvJrfNPTqFbIKV9dY8GaYA765qy11toqYmpv/WCxMAOKO52ElS0dko5+nt8S
+ykN0k7XY6EzIqvbjvWh8AzhNvO8Gog==
+=cUGJ
+-----END PGP SIGNATURE-----
+
+--bzzg2zjmqpjfr7ls--
 
