@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-20599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C5C760367
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:00:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB1776036B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30191C20CA3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:00:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ED761C20CD8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC3C134B9;
-	Tue, 25 Jul 2023 00:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EACF134CC;
+	Tue, 25 Jul 2023 00:00:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0D012B61
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:00:01 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFA9171E
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:00 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58398367e4eso45709887b3.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAB713ADD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:00:03 +0000 (UTC)
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1110A171E
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:02 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5633d17d8bfso2462456a12.3
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690243199; x=1690847999;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=mb1j8LQVRs00LG4v/ZDtJyKdrYAUO/L1CQHpXM/CMbw=;
-        b=JE/idUD1XwLgxZtdASbXBtVEWkJvBd7ZIW4j7n3sas8NWnjxxJ3YsmvpSub5z8hdYm
-         +i0gfHcxDiPX5eIMV2V5DV++oTJZsKIEzKus3Tat962dZJcOhC9Yu6UApxtly9HBssdv
-         0yBV3tN0zQIa0oQaR+QSuhTUtgBzk+yRH7VpQ5PyB0AHHqhVosMafKRGGpvX4ckg+dhE
-         knf+uxIwYEU7rkxTm8lFqPAq1XZDTz9PAjzZ6FBCb1dNkHgJGQ0eKWH8URTjHcBXvVaY
-         jIcmc6p3AwPhUrEvI8zntzgSe7QdoYGcr40ZENkr7eJtSC/aUPuWeQRUD73G6ibOhmgh
-         kNFw==
+        d=google.com; s=20221208; t=1690243201; x=1690848001;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ymr8o17vJSUQpypwAQoDIcs9nAf632/dWN/6S7ClCgA=;
+        b=pfg60D5uS6o8HBdDJjgjAYVi2db59uWz/50Miz2Wss/RJlx86G/6r0Cy8QDiuaFHRQ
+         XpYOPDJzLTmqOOXsoq8h8+9mi9B5Z7uUzVPjbZ2zoW8DarH2t0C6g/uTa4p42jpibZ/Y
+         LKpnWAWypFIw1cfb08IOOvTWigxCr8kv64YaVdAlMu52Ue8DtBHYr3bnPFxDJapSTjjJ
+         RgrEFCqrbkiZyzAQmxFcKIO/V6SixWzfy8XYPJ4hbf1jkQ+jXED2khQJlwZgLU3UlmxW
+         pYDrEms/Y/Pais1vAvtkmdQufOQ5ekBQEFtpATKhu2xQSg8COWxFGJS2uq3QxKXh4Gwe
+         cqjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690243199; x=1690847999;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mb1j8LQVRs00LG4v/ZDtJyKdrYAUO/L1CQHpXM/CMbw=;
-        b=TgTiEa/vvYwtPguKxX2MGD7KLFc5610FLKqToNPIuQqU5QlXDlK4mueSmpLCiTv/ra
-         iNckoAsaF2L91Dx6dd7zyaZzSx14xPctWpc+YT1senbUfIUxr4m4X5VhcxcJnayyvkn9
-         Fd8toTlYrn/pc1RYofoOT5wYkOieA0K+lNPei9O8EuR1wC4P/gElCRNW9SQ+IwbTqOt/
-         V38o/C0cJkVxfKENoEaWmLm1V+yilrlqNmLmbzLiQThuUBOW+Rwitcd2ph3mhkulXvq+
-         Y1iwZW00fRzSZzgFjg2mt1M8yAigoa359HbhiMLBQVLf18chmbzIAX8lN37LQRYVd9m9
-         g/1g==
-X-Gm-Message-State: ABy/qLaLXpQ4zBVGa0h3Kemqeyey4N+33v5OJq9D8oli2x0RiR81uEC1
-	L6W0SzHNZAkfQl0Rmg2cSUhSWyk=
-X-Google-Smtp-Source: APBJJlGYebW0op/3iuEIh9lx2Hv4PKsRCDOc1Xco+8T07Ui5UtuoEVB82IkQQNytxac4RdcXFVeEz8Y=
+        d=1e100.net; s=20221208; t=1690243201; x=1690848001;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ymr8o17vJSUQpypwAQoDIcs9nAf632/dWN/6S7ClCgA=;
+        b=RouA76rd/zs5QURhj8m6dWBM8ssappFsC/3MPul9AGXXBqHTixu8ZNcyGByGkTDBj9
+         HQT42AZ2qViEwHr6kTrueEgdIeJ9N8sacS2C0Ij3EDy+2HfH9elHuRa8EI1UlSM5A8Oc
+         U2ugVvRum5JwD1SPwYuybfQjcvGYha87yCQCag9PjcPwvOu1DAbSbfJpJM1GSzX/rPUx
+         oTWpMkiKZ8ak3Okle6Os4/UfGqtc3oNP1ZPk+40o+w24M1QpY9r+J991sofz7H9YbN2z
+         2QfN4Hr0dg5vzzXEq3920Cch6x/ndQWns7dZXUidvSFlXmA4zJKp7XEKAXJF+yXrh+Fp
+         AqQQ==
+X-Gm-Message-State: ABy/qLYwqIF14RrLFfgtpsx5bsFW004MoY8IyY1y5Pw/f12GTTrlHHXM
+	IMkoXmU8IYB9m9GWXNxYgnwgl6g=
+X-Google-Smtp-Source: APBJJlErUfwmrS0d2RvZugBgVb6ZaXP+fW/wxDQ4lV9RPiRCVOmKdMSFH2IMrq5vkOJhND2554kTdcc=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a81:af5d:0:b0:583:a866:3450 with SMTP id
- x29-20020a81af5d000000b00583a8663450mr81469ywj.7.1690243199375; Mon, 24 Jul
- 2023 16:59:59 -0700 (PDT)
-Date: Mon, 24 Jul 2023 16:59:49 -0700
+ (user=sdf job=sendgmr) by 2002:a63:da18:0:b0:563:4869:f54d with SMTP id
+ c24-20020a63da18000000b005634869f54dmr43774pgh.11.1690243201202; Mon, 24 Jul
+ 2023 17:00:01 -0700 (PDT)
+Date: Mon, 24 Jul 2023 16:59:50 -0700
+In-Reply-To: <20230724235957.1953861-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20230724235957.1953861-1-sdf@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230724235957.1953861-1-sdf@google.com>
-Subject: [RFC net-next v4 0/8] xsk: TX metadata
+Message-ID: <20230724235957.1953861-2-sdf@google.com>
+Subject: [RFC net-next v4 1/8] xsk: Support XDP_TX_METADATA_LEN
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -78,63 +80,157 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This series implements initial TX metadata (offloads) for AF_XDP.
-See patch #2 for the main implementation and mlx5-one for the
-example on how to consume the metadata on the device side.
+For zerocopy mode, tx_desc->addr can point to the arbitrary offset
+and carry some TX metadata in the headroom. For copy mode, there
+is no way currently to populate skb metadata.
 
-With v4, I'm switching from BPF hooks and kfuncs to a fixed TX
-metadata/offload format: the metadata is passed with every tx
-umem chunk and it's up to the device driver to interpret it.
+Introduce new XDP_TX_METADATA_LEN that indicates how many bytes
+to treat as metadata. Metadata bytes come prior to tx_desc address
+(same as in RX case).
 
-Starting with two types of offloads:
-- request TX timestamp (and write it back into the metadata area)
-- request TX checksum offload
+The size of the metadata has the same constraints as XDP:
+- less than 256 bytes
+- 4-byte aligned
+- non-zero
 
-TODO for the non-RFC series:
-- have some real device support to verify xdp_hw_metadata works
-- Documentation/networking/xdp-rx-metadata.rst - like documentation
+This data is not interpreted in any way right now.
 
-v3: https://lore.kernel.org/bpf/20230707193006.1309662-1-sdf@google.com/
+Signed-off-by: Stanislav Fomichev <sdf@google.com>
+---
+ include/net/xdp_sock.h      |  1 +
+ include/net/xsk_buff_pool.h |  1 +
+ include/uapi/linux/if_xdp.h |  1 +
+ net/xdp/xsk.c               | 20 ++++++++++++++++++++
+ net/xdp/xsk_buff_pool.c     |  1 +
+ net/xdp/xsk_queue.h         | 17 ++++++++++-------
+ 6 files changed, 34 insertions(+), 7 deletions(-)
 
-Stanislav Fomichev (8):
-  xsk: Support XDP_TX_METADATA_LEN
-  xsk: add TX timestamp and TX checksum offload support
-  net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
-  tools: ynl: update netdev sample to dump xsk-features
-  selftests/xsk: Support XDP_TX_METADATA_LEN
-  selftests/bpf: Add csum helpers
-  selftests/bpf: Add TX side to xdp_metadata
-  selftests/bpf: Add TX side to xdp_hw_metadata
-
- Documentation/netlink/specs/netdev.yaml       |  25 ++-
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
- .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  71 ++++++-
- .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  10 +-
- .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |   9 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
- include/linux/netdevice.h                     |  27 +++
- include/linux/skbuff.h                        |   5 +-
- include/net/xdp_sock.h                        |  61 ++++++
- include/net/xdp_sock_drv.h                    |  13 ++
- include/net/xsk_buff_pool.h                   |   1 +
- include/uapi/linux/if_xdp.h                   |  36 ++++
- include/uapi/linux/netdev.h                   |  15 ++
- net/core/netdev-genl.c                        |  12 +-
- net/xdp/xsk.c                                 |  58 +++++
- net/xdp/xsk_buff_pool.c                       |   1 +
- net/xdp/xsk_queue.h                           |  19 +-
- tools/include/uapi/linux/if_xdp.h             |  50 ++++-
- tools/include/uapi/linux/netdev.h             |  15 ++
- tools/net/ynl/generated/netdev-user.c         |  25 +++
- tools/net/ynl/generated/netdev-user.h         |   5 +
- tools/net/ynl/samples/netdev.c                |   8 +
- tools/testing/selftests/bpf/network_helpers.h |  43 ++++
- .../selftests/bpf/prog_tests/xdp_metadata.c   |  31 ++-
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 201 +++++++++++++++++-
- tools/testing/selftests/bpf/xsk.c             |  17 ++
- tools/testing/selftests/bpf/xsk.h             |   1 +
- 27 files changed, 718 insertions(+), 46 deletions(-)
-
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index 1617af380162..467b9fb56827 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -51,6 +51,7 @@ struct xdp_sock {
+ 	struct list_head flush_node;
+ 	struct xsk_buff_pool *pool;
+ 	u16 queue_id;
++	u8 tx_metadata_len;
+ 	bool zc;
+ 	bool sg;
+ 	enum {
+diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+index b0bdff26fc88..9c31e8d1e198 100644
+--- a/include/net/xsk_buff_pool.h
++++ b/include/net/xsk_buff_pool.h
+@@ -77,6 +77,7 @@ struct xsk_buff_pool {
+ 	u32 chunk_size;
+ 	u32 chunk_shift;
+ 	u32 frame_len;
++	u8 tx_metadata_len; /* inherited from xsk_sock */
+ 	u8 cached_need_wakeup;
+ 	bool uses_need_wakeup;
+ 	bool dma_need_sync;
+diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+index 8d48863472b9..b37b50102e1c 100644
+--- a/include/uapi/linux/if_xdp.h
++++ b/include/uapi/linux/if_xdp.h
+@@ -69,6 +69,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_TX_METADATA_LEN		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 4f1e0599146e..81106e4d6e0f 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -1337,6 +1337,26 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
+ 		mutex_unlock(&xs->mutex);
+ 		return err;
+ 	}
++	case XDP_TX_METADATA_LEN:
++	{
++		int val;
++
++		if (optlen < sizeof(val))
++			return -EINVAL;
++		if (copy_from_sockptr(&val, optval, sizeof(val)))
++			return -EFAULT;
++		if (!val || val > 256 || val % 4)
++			return -EINVAL;
++
++		mutex_lock(&xs->mutex);
++		if (xs->state != XSK_READY) {
++			mutex_unlock(&xs->mutex);
++			return -EBUSY;
++		}
++		xs->tx_metadata_len = val;
++		mutex_unlock(&xs->mutex);
++		return 0;
++	}
+ 	default:
+ 		break;
+ 	}
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index b3f7b310811e..b351732f1032 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -85,6 +85,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
+ 		XDP_PACKET_HEADROOM;
+ 	pool->umem = umem;
+ 	pool->addrs = umem->addrs;
++	pool->tx_metadata_len = xs->tx_metadata_len;
+ 	INIT_LIST_HEAD(&pool->free_list);
+ 	INIT_LIST_HEAD(&pool->xskb_list);
+ 	INIT_LIST_HEAD(&pool->xsk_tx_list);
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index 13354a1e4280..c74a1372bcb9 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -143,15 +143,17 @@ static inline bool xp_unused_options_set(u32 options)
+ static inline bool xp_aligned_validate_desc(struct xsk_buff_pool *pool,
+ 					    struct xdp_desc *desc)
+ {
+-	u64 offset = desc->addr & (pool->chunk_size - 1);
++	u64 addr = desc->addr - pool->tx_metadata_len;
++	u64 len = desc->len + pool->tx_metadata_len;
++	u64 offset = addr & (pool->chunk_size - 1);
+ 
+ 	if (!desc->len)
+ 		return false;
+ 
+-	if (offset + desc->len > pool->chunk_size)
++	if (offset + len > pool->chunk_size)
+ 		return false;
+ 
+-	if (desc->addr >= pool->addrs_cnt)
++	if (addr >= pool->addrs_cnt)
+ 		return false;
+ 
+ 	if (xp_unused_options_set(desc->options))
+@@ -162,16 +164,17 @@ static inline bool xp_aligned_validate_desc(struct xsk_buff_pool *pool,
+ static inline bool xp_unaligned_validate_desc(struct xsk_buff_pool *pool,
+ 					      struct xdp_desc *desc)
+ {
+-	u64 addr = xp_unaligned_add_offset_to_addr(desc->addr);
++	u64 addr = xp_unaligned_add_offset_to_addr(desc->addr) - pool->tx_metadata_len;
++	u64 len = desc->len + pool->tx_metadata_len;
+ 
+ 	if (!desc->len)
+ 		return false;
+ 
+-	if (desc->len > pool->chunk_size)
++	if (len > pool->chunk_size)
+ 		return false;
+ 
+-	if (addr >= pool->addrs_cnt || addr + desc->len > pool->addrs_cnt ||
+-	    xp_desc_crosses_non_contig_pg(pool, addr, desc->len))
++	if (addr >= pool->addrs_cnt || addr + len > pool->addrs_cnt ||
++	    xp_desc_crosses_non_contig_pg(pool, addr, len))
+ 		return false;
+ 
+ 	if (xp_unused_options_set(desc->options))
 -- 
 2.41.0.487.g6d72f3e995-goog
 
