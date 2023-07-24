@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-20603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11C9B760378
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:02:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 176FD76037B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFDCC2813B4
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:02:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 487B21C20D09
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50FF15485;
-	Tue, 25 Jul 2023 00:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195FD134C1;
+	Tue, 25 Jul 2023 00:00:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF6E14F8B
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:00:08 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D83F1729
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:07 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-563396c1299so4372412a12.2
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7DE15484
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:00:12 +0000 (UTC)
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E809171E
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:09 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-563bcd2cb78so744417a12.3
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 17:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690243207; x=1690848007;
+        d=google.com; s=20221208; t=1690243209; x=1690848009;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYPI2K6JBOjd1+pY70YCu9jKXxrCOX47P33ZqKkUSxc=;
-        b=QmlwXkHzEauxPVcwS/n3ZMJfn8iybVtAxsXTt/jaraqj2wtVmuNQznBojqOs9mpncn
-         gn7/j0AErZmAlABS/aKjbVs1z+rZjuKvA0c29UKOlbUvfb9KrQ9SvceBjKFu0mNn85vA
-         TdTlzL5/EFeOZv9QJDIfd0u79hSm9opBGH31Uzok4NmSzGK7vyggYoAf+IRhM/ZwIYRi
-         kVY3A4FYXXY7rlRIo3IiodHnnMXiJdpi549lX0dPk8fMEROEAnPnstVSuPrm3zGCPclX
-         xYaRkHiQ8NYDnJ6n4zN49ngvBy+i1Nf9a8Kl9fqqFnrcP+3bIlKeuS8mzBejPuyYiTPE
-         QLoA==
+        bh=b2a2EwusvFoc235pktXY/nIycpWVex16wqLhee3jeA4=;
+        b=kQx8Vt5ByAzdsbZZyTLJV+DrKdYLTUXs6wNFNOIpYvqowtQCrv9aSgqtb6eVW4iccF
+         Kq3iy5Cs+ku1wxCHTGkdpyMXut5xxv5C54JKXpxoqt4GxTX02cT9LwlI1Xwpt/lGWasV
+         jeDTsSKMPrmenQDmsISd8JVvioi+PL0tk/RAFU+UMlHwzEclxeOiOFmlN3NnBlX16i3B
+         A6ylPJBNYbjpi0/MuiWAcdqYUppcBhjuSm93r1R2ZhdpSedEW/gLVgV7LCTiet8gBSLQ
+         DN4TrAY30H+IdI1S93AuFTcG5FpuimHRSUWqW6vAseWXI7ncYySm5R6nlEYwzJHtk/uc
+         gL8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690243207; x=1690848007;
+        d=1e100.net; s=20221208; t=1690243209; x=1690848009;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYPI2K6JBOjd1+pY70YCu9jKXxrCOX47P33ZqKkUSxc=;
-        b=g+JuttqFs697HXTmxxsPpuCE/vUHpP7C3B3aEi69g34F2XeCLEiBSzaIQBIzBRGmQx
-         DKtMR7L0xE8tZlsY8EErch9o0e3GcYJEyz2CXR3m3G8vp+ONvrsOKikqJGbGWTXsjtVo
-         DAAcDqqdKWfhviEJBp3uQdT5bpOkuaB/w3cvpOzY4wFh90koWlr9jTw5DVx9Cz9kU6nG
-         3ifof2zH5Iv5A59U+SWi2R5/coFFlaJbMEF3pgBBUnZWllN5ZXl5Ojn1BclVY0TogZEK
-         oJKJiIlcfMICFpk25+40bxEyUMqhrONWirb4H21lRzNa5AkObzLh72I18BY9LIIMuOyx
-         aSqg==
-X-Gm-Message-State: ABy/qLZKflcz3qm1EsgXCVYgIO2AcjmitN15cYoWZsUeHFhe0zMK0hpm
-	0p0ph+sJpZ4C66XwFmdhTWXd1Hw=
-X-Google-Smtp-Source: APBJJlFE7wvCOtlI7Fx3yby8NAxK/U/VrkbEPfZrMzF0UfynwcVjEOofhg7KEXtL9k65YABa1rP174s=
+        bh=b2a2EwusvFoc235pktXY/nIycpWVex16wqLhee3jeA4=;
+        b=X2bHFjHRfppNm49pteow1ch3N/4XwoNvJBEgyCkuJLbLXiLY5sgK5Gytrfl97Ys9N1
+         cgFn3t/7SV7g+YA1qtALY8ITNwyTflsAeOl2/r9T1XtrazsHlF2T00iB2J/yY1aQDzq0
+         ZYJeeKSYPEROf0R5dl/xZ1NwiwSxGGcNteFL0pdJAzMyc8ObIsMT+b8WWpTbKXAbTR/s
+         m9b1GAMBck+pkrELitYeal7Qe0iVXecj8lyF4JmnvfKxpL/npF+MQkf653TmouBUOYRL
+         rWpaRbd04Kf/bO7dha1n7RZkFHBpJo+OebHrYiGslBWlpIj44ZVieYqgci1CzMfyW/q1
+         851w==
+X-Gm-Message-State: ABy/qLYiPgCpHerN5KEuoQHOEJxqZO8STBeoLySrb0j+65sYhJ8l6Oai
+	YVE812znQRuBinIY3A+ZUhEeAn0=
+X-Google-Smtp-Source: APBJJlGPTBtKFxHsCwBB4LCKIOZEIfd2ck9tFuo2cXcUbuJkFqXNc0zwZG6EUaQOfF/7XAlF7Ey9OXk=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:7702:0:b0:55f:e64f:d3e0 with SMTP id
- s2-20020a637702000000b0055fe64fd3e0mr45840pgc.4.1690243206840; Mon, 24 Jul
- 2023 17:00:06 -0700 (PDT)
-Date: Mon, 24 Jul 2023 16:59:53 -0700
+ (user=sdf job=sendgmr) by 2002:a63:7e4a:0:b0:534:6903:efd8 with SMTP id
+ o10-20020a637e4a000000b005346903efd8mr47484pgn.1.1690243208808; Mon, 24 Jul
+ 2023 17:00:08 -0700 (PDT)
+Date: Mon, 24 Jul 2023 16:59:54 -0700
 In-Reply-To: <20230724235957.1953861-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230724235957.1953861-1-sdf@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230724235957.1953861-5-sdf@google.com>
-Subject: [RFC net-next v4 4/8] tools: ynl: update netdev sample to dump xsk-features
+Message-ID: <20230724235957.1953861-6-sdf@google.com>
+Subject: [RFC net-next v4 5/8] selftests/xsk: Support XDP_TX_METADATA_LEN
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -80,174 +80,74 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-While at it, also dump recently added ZC max segs (and rename
-it to use dashes). Plus fix small spelling issue.
+Add new config field and call setsockopt.
 
 Signed-off-by: Stanislav Fomichev <sdf@google.com>
 ---
- Documentation/netlink/specs/netdev.yaml |  6 ++++--
- tools/include/uapi/linux/netdev.h       | 15 +++++++++++++++
- tools/net/ynl/generated/netdev-user.c   | 25 +++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h   |  5 +++++
- tools/net/ynl/samples/netdev.c          |  8 ++++++++
- 5 files changed, 57 insertions(+), 2 deletions(-)
+ tools/testing/selftests/bpf/xsk.c | 17 +++++++++++++++++
+ tools/testing/selftests/bpf/xsk.h |  1 +
+ 2 files changed, 18 insertions(+)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index bf9c1cc32614..9002b37b7676 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -14,7 +14,7 @@ name: netdev
-       -
-         name: basic
-         doc:
--          XDP feautues set supported by all drivers
-+          XDP features set supported by all drivers
-           (XDP_ABORTED, XDP_DROP, XDP_PASS, XDP_TX)
-       -
-         name: redirect
-@@ -76,7 +76,7 @@ name: netdev
-         enum: xdp-act
-         enum-as-flags: true
-       -
--        name: xdp_zc_max_segs
-+        name: xdp-zc-max-segs
-         doc: max fragment count supported by ZC driver
-         type: u32
-         checks:
-@@ -102,6 +102,8 @@ name: netdev
-           attributes:
-             - ifindex
-             - xdp-features
-+            - xdp-zc-max-segs
-+            - xsk-features
-       dump:
-         reply: *dev-all
-     -
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index bf71698a1e82..cf1e11c76339 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -37,11 +37,26 @@ enum netdev_xdp_act {
- 	NETDEV_XDP_ACT_MASK = 127,
- };
+diff --git a/tools/testing/selftests/bpf/xsk.c b/tools/testing/selftests/bpf/xsk.c
+index d9fb2b730a2c..cb7e48f24289 100644
+--- a/tools/testing/selftests/bpf/xsk.c
++++ b/tools/testing/selftests/bpf/xsk.c
+@@ -49,6 +49,10 @@
+  #define PF_XDP AF_XDP
+ #endif
  
-+/**
-+ * enum netdev_xsk_flags
-+ * @NETDEV_XSK_FLAGS_TX_TIMESTAMP: HW timestamping egress packets is supported
-+ *   by the driver.
-+ * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-+ *   driver.
-+ */
-+enum netdev_xsk_flags {
-+	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
-+	NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
++#ifndef XDP_TX_METADATA_LEN
++#define XDP_TX_METADATA_LEN 9
++#endif
 +
-+	NETDEV_XSK_FLAGS_MASK = 3,
-+};
-+
- enum {
- 	NETDEV_A_DEV_IFINDEX = 1,
- 	NETDEV_A_DEV_PAD,
- 	NETDEV_A_DEV_XDP_FEATURES,
- 	NETDEV_A_DEV_XDP_ZC_MAX_SEGS,
-+	NETDEV_A_DEV_XSK_FEATURES,
+ #define pr_warn(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
  
- 	__NETDEV_A_DEV_MAX,
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
-diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
-index 4eb8aefef0cd..f8dd6aa0ad97 100644
---- a/tools/net/ynl/generated/netdev-user.c
-+++ b/tools/net/ynl/generated/netdev-user.c
-@@ -45,11 +45,26 @@ const char *netdev_xdp_act_str(enum netdev_xdp_act value)
- 	return netdev_xdp_act_strmap[value];
+ #define XSKMAP_SIZE 1
+@@ -132,12 +136,14 @@ static int xsk_set_xdp_socket_config(struct xsk_socket_config *cfg,
+ 		cfg->rx_size = XSK_RING_CONS__DEFAULT_NUM_DESCS;
+ 		cfg->tx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
+ 		cfg->bind_flags = 0;
++		cfg->tx_metadata_len = 0;
+ 		return 0;
+ 	}
+ 
+ 	cfg->rx_size = usr_cfg->rx_size;
+ 	cfg->tx_size = usr_cfg->tx_size;
+ 	cfg->bind_flags = usr_cfg->bind_flags;
++	cfg->tx_metadata_len = usr_cfg->tx_metadata_len;
+ 
+ 	return 0;
  }
- 
-+static const char * const netdev_xsk_flags_strmap[] = {
-+	[0] = "tx-timestamp",
-+	[1] = "tx-checksum",
-+};
-+
-+const char *netdev_xsk_flags_str(enum netdev_xsk_flags value)
-+{
-+	value = ffs(value) - 1;
-+	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(netdev_xsk_flags_strmap))
-+		return NULL;
-+	return netdev_xsk_flags_strmap[value];
-+}
-+
- /* Policies */
- struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
- 	[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
- 	[NETDEV_A_DEV_PAD] = { .name = "pad", .type = YNL_PT_IGNORE, },
- 	[NETDEV_A_DEV_XDP_FEATURES] = { .name = "xdp-features", .type = YNL_PT_U64, },
-+	[NETDEV_A_DEV_XDP_ZC_MAX_SEGS] = { .name = "xdp-zc-max-segs", .type = YNL_PT_U32, },
-+	[NETDEV_A_DEV_XSK_FEATURES] = { .name = "xsk-features", .type = YNL_PT_U64, },
- };
- 
- struct ynl_policy_nest netdev_dev_nest = {
-@@ -91,6 +106,16 @@ int netdev_dev_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
- 				return MNL_CB_ERROR;
- 			dst->_present.xdp_features = 1;
- 			dst->xdp_features = mnl_attr_get_u64(attr);
-+		} else if (type == NETDEV_A_DEV_XDP_ZC_MAX_SEGS) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.xdp_zc_max_segs = 1;
-+			dst->xdp_zc_max_segs = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_DEV_XSK_FEATURES) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.xsk_features = 1;
-+			dst->xsk_features = mnl_attr_get_u64(attr);
- 		}
+@@ -613,6 +619,17 @@ int xsk_socket__create_shared(struct xsk_socket **xsk_ptr,
+ 			umem->tx_ring_setup_done = true;
  	}
  
-diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
-index 5554dc69bb9c..b8c5cdb331b4 100644
---- a/tools/net/ynl/generated/netdev-user.h
-+++ b/tools/net/ynl/generated/netdev-user.h
-@@ -18,6 +18,7 @@ extern const struct ynl_family ynl_netdev_family;
- /* Enums */
- const char *netdev_op_str(int op);
- const char *netdev_xdp_act_str(enum netdev_xdp_act value);
-+const char *netdev_xsk_flags_str(enum netdev_xsk_flags value);
- 
- /* Common nested types */
- /* ============== NETDEV_CMD_DEV_GET ============== */
-@@ -47,10 +48,14 @@ struct netdev_dev_get_rsp {
- 	struct {
- 		__u32 ifindex:1;
- 		__u32 xdp_features:1;
-+		__u32 xdp_zc_max_segs:1;
-+		__u32 xsk_features:1;
- 	} _present;
- 
- 	__u32 ifindex;
- 	__u64 xdp_features;
-+	__u32 xdp_zc_max_segs;
-+	__u64 xsk_features;
- };
- 
- void netdev_dev_get_rsp_free(struct netdev_dev_get_rsp *rsp);
-diff --git a/tools/net/ynl/samples/netdev.c b/tools/net/ynl/samples/netdev.c
-index d31268aa47c5..06377e3f1df5 100644
---- a/tools/net/ynl/samples/netdev.c
-+++ b/tools/net/ynl/samples/netdev.c
-@@ -38,6 +38,14 @@ static void netdev_print_device(struct netdev_dev_get_rsp *d, unsigned int op)
- 			printf(" %s", netdev_xdp_act_str(1 << i));
- 	}
- 
-+	printf(" %llx:", d->xsk_features);
-+	for (int i = 0; d->xsk_features > 1U << i; i++) {
-+		if (d->xsk_features & (1U << i))
-+			printf(" %s", netdev_xsk_flags_str(1 << i));
++	if (xsk->config.tx_metadata_len) {
++		int optval = xsk->config.tx_metadata_len;
++
++		err = setsockopt(xsk->fd, SOL_XDP, XDP_TX_METADATA_LEN,
++				 &optval, sizeof(optval));
++		if (err) {
++			err = -errno;
++			goto out_put_ctx;
++		}
 +	}
 +
-+	printf(" xdp-zc-max-segs=%u", d->xdp_zc_max_segs);
-+
- 	name = netdev_op_str(op);
- 	if (name)
- 		printf(" (ntf: %s)", name);
+ 	err = xsk_get_mmap_offsets(xsk->fd, &off);
+ 	if (err) {
+ 		err = -errno;
+diff --git a/tools/testing/selftests/bpf/xsk.h b/tools/testing/selftests/bpf/xsk.h
+index d93200fdaa8d..325fe0c83e5d 100644
+--- a/tools/testing/selftests/bpf/xsk.h
++++ b/tools/testing/selftests/bpf/xsk.h
+@@ -212,6 +212,7 @@ struct xsk_socket_config {
+ 	__u32 rx_size;
+ 	__u32 tx_size;
+ 	__u16 bind_flags;
++	__u8 tx_metadata_len;
+ };
+ 
+ /* Set config to NULL to get the default configuration. */
 -- 
 2.41.0.487.g6d72f3e995-goog
 
