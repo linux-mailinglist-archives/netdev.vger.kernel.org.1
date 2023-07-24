@@ -1,60 +1,106 @@
-Return-Path: <netdev+bounces-20330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FDFC75F171
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:57:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 010D575F01F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF8D42814EB
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:57:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1CDE280D8B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F4D79F1;
-	Mon, 24 Jul 2023 09:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8BF7465;
+	Mon, 24 Jul 2023 09:48:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74AE748A
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:51:21 +0000 (UTC)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A75D59CD
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:51:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690192262; x=1721728262;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OioHk1ChN5JiT7QsVymWpXuiBzyoD3qR9bpeqjbMExQ=;
-  b=T99Tah0Gi+ulJvMBzhKx19XcPOETSG4YZAblyU51szAsPKJxJLQ62To6
-   OtgZpmidWFHSuc1oI8l4mJ1y3muZKYJqfVeW2S8wYh6gOg3ht4t7CmBOY
-   8DFlq6aNFCqfnP2e8PXDAtbaFkPiEyoplrODrJvucLIcrsdnYkv9jv0ie
-   DWitvv5GCcdK/wfV3uVlvRKhXO8gHzDDwYKy51PDb7blg1Wo7H9HF0xnr
-   tEjECHqlak3Jv4O40Ytf30sXfaFOxVXA5TCWHjPI5ykZS1MwMnPx0SO1P
-   nyG7gVM8DXAMd62iOA3sb2VvU0qgClqC8W64w2+r8VeijM0VCvl6Mp3MQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="367423349"
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="367423349"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 02:50:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="795709749"
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="795709749"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Jul 2023 02:50:20 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	Grzegorz Szczurek <grzegorzx.szczurek@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: [PATCH iwl-next v1] i40e: Clear stats after deleting tc
-Date: Mon, 24 Jul 2023 11:43:19 +0200
-Message-Id: <20230724094319.57359-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20FB6FBB
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:48:27 +0000 (UTC)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2DB10C1
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:48:05 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b867f9198dso8896455ad.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:48:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690192062; x=1690796862;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rzRsL3uPXf8EtZhij3twpf+iuH9MzH4dVPBmPqsS5Og=;
+        b=gX8Q7SXHLW91QeJQyKDVumBjdRBjyll1XQW/JTChdq9dJqktv+X9ib4/uAMXxgigqH
+         2jaNwNGzNzbxV0P1Wq3smVBCy4sNVeMp2d3znSQmH+08EqCorhh8sobS3FzAo1aci+WZ
+         ahKKXhVh1u/zcYQLSV07bWs7cg92+ga+7wTGv6JJSEqo99xKqc3+YUXi9LMwyQq6STAk
+         AcT7MY/9kuaNFBZqw4pd3+jIBecT2Ao+Yw0ycAdTL8xM/HvxupDlq0E7GLdDU4836YR8
+         3HkgcSbyA4vS6vLviPYG979wLCQ5W42uSMh1vXnsGUiqQWrA1KKfF7bNogJb+rMbZ6Yg
+         D/lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690192062; x=1690796862;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rzRsL3uPXf8EtZhij3twpf+iuH9MzH4dVPBmPqsS5Og=;
+        b=fVTfpj6pt++fsohkRBTnxbGfT4WUGedN/Z27IArOjT1nxk8otASDQklSHFt7RymYrF
+         NiNtlS4zmWEUnt/n2Q7nXSyPfFrywTWzdd53k13yzYerf6/oyBSXhbB3CZ2hjpDU9dlz
+         wzhOBBRcZOINjffPd2l3jwhxCjIQFuTbRNfDpgiC11JPD7CTCRar/iohqF0JQ09iuvRI
+         kYLCl5hevtYV1m3d3ZzLaUdyNmjSeX2pQ0EkxWuqeQ+S7cTno0sS4ysKt9NFKn4fTa4c
+         wEcHvY5oEnrJRPfPzuMWOYJgN+/vZePWs3cECYPolzmClGqvxAoA9aqanBSnVcTVHpWW
+         WCjA==
+X-Gm-Message-State: ABy/qLYFBQyhrIUD5Ne3IZA0gGAa/Novszk6KSR6+srAirWtr89QhdkN
+	jf2NY6DamMBaTcfIkU6c/939Lw==
+X-Google-Smtp-Source: APBJJlE2hlcoboYUdUaSOoRiDnmiId7r6Wv5DYfSEbrHd1JPgB9nwdB4ObCAMGW7eL9gTiY+r7GrFA==
+X-Received: by 2002:a17:902:d508:b0:1a6:6bdb:b548 with SMTP id b8-20020a170902d50800b001a66bdbb548mr12141350plg.1.1690192062448;
+        Mon, 24 Jul 2023 02:47:42 -0700 (PDT)
+Received: from C02DW0BEMD6R.bytedance.net ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id d5-20020a170902c18500b001bb20380bf2sm8467233pld.13.2023.07.24.02.47.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 02:47:42 -0700 (PDT)
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+To: akpm@linux-foundation.org,
+	david@fromorbit.com,
+	tkhai@ya.ru,
+	vbabka@suse.cz,
+	roman.gushchin@linux.dev,
+	djwong@kernel.org,
+	brauner@kernel.org,
+	paulmck@kernel.org,
+	tytso@mit.edu,
+	steven.price@arm.com,
+	cel@kernel.org,
+	senozhatsky@chromium.org,
+	yujie.liu@intel.com,
+	gregkh@linuxfoundation.org,
+	muchun.song@linux.dev
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	x86@kernel.org,
+	kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	cluster-devel@redhat.com,
+	linux-nfs@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	rcu@vger.kernel.org,
+	netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	Qi Zheng <zhengqi.arch@bytedance.com>
+Subject: [PATCH v2 13/47] nfs: dynamically allocate the nfs-acl shrinker
+Date: Mon, 24 Jul 2023 17:43:20 +0800
+Message-Id: <20230724094354.90817-14-zhengqi.arch@bytedance.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+In-Reply-To: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,45 +108,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+Use new APIs to dynamically allocate the nfs-acl shrinker.
 
-There was an issue with ethtool stats that
-have not been cleared after tc had been deleted.
-
-Fix this by resetting stats after deleting tc
-by calling i40e_vsi_reset_stats() function after
-distroying qdisc.
-
-Signed-off-by: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/nfs/super.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 29ad1797adce..6f604bfe7437 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -5885,6 +5885,11 @@ static int i40e_vsi_config_tc(struct i40e_vsi *vsi, u8 enabled_tc)
- 
- 	/* Update the netdev TC setup */
- 	i40e_vsi_config_netdev_tc(vsi, enabled_tc);
-+
-+	/* After distroying qdisc reset all stats of the vsi */
-+	if (!vsi->mqprio_qopt.qopt.hw)
-+		i40e_vsi_reset_stats(vsi);
-+
- out:
- 	return ret;
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 2284f749d892..a90b12593383 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -129,11 +129,7 @@ static void nfs_ssc_unregister_ops(void)
  }
+ #endif /* CONFIG_NFS_V4_2 */
+ 
+-static struct shrinker acl_shrinker = {
+-	.count_objects	= nfs_access_cache_count,
+-	.scan_objects	= nfs_access_cache_scan,
+-	.seeks		= DEFAULT_SEEKS,
+-};
++static struct shrinker *acl_shrinker;
+ 
+ /*
+  * Register the NFS filesystems
+@@ -153,9 +149,17 @@ int __init register_nfs_fs(void)
+ 	ret = nfs_register_sysctl();
+ 	if (ret < 0)
+ 		goto error_2;
+-	ret = register_shrinker(&acl_shrinker, "nfs-acl");
+-	if (ret < 0)
++
++	acl_shrinker = shrinker_alloc(0, "nfs-acl");
++	if (!acl_shrinker)
+ 		goto error_3;
++
++	acl_shrinker->count_objects = nfs_access_cache_count;
++	acl_shrinker->scan_objects = nfs_access_cache_scan;
++	acl_shrinker->seeks = DEFAULT_SEEKS;
++
++	shrinker_register(acl_shrinker);
++
+ #ifdef CONFIG_NFS_V4_2
+ 	nfs_ssc_register_ops();
+ #endif
+@@ -175,7 +179,7 @@ int __init register_nfs_fs(void)
+  */
+ void __exit unregister_nfs_fs(void)
+ {
+-	unregister_shrinker(&acl_shrinker);
++	shrinker_unregister(acl_shrinker);
+ 	nfs_unregister_sysctl();
+ 	unregister_nfs4_fs();
+ #ifdef CONFIG_NFS_V4_2
 -- 
-2.31.1
+2.30.2
 
 
