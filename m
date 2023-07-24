@@ -1,113 +1,112 @@
-Return-Path: <netdev+bounces-20280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B020675EF01
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:21:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8AAD75EF08
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD7CD1C20915
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:21:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AFF9281492
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A796FA4;
-	Mon, 24 Jul 2023 09:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26AE26FBB;
+	Mon, 24 Jul 2023 09:23:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C6D20FB
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:21:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C06EC433C7;
-	Mon, 24 Jul 2023 09:20:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690190461;
-	bh=hYZSp23/VZnyiPenBn/BSzT12KqKsEamnSBdtafgomc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OP36OM8W0zUYoWak6ujK1nziRzxIwc3NzUMcDxlJb3NcXVc/BeTct4m+aQvAMsQIN
-	 ejeCmrw6fAV+i/Z/AgnOItsEeDwU4VfYrQKlx0/tTZgNchGLAXZ28QI5B6PdYVQqlt
-	 FvBfY038tmRqh32hVXBWfABl1ZBMMBZxioXJtCyI7yOqFbc3YtduUO7Noby9r26NH/
-	 GAyExsvv/UH3PtcUApVZ0gtBRzLldGeOpD5z2RgdOGfNSp6Mizs5osLguKnWeww1s1
-	 zIza8uCegyQrtFn7XLhoYXXniBWRxqVax1lveb2yY4IzXP1OHcXHNOwQxxmwt/yczO
-	 m21AK7S3JqWFQ==
-Date: Mon, 24 Jul 2023 10:20:55 +0100
-From: Lee Jones <lee@kernel.org>
-To: Zheng Hacker <hackerzheng666@gmail.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, Jakub Kicinski <kuba@kernel.org>,
-	Zheng Wang <zyytlz.wz@163.com>, davem@davemloft.net,
-	linyunsheng@huawei.com, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	1395428693sheep@gmail.com, alex000young@gmail.com
-Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
-Message-ID: <20230724092055.GB11203@google.com>
-References: <20230311180630.4011201-1-zyytlz.wz@163.com>
- <20230710114253.GA132195@google.com>
- <20230710091545.5df553fc@kernel.org>
- <20230712115633.GB10768@google.com>
- <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
- <a116e972-dfcf-6923-1ad3-a40870e02f6a@omp.ru>
- <CAJedcCz1ynutATi9qev1t3-moXti_19ZJSzgC2t-5q4JAYG3dw@mail.gmail.com>
- <CAJedcCydqmVBrNq_RCDF2gRds39XqWORFi32MV+9LGa5p28dPQ@mail.gmail.com>
- <20230717130408.GC1082701@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF872113
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:23:36 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079D8FD;
+	Mon, 24 Jul 2023 02:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nHwERRNohuUhZsb3fsbGJZNV/wqpb0sJjOXJGxj/gFU=; b=0eTCGmkFvYRanCjqIruUc+gFHD
+	eb0YjlozDEULA37j7v5qY4zn7oNzSJHyKS6Mu3lubDRF2RaMczkF4f0lJh//Gw6lfNr0hipZSgCGS
+	JIWlEQVkw7RyvqjD3Uxd4RuJG7sAceLde0p86r2jFr/kdLPlkftX1hnSBOxxVBlLMicc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qNrmC-0026m1-D4; Mon, 24 Jul 2023 11:22:48 +0200
+Date: Mon, 24 Jul 2023 11:22:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Evan Quan <evan.quan@amd.com>
+Cc: rafael@kernel.org, lenb@kernel.org, Alexander.Deucher@amd.com,
+	Christian.Koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
+	daniel@ffwll.ch, johannes@sipsolutions.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Mario.Limonciello@amd.com, mdaenzer@redhat.com,
+	maarten.lankhorst@linux.intel.com, tzimmermann@suse.de,
+	hdegoede@redhat.com, jingyuwang_vip@163.com, Lijo.Lazar@amd.com,
+	jim.cromie@gmail.com, bellosilicio@gmail.com,
+	andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au,
+	arnd@arndb.de, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V7 4/9] wifi: mac80211: Add support for ACPI WBRF
+Message-ID: <9b1f45f9-02a3-4c03-b9d5-cc3b9ab3a058@lunn.ch>
+References: <20230719090020.2716892-1-evan.quan@amd.com>
+ <20230719090020.2716892-5-evan.quan@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230717130408.GC1082701@google.com>
+In-Reply-To: <20230719090020.2716892-5-evan.quan@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 17 Jul 2023, Lee Jones wrote:
+> @@ -1395,6 +1395,8 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
+>  	debugfs_hw_add(local);
+>  	rate_control_add_debugfs(local);
+>  
+> +	ieee80211_check_wbrf_support(local);
+> +
+>  	rtnl_lock();
+>  	wiphy_lock(hw->wiphy);
+>  
 
-> On Sun, 16 Jul 2023, Zheng Hacker wrote:
-> > Zheng Hacker <hackerzheng666@gmail.com> 于2023年7月16日周日 10:11写道：
-> > >
-> > > Hello,
-> > >
-> > > This bug is found by static analysis. I'm sorry that my friends apply
-> > > for a CVE number before we really fix it. We made a list about the
-> > > bugs we have submitted and wouldn't disclose them before the fix. But
-> > > we had a inconsistent situation last month. And we applied it by
-> > > mistake foe we thought we had fixed it. And so sorry about my late
-> > > reply, I'll see the patch right now.
-> > >
-> > > Best regards,
-> > > Zheng Wang
-> > >
-> > > Sergey Shtylyov <s.shtylyov@omp.ru> 于2023年7月16日周日 04:48写道：
-> > > >
-> > > > On 7/15/23 7:07 PM, Zheng Hacker wrote:
-> > > >
-> > > > > Sorry for my late reply. I'll see what I can do later.
-> > > >
-> > > >    That's good to hear!
-> > > >    Because I'm now only able to look at it during weekends...
-> > > >
-> > > > > Lee Jones <lee@kernel.org> 于2023年7月12日周三 19:56写道：
-> > > > >>
-> > > > >> On Mon, 10 Jul 2023, Jakub Kicinski wrote:
-> > > > >>
-> > > > >>> On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
-> > > > >>>> For better or worse, it looks like this issue was assigned a CVE.
-> > > > >>>
-> > > > >>> Ugh, what a joke.
-> > > > >>
-> > > > >> I think that's putting it politely. :)
-> >
-> > After reviewing the code, I think it's better to put the code in
-> > ravb_remove. For the ravb_remove is bound with the device and
-> > ravb_close is bound with the file. We may not call ravb_close if
-> > there's no file opened.
-> 
-> When you do submit this, would you be kind enough to Cc me please?
+> +void ieee80211_check_wbrf_support(struct ieee80211_local *local)
+> +{
+> +	struct wiphy *wiphy = local->hw.wiphy;
+> +	struct device *dev;
+> +
+> +	if (!wiphy)
+> +		return;
+> +
+> +	dev = wiphy->dev.parent;
+> +	if (!dev)
+> +		return;
+> +
+> +	local->wbrf_supported = wbrf_supported_producer(dev);
+> +	dev_dbg(dev, "WBRF is %s supported\n",
+> +		local->wbrf_supported ? "" : "not");
+> +}
 
-Could I trouble you for an update on this please?
+This seems wrong. wbrf_supported_producer() is about "Should this
+device report the frequencies it is using?" The answer to that depends
+on a combination of: Are there consumers registered with the core, and
+is the policy set so WBRF should take actions.
 
-Have you submitted v4 yet?
+The problem here is, you have no idea of the probe order. It could be
+this device probes before others, so wbrf_supported_producer() reports
+false, but a few second later would report true, once other devices
+have probed.
 
--- 
-Lee Jones [李琼斯]
+It should be an inexpensive call into the core, so can be made every
+time the channel changes. All the core needs to do is check if the
+list of consumers is empty, and if not, check a Boolean policy value.
+
+     Andrew
 
