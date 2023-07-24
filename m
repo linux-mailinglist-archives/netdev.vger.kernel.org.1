@@ -1,87 +1,128 @@
-Return-Path: <netdev+bounces-20535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDEA75FF9B
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:10:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8658775FFCC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:27:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 596601C20C35
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 19:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FD1E281370
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 19:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25C7100DC;
-	Mon, 24 Jul 2023 19:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D66101CC;
+	Mon, 24 Jul 2023 19:27:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5919EF51C;
-	Mon, 24 Jul 2023 19:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20D49C433C9;
-	Mon, 24 Jul 2023 19:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690225822;
-	bh=ujnDSd65smrCj3S58K++7NXFH0zZfR/5ieE5tyGHfm0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mQWKVps6qy4AKLQP3EB7Sqqz/cVnf2stFPXSjPU1ay9pyi0oQB+8wjZ9g1mYGiodI
-	 VMwo1KlNLIJJ/eR4MQAW3YXm+yftxQd18iaobYrWERqJA0/F/Rxg51s3I86t1dFck5
-	 kGO+HUP9KTeqheygUyJGZiPXmp42jmBKiPZC4nY2uytNSks1z1CkGBSLvEO5IKo9RB
-	 iXdNF0tH48e0o6cSo8zUMXnSM/VnNAxf2uT1a9cvgnNAUwPhAgIv+AaNecj+zStr+A
-	 VEsyo7JpWGaJOC8SWAbeaL+Hd9dh9BQBL+uR8Ei/IW0c34IR1qyuDPIQudXRPKSbOV
-	 aRM8wIQUmD63w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0911DC595D7;
-	Mon, 24 Jul 2023 19:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258D8100C0
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:27:48 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DCAF10E4;
+	Mon, 24 Jul 2023 12:27:47 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b74209fb60so68344551fa.0;
+        Mon, 24 Jul 2023 12:27:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690226865; x=1690831665;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sP6uapY58+owO3zXpIyqoIEA464+0UGYLjjK0+g0hVI=;
+        b=KVoqsNkD9pPtqu0gDsOeYD6u1B6n+mw56rFIS/cTeGCxqQ35TnpKO/6aUbQIhjj460
+         v8+KyM+jZTre4DHvIn0YQbNJS7o3uNSPzpl1SAA27Xnvhx+GiP9gxs4Mt49mreeffIXB
+         NKS6gfCpYYsc47Tdgizooc6/2a0hSCAdapIIg9qdpMT/q1dMr7Mt4mB4e6ZGR/07H1zU
+         DvH9YBX/TJfwbuVGYOPF5b5mItvrBMErGvlAWLHMwJWQSTnvMcGwtwXKZhRNhuaQkt0N
+         Yg1xr+04OsQpRpI8YlmUdd3G2LGAVfJ7+goDJkdRu860dfPUbM4qmvn6auGclEdW6xUu
+         Br2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690226865; x=1690831665;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sP6uapY58+owO3zXpIyqoIEA464+0UGYLjjK0+g0hVI=;
+        b=PmsBfknILRT5HjaysZw5u9vflbUliPf2uNABJSPX9/LgjBYmDlnh5J3QSwGTWgmvk8
+         S8rBHgkYQUz+7mwJnHDI1pjEd+aArTY7994YxglmUqp3g5TMx/I6HfUQ6eAPpEQvcoa8
+         FpZt0uJ/tOC1J67KCI56q7ygIhrNyPnUVhtljZ7RZOqehUDvmz+X1YCWW/gkzQEuxN+b
+         16k/0xe1ALhKYRO2intXcH7F+H7H3wCTzbBl4Ogt7QK6k1bs1w3dPkqOc1gdGFkY8OwU
+         1B7A5CwSxB6HoCIsK28cYkBiNfIaMYiJNYM1cJLZSxnCtqLfGFMFY3wk13Sq+kMS4k+v
+         7iJw==
+X-Gm-Message-State: ABy/qLaNpzM7VA/GANFSa3kws9ZxjDnkZS35O8wmsXzNzLVM0K46erPO
+	nT9jw0B0+wx4zbUuUQlNzJANotCK5UI=
+X-Google-Smtp-Source: APBJJlGhrCNAMYuFCP0Z65Af/IAlcihiKhv0LS79VPeXYse0mmqg2Ht3M2NE8kIruU8PQNqMhgEWOQ==
+X-Received: by 2002:a05:651c:22d:b0:2b9:4841:9652 with SMTP id z13-20020a05651c022d00b002b948419652mr6367663ljn.25.1690226865198;
+        Mon, 24 Jul 2023 12:27:45 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id x21-20020a05600c21d500b003fb41491670sm13743216wmj.24.2023.07.24.12.27.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 12:27:44 -0700 (PDT)
+Subject: Re: [net 0/2] rxfh with custom RSS fixes
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
+ saeedm@nvidia.com, tariqt@nvidia.com, ecree@solarflare.com, andrew@lunn.ch,
+ kuba@kernel.org, davem@davemloft.net, leon@kernel.org, pabeni@redhat.com,
+ bhutchings@solarflare.com, arnd@arndb.de
+Cc: linux-kernel@vger.kernel.org
+References: <20230723150658.241597-1-jdamato@fastly.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <b52f55ef-f166-cd1a-85b5-5fe32fe5f525@gmail.com>
+Date: Mon, 24 Jul 2023 20:27:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tcx: Fix splat in ingress_destroy upon
- tcx_entry_free
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169022582203.21248.6314356948130016152.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Jul 2023 19:10:22 +0000
-References: <20230721233330.5678-1-daniel@iogearbox.net>
-In-Reply-To: <20230721233330.5678-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: kuba@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org,
- syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com,
- syzbot+b202b7208664142954fa@syzkaller.appspotmail.com,
- syzbot+14736e249bce46091c18@syzkaller.appspotmail.com
+In-Reply-To: <20230723150658.241597-1-jdamato@fastly.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 22 Jul 2023 01:33:30 +0200 you wrote:
-> On qdisc destruction, the ingress_destroy() needs to update the correct
-> entry, that is, tcx_entry_update must NULL the dev->tcx_ingress pointer.
-> Therefore, fix the typo.
+On 23/07/2023 16:06, Joe Damato wrote:
+> Greetings:
 > 
-> Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
-> Reported-by: syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com
-> Reported-by: syzbot+b202b7208664142954fa@syzkaller.appspotmail.com
-> Reported-by: syzbot+14736e249bce46091c18@syzkaller.appspotmail.com
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> While attempting to get the RX flow hash key for a custom RSS context on
+> my mlx5 NIC, I got an error:
 > 
-> [...]
+> $ sudo ethtool -u eth1 rx-flow-hash tcp4 context 1
+> Cannot get RX network flow hashing options: Invalid argument
+> 
+> I dug into this a bit and noticed two things:
+> 
+> 1. ETHTOOL_GRXFH supports custom RSS contexts, but ETHTOOL_SRXFH does
+> not. I moved the copy logic out of ETHTOOL_GRXFH and into a helper so
+> that both ETHTOOL_{G,S}RXFH now call it, which fixes ETHTOOL_SRXFH. This
+> is patch 1/2.
 
-Here is the summary with links:
-  - [net-next] tcx: Fix splat in ingress_destroy upon tcx_entry_free
-    https://git.kernel.org/netdev/net-next/c/dc644b540a2d
+As I see it, this is a new feature, not a fix, so belongs on net-next.
+(No existing driver accepts FLOW_RSS in ETHTOOL_SRXFH's cmd->flow_type,
+ which is just as well as if they did this would be a uABI break.)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Going forward, ETHTOOL_SRXFH will hopefully be integrated into the new
+ RSS context kAPI I'm working on[1], so that we can have a new netlink
+ uAPI for RSS configuration that's all in one place instead of the
+ piecemeal-grown ethtool API with its backwards-compatible hacks.
+But that will take a while, so I think this should go in even though
+ it's technically an extension to legacy ethtool; it was part of the
+ documented uAPI and userland implements it, it just never got
+ implemented on the kernel side (because the initial driver with
+ context support, sfc, didn't support SRXFH).
 
+> 2. mlx5 defaulted to RSS context 0 for both ETHTOOL_{G,S}RXFH paths. I
+> have modified the driver to support custom contexts for both paths. It
+> is now possible to get and set the flow hash key for custom RSS contexts
+> with mlx5. This is patch 2/2.
 
+My feeling would be that this isn't a Fix either, but not my place to say.
+
+-ed
+
+[1]: https://lore.kernel.org/netdev/ecaae93a-d41d-4c3d-8e52-2800baa7080d@lunn.ch/T/
 
