@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-20457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A90DE75F9D7
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 16:27:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57CF375F9DB
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 16:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4869C2815A0
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:27:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EF6C1C20AC6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9C4D505;
-	Mon, 24 Jul 2023 14:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E082D506;
+	Mon, 24 Jul 2023 14:28:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E400D30A
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 14:27:25 +0000 (UTC)
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2095.outbound.protection.outlook.com [40.107.96.95])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B72EE67;
-	Mon, 24 Jul 2023 07:27:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F719470
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 14:28:14 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14CC0A4;
+	Mon, 24 Jul 2023 07:28:13 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WpRGH8GqX65VsLri36UYWJKXAFGQiNYw11b5mupvMCYp9WJiYat9PQy9Nrg5eHSo8fsroIAz+rTe4oTLGDj46RIUxsbM7HXugftoKdvu7PAgIGaFmJ+sc4iDZwOSg3RsXPfX+c6Uwgaj1yoYVvT7PhCqgqvG/zdIbjrKZoImWfa0SvhLTyG9ImzODaKHd44Qw7R98V7y2iadehnPni/+fRyCW5JTGkd5EAHJM7byhx6O/uFhEifd6d4tUzeB8TnPRI3BR6TMyeWVP9gwmL4TzO1UXXFYEblQBcC084ItOtUXsk8lOysmg2vmnkRS6uuR86K1m0H/oISXPdjyIM8vhA==
+ b=W2Kb+P9VJl0vEwKAm0Lni7zYTGN6fAh49P2U7xAoroMfdC6+7BNjXBn9Djxuu3Nerl7ZIy9SVxqVU0NXB06OeUd+y/ssX/gfgbJBcyOG6/hHOgsyURfW51bo4wpGR0+PuinkUAVePKjBM7et5D2C84jCX+E0oK0r+EKvuc55RJEpgpPWyRFD3uM9ahLAJmvtl19CTfyin7cPj6IpnLyAcds0ie2SVMm/bmWgAJ6CttaGxVyxrFWkSOflGw2tgFs42sxiqdGmAWnYAy/5uB3oXDnd/SqQOjUeKIx5Siva2z9mJhNcF8rLg4PLYfuqGMajtXfMP9oMUfcYF3uk4rlG1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XPFL9IuYU0OFrHiiQ0Tn/Q6B8pBvS8+PxYspI2D9PRA=;
- b=Ca30ku/VhOY7ikT5vd1h+CTRxfRgUxw33ZbNedFd7bj55NyLIJpWpAPgFysyptLLFmsO1fxc5TgZWhuV3A9wlCqWfo4kFoOh2oiIfNeuSgpNuQK/QZ/DpQWIqW3EJWVOWTAa3/ASBdNl+WMt0r7MIsOtUfxxp4/b7C0jBuQjRhAd4av4Y9ghyhktJBC71KhxznCt3IQDgm1ugiL+GSxVT8Kn2CuQDBupBmGBTbcOZ1uEk/9EJX7gEv6FaloOFzi0oW5P+Fm41F6Xjn9G5KCQXAjlRuD7SIsHdTnafESHS9i8XQOcArsi021d8aWMTdvGwwmJlyIJ0Mx+aLCBO6R6/A==
+ bh=AyOgDoN1xxs9FWEXRHGJq6XTdrxTXxyn0hX1IyjlzYk=;
+ b=ZYi8Fg9gq4J+wbEX6JZ0A429ZL9b8RZRoFgRhL5MyOjZatKpbLd7KNsvVOqQV3evq6VIBtoLPViP1plHtSP30qD3FdINLq+rL1uUuaviSMIoqXgyPgQH58tkRDReVZKkL8OtEB8tWbmJuq7K56CAazjTdQ2POS/Q7hnDlLppCkGVpcDKQcQ1e5v7eBtYv2PPebGbt/l0YB1QoWzbTEgvp6YB6W3hLG19AfofGncTFDwpCVrSOMAQG4RoM3eqt99yPl464/JmmEvRb5CAP2LWfIzFR4pMUE7O8v2JBseVG4y2SX8nc6nnp0T6JqY/qZQdg5K0K+9je6Y0nZpa19/Pow==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XPFL9IuYU0OFrHiiQ0Tn/Q6B8pBvS8+PxYspI2D9PRA=;
- b=W/5IsgxtZTJS5PXs+4yRFhqYRnQ0cu9FHI3Hik8lKaTOPlpVj6Z/K/z5c4Nt8eJxRxf9rIMK3GHBRRg4mbDHUD2rFEvOqMvpTQhJFK7jQ/avOTeUwNpxKRB6Mh7OwJfONOWh8CvnFz1dkKKhk4r9ZvFLwgJM9Qm+nw0HrQKE+/4=
+ bh=AyOgDoN1xxs9FWEXRHGJq6XTdrxTXxyn0hX1IyjlzYk=;
+ b=fYDCV/pPcaNusLxPR7zWrMaI+4Js8FvLAb0pAsnnXMVQ/rP7BabD0aSIg2EBtW0nmtchGFeC3eSzehXalN5sr4Npp97H3ShFwZ9DzMNdPb0zIr77qKgvNVh9uTTFFuycQlTU6EuIgwAusyRYEel7Md9nwe06kMYT7628Bhrxx8M=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CO1PR13MB5030.namprd13.prod.outlook.com (2603:10b6:303:f4::12) with
+ by MW4PR13MB5602.namprd13.prod.outlook.com (2603:10b6:303:182::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Mon, 24 Jul
- 2023 14:27:19 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
+ 2023 14:28:08 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
- 14:27:19 +0000
-Date: Mon, 24 Jul 2023 16:27:12 +0200
+ 14:28:08 +0000
+Date: Mon, 24 Jul 2023 16:28:02 +0200
 From: Simon Horman <simon.horman@corigine.com>
 To: Breno Leitao <leitao@debian.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -56,15 +56,16 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	leit@meta.com, Petr Mladek <pmladek@suse.com>,
 	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
 	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] netconsole: Use sysfs_emit() instead of
- snprintf()
-Message-ID: <ZL6KQLUNIyXHAtOy@corigine.com>
+Subject: Re: [PATCH net-next 2/2] netconsole: Use kstrtobool() instead of
+ kstrtoint()
+Message-ID: <ZL6KcmKWCI3BtfUn@corigine.com>
 References: <20230721092146.4036622-1-leitao@debian.org>
+ <20230721092146.4036622-2-leitao@debian.org>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230721092146.4036622-1-leitao@debian.org>
-X-ClientProxiedBy: AS4PR10CA0007.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dc::9) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230721092146.4036622-2-leitao@debian.org>
+X-ClientProxiedBy: AS4PR10CA0024.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d8::16) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,57 +74,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CO1PR13MB5030:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39e5e8ae-e1f3-4cca-55ea-08db8c521611
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW4PR13MB5602:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0497af62-ec42-4fc9-7cdf-08db8c523374
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	8iMbpgvgRMdBtV4GeM88LocLGeUrE0Elz2DIZ2baSFScg9DS++K2QDB3FIDMDDZEWRyIVRdfURnjYrp555ADp7I1FWQPhaw1R91/M6YWKMVdI8FlAs/k8o+38Gip4Nr5kuCBJjqLTqcBTHiQBpzxKlOfskCsTwezqca0D254Ey1bY5UJpoWzOg8NBNcVpfM/mbcHeaLdikg50iMmr7vSF0GCRiJLIFa0fzq/V+xYoo36B95ZoEzXNUArdYGOUABWh/3rR/jHxqy2NFN3DFoaI5i+4xeb5vOkBa+Bj/JEmII5EPAVYl0P4aXFZZ8OeQYbIxBuzf5z2GT2Q3NLQOe558ZPtX3LzcN6jyHdl8FrDD6rUHi1CU2QVlFU1kGIE8Eb1OacB5VZHhiZqhFZdaYpw8TdjlH1stJSldkY9vqqRuve8O/coWLxeSKUKx+s8IeMgwsHpGFTZVjmjcpKTXJReJ06709/kf0Fmg/k0H3J5vEAfmO4swMgSQZJ2NPp20xqJaKyyufR/fWOpJqeVOmhT2z8TR9n0KrJz5S9KIYmk4WUgydDmMP0+CtEYGDPf2VHbcUKi8VBQ52JCg0L6bz278FVDYsOWYH/vyac/uIte9Y=
+	6rKT8CBz4hRA9SgmrV1kzy7o1YiU4+Kz+gSDBllrRuGnxlF5l7ZYhWdem1XvHFSKJZagVqtN61rF8IZ591aw3vx65g8v7UMJI9iUCngaPDmX7hkq3RqAg04hHMM6cx4/clm7DM4FyczG4g8Jt8NjW8V4a+ccQfm+l1QCM90D+E9l2oSRkFFvhMIboI5cC5Ki2IvPfnIJF/o1fyuOKa9CjCgq0mUEFx8qO9vVfVnHVWhvguAaAUZfcHeiCx8yFnq483sQq05F5SIc3URYdzlYHTG0WpLEoUuJ3jw9YPzjqhtqgZV2Bw+1OwP/sf13tN91OTiuZL0np0oWA2HDtCEH4ke69nLdW4vIR032MHiBZqz53foZ99LRCL+dEl8CXNmDBpsgECk/j8CEnwyBuwejPGKFaLuDucMRwEte8QF2MbQY+70iz1qwRw5mWQPws4KlXHXGRrOJcWnj4MigodTF5pj2ZDmbYtq/iEAJFdu2gCMTIw6YCNnsGlSZCABAUMooLAXkFfzg7D1HEx7Ji+FIa/9vIUM3MEDYg/HCfZpMBuKkJTPPoWsP153q1/fS5OXYsg8bxl6HFCbcVugL/SOz4X6vPonbWYjAvb95fWRB4mk=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(396003)(136003)(366004)(376002)(346002)(451199021)(2906002)(38100700002)(478600001)(8676002)(6512007)(186003)(2616005)(8936002)(86362001)(6506007)(5660300002)(4744005)(36756003)(44832011)(6666004)(6486002)(66476007)(6916009)(4326008)(66556008)(66946007)(316002)(54906003)(41300700001);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39840400004)(376002)(136003)(396003)(366004)(451199021)(6486002)(6512007)(478600001)(6666004)(54906003)(86362001)(44832011)(4744005)(2906002)(186003)(2616005)(6506007)(66556008)(36756003)(38100700002)(66476007)(6916009)(4326008)(66946007)(41300700001)(8676002)(8936002)(316002)(5660300002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Dy+ru3CN66ODHpKBZUPpLU8Rwpg4WxacuAuARCWZPFGjh+vrw54H8n1QXbF2?=
- =?us-ascii?Q?usN9MkGydNgy7SUv+32gUvERsbaaB41xNN3hrH+CPWuyTR0S46Nq/c4wueVl?=
- =?us-ascii?Q?oMGn+ltrGJekr21k/7hniuZ+EA/yeHJ8EGuOv4/obwSSBbsPDMhXBVdkJ84G?=
- =?us-ascii?Q?es/ksOvoqfsd0c7unAFOuwmfQCTLvd2oWxWnYmoC8koRgnkcEVvWybMo3soq?=
- =?us-ascii?Q?He7BQ9nYHmTQIZDtA1R4kYistnDk/1d2DmvXxk0X4pvAy5eXSAM3gToI3zhn?=
- =?us-ascii?Q?kJxwX3EhMkRsnzWlMOR6awleViTpSDBngpKBqC5zlYhLFJN1pHVhEYbsMpJI?=
- =?us-ascii?Q?agzny1R9dNqT/W7fKhYs4mIjUj+NEfcchTd+zdf6v0Jzamn14GJ0Kdm/+fpY?=
- =?us-ascii?Q?BDj/DkaHnt1fuSdDbjGJ+XgLP8/VE7VSPyiN3+dGLoteWEtqdi+CqbxAm90F?=
- =?us-ascii?Q?vAK/Z3WwTMwLW0JteGz+HaGwY37Ee7sGW+FSQx8t4TfpzyBfNZjEkhjZIBpG?=
- =?us-ascii?Q?CW5ASGYEBkRMU5WitGMVV2ka+1Qk9y6upS4SRBJR97wqHllmFibL2GpJz5d7?=
- =?us-ascii?Q?R00a6+NQWRuOA1bBXx3afpiWSc4bRqbDSbOz4VwSf6rbtn730vmoLcFDCO+8?=
- =?us-ascii?Q?KQSTECy1/BZ3xwTGMDgRrhOvcz26iyTEh01moCnvK6vByBzhTBy0cBrXlWAl?=
- =?us-ascii?Q?S/BLgi7Z1Z8vCgvLdkC+6oKkZU4tCABRS7VNXR12JdS+NHjMW4jHuc8t8ey7?=
- =?us-ascii?Q?BRLTgpe0W2T3DqS4I5UXWzRZa9aIDyOONVbpX1SIpQkaRTYocUrx7d/Q+aAs?=
- =?us-ascii?Q?s8iohUCQ0yE7MvpuMO4KUJVx/V9mrsSletjWDkpI7Ihas2ezWlTi7vRdXsmy?=
- =?us-ascii?Q?comVU8I1NhtRjirtuWPrCsFJiyzQ7bdTRHJYgB3Oq+V69VMEJ3u7/6HtvqP2?=
- =?us-ascii?Q?jCFw9lLL7cDl5lBlRCc3GuBF9HHJ1GSo7OJmAKBp3z9Qry9Mf4StiVQPg5ex?=
- =?us-ascii?Q?0tU+u1w0/m19WDgiDrGeQgi1M5uE6GndSW3oT0iobiEQcmi9FdRXXsHpjC+g?=
- =?us-ascii?Q?HW+BE50bruCDuN4RnhSZcYAFh88pAU4Q+7d1NuGAZJosEOlH9CPfbfpjSqOZ?=
- =?us-ascii?Q?4vTFDOXZ+h+ugUC2UsUnf/pWMrzFKMCmGt0Hv+0Bi1at4569Xt6EqG0kGTI1?=
- =?us-ascii?Q?rvDxcJifxowwduQ/TvQoX/WP1B83bMTUAsbZVcDlHhL3K9uWzFFxu07N1hIj?=
- =?us-ascii?Q?Eg/ePmBMA/7jMegDrzdKwvsu8Xv1uKXyfpwiK5VnXFEnTLFUUqmNFqEpWadH?=
- =?us-ascii?Q?2qTqlw0IHwkEdz6B30vU39S5IDF5MW+XVCRyNk7BK2IDxhLqVS9odagD5mAo?=
- =?us-ascii?Q?F97ev+V7ym6aC9gbvNbByzRuFEU5h8p1ON89zB/xkEdT5dNogeNN0GQWf/p+?=
- =?us-ascii?Q?WjgE0ac3Zg9lYcmXjPiDRoi4Z/CWgjW2Kp7YLCmJKnNvCpMnAaCS4VHf145a?=
- =?us-ascii?Q?kCHw4CHNYN5DCchGcY4VDgBH61l4e62cihr009l9QgQLPhNbsCbF2zvwwFDE?=
- =?us-ascii?Q?5hJ59LeRM+R+9xz4do7vqTzkyqfTAt9e4tpjQcnKgE1gcXV8vd14dhASxxmr?=
- =?us-ascii?Q?pR7z9CKaKZjP7CS6mFn1oG2UWnlWc/uHgHQyIXrfu3SNAvxyEQ1MS0FYk5Qm?=
- =?us-ascii?Q?1vbmEw=3D=3D?=
+	=?us-ascii?Q?dE/vTOLLY2yhojdKmMVnzzZDFixGDF9cXVYW+pXO4cruv4iWNs0i2Duod0GP?=
+ =?us-ascii?Q?xmTFx1XjbV6uPo10o+gIn4X40CWKM/r+Us2ks/5BABSDY4fL7KPcWTCktXh0?=
+ =?us-ascii?Q?t5KO3dVULqUDynG0aK6pMKupqWefLJnWguqhRdgmnar+H62x1m+WIkn1Yrqs?=
+ =?us-ascii?Q?FAHUIu6fvadgys/r/zOUVJFVSxKYnqVvkjGpgVpGFyBVCas0T85Gr/xzH8cO?=
+ =?us-ascii?Q?cJGcAwo/uhYWJuO4f4mUk8w77+KBVkJYpnCNUsRAcb3JB07s/GuMkU1+Mtwo?=
+ =?us-ascii?Q?LgD8xVm2gt3VolUfIWa34N9ICXm5zqruuTqzqPTbXLGdZCmHzQTOziHrL/eB?=
+ =?us-ascii?Q?L6R0eqAAESvs4eqQ2BN6UQczOLGFeTIESG95JRkhs4LuWpWfhmSA4JyQRZgb?=
+ =?us-ascii?Q?szxi593NL6Q8nixJc5+0+GKqGM6FmieORqBe0npK9ZxPfvlezMKLBFvj/Mop?=
+ =?us-ascii?Q?mrrYePH1Krjld3EVAFwGLXfaVL5HrJRztM4CROp+ufZ9GuZq/3gaQ/EDobHF?=
+ =?us-ascii?Q?b4PvxROfsqoEnSVY0NmEytXWWZJO4g1Q0ezkDZY5ysI59nMKltPLHlB5Qrpj?=
+ =?us-ascii?Q?u+AsPpTB9bsCE8Rxh4PTC7Y2f4qlR47zojBHMEo4P8Tzs6RJAXBbIzUs3jBO?=
+ =?us-ascii?Q?l+qjV/rw7Atd+gWRZd74Li3w4+bCpvcdLy1P2eIoThcPAqjiRawBY/M9qN+R?=
+ =?us-ascii?Q?gM7bTBs0pWXf22E+AQz7uMGOoF+zJdmrJZkjqVglJ8eO7KD0IkvUpQVmMmtz?=
+ =?us-ascii?Q?IvP6KtU0+tq6msmnSDteNMDCREBzUqngIOPz0z5xiwVxXbO9nOrAzd2nRXsw?=
+ =?us-ascii?Q?19CeWECc4mTiqxoizdIwvVcRX2jp8M/q5dg4XZtcOdDSjLTTpJRcQcnzQ+2F?=
+ =?us-ascii?Q?3nwoxyRcA/VQP/3LjYVM/oQfT/MtJl3cAU+ukfR7+Xo9GsbtQ5Bj2xNvkHJ2?=
+ =?us-ascii?Q?f+f9dCeg+2rCkgYlz2UI+EfXV+zbSpHnmxLRWPnIF+q8YyB8idT3bs83V/NA?=
+ =?us-ascii?Q?s/XcEFyh72rLcmLCUF75foStdS42YXgfuVlB19KKEB5FxTUni6HdkHGvBjUY?=
+ =?us-ascii?Q?Z/PCE7xVO9egtFRju3UTmQlPUWtMsWT6RIMbYZUQuqa82WzY48igN7NwHw7N?=
+ =?us-ascii?Q?+I9iR5j9YZrTlAUWvUvehfbREuBQEt6Vi8A3zCj1nQuPvEV23j5m66ZUn7WA?=
+ =?us-ascii?Q?IqhsXgkQmcRXDzk2ThtbtQ/JfM+LbYOuI49HAxNVR2ppXBXeNtbHHpRvFHEx?=
+ =?us-ascii?Q?UEUxud9kt97mzS2VaOsGr2rvpMnvYikGv8XScgHCPyM2zIzDyjsD189/QiFx?=
+ =?us-ascii?Q?wNynRAO80lS/co9MbQuJWY3I0ZRJYoSR89oGJkQbB9OrAoSgdZxIG55JPSXX?=
+ =?us-ascii?Q?42+Dg2/5x8HUzPZh/CbGBGYai5CyztXGc4F4BVoyeeb8ygvZsnc1as1Qi0ZA?=
+ =?us-ascii?Q?uPLE46KARqF+OPzAxRSEvT/wThCRXxd7+MHtDaKLXfzt4oxDoSH1IlnH3p0F?=
+ =?us-ascii?Q?8Nb9t6QPKyrg9ddk4o2IZPLUhboPAqiGjOmm+0jHnK7DE9d5qPnzR3H3QOND?=
+ =?us-ascii?Q?YcMQ/6jeeFN67WibD3RvcrQJphC0gkwkrc4jy6Ws0s7ZHgckwTkjV8Ddrdkd?=
+ =?us-ascii?Q?30XwpLpH4MWWhjg+ImC6ab41vSjKSBk34vl47ew8lymjAQwZdZP1q8mITCTg?=
+ =?us-ascii?Q?kDusng=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39e5e8ae-e1f3-4cca-55ea-08db8c521611
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0497af62-ec42-4fc9-7cdf-08db8c523374
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 14:27:19.0546
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 14:28:08.3066
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bpbCkLG52u5fMvIHC3Hjrf/cYpG7ApQT/u3Km0gP8t2Tyo7Z2f/DYbm2vXKvqAw7J+krR0whDQ11hot3K4A2JilKu/bU/Tpijrh2Qkmu7os=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR13MB5030
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5w1nM2rXzgypual5wAA6dFmBdWt1T13u93B6FS5zwItTv1GWOJUxEVryQ5UUbexr9x/Xk+Vo1qsOPFvfhaVaFC73+m7SpC6TpXmhyCc9gOw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR13MB5602
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
 	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -131,12 +132,16 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 02:21:44AM -0700, Breno Leitao wrote:
-> According to the sysfs.rst documentation, _show() functions should only
-> use sysfs_emit() instead of snprintf().
+On Fri, Jul 21, 2023 at 02:21:45AM -0700, Breno Leitao wrote:
+> Replace kstrtoint() by kstrtobool() in the sysfs _store() functions.
+> This improves the user usability and simplify the code.
 > 
-> Since snprintf() shouldn't be used in the sysfs _show() path, replace it
-> by sysfs_emit().
+> With this fix, it is now possible to use [YyNn] to set and unset a
+> feature. Old behaviour is still unchanged.
+> 
+> kstrtobool() is also safer and doesn't need the extra validation that
+> is required when converting a string to bool (end field in the struct),
+> which makes the code simpler.
 > 
 > Suggested-by: Petr Mladek <pmladek@suse.com>
 > Signed-off-by: Breno Leitao <leitao@debian.org>
