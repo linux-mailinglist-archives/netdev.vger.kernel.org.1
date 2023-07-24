@@ -1,69 +1,100 @@
-Return-Path: <netdev+bounces-20522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D205F75FED1
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 20:09:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ACFC75FED3
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 20:11:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA0B1C20950
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 18:09:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F082814AC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 18:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DA8100AD;
-	Mon, 24 Jul 2023 18:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70376100B0;
+	Mon, 24 Jul 2023 18:11:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98613E574
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 18:09:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFFE8C433C7;
-	Mon, 24 Jul 2023 18:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18251100AD
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 18:11:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C635AC433C8;
+	Mon, 24 Jul 2023 18:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690222187;
-	bh=+pWi1r3aCY7xeRVAh3EZgJfEfKcDCtnfNsmOx5/49f4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=R/pADjoK5lpWcAvs6GsyN0/fc9vCEgP9oNnxIo6HlMT2O1huD7JiCdjAtZO28bcIi
-	 53FLT1mxN7p2qfdaJItP4aslh7w04VID/PPfkevWVqHm7pYS93tg0gyqb52UCpg5Hu
-	 EMWgBDuGO1h50tSM9lO5rj1ckzXm1Q54Qz7L78rV1JK3CFB7JscBFRTHMeDiUioIGf
-	 1awNTDgnaxrqjBQGgpnzdOyCsFHYko6rHLTRhX1QINhfRX3EQBWqEmTgqxd9GpQdth
-	 ShrZnHZisW356+RzkWzqch3/QXvo2CTbwwsNh/WDcBlsbRcHkiyN7mceHcB+OSxaYl
-	 Uum16QHHuvXfQ==
-Date: Mon, 24 Jul 2023 11:09:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Thomas
- Haller <thaller@redhat.com>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Xiao Ma
- <xiaom@google.com>
-Subject: Re: [PATCH net v2] ipv6 addrconf: fix bug where deleting a
- mngtmpaddr can create a new temporary address
-Message-ID: <20230724110945.55e91964@kernel.org>
-In-Reply-To: <CANP3RGfsp3eHmSabzwsvHJbc6mb6QGgfPmoEF3B0t03SHwNkFA@mail.gmail.com>
-References: <f3e69ba8-2a20-f2ac-d4a0-3165065a6707@kernel.org>
-	<20230720160022.1887942-1-maze@google.com>
-	<20230720093423.5fe02118@kernel.org>
-	<CANP3RGexoRnp6PRX6OG8obxPhdTt74J-8yjr_hNJOhzHnv1Xsw@mail.gmail.com>
-	<CANP3RGfsp3eHmSabzwsvHJbc6mb6QGgfPmoEF3B0t03SHwNkFA@mail.gmail.com>
+	s=k20201202; t=1690222269;
+	bh=lVl/AoyoC3+s3150PJB7m2OVF2U2VY5mosVKutorV/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fLxx1cJ7WRLyBjboZj27c0pna1eGR+fCO+km4x5R9cBWxpNR9AHc2zVnostvDm33y
+	 ouKZWeqCO2jyWpcuzSGXqJsKjcw1BQTyMWv2cer8LbSL/juksaHecI7R9I0KtTHmFv
+	 +tErBrJc5HiKIY4YislKAQKbpCW0JAEMHKDR4rBYYWjRcFAk80SCF3kn4k0lH/cUUd
+	 /4N3YPyo8/Is+KPdHWY14mAjm1cE6lghRAQM+jTfzxse8ZErgC8dinjpoRtmmPXynY
+	 s9waxOgIcU18SW6csvbm2epdLW0999zHzd7XmazwwKeRel0yU6LaUu2A9V1cqAzTib
+	 lyPASW3sHewcg==
+Date: Mon, 24 Jul 2023 21:11:05 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Ilia Lin <ilia.lin@kernel.org>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jeffrey.t.kirsher@intel.com
+Subject: Re: [PATCH] xfrm: kconfig: Fix XFRM_OFFLOAD dependency on XFRM
+Message-ID: <20230724181105.GD11388@unreal>
+References: <20230724090044.2668064-1-ilia.lin@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724090044.2668064-1-ilia.lin@kernel.org>
 
-On Mon, 24 Jul 2023 14:07:06 +0200 Maciej =C5=BBenczykowski wrote:
-> I see this is once again marked as changes requested.
-> Ok, I get it, you win.
+On Mon, Jul 24, 2023 at 12:00:44PM +0300, Ilia Lin wrote:
+> If XFRM_OFFLOAD is configured, but XFRM is not
 
-FTR wasn't me who set it to changes requested :S=20
-My comments were meant more as a request for future postings.
+How did you do it?
 
-I don't see a repost so let's just bring the v2 back:
+>, it will cause
+> compilation error on include xfrm.h:
+>  C 05:56:39 In file included from /src/linux/kernel_platform/msm-kernel/net/core/sock.c:127:
+>  C 05:56:39 /src/linux/kernel_platform/msm-kernel/include/net/xfrm.h:1932:30: error: no member named 'xfrm' in 'struct dst_entry'
+>  C 05:56:39         struct xfrm_state *x = dst->xfrm;
+>  C 05:56:39                                ~~~  ^
+> 
+> Making the XFRM_OFFLOAD select the XFRM.
+> 
+> Fixes: 48e01e001da31 ("ixgbe/ixgbevf: fix XFRM_ALGO dependency")
+> Reported-by: Ilia Lin <ilia.lin@kernel.org>
+> Signed-off-by: Ilia Lin <ilia.lin@kernel.org>
+> ---
+>  net/xfrm/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
+> index 3adf31a83a79a..3fc2c1bcb5bbe 100644
+> --- a/net/xfrm/Kconfig
+> +++ b/net/xfrm/Kconfig
+> @@ -10,6 +10,7 @@ config XFRM
+> 
+>  config XFRM_OFFLOAD
+>  	bool
+> +	select XFRM
 
-pw-bot: under review
+struct dst_entry depends on CONFIG_XFRM and not on CONFIG_XFRM_OFFLOAD,
+so it is unclear to me why do you need to add new "select XFRM" line.
+
+   26 struct dst_entry {
+   27         struct net_device       *dev;
+   28         struct  dst_ops         *ops;
+   29         unsigned long           _metrics;
+   30         unsigned long           expires;
+   31 #ifdef CONFIG_XFRM
+   32         struct xfrm_state       *xfrm;
+   33 #else
+   34         void                    *__pad1;
+   35 #endif
+   36         int
+
+Thanks
 
