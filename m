@@ -1,214 +1,253 @@
-Return-Path: <netdev+bounces-20390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24BA975F4E7
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:29:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E38E375F50D
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A6072813EB
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:29:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F2C7281573
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC375690;
-	Mon, 24 Jul 2023 11:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00416ABA;
+	Mon, 24 Jul 2023 11:30:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184BD23A3
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 11:29:22 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2087.outbound.protection.outlook.com [40.107.101.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D09FE54;
-	Mon, 24 Jul 2023 04:29:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GskoFfXZ+mIRJWqiapEoRX7Qgh5FWAy+d6vgqiVz94GL09+wkk8CtB3gsvWqPqihG9Hh6nqozX/teyCLwuxAcWX6U+ITpRlOf2gm+0IjU0nIHon6NZCFKlFmr5lC/7Kma+onNln1MM3VIeChGjDAM4X/QJ1hczj3KJHBa0VQ6txQXCrajnVZYcIK9sGsph4DLN69JhZ+SjhHi/V6Ug7Pl96yJ6y7iLbOSECIuruKbmQAoXlD/XUT1AzmipWGi3zrRfEv2lHSlJXQVP6hLVFEg+0mpfxY6oWR7pe3qhE1RVt0t7/4mKzV8/DHaNYwEqz2DSGu5YGdjnoRN3Htv5rf2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K/HEcDwGW1j2TTnHqB4zMwbSsdre41jJvauX8pVaVvE=;
- b=n8kB5JBZSdL93Sfp9KoMTqLHZvBnZdDXUfiL6GDV8zB8QKzWDduhd1no6mu4ewvfxev78qGI5V8YjghtQbrxd/f2HkSK13R8tvvrjUOiM0kX6cIqV0ZWTpZ2cKVwm6WHSxLv/ZjYK6yZnG6yEIQP/2Sen4Bi5pGrZt5fgtv9rZ5pVE2gWe5OuI9UKvl2wOYStm6Ccjb7GDv0B2yYqSySlWkydeiS5Q4djzxSz0eDCT/DZyRTUPs7d2buCH2d94I5+WhMfO+FrkvnSJ70iFvYnDsU9B8MI0wGGzDmVNh0FlEu3gZZjTWniGCqO8oL1eCi5Zwcwjd9JNofasdYW4TJWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K/HEcDwGW1j2TTnHqB4zMwbSsdre41jJvauX8pVaVvE=;
- b=liA4vAhwq769uuq/kFxEXV8dUd+0+ZtmmC7UiMxoDglj0vaMGVTRU6ocwlI8XAhLKXhWJURoxG0wLBpGNk7GLPh/y7ST2BkQhDMs5ZkOeGErXYMhPbeQ7R9wFj7shr1bRhV4UFCj7FWcBhEn6+1SW7PUoQCKcqlgIVavPXbJQ9A4P9zmvjJYpko6JQliXG2lM3S033RilZs7Ln0YPlgHeTtyUuEcr7tFsil8mbhIBR+adnJjsDC9d5h3kUx7LFuFCGRD8Xs9/SbhydLGvkeG5fpRYqTR55Z1B6ElT6js6hqoe5aiWEkC3MyCNPj3dt6/Xlb/jeKoBMEKAY2IfzIvfA==
-Received: from BL3PR12MB6450.namprd12.prod.outlook.com (2603:10b6:208:3b9::22)
- by DM4PR12MB7528.namprd12.prod.outlook.com (2603:10b6:8:110::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
- 2023 11:29:19 +0000
-Received: from BL3PR12MB6450.namprd12.prod.outlook.com
- ([fe80::8dd4:fb0b:cea7:fce0]) by BL3PR12MB6450.namprd12.prod.outlook.com
- ([fe80::8dd4:fb0b:cea7:fce0%4]) with mapi id 15.20.6609.022; Mon, 24 Jul 2023
- 11:29:18 +0000
-From: Revanth Kumar Uppala <ruppala@nvidia.com>
-To: Andrew Lunn <andrew@lunn.ch>, "Russell King (Oracle)"
-	<linux@armlinux.org.uk>
-CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-tegra@vger.kernel.org"
-	<linux-tegra@vger.kernel.org>, Narayan Reddy <narayanr@nvidia.com>
-Subject: RE: [PATCH 1/4] net: phy: aquantia: Enable Tx/Rx pause frame support
- in aquantia PHY
-Thread-Topic: [PATCH 1/4] net: phy: aquantia: Enable Tx/Rx pause frame support
- in aquantia PHY
-Thread-Index: AQHZqb4y/UnCFG0OJkmo9e/Tj/o/pq+gNgMAgAAEfoCAKKujIA==
-Date: Mon, 24 Jul 2023 11:29:18 +0000
-Message-ID:
- <BL3PR12MB6450050A7423D4ADF4E4CFE9C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
-References: <20230628124326.55732-1-ruppala@nvidia.com>
- <ZJw2CKtgqbRU/3Z6@shell.armlinux.org.uk>
- <ce4c10b5-c2cf-489d-b096-19b5bcd8c49e@lunn.ch>
-In-Reply-To: <ce4c10b5-c2cf-489d-b096-19b5bcd8c49e@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL3PR12MB6450:EE_|DM4PR12MB7528:EE_
-x-ms-office365-filtering-correlation-id: d0818721-dcd1-45ef-c887-08db8c393832
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- LfR2lQKjOWRGbTkaK9IQfg5S615MyGqRjpufIYxE+P/hGFoU+/nydtJQeiAspP0d0jNBKJ+n3ArIuw5G+GQasAi96YUSGZiEkn9Uw8ur9d8krzo0L0tAR9fzQk3aTpeOap+LTImQcMn/I+UrNDy38xtBR9PP5n8Ebj0ndjP9caYw8awrUBezFHgvLCIVj+/VT4Y5UpmeEzQsjLbJ8Rxk+EkYEsiU7VkkPdENPeLpZOArCdcjP21OkxjOqNvPNb8UN01zVo+9U3lq4pVABN71dwXp2ywaHzJqXIOLCkzsrXXBcdPB9W8n7xcmZBJM/qcf2aR6d6tJcfqCZMAZnVILx3u2ep/l7U5gZaT6heMYavVYBGJFwIf02XDhHjyMs5EhMteXCENg+iAmyZIM3hOeWnAbX5xgmzjdtFpZ7OIH777CWhYFt9HWKfOBHNUqYdMchyTZFqDQZ58L7XmUDp+n93ScVKIARAbOP3ARgmtoINT6Nmr0b+xWt7YCTICKAmzukP18F91R7Df5VyAVN5nImNpOKimIxv+V2TiYQ7QW2EpX82o2Zn/QHnE2AHn7InEWS0G53DLgf0+Oy5P/nPZ7ZDoadSyoR9XDiigJLjrj04nuMgDe6iG4CQ1x3rQ6m4/E
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB6450.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(376002)(366004)(39860400002)(451199021)(66556008)(66446008)(66476007)(66946007)(64756008)(8676002)(8936002)(316002)(4326008)(86362001)(76116006)(33656002)(38070700005)(83380400001)(122000001)(2906002)(41300700001)(52536014)(38100700002)(5660300002)(478600001)(110136005)(55016003)(54906003)(71200400001)(107886003)(6506007)(7696005)(9686003)(53546011)(186003)(26005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?0JHQ4T8bzdrGbPjBOQpKx6wuTBli97iO3vGG6zzPd27FymBjSE5kOQlmIQZ6?=
- =?us-ascii?Q?4B/oAuk7OtrG5d7kXOGJhdWLIRTRpURpKAisaFME+LpxYuzww/6PJq0rHp9V?=
- =?us-ascii?Q?85Ssz1N9WNFjxdbOAVnvigYzhc3kdPb+HLDrufJdLy8vJFULP3T3DYajZytm?=
- =?us-ascii?Q?GIr0jkfiUoiejXrgwmF4j5kM07LAvlgNpAYM2AaReWuuAltSjKUTZObUhJpX?=
- =?us-ascii?Q?MbrDZV/ULl4L/tanM90VzyoTTBbVU0/lpo8pjHuBIL0b+FZqF1WUVKjQQ5gU?=
- =?us-ascii?Q?xD8UrzmSXeQg6tboctfOGUppB31Pr4TmVS0uaXNZX4TP4VyVFhsQdMXjTxYG?=
- =?us-ascii?Q?nRQt+iXKPukHTPoRRf7g6rPbNbOrSX+7i/rekV6/YqlEtPjHni4PAh6kgn35?=
- =?us-ascii?Q?gH+1EroXbHusHASBZLjqS9b5gyElsaPxFmWUapQPTEb5w1XmOVO1t4oGG23b?=
- =?us-ascii?Q?eZ7rfvuQIuUhNX/MScwO2ciwQaE31iwVDhlqKDa96Y4RFoSK5Hx6b2rRDFI6?=
- =?us-ascii?Q?+dwyyHumE+xrnp6rmsMl15JrJqv8fvH9YcybbqgrejcjxZMUi0cZLDQa03yC?=
- =?us-ascii?Q?znMZRWZtaSxtGyuHs155QFRdUvHtUVxJh7GbCqT4uJTJMeKYcK2qFicgSg0z?=
- =?us-ascii?Q?ax5aEbyoM0gGXXMqPTV1m/501210aDIXKBeECDieUz6sBH8T2OgTxAx+tljj?=
- =?us-ascii?Q?A3LkoHMaVmKiWSkguKKcbP64H9q+oRjEqsJVckMXmZ0LJGC1egpffkuKDWb5?=
- =?us-ascii?Q?rG7g5F6Ki1ofocSebgzUQn45qaP8Jfi1GGVh1OHu6fYOkOW0R+9bxpBqVgmE?=
- =?us-ascii?Q?sd5iJtrh4P5+cksIbNMNupgkZqIO+u6X7jXlO69R+yVuoEPnquWVKLW9/OZu?=
- =?us-ascii?Q?3U7t/d0Af+o44vsfdv92cLPQzyQI1B8wMA/LHRC4Ze9dfsxDljvAQAqCzvwI?=
- =?us-ascii?Q?DwOHnSiMO0jbjkQrqhkO0nt/EupJNKa41CuTfrpTNMpY1zrapLWgVqBTBJ4t?=
- =?us-ascii?Q?ZEXw6O1n4fu/QbB6Qg55/ALmYX20Cr6IZB83kGohuoQ5Jn2o9wyMc7+y507t?=
- =?us-ascii?Q?7nL7r7mz06nXGIhSUhGD+YgqcNQRT4MyuGTgrwTM3i+1SoZYLvvu0n5VLKks?=
- =?us-ascii?Q?MAVI7TgfxjY4AC+I8QuWYTt9PvyVnNcAdzjxmkZX6Kzuq3Pvs3EZl7B71Z/U?=
- =?us-ascii?Q?3+T3+LNqDX9X/Y+9XVlggneio7OJeVA0ls1BjtQQgm7PVVwFm/6ZvY1q1b2I?=
- =?us-ascii?Q?7ogHBatAgOa+oWE+JSjhLMAaRTg5SvzmnLaeqFhMqDkMy8n+al7FeUEeGLhL?=
- =?us-ascii?Q?8ox92t4cEG9EWFMorEiQheNU3ifhWNZPndLs1jtA6YzQeMba84sfp59aWNSt?=
- =?us-ascii?Q?P0zd+XW+Lm+GYrEGlMxBxSC56UKmSTORI4p8nDeLFMEFe+78iQ3RAebF2Lta?=
- =?us-ascii?Q?Rv8M6CIuXa+d1ove2Om8KcnR4v9ouOyPo/A0wp6LXwTIR3vkQGbdFDgV5FoK?=
- =?us-ascii?Q?n2TiNLzr/ADC/uVSuHcWlWWfZv50K9vc3SvUAKjcU/GHY5jAVhcLwMFcnvyX?=
- =?us-ascii?Q?r1E27+8A4GOUXOkkFgbJhJ6TQo9imRNvFGa6puoB?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E25A63A3
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 11:30:14 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C6A010C0;
+	Mon, 24 Jul 2023 04:30:12 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36OBTgoZ082042;
+	Mon, 24 Jul 2023 06:29:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1690198182;
+	bh=FIbuCQmGywo34kh/9gawzarjGz1qCcr4NM1ZHalmclw=;
+	h=From:To:CC:Subject:Date;
+	b=Q4oTs1V/MuiB5FeIL+Q+fe97SWGN/GncTm65CCmZhxxNUb9S/RT2q6EAgMETfmK4v
+	 87T/aujBApsKOWJhzxPBQzNpmXdwpdxg7W4yKGgxgnd2TGmUb98V50hN/XRlWyEgK6
+	 CuzgMC1mOyQCjP/p18SHnrI21jnVSULsiEVVZSt8=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36OBTgQp033941
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 24 Jul 2023 06:29:42 -0500
+Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 24
+ Jul 2023 06:29:41 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 24 Jul 2023 06:29:41 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36OBTfwc064029;
+	Mon, 24 Jul 2023 06:29:41 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 36OBTfGJ007447;
+	Mon, 24 Jul 2023 06:29:41 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        MD Danish Anwar <danishanwar@ti.com>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v11 00/10] Introduce ICSSG based ethernet Driver
+Date: Mon, 24 Jul 2023 16:59:24 +0530
+Message-ID: <20230724112934.2637802-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB6450.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0818721-dcd1-45ef-c887-08db8c393832
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2023 11:29:18.6904
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: x6z5yXl3kx58SJiQaX5+Vr++UHUunkWcXeWO9dRiUCMDVmEfyaDZycTz4BEMINvJyVsFlUMLauqB3957cdkO4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7528
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The Programmable Real-time Unit and Industrial Communication Subsystem
+Gigabit (PRU_ICSSG) is a low-latency microcontroller subsystem in the TI
+SoCs. This subsystem is provided for the use cases like the implementation
+of custom peripheral interfaces, offloading of tasks from the other
+processor cores of the SoC, etc.
 
+The subsystem includes many accelerators for data processing like
+multiplier and multiplier-accumulator. It also has peripherals like
+UART, MII/RGMII, MDIO, etc. Every ICSSG core includes two 32-bit
+load/store RISC CPU cores called PRUs.
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Wednesday, June 28, 2023 7:17 PM
-> To: Russell King (Oracle) <linux@armlinux.org.uk>
-> Cc: Revanth Kumar Uppala <ruppala@nvidia.com>; hkallweit1@gmail.com;
-> netdev@vger.kernel.org; linux-tegra@vger.kernel.org; Narayan Reddy
-> <narayanr@nvidia.com>
-> Subject: Re: [PATCH 1/4] net: phy: aquantia: Enable Tx/Rx pause frame sup=
-port
-> in aquantia PHY
->=20
-> External email: Use caution opening links or attachments
->=20
->=20
-> On Wed, Jun 28, 2023 at 02:30:48PM +0100, Russell King (Oracle) wrote:
-> > On Wed, Jun 28, 2023 at 06:13:23PM +0530, Revanth Kumar Uppala wrote:
-> > > From: Narayan Reddy <narayanr@nvidia.com>
-> > >
-> > > Enable flow control support using pause frames in aquantia phy driver=
-.
-> > >
-> > > Signed-off-by: Narayan Reddy <narayanr@nvidia.com>
-> > > Signed-off-by: Revanth Kumar Uppala <ruppala@nvidia.com>
-> >
-> > I think this is over-complex.
-> >
-> > >  #define MDIO_PHYXS_VEND_IF_STATUS          0xe812
-> > >  #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK        GENMASK(7, 3)
-> > >  #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_KR  0 @@ -583,6 +585,17
-> @@
-> > > static int aqr107_config_init(struct phy_device *phydev)
-> > >     if (!ret)
-> > >             aqr107_chip_info(phydev);
-> > >
-> > > +   /* Advertize flow control */
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, phydev-
-> >supported);
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, phydev-
-> >supported);
-> > > +   linkmode_copy(phydev->advertising, phydev->supported);
-> >
-> > This is the wrong place to be doing this, since pause support depends
-> > not only on the PHY but also on the MAC. There are phylib interfaces
-> > that MACs should call so that phylib knows that the MAC supports pause
-> > frames.
-> >
-> > Secondly, the PHY driver needs to tell phylib that the PHY supports
-> > pause frames, and that's done through either setting the .features
-> > member in the PHY driver, or by providing a .get_features
-> > implementation.
-> >
-> > Configuration of the pause advertisement should already be happening
-> > through the core phylib code.
->=20
-> I really should do a LPC netdev talk "Everybody gets pause wrong..."
->=20
-> genphy_c45_an_config_aneg() will configure pause advertisement. The PHY
-> driver does not need to configure it, if the PHY follows the standard and=
- has the
-> configuration in the correct place. As Russell said, please check the PHY=
-s ability
-> to advertise pause is being reported correctly, by .get_features, of the =
-default
-> implementation of .get_features if that is being used. And then check you=
-r MAC
-> driver is also indicating it supports pause.
-From .get_features, it is not possible to check PHY's ability to advertise =
-pause is being reported as there is no such register present for AQR PHY to=
- check capabilities in its datasheet.
-Hence, we are directly configuring the pause frames from  aqr107_config_ini=
-t().
-Thanks,
-Revanth Uppala
->=20
->         Andrew
+The above features allow it to be used for implementing custom firmware
+based peripherals like ethernet.
+
+This series adds the YAML documentation and the driver with basic EMAC
+support for TI AM654 Silicon Rev 2 SoC with the PRU_ICSSG Sub-system.
+running dual-EMAC firmware.
+This currently supports basic EMAC with 1Gbps and 100Mbps link. 10M and
+half-duplex modes are not yet supported because they require the support
+of an IEP, which will be added later.
+Advanced features like switch-dev and timestamping will be added later. 
+
+This is the v11 of the patch series [v1]. This version of the patchset 
+addresses comments made on v10.
+
+There series doesn't have any dependency.
+
+Changes from v10 to v11 :
+*) Rebased the series on latest net-next.
+*) Split the ICSSG driver introduction patch into 9 different patches as
+   asked by Jakub.
+*) Introduced new patch(patch 8/10) to dump Standard network interface
+   staticstics via ndo_get_stats64. Now certain stats that are reported by
+   ICSSG hardware and are also part of struct rtnl_link_stats64, will be 
+   reported by ndo_get_stats64. While other stats that are not part of the
+   struct rtnl_link_stats64 will be reported by ethtool -S. These stats 
+   are not duplicated.
+
+Changes from v9 to v10 :
+*) Rebased the series on latest net-next.
+*) Moved 'ndev prueth->emac[mac] == emac' assignment to the end of function
+   prueth_netdev_init().
+*) In unsupported phy_mode switch case instead of returning -EINVAL, store
+   the error code in ret and 'goto free'
+
+Changes from v8 to v9 :
+*) Rebased the series on latest net-next.
+*) Fixed smatch and sparse warnings as pointed by Simon.
+*) Fixed leaky ndev in prueth_netdev_init() as asked by Simon.
+
+Changes from v7 to v8 :
+*) Rebased the series on 6.5-rc1.
+*) Fixed few formattings. 
+
+Changes from v6 to v7 :
+*) Added RB tag of Rob in patch 1 of this series.
+*) Addressed Simon's comment on patch 2 of the series.
+*) Rebased patchset on next-20230428 linux-next.
+
+Changes from v5 to v6 :
+*) Added RB tag of Andrew Lunn in patch 2 of this series.
+*) Addressed Rob's comment on patch 1 of the series.
+*) Rebased patchset on next-20230421 linux-next.
+
+Changes from v4 to v5 :
+*) Re-arranged properties section in ti,icssg-prueth.yaml file.
+*) Added requirement for minimum one ethernet port.
+*) Fixed some minor formatting errors as asked by Krzysztof.
+*) Dropped SGMII mode from enum mii_mode as SGMII mode is not currently
+   supported by the driver.
+*) Added switch-case block to handle different phy modes by ICSSG driver.
+
+Changes from v3 to v4 :
+*) Addressed Krzysztof's comments and fixed dt_binding_check errors in 
+   patch 1/2.
+*) Added interrupt-extended property in ethernet-ports properties section.
+*) Fixed comments in file icssg_switch_map.h according to the Linux coding
+   style in patch 2/2. Added Documentation of structures in patch 2/2.
+
+Changes from v2 to v3 :
+*) Addressed Rob and Krzysztof's comments on patch 1 of this series.
+   Fixed indentation. Removed description and pinctrl section from 
+   ti,icssg-prueth.yaml file.
+*) Addressed Krzysztof, Paolo, Randy, Andrew and Christophe's comments on 
+   patch 2 of this seires.
+*) Fixed blanklines in Kconfig and Makefile. Changed structures to const 
+   as suggested by Krzysztof.
+*) Fixed while loop logic in emac_tx_complete_packets() API as suggested 
+   by Paolo. Previously in the loop's last iteration 'budget' was 0 and 
+   napi_consume_skb would wrongly assume the caller is not in NAPI context
+   Now, budget won't be zero in last iteration of loop. 
+*) Removed inline functions addr_to_da1() and addr_to_da0() as asked by 
+   Andrew.
+*) Added dev_err_probe() instead of dev_err() as suggested by Christophe.
+*) In ti,icssg-prueth.yaml file, in the patternProperties section of 
+   ethernet-ports, kept the port name as "port" instead of "ethernet-port" 
+   as all other drivers were using "port". Will change it if is compulsory 
+   to use "ethernet-port".
+
+[v1] https://lore.kernel.org/all/20220506052433.28087-1-p-mohan@ti.com/
+[v2] https://lore.kernel.org/all/20220531095108.21757-1-p-mohan@ti.com/
+[v3] https://lore.kernel.org/all/20221223110930.1337536-1-danishanwar@ti.com/
+[v4] https://lore.kernel.org/all/20230206060708.3574472-1-danishanwar@ti.com/
+[v5] https://lore.kernel.org/all/20230210114957.2667963-1-danishanwar@ti.com/
+[v6] https://lore.kernel.org/all/20230424053233.2338782-1-danishanwar@ti.com/
+[v7] https://lore.kernel.org/all/20230502061650.2716736-1-danishanwar@ti.com/
+[v8] https://lore.kernel.org/all/20230710053550.89160-1-danishanwar@ti.com/
+[v9] https://lore.kernel.org/all/20230714094432.1834489-1-danishanwar@ti.com/
+[v10] https://lore.kernel.org/all/20230719082755.3399424-1-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+
+MD Danish Anwar (9):
+  net: ti: icssg-prueth: Add Firmware Interface for ICSSG Ethernet
+    driver.
+  net: ti: icssg-prueth: Add mii helper apis and macros
+  net: ti: icssg-prueth: Add Firmware config and classification APIs.
+  net: ti: icssg-prueth: Add icssg queues APIs and macros
+  dt-bindings: net: Add ICSSG Ethernet
+  net: ti: icssg-prueth: Add ICSSG Stats
+  net: ti: icssg-prueth: Add Standard network staticstics
+  net: ti: icssg-prueth: Add ethtool ops for ICSSG Ethernet driver
+  net: ti: icssg-prueth: Add Power management support
+
+Roger Quadros (1):
+  net: ti: icssg-prueth: Add ICSSG ethernet driver
+
+ .../bindings/net/ti,icssg-prueth.yaml         |  184 ++
+ drivers/net/ethernet/ti/Kconfig               |   13 +
+ drivers/net/ethernet/ti/Makefile              |    3 +
+ drivers/net/ethernet/ti/icssg_classifier.c    |  367 ++++
+ drivers/net/ethernet/ti/icssg_config.c        |  450 ++++
+ drivers/net/ethernet/ti/icssg_config.h        |  200 ++
+ drivers/net/ethernet/ti/icssg_ethtool.c       |  154 ++
+ drivers/net/ethernet/ti/icssg_mii_cfg.c       |  120 ++
+ drivers/net/ethernet/ti/icssg_mii_rt.h        |  151 ++
+ drivers/net/ethernet/ti/icssg_prueth.c        | 1919 +++++++++++++++++
+ drivers/net/ethernet/ti/icssg_prueth.h        |  259 +++
+ drivers/net/ethernet/ti/icssg_queues.c        |   38 +
+ drivers/net/ethernet/ti/icssg_stats.c         |   57 +
+ drivers/net/ethernet/ti/icssg_stats.h         |  158 ++
+ drivers/net/ethernet/ti/icssg_switch_map.h    |  234 ++
+ 15 files changed, 4307 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssg_classifier.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_config.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_config.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_ethtool.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_mii_cfg.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_mii_rt.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_prueth.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_prueth.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_queues.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_stats.c
+ create mode 100644 drivers/net/ethernet/ti/icssg_stats.h
+ create mode 100644 drivers/net/ethernet/ti/icssg_switch_map.h
+
+-- 
+2.34.1
+
 
