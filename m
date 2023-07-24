@@ -1,79 +1,106 @@
-Return-Path: <netdev+bounces-20386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4729A75F410
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:00:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358A775F1F6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01A76281410
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:00:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65F871C20A75
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632255663;
-	Mon, 24 Jul 2023 10:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D03379FB;
+	Mon, 24 Jul 2023 10:02:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5825E53A9
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:59:35 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704C090;
-	Mon, 24 Jul 2023 03:59:33 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b96789d574so55378601fa.2;
-        Mon, 24 Jul 2023 03:59:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2F179F7
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:02:29 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985174EDA
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:02:08 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-682ae5d4184so1052603b3a.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:02:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690196372; x=1690801172;
+        d=bytedance.com; s=google; t=1690192901; x=1690797701;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pg3LdyxpJSkdMgcrpAAOq3iMwhvNlpKWfKdNTyn8mhQ=;
-        b=fGCTLEynvWOQHnVbYne2y6L2d9vnBZo/jnGWEWmz9zuFcCXTvm6o667Ojx94ghpyA8
-         bWcxKpvJTvskyvv38Ih75tsWtryCPG83LE1a11GYVAxD5gLrug468mwu6qGZaKSKxSqO
-         7d5BLjzBONIjzO5Zt+gg+Ay4kKv0ku4wpVVAA8LfCjMJGcQDWmggzQ5UJpu26BOiIPU8
-         R7+1FkiTzA9dhieeSAQBgqVV1+GqEU0baO62BtZliIcOV/49wXVx5pX/PVoEq+XS4m9o
-         ZQFAkuoatPxqatCg0hVLqxx5rxionrbgXKTxMt4P0ZRV5q9vWNcGma+UGOwzSnzhTJfN
-         nSNA==
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9Za/Hz+nmH3G3JzZh25LzFiu0ZOWgA3znFTLEp4oxTw=;
+        b=ihuMdsVfYxMOokDnAk+IJXIWl/MZAQsCcYfTgPmkTeFKPLbxlFgWn13eR5FJUy9Lly
+         YNpy5HZwfV/gW3WqnCRVush4flVqU9NgQmKt1MZ/JIks3eQkcyVrcPI4sUIbu8qbacls
+         Eto04MiOhttPZsC68GLfFWyeUlUHGtZSxppYXLqDrkW3jopp3wu/IYBSZlmb+JTTsxRl
+         cg/nQo97dJYfyy8i4XNCTi8srCVtxDOq7ApbSQMbggFOwFBigZYXr08oIL8JYF0QjpCI
+         iPN49MJyz2k7Ts4kFISS5Q66ywTELfe2jt38iT2Sq1gp2ZolDU56fuKuvB2r/VzeY//Q
+         XdUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690196372; x=1690801172;
+        d=1e100.net; s=20221208; t=1690192901; x=1690797701;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Pg3LdyxpJSkdMgcrpAAOq3iMwhvNlpKWfKdNTyn8mhQ=;
-        b=BP3/X7kwMrXO+te9e/avjlMTK6X4UGBJoAc/vCJpcCD4yv+GNPKLqNH1PcbXmzgxHB
-         Z31+SqRTKCctFK5YbO+9HAdu+dW/VdvCm1swS0cLMfhWxlzrrMygIkor7vzH0ILLPsTP
-         PpbDHulns+ycgtzxexboGvyhhDRMKuL7zY0xqloSzwNCj8yKuYmzNFhjG5sz30KjrWda
-         zpsbmWa0uLlQDyxN95jUjeYxwZX9oX4AiajpZ7Fgb+pzEW1MRnhYuNS57DEZLL9ECYu/
-         KwBUV9OlxxPELjkX9VS04j4FDtpxb6mf0hPvXn7GMuUF0TwJzdOh2Er7IOBNSSnxg2OL
-         DXVg==
-X-Gm-Message-State: ABy/qLYsQHBtoMymOt6JAK+nNLs/yMYPEBzykzExiXjDWs7+4qSstj11
-	5cXCO0NS2pZH4mnhiY8kJRY=
-X-Google-Smtp-Source: APBJJlFLKQlYGJVUR8zBuBtVygQ6CORcyKk19Gzmrvbw88E6Skc6S40ZBE0E2VWtSblQH3gKWcnu6A==
-X-Received: by 2002:a2e:990d:0:b0:2b6:9dd5:7a5 with SMTP id v13-20020a2e990d000000b002b69dd507a5mr5323602lji.12.1690196371615;
-        Mon, 24 Jul 2023 03:59:31 -0700 (PDT)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id m14-20020a7bcb8e000000b003fbc9371193sm10055353wmi.13.2023.07.24.03.59.30
+        bh=9Za/Hz+nmH3G3JzZh25LzFiu0ZOWgA3znFTLEp4oxTw=;
+        b=PeJ3ogCHmQxak4cIFZxo4tNmafdsOOKDiL71Z3CCTI8qIA2vk4RARxDMc3cyKFFzhR
+         UTqymXGWtiefIGh4Fa2Bh6wh8JVQsmvM0ca9by0fUoMG/1WF/uxaTtoTQP+uy2YuQ1nk
+         Yp9bKtt0Bpt5YxhNzGh2N2DEEHaJeexQ34j9zl104ytuGU3/Csf6EWvUyLMPARRaJNI3
+         +wEshZKXOp5uO+Aq4csPrYzzdrMuJwsdtqzgXAYP2DQ0tOXXWW5h0GXgpQkotkH3rAWa
+         wtzRTYRh9Edm2FYX84DZKIVYHwyyJ0C//l7GA4yezyVCyvyEmMhEx1VZtUPYh8XDBN+j
+         55+g==
+X-Gm-Message-State: ABy/qLbQETAkZg0PmFjwqo5z/AKWbUk7VrSSCGT+cWDUnZDFFtWU1kOo
+	SCa6IO9TsYz3pgIZtID/sbzql73Skk/Gn2xlckI=
+X-Google-Smtp-Source: APBJJlFYiQjYsesoLBIGYzIbaqvqBpGNnPrMVt+9gbe/8vvXchqG9OkxYsLP3NQiA5NgJtO6rGDrrQ==
+X-Received: by 2002:a17:902:e80a:b0:1b8:50a9:6874 with SMTP id u10-20020a170902e80a00b001b850a96874mr12325717plg.5.1690192194956;
+        Mon, 24 Jul 2023 02:49:54 -0700 (PDT)
+Received: from C02DW0BEMD6R.bytedance.net ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id d5-20020a170902c18500b001bb20380bf2sm8467233pld.13.2023.07.24.02.49.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 03:59:31 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Atin Bainada <hi@atinb.me>,
+        Mon, 24 Jul 2023 02:49:54 -0700 (PDT)
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+To: akpm@linux-foundation.org,
+	david@fromorbit.com,
+	tkhai@ya.ru,
+	vbabka@suse.cz,
+	roman.gushchin@linux.dev,
+	djwong@kernel.org,
+	brauner@kernel.org,
+	paulmck@kernel.org,
+	tytso@mit.edu,
+	steven.price@arm.com,
+	cel@kernel.org,
+	senozhatsky@chromium.org,
+	yujie.liu@intel.com,
+	gregkh@linuxfoundation.org,
+	muchun.song@linux.dev
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	x86@kernel.org,
+	kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	cluster-devel@redhat.com,
+	linux-nfs@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	rcu@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH 3/3] net: dsa: qca8k: limit user ports access to the first CPU port on setup
-Date: Mon, 24 Jul 2023 05:30:58 +0200
-Message-Id: <20230724033058.16795-3-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230724033058.16795-1-ansuelsmth@gmail.com>
-References: <20230724033058.16795-1-ansuelsmth@gmail.com>
+	dri-devel@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	Qi Zheng <zhengqi.arch@bytedance.com>
+Subject: [PATCH v2 24/47] drm/panfrost: dynamically allocate the drm-panfrost shrinker
+Date: Mon, 24 Jul 2023 17:43:31 +0800
+Message-Id: <20230724094354.90817-25-zhengqi.arch@bytedance.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+In-Reply-To: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,58 +108,137 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In preparation for multi-CPU support, set CPU port LOOKUP MEMBER outside
-the port loop and setup the LOOKUP MEMBER mask for user ports only to
-the first CPU port.
+In preparation for implementing lockless slab shrink, use new APIs to
+dynamically allocate the drm-panfrost shrinker, so that it can be freed
+asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
+read-side critical section when releasing the struct panfrost_device.
 
-This is to handle flooding condition where every CPU port is set as
-target and prevent packet duplication for unknown frames from user ports.
-
-Secondary CPU port LOOKUP MEMBER mask will be setup later when
-port_change_master will be implemented.
-
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 ---
- drivers/net/dsa/qca/qca8k-8xxx.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ drivers/gpu/drm/panfrost/panfrost_device.h    |  2 +-
+ drivers/gpu/drm/panfrost/panfrost_drv.c       |  6 +++-
+ drivers/gpu/drm/panfrost/panfrost_gem.h       |  2 +-
+ .../gpu/drm/panfrost/panfrost_gem_shrinker.c  | 32 ++++++++++++-------
+ 4 files changed, 27 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index 31552853fdd4..6286a64a2fe3 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -1850,18 +1850,16 @@ qca8k_setup(struct dsa_switch *ds)
- 	if (ret)
- 		return ret;
+diff --git a/drivers/gpu/drm/panfrost/panfrost_device.h b/drivers/gpu/drm/panfrost/panfrost_device.h
+index b0126b9fbadc..e667e5689353 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_device.h
++++ b/drivers/gpu/drm/panfrost/panfrost_device.h
+@@ -118,7 +118,7 @@ struct panfrost_device {
  
-+	/* CPU port gets connected to all user ports of the switch */
-+	ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(cpu_port),
-+			QCA8K_PORT_LOOKUP_MEMBER, dsa_user_ports(ds));
-+	if (ret)
-+		return ret;
+ 	struct mutex shrinker_lock;
+ 	struct list_head shrinker_list;
+-	struct shrinker shrinker;
++	struct shrinker *shrinker;
+ 
+ 	struct panfrost_devfreq pfdevfreq;
+ };
+diff --git a/drivers/gpu/drm/panfrost/panfrost_drv.c b/drivers/gpu/drm/panfrost/panfrost_drv.c
+index bbada731bbbd..f705bbdea360 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_drv.c
++++ b/drivers/gpu/drm/panfrost/panfrost_drv.c
+@@ -598,10 +598,14 @@ static int panfrost_probe(struct platform_device *pdev)
+ 	if (err < 0)
+ 		goto err_out1;
+ 
+-	panfrost_gem_shrinker_init(ddev);
++	err = panfrost_gem_shrinker_init(ddev);
++	if (err)
++		goto err_out2;
+ 
+ 	return 0;
+ 
++err_out2:
++	drm_dev_unregister(ddev);
+ err_out1:
+ 	pm_runtime_disable(pfdev->dev);
+ 	panfrost_device_fini(pfdev);
+diff --git a/drivers/gpu/drm/panfrost/panfrost_gem.h b/drivers/gpu/drm/panfrost/panfrost_gem.h
+index ad2877eeeccd..863d2ec8d4f0 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_gem.h
++++ b/drivers/gpu/drm/panfrost/panfrost_gem.h
+@@ -81,7 +81,7 @@ panfrost_gem_mapping_get(struct panfrost_gem_object *bo,
+ void panfrost_gem_mapping_put(struct panfrost_gem_mapping *mapping);
+ void panfrost_gem_teardown_mappings_locked(struct panfrost_gem_object *bo);
+ 
+-void panfrost_gem_shrinker_init(struct drm_device *dev);
++int panfrost_gem_shrinker_init(struct drm_device *dev);
+ void panfrost_gem_shrinker_cleanup(struct drm_device *dev);
+ 
+ #endif /* __PANFROST_GEM_H__ */
+diff --git a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+index bf0170782f25..9a90dfb5301f 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
++++ b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+@@ -18,8 +18,7 @@
+ static unsigned long
+ panfrost_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
+ {
+-	struct panfrost_device *pfdev =
+-		container_of(shrinker, struct panfrost_device, shrinker);
++	struct panfrost_device *pfdev = shrinker->private_data;
+ 	struct drm_gem_shmem_object *shmem;
+ 	unsigned long count = 0;
+ 
+@@ -65,8 +64,7 @@ static bool panfrost_gem_purge(struct drm_gem_object *obj)
+ static unsigned long
+ panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+ {
+-	struct panfrost_device *pfdev =
+-		container_of(shrinker, struct panfrost_device, shrinker);
++	struct panfrost_device *pfdev = shrinker->private_data;
+ 	struct drm_gem_shmem_object *shmem, *tmp;
+ 	unsigned long freed = 0;
+ 
+@@ -97,13 +95,24 @@ panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+  *
+  * This function registers and sets up the panfrost shrinker.
+  */
+-void panfrost_gem_shrinker_init(struct drm_device *dev)
++int panfrost_gem_shrinker_init(struct drm_device *dev)
+ {
+ 	struct panfrost_device *pfdev = dev->dev_private;
+-	pfdev->shrinker.count_objects = panfrost_gem_shrinker_count;
+-	pfdev->shrinker.scan_objects = panfrost_gem_shrinker_scan;
+-	pfdev->shrinker.seeks = DEFAULT_SEEKS;
+-	WARN_ON(register_shrinker(&pfdev->shrinker, "drm-panfrost"));
 +
- 	/* Setup connection between CPU port & user ports
- 	 * Configure specific switch configuration for ports
- 	 */
- 	for (i = 0; i < QCA8K_NUM_PORTS; i++) {
--		/* CPU port gets connected to all user ports of the switch */
--		if (dsa_is_cpu_port(ds, i)) {
--			ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(i),
--					QCA8K_PORT_LOOKUP_MEMBER, dsa_user_ports(ds));
--			if (ret)
--				return ret;
--		}
--
- 		/* Individual user ports get connected to CPU port only */
- 		if (dsa_is_user_port(ds, i)) {
- 			ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(i),
++	pfdev->shrinker = shrinker_alloc(0, "drm-panfrost");
++	if (!pfdev->shrinker) {
++		WARN_ON(1);
++		return -ENOMEM;
++	}
++
++	pfdev->shrinker->count_objects = panfrost_gem_shrinker_count;
++	pfdev->shrinker->scan_objects = panfrost_gem_shrinker_scan;
++	pfdev->shrinker->seeks = DEFAULT_SEEKS;
++	pfdev->shrinker->private_data = pfdev;
++
++	shrinker_register(pfdev->shrinker);
++
++	return 0;
+ }
+ 
+ /**
+@@ -116,7 +125,6 @@ void panfrost_gem_shrinker_cleanup(struct drm_device *dev)
+ {
+ 	struct panfrost_device *pfdev = dev->dev_private;
+ 
+-	if (pfdev->shrinker.nr_deferred) {
+-		unregister_shrinker(&pfdev->shrinker);
+-	}
++	if (pfdev->shrinker)
++		shrinker_unregister(pfdev->shrinker);
+ }
 -- 
-2.40.1
+2.30.2
 
 
