@@ -1,51 +1,74 @@
-Return-Path: <netdev+bounces-20263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0E875ECA6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:40:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5E7875ECC2
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:51:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0F4E1C209F8
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:40:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A9CA28145F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5062B185B;
-	Mon, 24 Jul 2023 07:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368481863;
+	Mon, 24 Jul 2023 07:51:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB5F184F
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:40:38 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342A6198;
-	Mon, 24 Jul 2023 00:40:34 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0Vo3N3vd_1690184429;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vo3N3vd_1690184429)
-          by smtp.aliyun-inc.com;
-          Mon, 24 Jul 2023 15:40:30 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2745915C6
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:51:01 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 828A61A1
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:50:59 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-66767d628e2so2131843b3a.2
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:50:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690185058; x=1690789858;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=96g2JSCirMbJA/+oNaxtCM0yePpJ3cdzIwt24xckPZY=;
+        b=RgpaRuj6XjMznYXNPa9TQl0XRFA0s9FgMDZ68veAt6G7QYLdt/V4xRr/zYrIQJ1dv5
+         HgwbbZ/cKaeQlT4MBByCxOUaUKf1JOJt1DSoMy9yHo9bWPBel7r+szzN9M3brmEQWO/L
+         oByR3VMdF1lJlwP1BEdi+E7wh1Cu/B3bN9iyDaMuXIZun732uhmTvsBpkfEEpv28fLm2
+         0s1R5yXlyw3FKeo0QptAcddPxl9F4S5+Q7YMoBx71+oqvxvJZFQVdMXRUR6ETs/XR7ES
+         9JuQZfofvpB9kotckLXeTWiAJe/v5Cuq4Y0s7dxvLccVMRaVnpjOVe8rqTePmdES/Vio
+         UWYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690185058; x=1690789858;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=96g2JSCirMbJA/+oNaxtCM0yePpJ3cdzIwt24xckPZY=;
+        b=YgEB08PiTCtuV8VArtnfgfM+Vj4DiIs6fyze4aaNxvTxVXc9AOhoPDHGabp57moZtB
+         hbUY//ho1HiSM+ErXRi4zw36oMPBku+ggctVBrFZphGre2+kevA4UTMOtpgmYDZeNNky
+         tH6GZ01WvdmiHECjFO6y0HnsN1QyIZD6Ssgh2K/6vTRcUyijPaAGOzwUxZJ3CvSdx1nE
+         tiH9AARTPFv5e61TMIf/APaLLoLlP2l4YWNEEwTqsKJmQcrdZqLmPcj4+GmGdJajqnXT
+         NrZL10QNkXiCv/LYIoVgaboL4SIStaEXzq6q+QSs1MQa1koE75tq3Q27vB/Ej/CtJmvq
+         HERw==
+X-Gm-Message-State: ABy/qLbe6SvjYGtezwBVF6l7gjA/mKIyFdOvOh3FRCaWQBDxRGMuI6OO
+	/eB6OWbzmSDmeaTokp6b/u8/pfFxPDqcIVNR
+X-Google-Smtp-Source: APBJJlFblnUHvPiJD67l26AN1OcipdftfYb6JxIEYRZizAoTtDFPk7XuRcMFgCAThYXx/uwYJnrXog==
+X-Received: by 2002:a05:6a20:9388:b0:137:c811:3510 with SMTP id x8-20020a056a20938800b00137c8113510mr7679594pzh.44.1690185058277;
+        Mon, 24 Jul 2023 00:50:58 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e22-20020aa78c56000000b006702c433741sm7131712pfd.3.2023.07.24.00.50.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 00:50:57 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Cc: Jiejian Wu <jiejian@linux.alibaba.com>,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH v3 net-next] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table per netns
-Date: Mon, 24 Jul 2023 15:40:28 +0800
-Message-Id: <20230724074028.17964-1-dust.li@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+	Ido Schimmel <idosch@idosch.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Beniamino Galvani <bgalvani@redhat.com>
+Subject: [PATCHv3 net-next] IPv6: add extack info for IPv6 address add/delete
+Date: Mon, 24 Jul 2023 15:50:51 +0800
+Message-Id: <20230724075051.20081-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,633 +76,261 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiejian Wu <jiejian@linux.alibaba.com>
+Add extack info for IPv6 address add/delete, which would be useful for
+users to understand the problem without having to read kernel code.
 
-Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
-"ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
-tens of thousands of services from different netns in the table, it
-takes a long time to look up the table, for example, using "ipvsadm
--ln" from different netns simultaneously.
-
-We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
-add "service_mutex" per netns to keep these two tables safe instead of
-the global "__ip_vs_mutex" in current version. To this end, looking up
-services from different netns simultaneously will not get stuck,
-shortening the time consumption in large-scale deployment. It can be
-reproduced using the simple scripts below.
-
-init.sh: #!/bin/bash
-for((i=1;i<=4;i++));do
-        ip netns add ns$i
-        ip netns exec ns$i ip link set dev lo up
-        ip netns exec ns$i sh add-services.sh
-done
-
-add-services.sh: #!/bin/bash
-for((i=0;i<30000;i++)); do
-        ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
-done
-
-runtest.sh: #!/bin/bash
-for((i=1;i<4;i++));do
-        ip netns exec ns$i ipvsadm -ln > /dev/null &
-done
-ip netns exec ns4 ipvsadm -ln > /dev/null
-
-Run "sh init.sh" to initiate the network environment. Then run "time
-./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
-Intel Xeon ECS. The result of the original version is around 8 seconds,
-while the result of the modified version is only 0.8 seconds.
-
-Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
-Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
-Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+Suggested-by: Beniamino Galvani <bgalvani@redhat.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-v3:
-  * fix complains of checkpatch
-v2:
-  * remove global __ip_vs_mutex in ip_vs_est.c
-  * remove ip_vs_ prefix for svc_table and svc_fwm_table
-  * remove redundant "svc->ipvs == ipvs" checks
+v3: * Update extack message. Pass extack to addrconf_f6i_alloc().
+    * Return "IPv6 is disabled" for addrconf_add_dev(), as the same
+      with ndisc_allow_add() does.
+    * Set dup addr extack message in inet6_rtm_newaddr() instead of
+      ipv6_add_addr_hash().
+v2: Update extack msg for dead dev. Remove msg for NOBUFS error.
+    Add extack for ipv6_add_addr_hash()
 ---
- include/net/ip_vs.h            |  13 +++
- net/netfilter/ipvs/ip_vs_ctl.c | 167 ++++++++++++++-------------------
- net/netfilter/ipvs/ip_vs_est.c |  18 ++--
- 3 files changed, 94 insertions(+), 104 deletions(-)
+ include/net/ip6_route.h |  2 +-
+ net/ipv6/addrconf.c     | 63 +++++++++++++++++++++++++++++------------
+ net/ipv6/anycast.c      |  2 +-
+ net/ipv6/route.c        |  5 ++--
+ 4 files changed, 50 insertions(+), 22 deletions(-)
 
-diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
-index ff406ef4fd4aa..68e562bc9df2b 100644
---- a/include/net/ip_vs.h
-+++ b/include/net/ip_vs.h
-@@ -33,6 +33,12 @@
+diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+index 3556595ce59a..b32539bb0fb0 100644
+--- a/include/net/ip6_route.h
++++ b/include/net/ip6_route.h
+@@ -156,7 +156,7 @@ void fib6_force_start_gc(struct net *net);
  
- #define IP_VS_HDR_INVERSE	1
- #define IP_VS_HDR_ICMP		2
-+/*
-+ *	Hash table: for virtual service lookups
-+ */
-+#define IP_VS_SVC_TAB_BITS 8
-+#define IP_VS_SVC_TAB_SIZE BIT(IP_VS_SVC_TAB_BITS)
-+#define IP_VS_SVC_TAB_MASK (IP_VS_SVC_TAB_SIZE - 1)
+ struct fib6_info *addrconf_f6i_alloc(struct net *net, struct inet6_dev *idev,
+ 				     const struct in6_addr *addr, bool anycast,
+-				     gfp_t gfp_flags);
++				     gfp_t gfp_flags, struct netlink_ext_ack *extack);
  
- /* Generic access of ipvs struct */
- static inline struct netns_ipvs *net_ipvs(struct net* net)
-@@ -1041,6 +1047,13 @@ struct netns_ipvs {
- 	 */
- 	unsigned int		mixed_address_family_dests;
- 	unsigned int		hooks_afmask;	/* &1=AF_INET, &2=AF_INET6 */
-+
-+	/* the service mutex that protect svc_table and svc_fwm_table */
-+	struct mutex service_mutex;
-+	/* the service table hashed by <protocol, addr, port> */
-+	struct hlist_head svc_table[IP_VS_SVC_TAB_SIZE];
-+	/* the service table hashed by fwmark */
-+	struct hlist_head svc_fwm_table[IP_VS_SVC_TAB_SIZE];
- };
- 
- #define DEFAULT_SYNC_THRESHOLD	3
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 62606fb44d027..e5ae4fac8ec93 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -49,7 +49,7 @@
- 
- MODULE_ALIAS_GENL_FAMILY(IPVS_GENL_NAME);
- 
--DEFINE_MUTEX(__ip_vs_mutex); /* Serialize configuration with sockopt/netlink */
-+static struct lock_class_key __ipvs_service_key;
- 
- /* sysctl variables */
- 
-@@ -294,17 +294,6 @@ ip_vs_use_count_dec(void)
- }
- 
- 
--/*
-- *	Hash table: for virtual service lookups
-- */
--#define IP_VS_SVC_TAB_BITS 8
--#define IP_VS_SVC_TAB_SIZE (1 << IP_VS_SVC_TAB_BITS)
--#define IP_VS_SVC_TAB_MASK (IP_VS_SVC_TAB_SIZE - 1)
--
--/* the service table hashed by <protocol, addr, port> */
--static struct hlist_head ip_vs_svc_table[IP_VS_SVC_TAB_SIZE];
--/* the service table hashed by fwmark */
--static struct hlist_head ip_vs_svc_fwm_table[IP_VS_SVC_TAB_SIZE];
- 
- 
- /*
-@@ -339,8 +328,8 @@ static inline unsigned int ip_vs_svc_fwm_hashkey(struct netns_ipvs *ipvs, __u32
- }
- 
- /*
-- *	Hashes a service in the ip_vs_svc_table by <netns,proto,addr,port>
-- *	or in the ip_vs_svc_fwm_table by fwmark.
-+ *	Hashes a service in the svc_table by <netns,proto,addr,port>
-+ *	or in the svc_fwm_table by fwmark.
-  *	Should be called with locked tables.
-  */
- static int ip_vs_svc_hash(struct ip_vs_service *svc)
-@@ -355,17 +344,17 @@ static int ip_vs_svc_hash(struct ip_vs_service *svc)
- 
- 	if (svc->fwmark == 0) {
- 		/*
--		 *  Hash it by <netns,protocol,addr,port> in ip_vs_svc_table
-+		 *  Hash it by <netns,protocol,addr,port> in svc_table
- 		 */
- 		hash = ip_vs_svc_hashkey(svc->ipvs, svc->af, svc->protocol,
- 					 &svc->addr, svc->port);
--		hlist_add_head_rcu(&svc->s_list, &ip_vs_svc_table[hash]);
-+		hlist_add_head_rcu(&svc->s_list, &svc->ipvs->svc_table[hash]);
- 	} else {
- 		/*
- 		 *  Hash it by fwmark in svc_fwm_table
- 		 */
- 		hash = ip_vs_svc_fwm_hashkey(svc->ipvs, svc->fwmark);
--		hlist_add_head_rcu(&svc->f_list, &ip_vs_svc_fwm_table[hash]);
-+		hlist_add_head_rcu(&svc->f_list, &svc->ipvs->svc_fwm_table[hash]);
- 	}
- 
- 	svc->flags |= IP_VS_SVC_F_HASHED;
-@@ -414,12 +403,9 @@ __ip_vs_service_find(struct netns_ipvs *ipvs, int af, __u16 protocol,
- 	/* Check for "full" addressed entries */
- 	hash = ip_vs_svc_hashkey(ipvs, af, protocol, vaddr, vport);
- 
--	hlist_for_each_entry_rcu(svc, &ip_vs_svc_table[hash], s_list) {
--		if ((svc->af == af)
--		    && ip_vs_addr_equal(af, &svc->addr, vaddr)
--		    && (svc->port == vport)
--		    && (svc->protocol == protocol)
--		    && (svc->ipvs == ipvs)) {
-+	hlist_for_each_entry_rcu(svc, &ipvs->svc_table[hash], s_list) {
-+		if (svc->af == af && ip_vs_addr_equal(af, &svc->addr, vaddr) &&
-+		    svc->port == vport && svc->protocol == protocol) {
- 			/* HIT */
- 			return svc;
- 		}
-@@ -441,9 +427,8 @@ __ip_vs_svc_fwm_find(struct netns_ipvs *ipvs, int af, __u32 fwmark)
- 	/* Check for fwmark addressed entries */
- 	hash = ip_vs_svc_fwm_hashkey(ipvs, fwmark);
- 
--	hlist_for_each_entry_rcu(svc, &ip_vs_svc_fwm_table[hash], f_list) {
--		if (svc->fwmark == fwmark && svc->af == af
--		    && (svc->ipvs == ipvs)) {
-+	hlist_for_each_entry_rcu(svc, &ipvs->svc_fwm_table[hash], f_list) {
-+		if (svc->fwmark == fwmark && svc->af == af) {
- 			/* HIT */
- 			return svc;
- 		}
-@@ -1701,10 +1686,9 @@ static int ip_vs_flush(struct netns_ipvs *ipvs, bool cleanup)
- 	 * Flush the service table hashed by <netns,protocol,addr,port>
- 	 */
- 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry_safe(svc, n, &ip_vs_svc_table[idx],
-+		hlist_for_each_entry_safe(svc, n, &ipvs->svc_table[idx],
- 					  s_list) {
--			if (svc->ipvs == ipvs)
--				ip_vs_unlink_service(svc, cleanup);
-+			ip_vs_unlink_service(svc, cleanup);
- 		}
- 	}
- 
-@@ -1712,10 +1696,9 @@ static int ip_vs_flush(struct netns_ipvs *ipvs, bool cleanup)
- 	 * Flush the service table hashed by fwmark
- 	 */
- 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry_safe(svc, n, &ip_vs_svc_fwm_table[idx],
-+		hlist_for_each_entry_safe(svc, n, &ipvs->svc_fwm_table[idx],
- 					  f_list) {
--			if (svc->ipvs == ipvs)
--				ip_vs_unlink_service(svc, cleanup);
-+			ip_vs_unlink_service(svc, cleanup);
- 		}
- 	}
- 
-@@ -1732,12 +1715,12 @@ void ip_vs_service_nets_cleanup(struct list_head *net_list)
- 	struct net *net;
- 
- 	/* Check for "full" addressed entries */
--	mutex_lock(&__ip_vs_mutex);
- 	list_for_each_entry(net, net_list, exit_list) {
- 		ipvs = net_ipvs(net);
-+		mutex_lock(&ipvs->service_mutex);
- 		ip_vs_flush(ipvs, true);
-+		mutex_unlock(&ipvs->service_mutex);
- 	}
--	mutex_unlock(&__ip_vs_mutex);
- }
- 
- /* Put all references for device (dst_cache) */
-@@ -1775,25 +1758,20 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
- 	if (event != NETDEV_DOWN || !ipvs)
- 		return NOTIFY_DONE;
- 	IP_VS_DBG(3, "%s() dev=%s\n", __func__, dev->name);
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_table[idx], s_list) {
--			if (svc->ipvs == ipvs) {
--				list_for_each_entry(dest, &svc->destinations,
--						    n_list) {
--					ip_vs_forget_dev(dest, dev);
--				}
-+		hlist_for_each_entry(svc, &ipvs->svc_table[idx], s_list) {
-+			list_for_each_entry(dest, &svc->destinations,
-+					    n_list) {
-+				ip_vs_forget_dev(dest, dev);
- 			}
- 		}
- 
--		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[idx], f_list) {
--			if (svc->ipvs == ipvs) {
--				list_for_each_entry(dest, &svc->destinations,
--						    n_list) {
--					ip_vs_forget_dev(dest, dev);
--				}
-+		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[idx], f_list) {
-+			list_for_each_entry(dest, &svc->destinations,
-+					    n_list) {
-+				ip_vs_forget_dev(dest, dev);
- 			}
--
- 		}
- 	}
- 
-@@ -1802,7 +1780,7 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
- 		ip_vs_forget_dev(dest, dev);
- 	}
- 	spin_unlock_bh(&ipvs->dest_trash_lock);
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 	return NOTIFY_DONE;
- }
- 
-@@ -1826,16 +1804,14 @@ static int ip_vs_zero_all(struct netns_ipvs *ipvs)
- 	struct ip_vs_service *svc;
- 
- 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_table[idx], s_list) {
--			if (svc->ipvs == ipvs)
--				ip_vs_zero_service(svc);
-+		hlist_for_each_entry(svc, &ipvs->svc_table[idx], s_list) {
-+			ip_vs_zero_service(svc);
- 		}
- 	}
- 
- 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[idx], f_list) {
--			if (svc->ipvs == ipvs)
--				ip_vs_zero_service(svc);
-+		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[idx], f_list) {
-+			ip_vs_zero_service(svc);
- 		}
- 	}
- 
-@@ -2303,9 +2279,9 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
- 
- 	/* look in hash by protocol */
- 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry_rcu(svc, &ip_vs_svc_table[idx], s_list) {
--			if ((svc->ipvs == ipvs) && pos-- == 0) {
--				iter->table = ip_vs_svc_table;
-+		hlist_for_each_entry_rcu(svc, &ipvs->svc_table[idx], s_list) {
-+			if (pos-- == 0) {
-+				iter->table = ipvs->svc_table;
- 				iter->bucket = idx;
- 				return svc;
- 			}
-@@ -2314,10 +2290,10 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
- 
- 	/* keep looking in fwmark */
- 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry_rcu(svc, &ip_vs_svc_fwm_table[idx],
-+		hlist_for_each_entry_rcu(svc, &ipvs->svc_fwm_table[idx],
- 					 f_list) {
--			if ((svc->ipvs == ipvs) && pos-- == 0) {
--				iter->table = ip_vs_svc_fwm_table;
-+			if (pos-- == 0) {
-+				iter->table = ipvs->svc_fwm_table;
- 				iter->bucket = idx;
- 				return svc;
- 			}
-@@ -2340,6 +2316,8 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 	struct hlist_node *e;
- 	struct ip_vs_iter *iter;
- 	struct ip_vs_service *svc;
-+	struct net *net = seq_file_net(seq);
-+	struct netns_ipvs *ipvs = net_ipvs(net);
- 
- 	++*pos;
- 	if (v == SEQ_START_TOKEN)
-@@ -2348,7 +2326,7 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 	svc = v;
- 	iter = seq->private;
- 
--	if (iter->table == ip_vs_svc_table) {
-+	if (iter->table == ipvs->svc_table) {
- 		/* next service in table hashed by protocol */
- 		e = rcu_dereference(hlist_next_rcu(&svc->s_list));
- 		if (e)
-@@ -2356,13 +2334,13 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 
- 		while (++iter->bucket < IP_VS_SVC_TAB_SIZE) {
- 			hlist_for_each_entry_rcu(svc,
--						 &ip_vs_svc_table[iter->bucket],
-+						 &ipvs->svc_table[iter->bucket],
- 						 s_list) {
- 				return svc;
- 			}
- 		}
- 
--		iter->table = ip_vs_svc_fwm_table;
-+		iter->table = ipvs->svc_fwm_table;
- 		iter->bucket = -1;
- 		goto scan_fwmark;
- 	}
-@@ -2375,7 +2353,7 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-  scan_fwmark:
- 	while (++iter->bucket < IP_VS_SVC_TAB_SIZE) {
- 		hlist_for_each_entry_rcu(svc,
--					 &ip_vs_svc_fwm_table[iter->bucket],
-+					 &ipvs->svc_fwm_table[iter->bucket],
- 					 f_list)
- 			return svc;
- 	}
-@@ -2411,7 +2389,7 @@ static int ip_vs_info_seq_show(struct seq_file *seq, void *v)
- 
- 		if (svc->ipvs != ipvs)
- 			return 0;
--		if (iter->table == ip_vs_svc_table) {
-+		if (iter->table == ipvs->svc_table) {
- #ifdef CONFIG_IP_VS_IPV6
- 			if (svc->af == AF_INET6)
- 				seq_printf(seq, "%s  [%pI6]:%04X %s ",
-@@ -2733,7 +2711,7 @@ do_ip_vs_set_ctl(struct sock *sk, int cmd, sockptr_t ptr, unsigned int len)
- 		return ret;
- 	}
- 
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 	if (cmd == IP_VS_SO_SET_FLUSH) {
- 		/* Flush the virtual service */
- 		ret = ip_vs_flush(ipvs, false);
-@@ -2830,7 +2808,7 @@ do_ip_vs_set_ctl(struct sock *sk, int cmd, sockptr_t ptr, unsigned int len)
- 	}
- 
-   out_unlock:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 	return ret;
- }
- 
-@@ -2868,9 +2846,9 @@ __ip_vs_get_service_entries(struct netns_ipvs *ipvs,
- 	int ret = 0;
- 
- 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_table[idx], s_list) {
-+		hlist_for_each_entry(svc, &ipvs->svc_table[idx], s_list) {
- 			/* Only expose IPv4 entries to old interface */
--			if (svc->af != AF_INET || (svc->ipvs != ipvs))
-+			if (svc->af != AF_INET)
- 				continue;
- 
- 			if (count >= get->num_services)
-@@ -2887,9 +2865,9 @@ __ip_vs_get_service_entries(struct netns_ipvs *ipvs,
- 	}
- 
- 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[idx], f_list) {
-+		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[idx], f_list) {
- 			/* Only expose IPv4 entries to old interface */
--			if (svc->af != AF_INET || (svc->ipvs != ipvs))
-+			if (svc->af != AF_INET)
- 				continue;
- 
- 			if (count >= get->num_services)
-@@ -3058,7 +3036,7 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
- 		return ret;
- 	}
- 
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 	switch (cmd) {
- 	case IP_VS_SO_GET_VERSION:
- 	{
-@@ -3157,7 +3135,7 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
- 	}
- 
- out:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 	return ret;
- }
- 
-@@ -3392,10 +3370,10 @@ static int ip_vs_genl_dump_services(struct sk_buff *skb,
- 	struct net *net = sock_net(skb->sk);
- 	struct netns_ipvs *ipvs = net_ipvs(net);
- 
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 	for (i = 0; i < IP_VS_SVC_TAB_SIZE; i++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_table[i], s_list) {
--			if (++idx <= start || (svc->ipvs != ipvs))
-+		hlist_for_each_entry(svc, &ipvs->svc_table[i], s_list) {
-+			if (++idx <= start)
- 				continue;
- 			if (ip_vs_genl_dump_service(skb, svc, cb) < 0) {
- 				idx--;
-@@ -3405,8 +3383,8 @@ static int ip_vs_genl_dump_services(struct sk_buff *skb,
- 	}
- 
- 	for (i = 0; i < IP_VS_SVC_TAB_SIZE; i++) {
--		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[i], f_list) {
--			if (++idx <= start || (svc->ipvs != ipvs))
-+		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[i], f_list) {
-+			if (++idx <= start)
- 				continue;
- 			if (ip_vs_genl_dump_service(skb, svc, cb) < 0) {
- 				idx--;
-@@ -3416,7 +3394,7 @@ static int ip_vs_genl_dump_services(struct sk_buff *skb,
- 	}
- 
- nla_put_failure:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 	cb->args[0] = idx;
- 
- 	return skb->len;
-@@ -3605,7 +3583,7 @@ static int ip_vs_genl_dump_dests(struct sk_buff *skb,
- 	struct net *net = sock_net(skb->sk);
- 	struct netns_ipvs *ipvs = net_ipvs(net);
- 
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 
- 	/* Try to find the service for which to dump destinations */
- 	if (nlmsg_parse_deprecated(cb->nlh, GENL_HDRLEN, attrs, IPVS_CMD_ATTR_MAX, ip_vs_cmd_policy, cb->extack))
-@@ -3630,7 +3608,7 @@ static int ip_vs_genl_dump_dests(struct sk_buff *skb,
- 	cb->args[0] = idx;
- 
- out_err:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 
- 	return skb->len;
- }
-@@ -3916,7 +3894,7 @@ static int ip_vs_genl_set_cmd(struct sk_buff *skb, struct genl_info *info)
- 
- 	cmd = info->genlhdr->cmd;
- 
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 
- 	if (cmd == IPVS_CMD_FLUSH) {
- 		ret = ip_vs_flush(ipvs, false);
-@@ -4028,7 +4006,7 @@ static int ip_vs_genl_set_cmd(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- out:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 
- 	return ret;
- }
-@@ -4058,7 +4036,7 @@ static int ip_vs_genl_get_cmd(struct sk_buff *skb, struct genl_info *info)
- 	if (!msg)
- 		return -ENOMEM;
- 
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 
- 	reply = genlmsg_put_reply(msg, info, &ip_vs_genl_family, 0, reply_cmd);
- 	if (reply == NULL)
-@@ -4126,7 +4104,7 @@ static int ip_vs_genl_get_cmd(struct sk_buff *skb, struct genl_info *info)
- out_err:
- 	nlmsg_free(msg);
- out:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 
- 	return ret;
- }
-@@ -4243,6 +4221,7 @@ static struct genl_family ip_vs_genl_family __ro_after_init = {
- 	.small_ops	= ip_vs_genl_ops,
- 	.n_small_ops	= ARRAY_SIZE(ip_vs_genl_ops),
- 	.resv_start_op	= IPVS_CMD_FLUSH + 1,
-+	.parallel_ops	= 1,
- };
- 
- static int __init ip_vs_genl_register(void)
-@@ -4411,6 +4390,13 @@ int __net_init ip_vs_control_net_init(struct netns_ipvs *ipvs)
- 	int ret = -ENOMEM;
- 	int idx;
- 
-+	/* Initialize service_mutex, svc_table, svc_fwm_table per netns */
-+	__mutex_init(&ipvs->service_mutex, "ipvs->service_mutex", &__ipvs_service_key);
-+	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
-+		INIT_HLIST_HEAD(&ipvs->svc_table[idx]);
-+		INIT_HLIST_HEAD(&ipvs->svc_fwm_table[idx]);
+ struct rt6_info *ip6_dst_alloc(struct net *net, struct net_device *dev,
+ 			       int flags);
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 19eb4b3d26ea..53dea18a4a07 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1068,15 +1068,19 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+ 	     !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) ||
+ 	    (!(idev->dev->flags & IFF_LOOPBACK) &&
+ 	     !netif_is_l3_master(idev->dev) &&
+-	     addr_type & IPV6_ADDR_LOOPBACK))
++	     addr_type & IPV6_ADDR_LOOPBACK)) {
++		NL_SET_ERR_MSG(extack, "Cannot assign requested address");
+ 		return ERR_PTR(-EADDRNOTAVAIL);
 +	}
-+
- 	/* Initialize rs_table */
- 	for (idx = 0; idx < IP_VS_RTAB_SIZE; idx++)
- 		INIT_HLIST_HEAD(&ipvs->rs_table[idx]);
-@@ -4515,17 +4501,8 @@ void ip_vs_unregister_nl_ioctl(void)
  
- int __init ip_vs_control_init(void)
- {
--	int idx;
- 	int ret;
- 
--	/* Initialize svc_table, ip_vs_svc_fwm_table */
--	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
--		INIT_HLIST_HEAD(&ip_vs_svc_table[idx]);
--		INIT_HLIST_HEAD(&ip_vs_svc_fwm_table[idx]);
--	}
--
--	smp_wmb();	/* Do we really need it now ? */
--
- 	ret = register_netdevice_notifier(&ip_vs_dst_notifier);
- 	if (ret < 0)
- 		return ret;
-diff --git a/net/netfilter/ipvs/ip_vs_est.c b/net/netfilter/ipvs/ip_vs_est.c
-index c5970ba416aea..323098dc8be68 100644
---- a/net/netfilter/ipvs/ip_vs_est.c
-+++ b/net/netfilter/ipvs/ip_vs_est.c
-@@ -601,7 +601,7 @@ static void ip_vs_est_drain_temp_list(struct netns_ipvs *ipvs)
- 	while (1) {
- 		int max = 16;
- 
--		mutex_lock(&__ip_vs_mutex);
-+		mutex_lock(&ipvs->service_mutex);
- 
- 		while (max-- > 0) {
- 			est = hlist_entry_safe(ipvs->est_temp_list.first,
-@@ -621,12 +621,12 @@ static void ip_vs_est_drain_temp_list(struct netns_ipvs *ipvs)
- 			}
- 			goto unlock;
- 		}
--		mutex_unlock(&__ip_vs_mutex);
-+		mutex_unlock(&ipvs->service_mutex);
- 		cond_resched();
+ 	if (idev->dead) {
+-		err = -ENODEV;			/*XXX*/
++		NL_SET_ERR_MSG(extack, "IPv6 device is going away");
++		err = -ENODEV;
+ 		goto out;
  	}
  
- unlock:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- }
- 
- /* Calculate limits for all kthreads */
-@@ -646,9 +646,9 @@ static int ip_vs_est_calc_limits(struct netns_ipvs *ipvs, int *chain_max)
- 	u64 val;
- 
- 	INIT_HLIST_HEAD(&chain);
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
- 	kd = ipvs->est_kt_arr[0];
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
- 	s = kd ? kd->calc_stats : NULL;
- 	if (!s)
+ 	if (idev->cnf.disable_ipv6) {
++		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
+ 		err = -EACCES;
  		goto out;
-@@ -747,7 +747,7 @@ static void ip_vs_est_calc_phase(struct netns_ipvs *ipvs)
- 	if (!ip_vs_est_calc_limits(ipvs, &chain_max))
- 		return;
+ 	}
+@@ -1103,7 +1107,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+ 		goto out;
+ 	}
  
--	mutex_lock(&__ip_vs_mutex);
-+	mutex_lock(&ipvs->service_mutex);
+-	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags);
++	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags, extack);
+ 	if (IS_ERR(f6i)) {
+ 		err = PTR_ERR(f6i);
+ 		f6i = NULL;
+@@ -2921,30 +2925,40 @@ static int inet6_addr_add(struct net *net, int ifindex,
  
- 	/* Stop all other tasks, so that we can immediately move the
- 	 * estimators to est_temp_list without RCU grace period
-@@ -814,9 +814,9 @@ static void ip_vs_est_calc_phase(struct netns_ipvs *ipvs)
- 		/* Give chance estimators to be added (to est_temp_list)
- 		 * and deleted (releasing kthread contexts)
- 		 */
--		mutex_unlock(&__ip_vs_mutex);
-+		mutex_unlock(&ipvs->service_mutex);
- 		cond_resched();
--		mutex_lock(&__ip_vs_mutex);
-+		mutex_lock(&ipvs->service_mutex);
+ 	ASSERT_RTNL();
  
- 		/* Current kt released ? */
- 		if (id >= ipvs->est_kt_count)
-@@ -892,7 +892,7 @@ static void ip_vs_est_calc_phase(struct netns_ipvs *ipvs)
- 	mutex_unlock(&ipvs->est_mutex);
+-	if (cfg->plen > 128)
++	if (cfg->plen > 128) {
++		NL_SET_ERR_MSG(extack, "Invalid prefix length");
+ 		return -EINVAL;
++	}
  
- unlock:
--	mutex_unlock(&__ip_vs_mutex);
-+	mutex_unlock(&ipvs->service_mutex);
+ 	/* check the lifetime */
+-	if (!cfg->valid_lft || cfg->preferred_lft > cfg->valid_lft)
++	if (!cfg->valid_lft || cfg->preferred_lft > cfg->valid_lft) {
++		NL_SET_ERR_MSG(extack, "IPv6 address lifetime invalid");
+ 		return -EINVAL;
++	}
+ 
+-	if (cfg->ifa_flags & IFA_F_MANAGETEMPADDR && cfg->plen != 64)
++	if (cfg->ifa_flags & IFA_F_MANAGETEMPADDR && cfg->plen != 64) {
++		NL_SET_ERR_MSG(extack, "IPv6 address with \"mngtmpaddr\" flag must have a prefix length of 64");
+ 		return -EINVAL;
++	}
+ 
+ 	dev = __dev_get_by_index(net, ifindex);
+ 	if (!dev)
+ 		return -ENODEV;
+ 
+ 	idev = addrconf_add_dev(dev);
+-	if (IS_ERR(idev))
++	if (IS_ERR(idev)) {
++		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
+ 		return PTR_ERR(idev);
++	}
+ 
+ 	if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+ 		int ret = ipv6_mc_config(net->ipv6.mc_autojoin_sk,
+ 					 true, cfg->pfx, ifindex);
+ 
+-		if (ret < 0)
++		if (ret < 0) {
++			NL_SET_ERR_MSG(extack, "Multicast auto join failed");
+ 			return ret;
++		}
+ 	}
+ 
+ 	cfg->scope = ipv6_addr_scope(cfg->pfx);
+@@ -3001,22 +3015,29 @@ static int inet6_addr_add(struct net *net, int ifindex,
  }
  
- void ip_vs_zero_estimator(struct ip_vs_stats *stats)
+ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+-			  const struct in6_addr *pfx, unsigned int plen)
++			  const struct in6_addr *pfx, unsigned int plen,
++			  struct netlink_ext_ack *extack)
+ {
+ 	struct inet6_ifaddr *ifp;
+ 	struct inet6_dev *idev;
+ 	struct net_device *dev;
+ 
+-	if (plen > 128)
++	if (plen > 128) {
++		NL_SET_ERR_MSG(extack, "Invalid prefix length");
+ 		return -EINVAL;
++	}
+ 
+ 	dev = __dev_get_by_index(net, ifindex);
+-	if (!dev)
++	if (!dev) {
++		NL_SET_ERR_MSG(extack, "Unable to find the interface");
+ 		return -ENODEV;
++	}
+ 
+ 	idev = __in6_dev_get(dev);
+-	if (!idev)
++	if (!idev) {
++		NL_SET_ERR_MSG(extack, "IPv6 is disabled on this device");
+ 		return -ENXIO;
++	}
+ 
+ 	read_lock_bh(&idev->lock);
+ 	list_for_each_entry(ifp, &idev->addr_list, if_list) {
+@@ -3039,6 +3060,8 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+ 		}
+ 	}
+ 	read_unlock_bh(&idev->lock);
++
++	NL_SET_ERR_MSG(extack, "IPv6 address not found");
+ 	return -EADDRNOTAVAIL;
+ }
+ 
+@@ -3081,7 +3104,7 @@ int addrconf_del_ifaddr(struct net *net, void __user *arg)
+ 
+ 	rtnl_lock();
+ 	err = inet6_addr_del(net, ireq.ifr6_ifindex, 0, &ireq.ifr6_addr,
+-			     ireq.ifr6_prefixlen);
++			     ireq.ifr6_prefixlen, NULL);
+ 	rtnl_unlock();
+ 	return err;
+ }
+@@ -3484,7 +3507,7 @@ static int fixup_permanent_addr(struct net *net,
+ 		struct fib6_info *f6i, *prev;
+ 
+ 		f6i = addrconf_f6i_alloc(net, idev, &ifp->addr, false,
+-					 GFP_ATOMIC);
++					 GFP_ATOMIC, NULL);
+ 		if (IS_ERR(f6i))
+ 			return PTR_ERR(f6i);
+ 
+@@ -4694,7 +4717,7 @@ inet6_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	ifa_flags &= IFA_F_MANAGETEMPADDR;
+ 
+ 	return inet6_addr_del(net, ifm->ifa_index, ifa_flags, pfx,
+-			      ifm->ifa_prefixlen);
++			      ifm->ifa_prefixlen, extack);
+ }
+ 
+ static int modify_prefix_route(struct inet6_ifaddr *ifp,
+@@ -4899,8 +4922,10 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	}
+ 
+ 	dev =  __dev_get_by_index(net, ifm->ifa_index);
+-	if (!dev)
++	if (!dev) {
++		NL_SET_ERR_MSG(extack, "Unable to find the interface");
+ 		return -ENODEV;
++	}
+ 
+ 	if (tb[IFA_FLAGS])
+ 		cfg.ifa_flags = nla_get_u32(tb[IFA_FLAGS]);
+@@ -4935,10 +4960,12 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	}
+ 
+ 	if (nlh->nlmsg_flags & NLM_F_EXCL ||
+-	    !(nlh->nlmsg_flags & NLM_F_REPLACE))
++	    !(nlh->nlmsg_flags & NLM_F_REPLACE)) {
++		NL_SET_ERR_MSG(extack, "IPv6 address already assigned");
+ 		err = -EEXIST;
+-	else
++	} else {
+ 		err = inet6_addr_modify(net, ifa, &cfg);
++	}
+ 
+ 	in6_ifa_put(ifa);
+ 
+diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+index dacdea7fcb62..bb17f484ee2c 100644
+--- a/net/ipv6/anycast.c
++++ b/net/ipv6/anycast.c
+@@ -305,7 +305,7 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
+ 	}
+ 
+ 	net = dev_net(idev->dev);
+-	f6i = addrconf_f6i_alloc(net, idev, addr, true, GFP_ATOMIC);
++	f6i = addrconf_f6i_alloc(net, idev, addr, true, GFP_ATOMIC, NULL);
+ 	if (IS_ERR(f6i)) {
+ 		err = PTR_ERR(f6i);
+ 		goto out;
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 64e873f5895f..c90700aed3a1 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4543,7 +4543,8 @@ static int ip6_pkt_prohibit_out(struct net *net, struct sock *sk, struct sk_buff
+ struct fib6_info *addrconf_f6i_alloc(struct net *net,
+ 				     struct inet6_dev *idev,
+ 				     const struct in6_addr *addr,
+-				     bool anycast, gfp_t gfp_flags)
++				     bool anycast, gfp_t gfp_flags,
++				     struct netlink_ext_ack *extack)
+ {
+ 	struct fib6_config cfg = {
+ 		.fc_table = l3mdev_fib_table(idev->dev) ? : RT6_TABLE_LOCAL,
+@@ -4565,7 +4566,7 @@ struct fib6_info *addrconf_f6i_alloc(struct net *net,
+ 		cfg.fc_flags |= RTF_LOCAL;
+ 	}
+ 
+-	f6i = ip6_route_info_create(&cfg, gfp_flags, NULL);
++	f6i = ip6_route_info_create(&cfg, gfp_flags, extack);
+ 	if (!IS_ERR(f6i)) {
+ 		f6i->dst_nocount = true;
+ 
 -- 
-2.19.1.6.gb485710b
+2.38.1
 
 
