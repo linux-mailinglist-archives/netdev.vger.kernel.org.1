@@ -1,201 +1,144 @@
-Return-Path: <netdev+bounces-20249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E900775EA3F
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:47:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5749275EA4E
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 274671C20988
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:47:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 200361C2099C
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0569EC9;
-	Mon, 24 Jul 2023 03:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A761DEDA;
+	Mon, 24 Jul 2023 03:59:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E549BEC5
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:47:13 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086D5DB
-	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 20:47:12 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6726d5d92afso3170489b3a.1
-        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 20:47:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C222EC5
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:59:36 +0000 (UTC)
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C828B0
+	for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 20:59:35 -0700 (PDT)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-583b3939521so22411687b3.0
+        for <netdev@vger.kernel.org>; Sun, 23 Jul 2023 20:59:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690170431; x=1690775231;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1NSxBI+jZ4lM78HRKxD8ibkmyQyG/FtRFP+HyoBnx5I=;
-        b=PgEeS0qOI+pKcrpPsv7cx17Jlt7Uzht14nwBIdBKNMvY9lkPJv+0Kt98k1wsdnIzG9
-         iSOI7qakWbJdPnM6TsHMhEEbpc1/VybplhTM0PsZyroqv8Kmm0p+by7fpC7oedDAGnFJ
-         eCmTNVgTyCAu5MVVme1Ez5G8PIxUSZqLfqn3iEHdI5GWl+HVWWK3XgVHPwP99qeED/Nr
-         54QvjkQaaJj8zr0ff8BGNk0KBQ5UUrnePYxFm4YzSF3r0O2Nq3CP3fITV8nYm1kwMXkc
-         ro+uz9JlKWbIcp26gzgXJ+gw4DKpOys7OSBDl5v5JwqaBhyejNeuuwKnv1Em5AkWiAPb
-         jwRQ==
+        d=gmail.com; s=20221208; t=1690171174; x=1690775974;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VHAPnnSZKvMt5Lg/QwwUMZiuW3NABbsBjEppktwmZ5s=;
+        b=s6QlQkeGDbg4NtN0K1dDPke7OouHeeljrgct8fibCP+/nASOksiruIbML3WWZIQ2BX
+         8+nZO2WoxzcGf0FmY1fsAPAdCldnIpftIkU40XnkqYdxu1oCe97jN5nqlBvrBk+E0d33
+         h0/m9cVF5M/dDAXTZop9LUiZIO1ZfOb/QWVz57K6rUbCBqiqe/uxDjrDQVsp+wJGfUlV
+         rztbYuNHNUZPGM7l1VPKEkmPtVzTB7v3RbIY0x/H7G+rYrCv++1lyA8amyJJGIkTEGv5
+         +aIDdcCOs9htUlcyu1YxRXCws1H68NZ2+nq/f62cyLrAXrNa4sp7/mL5cvggPeb2oAA+
+         lgUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690170431; x=1690775231;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1NSxBI+jZ4lM78HRKxD8ibkmyQyG/FtRFP+HyoBnx5I=;
-        b=DOPAlEggHpc8Mm5v0M/0BxduQaNrXDLMUI7pCxI8RLJPDbmhWp97kcUdvgGPz1cIbC
-         wBKS+hMk8r8JmbPsP4WQUA9IB4E9SkITE1LisPT0ly31ExjCyPFyKLrU06ZoqBKCaOoh
-         jcYsYeoMhOyste5TfZj7xp8h7YJli8qqCOFwG3/NKLzPs0kZdXHcVUXGZxyuSRvPjZoH
-         AyNyWKruOJNYPaXVioFRjYhfz2KEJbgeRxXzE8KMFTnjxtAX9Mp4Fd+vu4jkBpwli6BJ
-         t1isXDv3++mMzgTHYE5qKkIl3FIguJLaYaLoXis4Qr9T8IbZe4uOb60kYn0GGLpAIHo8
-         avEQ==
-X-Gm-Message-State: ABy/qLbIy0D0mCZiLz5d84hRAiL91MKZVBbHDfRTfV2paq5cj1uMd7g6
-	qUxQKuTG+V90XxsrmCQ/eMh/yw==
-X-Google-Smtp-Source: APBJJlEyQhIh1pIemHqUgQdKJnZFXDHmNxVzskhvDJZSJRCsJIVIOay9LorLBuwXEjozyQKE9n+Xqg==
-X-Received: by 2002:a17:90b:195:b0:268:f2e:b480 with SMTP id t21-20020a17090b019500b002680f2eb480mr3628698pjs.11.1690170431458;
-        Sun, 23 Jul 2023 20:47:11 -0700 (PDT)
-Received: from ?IPV6:fdbd:ff1:ce00:11bb:1457:9302:1528:c8f4? ([240e:694:e21:b::2])
-        by smtp.gmail.com with ESMTPSA id om5-20020a17090b3a8500b002677739860fsm5583934pjb.34.2023.07.23.20.47.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Jul 2023 20:47:10 -0700 (PDT)
-Message-ID: <58e75f44-16e3-a40a-4c8a-0f61bbf393f9@bytedance.com>
-Date: Mon, 24 Jul 2023 11:47:02 +0800
+        d=1e100.net; s=20221208; t=1690171174; x=1690775974;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VHAPnnSZKvMt5Lg/QwwUMZiuW3NABbsBjEppktwmZ5s=;
+        b=EFgnosCpRFlUOysTReTZMGxZzPQjxGW6MmUNylHXTsSjrrwthKx4Gwq+vA6CN+fen0
+         de1jEg6vHPGEQ3A16Vd+AwqI876bum6xio6+pMDbWbexG/FNwi8r1LtuvMfUT/BQbZbg
+         pN4wK+K1gjipYK3zw0p95dqRqjTr8/8a+y7RxecY/LSPSwE87RmAGB46xz3eMLFJqBef
+         ZcDz7lgcIR1QBAgbg1nrbATy566OAF5OhSzwQOiquYfNHGp6eIJM3AK6ZlYIVf/P6hlm
+         dR6vFRms7XxPpZ3A33JRud1pAX9+ootE+vNbBo/frBnQkU6OQF1B6r1wX8SSYlyeiV0u
+         FpvQ==
+X-Gm-Message-State: ABy/qLZiMN9QxbaSEatpaXbxC5EaSM99XcvFD/Vs7wU35TMZR1HPAscp
+	FfG7ETta4J54O+NOTxeKpG6bhHHx76XacKXo
+X-Google-Smtp-Source: APBJJlFTv5haGrkOIdYByCil8F+KVUqqmN0jiUzmmVkUEAHj4wfsVdkLcENFThFXnLFuwxiUj0XwZQ==
+X-Received: by 2002:a81:9143:0:b0:573:7f55:a40e with SMTP id i64-20020a819143000000b005737f55a40emr4764334ywg.49.1690171174347;
+        Sun, 23 Jul 2023 20:59:34 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id jh6-20020a170903328600b001aad714400asm7671560plb.229.2023.07.23.20.59.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Jul 2023 20:59:33 -0700 (PDT)
+Date: Mon, 24 Jul 2023 11:59:28 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Beniamino Galvani <bgalvani@redhat.com>
+Subject: Re: [PATCHv2 net-next] IPv6: add extack info for inet6_addr_add/del
+Message-ID: <ZL33IPUcU3bmpO82@Laptop-X1>
+References: <20230719135644.3011570-1-liuhangbin@gmail.com>
+ <ZLkL3eNVNfzZbaBv@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: Re: [PATCH RESEND net-next 1/2] net-memcg: Scopify the indicators
- of sockmem pressure
-To: Roman Gushchin <roman.gushchin@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Shakeel Butt <shakeelb@google.com>,
- Muchun Song <muchun.song@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, David Ahern <dsahern@kernel.org>,
- Yosry Ahmed <yosryahmed@google.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Yu Zhao
- <yuzhao@google.com>, Kefeng Wang <wangkefeng.wang@huawei.com>,
- Yafang Shao <laoar.shao@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Breno Leitao <leitao@debian.org>, David Howells <dhowells@redhat.com>,
- Jason Xing <kernelxing@tencent.com>, Xin Long <lucien.xin@gmail.com>,
- Michal Hocko <mhocko@suse.com>, Alexei Starovoitov <ast@kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)"
- <cgroups@vger.kernel.org>,
- "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)"
- <linux-mm@kvack.org>
-References: <20230711124157.97169-1-wuyun.abel@bytedance.com>
- <ZLsg1wklldKkVI2Z@P9FQF9L96D.corp.robot.car>
-Content-Language: en-US
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <ZLsg1wklldKkVI2Z@P9FQF9L96D.corp.robot.car>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLkL3eNVNfzZbaBv@shredder>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Roman, thanks for taking time to have a look!
-
-On 7/22/23 8:20 AM, Roman Gushchin wrote:
-> On Tue, Jul 11, 2023 at 08:41:43PM +0800, Abel Wu wrote:
->> Now there are two indicators of socket memory pressure sit inside
->> struct mem_cgroup, socket_pressure and tcpmem_pressure.
+On Thu, Jul 20, 2023 at 01:26:37PM +0300, Ido Schimmel wrote:
+> > -static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa)
+> > +static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa,
+> > +			      struct netlink_ext_ack *extack)
+> >  {
+> >  	struct net *net = dev_net(dev);
+> >  	unsigned int hash = inet6_addr_hash(net, &ifa->addr);
+> > @@ -1037,7 +1038,7 @@ static int ipv6_add_addr_hash(struct net_device *dev, struct inet6_ifaddr *ifa)
+> >  
+> >  	/* Ignore adding duplicate addresses on an interface */
+> >  	if (ipv6_chk_same_addr(net, &ifa->addr, dev, hash)) {
+> > -		netdev_dbg(dev, "ipv6_add_addr: already assigned\n");
+> > +		NL_SET_ERR_MSG(extack, "ipv6_add_addr: already assigned");
 > 
-> Hi Abel!
+> How do you trigger it?
 > 
->> When in legacy mode aka. cgroupv1, the socket memory is charged
->> into a separate counter memcg->tcpmem rather than ->memory, so
->> the reclaim pressure of the memcg has nothing to do with socket's
->> pressure at all.
+> # ip link add name dummy10 up type dummy
+> # ip address add 2001:db8:1::1/64 dev dummy10
+> # ip address add 2001:db8:1::1/64 dev dummy10
+> RTNETLINK answers: File exists
 > 
-> But we still might set memcg->socket_pressure and propagate the pressure,
-> right?
-
-Yes, but the pressure comes from memcg->socket_pressure does not mean
-pressure in socket memory in cgroupv1, which might lead to premature
-reclamation or throttling on socket memory allocation. As the following
-example shows:
-
-			->memory	->tcpmem
-	limit		10G		10G
-	usage		9G		4G
-	pressure	true		false
-
-the memcg's memory limits are both set to 10G, and the ->memory part
-is suffering from reclaim pressure while ->tcpmem still has much room
-for use. I have no idea why should treat the ->tcpmem as under pressure
-in this scenario, am I missed something?
-
-> If you're changing this, you need to provide a bit more data on why it's
-> a good idea. I'm not saying the current status is perfect, but I think we need
-> a bit more justification for this change.
+> Better to add extack in inet6_rtm_newaddr():
 > 
->> While for default mode, the ->tcpmem is simply
->> not used.
->>
->> So {socket,tcpmem}_pressure are only used in default/legacy mode
->> respectively. This patch fixes the pieces of code that make mixed
->> use of both.
->>
->> Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
->> ---
->>   include/linux/memcontrol.h | 4 ++--
->>   mm/vmpressure.c            | 8 ++++++++
->>   2 files changed, 10 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
->> index 5818af8eca5a..5860c7f316b9 100644
->> --- a/include/linux/memcontrol.h
->> +++ b/include/linux/memcontrol.h
->> @@ -1727,8 +1727,8 @@ void mem_cgroup_sk_alloc(struct sock *sk);
->>   void mem_cgroup_sk_free(struct sock *sk);
->>   static inline bool mem_cgroup_under_socket_pressure(struct mem_cgroup *memcg)
->>   {
->> -	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys) && memcg->tcpmem_pressure)
->> -		return true;
->> +	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
->> +		return !!memcg->tcpmem_pressure;
+> if (nlh->nlmsg_flags & NLM_F_EXCL || 
+>     !(nlh->nlmsg_flags & NLM_F_REPLACE))
+> 	err = -EEXIST;
+> else
+> 	err = inet6_addr_modify(net, ifa, &cfg)
+
+Thanks. Since the dup addr checking will be done on inet6_rtm_newaddr(). I
+will remove the extack msg in ipv6_add_addr_hash().
+
+> > @@ -1103,6 +1108,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+> >  
+> >  	f6i = addrconf_f6i_alloc(net, idev, cfg->pfx, false, gfp_flags);
+> >  	if (IS_ERR(f6i)) {
+> > +		NL_SET_ERR_MSG(extack, "Dest allocate failed");
 > 
-> So here you can have something like
->     if (cgroup_subsys_on_dfl(memory_cgrp_subsys)) {
->          do {
->              if (time_before(jiffies, READ_ONCE(memcg->socket_pressure)))
->                    return true;
->          } while ((memcg = parent_mem_cgroup(memcg)));
->     } else {
-> 	return !!READ_ONCE(memcg->socket_pressure);
->     }
+> The only thing that can fail in this function is ip6_route_info_create()
+> which already has an extack argument. Better to pass extack to
+> addrconf_f6i_alloc() and get a more accurate error message.
 
-Yes, this looks better.
+OK, I will update the patch.
 
+> > -	if (cfg->plen > 128)
+> > +	if (cfg->plen > 128) {
+> > +		NL_SET_ERR_MSG(extack, "IPv6 address prefix length larger than 128");
 > 
-> And, please, add a bold comment here or nearby the socket_pressure definition
-> that it has a different semantics in the legacy and default modes.
+> For RTM_NEWROUTE IPv6 code just says "Invalid prefix length", so might
+> as well be consistent with it. Also, I see IPv4 doesn't have such
+> messages for its RTM_{NEW,DEL}ADDR messages. If you think it's useful
+> for IPv6, then I suggest also adding it to IPv4.
 
-Agreed.
+OK. But since this patch is for IPv6. I will post another patch for IPv4
+specifically.
 
-> 
-> Overall I think it's a good idea to clean these things up and thank you
-> for working on this. But I wonder if we can make the next step and leave only
-> one mechanism for both cgroup v1 and v2 instead of having this weird setup
-> where memcg->socket_pressure is set differently from different paths on cgroup
-> v1 and v2.
-
-There is some difficulty in unifying the mechanism for both cgroup
-designs. Throttling socket memory allocation when memcg is under
-pressure only makes sense when socket memory and other usages are
-sharing the same limit, which is not true for cgroupv1. Thoughts?
-
-Thanks & Best,
-	Abel
+Thanks
+Hangbin
 
