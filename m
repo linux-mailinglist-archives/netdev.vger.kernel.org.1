@@ -1,371 +1,685 @@
-Return-Path: <netdev+bounces-20262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C647275EC94
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:33:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0E875ECA6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8555928147C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:33:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0F4E1C209F8
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9D4185B;
-	Mon, 24 Jul 2023 07:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5062B185B;
+	Mon, 24 Jul 2023 07:40:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1F7184C
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:33:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B6719B
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:32:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690183978;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=obJKEr7PPFK0pLw7ZGOQfDHbqPEfj1yDCcKlqGnAfNY=;
-	b=isgWf84nq2zW75OZo68IreQZ1lFD9rId/lj5Ehw7+Xuc/z7NEWb847Ea3hmcSAekp1gT31
-	WmRy7zOKcgb0Ys0DwX6w4Zco9KLd1ZNdqSySfozA1RHLwsQjFEkYx67s3y1owonI7lJHJL
-	QRL2xT5555RB9cwJjDmG40WwYmnkJng=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-505-adwR53jmMM2uvqYVur1F6w-1; Mon, 24 Jul 2023 03:32:57 -0400
-X-MC-Unique: adwR53jmMM2uvqYVur1F6w-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b6fdbe2efdso36011351fa.3
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:32:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690183975; x=1690788775;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=obJKEr7PPFK0pLw7ZGOQfDHbqPEfj1yDCcKlqGnAfNY=;
-        b=OZrJD7cZS+74IdsReFKhC3ZnIVb1TNZpqAweMDxCSaYfHMHgRQI47OvePuso6hwCGv
-         tEDV9hww6aPvFiYbRIKWqqUwIvlSaUk/EHXaWnJ8sUwz4MxucNndlQ139TVj759xU71J
-         2ZMDelCRdpcivYxEPohsAmbHZtgRrXn8XM2rITMs25dn9Xd7jS/X0wjLqmSmJtivlmvm
-         l+2aGuA7cT5zqN3mktjcj/KkzJX9RjWiQwYIUPXXLYXJw1+AQs4Z5z81iEamjGvYmpDH
-         JUEqdTM0amCUKgq0Ym1c77WF4D4Ue+si4FB98gtfDFdqTVliQDJfLbZqVdrVuIlL6LUA
-         3vXg==
-X-Gm-Message-State: ABy/qLbRIO+DyynfTQbbKyH0mT02bX/hbRCMZPV+ItP6O2vTZb5WafmU
-	TTCH6tKb60ETFkCaYYTQYGSPz+EdvisJCwW7dlpP9gbCztG/mWdxSLfPGpH02Rj80XH9EiSY4P9
-	Gys0EhRxysycB2h/A
-X-Received: by 2002:a2e:988d:0:b0:2b6:fa92:479e with SMTP id b13-20020a2e988d000000b002b6fa92479emr5540266ljj.42.1690183975468;
-        Mon, 24 Jul 2023 00:32:55 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFha0kr3za1tiulXuUUpmLoGr/15/UKVQHTMghA8BLPnDMFKNbxFPtb4c1QICku3M6nKSRLrA==
-X-Received: by 2002:a2e:988d:0:b0:2b6:fa92:479e with SMTP id b13-20020a2e988d000000b002b6fa92479emr5540249ljj.42.1690183975012;
-        Mon, 24 Jul 2023 00:32:55 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73e0:3800:a16e:b2a0:7d06:58aa])
-        by smtp.gmail.com with ESMTPSA id h19-20020a1ccc13000000b003fbcdba1a63sm4012097wmb.12.2023.07.24.00.32.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 00:32:54 -0700 (PDT)
-Date: Mon, 24 Jul 2023 03:32:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gavin Li <gavinl@nvidia.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, jiri@nvidia.com, dtatulea@nvidia.com,
-	gavi@nvidia.com, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH net-next V3 3/4] virtio_net: support per queue interrupt
- coalesce command
-Message-ID: <20230724032451-mutt-send-email-mst@kernel.org>
-References: <20230724034048.51482-1-gavinl@nvidia.com>
- <20230724034048.51482-4-gavinl@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB5F184F
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:40:38 +0000 (UTC)
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342A6198;
+	Mon, 24 Jul 2023 00:40:34 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0Vo3N3vd_1690184429;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vo3N3vd_1690184429)
+          by smtp.aliyun-inc.com;
+          Mon, 24 Jul 2023 15:40:30 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Cc: Jiejian Wu <jiejian@linux.alibaba.com>,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH v3 net-next] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table per netns
+Date: Mon, 24 Jul 2023 15:40:28 +0800
+Message-Id: <20230724074028.17964-1-dust.li@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724034048.51482-4-gavinl@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 06:40:47AM +0300, Gavin Li wrote:
-> Add interrupt_coalesce config in send_queue and receive_queue to cache user
-> config.
-> 
-> Send per virtqueue interrupt moderation config to underline device in order
-> to have more efficient interrupt moderation and cpu utilization of guest
-> VM.
-> 
-> Signed-off-by: Gavin Li <gavinl@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  drivers/net/virtio_net.c        | 120 ++++++++++++++++++++++++++++----
->  include/uapi/linux/virtio_net.h |  14 ++++
->  2 files changed, 122 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 802ed21453f5..0c3ee1e26ece 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -144,6 +144,8 @@ struct send_queue {
->  
->  	struct virtnet_sq_stats stats;
->  
-> +	struct virtnet_interrupt_coalesce intr_coal;
-> +
->  	struct napi_struct napi;
->  
->  	/* Record whether sq is in reset state. */
-> @@ -161,6 +163,8 @@ struct receive_queue {
->  
->  	struct virtnet_rq_stats stats;
->  
-> +	struct virtnet_interrupt_coalesce intr_coal;
-> +
->  	/* Chain pages by the private ptr. */
->  	struct page *pages;
->  
-> @@ -212,6 +216,7 @@ struct control_buf {
->  	struct virtio_net_ctrl_rss rss;
->  	struct virtio_net_ctrl_coal_tx coal_tx;
->  	struct virtio_net_ctrl_coal_rx coal_rx;
-> +	struct virtio_net_ctrl_coal_vq coal_vq;
->  };
->  
->  struct virtnet_info {
-> @@ -3078,6 +3083,55 @@ static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
->  	return 0;
->  }
->  
-> +static int virtnet_send_ctrl_coal_vq_cmd(struct virtnet_info *vi,
-> +					 u16 vqn, u32 max_usecs, u32 max_packets)
-> +{
-> +	struct scatterlist sgs;
-> +
-> +	vi->ctrl->coal_vq.vqn = cpu_to_le16(vqn);
-> +	vi->ctrl->coal_vq.coal.max_usecs = cpu_to_le32(max_usecs);
-> +	vi->ctrl->coal_vq.coal.max_packets = cpu_to_le32(max_packets);
-> +	sg_init_one(&sgs, &vi->ctrl->coal_vq, sizeof(vi->ctrl->coal_vq));
-> +
-> +	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
-> +				  VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET,
-> +				  &sgs))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
-> +					  struct ethtool_coalesce *ec,
-> +					  u16 queue)
-> +{
-> +	int err;
-> +
-> +	if (ec->rx_coalesce_usecs || ec->rx_max_coalesced_frames) {
-> +		err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
-> +						    ec->rx_coalesce_usecs,
-> +						    ec->rx_max_coalesced_frames);
-> +		if (err)
-> +			return err;
-> +		/* Save parameters */
-> +		vi->rq[queue].intr_coal.max_usecs = ec->rx_coalesce_usecs;
-> +		vi->rq[queue].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-> +	}
-> +
-> +	if (ec->tx_coalesce_usecs || ec->tx_max_coalesced_frames) {
-> +		err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
-> +						    ec->tx_coalesce_usecs,
-> +						    ec->tx_max_coalesced_frames);
-> +		if (err)
-> +			return err;
-> +		/* Save parameters */
-> +		vi->sq[queue].intr_coal.max_usecs = ec->tx_coalesce_usecs;
-> +		vi->sq[queue].intr_coal.max_packets = ec->tx_max_coalesced_frames;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
->  {
->  	/* usecs coalescing is supported only if VIRTIO_NET_F_NOTF_COAL
-> @@ -3094,23 +3148,39 @@ static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
->  }
->  
->  static int virtnet_set_coalesce_one(struct net_device *dev,
-> -				    struct ethtool_coalesce *ec)
-> +				    struct ethtool_coalesce *ec,
-> +				    bool per_queue,
-> +				    u32 queue)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
-> -	int ret, i, napi_weight;
-> +	int queue_count = per_queue ? 1 : vi->max_queue_pairs;
-> +	int queue_number = per_queue ? queue : 0;
+From: Jiejian Wu <jiejian@linux.alibaba.com>
 
-Actually can't we refactor this? This whole function is littered
-with if/else branches. just code it separately - the only
-common part is:
+Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
+"ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
+tens of thousands of services from different netns in the table, it
+takes a long time to look up the table, for example, using "ipvsadm
+-ln" from different netns simultaneously.
 
-        napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
-        if (napi_weight ^ vi->sq[0].napi.weight) {
-                if (dev->flags & IFF_UP)
-                        return -EBUSY;
-                else
-                        update_napi = true;
-        }
+We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
+add "service_mutex" per netns to keep these two tables safe instead of
+the global "__ip_vs_mutex" in current version. To this end, looking up
+services from different netns simultaneously will not get stuck,
+shortening the time consumption in large-scale deployment. It can be
+reproduced using the simple scripts below.
 
-so just move this to a helper and have two functions - global and
-per queue.
+init.sh: #!/bin/bash
+for((i=1;i<=4;i++));do
+        ip netns add ns$i
+        ip netns exec ns$i ip link set dev lo up
+        ip netns exec ns$i sh add-services.sh
+done
 
+add-services.sh: #!/bin/bash
+for((i=0;i<30000;i++)); do
+        ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
+done
 
+runtest.sh: #!/bin/bash
+for((i=1;i<4;i++));do
+        ip netns exec ns$i ipvsadm -ln > /dev/null &
+done
+ip netns exec ns4 ipvsadm -ln > /dev/null
 
->  	bool update_napi = false;
-> +	int ret, i, napi_weight;
-> +
-> +	if (queue >= vi->max_queue_pairs)
-> +		return -EINVAL;
->  
->  	/* Can't change NAPI weight if the link is up */
->  	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
-> -	if (napi_weight ^ vi->sq[0].napi.weight) {
-> -		if (dev->flags & IFF_UP)
-> -			return -EBUSY;
-> -		else
-> +	for (i = queue_number; i < queue_count; i++) {
-> +		if (napi_weight ^ vi->sq[i].napi.weight) {
-> +			if (dev->flags & IFF_UP)
-> +				return -EBUSY;
-> +
->  			update_napi = true;
-> +			/* All queues that belong to [queue_number, queue_count] will be
-> +			 * updated for the sake of simplicity, which might not be necessary
-> +			 */
-> +			queue_number = i;
-> +			break;
-> +		}
->  	}
->  
-> -	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
-> +	if (!per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
->  		ret = virtnet_send_notf_coal_cmds(vi, ec);
-> +	else if (per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> +		ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
->  	else
->  		ret = virtnet_coal_params_supported(ec);
->  
-> @@ -3118,7 +3188,7 @@ static int virtnet_set_coalesce_one(struct net_device *dev,
->  		return ret;
->  
->  	if (update_napi) {
-> -		for (i = 0; i < vi->max_queue_pairs; i++)
-> +		for (i = queue_number; i < queue_count; i++)
->  			vi->sq[i].napi.weight = napi_weight;
->  	}
->  
-> @@ -3130,19 +3200,29 @@ static int virtnet_set_coalesce(struct net_device *dev,
->  				struct kernel_ethtool_coalesce *kernel_coal,
->  				struct netlink_ext_ack *extack)
->  {
-> -	return virtnet_set_coalesce_one(dev, ec);
-> +	return virtnet_set_coalesce_one(dev, ec, false, 0);
->  }
->  
->  static int virtnet_get_coalesce_one(struct net_device *dev,
-> -				    struct ethtool_coalesce *ec)
-> +				    struct ethtool_coalesce *ec,
-> +				    bool per_queue,
-> +				    u32 queue)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
->  
-> -	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
-> +	if (queue >= vi->max_queue_pairs)
-> +		return -EINVAL;
-> +
-> +	if (!per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
->  		ec->rx_coalesce_usecs = vi->intr_coal_rx.max_usecs;
->  		ec->tx_coalesce_usecs = vi->intr_coal_tx.max_usecs;
->  		ec->tx_max_coalesced_frames = vi->intr_coal_tx.max_packets;
->  		ec->rx_max_coalesced_frames = vi->intr_coal_rx.max_packets;
-> +	} else if (per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> +		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
-> +		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
-> +		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
-> +		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
->  	} else {
->  		ec->rx_max_coalesced_frames = 1;
->  
-> @@ -3158,7 +3238,21 @@ static int virtnet_get_coalesce(struct net_device *dev,
->  				struct kernel_ethtool_coalesce *kernel_coal,
->  				struct netlink_ext_ack *extack)
->  {
-> -	return virtnet_get_coalesce_one(dev, ec);
-> +	return virtnet_get_coalesce_one(dev, ec, false, 0);
-> +}
-> +
-> +static int virtnet_set_per_queue_coalesce(struct net_device *dev,
-> +					  u32 queue,
-> +					  struct ethtool_coalesce *ec)
-> +{
-> +	return virtnet_set_coalesce_one(dev, ec, true, queue);
-> +}
-> +
-> +static int virtnet_get_per_queue_coalesce(struct net_device *dev,
-> +					  u32 queue,
-> +					  struct ethtool_coalesce *ec)
-> +{
-> +	return virtnet_get_coalesce_one(dev, ec, true, queue);
->  }
->  
->  static void virtnet_init_settings(struct net_device *dev)
-> @@ -3291,6 +3385,8 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
->  	.set_link_ksettings = virtnet_set_link_ksettings,
->  	.set_coalesce = virtnet_set_coalesce,
->  	.get_coalesce = virtnet_get_coalesce,
-> +	.set_per_queue_coalesce = virtnet_set_per_queue_coalesce,
-> +	.get_per_queue_coalesce = virtnet_get_per_queue_coalesce,
->  	.get_rxfh_key_size = virtnet_get_rxfh_key_size,
->  	.get_rxfh_indir_size = virtnet_get_rxfh_indir_size,
->  	.get_rxfh = virtnet_get_rxfh,
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index 12c1c9699935..cc65ef0f3c3e 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -56,6 +56,7 @@
->  #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
->  					 * Steering */
->  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> +#define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
->  #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
->  #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
->  #define VIRTIO_NET_F_GUEST_USO6	55	/* Guest can handle USOv6 in. */
-> @@ -391,5 +392,18 @@ struct virtio_net_ctrl_coal_rx {
->  };
->  
->  #define VIRTIO_NET_CTRL_NOTF_COAL_RX_SET		1
-> +#define VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET		2
-> +#define VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET		3
-> +
-> +struct virtio_net_ctrl_coal {
-> +	__le32 max_packets;
-> +	__le32 max_usecs;
-> +};
-> +
-> +struct  virtio_net_ctrl_coal_vq {
-> +	__le16 vqn;
-> +	__le16 reserved;
-> +	struct virtio_net_ctrl_coal coal;
-> +};
->  
->  #endif /* _UAPI_LINUX_VIRTIO_NET_H */
-> -- 
-> 2.39.1
+Run "sh init.sh" to initiate the network environment. Then run "time
+./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
+Intel Xeon ECS. The result of the original version is around 8 seconds,
+while the result of the modified version is only 0.8 seconds.
+
+Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
+Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+---
+v3:
+  * fix complains of checkpatch
+v2:
+  * remove global __ip_vs_mutex in ip_vs_est.c
+  * remove ip_vs_ prefix for svc_table and svc_fwm_table
+  * remove redundant "svc->ipvs == ipvs" checks
+---
+ include/net/ip_vs.h            |  13 +++
+ net/netfilter/ipvs/ip_vs_ctl.c | 167 ++++++++++++++-------------------
+ net/netfilter/ipvs/ip_vs_est.c |  18 ++--
+ 3 files changed, 94 insertions(+), 104 deletions(-)
+
+diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+index ff406ef4fd4aa..68e562bc9df2b 100644
+--- a/include/net/ip_vs.h
++++ b/include/net/ip_vs.h
+@@ -33,6 +33,12 @@
+ 
+ #define IP_VS_HDR_INVERSE	1
+ #define IP_VS_HDR_ICMP		2
++/*
++ *	Hash table: for virtual service lookups
++ */
++#define IP_VS_SVC_TAB_BITS 8
++#define IP_VS_SVC_TAB_SIZE BIT(IP_VS_SVC_TAB_BITS)
++#define IP_VS_SVC_TAB_MASK (IP_VS_SVC_TAB_SIZE - 1)
+ 
+ /* Generic access of ipvs struct */
+ static inline struct netns_ipvs *net_ipvs(struct net* net)
+@@ -1041,6 +1047,13 @@ struct netns_ipvs {
+ 	 */
+ 	unsigned int		mixed_address_family_dests;
+ 	unsigned int		hooks_afmask;	/* &1=AF_INET, &2=AF_INET6 */
++
++	/* the service mutex that protect svc_table and svc_fwm_table */
++	struct mutex service_mutex;
++	/* the service table hashed by <protocol, addr, port> */
++	struct hlist_head svc_table[IP_VS_SVC_TAB_SIZE];
++	/* the service table hashed by fwmark */
++	struct hlist_head svc_fwm_table[IP_VS_SVC_TAB_SIZE];
+ };
+ 
+ #define DEFAULT_SYNC_THRESHOLD	3
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index 62606fb44d027..e5ae4fac8ec93 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -49,7 +49,7 @@
+ 
+ MODULE_ALIAS_GENL_FAMILY(IPVS_GENL_NAME);
+ 
+-DEFINE_MUTEX(__ip_vs_mutex); /* Serialize configuration with sockopt/netlink */
++static struct lock_class_key __ipvs_service_key;
+ 
+ /* sysctl variables */
+ 
+@@ -294,17 +294,6 @@ ip_vs_use_count_dec(void)
+ }
+ 
+ 
+-/*
+- *	Hash table: for virtual service lookups
+- */
+-#define IP_VS_SVC_TAB_BITS 8
+-#define IP_VS_SVC_TAB_SIZE (1 << IP_VS_SVC_TAB_BITS)
+-#define IP_VS_SVC_TAB_MASK (IP_VS_SVC_TAB_SIZE - 1)
+-
+-/* the service table hashed by <protocol, addr, port> */
+-static struct hlist_head ip_vs_svc_table[IP_VS_SVC_TAB_SIZE];
+-/* the service table hashed by fwmark */
+-static struct hlist_head ip_vs_svc_fwm_table[IP_VS_SVC_TAB_SIZE];
+ 
+ 
+ /*
+@@ -339,8 +328,8 @@ static inline unsigned int ip_vs_svc_fwm_hashkey(struct netns_ipvs *ipvs, __u32
+ }
+ 
+ /*
+- *	Hashes a service in the ip_vs_svc_table by <netns,proto,addr,port>
+- *	or in the ip_vs_svc_fwm_table by fwmark.
++ *	Hashes a service in the svc_table by <netns,proto,addr,port>
++ *	or in the svc_fwm_table by fwmark.
+  *	Should be called with locked tables.
+  */
+ static int ip_vs_svc_hash(struct ip_vs_service *svc)
+@@ -355,17 +344,17 @@ static int ip_vs_svc_hash(struct ip_vs_service *svc)
+ 
+ 	if (svc->fwmark == 0) {
+ 		/*
+-		 *  Hash it by <netns,protocol,addr,port> in ip_vs_svc_table
++		 *  Hash it by <netns,protocol,addr,port> in svc_table
+ 		 */
+ 		hash = ip_vs_svc_hashkey(svc->ipvs, svc->af, svc->protocol,
+ 					 &svc->addr, svc->port);
+-		hlist_add_head_rcu(&svc->s_list, &ip_vs_svc_table[hash]);
++		hlist_add_head_rcu(&svc->s_list, &svc->ipvs->svc_table[hash]);
+ 	} else {
+ 		/*
+ 		 *  Hash it by fwmark in svc_fwm_table
+ 		 */
+ 		hash = ip_vs_svc_fwm_hashkey(svc->ipvs, svc->fwmark);
+-		hlist_add_head_rcu(&svc->f_list, &ip_vs_svc_fwm_table[hash]);
++		hlist_add_head_rcu(&svc->f_list, &svc->ipvs->svc_fwm_table[hash]);
+ 	}
+ 
+ 	svc->flags |= IP_VS_SVC_F_HASHED;
+@@ -414,12 +403,9 @@ __ip_vs_service_find(struct netns_ipvs *ipvs, int af, __u16 protocol,
+ 	/* Check for "full" addressed entries */
+ 	hash = ip_vs_svc_hashkey(ipvs, af, protocol, vaddr, vport);
+ 
+-	hlist_for_each_entry_rcu(svc, &ip_vs_svc_table[hash], s_list) {
+-		if ((svc->af == af)
+-		    && ip_vs_addr_equal(af, &svc->addr, vaddr)
+-		    && (svc->port == vport)
+-		    && (svc->protocol == protocol)
+-		    && (svc->ipvs == ipvs)) {
++	hlist_for_each_entry_rcu(svc, &ipvs->svc_table[hash], s_list) {
++		if (svc->af == af && ip_vs_addr_equal(af, &svc->addr, vaddr) &&
++		    svc->port == vport && svc->protocol == protocol) {
+ 			/* HIT */
+ 			return svc;
+ 		}
+@@ -441,9 +427,8 @@ __ip_vs_svc_fwm_find(struct netns_ipvs *ipvs, int af, __u32 fwmark)
+ 	/* Check for fwmark addressed entries */
+ 	hash = ip_vs_svc_fwm_hashkey(ipvs, fwmark);
+ 
+-	hlist_for_each_entry_rcu(svc, &ip_vs_svc_fwm_table[hash], f_list) {
+-		if (svc->fwmark == fwmark && svc->af == af
+-		    && (svc->ipvs == ipvs)) {
++	hlist_for_each_entry_rcu(svc, &ipvs->svc_fwm_table[hash], f_list) {
++		if (svc->fwmark == fwmark && svc->af == af) {
+ 			/* HIT */
+ 			return svc;
+ 		}
+@@ -1701,10 +1686,9 @@ static int ip_vs_flush(struct netns_ipvs *ipvs, bool cleanup)
+ 	 * Flush the service table hashed by <netns,protocol,addr,port>
+ 	 */
+ 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry_safe(svc, n, &ip_vs_svc_table[idx],
++		hlist_for_each_entry_safe(svc, n, &ipvs->svc_table[idx],
+ 					  s_list) {
+-			if (svc->ipvs == ipvs)
+-				ip_vs_unlink_service(svc, cleanup);
++			ip_vs_unlink_service(svc, cleanup);
+ 		}
+ 	}
+ 
+@@ -1712,10 +1696,9 @@ static int ip_vs_flush(struct netns_ipvs *ipvs, bool cleanup)
+ 	 * Flush the service table hashed by fwmark
+ 	 */
+ 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry_safe(svc, n, &ip_vs_svc_fwm_table[idx],
++		hlist_for_each_entry_safe(svc, n, &ipvs->svc_fwm_table[idx],
+ 					  f_list) {
+-			if (svc->ipvs == ipvs)
+-				ip_vs_unlink_service(svc, cleanup);
++			ip_vs_unlink_service(svc, cleanup);
+ 		}
+ 	}
+ 
+@@ -1732,12 +1715,12 @@ void ip_vs_service_nets_cleanup(struct list_head *net_list)
+ 	struct net *net;
+ 
+ 	/* Check for "full" addressed entries */
+-	mutex_lock(&__ip_vs_mutex);
+ 	list_for_each_entry(net, net_list, exit_list) {
+ 		ipvs = net_ipvs(net);
++		mutex_lock(&ipvs->service_mutex);
+ 		ip_vs_flush(ipvs, true);
++		mutex_unlock(&ipvs->service_mutex);
+ 	}
+-	mutex_unlock(&__ip_vs_mutex);
+ }
+ 
+ /* Put all references for device (dst_cache) */
+@@ -1775,25 +1758,20 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
+ 	if (event != NETDEV_DOWN || !ipvs)
+ 		return NOTIFY_DONE;
+ 	IP_VS_DBG(3, "%s() dev=%s\n", __func__, dev->name);
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_table[idx], s_list) {
+-			if (svc->ipvs == ipvs) {
+-				list_for_each_entry(dest, &svc->destinations,
+-						    n_list) {
+-					ip_vs_forget_dev(dest, dev);
+-				}
++		hlist_for_each_entry(svc, &ipvs->svc_table[idx], s_list) {
++			list_for_each_entry(dest, &svc->destinations,
++					    n_list) {
++				ip_vs_forget_dev(dest, dev);
+ 			}
+ 		}
+ 
+-		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[idx], f_list) {
+-			if (svc->ipvs == ipvs) {
+-				list_for_each_entry(dest, &svc->destinations,
+-						    n_list) {
+-					ip_vs_forget_dev(dest, dev);
+-				}
++		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[idx], f_list) {
++			list_for_each_entry(dest, &svc->destinations,
++					    n_list) {
++				ip_vs_forget_dev(dest, dev);
+ 			}
+-
+ 		}
+ 	}
+ 
+@@ -1802,7 +1780,7 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
+ 		ip_vs_forget_dev(dest, dev);
+ 	}
+ 	spin_unlock_bh(&ipvs->dest_trash_lock);
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 	return NOTIFY_DONE;
+ }
+ 
+@@ -1826,16 +1804,14 @@ static int ip_vs_zero_all(struct netns_ipvs *ipvs)
+ 	struct ip_vs_service *svc;
+ 
+ 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_table[idx], s_list) {
+-			if (svc->ipvs == ipvs)
+-				ip_vs_zero_service(svc);
++		hlist_for_each_entry(svc, &ipvs->svc_table[idx], s_list) {
++			ip_vs_zero_service(svc);
+ 		}
+ 	}
+ 
+ 	for(idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[idx], f_list) {
+-			if (svc->ipvs == ipvs)
+-				ip_vs_zero_service(svc);
++		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[idx], f_list) {
++			ip_vs_zero_service(svc);
+ 		}
+ 	}
+ 
+@@ -2303,9 +2279,9 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
+ 
+ 	/* look in hash by protocol */
+ 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry_rcu(svc, &ip_vs_svc_table[idx], s_list) {
+-			if ((svc->ipvs == ipvs) && pos-- == 0) {
+-				iter->table = ip_vs_svc_table;
++		hlist_for_each_entry_rcu(svc, &ipvs->svc_table[idx], s_list) {
++			if (pos-- == 0) {
++				iter->table = ipvs->svc_table;
+ 				iter->bucket = idx;
+ 				return svc;
+ 			}
+@@ -2314,10 +2290,10 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
+ 
+ 	/* keep looking in fwmark */
+ 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry_rcu(svc, &ip_vs_svc_fwm_table[idx],
++		hlist_for_each_entry_rcu(svc, &ipvs->svc_fwm_table[idx],
+ 					 f_list) {
+-			if ((svc->ipvs == ipvs) && pos-- == 0) {
+-				iter->table = ip_vs_svc_fwm_table;
++			if (pos-- == 0) {
++				iter->table = ipvs->svc_fwm_table;
+ 				iter->bucket = idx;
+ 				return svc;
+ 			}
+@@ -2340,6 +2316,8 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ 	struct hlist_node *e;
+ 	struct ip_vs_iter *iter;
+ 	struct ip_vs_service *svc;
++	struct net *net = seq_file_net(seq);
++	struct netns_ipvs *ipvs = net_ipvs(net);
+ 
+ 	++*pos;
+ 	if (v == SEQ_START_TOKEN)
+@@ -2348,7 +2326,7 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ 	svc = v;
+ 	iter = seq->private;
+ 
+-	if (iter->table == ip_vs_svc_table) {
++	if (iter->table == ipvs->svc_table) {
+ 		/* next service in table hashed by protocol */
+ 		e = rcu_dereference(hlist_next_rcu(&svc->s_list));
+ 		if (e)
+@@ -2356,13 +2334,13 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ 
+ 		while (++iter->bucket < IP_VS_SVC_TAB_SIZE) {
+ 			hlist_for_each_entry_rcu(svc,
+-						 &ip_vs_svc_table[iter->bucket],
++						 &ipvs->svc_table[iter->bucket],
+ 						 s_list) {
+ 				return svc;
+ 			}
+ 		}
+ 
+-		iter->table = ip_vs_svc_fwm_table;
++		iter->table = ipvs->svc_fwm_table;
+ 		iter->bucket = -1;
+ 		goto scan_fwmark;
+ 	}
+@@ -2375,7 +2353,7 @@ static void *ip_vs_info_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+  scan_fwmark:
+ 	while (++iter->bucket < IP_VS_SVC_TAB_SIZE) {
+ 		hlist_for_each_entry_rcu(svc,
+-					 &ip_vs_svc_fwm_table[iter->bucket],
++					 &ipvs->svc_fwm_table[iter->bucket],
+ 					 f_list)
+ 			return svc;
+ 	}
+@@ -2411,7 +2389,7 @@ static int ip_vs_info_seq_show(struct seq_file *seq, void *v)
+ 
+ 		if (svc->ipvs != ipvs)
+ 			return 0;
+-		if (iter->table == ip_vs_svc_table) {
++		if (iter->table == ipvs->svc_table) {
+ #ifdef CONFIG_IP_VS_IPV6
+ 			if (svc->af == AF_INET6)
+ 				seq_printf(seq, "%s  [%pI6]:%04X %s ",
+@@ -2733,7 +2711,7 @@ do_ip_vs_set_ctl(struct sock *sk, int cmd, sockptr_t ptr, unsigned int len)
+ 		return ret;
+ 	}
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 	if (cmd == IP_VS_SO_SET_FLUSH) {
+ 		/* Flush the virtual service */
+ 		ret = ip_vs_flush(ipvs, false);
+@@ -2830,7 +2808,7 @@ do_ip_vs_set_ctl(struct sock *sk, int cmd, sockptr_t ptr, unsigned int len)
+ 	}
+ 
+   out_unlock:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 	return ret;
+ }
+ 
+@@ -2868,9 +2846,9 @@ __ip_vs_get_service_entries(struct netns_ipvs *ipvs,
+ 	int ret = 0;
+ 
+ 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_table[idx], s_list) {
++		hlist_for_each_entry(svc, &ipvs->svc_table[idx], s_list) {
+ 			/* Only expose IPv4 entries to old interface */
+-			if (svc->af != AF_INET || (svc->ipvs != ipvs))
++			if (svc->af != AF_INET)
+ 				continue;
+ 
+ 			if (count >= get->num_services)
+@@ -2887,9 +2865,9 @@ __ip_vs_get_service_entries(struct netns_ipvs *ipvs,
+ 	}
+ 
+ 	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[idx], f_list) {
++		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[idx], f_list) {
+ 			/* Only expose IPv4 entries to old interface */
+-			if (svc->af != AF_INET || (svc->ipvs != ipvs))
++			if (svc->af != AF_INET)
+ 				continue;
+ 
+ 			if (count >= get->num_services)
+@@ -3058,7 +3036,7 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
+ 		return ret;
+ 	}
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 	switch (cmd) {
+ 	case IP_VS_SO_GET_VERSION:
+ 	{
+@@ -3157,7 +3135,7 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
+ 	}
+ 
+ out:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 	return ret;
+ }
+ 
+@@ -3392,10 +3370,10 @@ static int ip_vs_genl_dump_services(struct sk_buff *skb,
+ 	struct net *net = sock_net(skb->sk);
+ 	struct netns_ipvs *ipvs = net_ipvs(net);
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 	for (i = 0; i < IP_VS_SVC_TAB_SIZE; i++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_table[i], s_list) {
+-			if (++idx <= start || (svc->ipvs != ipvs))
++		hlist_for_each_entry(svc, &ipvs->svc_table[i], s_list) {
++			if (++idx <= start)
+ 				continue;
+ 			if (ip_vs_genl_dump_service(skb, svc, cb) < 0) {
+ 				idx--;
+@@ -3405,8 +3383,8 @@ static int ip_vs_genl_dump_services(struct sk_buff *skb,
+ 	}
+ 
+ 	for (i = 0; i < IP_VS_SVC_TAB_SIZE; i++) {
+-		hlist_for_each_entry(svc, &ip_vs_svc_fwm_table[i], f_list) {
+-			if (++idx <= start || (svc->ipvs != ipvs))
++		hlist_for_each_entry(svc, &ipvs->svc_fwm_table[i], f_list) {
++			if (++idx <= start)
+ 				continue;
+ 			if (ip_vs_genl_dump_service(skb, svc, cb) < 0) {
+ 				idx--;
+@@ -3416,7 +3394,7 @@ static int ip_vs_genl_dump_services(struct sk_buff *skb,
+ 	}
+ 
+ nla_put_failure:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 	cb->args[0] = idx;
+ 
+ 	return skb->len;
+@@ -3605,7 +3583,7 @@ static int ip_vs_genl_dump_dests(struct sk_buff *skb,
+ 	struct net *net = sock_net(skb->sk);
+ 	struct netns_ipvs *ipvs = net_ipvs(net);
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 
+ 	/* Try to find the service for which to dump destinations */
+ 	if (nlmsg_parse_deprecated(cb->nlh, GENL_HDRLEN, attrs, IPVS_CMD_ATTR_MAX, ip_vs_cmd_policy, cb->extack))
+@@ -3630,7 +3608,7 @@ static int ip_vs_genl_dump_dests(struct sk_buff *skb,
+ 	cb->args[0] = idx;
+ 
+ out_err:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 
+ 	return skb->len;
+ }
+@@ -3916,7 +3894,7 @@ static int ip_vs_genl_set_cmd(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	cmd = info->genlhdr->cmd;
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 
+ 	if (cmd == IPVS_CMD_FLUSH) {
+ 		ret = ip_vs_flush(ipvs, false);
+@@ -4028,7 +4006,7 @@ static int ip_vs_genl_set_cmd(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ out:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 
+ 	return ret;
+ }
+@@ -4058,7 +4036,7 @@ static int ip_vs_genl_get_cmd(struct sk_buff *skb, struct genl_info *info)
+ 	if (!msg)
+ 		return -ENOMEM;
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 
+ 	reply = genlmsg_put_reply(msg, info, &ip_vs_genl_family, 0, reply_cmd);
+ 	if (reply == NULL)
+@@ -4126,7 +4104,7 @@ static int ip_vs_genl_get_cmd(struct sk_buff *skb, struct genl_info *info)
+ out_err:
+ 	nlmsg_free(msg);
+ out:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 
+ 	return ret;
+ }
+@@ -4243,6 +4221,7 @@ static struct genl_family ip_vs_genl_family __ro_after_init = {
+ 	.small_ops	= ip_vs_genl_ops,
+ 	.n_small_ops	= ARRAY_SIZE(ip_vs_genl_ops),
+ 	.resv_start_op	= IPVS_CMD_FLUSH + 1,
++	.parallel_ops	= 1,
+ };
+ 
+ static int __init ip_vs_genl_register(void)
+@@ -4411,6 +4390,13 @@ int __net_init ip_vs_control_net_init(struct netns_ipvs *ipvs)
+ 	int ret = -ENOMEM;
+ 	int idx;
+ 
++	/* Initialize service_mutex, svc_table, svc_fwm_table per netns */
++	__mutex_init(&ipvs->service_mutex, "ipvs->service_mutex", &__ipvs_service_key);
++	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
++		INIT_HLIST_HEAD(&ipvs->svc_table[idx]);
++		INIT_HLIST_HEAD(&ipvs->svc_fwm_table[idx]);
++	}
++
+ 	/* Initialize rs_table */
+ 	for (idx = 0; idx < IP_VS_RTAB_SIZE; idx++)
+ 		INIT_HLIST_HEAD(&ipvs->rs_table[idx]);
+@@ -4515,17 +4501,8 @@ void ip_vs_unregister_nl_ioctl(void)
+ 
+ int __init ip_vs_control_init(void)
+ {
+-	int idx;
+ 	int ret;
+ 
+-	/* Initialize svc_table, ip_vs_svc_fwm_table */
+-	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+-		INIT_HLIST_HEAD(&ip_vs_svc_table[idx]);
+-		INIT_HLIST_HEAD(&ip_vs_svc_fwm_table[idx]);
+-	}
+-
+-	smp_wmb();	/* Do we really need it now ? */
+-
+ 	ret = register_netdevice_notifier(&ip_vs_dst_notifier);
+ 	if (ret < 0)
+ 		return ret;
+diff --git a/net/netfilter/ipvs/ip_vs_est.c b/net/netfilter/ipvs/ip_vs_est.c
+index c5970ba416aea..323098dc8be68 100644
+--- a/net/netfilter/ipvs/ip_vs_est.c
++++ b/net/netfilter/ipvs/ip_vs_est.c
+@@ -601,7 +601,7 @@ static void ip_vs_est_drain_temp_list(struct netns_ipvs *ipvs)
+ 	while (1) {
+ 		int max = 16;
+ 
+-		mutex_lock(&__ip_vs_mutex);
++		mutex_lock(&ipvs->service_mutex);
+ 
+ 		while (max-- > 0) {
+ 			est = hlist_entry_safe(ipvs->est_temp_list.first,
+@@ -621,12 +621,12 @@ static void ip_vs_est_drain_temp_list(struct netns_ipvs *ipvs)
+ 			}
+ 			goto unlock;
+ 		}
+-		mutex_unlock(&__ip_vs_mutex);
++		mutex_unlock(&ipvs->service_mutex);
+ 		cond_resched();
+ 	}
+ 
+ unlock:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ }
+ 
+ /* Calculate limits for all kthreads */
+@@ -646,9 +646,9 @@ static int ip_vs_est_calc_limits(struct netns_ipvs *ipvs, int *chain_max)
+ 	u64 val;
+ 
+ 	INIT_HLIST_HEAD(&chain);
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 	kd = ipvs->est_kt_arr[0];
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ 	s = kd ? kd->calc_stats : NULL;
+ 	if (!s)
+ 		goto out;
+@@ -747,7 +747,7 @@ static void ip_vs_est_calc_phase(struct netns_ipvs *ipvs)
+ 	if (!ip_vs_est_calc_limits(ipvs, &chain_max))
+ 		return;
+ 
+-	mutex_lock(&__ip_vs_mutex);
++	mutex_lock(&ipvs->service_mutex);
+ 
+ 	/* Stop all other tasks, so that we can immediately move the
+ 	 * estimators to est_temp_list without RCU grace period
+@@ -814,9 +814,9 @@ static void ip_vs_est_calc_phase(struct netns_ipvs *ipvs)
+ 		/* Give chance estimators to be added (to est_temp_list)
+ 		 * and deleted (releasing kthread contexts)
+ 		 */
+-		mutex_unlock(&__ip_vs_mutex);
++		mutex_unlock(&ipvs->service_mutex);
+ 		cond_resched();
+-		mutex_lock(&__ip_vs_mutex);
++		mutex_lock(&ipvs->service_mutex);
+ 
+ 		/* Current kt released ? */
+ 		if (id >= ipvs->est_kt_count)
+@@ -892,7 +892,7 @@ static void ip_vs_est_calc_phase(struct netns_ipvs *ipvs)
+ 	mutex_unlock(&ipvs->est_mutex);
+ 
+ unlock:
+-	mutex_unlock(&__ip_vs_mutex);
++	mutex_unlock(&ipvs->service_mutex);
+ }
+ 
+ void ip_vs_zero_estimator(struct ip_vs_stats *stats)
+-- 
+2.19.1.6.gb485710b
 
 
