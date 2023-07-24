@@ -1,91 +1,169 @@
-Return-Path: <netdev+bounces-20222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 600B275E68A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54FD675E7B8
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:33:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 592D328143B
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 01:21:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEEED2814BD
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 01:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C83D7FA;
-	Mon, 24 Jul 2023 01:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9F87FA;
+	Mon, 24 Jul 2023 01:33:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227F87E8
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:21:02 +0000 (UTC)
-Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CDBE91730;
-	Sun, 23 Jul 2023 18:20:32 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.62] ) by
- ajax-webmail-mail-app2 (Coremail) ; Mon, 24 Jul 2023 09:19:14 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.62]
-Date: Mon, 24 Jul 2023 09:19:14 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Victor Nogueira" <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] net/sched: mqprio: Add length check for
- TCA_MQPRIO_{MAX/MIN}_RATE64
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <fe7cba2c-a0da-b1bd-1f0b-c6ecfa10de81@mojatatu.com>
-References: <20230723075631.3712113-1-linma@zju.edu.cn>
- <fe7cba2c-a0da-b1bd-1f0b-c6ecfa10de81@mojatatu.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFC6EC9
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:33:11 +0000 (UTC)
+Received: from out199-10.us.a.mail.aliyun.com (out199-10.us.a.mail.aliyun.com [47.90.199.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B0059C3;
+	Sun, 23 Jul 2023 18:32:45 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R851e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0Vo.bCsO_1690162261;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vo.bCsO_1690162261)
+          by smtp.aliyun-inc.com;
+          Mon, 24 Jul 2023 09:31:02 +0800
+Date: Mon, 24 Jul 2023 09:31:01 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Julian Anastasov <ja@ssi.bg>
+Cc: Simon Horman <horms@verge.net.au>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jiejian Wu <jiejian@linux.alibaba.com>, netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH v2 net-next] ipvs: make ip_vs_svc_table and
+ ip_vs_svc_fwm_table per netns
+Message-ID: <20230724013101.GI6751@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20230723154426.81242-1-dust.li@linux.alibaba.com>
+ <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <225079a8.e02fc.189857aa264.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgBXX4uS0b1k8qhwCg--.27483W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQFEmS8hHkF2QAGsv
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGVsbG8gVmljdG9yLAoKPgo+IFNob3VsZG4ndCB0aGUgY2hlY2sgYmUgbmxhX2xlbihhdHRyKSAh
-PSBzaXplb2YodTY0KT8KPiBBbiBhdHRyaWJ1dGUgd2l0aCBhIGJpZ2dlciBsZW5ndGggYWxzbyBz
-ZWVtcyB0byBiZSBpbnZhbGlkLgo+IAo+IFlvdSBjb3VsZCBhbHNvIHNlcGFyYXRlIHRoaXMgY2hl
-Y2sgaW50byBhbm90aGVyIGlmIHN0YXRlbWVudCwKPiBzbyB0aGF0IHRoZSBlcnJvciBtZXNzYWdl
-IGlzIGNsZWFyZXIgaW4gcmVnYXJkcyB0byB3aHkgdGhlIGF0dHIgaXMKPiBpbnZhbGlkLiBTb21l
-dGhpbmcgbGlrZToKPiAKPiBpZiAobmxhX2xlbihhdHRyKSAhPSBzaXplb2YodTY0KSkgewo+ICAg
-ICAgICAgIE5MX1NFVF9FUlJfTVNHX0FUVFJfRk1UKGV4dGFjaywgYXR0ciwKPiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAiQXR0cmlidXRlIGxlbmd0aCBleHBlY3RlZCB0byBiZSAl
-bHUiLAo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVvZih1NjQpKTsKPiAg
-ICAgICAgICByZXR1cm4gLUVJTlZBTDsKPiB9Cj4gCj4gPiAgIAkJCQlOTF9TRVRfRVJSX01TR19B
-VFRSKGV4dGFjaywgYXR0ciwKPiA+ICAgCQkJCQkJICAgICJBdHRyaWJ1dGUgdHlwZSBleHBlY3Rl
-ZCB0byBiZSBUQ0FfTVFQUklPX01JTl9SQVRFNjQiKTsKPiA+ICAgCQkJCXJldHVybiAtRUlOVkFM
-Owo+ID4gQEAgLTMwNyw3ICszMDgsOCBAQCBzdGF0aWMgaW50IG1xcHJpb19wYXJzZV9ubGF0dHIo
-c3RydWN0IFFkaXNjICpzY2gsIHN0cnVjdCB0Y19tcXByaW9fcW9wdCAqcW9wdCwKPiA+ICAgCQlp
-ID0gMDsKPiA+ICAgCQlubGFfZm9yX2VhY2hfbmVzdGVkKGF0dHIsIHRiW1RDQV9NUVBSSU9fTUFY
-X1JBVEU2NF0sCj4gPiAgIAkJCQkgICAgcmVtKSB7Cj4gPiAtCQkJaWYgKG5sYV90eXBlKGF0dHIp
-ICE9IFRDQV9NUVBSSU9fTUFYX1JBVEU2NCkgewo+ID4gKwkJCWlmIChubGFfdHlwZShhdHRyKSAh
-PSBUQ0FfTVFQUklPX01BWF9SQVRFNjQgfHwKPiA+ICsJCQkgICAgbmxhX2xlbihhdHRyKSA8IHNp
-emVvZih1NjQpKSB7Cj4gCj4gU2FtZSBhcyB0aGUgcHJldmlvdXMgY29tbWVudC4KPiAKPiA+ICAg
-CQkJCU5MX1NFVF9FUlJfTVNHX0FUVFIoZXh0YWNrLCBhdHRyLAo+ID4gICAJCQkJCQkgICAgIkF0
-dHJpYnV0ZSB0eXBlIGV4cGVjdGVkIHRvIGJlIFRDQV9NUVBSSU9fTUFYX1JBVEU2NCIpOwo+ID4g
-ICAJCQkJcmV0dXJuIC1FSU5WQUw7Cj4gCj4gY2hlZXJzLAo+IFZpY3RvcgoKWWVhaCwgSSB1c2Ug
-PCBpbnN0ZWFkIG9mICE9IGZvciBhIGxvb3NlciBjaGVjay4gSSBhZ3JlZSB3aXRoIHlvdSB0aGUg
-IiE9IiBjb25kaXRpb24gYW5kIHRoZSBzZXBhcmF0aW9uIHN1Z2dlc3Rpb24uCkkgd2lsbCBwcmVw
-YXJlIHRoZSB2MiBBU0FQLgoKVGhhbmtzCkxpbiAgCg==
+On Sun, Jul 23, 2023 at 08:19:54PM +0300, Julian Anastasov wrote:
+>
+>	Hello,
+>
+>On Sun, 23 Jul 2023, Dust Li wrote:
+>
+>> From: Jiejian Wu <jiejian@linux.alibaba.com>
+>> 
+>> Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
+>> "ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
+>> tens of thousands of services from different netns in the table, it
+>> takes a long time to look up the table, for example, using "ipvsadm
+>> -ln" from different netns simultaneously.
+>> 
+>> We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
+>> add "service_mutex" per netns to keep these two tables safe instead of
+>> the global "__ip_vs_mutex" in current version. To this end, looking up
+>> services from different netns simultaneously will not get stuck,
+>> shortening the time consumption in large-scale deployment. It can be
+>> reproduced using the simple scripts below.
+>> 
+>> init.sh: #!/bin/bash
+>> for((i=1;i<=4;i++));do
+>>         ip netns add ns$i
+>>         ip netns exec ns$i ip link set dev lo up
+>>         ip netns exec ns$i sh add-services.sh
+>> done
+>> 
+>> add-services.sh: #!/bin/bash
+>> for((i=0;i<30000;i++)); do
+>>         ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
+>> done
+>> 
+>> runtest.sh: #!/bin/bash
+>> for((i=1;i<4;i++));do
+>>         ip netns exec ns$i ipvsadm -ln > /dev/null &
+>> done
+>> ip netns exec ns4 ipvsadm -ln > /dev/null
+>> 
+>> Run "sh init.sh" to initiate the network environment. Then run "time
+>> ./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
+>> Intel Xeon ECS. The result of the original version is around 8 seconds,
+>> while the result of the modified version is only 0.8 seconds.
+>> 
+>> Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
+>> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+>> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+>
+>	Changes look good to me, thanks! But checkpatch is reporting
+>for some cosmetic changes that you have to do in v3:
+>
+>scripts/checkpatch.pl --strict /tmp/file.patch
+
+Oh, sorry for that! I ignored the CHECKs checkpatch reported, my checkpatch
+shows:
+
+
+   $./scripts/checkpatch.pl --strict 0001-ipvs-make-ip_vs_svc_table-and-ip_vs_svc_fwm_table-pe.patch
+   CHECK: Prefer using the BIT macro
+   #69: FILE: include/net/ip_vs.h:40:
+   +#define IP_VS_SVC_TAB_SIZE (1 << IP_VS_SVC_TAB_BITS)
+
+We just moved this line from ip_vs_ctl.c to ip_vs.h, so we ignored the
+BIT macro. Do you think we should change it using BIT macro ?
+
+
+   CHECK: struct mutex definition without comment
+   #79: FILE: include/net/ip_vs.h:1051:
+   +       struct mutex service_mutex;
+
+I think we can add comment for it.
+But rethinking a bit on the service_mutex in ip_vs_est.c, I'm a
+wondering why we are using the service_mutex in estimation ? Is est_mutex
+enough for the protecting in ip_vs_est.c ?
+
+
+   CHECK: Logical continuations should be on the previous line
+   #161: FILE: net/netfilter/ipvs/ip_vs_ctl.c:410:
+                       && (svc->port == vport)
+   +                   && (svc->protocol == protocol)) {
+
+This is just the removal of '(svc->ipvs == ipvs)' and kept it as it is.
+So haven't change according to checkpatch. If you prefer, I can modify
+it to make checkpatch happy.
+
+
+   CHECK: Alignment should match open parenthesis
+   #233: FILE: net/netfilter/ipvs/ip_vs_ctl.c:1767:
+   +                       list_for_each_entry(dest, &svc->destinations,
+   +                                               n_list) {
+
+We missed this, will change.
+
+
+   CHECK: Alignment should match open parenthesis
+   #246: FILE: net/netfilter/ipvs/ip_vs_ctl.c:1774:
+   +                       list_for_each_entry(dest, &svc->destinations,
+   +                                               n_list) {
+
+Same above.
+
+   total: 0 errors, 0 warnings, 5 checks, 506 lines checked
+
+
+
+>
+>Regards
+>
+>--
+>Julian Anastasov <ja@ssi.bg>
 
