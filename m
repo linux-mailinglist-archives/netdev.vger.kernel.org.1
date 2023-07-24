@@ -1,164 +1,279 @@
-Return-Path: <netdev+bounces-20463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35F175FA28
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 16:49:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BCD75FA5A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:02:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFDB4281436
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:49:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF96280EAE
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA897490;
-	Mon, 24 Jul 2023 14:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE17D505;
+	Mon, 24 Jul 2023 15:02:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1AC20F3
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 14:49:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B5010C0
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:49:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE59566E
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:02:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A22910D3
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690210150;
+	s=mimecast20190719; t=1690210593;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fsLYJe5t/77EhFY2y7t8CDXDfhtKblrdoZ5BykMiC1o=;
-	b=Je1mY6JON4D0YPRvloPwICmd5eobHAogmwu1qQg5hPwSVYL1W/R6DqEVeU03/lLJfmuWMF
-	0ka6DC6ix70cnH6qaKKyAkrEgQGo7axAYoTbhWx74CLk84oGFn++XS0ax7auYSYnoYL2wn
-	q7eE5ivD4uFUT4wDSE5Wnbmq3n1eJ7o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-477-LKLA73ipPXSxiztEMZEcmw-1; Mon, 24 Jul 2023 10:49:06 -0400
-X-MC-Unique: LKLA73ipPXSxiztEMZEcmw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26D308019DC;
-	Mon, 24 Jul 2023 14:49:06 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.33.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BF0F540D2839;
-	Mon, 24 Jul 2023 14:49:05 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  i.maximets@ovn.org,
-  eric@garver.life
-Subject: Re: [PATCH net-next 7/7] selftests: openvswitch: add explicit drop
- testcase
-References: <20230722094238.2520044-1-amorenoz@redhat.com>
-	<20230722094238.2520044-8-amorenoz@redhat.com>
-Date: Mon, 24 Jul 2023 10:49:05 -0400
-In-Reply-To: <20230722094238.2520044-8-amorenoz@redhat.com> (Adrian Moreno's
-	message of "Sat, 22 Jul 2023 11:42:37 +0200")
-Message-ID: <f7t8rb5l5zy.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	bh=qyDhIAIIOkviYuugYW1Y2WwDIHyMCteZyLgKjPu6Mk8=;
+	b=bLHOtEixW62mJrsbgtte/mDJCkb+34c3NJYiX19Jc21ABP/NmiQK7U/uWRT3xfnwZH/0mI
+	2SzEvWoJD9zgdCHKZ9z7aW11VPXckxyvQ6aJj7fYunrrszQ4NMobg3DxfzkUjMF+AcDo3q
+	oOsjrlh0BqU4/GaSiA+p4m85l9ZmoaA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-8-JChBx7ckNJCGynoBFNeufg-1; Mon, 24 Jul 2023 10:56:32 -0400
+X-MC-Unique: JChBx7ckNJCGynoBFNeufg-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99ab59eef1fso369249366b.2
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:56:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690210591; x=1690815391;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qyDhIAIIOkviYuugYW1Y2WwDIHyMCteZyLgKjPu6Mk8=;
+        b=AmRguF1+wkriaRVo7veHN/IFmZAVBEc9NBL+Y0MKbj6xlG0Fl++wGZoLQUPf0ft2Cf
+         1m/kVJdfvvMIVJ73vIBZZDa1GCkHvOtQlC6TRR/7IVJ/U5GozP36+co2sx4sOe0F2FKE
+         TcKymnSL0TzNhnjokrk1rkAJmkDvAVdjSWi0P3HXtyU47fO8AwD1PMJfj18DycACRp5j
+         Y124HN5uf+ObXE6tZo2M4s6cmSG3YrV7AR9+9co5EHwneXwCv6n6BJAJXZiHCoa0fvWd
+         t2QNtrkxrAKslrFeT3CZ/0a92LK126sgwLODUuEGwkZ/tDIiEKReYnc1/gba6PNGmTt8
+         OAyw==
+X-Gm-Message-State: ABy/qLbfHkDM4kVfqIQ6nRmlQzLHO+HpfmPq38znaZXBLA0cQKeF82LN
+	zstQkLa8u6ZFTSs4V+qg2Rw5R7K7Lqx+qgH823im/2ogRNZ1aHNdAOontv9fQRjyOramrp/WhC1
+	UE+OR6MVTv1Gs1ec9pwqjdjaDSTo=
+X-Received: by 2002:a17:906:142:b0:99b:4378:a5aa with SMTP id 2-20020a170906014200b0099b4378a5aamr10932481ejh.49.1690210590812;
+        Mon, 24 Jul 2023 07:56:30 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGew8ZfxpMg1IPHgdW+P4N+fJj23+LIyZEInwx4n2Bho+JUbvzjjxmxPJwDcIJS99FXO2fHEg==
+X-Received: by 2002:a17:906:142:b0:99b:4378:a5aa with SMTP id 2-20020a170906014200b0099b4378a5aamr10932446ejh.49.1690210590470;
+        Mon, 24 Jul 2023 07:56:30 -0700 (PDT)
+Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id dt15-20020a170906b78f00b00991bba473e1sm6867427ejb.3.2023.07.24.07.56.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 07:56:29 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <a2569132-393e-0149-f76c-f6de282e1c96@redhat.com>
+Date: Mon, 24 Jul 2023 16:56:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: brouer@redhat.com, =?UTF-8?Q?Christian_K=c3=b6nig?=
+ <christian.koenig@amd.com>, Hari Ramakrishnan <rharix@google.com>,
+ David Ahern <dsahern@kernel.org>, Samiullah Khawaja <skhawaja@google.com>,
+ Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, John Hubbard <jhubbard@nvidia.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang
+ <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Eric Dumazet <edumazet@google.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>, Ryder Lee <ryder.lee@mediatek.com>,
+ Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-rdma@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, logang@deltatee.com,
+ Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, Jason Gunthorpe <jgg@ziepe.ca>
+References: <04187826-8dad-d17b-2469-2837bafd3cd5@kernel.org>
+ <20230711093224.1bf30ed5@kernel.org>
+ <CAHS8izNHkLF0OowU=p=mSNZss700HKAzv1Oxqu2bvvfX_HxttA@mail.gmail.com>
+ <20230711133915.03482fdc@kernel.org>
+ <2263ae79-690e-8a4d-fca2-31aacc5c9bc6@kernel.org>
+ <CAHS8izP=k8CqUZk7bGUx4ctm4m2kRC2MyEJv+N4+b0cHVkTQmA@mail.gmail.com>
+ <ZK6kOBl4EgyYPtaD@ziepe.ca>
+ <CAHS8izNuda2DXKTFAov64F7J2_BbMPaqJg1NuMpWpqGA20+S_Q@mail.gmail.com>
+ <143a7ca4-e695-db98-9488-84cf8b78cf86@amd.com>
+ <CAHS8izPm6XRS54LdCDZVd0C75tA1zHSu6jLVO8nzTLXCc=H7Nw@mail.gmail.com>
+ <ZLFv2PIgdeH8gKmh@ziepe.ca>
+ <CAHS8izNMB-H3w0CE9kj6hT5q_F6_XJy_X_HtZwmisOEDhp31yg@mail.gmail.com>
+In-Reply-To: <CAHS8izNMB-H3w0CE9kj6hT5q_F6_XJy_X_HtZwmisOEDhp31yg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Adrian Moreno <amorenoz@redhat.com> writes:
 
-> Make ovs-dpctl.py support explicit drops as:
-> "drop" -> implicit empty-action drop
-> "drop(0)" -> explicit non-error action drop
-> "drop(42)" -> explicit error action drop
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  .../selftests/net/openvswitch/openvswitch.sh  | 25 +++++++++++++++++++
->  .../selftests/net/openvswitch/ovs-dpctl.py    | 18 ++++++++++---
->  2 files changed, 39 insertions(+), 4 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index a10c345f40ef..398a69f1c923 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -217,6 +217,31 @@ test_drop_reason() {
->  		return 1
->  	fi
->  
-> +	# Drop UDP 6000 traffic with an explicit action and an error code.
-> +	ovs_add_flow "test_drop_reason" dropreason \
-> +		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=17),udp(dst=6000)" \
-> +                'drop(42)'
-> +	# Drop UDP 7000 traffic with an explicit action with no error code.
-> +	ovs_add_flow "test_drop_reason" dropreason \
-> +		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=17),udp(dst=7000)" \
-> +                'drop(0)'
-> +
-> +	ovs_drop_record_and_run \
-> +            "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 6000
-> +	ovs_drop_reason_count 0x30003 # OVS_DROP_EXPLICIT_ACTION_ERROR
-> +	if [[ "$?" -ne "1" ]]; then
-> +		info "Did not detect expected explicit error drops: $?"
-> +		return 1
-> +	fi
-> +
-> +	ovs_drop_record_and_run \
-> +            "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 7000
-> +	ovs_drop_reason_count 0x30002 # OVS_DROP_EXPLICIT_ACTION
-> +	if [[ "$?" -ne "1" ]]; then
-> +		info "Did not detect expected explicit drops: $?"
-> +		return 1
-> +	fi
-> +
->  	return 0
->  }
->  
-> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> index 0bc944f36e02..de6db59ab115 100644
-> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> @@ -448,7 +448,7 @@ class ovsactions(nla):
->                  elif field[0] == "OVS_ACTION_ATTR_TRUNC":
->                      print_str += "trunc(%d)" % int(self.get_attr(field[0]))
->                  elif field[0] == "OVS_ACTION_ATTR_DROP":
-> -                    print_str += "drop"
-> +                    print_str += "drop(%d)" % int(self.get_attr(field[0]))
->              elif field[1] == "flag":
->                  if field[0] == "OVS_ACTION_ATTR_CT_CLEAR":
->                      print_str += "ct_clear"
-> @@ -470,9 +470,19 @@ class ovsactions(nla):
->          parsed = False
->          while len(actstr) != 0:
->              if actstr.startswith("drop"):
-> -                # for now, drops have no explicit action, so we
-> -                # don't need to set any attributes.  The final
-> -                # act of the processing chain will just drop the packet
-> +                # If no reason is provided, the implicit drop is used (i.e no
-> +                # action). If some reason is given, an explicit action is used.
-> +                actstr, reason = parse_extract_field(
-> +                    actstr,
-> +                    "drop(",
-> +                    "([0-9]+)",
-> +                    lambda x: int(x, 0),
-> +                    False,
-> +                    None,
-> +                )
-> +                if reason is not None:
-> +                    self["attrs"].append(["OVS_ACTION_ATTR_DROP", reason])
-> +
->                  return
 
-If we decide to validate that drop() action is the last one, we can
-probably also remove this return.
+On 17/07/2023 03.53, Mina Almasry wrote:
+> On Fri, Jul 14, 2023 at 8:55 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>>
+>> On Fri, Jul 14, 2023 at 07:55:15AM -0700, Mina Almasry wrote:
+>>
+>>> Once the skb frags with struct new_abstraction are in the TCP stack,
+>>> they will need some special handling in code accessing the frags. But
+>>> my RFC already addressed that somewhat because the frags were
+>>> inaccessible in that case. In this case the frags will be both
+>>> inaccessible and will not be struct pages at all (things like
+>>> get_page() will not work), so more special handling will be required,
+>>> maybe.
+>>
+>> It seems sort of reasonable, though there will be interesting concerns
+>> about coherence and synchronization with generial purpose DMABUFs that
+>> will need tackling.
+>>
+>> Still it is such a lot of churn and weridness in the netdev side, I
+>> think you'd do well to present an actual full application as
+>> justification.
+>>
+>> Yes, you showed you can stick unordered TCP data frags into GPU memory
+>> sort of quickly, but have you gone further with this to actually show
+>> it is useful for a real world GPU centric application?
+>>
+>> BTW your cover letter said 96% utilization, the usual server
+>> configuation is one NIC per GPU, so you were able to hit 1500Gb/sec of
+>> TCP BW with this?
+>>
+> 
+> I do notice that the number of NICs is missing from our public
+> documentation so far, so I will refrain from specifying how many NICs
+> are on those A3 VMs until the information is public. But I think I can
+> confirm that your general thinking is correct, the perf that we're
+> getting is 96.6% line rate of each GPU/NIC pair, 
 
->  
->              elif parse_starts_block(actstr, "^(\d+)", False, True):
+What do you mean by 96.6% "line rate".
+Is is the Ethernet line-rate?
+
+Is the measured throughput the measured TCP data "goodput"?
+Assuming
+  - MTU 1500 bytes (1514 on wire).
+  - Ethernet header 14 bytes
+  - IP header 20 bytes
+  - TCP header 20 bytes
+
+Due to header overhead the goodput will be approx 96.4%.
+  - (1514-(14+20+20))/1514 = 0.9643
+  - (Not taking Ethernet interframe gap into account).
+
+Thus, maybe you have hit Ethernet wire line-rate already?
+
+> and scales linearly
+> for each NIC/GPU pair we've tested with so far. Line rate of each
+> NIC/GPU pair is 200 Gb/sec.
+> 
+> So if we have 8 NIC/GPU pairs we'd be hitting 96.6% * 200 * 8 = 1545 GB/sec.
+
+Lets keep our units straight.
+Here you mean 1545 Gbit/sec, which is 193 GBytes/s
+
+> If we have, say, 2 NIC/GPU pairs, we'd be hitting 96.6% * 200 * 2 = 384 GB/sec
+
+Here you mean 384 Gbit/sec, which is 48 GBytes/sec.
+
+> ...
+> etc.
+> 
+
+These massive throughput numbers are important, because they *exceed*
+the physical host RAM/DIMM memory speeds.
+
+This is the *real argument* why software cannot afford to do a single
+copy of the data from host-RAM into GPU-memory, because the CPU memory
+throughput to DRAM/DIMM are insufficient.
+
+My testlab CPU E5-1650 have 4 DIMM slots DDR4
+  - Data Width: 64 bits (= 8 bytes)
+  - Configured Memory Speed: 2400 MT/s
+  - Theoretical maximum memory bandwidth: 76.8 GBytes/s (2400*8*4)
+
+Even the theoretical max 76.8 GBytes/s (614 Gbit/s) is not enough for
+the 193 GBytes/s or 1545 Gbit/s (8 NIC/GPU pairs).
+
+When testing this with lmbench tool bw_mem, the results (below
+signature) are in the area 14.8 GBytes/sec (118 Gbit/s), as soon as
+exceeding L3 cache size.  In practice it looks like main memory is
+limited to reading 118 Gbit/s *once*. (Mina's NICs run at 200 Gbit/s)
+
+Given DDIO can deliver network packets into L3, I also tried to figure
+out what the L3 read bandwidth, which I measured to be 42.4 GBits/sec
+(339 Gbit/s), in hopes that it would be enough, but it was not.
+
+
+--Jesper
+(data below signature)
+
+CPU under test:
+
+  $ cat /proc/cpuinfo | egrep -e 'model name|cache size' | head -2
+  model name	: Intel(R) Xeon(R) CPU E5-1650 v4 @ 3.60GHz
+  cache size	: 15360 KB
+
+
+Providing some cmdline outputs from lmbench "bw_mem" tool.
+(Output format is "%0.2f %.2f\n", megabytes, megabytes_per_second)
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M rd
+256.00 14924.50
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M wr
+256.00 9895.25
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M rdwr
+256.00 9737.54
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M bcopy
+256.00 12462.88
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M bzero
+256.00 14869.89
+
+
+Next output shows reducing size below L3 cache size, which shows an
+increase in speed, likely the L3 bandwidth.
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 64M rd
+64.00 14840.58
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 32M rd
+32.00 14823.97
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 16M rd
+16.00 24743.86
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 8M rd
+8.00 40852.26
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 4M rd
+4.00 42545.65
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 2M rd
+2.00 42447.82
+
+$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 1M rd
+1.00 42447.82
 
 
