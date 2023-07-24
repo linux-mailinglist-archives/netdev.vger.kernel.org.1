@@ -1,177 +1,91 @@
-Return-Path: <netdev+bounces-20221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE8DA75E61E
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:15:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 600B275E68A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC5EB2814BC
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 01:15:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 592D328143B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 01:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32A277FA;
-	Mon, 24 Jul 2023 01:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C83D7FA;
+	Mon, 24 Jul 2023 01:21:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97097E8
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:15:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 898D4C433C8;
-	Mon, 24 Jul 2023 01:15:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690161312;
-	bh=nWokQeMtYUr7Atw3bnVpcMn4iJqjdFJHeSpzyXBlRqY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zx6rtNkVXlMv7bhs8YY3FKMUbB/pSUND/E4rxCwnz8xtkjVGLqZNvLea/Kl4bVHAo
-	 OZ2+FLi106xZ2arh/QJrfPf81E18CwgcY4TRUuhto6OiNS5mc4urVbE9huTWW6zCpP
-	 t4pTk7F1hQssw7Rj1lAK8iCluGlfwEzH8m/SFB61U89uGsCs1KxkIcMjFnzs+2DBRX
-	 utbuGv2+BDs4rJmbhwx8FetjgOrLwtBByY3J+VbmkM0xs1BUxmZwTxrZe6XBdEcoZj
-	 IaTWAuwWw2FZ2oNybka+uvMMEEZhGolhdvS765AnjVIoc0ORFawjuYRWMqoFuHdPJA
-	 AlxDyvt9Km1Dg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Long Li <longli@microsoft.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sharmaajay@microsoft.com,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	tglx@linutronix.de,
-	alardam@gmail.com,
-	shradhagupta@linux.microsoft.com,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 20/58] RDMA/mana_ib: Use v2 version of cfg_rx_steer_req to enable RX coalescing
-Date: Sun, 23 Jul 2023 21:12:48 -0400
-Message-Id: <20230724011338.2298062-20-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230724011338.2298062-1-sashal@kernel.org>
-References: <20230724011338.2298062-1-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227F87E8
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:21:02 +0000 (UTC)
+Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CDBE91730;
+	Sun, 23 Jul 2023 18:20:32 -0700 (PDT)
+Received: from linma$zju.edu.cn ( [42.120.103.62] ) by
+ ajax-webmail-mail-app2 (Coremail) ; Mon, 24 Jul 2023 09:19:14 +0800
+ (GMT+08:00)
+X-Originating-IP: [42.120.103.62]
+Date: Mon, 24 Jul 2023 09:19:14 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Lin Ma" <linma@zju.edu.cn>
+To: "Victor Nogueira" <victor@mojatatu.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] net/sched: mqprio: Add length check for
+ TCA_MQPRIO_{MAX/MIN}_RATE64
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
+ Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <fe7cba2c-a0da-b1bd-1f0b-c6ecfa10de81@mojatatu.com>
+References: <20230723075631.3712113-1-linma@zju.edu.cn>
+ <fe7cba2c-a0da-b1bd-1f0b-c6ecfa10de81@mojatatu.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.5
-Content-Transfer-Encoding: 8bit
+Message-ID: <225079a8.e02fc.189857aa264.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:by_KCgBXX4uS0b1k8qhwCg--.27483W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQFEmS8hHkF2QAGsv
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Long Li <longli@microsoft.com>
-
-[ Upstream commit 2145328515c8fa9b8a9f7889250bc6c032f2a0e6 ]
-
-With RX coalescing, one CQE entry can be used to indicate multiple packets
-on the receive queue. This saves processing time and PCI bandwidth over
-the CQ.
-
-The MANA Ethernet driver also uses the v2 version of the protocol. It
-doesn't use RX coalescing and its behavior is not changed.
-
-Link: https://lore.kernel.org/r/1684045095-31228-1-git-send-email-longli@linuxonhyperv.com
-Signed-off-by: Long Li <longli@microsoft.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/infiniband/hw/mana/qp.c               | 5 ++++-
- drivers/net/ethernet/microsoft/mana/mana_en.c | 5 ++++-
- include/net/mana/mana.h                       | 4 +++-
- 3 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
-index 54b61930a7fdb..4b3b5b274e849 100644
---- a/drivers/infiniband/hw/mana/qp.c
-+++ b/drivers/infiniband/hw/mana/qp.c
-@@ -13,7 +13,7 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
- 				      u8 *rx_hash_key)
- {
- 	struct mana_port_context *mpc = netdev_priv(ndev);
--	struct mana_cfg_rx_steer_req *req = NULL;
-+	struct mana_cfg_rx_steer_req_v2 *req;
- 	struct mana_cfg_rx_steer_resp resp = {};
- 	mana_handle_t *req_indir_tab;
- 	struct gdma_context *gc;
-@@ -33,6 +33,8 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
- 	mana_gd_init_req_hdr(&req->hdr, MANA_CONFIG_VPORT_RX, req_buf_size,
- 			     sizeof(resp));
- 
-+	req->hdr.req.msg_version = GDMA_MESSAGE_V2;
-+
- 	req->vport = mpc->port_handle;
- 	req->rx_enable = 1;
- 	req->update_default_rxobj = 1;
-@@ -46,6 +48,7 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
- 	req->num_indir_entries = MANA_INDIRECT_TABLE_SIZE;
- 	req->indir_tab_offset = sizeof(*req);
- 	req->update_indir_tab = true;
-+	req->cqe_coalescing_enable = 1;
- 
- 	req_indir_tab = (mana_handle_t *)(req + 1);
- 	/* The ind table passed to the hardware must have
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index d907727c7b7a5..7f4e861e398e6 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -972,7 +972,7 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 				   bool update_tab)
- {
- 	u16 num_entries = MANA_INDIRECT_TABLE_SIZE;
--	struct mana_cfg_rx_steer_req *req = NULL;
-+	struct mana_cfg_rx_steer_req_v2 *req;
- 	struct mana_cfg_rx_steer_resp resp = {};
- 	struct net_device *ndev = apc->ndev;
- 	mana_handle_t *req_indir_tab;
-@@ -987,6 +987,8 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 	mana_gd_init_req_hdr(&req->hdr, MANA_CONFIG_VPORT_RX, req_buf_size,
- 			     sizeof(resp));
- 
-+	req->hdr.req.msg_version = GDMA_MESSAGE_V2;
-+
- 	req->vport = apc->port_handle;
- 	req->num_indir_entries = num_entries;
- 	req->indir_tab_offset = sizeof(*req);
-@@ -996,6 +998,7 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 	req->update_hashkey = update_key;
- 	req->update_indir_tab = update_tab;
- 	req->default_rxobj = apc->default_rxobj;
-+	req->cqe_coalescing_enable = 0;
- 
- 	if (update_key)
- 		memcpy(&req->hashkey, apc->hashkey, MANA_HASH_KEY_SIZE);
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 9eef199728454..024ad8ddb27e5 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -579,7 +579,7 @@ struct mana_fence_rq_resp {
- }; /* HW DATA */
- 
- /* Configure vPort Rx Steering */
--struct mana_cfg_rx_steer_req {
-+struct mana_cfg_rx_steer_req_v2 {
- 	struct gdma_req_hdr hdr;
- 	mana_handle_t vport;
- 	u16 num_indir_entries;
-@@ -592,6 +592,8 @@ struct mana_cfg_rx_steer_req {
- 	u8 reserved;
- 	mana_handle_t default_rxobj;
- 	u8 hashkey[MANA_HASH_KEY_SIZE];
-+	u8 cqe_coalescing_enable;
-+	u8 reserved2[7];
- }; /* HW DATA */
- 
- struct mana_cfg_rx_steer_resp {
--- 
-2.39.2
-
+SGVsbG8gVmljdG9yLAoKPgo+IFNob3VsZG4ndCB0aGUgY2hlY2sgYmUgbmxhX2xlbihhdHRyKSAh
+PSBzaXplb2YodTY0KT8KPiBBbiBhdHRyaWJ1dGUgd2l0aCBhIGJpZ2dlciBsZW5ndGggYWxzbyBz
+ZWVtcyB0byBiZSBpbnZhbGlkLgo+IAo+IFlvdSBjb3VsZCBhbHNvIHNlcGFyYXRlIHRoaXMgY2hl
+Y2sgaW50byBhbm90aGVyIGlmIHN0YXRlbWVudCwKPiBzbyB0aGF0IHRoZSBlcnJvciBtZXNzYWdl
+IGlzIGNsZWFyZXIgaW4gcmVnYXJkcyB0byB3aHkgdGhlIGF0dHIgaXMKPiBpbnZhbGlkLiBTb21l
+dGhpbmcgbGlrZToKPiAKPiBpZiAobmxhX2xlbihhdHRyKSAhPSBzaXplb2YodTY0KSkgewo+ICAg
+ICAgICAgIE5MX1NFVF9FUlJfTVNHX0FUVFJfRk1UKGV4dGFjaywgYXR0ciwKPiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAiQXR0cmlidXRlIGxlbmd0aCBleHBlY3RlZCB0byBiZSAl
+bHUiLAo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVvZih1NjQpKTsKPiAg
+ICAgICAgICByZXR1cm4gLUVJTlZBTDsKPiB9Cj4gCj4gPiAgIAkJCQlOTF9TRVRfRVJSX01TR19B
+VFRSKGV4dGFjaywgYXR0ciwKPiA+ICAgCQkJCQkJICAgICJBdHRyaWJ1dGUgdHlwZSBleHBlY3Rl
+ZCB0byBiZSBUQ0FfTVFQUklPX01JTl9SQVRFNjQiKTsKPiA+ICAgCQkJCXJldHVybiAtRUlOVkFM
+Owo+ID4gQEAgLTMwNyw3ICszMDgsOCBAQCBzdGF0aWMgaW50IG1xcHJpb19wYXJzZV9ubGF0dHIo
+c3RydWN0IFFkaXNjICpzY2gsIHN0cnVjdCB0Y19tcXByaW9fcW9wdCAqcW9wdCwKPiA+ICAgCQlp
+ID0gMDsKPiA+ICAgCQlubGFfZm9yX2VhY2hfbmVzdGVkKGF0dHIsIHRiW1RDQV9NUVBSSU9fTUFY
+X1JBVEU2NF0sCj4gPiAgIAkJCQkgICAgcmVtKSB7Cj4gPiAtCQkJaWYgKG5sYV90eXBlKGF0dHIp
+ICE9IFRDQV9NUVBSSU9fTUFYX1JBVEU2NCkgewo+ID4gKwkJCWlmIChubGFfdHlwZShhdHRyKSAh
+PSBUQ0FfTVFQUklPX01BWF9SQVRFNjQgfHwKPiA+ICsJCQkgICAgbmxhX2xlbihhdHRyKSA8IHNp
+emVvZih1NjQpKSB7Cj4gCj4gU2FtZSBhcyB0aGUgcHJldmlvdXMgY29tbWVudC4KPiAKPiA+ICAg
+CQkJCU5MX1NFVF9FUlJfTVNHX0FUVFIoZXh0YWNrLCBhdHRyLAo+ID4gICAJCQkJCQkgICAgIkF0
+dHJpYnV0ZSB0eXBlIGV4cGVjdGVkIHRvIGJlIFRDQV9NUVBSSU9fTUFYX1JBVEU2NCIpOwo+ID4g
+ICAJCQkJcmV0dXJuIC1FSU5WQUw7Cj4gCj4gY2hlZXJzLAo+IFZpY3RvcgoKWWVhaCwgSSB1c2Ug
+PCBpbnN0ZWFkIG9mICE9IGZvciBhIGxvb3NlciBjaGVjay4gSSBhZ3JlZSB3aXRoIHlvdSB0aGUg
+IiE9IiBjb25kaXRpb24gYW5kIHRoZSBzZXBhcmF0aW9uIHN1Z2dlc3Rpb24uCkkgd2lsbCBwcmVw
+YXJlIHRoZSB2MiBBU0FQLgoKVGhhbmtzCkxpbiAgCg==
 
