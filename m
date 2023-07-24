@@ -1,141 +1,136 @@
-Return-Path: <netdev+bounces-20369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEE5675F2C4
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:19:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D622D75F2B4
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E03651C20840
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:19:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9E1C1C20AE3
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982948BED;
-	Mon, 24 Jul 2023 10:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C351846A;
+	Mon, 24 Jul 2023 10:18:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1258BE3
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:18:57 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1B15275
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:18:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
-	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=dlyzpGUpyMPXTc27ZVb14kq0hZBF0Z31oD4WZBCGsyA=; b=UMAiMvARiHSaLlfXet0rsKJAbE
-	88X2Zvqy/E5nwtFq8Dduc6BSIdA4Z/I7jq6ih508V2WqnSMTfA8s/liRg7DciJSbqVSxpFxVQkFpo
-	Oc0B72XO05kHZwz5NFvi5GRj55y9ESq7iqvDqUHME01ineOo1EMBpC7xO/gAX9bfnPYqlof8v7Yjj
-	rEe4Axwwsyd8G0Dkj0KtFeNIwLNkSsuRdNZfZqy8E8KPNvoVqRXz5httDE/Tu/katjEX0eJZZipCc
-	iw6m6b0KkXbtQKAi5J9QytCJRC14ydU7GGKSUVmxAC0BTDyKrgBpP6KeCN1cgrgutJFf6kbMf/NbD
-	/J+UmkJQ==;
-Received: from [192.168.1.4] (port=9769 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qNseN-00081c-39;
-	Mon, 24 Jul 2023 12:18:47 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Mon, 24 Jul 2023 12:18:47 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <netdev@vger.kernel.org>
-CC: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, Ante Knezic
-	<ante.knezic@helmholz.de>
-Subject: [PATCH net-next] net: dsa: mv88e6xxx: enable automedia on 6190x and 6390x devices
-Date: Mon, 24 Jul 2023 12:18:29 +0200
-Message-ID: <20230724101829.9431-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E69CD2ED
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:18:56 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2495267;
+	Mon, 24 Jul 2023 03:18:51 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id E414923226;
+	Mon, 24 Jul 2023 13:18:47 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id CC14523222;
+	Mon, 24 Jul 2023 13:18:47 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 0683E3C07C8;
+	Mon, 24 Jul 2023 13:18:42 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1690193923; bh=SCZRWOzob6VC4Fc+IynUeDO44QbYqOB9xWyQgHRmE+I=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=uwX3347G3JprqfWir/U5Crg1yILWVwb6y5At63Rrxk+aPRWoZh9yD8vhRyJM29fsM
+	 NJbo8iZ6XQBPzYWSjE346G+TsuMEwpwUvGh5+zBsCOpDXFV1zkYdpxZuMNsKfgiXbi
+	 U+ZC1TYD17XKBhEGxSzgh2DhtQKQTNzx5Qg0rXyo=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 36OAIcAO063160;
+	Mon, 24 Jul 2023 13:18:40 +0300
+Date: Mon, 24 Jul 2023 13:18:38 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Dust Li <dust.li@linux.alibaba.com>
+cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+        Simon Horman <horms@verge.net.au>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        Jiejian Wu <jiejian@linux.alibaba.com>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH v3 net-next] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table
+ per netns
+In-Reply-To: <20230724074028.17964-1-dust.li@linux.alibaba.com>
+Message-ID: <b1c9352e-b1be-09dd-6bd4-d107f1181241@ssi.bg>
+References: <20230724074028.17964-1-dust.li@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+Content-Type: text/plain; charset=US-ASCII
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Marvell 6190x and 6390x devices support using unusued lanes of
-ports 9 and 10 as automedia PHY/SERDES ports. In order to be
-able to use them as automedia ports, serdes lanes must be
-properly initialized so we allow setting the desired cmode to
-be later used by the phylink_pcs infrastructure.
 
-Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
----
- drivers/net/dsa/mv88e6xxx/port.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+	Hello,
 
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index 5394a8cf7bf1..060cbf8c703c 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -12,6 +12,7 @@
- #include <linux/if_bridge.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
-+#include <linux/of_net.h>
- 
- #include "chip.h"
- #include "global2.h"
-@@ -596,9 +597,42 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 	return 0;
- }
- 
-+static int mv88e6390x_port_automedia(struct mv88e6xxx_chip *chip, int port,
-+				     phy_interface_t mode)
-+{
-+	phy_interface_t of_mode;
-+	struct dsa_port *dp;
-+	int err;
-+
-+	if (mode == PHY_INTERFACE_MODE_NA) {
-+		dp = dsa_to_port(chip->ds, port);
-+		err = of_get_phy_mode(dp->dn, &of_mode);
-+		if (err)
-+			return -EOPNOTSUPP;
-+
-+		if (of_mode != PHY_INTERFACE_MODE_1000BASEX)
-+			return -EOPNOTSUPP;
-+
-+		/* Physical cmode value is writable only for ports 9 and 10
-+		 * but we need the desired cmode in order to properly prepare
-+		 * phylink infrastructure. The physical cmode value will be
-+		 * updated by the switch itself once the automedia port is
-+		 * linked.
-+		 * Automedia ports support only 1000BASE-X cmode.
-+		 */
-+		chip->ports[port].cmode = MV88E6XXX_PORT_STS_CMODE_1000BASEX;
-+		return 0;
-+	}
-+
-+	return -EOPNOTSUPP;
-+}
-+
- int mv88e6390x_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 			      phy_interface_t mode)
- {
-+	if (port >= 2 && port <= 7)
-+		return mv88e6390x_port_automedia(chip, port, mode);
-+
- 	if (port != 9 && port != 10)
- 		return -EOPNOTSUPP;
- 
--- 
-2.11.0
+On Mon, 24 Jul 2023, Dust Li wrote:
+
+> From: Jiejian Wu <jiejian@linux.alibaba.com>
+> 
+> Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
+> "ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
+> tens of thousands of services from different netns in the table, it
+> takes a long time to look up the table, for example, using "ipvsadm
+> -ln" from different netns simultaneously.
+> 
+> We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
+> add "service_mutex" per netns to keep these two tables safe instead of
+> the global "__ip_vs_mutex" in current version. To this end, looking up
+> services from different netns simultaneously will not get stuck,
+> shortening the time consumption in large-scale deployment. It can be
+> reproduced using the simple scripts below.
+> 
+> init.sh: #!/bin/bash
+> for((i=1;i<=4;i++));do
+>         ip netns add ns$i
+>         ip netns exec ns$i ip link set dev lo up
+>         ip netns exec ns$i sh add-services.sh
+> done
+> 
+> add-services.sh: #!/bin/bash
+> for((i=0;i<30000;i++)); do
+>         ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
+> done
+> 
+> runtest.sh: #!/bin/bash
+> for((i=1;i<4;i++));do
+>         ip netns exec ns$i ipvsadm -ln > /dev/null &
+> done
+> ip netns exec ns4 ipvsadm -ln > /dev/null
+> 
+> Run "sh init.sh" to initiate the network environment. Then run "time
+> ./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
+> Intel Xeon ECS. The result of the original version is around 8 seconds,
+> while the result of the modified version is only 0.8 seconds.
+> 
+> Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
+> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+
+	Looks good to me, thanks! I'm taking this patch and
+will repost it together with other related patches.
+
+> ---
+> v3:
+>   * fix complains of checkpatch
+> v2:
+>   * remove global __ip_vs_mutex in ip_vs_est.c
+>   * remove ip_vs_ prefix for svc_table and svc_fwm_table
+>   * remove redundant "svc->ipvs == ipvs" checks
+> ---
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
