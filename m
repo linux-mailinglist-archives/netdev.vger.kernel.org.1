@@ -1,39 +1,78 @@
-Return-Path: <netdev+bounces-20315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C133575F0B9
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:53:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18C775F3E7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D2E8281427
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:53:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D52A51C208EC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 370D98C04;
-	Mon, 24 Jul 2023 09:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FEE524D;
+	Mon, 24 Jul 2023 10:54:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD66879FB
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 23373C4339A;
-	Mon, 24 Jul 2023 09:50:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690192221;
-	bh=NHd4ukGaYelpdsG2A1D51no+AJq1E+sf+uWuGcA3d/8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NHzxq8H48i4sEtyUTRDeHs45ud9eN/AJY4oKA1Iqx6uRDz4u21G6qLzNW8yEyUtWU
-	 q02h+Xh9fNxxK3wFuj64TukVve0ruejM7Q9qBabjRhDDh75+i3Sn4l5ZydL0XYMVVY
-	 PJB3ovXB5ubyDM0zOJRZ0BUiGmyJLZsLhOR9YN3fdY65KKkm+CRf2d6TVBFia6dTyY
-	 q7gI1Slk6f27Nn1WET6s51FpLF2+QuC3W0TJKZkoR++imCpOvTAK+UgHIjoUZc0NLN
-	 fFd7Z/bJYRvxmI+Cvn+OTJ5xm1QbTUej6LOuQT0ShjZkARJN7+eHIqCieiuMYsiSrN
-	 fKos4FTZn50Pw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 078D7C595D7;
-	Mon, 24 Jul 2023 09:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C47F2108
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:54:31 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E442A90;
+	Mon, 24 Jul 2023 03:54:29 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fd190065a7so32623325e9.2;
+        Mon, 24 Jul 2023 03:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690196068; x=1690800868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jm2AmYXeSq7Hv1D3EYH8vxoR54aZLC/z7y6TUDXlfXw=;
+        b=d9UMgBhPwr9+yS0cB8RgNScyWl6BhHVnRy8vrVAfOBKNk6b2xc+GWR5P56tHAcVBZT
+         ckIoK4Eqrokqg700VJ3UnLuEVrOCK8jrRwCBv3BOS8u8NST3tSx+CltWurz5swA81Mfv
+         A2Es1/fkBb+zs4Tv2VY8QEmqRZhwg4BZ7Ym4fqUQjP5d9XBO1OHi9GojHgOGw7V46DGX
+         de/BS6iskM9gQnfDrdHjzG4mi4aQBOC5HguEkLHuomkhX6N0kordNQlWGky/OwvcKisN
+         iP0OG97pozmINDmZ8dHhnrLnq4o534AgT29943ny4cLzpbvknbksrSq+f82ZoOIHFO7I
+         vu+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690196068; x=1690800868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jm2AmYXeSq7Hv1D3EYH8vxoR54aZLC/z7y6TUDXlfXw=;
+        b=dSvhFHEwvlz2I0V269xO062qdp8QOI2MzyVlgYj3efoQaUvETQ1eusOnVd8RhJyuDK
+         4slC2GKD02JoDQ7MCTBWXKlaG2KednNL13hU0EGxV3EUl/L98U4S2iRRVpa4b0NH6O09
+         y8EHRROeNuq77Hch3YVyOapK8ptr06cObWiAIx3MVRQ9uAHlam5eQ7NbLiuRuNjKExhq
+         ECJ6W9JJPPMiNB6TqrSnAfnk8H0MReI3RbzISD+T15GnuoghloOWnOv21z33sCj7kVhv
+         WdMZ1LmZOLbcI84jkiZNoVl4puK9LuRM0e68DQXD49gyIhNP4n8omuPc85QeV962xOe7
+         Uw1g==
+X-Gm-Message-State: ABy/qLaTscQvWstrY4BOU4IeHt9qbUgAVP2F/z8OZa/hX18dvUgtPNLo
+	PzBfanXjIuiZrMKLN0+wSX4=
+X-Google-Smtp-Source: APBJJlH/2BbzxEZghaykXJzZO9SLi2QkikMnuGRruKqHnDxO2xRWHD+bs5wItOEpHv6nJW1vwwaEmA==
+X-Received: by 2002:a5d:5909:0:b0:317:60ae:2ef5 with SMTP id v9-20020a5d5909000000b0031760ae2ef5mr1036070wrd.31.1690196068041;
+        Mon, 24 Jul 2023 03:54:28 -0700 (PDT)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id j6-20020adfff86000000b0031274a184d5sm12529631wrr.109.2023.07.24.03.54.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 03:54:27 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Atin Bainada <hi@atinb.me>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Mark Brown <broonie@kernel.org>,
+	stable@vger.kernel.org
+Subject: [net PATCH 1/4] net: dsa: qca8k: enable use_single_write for qca8xxx
+Date: Mon, 24 Jul 2023 05:25:28 +0200
+Message-Id: <20230724032531.15998-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,48 +80,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net-next 0/4] ionic: add FLR support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169019222102.26830.4630551452871557340.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Jul 2023 09:50:21 +0000
-References: <20230720190816.15577-1-shannon.nelson@amd.com>
-In-Reply-To: <20230720190816.15577-1-shannon.nelson@amd.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- simon.horman@corigine.com, idosch@idosch.org, brett.creeley@amd.com,
- drivers@pensando.io
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+The qca8xxx switch supports 2 way to write reg values, a slow way using
+mdio and a fast way by sending specially crafted mgmt packet to
+read/write reg.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+The fast way can support up to 32 bytes of data as eth packet are used
+to send/receive.
 
-On Thu, 20 Jul 2023 12:08:12 -0700 you wrote:
-> Add support for handing and recovering from a PCI FLR event.
-> This patchset first moves some code around to make it usable
-> from multiple paths, then adds the PCI error handler callbacks
-> for reset_prepare and reset_done.
-> 
-> Example test:
->     echo 1 > /sys/bus/pci/devices/0000:2a:00.0/reset
-> 
-> [...]
+This correctly works for almost the entire regmap of the switch but with
+the use of some kernel selftests for dsa drivers it was found a funny
+and interesting hw defect/limitation.
 
-Here is the summary with links:
-  - [v4,net-next,1/4] ionic: extract common bits from ionic_remove
-    https://git.kernel.org/netdev/net-next/c/87d7a9f3734f
-  - [v4,net-next,2/4] ionic: extract common bits from ionic_probe
-    https://git.kernel.org/netdev/net-next/c/0de38d9f1dba
-  - [v4,net-next,3/4] ionic: pull out common bits from fw_up
-    https://git.kernel.org/netdev/net-next/c/30d2e073964d
-  - [v4,net-next,4/4] ionic: add FLR recovery support
-    https://git.kernel.org/netdev/net-next/c/a79b559e99be
+For some specific reg, bulk write won't work and will result in writing
+only part of the requested regs resulting in half data written. This was
+especially hard to track and discover due to the total strangeness of
+the problem and also by the specific regs where this occurs.
 
-You are awesome, thank you!
+This occurs in the specific regs of the ATU table, where multiple entry
+needs to be written to compose the entire entry.
+It was discovered that with a bulk write of 12 bytes on
+QCA8K_REG_ATU_DATA0 only QCA8K_REG_ATU_DATA0 and QCA8K_REG_ATU_DATA2
+were written, but QCA8K_REG_ATU_DATA1 was always zero.
+Tcpdump was used to make sure the specially crafted packet was correct
+and this was confirmed.
+
+The problem was hard to track as the lack of QCA8K_REG_ATU_DATA1
+resulted in an entry somehow possible as the first bytes of the mac
+address are set in QCA8K_REG_ATU_DATA0 and the entry type is set in
+QCA8K_REG_ATU_DATA2.
+
+Funlly enough writing QCA8K_REG_ATU_DATA1 results in the same problem
+with QCA8K_REG_ATU_DATA2 empty and QCA8K_REG_ATU_DATA1 and
+QCA8K_REG_ATU_FUNC correctly written.
+A speculation on the problem might be that there are some kind of
+indirection internally when accessing these regs and they can't be
+accessed all together, due to the fact that it's really a table mapped
+somewhere in the switch SRAM.
+
+Even more funny is the fact that every other reg was tested with all
+kind of combination and they are not affected by this problem. Read
+operation was also tested and always worked so it's not affected by this
+problem.
+
+The problem is not present if we limit writing a single reg at times.
+
+To handle this hardware defect, enable use_single_write so that bulk
+api can correctly split the write in multiple different operation
+effectively reverting to a non-bulk write.
+
+Cc: Mark Brown <broonie@kernel.org>
+Fixes: c766e077d927 ("net: dsa: qca8k: convert to regmap read/write API")
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/net/dsa/qca/qca8k-8xxx.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+index dee7b6579916..ae088a4df794 100644
+--- a/drivers/net/dsa/qca/qca8k-8xxx.c
++++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+@@ -576,8 +576,11 @@ static struct regmap_config qca8k_regmap_config = {
+ 	.rd_table = &qca8k_readable_table,
+ 	.disable_locking = true, /* Locking is handled by qca8k read/write */
+ 	.cache_type = REGCACHE_NONE, /* Explicitly disable CACHE */
+-	.max_raw_read = 32, /* mgmt eth can read/write up to 8 registers at time */
+-	.max_raw_write = 32,
++	.max_raw_read = 32, /* mgmt eth can read up to 8 registers at time */
++	/* ATU regs suffer from a bug where some data are not correctly
++	 * written. Disable bulk write to correctly write ATU entry.
++	 */
++	.use_single_write = true,
+ };
+ 
+ static int
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
 
