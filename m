@@ -1,234 +1,208 @@
-Return-Path: <netdev+bounces-20388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31CAC75F493
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:12:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 533ED75F4CA
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E07A1C20AA6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:12:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94E4D281567
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2FA5678;
-	Mon, 24 Jul 2023 11:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6B6568D;
+	Mon, 24 Jul 2023 11:18:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C216F5254
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 11:12:14 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 598D6FF
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 04:12:12 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-57059f90cc5so55120897b3.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 04:12:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690197131; x=1690801931;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eFhXqPzQ2tthbPayltjw9RTOGjFgrZqk+zK3gjC9kM4=;
-        b=ggmPGkyrWpVK5PTOJ3pk2b+/2dvKWx6SYUg1qa3HtHNQNKRK05jGRT+R8HchyqBDtC
-         ot4QslRmPwsZ7WsUTn03dcT/oSDMCDJfz3g75Oxle7RG4q+eO+yGbpq4YoqiqpCfHj50
-         DExXtwDUy3R298B62XsY67RzfRHtx5/bdYgM4ayvtp/kW9B6BTuSlSCES/8KF7ONLzZN
-         90pzossXOjJX4GqfQVHA1yFG6FRgsjjKLr8uLwzH3cjas2Rpyq5TjyIwDRzZwEyAYhOe
-         mLB0rOdzZ3RNGL5uwRyr1NVVzYSWdnZ0wMs6ukr3NDKmuSaAKZsz7EdH0EYRWI/Tc9N1
-         CNtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690197131; x=1690801931;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eFhXqPzQ2tthbPayltjw9RTOGjFgrZqk+zK3gjC9kM4=;
-        b=OgehaDk0gqXPlJZNv8cHKAH9euCPCKaw0Y40Dp4xHuA4oEtcU40fx1ptRI3C7hpL++
-         EtktpYySCItxYM2kvmZFgDk6lX8F6Ed2OxsJd4oWco6FGdEEuEFvtm4lc/YqfQlShI4Y
-         iGR6IVRKlHcLimsVbX66jGs/kAWeV3t036G+8esxAmVLr/orN3U470Nm5PXOZHK/q64a
-         D5XVZTC4S/YVrJ6/sYTf5FGjXKrupn2K6VPQgSn3rysMjLLpH3Bkq73NTnCHBekxPduE
-         qf9zSqzkPVKC3Sk29dC6Ti19tgVFMUw6pkw5Qwm0B+2hg7oLqeoGZRO8PopqbLR2IFUm
-         Tqnw==
-X-Gm-Message-State: ABy/qLaOyCRz2bBohrrm1OvxPBybvpS8xz/j8HPsehoSO/E9UbiTXkGh
-	4U7vPNlbivjpurgykpQXHwagobc83m6NvwKCPQ==
-X-Google-Smtp-Source: APBJJlEY2EaCw8gfh/yN9knR87JKhxx2QZqfY/XgAy8v+8VYYf0LtPMlTdKOLzsWSCMwHdK8OLzrg6XU+81MIddhgA==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:17:e198:1dc1:794b:3807])
- (user=howardchung job=sendgmr) by 2002:a81:eb02:0:b0:56c:b037:88aa with SMTP
- id n2-20020a81eb02000000b0056cb03788aamr66188ywm.5.1690197131602; Mon, 24 Jul
- 2023 04:12:11 -0700 (PDT)
-Date: Mon, 24 Jul 2023 19:12:04 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DC823A3
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 11:18:08 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24B84E65;
+	Mon, 24 Jul 2023 04:17:47 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B206CDE0;
+	Mon, 24 Jul 2023 04:18:29 -0700 (PDT)
+Received: from [10.57.34.62] (unknown [10.57.34.62])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C518B3F5A1;
+	Mon, 24 Jul 2023 04:17:39 -0700 (PDT)
+Message-ID: <cdd08c9e-81d3-a85f-5426-5db738aa73ec@arm.com>
+Date: Mon, 24 Jul 2023 12:17:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230724111206.3067352-1-howardchung@google.com>
-Subject: [PATCH v1] Bluetooth: Add timeout in disconnect when power off
-From: Howard Chung <howardchung@google.com>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc: Howard Chung <howardchung@google.com>, Archie Pusaka <apusaka@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 24/47] drm/panfrost: dynamically allocate the
+ drm-panfrost shrinker
+To: Qi Zheng <zhengqi.arch@bytedance.com>, akpm@linux-foundation.org,
+ david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz, roman.gushchin@linux.dev,
+ djwong@kernel.org, brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+ cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+ gregkh@linuxfoundation.org, muchun.song@linux.dev
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-25-zhengqi.arch@bytedance.com>
+Content-Language: en-GB
+From: Steven Price <steven.price@arm.com>
+In-Reply-To: <20230724094354.90817-25-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For some controllers, it is known that when the HCI disconnect and HCI
-Reset are too close to each other, the LMP disconnect command might not
-been sent out yet and the command will be dropped by the controoler when
-it is asked to reset itself. This could happen on powering off adapter.
+On 24/07/2023 10:43, Qi Zheng wrote:
+> In preparation for implementing lockless slab shrink, use new APIs to
+> dynamically allocate the drm-panfrost shrinker, so that it can be freed
+> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
+> read-side critical section when releasing the struct panfrost_device.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
-One possible issue is that if a connection exists, and then powering off
-and on adapter within a short time, then our host stack assumes the
-conntection was disconnected but this might not be true, so if we issue
-a connection to the peer, it will fail with ACL Already Connected error.
+One nit below, but otherwise:
 
-This CL makes the host stack to wait for |HCI_EV_DISCONN_COMPLETE| when
-powering off with a configurable timeout unless the timeout is set to 0.
+Reviewed-by: Steven Price <steven.price@arm.com>
 
-Reviewed-by: Archie Pusaka <apusaka@google.com>
-Signed-off-by: Howard Chung <howardchung@google.com>
----
-Hi upstream maintainers, this is tested with an AX211 device and Logi
-K580 keyboard by the following procedures:
-1. pair the peer and stay connected.
-2. power off and on immediately
-3. observe that the btsnoop log is consistent with the configured
-   timeout.
+> ---
+>  drivers/gpu/drm/panfrost/panfrost_device.h    |  2 +-
+>  drivers/gpu/drm/panfrost/panfrost_drv.c       |  6 +++-
+>  drivers/gpu/drm/panfrost/panfrost_gem.h       |  2 +-
+>  .../gpu/drm/panfrost/panfrost_gem_shrinker.c  | 32 ++++++++++++-------
+>  4 files changed, 27 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_device.h b/drivers/gpu/drm/panfrost/panfrost_device.h
+> index b0126b9fbadc..e667e5689353 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_device.h
+> +++ b/drivers/gpu/drm/panfrost/panfrost_device.h
+> @@ -118,7 +118,7 @@ struct panfrost_device {
+>  
+>  	struct mutex shrinker_lock;
+>  	struct list_head shrinker_list;
+> -	struct shrinker shrinker;
+> +	struct shrinker *shrinker;
+>  
+>  	struct panfrost_devfreq pfdevfreq;
+>  };
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_drv.c b/drivers/gpu/drm/panfrost/panfrost_drv.c
+> index bbada731bbbd..f705bbdea360 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_drv.c
+> +++ b/drivers/gpu/drm/panfrost/panfrost_drv.c
+> @@ -598,10 +598,14 @@ static int panfrost_probe(struct platform_device *pdev)
+>  	if (err < 0)
+>  		goto err_out1;
+>  
+> -	panfrost_gem_shrinker_init(ddev);
+> +	err = panfrost_gem_shrinker_init(ddev);
+> +	if (err)
+> +		goto err_out2;
+>  
+>  	return 0;
+>  
+> +err_out2:
+> +	drm_dev_unregister(ddev);
+>  err_out1:
+>  	pm_runtime_disable(pfdev->dev);
+>  	panfrost_device_fini(pfdev);
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem.h b/drivers/gpu/drm/panfrost/panfrost_gem.h
+> index ad2877eeeccd..863d2ec8d4f0 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_gem.h
+> +++ b/drivers/gpu/drm/panfrost/panfrost_gem.h
+> @@ -81,7 +81,7 @@ panfrost_gem_mapping_get(struct panfrost_gem_object *bo,
+>  void panfrost_gem_mapping_put(struct panfrost_gem_mapping *mapping);
+>  void panfrost_gem_teardown_mappings_locked(struct panfrost_gem_object *bo);
+>  
+> -void panfrost_gem_shrinker_init(struct drm_device *dev);
+> +int panfrost_gem_shrinker_init(struct drm_device *dev);
+>  void panfrost_gem_shrinker_cleanup(struct drm_device *dev);
+>  
+>  #endif /* __PANFROST_GEM_H__ */
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+> index bf0170782f25..9a90dfb5301f 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+> +++ b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+> @@ -18,8 +18,7 @@
+>  static unsigned long
+>  panfrost_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
+>  {
+> -	struct panfrost_device *pfdev =
+> -		container_of(shrinker, struct panfrost_device, shrinker);
+> +	struct panfrost_device *pfdev = shrinker->private_data;
+>  	struct drm_gem_shmem_object *shmem;
+>  	unsigned long count = 0;
+>  
+> @@ -65,8 +64,7 @@ static bool panfrost_gem_purge(struct drm_gem_object *obj)
+>  static unsigned long
+>  panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+>  {
+> -	struct panfrost_device *pfdev =
+> -		container_of(shrinker, struct panfrost_device, shrinker);
+> +	struct panfrost_device *pfdev = shrinker->private_data;
+>  	struct drm_gem_shmem_object *shmem, *tmp;
+>  	unsigned long freed = 0;
+>  
+> @@ -97,13 +95,24 @@ panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+>   *
+>   * This function registers and sets up the panfrost shrinker.
+>   */
+> -void panfrost_gem_shrinker_init(struct drm_device *dev)
+> +int panfrost_gem_shrinker_init(struct drm_device *dev)
+>  {
+>  	struct panfrost_device *pfdev = dev->dev_private;
+> -	pfdev->shrinker.count_objects = panfrost_gem_shrinker_count;
+> -	pfdev->shrinker.scan_objects = panfrost_gem_shrinker_scan;
+> -	pfdev->shrinker.seeks = DEFAULT_SEEKS;
+> -	WARN_ON(register_shrinker(&pfdev->shrinker, "drm-panfrost"));
+> +
+> +	pfdev->shrinker = shrinker_alloc(0, "drm-panfrost");
+> +	if (!pfdev->shrinker) {
+> +		WARN_ON(1);
 
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         |  2 +-
- net/bluetooth/hci_sync.c         | 38 +++++++++++++++++++++++---------
- net/bluetooth/mgmt_config.c      |  6 +++++
- 4 files changed, 35 insertions(+), 12 deletions(-)
+I don't think this WARN_ON is particularly useful - if there's a failed
+memory allocation we should see output from the kernel anyway. And we're
+changing the semantics from "continue just without a shrinker" (which
+argueably justifies the warning) to "probe fails, device doesn't work"
+which will be obvious to the user so I don't feel we need the additional
+warn.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 8200a6689b39..ce44f9c60059 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -432,6 +432,7 @@ struct hci_dev {
- 	__u16		advmon_allowlist_duration;
- 	__u16		advmon_no_filter_duration;
- 	__u8		enable_advmon_interleave_scan;
-+	__u16		discon_on_poweroff_timeout;
- 
- 	__u16		devid_source;
- 	__u16		devid_vendor;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0fefa6788911..769865494f45 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2479,7 +2479,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	hdev->adv_instance_cnt = 0;
- 	hdev->cur_adv_instance = 0x00;
- 	hdev->adv_instance_timeout = 0;
--
-+	hdev->discon_on_poweroff_timeout = 0;	/* Default to no timeout */
- 	hdev->advmon_allowlist_duration = 300;
- 	hdev->advmon_no_filter_duration = 500;
- 	hdev->enable_advmon_interleave_scan = 0x00;	/* Default to disable */
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 3348a1b0e3f7..260e9f05359c 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5250,6 +5250,8 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 			       u8 reason)
- {
- 	struct hci_cp_disconnect cp;
-+	unsigned long timeout;
-+	int err;
- 
- 	if (conn->type == AMP_LINK)
- 		return hci_disconnect_phy_link_sync(hdev, conn->handle, reason);
-@@ -5258,19 +5260,33 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 	cp.handle = cpu_to_le16(conn->handle);
- 	cp.reason = reason;
- 
--	/* Wait for HCI_EV_DISCONN_COMPLETE, not HCI_EV_CMD_STATUS, when the
--	 * reason is anything but HCI_ERROR_REMOTE_POWER_OFF. This reason is
--	 * used when suspending or powering off, where we don't want to wait
--	 * for the peer's response.
-+	/* The HCI_ERROR_REMOTE_POWER_OFF is used when suspending or powering off,
-+	 * so we don't want to waste time waiting for the reply of the peer.
-+	 * However, if the configuration specified, we'll wait some time to give the
-+	 * controller chance to actually send the disconnect command.
- 	 */
--	if (reason != HCI_ERROR_REMOTE_POWER_OFF)
--		return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
--						sizeof(cp), &cp,
--						HCI_EV_DISCONN_COMPLETE,
--						HCI_CMD_TIMEOUT, NULL);
-+	if (reason == HCI_ERROR_REMOTE_POWER_OFF && !hdev->discon_on_poweroff_timeout) {
-+		return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT,
-+					     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-+	}
- 
--	return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp,
--				     HCI_CMD_TIMEOUT);
-+	if (reason == HCI_ERROR_REMOTE_POWER_OFF)
-+		timeout = msecs_to_jiffies(hdev->discon_on_poweroff_timeout);
-+	else
-+		timeout = HCI_CMD_TIMEOUT;
-+
-+	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
-+				       sizeof(cp), &cp,
-+				       HCI_EV_DISCONN_COMPLETE,
-+				       timeout, NULL);
-+
-+	/* Ignore the error in suspending or powering off case to avoid the procedure being
-+	 * aborted.
-+	 */
-+	if (reason == HCI_ERROR_REMOTE_POWER_OFF)
-+		return 0;
-+
-+	return err;
- }
- 
- static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-index 6ef701c27da4..f3194e3642d9 100644
---- a/net/bluetooth/mgmt_config.c
-+++ b/net/bluetooth/mgmt_config.c
-@@ -78,6 +78,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		HDEV_PARAM_U16(advmon_allowlist_duration);
- 		HDEV_PARAM_U16(advmon_no_filter_duration);
- 		HDEV_PARAM_U8(enable_advmon_interleave_scan);
-+		HDEV_PARAM_U16(discon_on_poweroff_timeout);
- 	} __packed rp = {
- 		TLV_SET_U16(0x0000, def_page_scan_type),
- 		TLV_SET_U16(0x0001, def_page_scan_int),
-@@ -111,6 +112,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		TLV_SET_U16(0x001d, advmon_allowlist_duration),
- 		TLV_SET_U16(0x001e, advmon_no_filter_duration),
- 		TLV_SET_U8(0x001f, enable_advmon_interleave_scan),
-+		TLV_SET_U16(0x0020, discon_on_poweroff_timeout),
- 	};
- 
- 	bt_dev_dbg(hdev, "sock %p", sk);
-@@ -186,6 +188,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		case 0x001b:
- 		case 0x001d:
- 		case 0x001e:
-+		case 0x0020:
- 			exp_type_len = sizeof(u16);
- 			break;
- 		case 0x001f:
-@@ -314,6 +317,9 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		case 0x0001f:
- 			hdev->enable_advmon_interleave_scan = TLV_GET_U8(buffer);
- 			break;
-+		case 0x00020:
-+			hdev->discon_on_poweroff_timeout = TLV_GET_LE16(buffer);
-+			break;
- 		default:
- 			bt_dev_warn(hdev, "unsupported parameter %u", type);
- 			break;
--- 
-2.41.0.487.g6d72f3e995-goog
+> +		return -ENOMEM;
+> +	}
+> +
+> +	pfdev->shrinker->count_objects = panfrost_gem_shrinker_count;
+> +	pfdev->shrinker->scan_objects = panfrost_gem_shrinker_scan;
+> +	pfdev->shrinker->seeks = DEFAULT_SEEKS;
+> +	pfdev->shrinker->private_data = pfdev;
+> +
+> +	shrinker_register(pfdev->shrinker);
+> +
+> +	return 0;
+>  }
+>  
+>  /**
+> @@ -116,7 +125,6 @@ void panfrost_gem_shrinker_cleanup(struct drm_device *dev)
+>  {
+>  	struct panfrost_device *pfdev = dev->dev_private;
+>  
+> -	if (pfdev->shrinker.nr_deferred) {
+> -		unregister_shrinker(&pfdev->shrinker);
+> -	}
+> +	if (pfdev->shrinker)
+> +		shrinker_unregister(pfdev->shrinker);
+>  }
 
 
