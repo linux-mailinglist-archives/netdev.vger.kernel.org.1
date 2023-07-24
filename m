@@ -1,45 +1,62 @@
-Return-Path: <netdev+bounces-20402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5336E75F524
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:33:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7040F75F569
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E345280F9E
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:33:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DF72281207
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747E95692;
-	Mon, 24 Jul 2023 11:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AC9612A;
+	Mon, 24 Jul 2023 11:47:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAE08F43
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 11:30:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8409C433D9;
-	Mon, 24 Jul 2023 11:30:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690198259;
-	bh=p7v9priVhxS6OpRqrU1U0OeVZS6L2EHIujm2fZHvIKc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tv7JCflXiDkmz1RVLX3aSIyORlhMSjolJC7tFHNqNYvj3MXJ4gv04aNhTVKkANH04
-	 vop9syQd12WOHXaA8XenB0rxC97ji6mZ4cOjSwvmpOxvwHv9uU0dgP1wdNNi1HiZWY
-	 bH3ItqABfo+v31kLAHm/MD/FMrX/TZ4iOprDJrzcsgcpOesL4SM/XbISnCSQ5hDAnN
-	 miVAeP3W/xwy/8FM4AyLSmS/az3eTkNJXyvl/YYTwVuc2lWtT857eGq5YTrMckIBxj
-	 2EzsOcPaWdG6WNLT3wG9LZk22j5XeUct/vIMGtX3n9dwSfGHz6ysaKZmKcHJA0Nr/c
-	 ijRWNSrWbBayg==
-Date: Mon, 24 Jul 2023 14:30:55 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] xfrm: add NULL check in xfrm_update_ae_params
-Message-ID: <20230724113055.GC9776@unreal>
-References: <20230721145103.2714073-1-linma@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E21BEC2
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 11:47:25 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB77EE61;
+	Mon, 24 Jul 2023 04:47:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qt65iVIysC/IYhlufKXMzTRfFYaF4aQEGwEXCapI7ik=; b=JbDQLqfjBSwW/9ggul3F1GqbCB
+	xNAgJQxJCwI3fwzwiQ2ce97DiGqTCjLOHj1nkKzZ7EA8CrqpOU8/AEmCMB/Rnob5+NY8B0SKIFufj
+	fVrugwMS620YEFuAgb8rDryTITDjJC8X5sjp4qfSU2qCPsdj6e2hRLaHPUyYLH+eYdM1DB5JhRoWL
+	V4o6JzaCBG6BEVzLSVUI5qBHEIaOyyHTnZUzqYujkdmr5ccAiXDAPCROxXqGuz/eVzMMeE4rEqTI7
+	uMU6P6XWK9wP/AKAlbGNco4JRKwNe3pNgI8k/wjFQMCFjUH5cyUSHjG/N4LIw7Zlqphi+xi/dv0uI
+	eaDbpSCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57574)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qNu22-0008Pt-2Y;
+	Mon, 24 Jul 2023 12:47:18 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qNu22-0000lp-Fd; Mon, 24 Jul 2023 12:47:18 +0100
+Date: Mon, 24 Jul 2023 12:47:18 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Revanth Kumar Uppala <ruppala@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	Narayan Reddy <narayanr@nvidia.com>
+Subject: Re: [PATCH 1/4] net: phy: aquantia: Enable Tx/Rx pause frame support
+ in aquantia PHY
+Message-ID: <ZL5kxvUOJb6xHiPR@shell.armlinux.org.uk>
+References: <20230628124326.55732-1-ruppala@nvidia.com>
+ <ZJw2CKtgqbRU/3Z6@shell.armlinux.org.uk>
+ <ce4c10b5-c2cf-489d-b096-19b5bcd8c49e@lunn.ch>
+ <BL3PR12MB6450050A7423D4ADF4E4CFE9C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,101 +65,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230721145103.2714073-1-linma@zju.edu.cn>
+In-Reply-To: <BL3PR12MB6450050A7423D4ADF4E4CFE9C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 10:51:03PM +0800, Lin Ma wrote:
-> Normally, x->replay_esn and x->preplay_esn should be allocated at
-> xfrm_alloc_replay_state_esn(...) in xfrm_state_construct(...), hence the
-> xfrm_update_ae_params(...) is okay to update them. However, the current
-> implementation of xfrm_new_ae(...) allows a malicious user to directly
-> dereference a NULL pointer and crash the kernel like below.
+On Mon, Jul 24, 2023 at 11:29:18AM +0000, Revanth Kumar Uppala wrote:
 > 
-> BUG: kernel NULL pointer dereference, address: 0000000000000000
-> PGD 8253067 P4D 8253067 PUD 8e0e067 PMD 0
-> Oops: 0002 [#1] PREEMPT SMP KASAN NOPTI
-> CPU: 0 PID: 98 Comm: poc.npd Not tainted 6.4.0-rc7-00072-gdad9774deaf1 #8
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.o4
-> RIP: 0010:memcpy_orig+0xad/0x140
-> Code: e8 4c 89 5f e0 48 8d 7f e0 73 d2 83 c2 20 48 29 d6 48 29 d7 83 fa 10 72 34 4c 8b 06 4c 8b 4e 08 c
-> RSP: 0018:ffff888008f57658 EFLAGS: 00000202
-> RAX: 0000000000000000 RBX: ffff888008bd0000 RCX: ffffffff8238e571
-> RDX: 0000000000000018 RSI: ffff888007f64844 RDI: 0000000000000000
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff888008f57818
-> R13: ffff888007f64aa4 R14: 0000000000000000 R15: 0000000000000000
-> FS:  00000000014013c0(0000) GS:ffff88806d600000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 00000000054d8000 CR4: 00000000000006f0
-> Call Trace:
->  <TASK>
->  ? __die+0x1f/0x70
->  ? page_fault_oops+0x1e8/0x500
->  ? __pfx_is_prefetch.constprop.0+0x10/0x10
->  ? __pfx_page_fault_oops+0x10/0x10
->  ? _raw_spin_unlock_irqrestore+0x11/0x40
->  ? fixup_exception+0x36/0x460
->  ? _raw_spin_unlock_irqrestore+0x11/0x40
->  ? exc_page_fault+0x5e/0xc0
->  ? asm_exc_page_fault+0x26/0x30
->  ? xfrm_update_ae_params+0xd1/0x260
->  ? memcpy_orig+0xad/0x140
->  ? __pfx__raw_spin_lock_bh+0x10/0x10
->  xfrm_update_ae_params+0xe7/0x260
->  xfrm_new_ae+0x298/0x4e0
->  ? __pfx_xfrm_new_ae+0x10/0x10
->  ? __pfx_xfrm_new_ae+0x10/0x10
->  xfrm_user_rcv_msg+0x25a/0x410
->  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
->  ? __alloc_skb+0xcf/0x210
->  ? stack_trace_save+0x90/0xd0
->  ? filter_irq_stacks+0x1c/0x70
->  ? __stack_depot_save+0x39/0x4e0
->  ? __kasan_slab_free+0x10a/0x190
->  ? kmem_cache_free+0x9c/0x340
->  ? netlink_recvmsg+0x23c/0x660
->  ? sock_recvmsg+0xeb/0xf0
->  ? __sys_recvfrom+0x13c/0x1f0
->  ? __x64_sys_recvfrom+0x71/0x90
->  ? do_syscall_64+0x3f/0x90
->  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
->  ? copyout+0x3e/0x50
->  netlink_rcv_skb+0xd6/0x210
->  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
->  ? __pfx_netlink_rcv_skb+0x10/0x10
->  ? __pfx_sock_has_perm+0x10/0x10
->  ? mutex_lock+0x8d/0xe0
->  ? __pfx_mutex_lock+0x10/0x10
->  xfrm_netlink_rcv+0x44/0x50
->  netlink_unicast+0x36f/0x4c0
->  ? __pfx_netlink_unicast+0x10/0x10
->  ? netlink_recvmsg+0x500/0x660
->  netlink_sendmsg+0x3b7/0x700
 > 
-> This Null-ptr-deref bug is assigned CVE-2023-3772. And this commit
-> adds additional NULL check in xfrm_update_ae_params to fix the NPD.
-> 
-> Fixes: d8647b79c3b7 ("xfrm: Add user interface for esn and big anti-replay windows")
-> Signed-off-by: Lin Ma <linma@zju.edu.cn>
-> ---
-> V1 -> V2: fix some typos: impelementation -> implementation,
->           frm_update_ae_params -> xfrm_update_ae_params
-> 
->  net/xfrm/xfrm_user.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> index c34a2a06ca94..bf2564967501 100644
-> --- a/net/xfrm/xfrm_user.c
-> +++ b/net/xfrm/xfrm_user.c
-> @@ -628,7 +628,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
->  	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
->  	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
->  
-> -	if (re) {
-> +	if (re && x->replay_esn && x->preplay_esn) {
+> > -----Original Message-----
+> > From: Andrew Lunn <andrew@lunn.ch>
+> > Sent: Wednesday, June 28, 2023 7:17 PM
+> > To: Russell King (Oracle) <linux@armlinux.org.uk>
+> > Cc: Revanth Kumar Uppala <ruppala@nvidia.com>; hkallweit1@gmail.com;
+> > netdev@vger.kernel.org; linux-tegra@vger.kernel.org; Narayan Reddy
+> > <narayanr@nvidia.com>
+> > Subject: Re: [PATCH 1/4] net: phy: aquantia: Enable Tx/Rx pause frame support
+> > in aquantia PHY
+> > 
+> > External email: Use caution opening links or attachments
+> > 
+> > 
+> > On Wed, Jun 28, 2023 at 02:30:48PM +0100, Russell King (Oracle) wrote:
+> > > On Wed, Jun 28, 2023 at 06:13:23PM +0530, Revanth Kumar Uppala wrote:
+> > > > From: Narayan Reddy <narayanr@nvidia.com>
+> > > >
+> > > > Enable flow control support using pause frames in aquantia phy driver.
+> > > >
+> > > > Signed-off-by: Narayan Reddy <narayanr@nvidia.com>
+> > > > Signed-off-by: Revanth Kumar Uppala <ruppala@nvidia.com>
+> > >
+> > > I think this is over-complex.
+> > >
+> > > >  #define MDIO_PHYXS_VEND_IF_STATUS          0xe812
+> > > >  #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK        GENMASK(7, 3)
+> > > >  #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_KR  0 @@ -583,6 +585,17
+> > @@
+> > > > static int aqr107_config_init(struct phy_device *phydev)
+> > > >     if (!ret)
+> > > >             aqr107_chip_info(phydev);
+> > > >
+> > > > +   /* Advertize flow control */
+> > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, phydev-
+> > >supported);
+> > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, phydev-
+> > >supported);
+> > > > +   linkmode_copy(phydev->advertising, phydev->supported);
+> > >
+> > > This is the wrong place to be doing this, since pause support depends
+> > > not only on the PHY but also on the MAC. There are phylib interfaces
+> > > that MACs should call so that phylib knows that the MAC supports pause
+> > > frames.
+> > >
+> > > Secondly, the PHY driver needs to tell phylib that the PHY supports
+> > > pause frames, and that's done through either setting the .features
+> > > member in the PHY driver, or by providing a .get_features
+> > > implementation.
+> > >
+> > > Configuration of the pause advertisement should already be happening
+> > > through the core phylib code.
+> > 
+> > I really should do a LPC netdev talk "Everybody gets pause wrong..."
+> > 
+> > genphy_c45_an_config_aneg() will configure pause advertisement. The PHY
+> > driver does not need to configure it, if the PHY follows the standard and has the
+> > configuration in the correct place. As Russell said, please check the PHYs ability
+> > to advertise pause is being reported correctly, by .get_features, of the default
+> > implementation of .get_features if that is being used. And then check your MAC
+> > driver is also indicating it supports pause.
+> From .get_features, it is not possible to check PHY's ability to advertise pause is being reported as there is no such register present for AQR PHY to check capabilities in its datasheet.
+> Hence, we are directly configuring the pause frames from  aqr107_config_init().
 
-If x->replay_esn is valid, x->preplay_esn will be valid too.
+... and thus creating a trashy implementation... so NAK.
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+The first thing to get straight is that in "normal" non-rate adapting
+setups, pause frames are no different from normal Ethernet frames as
+far as a PHY is concerned. The PHY should be doing absolutely nothing
+special with pause frames - it should merely forward them to the MAC,
+and it's the MAC that deals with pause frames.
+
+The only thing that a non-rate adapting baseT PHY has to deal with is
+the media advertisement and nothing else.
+
+So, whether pause frames are supported has more to do with the MAC
+than the PHY.
+
+The way phylib works is that when a PHY is probed, phy_probe() will
+set the Pause and Asym_Pause bits in the ->supported bitmap. It is
+then up to the MAC driver (or phylink) to call phy_support_asym_pause()
+or phy_support_sym_pause() to tell phylib what the MAC supports.
+
+PHY drivers must *not* override this in their config_init() function,
+and most certainly must not copy the supported bitmap to the advertising
+bitmap there either.
+
+If you need pause-mode rate adaption, this has nothing to do with the
+media side, and ->supported and ->advertising are not relevant for
+that. Non-phylink based MAC drivers have to use phy_get_rate_matching()
+to find out whether the PHY will be using rate adaption and act
+accordingly. phylink based MAC drivers have this dealt with for them
+and as long as they do what phylink tells them to do, everything
+should be fine.
+
+So, basically, do not mess with setting bits in the ->supported bitmap
+nor the ->advertising bitmap in config_init. It is wrong, and we will
+NAK it.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
