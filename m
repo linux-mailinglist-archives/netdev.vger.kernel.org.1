@@ -1,192 +1,164 @@
-Return-Path: <netdev+bounces-20423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EC8A75F7A6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:00:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D0B375F7A7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FC1C1C20B6E
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:00:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDB9D1C20B68
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C826FD9;
-	Mon, 24 Jul 2023 13:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE966FD9;
+	Mon, 24 Jul 2023 13:00:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D60653BA
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:00:14 +0000 (UTC)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A567B1FDA
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 05:59:56 -0700 (PDT)
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-3facc7a4e8aso4912595e9.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 05:59:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690203595; x=1690808395;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o1ebpl5NxHbK12xs55CEp48/oVbgsK3Wk7Vvj0Ronr8=;
-        b=jyqLXgnCoa4Bg8DXuxBPpoHnglhua+tLQ86AvN4WtHPDPiw3VdnHhPbfWXg3CsC5be
-         iToSffbeja5e2KWW9ctZ+kIKHtY5FIbnd05B1aF+fuyI+9i0Q7drMbN1KBJRIICI3RAU
-         wmPyjtfrA6vA7XK63Wp1hFjeFHs2ZWJ9vFG8fbvi5ZCviNFcWKn+oeHUdBxQXKoCjYlN
-         mZ4DV8WFon9+7d2mmScqp+5tqGXd4OSVa0Pg4g2pbK5EIk2yqvNtlhL+Ukq3Uu9BtVGt
-         HrnP+klz/bE20fEJASWRtczehg+M73bwsiRVHIWHOs5AubQR/OcHE9Bo8Ss+Rzm+gA17
-         aC0g==
-X-Gm-Message-State: ABy/qLYF6+MMfZNvGcMDdiXyocFJprXURgLQfdCEnjfgqcoJtM9lSNli
-	U5nUIUWNhUh5LxSyX/DQh0+JWxrr9BE=
-X-Google-Smtp-Source: APBJJlGYzj5Cyhk0zoVvabeGklRVYZ1E/0sg49CwkkRJjz60K6uZEp3QvudqftgNPAHPAovsC4Rdow==
-X-Received: by 2002:a05:600c:3b99:b0:3fb:3dd9:89c with SMTP id n25-20020a05600c3b9900b003fb3dd9089cmr7873825wms.0.1690203594929;
-        Mon, 24 Jul 2023 05:59:54 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id k8-20020a7bc408000000b003fa95f328afsm12805442wmi.29.2023.07.24.05.59.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 05:59:54 -0700 (PDT)
-Message-ID: <5196edbd-45dc-8542-975b-1a49e4061668@grimberg.me>
-Date: Mon, 24 Jul 2023 15:59:52 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EF98476
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:00:30 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B0F10C0;
+	Mon, 24 Jul 2023 06:00:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kuAccUqOiNUPwNyipZmypw176Bp+HiwTQQUOpvq7FgDeImyxlEugfGFz27RZpFDmcKf9jkB9CBWXUGWdDTPv12+WSeE5ZeTTbGRWFZHJVUp88EAiFOk+0iDHuta8XkcOtw+S7UG0TOlOm5uHoBYA73I52xjECeE8x/gOGWSsCmMB2dhSkgI7bgqBlJSh1kXQt6jn65ehcs11/IUY5vy+Zd4+NQHQYevQz7LAA1o25PPb0oEvgRs5aNwV0WUhKhVGNL3jTOC5czSt2lhO7ifjmEd7bHWsLfCkguo6jr8dKrT+JzRtBaNj9CWkTUEht4DmAYKHx+i0E9sV5ZV9ZmcKIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hDBAPlgpmfyMwj/MHnu8ryc3JVGCZDQFlDs2ehOmEUo=;
+ b=bq3Ye2UrDP6iA1rHOxUBnOQ2N9aLh5LwhxpM8zPPUFH1h7VurfzZs3GM6FzHaNc0+uPAZyjnbeFugdzh6MXp1cB9NFvVjTWErAVpsiL3DGb2NM34IrJpmDNXUn8pB8Ex3x3RwdT0iffkwt/RZVAxEZQ9We40oZbAAVELQzIZd4E1YvRhw52Uxp5bRiI1kweM1jO2D4kMuOymS60yYNa111JIYlgPoKCMZVt7Qt4NpBUM4vsgQzvtHsDr0XBsiz2FtXWdkJx7te4mC92ihGttyABEFJAyeajw7JsiDG165jewTWmXI3vYk7QQ/icZ2M4i/zn5F+zVb1ucXN9dg3KbWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hDBAPlgpmfyMwj/MHnu8ryc3JVGCZDQFlDs2ehOmEUo=;
+ b=p//72aFCKgNuHan4xfXHqn+fRvoryGPa3EVXwaHD2MrzpfFBIhy9FHl3EIe0XnIrPQtvHi03nmLleMFJnYJ9fYdpAPUTpuTxPKnNdx8ThcMRVcDmnfspgQu4H5uClliS37mJfJ2nyI4aRgzAeqCc69GqvDdcLS4Jgt9UKFdBmxNEoVdpDgsEtzsPNlfTcGIa/CFeYElmkcrVRjtT/gFsMg0BO2MqDjK3X09gl7E50KqEwY59Dqdj6EDHYbF3VOonMSn85aNLA4o5tcbk4+pLWa4rby1qsOq+1B6pJgu987vpExB8ui1OnGUz/qHZET+U4eqgYYf32zTqlVTWeqRGrg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BN9PR12MB5145.namprd12.prod.outlook.com (2603:10b6:408:136::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
+ 2023 13:00:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
+ 13:00:26 +0000
+Date: Mon, 24 Jul 2023 10:00:25 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Brett Creeley <bcreeley@amd.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v12 vfio 3/7] vfio/pds: register with the pds_core PF
+Message-ID: <ZL516RPMMHS4Ds1k@nvidia.com>
+References: <20230719223527.12795-1-brett.creeley@amd.com>
+ <20230719223527.12795-4-brett.creeley@amd.com>
+ <BN9PR11MB527656A2E28090DDA4ED07728C3FA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ea5cd85a-e29e-d178-5b17-1440be84f5fe@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea5cd85a-e29e-d178-5b17-1440be84f5fe@amd.com>
+X-ClientProxiedBy: MN2PR08CA0004.namprd08.prod.outlook.com
+ (2603:10b6:208:239::9) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 6/6] net/tls: implement ->read_sock()
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Boris Pismenny <boris.pismenny@gmail.com>
-References: <20230721143523.56906-1-hare@suse.de>
- <20230721143523.56906-7-hare@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230721143523.56906-7-hare@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5145:EE_
+X-MS-Office365-Filtering-Correlation-Id: 55c4aafc-1a14-4186-a4eb-08db8c45f343
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	OYItgJWCmM+U0t6bjOnPBm+TEnKqtehPfhFv7kLUFjJDh4v3wSOig0p4AU8JqYEumkjtEmnWwnrw1pseLQJyOiN307zSMj1A9nOOzsbF4yI4UQdhkzKK90cxmwrGKeC0RUIKa5yT//y+PihaH3FILOTeBg6uvzI/+gvzGnvahfNMUWvoguBvRT1N8wLgbbi3TZmv9WQ1gUd9EKJe97NJZt0pkfJ/zybq/nGQGYaiqCMpRlGBzFHp9cRhH06ix7TTechYlSJrne8gZHyVmTiy9jeqfNIbNvlrn0d3ygP5Yk94xDHg8Q+bwJVcwsbZHB1eT96nfn8iqP+jr8g0s/ZsyxUEFVBEo2liEcdQOLetu62691xecKP1N9vu6Oz707BOj9rDCkzP6oP3j2bV5VQYX1429YAeLW3Q7IS6F5f7QojVhrVQ+tvDZCdt5MiVrVWhAW0NKRVVJYycORckeM1aCQOqWc8csts5OMFFpBosmQk/DQ5oMoUvWt6g2l1N8JqSl6fL/YlBwPJr+m5g5Vndxm9OoJdlq/xJIgqQMl2v2f9oFXzXb16ozrhKumqsx6TF
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(39860400002)(366004)(346002)(396003)(451199021)(8676002)(8936002)(478600001)(4744005)(2906002)(66476007)(66556008)(66946007)(4326008)(6916009)(316002)(41300700001)(5660300002)(54906003)(36756003)(38100700002)(6506007)(53546011)(186003)(86362001)(26005)(2616005)(6512007)(6486002)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pfBDkhmzUnVwfw5vBObLZpsrl+a4dIsvbD0bOzU01usrw23n6SXG0AnEkq7B?=
+ =?us-ascii?Q?ZjRah6p8kjMw5onjsNFGL51vJ0/s0z/4FDKqjM3/1ZVP4iFu6we3Uh0+ps8H?=
+ =?us-ascii?Q?7E6XO5pKQ4JtWJgoyL49r9sCl4LS3vwh+LTWjoLmNKJVMveSrCKMYn9BCs5r?=
+ =?us-ascii?Q?+/0nYDXXDWd0xb0ttSuSI98CWIOciUCli4ZkldibczSPlkO/NqKVtg0uLN+o?=
+ =?us-ascii?Q?qqittkCl8OhlphPrcbx1QZcRj2t63fOLCaOYSo2Wkcd0StSTxuDOYHzuiFoe?=
+ =?us-ascii?Q?KP6i5CyEo9NQdHm1TPNhag27MlLOFZe11OigTBrOtyYRZKdSqxDnartQzucM?=
+ =?us-ascii?Q?odIktV84dNsKJsVrk4GRSeW9PAZKP4v/ez26n0mHqitNd8FiDoVz1qsy3D7p?=
+ =?us-ascii?Q?50cLJsZb69qxHgVgmnFSzjVwMFdGKV6osjZR/cZQGOPY9xkTh06jCNhz1Qjw?=
+ =?us-ascii?Q?yeG2YrMXKFt7Lv/84WqjRKc3VUIhqxbKpdyBwibD6OVAk+W0jmuEPhsLYKU7?=
+ =?us-ascii?Q?LF1jCS82J6qYb82b3PFgENqSutRFsnN4f0+8EpXUeHkMdrpC13X9Ic0t+V6N?=
+ =?us-ascii?Q?VosuExMeE5XD8iqENojPJE6rSqzbT9idm6AYYS90MFTE99g73gmZsifv8aBB?=
+ =?us-ascii?Q?5QseSlw5+038FEkfAA3eYkuA9yTsIUatT1gJWCzXvzTUL3CwifA0lAXrlE4K?=
+ =?us-ascii?Q?blfZkumBf1BWIqzo3UEx1XaSRL4c+YfcNyRa0xpSYslbdKJXHO7XBEbRcl9z?=
+ =?us-ascii?Q?0CgDkBeenSFZXdBPjmUNuHkUZeEn5BRa5Dw4FPIFcY1Y+85xgHqEmvCiKlSf?=
+ =?us-ascii?Q?cgYcGoLza9oGFR1+F7Zw267YDm9ctnTSFhFv6bs1PZIlcZc5HU+IiIrTPoZN?=
+ =?us-ascii?Q?2JIRJSKOLvdDe5EylAMB0hIAXMOlSjW+NsxRS4hzdkUdwYWKeRfAG+2hbKXl?=
+ =?us-ascii?Q?hdg0IafP+9GJfjljXFz21bhAg0WI1jTbrwlq4EidolYyQxkwjIuAn8ETmLJq?=
+ =?us-ascii?Q?nqf9IlacYRtfdHCLwOwksQdyZl6Q24And5s/JgeJ4KmUKYwr8d9H15FdkGev?=
+ =?us-ascii?Q?eTzhQxgV+L2lN3xfJWfe/Ie9F2Qfy4eZdImx6Bqkweqbz9s41+Bi2q/JX/fz?=
+ =?us-ascii?Q?ztfvzDWlRmvy5LKDjJ9rSjsPAccxRjEKX6xj+hwouqt8iLaxCMf6T06cVnUb?=
+ =?us-ascii?Q?8PLiY5XA16k0ntOcUpcprOYknZlZwjRrVRYcM/0jR9y0FcN6X+GEOaYbpw6j?=
+ =?us-ascii?Q?meuyeBumqo9wD1oSKaL0H7T5K6zj2Rw0BsdaBR8dwWze86325xqeTLRREZVV?=
+ =?us-ascii?Q?8jg+wGH3nWkKsm5AGwA7NDTLwOWByUbAb+5EYXo3oAegSvZmgFIWeWEHyres?=
+ =?us-ascii?Q?cvBugS12gFqlMXHwqtflvamem8TCLE/ZFAHr+iDe4+c/YNyJQerMQ1ES1zOX?=
+ =?us-ascii?Q?YPtbadAQ6tUKCsrHGZeR9pekKS7v/p1iD8vOSWVzLf7egXhZjDOrpM44lxL+?=
+ =?us-ascii?Q?Odfan/nhLTW+N1g0nBG1IpE0MCPXexO7Mzs7zrMBL5x/WQRg+5jM9I5awPgx?=
+ =?us-ascii?Q?Apw6O54nL0IyVFrB/IFhLLQDkoTrMwYTVZPK1zT/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55c4aafc-1a14-4186-a4eb-08db8c45f343
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 13:00:26.6539
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T4HzgoKRb8Gt+BGbkq+6CS1vagNpvTZ+Vz7CrW1UndLtIfgCkF5QI5MeKNQcCsqv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5145
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 7/21/23 17:35, Hannes Reinecke wrote:
-> Implement ->read_sock() function for use with nvme-tcp.
+On Sat, Jul 22, 2023 at 12:09:58AM -0700, Brett Creeley wrote:
+> On 7/21/2023 2:01 AM, Tian, Kevin wrote:
+> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> > 
+> > 
+> > > From: Brett Creeley <brett.creeley@amd.com>
+> > > Sent: Thursday, July 20, 2023 6:35 AM
+> > > 
+> > > +void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+> > > +{
+> > > +     struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+> > > +     int err;
+> > > +
+> > > +     err = pds_client_unregister(pci_physfn(pdev), pds_vfio->client_id);
+> > > +     if (err)
+> > > +             dev_err(&pdev->dev, "unregister from DSC failed: %pe\n",
+> > > +                     ERR_PTR(err));
+> > 
+> > Why using ERR_PTR() here? it looks a common pattern used cross
+> > this series.
 > 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Boris Pismenny <boris.pismenny@gmail.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: netdev@vger.kernel.org
-> ---
->   net/tls/tls.h      |  2 ++
->   net/tls/tls_main.c |  2 ++
->   net/tls/tls_sw.c   | 89 ++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 93 insertions(+)
-> 
-> diff --git a/net/tls/tls.h b/net/tls/tls.h
-> index 86cef1c68e03..7e4d45537deb 100644
-> --- a/net/tls/tls.h
-> +++ b/net/tls/tls.h
-> @@ -110,6 +110,8 @@ bool tls_sw_sock_is_readable(struct sock *sk);
->   ssize_t tls_sw_splice_read(struct socket *sock, loff_t *ppos,
->   			   struct pipe_inode_info *pipe,
->   			   size_t len, unsigned int flags);
-> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-> +		     sk_read_actor_t read_actor);
->   
->   int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
->   void tls_device_splice_eof(struct socket *sock);
-> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-> index b6896126bb92..7dbb8cd8f809 100644
-> --- a/net/tls/tls_main.c
-> +++ b/net/tls/tls_main.c
-> @@ -962,10 +962,12 @@ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
->   	ops[TLS_BASE][TLS_SW  ] = ops[TLS_BASE][TLS_BASE];
->   	ops[TLS_BASE][TLS_SW  ].splice_read	= tls_sw_splice_read;
->   	ops[TLS_BASE][TLS_SW  ].poll		= tls_sk_poll;
-> +	ops[TLS_BASE][TLS_SW  ].read_sock	= tls_sw_read_sock;
->   
->   	ops[TLS_SW  ][TLS_SW  ] = ops[TLS_SW  ][TLS_BASE];
->   	ops[TLS_SW  ][TLS_SW  ].splice_read	= tls_sw_splice_read;
->   	ops[TLS_SW  ][TLS_SW  ].poll		= tls_sk_poll;
-> +	ops[TLS_SW  ][TLS_SW  ].read_sock	= tls_sw_read_sock;
->   
->   #ifdef CONFIG_TLS_DEVICE
->   	ops[TLS_HW  ][TLS_BASE] = ops[TLS_BASE][TLS_BASE];
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index d0636ea13009..f7ffbe7620cb 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -2202,6 +2202,95 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
->   	goto splice_read_end;
->   }
->   
-> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-> +		     sk_read_actor_t read_actor)
-> +{
-> +	struct tls_context *tls_ctx = tls_get_ctx(sk);
-> +	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
-> +	struct strp_msg *rxm = NULL;
-> +	struct sk_buff *skb = NULL;
-> +	struct sk_psock *psock;
-> +	struct tls_msg *tlm;
-> +	ssize_t copied = 0;
-> +	int err, used;
-> +
-> +	psock = sk_psock_get(sk);
-> +	if (psock) {
-> +		sk_psock_put(sk, psock);
-> +		return -EINVAL;
-> +	}
-> +	err = tls_rx_reader_acquire(sk, ctx, true);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* If crypto failed the connection is broken */
-> +	err = ctx->async_wait.err;
-> +	if (err)
-> +		goto read_sock_end;
-> +
-> +	do {
-> +		if (!skb_queue_empty(&ctx->rx_list)) {
-> +			skb = __skb_dequeue(&ctx->rx_list);
-> +			rxm = strp_msg(skb);
-> +			tlm = tls_msg(skb);
-> +		} else {
-> +			struct tls_decrypt_arg darg;
-> +
-> +			err = tls_rx_rec_wait(sk, NULL, true, true);
-> +			if (err <= 0)
-> +				goto read_sock_end;
-> +
-> +			memset(&darg.inargs, 0, sizeof(darg.inargs));
-> +
-> +			rxm = strp_msg(tls_strp_msg(ctx));
-> +			tlm = tls_msg(tls_strp_msg(ctx));
-> +
-> +			err = tls_rx_one_record(sk, NULL, &darg);
-> +			if (err < 0) {
-> +				tls_err_abort(sk, -EBADMSG);
-> +				goto read_sock_end;
-> +			}
-> +
-> +			sk_flush_backlog(sk);
+> Yes, this is intentional. This is more readable than just printing out the
+> error value.
 
-Question,
-Based on Jakub's comment, the flush is better spaced out.
-Why not just do it once at the end? Or alternatively,
-call tls_read_flush_backlog() ? Or just count by hand
-every 4 records or 128K (and once in the end)?
+That seems like a hack, it would be nicer if printk could format
+errnos natively
 
-I don't really know what would be the impact though, but
-you are effectively releasing and re-acquiring the socket
-flushing the backlog every record...
+Jason
 
