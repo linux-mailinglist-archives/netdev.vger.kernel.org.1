@@ -1,142 +1,217 @@
-Return-Path: <netdev+bounces-20434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3A2275F8C3
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67A6975F8C8
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E79628147A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:47:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21991280F16
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1598C16;
-	Mon, 24 Jul 2023 13:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8988C18;
+	Mon, 24 Jul 2023 13:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5048C15
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:47:08 +0000 (UTC)
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2093.outbound.protection.outlook.com [40.107.102.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977C9E73
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 06:46:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TJr4jxF2uPUnWUeXW5rLFBCezuKQfoFZ7ji+HgwXrs/6xZph/dZlHHOcf34rjGSyGT4ybKso/P6aTYZsNrN8PpQ+TMWI1G6nj/lnmJ0pKLBrLY+0+1G2sfo6jSv04Ed+JQmGG9xuBT94iRMdz0gFwfbfEntTeE0nZ5pLzENFD+hdMzozNMLvVg8iqpifqU/zJxcXEKtQEiaymihNhJkk6z8Q+HmA/u80ltaaR3kySqpHo5oz5liEu/uO5Pn3wFlaPrts92brh/H4zSnJZ0whpUzMYWSmMZkdkWbVpoW2nrEuM9iMzzCY9Gg7hTcFS8lqj2sHqWRVa1qL7mFWa0CRkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lenl7bGHRqlhX1FY5vmtOMU2fj+Ad6c5O7/pmRES4IU=;
- b=Yp32osPZZgrZLx5w/1r76NcJSZIf/+1LVPvvgeoC5mEe4VJFcdddv9RoBffZ15lWaC3BC1ULPNOsfsVBY4VO9nPy2XN7MnlbpAF7wn6kZbcaSDGoT8VFb53W9jsiplj8QSYQKUzvKw/MUbM6r8KrnuMk28BrOxef8nRXnFVfgeU0rjMNWLqvPEyBQ3VvrCGaWIpMi2+JJoAAv/XS5VZx+B8cZRjEweE9cHnHA1/aAsckDmLzsriVy4HpuH7JH3NQ7OkZBGtU4YuoC/lQJPT8AyBh4POGpcb8yDX1YLRLo0fI63qr0pNuRazMFG7qI4G/P9+TBvnLG4itk8ch6gseUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lenl7bGHRqlhX1FY5vmtOMU2fj+Ad6c5O7/pmRES4IU=;
- b=s0HQ0rSp9XbUYvxZA4hJbhjLSV3IT77GhO15CHBJ9wELIUxZQoFXZwb2t24TQnS7X6lJuR5KnXrZAvBMIz9w+vuTWrmEP0ldHgZtnKYzwMW6jFOAoiTHxQs9sqMHjLWBgLkO2iw0emPE+xEp1OAyGcxeSgaOE7/K+8SCSmab6Ho=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MW3PR13MB4156.namprd13.prod.outlook.com (2603:10b6:303:2d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Mon, 24 Jul
- 2023 13:46:24 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
- 13:46:23 +0000
-Date: Mon, 24 Jul 2023 15:46:16 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, magnus.karlsson@intel.com,
-	davem@davemloft.net, Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH net-next] net: add missing net_device::xdp_zc_max_segs
- description
-Message-ID: <ZL6AqJP25qKHBNgs@corigine.com>
-References: <20230721145808.596298-1-maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230721145808.596298-1-maciej.fijalkowski@intel.com>
-X-ClientProxiedBy: AS4P190CA0021.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d0::6) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D448C15
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:47:48 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B134693
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 06:47:29 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8F7B01FD71;
+	Mon, 24 Jul 2023 13:47:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1690206442; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QP/WVjCIONboJunkMSgHtybWCZ4waVswj2O82yhFIeM=;
+	b=zQ90BDSJ177kl/6Gc7knyVvOAkOiru771Pm0Kkg0p/G/2bQ+h3Qu4Fzl+NthL6Zvk4cAdE
+	t82RxmV2lfidkPPwkfdx8Xn/RiE7aKHDrSTAuoN79L+zl6gpjjObe3B6FgCegIuqb50tmA
+	21eDQAx7KCEym5T+0SGfnM1OxUtU3sw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1690206442;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QP/WVjCIONboJunkMSgHtybWCZ4waVswj2O82yhFIeM=;
+	b=rvu4r5tAE+zz0pTIFald55LFnNE7m1pk09VmPNJpl2pGaBQBt0kGTYo6qlyKMTvzyB4BEq
+	Rd6woS2ul0sVRPCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4B93013476;
+	Mon, 24 Jul 2023 13:47:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id EA4EEeqAvmRCRgAAMHmgww
+	(envelope-from <hare@suse.de>); Mon, 24 Jul 2023 13:47:22 +0000
+Message-ID: <002b18c9-f2cc-046d-def8-f99bd9e0125d@suse.de>
+Date: Mon, 24 Jul 2023 15:47:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW3PR13MB4156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 373e1b56-eba9-4aaf-22d4-08db8c4c5e45
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	lE/2kvRxg0Szr0oVKBjh/xVLAkXetc9eu+VdVulaHxLhSr4ljBBDOeFQGNMV4pgtZTcwsyhi1/4ckrsNdM/ZENzcw//Lw3onbl6DzlCzs/lzCBTCugELFpFOP43kHNrNjRZpFw+DTiNaYxdq3Hh99gwvwwvJGGWZJHFAGsRhL9apbSsnlKHNa+w2ThDu76Gc544u68TWudFIW8anj/Soci5qyJCCcLuOAgrQO48W8JiuRBt9ND+EKKuBuDAFRpMNFSvLOpuI1SfHu0uQZ3wuL9JzEPkyTY9Yf2c/8Kwm66gZQ5iPOpaJcN9OJk6Sdc9tnVfrfJrBeidTaL/OedcW+ukCb6D3xPiNKK8mXO3GCbWjDGAAXyjaEgluUKEKT1KQ94MaC7qs1hHlUYtp+HQKNR7wK2zz1GPhi7GMVZrLpoj7E63XGef+YL8jE/HAAPxZXuPi8k5gMgDFejaxSQePYfQ9hm20xLIGBVoIACJlkCeS88SNaKsQZfz8QlR1/jOYSRy/99rnSIRsiOwNs9zoRwSudpfgTUB+bKgnO18KYAEV0srR3DMtIV/8pPEf1pww+j4/RbZfvVbw9nt4SFKF6AtDVzaTZUcZ09/0wm46LZY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39840400004)(366004)(376002)(396003)(346002)(451199021)(966005)(6512007)(6506007)(38100700002)(83380400001)(186003)(2616005)(44832011)(4744005)(8936002)(8676002)(41300700001)(5660300002)(2906002)(36756003)(6486002)(6916009)(66556008)(4326008)(66476007)(478600001)(86362001)(316002)(6666004)(66946007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?R97fwcei3GWFCcl3i1iXSZw8Fpy8h+YjuagchqglP9UYPphMCLeCQy1E4U/B?=
- =?us-ascii?Q?Td4ozYlsXzKczM2J+KC+nygcYBhK4P+56H68Kwn4ZrCLMtA3I1pAQ2yyehWJ?=
- =?us-ascii?Q?P8c+uvJidP3bvV8i1MtQolxevwVcZKGr3DNyWDwoEw6G7YccM4WJCLKa3XiL?=
- =?us-ascii?Q?mrkevsaM8E4f5T5d3pxJzyoQ3BrtHVjUi/r8aAijQxWdaQ0n8DPyrzwbmhoY?=
- =?us-ascii?Q?5kpspN1Lq360axSUlovfIBv5jlNcl3mMaiJxuLmYZvgjiXa1mMkNcnzbAHez?=
- =?us-ascii?Q?QlOiOCXyXor/BPCqjmVIUgFzIVpP7l7mo7WjJgadsYvGgl+O88l4ZV1sa5Ui?=
- =?us-ascii?Q?i0faNdAr25R3YBsuTNO7tTF4ZD4CtimIBEG9feodmwU36qaBpnPa3fQAfXAn?=
- =?us-ascii?Q?c2u+01AyLtxGCv8j7Oyhatau3wln3b+DTEzkIGj6dI+Mnnf51FlJvnfM6FXK?=
- =?us-ascii?Q?nwWVoXJCXQCkI6qEKFZsQyA8fK+155vkecLvZzaCjKc7g8uiK4F6uM7aUfxp?=
- =?us-ascii?Q?Lig9rMC+151zjTb0QGsPi+UuHo4E89vpuW5Hztzr49XCL8UOnxypUNyLg3+Z?=
- =?us-ascii?Q?jaiWD2wbmwaiP/QHZVnC7zWAooxJIVijvfFbb7DSMXHDVxTaeZLlZ8c4cWFZ?=
- =?us-ascii?Q?FaHhbNHx65u7VFVWCaVauDXiuXfhBm8w+ko0+wh5LlvrpFdKxeBM2Jpy6nyz?=
- =?us-ascii?Q?1JTEfDhEpSmPwr81FKbYZmwuxQgeT7lYwUv+A4S5/uLIJNlWu4xwIPGP6n3+?=
- =?us-ascii?Q?jhBRW4YDl0Lm3/dbJAhXw9Y7Y/CzQXCOX4IxmgsI1H54jCqWX52m9lgIomvd?=
- =?us-ascii?Q?39qzdlycS0NBDl2QoOrHFT0DhiZ6JQPWCZSoKn6eWyleZ7p5AGwvFT2ukV0R?=
- =?us-ascii?Q?vK9eo+YJXQoKksvpy5vUvGN4YTTrSIU13gI/1kXSetHM2i6txkeDUdsHV8Bi?=
- =?us-ascii?Q?id6CE8nHfeQBebB2faUJ9d34QSf2jy83NST3S3tqGEoK5wmj506Jf9h0oaDA?=
- =?us-ascii?Q?Lz9AoqTRIt1mTpCqCwFI8i7/mjky5RY5bORx+3T67UaojlrCi2Jv9bP5symJ?=
- =?us-ascii?Q?djlk3VBMntaxCzlzAhhM3ShrbgPGfM+q6WkQu80uOT9Nz16mgwPTNEWLkMYn?=
- =?us-ascii?Q?gnv1Sn8WE03Pi2Iivi3kHlf2t8t2CfxUGg4VW9k7KEnaZ5lAmgIEIGBIpXud?=
- =?us-ascii?Q?aRjIIdRAW8n3SQaHEFrO2f3UVzkjKSq2kShCO674VIDnk+pSdw7fgKcIHsuT?=
- =?us-ascii?Q?jNSI2RIOFvLT/HVHq9GPjjUevWk8obJrVRfB6T+uA5BMEsU7h286ZAAP2z3G?=
- =?us-ascii?Q?zOd5SpoAf2eX5Jx6aNQgFEVPnyJ9ZxGMToLtatzvTDmm4Y/B58rn0oFILkTc?=
- =?us-ascii?Q?lofeCHrPKSdZrIm5og1FusSRmHzjdx7qoMjQTosnTdhKgmiCDVJ5fn/56Q01?=
- =?us-ascii?Q?84Rzc85pPyMMdIeJbPiF28qg0ONLOm+PvCF647yMWUsnABhyK0yIvO0GUAtp?=
- =?us-ascii?Q?GgIfVZE/I2gCVYxSzt2ViKhuQSOj8iF4/3MWZyrO1YOVG4JGu8d30i1wocfP?=
- =?us-ascii?Q?2czYB0Tlp9oIk8MaK8D8CsOQhrpq2J7TL3s6Bf9dcTxgdZR3aAMZHNgotTOP?=
- =?us-ascii?Q?WqmKJnz4p9cvp44YJAoxDdoTqzlZInSi5Mvv52F+Lj3cGv/8bU3cgukaJEK3?=
- =?us-ascii?Q?uZwXtw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 373e1b56-eba9-4aaf-22d4-08db8c4c5e45
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 13:46:23.3078
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t3LAlpO4X5K1L5zQaRCisZ875CWgMwiswRdO50l4p6ual50uKAT7wumo1X3IZzjYT8wn51l57LTm8KgA86K3jmWXPQPR6TfN717QucdiU4w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR13MB4156
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 6/6] net/tls: implement ->read_sock()
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Boris Pismenny <boris.pismenny@gmail.com>
+References: <20230721143523.56906-1-hare@suse.de>
+ <20230721143523.56906-7-hare@suse.de>
+ <5196edbd-45dc-8542-975b-1a49e4061668@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <5196edbd-45dc-8542-975b-1a49e4061668@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 04:58:08PM +0200, Maciej Fijalkowski wrote:
-> Cited commit under 'Fixes' tag introduced new member to struct
-> net_device without providing description of it - fix it.
+On 7/24/23 14:59, Sagi Grimberg wrote:
 > 
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Closes: https://lore.kernel.org/all/20230720141613.61488b9e@canb.auug.org.au/
-> Fixes: 13ce2daa259a ("xsk: add new netlink attribute dedicated for ZC max frags")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> 
+> On 7/21/23 17:35, Hannes Reinecke wrote:
+>> Implement ->read_sock() function for use with nvme-tcp.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+>> Cc: Boris Pismenny <boris.pismenny@gmail.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: netdev@vger.kernel.org
+>> ---
+>>   net/tls/tls.h      |  2 ++
+>>   net/tls/tls_main.c |  2 ++
+>>   net/tls/tls_sw.c   | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 93 insertions(+)
+>>
+>> diff --git a/net/tls/tls.h b/net/tls/tls.h
+>> index 86cef1c68e03..7e4d45537deb 100644
+>> --- a/net/tls/tls.h
+>> +++ b/net/tls/tls.h
+>> @@ -110,6 +110,8 @@ bool tls_sw_sock_is_readable(struct sock *sk);
+>>   ssize_t tls_sw_splice_read(struct socket *sock, loff_t *ppos,
+>>                  struct pipe_inode_info *pipe,
+>>                  size_t len, unsigned int flags);
+>> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+>> +             sk_read_actor_t read_actor);
+>>   int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t 
+>> size);
+>>   void tls_device_splice_eof(struct socket *sock);
+>> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+>> index b6896126bb92..7dbb8cd8f809 100644
+>> --- a/net/tls/tls_main.c
+>> +++ b/net/tls/tls_main.c
+>> @@ -962,10 +962,12 @@ static void build_proto_ops(struct proto_ops 
+>> ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
+>>       ops[TLS_BASE][TLS_SW  ] = ops[TLS_BASE][TLS_BASE];
+>>       ops[TLS_BASE][TLS_SW  ].splice_read    = tls_sw_splice_read;
+>>       ops[TLS_BASE][TLS_SW  ].poll        = tls_sk_poll;
+>> +    ops[TLS_BASE][TLS_SW  ].read_sock    = tls_sw_read_sock;
+>>       ops[TLS_SW  ][TLS_SW  ] = ops[TLS_SW  ][TLS_BASE];
+>>       ops[TLS_SW  ][TLS_SW  ].splice_read    = tls_sw_splice_read;
+>>       ops[TLS_SW  ][TLS_SW  ].poll        = tls_sk_poll;
+>> +    ops[TLS_SW  ][TLS_SW  ].read_sock    = tls_sw_read_sock;
+>>   #ifdef CONFIG_TLS_DEVICE
+>>       ops[TLS_HW  ][TLS_BASE] = ops[TLS_BASE][TLS_BASE];
+>> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+>> index d0636ea13009..f7ffbe7620cb 100644
+>> --- a/net/tls/tls_sw.c
+>> +++ b/net/tls/tls_sw.c
+>> @@ -2202,6 +2202,95 @@ ssize_t tls_sw_splice_read(struct socket 
+>> *sock,  loff_t *ppos,
+>>       goto splice_read_end;
+>>   }
+>> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+>> +             sk_read_actor_t read_actor)
+>> +{
+>> +    struct tls_context *tls_ctx = tls_get_ctx(sk);
+>> +    struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
+>> +    struct strp_msg *rxm = NULL;
+>> +    struct sk_buff *skb = NULL;
+>> +    struct sk_psock *psock;
+>> +    struct tls_msg *tlm;
+>> +    ssize_t copied = 0;
+>> +    int err, used;
+>> +
+>> +    psock = sk_psock_get(sk);
+>> +    if (psock) {
+>> +        sk_psock_put(sk, psock);
+>> +        return -EINVAL;
+>> +    }
+>> +    err = tls_rx_reader_acquire(sk, ctx, true);
+>> +    if (err < 0)
+>> +        return err;
+>> +
+>> +    /* If crypto failed the connection is broken */
+>> +    err = ctx->async_wait.err;
+>> +    if (err)
+>> +        goto read_sock_end;
+>> +
+>> +    do {
+>> +        if (!skb_queue_empty(&ctx->rx_list)) {
+>> +            skb = __skb_dequeue(&ctx->rx_list);
+>> +            rxm = strp_msg(skb);
+>> +            tlm = tls_msg(skb);
+>> +        } else {
+>> +            struct tls_decrypt_arg darg;
+>> +
+>> +            err = tls_rx_rec_wait(sk, NULL, true, true);
+>> +            if (err <= 0)
+>> +                goto read_sock_end;
+>> +
+>> +            memset(&darg.inargs, 0, sizeof(darg.inargs));
+>> +
+>> +            rxm = strp_msg(tls_strp_msg(ctx));
+>> +            tlm = tls_msg(tls_strp_msg(ctx));
+>> +
+>> +            err = tls_rx_one_record(sk, NULL, &darg);
+>> +            if (err < 0) {
+>> +                tls_err_abort(sk, -EBADMSG);
+>> +                goto read_sock_end;
+>> +            }
+>> +
+>> +            sk_flush_backlog(sk);
+> 
+> Question,
+> Based on Jakub's comment, the flush is better spaced out.
+> Why not just do it once at the end? Or alternatively,
+> call tls_read_flush_backlog() ? Or just count by hand
+> every 4 records or 128K (and once in the end)?
+> 
+> I don't really know what would be the impact though, but
+> you are effectively releasing and re-acquiring the socket
+> flushing the backlog every record...
 
+I really have no idea.
+I'll see to modify it to use tls_read_flush_backlog().
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Tested-by: Simon Horman <simon.horman@corigine.com> # build-tested
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
 
