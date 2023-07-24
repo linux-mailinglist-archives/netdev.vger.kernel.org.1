@@ -1,169 +1,99 @@
-Return-Path: <netdev+bounces-20227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54FD675E7B8
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:33:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D7E75E7AD
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:32:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEEED2814BD
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 01:33:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 816DD1C20981
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 01:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9F87FA;
-	Mon, 24 Jul 2023 01:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F9C811;
+	Mon, 24 Jul 2023 01:32:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFC6EC9
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:33:11 +0000 (UTC)
-Received: from out199-10.us.a.mail.aliyun.com (out199-10.us.a.mail.aliyun.com [47.90.199.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B0059C3;
-	Sun, 23 Jul 2023 18:32:45 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R851e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0Vo.bCsO_1690162261;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vo.bCsO_1690162261)
-          by smtp.aliyun-inc.com;
-          Mon, 24 Jul 2023 09:31:02 +0800
-Date: Mon, 24 Jul 2023 09:31:01 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Julian Anastasov <ja@ssi.bg>
-Cc: Simon Horman <horms@verge.net.au>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jiejian Wu <jiejian@linux.alibaba.com>, netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH v2 net-next] ipvs: make ip_vs_svc_table and
- ip_vs_svc_fwm_table per netns
-Message-ID: <20230724013101.GI6751@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20230723154426.81242-1-dust.li@linux.alibaba.com>
- <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFD27FA
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 01:32:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB8DC433D9;
+	Mon, 24 Jul 2023 01:32:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690162330;
+	bh=VWn7I8aeOGGxbqba3PmdYM9O7ZKxNndmWAI4lNJd0nM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hwPBp819TecWumj6uZkymau1WW2ikZymIXJzT4mvo3ofHWIk+UoJY9SkZDFNawKuA
+	 QijjltEbGmz0VVQVoW2LVz+rRyKLs5xzappYu0LRTldhIRa0UldzELDFLPYUhacs0Y
+	 DLCEVWhWNZWn9Wb4CqK6dVxymUZJe0M6YStrn3EjDzQaeS7EigQqJJuJvgdrOfguLU
+	 EIBtPTadQDDQQRk84b4ghxPtlFR4icoUJHmXImvVNneMiJ5mCB3uUi3CRRDyEdvCE9
+	 IG9X9V2Pp65qig15MrwM9As2xD310E47pgKyqsDcwk0Fufo0JIFJYRLSF/8fhiZDK0
+	 4WCefD41aFAGg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Zhengping Jiang <jiangzp@google.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 21/40] Bluetooth: L2CAP: Fix use-after-free
+Date: Sun, 23 Jul 2023 21:31:21 -0400
+Message-Id: <20230724013140.2327815-21-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230724013140.2327815-1-sashal@kernel.org>
+References: <20230724013140.2327815-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.5
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jul 23, 2023 at 08:19:54PM +0300, Julian Anastasov wrote:
->
->	Hello,
->
->On Sun, 23 Jul 2023, Dust Li wrote:
->
->> From: Jiejian Wu <jiejian@linux.alibaba.com>
->> 
->> Current ipvs uses one global mutex "__ip_vs_mutex" to keep the global
->> "ip_vs_svc_table" and "ip_vs_svc_fwm_table" safe. But when there are
->> tens of thousands of services from different netns in the table, it
->> takes a long time to look up the table, for example, using "ipvsadm
->> -ln" from different netns simultaneously.
->> 
->> We make "ip_vs_svc_table" and "ip_vs_svc_fwm_table" per netns, and we
->> add "service_mutex" per netns to keep these two tables safe instead of
->> the global "__ip_vs_mutex" in current version. To this end, looking up
->> services from different netns simultaneously will not get stuck,
->> shortening the time consumption in large-scale deployment. It can be
->> reproduced using the simple scripts below.
->> 
->> init.sh: #!/bin/bash
->> for((i=1;i<=4;i++));do
->>         ip netns add ns$i
->>         ip netns exec ns$i ip link set dev lo up
->>         ip netns exec ns$i sh add-services.sh
->> done
->> 
->> add-services.sh: #!/bin/bash
->> for((i=0;i<30000;i++)); do
->>         ipvsadm -A  -t 10.10.10.10:$((80+$i)) -s rr
->> done
->> 
->> runtest.sh: #!/bin/bash
->> for((i=1;i<4;i++));do
->>         ip netns exec ns$i ipvsadm -ln > /dev/null &
->> done
->> ip netns exec ns4 ipvsadm -ln > /dev/null
->> 
->> Run "sh init.sh" to initiate the network environment. Then run "time
->> ./runtest.sh" to evaluate the time consumption. Our testbed is a 4-core
->> Intel Xeon ECS. The result of the original version is around 8 seconds,
->> while the result of the modified version is only 0.8 seconds.
->> 
->> Signed-off-by: Jiejian Wu <jiejian@linux.alibaba.com>
->> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
->> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
->
->	Changes look good to me, thanks! But checkpatch is reporting
->for some cosmetic changes that you have to do in v3:
->
->scripts/checkpatch.pl --strict /tmp/file.patch
+From: Zhengping Jiang <jiangzp@google.com>
 
-Oh, sorry for that! I ignored the CHECKs checkpatch reported, my checkpatch
-shows:
+[ Upstream commit f752a0b334bb95fe9b42ecb511e0864e2768046f ]
 
+Fix potential use-after-free in l2cap_le_command_rej.
 
-   $./scripts/checkpatch.pl --strict 0001-ipvs-make-ip_vs_svc_table-and-ip_vs_svc_fwm_table-pe.patch
-   CHECK: Prefer using the BIT macro
-   #69: FILE: include/net/ip_vs.h:40:
-   +#define IP_VS_SVC_TAB_SIZE (1 << IP_VS_SVC_TAB_BITS)
+Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/bluetooth/l2cap_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-We just moved this line from ip_vs_ctl.c to ip_vs.h, so we ignored the
-BIT macro. Do you think we should change it using BIT macro ?
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c5e8798e297ca..17ca13e8c044c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6374,9 +6374,14 @@ static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
+ 	if (!chan)
+ 		goto done;
+ 
++	chan = l2cap_chan_hold_unless_zero(chan);
++	if (!chan)
++		goto done;
++
+ 	l2cap_chan_lock(chan);
+ 	l2cap_chan_del(chan, ECONNREFUSED);
+ 	l2cap_chan_unlock(chan);
++	l2cap_chan_put(chan);
+ 
+ done:
+ 	mutex_unlock(&conn->chan_lock);
+-- 
+2.39.2
 
-
-   CHECK: struct mutex definition without comment
-   #79: FILE: include/net/ip_vs.h:1051:
-   +       struct mutex service_mutex;
-
-I think we can add comment for it.
-But rethinking a bit on the service_mutex in ip_vs_est.c, I'm a
-wondering why we are using the service_mutex in estimation ? Is est_mutex
-enough for the protecting in ip_vs_est.c ?
-
-
-   CHECK: Logical continuations should be on the previous line
-   #161: FILE: net/netfilter/ipvs/ip_vs_ctl.c:410:
-                       && (svc->port == vport)
-   +                   && (svc->protocol == protocol)) {
-
-This is just the removal of '(svc->ipvs == ipvs)' and kept it as it is.
-So haven't change according to checkpatch. If you prefer, I can modify
-it to make checkpatch happy.
-
-
-   CHECK: Alignment should match open parenthesis
-   #233: FILE: net/netfilter/ipvs/ip_vs_ctl.c:1767:
-   +                       list_for_each_entry(dest, &svc->destinations,
-   +                                               n_list) {
-
-We missed this, will change.
-
-
-   CHECK: Alignment should match open parenthesis
-   #246: FILE: net/netfilter/ipvs/ip_vs_ctl.c:1774:
-   +                       list_for_each_entry(dest, &svc->destinations,
-   +                                               n_list) {
-
-Same above.
-
-   total: 0 errors, 0 warnings, 5 checks, 506 lines checked
-
-
-
->
->Regards
->
->--
->Julian Anastasov <ja@ssi.bg>
 
