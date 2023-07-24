@@ -1,280 +1,190 @@
-Return-Path: <netdev+bounces-20569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE2A76024C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:31:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D35760279
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC681C20CA0
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 22:31:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462F51C20C67
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 22:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6405226;
-	Mon, 24 Jul 2023 22:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE7711CA2;
+	Mon, 24 Jul 2023 22:41:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA57012B6A
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 22:31:25 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7114110D;
-	Mon, 24 Jul 2023 15:31:23 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b935316214so61528441fa.1;
-        Mon, 24 Jul 2023 15:31:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDF65226
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 22:41:01 +0000 (UTC)
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C4B10FA
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:40:59 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-348ccbf27eeso10483165ab.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690237882; x=1690842682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hyLFD9WDuFUoUwZ/OsjIvbcM065C9QMvLj1zUBG6gSs=;
-        b=D8lWwBjBGAMzsHFRYBQ6rpF6OZp/H8askSMoajc/eyDhinGEKNAMmn6S35DJLfbVk3
-         O/gNf+3UzyRYxYLe/Oh5VbDFAtc3VRS2P2rAGkPdc5sn1hBXPWwrnUO1Ec+DGHw3N7Mh
-         9cTdFGxggt7lvsZl7vgRVH0qEuanzThS13cGa1OnquvyUmUHie3Sw2Xgvo+5DII9UVgw
-         mvexL5Ikm5J40zETtVUzkh0mmEteTAEgStzt28I4mfKrzcDuiXa6olS5vymqsL6FESSp
-         lVk3gde9A+VUniMEzRYfk58xEmxZ5sNxiTQ31VZGI/TGNLRMURXw81nTtw79qutQvnme
-         ynyA==
+        d=linaro.org; s=google; t=1690238458; x=1690843258;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iKKgu6i/BBqK+vHvXOuZXXT6jRdj5IPssioGIwoBJF4=;
+        b=Hzu3T9XRyiq8KcynvHxfdIrLya3B1g/zWPJ57AoSNqTf6WLvQkAl7lLPBg3JcBQNk7
+         XCe5GmZtcSJmpMaCLHK0FdZGTermZaDN2ZyQS4Ic0OBqm+6GU97c6w9+8KhzFlcG8ndH
+         iYktX4ihjyT79kvfDkJOWXvTyr4067FfY61ONlueQEe1QBhQva36howY/OQ7g4JF1OkV
+         dlHPOavI+CteCqNVxPKtAqABLki/5bkxxnJiloH7qKhJT61LcVGOSaC0rBh+mEIGosjB
+         9FmPee5ELruCiQU03d8C/vpfDeCL1GFFBziCMk26YjTUVatDO3qn2gv2slFnpK4rEh9U
+         5mRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690237882; x=1690842682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hyLFD9WDuFUoUwZ/OsjIvbcM065C9QMvLj1zUBG6gSs=;
-        b=FRkWgTSZmylNdTGOvtQnXmzitWp6Dzuw8oATXuJyzbwp+/w+F684yb/ggNa2+yOxJ+
-         /AuvnH1OK1U1ogQaIbtuNu777JVH3r4Cp5jsMsyPQrBym0fkXdAlj3rM7Tcz+iibF3PE
-         Gek983/m0k7F1lkH/L77gfbnrFhJ5pg4lpp1l4ANYrDUOSHrS6VE3sdAAd0o7v1lq212
-         wrMpihjT6lTzzlXZ8XqwiuazB/XCzHRgON2ljgt4Nv36HdgxscP5/aBtrqqj68xBguOh
-         0kA2wspMMBfhcRtYcZvrwoEJun/7pUfft4+EbU9baO4a1hIWfPUoiY/XeH1iTgvvEpz3
-         IDHQ==
-X-Gm-Message-State: ABy/qLZcSzyVzaAYfL3QNKiSgfdJfLsKjTUc3DKCP21fAEKCkDtMPw5y
-	gFsnr/2tqhm4HLTXD0yTDRGPw5Ux0QJr3d9J5yc=
-X-Google-Smtp-Source: APBJJlH3RgcI+9OcZhDB3VBSHeLKnLdw/X5RT0kz+ivy2QJy6uHCoki8/0N9tEvZhMi1gQdkhw/J1cjNP9fMwsLtO40=
-X-Received: by 2002:a2e:98c7:0:b0:2b6:d47f:2a4 with SMTP id
- s7-20020a2e98c7000000b002b6d47f02a4mr245042ljj.13.1690237881392; Mon, 24 Jul
- 2023 15:31:21 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690238458; x=1690843258;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iKKgu6i/BBqK+vHvXOuZXXT6jRdj5IPssioGIwoBJF4=;
+        b=AGQyNwMxXvvZflAAXM1qbAySvy28eJHSIsfBAvN2t7Aha7jLweD1kR9rkNotPsXwRA
+         HFjrugthqoWU2oiXc2zE10m4gEvNWLDtxbhsbl7hGPcTd12vR9BSpDLUQYurwNF4dzk1
+         SaJlWh7tl+dbvkMKggA8RZXHT9P5wzLJAd1yK3ajuLsxdFhIwZvddmZInh2rvRT41sIk
+         9THylTpu21FGceUx98WTnsGDOdXD4fL1YQaXjGqSt1aLLUIgRWumz+mevybbQSvC33+u
+         ONa3+Huv8dFb1sYWyU03P/mm1B034zpQHqX4RZEusA2va350O49HWYsgbB+8YU5MdTwG
+         22ag==
+X-Gm-Message-State: ABy/qLbH6/ut8d6qT1AczA0hWnTdSY56R919/CrBCqPUcpa++XYB1uKo
+	e3DdVuHX5AoKvAhhsPHjH53xfg==
+X-Google-Smtp-Source: APBJJlEWt68nkZpbyT0RxibRCLbOdlbisPQd9crre6rbKDCoThNCdcGwvFgg74D0WZSNonJH4u9QYw==
+X-Received: by 2002:a05:6e02:b47:b0:348:8163:b6be with SMTP id f7-20020a056e020b4700b003488163b6bemr1218203ilu.30.1690238458732;
+        Mon, 24 Jul 2023 15:40:58 -0700 (PDT)
+Received: from localhost.localdomain (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
+        by smtp.gmail.com with ESMTPSA id o11-20020a056638124b00b0042b482a8763sm3090952jas.70.2023.07.24.15.40.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 15:40:58 -0700 (PDT)
+From: Alex Elder <elder@linaro.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: dianders@chromium.org,
+	caleb.connolly@linaro.org,
+	mka@chromium.org,
+	evgreen@chromium.org,
+	andersson@kernel.org,
+	quic_cpratapa@quicinc.com,
+	quic_avuyyuru@quicinc.com,
+	quic_jponduru@quicinc.com,
+	quic_subashab@quicinc.com,
+	elder@kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: ipa: only reset hashed tables when supported
+Date: Mon, 24 Jul 2023 17:40:55 -0500
+Message-Id: <20230724224055.1688854-1-elder@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230724111206.3067352-1-howardchung@google.com>
-In-Reply-To: <20230724111206.3067352-1-howardchung@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 24 Jul 2023 15:31:08 -0700
-Message-ID: <CABBYNZ+UrWFNULhn8Nu79rvS-NZ4Rt4X4y=s+-DHEwjfKuX8Gg@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Add timeout in disconnect when power off
-To: Howard Chung <howardchung@google.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
-	Archie Pusaka <apusaka@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Howard,
+Last year, the code that manages GSI channel transactions switched
+from using spinlock-protected linked lists to using indexes into the
+ring buffer used for a channel.  Recently, Google reported seeing
+transaction reference count underflows occasionally during shutdown.
 
-On Mon, Jul 24, 2023 at 4:12=E2=80=AFAM Howard Chung <howardchung@google.co=
-m> wrote:
->
-> For some controllers, it is known that when the HCI disconnect and HCI
-> Reset are too close to each other, the LMP disconnect command might not
-> been sent out yet and the command will be dropped by the controoler when
-> it is asked to reset itself. This could happen on powering off adapter.
->
-> One possible issue is that if a connection exists, and then powering off
-> and on adapter within a short time, then our host stack assumes the
-> conntection was disconnected but this might not be true, so if we issue
-> a connection to the peer, it will fail with ACL Already Connected error.
+Doug Anderson found a way to reproduce the issue reliably, and
+bisected the issue to the commit that eliminated the linked lists
+and the lock.  The root cause was ultimately determined to be
+related to unused transactions being committed as part of the modem
+shutdown cleanup activity.  Unused transactions are not normally
+expected (except in error cases).
 
-That sounds more like a bug in the controller though, the spec is
-quite clear that it must reset the link-layer state:
+The modem uses some ranges of IPA-resident memory, and whenever it
+shuts down we zero those ranges.  In ipa_filter_reset_table() a
+transaction is allocated to zero modem filter table entries.  If
+hashing is not supported, hashed table memory should not be zeroed.
+But currently nothing prevents that, and the result is an unused
+transaction.  Something similar occurs when we zero routing table
+entries for the modem.
 
-BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-page 1972
+By preventing any attempt to clear hashed tables when hashing is not
+supported, the reference count underflow is avoided in this case.
 
-...HCI_Reset command shall reset the Link Manager, Baseband and Link Layer.
+Note that there likely remains an issue with properly freeing unused
+transactions (if they occur due to errors).  This patch addresses
+only the underflows that Google originally reported.
 
-So it sounds like the controller shall perform and the necessary
-procedures before it respond with a Command Complete.
+Fixes: d338ae28d8a8 ("net: ipa: kill all other transaction lists")
+Cc: <stable@vger.kernel.org>	# 6.4.x
+Tested-by: Douglas Anderson <dianders@chromium.org>
+Signed-off-by: Alex Elder <elder@linaro.org>
+---
+ drivers/net/ipa/ipa_table.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-> This CL makes the host stack to wait for |HCI_EV_DISCONN_COMPLETE| when
-> powering off with a configurable timeout unless the timeout is set to 0.
->
-> Reviewed-by: Archie Pusaka <apusaka@google.com>
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> ---
-> Hi upstream maintainers, this is tested with an AX211 device and Logi
-> K580 keyboard by the following procedures:
-> 1. pair the peer and stay connected.
-> 2. power off and on immediately
-> 3. observe that the btsnoop log is consistent with the configured
->    timeout.
->
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         |  2 +-
->  net/bluetooth/hci_sync.c         | 38 +++++++++++++++++++++++---------
->  net/bluetooth/mgmt_config.c      |  6 +++++
->  4 files changed, 35 insertions(+), 12 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index 8200a6689b39..ce44f9c60059 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -432,6 +432,7 @@ struct hci_dev {
->         __u16           advmon_allowlist_duration;
->         __u16           advmon_no_filter_duration;
->         __u8            enable_advmon_interleave_scan;
-> +       __u16           discon_on_poweroff_timeout;
->
->         __u16           devid_source;
->         __u16           devid_vendor;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 0fefa6788911..769865494f45 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2479,7 +2479,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
->         hdev->adv_instance_cnt =3D 0;
->         hdev->cur_adv_instance =3D 0x00;
->         hdev->adv_instance_timeout =3D 0;
-> -
-> +       hdev->discon_on_poweroff_timeout =3D 0;   /* Default to no timeou=
-t */
->         hdev->advmon_allowlist_duration =3D 300;
->         hdev->advmon_no_filter_duration =3D 500;
->         hdev->enable_advmon_interleave_scan =3D 0x00;     /* Default to d=
-isable */
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 3348a1b0e3f7..260e9f05359c 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -5250,6 +5250,8 @@ static int hci_disconnect_sync(struct hci_dev *hdev=
-, struct hci_conn *conn,
->                                u8 reason)
->  {
->         struct hci_cp_disconnect cp;
-> +       unsigned long timeout;
-> +       int err;
->
->         if (conn->type =3D=3D AMP_LINK)
->                 return hci_disconnect_phy_link_sync(hdev, conn->handle, r=
-eason);
-> @@ -5258,19 +5260,33 @@ static int hci_disconnect_sync(struct hci_dev *hd=
-ev, struct hci_conn *conn,
->         cp.handle =3D cpu_to_le16(conn->handle);
->         cp.reason =3D reason;
->
-> -       /* Wait for HCI_EV_DISCONN_COMPLETE, not HCI_EV_CMD_STATUS, when =
-the
-> -        * reason is anything but HCI_ERROR_REMOTE_POWER_OFF. This reason=
- is
-> -        * used when suspending or powering off, where we don't want to w=
-ait
-> -        * for the peer's response.
-> +       /* The HCI_ERROR_REMOTE_POWER_OFF is used when suspending or powe=
-ring off,
-> +        * so we don't want to waste time waiting for the reply of the pe=
-er.
-> +        * However, if the configuration specified, we'll wait some time =
-to give the
-> +        * controller chance to actually send the disconnect command.
->          */
-> -       if (reason !=3D HCI_ERROR_REMOTE_POWER_OFF)
-> -               return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
-> -                                               sizeof(cp), &cp,
-> -                                               HCI_EV_DISCONN_COMPLETE,
-> -                                               HCI_CMD_TIMEOUT, NULL);
-> +       if (reason =3D=3D HCI_ERROR_REMOTE_POWER_OFF && !hdev->discon_on_=
-poweroff_timeout) {
-> +               return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT,
-> +                                            sizeof(cp), &cp, HCI_CMD_TIM=
-EOUT);
-> +       }
->
-> -       return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT, sizeof(cp),=
- &cp,
-> -                                    HCI_CMD_TIMEOUT);
-> +       if (reason =3D=3D HCI_ERROR_REMOTE_POWER_OFF)
-> +               timeout =3D msecs_to_jiffies(hdev->discon_on_poweroff_tim=
-eout);
-> +       else
-> +               timeout =3D HCI_CMD_TIMEOUT;
-> +
-> +       err =3D __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
-> +                                      sizeof(cp), &cp,
-> +                                      HCI_EV_DISCONN_COMPLETE,
-> +                                      timeout, NULL);
-> +
-> +       /* Ignore the error in suspending or powering off case to avoid t=
-he procedure being
-> +        * aborted.
-> +        */
-> +       if (reason =3D=3D HCI_ERROR_REMOTE_POWER_OFF)
-> +               return 0;
-> +
-> +       return err;
->  }
->
->  static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
-> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index 6ef701c27da4..f3194e3642d9 100644
-> --- a/net/bluetooth/mgmt_config.c
-> +++ b/net/bluetooth/mgmt_config.c
-> @@ -78,6 +78,7 @@ int read_def_system_config(struct sock *sk, struct hci_=
-dev *hdev, void *data,
->                 HDEV_PARAM_U16(advmon_allowlist_duration);
->                 HDEV_PARAM_U16(advmon_no_filter_duration);
->                 HDEV_PARAM_U8(enable_advmon_interleave_scan);
-> +               HDEV_PARAM_U16(discon_on_poweroff_timeout);
->         } __packed rp =3D {
->                 TLV_SET_U16(0x0000, def_page_scan_type),
->                 TLV_SET_U16(0x0001, def_page_scan_int),
-> @@ -111,6 +112,7 @@ int read_def_system_config(struct sock *sk, struct hc=
-i_dev *hdev, void *data,
->                 TLV_SET_U16(0x001d, advmon_allowlist_duration),
->                 TLV_SET_U16(0x001e, advmon_no_filter_duration),
->                 TLV_SET_U8(0x001f, enable_advmon_interleave_scan),
-> +               TLV_SET_U16(0x0020, discon_on_poweroff_timeout),
->         };
->
->         bt_dev_dbg(hdev, "sock %p", sk);
-> @@ -186,6 +188,7 @@ int set_def_system_config(struct sock *sk, struct hci=
-_dev *hdev, void *data,
->                 case 0x001b:
->                 case 0x001d:
->                 case 0x001e:
-> +               case 0x0020:
->                         exp_type_len =3D sizeof(u16);
->                         break;
->                 case 0x001f:
-> @@ -314,6 +317,9 @@ int set_def_system_config(struct sock *sk, struct hci=
-_dev *hdev, void *data,
->                 case 0x0001f:
->                         hdev->enable_advmon_interleave_scan =3D TLV_GET_U=
-8(buffer);
->                         break;
-> +               case 0x00020:
-> +                       hdev->discon_on_poweroff_timeout =3D TLV_GET_LE16=
-(buffer);
-> +                       break;
->                 default:
->                         bt_dev_warn(hdev, "unsupported parameter %u", typ=
-e);
->                         break;
-> --
-> 2.41.0.487.g6d72f3e995-goog
->
+diff --git a/drivers/net/ipa/ipa_table.c b/drivers/net/ipa/ipa_table.c
+index f0529c31d0b6e..7b637bb8b41c8 100644
+--- a/drivers/net/ipa/ipa_table.c
++++ b/drivers/net/ipa/ipa_table.c
+@@ -273,16 +273,15 @@ static int ipa_filter_reset(struct ipa *ipa, bool modem)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = ipa_filter_reset_table(ipa, true, false, modem);
+-	if (ret)
+-		return ret;
+-
+ 	ret = ipa_filter_reset_table(ipa, false, true, modem);
++	if (ret || !ipa_table_hash_support(ipa))
++		return ret;
++
++	ret = ipa_filter_reset_table(ipa, true, false, modem);
+ 	if (ret)
+ 		return ret;
+-	ret = ipa_filter_reset_table(ipa, true, true, modem);
+ 
+-	return ret;
++	return ipa_filter_reset_table(ipa, true, true, modem);
+ }
+ 
+ /* The AP routes and modem routes are each contiguous within the
+@@ -291,12 +290,13 @@ static int ipa_filter_reset(struct ipa *ipa, bool modem)
+  * */
+ static int ipa_route_reset(struct ipa *ipa, bool modem)
+ {
++	bool hash_support = ipa_table_hash_support(ipa);
+ 	u32 modem_route_count = ipa->modem_route_count;
+ 	struct gsi_trans *trans;
+ 	u16 first;
+ 	u16 count;
+ 
+-	trans = ipa_cmd_trans_alloc(ipa, 4);
++	trans = ipa_cmd_trans_alloc(ipa, hash_support ? 4 : 2);
+ 	if (!trans) {
+ 		dev_err(&ipa->pdev->dev,
+ 			"no transaction for %s route reset\n",
+@@ -313,10 +313,12 @@ static int ipa_route_reset(struct ipa *ipa, bool modem)
+ 	}
+ 
+ 	ipa_table_reset_add(trans, false, false, false, first, count);
+-	ipa_table_reset_add(trans, false, true, false, first, count);
+-
+ 	ipa_table_reset_add(trans, false, false, true, first, count);
+-	ipa_table_reset_add(trans, false, true, true, first, count);
++
++	if (hash_support) {
++		ipa_table_reset_add(trans, false, true, false, first, count);
++		ipa_table_reset_add(trans, false, true, true, first, count);
++	}
+ 
+ 	gsi_trans_commit_wait(trans);
+ 
+-- 
+2.34.1
 
-
---=20
-Luiz Augusto von Dentz
 
