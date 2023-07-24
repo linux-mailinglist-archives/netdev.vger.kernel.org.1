@@ -1,102 +1,174 @@
-Return-Path: <netdev+bounces-20436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96CE075F8FC
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:55:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C97A575F910
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:59:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C864D1C20B85
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:55:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D64F1C20B5A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99DAD8C1B;
-	Mon, 24 Jul 2023 13:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737F89470;
+	Mon, 24 Jul 2023 13:58:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA628C0F
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:55:40 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9491FCC
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 06:55:35 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fb863edcb6so6544799e87.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 06:55:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1690206933; x=1690811733;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cLuBTJcHgRw5Dz5uIr7zOsQg7JkLL64F6mhAMmK/Urg=;
-        b=gvHlyPxpUKDXveeruAvPPnL2uwW7r0Lm6j/W1meQaI6mI9bctOF+FA+qn05a9Sgtx6
-         YLUJNCG7B6Bg6YnKGdq4BjFBF218V2BzeuKMNMBnLqM1NwslZsz/em1+PzKJfEko3N5D
-         Ki+Xww/RrchuUj/d3YykuEcicj0QjNcfotE4c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690206933; x=1690811733;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cLuBTJcHgRw5Dz5uIr7zOsQg7JkLL64F6mhAMmK/Urg=;
-        b=Eh6nCpS7LAIb7GUVHgWGNWk0Sxf2/1XbcMEuk0q2P+4Z9G0hOz25TIJL6ZXueYaBgk
-         q8PkG8Id7la65+/o0qLQUyj7uQ1pnck5ccp2A2PLW4YeQqhqHNVMZwLzcSnf7+55a4X1
-         WJFtzzS2nwDnZqi7gM9r2wmOlvWEp+YP5p7Ntk2IaRVgOBiWzN4u2PXHXu7DEyOHr1o3
-         lz+JZUv91zVBzTZ6sMrXZ3Ea9LEeCqrn0QFkBqmn2idpu3/y6prQOnYjyaZykRQR5MIH
-         xpf9Kl5JTdtyhzw3ehMOo2nEQTjY1b+bM1Z5jsjLfagVhpp8c9na2db1gan1bpqGy6FR
-         gAwg==
-X-Gm-Message-State: ABy/qLYwSRjTjq0b5hhXVlLkTzkrFQvf6Tx4D7nJ82KD/T7J898nKdI+
-	hKbbrCGu9YWQ9E8GI033CPy352BsFdPwCljcSye9GQ==
-X-Google-Smtp-Source: APBJJlFFevIadl9sawEPFI9I5OR2dPQnGvYtXsyb59paj5UKaXjSUkFCIk1mA0a3cy0sEARUqP5jmS4qlpHJ1cAJBSw=
-X-Received: by 2002:a05:6512:234c:b0:4fa:5255:4fa3 with SMTP id
- p12-20020a056512234c00b004fa52554fa3mr6246134lfu.5.1690206933287; Mon, 24 Jul
- 2023 06:55:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6724F8C15
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:58:58 +0000 (UTC)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7190618E
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 06:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690207136; x=1721743136;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=NPiwupa9t8YKDwSwTQOsNFLig1lIbwPc5gnDmsk//9g=;
+  b=isIuTHgr8WchitPkPazqOT7QK3Vd2W5ykihnZpqXYlQQi02Jm59UBmgd
+   3c8lzX98oZrrhQzLfWb8NwUNOvhLcZRTxq/8BYF9EeI2JvZAR5fYSCAJ6
+   kkf2mGmWZ3XLH1P8+xDnlQb1bgz0aw8IlhT6gIZyg9hcx46otzsBejizN
+   eTYcSt2sowFwA8lRcPsV296p5kqbUjN81tONduFmyd47xP7Gnk2/L8Ndo
+   +VksZe1Bl4GMVLLuM7NPPk42OWq14lN78hc/9SSNMJQs0AJ/mANa/HCBE
+   TZY4+vHtyVtCPokcEXcrR4CjxkkqcvsZNgeK6gw3QUTyf2fMRiRYtQyCw
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10781"; a="398353887"
+X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
+   d="scan'208";a="398353887"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 06:58:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10781"; a="760798777"
+X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
+   d="scan'208";a="760798777"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.237.140.125]) ([10.237.140.125])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 06:58:53 -0700
+Message-ID: <24784f80-df7b-a666-a56b-9b4c288978a1@linux.intel.com>
+Date: Mon, 24 Jul 2023 15:58:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230629155433.4170837-1-dhowells@redhat.com> <20230629155433.4170837-2-dhowells@redhat.com>
- <CAJfpegsJuvXJDcXpo9T19Gw0tDuvyOJdv44Y2bt04MEf1JLxGg@mail.gmail.com>
- <c634a18e-9f2b-4746-bd8f-aa1d41e6ddf7@mattwhitlock.name> <CAJfpegvq4M_Go7fHiWVBBkrK6h4ChLqQTd0+EOKbRWZDcVerWA@mail.gmail.com>
- <ZLg9HbhOVnLk1ogA@casper.infradead.org> <CAHk-=wiq95bWiWLyz96ombPfpy=PNrc2KKyzJ2d+WMrxi6=OVA@mail.gmail.com>
- <63041.1690191864@warthog.procyon.org.uk>
-In-Reply-To: <63041.1690191864@warthog.procyon.org.uk>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Mon, 24 Jul 2023 15:55:21 +0200
-Message-ID: <CAJfpegstr2CwC2ZL4-y_bAjS3hqF_vta5e4XQneJYmxz9rhVpA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/4] splice: Fix corruption of spliced data after
- splice() returns
-To: David Howells <dhowells@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Matthew Wilcox <willy@infradead.org>, 
-	Matt Whitlock <kernel@mattwhitlock.name>, netdev@vger.kernel.org, 
-	Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>, linux-fsdevel@kvack.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH iwl-next v3 6/6] ice: Add support for PFCP hardware
+ offload in switchdev
+Content-Language: en-US
+To: Andy Shevchenko <andy@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ wojciech.drewek@intel.com, michal.swiatkowski@linux.intel.com,
+ aleksander.lobakin@intel.com, davem@davemloft.net, kuba@kernel.org,
+ jiri@resnulli.us, pabeni@redhat.com, jesse.brandeburg@intel.com,
+ simon.horman@corigine.com, idosch@nvidia.com
+References: <20230721071532.613888-1-marcin.szycik@linux.intel.com>
+ <20230721071532.613888-7-marcin.szycik@linux.intel.com>
+ <ZLqfJZi/14dyEzhH@smile.fi.intel.com>
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <ZLqfJZi/14dyEzhH@smile.fi.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 24 Jul 2023 at 11:44, David Howells <dhowells@redhat.com> wrote:
->
-> Linus Torvalds <torvalds@linux-foundation.org> wrote:
->
-> > > So what's the API that provides the semantics of _copying_?
-> >
-> > It's called "read()" and "write()".
->
-> What about copy_file_range()?  That seems to fall back to splicing if not
-> directly implemented by the filesystem.  It looks like the manpage for that
-> needs updating too - or should that actually copy?
 
-Both source and destination of copy_file_range() are regular files and
-do_splice_direct() is basically equivalent to write(dest, mmap of
-source), no refd buffers remain beyond the end of the syscall.  What
-is it that should be updated in the manpage?
 
-Thanks,
-Miklos
+On 21.07.2023 17:07, Andy Shevchenko wrote:
+> On Fri, Jul 21, 2023 at 09:15:32AM +0200, Marcin Szycik wrote:
+>> Add support for creating PFCP filters in switchdev mode. Add support
+>> for parsing PFCP-specific tc options: S flag and SEID.
+>>
+>> To create a PFCP filter, a special netdev must be created and passed
+>> to tc command:
+>>
+>> ip link add pfcp0 type pfcp
+>> tc filter add dev eth0 ingress prio 1 flower pfcp_opts \
+>> 1:123/ff:fffffffffffffff0 skip_hw action mirred egress redirect dev pfcp0
+> 
+> Can you indent this (by 2 spaces?) to differentiate with the commit message
+> itself?
+
+Sure.
+
+> 
+>> Changes in iproute2 [1] are required to be able to use pfcp_opts in tc.
+>>
+>> ICE COMMS package is required to create a filter as it contains PFCP
+>> profiles.
+> 
+>> [1] https://lore.kernel.org/netdev/20230614091758.11180-1-marcin.szycik@linux.intel.com
+> 
+> We have Link: tag for such kind of stuff.
+
+Are you sure this is a valid use of Link: tag? Patch that is linked here is
+in another tree, and also I want to have [1] inline for context.
+
+> 
+> ...
+> 
+>> +	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ENC_OPTS) &&
+>> +	    fltr->tunnel_type == TNL_PFCP) {
+>> +		struct flow_match_enc_opts match;
+>> +
+>> +		flow_rule_match_enc_opts(rule, &match);
+>> +
+>> +		memcpy(&fltr->pfcp_meta_keys, &match.key->data[0],
+>> +		       sizeof(struct pfcp_metadata));
+> 
+> Why not simply
+> 
+> 		match.key->data
+> 
+> ?
+
+Will change.
+
+> 
+>> +		memcpy(&fltr->pfcp_meta_masks, &match.mask->data[0],
+>> +		       sizeof(struct pfcp_metadata));
+> 
+> Ditto.
+> 
+>> +		fltr->flags |= ICE_TC_FLWR_FIELD_PFCP_OPTS;
+>> +	}
+> 
+> ...
+> 
+>>  #ifndef _ICE_TC_LIB_H_
+>>  #define _ICE_TC_LIB_H_
+> 
+> Seems bits.h is missing...
+
+Will add.
+
+> 
+>> +#include <net/pfcp.h>
+>> +
+>>  #define ICE_TC_FLWR_FIELD_DST_MAC		BIT(0)
+>>  #define ICE_TC_FLWR_FIELD_SRC_MAC		BIT(1)
+>>  #define ICE_TC_FLWR_FIELD_VLAN			BIT(2)
+> 
+> ...
+> 
+>>  #define ICE_TC_FLWR_FIELD_VLAN_PRIO		BIT(27)
+>>  #define ICE_TC_FLWR_FIELD_CVLAN_PRIO		BIT(28)
+>>  #define ICE_TC_FLWR_FIELD_VLAN_TPID		BIT(29)
+>> +#define ICE_TC_FLWR_FIELD_PFCP_OPTS		BIT(30)
+>>  
+>>  #define ICE_TC_FLOWER_MASK_32   0xFFFFFFFF
+> 
+> ...and (at least) this can utilize GENMASK().
+
+It can, but it's unrelated to this patch.
+
+
+Thank you for review!
+Marcin
 
