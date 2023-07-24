@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-20381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B26475F3F0
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:54:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD3775F3F2
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6A31C208EA
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 185F9281396
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A5853A2;
-	Mon, 24 Jul 2023 10:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652EA53B2;
+	Mon, 24 Jul 2023 10:54:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DDE539F
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:54:32 +0000 (UTC)
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10BEE6;
-	Mon, 24 Jul 2023 03:54:30 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31751d7d96eso978073f8f.1;
-        Mon, 24 Jul 2023 03:54:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589C0539E
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:54:33 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA1990;
+	Mon, 24 Jul 2023 03:54:31 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-31765aee31bso128007f8f.1;
+        Mon, 24 Jul 2023 03:54:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690196069; x=1690800869;
+        d=gmail.com; s=20221208; t=1690196070; x=1690800870;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZuukWSSIlqBsc+jjkqa9IHelgU4HEBkAlLZYUDelO8M=;
-        b=qKBwUn9uzu/b+NKMwT8JHRsWh7mw0jMgRMxpcirBzwnwd180sqhjHJ8Kw4W84xy7MK
-         1JbJGud4GyC49w7bT7EZ1DOf2BbdEqAyuAP+XjaYwo0obaQQpScUq5eWKnf+QH5lkWdS
-         Pjf/l+l6N8uYqik3JqmZ2lzf9ZTZQIMPXQPmKLI1T3D01NIC4mbHEjFlIYQK6Bi6bouy
-         1rQJHm62iBoSLuPIAgLRa5Q9ItREg5lBZhNXF2znv6kSYYCTditN9Lfz45K7BgrSf5EG
-         Muco895fHevbWPg7Nb9jM9JvTbM75QjbKosW6lkQAhS65Hmj1YDoQzKtUOgN7gqJk/nD
-         12gw==
+        bh=OEyWGecSm4CuQ74zs3MLXEg5kzDp90u6LK+sKJXsB/Y=;
+        b=B07Xq67Ah++90WKhMX1GMpNC+E4X9DXk7Lz+6CBjPwH+uZ9JOMyCvW4oVr3tCfboZy
+         H4soUZeTOOhYteIOmvZI3DV9oo3uMAvHkF5sf8LVeTQKpVu9+D4yXMiyEPnkJrBQZs5G
+         lw7QHISG6LTo8Mav2202xrUQS5UigmCMtHIrAwkLmaKui1qvc3dVGNHZB+twCfMb8i7p
+         So2k3vhM4sjwB1RG4gMN4cZoGofNIEV/MIRAU17hir4DWFqFhhlRm+qpy28tC49r6/IY
+         Wpiw+LEUCifV5skNSHXp6s0RiKJ28Kcahw2oClXRuVEDKoMKDlU8SZHiKJsn+muSpjUj
+         7cwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690196069; x=1690800869;
+        d=1e100.net; s=20221208; t=1690196070; x=1690800870;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZuukWSSIlqBsc+jjkqa9IHelgU4HEBkAlLZYUDelO8M=;
-        b=FhVPQMlH3tqfKKLJVgeBoBqEjY9T1HRnagHEKUz8Q4Mojcc/iGWifAWUhMQHAE3MtR
-         GuAAebxWH276ZJCF5Q/qzXV+MGK9hLZQ/eFgDG0QyzaM58MWE5/ycyTKU/lXwGHNIFGQ
-         si/dyGyL8nwNPbWM1e/HsZXkB4rNwA7nV6u23x9n+OPFwZ3i4g56ByxY9oOEmJGX/wpl
-         CGgQn322QasrzNdyf7VKf0fDkeZbKfVStbl7GLaa0rI3bmJS4CxLqPh2YTUGYKbQkVP+
-         Pj+bB3Sln71QgLLnIUdy9wZn+LC0BJ1AFZBpfQbaKXHOAygvhOIKDkFOhta462YYWrLM
-         Hy3g==
-X-Gm-Message-State: ABy/qLZwbLJG61FhVxmqeExJVnUlSDWinbazNQctJlntL0auAv1RwfB/
-	9PzgQ9mqDG3tlNsDnpHkFgM=
-X-Google-Smtp-Source: APBJJlFpKYZ0rfl6BcoKmne1Hm7Zln371bZfCqmtU+360RsDDJSJgeO+gcrcAQcXSBlI6XVqOIx9/w==
-X-Received: by 2002:a5d:638c:0:b0:314:10d8:b483 with SMTP id p12-20020a5d638c000000b0031410d8b483mr7199581wru.64.1690196069066;
-        Mon, 24 Jul 2023 03:54:29 -0700 (PDT)
+        bh=OEyWGecSm4CuQ74zs3MLXEg5kzDp90u6LK+sKJXsB/Y=;
+        b=OgWbdeeh5aF/wj7YsiL3WCZNInLK8HKbgbAz9nEE9jV0waWd/kPSR7aW1flXGGhSN3
+         8mVeDYw/PAQ0xlVQTx+sTfqrrrhVSvKpDwj1ZwmrItqELfmwJPfyKB28ru3aY31U+75J
+         roQZSRHF12BL+0dTrPOmZxo77AMyscnldhODwBsAGbLKzM8YeezpGtSGIjcyafW/aKN/
+         sSVN3r6UyakPQ93OFmi5TQezzGulKaG+B0ppfoLVFxcUHLZREiAsez4pvHSh2xUmdLtp
+         ySwW3D6+tv3PFbivEUw392ZwcUXbUnkqcjJVc9FFBwhUrH029jhEqZ01Q23MYq6ejN3O
+         r52Q==
+X-Gm-Message-State: ABy/qLbp7uIZmoYO7cAVaTnL1j1tv0/8nQSMB1qqCV0fZN/hTFHHmXYu
+	IZIMhT+lZGrqhtKFLpUrgE8=
+X-Google-Smtp-Source: APBJJlGy2kE8D1SFU2thsf2H+b7Wre6gbhmnESK+alrHjr1iFzxm+EDmn8w9Z4MaKp0jwVQ6Qc3vag==
+X-Received: by 2002:adf:e94b:0:b0:315:a6a5:fe95 with SMTP id m11-20020adfe94b000000b00315a6a5fe95mr6070624wrn.52.1690196070065;
+        Mon, 24 Jul 2023 03:54:30 -0700 (PDT)
 Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id j6-20020adfff86000000b0031274a184d5sm12529631wrr.109.2023.07.24.03.54.28
+        by smtp.googlemail.com with ESMTPSA id j6-20020adfff86000000b0031274a184d5sm12529631wrr.109.2023.07.24.03.54.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 03:54:28 -0700 (PDT)
+        Mon, 24 Jul 2023 03:54:29 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
@@ -69,9 +69,9 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [net PATCH 2/4] net: dsa: qca8k: fix search_and_insert wrong handling of new rule
-Date: Mon, 24 Jul 2023 05:25:29 +0200
-Message-Id: <20230724032531.15998-2-ansuelsmth@gmail.com>
+Subject: [net PATCH 3/4] net: dsa: qca8k: fix broken search_and_del
+Date: Mon, 24 Jul 2023 05:25:30 +0200
+Message-Id: <20230724032531.15998-3-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230724032531.15998-1-ansuelsmth@gmail.com>
 References: <20230724032531.15998-1-ansuelsmth@gmail.com>
@@ -89,70 +89,41 @@ X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On inserting a mdb entry, fdb_search_and_insert is used to add a port to
-the qca8k target entry in the FDB db.
+On deleting an MDB entry for a port, fdb_search_and_del is used.
+An FDB entry can't be modified so it needs to be deleted and readded
+again with the new portmap (and the port deleted as requested)
 
-A FDB entry can't be modified so it needs to be removed and insert again
-with the new values.
+We use the SEARCH operator to search the entry to edit by vid and mac
+address and then we check the aging if we actually found an entry.
 
-To detect if an entry already exist, the SEARCH operation is used and we
-check the aging of the entry. If the entry is not 0, the entry exist and
-we proceed to delete it.
+Currently the code suffer from a bug where the searched fdb entry is
+never read again with the found values (if found) resulting in the code
+always returning -EINVAL as aging was always 0.
 
-Current code have 2 main problem:
-- The condition to check if the FDB entry exist is wrong and should be
-  the opposite.
-- When a FDB entry doesn't exist, aging was never actually set to the
-  STATIC value resulting in allocating an invalid entry.
-
-Fix both problem by adding aging support to the function, calling the
-function with STATIC as aging by default and finally by correct the
-condition to check if the entry actually exist.
+Fix this by correctly read the fdb entry after it was searched.
 
 Fixes: ba8f870dfa63 ("net: dsa: qca8k: add support for mdb_add/del")
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 Cc: stable@vger.kernel.org
 ---
- drivers/net/dsa/qca/qca8k-common.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/dsa/qca/qca8k-common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
-index 8c2dc0e48ff4..4909603d07c8 100644
+index 4909603d07c8..b644c05337c5 100644
 --- a/drivers/net/dsa/qca/qca8k-common.c
 +++ b/drivers/net/dsa/qca/qca8k-common.c
-@@ -244,7 +244,7 @@ void qca8k_fdb_flush(struct qca8k_priv *priv)
- }
- 
- static int qca8k_fdb_search_and_insert(struct qca8k_priv *priv, u8 port_mask,
--				       const u8 *mac, u16 vid)
-+				       const u8 *mac, u16 vid, u8 aging)
- {
- 	struct qca8k_fdb fdb = { 0 };
- 	int ret;
-@@ -261,10 +261,12 @@ static int qca8k_fdb_search_and_insert(struct qca8k_priv *priv, u8 port_mask,
+@@ -293,6 +293,10 @@ static int qca8k_fdb_search_and_del(struct qca8k_priv *priv, u8 port_mask,
+ 	if (ret < 0)
  		goto exit;
  
- 	/* Rule exist. Delete first */
--	if (!fdb.aging) {
-+	if (fdb.aging) {
- 		ret = qca8k_fdb_access(priv, QCA8K_FDB_PURGE, -1);
- 		if (ret)
- 			goto exit;
-+	} else {
-+		fdb.aging = aging;
- 	}
- 
- 	/* Add port to fdb portmask */
-@@ -810,7 +812,8 @@ int qca8k_port_mdb_add(struct dsa_switch *ds, int port,
- 	const u8 *addr = mdb->addr;
- 	u16 vid = mdb->vid;
- 
--	return qca8k_fdb_search_and_insert(priv, BIT(port), addr, vid);
-+	return qca8k_fdb_search_and_insert(priv, BIT(port), addr, vid,
-+					   QCA8K_ATU_STATUS_STATIC);
- }
- 
- int qca8k_port_mdb_del(struct dsa_switch *ds, int port,
++	ret = qca8k_fdb_read(priv, &fdb);
++	if (ret < 0)
++		goto exit;
++
+ 	/* Rule doesn't exist. Why delete? */
+ 	if (!fdb.aging) {
+ 		ret = -EINVAL;
 -- 
 2.40.1
 
