@@ -1,279 +1,300 @@
-Return-Path: <netdev+bounces-20468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BCD75FA5A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B272175FA4E
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF96280EAE
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:02:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D32A9281445
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE17D505;
-	Mon, 24 Jul 2023 15:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB418BE7;
+	Mon, 24 Jul 2023 15:01:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE59566E
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:02:41 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A22910D3
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690210593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qyDhIAIIOkviYuugYW1Y2WwDIHyMCteZyLgKjPu6Mk8=;
-	b=bLHOtEixW62mJrsbgtte/mDJCkb+34c3NJYiX19Jc21ABP/NmiQK7U/uWRT3xfnwZH/0mI
-	2SzEvWoJD9zgdCHKZ9z7aW11VPXckxyvQ6aJj7fYunrrszQ4NMobg3DxfzkUjMF+AcDo3q
-	oOsjrlh0BqU4/GaSiA+p4m85l9ZmoaA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-8-JChBx7ckNJCGynoBFNeufg-1; Mon, 24 Jul 2023 10:56:32 -0400
-X-MC-Unique: JChBx7ckNJCGynoBFNeufg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99ab59eef1fso369249366b.2
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:56:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690210591; x=1690815391;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qyDhIAIIOkviYuugYW1Y2WwDIHyMCteZyLgKjPu6Mk8=;
-        b=AmRguF1+wkriaRVo7veHN/IFmZAVBEc9NBL+Y0MKbj6xlG0Fl++wGZoLQUPf0ft2Cf
-         1m/kVJdfvvMIVJ73vIBZZDa1GCkHvOtQlC6TRR/7IVJ/U5GozP36+co2sx4sOe0F2FKE
-         TcKymnSL0TzNhnjokrk1rkAJmkDvAVdjSWi0P3HXtyU47fO8AwD1PMJfj18DycACRp5j
-         Y124HN5uf+ObXE6tZo2M4s6cmSG3YrV7AR9+9co5EHwneXwCv6n6BJAJXZiHCoa0fvWd
-         t2QNtrkxrAKslrFeT3CZ/0a92LK126sgwLODUuEGwkZ/tDIiEKReYnc1/gba6PNGmTt8
-         OAyw==
-X-Gm-Message-State: ABy/qLbfHkDM4kVfqIQ6nRmlQzLHO+HpfmPq38znaZXBLA0cQKeF82LN
-	zstQkLa8u6ZFTSs4V+qg2Rw5R7K7Lqx+qgH823im/2ogRNZ1aHNdAOontv9fQRjyOramrp/WhC1
-	UE+OR6MVTv1Gs1ec9pwqjdjaDSTo=
-X-Received: by 2002:a17:906:142:b0:99b:4378:a5aa with SMTP id 2-20020a170906014200b0099b4378a5aamr10932481ejh.49.1690210590812;
-        Mon, 24 Jul 2023 07:56:30 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGew8ZfxpMg1IPHgdW+P4N+fJj23+LIyZEInwx4n2Bho+JUbvzjjxmxPJwDcIJS99FXO2fHEg==
-X-Received: by 2002:a17:906:142:b0:99b:4378:a5aa with SMTP id 2-20020a170906014200b0099b4378a5aamr10932446ejh.49.1690210590470;
-        Mon, 24 Jul 2023 07:56:30 -0700 (PDT)
-Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id dt15-20020a170906b78f00b00991bba473e1sm6867427ejb.3.2023.07.24.07.56.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 07:56:29 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <a2569132-393e-0149-f76c-f6de282e1c96@redhat.com>
-Date: Mon, 24 Jul 2023 16:56:27 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD76163D7
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:01:36 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2095.outbound.protection.outlook.com [40.107.243.95])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E781FE56;
+	Mon, 24 Jul 2023 08:01:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SpjAnVRVnk+O5vQ+Zye9vXOj5RbZC8TnmA6HvFxEmfX2DiZy1xlBGMLYdWv42UN1SBFsKnY0IDE/u4FxjwKar63izo4pJ4IFCLxeQAbIE7Dmjz9mQx5WVrMbJBW+d+YnpCc5wvwFIkzzUlelML8jMZLFVPbZMAFVut/sIpXlKvkvLAf4NsFARTXQiBAEwDEz/TgO5OpIuSgNEnyGQn6OnRKoAHN42dHFt9rxiCuHXlORJ12cz8iizBm4+/ZU9WTXDDxMm6fOuPwdrpsFo80YJ9UcqJFThdbXzr72K/iIIoFXQFqfjdJRx4wsnvO49fhl39mQV9+lutYbFJg+yM80AQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jyeiz5wX9Vwody+tcoC2vRgG0ZBVBV1Q8bugTxWZPug=;
+ b=lbvKvuUN95PCWR4Tex2Io2el3pQwrYaa5lRiNZlLgPjYGpOye1YaLfc1kvgT2R+mdN8KNRS+6dQLkDjlCu44UfMfsRoj5qlpwvkgUz1GZjxml/GbaPAKPMo00j6pC1F2dQzyQgEFpkEoZa9ezhzYZRKZsx3lxiHQnQDgf7djnOhD/ooAaS99GSOjnqFrm6D3SJuV/rJYyyRQC7KBm9EGIpDQVejBQIVk7sPXuxLNQ9S0O996nNOry+Agz9UNYkU1yBbRDEFuxIsr6T/EOtHTK/pJmyz/u5H87ZDGzWxXR7OuN6yxSsGvoNo0v0Gprnqbs3pKHWmob42TWb0em4F1Lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jyeiz5wX9Vwody+tcoC2vRgG0ZBVBV1Q8bugTxWZPug=;
+ b=GtCjnLD4M/30bF3SQc58Cs3eDQa3XsDDw8cCcQYaytXNAGpMGkn9dBXwt+47dcuAJhMV7GepSONLaX6mfxTJB2pCTmSlXgCXtyklgk5n0HCQ25BphPJuctjdqJYUjiAya0Xr8OnLzIC4FpfW+CGOxa6m3orVehT6NvjtZu0bT6g=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SN4PR13MB5709.namprd13.prod.outlook.com (2603:10b6:806:1ed::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Mon, 24 Jul
+ 2023 15:01:31 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
+ 15:01:31 +0000
+Date: Mon, 24 Jul 2023 17:01:24 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: nick.hawkins@hpe.com
+Cc: verdun@hpe.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 4/5] net: hpe: Add GXP UMAC Driver
+Message-ID: <ZL6SRE0ikLX0BS+M@corigine.com>
+References: <20230721212044.59666-1-nick.hawkins@hpe.com>
+ <20230721212044.59666-5-nick.hawkins@hpe.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230721212044.59666-5-nick.hawkins@hpe.com>
+X-ClientProxiedBy: AM8P251CA0001.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21b::6) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: brouer@redhat.com, =?UTF-8?Q?Christian_K=c3=b6nig?=
- <christian.koenig@amd.com>, Hari Ramakrishnan <rharix@google.com>,
- David Ahern <dsahern@kernel.org>, Samiullah Khawaja <skhawaja@google.com>,
- Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Christoph Hellwig <hch@lst.de>, John Hubbard <jhubbard@nvidia.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Jesper Dangaard Brouer <jbrouer@redhat.com>,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang
- <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Eric Dumazet <edumazet@google.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Felix Fietkau <nbd@nbd.name>, Ryder Lee <ryder.lee@mediatek.com>,
- Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
- Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-rdma@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, Jonathan Lemon
- <jonathan.lemon@gmail.com>, logang@deltatee.com,
- Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
- page_pool: remove PP_FLAG_PAGE_FRAG flag)
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>, Jason Gunthorpe <jgg@ziepe.ca>
-References: <04187826-8dad-d17b-2469-2837bafd3cd5@kernel.org>
- <20230711093224.1bf30ed5@kernel.org>
- <CAHS8izNHkLF0OowU=p=mSNZss700HKAzv1Oxqu2bvvfX_HxttA@mail.gmail.com>
- <20230711133915.03482fdc@kernel.org>
- <2263ae79-690e-8a4d-fca2-31aacc5c9bc6@kernel.org>
- <CAHS8izP=k8CqUZk7bGUx4ctm4m2kRC2MyEJv+N4+b0cHVkTQmA@mail.gmail.com>
- <ZK6kOBl4EgyYPtaD@ziepe.ca>
- <CAHS8izNuda2DXKTFAov64F7J2_BbMPaqJg1NuMpWpqGA20+S_Q@mail.gmail.com>
- <143a7ca4-e695-db98-9488-84cf8b78cf86@amd.com>
- <CAHS8izPm6XRS54LdCDZVd0C75tA1zHSu6jLVO8nzTLXCc=H7Nw@mail.gmail.com>
- <ZLFv2PIgdeH8gKmh@ziepe.ca>
- <CAHS8izNMB-H3w0CE9kj6hT5q_F6_XJy_X_HtZwmisOEDhp31yg@mail.gmail.com>
-In-Reply-To: <CAHS8izNMB-H3w0CE9kj6hT5q_F6_XJy_X_HtZwmisOEDhp31yg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN4PR13MB5709:EE_
+X-MS-Office365-Filtering-Correlation-Id: cab48c88-e117-461d-800d-08db8c56dd5b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	BHONOvhuSDlWFdOBwoVSECg0gS04ksscOwEEjZJRrNMrEOFH0VhuC2/Sx0Po1rQ5gIs22TOQYE2T280HnubfYzj7YV40bPXG8cXWwacqSsqDjv1mBoEseXV96Ee+bM0VSGjyTqsKf7sOiDY9orBHLcyyLISarY9nlGFxlME8USbXEtRhICb/O+5F/jubfaeOOKy4qPRg41SiNe5CZ7nol8+YhqQTHD+XGDrp8hOHQFKIeuDJVuCMXXnlAV4oIt2vcHVg1svbQ+U01TWI5xETLCcYQvDD5/ipUU7q6KDIQKq8EUp8rx0rGYjCZ+4OnvCzL1vTD5K8F+iLizNR6hHQDjawcJpsQD3DiYDbEkZMkxI+L6zoDwAKG02iSwIi89Nm7AeDM5y35Y1sczb1PHV5RrBUR9+0ZXq8ZTabQWS9yXflAixceN/5/Cxj6qnRKpH9lVK8HhWXQ7usNIILxQ5bTMK4s23kZvtKZMDo6vnitAQ1pyvG/F37QjsPi0MNOXRCBPPzB6Ra3BNKVNqaSLgFvQsQqCbD4LOQidWQOUVnEQ+VoITRpHynE40LPAvNEOSl7Tp26PfcrkiVwYtgFpclSW3XksGTTssvXAtU0h6100tdCahA6mLls+k2pBAjVj2Uza3lzOgFoT7KeKn7IlUNcA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(366004)(39840400004)(376002)(346002)(451199021)(5660300002)(8936002)(8676002)(7416002)(44832011)(6916009)(4326008)(66556008)(66476007)(66946007)(316002)(296002)(41300700001)(2906002)(6666004)(6486002)(966005)(6512007)(6506007)(186003)(2616005)(83380400001)(478600001)(38100700002)(36756003)(86362001)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?dInF6GjNUBmmPLs7zzp1Y9yiyoxwKfjZW7cs4O9RQeHtzESBZG803jS+1GQq?=
+ =?us-ascii?Q?Pl7MfmDWYkCGZyPehS3T9fihUJyccOSmuC15VBUdtf1Vz3QhA99fRaip5v8K?=
+ =?us-ascii?Q?2IacuGN0d1HfdNZ+gY4lz/lxt4d9RD+rYt1uHtA1XE2nS1wTRGFIKzzwM3uw?=
+ =?us-ascii?Q?WY61PHci5eeEzFs05q3SiApv7gHQDE2C5zfCBUPmS9F7eKGbNFV7l+ooO42H?=
+ =?us-ascii?Q?jGEPezJ98v/rSucJG1TnEfMHCE83gkCxajM+bIIpzmBrNvI/pVHv+fHDUu98?=
+ =?us-ascii?Q?PMfZ/26piG2wbhlSvV3UkNY49EpZzJ9zDu6bTtrhm2dU19TFpBQo01ODlHBL?=
+ =?us-ascii?Q?xdIIWiqSCuXWWRRM/y2u9k3igPaFQzTs5xNvOUwvHszKgBDvlDXT42FmIVDv?=
+ =?us-ascii?Q?6FP+uboix5igZMFJ3gnNzAOqFDVzwkmnXeoVXdrAK9NmShWGF+ucp7yxuuDC?=
+ =?us-ascii?Q?zah8C8b9W9ennRnMvUXJsWImZw4G1Gctno1qZsq8WlgfY0RqRpgC935zNnTY?=
+ =?us-ascii?Q?tt9H4QaDmL1JtoXVwlJhfHCriJ+J918tGzyibhtPAgcywTTCRh1uQkYKFweY?=
+ =?us-ascii?Q?VX7rFYAPHZrCXPQg0ia7/grs57wqNoSMrHvmrSC3FnYbmFhk4KC0YoOBMCjz?=
+ =?us-ascii?Q?+UyfDzMVTUhTfTCcLZOxBmQBrnLXUzet75jPlvyve3jim+xi8pcRccRlSwmg?=
+ =?us-ascii?Q?04vY6LelHbvhYIy5xhaMJt2vRh8Uu82tCNaEI297bf0FSD3XtrNUZ/pwm6Qg?=
+ =?us-ascii?Q?nnxvK6xD0/UTSyPL9pOv7KUgN1D2D5dLeMlcYcdgJQa/RMAjxZB+CX4c56RL?=
+ =?us-ascii?Q?dCAFu0M8gxK+pWjvyqXv2oPklhcoPFALWqnGgXSawSoePQGRyVZMlIA2t4jx?=
+ =?us-ascii?Q?u+9KOHct3kSwcUFQkZ7UNuDWzZAJZhYCSOmebNQxQer2Wp4Q6mGULABO3zku?=
+ =?us-ascii?Q?PrWxh5iI8JC5UPcBRLJ2slIZzsy3dpTzJz2RVG5nTA5JGEPpcNLo6VVZ7me5?=
+ =?us-ascii?Q?mhYzegsZN/QERfUcDePhho/dbhPyl0eZPZTTOV4S5xZSenJtGrJ+pIb2EKuY?=
+ =?us-ascii?Q?d82NeeV8Z+uQwQGhw1tq5hb1rWHwbfSkAsrZNCT25x2HEbvUb2otSp0oMLP3?=
+ =?us-ascii?Q?BHFrpnU1fSExLsrqpoUNyGBG4pt5VHJ+JYwEu9Xyflx0J1gqQ5h3eLgzNQ7m?=
+ =?us-ascii?Q?5DY9gCF+VCZKi9xSnwhLKIbLvCkh1dLbg3dRQAVJo0cesHald3wXyTJwYxX7?=
+ =?us-ascii?Q?VoSQL+9J3uuYKmpOI0cURiml8Dmtflv7E9NOIu/F7Kj1mMjZGJWl8LYjCklQ?=
+ =?us-ascii?Q?4AlKGZZ143MRYgs3scwfIdrziRX2mFZp78hDSoK1GKw1wzLBL+/kexAVkZYu?=
+ =?us-ascii?Q?5zjS8xPmUv+LxX+xqYUZlOF37BIxTeMRIIKWbYbABob0AQXrkuqQ5fwCustP?=
+ =?us-ascii?Q?xoy+P2NBmiWWIeq24PZSzztZlTmmPVNk2MlEW4MN1TDZsqBeROHlgXXe1V0/?=
+ =?us-ascii?Q?1WuGKYUBzyv9DYso+aThMKN0feHQtN8LUnu/Atrkw/Zvr4Dq20Y+a2QhBwtG?=
+ =?us-ascii?Q?HotfTzFu/JkBkg9Als/ZDLQ5jTMbKZHsshrgyI6e1LlCJ6cpQ7aO65wtsUy0?=
+ =?us-ascii?Q?+5+is7UrxMceZAK1OwXDHff7fLKbcsGif74YSHQGydXJThunU5EzmQe57UuT?=
+ =?us-ascii?Q?98aM0g=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cab48c88-e117-461d-800d-08db8c56dd5b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 15:01:31.4926
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FQBGaQVz0ioDVntYPzmDja0IJQnKt2K8fTfk7Wt2Us76cUAHnTn0B23y9x7TjNDph4X+M3dP/g5kzimg9MiQcuZ14Ba2eCaGEfa0Cl6W3DU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5709
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Fri, Jul 21, 2023 at 04:20:43PM -0500, nick.hawkins@hpe.com wrote:
 
+...
 
-On 17/07/2023 03.53, Mina Almasry wrote:
-> On Fri, Jul 14, 2023 at 8:55 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->>
->> On Fri, Jul 14, 2023 at 07:55:15AM -0700, Mina Almasry wrote:
->>
->>> Once the skb frags with struct new_abstraction are in the TCP stack,
->>> they will need some special handling in code accessing the frags. But
->>> my RFC already addressed that somewhat because the frags were
->>> inaccessible in that case. In this case the frags will be both
->>> inaccessible and will not be struct pages at all (things like
->>> get_page() will not work), so more special handling will be required,
->>> maybe.
->>
->> It seems sort of reasonable, though there will be interesting concerns
->> about coherence and synchronization with generial purpose DMABUFs that
->> will need tackling.
->>
->> Still it is such a lot of churn and weridness in the netdev side, I
->> think you'd do well to present an actual full application as
->> justification.
->>
->> Yes, you showed you can stick unordered TCP data frags into GPU memory
->> sort of quickly, but have you gone further with this to actually show
->> it is useful for a real world GPU centric application?
->>
->> BTW your cover letter said 96% utilization, the usual server
->> configuation is one NIC per GPU, so you were able to hit 1500Gb/sec of
->> TCP BW with this?
->>
+Hi Nick,
+
+> diff --git a/drivers/net/ethernet/hpe/gxp-umac.c b/drivers/net/ethernet/hpe/gxp-umac.c
+
+...
+
+> +static void umac_set_mac_address(struct net_device *ndev, void *p_addr)
+> +{
+> +	struct umac_priv *umac = netdev_priv(ndev);
+> +	char *addr = (char *)p_addr;
+> +	unsigned int value;
+> +
+> +	/* update address to register */
+> +	value = addr[0] << 8 | addr[1];
+> +	writel(value, umac->base + UMAC_MAC_ADDR_HI);
+> +	value = addr[2] << 8 | addr[3];
+> +	writel(value, umac->base + UMAC_MAC_ADDR_MID);
+> +	value = addr[4] << 8 | addr[5];
+> +	writel(value, umac->base + UMAC_MAC_ADDR_LO);
+> +}
+> +
+> +static int umac_eth_mac_addr(struct net_device *ndev, void *p)
+> +{
+> +	int ret;
+> +	struct sockaddr *addr = p;
+
+Please use reverse xmas tree - longest like to shortest - for
+new Networking code. Likewise in some other places in this patch/series.
+
+This tool can be helpful in this regard.
+https://github.com/ecree-solarflare/xmastree
+
+...
+
+> +static int umac_init_hw(struct net_device *ndev)
+> +{
+> +	struct umac_priv *umac = netdev_priv(ndev);
+> +	unsigned int value;
+> +
+> +	/* initialize tx and rx rings to first entry */
+> +	writel(0, umac->base + UMAC_RING_PTR);
+> +
+> +	/* clear the missed bit */
+> +	writel(0, umac->base + UMAC_CLEAR_STATUS);
+> +
+> +	/* disable checksum generation */
+> +	writel(0, umac->base + UMAC_CKSUM_CONFIG);
+> +
+> +	/* write the ring size register */
+> +	value = ((UMAC_RING_SIZE_256 << UMAC_TX_RING_SIZE_SHIFT) &
+> +			UMAC_TX_RING_SIZE_MASK) |
+> +		((UMAC_RING_SIZE_256 << UMAC_RX_RING_SIZE_SHIFT) &
+> +			UMAC_RX_RING_SIZE_MASK);
+> +	writel(value, umac->base + UMAC_RING_SIZE);
+> +
+> +	/* write rx ring base address */
+> +	writel(cpu_to_le32(umac->rx_descs_dma_addr),
+> +	       umac->base + UMAC_RX_RING_ADDR);
+
+It is my understanding that writel will convert the value
+from host byte order to little endien. If so then pre-converting value
+seems incorrect. Perhaps this should be:
+
+	writel(umac->rx_descs_dma_addr, umac->base + UMAC_RX_RING_ADDR);
+
+Flagged by Sparse.
+
+> +
+> +	/* write tx ring base address */
+> +	writel(cpu_to_le32(umac->tx_descs_dma_addr),
+> +	       umac->base + UMAC_TX_RING_ADDR);
+
+Ditto.
+
+> +
+> +	/* write burst size */
+> +	writel(0x22, umac->base + UMAC_DMA_CONFIG);
+> +
+> +	umac_channel_disable(umac);
+> +
+> +	/* disable clocks and gigabit mode (leave channels disabled) */
+> +	value = readl(umac->base + UMAC_CONFIG_STATUS);
+> +	value &= 0xfffff9ff;
+> +	writel(value, umac->base + UMAC_CONFIG_STATUS);
+> +	udelay(2);
+> +
+> +	if (umac->use_ncsi) {
+> +		/* set correct tx clock */
+> +		value &= UMAC_CFG_TX_CLK_EN;
+> +		value &= ~UMAC_CFG_GTX_CLK_EN;
+> +		value &= ~UMAC_CFG_GIGABIT_MODE; /* RMII mode */
+> +		value |= UMAC_CFG_FULL_DUPLEX; /* full duplex */
+> +	} else {
+> +		if (ndev->phydev->duplex)
+> +			value |= UMAC_CFG_FULL_DUPLEX;
+> +		else
+> +			value &= ~UMAC_CFG_FULL_DUPLEX;
+> +
+> +		if (ndev->phydev->speed == SPEED_1000) {
+> +			value &= ~UMAC_CFG_TX_CLK_EN;
+> +			value |= UMAC_CFG_GTX_CLK_EN;
+> +			value |= UMAC_CFG_GIGABIT_MODE;
+> +		} else {
+> +			value |= UMAC_CFG_TX_CLK_EN;
+> +			value &= ~UMAC_CFG_GTX_CLK_EN;
+> +			value &= ~UMAC_CFG_GIGABIT_MODE;
+> +		}
+> +	}
+> +	writel(value, umac->base + UMAC_CONFIG_STATUS);
+> +	udelay(2);
+> +
+> +	umac_channel_enable(umac);
+> +
+> +	return 0;
+> +}
+
+...
+
+> diff --git a/drivers/net/ethernet/hpe/gxp-umac.h b/drivers/net/ethernet/hpe/gxp-umac.h
+
+...
+
+> +struct umac_rx_desc_entry {
+> +	u32  dmaaddress;   // Start address for DMA operationg
+
+1. operationg -> operating
+2. It appears that this field is used to hold __le32 values.
+   Perhaps it's type should be __le32.
+   As is, Sparse complains about this.
+
+> +	u16  status;       // Packet tx status and ownership flag
+> +	u16  count;        // Number of bytes received
+> +	u16  checksum;     // On-the-fly packet checksum
+> +	u16  control;      // Checksum-in-time flag
+> +	u32  reserved;
+> +} __aligned(16);
+> +
+> +struct umac_rx_descs {
+> +	struct umac_rx_desc_entry entrylist[UMAC_MAX_RX_DESC_ENTRIES];
+> +	u8 framelist[UMAC_MAX_RX_DESC_ENTRIES][UMAC_MAX_RX_FRAME_SIZE];
+> +} __packed;
+> +
+> +struct umac_tx_desc_entry {
+> +	u32  dmaaddress;   // Start address for DMA operationg
+
+Ditto.
+
+> +	u16  status;       // Packet rx status, type, and ownership flag
+> +	u16  count;        // Number of bytes received
+> +	u32  cksumoffset;  // Specifies where to place packet checksum
+> +	u32  reserved;
+> +} __aligned(16);
+> +
+> +struct umac_tx_descs {
+> +	struct umac_tx_desc_entry entrylist[UMAC_MAX_TX_DESC_ENTRIES];
+> +	u8 framelist[UMAC_MAX_TX_DESC_ENTRIES][UMAC_MAX_TX_FRAME_SIZE];
+> +} __packed;
+> +
+> +#endif
+> -- 
+> 2.17.1
 > 
-> I do notice that the number of NICs is missing from our public
-> documentation so far, so I will refrain from specifying how many NICs
-> are on those A3 VMs until the information is public. But I think I can
-> confirm that your general thinking is correct, the perf that we're
-> getting is 96.6% line rate of each GPU/NIC pair, 
-
-What do you mean by 96.6% "line rate".
-Is is the Ethernet line-rate?
-
-Is the measured throughput the measured TCP data "goodput"?
-Assuming
-  - MTU 1500 bytes (1514 on wire).
-  - Ethernet header 14 bytes
-  - IP header 20 bytes
-  - TCP header 20 bytes
-
-Due to header overhead the goodput will be approx 96.4%.
-  - (1514-(14+20+20))/1514 = 0.9643
-  - (Not taking Ethernet interframe gap into account).
-
-Thus, maybe you have hit Ethernet wire line-rate already?
-
-> and scales linearly
-> for each NIC/GPU pair we've tested with so far. Line rate of each
-> NIC/GPU pair is 200 Gb/sec.
 > 
-> So if we have 8 NIC/GPU pairs we'd be hitting 96.6% * 200 * 8 = 1545 GB/sec.
-
-Lets keep our units straight.
-Here you mean 1545 Gbit/sec, which is 193 GBytes/s
-
-> If we have, say, 2 NIC/GPU pairs, we'd be hitting 96.6% * 200 * 2 = 384 GB/sec
-
-Here you mean 384 Gbit/sec, which is 48 GBytes/sec.
-
-> ...
-> etc.
-> 
-
-These massive throughput numbers are important, because they *exceed*
-the physical host RAM/DIMM memory speeds.
-
-This is the *real argument* why software cannot afford to do a single
-copy of the data from host-RAM into GPU-memory, because the CPU memory
-throughput to DRAM/DIMM are insufficient.
-
-My testlab CPU E5-1650 have 4 DIMM slots DDR4
-  - Data Width: 64 bits (= 8 bytes)
-  - Configured Memory Speed: 2400 MT/s
-  - Theoretical maximum memory bandwidth: 76.8 GBytes/s (2400*8*4)
-
-Even the theoretical max 76.8 GBytes/s (614 Gbit/s) is not enough for
-the 193 GBytes/s or 1545 Gbit/s (8 NIC/GPU pairs).
-
-When testing this with lmbench tool bw_mem, the results (below
-signature) are in the area 14.8 GBytes/sec (118 Gbit/s), as soon as
-exceeding L3 cache size.  In practice it looks like main memory is
-limited to reading 118 Gbit/s *once*. (Mina's NICs run at 200 Gbit/s)
-
-Given DDIO can deliver network packets into L3, I also tried to figure
-out what the L3 read bandwidth, which I measured to be 42.4 GBits/sec
-(339 Gbit/s), in hopes that it would be enough, but it was not.
-
-
---Jesper
-(data below signature)
-
-CPU under test:
-
-  $ cat /proc/cpuinfo | egrep -e 'model name|cache size' | head -2
-  model name	: Intel(R) Xeon(R) CPU E5-1650 v4 @ 3.60GHz
-  cache size	: 15360 KB
-
-
-Providing some cmdline outputs from lmbench "bw_mem" tool.
-(Output format is "%0.2f %.2f\n", megabytes, megabytes_per_second)
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M rd
-256.00 14924.50
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M wr
-256.00 9895.25
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M rdwr
-256.00 9737.54
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M bcopy
-256.00 12462.88
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 256M bzero
-256.00 14869.89
-
-
-Next output shows reducing size below L3 cache size, which shows an
-increase in speed, likely the L3 bandwidth.
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 64M rd
-64.00 14840.58
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 32M rd
-32.00 14823.97
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 16M rd
-16.00 24743.86
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 8M rd
-8.00 40852.26
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 4M rd
-4.00 42545.65
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 2M rd
-2.00 42447.82
-
-$ taskset -c 2 /usr/lib/lmbench/bin/x86_64-linux-gnu/bw_mem 1M rd
-1.00 42447.82
-
 
