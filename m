@@ -1,83 +1,47 @@
-Return-Path: <netdev+bounces-20571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D1F76027E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:41:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A87276028D
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8F921C20C75
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 22:41:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76F3B2814EF
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 22:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2E711CAB;
-	Mon, 24 Jul 2023 22:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8597F125C1;
+	Mon, 24 Jul 2023 22:44:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E15A11CA2
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 22:41:13 +0000 (UTC)
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B30173E
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:41:10 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id ca18e2360f4ac-78374596182so257528839f.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:41:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690238470; x=1690843270;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KeP2Bpkp9J7OOE4sWn2E6NWLqeXa4peAEEdE+9mQzSs=;
-        b=uVBTiaICcqS0cbclHhojIy9A/rn1xLF2yWj0IT3eGwYot+z7UEEoFf8vl2QmbV5HZd
-         oZMhnIVX0R9vxalzBDfEdnRYeggfqAWPp4oZ9iIRiYDirNYDPry665l3xLJOv4w9ndoV
-         atAKzCpgip8LDAIXf6qHwji/s1g3JbuWcbuDNTbWkgkfmMoERf1A203T+0pmhikbtKdF
-         ftEXpPbfnz5Wvvbtbdb23i/4K0J3WvPEoAfxj+wRypNZFJmdRvo094Efvgx0Uz399ao+
-         kY/uZo+vG0RSD0FXczITHgWRFih72r4lLaRNLR1zaoxfD2RRB/VOQFv104/3q7VyvDCy
-         wRoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690238470; x=1690843270;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KeP2Bpkp9J7OOE4sWn2E6NWLqeXa4peAEEdE+9mQzSs=;
-        b=hkrC/weOhDfN2keazhFu5QW94wsEILQxOwMaJiGvSau/z26N3Wwfxlhv7UTO7uctGK
-         C0kNnW8v3P33+XRj7PV3Tq40cb5RR/cz4g9kyIjozGwA4V7tlPIiNTwjqPGg3MnhpEOW
-         dVVlH7+e7okslf98qAhCBYUPJKAYRwvFgaD03BsAOoVKphOc3MXiZLT1GWHyF2xuqwZQ
-         0twZ6aFr3TWq4h2/k72LJNT+vdnLMKmrYkPxpLZn8hPB3+xI4JbsIL2HutKEur2iCk54
-         DOHnv3ILPuM1QAmCE6xl6gKtqrJMj4FpKBFj9QoRDMuXeCcmGJydeVMUUXwmoHXGOddW
-         pVEA==
-X-Gm-Message-State: ABy/qLZPLVR8o3H/s8RwFQsexarEa0oSUX/aW7nbbNIr+ylutZEmX1S7
-	+BT2Ib1EIXzFb3YcnQCv9cdSjg==
-X-Google-Smtp-Source: APBJJlEhDUh7RSS2Z2tTSspy5ELCXvyGnC/B2CaIbRlOt16SjoWMnBbRRS+8HrDzVxydj5/qeS3lcg==
-X-Received: by 2002:a5d:9b8f:0:b0:783:5e20:768d with SMTP id r15-20020a5d9b8f000000b007835e20768dmr1134570iom.18.1690238469994;
-        Mon, 24 Jul 2023 15:41:09 -0700 (PDT)
-Received: from localhost.localdomain (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
-        by smtp.gmail.com with ESMTPSA id gv18-20020a0566382e5200b0042b1297468esm3103953jab.51.2023.07.24.15.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 15:41:08 -0700 (PDT)
-From: Alex Elder <elder@linaro.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: dianders@chromium.org,
-	caleb.connolly@linaro.org,
-	mka@chromium.org,
-	evgreen@chromium.org,
-	andersson@kernel.org,
-	quic_cpratapa@quicinc.com,
-	quic_avuyyuru@quicinc.com,
-	quic_jponduru@quicinc.com,
-	quic_subashab@quicinc.com,
-	elder@kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16600100BE
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 22:44:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86B77C433C7;
+	Mon, 24 Jul 2023 22:44:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690238669;
+	bh=73hrsrjw6DK33qytbV2VMU5PllPbT9UMq7YR1HxHFXM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dG3LY+W2LVxmrz1IHWxojwaAuMwZ0lzwa0R53hHbmUm248PFojKcnrEtaSE8zz9sb
+	 5NOFuY6FPuG3O0fh/UlD6hncuxKZ/BRVr+ZUHq02D2crxEMxVwqC5xPOkfxBKhOyoi
+	 6NRiJ+qA+Gk4vSToHvmwb7yNs/gf7SQ3trOSSmFjsletvyjqKz01ETrCmoJSh+2IYO
+	 yG2WUu/lRDU2VHK5OVAL5rn7JV2w/gkE9RdpMPN7t3bTW1fPSjZ02js7yBb26VXrhs
+	 a7f8tgTCXKjTkraee2PTKFLZ9RJRzW9sI0w49WdUQwF7Fbh9EHv2/1BmKMOWIKUoiE
+	 nqk0tKX7ntOlg==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: ipa: only reset hashed tables when supported
-Date: Mon, 24 Jul 2023 17:41:06 -0500
-Message-Id: <20230724224106.1688869-1-elder@linaro.org>
-X-Mailer: git-send-email 2.34.1
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net-next 00/14] mlx5 updates 2023-07-24
+Date: Mon, 24 Jul 2023 15:44:12 -0700
+Message-ID: <20230724224426.231024-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,109 +49,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Last year, the code that manages GSI channel transactions switched
-from using spinlock-protected linked lists to using indexes into the
-ring buffer used for a channel.  Recently, Google reported seeing
-transaction reference count underflows occasionally during shutdown.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-Doug Anderson found a way to reproduce the issue reliably, and
-bisected the issue to the commit that eliminated the linked lists
-and the lock.  The root cause was ultimately determined to be
-related to unused transactions being committed as part of the modem
-shutdown cleanup activity.  Unused transactions are not normally
-expected (except in error cases).
+This series adds misc updates.
+For more information please see tag log below.
 
-The modem uses some ranges of IPA-resident memory, and whenever it
-shuts down we zero those ranges.  In ipa_filter_reset_table() a
-transaction is allocated to zero modem filter table entries.  If
-hashing is not supported, hashed table memory should not be zeroed.
-But currently nothing prevents that, and the result is an unused
-transaction.  Something similar occurs when we zero routing table
-entries for the modem.
+Please pull and let me know if there is any problem.
 
-By preventing any attempt to clear hashed tables when hashing is not
-supported, the reference count underflow is avoided in this case.
+Thanks,
+Saeed.
 
-Note that there likely remains an issue with properly freeing unused
-transactions (if they occur due to errors).  This patch addresses
-only the underflows that Google originally reported.
 
-Fixes: d338ae28d8a8 ("net: ipa: kill all other transaction lists")
-Cc: <stable@vger.kernel.org>    # 6.1.x
-Tested-by: Douglas Anderson <dianders@chromium.org>
-Signed-off-by: Alex Elder <elder@linaro.org>
----
- drivers/net/ipa/ipa_table.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+The following changes since commit dc644b540a2d2874112706591234be3d3fbf9ef7:
 
-diff --git a/drivers/net/ipa/ipa_table.c b/drivers/net/ipa/ipa_table.c
-index 510ff2dc8999a..cd81dd916c29e 100644
---- a/drivers/net/ipa/ipa_table.c
-+++ b/drivers/net/ipa/ipa_table.c
-@@ -311,16 +311,15 @@ static int ipa_filter_reset(struct ipa *ipa, bool modem)
- 	if (ret)
- 		return ret;
- 
--	ret = ipa_filter_reset_table(ipa, IPA_MEM_V4_FILTER_HASHED, modem);
--	if (ret)
--		return ret;
--
- 	ret = ipa_filter_reset_table(ipa, IPA_MEM_V6_FILTER, modem);
-+	if (ret || !ipa_table_hash_support(ipa))
-+		return ret;
-+
-+	ret = ipa_filter_reset_table(ipa, IPA_MEM_V4_FILTER_HASHED, modem);
- 	if (ret)
- 		return ret;
--	ret = ipa_filter_reset_table(ipa, IPA_MEM_V6_FILTER_HASHED, modem);
- 
--	return ret;
-+	return ipa_filter_reset_table(ipa, IPA_MEM_V6_FILTER_HASHED, modem);
- }
- 
- /* The AP routes and modem routes are each contiguous within the
-@@ -329,11 +328,12 @@ static int ipa_filter_reset(struct ipa *ipa, bool modem)
-  * */
- static int ipa_route_reset(struct ipa *ipa, bool modem)
- {
-+	bool hash_support = ipa_table_hash_support(ipa);
- 	struct gsi_trans *trans;
- 	u16 first;
- 	u16 count;
- 
--	trans = ipa_cmd_trans_alloc(ipa, 4);
-+	trans = ipa_cmd_trans_alloc(ipa, hash_support ? 4 : 2);
- 	if (!trans) {
- 		dev_err(&ipa->pdev->dev,
- 			"no transaction for %s route reset\n",
-@@ -350,12 +350,14 @@ static int ipa_route_reset(struct ipa *ipa, bool modem)
- 	}
- 
- 	ipa_table_reset_add(trans, false, first, count, IPA_MEM_V4_ROUTE);
--	ipa_table_reset_add(trans, false, first, count,
--			    IPA_MEM_V4_ROUTE_HASHED);
--
- 	ipa_table_reset_add(trans, false, first, count, IPA_MEM_V6_ROUTE);
--	ipa_table_reset_add(trans, false, first, count,
--			    IPA_MEM_V6_ROUTE_HASHED);
-+
-+	if (hash_support) {
-+		ipa_table_reset_add(trans, false, first, count,
-+				    IPA_MEM_V4_ROUTE_HASHED);
-+		ipa_table_reset_add(trans, false, first, count,
-+				    IPA_MEM_V6_ROUTE_HASHED);
-+	}
- 
- 	gsi_trans_commit_wait(trans);
- 
--- 
-2.34.1
+  tcx: Fix splat in ingress_destroy upon tcx_entry_free (2023-07-24 11:42:35 -0700)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-07-24
+
+for you to fetch changes up to 67d648e27188088a28cb7ea67208b9e174af1bf3:
+
+  net/mlx5: Remove pointless devlink_rate checks (2023-07-24 15:34:06 -0700)
+
+----------------------------------------------------------------
+mlx5-updates-2023-07-24
+
+1) Replace current thermal implementation with hwmon API.
+
+2) Generalize devcom implementation to be independent of number of ports
+   or device's GUID.
+
+3) Save memory on command interface statistics.
+
+4) General code cleanups
+
+----------------------------------------------------------------
+Adham Faris (2):
+      net/mlx5: Expose port.c/mlx5_query_module_num() function
+      net/mlx5: Expose NIC temperature via hardware monitoring kernel API
+
+Jiri Pirko (2):
+      net/mlx5: Don't check vport->enabled in port ops
+      net/mlx5: Remove pointless devlink_rate checks
+
+Parav Pandit (2):
+      net/mlx5e: Remove duplicate code for user flow
+      net/mlx5e: Make flow classification filters static
+
+Roi Dayan (4):
+      net/mlx5: Use shared code for checking lag is supported
+      net/mlx5: Devcom, Infrastructure changes
+      net/mlx5e: E-Switch, Register devcom device with switch id key
+      net/mlx5e: E-Switch, Allow devcom initialization on more vports
+
+Shay Drory (4):
+      net/mlx5: Re-organize mlx5_cmd struct
+      net/mlx5: Remove redundant cmdif revision check
+      net/mlx5: split mlx5_cmd_init() to probe and reload routines
+      net/mlx5: Allocate command stats with xarray
+
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile   |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 223 +++++-----
+ drivers/net/ethernet/mellanox/mlx5/core/debugfs.c  |  34 +-
+ drivers/net/ethernet/mellanox/mlx5/core/dev.c      |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   3 -
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   6 +-
+ .../ethernet/mellanox/mlx5/core/en_fs_ethtool.c    |   4 -
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  21 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  45 +--
+ .../net/ethernet/mellanox/mlx5/core/esw/bridge.c   |  22 +-
+ .../ethernet/mellanox/mlx5/core/esw/bridge_mcast.c |  17 +-
+ .../ethernet/mellanox/mlx5/core/esw/devlink_port.c |  12 +-
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.h  |   7 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  79 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/hwmon.c    | 428 ++++++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/hwmon.h    |  24 ++
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c  |  12 +-
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h  |  12 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.c   | 448 +++++++++++----------
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |  74 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  35 +-
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   3 +
+ drivers/net/ethernet/mellanox/mlx5/core/port.c     |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/thermal.c  | 114 ------
+ drivers/net/ethernet/mellanox/mlx5/core/thermal.h  |  20 -
+ include/linux/mlx5/driver.h                        |  30 +-
+ include/linux/mlx5/mlx5_ifc.h                      |  14 +-
+ 27 files changed, 1039 insertions(+), 658 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/hwmon.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/hwmon.h
+ delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/thermal.c
+ delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/thermal.h
 
