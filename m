@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-20352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72AA175F1FE
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:05:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D2E75F210
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32C91C20837
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:05:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965101C20B54
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEAD8BFD;
-	Mon, 24 Jul 2023 10:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFF179F4;
+	Mon, 24 Jul 2023 10:05:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003FE8BFB
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:03:11 +0000 (UTC)
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7B96E9A
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:02:53 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d0b41681257so176195276.1
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:02:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9858824
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:05:47 +0000 (UTC)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 716715FC8
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:05:22 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-403a7c0ce4dso11797411cf.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:05:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690192947; x=1690797747;
+        d=bytedance.com; s=google; t=1690193100; x=1690797900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qE79rW9nQFdZueatbKkJSwG7PQvomLDBWPiy7CJ1pOw=;
-        b=cmc/VrIVpJUSHs2nC40ZQYuahYbP+cYk3En+jOjLL3Qmh57eBb2El7ovZBEyp2NIrz
-         2eVCYPyv2/F1CEHL8E5bOnbVHIipouHTxaaNXxMsuo3rC2zc8oDw2MvzuW3AmFdIGMCN
-         UqpKwHmFM6K3RxD+lPTnTdv2z1L1yoBVUm4CQPB+5est/o01ajbgppWjfzaVCFz7BCq8
-         +DtmC7Osu5zZPdROfWo7mYXhMyPBJRHsJgR0NTgse5cRoSdVmn1Zb6gbNYjRaHQJ8PPU
-         q8gcHsaZ571f/w5MWUyMKzeBuF1EmQiY0nO3ob3Da7d/aLOGneNPmF//jJXHOOvroigO
-         ZEBQ==
+        bh=oXR+qbQ7FZSOf8H8/XKWyl6GGcPr2+dTjVkbZb7uW4E=;
+        b=MGMrVKJYfILxt5i/hb/V8SbXivbTSsLH5Qcfkv4ol/Y29OoVi0LLOih5fbU4orC5YJ
+         PhnzZC3J61RqzaPTzuJQ3iZilPfUGTQcA/s1jbXi5ZFo1FrIzk/3/FwwUe+BnrU8MzUt
+         am0n6BipEI6zgXHEP1jqmaBfeT26xIa4Ljp4AA9+obFgTXMzrXX0kx8oaukFOTOapaob
+         4KgTT6K36sV6vuc9RwlLAnwwWKDulGG4nOu2tYCwOFBM/IzDfBlY0QnyhrkjfGGIP/K+
+         2mJDCYDFCrGSKHKqAxyDMGKIpz7qyyBrrWw3X/+J2P0HAzozYAL0/M2DOkJC/S2dslHQ
+         W1Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690192947; x=1690797747;
+        d=1e100.net; s=20221208; t=1690193100; x=1690797900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qE79rW9nQFdZueatbKkJSwG7PQvomLDBWPiy7CJ1pOw=;
-        b=eIi0pcqLlrTBHROanvY2SdEAmOFh2eyyXl4fIM/DDgqr0fsTwXHm/VlvW2WoobSX9o
-         LnHkLwgiKs+f1Pf2uTou7vjw6IBD84pUhlnbVOWclWnU9Q8uZ9rGnXAE42hnIoVQrbDi
-         5eW4WcgGD0TMEgSWk2Yvaf7IjuODum+LXiwI/ffrd8q5ZsuZAxTBwqS1vbfiFlj95dNI
-         66Ss0MMS9C4aoK3IImVgZ9WBFAdEzRAkJlDMBVgQP9Q1HAZQEC+wVMDmSxbz7sF6HXZS
-         2lJOWIWA4i34aaoVn9IhDz7ff5EZJBSr9f+/J7crTe4NtPwvUJM/j4A6LgoTlx/SEgul
-         +e8g==
-X-Gm-Message-State: ABy/qLY1r4MIpldDzWvTFUKP8ahxVu2DMMIg6iu7zlPsqYHwjTgk8A6d
-	NU+3EVMJnprq+7hASrHqUxVDJgpn4N5ThBLRTPo=
-X-Google-Smtp-Source: APBJJlFDDpJsPsXaM9K0eN3GbgFDnugc0MZ81V5AeEkSNRv9osxW0v212MSH0egY7R7+BB7SiCdLdQ==
-X-Received: by 2002:a17:902:e802:b0:1b3:d4bb:3515 with SMTP id u2-20020a170902e80200b001b3d4bb3515mr12388503plg.0.1690192254453;
-        Mon, 24 Jul 2023 02:50:54 -0700 (PDT)
+        bh=oXR+qbQ7FZSOf8H8/XKWyl6GGcPr2+dTjVkbZb7uW4E=;
+        b=OJwLNfvIzdFeWv3N38S7fW5u6loYiOceT1NVTl2xvbyn/1qI9+EYhBOz7Ep7Afobug
+         4d9241wJ4yRsan/nrqQE2l2H7WMOlI7wl02RIE6OaSxIBZm/hjqi5BwOkW77rKQVY8mH
+         z8jbxiVx3k8AHMLAjq1X6bLh38KhlSJT2M3vRMmpjmM24Ly45UbfqnGrXHNvc4Ps7ZYm
+         /R1tJK8yV8St9l4XFRx2hnnGxb3g/NemiC7SmdVuQN4XIGVbYFDGq+fl+NiUqZGus7gM
+         z3ImEvq0NC24SpIgYYy6UVN/kk0x4meLAlBb+LPxdYzdpzsyacmb8rQmW9UzCya/XuKf
+         8j3g==
+X-Gm-Message-State: ABy/qLYCd0tLU5zjyRB/UtaVgOpLM3KgH5mnfspIYvkd1z8XBJIqK+wJ
+	FEYGM7AbALWVaL/HDX3PQBA0BVpZvbFCX1O/pIU=
+X-Google-Smtp-Source: APBJJlFC05XpXuobjW4LsGQFjmg3Q9TZDeGvX5MkKK/m+2sDEjZkN7MidhVsDpGMtrBJxCeRn4k3XA==
+X-Received: by 2002:a17:903:22ce:b0:1b8:2ba0:c9a8 with SMTP id y14-20020a17090322ce00b001b82ba0c9a8mr12484346plg.2.1690192289977;
+        Mon, 24 Jul 2023 02:51:29 -0700 (PDT)
 Received: from C02DW0BEMD6R.bytedance.net ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id d5-20020a170902c18500b001bb20380bf2sm8467233pld.13.2023.07.24.02.50.42
+        by smtp.gmail.com with ESMTPSA id d5-20020a170902c18500b001bb20380bf2sm8467233pld.13.2023.07.24.02.51.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 02:50:54 -0700 (PDT)
+        Mon, 24 Jul 2023 02:51:29 -0700 (PDT)
 From: Qi Zheng <zhengqi.arch@bytedance.com>
 To: akpm@linux-foundation.org,
 	david@fromorbit.com,
@@ -95,9 +95,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-xfs@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	Qi Zheng <zhengqi.arch@bytedance.com>
-Subject: [PATCH v2 29/47] vmw_balloon: dynamically allocate the vmw-balloon shrinker
-Date: Mon, 24 Jul 2023 17:43:36 +0800
-Message-Id: <20230724094354.90817-30-zhengqi.arch@bytedance.com>
+Subject: [PATCH v2 32/47] ext4: dynamically allocate the ext4-es shrinker
+Date: Mon, 24 Jul 2023 17:43:39 +0800
+Message-Id: <20230724094354.90817-33-zhengqi.arch@bytedance.com>
 X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 In-Reply-To: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
 References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
@@ -109,103 +109,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 In preparation for implementing lockless slab shrink, use new APIs to
-dynamically allocate the vmw-balloon shrinker, so that it can be freed
+dynamically allocate the ext4-es shrinker, so that it can be freed
 asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
-read-side critical section when releasing the struct vmballoon.
-
-And we can simply exit vmballoon_init() when registering the shrinker
-fails. So the shrinker_registered indication is redundant, just remove it.
+read-side critical section when releasing the struct ext4_sb_info.
 
 Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 ---
- drivers/misc/vmw_balloon.c | 38 ++++++++++++--------------------------
- 1 file changed, 12 insertions(+), 26 deletions(-)
+ fs/ext4/ext4.h           |  2 +-
+ fs/ext4/extents_status.c | 22 ++++++++++++----------
+ 2 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/misc/vmw_balloon.c b/drivers/misc/vmw_balloon.c
-index 9ce9b9e0e9b6..d216d4dc042e 100644
---- a/drivers/misc/vmw_balloon.c
-+++ b/drivers/misc/vmw_balloon.c
-@@ -380,16 +380,7 @@ struct vmballoon {
- 	/**
- 	 * @shrinker: shrinker interface that is used to avoid over-inflation.
- 	 */
--	struct shrinker shrinker;
--
--	/**
--	 * @shrinker_registered: whether the shrinker was registered.
--	 *
--	 * The shrinker interface does not handle gracefully the removal of
--	 * shrinker that was not registered before. This indication allows to
--	 * simplify the unregistration process.
--	 */
--	bool shrinker_registered;
-+	struct shrinker *shrinker;
- };
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index 0a2d55faa095..1bd150d454f5 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -1651,7 +1651,7 @@ struct ext4_sb_info {
+ 	__u32 s_csum_seed;
  
- static struct vmballoon balloon;
-@@ -1568,29 +1559,27 @@ static unsigned long vmballoon_shrinker_count(struct shrinker *shrinker,
+ 	/* Reclaim extents from extent status tree */
+-	struct shrinker s_es_shrinker;
++	struct shrinker *s_es_shrinker;
+ 	struct list_head s_es_list;	/* List of inodes with reclaimable extents */
+ 	long s_es_nr_inode;
+ 	struct ext4_es_stats s_es_stats;
+diff --git a/fs/ext4/extents_status.c b/fs/ext4/extents_status.c
+index 9b5b8951afb4..8d4a959dd32f 100644
+--- a/fs/ext4/extents_status.c
++++ b/fs/ext4/extents_status.c
+@@ -1596,7 +1596,7 @@ static unsigned long ext4_es_count(struct shrinker *shrink,
+ 	unsigned long nr;
+ 	struct ext4_sb_info *sbi;
  
- static void vmballoon_unregister_shrinker(struct vmballoon *b)
+-	sbi = container_of(shrink, struct ext4_sb_info, s_es_shrinker);
++	sbi = shrink->private_data;
+ 	nr = percpu_counter_read_positive(&sbi->s_es_stats.es_stats_shk_cnt);
+ 	trace_ext4_es_shrink_count(sbi->s_sb, sc->nr_to_scan, nr);
+ 	return nr;
+@@ -1605,8 +1605,7 @@ static unsigned long ext4_es_count(struct shrinker *shrink,
+ static unsigned long ext4_es_scan(struct shrinker *shrink,
+ 				  struct shrink_control *sc)
  {
--	if (b->shrinker_registered)
--		unregister_shrinker(&b->shrinker);
--	b->shrinker_registered = false;
-+	shrinker_unregister(b->shrinker);
- }
+-	struct ext4_sb_info *sbi = container_of(shrink,
+-					struct ext4_sb_info, s_es_shrinker);
++	struct ext4_sb_info *sbi = shrink->private_data;
+ 	int nr_to_scan = sc->nr_to_scan;
+ 	int ret, nr_shrunk;
  
- static int vmballoon_register_shrinker(struct vmballoon *b)
- {
--	int r;
--
- 	/* Do nothing if the shrinker is not enabled */
- 	if (!vmwballoon_shrinker_enable)
- 		return 0;
+@@ -1690,14 +1689,17 @@ int ext4_es_register_shrinker(struct ext4_sb_info *sbi)
+ 	if (err)
+ 		goto err3;
  
--	b->shrinker.scan_objects = vmballoon_shrinker_scan;
--	b->shrinker.count_objects = vmballoon_shrinker_count;
--	b->shrinker.seeks = DEFAULT_SEEKS;
-+	b->shrinker = shrinker_alloc(0, "vmw-balloon");
-+	if (!b->shrinker)
-+		return -ENOMEM;
+-	sbi->s_es_shrinker.scan_objects = ext4_es_scan;
+-	sbi->s_es_shrinker.count_objects = ext4_es_count;
+-	sbi->s_es_shrinker.seeks = DEFAULT_SEEKS;
+-	err = register_shrinker(&sbi->s_es_shrinker, "ext4-es:%s",
+-				sbi->s_sb->s_id);
+-	if (err)
++	sbi->s_es_shrinker = shrinker_alloc(0, "ext4-es:%s", sbi->s_sb->s_id);
++	if (!sbi->s_es_shrinker)
+ 		goto err4;
  
--	r = register_shrinker(&b->shrinker, "vmw-balloon");
-+	b->shrinker->scan_objects = vmballoon_shrinker_scan;
-+	b->shrinker->count_objects = vmballoon_shrinker_count;
-+	b->shrinker->seeks = DEFAULT_SEEKS;
-+	b->shrinker->private_data = b;
- 
--	if (r == 0)
--		b->shrinker_registered = true;
-+	shrinker_register(b->shrinker);
- 
--	return r;
-+	return 0;
- }
- 
- /*
-@@ -1883,7 +1872,7 @@ static int __init vmballoon_init(void)
- 
- 	error = vmballoon_register_shrinker(&balloon);
- 	if (error)
--		goto fail;
-+		return error;
- 
- 	/*
- 	 * Initialization of compaction must be done after the call to
-@@ -1905,9 +1894,6 @@ static int __init vmballoon_init(void)
- 	vmballoon_debugfs_init(&balloon);
- 
++	sbi->s_es_shrinker->scan_objects = ext4_es_scan;
++	sbi->s_es_shrinker->count_objects = ext4_es_count;
++	sbi->s_es_shrinker->seeks = DEFAULT_SEEKS;
++	sbi->s_es_shrinker->private_data = sbi;
++
++	shrinker_register(sbi->s_es_shrinker);
++
  	return 0;
--fail:
--	vmballoon_unregister_shrinker(&balloon);
--	return error;
+ err4:
+ 	percpu_counter_destroy(&sbi->s_es_stats.es_stats_shk_cnt);
+@@ -1716,7 +1718,7 @@ void ext4_es_unregister_shrinker(struct ext4_sb_info *sbi)
+ 	percpu_counter_destroy(&sbi->s_es_stats.es_stats_cache_misses);
+ 	percpu_counter_destroy(&sbi->s_es_stats.es_stats_all_cnt);
+ 	percpu_counter_destroy(&sbi->s_es_stats.es_stats_shk_cnt);
+-	unregister_shrinker(&sbi->s_es_shrinker);
++	shrinker_unregister(sbi->s_es_shrinker);
  }
  
  /*
