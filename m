@@ -1,133 +1,291 @@
-Return-Path: <netdev+bounces-20251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B76F75EAC7
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9389E75EAEC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:38:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D58F281479
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:18:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4731F2814E0
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CABFEBB;
-	Mon, 24 Jul 2023 05:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC7510EC;
+	Mon, 24 Jul 2023 05:38:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF127C;
-	Mon, 24 Jul 2023 05:18:26 +0000 (UTC)
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD84FF;
-	Sun, 23 Jul 2023 22:18:24 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R741e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0Vo0kKJZ_1690175900;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vo0kKJZ_1690175900)
-          by smtp.aliyun-inc.com;
-          Mon, 24 Jul 2023 13:18:21 +0800
-Date: Mon, 24 Jul 2023 13:18:20 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Gavin Li <gavinl@nvidia.com>
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, jiri@nvidia.com,
-	dtatulea@nvidia.com, gavi@nvidia.com,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next V3 0/4] virtio_net: add per queue interrupt
- coalescing support
-Message-ID: <20230724051820.GA53686@h68b04307.sqa.eu95>
-References: <20230724034048.51482-1-gavinl@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ED97C
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 05:38:46 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24A79E41;
+	Sun, 23 Jul 2023 22:38:45 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id BD80C23706B2; Sun, 23 Jul 2023 22:38:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BD80C23706B2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1690177123;
+	bh=Vy8aTaM39jpBrwLLP52qlYSRU3Ucfpi8knlMTIQeBUQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TVHhqvOYywyg6Td7QfQYAtt/DYVyE8cR+X3kMOHypB2B7MKxZj8GktY1Av9sV1Or9
+	 fdopSpVLDUVUHSXA70VOEpCnP7R5Lbl1SNjiH3dCkgWnghPf4OjNgNNCGk0P3p1YLC
+	 LXkXNnOoZ+LWuRa069/SFlO0C85cTPgatrEsNZ6w=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	sharmaajay@microsoft.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: schakrabarti@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: [PATCH V5 net-next] net: mana: Configure hwc timeout from hardware
+Date: Sun, 23 Jul 2023 22:38:40 -0700
+Message-Id: <1690177120-20938-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724034048.51482-1-gavinl@nvidia.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 06:40:44AM +0300, Gavin Li wrote:
-> Currently, coalescing parameters are grouped for all transmit and receive
-> virtqueues. This patch series add support to set or get the parameters for
-> a specified virtqueue.
-> 
-> When the traffic between virtqueues is unbalanced, for example, one virtqueue
-> is busy and another virtqueue is idle, then it will be very useful to
-> control coalescing parameters at the virtqueue granularity.
-> 
+At present hwc timeout value is a fixed value. This patch sets the hwc
+timeout from the hardware. It now uses a new hardware capability
+GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG to query and set the value
+in hwc_timeout.
 
-For series:
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+---
+V4 -> V5:
+* Replaced dev_err in mana_hwc_send_request with dev_dbg.
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 30 ++++++++++++++++++-
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 25 +++++++++++++++-
+ include/net/mana/gdma.h                       | 20 ++++++++++++-
+ include/net/mana/hw_channel.h                 |  5 ++++
+ 4 files changed, 77 insertions(+), 3 deletions(-)
 
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 8f3f78b68592..4537a70e30d4 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -106,6 +106,25 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
+ 	return 0;
+ }
+ 
++static int mana_gd_query_hwc_timeout(struct pci_dev *pdev, u32 *timeout_val)
++{
++	struct gdma_context *gc = pci_get_drvdata(pdev);
++	struct gdma_query_hwc_timeout_resp resp = {};
++	struct gdma_query_hwc_timeout_req req = {};
++	int err;
++
++	mana_gd_init_req_hdr(&req.hdr, GDMA_QUERY_HWC_TIMEOUT,
++			     sizeof(req), sizeof(resp));
++	req.timeout_ms = *timeout_val;
++	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
++	if (err || resp.hdr.status)
++		return err ? err : -EPROTO;
++
++	*timeout_val = resp.timeout_ms;
++
++	return 0;
++}
++
+ static int mana_gd_detect_devices(struct pci_dev *pdev)
+ {
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
+@@ -879,8 +898,11 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
+ 	struct gdma_verify_ver_resp resp = {};
+ 	struct gdma_verify_ver_req req = {};
++	struct hw_channel_context *hwc;
+ 	int err;
+ 
++	hwc = gc->hwc.driver_data;
++
+ 	mana_gd_init_req_hdr(&req.hdr, GDMA_VERIFY_VF_DRIVER_VERSION,
+ 			     sizeof(req), sizeof(resp));
+ 
+@@ -907,7 +929,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
+ 			err, resp.hdr.status);
+ 		return err ? err : -EPROTO;
+ 	}
+-
++	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
++		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
++		if (err) {
++			dev_err(gc->dev, "Failed to set the hwc timeout %d\n", err);
++			return err;
++		}
++	}
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index 2bd1d74021f7..35b5371d89bb 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -174,7 +174,25 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 		complete(&hwc->hwc_init_eqe_comp);
+ 		break;
+ 
++	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
++		type_data.as_uint32 = event->details[0];
++		type = type_data.type;
++		val = type_data.value;
++
++		switch (type) {
++		case HWC_DATA_CFG_HWC_TIMEOUT:
++			hwc->hwc_timeout = val;
++			break;
++
++		default:
++			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
++			break;
++		}
++
++		break;
++
+ 	default:
++		dev_warn(hwc->dev, "Received unknown gdma event %u\n", event->type);
+ 		/* Ignore unknown events, which should never happen. */
+ 		break;
+ 	}
+@@ -704,6 +722,7 @@ int mana_hwc_create_channel(struct gdma_context *gc)
+ 	gd->pdid = INVALID_PDID;
+ 	gd->doorbell = INVALID_DOORBELL;
+ 
++	hwc->hwc_timeout = HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS;
+ 	/* mana_hwc_init_queues() only creates the required data structures,
+ 	 * and doesn't touch the HWC device.
+ 	 */
+@@ -770,6 +789,8 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
+ 	hwc->gdma_dev->doorbell = INVALID_DOORBELL;
+ 	hwc->gdma_dev->pdid = INVALID_PDID;
+ 
++	hwc->hwc_timeout = 0;
++
+ 	kfree(hwc);
+ 	gc->hwc.driver_data = NULL;
+ 	gc->hwc.gdma_context = NULL;
+@@ -818,6 +839,7 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 		dest_vrq = hwc->pf_dest_vrq_id;
+ 		dest_vrcq = hwc->pf_dest_vrcq_id;
+ 	}
++	dev_dbg(hwc->dev, "HWC: timeout %u ms\n", hwc->hwc_timeout);
+ 
+ 	err = mana_hwc_post_tx_wqe(txq, tx_wr, dest_vrq, dest_vrcq, false);
+ 	if (err) {
+@@ -825,7 +847,8 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 		goto out;
+ 	}
+ 
+-	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
++	if (!wait_for_completion_timeout(&ctx->comp_event,
++					 (hwc->hwc_timeout / 1000) * HZ)) {
+ 		dev_err(hwc->dev, "HWC: Request timed out!\n");
+ 		err = -ETIMEDOUT;
+ 		goto out;
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 96c120160f15..88b6ef7ce1a6 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -33,6 +33,7 @@ enum gdma_request_type {
+ 	GDMA_DESTROY_PD			= 30,
+ 	GDMA_CREATE_MR			= 31,
+ 	GDMA_DESTROY_MR			= 32,
++	GDMA_QUERY_HWC_TIMEOUT		= 84, /* 0x54 */
+ };
+ 
+ #define GDMA_RESOURCE_DOORBELL_PAGE	27
+@@ -57,6 +58,8 @@ enum gdma_eqe_type {
+ 	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
+ 	GDMA_EQE_HWC_INIT_DATA		= 130,
+ 	GDMA_EQE_HWC_INIT_DONE		= 131,
++	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
++	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
+ };
+ 
+ enum {
+@@ -531,10 +534,12 @@ enum {
+  * so the driver is able to reliably support features like busy_poll.
+  */
+ #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
++#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
+ 
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+-	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX)
++	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
++	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+@@ -664,6 +669,19 @@ struct gdma_disable_queue_req {
+ 	u32 alloc_res_id_on_creation;
+ }; /* HW DATA */
+ 
++/* GDMA_QUERY_HWC_TIMEOUT */
++struct gdma_query_hwc_timeout_req {
++	struct gdma_req_hdr hdr;
++	u32 timeout_ms;
++	u32 reserved;
++};
++
++struct gdma_query_hwc_timeout_resp {
++	struct gdma_resp_hdr hdr;
++	u32 timeout_ms;
++	u32 reserved;
++};
++
+ enum atb_page_size {
+ 	ATB_PAGE_SIZE_4K,
+ 	ATB_PAGE_SIZE_8K,
+diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
+index 6a757a6e2732..3d3b5c881bc1 100644
+--- a/include/net/mana/hw_channel.h
++++ b/include/net/mana/hw_channel.h
+@@ -23,6 +23,10 @@
+ #define HWC_INIT_DATA_PF_DEST_RQ_ID	10
+ #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
+ 
++#define HWC_DATA_CFG_HWC_TIMEOUT 1
++
++#define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
++
+ /* Structures labeled with "HW DATA" are exchanged with the hardware. All of
+  * them are naturally aligned and hence don't need __packed.
+  */
+@@ -182,6 +186,7 @@ struct hw_channel_context {
+ 
+ 	u32 pf_dest_vrq_id;
+ 	u32 pf_dest_vrcq_id;
++	u32 hwc_timeout;
+ 
+ 	struct hwc_caller_ctx *caller_ctx;
+ };
+-- 
+2.34.1
 
-After this set is merged, I will issue the netdim patchset on top of this.
-
-Thanks.
-
-> Example command:
-> $ ethtool -Q eth5 queue_mask 0x1 --coalesce tx-packets 10
-> Would set max_packets=10 to VQ 1.
-> $ ethtool -Q eth5 queue_mask 0x1 --coalesce rx-packets 10
-> Would set max_packets=10 to VQ 0.
-> $ ethtool -Q eth5 queue_mask 0x1 --show-coalesce
->  Queue: 0
->  Adaptive RX: off  TX: off
->  stats-block-usecs: 0
->  sample-interval: 0
->  pkt-rate-low: 0
->  pkt-rate-high: 0
-> 
->  rx-usecs: 222
->  rx-frames: 0
->  rx-usecs-irq: 0
->  rx-frames-irq: 256
-> 
->  tx-usecs: 222
->  tx-frames: 0
->  tx-usecs-irq: 0
->  tx-frames-irq: 256
-> 
->  rx-usecs-low: 0
->  rx-frame-low: 0
->  tx-usecs-low: 0
->  tx-frame-low: 0
-> 
->  rx-usecs-high: 0
->  rx-frame-high: 0
->  tx-usecs-high: 0
->  tx-frame-high: 0
-> 
-> Gavin Li (4):
->   virtio_net: extract interrupt coalescing settings to a structure
->   virtio_net: extract get/set interrupt coalesce to a function
->   virtio_net: support per queue interrupt coalesce command
-> ---
-> changelog:
-> v1->v2
-> - Addressed the comment from Xuan Zhuo
-> - Allocate memory from heap instead of using stack memory for control vq
-> 	messages
-> v2->v3
-> - Addressed the comment from Heng Qi
-> - Use control_buf for control vq messages
-> ---
->   virtio_net: enable per queue interrupt coalesce feature
-> 
->  drivers/net/virtio_net.c        | 172 ++++++++++++++++++++++++++------
->  include/uapi/linux/virtio_net.h |  14 +++
->  2 files changed, 157 insertions(+), 29 deletions(-)
-> 
-> -- 
-> 2.39.1
-> 
 
