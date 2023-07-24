@@ -1,247 +1,116 @@
-Return-Path: <netdev+bounces-20351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255C775F1F9
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:04:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2EF75F2AF
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:18:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFAA62815AA
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:04:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAAC02815AC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644BE882D;
-	Mon, 24 Jul 2023 10:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DC88C05;
+	Mon, 24 Jul 2023 10:17:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5836B8495
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:03:03 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36DD9ECD
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:02:25 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qNsNn-00053J-UK; Mon, 24 Jul 2023 12:01:39 +0200
-Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qNsNk-001j38-Cg; Mon, 24 Jul 2023 12:01:36 +0200
-Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
-	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qNsNj-008cdz-5s; Mon, 24 Jul 2023 12:01:35 +0200
-From: Johannes Zink <j.zink@pengutronix.de>
-Date: Mon, 24 Jul 2023 12:01:31 +0200
-Subject: [PATCH v2] net: stmmac: correct MAC propagation delay
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8E18C03
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:17:02 +0000 (UTC)
+X-Greylist: delayed 347 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Jul 2023 03:17:00 PDT
+Received: from mail.bugwerft.de (mail.bugwerft.de [46.23.86.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7CBFE49DB
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:17:00 -0700 (PDT)
+Received: from hq-00595.holoplot.net (unknown [62.214.9.170])
+	by mail.bugwerft.de (Postfix) with ESMTPSA id 4149B280454;
+	Mon, 24 Jul 2023 10:11:06 +0000 (UTC)
+From: Daniel Mack <daniel.mack@holoplot.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	Daniel Mack <daniel.mack@holoplot.com>
+Subject: [PATCH] net: dsa: mv88e6xxx: use distinct FIDs for each bridge
+Date: Mon, 24 Jul 2023 12:10:59 +0200
+Message-ID: <20230724101059.2228381-1-daniel.mack@holoplot.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAPpLvmQC/42NWwqDMBREtyL5boqJUk2/3EcRyeNWA5rITRRF3
- HujK+jfnIGZc5AAaCGQd3YQhNUG610C/siIHqTrgVqTmPCcF3nFBA1xmqTutEcEHbsrGxjlTkt
- e1VoJI5RmJM2VDEAVSqeHdOCWcUzljPC12+37tIkHG6LH/dav7Gr/MK2MMlq9ailLk4uiKJsZX
- L9E9M5uTwOkPc/zB2bDcCLaAAAA
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kernel@pengutronix.de, Johannes Zink <j.zink@pengutronix.de>, 
- kernel test robot <lkp@intel.com>
-X-Mailer: b4 0.12.2
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The IEEE1588 Standard specifies that the timestamps of Packets must be
-captured when the PTP message timestamp point (leading edge of first
-octet after the start of frame delimiter) crosses the boundary between
-the node and the network. As the MAC latches the timestamp at an
-internal point, the captured timestamp must be corrected for the
-additional path latency, as described in the publicly available
-datasheet [1].
+Allow setups with overlapping VLAN IDs in different bridges by settting
+the FID of all bridge ports to the index of the bridge.
 
-This patch only corrects for the MAC-Internal delay, which can be read
-out from the MAC_Ingress_Timestamp_Latency register, since the Phy
-framework currently does not support querying the Phy ingress and egress
-latency. The Closs Domain Crossing Circuits errors as indicated in [1]
-are already being accounted in the stmmac_get_tx_hwtstamp() function and
-are not corrected here.
+Read the FID back when detecting overlaps.
 
-As the Latency varies for different link speeds and MII
-modes of operation, the correction value needs to be updated on each
-link state change.
-
-As the delay also causes a phase shift in the timestamp counter compared
-to the rest of the network, this correction will also reduce phase error
-when generating PPS outputs from the timestamp counter.
-
-[1] i.MX8MP Reference Manual, rev.1 Section 11.7.2.5.3 "Timestamp
-correction"
-
-Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
+Signed-off-by: Daniel Mack <daniel.mack@holoplot.com>
 ---
-Changes in v2:
-- fix builds for 32bit, this was found by the kernel build bot
-	Reported-by: kernel test robot <lkp@intel.com>
-	Closes: https://lore.kernel.org/oe-kbuild-all/202307200225.B8rmKQPN-lkp@intel.com/
-- while at it also fix an overflow by shifting a u32 constant from macro by 10bits
-  by casting the constant to u64
-- Link to v1: https://lore.kernel.org/r/20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de
----
- drivers/net/ethernet/stmicro/stmmac/hwif.h         |  3 ++
- .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  | 43 ++++++++++++++++++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  4 ++
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h   |  6 +++
- 4 files changed, 56 insertions(+)
+ drivers/net/dsa/mv88e6xxx/chip.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index 6ee7cf07cfd7..95a4d6099577 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -536,6 +536,7 @@ struct stmmac_hwtimestamp {
- 	void (*get_systime) (void __iomem *ioaddr, u64 *systime);
- 	void (*get_ptptime)(void __iomem *ioaddr, u64 *ptp_time);
- 	void (*timestamp_interrupt)(struct stmmac_priv *priv);
-+	void (*correct_latency)(struct stmmac_priv *priv);
- };
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index c7d51a539451..dff271981c69 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -2028,6 +2028,7 @@ static int mv88e6xxx_port_check_hw_vlan(struct dsa_switch *ds, int port,
+ 	struct mv88e6xxx_chip *chip = ds->priv;
+ 	struct mv88e6xxx_vtu_entry vlan;
+ 	int err;
++	u16 fid;
  
- #define stmmac_config_hw_tstamping(__priv, __args...) \
-@@ -554,6 +555,8 @@ struct stmmac_hwtimestamp {
- 	stmmac_do_void_callback(__priv, ptp, get_ptptime, __args)
- #define stmmac_timestamp_interrupt(__priv, __args...) \
- 	stmmac_do_void_callback(__priv, ptp, timestamp_interrupt, __args)
-+#define stmmac_correct_latency(__priv, __args...) \
-+	stmmac_do_void_callback(__priv, ptp, correct_latency, __args)
+ 	/* DSA and CPU ports have to be members of multiple vlans */
+ 	if (dsa_port_is_dsa(dp) || dsa_port_is_cpu(dp))
+@@ -2037,11 +2038,16 @@ static int mv88e6xxx_port_check_hw_vlan(struct dsa_switch *ds, int port,
+ 	if (err)
+ 		return err;
  
- struct stmmac_tx_queue;
- struct stmmac_rx_queue;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-index fa2c3ba7e9fe..7e0fa024e0ad 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-@@ -60,6 +60,48 @@ static void config_sub_second_increment(void __iomem *ioaddr,
- 		*ssinc = data;
- }
- 
-+static void correct_latency(struct stmmac_priv *priv)
-+{
-+	void __iomem *ioaddr = priv->ptpaddr;
-+	u32 reg_tsic, reg_tsicsns;
-+	u32 reg_tsec, reg_tsecsns;
-+	u64 scaled_ns;
-+	u32 val;
++	err = mv88e6xxx_port_get_fid(chip, port, &fid);
++	if (err)
++		return err;
 +
-+	/* MAC-internal ingress latency */
-+	scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
+ 	if (!vlan.valid)
+ 		return 0;
+ 
+ 	dsa_switch_for_each_user_port(other_dp, ds) {
+ 		struct net_device *other_br;
++		u16 other_fid;
+ 
+ 		if (vlan.member[other_dp->index] ==
+ 		    MV88E6XXX_G1_VTU_DATA_MEMBER_TAG_NON_MEMBER)
+@@ -2054,6 +2060,10 @@ static int mv88e6xxx_port_check_hw_vlan(struct dsa_switch *ds, int port,
+ 		if (!other_br)
+ 			continue;
+ 
++		err = mv88e6xxx_port_get_fid(chip, other_dp->index, &other_fid);
++		if (err == 0 && fid != other_fid)
++			continue;
 +
-+	/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
-+	 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
+ 		dev_err(ds->dev, "p%d: hw VLAN %d already used by port %d in %s\n",
+ 			port, vlan.vid, other_dp->index, netdev_name(other_br));
+ 		return -EOPNOTSUPP;
+@@ -2948,6 +2958,11 @@ static int mv88e6xxx_port_bridge_join(struct dsa_switch *ds, int port,
+ 		*tx_fwd_offload = true;
+ 	}
+ 
++	/* Set the port's FID to the bridge index so bridges can have
++	 * overlapping VLANs.
 +	 */
-+	val = readl(ioaddr + PTP_TCR);
-+	if (val & PTP_TCR_TSCTRLSSR)
-+		/* nanoseconds field is in decimal format with granularity of 1ns/bit */
-+		scaled_ns = ((u64)NSEC_PER_SEC << 16) - scaled_ns;
-+	else
-+		/* nanoseconds field is in binary format with granularity of ~0.466ns/bit */
-+		scaled_ns = ((1ULL << 31) << 16) -
-+			DIV_U64_ROUND_CLOSEST(scaled_ns * PSEC_PER_NSEC, 466U);
++	err = mv88e6xxx_port_set_fid(chip, port, bridge.num);
 +
-+	reg_tsic = scaled_ns >> 16;
-+	reg_tsicsns = scaled_ns & 0xff00;
-+
-+	/* set bit 31 for 2's compliment */
-+	reg_tsic |= BIT(31);
-+
-+	writel(reg_tsic, ioaddr + PTP_TS_INGR_CORR_NS);
-+	writel(reg_tsicsns, ioaddr + PTP_TS_INGR_CORR_SNS);
-+
-+	/* MAC-internal egress latency */
-+	scaled_ns = readl(ioaddr + PTP_TS_EGR_LAT);
-+
-+	reg_tsec = scaled_ns >> 16;
-+	reg_tsecsns = scaled_ns & 0xff00;
-+
-+	writel(reg_tsec, ioaddr + PTP_TS_EGR_CORR_NS);
-+	writel(reg_tsecsns, ioaddr + PTP_TS_EGR_CORR_SNS);
-+}
-+
- static int init_systime(void __iomem *ioaddr, u32 sec, u32 nsec)
- {
- 	u32 value;
-@@ -221,4 +263,5 @@ const struct stmmac_hwtimestamp stmmac_ptp = {
- 	.get_systime = get_systime,
- 	.get_ptptime = get_ptptime,
- 	.timestamp_interrupt = timestamp_interrupt,
-+	.correct_latency = correct_latency,
- };
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index efe85b086abe..ee78e69e9ae3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -909,6 +909,8 @@ static int stmmac_init_ptp(struct stmmac_priv *priv)
- 	priv->hwts_tx_en = 0;
- 	priv->hwts_rx_en = 0;
+ unlock:
+ 	mv88e6xxx_reg_unlock(chip);
  
-+	stmmac_correct_latency(priv, priv);
-+
- 	return 0;
- }
- 
-@@ -1094,6 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 
- 	if (priv->dma_cap.fpesel)
- 		stmmac_fpe_link_state_handle(priv, true);
-+
-+	stmmac_correct_latency(priv, priv);
- }
- 
- static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-index bf619295d079..d1fe4b46f162 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-@@ -26,6 +26,12 @@
- #define	PTP_ACR		0x40	/* Auxiliary Control Reg */
- #define	PTP_ATNR	0x48	/* Auxiliary Timestamp - Nanoseconds Reg */
- #define	PTP_ATSR	0x4c	/* Auxiliary Timestamp - Seconds Reg */
-+#define	PTP_TS_INGR_CORR_NS	0x58	/* Ingress timestamp correction nanoseconds */
-+#define	PTP_TS_EGR_CORR_NS	0x5C	/* Egress timestamp correction nanoseconds*/
-+#define	PTP_TS_INGR_CORR_SNS	0x60	/* Ingress timestamp correction subnanoseconds */
-+#define	PTP_TS_EGR_CORR_SNS	0x64	/* Egress timestamp correction subnanoseconds */
-+#define	PTP_TS_INGR_LAT	0x68	/* MAC internal Ingress Latency */
-+#define	PTP_TS_EGR_LAT	0x6c	/* MAC internal Egress Latency */
- 
- #define	PTP_STNSUR_ADDSUB_SHIFT	31
- #define	PTP_DIGITAL_ROLLOVER_MODE	0x3B9ACA00	/* 10e9-1 ns */
-
----
-base-commit: ba80e20d7f3f87dab3f9f0c0ca66e4b1fcc7be9f
-change-id: 20230719-stmmac_correct_mac_delay-4278cb9d9bc1
-
-Best regards,
 -- 
-Johannes Zink <j.zink@pengutronix.de>
+2.41.0
 
 
