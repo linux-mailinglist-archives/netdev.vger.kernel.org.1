@@ -1,147 +1,113 @@
-Return-Path: <netdev+bounces-20257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9F175EC33
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:09:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4030075EC3E
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CD062812FD
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:09:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E3F5281396
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDFC15B8;
-	Mon, 24 Jul 2023 07:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF49315BB;
+	Mon, 24 Jul 2023 07:10:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727B01117
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:09:19 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22C6138;
-	Mon, 24 Jul 2023 00:09:14 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6C2E524000E;
-	Mon, 24 Jul 2023 07:09:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1690182552;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30151117
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:10:46 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC764137
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:10:44 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5D9AD20534;
+	Mon, 24 Jul 2023 07:10:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1690182643; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0OTdgWQ6Vo/4tl1ZM7En0YdjITPLKGIP2IIxkkPFJRM=;
-	b=iC5ZIY44VFrCSUNoeMIdYmOyqSrlrW7N4tyY+Hq53oXBVph3jCQ5ij8fsDynsYh6NybKfF
-	47iBUwR964ggu52YB13yaU1E18wok2aDQAXdbpXfZnCVzqeybMcvNBEm04M8MJv49vz912
-	60p20TKBhztddQMV6EZbSo0vTLzFb3Ok+FWErn92iDiDFjDyPmqRh1JKdYw5xT3hwpwVlV
-	u4k2GthKUnBFuRNrRP/XoPSerupU1HIaiVySzO/QpWk35FaiLI3dwdIhQ2brWGTyOPPUCM
-	8E3/Ier83smwYkYCv/LsZ20OWFpB5I2g8A5epoX659Pa/Omr3Rckh60nqnZ+5A==
-Date: Mon, 24 Jul 2023 09:09:02 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andy Shevchenko <andy@kernel.org>
-Cc: nikita.shubin@maquefel.me, Hartley Sweeten
- <hsweeten@visionengravers.com>, Lennert Buytenhek <kernel@wantstofly.org>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Rob
- Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, Thomas
- Gleixner <tglx@linutronix.de>, Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Wim Van Sebroeck
- <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, Sebastian
- Reichel <sre@kernel.org>, Thierry Reding <thierry.reding@gmail.com>, Uwe
- =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>, Mark
- Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Richard
- Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Damien
- Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry
- Torokhov <dmitry.torokhov@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Olof
- Johansson <olof@lixom.net>, soc@kernel.org, Liam Girdwood
- <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Michael Peters <mpeters@embeddedts.com>, Kris Bahnsen
- <kris@embeddedts.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- devicetree@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-pwm@vger.kernel.org,
- linux-spi@vger.kernel.org, netdev@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-ide@vger.kernel.org, linux-input@vger.kernel.org,
- alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 24/42] mtd: nand: add support for ts72xx
-Message-ID: <20230724090902.679ea56d@xps-13>
-In-Reply-To: <ZLqx+Osn3gcHjUph@smile.fi.intel.com>
-References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
-	<20230605-ep93xx-v3-24-3d63a5f1103e@maquefel.me>
-	<ZLqx+Osn3gcHjUph@smile.fi.intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=Bs8GFqJdLR6YpYEb/PQpUFtoXE+F2xMFCO/25AMcKi4=;
+	b=fBa9aV8+gRtjHML/OsSesIUP51mYQFhkYM/7fgqPo5h43uo7T5Akhavq8I0fiBZSrIDmHU
+	x2L/4XxXEVCYQl6+x0lqRABaixaogDDqdgl2UNSGsyvx9hQuDydXAC/18jBj8KwsBIFKJs
+	o+DVXYOrCVlwHbTEx/JPbw0uxVq62KI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1690182643;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bs8GFqJdLR6YpYEb/PQpUFtoXE+F2xMFCO/25AMcKi4=;
+	b=oWujHEFreCiu7vRYWv50U9iY0dW6CLto56R8LC7N39+g4VB41cwOT+oD0Lu9NaCZzKVPuf
+	X//7dRdS+blS44AA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1065413476;
+	Mon, 24 Jul 2023 07:10:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id R36cAvMjvmQMWQAAMHmgww
+	(envelope-from <hare@suse.de>); Mon, 24 Jul 2023 07:10:43 +0000
+Message-ID: <3e83c1dd-99bd-4dbd-2f83-4008e7059cfa@suse.de>
+Date: Mon, 24 Jul 2023 09:10:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCHv8 0/6] net/tls: fixes for NVMe-over-TLS
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ linux-nvme@lists.infradead.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230721143523.56906-1-hare@suse.de>
+ <20230721190026.25d2f0a5@kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230721190026.25d2f0a5@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andy,
+On 7/22/23 04:00, Jakub Kicinski wrote:
+> On Fri, 21 Jul 2023 16:35:17 +0200 Hannes Reinecke wrote:
+>> here are some small fixes to get NVMe-over-TLS up and running.
+>> The first set are just minor modifications to have MSG_EOR handled
+>> for TLS, but the second set implements the ->read_sock() callback for tls_sw
+>> which I guess could do with some reviews.
+> 
+> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> Sagi, I _think_ a stable branch with this should be doable,
+> would you like one, or no rush?
 
-> > +static int ts72xx_nand_attach_chip(struct nand_chip *chip)
-> > +{
-> > +	switch (chip->ecc.engine_type) {
-> > +	case NAND_ECC_ENGINE_TYPE_SOFT:
-> > +		if (chip->ecc.algo =3D=3D NAND_ECC_ALGO_UNKNOWN)
-> > +			chip->ecc.algo =3D NAND_ECC_ALGO_HAMMING;
-> > +		break;
-> > +	case NAND_ECC_ENGINE_TYPE_ON_HOST:
-> > +		return -EINVAL;
-> > +	default: =20
->=20
-> > +		break; =20
->=20
-> Here it will return 0, is it a problem?
+I guess a stable branch would not be too bad; I've got another
+set of patches for the NVMe side, too.
+Sagi?
 
-Seems ok, there are two other situations: on-die ECC engine and no ECC
-engine, both do not require any specific handling on the controller
-side.
+Cheers,
 
->=20
-> > +	}
-> > +
-> > +	return 0;
-> > +} =20
->=20
-> ...
->=20
-> > +static void ts72xx_nand_remove(struct platform_device *pdev)
-> > +{
-> > +	struct ts72xx_nand_data *data =3D platform_get_drvdata(pdev);
-> > +	struct nand_chip *chip =3D &data->chip;
-> > +	int ret;
-> > +
-> > +	ret =3D mtd_device_unregister(nand_to_mtd(chip)); =20
->=20
-> > +	WARN_ON(ret); =20
->=20
-> Why?!  Is it like this in other MTD drivers?
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
-Yes, we did not yet change the internal machinery to return void, and
-we don't want people to think getting errors there is normal.
-
-> > +	nand_cleanup(chip);
-> > +} =20
->=20
-
-Thanks,
-Miqu=C3=A8l
 
