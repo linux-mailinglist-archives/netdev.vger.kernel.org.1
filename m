@@ -1,114 +1,91 @@
-Return-Path: <netdev+bounces-20476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735FF75FADE
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:35:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2A0075FB02
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 17:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43241C2092A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:35:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD9AE1C20A95
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5113BDDCF;
-	Mon, 24 Jul 2023 15:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A078DDD1;
+	Mon, 24 Jul 2023 15:41:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BD5D530
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:35:19 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B05B7;
-	Mon, 24 Jul 2023 08:35:17 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-666e6541c98so4256006b3a.2;
-        Mon, 24 Jul 2023 08:35:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690212917; x=1690817717;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SL6yND5mG8rB1Q/PAlTBUsUBz7nYVLDoCOtcQa0d2jY=;
-        b=ekVFd7GOf7pP7rOcuuayFRfZVoFWBPofzsTOC5EMRT6p8gLVF579AphjizhEuH/i+k
-         Y1Bv6oFFz5F+ZPgJQfqQFUt9Dtt2g0F5ie8EClZC4MIP+gkwC/DslZP3Dzy4Ic9zUsf+
-         +smD6Ryfyg+eNVemPeMQyvyaUJjFumnSZtypYuQFX7dm+2386CMYv5MJW/odi8ox6I3d
-         s+GGTrr3Z0ShpIDh9qhMe0M4FQrVCUe0ei7WnBmfhZDDZDDZXPdn0ZIdRZrNq3KEPdNn
-         e5k3pXLn4o0tRckpfNVTCut4+yUWzfG77p/toQHlBlvOZzyX8nsjRHO8dMmuemRPv1A9
-         I7ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690212917; x=1690817717;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SL6yND5mG8rB1Q/PAlTBUsUBz7nYVLDoCOtcQa0d2jY=;
-        b=X4ZkxnLHOMI5y2+OxjvdYpiHlKWvECcW27H3thdLuWyl+PGwNOrnYyPqF3agvXVRvh
-         GwPkF6U55Mu8IXoxGq7QAdcUKzmQjPImW7RRvvcK70/0QpIYfgwlGBZAmxQO//IUwOWQ
-         o7asyKbRwpLq6Arbuc3jWHDi7CWFR+ZVztbFzgSul0L3mb4y/ngNMF/KSAV7eZc6UmoG
-         pfsWlJa95+5B/I86f2unkOP78p/WoYr9J1cg94Foln+t5+1/Kzw9YSThckrxwRszh8dt
-         ls870Oupnt0tRyk9Ir2QeoCFFacWClOS5NAxtE16D/03NZusKm016rL6bR2P1Ul7KoMG
-         YrEA==
-X-Gm-Message-State: ABy/qLYRgkw8OXyUEPpBCHxFUO3RDf0LsMxGRS3HZIRREzHvmPaG3bCk
-	GBU6FBl1QIX7FIqvpHwfesc=
-X-Google-Smtp-Source: APBJJlF+Mbf05zfWSsQ6Xtgd5LvdTBqC+q5t1f4aBvSCxFAonHhBNwdvgq7jO166eA3y6LApHwKqLw==
-X-Received: by 2002:a05:6a20:734c:b0:122:c6c4:36b1 with SMTP id v12-20020a056a20734c00b00122c6c436b1mr12757046pzc.4.1690212916664;
-        Mon, 24 Jul 2023 08:35:16 -0700 (PDT)
-Received: from ?IPV6:2600:8802:b00:4a48:acad:6c64:8815:b48d? ([2600:8802:b00:4a48:acad:6c64:8815:b48d])
-        by smtp.gmail.com with ESMTPSA id v1-20020aa78501000000b00682704663fcsm7851102pfn.191.2023.07.24.08.35.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 08:35:15 -0700 (PDT)
-Message-ID: <cf089185-4696-40ce-42c9-df2eea336d05@gmail.com>
-Date: Mon, 24 Jul 2023 08:35:14 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173F68839
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 15:41:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48908C433C8;
+	Mon, 24 Jul 2023 15:41:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690213287;
+	bh=ykEBR5UUmS0xV+TmQli48AV2jUH+UxZHF+IllPg7RX4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EfjI9rcOA+s2xPYRr6aoPR4wNLDeE2gKJHSSjKOoiDZoVzOBqAjDsemCW1miLggGV
+	 FsF7RUoxel1MMqQ7xS+Q7IxV4hHCrrzCnELbJzmzkvz+gMwDMQylPlOSsm8QHF4lBH
+	 xxpF75j3XBA1jR9EugEi9e3DuwHuDaWzq7vnokKcb/cZBZRETXVgJrobImCpJnHsyC
+	 hH7FXJFDwVAA2q/k9s+mZnqRW3Xqu0H2+l2povNIKCmhRtIbEp18AWarOh5yG6bVxi
+	 hPjQ5+ifWW+CP7Y5M8BOYW2kFy7d9xbsLDHQARsQSDy0+2XlV8SIYqFrmWEDXmEMMF
+	 wQgVGM7Qguu/g==
+Date: Mon, 24 Jul 2023 08:41:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ mkubecek@suse.cz, lorenzo@kernel.org, Herbert Xu
+ <herbert@gondor.apana.org.au>, Neil Brown <neilb@suse.de>
+Subject: Re: [PATCH net-next 1/2] net: store netdevs in an xarray
+Message-ID: <20230724084126.38d55715@kernel.org>
+In-Reply-To: <20788d4df9bbcdce9453be3fd047fdf8e0465714.camel@redhat.com>
+References: <20230722014237.4078962-1-kuba@kernel.org>
+	<20230722014237.4078962-2-kuba@kernel.org>
+	<20788d4df9bbcdce9453be3fd047fdf8e0465714.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v5 net-next] net: phy: smsc: add WoL support to
- LAN8740/LAN8742 PHYs
-Content-Language: en-US
-To: Tristram.Ha@microchip.com, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1689900053-13118-1-git-send-email-Tristram.Ha@microchip.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <1689900053-13118-1-git-send-email-Tristram.Ha@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
+On Mon, 24 Jul 2023 10:18:04 +0200 Paolo Abeni wrote:
+> A possibly dumb question: why using an xarray over a plain list?
 
+We need to drop the lock during the walk. So for a list we'd need 
+to either 
+ - add explicit iteration "cursor" or 
+ - suffer O(n) for insertion + O(n^2) for restart?
 
-On 7/20/2023 5:40 PM, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <Tristram.Ha@microchip.com>
-> 
-> Microchip LAN8740/LAN8742 PHYs support basic unicast, broadcast, and
-> Magic Packet WoL.  They have one pattern filter matching up to 128 bytes
-> of frame data, which can be used to implement ARP or multicast WoL.
-> 
-> ARP WoL matches any ARP frame with broadcast address.
-> 
-> Multicast WoL matches any multicast frame.
-> 
-> Signed-off-by: Tristram Ha <Tristram.Ha@microchip.com>
+Or there's a easier way to do it?
+The cursor is not the worst option, I guess, a bit less intuitive
+and harder to clean up on error, but doable?
 
-This looks good to me, just one suggestion but which you can implement 
-later, it would be nice to have a pm_wakeup_event(&phydev->mdio.dev, 0) 
-in order to have the PHY device accounted for any wake-up event. You can 
-do that when you do the initial acknowledgement of any wake-up 
-interrupts in your .config_init callback.
+> It looks like the idea is to additionally use xarray for device lookup
+> beyond for dumping?
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+I was measuring it to find out if we can delete the hash table without
+anyone noticing, but it's not really the motivation.
+
+> WRT the above, have you considered instead replacing dev_name_head with
+> an rhashtable? (and add the mentioned list)
+
+The main motivation is ease of iteration for netlink dumps.
+
+I'll admit that my understanding of rhashtable is superficial but
+I don't think it's possible to do consistent dumps with it. Even 
+if it supported "cursors" (which I'm not sure it does) a rhash could
+rearrange buckets and mess the order up. The comment on
+rhltable_walk_enter() says:
+
+ * For a completely stable walk you should construct your own data
+ * structure outside the hash table.
+
+Given the iteration process is controlled by user space trying to
+constrain a rhash also used by the fast path to get consistent dumps
+seems risky.
+
+Adding Herbert and Neil to keep me honest.
 
