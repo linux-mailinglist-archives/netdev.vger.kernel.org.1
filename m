@@ -1,132 +1,87 @@
-Return-Path: <netdev+bounces-20534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1635F75FF94
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EDEA75FF9B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CD1280EC6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 19:09:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 596601C20C35
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 19:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C6E100D8;
-	Mon, 24 Jul 2023 19:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25C7100DC;
+	Mon, 24 Jul 2023 19:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0C9F51C
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:09:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60F6AC433C7;
-	Mon, 24 Jul 2023 19:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5919EF51C;
+	Mon, 24 Jul 2023 19:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20D49C433C9;
+	Mon, 24 Jul 2023 19:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690225779;
-	bh=/asO4NAxz4TCfJh+oAmGqjcZIqYZmReNfbcHJJQwO24=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z15o8Dj8963keR9x/jpw8Eg5CBbEnC++MTWj7A53CnPUnvIXJrK38l5dPD4YBrJUb
-	 purZ8G/11wRSdMZqMi3+IBDgjPE4RSMVhU+abydTsQ+dfzydBlivhbzyACBRqBBH6X
-	 bKBNMUB8W3Boc+dsMe+c3+JUU1VHp1iMqXD5yrF0AxaGnMc5p1ReQb2AI3MDL3o7hy
-	 hdJBl/FN2yxKxjb9++30Oskxkkb/8qXq7xC7M8KjcllmUHwU+9ZYB8IMwH2dkA79Gb
-	 VA3LRhhZUdUUcwtzOn/BPTdaaGyiISQxykzB1tbmzxpM9WLkWfbe+I2IPX0GhR+CUn
-	 eyimz6dqAVGRw==
-Date: Mon, 24 Jul 2023 22:09:34 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, mkubecek@suse.cz, lorenzo@kernel.org
-Subject: Re: [PATCH net-next 1/2] net: store netdevs in an xarray
-Message-ID: <20230724190934.GE11388@unreal>
-References: <20230722014237.4078962-1-kuba@kernel.org>
- <20230722014237.4078962-2-kuba@kernel.org>
+	s=k20201202; t=1690225822;
+	bh=ujnDSd65smrCj3S58K++7NXFH0zZfR/5ieE5tyGHfm0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mQWKVps6qy4AKLQP3EB7Sqqz/cVnf2stFPXSjPU1ay9pyi0oQB+8wjZ9g1mYGiodI
+	 VMwo1KlNLIJJ/eR4MQAW3YXm+yftxQd18iaobYrWERqJA0/F/Rxg51s3I86t1dFck5
+	 kGO+HUP9KTeqheygUyJGZiPXmp42jmBKiPZC4nY2uytNSks1z1CkGBSLvEO5IKo9RB
+	 iXdNF0tH48e0o6cSo8zUMXnSM/VnNAxf2uT1a9cvgnNAUwPhAgIv+AaNecj+zStr+A
+	 VEsyo7JpWGaJOC8SWAbeaL+Hd9dh9BQBL+uR8Ei/IW0c34IR1qyuDPIQudXRPKSbOV
+	 aRM8wIQUmD63w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0911DC595D7;
+	Mon, 24 Jul 2023 19:10:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230722014237.4078962-2-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] tcx: Fix splat in ingress_destroy upon
+ tcx_entry_free
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169022582203.21248.6314356948130016152.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Jul 2023 19:10:22 +0000
+References: <20230721233330.5678-1-daniel@iogearbox.net>
+In-Reply-To: <20230721233330.5678-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org,
+ syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com,
+ syzbot+b202b7208664142954fa@syzkaller.appspotmail.com,
+ syzbot+14736e249bce46091c18@syzkaller.appspotmail.com
 
-On Fri, Jul 21, 2023 at 06:42:36PM -0700, Jakub Kicinski wrote:
-> Iterating over the netdev hash table for netlink dumps is hard.
-> Dumps are done in "chunks" so we need to save the position
-> after each chunk, so we know where to restart from. Because
-> netdevs are stored in a hash table we remember which bucket
-> we were in and how many devices we dumped.
-> 
-> Since we don't hold any locks across the "chunks" - devices may
-> come and go while we're dumping. If that happens we may miss
-> a device (if device is deleted from the bucket we were in).
-> We indicate to user space that this may have happened by setting
-> NLM_F_DUMP_INTR. User space is supposed to dump again (I think)
-> if it sees that. Somehow I doubt most user space gets this right..
-> 
-> To illustrate let's look at an example:
-> 
->                System state:
->   start:       # [A, B, C]
->   del:  B      # [A, C]
-> 
-> with the hash table we may dump [A, B], missing C completely even
-> tho it existed both before and after the "del B".
-> 
-> Add an xarray and use it to allocate ifindexes. This way we
-> can iterate ifindexes in order, without the worry that we'll
-> skip one. We may still generate a dump of a state which "never
-> existed", for example for a set of values and sequence of ops:
-> 
->                System state:
->   start:       # [A, B]
->   add:  C      # [A, C, B]
->   del:  B      # [A, C]
-> 
-> we may generate a dump of [A], if C got an index between A and B.
-> System has never been in such state. But I'm 90% sure that's perfectly
-> fine, important part is that we can't _miss_ devices which exist before
-> and after. User space which wants to mirror kernel's state subscribes
-> to notifications and does periodic dumps so it will know that C exists
-> from the notification about its creation or from the next dump
-> (next dump is _guaranteed_ to include C, if it doesn't get removed).
-> 
-> To avoid any perf regressions keep the hash table for now. Most
-> net namespaces have very few devices and microbenchmarking 1M lookups
-> on Skylake I get the following results (not counting loopback
-> to number of devs):
-> 
->  #devs | hash |  xa  | delta
->     2  | 18.3 | 20.1 | + 9.8%
->    16  | 18.3 | 20.1 | + 9.5%
->    64  | 18.3 | 26.3 | +43.8%
->   128  | 20.4 | 26.3 | +28.6%
->   256  | 20.0 | 26.4 | +32.1%
->  1024  | 26.6 | 26.7 | + 0.2%
->  8192  |541.3 | 33.5 | -93.8%
-> 
-> No surprises since the hash table has 256 entries.
-> The microbenchmark scans indexes in order, if the pattern is more
-> random xa starts to win at 512 devices already. But that's a lot
-> of devices, in practice.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  include/net/net_namespace.h |  4 +-
->  net/core/dev.c              | 82 ++++++++++++++++++++++++-------------
->  2 files changed, 57 insertions(+), 29 deletions(-)
+Hello:
 
-<...>
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +	if (!ifindex)
-> +		err = xa_alloc_cyclic(&net->dev_by_index, &ifindex, NULL,
-> +				      xa_limit_31b, &net->ifindex, GFP_KERNEL);
-> +	else
-> +		err = xa_insert(&net->dev_by_index, ifindex, NULL, GFP_KERNEL);
-> +	if (err)
-> +		return err;
+On Sat, 22 Jul 2023 01:33:30 +0200 you wrote:
+> On qdisc destruction, the ingress_destroy() needs to update the correct
+> entry, that is, tcx_entry_update must NULL the dev->tcx_ingress pointer.
+> Therefore, fix the typo.
+> 
+> Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
+> Reported-by: syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com
+> Reported-by: syzbot+b202b7208664142954fa@syzkaller.appspotmail.com
+> Reported-by: syzbot+14736e249bce46091c18@syzkaller.appspotmail.com
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> 
+> [...]
 
-Please pay attention that xa_alloc_cyclic() returns 1 if the allocation
-succeeded after wrapping. So the more accurate check is "if (err < 0) ..."
+Here is the summary with links:
+  - [net-next] tcx: Fix splat in ingress_destroy upon tcx_entry_free
+    https://git.kernel.org/netdev/net-next/c/dc644b540a2d
 
-Thanks
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
