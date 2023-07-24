@@ -1,1438 +1,849 @@
-Return-Path: <netdev+bounces-20553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4642760120
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 23:22:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B81760129
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 23:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74FB1281062
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:22:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BC2C1C20B68
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947411119F;
-	Mon, 24 Jul 2023 21:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1F31119F;
+	Mon, 24 Jul 2023 21:24:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391C510978;
-	Mon, 24 Jul 2023 21:22:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B9D0C433C7;
-	Mon, 24 Jul 2023 21:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0EE2FB6
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 21:24:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 389D3C433C8;
+	Mon, 24 Jul 2023 21:24:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690233753;
-	bh=XxYi/1Gt9v2LpWnn1if18vwrLT6DyG4npZ3OigxbwRk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=K2A9RJnit2vN0UMa8CIYp4blG561GUaS/VYkcXbOplBtSLnikOEZtBka3725p1v4F
-	 KM6sfS3TtNaY3mXdRpxLDaeOK7DJbKJHyPGE+X7Tw1dh/rFrbQM/fvxWHCC4LLi3jj
-	 7945t1SKRIxGpTgkFTAGHTGmMb7YYkevAOdzGJg+JtUkgILgbL+bKXb/YWDk+TAHk3
-	 zmahpT5xuS+FnHFGsQ9qjknkQ1SeR0Z76uX8iSLLSjSKXRc+TBUR0YmYoel7izQ8qj
-	 fZwKtNK+JqFgcak+4ugW9pKkY2V33Nv73ep0w2SB+RBarr0JQ3V+VBD//JtzGO0/68
-	 0PGALBo2UQiug==
-Received: (nullmailer pid 810136 invoked by uid 1000);
-	Mon, 24 Jul 2023 21:22:25 -0000
-From: Rob Herring <robh@kernel.org>
-To: Andreas Larsson <andreas@gaisler.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Iyappan Subramanian <iyappan@os.amperecomputing.com>, Keyur Chudgar <keyur@os.amperecomputing.com>, Chris Snook <chris.snook@gmail.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@microchip.com>, Madalin Bucur <madalin.bucur@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Sean Anderson <sean.anderson@seco.com>, Pantelis Antoniou <pantelis.antoniou@gmail.com>, Li Yang <leoyang.li@nxp.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Douglas Miller <dougmill@linux.ibm.com>, Marcin Wojtas <mw@semihalf.com>, Russell King <linux@armlinux.org.uk>, Taras Chorny
- i <taras.chornyi@plvision.eu>, Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Alexandre Belloni <alexandre.belloni@bootlin.com>, Timur Tabi <timur@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, Steve Glendinning <steve.glendinning@shawell.net>, Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
-  Fabio Estevam <festevam@gmail.com>, Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, Grygorii Strashko <grygorii.strashko@ti.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, Alex Elder <elder@kernel.org>, A
- ndrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Richard Cochran <richardcochran@gmail.com>
-Cc: Alex Elder <elder@linaro.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-amlogic@lists.infradead.org, linux-oxnas@groups.io, linux-arm-msm@vger.kernel.org, linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, linux-omap@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: [PATCH v2] net: Explicitly include correct DT includes
-Date: Mon, 24 Jul 2023 15:22:16 -0600
-Message-Id: <20230724212222.809909-1-robh@kernel.org>
-X-Mailer: git-send-email 2.40.1
+	s=k20201202; t=1690233856;
+	bh=/ePTC90N0jfKqdgywr43mFXcpqi4NTcraGIGAOByEok=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gtUv+nTX3e4eDwsOZAiR5OBV/wJUWIvsbKY86Fni+n6M/He59/p/7e98z5gHOmI0S
+	 8N13qdfCkBU9bZm836POY+RkxCnWRqgXiktJvFRNe5LMfHULapmrYzzNpR9K0gO11s
+	 8oZetdqb61fuoF00FeNVklnym8L8ElT3T/9ckt96GTNj2/dKaSeg2Tg3n8j1OEiRwG
+	 kCiDDSSTwCoJilpeE98L4+jheuE3A/Yt+fx3G8wySPkl+B09NkezNHtkl0iAGrBTEO
+	 qL2BUPzep1EvMml/31IM4rf04Iav1iKCM0zoMgMOGDPksYPWxLKmC6qAtE0TvAhK1r
+	 8MSXMwu5isxxA==
+Date: Mon, 24 Jul 2023 14:24:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ian Kumlien <ian.kumlien@gmail.com>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ netfilter-devel@vger.kernel.org
+Subject: Re: Kernel oops with 6.4.4 - flow offloads - NULL pointer deref
+Message-ID: <20230724142415.03a9d133@kernel.org>
+In-Reply-To: <CAA85sZsTF21va8HhwrJc_yuVgVU6+dppEd-SdQpDjqLNFtcneQ@mail.gmail.com>
+References: <CAA85sZsTF21va8HhwrJc_yuVgVU6+dppEd-SdQpDjqLNFtcneQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The DT of_device.h and of_platform.h date back to the separate
-of_platform_bus_type before it as merged into the regular platform bus.
-As part of that merge prepping Arm DT support 13 years ago, they
-"temporarily" include each other. They also include platform_device.h
-and of.h. As a result, there's a pretty much random mix of those include
-files used throughout the tree. In order to detangle these headers and
-replace the implicit includes with struct declarations, users need to
-explicitly include the correct includes.
+Adding netfilter to CC.
 
-Acked-by: Alex Elder <elder@linaro.org>
-Reviewed-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
-Signed-off-by: Rob Herring <robh@kernel.org>
----
-v2:
- - Fix applying to net-next (was due to dependency in my tree)
- - Split out can, dsa, wireless, phy/pcs to separate patches
----
- drivers/net/ethernet/aeroflex/greth.c                   | 4 ++--
- drivers/net/ethernet/amd/sunlance.c                     | 2 +-
- drivers/net/ethernet/apm/xgene-v2/main.h                | 1 +
- drivers/net/ethernet/arc/emac_main.c                    | 2 +-
- drivers/net/ethernet/atheros/ag71xx.c                   | 3 ++-
- drivers/net/ethernet/cadence/macb_main.c                | 1 -
- drivers/net/ethernet/cirrus/cs89x0.c                    | 1 -
- drivers/net/ethernet/ezchip/nps_enet.c                  | 5 ++---
- drivers/net/ethernet/freescale/dpaa/dpaa_eth.c          | 3 ++-
- drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c      | 2 ++
- drivers/net/ethernet/freescale/enetc/enetc_ierb.c       | 2 +-
- drivers/net/ethernet/freescale/fec_mpc52xx.c            | 4 ++--
- drivers/net/ethernet/freescale/fec_mpc52xx_phy.c        | 3 ++-
- drivers/net/ethernet/freescale/fec_ptp.c                | 1 -
- drivers/net/ethernet/freescale/fman/fman.c              | 1 +
- drivers/net/ethernet/freescale/fman/fman_port.c         | 1 +
- drivers/net/ethernet/freescale/fman/mac.c               | 2 ++
- drivers/net/ethernet/freescale/fs_enet/mac-fcc.c        | 1 -
- drivers/net/ethernet/freescale/fs_enet/mac-fec.c        | 1 -
- drivers/net/ethernet/freescale/fs_enet/mac-scc.c        | 1 -
- drivers/net/ethernet/freescale/fsl_pq_mdio.c            | 1 +
- drivers/net/ethernet/freescale/gianfar.c                | 2 +-
- drivers/net/ethernet/freescale/gianfar_ethtool.c        | 2 ++
- drivers/net/ethernet/freescale/ucc_geth.c               | 3 ++-
- drivers/net/ethernet/freescale/xgmac_mdio.c             | 4 ++--
- drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.c       | 3 ---
- drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c       | 4 ----
- drivers/net/ethernet/ibm/ehea/ehea_main.c               | 1 +
- drivers/net/ethernet/ibm/emac/core.c                    | 1 +
- drivers/net/ethernet/ibm/emac/core.h                    | 1 -
- drivers/net/ethernet/ibm/emac/mal.c                     | 2 ++
- drivers/net/ethernet/ibm/emac/rgmii.c                   | 2 ++
- drivers/net/ethernet/ibm/emac/tah.c                     | 2 ++
- drivers/net/ethernet/ibm/emac/zmii.c                    | 2 ++
- drivers/net/ethernet/korina.c                           | 2 +-
- drivers/net/ethernet/marvell/mvmdio.c                   | 2 +-
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c         | 1 -
- drivers/net/ethernet/marvell/prestera/prestera_rxtx.c   | 3 ---
- drivers/net/ethernet/marvell/sky2.c                     | 1 -
- drivers/net/ethernet/mediatek/mtk_eth_soc.c             | 3 ++-
- drivers/net/ethernet/mediatek/mtk_star_emac.c           | 1 -
- drivers/net/ethernet/mediatek/mtk_wed.c                 | 1 +
- drivers/net/ethernet/mediatek/mtk_wed_wo.c              | 3 +--
- drivers/net/ethernet/microchip/lan966x/lan966x_main.c   | 3 ++-
- drivers/net/ethernet/mscc/ocelot_fdma.c                 | 1 -
- drivers/net/ethernet/mscc/ocelot_vsc7514.c              | 3 ++-
- drivers/net/ethernet/ni/nixge.c                         | 5 ++---
- drivers/net/ethernet/qualcomm/emac/emac-sgmii.c         | 2 ++
- drivers/net/ethernet/qualcomm/emac/emac.c               | 1 -
- drivers/net/ethernet/qualcomm/qca_spi.c                 | 1 -
- drivers/net/ethernet/qualcomm/qca_uart.c                | 1 -
- drivers/net/ethernet/renesas/ravb_main.c                | 3 +--
- drivers/net/ethernet/renesas/rswitch.c                  | 3 +--
- drivers/net/ethernet/renesas/sh_eth.c                   | 2 --
- drivers/net/ethernet/smsc/smsc911x.c                    | 1 -
- drivers/net/ethernet/socionext/sni_ave.c                | 3 ++-
- drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c | 2 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c         | 1 -
- drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c     | 1 -
- drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c    | 2 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c     | 2 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-oxnas.c       | 1 -
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 1 -
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c          | 2 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c    | 4 +++-
- drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c         | 1 -
- drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c       | 1 -
- drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c       | 3 ++-
- drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c       | 2 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c    | 3 ++-
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c   | 1 -
- drivers/net/ethernet/sun/niu.c                          | 2 +-
- drivers/net/ethernet/sun/sunbmac.c                      | 2 +-
- drivers/net/ethernet/sun/sungem.c                       | 1 +
- drivers/net/ethernet/sun/sunhme.c                       | 3 ++-
- drivers/net/ethernet/sun/sunqe.c                        | 2 +-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c                | 1 +
- drivers/net/ethernet/ti/cpsw-common.c                   | 1 -
- drivers/net/ethernet/ti/cpsw-phy-sel.c                  | 1 -
- drivers/net/ethernet/ti/davinci_mdio.c                  | 1 -
- drivers/net/ethernet/via/via-rhine.c                    | 2 +-
- drivers/net/ethernet/via/via-velocity.c                 | 2 +-
- drivers/net/ethernet/xilinx/ll_temac.h                  | 1 +
- drivers/net/ethernet/xilinx/ll_temac_main.c             | 4 +---
- drivers/net/ethernet/xilinx/ll_temac_mdio.c             | 2 +-
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c       | 3 ++-
- drivers/net/ethernet/xilinx/xilinx_emaclite.c           | 4 ++--
- drivers/net/ieee802154/ca8210.c                         | 1 -
- drivers/net/ipa/ipa_main.c                              | 2 +-
- net/core/of_net.c                                       | 1 +
- 90 files changed, 88 insertions(+), 92 deletions(-)
-
-diff --git a/drivers/net/ethernet/aeroflex/greth.c b/drivers/net/ethernet/aeroflex/greth.c
-index aa0d2f3aaeaa..597a02c75d52 100644
---- a/drivers/net/ethernet/aeroflex/greth.c
-+++ b/drivers/net/ethernet/aeroflex/greth.c
-@@ -29,9 +29,9 @@
- #include <linux/io.h>
- #include <linux/crc32.h>
- #include <linux/mii.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <asm/cacheflush.h>
- #include <asm/byteorder.h>
-diff --git a/drivers/net/ethernet/amd/sunlance.c b/drivers/net/ethernet/amd/sunlance.c
-index 68ca1225eedc..33bb539ad70a 100644
---- a/drivers/net/ethernet/amd/sunlance.c
-+++ b/drivers/net/ethernet/amd/sunlance.c
-@@ -92,7 +92,7 @@ static char lancestr[] = "LANCE";
- #include <linux/bitops.h>
- #include <linux/dma-mapping.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/platform_device.h>
- #include <linux/gfp.h>
- #include <linux/pgtable.h>
- 
-diff --git a/drivers/net/ethernet/apm/xgene-v2/main.h b/drivers/net/ethernet/apm/xgene-v2/main.h
-index b3985a7be59d..7be6f83e22fe 100644
---- a/drivers/net/ethernet/apm/xgene-v2/main.h
-+++ b/drivers/net/ethernet/apm/xgene-v2/main.h
-@@ -22,6 +22,7 @@
- #include <linux/of_mdio.h>
- #include <linux/prefetch.h>
- #include <linux/phy.h>
-+#include <linux/platform_device.h>
- #include <net/ip.h>
- #include "mac.h"
- #include "enet.h"
-diff --git a/drivers/net/ethernet/arc/emac_main.c b/drivers/net/ethernet/arc/emac_main.c
-index 2b427d8a1831..31ee477dd131 100644
---- a/drivers/net/ethernet/arc/emac_main.c
-+++ b/drivers/net/ethernet/arc/emac_main.c
-@@ -15,11 +15,11 @@
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/module.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
- 
- #include "emac.h"
- 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index ff1a5edf8df1..009e0b3066fa 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -29,9 +29,10 @@
- 
- #include <linux/if_vlan.h>
- #include <linux/mfd/syscon.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/phylink.h>
- #include <linux/regmap.h>
- #include <linux/reset.h>
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index f6a0f12a6d52..b61566afb2f4 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -26,7 +26,6 @@
- #include <linux/platform_device.h>
- #include <linux/phylink.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_gpio.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-diff --git a/drivers/net/ethernet/cirrus/cs89x0.c b/drivers/net/ethernet/cirrus/cs89x0.c
-index 276c32c3926a..7c51fd9fc9be 100644
---- a/drivers/net/ethernet/cirrus/cs89x0.c
-+++ b/drivers/net/ethernet/cirrus/cs89x0.c
-@@ -54,7 +54,6 @@
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/platform_device.h>
- #include <linux/kernel.h>
- #include <linux/types.h>
-diff --git a/drivers/net/ethernet/ezchip/nps_enet.c b/drivers/net/ethernet/ezchip/nps_enet.c
-index f1eb660aaee2..edf000e7bab4 100644
---- a/drivers/net/ethernet/ezchip/nps_enet.c
-+++ b/drivers/net/ethernet/ezchip/nps_enet.c
-@@ -6,10 +6,9 @@
- #include <linux/module.h>
- #include <linux/etherdevice.h>
- #include <linux/interrupt.h>
--#include <linux/of_address.h>
--#include <linux/of_irq.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include "nps_enet.h"
- 
- #define DRV_NAME			"nps_mgt_enet"
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index 431f8917dc39..7cbfc5864ade 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -7,8 +7,8 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/init.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
--#include <linux/of_platform.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/io.h>
-@@ -17,6 +17,7 @@
- #include <linux/icmp.h>
- #include <linux/ip.h>
- #include <linux/ipv6.h>
-+#include <linux/platform_device.h>
- #include <linux/udp.h>
- #include <linux/tcp.h>
- #include <linux/net.h>
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-index 9c71cbbb13d8..5bd0b36d1feb 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-@@ -6,7 +6,9 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/string.h>
-+#include <linux/of.h>
- #include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/net_tstamp.h>
- #include <linux/fsl/ptp_qoriq.h>
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ierb.c b/drivers/net/ethernet/freescale/enetc/enetc_ierb.c
-index b307bef4dc29..d39617ab9306 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ierb.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ierb.c
-@@ -18,8 +18,8 @@
-  */
- 
- #include <linux/io.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
--#include <linux/of_device.h>
- #include <linux/pci.h>
- #include <linux/platform_device.h>
- #include "enetc.h"
-diff --git a/drivers/net/ethernet/freescale/fec_mpc52xx.c b/drivers/net/ethernet/freescale/fec_mpc52xx.c
-index b88816b71ddf..f843ea0df065 100644
---- a/drivers/net/ethernet/freescale/fec_mpc52xx.c
-+++ b/drivers/net/ethernet/freescale/fec_mpc52xx.c
-@@ -29,12 +29,12 @@
- #include <linux/crc32.h>
- #include <linux/hardirq.h>
- #include <linux/delay.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
- #include <linux/of_irq.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- 
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
-diff --git a/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c b/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c
-index 95f778cce98c..894130985e2c 100644
---- a/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c
-+++ b/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c
-@@ -13,10 +13,11 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/phy.h>
--#include <linux/of_platform.h>
- #include <linux/slab.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_mdio.h>
-+#include <linux/platform_device.h>
- #include <asm/io.h>
- #include <asm/mpc52xx.h>
- #include "fec_mpc52xx.h"
-diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
-index ab86bb8562ef..9428a06b6a87 100644
---- a/drivers/net/ethernet/freescale/fec_ptp.c
-+++ b/drivers/net/ethernet/freescale/fec_ptp.c
-@@ -30,7 +30,6 @@
- #include <linux/phy.h>
- #include <linux/fec.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_gpio.h>
- #include <linux/of_net.h>
- 
-diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-index 9d85fb136e34..d96028f01770 100644
---- a/drivers/net/ethernet/freescale/fman/fman.c
-+++ b/drivers/net/ethernet/freescale/fman/fman.c
-@@ -7,6 +7,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/fsl/guts.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/delay.h>
- #include <linux/module.h>
-diff --git a/drivers/net/ethernet/freescale/fman/fman_port.c b/drivers/net/ethernet/freescale/fman/fman_port.c
-index ab90fe2bee5e..406e75e9e5ea 100644
---- a/drivers/net/ethernet/freescale/fman/fman_port.c
-+++ b/drivers/net/ethernet/freescale/fman/fman_port.c
-@@ -6,6 +6,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/io.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/module.h>
- #include <linux/interrupt.h>
-diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
-index 43665806c590..57de8a6ab180 100644
---- a/drivers/net/ethernet/freescale/fman/mac.c
-+++ b/drivers/net/ethernet/freescale/fman/mac.c
-@@ -12,12 +12,14 @@
- #include <linux/of_net.h>
- #include <linux/of_mdio.h>
- #include <linux/device.h>
-+#include <linux/of_platform.h>
- #include <linux/phy.h>
- #include <linux/netdevice.h>
- #include <linux/phy_fixed.h>
- #include <linux/phylink.h>
- #include <linux/etherdevice.h>
- #include <linux/libfdt_env.h>
-+#include <linux/platform_device.h>
- 
- #include "mac.h"
- #include "fman_mac.h"
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c b/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-index b47490be872c..925428f1b0c8 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-@@ -32,7 +32,6 @@
- #include <linux/platform_device.h>
- #include <linux/phy.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
- #include <linux/of_irq.h>
- #include <linux/gfp.h>
- #include <linux/pgtable.h>
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-fec.c b/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-index 61f4b6e50d29..f609dc112458 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-@@ -32,7 +32,6 @@
- #include <linux/fs.h>
- #include <linux/platform_device.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
- #include <linux/of_irq.h>
- #include <linux/gfp.h>
- 
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-scc.c b/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-index 64300ac13e02..66d40da5cde0 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-@@ -32,7 +32,6 @@
- #include <linux/platform_device.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
--#include <linux/of_platform.h>
- 
- #include <asm/irq.h>
- #include <linux/uaccess.h>
-diff --git a/drivers/net/ethernet/freescale/fsl_pq_mdio.c b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-index 9d58d8334467..647a499fe84b 100644
---- a/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-+++ b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-@@ -12,6 +12,7 @@
-  */
- 
- #include <linux/kernel.h>
-+#include <linux/platform_device.h>
- #include <linux/string.h>
- #include <linux/errno.h>
- #include <linux/slab.h>
-diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index 38d5013c6fed..4f0099ce8f1e 100644
---- a/drivers/net/ethernet/freescale/gianfar.c
-+++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -60,6 +60,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/kernel.h>
-+#include <linux/platform_device.h>
- #include <linux/string.h>
- #include <linux/errno.h>
- #include <linux/unistd.h>
-@@ -75,7 +76,6 @@
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
- #include <linux/of_mdio.h>
--#include <linux/of_platform.h>
- #include <linux/ip.h>
- #include <linux/tcp.h>
- #include <linux/udp.h>
-diff --git a/drivers/net/ethernet/freescale/gianfar_ethtool.c b/drivers/net/ethernet/freescale/gianfar_ethtool.c
-index b2b0d3c26fcc..7a15b9245698 100644
---- a/drivers/net/ethernet/freescale/gianfar_ethtool.c
-+++ b/drivers/net/ethernet/freescale/gianfar_ethtool.c
-@@ -38,7 +38,9 @@
- #include <linux/phy.h>
- #include <linux/sort.h>
- #include <linux/if_vlan.h>
-+#include <linux/of.h>
- #include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/fsl/ptp_qoriq.h>
- 
- #include "gianfar.h"
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
-index 7a4cb4f07c32..49e759f24444 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -28,11 +28,12 @@
- #include <linux/phy.h>
- #include <linux/phy_fixed.h>
- #include <linux/workqueue.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- 
- #include <linux/uaccess.h>
- #include <asm/irq.h>
-diff --git a/drivers/net/ethernet/freescale/xgmac_mdio.c b/drivers/net/ethernet/freescale/xgmac_mdio.c
-index a13b4ba4d6e1..65dc07d0df0f 100644
---- a/drivers/net/ethernet/freescale/xgmac_mdio.c
-+++ b/drivers/net/ethernet/freescale/xgmac_mdio.c
-@@ -19,10 +19,10 @@
- #include <linux/kernel.h>
- #include <linux/mdio.h>
- #include <linux/module.h>
--#include <linux/of_address.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
--#include <linux/of_platform.h>
- #include <linux/phy.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- 
- /* Number of microseconds to wait for a register to respond */
-diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.c b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.c
-index a7eb87da4e70..a08d1f0a5a16 100644
---- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.c
-+++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.c
-@@ -9,9 +9,6 @@
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
- #include <linux/platform_device.h>
--#include <linux/of.h>
--#include <linux/of_address.h>
--#include <linux/of_platform.h>
- 
- #include "hns_dsaf_ppe.h"
- 
-diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c
-index e2ff3ca198d1..93344563a259 100644
---- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c
-+++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c
-@@ -11,10 +11,6 @@
- #include <linux/etherdevice.h>
- #include <asm/cacheflush.h>
- #include <linux/platform_device.h>
--#include <linux/of.h>
--#include <linux/of_address.h>
--#include <linux/of_platform.h>
--#include <linux/of_irq.h>
- #include <linux/spinlock.h>
- 
- #include "hns_dsaf_main.h"
-diff --git a/drivers/net/ethernet/ibm/ehea/ehea_main.c b/drivers/net/ethernet/ibm/ehea/ehea_main.c
-index b4aff59b3eb4..0a56e9752464 100644
---- a/drivers/net/ethernet/ibm/ehea/ehea_main.c
-+++ b/drivers/net/ethernet/ibm/ehea/ehea_main.c
-@@ -31,6 +31,7 @@
- #include <linux/prefetch.h>
- #include <linux/of.h>
- #include <linux/of_device.h>
-+#include <linux/platform_device.h>
- 
- #include <net/ip.h>
- 
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index c97095abd26a..0c314bf97480 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -38,6 +38,7 @@
- #include <linux/of_irq.h>
- #include <linux/of_net.h>
- #include <linux/of_mdio.h>
-+#include <linux/of_platform.h>
- #include <linux/platform_device.h>
- #include <linux/slab.h>
- 
-diff --git a/drivers/net/ethernet/ibm/emac/core.h b/drivers/net/ethernet/ibm/emac/core.h
-index 89a1b0fea158..295516b07662 100644
---- a/drivers/net/ethernet/ibm/emac/core.h
-+++ b/drivers/net/ethernet/ibm/emac/core.h
-@@ -27,7 +27,6 @@
- #include <linux/netdevice.h>
- #include <linux/dma-mapping.h>
- #include <linux/spinlock.h>
--#include <linux/of_platform.h>
- #include <linux/slab.h>
- 
- #include <asm/io.h>
-diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index ff5487bbebe3..c3236b59e7e9 100644
---- a/drivers/net/ethernet/ibm/emac/mal.c
-+++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -22,7 +22,9 @@
- 
- #include <linux/delay.h>
- #include <linux/slab.h>
-+#include <linux/of.h>
- #include <linux/of_irq.h>
-+#include <linux/platform_device.h>
- 
- #include "core.h"
- #include <asm/dcr-regs.h>
-diff --git a/drivers/net/ethernet/ibm/emac/rgmii.c b/drivers/net/ethernet/ibm/emac/rgmii.c
-index 50358cf00130..fd437f986edf 100644
---- a/drivers/net/ethernet/ibm/emac/rgmii.c
-+++ b/drivers/net/ethernet/ibm/emac/rgmii.c
-@@ -19,7 +19,9 @@
- #include <linux/slab.h>
- #include <linux/kernel.h>
- #include <linux/ethtool.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <asm/io.h>
- 
- #include "emac.h"
-diff --git a/drivers/net/ethernet/ibm/emac/tah.c b/drivers/net/ethernet/ibm/emac/tah.c
-index 008bbdaf1204..aae9a88d95d7 100644
---- a/drivers/net/ethernet/ibm/emac/tah.c
-+++ b/drivers/net/ethernet/ibm/emac/tah.c
-@@ -14,7 +14,9 @@
-  *
-  * Copyright (c) 2005 Eugene Surovegin <ebs@ebshome.net>
-  */
-+#include <linux/mod_devicetable.h>
- #include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <asm/io.h>
- 
- #include "emac.h"
-diff --git a/drivers/net/ethernet/ibm/emac/zmii.c b/drivers/net/ethernet/ibm/emac/zmii.c
-index 57a25c7a9e70..6337388ee5f4 100644
---- a/drivers/net/ethernet/ibm/emac/zmii.c
-+++ b/drivers/net/ethernet/ibm/emac/zmii.c
-@@ -19,7 +19,9 @@
- #include <linux/slab.h>
- #include <linux/kernel.h>
- #include <linux/ethtool.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <asm/io.h>
- 
- #include "emac.h"
-diff --git a/drivers/net/ethernet/korina.c b/drivers/net/ethernet/korina.c
-index 2b9335cb4bb3..41f3f3df6ec3 100644
---- a/drivers/net/ethernet/korina.c
-+++ b/drivers/net/ethernet/korina.c
-@@ -33,6 +33,7 @@
-  *  should stick to this procedure.
-  */
- 
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/moduleparam.h>
-@@ -43,7 +44,6 @@
- #include <linux/ioport.h>
- #include <linux/iopoll.h>
- #include <linux/in.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-diff --git a/drivers/net/ethernet/marvell/mvmdio.c b/drivers/net/ethernet/marvell/mvmdio.c
-index 8662543ca5c8..a1a80f13b1e8 100644
---- a/drivers/net/ethernet/marvell/mvmdio.c
-+++ b/drivers/net/ethernet/marvell/mvmdio.c
-@@ -24,8 +24,8 @@
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/kernel.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
--#include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 1fec84b4c068..9e1b596c8f08 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -24,7 +24,6 @@
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
- #include <linux/phy/phy.h>
-diff --git a/drivers/net/ethernet/marvell/prestera/prestera_rxtx.c b/drivers/net/ethernet/marvell/prestera/prestera_rxtx.c
-index 9277a8fd1339..cc2a9ae794be 100644
---- a/drivers/net/ethernet/marvell/prestera/prestera_rxtx.c
-+++ b/drivers/net/ethernet/marvell/prestera/prestera_rxtx.c
-@@ -5,9 +5,6 @@
- #include <linux/dmapool.h>
- #include <linux/etherdevice.h>
- #include <linux/if_vlan.h>
--#include <linux/of_address.h>
--#include <linux/of_device.h>
--#include <linux/of.h>
- #include <linux/platform_device.h>
- 
- #include "prestera_dsa.h"
-diff --git a/drivers/net/ethernet/marvell/sky2.c b/drivers/net/ethernet/marvell/sky2.c
-index 7c487f9b36ec..c4cca27fb0d5 100644
---- a/drivers/net/ethernet/marvell/sky2.c
-+++ b/drivers/net/ethernet/marvell/sky2.c
-@@ -32,7 +32,6 @@
- #include <linux/prefetch.h>
- #include <linux/debugfs.h>
- #include <linux/mii.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/dmi.h>
- 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 2d15342c260a..ac8b98c023c8 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -6,11 +6,12 @@
-  *   Copyright (C) 2013-2016 Michael Lee <igvtee@gmail.com>
-  */
- 
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/of_address.h>
- #include <linux/mfd/syscon.h>
-+#include <linux/platform_device.h>
- #include <linux/regmap.h>
- #include <linux/clk.h>
- #include <linux/pm_runtime.h>
-diff --git a/drivers/net/ethernet/mediatek/mtk_star_emac.c b/drivers/net/ethernet/mediatek/mtk_star_emac.c
-index 02c03325911f..31aebeb2e285 100644
---- a/drivers/net/ethernet/mediatek/mtk_star_emac.c
-+++ b/drivers/net/ethernet/mediatek/mtk_star_emac.c
-@@ -17,7 +17,6 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
-index 985cff910f30..52688cbaa7b4 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2021 Felix Fietkau <nbd@nbd.name> */
- 
- #include <linux/kernel.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/module.h>
- #include <linux/bitfield.h>
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.c b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-index 69fba29055e9..3bd51a3d6650 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-@@ -7,10 +7,9 @@
- 
- #include <linux/kernel.h>
- #include <linux/dma-mapping.h>
--#include <linux/of_platform.h>
- #include <linux/interrupt.h>
--#include <linux/of_address.h>
- #include <linux/mfd/syscon.h>
-+#include <linux/of.h>
- #include <linux/of_irq.h>
- #include <linux/bitfield.h>
- 
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-index fbb0bb4594cd..73f20683210e 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-@@ -5,9 +5,10 @@
- #include <linux/if_vlan.h>
- #include <linux/iopoll.h>
- #include <linux/ip.h>
--#include <linux/of_platform.h>
-+#include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/phy/phy.h>
-+#include <linux/platform_device.h>
- #include <linux/reset.h>
- #include <net/addrconf.h>
- 
-diff --git a/drivers/net/ethernet/mscc/ocelot_fdma.c b/drivers/net/ethernet/mscc/ocelot_fdma.c
-index 83a3ce0c568e..312a46832154 100644
---- a/drivers/net/ethernet/mscc/ocelot_fdma.c
-+++ b/drivers/net/ethernet/mscc/ocelot_fdma.c
-@@ -12,7 +12,6 @@
- #include <linux/dmapool.h>
- #include <linux/dsa/ocelot.h>
- #include <linux/netdevice.h>
--#include <linux/of_platform.h>
- #include <linux/skbuff.h>
- 
- #include "ocelot_fdma.h"
-diff --git a/drivers/net/ethernet/mscc/ocelot_vsc7514.c b/drivers/net/ethernet/mscc/ocelot_vsc7514.c
-index 97e90e2869d4..151b42465348 100644
---- a/drivers/net/ethernet/mscc/ocelot_vsc7514.c
-+++ b/drivers/net/ethernet/mscc/ocelot_vsc7514.c
-@@ -10,8 +10,9 @@
- #include <linux/of_net.h>
- #include <linux/netdevice.h>
- #include <linux/phylink.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
--#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/mfd/syscon.h>
- #include <linux/skbuff.h>
- #include <net/switchdev.h>
-diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
-index 0fd156286d4d..ba27bbc68f85 100644
---- a/drivers/net/ethernet/ni/nixge.c
-+++ b/drivers/net/ethernet/ni/nixge.c
-@@ -7,11 +7,10 @@
- #include <linux/etherdevice.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
--#include <linux/of_address.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
--#include <linux/of_irq.h>
-+#include <linux/platform_device.h>
- #include <linux/skbuff.h>
- #include <linux/phy.h>
- #include <linux/mii.h>
-diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-index 802ef81493e0..e4bc18009d08 100644
---- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-+++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-@@ -8,7 +8,9 @@
- #include <linux/interrupt.h>
- #include <linux/iopoll.h>
- #include <linux/acpi.h>
-+#include <linux/of.h>
- #include <linux/of_device.h>
-+#include <linux/of_platform.h>
- #include "emac.h"
- #include "emac-mac.h"
- #include "emac-sgmii.h"
-diff --git a/drivers/net/ethernet/qualcomm/emac/emac.c b/drivers/net/ethernet/qualcomm/emac/emac.c
-index eaa50050aa0b..19bb16daf4e7 100644
---- a/drivers/net/ethernet/qualcomm/emac/emac.c
-+++ b/drivers/net/ethernet/qualcomm/emac/emac.c
-@@ -11,7 +11,6 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_net.h>
--#include <linux/of_device.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
- #include <linux/acpi.h>
-diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/ethernet/qualcomm/qca_spi.c
-index 4a1b94e5a8ea..bec723028e96 100644
---- a/drivers/net/ethernet/qualcomm/qca_spi.c
-+++ b/drivers/net/ethernet/qualcomm/qca_spi.c
-@@ -35,7 +35,6 @@
- #include <linux/moduleparam.h>
- #include <linux/netdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/sched.h>
- #include <linux/skbuff.h>
-diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethernet/qualcomm/qca_uart.c
-index 26646cb6a20a..ace99c62d03a 100644
---- a/drivers/net/ethernet/qualcomm/qca_uart.c
-+++ b/drivers/net/ethernet/qualcomm/qca_uart.c
-@@ -32,7 +32,6 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/sched.h>
- #include <linux/serdev.h>
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 4d6b3b7d6abb..7df9f9f8e134 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -21,10 +21,9 @@
- #include <linux/module.h>
- #include <linux/net_tstamp.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
--#include <linux/of_irq.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-+#include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 4e412ac0965a..0ba7fb75d589 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -12,11 +12,10 @@
- #include <linux/module.h>
- #include <linux/net_tstamp.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
--#include <linux/of_irq.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/phy/phy.h>
-+#include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/rtnetlink.h>
- #include <linux/slab.h>
-diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
-index d8ec729825be..274ea16c0a1f 100644
---- a/drivers/net/ethernet/renesas/sh_eth.c
-+++ b/drivers/net/ethernet/renesas/sh_eth.c
-@@ -19,8 +19,6 @@
- #include <linux/mdio-bitbang.h>
- #include <linux/netdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
--#include <linux/of_irq.h>
- #include <linux/of_net.h>
- #include <linux/phy.h>
- #include <linux/cache.h>
-diff --git a/drivers/net/ethernet/smsc/smsc911x.c b/drivers/net/ethernet/smsc/smsc911x.c
-index 174dc8908b72..2f755722e858 100644
---- a/drivers/net/ethernet/smsc/smsc911x.c
-+++ b/drivers/net/ethernet/smsc/smsc911x.c
-@@ -43,7 +43,6 @@
- #include <linux/smsc911x.h>
- #include <linux/device.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_gpio.h>
- #include <linux/of_net.h>
- #include <linux/acpi.h>
-diff --git a/drivers/net/ethernet/socionext/sni_ave.c b/drivers/net/ethernet/socionext/sni_ave.c
-index 492c39c08af1..4838d2383a43 100644
---- a/drivers/net/ethernet/socionext/sni_ave.c
-+++ b/drivers/net/ethernet/socionext/sni_ave.c
-@@ -15,10 +15,11 @@
- #include <linux/mii.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
-+#include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/of_mdio.h>
--#include <linux/of_platform.h>
- #include <linux/phy.h>
-+#include <linux/platform_device.h>
- #include <linux/regmap.h>
- #include <linux/reset.h>
- #include <linux/types.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index 9f88530c5e8c..2bf74efbf2eb 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -14,7 +14,7 @@
- #include <linux/iopoll.h>
- #include <linux/ioport.h>
- #include <linux/module.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/mfd/syscon.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-index b9378a63f0e8..92e06a96757a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-@@ -12,7 +12,6 @@
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-index 8063ba1c3ce8..e22ef0d6bc73 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-@@ -11,7 +11,6 @@
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-index 73c1dfa7ecb1..e301bf7fc30f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-@@ -7,8 +7,8 @@
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
-+#include <linux/platform_device.h>
- #include <linux/regmap.h>
- #include <linux/stmmac.h>
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-index 92b16048f91c..0b159dc0d5f6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-@@ -13,7 +13,7 @@
- #include <linux/io.h>
- #include <linux/ioport.h>
- #include <linux/module.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/mfd/syscon.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-oxnas.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-oxnas.c
-index 42954020de2c..f91753565d60 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-oxnas.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-oxnas.c
-@@ -12,7 +12,6 @@
- #include <linux/io.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/platform_device.h>
- #include <linux/regmap.h>
- #include <linux/mfd/syscon.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index e62940414e54..fa791f0f24ad 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -3,7 +3,6 @@
- 
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/platform_device.h>
- #include <linux/phy.h>
- #include <linux/phy/phy.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index d81591b470a2..35789cb549f7 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -14,8 +14,8 @@
- #include <linux/of_net.h>
- #include <linux/gpio.h>
- #include <linux/module.h>
-+#include <linux/of.h>
- #include <linux/of_gpio.h>
--#include <linux/of_device.h>
- #include <linux/platform_device.h>
- #include <linux/regulator/consumer.h>
- #include <linux/delay.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-index d3a39d2fb3a9..b1c5f2527c0d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-@@ -7,8 +7,10 @@
-  *
-  */
- 
-+#include <linux/mod_devicetable.h>
-+#include <linux/platform_device.h>
-+#include <linux/property.h>
- #include <linux/mfd/syscon.h>
--#include <linux/of_device.h>
- #include <linux/regmap.h>
- 
- #include "stmmac_platform.h"
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
-index dcbb17c4f07a..ef03e4669491 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
-@@ -17,7 +17,6 @@
- #include <linux/regmap.h>
- #include <linux/clk.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- 
- #include "stmmac_platform.h"
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index bdb4de59a672..3a09085819dc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -11,7 +11,6 @@
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_net.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 1e714380d125..2885d8568d4b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -11,9 +11,10 @@
- #include <linux/mdio-mux.h>
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-+#include <linux/of_platform.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-index f8367c5b490b..65ddf6ce1535 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include <linux/platform_device.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/module.h>
- #include <linux/stmmac.h>
- #include <linux/clk.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-index acbb284be174..a8731ce0fff0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-@@ -6,7 +6,8 @@
-  */
- 
- #include <linux/module.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/of_net.h>
- #include <linux/stmmac.h>
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 231152ee5a32..85ec9d975a55 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -15,7 +15,6 @@
- #include <linux/io.h>
- #include <linux/of.h>
- #include <linux/of_net.h>
--#include <linux/of_device.h>
- #include <linux/of_mdio.h>
- 
- #include "stmmac.h"
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index 7a2e76776297..011d74087f86 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -31,7 +31,7 @@
- #include <linux/slab.h>
- 
- #include <linux/io.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- 
- #include "niu.h"
- 
-diff --git a/drivers/net/ethernet/sun/sunbmac.c b/drivers/net/ethernet/sun/sunbmac.c
-index 34b94153bf0c..cc34d92d2e3d 100644
---- a/drivers/net/ethernet/sun/sunbmac.c
-+++ b/drivers/net/ethernet/sun/sunbmac.c
-@@ -25,7 +25,7 @@
- #include <linux/bitops.h>
- #include <linux/dma-mapping.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/platform_device.h>
- #include <linux/gfp.h>
- 
- #include <asm/auxio.h>
-diff --git a/drivers/net/ethernet/sun/sungem.c b/drivers/net/ethernet/sun/sungem.c
-index 4154e68639ac..9bd1df8308d2 100644
---- a/drivers/net/ethernet/sun/sungem.c
-+++ b/drivers/net/ethernet/sun/sungem.c
-@@ -40,6 +40,7 @@
- #include <linux/bitops.h>
- #include <linux/mm.h>
- #include <linux/gfp.h>
-+#include <linux/of.h>
- 
- #include <asm/io.h>
- #include <asm/byteorder.h>
-diff --git a/drivers/net/ethernet/sun/sunhme.c b/drivers/net/ethernet/sun/sunhme.c
-index b93613cd1994..b983b9c23be6 100644
---- a/drivers/net/ethernet/sun/sunhme.c
-+++ b/drivers/net/ethernet/sun/sunhme.c
-@@ -32,9 +32,10 @@
- #include <linux/mm.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
--#include <linux/of_device.h>
- #include <linux/of.h>
-+#include <linux/of_device.h>
- #include <linux/pci.h>
-+#include <linux/platform_device.h>
- #include <linux/random.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-diff --git a/drivers/net/ethernet/sun/sunqe.c b/drivers/net/ethernet/sun/sunqe.c
-index 6418fcc3139f..b37360f44972 100644
---- a/drivers/net/ethernet/sun/sunqe.c
-+++ b/drivers/net/ethernet/sun/sunqe.c
-@@ -27,8 +27,8 @@
- #include <linux/bitops.h>
- #include <linux/dma-mapping.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/pgtable.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/io.h>
- #include <asm/dma.h>
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index bebcfd5e6b57..bea6fc0f324c 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -19,6 +19,7 @@
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/of_device.h>
-+#include <linux/of_platform.h>
- #include <linux/phylink.h>
- #include <linux/phy/phy.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/ti/cpsw-common.c b/drivers/net/ethernet/ti/cpsw-common.c
-index bfa81bbfce3f..26dc906eae90 100644
---- a/drivers/net/ethernet/ti/cpsw-common.c
-+++ b/drivers/net/ethernet/ti/cpsw-common.c
-@@ -3,7 +3,6 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/regmap.h>
- #include <linux/mfd/syscon.h>
- 
-diff --git a/drivers/net/ethernet/ti/cpsw-phy-sel.c b/drivers/net/ethernet/ti/cpsw-phy-sel.c
-index 25e707d7b87c..4edb7963f856 100644
---- a/drivers/net/ethernet/ti/cpsw-phy-sel.c
-+++ b/drivers/net/ethernet/ti/cpsw-phy-sel.c
-@@ -12,7 +12,6 @@
- #include <linux/netdevice.h>
- #include <linux/phy.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- 
- #include "cpsw.h"
- 
-diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
-index 23169e36a3d4..89b6d23e9937 100644
---- a/drivers/net/ethernet/ti/davinci_mdio.c
-+++ b/drivers/net/ethernet/ti/davinci_mdio.c
-@@ -23,7 +23,6 @@
- #include <linux/pm_runtime.h>
- #include <linux/davinci_emac.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/pinctrl/consumer.h>
- #include <linux/mdio-bitbang.h>
-diff --git a/drivers/net/ethernet/via/via-rhine.c b/drivers/net/ethernet/via/via-rhine.c
-index d716e6fe26e1..3e09e5036490 100644
---- a/drivers/net/ethernet/via/via-rhine.c
-+++ b/drivers/net/ethernet/via/via-rhine.c
-@@ -94,7 +94,7 @@ static const int multicast_filter_limit = 32;
- #include <linux/ioport.h>
- #include <linux/interrupt.h>
- #include <linux/pci.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/of_irq.h>
- #include <linux/platform_device.h>
- #include <linux/dma-mapping.h>
-diff --git a/drivers/net/ethernet/via/via-velocity.c b/drivers/net/ethernet/via/via-velocity.c
-index 86f7843b4591..731f689412e6 100644
---- a/drivers/net/ethernet/via/via-velocity.c
-+++ b/drivers/net/ethernet/via/via-velocity.c
-@@ -57,8 +57,8 @@
- #include <linux/if.h>
- #include <linux/uaccess.h>
- #include <linux/proc_fs.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
- #include <linux/of_irq.h>
- #include <linux/inetdevice.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/net/ethernet/xilinx/ll_temac.h b/drivers/net/ethernet/xilinx/ll_temac.h
-index 6668d1b760d8..90d122d5475c 100644
---- a/drivers/net/ethernet/xilinx/ll_temac.h
-+++ b/drivers/net/ethernet/xilinx/ll_temac.h
-@@ -5,6 +5,7 @@
- 
- #include <linux/netdevice.h>
- #include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/spinlock.h>
- 
- #ifdef CONFIG_PPC_DCR
-diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
-index e0ac1bcd9925..0bf9cdee1df2 100644
---- a/drivers/net/ethernet/xilinx/ll_temac_main.c
-+++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
-@@ -35,12 +35,10 @@
- #include <linux/netdevice.h>
- #include <linux/if_ether.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_irq.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
--#include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <linux/skbuff.h>
- #include <linux/spinlock.h>
- #include <linux/tcp.h>      /* needed for sizeof(tcphdr) */
-diff --git a/drivers/net/ethernet/xilinx/ll_temac_mdio.c b/drivers/net/ethernet/xilinx/ll_temac_mdio.c
-index 2371c072b53f..07a9fb49eda1 100644
---- a/drivers/net/ethernet/xilinx/ll_temac_mdio.c
-+++ b/drivers/net/ethernet/xilinx/ll_temac_mdio.c
-@@ -10,8 +10,8 @@
- #include <linux/mutex.h>
- #include <linux/phy.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/of_mdio.h>
- #include <linux/platform_data/xilinx-ll-temac.h>
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 8e32dc50a408..b7ec4dafae90 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -27,11 +27,12 @@
- #include <linux/etherdevice.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
-+#include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
--#include <linux/of_platform.h>
- #include <linux/of_irq.h>
- #include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <linux/skbuff.h>
- #include <linux/math64.h>
- #include <linux/phy.h>
-diff --git a/drivers/net/ethernet/xilinx/xilinx_emaclite.c b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
-index ad2c30d9a482..b358ecc67227 100644
---- a/drivers/net/ethernet/xilinx/xilinx_emaclite.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/platform_device.h>
- #include <linux/uaccess.h>
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
-@@ -15,9 +16,8 @@
- #include <linux/ethtool.h>
- #include <linux/io.h>
- #include <linux/slab.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
--#include <linux/of_platform.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/phy.h>
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index f9b10e84de06..aebb19f1b3a4 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -57,7 +57,6 @@
- #include <linux/io.h>
- #include <linux/kfifo.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_gpio.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
-diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 6a2f2fc2f501..da853353a5c7 100644
---- a/drivers/net/ipa/ipa_main.c
-+++ b/drivers/net/ipa/ipa_main.c
-@@ -13,8 +13,8 @@
- #include <linux/firmware.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/of_address.h>
-+#include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/firmware/qcom/qcom_scm.h>
- #include <linux/soc/qcom/mdt_loader.h>
-diff --git a/net/core/of_net.c b/net/core/of_net.c
-index 55d3fe229269..93ea425b9248 100644
---- a/net/core/of_net.c
-+++ b/net/core/of_net.c
-@@ -8,6 +8,7 @@
- #include <linux/kernel.h>
- #include <linux/of_net.h>
- #include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/phy.h>
- #include <linux/export.h>
- #include <linux/device.h>
--- 
-2.40.1
+On Sun, 23 Jul 2023 16:44:50 +0200 Ian Kumlien wrote:
+> Running vanilla 6.4.4 with cherry picked:
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.4.5&id=7a59f29961cf97b98b02acaadf5a0b1f8dde938c
+> 
+> cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
+> [108431.234344] BUG: kernel NULL pointer dereference, address: 0000000000000081
+> [108431.241509] #PF: supervisor write access in kernel mode
+> [108431.246912] #PF: error_code(0x0002) - not-present page
+> [108431.252226] PGD 0 P4D 0
+> [108431.254938] Oops: 0002 [#1] PREEMPT SMP NOPTI
+> [108431.259472] CPU: 2 PID: 76217 Comm: kworker/2:0 Not tainted 6.4.4-dirty #381
+> [108431.266698] Hardware name: Supermicro Super
+> Server/A2SDi-12C-HLN4F, BIOS 1.7a 10/13/2022
+> [108431.274967] Workqueue: events_power_efficient nf_flow_offload_work_gc
+> [108431.281599] RIP: 0010:flow_offload_teardown
+> (./arch/x86/include/asm/bitops.h:75
+> ./include/asm-generic/bitops/instrumented-atomic.h:42
+> net/netfilter/nf_flow_table_core.c:362)
+> [108431.286746] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
+> 08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
+> 00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
+> b6 42
+> All code
+> ========
+>    0: 00 00                add    %al,(%rax)
+>    2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
+>    7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
+>    d: 48 83 c7 08          add    $0x8,%rdi
+>   11: be 32 00 00 00        mov    $0x32,%esi
+>   16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
+>   1b: 66 90                xchg   %ax,%ax
+>   1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
+>   24: 48 05 81 00 00 00    add    $0x81,%rax
+>   2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
+>   2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>   35: 04
+>   36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   3d: 0f                    .byte 0xf
+>   3e: b6 42                mov    $0x42,%dh
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: f0 80 20 bf          lock andb $0xbf,(%rax)
+>    4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>    b: 04
+>    c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   13: 0f                    .byte 0xf
+>   14: b6 42                mov    $0x42,%dh
+> [108431.305700] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> [108431.311107] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> 0000000000000001
+> [108431.318420] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> ffff9ebeda71ce58
+> [108431.325735] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> ffff9ebe3d7fad58
+> [108431.333068] R10: 0000000000000000 R11: 0000000000000003 R12:
+> ffff9ebfafab0000
+> [108431.340415] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> ffff9ebd79a0f780
+> [108431.347764] FS:  0000000000000000(0000) GS:ffff9ebfafa80000(0000)
+> knlGS:0000000000000000
+> [108431.356069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.362012] CR2: 0000000000000081 CR3: 000000045e99e000 CR4:
+> 00000000003526e0
+> [108431.369361] Call Trace:
+> [108431.371999]  <TASK>
+> [108431.374296] ? __die (arch/x86/kernel/dumpstack.c:421
+> arch/x86/kernel/dumpstack.c:434)
+> [108431.377553] ? page_fault_oops (arch/x86/mm/fault.c:707)
+> [108431.381850] ? load_balance (kernel/sched/fair.c:10926)
+> [108431.385884] ? exc_page_fault (arch/x86/mm/fault.c:1279
+> arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
+> [108431.390094] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
+> [108431.394482] ? flow_offload_teardown
+> (./arch/x86/include/asm/bitops.h:75
+> ./include/asm-generic/bitops/instrumented-atomic.h:42
+> net/netfilter/nf_flow_table_core.c:362)
+> [108431.399036] nf_flow_offload_gc_step
+> (./arch/x86/include/asm/bitops.h:207
+> ./arch/x86/include/asm/bitops.h:239
+> ./include/asm-generic/bitops/instrumented-non-atomic.h:142
+> net/netfilter/nf_flow_table_core.c:436)
+> [108431.403675] nf_flow_offload_work_gc
+> (net/netfilter/nf_flow_table_core.c:407
+> net/netfilter/nf_flow_table_core.c:452
+> net/netfilter/nf_flow_table_core.c:460)
+> [108431.408321] process_one_work (kernel/workqueue.c:2413)
+> [108431.412533] worker_thread (./include/linux/list.h:292
+> kernel/workqueue.c:2556)
+> [108431.416396] ? rescuer_thread (kernel/workqueue.c:2498)
+> [108431.420608] kthread (kernel/kthread.c:379)
+> [108431.423944] ? kthread_complete_and_exit (kernel/kthread.c:332)
+> [108431.428937] ret_from_fork (arch/x86/entry/entry_64.S:314)
+> [108431.432710]  </TASK>
+> [108431.435087] Modules linked in: chaoskey
+> [108431.439119] CR2: 0000000000000081
+> [108431.442633] ---[ end trace 0000000000000000 ]---
+> [108431.455408] BUG: kernel NULL pointer dereference, address: 0000000000000008
+> [108431.462591] #PF: supervisor read access in kernel mode
+> [108431.464358] pstore: backend (erst) writing error (-28)
+> [108431.467928] #PF: error_code(0x0000) - not-present page
+> [108431.468038] RIP: 0010:flow_offload_teardown
+> (./arch/x86/include/asm/bitops.h:75
+> ./include/asm-generic/bitops/instrumented-atomic.h:42
+> net/netfilter/nf_flow_table_core.c:362)
+> [108431.468148] PGD 0
+> [108431.468254] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
+> 08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
+> 00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
+> b6 42
+> All code
+> ========
+>    0: 00 00                add    %al,(%rax)
+>    2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
+>    7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
+>    d: 48 83 c7 08          add    $0x8,%rdi
+>   11: be 32 00 00 00        mov    $0x32,%esi
+>   16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
+>   1b: 66 90                xchg   %ax,%ax
+>   1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
+>   24: 48 05 81 00 00 00    add    $0x81,%rax
+>   2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
+>   2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>   35: 04
+>   36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   3d: 0f                    .byte 0xf
+>   3e: b6 42                mov    $0x42,%dh
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: f0 80 20 bf          lock andb $0xbf,(%rax)
+>    4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>    b: 04
+>    c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   13: 0f                    .byte 0xf
+>   14: b6 42                mov    $0x42,%dh
+> [108431.473471] P4D 0
+> [108431.473571] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> [108431.473740]
+> [108431.473841]
+> [108431.473949] Oops: 0000 [#2] PREEMPT SMP NOPTI
+> [108431.474047] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> 0000000000000001
+> [108431.474150] CPU: 6 PID: 0 Comm: swapper/6 Tainted: G      D
+>     6.4.4-dirty #381
+> [108431.474253] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> ffff9ebeda71ce58
+> [108431.474382] Hardware name: Supermicro Super
+> Server/A2SDi-12C-HLN4F, BIOS 1.7a 10/13/2022
+> [108431.474511] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> ffff9ebe3d7fad58
+> [108431.474640] RIP: 0010:memcmp (lib/string.c:681)
+> [108431.474768] R10: 0000000000000000 R11: 0000000000000003 R12:
+> ffff9ebfafab0000
+> [108431.474898] Code: cc cc cc 48 85 c0 75 f3 0f b6 4f 01 48 83 c7 01
+> 84 c9 75 bc eb e3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 eb 14
+> 48 8b 06 <48> 39 07 75 17 48 83 c7 08 48 83 c6 08 48 83 ea 08 48 83 fa
+> 07 77
+> All code
+> ========
+>    0: cc                    int3
+>    1: cc                    int3
+>    2: cc                    int3
+>    3: 48 85 c0              test   %rax,%rax
+>    6: 75 f3                jne    0xfffffffffffffffb
+>    8: 0f b6 4f 01          movzbl 0x1(%rdi),%ecx
+>    c: 48 83 c7 01          add    $0x1,%rdi
+>   10: 84 c9                test   %cl,%cl
+>   12: 75 bc                jne    0xffffffffffffffd0
+>   14: eb e3                jmp    0xfffffffffffffff9
+>   16: 66 66 2e 0f 1f 84 00 data16 cs nopw 0x0(%rax,%rax,1)
+>   1d: 00 00 00 00
+>   21: 0f 1f 40 00          nopl   0x0(%rax)
+>   25: eb 14                jmp    0x3b
+>   27: 48 8b 06              mov    (%rsi),%rax
+>   2a:* 48 39 07              cmp    %rax,(%rdi) <-- trapping instruction
+>   2d: 75 17                jne    0x46
+>   2f: 48 83 c7 08          add    $0x8,%rdi
+>   33: 48 83 c6 08          add    $0x8,%rsi
+>   37: 48 83 ea 08          sub    $0x8,%rdx
+>   3b: 48 83 fa 07          cmp    $0x7,%rdx
+>   3f: 77                    .byte 0x77
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: 48 39 07              cmp    %rax,(%rdi)
+>    3: 75 17                jne    0x1c
+>    5: 48 83 c7 08          add    $0x8,%rdi
+>    9: 48 83 c6 08          add    $0x8,%rsi
+>    d: 48 83 ea 08          sub    $0x8,%rdx
+>   11: 48 83 fa 07          cmp    $0x7,%rdx
+>   15: 77                    .byte 0x77
+> [108431.475001] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> ffff9ebd79a0f780
+> [108431.475129] RSP: 0018:ffffac2500200ae8 EFLAGS: 00010216
+> [108431.475297] FS:  0000000000000000(0000) GS:ffff9ebfafa80000(0000)
+> knlGS:0000000000000000
+> [108431.475426]
+> [108431.475534] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.475664] RAX: 000000008a00000a RBX: ffff9ebc413b4250 RCX:
+> 0000000000000000
+> [108431.475764] CR2: 0000000000000081 CR3: 000000045e99e000 CR4:
+> 00000000003526e0
+> [108431.475872] RDX: 0000000000000032 RSI: ffffac2500200ba0 RDI:
+> 0000000000000008
+> [108431.476001] note: kworker/2:0[76217] exited with irqs disabled
+> [108431.476128] RBP: ffff9ebd42b18058 R08: 000000000000000a R09:
+> 0000000000000028
+> [108431.653260] R10: 00000000000000f0 R11: 00000000000000f0 R12:
+> 0000000000000000
+> [108431.660609] R13: ffff9ebc413b4260 R14: ffff9ebd42b18000 R15:
+> 0000000000000000
+> [108431.667958] FS:  0000000000000000(0000) GS:ffff9ebfafb80000(0000)
+> knlGS:0000000000000000
+> [108431.676260] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.682203] CR2: 0000000000000008 CR3: 0000000109310000 CR4:
+> 00000000003526e0
+> [108431.689555] Call Trace:
+> [108431.692193]  <IRQ>
+> [108431.694401] ? __die (arch/x86/kernel/dumpstack.c:421
+> arch/x86/kernel/dumpstack.c:434)
+> [108431.697657] ? page_fault_oops (arch/x86/mm/fault.c:707)
+> [108431.701954] ? vhost_poll_wakeup (drivers/vhost/vhost.c:179)
+> [108431.706244] ? __wake_up_common (kernel/sched/wait.c:108)
+> [108431.710546] ? exc_page_fault (arch/x86/mm/fault.c:1279
+> arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
+> [108431.714756] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
+> [108431.719136] ? memcmp (lib/string.c:681)
+> [108431.722385] flow_offload_hash_cmp (net/netfilter/nf_flow_table_core.c:253)
+> [108431.726854] flow_offload_lookup (./include/linux/rhashtable.h:608
+> ./include/linux/rhashtable.h:646
+> net/netfilter/nf_flow_table_core.c:376)
+> [108431.731234] nf_flow_offload_ip_hook (net/netfilter/nf_flow_table_ip.c:363)
+> [108431.736050] ? netlink_broadcast (net/netlink/af_netlink.c:1548)
+> [108431.740517] nf_hook_slow (./include/linux/netfilter.h:143
+> net/netfilter/core.c:626)
+> [108431.744208] __netif_receive_skb_core.constprop.0
+> (./include/linux/netfilter_netdev.h:34 net/core/dev.c:5274
+> net/core/dev.c:5361)
+> [108431.750163] __netif_receive_skb_list_core (net/core/dev.c:5570)
+> [108431.755500] netif_receive_skb_list_internal (net/core/dev.c:5638
+> net/core/dev.c:5727)
+> [108431.761011] napi_complete_done (./include/linux/list.h:37
+> ./include/net/gro.h:434 ./include/net/gro.h:429 net/core/dev.c:6067)
+> [108431.765308] ixgbe_poll (drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:3191)
+> [108431.769093] __napi_poll (net/core/dev.c:6498)
+> [108431.772779] net_rx_action (net/core/dev.c:6567 net/core/dev.c:6698)
+> [108431.776723] __do_softirq (./arch/x86/include/asm/jump_label.h:27
+> ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142
+> kernel/softirq.c:572)
+> [108431.780501] irq_exit_rcu (kernel/softirq.c:445
+> kernel/softirq.c:650 kernel/softirq.c:662)
+> [108431.784194] common_interrupt (arch/x86/kernel/irq.c:240 (discriminator 14))
+> [108431.788232]  </IRQ>
+> [108431.790518]  <TASK>
+> [108431.792808] asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+> [108431.797194] RIP: 0010:cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+> [108431.802358] Code: 00 e8 52 14 fd fe e8 7d fa ff ff 8b 53 04 49 89
+> c5 0f 1f 44 00 00 31 ff e8 cb 83 fc fe 45 84 ff 0f 85 60 02 00 00 fb
+> 45 85 f6 <0f> 88 8e 01 00 00 49 63 ce 4c 8b 14 24 48 8d 04 49 48 8d 14
+> 81 48
+> All code
+> ========
+>    0: 00 e8                add    %ch,%al
+>    2: 52                    push   %rdx
+>    3: 14 fd                adc    $0xfd,%al
+>    5: fe                    (bad)
+>    6: e8 7d fa ff ff        call   0xfffffffffffffa88
+>    b: 8b 53 04              mov    0x4(%rbx),%edx
+>    e: 49 89 c5              mov    %rax,%r13
+>   11: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
+>   16: 31 ff                xor    %edi,%edi
+>   18: e8 cb 83 fc fe        call   0xfffffffffefc83e8
+>   1d: 45 84 ff              test   %r15b,%r15b
+>   20: 0f 85 60 02 00 00    jne    0x286
+>   26: fb                    sti
+>   27: 45 85 f6              test   %r14d,%r14d
+>   2a:* 0f 88 8e 01 00 00    js     0x1be <-- trapping instruction
+>   30: 49 63 ce              movslq %r14d,%rcx
+>   33: 4c 8b 14 24          mov    (%rsp),%r10
+>   37: 48 8d 04 49          lea    (%rcx,%rcx,2),%rax
+>   3b: 48 8d 14 81          lea    (%rcx,%rax,4),%rdx
+>   3f: 48                    rex.W
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: 0f 88 8e 01 00 00    js     0x194
+>    6: 49 63 ce              movslq %r14d,%rcx
+>    9: 4c 8b 14 24          mov    (%rsp),%r10
+>    d: 48 8d 04 49          lea    (%rcx,%rcx,2),%rax
+>   11: 48 8d 14 81          lea    (%rcx,%rax,4),%rdx
+>   15: 48                    rex.W
+> [108431.821362] RSP: 0018:ffffac25000c7e98 EFLAGS: 00000202
+> [108431.826787] RAX: ffff9ebfafbabb80 RBX: ffff9ebfafbb6600 RCX:
+> 0000000000000000
+> [108431.834135] RDX: 0000000000000006 RSI: fffffff19cf255d6 RDI:
+> 0000000000000000
+> [108431.841486] RBP: 0000000000000002 R08: 0000000000000000 R09:
+> 0000000040000000
+> [108431.848833] R10: 0000000000000018 R11: 00000000000000d4 R12:
+> ffffffff8c015480
+> [108431.856185] R13: 0000629e2a6170d9 R14: 0000000000000002 R15:
+> 0000000000000000
+> [108431.863539] ? cpuidle_enter_state (drivers/cpuidle/cpuidle.c:285)
+> [108431.868104] cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+> [108431.871879] do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+> [108431.875305] cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+> [108431.879429] start_secondary (arch/x86/kernel/smpboot.c:288)
+> [108431.883459] secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:370)
+> [108431.888714]  </TASK>
+> [108431.891094] Modules linked in: chaoskey
+> [108431.895132] CR2: 0000000000000008
+> [108431.898647] ---[ end trace 0000000000000000 ]---
+> [108431.898648] BUG: kernel NULL pointer dereference, address: 0000000000000008
+> [108431.910630] #PF: supervisor read access in kernel mode
+> [108431.915969] #PF: error_code(0x0000) - not-present page
+> [108431.916671] RIP: 0010:flow_offload_teardown
+> (./arch/x86/include/asm/bitops.h:75
+> ./include/asm-generic/bitops/instrumented-atomic.h:42
+> net/netfilter/nf_flow_table_core.c:362)
+> [108431.921305] PGD 0
+> [108431.921416] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
+> 08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
+> 00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
+> b6 42
+> All code
+> ========
+>    0: 00 00                add    %al,(%rax)
+>    2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
+>    7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
+>    d: 48 83 c7 08          add    $0x8,%rdi
+>   11: be 32 00 00 00        mov    $0x32,%esi
+>   16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
+>   1b: 66 90                xchg   %ax,%ax
+>   1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
+>   24: 48 05 81 00 00 00    add    $0x81,%rax
+>   2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
+>   2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>   35: 04
+>   36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   3d: 0f                    .byte 0xf
+>   3e: b6 42                mov    $0x42,%dh
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: f0 80 20 bf          lock andb $0xbf,(%rax)
+>    4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>    b: 04
+>    c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   13: 0f                    .byte 0xf
+>   14: b6 42                mov    $0x42,%dh
+> [108431.926468] P4D 0
+> [108431.926568] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> [108431.926738]
+> [108431.926839]
+> [108431.926946] Oops: 0000 [#3] PREEMPT SMP NOPTI
+> [108431.927044] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> 0000000000000001
+> [108431.927145] CPU: 10 PID: 986 Comm: CPU 1/KVM Tainted: G      D
+>        6.4.4-dirty #381
+> [108431.927249] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> ffff9ebeda71ce58
+> [108431.927377] Hardware name: Supermicro Super
+> Server/A2SDi-12C-HLN4F, BIOS 1.7a 10/13/2022
+> [108431.927508] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> ffff9ebe3d7fad58
+> [108431.927635] RIP: 0010:memcmp (lib/string.c:681)
+> [108431.927765] R10: 0000000000000000 R11: 0000000000000003 R12:
+> ffff9ebfafab0000
+> [108431.927893] Code: cc cc cc 48 85 c0 75 f3 0f b6 4f 01 48 83 c7 01
+> 84 c9 75 bc eb e3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 eb 14
+> 48 8b 06 <48> 39 07 75 17 48 83 c7 08 48 83 c6 08 48 83 ea 08 48 83 fa
+> 07 77
+> All code
+> ========
+>    0: cc                    int3
+>    1: cc                    int3
+>    2: cc                    int3
+>    3: 48 85 c0              test   %rax,%rax
+>    6: 75 f3                jne    0xfffffffffffffffb
+>    8: 0f b6 4f 01          movzbl 0x1(%rdi),%ecx
+>    c: 48 83 c7 01          add    $0x1,%rdi
+>   10: 84 c9                test   %cl,%cl
+>   12: 75 bc                jne    0xffffffffffffffd0
+>   14: eb e3                jmp    0xfffffffffffffff9
+>   16: 66 66 2e 0f 1f 84 00 data16 cs nopw 0x0(%rax,%rax,1)
+>   1d: 00 00 00 00
+>   21: 0f 1f 40 00          nopl   0x0(%rax)
+>   25: eb 14                jmp    0x3b
+>   27: 48 8b 06              mov    (%rsi),%rax
+>   2a:* 48 39 07              cmp    %rax,(%rdi) <-- trapping instruction
+>   2d: 75 17                jne    0x46
+>   2f: 48 83 c7 08          add    $0x8,%rdi
+>   33: 48 83 c6 08          add    $0x8,%rsi
+>   37: 48 83 ea 08          sub    $0x8,%rdx
+>   3b: 48 83 fa 07          cmp    $0x7,%rdx
+>   3f: 77                    .byte 0x77
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: 48 39 07              cmp    %rax,(%rdi)
+>    3: 75 17                jne    0x1c
+>    5: 48 83 c7 08          add    $0x8,%rdi
+>    9: 48 83 c6 08          add    $0x8,%rsi
+>    d: 48 83 ea 08          sub    $0x8,%rdx
+>   11: 48 83 fa 07          cmp    $0x7,%rdx
+>   15: 77                    .byte 0x77
+> [108431.927997] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> ffff9ebd79a0f780
+> 
+> [108431.928294] FS:  0000000000000000(0000) GS:ffff9ebfafb80000(0000)
+> knlGS:0000000000000000
+> [108431.928421]
+> [108431.928529] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.928658] RAX: 00000000af00000a RBX: ffff9ebc413b4250 RCX:
+> 0000000000000000
+> [108431.928758] CR2: 0000000000000008 CR3: 0000000109310000 CR4:
+> 00000000003526e0
+> [108431.928866] RDX: 0000000000000032 RSI: ffffac25002b0ba0 RDI:
+> 0000000000000008
+> [108431.928996] Kernel panic - not syncing: Fatal exception in interrupt
+> [108431.929123] RBP: ffff9ebd42b18058 R08: 000000000000000a R09:
+> 000000000000001c
+> [108431.929254] R10: 000000000000006b R11: 000000000000006b R12:
+> 0000000000000000
+> [108431.930351] R13: ffff9ebc413b4260 R14: ffff9ebd42b18000 R15:
+> 0000000000000000
+> [108431.930482] FS:  00007f50a75fe6c0(0000) GS:ffff9ebfafc80000(0000)
+> knlGS:0000000000000000
+> [108431.930615] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.930746] CR2: 0000000000000008 CR3: 0000000109310000 CR4:
+> 00000000003526e0
+> [108431.930879] Call Trace:
+> [108431.930992]  <IRQ>
+> [108431.931124] ? __die (arch/x86/kernel/dumpstack.c:421
+> arch/x86/kernel/dumpstack.c:434)
+> [108431.931236] ? page_fault_oops (arch/x86/mm/fault.c:707)
+> [108431.931347] ? vhost_poll_wakeup (drivers/vhost/vhost.c:179)
+> [108431.931456] ? __wake_up_common (kernel/sched/wait.c:108)
+> [108431.931572] ? exc_page_fault (arch/x86/mm/fault.c:1279
+> arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
+> [108431.931685] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
+> [108431.931801] ? memcmp (lib/string.c:681)
+> [108431.931912] flow_offload_hash_cmp (net/netfilter/nf_flow_table_core.c:253)
+> [108431.932023] flow_offload_lookup (./include/linux/rhashtable.h:608
+> ./include/linux/rhashtable.h:646
+> net/netfilter/nf_flow_table_core.c:376)
+> [108431.932133] nf_flow_offload_ip_hook (net/netfilter/nf_flow_table_ip.c:363)
+> [108431.932245] ? netif_receive_skb (net/core/dev.c:5695 net/core/dev.c:5752)
+> [108431.932358] ? reuseport_select_sock (net/core/sock_reuseport.c:609)
+> [108431.932476] nf_hook_slow (./include/linux/netfilter.h:143
+> net/netfilter/core.c:626)
+> [108431.932591] __netif_receive_skb_core.constprop.0
+> (./include/linux/netfilter_netdev.h:34 net/core/dev.c:5274
+> net/core/dev.c:5361)
+> [108431.932709] __netif_receive_skb_list_core (net/core/dev.c:5570)
+> [108431.932822] netif_receive_skb_list_internal (net/core/dev.c:5638
+> net/core/dev.c:5727)
+> [108431.932938] ? napi_gro_flush (net/core/gro.c:342 net/core/gro.c:361)
+> [108431.933052] napi_complete_done (./include/linux/list.h:37
+> ./include/net/gro.h:434 ./include/net/gro.h:429 net/core/dev.c:6067)
+> [108431.933166] ixgbe_poll (drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:3191)
+> [108431.933281] ? timekeeping_advance (kernel/time/timekeeping.c:2223
+> (discriminator 5))
+> [108431.933395] __napi_poll (net/core/dev.c:6498)
+> [108431.933506] net_rx_action (net/core/dev.c:6567 net/core/dev.c:6698)
+> [108431.933621] __do_softirq (./arch/x86/include/asm/jump_label.h:27
+> ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142
+> kernel/softirq.c:572)
+> [108431.933734] irq_exit_rcu (kernel/softirq.c:445
+> kernel/softirq.c:650 kernel/softirq.c:662)
+> [108431.933847] common_interrupt (arch/x86/kernel/irq.c:240 (discriminator 14))
+> [108431.933958]  </IRQ>
+> [108431.934063]  <TASK>
+> [108431.934168] asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+> [108431.934277] RIP: 0010:vmx_set_hv_timer (arch/x86/kvm/vmx/vmx.c:7947)
+> [108431.934389] Code: 5b c3 cc cc cc cc 31 f6 48 89 df e8 7a dd 01 00
+> 85 c0 75 ec c6 83 da 1f 00 00 01 31 c0 c6 83 e9 21 00 00 00 eb da 0f
+> 1f 40 00 <41> 56 41 55 41 54 49 89 fc 55 48 89 d5 53 48 89 f3 4c 8b b7
+> 08 02
+> All code
+> ========
+>    0: 5b                    pop    %rbx
+>    1: c3                    ret
+>    2: cc                    int3
+>    3: cc                    int3
+>    4: cc                    int3
+>    5: cc                    int3
+>    6: 31 f6                xor    %esi,%esi
+>    8: 48 89 df              mov    %rbx,%rdi
+>    b: e8 7a dd 01 00        call   0x1dd8a
+>   10: 85 c0                test   %eax,%eax
+>   12: 75 ec                jne    0x0
+>   14: c6 83 da 1f 00 00 01 movb   $0x1,0x1fda(%rbx)
+>   1b: 31 c0                xor    %eax,%eax
+>   1d: c6 83 e9 21 00 00 00 movb   $0x0,0x21e9(%rbx)
+>   24: eb da                jmp    0x0
+>   26: 0f 1f 40 00          nopl   0x0(%rax)
+>   2a:* 41 56                push   %r14 <-- trapping instruction
+>   2c: 41 55                push   %r13
+>   2e: 41 54                push   %r12
+>   30: 49 89 fc              mov    %rdi,%r12
+>   33: 55                    push   %rbp
+>   34: 48 89 d5              mov    %rdx,%rbp
+>   37: 53                    push   %rbx
+>   38: 48 89 f3              mov    %rsi,%rbx
+>   3b: 4c                    rex.WR
+>   3c: 8b                    .byte 0x8b
+>   3d: b7 08                mov    $0x8,%bh
+>   3f: 02                    .byte 0x2
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: 41 56                push   %r14
+>    2: 41 55                push   %r13
+>    4: 41 54                push   %r12
+>    6: 49 89 fc              mov    %rdi,%r12
+>    9: 55                    push   %rbp
+>    a: 48 89 d5              mov    %rdx,%rbp
+>    d: 53                    push   %rbx
+>    e: 48 89 f3              mov    %rsi,%rbx
+>   11: 4c                    rex.WR
+>   12: 8b                    .byte 0x8b
+>   13: b7 08                mov    $0x8,%bh
+>   15: 02                    .byte 0x2
+> [108431.934498] RSP: 0018:ffffac2503c7fdb0 EFLAGS: 00000206
+> [108431.934776] RAX: 0000000000000000 RBX: ffff9ebc49303200 RCX:
+> 0000000000000000
+> [108431.934886] RDX: ffffac2503c7fdbf RSI: 0000c534e9ede5fa RDI:
+> ffff9ebcf5bb23c0
+> [108431.935017] RBP: ffff9ebcf5bb23c0 R08: 0000000000000000 R09:
+> ffffac2503c7fd0c
+> [108431.935148] R10: 0000000000000000 R11: 0000000000000022 R12:
+> ffff9ebc4ca4d000
+> [108431.935278] R13: ffff9ebcfaea5d00 R14: 0000000000000003 R15:
+> ffff9ebcf5bb23c0
+> [108431.935413] restart_apic_timer (arch/x86/kvm/lapic.c:2085
+> arch/x86/kvm/lapic.c:2138)
+> [108431.935552] kvm_arch_vcpu_ioctl_run (arch/x86/kvm/x86.c:10887
+> arch/x86/kvm/x86.c:10954 arch/x86/kvm/x86.c:11173)
+> [108431.935666] ? kvm_vm_ioctl_irq_line (arch/x86/kvm/x86.c:6241)
+> [108431.935778] kvm_vcpu_ioctl (arch/x86/kvm/../../../virt/kvm/kvm_main.c:4124)
+> [108431.935891] ? net_rx_action (net/core/dev.c:6567 net/core/dev.c:6698)
+> [108431.936003] ? __seccomp_filter (kernel/seccomp.c:1207)
+> [108431.936120] __x64_sys_ioctl (fs/ioctl.c:52 fs/ioctl.c:870
+> fs/ioctl.c:856 fs/ioctl.c:856)
+> [108431.936235] do_syscall_64 (arch/x86/entry/common.c:50
+> arch/x86/entry/common.c:80)
+> [108431.936346] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
+> [108431.936457] RIP: 0033:0x7f512ebfda3c
+> [108431.936570] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 48 89 44
+> 24 08 48 8d 44 24 20 48 89 44 24 10 c7 04 24 10 00 00 00 b8 10 00 00
+> 00 0f 05 <3d> 00 f0 ff ff 89 c2 77 1b 48 8b 44 24 18 64 48 2b 04 25 28
+> 00 00
+> All code
+> ========
+>    0: 00 48 89              add    %cl,-0x77(%rax)
+>    3: 44 24 18              rex.R and $0x18,%al
+>    6: 31 c0                xor    %eax,%eax
+>    8: 48 8d 44 24 60        lea    0x60(%rsp),%rax
+>    d: 48 89 44 24 08        mov    %rax,0x8(%rsp)
+>   12: 48 8d 44 24 20        lea    0x20(%rsp),%rax
+>   17: 48 89 44 24 10        mov    %rax,0x10(%rsp)
+>   1c: c7 04 24 10 00 00 00 movl   $0x10,(%rsp)
+>   23: b8 10 00 00 00        mov    $0x10,%eax
+>   28: 0f 05                syscall
+>   2a:* 3d 00 f0 ff ff        cmp    $0xfffff000,%eax <-- trapping instruction
+>   2f: 89 c2                mov    %eax,%edx
+>   31: 77 1b                ja     0x4e
+>   33: 48 8b 44 24 18        mov    0x18(%rsp),%rax
+>   38: 64                    fs
+>   39: 48                    rex.W
+>   3a: 2b                    .byte 0x2b
+>   3b: 04 25                add    $0x25,%al
+>   3d: 28 00                sub    %al,(%rax)
+> ...
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: 3d 00 f0 ff ff        cmp    $0xfffff000,%eax
+>    5: 89 c2                mov    %eax,%edx
+>    7: 77 1b                ja     0x24
+>    9: 48 8b 44 24 18        mov    0x18(%rsp),%rax
+>    e: 64                    fs
+>    f: 48                    rex.W
+>   10: 2b                    .byte 0x2b
+>   11: 04 25                add    $0x25,%al
+>   13: 28 00                sub    %al,(%rax)
+> ...
+> [108431.936678] RSP: 002b:00007f50a75fd5a0 EFLAGS: 00000246 ORIG_RAX:
+> 0000000000000010
+> [108431.936979] RAX: ffffffffffffffda RBX: 0000556810191420 RCX:
+> 00007f512ebfda3c
+> [108431.937110] RDX: 0000000000000000 RSI: 000000000000ae80 RDI:
+> 000000000000001c
+> [108431.937240] RBP: 000000000000ae80 R08: 000055680eb3bdf0 R09:
+> 00000000000000ff
+> [108431.937371] R10: 0000000000000002 R11: 0000000000000246 R12:
+> 0000000000000000
+> [108431.937501] R13: 0000000000000001 R14: 0000000000000001 R15:
+> 0000000000000000
+> [108431.937634]  </TASK>
+> [108431.937736] Modules linked in: chaoskey
+> [108431.937851] CR2: 0000000000000008
+> [108431.937959] ---[ end trace 0000000000000000 ]---
+> [108431.937962] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [108431.937972] #PF: supervisor read access in kernel mode
+> [108431.937977] #PF: error_code(0x0000) - not-present page
+> [108431.937982] PGD 0 P4D 0
+> [108431.937989] Oops: 0000 [#4] PREEMPT SMP NOPTI
+> [108431.937997] CPU: 3 PID: 74552 Comm: kworker/3:1 Tainted: G      D
+>           6.4.4-dirty #381
+> [108431.938006] Hardware name: Supermicro Super
+> Server/A2SDi-12C-HLN4F, BIOS 1.7a 10/13/2022
+> [108431.938009] Workqueue: events rht_deferred_worker
+> [108431.938026] RIP: 0010:rht_deferred_worker (lib/rhashtable.c:244
+> lib/rhashtable.c:288 lib/rhashtable.c:328 lib/rhashtable.c:432)
+> [108431.938038] Code: 00 48 83 e2 fe 48 0f 44 14 24 48 89 d0 f6 c2 01
+> 0f 85 af 01 00 00 48 8b 2a 40 f6 c5 01 74 0b e9 87 02 00 00 48 89 e8
+> 4c 89 e5 <4c> 8b 65 00 41 f6 c4 01 74 f0 48 89 c3 41 0f b7 56 d6 49 8b
+> 46 e8
+> All code
+> ========
+>    0: 00 48 83              add    %cl,-0x7d(%rax)
+>    3: e2 fe                loop   0x3
+>    5: 48 0f 44 14 24        cmove  (%rsp),%rdx
+>    a: 48 89 d0              mov    %rdx,%rax
+>    d: f6 c2 01              test   $0x1,%dl
+>   10: 0f 85 af 01 00 00    jne    0x1c5
+>   16: 48 8b 2a              mov    (%rdx),%rbp
+>   19: 40 f6 c5 01          test   $0x1,%bpl
+>   1d: 74 0b                je     0x2a
+>   1f: e9 87 02 00 00        jmp    0x2ab
+>   24: 48 89 e8              mov    %rbp,%rax
+>   27: 4c 89 e5              mov    %r12,%rbp
+>   2a:* 4c 8b 65 00          mov    0x0(%rbp),%r12 <-- trapping instruction
+>   2e: 41 f6 c4 01          test   $0x1,%r12b
+>   32: 74 f0                je     0x24
+>   34: 48 89 c3              mov    %rax,%rbx
+>   37: 41 0f b7 56 d6        movzwl -0x2a(%r14),%edx
+>   3c: 49 8b 46 e8          mov    -0x18(%r14),%rax
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: 4c 8b 65 00          mov    0x0(%rbp),%r12
+>    4: 41 f6 c4 01          test   $0x1,%r12b
+>    8: 74 f0                je     0xfffffffffffffffa
+>    a: 48 89 c3              mov    %rax,%rbx
+>    d: 41 0f b7 56 d6        movzwl -0x2a(%r14),%edx
+>   12: 49 8b 46 e8          mov    -0x18(%r14),%rax
+> [108431.938044] RSP: 0018:ffffac2509a83e30 EFLAGS: 00010046
+> [108431.938050] RAX: ffff9ebeda71ce58 RBX: 0000000000000000 RCX:
+> ffff9ebd42b18000
+> [108431.938055] RDX: ffff9ebeda71ce58 RSI: 0000000000000006 RDI:
+> ffff9ebd42b18000
+> [108431.938059] RBP: 0000000000000000 R08: 00000000de58e2a2 R09:
+> 0000000000000000
+> [108431.938063] R10: ffffffff8b1dd610 R11: 0000000000000000 R12:
+> ffff9ebd42b18049
+> [108431.938066] R13: ffff9ebd42b18058 R14: ffff9ebc413b42a0 R15:
+> ffff9ebc985cc800
+> [108431.938191] FS:  0000000000000000(0000) GS:ffff9ebfafac0000(0000)
+> knlGS:0000000000000000
+> [108431.938304] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.938415] CR2: 0000000000000000 CR3: 000000044b69a000 CR4:
+> 00000000003526e0
+> [108431.938520] Call Trace:
+> [108431.938630]  <TASK>
+> [108431.938766] ? __die (arch/x86/kernel/dumpstack.c:421
+> arch/x86/kernel/dumpstack.c:434)
+> [108431.938906] ? page_fault_oops (arch/x86/mm/fault.c:707)
+> [108431.939025] ? exc_page_fault (arch/x86/mm/fault.c:1279
+> arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
+> [108431.939143] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
+> [108431.939320] ? flow_offload_fill_dir (net/netfilter/nf_flow_table_core.c:237)
+> [108431.939440] ? rht_deferred_worker (lib/rhashtable.c:244
+> lib/rhashtable.c:288 lib/rhashtable.c:328 lib/rhashtable.c:432)
+> [108431.939580] process_one_work (kernel/workqueue.c:2413)
+> [108431.939720] worker_thread (./include/linux/list.h:292
+> kernel/workqueue.c:2556)
+> [108431.939857] ? rescuer_thread (kernel/workqueue.c:2498)
+> [108431.939993] kthread (kernel/kthread.c:379)
+> [108431.940128] ? kthread_complete_and_exit (kernel/kthread.c:332)
+> [108431.940267] ret_from_fork (arch/x86/entry/entry_64.S:314)
+> [108431.940385]  </TASK>
+> [108431.940514] Modules linked in: chaoskey
+> [108431.940823] CR2: 0000000000000000
+> [108431.941035] ---[ end trace 0000000000000000 ]---
+> [108431.957494] RIP: 0010:flow_offload_teardown
+> (./arch/x86/include/asm/bitops.h:75
+> ./include/asm-generic/bitops/instrumented-atomic.h:42
+> net/netfilter/nf_flow_table_core.c:362)
+> [108431.957615] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
+> 08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
+> 00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
+> b6 42
+> All code
+> ========
+>    0: 00 00                add    %al,(%rax)
+>    2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
+>    7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
+>    d: 48 83 c7 08          add    $0x8,%rdi
+>   11: be 32 00 00 00        mov    $0x32,%esi
+>   16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
+>   1b: 66 90                xchg   %ax,%ax
+>   1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
+>   24: 48 05 81 00 00 00    add    $0x81,%rax
+>   2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
+>   2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>   35: 04
+>   36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   3d: 0f                    .byte 0xf
+>   3e: b6 42                mov    $0x42,%dh
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: f0 80 20 bf          lock andb $0xbf,(%rax)
+>    4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>    b: 04
+>    c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   13: 0f                    .byte 0xf
+>   14: b6 42                mov    $0x42,%dh
+> [108431.957727] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> [108431.957940] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> 0000000000000001
+> [108431.958048] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> ffff9ebeda71ce58
+> [108431.958155] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> ffff9ebe3d7fad58
+> [108431.958265] R10: 0000000000000000 R11: 0000000000000003 R12:
+> ffff9ebfafab0000
+> [108431.958372] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> ffff9ebd79a0f780
+> [108431.958477] FS:  00007f50a75fe6c0(0000) GS:ffff9ebfafc80000(0000)
+> knlGS:0000000000000000
+> [108431.958587] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.958694] CR2: 0000000000000008 CR3: 0000000109310000 CR4:
+> 00000000003526e0
+> [108431.977125] RIP: 0010:flow_offload_teardown
+> (./arch/x86/include/asm/bitops.h:75
+> ./include/asm-generic/bitops/instrumented-atomic.h:42
+> net/netfilter/nf_flow_table_core.c:362)
+> [108431.977247] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
+> 08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
+> 00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
+> b6 42
+> All code
+> ========
+>    0: 00 00                add    %al,(%rax)
+>    2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
+>    7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
+>    d: 48 83 c7 08          add    $0x8,%rdi
+>   11: be 32 00 00 00        mov    $0x32,%esi
+>   16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
+>   1b: 66 90                xchg   %ax,%ax
+>   1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
+>   24: 48 05 81 00 00 00    add    $0x81,%rax
+>   2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
+>   2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>   35: 04
+>   36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   3d: 0f                    .byte 0xf
+>   3e: b6 42                mov    $0x42,%dh
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0: f0 80 20 bf          lock andb $0xbf,(%rax)
+>    4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
+>    b: 04
+>    c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
+>   13: 0f                    .byte 0xf
+>   14: b6 42                mov    $0x42,%dh
+> [108431.977421] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> [108431.977661] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> 0000000000000001
+> [108431.977792] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> ffff9ebeda71ce58
+> [108431.977923] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> ffff9ebe3d7fad58
+> [108431.978054] R10: 0000000000000000 R11: 0000000000000003 R12:
+> ffff9ebfafab0000
+> [108431.978184] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> ffff9ebd79a0f780
+> [108431.978317] FS:  0000000000000000(0000) GS:ffff9ebfafac0000(0000)
+> knlGS:0000000000000000
+> [108431.978430] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [108431.978561] CR2: 0000000000000000 CR3: 000000044b69a000 CR4:
+> 00000000003526e0
+> [108431.978671] note: kworker/3:1[74552] exited with irqs disabled
+> [108433.230657] Shutting down cpus with NMI
+> [108434.330988] Kernel Offset: 0x9200000 from 0xffffffff81000000
+> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> [108434.361885] ---[ end Kernel panic - not syncing: Fatal exception
+> in interrupt ]---
+> 
 
 
