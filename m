@@ -1,243 +1,318 @@
-Return-Path: <netdev+bounces-20427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42CBD75F804
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1228775F807
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 15:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65CB61C2092F
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:16:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE1FB1C20B38
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 13:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CEE882D;
-	Mon, 24 Jul 2023 13:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C86882D;
+	Mon, 24 Jul 2023 13:16:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8E86D38
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:16:17 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFF4DD;
-	Mon, 24 Jul 2023 06:16:15 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36OD9GFN025220;
-	Mon, 24 Jul 2023 13:16:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=GZ38s4l7BD35jhBNpdOBoSVAuAi8nL+7mdh2cicayvs=;
- b=QGUGj5DKpp20KMHDdc2jpDlHU/HojBA/aSo5l1azZeyMQMzJTTQG8ge54p12SN/35MWM
- XjncauQosdCnEMxPRLAUfJ70pyUi9jFaa3oNA3fgepq4D8M9G2xB5ztSRBPa+OlH1dkW
- PiVeOHUeRPBaqruosxWKEP+txFQ65iIbORdJte2XSYwYubz7zEwAkWKfXLynzUS0CzBB
- a7KfBL+aeCyaAdngcFi10XQq8ScRFVIlwrbVh6Y7Sc/5RgLO+kT4MWzOGYc6ABKKOhMG
- 0j363oKuGNJ0cdbaa5C+R+T1TSNv/tVrn7IkvJSj15nIkvJQTETZfqGoTzHq56MrjfHF rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1s62sbn3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Jul 2023 13:16:01 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36ODA13D030136;
-	Mon, 24 Jul 2023 13:16:01 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1s62sbmu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Jul 2023 13:16:00 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36OCXkLk026200;
-	Mon, 24 Jul 2023 13:16:00 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0serkq85-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Jul 2023 13:16:00 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36ODFvgg28050046
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Jul 2023 13:15:57 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 37A5D2005A;
-	Mon, 24 Jul 2023 13:15:57 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 225B420043;
-	Mon, 24 Jul 2023 13:15:57 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 24 Jul 2023 13:15:57 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id C6020E0875; Mon, 24 Jul 2023 15:15:56 +0200 (CEST)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH net] s390/lcs: Remove FDDI option
-Date: Mon, 24 Jul 2023 15:15:46 +0200
-Message-Id: <20230724131546.3597001-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.39.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7czs-R7QrH8z6oXtf_Sk2VAnJfFcwk7y
-X-Proofpoint-ORIG-GUID: Ie3cqatDmXXW5iIra6qY_swGOOj4gM-N
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735FC8BF2
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 13:16:35 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2052.outbound.protection.outlook.com [40.107.237.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E62DD;
+	Mon, 24 Jul 2023 06:16:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q+FAV8oPTkI6iDk0bpzXDpVUhRCMj0UUvttlWLdoO+Ty+FlJn4E1KlS0grarcdCovGDT6GQLd+zlzmS5BkXNCvwzwxWk0bBetPxuVkAdqzG+Vk34NjseZ4S6hrIsITnLoTEF5T6532Ozn1rSBx935Y81jcL91Vb1ASwstrauhFAv8sekKkkbjndX6rYXY08fsszINv54KwGVzny98pK/dKHGSzmANPiFGwXPeyfo7d4JRsfbOPh7gmRptwZrtfwut7moPIaAvp05Fz34lVHQQZU1el6zRZ/p7PVpupM8GVlGpL89wO49QpvdAGkP4XGsYZkEcLvB7VkQ3KWn72keng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jo2vWYHBEeA0YwfRecSAYyMET2uOxleQamR37vvXyz8=;
+ b=GfYtdVl4qgmVpMpQnSbBx4kMmtM9F6Sm4wjrOiy3FI1Uc3P2I1kJ+v3hbFRBBCkZj+TMWNCWR9nP7Dch5nvt+tFMHjQITTB0ssKdpaNJGf9LQM+hVCzJ/QzM9BdeZs6K391xuF8j1nuj0nxnMMVUx+QF+znYCMQxGoua+O0Q26olUkUG+7BUx34f3AO5YeqjMPTfbPQz+dcEAmeJaUrW4e58NuYdAahx9hOYVve94ZTZZLPpwh9teTypm7d7grWlBZ9Zg3iyqa9ykgl73EEyGQLraEN28GJtPetw3Oigbsv86+hmBBsHrF8xeCW+qyar8ddazfjRWK/O/tgR9oyjiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jo2vWYHBEeA0YwfRecSAYyMET2uOxleQamR37vvXyz8=;
+ b=F2KPcypY/NEu+zBTcYTa1ULsHKzCTHiBO8ZXGLhm27PrZvp87AVv/zhvvIrbib37oReSUFASb2p+YhbtlIW8OEZLXO/KxIwyHQdZOHm+70YCPIAUlywdOHFPkR1pN6KAcZGJwm5x5jOuwDjtbpzodzwQCuJoymA32Ayg3SOg9Fw=
+Received: from BN8PR12MB2852.namprd12.prod.outlook.com (2603:10b6:408:9a::14)
+ by SN7PR12MB6690.namprd12.prod.outlook.com (2603:10b6:806:272::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Mon, 24 Jul
+ 2023 13:16:30 +0000
+Received: from BN8PR12MB2852.namprd12.prod.outlook.com
+ ([fe80::c371:256e:45d1:a680]) by BN8PR12MB2852.namprd12.prod.outlook.com
+ ([fe80::c371:256e:45d1:a680%4]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
+ 13:16:30 +0000
+From: "Somisetty, Pranavi" <pranavi.somisetty@amd.com>
+To: Rob Herring <robh@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "Simek, Michal"
+	<michal.simek@amd.com>, "Katakam, Harini" <harini.katakam@amd.com>, "git
+ (AMD-Xilinx)" <git@amd.com>, "Pandey, Radhey Shyam"
+	<radhey.shyam.pandey@amd.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH v2] dt-bindings: net: xilinx_gmii2rgmii: Convert to json
+ schema
+Thread-Topic: [PATCH v2] dt-bindings: net: xilinx_gmii2rgmii: Convert to json
+ schema
+Thread-Index: AQHZugjScH8iKU5N9kWTSvwBM7ERX6/BZ8YAgAd/OlA=
+Date: Mon, 24 Jul 2023 13:16:30 +0000
+Message-ID:
+ <BN8PR12MB2852E09191C6AB6DBF7EF33AF702A@BN8PR12MB2852.namprd12.prod.outlook.com>
+References: <20230719061808.30967-1-pranavi.somisetty@amd.com>
+ <20230719182206.GA537052-robh@kernel.org>
+In-Reply-To: <20230719182206.GA537052-robh@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN8PR12MB2852:EE_|SN7PR12MB6690:EE_
+x-ms-office365-filtering-correlation-id: aa2d1881-49b7-47d6-0487-08db8c4831ff
+x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Xd/nBSrQFnXfsSw0M40iwrPHm7KTCYKIIJ/HoDH9ZojCvZsTEpNU4B/ceTRcXQWnvL1Vb/EkGyFAH5alf8b24/Wob8ZpnRax5PL/58ATyg1biOYG386Y6ppisPjzuWjLiWpBZATsqfVfHitmAWq09jrWMndG8wKpH/Fg1dN07ISgVAz59U88ObXwUwEbOdaFTb8nBliRZp6UrrOG7jJbqXExomsZlS2bk2ejGCyasnaceU4vXcLwGBEPKfWrhia/9DmwtLcXm6YGk0N6sfoH0ri675ChmOLZtUGh2ULbu4we8D/kiC7joEN1tYBdHzqMXhEl8AAXd5ZFnyAFoZPzg7UgZ6NcuW0Jc6eP7L4dBc9i/1woNwxk0kbghZa+BxCh1Pnhlzrn9qwEZIj/5+u/glaD975k985d8YVMuaMKC8mz4tEEN6SoNPysAuFrHs82LKtBx6541AbHiF5DKjZ9lldBSAyVrDnB6Arc/S0V2inoJc2C8Ajp/PpDjHWfwX1YVr+t1l+u8BLLWKB6VhOIs8++IJH5X8ibZXoSy44o9RHJsuaxFopl89XVsknjAXI9LPFMvYYRHjOJiSU6wavsfNupc9bcwy11FMByEWSj9zhMOAeMwXoi4ndcSSPMwr5xNEgoqjbJ80IafPfeH7z5jw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB2852.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(366004)(136003)(376002)(39860400002)(451199021)(2906002)(55016003)(478600001)(38100700002)(8676002)(83380400001)(966005)(122000001)(9686003)(186003)(6506007)(53546011)(86362001)(52536014)(8936002)(5660300002)(33656002)(7416002)(71200400001)(7696005)(6916009)(76116006)(38070700005)(66556008)(64756008)(66946007)(66476007)(66446008)(316002)(54906003)(41300700001)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?i6Tr2RRoJqH9DxIRwSMhqttjcS86OhkzC3Z5o0mBmYfhriki39s13Zh3ec2l?=
+ =?us-ascii?Q?A20O3Efx3bsd2kP27YxcL9Ki/QkLCuao3fIGVTLk9oFzgoSfohTdglG2FEzi?=
+ =?us-ascii?Q?7HwJsHyXRaG+kSwtgPkX7fMBsljlqBo8Vxt3iHlWcqX8OiYBQ+AyAIPdLHT0?=
+ =?us-ascii?Q?vlO6xI2pzwZEnyUTcyv7AVqBRT85pjsRL6duP/A2z5NkAL7eaJImc0Qp1GoQ?=
+ =?us-ascii?Q?S6lDJrGdYzds0OYpdUyYsa8oIyikfsMMv9kBHtfRLcth5GErW26/2C0NzvM5?=
+ =?us-ascii?Q?p21XvpfOw1PBZusMQMX+HvGfkrEcs8EiQNcejyetJxX5ggrcQ1kIMprYQzeN?=
+ =?us-ascii?Q?LyMFst+CEWdhwAxr4sJQZI1xAiRytiCC8j+wDhgS1vsS6nZDUsoN0Hll7ViE?=
+ =?us-ascii?Q?qG+AozL60rabKnvT/oUM70w1S+2GHwboDxNxx9cap4ZPy67i1iqxTYgntGUt?=
+ =?us-ascii?Q?P1hs9x0PDX2TGaZvOvEzDzIaOJPxambEBfD5cmBYOxvb2DIoBfgCaHE1igyn?=
+ =?us-ascii?Q?91pGeXZMWNOsoRAT5HBahQmhUM3UiolXo0ooz4oE5UJQTMnJQz7LKSru0GrJ?=
+ =?us-ascii?Q?/pULWPs4+n7W/ukXTnmE/yMweiuoz57Z5kncXGSLHo1pNF70abgEYZyqbXY4?=
+ =?us-ascii?Q?D6rqPeI85rLmyz/9c2vgv9P5As7mictIyEBoa9oOeIf8sWzRTy6ipQA5CBz3?=
+ =?us-ascii?Q?M1ax/OlhU3SJbAiPrRMLQY8BkfzaS5tqqbkMyC8mhJ4qQb0yX7BIWxrCQAv3?=
+ =?us-ascii?Q?+Y1CrLmEygmOY+Ljc0cj3Xa5FU5gr/5HyqRFYK/7IeMzE4C8bocCXiRTD/rd?=
+ =?us-ascii?Q?gTtD+y0ionvoDx78d29d7Q8axTYMKzsEvZ4C3alGrtdGC7TzJ/1XynSDYGS1?=
+ =?us-ascii?Q?iQO2v2Ow7GwBloip1SRCajmsBH7GxrnkCzeD4fc6M8A+ADi+fiQPP3xzf+NP?=
+ =?us-ascii?Q?N4dG99f+knvgAKpFNXOb/0RjvtgWYsOSk+42otuzP01lY8Q0SxzQOuzuGCoP?=
+ =?us-ascii?Q?JkoNG4z+BLQW3c1jcCxkn5kxwFMmOcFYMYdSWWzelA2jbIX9bCcw6J3dLHvA?=
+ =?us-ascii?Q?cRimzi6G+9jQjl8sR36kSXrZoaKAW+pmcNKpD/yboYBu56HmVkWWOxEXhqj4?=
+ =?us-ascii?Q?+xSR6bUMR+EGyD0kLMOfUuXVdFe9x6jz9G2x2TtyMCAELXkgeNyLJZ0FC83P?=
+ =?us-ascii?Q?6Uv6N2OSuNEM3k4zSkQCmOhuRl/pEKGJB3ZulFC0d+a97q9j0THLWt1UPB5z?=
+ =?us-ascii?Q?akSCde+Ck8e3Dyh7WQYIyPsE9sPgLk6s2YCdyJxY/q9nXkESEJ62uILwPigY?=
+ =?us-ascii?Q?OnzpkDXXcPcw2d3syRExOvD3UDM+qXUt0S59wijR0iMLBPD/G3L1pqQv/H48?=
+ =?us-ascii?Q?kowWtYSCRo/bHQgeVIrnyDEW16OO04vuF9y1uNWT8kpiL5ClFfcOiyy/Qi6t?=
+ =?us-ascii?Q?NG/d+q+m6GcNBmKkTrrPNAAgF38OVafbcM7DMdKajkP22zC/rYGj9Vnt/pCe?=
+ =?us-ascii?Q?J7FSSPy5pfuB0R4vamWrtZkRLBqcSaHju9zbxqSHILTW0XwAhkcGHdQrnw?=
+ =?us-ascii?Q?=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-24_10,2023-07-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- phishscore=0 spamscore=0 clxscore=1015 bulkscore=0 impostorscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307240116
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB2852.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa2d1881-49b7-47d6-0487-08db8c4831ff
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2023 13:16:30.7008
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UWVSZChvaQb+rqVmg42mihVji/hJz7ADTTU1F9jbDFhv8odpK9M3MzFBtDL05++uz/i1hQO6SXRZ/teXcX5g9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6690
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The last s390 machine that supported FDDI was z900 ('7th generation',
-released in 2000). The oldest machine generation currently supported by
-the Linux kernel is MARCH_Z10 (released 2008). If there is still a usecase
-for connecting a Linux on s390 instance to a LAN Channel Station (LCS), it
-can only do so via Ethernet.
 
-Randy Dunlap[1] found that LCS over FDDI has never worked, when FDDI
-was compiled as module. Instead of fixing that, remove the FDDI option
-from the lcs driver.
 
-While at it, make the CONFIG_LCS description a bit more helpful.
+> -----Original Message-----
+> From: Rob Herring <robh@kernel.org>
+> Sent: Wednesday, July 19, 2023 11:52 PM
+> To: Somisetty, Pranavi <pranavi.somisetty@amd.com>
+> Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> krzysztof.kozlowski+dt@linaro.org; conor+dt@kernel.org; Simek, Michal
+> <michal.simek@amd.com>; Katakam, Harini <harini.katakam@amd.com>;
+> git (AMD-Xilinx) <git@amd.com>; Pandey, Radhey Shyam
+> <radhey.shyam.pandey@amd.com>; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; devicetree@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org
+> Subject: Re: [PATCH v2] dt-bindings: net: xilinx_gmii2rgmii: Convert to j=
+son
+> schema
+>=20
+> On Wed, Jul 19, 2023 at 12:18:08AM -0600, Pranavi Somisetty wrote:
+> > Convert the Xilinx GMII to RGMII Converter device tree binding
+> > documentation to json schema.
+> > This converter is usually used as gem <---> gmii2rgmii <---> external
+> > phy and, it's phy-handle should point to the phandle of the external ph=
+y.
+> >
+> > Signed-off-by: Pranavi Somisetty <pranavi.somisetty@amd.com>
+> > ---
+> > Changes v2:
+> > 1. Changed description for the property "reg".
+> > 2. Added a reference to the description of "phy-handle" property.
+> > ---
+> >  .../bindings/net/xilinx_gmii2rgmii.txt        | 35 ------------
+> >  .../bindings/net/xlnx,gmii-to-rgmii.yaml      | 54 +++++++++++++++++++
+> >  2 files changed, 54 insertions(+), 35 deletions(-)  delete mode
+> > 100644 Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+> >  create mode 100644
+> > Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> >
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+> > b/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+> > deleted file mode 100644
+> > index 038dda48b8e6..000000000000
+> > --- a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+> > +++ /dev/null
+> > @@ -1,35 +0,0 @@
+> > -XILINX GMIITORGMII Converter Driver Device Tree Bindings
+> > ---------------------------------------------------------
+> > -
+> > -The Gigabit Media Independent Interface (GMII) to Reduced Gigabit
+> > Media -Independent Interface (RGMII) core provides the RGMII between
+> > RGMII-compliant -Ethernet physical media devices (PHY) and the Gigabit
+> Ethernet controller.
+> > -This core can be used in all three modes of operation(10/100/1000 Mb/s=
+).
+> > -The Management Data Input/Output (MDIO) interface is used to
+> > configure the -Speed of operation. This core can switch dynamically
+> > between the three -Different speed modes by configuring the conveter
+> register through mdio write.
+> > -
+> > -This converter sits between the ethernet MAC and the external phy.
+> > -MAC <=3D=3D> GMII2RGMII <=3D=3D> RGMII_PHY
+> > -
+> > -For more details about mdio please refer phy.txt file in the same dire=
+ctory.
+> > -
+> > -Required properties:
+> > -- compatible	: Should be "xlnx,gmii-to-rgmii-1.0"
+> > -- reg		: The ID number for the phy, usually a small integer
+> > -- phy-handle	: Should point to the external phy device.
+> > -		  See ethernet.txt file in the same directory.
+> > -
+> > -Example:
+> > -	mdio {
+> > -		#address-cells =3D <1>;
+> > -		#size-cells =3D <0>;
+> > -		phy: ethernet-phy@0 {
+> > -			......
+> > -		};
+> > -		gmiitorgmii: gmiitorgmii@8 {
+> > -			compatible =3D "xlnx,gmii-to-rgmii-1.0";
+> > -			reg =3D <8>;
+> > -			phy-handle =3D <&phy>;
+> > -		};
+> > -	};
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> > b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> > new file mode 100644
+> > index 000000000000..9d22382a64ba
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+> > @@ -0,0 +1,54 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) %YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/xlnx,gmii-to-rgmii.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Xilinx GMII to RGMII Converter
+> > +
+> > +maintainers:
+> > +  - Harini Katakam <harini.katakam@amd.com>
+> > +
+> > +description:
+> > +  The Gigabit Media Independent Interface (GMII) to Reduced Gigabit
+> > +Media
+> > +  Independent Interface (RGMII) core provides the RGMII between
+> > +RGMII-compliant
+> > +  ethernet physical media devices (PHY) and the Gigabit Ethernet
+> controller.
+> > +  This core can be used in all three modes of operation(10/100/1000
+> Mb/s).
+> > +  The Management Data Input/Output (MDIO) interface is used to
+> > +configure the
+> > +  speed of operation. This core can switch dynamically between the
+> > +three
+> > +  different speed modes by configuring the converter register through
+> mdio write.
+> > +  The core cannot function without an external phy connected to it.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: xlnx,gmii-to-rgmii-1.0
+> > +
+> > +  reg:
+> > +    minimum: 0
+> > +    maximum: 31
+> > +    description: The ID number for the phy.
+> > +
+> > +  phy-handle:
+> > +    $ref: ethernet-controller.yaml#/properties/phy-handle
+>=20
+> Don't reference individual properties like this. Instead add a $ref at th=
+e top
+> level to just "ethernet-controller.yaml#". Since this is the only propert=
+y you
+> want from there, put a 'phy-handle: true' here and use additionalProperti=
+es
+> instead of unevaluatedProperties below.
+>
 
-References:
-[1] https://lore.kernel.org/netdev/20230621213742.8245-1-rdunlap@infradead.org/
+Adding a top level $ref to ethernet-controller, implies, DT for gmii2rgmii,=
+ follows the schema in ethernet-controller.yaml. This is incorrect since gm=
+ii2rgmii IP isn't an ethernet controller.
+I'm not sure how to reference ethernet-controller.yaml from this schema. Wo=
+uld it be okay to add a description to the phy-handle property instead of r=
+eferencing the description in ethernet-controller.yaml?
 
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
----
- drivers/s390/net/Kconfig |  5 ++---
- drivers/s390/net/lcs.c   | 39 ++++++---------------------------------
- 2 files changed, 8 insertions(+), 36 deletions(-)
-
-diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
-index 9c67b97faba2..74760c1a163b 100644
---- a/drivers/s390/net/Kconfig
-+++ b/drivers/s390/net/Kconfig
-@@ -5,12 +5,11 @@ menu "S/390 network device drivers"
- config LCS
- 	def_tristate m
- 	prompt "Lan Channel Station Interface"
--	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-+	depends on CCW && NETDEVICES && ETHERNET
- 	help
- 	  Select this option if you want to use LCS networking on IBM System z.
--	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
- 	  To compile as a module, choose M. The module name is lcs.
--	  If you do not know what it is, it's safe to choose Y.
-+	  If you do not use LCS, choose N.
- 
- config CTCM
- 	def_tristate m
-diff --git a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
-index 9fd8e6f07a03..a1f2acd6fb8f 100644
---- a/drivers/s390/net/lcs.c
-+++ b/drivers/s390/net/lcs.c
-@@ -17,7 +17,6 @@
- #include <linux/if.h>
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
--#include <linux/fddidevice.h>
- #include <linux/inetdevice.h>
- #include <linux/in.h>
- #include <linux/igmp.h>
-@@ -36,10 +35,6 @@
- #include "lcs.h"
- 
- 
--#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
--#error Cannot compile lcs.c without some net devices switched on.
--#endif
--
- /*
-  * initialization string for output
-  */
-@@ -1601,19 +1596,11 @@ lcs_startlan_auto(struct lcs_card *card)
- 	int rc;
- 
- 	LCS_DBF_TEXT(2, trace, "strtauto");
--#ifdef CONFIG_ETHERNET
- 	card->lan_type = LCS_FRAME_TYPE_ENET;
- 	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
- 	if (rc == 0)
- 		return 0;
- 
--#endif
--#ifdef CONFIG_FDDI
--	card->lan_type = LCS_FRAME_TYPE_FDDI;
--	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
--	if (rc == 0)
--		return 0;
--#endif
- 	return -EIO;
- }
- 
-@@ -1806,22 +1793,16 @@ lcs_get_frames_cb(struct lcs_channel *channel, struct lcs_buffer *buffer)
- 			card->stats.rx_errors++;
- 			return;
- 		}
--		/* What kind of frame is it? */
--		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL) {
--			/* Control frame. */
-+		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL)
- 			lcs_get_control(card, (struct lcs_cmd *) lcs_hdr);
--		} else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET ||
--			   lcs_hdr->type == LCS_FRAME_TYPE_TR ||
--			   lcs_hdr->type == LCS_FRAME_TYPE_FDDI) {
--			/* Normal network packet. */
-+		else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET)
- 			lcs_get_skb(card, (char *)(lcs_hdr + 1),
- 				    lcs_hdr->offset - offset -
- 				    sizeof(struct lcs_header));
--		} else {
--			/* Unknown frame type. */
--			; // FIXME: error message ?
--		}
--		/* Proceed to next frame. */
-+		else
-+			dev_info_once(&card->dev->dev,
-+				      "Unknown frame type %d\n",
-+				      lcs_hdr->type);
- 		offset = lcs_hdr->offset;
- 		lcs_hdr->offset = LCS_ILLEGAL_OFFSET;
- 		lcs_hdr = (struct lcs_header *) (buffer->data + offset);
-@@ -2140,18 +2121,10 @@ lcs_new_device(struct ccwgroup_device *ccwgdev)
- 		goto netdev_out;
- 	}
- 	switch (card->lan_type) {
--#ifdef CONFIG_ETHERNET
- 	case LCS_FRAME_TYPE_ENET:
- 		card->lan_type_trans = eth_type_trans;
- 		dev = alloc_etherdev(0);
- 		break;
--#endif
--#ifdef CONFIG_FDDI
--	case LCS_FRAME_TYPE_FDDI:
--		card->lan_type_trans = fddi_type_trans;
--		dev = alloc_fddidev(0);
--		break;
--#endif
- 	default:
- 		LCS_DBF_TEXT(3, setup, "errinit");
- 		pr_err(" Initialization failed\n");
--- 
-2.39.2
+Regards
+Pranavi
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - phy-handle
+> > +
+> > +unevaluatedProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    mdio {
+> > +        #address-cells =3D <1>;
+> > +        #size-cells =3D <0>;
+> > +        phy: ethernet-phy@0 {
+> > +            reg =3D <0>;
+> > +        };
+> > +        gmiitorgmii@8 {
+> > +            compatible =3D "xlnx,gmii-to-rgmii-1.0";
+> > +            reg =3D <8>;
+> > +            phy-handle =3D <&phy>;
+> > +        };
+> > +    };
+> > --
+> > 2.36.1
+> >
 
 
