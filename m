@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-20288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A117175EF4A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:41:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C26F75EF4F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 11:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B0D72813BD
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:41:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CCA11C209BD
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E36B6FCD;
-	Mon, 24 Jul 2023 09:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2826FD0;
+	Mon, 24 Jul 2023 09:42:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FB87460
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:41:26 +0000 (UTC)
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9741A1
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:41:25 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-40550136e54so492531cf.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:41:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EC3185A
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 09:42:40 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00F41A5
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:42:39 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b8b4749013so33203015ad.2
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 02:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690191684; x=1690796484;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fgQCLvMpvyW6f+GmCUNJh1u069+gXt093XbItedR5zQ=;
-        b=c9y/c5AaiYg7Fa9NEnrTY0jD1fl80Y4h+EZTotSDFzg3dmUzleWyW2ZnwQ62LxAgJr
-         B8GfM/MQj5RveAE23zxNkDiXN6q6votLvq8iJneDKdLGxCLogIerNXUYdI5OUDFqOoKG
-         ZbO6wiigHRv/HVdcguSAmga8C9praPlFPrfy4KRGvOPdpfmJ2lHu8jmtQRMeC+uFCCkW
-         iax2al7cyg7rwdg1BYqbtfMrpkBsLXLu53MLdDVdEkZHHj89lDqbK2Mo7IT59ZYKvOB4
-         hCfS1+PYr3YORNo7H3Rb1DV04pUO4i6OZzkM7Vo4BcuYJXF4M+FSEIDL/WPH/2pjXQs+
-         CECg==
+        d=gmail.com; s=20221208; t=1690191759; x=1690796559;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Me09JAHDE7SDhvsN7mmKdb7NoKKGDMVG5pQHu9N427Y=;
+        b=baffDOg8ahGncXz9Zjz6TH/ve4ciwVqCVOaxVccVq3lOT81+ECLf1ci8uuyv0UtdZ6
+         PF/aIAiEL/vAu4FJTy4LHTxdgKuPMc0LgS+jGSCkM2fDwxp0jykDoo/+XTlVwq8ZrAaO
+         LsBxbTMJz3FPo+ckfj35nb2dQiJvMpB7V18JeA3/Vbm26Qz0X7zwhJ2Lueyudh8BT9R7
+         HdG8vhsxrJrQz/oEVJFKspVW+AM+cxZM13IfqdGJPB/ZWLyvB8OHfT/BKexcNbloBmZ+
+         DE2UYzcaoOTI/Ga06u5vST6+sfi0TwUfAhE+vUgfgnLSFujBS4cwhuVNAockkBOpS6eM
+         eHCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690191684; x=1690796484;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fgQCLvMpvyW6f+GmCUNJh1u069+gXt093XbItedR5zQ=;
-        b=CZWkD6Y7zyRC820x8NC8MirMyDvDqoQIYVgjOW9NqOep8z6NJBUlWCICNfpR3M7RDo
-         vdLkBrU1i3QH04s3/SFAe0Mn//bWKm6OvaqXIx4+wjEZ5qPQ1wwZlZFpxHg8zg8i0RCa
-         RZog/XuYQWMDAtcNOpiDwt8mHjXOOkQPwEoC2L6r63uoUHzkfEzsOjVT1WI7M1LuqoyP
-         DpPC//Az7vRg6huT/izbfzRuAyn/IP4XtewtQTi5qUzBf/TTvQC9nLx6xdSi2zxWNk2V
-         Z9euQ/aGcfOu7wCYHZ9QPfZVqwXaEZ/r/se99a4vy5T28sC8Rfj5hhbFoamcITRaobzY
-         /f7g==
-X-Gm-Message-State: ABy/qLYEvrsUQ7zB1NAzs0L6Mjf1VtQusgQNOQddwIpGxd0CLkvHYIv3
-	oienWGitjucv5mQoAsjRBGCqMZnw95eAHWR3PyIj6Q==
-X-Google-Smtp-Source: APBJJlHrP2O8u7XmwqAga3fZfE1iRfKqIZjp3+U2vI+uQdMs26Z2fQqhqqCQdWVp7SAEtH3pYbE8BGzLqthyA05M0Lg=
-X-Received: by 2002:ac8:7c47:0:b0:403:b3ab:393e with SMTP id
- o7-20020ac87c47000000b00403b3ab393emr449897qtv.18.1690191684081; Mon, 24 Jul
- 2023 02:41:24 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690191759; x=1690796559;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Me09JAHDE7SDhvsN7mmKdb7NoKKGDMVG5pQHu9N427Y=;
+        b=cCpfevwKSoeEIRvkibGx+8y6nFpHLsmNrNvkKcBOXEM/V4P0duqAIZqpp0GjLAzwNj
+         b6wKiegYnm8A/lBX8U8bGw4xUHx8+9/2Nzo4BNwOEJyob1I3/SuDHoWJN9QLYN1Ahg+k
+         QFTUUU4/fJKT3jBzNpa855LUPsNN/JrqUKfJ/G7sOvq7+WM9VhtROQRz9J/5oec6KSaP
+         IeKLaOZ4L5ZblGGzy6nQB+j55RoYCJywTzCFyiNx1w1f0RNtyKsZD9FZN0Eb4oR1vVBB
+         elKNYAnTjVmsGrlfoguwopqNtSu83GXnUBRAZxS+346zVUhGGWY/2lHyrjQPoNJojVGn
+         B6zA==
+X-Gm-Message-State: ABy/qLZwTUlfHzVEE/Y/4DEXC9YyiItirsvST4ztSCmmC4evCzafrgAG
+	H4IDAW1uiWk76fuMykIZapA=
+X-Google-Smtp-Source: APBJJlEKnDDPWiK5PLwQdmv6Spi80wYUuYGu4/jq6uO0jlBvFVTnCKXI7RM08MsHRm0HPIezXY7jcw==
+X-Received: by 2002:a17:903:22c4:b0:1b6:6b03:10cd with SMTP id y4-20020a17090322c400b001b66b0310cdmr12260338plg.67.1690191759251;
+        Mon, 24 Jul 2023 02:42:39 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id bh11-20020a170902a98b00b001a6a6169d45sm8400059plb.168.2023.07.24.02.42.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 02:42:38 -0700 (PDT)
+Date: Mon, 24 Jul 2023 17:42:34 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCHv3 net] ipv6: do not match device when remove source route
+Message-ID: <ZL5HijWsqLgVMHav@Laptop-X1>
+References: <20230720065941.3294051-1-liuhangbin@gmail.com>
+ <ZLk0/f82LfebI5OR@shredder>
+ <ZLlJi7OUy3kwbBJ3@shredder>
+ <ZLpI6YZPjmVD4r39@Laptop-X1>
+ <ZLzhMDIayD2z4szG@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230721222410.17914-1-kuniyu@amazon.com>
-In-Reply-To: <20230721222410.17914-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 24 Jul 2023 11:41:12 +0200
-Message-ID: <CANn89iKo9h6fFg4BbYBZeWH1qdZKS4SDn1ufcKbSmRiviXvfTg@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: Reduce chance of collisions in inet6_hashfn().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Amit Klein <aksecurity@gmail.com>, Benjamin Herrenschmidt <benh@amazon.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Stewart Smith <trawets@amazon.com>, Samuel Mendoza-Jonas <samjonas@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLzhMDIayD2z4szG@shredder>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 22, 2023 at 12:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: Stewart Smith <trawets@amazon.com>
->
-> For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
-> table with a hash over the source & destination addresses and ports.
-> However, the IPv6 hash is insufficient and can lead to a high rate of
-> collisions.
->
-> The IPv6 hash used an XOR to fit everything into the 96 bits for the
-> fast jenkins hash, meaning it is possible for an external entity to
-> ensure the hash collides, thus falling back to a linear search in the
-> bucket, which is slow.
->
-> We take the approach of hash the full length of IPv6 address in
-> __ipv6_addr_jhash() so that all users can benefit from a more secure
-> version.
->
-> While this may look like it adds overhead, the reality of modern CPUs
-> means that this is unmeasurable in real world scenarios.
->
-> In simulating with llvm-mca, the increase in cycles for the hashing
-> code was ~16 cycles on Skylake (from a base of ~155), and an extra ~9
-> on Nehalem (base of ~173).
->
-> In commit dd6d2910c5e0 ("netfilter: conntrack: switch to siphash")
-> netfilter switched from a jenkins hash to a siphash, but even the faster
-> hsiphash is a more significant overhead (~20-30%) in some preliminary
-> testing.  So, in this patch, we keep to the more conservative approach to
-> ensure we don't add much overhead per SYN.
->
-> In testing, this results in a consistently even spread across the
-> connection buckets.  In both testing and real-world scenarios, we have
-> not found any measurable performance impact.
->
-> Fixes: 08dcdbf6a7b9 ("ipv6: use a stronger hash for tcp")
-> Signed-off-by: Stewart Smith <trawets@amazon.com>
-> Signed-off-by: Samuel Mendoza-Jonas <samjonas@amazon.com>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
-> v2:
->   * Hash all IPv6 bytes once in __ipv6_addr_jhash() instead of reusing
->     some bytes twice.
+On Sun, Jul 23, 2023 at 11:13:36AM +0300, Ido Schimmel wrote:
+> > BTW, to fix it, how about check if the IPv6 addr still exist. e.g.
+> > 
+> > --- a/net/ipv6/route.c
+> > +++ b/net/ipv6/route.c
+> > @@ -4590,10 +4590,11 @@ static int fib6_remove_prefsrc(struct fib6_info *rt, void *arg)
+> >         struct net_device *dev = ((struct arg_dev_net_ip *)arg)->dev;
+> >         struct net *net = ((struct arg_dev_net_ip *)arg)->net;
+> >         struct in6_addr *addr = ((struct arg_dev_net_ip *)arg)->addr;
+> > +       u32 tb6_id = l3mdev_fib_table(dev) ? : RT_TABLE_MAIN;
+> > 
+> > -       if (!rt->nh &&
+> > -           ((void *)rt->fib6_nh->fib_nh_dev == dev || !dev) &&
+> > -           rt != net->ipv6.fib6_null_entry &&
+> > +       if (rt != net->ipv6.fib6_null_entry &&
+> > +           rt->fib6_table->tb6_id == tb6_id &&
+> > +           !ipv6_chk_addr_and_flags(net, addr, NULL, true, 0, IFA_F_TENTATIVE) &&
+> >             ipv6_addr_equal(addr, &rt->fib6_prefsrc.addr)) {
+> 
+> ipv6_chk_addr_and_flags() is more expensive than ipv6_addr_equal() so
+> better to first check that route indeed uses the address as the
+> preferred source address and only then check if it exists.
 
-Thanks, I think we should merge this patch as is, and think about
-further improvements later.
+OK.
+> 
+> Maybe you can even do it in rt6_remove_prefsrc(). That would be similar
+> to what IPv4 is doing.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Do you mean call ipv6_chk_addr_and_flags() in rt6_remove_prefsrc()?
+
+Thanks
+Hangbin
 
