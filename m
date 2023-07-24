@@ -1,158 +1,127 @@
-Return-Path: <netdev+bounces-20247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCEAA75EA2D
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:43:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6C0D75EA3C
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 05:46:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83BBB2814A4
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A8DE2814F7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 03:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A33910F8;
-	Mon, 24 Jul 2023 03:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B37BEC5;
+	Mon, 24 Jul 2023 03:46:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8FD1C39;
-	Mon, 24 Jul 2023 03:42:02 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2047.outbound.protection.outlook.com [40.107.94.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE3910C8;
-	Sun, 23 Jul 2023 20:41:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CV0NF+n57gn/kXZ4c+yviS/dLCz08jUcyYkLULs+zWcpgc6cKzVtxb4Cs0INVPAVdCmLuklNzpvd122cSmKr6Cel+YWdlyNDy8pH5gu6QB72k7RZmnkASyefaMWiKmtrKZYRlZ1S+nZleqYOUdLwjkMPzBvgENslxa/LCQ1uaMhv2L/Od/0pxwOgUXPo71I2Wpacdkvs4QYOj85dHveiCcPo4hpmk2QnTBzeSggvNec9a8bwsaFaJvhxBjDXqFs8mlxFevqmDT8ZDjVPfNCMxaCB78TFQghCK0KzttUS3c2j+mHAejksCrM2fuY99jiHm35VryuysLAKxClCIA9QqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RuBoUM/RIGTCyYd/wQd3oZEgZE1JEa2nvlIobdk6q50=;
- b=DIAQnovMdpPj9XLg/eiaNt9tYzFaynnik6ymeUPrw50lsb9CA95VqEXTnOJm6aBCLDe29ylKWY/pVhSZ0qFMeqdwq4ZyzajsvZxgqFcmkurv+zXUxp1B10P/lFx0w/oXT6Be/1wprPBofiNG/OvS4FMyQWFG/6n2+d3QG0cll+tfZpNAj9I5051mbNR3txNOEV/72dito7HeOc/9HkTU5IbKFjhcIOt3wnRewm6E4IEBAYhvxwh5W1huH9QhNLrthKewnllotJXLgAPKu94Atqo3QauRTkyOJpxJ//jFgu785+tr86LnYgxYt/IRRrSVIIbeAXBkZDLU9N0Mla60Cg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RuBoUM/RIGTCyYd/wQd3oZEgZE1JEa2nvlIobdk6q50=;
- b=qX+HqzG7IrLSfgNjpNklZ4pfIyryZjH98dICGcQOJDmk5zcI43yoOLce9AeJ5fU4eRJlkNUtGba76CSezyBc3+uyjiP50HQWzHprCWK6XDDPJ5Ru8erhETDObNnG7CuMytkmzrqjbkwgaNW09cp+ELnyLb6xF9t838N69WI9OEDCmwAWf4n8g9qVZjPhayb6o8KXw2ENhmi9BaXvCW077moPxfcDy6BmaXZ+PGV9obFcCa4kh0Y7Cgb4YYWzryi4uhtHKyw2q3AfIKvrLT/xcXuYwGm864RoRZnt3wF2KWE1x/4z2bx8Jst2cVx+MF5gtPC8DHe5XPc1JWvGid47SA==
-Received: from MW4PR04CA0116.namprd04.prod.outlook.com (2603:10b6:303:83::31)
- by MW4PR12MB6873.namprd12.prod.outlook.com (2603:10b6:303:20c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
- 2023 03:41:46 +0000
-Received: from CO1NAM11FT016.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:83:cafe::36) by MW4PR04CA0116.outlook.office365.com
- (2603:10b6:303:83::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28 via Frontend
- Transport; Mon, 24 Jul 2023 03:41:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1NAM11FT016.mail.protection.outlook.com (10.13.175.141) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.24 via Frontend Transport; Mon, 24 Jul 2023 03:41:44 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Sun, 23 Jul 2023
- 20:41:35 -0700
-Received: from nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Sun, 23 Jul
- 2023 20:41:30 -0700
-From: Gavin Li <gavinl@nvidia.com>
-To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<hawk@kernel.org>, <john.fastabend@gmail.com>, <jiri@nvidia.com>,
-	<dtatulea@nvidia.com>
-CC: <gavi@nvidia.com>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>
-Subject: [PATCH net-next V3 4/4] virtio_net: enable per queue interrupt coalesce feature
-Date: Mon, 24 Jul 2023 06:40:48 +0300
-Message-ID: <20230724034048.51482-5-gavinl@nvidia.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230724034048.51482-1-gavinl@nvidia.com>
-References: <20230724034048.51482-1-gavinl@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C45FEC2
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:46:33 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25965DB;
+	Sun, 23 Jul 2023 20:46:32 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 96B3820A09;
+	Mon, 24 Jul 2023 06:46:29 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 6F8DF20A08;
+	Mon, 24 Jul 2023 06:46:29 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 0E9533C0439;
+	Mon, 24 Jul 2023 06:46:25 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1690170387; bh=9wDE65OlhnCUzRgqjw2Uyz//+EJm/dZ/6yNBMKhGs7c=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=jZbF6lDEEGLK8dDaKiIjrEHyeSVKDWp0FjPwuug8PY2u0ahlIGq1qgH3f1FdN83Sg
+	 UdClFXYbzxTKTv/HapNN3Wd0XNN5KIv7eHIJgscm/UZa0jazrcujDL3sV3ZwCXECD1
+	 EEjtsN/Op9XdAjbz5de2deCqlPg5F47twdiRDJ4Y=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 36O3kMqn006749;
+	Mon, 24 Jul 2023 06:46:24 +0300
+Date: Mon, 24 Jul 2023 06:46:22 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Dust Li <dust.li@linux.alibaba.com>
+cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jiejian Wu <jiejian@linux.alibaba.com>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH v2 net-next] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table
+ per netns
+In-Reply-To: <20230724013101.GI6751@linux.alibaba.com>
+Message-ID: <3decf8be-ee64-b3c3-2e6d-4f3f392f6faf@ssi.bg>
+References: <20230723154426.81242-1-dust.li@linux.alibaba.com> <ff4612e3-bb5a-7acc-1607-5761e5d052c4@ssi.bg> <20230724013101.GI6751@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT016:EE_|MW4PR12MB6873:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ac3734c-8a1a-4369-efc2-08db8bf7e6e3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	JX7x/o7TiuM/fzN8t655dQUd1YzlWg6lWcZpgZ1oiM6lK8ecjLXHuZXwWMPm3mCXj8o0Z9tKj2tHZrW2GdPBmVXHJg2ArTx39UflWplyrpKXskbjtANwi57fU+eoaEp8dBT+kk8nOxadAITR+8j99cM3w63CSot1ocNGJhIJc+EZ1Sjer0HjVVKolSN9p4ut+hJHvlcXwXl3k0VfNETUzx9uttBjb2UIL3Qveo92ofkMVhVgVwQ29e9qD7wKYwKRe+x1IjbFqaVTU1c/QHEyfq08xVXfPtAFw8qe7Jw15SS8Vkq0xXr76RF9GpUznvrLGcFEKvo7H1pHSejjBKNq7LxsmYXd27WuHBFvxmYOsp0VYQKBwBm0WFaI+c+OliwXH6gVbCMH4PIMsj35DWbz2tGZaUC2wyFxpBJioFUPtt9BrywRnZccOocdkygq+LqWpY02z+HmVAwUSHD+YSbcDYKG399gkXwys8qOR40ZDL0EWJwEaAxyVdVgRI7FzxsrRrm9t00z9Y+ul727Qv/ybZak5NyGW2HiQgFvf0tVVf6/YEkTL638DF7Y6RCgG6PCBrnmU62TcvDJ2ale/0SeiQT03FRxebrhKaavQZtZleT977drZITbXQscBEObYLP/hs+mNBzvWMqZbCw+2NGYRkDXZtiCqi/HY6XkBRoqyPertKtraZhEJt/M5pJnYlDrvvHjP1gG1sHqGfqB/tHfjrvIE9zk4e+Gs+hJvg/2srmP0ZwckMwvxQA6IaYxAEK0pk4fT3iqX34t9n4jcQWjeeGbkxwexZytHJxqsQYT+8eKn3gs47MEx/NffkUCBQjq
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(39860400002)(346002)(396003)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(36860700001)(83380400001)(40480700001)(36756003)(86362001)(82740400003)(40460700003)(7636003)(921005)(356005)(55016003)(54906003)(110136005)(2906002)(478600001)(336012)(186003)(26005)(6286002)(1076003)(7696005)(6666004)(5660300002)(8676002)(7416002)(8936002)(316002)(41300700001)(70586007)(70206006)(6636002)(4326008)(16526019)(47076005)(2616005)(426003)(83996005)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 03:41:44.8375
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac3734c-8a1a-4369-efc2-08db8bf7e6e3
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1NAM11FT016.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6873
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Enable per queue interrupt coalesce feature bit in driver and validate its
-dependency with control queue.
 
-Signed-off-by: Gavin Li <gavinl@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/net/virtio_net.c | 3 +++
- 1 file changed, 3 insertions(+)
+	Hello,
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 0c3ee1e26ece..a03289da9f51 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4063,6 +4063,8 @@ static bool virtnet_validate_features(struct virtio_device *vdev)
- 	     VIRTNET_FAIL_ON(vdev, VIRTIO_NET_F_HASH_REPORT,
- 			     "VIRTIO_NET_F_CTRL_VQ") ||
- 	     VIRTNET_FAIL_ON(vdev, VIRTIO_NET_F_NOTF_COAL,
-+			     "VIRTIO_NET_F_CTRL_VQ") ||
-+	     VIRTNET_FAIL_ON(vdev, VIRTIO_NET_F_VQ_NOTF_COAL,
- 			     "VIRTIO_NET_F_CTRL_VQ"))) {
- 		return false;
- 	}
-@@ -4487,6 +4489,7 @@ static struct virtio_device_id id_table[] = {
- 	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
- 	VIRTIO_NET_F_SPEED_DUPLEX, VIRTIO_NET_F_STANDBY, \
- 	VIRTIO_NET_F_RSS, VIRTIO_NET_F_HASH_REPORT, VIRTIO_NET_F_NOTF_COAL, \
-+	VIRTIO_NET_F_VQ_NOTF_COAL, \
- 	VIRTIO_NET_F_GUEST_HDRLEN
- 
- static unsigned int features[] = {
--- 
-2.39.1
+On Mon, 24 Jul 2023, Dust Li wrote:
+
+> On Sun, Jul 23, 2023 at 08:19:54PM +0300, Julian Anastasov wrote:
+> >
+> >	Changes look good to me, thanks! But checkpatch is reporting
+> >for some cosmetic changes that you have to do in v3:
+> >
+> >scripts/checkpatch.pl --strict /tmp/file.patch
+> 
+> Oh, sorry for that! I ignored the CHECKs checkpatch reported, my checkpatch
+> shows:
+> 
+> 
+>    $./scripts/checkpatch.pl --strict 0001-ipvs-make-ip_vs_svc_table-and-ip_vs_svc_fwm_table-pe.patch
+>    CHECK: Prefer using the BIT macro
+>    #69: FILE: include/net/ip_vs.h:40:
+>    +#define IP_VS_SVC_TAB_SIZE (1 << IP_VS_SVC_TAB_BITS)
+> 
+> We just moved this line from ip_vs_ctl.c to ip_vs.h, so we ignored the
+> BIT macro. Do you think we should change it using BIT macro ?
+
+	Yes, lets fix all these complains.
+
+>    CHECK: struct mutex definition without comment
+>    #79: FILE: include/net/ip_vs.h:1051:
+>    +       struct mutex service_mutex;
+> 
+> I think we can add comment for it.
+> But rethinking a bit on the service_mutex in ip_vs_est.c, I'm a
+> wondering why we are using the service_mutex in estimation ? Is est_mutex
+> enough for the protecting in ip_vs_est.c ?
+
+	Yes, the estimation kthreads are synchronized only
+with reconfiguration: ip_vs_start_estimator() and ip_vs_stop_estimator()
+are called under service_mutex. And the estimation data is already 
+per-net, there is no global data.
+
+>    CHECK: Logical continuations should be on the previous line
+>    #161: FILE: net/netfilter/ipvs/ip_vs_ctl.c:410:
+>                        && (svc->port == vport)
+>    +                   && (svc->protocol == protocol)) {
+> 
+> This is just the removal of '(svc->ipvs == ipvs)' and kept it as it is.
+> So haven't change according to checkpatch. If you prefer, I can modify
+> it to make checkpatch happy.
+
+	Yes, lets move all '&&' in this 'if' block and also remove the 
+parens:
+
+	if (svc->af == af && ip_vs_addr_equal(af, &svc->addr, vaddr) &&
+	    svc->port == vport && svc->protocol == protocol) {
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
