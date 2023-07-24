@@ -1,97 +1,371 @@
-Return-Path: <netdev+bounces-20261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEAF375EC62
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:22:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C647275EC94
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 09:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BA021C209BC
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:22:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8555928147C
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 07:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4BA717FE;
-	Mon, 24 Jul 2023 07:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9D4185B;
+	Mon, 24 Jul 2023 07:33:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9125F1848
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:21:59 +0000 (UTC)
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B8090
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:21:57 -0700 (PDT)
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2b83c673ab5so10946631fa.1
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:21:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1F7184C
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:33:06 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B6719B
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:32:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690183978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=obJKEr7PPFK0pLw7ZGOQfDHbqPEfj1yDCcKlqGnAfNY=;
+	b=isgWf84nq2zW75OZo68IreQZ1lFD9rId/lj5Ehw7+Xuc/z7NEWb847Ea3hmcSAekp1gT31
+	WmRy7zOKcgb0Ys0DwX6w4Zco9KLd1ZNdqSySfozA1RHLwsQjFEkYx67s3y1owonI7lJHJL
+	QRL2xT5555RB9cwJjDmG40WwYmnkJng=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-adwR53jmMM2uvqYVur1F6w-1; Mon, 24 Jul 2023 03:32:57 -0400
+X-MC-Unique: adwR53jmMM2uvqYVur1F6w-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b6fdbe2efdso36011351fa.3
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 00:32:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690183316; x=1690788116;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=csHOlK60oFtyoKK55DCid0LNEQDIrrzyZU/pUX0ng1M=;
-        b=V0lzUd1T2WcWCoGcnnLL8OG6e4xwnFiSVT3aJZ34xCD0c8yTSpWPcFMBkbvQpH9JXk
-         7+sExRyWzVSna53soT3HVy/9FgWdDLHWSl0wxxdYCXE8X3EHrajF21LyGwbQ8jhgBxkq
-         LPUQBfCp3HZZYYZLS/p3rfOl0ef0fBs9aQ927Y5jEfDjgf396qruvAcVOJPnxNq92aL1
-         rYhZjtA2Ltd65VoC7HArJbe3wY9HtyI2w3qrWuOJD/Nfg+E61jq5IUSh7R/Zk2LDalzq
-         HEU6rV4a34yUsj5uvh4V3rdWxhYX5pVe1tpiEv2SxDckIXjYa5LPl952HvPwzPo4rKM3
-         N3ew==
-X-Gm-Message-State: ABy/qLad0yNudHqvdeuCPYe9IrRNiQMl21yUqgbXuV6a6+8ULgo0ChIp
-	Pj34s+AUZqKosxkGHA9xcr0=
-X-Google-Smtp-Source: APBJJlGL3OVo/tghx+lWn9HITaXRKTzvnR6vR/lieEMtbY0b49/X5EaR0GjTv5+BSbsIXBNaE13nMg==
-X-Received: by 2002:a2e:a98b:0:b0:2b6:99a7:2fb4 with SMTP id x11-20020a2ea98b000000b002b699a72fb4mr4787194ljq.0.1690183315690;
-        Mon, 24 Jul 2023 00:21:55 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id p3-20020a05600c204300b003fc3b03e41esm12385411wmg.1.2023.07.24.00.21.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 00:21:54 -0700 (PDT)
-Message-ID: <9f37941c-b265-7f28-ebec-76c04804b684@grimberg.me>
-Date: Mon, 24 Jul 2023 10:21:52 +0300
+        d=1e100.net; s=20221208; t=1690183975; x=1690788775;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=obJKEr7PPFK0pLw7ZGOQfDHbqPEfj1yDCcKlqGnAfNY=;
+        b=OZrJD7cZS+74IdsReFKhC3ZnIVb1TNZpqAweMDxCSaYfHMHgRQI47OvePuso6hwCGv
+         tEDV9hww6aPvFiYbRIKWqqUwIvlSaUk/EHXaWnJ8sUwz4MxucNndlQ139TVj759xU71J
+         2ZMDelCRdpcivYxEPohsAmbHZtgRrXn8XM2rITMs25dn9Xd7jS/X0wjLqmSmJtivlmvm
+         l+2aGuA7cT5zqN3mktjcj/KkzJX9RjWiQwYIUPXXLYXJw1+AQs4Z5z81iEamjGvYmpDH
+         JUEqdTM0amCUKgq0Ym1c77WF4D4Ue+si4FB98gtfDFdqTVliQDJfLbZqVdrVuIlL6LUA
+         3vXg==
+X-Gm-Message-State: ABy/qLbRIO+DyynfTQbbKyH0mT02bX/hbRCMZPV+ItP6O2vTZb5WafmU
+	TTCH6tKb60ETFkCaYYTQYGSPz+EdvisJCwW7dlpP9gbCztG/mWdxSLfPGpH02Rj80XH9EiSY4P9
+	Gys0EhRxysycB2h/A
+X-Received: by 2002:a2e:988d:0:b0:2b6:fa92:479e with SMTP id b13-20020a2e988d000000b002b6fa92479emr5540266ljj.42.1690183975468;
+        Mon, 24 Jul 2023 00:32:55 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFha0kr3za1tiulXuUUpmLoGr/15/UKVQHTMghA8BLPnDMFKNbxFPtb4c1QICku3M6nKSRLrA==
+X-Received: by 2002:a2e:988d:0:b0:2b6:fa92:479e with SMTP id b13-20020a2e988d000000b002b6fa92479emr5540249ljj.42.1690183975012;
+        Mon, 24 Jul 2023 00:32:55 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73e0:3800:a16e:b2a0:7d06:58aa])
+        by smtp.gmail.com with ESMTPSA id h19-20020a1ccc13000000b003fbcdba1a63sm4012097wmb.12.2023.07.24.00.32.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 00:32:54 -0700 (PDT)
+Date: Mon, 24 Jul 2023 03:32:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Gavin Li <gavinl@nvidia.com>
+Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, jiri@nvidia.com, dtatulea@nvidia.com,
+	gavi@nvidia.com, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH net-next V3 3/4] virtio_net: support per queue interrupt
+ coalesce command
+Message-ID: <20230724032451-mutt-send-email-mst@kernel.org>
+References: <20230724034048.51482-1-gavinl@nvidia.com>
+ <20230724034048.51482-4-gavinl@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCHv8 0/6] net/tls: fixes for NVMe-over-TLS
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
- linux-nvme@lists.infradead.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230721143523.56906-1-hare@suse.de>
- <20230721190026.25d2f0a5@kernel.org>
- <3e83c1dd-99bd-4dbd-2f83-4008e7059cfa@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <3e83c1dd-99bd-4dbd-2f83-4008e7059cfa@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724034048.51482-4-gavinl@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
->>> here are some small fixes to get NVMe-over-TLS up and running.
->>> The first set are just minor modifications to have MSG_EOR handled
->>> for TLS, but the second set implements the ->read_sock() callback for 
->>> tls_sw
->>> which I guess could do with some reviews.
->>
->> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
->>
->> Sagi, I _think_ a stable branch with this should be doable,
->> would you like one, or no rush?
+On Mon, Jul 24, 2023 at 06:40:47AM +0300, Gavin Li wrote:
+> Add interrupt_coalesce config in send_queue and receive_queue to cache user
+> config.
 > 
-> I guess a stable branch would not be too bad; I've got another
-> set of patches for the NVMe side, too.
-> Sagi?
+> Send per virtqueue interrupt moderation config to underline device in order
+> to have more efficient interrupt moderation and cpu utilization of guest
+> VM.
+> 
+> Signed-off-by: Gavin Li <gavinl@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/net/virtio_net.c        | 120 ++++++++++++++++++++++++++++----
+>  include/uapi/linux/virtio_net.h |  14 ++++
+>  2 files changed, 122 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 802ed21453f5..0c3ee1e26ece 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -144,6 +144,8 @@ struct send_queue {
+>  
+>  	struct virtnet_sq_stats stats;
+>  
+> +	struct virtnet_interrupt_coalesce intr_coal;
+> +
+>  	struct napi_struct napi;
+>  
+>  	/* Record whether sq is in reset state. */
+> @@ -161,6 +163,8 @@ struct receive_queue {
+>  
+>  	struct virtnet_rq_stats stats;
+>  
+> +	struct virtnet_interrupt_coalesce intr_coal;
+> +
+>  	/* Chain pages by the private ptr. */
+>  	struct page *pages;
+>  
+> @@ -212,6 +216,7 @@ struct control_buf {
+>  	struct virtio_net_ctrl_rss rss;
+>  	struct virtio_net_ctrl_coal_tx coal_tx;
+>  	struct virtio_net_ctrl_coal_rx coal_rx;
+> +	struct virtio_net_ctrl_coal_vq coal_vq;
+>  };
+>  
+>  struct virtnet_info {
+> @@ -3078,6 +3083,55 @@ static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
+>  	return 0;
+>  }
+>  
+> +static int virtnet_send_ctrl_coal_vq_cmd(struct virtnet_info *vi,
+> +					 u16 vqn, u32 max_usecs, u32 max_packets)
+> +{
+> +	struct scatterlist sgs;
+> +
+> +	vi->ctrl->coal_vq.vqn = cpu_to_le16(vqn);
+> +	vi->ctrl->coal_vq.coal.max_usecs = cpu_to_le32(max_usecs);
+> +	vi->ctrl->coal_vq.coal.max_packets = cpu_to_le32(max_packets);
+> +	sg_init_one(&sgs, &vi->ctrl->coal_vq, sizeof(vi->ctrl->coal_vq));
+> +
+> +	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
+> +				  VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET,
+> +				  &sgs))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+> +					  struct ethtool_coalesce *ec,
+> +					  u16 queue)
+> +{
+> +	int err;
+> +
+> +	if (ec->rx_coalesce_usecs || ec->rx_max_coalesced_frames) {
+> +		err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
+> +						    ec->rx_coalesce_usecs,
+> +						    ec->rx_max_coalesced_frames);
+> +		if (err)
+> +			return err;
+> +		/* Save parameters */
+> +		vi->rq[queue].intr_coal.max_usecs = ec->rx_coalesce_usecs;
+> +		vi->rq[queue].intr_coal.max_packets = ec->rx_max_coalesced_frames;
+> +	}
+> +
+> +	if (ec->tx_coalesce_usecs || ec->tx_max_coalesced_frames) {
+> +		err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
+> +						    ec->tx_coalesce_usecs,
+> +						    ec->tx_max_coalesced_frames);
+> +		if (err)
+> +			return err;
+> +		/* Save parameters */
+> +		vi->sq[queue].intr_coal.max_usecs = ec->tx_coalesce_usecs;
+> +		vi->sq[queue].intr_coal.max_packets = ec->tx_max_coalesced_frames;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>  {
+>  	/* usecs coalescing is supported only if VIRTIO_NET_F_NOTF_COAL
+> @@ -3094,23 +3148,39 @@ static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>  }
+>  
+>  static int virtnet_set_coalesce_one(struct net_device *dev,
+> -				    struct ethtool_coalesce *ec)
+> +				    struct ethtool_coalesce *ec,
+> +				    bool per_queue,
+> +				    u32 queue)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> -	int ret, i, napi_weight;
+> +	int queue_count = per_queue ? 1 : vi->max_queue_pairs;
+> +	int queue_number = per_queue ? queue : 0;
 
-I don't think there is a real need for this to go to stable, nothing
-is using it. Perhaps the MSG_EOR patches can go to stable in case
-there is some userspace code that wants to rely on it.
+Actually can't we refactor this? This whole function is littered
+with if/else branches. just code it separately - the only
+common part is:
+
+        napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+        if (napi_weight ^ vi->sq[0].napi.weight) {
+                if (dev->flags & IFF_UP)
+                        return -EBUSY;
+                else
+                        update_napi = true;
+        }
+
+so just move this to a helper and have two functions - global and
+per queue.
+
+
+
+>  	bool update_napi = false;
+> +	int ret, i, napi_weight;
+> +
+> +	if (queue >= vi->max_queue_pairs)
+> +		return -EINVAL;
+>  
+>  	/* Can't change NAPI weight if the link is up */
+>  	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+> -	if (napi_weight ^ vi->sq[0].napi.weight) {
+> -		if (dev->flags & IFF_UP)
+> -			return -EBUSY;
+> -		else
+> +	for (i = queue_number; i < queue_count; i++) {
+> +		if (napi_weight ^ vi->sq[i].napi.weight) {
+> +			if (dev->flags & IFF_UP)
+> +				return -EBUSY;
+> +
+>  			update_napi = true;
+> +			/* All queues that belong to [queue_number, queue_count] will be
+> +			 * updated for the sake of simplicity, which might not be necessary
+> +			 */
+> +			queue_number = i;
+> +			break;
+> +		}
+>  	}
+>  
+> -	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
+> +	if (!per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
+>  		ret = virtnet_send_notf_coal_cmds(vi, ec);
+> +	else if (per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+> +		ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
+>  	else
+>  		ret = virtnet_coal_params_supported(ec);
+>  
+> @@ -3118,7 +3188,7 @@ static int virtnet_set_coalesce_one(struct net_device *dev,
+>  		return ret;
+>  
+>  	if (update_napi) {
+> -		for (i = 0; i < vi->max_queue_pairs; i++)
+> +		for (i = queue_number; i < queue_count; i++)
+>  			vi->sq[i].napi.weight = napi_weight;
+>  	}
+>  
+> @@ -3130,19 +3200,29 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>  				struct kernel_ethtool_coalesce *kernel_coal,
+>  				struct netlink_ext_ack *extack)
+>  {
+> -	return virtnet_set_coalesce_one(dev, ec);
+> +	return virtnet_set_coalesce_one(dev, ec, false, 0);
+>  }
+>  
+>  static int virtnet_get_coalesce_one(struct net_device *dev,
+> -				    struct ethtool_coalesce *ec)
+> +				    struct ethtool_coalesce *ec,
+> +				    bool per_queue,
+> +				    u32 queue)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+>  
+> -	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
+> +	if (queue >= vi->max_queue_pairs)
+> +		return -EINVAL;
+> +
+> +	if (!per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
+>  		ec->rx_coalesce_usecs = vi->intr_coal_rx.max_usecs;
+>  		ec->tx_coalesce_usecs = vi->intr_coal_tx.max_usecs;
+>  		ec->tx_max_coalesced_frames = vi->intr_coal_tx.max_packets;
+>  		ec->rx_max_coalesced_frames = vi->intr_coal_rx.max_packets;
+> +	} else if (per_queue && virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
+> +		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
+> +		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
+> +		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
+> +		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
+>  	} else {
+>  		ec->rx_max_coalesced_frames = 1;
+>  
+> @@ -3158,7 +3238,21 @@ static int virtnet_get_coalesce(struct net_device *dev,
+>  				struct kernel_ethtool_coalesce *kernel_coal,
+>  				struct netlink_ext_ack *extack)
+>  {
+> -	return virtnet_get_coalesce_one(dev, ec);
+> +	return virtnet_get_coalesce_one(dev, ec, false, 0);
+> +}
+> +
+> +static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+> +					  u32 queue,
+> +					  struct ethtool_coalesce *ec)
+> +{
+> +	return virtnet_set_coalesce_one(dev, ec, true, queue);
+> +}
+> +
+> +static int virtnet_get_per_queue_coalesce(struct net_device *dev,
+> +					  u32 queue,
+> +					  struct ethtool_coalesce *ec)
+> +{
+> +	return virtnet_get_coalesce_one(dev, ec, true, queue);
+>  }
+>  
+>  static void virtnet_init_settings(struct net_device *dev)
+> @@ -3291,6 +3385,8 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
+>  	.set_link_ksettings = virtnet_set_link_ksettings,
+>  	.set_coalesce = virtnet_set_coalesce,
+>  	.get_coalesce = virtnet_get_coalesce,
+> +	.set_per_queue_coalesce = virtnet_set_per_queue_coalesce,
+> +	.get_per_queue_coalesce = virtnet_get_per_queue_coalesce,
+>  	.get_rxfh_key_size = virtnet_get_rxfh_key_size,
+>  	.get_rxfh_indir_size = virtnet_get_rxfh_indir_size,
+>  	.get_rxfh = virtnet_get_rxfh,
+> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> index 12c1c9699935..cc65ef0f3c3e 100644
+> --- a/include/uapi/linux/virtio_net.h
+> +++ b/include/uapi/linux/virtio_net.h
+> @@ -56,6 +56,7 @@
+>  #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
+>  					 * Steering */
+>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+> +#define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
+>  #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
+>  #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
+>  #define VIRTIO_NET_F_GUEST_USO6	55	/* Guest can handle USOv6 in. */
+> @@ -391,5 +392,18 @@ struct virtio_net_ctrl_coal_rx {
+>  };
+>  
+>  #define VIRTIO_NET_CTRL_NOTF_COAL_RX_SET		1
+> +#define VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET		2
+> +#define VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET		3
+> +
+> +struct virtio_net_ctrl_coal {
+> +	__le32 max_packets;
+> +	__le32 max_usecs;
+> +};
+> +
+> +struct  virtio_net_ctrl_coal_vq {
+> +	__le16 vqn;
+> +	__le16 reserved;
+> +	struct virtio_net_ctrl_coal coal;
+> +};
+>  
+>  #endif /* _UAPI_LINUX_VIRTIO_NET_H */
+> -- 
+> 2.39.1
+
 
