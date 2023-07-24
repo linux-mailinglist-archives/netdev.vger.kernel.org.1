@@ -1,116 +1,81 @@
-Return-Path: <netdev+bounces-20529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4857D75FF00
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 20:26:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C503375FF8B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 21:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03BA42813C9
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 18:26:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87F66280F9F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 19:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13537100CF;
-	Mon, 24 Jul 2023 18:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426CF101C0;
+	Mon, 24 Jul 2023 19:07:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82478100CB
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 18:26:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97218C433C7;
-	Mon, 24 Jul 2023 18:26:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690223167;
-	bh=Bkh8ORp11I3JWi+TdQCKZGsrCOdvGnXV6kNnuKPOC1A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Lww/DT2U8M0zocDcCpPa91hqcUcuhd5NB0kejtH66dOOwYjNiSPJ5de8rwKI/G0GW
-	 ji0ngJ3rmtYGO1Do7XI9BTUnTAydDJM26vgkshvxnQC6y2b0XjBIWYynynrVOQ92pd
-	 IJMx1K6UTIqHItBAHwG71YxoAHeqv/QCqcqE8QtQfyB+c+pihtanAIER76zy7np8zg
-	 v2+V9CDM1wjL4Efm64jvOc4RVDRw2QomTD3RlNVdQlQ0vxVMF29zfA3zhWjTwuBWTe
-	 mTAieRdkmzZBEh3F6UXZmnI8TzIJxs/l/97U2rT7LI/c1DXnYpbZzCmIAZ6YhmFAPr
-	 UbOR4WEzELAKw==
-Message-ID: <eda44d92-7ac9-c3e9-fdc4-3dd287464981@kernel.org>
-Date: Mon, 24 Jul 2023 12:26:05 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B1BF51C
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:07:26 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CE310E6;
+	Mon, 24 Jul 2023 12:07:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3Y4KGijrW9/aA84MSUFMPg+s6Z5g39h7S176iSgpcrM=; b=KIj2NFNg0/uDphKE+pfbXLaWeB
+	e0aQHJtXKY5OAlsIR6W19BDkz8gHEGUb/GJnIqIu81eqqVoxzsKB8jK0xH0SWZ56xbUdGYAipDO4P
+	5oWHE9VKbwanr19H06eomPMO7xVkEP29LQ20pjMRYajjir5QcZ0YM5LEjU8povDHqpgA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qO0O3-002AYP-D9; Mon, 24 Jul 2023 20:34:27 +0200
+Date: Mon, 24 Jul 2023 20:34:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: enable automedia on 6190x
+ and 6390x devices
+Message-ID: <d3f45312-882d-4667-89da-c562e0828589@lunn.ch>
+References: <20230724101829.9431-1-ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net v2] ipv6 addrconf: fix bug where deleting a mngtmpaddr
- can create a new temporary address
-Content-Language: en-US
-To: =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <maze@google.com>,
- =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Thomas Haller <thaller@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>,
- Xiao Ma <xiaom@google.com>
-References: <f3e69ba8-2a20-f2ac-d4a0-3165065a6707@kernel.org>
- <20230720160022.1887942-1-maze@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230720160022.1887942-1-maze@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724101829.9431-1-ante.knezic@helmholz.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/20/23 10:00 AM, Maciej Żenczykowski wrote:
-> currently on 6.4 net/main:
-> 
->   # ip link add dummy1 type dummy
->   # echo 1 > /proc/sys/net/ipv6/conf/dummy1/use_tempaddr
->   # ip link set dummy1 up
->   # ip -6 addr add 2000::1/64 mngtmpaddr dev dummy1
->   # ip -6 addr show dev dummy1
-> 
->   11: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->       inet6 2000::44f3:581c:8ca:3983/64 scope global temporary dynamic
->          valid_lft 604800sec preferred_lft 86172sec
->       inet6 2000::1/64 scope global mngtmpaddr
->          valid_lft forever preferred_lft forever
->       inet6 fe80::e8a8:a6ff:fed5:56d4/64 scope link
->          valid_lft forever preferred_lft forever
-> 
->   # ip -6 addr del 2000::44f3:581c:8ca:3983/64 dev dummy1
-> 
->   (can wait a few seconds if you want to, the above delete isn't [directly] the problem)
-> 
->   # ip -6 addr show dev dummy1
-> 
->   11: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->       inet6 2000::1/64 scope global mngtmpaddr
->          valid_lft forever preferred_lft forever
->       inet6 fe80::e8a8:a6ff:fed5:56d4/64 scope link
->          valid_lft forever preferred_lft forever
-> 
->   # ip -6 addr del 2000::1/64 mngtmpaddr dev dummy1
->   # ip -6 addr show dev dummy1
-> 
->   11: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->       inet6 2000::81c9:56b7:f51a:b98f/64 scope global temporary dynamic
->          valid_lft 604797sec preferred_lft 86169sec
->       inet6 fe80::e8a8:a6ff:fed5:56d4/64 scope link
->          valid_lft forever preferred_lft forever
-> 
-> This patch prevents this new 'global temporary dynamic' address from being
-> created by the deletion of the related (same subnet prefix) 'mngtmpaddr'
-> (which is triggered by there already being no temporary addresses).
-> 
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Ahern <dsahern@kernel.org>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Fixes: 53bd67491537 ("ipv6 addrconf: introduce IFA_F_MANAGETEMPADDR to tell kernel to manage temporary addresses")
-> Reported-by: Xiao Ma <xiaom@google.com>
-> Signed-off-by: Maciej Żenczykowski <maze@google.com>
-> ---
->  net/ipv6/addrconf.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
+On Mon, Jul 24, 2023 at 12:18:29PM +0200, Ante Knezic wrote:
+> Marvell 6190x and 6390x devices support using unusued lanes of
+> ports 9 and 10 as automedia PHY/SERDES ports. In order to be
+> able to use them as automedia ports, serdes lanes must be
+> properly initialized so we allow setting the desired cmode to
+> be later used by the phylink_pcs infrastructure.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+By auto-media, you mean both a copper PHY and an SFP? And whichever
+gets link first wins the MAC?
 
+auto-media has been discussed a few times, and rejected, since Linux
+has no concept of multiple 'phy like devices' connected to one MAC.
 
+How are you representing this in DT? I assume you have both an SFP
+socket, and a phy-handle pointing to a PHY? phylink will not drive
+both at the same time. So you cannot have them admin up at the same
+time? How do you get the SFP out of TX disable, when phylink sees a
+PHY? What does ethtool return? What the PHY is advertising as its link
+modes? Or nothing since an SFP does not advertise speeds?
+
+       Andrew
 
