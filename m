@@ -1,151 +1,129 @@
-Return-Path: <netdev+bounces-20458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CF375F9DB
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 16:28:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D6875F9F6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 16:34:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EF6C1C20AC6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:28:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BE442811B1
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 14:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E082D506;
-	Mon, 24 Jul 2023 14:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA01566E;
+	Mon, 24 Jul 2023 14:34:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F719470
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 14:28:14 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14CC0A4;
-	Mon, 24 Jul 2023 07:28:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W2Kb+P9VJl0vEwKAm0Lni7zYTGN6fAh49P2U7xAoroMfdC6+7BNjXBn9Djxuu3Nerl7ZIy9SVxqVU0NXB06OeUd+y/ssX/gfgbJBcyOG6/hHOgsyURfW51bo4wpGR0+PuinkUAVePKjBM7et5D2C84jCX+E0oK0r+EKvuc55RJEpgpPWyRFD3uM9ahLAJmvtl19CTfyin7cPj6IpnLyAcds0ie2SVMm/bmWgAJ6CttaGxVyxrFWkSOflGw2tgFs42sxiqdGmAWnYAy/5uB3oXDnd/SqQOjUeKIx5Siva2z9mJhNcF8rLg4PLYfuqGMajtXfMP9oMUfcYF3uk4rlG1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AyOgDoN1xxs9FWEXRHGJq6XTdrxTXxyn0hX1IyjlzYk=;
- b=ZYi8Fg9gq4J+wbEX6JZ0A429ZL9b8RZRoFgRhL5MyOjZatKpbLd7KNsvVOqQV3evq6VIBtoLPViP1plHtSP30qD3FdINLq+rL1uUuaviSMIoqXgyPgQH58tkRDReVZKkL8OtEB8tWbmJuq7K56CAazjTdQ2POS/Q7hnDlLppCkGVpcDKQcQ1e5v7eBtYv2PPebGbt/l0YB1QoWzbTEgvp6YB6W3hLG19AfofGncTFDwpCVrSOMAQG4RoM3eqt99yPl464/JmmEvRb5CAP2LWfIzFR4pMUE7O8v2JBseVG4y2SX8nc6nnp0T6JqY/qZQdg5K0K+9je6Y0nZpa19/Pow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AyOgDoN1xxs9FWEXRHGJq6XTdrxTXxyn0hX1IyjlzYk=;
- b=fYDCV/pPcaNusLxPR7zWrMaI+4Js8FvLAb0pAsnnXMVQ/rP7BabD0aSIg2EBtW0nmtchGFeC3eSzehXalN5sr4Npp97H3ShFwZ9DzMNdPb0zIr77qKgvNVh9uTTFFuycQlTU6EuIgwAusyRYEel7Md9nwe06kMYT7628Bhrxx8M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MW4PR13MB5602.namprd13.prod.outlook.com (2603:10b6:303:182::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
- 2023 14:28:08 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
- 14:28:08 +0000
-Date: Mon, 24 Jul 2023 16:28:02 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	leit@meta.com, Petr Mladek <pmladek@suse.com>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] netconsole: Use kstrtobool() instead of
- kstrtoint()
-Message-ID: <ZL6KcmKWCI3BtfUn@corigine.com>
-References: <20230721092146.4036622-1-leitao@debian.org>
- <20230721092146.4036622-2-leitao@debian.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230721092146.4036622-2-leitao@debian.org>
-X-ClientProxiedBy: AS4PR10CA0024.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d8::16) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11452583
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 14:34:44 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD0F120
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 07:34:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690209283;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=usaX6souPQgHJnRNd8w4HymicnwhPqVsN+QpbZMCn+k=;
+	b=CuZZNwkpy+/wFPR+KJn4RAoQ/nO3Rv0DnNqSPTDbcpHpX1av7GCkmfMoOVR3+XUyYvcPtD
+	BwOtPUm1JiwUTil37uVUNcWygX6RYzyb7XCVfUKTRvHx9pGT2YYgH/wS2xRdGxRO1HYKIA
+	87EmP2J0QuJ8ZDkty3HmUFH+99TvfsM=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-692-lO5xUtC3Nw2M-8BaZZ1JvA-1; Mon, 24 Jul 2023 10:34:39 -0400
+X-MC-Unique: lO5xUtC3Nw2M-8BaZZ1JvA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 319283810D36;
+	Mon, 24 Jul 2023 14:34:39 +0000 (UTC)
+Received: from RHTPC1VM0NT (unknown [10.22.33.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 39D3B2166B25;
+	Mon, 24 Jul 2023 14:34:38 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  i.maximets@ovn.org,
+  eric@garver.life, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 0/7] openvswitch: add drop reasons
+References: <20230722094238.2520044-1-amorenoz@redhat.com>
+Date: Mon, 24 Jul 2023 10:34:37 -0400
+In-Reply-To: <20230722094238.2520044-1-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Sat, 22 Jul 2023 11:42:30 +0200")
+Message-ID: <f7th6ptl6o2.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW4PR13MB5602:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0497af62-ec42-4fc9-7cdf-08db8c523374
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	6rKT8CBz4hRA9SgmrV1kzy7o1YiU4+Kz+gSDBllrRuGnxlF5l7ZYhWdem1XvHFSKJZagVqtN61rF8IZ591aw3vx65g8v7UMJI9iUCngaPDmX7hkq3RqAg04hHMM6cx4/clm7DM4FyczG4g8Jt8NjW8V4a+ccQfm+l1QCM90D+E9l2oSRkFFvhMIboI5cC5Ki2IvPfnIJF/o1fyuOKa9CjCgq0mUEFx8qO9vVfVnHVWhvguAaAUZfcHeiCx8yFnq483sQq05F5SIc3URYdzlYHTG0WpLEoUuJ3jw9YPzjqhtqgZV2Bw+1OwP/sf13tN91OTiuZL0np0oWA2HDtCEH4ke69nLdW4vIR032MHiBZqz53foZ99LRCL+dEl8CXNmDBpsgECk/j8CEnwyBuwejPGKFaLuDucMRwEte8QF2MbQY+70iz1qwRw5mWQPws4KlXHXGRrOJcWnj4MigodTF5pj2ZDmbYtq/iEAJFdu2gCMTIw6YCNnsGlSZCABAUMooLAXkFfzg7D1HEx7Ji+FIa/9vIUM3MEDYg/HCfZpMBuKkJTPPoWsP153q1/fS5OXYsg8bxl6HFCbcVugL/SOz4X6vPonbWYjAvb95fWRB4mk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39840400004)(376002)(136003)(396003)(366004)(451199021)(6486002)(6512007)(478600001)(6666004)(54906003)(86362001)(44832011)(4744005)(2906002)(186003)(2616005)(6506007)(66556008)(36756003)(38100700002)(66476007)(6916009)(4326008)(66946007)(41300700001)(8676002)(8936002)(316002)(5660300002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?dE/vTOLLY2yhojdKmMVnzzZDFixGDF9cXVYW+pXO4cruv4iWNs0i2Duod0GP?=
- =?us-ascii?Q?xmTFx1XjbV6uPo10o+gIn4X40CWKM/r+Us2ks/5BABSDY4fL7KPcWTCktXh0?=
- =?us-ascii?Q?t5KO3dVULqUDynG0aK6pMKupqWefLJnWguqhRdgmnar+H62x1m+WIkn1Yrqs?=
- =?us-ascii?Q?FAHUIu6fvadgys/r/zOUVJFVSxKYnqVvkjGpgVpGFyBVCas0T85Gr/xzH8cO?=
- =?us-ascii?Q?cJGcAwo/uhYWJuO4f4mUk8w77+KBVkJYpnCNUsRAcb3JB07s/GuMkU1+Mtwo?=
- =?us-ascii?Q?LgD8xVm2gt3VolUfIWa34N9ICXm5zqruuTqzqPTbXLGdZCmHzQTOziHrL/eB?=
- =?us-ascii?Q?L6R0eqAAESvs4eqQ2BN6UQczOLGFeTIESG95JRkhs4LuWpWfhmSA4JyQRZgb?=
- =?us-ascii?Q?szxi593NL6Q8nixJc5+0+GKqGM6FmieORqBe0npK9ZxPfvlezMKLBFvj/Mop?=
- =?us-ascii?Q?mrrYePH1Krjld3EVAFwGLXfaVL5HrJRztM4CROp+ufZ9GuZq/3gaQ/EDobHF?=
- =?us-ascii?Q?b4PvxROfsqoEnSVY0NmEytXWWZJO4g1Q0ezkDZY5ysI59nMKltPLHlB5Qrpj?=
- =?us-ascii?Q?u+AsPpTB9bsCE8Rxh4PTC7Y2f4qlR47zojBHMEo4P8Tzs6RJAXBbIzUs3jBO?=
- =?us-ascii?Q?l+qjV/rw7Atd+gWRZd74Li3w4+bCpvcdLy1P2eIoThcPAqjiRawBY/M9qN+R?=
- =?us-ascii?Q?gM7bTBs0pWXf22E+AQz7uMGOoF+zJdmrJZkjqVglJ8eO7KD0IkvUpQVmMmtz?=
- =?us-ascii?Q?IvP6KtU0+tq6msmnSDteNMDCREBzUqngIOPz0z5xiwVxXbO9nOrAzd2nRXsw?=
- =?us-ascii?Q?19CeWECc4mTiqxoizdIwvVcRX2jp8M/q5dg4XZtcOdDSjLTTpJRcQcnzQ+2F?=
- =?us-ascii?Q?3nwoxyRcA/VQP/3LjYVM/oQfT/MtJl3cAU+ukfR7+Xo9GsbtQ5Bj2xNvkHJ2?=
- =?us-ascii?Q?f+f9dCeg+2rCkgYlz2UI+EfXV+zbSpHnmxLRWPnIF+q8YyB8idT3bs83V/NA?=
- =?us-ascii?Q?s/XcEFyh72rLcmLCUF75foStdS42YXgfuVlB19KKEB5FxTUni6HdkHGvBjUY?=
- =?us-ascii?Q?Z/PCE7xVO9egtFRju3UTmQlPUWtMsWT6RIMbYZUQuqa82WzY48igN7NwHw7N?=
- =?us-ascii?Q?+I9iR5j9YZrTlAUWvUvehfbREuBQEt6Vi8A3zCj1nQuPvEV23j5m66ZUn7WA?=
- =?us-ascii?Q?IqhsXgkQmcRXDzk2ThtbtQ/JfM+LbYOuI49HAxNVR2ppXBXeNtbHHpRvFHEx?=
- =?us-ascii?Q?UEUxud9kt97mzS2VaOsGr2rvpMnvYikGv8XScgHCPyM2zIzDyjsD189/QiFx?=
- =?us-ascii?Q?wNynRAO80lS/co9MbQuJWY3I0ZRJYoSR89oGJkQbB9OrAoSgdZxIG55JPSXX?=
- =?us-ascii?Q?42+Dg2/5x8HUzPZh/CbGBGYai5CyztXGc4F4BVoyeeb8ygvZsnc1as1Qi0ZA?=
- =?us-ascii?Q?uPLE46KARqF+OPzAxRSEvT/wThCRXxd7+MHtDaKLXfzt4oxDoSH1IlnH3p0F?=
- =?us-ascii?Q?8Nb9t6QPKyrg9ddk4o2IZPLUhboPAqiGjOmm+0jHnK7DE9d5qPnzR3H3QOND?=
- =?us-ascii?Q?YcMQ/6jeeFN67WibD3RvcrQJphC0gkwkrc4jy6Ws0s7ZHgckwTkjV8Ddrdkd?=
- =?us-ascii?Q?30XwpLpH4MWWhjg+ImC6ab41vSjKSBk34vl47ew8lymjAQwZdZP1q8mITCTg?=
- =?us-ascii?Q?kDusng=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0497af62-ec42-4fc9-7cdf-08db8c523374
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 14:28:08.3066
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5w1nM2rXzgypual5wAA6dFmBdWt1T13u93B6FS5zwItTv1GWOJUxEVryQ5UUbexr9x/Xk+Vo1qsOPFvfhaVaFC73+m7SpC6TpXmhyCc9gOw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR13MB5602
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 02:21:45AM -0700, Breno Leitao wrote:
-> Replace kstrtoint() by kstrtobool() in the sysfs _store() functions.
-> This improves the user usability and simplify the code.
-> 
-> With this fix, it is now possible to use [YyNn] to set and unset a
-> feature. Old behaviour is still unchanged.
-> 
-> kstrtobool() is also safer and doesn't need the extra validation that
-> is required when converting a string to bool (end field in the struct),
-> which makes the code simpler.
-> 
-> Suggested-by: Petr Mladek <pmladek@suse.com>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+Adrian Moreno <amorenoz@redhat.com> writes:
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+> There is currently a gap in drop visibility in the openvswitch module.
+> This series tries to improve this by adding a new drop reason subsystem
+> for OVS.
+>
+> Apart from adding a new drop reasson subsystem and some common drop
+> reasons, this series takes Eric's preliminary work [1] on adding an
+> explicit drop action and integrates it into the same subsystem.
+>
+> This series also adds some selftests and so it requires [2] to be
+> applied first.
+>
+> A limitation of this series is that it does not report upcall errors.
+> The reason is that there could be many sources of upcall drops and the
+> most common one, which is the netlink buffer overflow, cannot be
+> reported via kfree_skb() because the skb is freed in the netlink layer
+> (see [3]). Therefore, using a reason for the rare events and not the
+> common one would be even more misleading. I'd propose we add (in a
+> follow up patch) a tracepoint to better report upcall errors.
+
+I guess you meant to add RFC tag to this, since it depends on other
+series that aren't accepted yet.
+
+If it's okay, I will pull in your patch 5/7 when I re-post my flow
+additions series, since it will need to be added there at some point
+anyway.
+
+> [1] https://lore.kernel.org/netdev/202306300609.tdRdZscy-lkp@intel.com/T/
+> [2] https://lore.kernel.org/all/9375ccbc-dd40-9998-dde5-c94e4e28f4f1@redhat.com/T/ 
+> [3] commit 1100248a5c5c ("openvswitch: Fix double reporting of drops in dropwatch")
+>
+> Adrian Moreno (6):
+>   net: openvswitch: add datapath flow drop reason
+>   net: openvswitch: add meter drop reason
+>   net: openvswitch: add misc error drop reasons
+>   selftests: openvswitch: support key masks
+>   selftests: openvswitch: add drop reason testcase
+>   selftests: openvswitch: add explicit drop testcase
+>
+> Eric Garver (1):
+>   net: openvswitch: add explicit drop action
+>
+>  include/net/dropreason.h                      |   6 +
+>  include/uapi/linux/openvswitch.h              |   2 +
+>  net/openvswitch/actions.c                     |  40 ++++--
+>  net/openvswitch/conntrack.c                   |   3 +-
+>  net/openvswitch/datapath.c                    |  16 +++
+>  net/openvswitch/drop.h                        |  33 +++++
+>  net/openvswitch/flow_netlink.c                |   8 +-
+>  .../selftests/net/openvswitch/openvswitch.sh  |  92 +++++++++++++-
+>  .../selftests/net/openvswitch/ovs-dpctl.py    | 115 ++++++++++++------
+>  9 files changed, 267 insertions(+), 48 deletions(-)
+>  create mode 100644 net/openvswitch/drop.h
 
 
