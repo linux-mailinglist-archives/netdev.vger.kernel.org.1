@@ -1,70 +1,57 @@
-Return-Path: <netdev+bounces-20377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 191BC75F385
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:38:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFA275F396
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 12:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E3C280DE0
-	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:38:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 864B72814E6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jul 2023 10:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380AD46B2;
-	Mon, 24 Jul 2023 10:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1184C8F;
+	Mon, 24 Jul 2023 10:40:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3241869
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:38:46 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B950710F4
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:38:13 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-5217ad95029so5531417a12.2
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:38:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690195092; x=1690799892;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ielYHzUrYNTg1vO1OyNLSAd+Y6bxAWIGr7ALSNd/VnA=;
-        b=FLEc6P9XLwXpzZPKVljuJLSGG+G36rdrqUSkkl4ZD4MkaNcFGBDcBPr0pkpzEmlP/7
-         2NbyOPDZtFRWBKOeU1nixSOo5wd5HWdUeYBIaky9a79mk3M9Kph27a5K1VHMHuaRN4HU
-         9QM4baKQOnI9Bfw4JP82TS0+Kwfv16uOELFt0al0hz3EEt4+01gJfWkxfCr0WDVsuhjw
-         WQN6Psz+bl/eNkXquY+mfgnIMuTwFZmba7L99YHDvZyfXVg1oQCSBk9KwA5tA+n5pAxB
-         YYBwZEflyq8xduXCWK+RzrSL2ai/LaghOZZXNHDdoGFSbRFxO4LX4+KqIhArmNAxuzJs
-         wHHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690195092; x=1690799892;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ielYHzUrYNTg1vO1OyNLSAd+Y6bxAWIGr7ALSNd/VnA=;
-        b=EzkRkwm+4NqZPxeHRwqLSADX0youf501ZPSZqg+14gbaIY1SgySlUYGoXGN68w6u05
-         Mcvmq/dgWIfWu4gOa17gkAsNKisYq6DF+dcwdnzabCTY+i31S/3RgXpnMsv6BXSrCCnm
-         LtUaqhGda7QrkARTjOKxSBirxF5tpvoOmVyYnTXJw7eKkgFSEFMIMjQZmtCTq8YGmo5c
-         /ZJcdsKTDNiimzmZBGM2BJNLwWX/NolQ67QigR3uxUUORTu0lO6NRfG/AKYwtgY5ySty
-         h8Jo2gtbbjMPE7u16De3SyBfIVkOkiyyElJ1L4QRNLiE5i9Bz4yBAKtiJXhJmFSK51+R
-         S56g==
-X-Gm-Message-State: ABy/qLbc2rNACm8ya1Duw7LAGvd2rH+cGG68B7xiChCHQHNClKR7w8O4
-	S/30aHlavx2j/8XGFj/r98dpXA==
-X-Google-Smtp-Source: APBJJlG0ivl9qydkBr1odu0uOOzuwT32303BMTuMr5q1sYlLdxedtbS0EHMjOdCXo5gNEN2SiCacGQ==
-X-Received: by 2002:a17:906:30d5:b0:993:d5bd:a757 with SMTP id b21-20020a17090630d500b00993d5bda757mr8454057ejb.19.1690195092017;
-        Mon, 24 Jul 2023 03:38:12 -0700 (PDT)
-Received: from hera (ppp046103056065.access.hol.gr. [46.103.56.65])
-        by smtp.gmail.com with ESMTPSA id op10-20020a170906bcea00b00989027eb30asm6514131ejb.158.2023.07.24.03.38.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 03:38:11 -0700 (PDT)
-Date: Mon, 24 Jul 2023 13:38:09 +0300
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, hawk@kernel.org
-Subject: Re: [PATCH net-next 4/4] net: page_pool: merge
- page_pool_release_page() with page_pool_return_page()
-Message-ID: <ZL5UkY+4wq4raIlv@hera>
-References: <20230720010409.1967072-1-kuba@kernel.org>
- <20230720010409.1967072-5-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913E815B9
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 10:40:39 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9763DE7D
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 03:40:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=E+0A3tHhR2iPvLG0SloVh59oDSaQvqrdwSbyC7fXGtc=; b=godSPV78Mhm2NRN4TKx+BEOfe/
+	fyNTHqlnhAFOL/TiyzE3apI4N191yJ1ZcHj9CrkerspZLmFw9PTSx7S8D4emWSKRJqibAw43kUZAB
+	VOj7/tCjzzXElIBhIZxFweP5mIobvvbK/Jdspk/Oeopb35t7AJi9Z3q1X9M8wuyqh4kKlYloUhblH
+	Qhk4ns4lqj9fc788LNwoRQ6XZfIohUJxNjeVjzSpiwhcvSFvMujRP3JmWzCzb8CP/sZdq0BYtQ5sq
+	0BuyIe0dceiq2I5wx+28TkwQWKBH7BDE9smNqJtX8RyYhW4RfzQ7uISv0FrAq0c84m457vBVf7yMR
+	DD/+zoUQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51818)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qNsz7-0008Ko-1J;
+	Mon, 24 Jul 2023 11:40:13 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qNsz6-0000jH-JU; Mon, 24 Jul 2023 11:40:12 +0100
+Date: Mon, 24 Jul 2023 11:40:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	Jose.Abreu@synopsys.com, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next 5/7] net: txgbe: support switching mode to
+ 1000BASE-X and SGMII
+Message-ID: <ZL5VDJeoRYy37LY/@shell.armlinux.org.uk>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com>
+ <20230724102341.10401-6-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,75 +60,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230720010409.1967072-5-kuba@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230724102341.10401-6-jiawenwu@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 06:04:09PM -0700, Jakub Kicinski wrote:
-> Now that page_pool_release_page() is not exported we can
-> merge it with page_pool_return_page(). I believe that
-> the "Do not replace this with page_pool_return_page()"
-> comment was there in case page_pool_return_page() was
-> not inlined, to avoid two function calls.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: hawk@kernel.org
-> CC: ilias.apalodimas@linaro.org
-> ---
->  net/core/page_pool.c | 12 ++----------
->  1 file changed, 2 insertions(+), 10 deletions(-)
->
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 2c7cf5f2bcb8..7ca456bfab71 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -492,7 +492,7 @@ static s32 page_pool_inflight(struct page_pool *pool)
->   * a regular page (that will eventually be returned to the normal
->   * page-allocator via put_page).
->   */
-> -static void page_pool_release_page(struct page_pool *pool, struct page *page)
-> +static void page_pool_return_page(struct page_pool *pool, struct page *page)
->  {
->  	dma_addr_t dma;
->  	int count;
-> @@ -518,12 +518,6 @@ static void page_pool_release_page(struct page_pool *pool, struct page *page)
->  	 */
->  	count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
->  	trace_page_pool_state_release(pool, page, count);
-> -}
-> -
-> -/* Return a page to the page allocator, cleaning up our state */
-> -static void page_pool_return_page(struct page_pool *pool, struct page *page)
-> -{
-> -	page_pool_release_page(pool, page);
->
->  	put_page(page);
->  	/* An optimization would be to call __free_pages(page, pool->p.order)
-> @@ -615,9 +609,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
->  	 * will be invoking put_page.
->  	 */
->  	recycle_stat_inc(pool, released_refcnt);
-> -	/* Do not replace this with page_pool_return_page() */
-> -	page_pool_release_page(pool, page);
-> -	put_page(page);
-> +	page_pool_return_page(pool, page);
-
-That comment is my fault.  In hindsight, it wasn't very helpful ...
-IIRC Jesper wanted to keep the calls discrete because we could optimize the
-page pool internal and eventually not call put_page().  But I am fine with
-the change regardless, it makes the code easier to read.
-
-Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-
->
->  	return NULL;
+On Mon, Jul 24, 2023 at 06:23:39PM +0800, Jiawen Wu wrote:
+> @@ -185,6 +186,8 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+>  	struct wx *wx = netdev_priv(to_net_dev(config->dev));
+>  	u32 txcfg, wdg;
+>  
+> +	txgbe_enable_sec_tx_path(wx);
+> +
+>  	txcfg = rd32(wx, WX_MAC_TX_CFG);
+>  	txcfg &= ~WX_MAC_TX_CFG_SPEED_MASK;
+>  
+> @@ -210,8 +213,20 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+>  	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
 >  }
-> --
-> 2.41.0
->
+>  
+> +static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
+> +			     phy_interface_t interface)
+> +{
+> +	struct wx *wx = netdev_priv(to_net_dev(config->dev));
+> +
+> +	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
+> +	wr32m(wx, WX_MAC_RX_CFG, WX_MAC_RX_CFG_RE, 0);
+> +
+> +	return txgbe_disable_sec_tx_path(wx);
+
+Is there a reason why the sec_tx_path is enabled/disabled asymmetrically?
+
+I would expect the transmit path to be disabled in mac_link_down() and
+re-enabled in mac_link_up().
+
+Alternatively, if it just needs to be disabled for reconfiguration,
+I would expect it to be disabled in mac_prepare() and re-enabled in
+mac_finish().
+
+The disable in mac_prepare() and enable in mac_link_up() just looks
+rather strange, because it isn't symmetrical.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
