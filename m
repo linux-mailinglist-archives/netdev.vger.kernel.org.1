@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-20835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85EE4761805
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:07:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29E3D76180F
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:13:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A448280D6C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:07:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF5F41C20E61
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EA81F927;
-	Tue, 25 Jul 2023 12:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B86F1F168;
+	Tue, 25 Jul 2023 12:13:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FAE21F922
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:05:47 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2137.outbound.protection.outlook.com [40.107.92.137])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D86A3
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:05:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECC08F4F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:13:50 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0199EE47
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:13:49 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DRLczdCqFJdZXUS+lHuZvo0q0eeYL6rgpJoYpObmrY37/FOlelD+YvzAb46bpZG/VrZ07zxKvEH7sKmDmrDZNbK5dbc5MmG/63nmCd9/KkbsjyPmscJCX7knvLyLV4zaaaB/CUb5kc2tKriXfcdslRhn54osonVBr05tAZsPuW8sqqRX/H4HkCyYPVepVLfx09CcwZRThpNvnSBZ8GmhxLV0q/0XWoLnnyN75BrEC9fFTAiZFA0Xkzo8TBxNXUGcT9VGIGz33eLkIXoQy0G3qasgAwLMDpQeZlENSlrMQpAmAx4W4duF382twuXfZya73LhkAh+aa9KVri74JlFnWw==
+ b=EYuhPv9sb+kVxgKm+m1ajwNDV3nZnItAYEkTKHt5CHMAQREzNzUGI93lJCgiB0E7yy1TH438DUpMUCdUGqfa6orX0t0Chh/XuRR0OWICgrhZqtwQmVmJCAmgKGPx6mh9ksYgTR/zTBLeS/n8B0w6fTWk9vvGsmxc4QCCFT8xqLxHP6uuy9bQfUmDCRsnSszFdRcxl3Ly+rEf1wU2JWTzkmbqukh4zOsaGHwvmkLN/9yi6/cW3wFZawaI8aWbYMk4REryU/z9f3sBROVW1bSMVCJV3pZ9aO15nsC17SFYr+ZAi7pt9Hqw/7Tc2vOZlJob60bNWb0ATFGnWudEsnjjqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4um2UiA0eBQyQgVrg1w1KeD81R/mOyhPxfklJJ6haJM=;
- b=Q92cMCwR+bQIqGlZH0ugyUDcP4w9RIFulBezc96JCA8CVEGN6Fha0X0VOMter+J4FuQxS4W3b+ihTqou5zWuL+k3qTF4zxATe9NUyXMZ+GsfdfKCc1i7pRdVTb9qsfS3o4roo7gUT5NfnEFSy79o4m49vEHPPLgLum8Qg3IgZIIYFOKLgejlDxk5UdcdMGqSn3LDykkOLzFw6+F+IUwxKTyYwHmT4E14BgjO3qzXBFnJwMFDf0cLJwV9r89/mv+LNCKnndXoY+TDSJO/B9M2ZhZgwg9ZSMiS454i3HFlB0Ufq2wXtq7zpG1FYPdFv6vMbx5A6Xi9UyfzuCkhwQ27KQ==
+ bh=EwC+niVCRI8oNmcmdtceQVJV5gYbGoMnKgd11yRgJkQ=;
+ b=nAV3wbyTb3ieybIkFiAMexBtU8DhpmcWJZ2bR5nGUMSmcJsbuauKBj0dAiqdDSlQ2f9/N7D3ib/Gd2zsoyoRfojzV64ZNsUv7DeL7Eqj6XXGQTdqBwN2PGpbpF2YK5H+YN06Ldw/6r9uIhyi0ja0bxo+LI3DtNPPaixjgYJVFzOvD4PTnaEH8+pJ6tkGRj2QQnXZ6Ef3afdD54lf3irpBsQhTIE8CrE1l6wmMFYwLnx5CB/KLR2q6RXw4mcOWrR3oeEIslXXzFiitctMRZ5q75LrVjHZ6EiEnS3/272L/T6E+v7B0R7p2fzniaSYuMV4d75JY2H1GAJZboB/BoeRIQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4um2UiA0eBQyQgVrg1w1KeD81R/mOyhPxfklJJ6haJM=;
- b=T6bDneKiBHw4q7bbQN1S4QU/zTx8D365zElZvMcI6BQ+eiAeAxeh1yTJm0XVSElccshw3PLIPoGob1YJotU6HeOUYOIr3unBCtbnHWQd2Zp6IUMD9OFEzZSPZCf35TwfB7nzl+WWIwihe2g6goaNPEwNnqgyoH6LU7e8cVJSS80=
+ bh=EwC+niVCRI8oNmcmdtceQVJV5gYbGoMnKgd11yRgJkQ=;
+ b=VRgZrrPELLV7EwOoYk6086JkyLWbpr9sPqyb7BjgcZbeW78jhUQffSuTDwSy0W3w5LvwQDgccyGqBXu6hOM0H0L8TJhKbVZrIv/mvj4nv7BnpJIk1179kNQXpQAy8SHrm8LFQqvKAd205Es3c2PJ0hS/2lSxZ3vHS9wpGC/P4uY=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MW5PR13MB5971.namprd13.prod.outlook.com (2603:10b6:303:1cc::10) with
+ by LV3PR13MB6405.namprd13.prod.outlook.com (2603:10b6:408:19f::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Tue, 25 Jul
- 2023 12:05:42 +0000
+ 2023 12:13:46 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 12:05:42 +0000
-Date: Tue, 25 Jul 2023 14:05:36 +0200
+ 12:13:46 +0000
+Date: Tue, 25 Jul 2023 14:13:41 +0200
 From: Simon Horman <simon.horman@corigine.com>
 To: Mengyuan Lou <mengyuanlou@net-swift.com>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
@@ -55,17 +55,15 @@ Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next 2/2] net: phy: add keep_data_connection to
- struct phydev
-Message-ID: <ZL+6kMqETdYL7QNF@corigine.com>
-References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
- <20207E0578DCE44C+20230724092544.73531-3-mengyuanlou@net-swift.com>
+	Andrew Lunn <andrew@lunn.ch>, Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: Re: [PATCH net-next 1/2] net: ngbe: add ncsi_enable flag for wangxun
+ nics
+Message-ID: <ZL+8dXjEmw9gyiBB@corigine.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20207E0578DCE44C+20230724092544.73531-3-mengyuanlou@net-swift.com>
-X-ClientProxiedBy: AM0PR03CA0093.eurprd03.prod.outlook.com
- (2603:10a6:208:69::34) To PH0PR13MB4842.namprd13.prod.outlook.com
+X-ClientProxiedBy: AM0PR06CA0107.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::48) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,126 +72,145 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW5PR13MB5971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 82ed6279-6e73-4318-7473-08db8d0777e2
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|LV3PR13MB6405:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5fceeff8-2b2b-494e-3b11-08db8d0898d0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	zhb8TsHmhUK0QtcLnHxh11RTEnbpwNmTHoY24F1T74QTJWnvoKd6WBJDc6NK1W/y95ZmQXrHLkt/1855lvByPj4UYW0xG3uYBmmwdefFS2dvnPhxONJrcL7FcQ5jDQeaA7DRp82zm5KdRiEE2n2Wk2Ad9vIDxugZ3jtstPjP2/+rPxpfuaEyIOIwtGOi9i9wVSFgEsg8PNU9/pwlLqfkEJpJj03J7S39oMXtc3yx1H7Wk4bUU0Yei0FlIxuT9SPwb+nl6eRFJYt+bHpr6sf2g8/olHd3m7Dtzr4DX0BIbxkvivcJrDQNrpkD81G1ZVIdPhQ6QiPM4C/5dbkEyoRJxZv/ng2sxJW5UU2JrksZ7wU93G+CHAKgsPm2xh1UhUOh3imm261etl9Dh/Iw/flDg8FHBWU+n+2ExyFswV8nmoOmmeJWOaggF9Y11Bukt7g656PdTVHrCYsTg+y0sMDnlQhVc17eKtMGKVYF5BYTk5iGaVS6fihSInsXljEqMRiFIRvTDArJImH+Xqpsv4Jrx9MGhxMbo7+mk54hxRXcj+lFlWgc2AWvJEnlUZKOuBPCWi2xVMzX+apru2NVcpFxEkykDkQldwjaIpXObBk8gWD9rNZrNSfW9XULkYrxAvzfq97x5XYbopD7IPmCZbDbdGVFogByCDUH/fuemds48J8=
+	5KeJl7DD1uOw1pYYxTDp/wRwBbvbjd01wXrDsxI77qn75+SRAeMZ4KUEatnvwYF57OaonPmeYSW6YOhikqkWkkIAGYU5qI5yMYZUYYEG3NiuzNLA37dYLPLOExY5LWYe9XzUB5UzikFla1bXFKiHTQyolj3a965Hxcj4fwQO36sXMcm2lPLifi187ulyvp7GrFBmwAPMDkC1DrJlOES2d7yha/ACa+En8c+JoM4p00+IX2/AvVjW02xf35SCAKNuqw1r7pj3Gz1AFzbjl/Ra9ajBaBUnAXWADpd4e7KLEKwdnZpHlxpYMAvfPMw+2AwPgmuqvrwdE4FzEVqs1ljJCRfhWylqHTHHWmbMuli/+pC3j0H0GynsEssDqDpZoISV0AqezmqsSJufPKLxLayfymxOTcAY8nRCWlTh1rsx8mrRJkZNgfmsF9NCNMzygAOsY+W7iR7u5Rf+quDDJFAukLU02grcSC7Y0rDA9eqVh7OTKhSINKCFTygs1AyyBpdkOJnAlIclmLGoeWWEVfoWhVN5BSk6Y7allMPIG1zveBtEivIbJMuzi2t6r9AW+WAE//kbhOb8Awp9/X0a942YvWtf9wjZjwKut+pilTPZl56QAcms3s8xKX1JXuNwgUh5QbThi85vgwBGcZIZ1/NsLL6r3nNpO7iRNUY4dYde6sE=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(136003)(396003)(346002)(366004)(376002)(451199021)(6486002)(86362001)(38100700002)(478600001)(6666004)(66476007)(66556008)(66946007)(54906003)(4326008)(6916009)(316002)(6512007)(41300700001)(36756003)(83380400001)(2906002)(2616005)(8676002)(8936002)(186003)(44832011)(6506007)(5660300002)(67856001);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39840400004)(346002)(366004)(376002)(136003)(451199021)(2906002)(2616005)(83380400001)(478600001)(36756003)(8676002)(8936002)(6666004)(54906003)(6486002)(86362001)(316002)(66556008)(41300700001)(66476007)(66946007)(6916009)(6512007)(4326008)(44832011)(186003)(38100700002)(6506007)(5660300002)(7416002)(67856001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?FgLj7dt7rZaRidTF4OV+ZmjOxPYBUtoE3baM16APzpADcAuh7M4xzkRVoWfc?=
- =?us-ascii?Q?Sw9bdIA7PbUzCL2lx/0/4nH92H2KsJQ1Mj7MUwl+tu3fBzOFrFfm1q6aYRtX?=
- =?us-ascii?Q?9BQKNpXy2cP/k+7rA5AgyLp8vMFfXrg/KiFtQmuCeXKatSPUM/l4KIF7sO5w?=
- =?us-ascii?Q?zh5UVbP4I/Gn3lghx4q2ggJhsgmebW0372A7p+kLVMq38/u/RT4cfiWQn4oE?=
- =?us-ascii?Q?6L0ONSI/uRgp2JyLW1fSibbFBEbKm+0LFK55uoA7FFsafXSKiw4+r3NdSWuc?=
- =?us-ascii?Q?fY8N+LrIR152o78m2FkvM7mPNKApJ1mBWdJTHczJU99EXOGtQkUA0UfKs8fi?=
- =?us-ascii?Q?G51WxW08r+bV3anf5Ld75S1pbZyBIhuqODq/5LiaoByrmQknHGzKwF4RAfjO?=
- =?us-ascii?Q?Dmo5nIkRCF1b/ZB3n8VN7chGONlvt7ygyeISczYQt3BIjTa3GWdylDQYm2Us?=
- =?us-ascii?Q?KE2Qi3BgZrJZJfx7tXMgJb0LplAbo2pCkqMkustbBokOguZ3QMvtCsiUv/TZ?=
- =?us-ascii?Q?7spRaggRlmFEbegPHiWzh28L1kMTwIpDSxSyqmGv7ZM8KxXWxF84q47OcFEN?=
- =?us-ascii?Q?BHNPh86FCmX3sWyHeU72x8ewaHWp4ooHR0qCcLsMwiOsP6bUVEI179iD6Vrq?=
- =?us-ascii?Q?RvVRfqR3UCN3aB8r7HyJE32gNQpq2gqpiPMfDDU5gPm2q0v6U4nFcP77B7LZ?=
- =?us-ascii?Q?1d2vex8bDOqckzK90TLornyetRvO1vIaJEk+6aKwopxt/gPopyxsOwIU6Jcp?=
- =?us-ascii?Q?gSrTQMagGreunDY1UPfdkHfaZfVNQP2onpeVijvc/yrPxtaPuHY2pt/ftOZb?=
- =?us-ascii?Q?G1S+iJpYqT9kAWd9tkMHSp8CzZIZS7SWVGqSuBQlKEk67UkyY1khAFgF3dVU?=
- =?us-ascii?Q?GQlENZTit39BWJZ2DM20/yqdiwOpkNJw9zBXa60AvUHlpnwJl3XaL7Eohdl1?=
- =?us-ascii?Q?zaoz/+rjzNvwsXxCMrmUm/DeFXnbfxX14fItEG61x0tyRbyzcIYreeAOsIWB?=
- =?us-ascii?Q?CPbN3iTA6nznfZrUFEuKnf5CBSBkHiqkUIoUn1VcubjiCqdBavGDkgBvxKEh?=
- =?us-ascii?Q?xTBWQdKeM7xfSXTj1laAzUKbJLaLFGqZkg7DuB1/P9vgLuOfQ4wMtFzm43xt?=
- =?us-ascii?Q?EP9Qq4cndNDzTcZ+GjteAjGEXsklL5kifIRICtuAr6llZH87q/lsBfNDZeEY?=
- =?us-ascii?Q?mCHCS0zNxfxcIwwveVnQeuL+Mr2oNQATEWpAtbKbbDqjM5miaBBBdnqLPzor?=
- =?us-ascii?Q?pVfgCM+MY8gq8kAv3oknQEMXf1E3ghLv1iXvHZl0U7yNpC8SQUt9imzxdKs5?=
- =?us-ascii?Q?GrzuYNRnrMw/BljcjcORG8xYQfpUu2bGp0lFHxCtNWBHGevgA/wlq0QfEIdt?=
- =?us-ascii?Q?fBukrmT4uTbw1klXKtapWOqN0d8B7p+U+gaqui9bXVvsU1Zc31F7UIfgzW29?=
- =?us-ascii?Q?erzVRF7M7ndZOPLNqUI69VK6PHjcUq/W2p2QV3BxjI1rhrgrgEfZt8t2dGVR?=
- =?us-ascii?Q?6y038OG3Bm8BRA4Kr7E98ELp+uPHfctS0o6DuMtT8jaiG7SUk/7ZCxBJZy0V?=
- =?us-ascii?Q?EvLwnWIkOXwB2My5UCnC+f299aq8+r9tSHj/jJMDdpWBf4UeJE4ONGrDrZHI?=
- =?us-ascii?Q?78DLJFhuCgE1MyaAzX9UqrupJGU7krjYJ685cedquuTfkOMIr/yP1whwnsyO?=
- =?us-ascii?Q?ZYv2/A=3D=3D?=
+	=?us-ascii?Q?QR7qnkmz3FINODf63MKKmRCRaG3mZo4+4uE5dbMdyZW/kQPfqFa8s5x2psF0?=
+ =?us-ascii?Q?steh5DETx9TmXb6g+qJ5mrB1xy3/H8xRvMdRmzravbSchFvkrF6FjSQGfrdu?=
+ =?us-ascii?Q?MK1R6evIECBJqOLc0sOVMc+8OjNCLAR4ER2GfwILcLAfVxr1cb1o0Dgq5eke?=
+ =?us-ascii?Q?Dv6muGGsEysPzQo1agXIcib/mLlGZLuDXrj6svLtHxznnTmHJ7aFh9PZ38n4?=
+ =?us-ascii?Q?u6/q99G7G+fRo2XWfuxJEgKWYxjswo+TcnYARutgSB8pflNfDpyRu8VLQVIf?=
+ =?us-ascii?Q?c5LiHsca8wJSoktvcH+qys13PHIUCXkgzvs3xybfA6+b9VE72OKLJzPpx0t7?=
+ =?us-ascii?Q?aqXM6Z8eggx63sVu1uxGiZ9MDQcPSgW5f8UV3ORggVv5/VduBcMB7kkRd/gR?=
+ =?us-ascii?Q?H6HAUFVg15/KEtzjhlFRIT9dMbWHKg5EnYWBVr6OEINmKHoY1LQc/lB6mWTS?=
+ =?us-ascii?Q?Vhssimv9kHajkZjATOQvVi34+lau/I5p0th4uBvtPTya9Y9IB+eDSo4ghxXB?=
+ =?us-ascii?Q?7RdLOgovgUP1zpgAS8jjkuZYKJkkD3kjYWOLZjITpt/S0kwv8ccKYVpU3e93?=
+ =?us-ascii?Q?83U2kktCCI4uNWiHKpNLFalpZtNdSsl3qE3B1fVGgz3Fr7K3byyeKIFzhuOp?=
+ =?us-ascii?Q?NtK71t/gwf0kc7VhN54ohE7VSQJvSImV0SPcQj0CWvkq4wZ7KN3JX698W6CT?=
+ =?us-ascii?Q?Oxt5LI07W0lbt6vNjajnl2XzOHSB2qiKrK6EtXtQQhTDDGNkaiBu03oWajdz?=
+ =?us-ascii?Q?sph/3YEGoofgwXEZGKOGQNcVz75FeMeysvJklDnIiHZ0br9SRjSIJiLjLRgZ?=
+ =?us-ascii?Q?yNa9jR2QFeba5oM+np1PkRw/YEVr+I/oREaNrpyEOWfLXq0QcRjJt27439WK?=
+ =?us-ascii?Q?+DxFWsJk7azYdphky/8JP9Nzh+1VKStkHUg7Bqa7t7oSzwyjF9+99QsRM86b?=
+ =?us-ascii?Q?ZGEuNTsHHpXE33b3G/nOYyIEHkHMxPp6O14w435wK/wt+h8Do+J/gcfOyrnf?=
+ =?us-ascii?Q?p5Dh5LN3gdyvVODUNBWtTAmSyAbv1jw16TfNpsGYnx8a5Ps9KbzzVxLBItTn?=
+ =?us-ascii?Q?IRkbtvPXwyHkKWtevvn1G7038zifuc1ecQfrMOt2EG4BzPpDRdJPb6Ase/lB?=
+ =?us-ascii?Q?lLp/BnJzvrJH1WO1p0ZOrdClLpDRwc7nlaROW5GKr2XK8VFTWPwPEdCadsBb?=
+ =?us-ascii?Q?iqGU33fzjeKN1EXeTlR33VEgt1+gDFDoEiv6UnTqBL4zM5iSChAho0uhz+ik?=
+ =?us-ascii?Q?KZMoZ971twUtZqfuHG8E4m/3QsvPrq3YOlMyz8Gt5FlWl0sdfWj66d4xP16A?=
+ =?us-ascii?Q?S8EI0bRnEJ/z9DBJaYZm1vPGl67A58x4mqhR/NAee3allllhURC7g6ODtw8X?=
+ =?us-ascii?Q?iCuVDR8huEW4+JtZnvU9Dn7nntvMummmUqhnG1NebQAKf0gbGGaMji1mvgFg?=
+ =?us-ascii?Q?x9kFMln/GPxR50z+9f58yF2HnqhekDZkpsfBWnPDebos++5oJWa6+TbUdlmC?=
+ =?us-ascii?Q?aT7GzE+DrAQjzfpVd4gVZcJWAHjLjqZUb8+Z+OmqttcOLc1Zp7o58GIZW8UQ?=
+ =?us-ascii?Q?+OPdBAz8Vu6dnLhThzI9FNo7oM7RqsGIFKtr9+ZIBYwJUiM7ov9pquqlDgqm?=
+ =?us-ascii?Q?LfC4N8R3X2zx/PX1+qXzrjYyzZPjcgK6cLcHwDiG0xxGcutRufworUYbEHjd?=
+ =?us-ascii?Q?rQZhPA=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82ed6279-6e73-4318-7473-08db8d0777e2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fceeff8-2b2b-494e-3b11-08db8d0898d0
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 12:05:41.9807
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 12:13:46.7294
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZIq1+SCKgegSBgWuBi7fC+sDzRc1yN3VRmrODBijR37MB8S63089Lj3fgE2/6oYhbWf2O4jtZ/psHYS0lsy7vQIqd3IXsPWadf/8S7xNlk8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR13MB5971
+X-MS-Exchange-CrossTenant-UserPrincipalName: MZvyxkOPgB2SkZ5EuzksuMU7wFYHCzTM6CQF2bClJjyGU9o3TWIRMC2WMSS9rGaPvek+MzT/l5jvb11VolCBG+0wfoKPq/ALDEjV3MCK1+0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR13MB6405
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-+ Jakub Kicinski, "Russell King (Oracle)", "David S. Miller", Paolo Abeni,
-  Eric Dumazet, Heiner Kallweit, Andrew Lunn
-
 On Mon, Jul 24, 2023 at 05:24:59PM +0800, Mengyuan Lou wrote:
-> Add flag keep_data_connection to struct phydev indicating whether
-> phy need to keep data connection.
-> Phy_suspend() will use it to decide whether PHY can be suspended
-> or not.
 
-This feels like a bug fix.
-What is the behaviour of the system without this change?
++ Jakub Kicinski, "Russell King (Oracle)", "David S. Miller", Paolo Abeni,
+  Eric Dumazet, Heiner Kallweit, Andrew Lunn, Jiawen Wu
+
+  Please use ./scripts/get_maintainer.pl --git-min-percent 25 this.patch
+  to determine the CC list for Networking patches
+
+> Add ncsi_enabled flag to struct netdev to indicate wangxun
+> nics which support NCSI.
+
+This patch adds ncsi_enabled to struct net_device.
+Which does raise the question of if other NICs support NCSI,
+and if so how they do so without this field.
+
+This patch also renames an existing field in struct wx.
+This is not reflected in the patch description.
 
 > Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 > ---
->  drivers/net/phy/phy_device.c | 6 ++++--
->  include/linux/phy.h          | 3 +++
->  2 files changed, 7 insertions(+), 2 deletions(-)
+>  drivers/net/ethernet/wangxun/libwx/wx_type.h  | 2 +-
+>  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 5 +++--
+>  include/linux/netdevice.h                     | 3 +++
+>  3 files changed, 7 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 0c2014accba7..4fe26660458e 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -1860,8 +1860,10 @@ int phy_suspend(struct phy_device *phydev)
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> index 1de88a33a698..1b932e66044e 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> @@ -851,7 +851,7 @@ struct wx {
+>  	struct phy_device *phydev;
 >  
->  	phy_ethtool_get_wol(phydev, &wol);
->  	phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
-> -	/* If the device has WOL enabled, we cannot suspend the PHY */
-> -	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
-> +	phydev->keep_data_connection = phydev->wol_enabled ||
-> +				       (netdev && netdev->ncsi_enabled);
-> +	/* We cannot suspend the PHY, when phy and mac need to receive packets. */
-> +	if (phydev->keep_data_connection && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
-
-As it stands, it seems that keep_data_connection is only used in this
-function. Could it be a local variable rather than field of struct
-phy_device.
-
-That said, I think Russell and Andrew will likely have a deeper insight here.
-
->  		return -EBUSY;
+>  	bool wol_hw_supported;
+> -	bool ncsi_enabled;
+> +	bool ncsi_hw_supported;
+>  	bool gpio_ctrl;
+>  	raw_spinlock_t gpio_lock;
 >  
->  	if (!phydrv || !phydrv->suspend)
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index 11c1e91563d4..bda646e7cc23 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -554,6 +554,8 @@ struct macsec_ops;
->   * @mac_managed_pm: Set true if MAC driver takes of suspending/resuming PHY
->   * @wol_enabled: Set to true if the PHY or the attached MAC have Wake-on-LAN
->   * 		 enabled.
-> + * @keep_data_connection: Set to true if the PHY or the attached MAC need
-> + *                        physical connection to receive packets.
->   * @state: State of the PHY for management purposes
->   * @dev_flags: Device-specific flags used by the PHY driver.
+> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> index 2b431db6085a..e42e4dd26700 100644
+> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> @@ -63,8 +63,8 @@ static void ngbe_init_type_code(struct wx *wx)
+>  		       em_mac_type_mdi;
+>  
+>  	wx->wol_hw_supported = (wol_mask == NGBE_WOL_SUP) ? 1 : 0;
+> -	wx->ncsi_enabled = (ncsi_mask == NGBE_NCSI_MASK ||
+> -			   type_mask == NGBE_SUBID_OCP_CARD) ? 1 : 0;
+> +	wx->ncsi_hw_supported = (ncsi_mask == NGBE_NCSI_MASK ||
+> +				 type_mask == NGBE_SUBID_OCP_CARD) ? 1 : 0;
+>  
+>  	switch (type_mask) {
+>  	case NGBE_SUBID_LY_YT8521S_SFP:
+> @@ -639,6 +639,7 @@ static int ngbe_probe(struct pci_dev *pdev,
+>  	netdev->wol_enabled = !!(wx->wol);
+>  	wr32(wx, NGBE_PSR_WKUP_CTL, wx->wol);
+>  	device_set_wakeup_enable(&pdev->dev, wx->wol);
+> +	netdev->ncsi_enabled = wx->ncsi_hw_supported;
+>  
+>  	/* Save off EEPROM version number and Option Rom version which
+>  	 * together make a unique identify for the eeprom
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index b828c7a75be2..dfa14e4c8e95 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2024,6 +2024,8 @@ enum netdev_ml_priv_type {
 >   *
-> @@ -651,6 +653,7 @@ struct phy_device {
->  	unsigned is_on_sfp_module:1;
->  	unsigned mac_managed_pm:1;
->  	unsigned wol_enabled:1;
-> +	unsigned keep_data_connection:1;
+>   *	@wol_enabled:	Wake-on-LAN is enabled
+>   *
+> + *	@ncsi_enabled:	NCSI is enabled.
+> + *
+>   *	@threaded:	napi threaded mode is enabled
+>   *
+>   *	@net_notifier_list:	List of per-net netdev notifier block
+> @@ -2393,6 +2395,7 @@ struct net_device {
+>  	struct lock_class_key	*qdisc_tx_busylock;
+>  	bool			proto_down;
+>  	unsigned		wol_enabled:1;
+> +	unsigned		ncsi_enabled:1;
+>  	unsigned		threaded:1;
 >  
->  	unsigned autoneg:1;
->  	/* The most recently read link state */
+>  	struct list_head	net_notifier_list;
 > -- 
 > 2.41.0
 > 
