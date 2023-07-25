@@ -1,58 +1,76 @@
-Return-Path: <netdev+bounces-20903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E959761DAE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:53:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35310761DB9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83FAA281839
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:53:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC08528140E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8743623BF5;
-	Tue, 25 Jul 2023 15:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4AC23BF6;
+	Tue, 25 Jul 2023 15:54:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C32821D5D
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:53:06 +0000 (UTC)
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3075691;
-	Tue, 25 Jul 2023 08:53:05 -0700 (PDT)
-Received: from eugen-station.. (unknown [82.76.24.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: ehristev)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id DD2386606F9F;
-	Tue, 25 Jul 2023 16:53:02 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1690300383;
-	bh=oTwjKmbIzP/ICl+gGyGP/1DH20byUoeqWEtx/veTs3o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JbyBladbKjcskcYcNNABx1wJ/caoCgyx6Ixz11oqpXplKT3bjW0LG8kuPflsO/Zif
-	 renQs/CYIAVyKv7FcLymQrorKZxhcfIkkfx0njUNVb7la5dGVo5aPfPufXc2yHMnfx
-	 EXFgdsmcXTtePOR1ckYdS4t7Yhx8rKW99t/WYqbKmfVnhIKCvIhk1O1aCZ9kwnZlpZ
-	 rk8O5CW2Cspxzdr7jaEh1AfhMmA+UnY+6J3x+m2EZjvL14jcXV/sNyt+qeP4RFAWlt
-	 AEZ8UVITATGZDICbwaB/RkA4wvFERFsogJ1ew6WGVnnP1s8jtfAeOrfqFAmgZ1+Vnb
-	 1fTcUIui7rA+w==
-From: Eugen Hristev <eugen.hristev@collabora.com>
-To: linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: david.wu@rock-chips.com,
-	heiko@sntech.de,
-	krzysztof.kozlowski+dt@linaro.org,
-	kernel@collabora.com,
-	Eugen Hristev <eugen.hristev@collabora.com>
-Subject: [PATCH] dt-bindings: net: rockchip-dwmac: fix {tx|rx}-delay defaults in schema
-Date: Tue, 25 Jul 2023 18:52:54 +0300
-Message-Id: <20230725155254.664361-1-eugen.hristev@collabora.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CE821D5D
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:54:30 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F94211C;
+	Tue, 25 Jul 2023 08:54:29 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9aa1d3029so9215311fa.2;
+        Tue, 25 Jul 2023 08:54:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690300467; x=1690905267;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+2ueYrBi52W2OkGXaF73xpgZBQIsvgeSihX41z0L7xE=;
+        b=L+StV56SO8Hq4MRlBfv5ewD58CUtuNhf3SladD8jctRRcL8zbKOJsdIzyNKM0XJ804
+         jLH3O4VhCEmWK1u6tUPh5jf0YG5dMHLu9yHparAuZpXH7rsAT9ZVHUMHcYtHDZzASR7b
+         3i3BXSwCf4JHyFWVVa5ojk+GqQLWDg4r1e1sxOQ1Tn++Guxd10G9SGo4Xr0rv+jmzODJ
+         WVegOTzRbBVIglLKAn1sVUe7mfWQE0B9vb0drVotj5vI5YJeJz4hy+Qy7bpDfsXJd/ZN
+         KrjAhhPwLx0XzQ/eK8ueSW9CGP3K9LXg87Hg2jeC3yiKtAJuuqB1/NxOePbT6bwnYdf8
+         cGYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690300467; x=1690905267;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+2ueYrBi52W2OkGXaF73xpgZBQIsvgeSihX41z0L7xE=;
+        b=U5tOeiApvtXPUNKyUKPMiW91jq1up57L2acjNAVzaFrJoKFQGC+Pfm27VAw1PWyTGz
+         cDYk9vzPWGSCXhx4tFA0KUHZ9fxJThlPqcfGQ0zVF+/91P7tMuGX5whAmm81HY14AUcM
+         q6glbYwj+FuY/BHD9uymKB2sKF0wRBBjC+gwWTy/x40bavNhb5AEM+5+4XmHuiUUoAEV
+         9V37ykm/vMGMU+2eKK60GkswBVS4KRnwauP+ff05cWlI1FWAhb3rLrNCLxg7pSPr3nk1
+         DhJVN6J3S/MamI9grH6/9A0G7T+BDJRWrN/yM85BY+XiiDAuAit8EEKyeEdOxcuQv0AR
+         6ZoQ==
+X-Gm-Message-State: ABy/qLa8bsOrQsgQ5h/9by74AkAl0nk++htX3e+qFq6GLu1wgYc868VA
+	ufW5funMwA1yf49SFuDba40=
+X-Google-Smtp-Source: APBJJlGFsUL2NLGBfql/tuKTnFjUD7SzrJRbhKHlGxQWMzvZUxuoklAu4R38OUCt1alorXvn+snuBQ==
+X-Received: by 2002:a2e:99d9:0:b0:2b5:80e0:f18e with SMTP id l25-20020a2e99d9000000b002b580e0f18emr8957085ljj.3.1690300467033;
+        Tue, 25 Jul 2023 08:54:27 -0700 (PDT)
+Received: from localhost.localdomain ([77.222.25.78])
+        by smtp.gmail.com with ESMTPSA id a24-20020a2e8618000000b002b96a3a87d5sm3510747lji.98.2023.07.25.08.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 08:54:26 -0700 (PDT)
+From: Andrew Kanner <andrew.kanner@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jasowang@redhat.com,
+	netdev@vger.kernel.org,
+	brouer@redhat.com,
+	linux-kernel@vger.kernel.org
+Cc: linux-kernel-mentees@lists.linuxfoundation.org,
+	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
+	Andrew Kanner <andrew.kanner@gmail.com>
+Subject: [PATCH v3] drivers: net: prevent tun_get_user() to exceed xdp size limits
+Date: Tue, 25 Jul 2023 18:54:04 +0300
+Message-Id: <20230725155403.796-1-andrew.kanner@gmail.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,44 +79,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The defaults are specified in the description instead of being specified
-in the schema.
-Fix it by adding the default value in the `default` field.
+Syzkaller reported the following issue:
+=======================================
+Too BIG xdp->frame_sz = 131072
+WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
+  ____bpf_xdp_adjust_tail net/core/filter.c:4121 [inline]
+WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
+  bpf_xdp_adjust_tail+0x466/0xa10 net/core/filter.c:4103
+...
+Call Trace:
+ <TASK>
+ bpf_prog_4add87e5301a4105+0x1a/0x1c
+ __bpf_prog_run include/linux/filter.h:600 [inline]
+ bpf_prog_run_xdp include/linux/filter.h:775 [inline]
+ bpf_prog_run_generic_xdp+0x57e/0x11e0 net/core/dev.c:4721
+ netif_receive_generic_xdp net/core/dev.c:4807 [inline]
+ do_xdp_generic+0x35c/0x770 net/core/dev.c:4866
+ tun_get_user+0x2340/0x3ca0 drivers/net/tun.c:1919
+ tun_chr_write_iter+0xe8/0x210 drivers/net/tun.c:2043
+ call_write_iter include/linux/fs.h:1871 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x650/0xe40 fs/read_write.c:584
+ ksys_write+0x12f/0x250 fs/read_write.c:637
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-Fixes: b331b8ef86f0 ("dt-bindings: net: convert rockchip-dwmac to json-schema")
-Signed-off-by: Eugen Hristev <eugen.hristev@collabora.com>
+xdp->frame_sz > PAGE_SIZE check was introduced in commit c8741e2bfe87
+("xdp: Allow bpf_xdp_adjust_tail() to grow packet size"). But
+tun_get_user() still provides an execution path with do_xdp_generic()
+and exceed XDP limits for packet size.
+
+Using the syzkaller repro with reduced packet size it was also
+discovered that XDP_PACKET_HEADROOM is not checked in
+tun_can_build_skb(), although pad may be incremented in
+tun_build_skb().
+
+If we move the limit check from tun_can_build_skb() to tun_build_skb()
+we will make xdp to be used only in tun_build_skb(), without falling
+in tun_alloc_skb(), etc. And moreover we will drop the packet which
+can't be processed in tun_build_skb().
+
+Reported-and-tested-by: syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000774b9205f1d8a80d@google.com/T/
+Link: https://syzkaller.appspot.com/bug?id=5335c7c62bfff89bbb1c8f14cdabebe91909060f
+Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
+Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
 ---
- Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-index bb943c96c196..6d08260ad828 100644
---- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-@@ -92,12 +92,14 @@ properties:
-     $ref: /schemas/types.yaml#/definitions/phandle
+Notes:
+    V2 -> V3:
+    * attach the forgotten changelog
+    V1 -> V2:
+    * merged 2 patches in 1, fixing both issues: WARN_ON_ONCE with
+      syzkaller repro and missing XDP_PACKET_HEADROOM in pad
+    * changed the title and description of the execution path, suggested
+      by Jason Wang <jasowang@redhat.com>
+    * move the limit check from tun_can_build_skb() to tun_build_skb() to
+      remove duplication and locking issue, and also drop the packet in
+      case of a failed check - noted by Jason Wang <jasowang@redhat.com>
+
+ drivers/net/tun.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index d75456adc62a..7c2b05ce0421 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1594,10 +1594,6 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+ 	if (zerocopy)
+ 		return false;
  
-   tx_delay:
--    description: Delay value for TXD timing. Range value is 0~0x7F, 0x30 as default.
-+    description: Delay value for TXD timing. Range value is 0~0x7F.
-     $ref: /schemas/types.yaml#/definitions/uint32
-+    default: 0x30
+-	if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
+-	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
+-		return false;
+-
+ 	return true;
+ }
  
-   rx_delay:
--    description: Delay value for RXD timing. Range value is 0~0x7F, 0x10 as default.
-+    description: Delay value for RXD timing. Range value is 0~0x7F.
-     $ref: /schemas/types.yaml#/definitions/uint32
-+    default: 0x10
+@@ -1673,6 +1669,9 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
+ 	buflen += SKB_DATA_ALIGN(len + pad);
+ 	rcu_read_unlock();
  
-   phy-supply:
-     description: PHY regulator
++	if (buflen > PAGE_SIZE)
++		return ERR_PTR(-EFAULT);
++
+ 	alloc_frag->offset = ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
+ 	if (unlikely(!skb_page_frag_refill(buflen, alloc_frag, GFP_KERNEL)))
+ 		return ERR_PTR(-ENOMEM);
 -- 
-2.34.1
+2.39.3
 
 
