@@ -1,187 +1,221 @@
-Return-Path: <netdev+bounces-21108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735E6762780
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 01:48:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E11762788
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 01:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4D321C21064
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:48:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60D31C21039
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1565D27722;
-	Tue, 25 Jul 2023 23:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E94527722;
+	Tue, 25 Jul 2023 23:50:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0780D26B6D
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:48:23 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B221B212E
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:48:22 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c79a5565aso2832757a12.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:48:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8E62771C
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:50:59 +0000 (UTC)
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD601E2;
+	Tue, 25 Jul 2023 16:50:57 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-56368c40e8eso3778499eaf.0;
+        Tue, 25 Jul 2023 16:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690328902; x=1690933702;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B1gbm7SHBDO0dPR/G75Fc7n9oOa169DATobxNqRb7Fo=;
-        b=Su10Lw0aZkMXrozhNalfPEWGBz3FhkeaPpGtzzOAn1qKwDNInPVoz6XPfyQwSzANfF
-         eMDlGZoQ3Es5KlBPDvYqSatRdy++wyXBAZyr3hvFYL1BdkpUtjqCDsXziWGQfvgt7Z1H
-         ccUxYrLGoL4bOJ19LhS5PN2iEoPp41kxKBrENXDFjCQQAcByjx4gfmJ+e9sGrRwRobtw
-         q2gnlpM+g2l0uNWR0L5w5SdRVCmFAy3COMYFvE7D8DrI1RwSrtdSvLPjEuKrqpDfyiJO
-         /I+j8+Gw0LFObfsHX37p6uBdeWU6jaihzh4YEi6wglZB7NFhiNrw5BQIxEGJbP3JCDwO
-         mAxA==
+        d=gmail.com; s=20221208; t=1690329057; x=1690933857;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MntZLPg9Q2TkUipdw5URIw2GbDHNmtTpFo/G9AqaGl8=;
+        b=NcnLZAsl/ELgMGRZHqKtVn9uEWSI7mXT9tyTc3vBN6zCSfgBl5nNIoHcUbeHj/1bb1
+         7TVWKeBXM4LVNKY3H4EEIOjYge9df3vlFwHI5CNoqM7xcvxhsu41x9CyjR/s9+wixj5Q
+         OiUwuFf/2P+3gbuIAhnbc0y6qkVIo/7TPUHbRhhemeQF4w15VIgeziXSgkZuBvGvtxky
+         75O3kuuW/8j7jeeC/gZJihv/Rj6o7OCKwuC6zsTWPp+SuTkt+qSvgZPDcM7pNgSYv5Dl
+         ukVrDRTuD6SWugwpqvBKVt9kQVcW7K0gpLRcQzBha0H4iC5ImojFMbgRPMdTRzsIYpid
+         42jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690328902; x=1690933702;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B1gbm7SHBDO0dPR/G75Fc7n9oOa169DATobxNqRb7Fo=;
-        b=J75fNo6fqOwA/C0/1vWKAoBcit79RbofPVj7QqlCAotJTZ1Ni2dNwjsb907Xao7WN2
-         ylmDld/ad46S5QI8W9e5jLkfm+Hq5hS1Rg2WkOw1O1RN3E7yvOeMEBAjlpXlV5haFZAH
-         ltE43o8DDqHKoYYAYpfz9w3L5+GNFgLnYzg6e2MhQKHGE0HZjKr3HYyxYbHvoH2si0Aj
-         FbJrp3v/kNyArOuy0PdhDsf8WOALRguNeegjVt8xX231k51wZbaho9qQls4pdNR3H6MJ
-         ejECeWoiP3cL66ZZMZE31VOra/8o5UHxwUn6GjPwuASdZ57E8SxfzbzxeNxLbVI7HdOa
-         IizQ==
-X-Gm-Message-State: ABy/qLZAG6z88b2NQ751J5iACq7u7TY/ynW3OO/f6itd8/5xiOMa9tEQ
-	g0q9t3lsz7eP84w1HodDnzdrolY=
-X-Google-Smtp-Source: APBJJlH3rRw/OjSC+3HxgvpyffsTjs0Fu3o5pNslJdK66NIDXlelQFYhoNUxe0vY3Ue+cuoipTE3cqc=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:3ec5:0:b0:557:6227:bf47 with SMTP id
- l188-20020a633ec5000000b005576227bf47mr3108pga.9.1690328902214; Tue, 25 Jul
- 2023 16:48:22 -0700 (PDT)
-Date: Tue, 25 Jul 2023 16:48:20 -0700
-In-Reply-To: <64c056686b527_3a4d294e6@willemb.c.googlers.com.notmuch>
+        d=1e100.net; s=20221208; t=1690329057; x=1690933857;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MntZLPg9Q2TkUipdw5URIw2GbDHNmtTpFo/G9AqaGl8=;
+        b=ZaEVZaaem8UQtNj/I3fN0WBJfIaoc9RVAlRvtSXbVGffNg5ncm3HcZicvNURYd/QJx
+         wUEzrHGhlGC8IuusRZfKpkDZbiqaNeLaaz+BKyIrqg1rDvXxVx7xgAXGS0OnLMdx0mI+
+         IB8V1o/vEt4hr1YkDfVViyILAkxCdnHSrkI116dNSkgzgYXkN7/D6dHeStBI+uH3alZI
+         8AEt0t7vw42nt7LvfgT3pI7598OZufuyux23np3omSuTVGHj+M0wdmjXM+ThmXTdT1WW
+         pG7pzTk5Z1vF/iXAgtVeXJ0LoPAmLexeilTZ6Q6lOBUFKkDoL/2/sBhXqYTlWQ9DPSF7
+         jMGw==
+X-Gm-Message-State: ABy/qLaGvmU6ueoIeVQAIdXiGcFxfLvG78cO5FeML809ZFdIHEfxJOFM
+	KQOZQXYHat38uH3+OTichyvN7ce05CTlYQ==
+X-Google-Smtp-Source: APBJJlHalXYmOhaEU6n05SNM4i/kOD7ydZDReFjh8w9A4vRIkL/8696/tstPkBJZxOJSkhZD6kYQEg==
+X-Received: by 2002:a05:6808:1588:b0:3a4:232c:5d7e with SMTP id t8-20020a056808158800b003a4232c5d7emr476635oiw.5.1690329056959;
+        Tue, 25 Jul 2023 16:50:56 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id rj14-20020a17090b3e8e00b00267fe43f518sm110915pjb.23.2023.07.25.16.50.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 16:50:56 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id AD3F981944A1; Wed, 26 Jul 2023 06:50:53 +0700 (WIB)
+Date: Wed, 26 Jul 2023 06:50:52 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Andrzej Kacprowski <andrzej.kacprowski@linux.intel.com>,
+	Krystian Pradzynski <krystian.pradzynski@linux.intel.com>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>,
+	hq.dev+kernel@msdfc.xyz,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux DRI Development <dri-devel@lists.freedesktop.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Intel Ethernet Drivers <intel-wired-lan@lists.osuosl.org>
+Subject: Re: Fwd: Unexplainable packet drop starting at v6.4
+Message-ID: <ZMBf3Cu+MgXjOpvF@debian.me>
+References: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230724235957.1953861-1-sdf@google.com> <20230724235957.1953861-3-sdf@google.com>
- <64c0369eadbd5_3fe1bc2940@willemb.c.googlers.com.notmuch> <ZMBPDe+IhvTQnKQa@google.com>
- <64c056686b527_3a4d294e6@willemb.c.googlers.com.notmuch>
-Message-ID: <ZMBfRPxMk0F45a/s@google.com>
-Subject: Re: [RFC net-next v4 2/8] xsk: add TX timestamp and TX checksum
- offload support
-From: Stanislav Fomichev <sdf@google.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, hawk@kernel.org, netdev@vger.kernel.org, 
-	xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="OUAsi7azhbgmAo1h"
+Content-Disposition: inline
+In-Reply-To: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 07/25, Willem de Bruijn wrote:
-> Stanislav Fomichev wrote:
-> > On 07/25, Willem de Bruijn wrote:
-> > > Stanislav Fomichev wrote:
-> > > > This change actually defines the (initial) metadata layout
-> > > > that should be used by AF_XDP userspace (xsk_tx_metadata).
-> > > > The first field is flags which requests appropriate offloads,
-> > > > followed by the offload-specific fields. The supported per-device
-> > > > offloads are exported via netlink (new xsk-flags).
-> > > > 
-> > > > The offloads themselves are still implemented in a bit of a
-> > > > framework-y fashion that's left from my initial kfunc attempt.
-> > > > I'm introducing new xsk_tx_metadata_ops which drivers are
-> > > > supposed to implement. The drivers are also supposed
-> > > > to call xsk_tx_metadata_request/xsk_tx_metadata_complete in
-> > > > the right places. Since xsk_tx_metadata_{request,_complete}
-> > > > are static inline, we don't incur any extra overhead doing
-> > > > indirect calls.
-> > > > 
-> > > > The benefit of this scheme is as follows:
-> > > > - keeps all metadata layout parsing away from driver code
-> > > > - makes it easy to grep and see which drivers implement what
-> > > > - don't need any extra flags to maintain to keep track of that
-> > > >   offloads are implemented; if the callback is implemented - the offload
-> > > >   is supported (used by netlink reporting code)
-> > > > 
-> > > > Two offloads are defined right now:
-> > > > 1. XDP_TX_METADATA_CHECKSUM: skb-style csum_start+csum_offset
-> > > > 2. XDP_TX_METADATA_TIMESTAMP: writes TX timestamp back into metadata
-> > > >    area upon completion (tx_timestamp field)
-> > > > 
-> > > > The offloads are also implemented for copy mode:
-> > > > 1. Extra XDP_TX_METADATA_CHECKSUM_SW to trigger skb_checksum_help; this
-> > > >    might be useful as a reference implementation and for testing
-> > > > 2. XDP_TX_METADATA_TIMESTAMP writes SW timestamp from the skb
-> > > >    destructor (note I'm reusing hwtstamps to pass metadata pointer)
-> > > > 
-> > > > The struct is forward-compatible and can be extended in the future
-> > > > by appending more fields.
-> > > > 
-> > > > Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> 
-> > > > +/* Request transmit checksum offload. Checksum start position and offset
-> > > > + * are communicated via csum_start and csum_offset fields of struct
-> > > > + * xsk_tx_metadata.
-> > > > + */
-> > > > +#define XDP_TX_METADATA_CHECKSUM		(1 << 1)
-> > > > +
-> > > > +/* Force checksum calculation in software. Can be used for testing or
-> > > > + * working around potential HW issues. This option causes performance
-> > > > + * degradation and only works in XDP_COPY mode.
-> > > > + */
-> > > > +#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)
-> > > 
-> > > Not sure how useful this is, especially if only for copy mode.
-> > 
-> > Seems useful at least as a reference implementation? But I'm happy
-> > to drop. It's used only in the tests for now. I was using it to
-> > verify csum_offset/start field values.
-> 
-> If testing over veth, does anything even look at the checksum?
 
-My receiver in the xdp_metadata test looks at it and compares to the
-fixed (verified) value:
+--OUAsi7azhbgmAo1h
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	ASSERT_EQ(udph->check, 0x1c72, "csum");
+On Tue, Jul 18, 2023 at 07:51:24AM +0700, Bagas Sanjaya wrote:
+> Hi,
+>=20
+> I notice a regression report on Bugzilla [1]. Quoting from it:
+>=20
+> > Hi,
+> >=20
+> > After I updated to 6.4 through Archlinux kernel update, suddenly I noti=
+ced random packet losses on my routers like nodes. I have these networking =
+relevant config on my nodes
+> >=20
+> > 1. Using archlinux
+> > 2. Network config through systemd-networkd
+> > 3. Using bird2 for BGP routing, but not relevant to this bug.
+> > 4. Using nftables for traffic control, but seems not relevant to this b=
+ug.=20
+> > 5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 l=
+evel
+> >=20
+> > After I ruled out systemd-networkd, nftables related issues. I tracked =
+down issues to kernel.
+> >=20
+> > Here's the tcpdump I'm seeing on one side of my node ""
+> >=20
+> > ```
+> > sudo tcpdump -i fios_wan port 38851
+> > tcpdump: verbose output suppressed, use -v[v]... for full protocol deco=
+de
+> > listening on fios_wan, link-type EN10MB (Ethernet), snapshot length 262=
+144 bytes
+> > 10:33:06.073236 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: =
+UDP, length 148
+> > 10:33:11.406607 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: =
+UDP, length 148
+> > 10:33:16.739969 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: =
+UDP, length 148
+> > 10:33:21.859856 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: =
+UDP, length 148
+> > 10:33:27.193176 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: =
+UDP, length 148
+> > 5 packets captured
+> > 5 packets received by filter
+> > 0 packets dropped by kernel
+> > ```
+> >=20
+> > But on the other side "[REDACTED_PUBLIC_IPv4_1]", tcpdump is replying p=
+ackets in this wireguard stream. So packet is lost somewhere in the link.
+> >=20
+> > From the otherside, I can do "mtr" to "[BOS1_NODE]"'s public IP and fou=
+nd the moment the link got lost is right at "[BOS1_NODE]", that means "[BOS=
+1_NODE]"'s networking stack completely drop the inbound packets from specif=
+ic ip addresses.
+> >=20
+> > Some more digging
+> >=20
+> > 1. This situation began after booting in different delays. Sometimes ca=
+n trigger after 30 seconds after booting, and sometimes will be after 18 ho=
+urs or more.
+> > 2. It can envolve into worse case that when I do "ip neigh show", the i=
+pv4 ARP table and ipv6 neighbor discovery start to appear as "invalid", mea=
+ning the internet is completely loss.
+> > 3. When this happened to wan facing interface, it seems OK with lan fac=
+ing interfaces. WAN interface was using Intel X710-T4L using i40e and lan s=
+ide was using virtio
+> > 4. I tried to bisect in between 6.3 and 6.4, and the first bad commit i=
+t reports was "a3efabee5878b8d7b1863debb78cb7129d07a346". But this is not r=
+elevant to networking at all, maybe it's the wrong commit to look at. At th=
+e meantime, because I haven't found a reproducible way of 100% trigger the =
+issue, it may be the case during bisect some "good" commits are actually ba=
+d.=20
+> > 5. I also tried to look at "dmesg", nothing interesting pop up. But I'l=
+l make it available upon request.
+> >=20
+> > This is my first bug reports. Sorry for any confusion it may lead to an=
+d thanks for reading.
+>=20
+> See Bugzilla for the full thread.
+>=20
+> Thorsten: The reporter had a bad bisect (some bad commits were marked as =
+good
+> instead), hence SoB chain for culprit (unrelated) ipvu commit is in To:
+> list. I also asked the reporter (also in To:) to provide dmesg and request
+> rerunning bisection, but he doesn't currently have a reliable reproducer.
+> Is it the best I can do?
+>=20
+> Anyway, I'm adding this regression to be tracked in regzbot:
+>=20
+> #regzbot introduced: a3efabee5878b8 https://bugzilla.kernel.org/show_bug.=
+cgi?id=3D217678
+> #regzbot title: packet drop on Intel X710-T4L due to ipvu boot fix
+>=20
 
-The packet is always the same (and macs are fixed), so we are able
-to do that.
- 
-> > > > +struct xsk_tx_metadata {
-> > > > +	__u32 flags;
-> > > > +
-> > > > +	/* XDP_TX_METADATA_CHECKSUM */
-> > > > +
-> > > > +	/* Offset from desc->addr where checksumming should start. */
-> > > > +	__u16 csum_start;
-> > > > +	/* Offset from csum_start where checksum should be stored. */
-> > > > +	__u16 csum_offset;
-> > > > +
-> > > > +	/* XDP_TX_METADATA_TIMESTAMP */
-> > > > +
-> > > > +	__u64 tx_timestamp;
-> > > > +};
-> > > 
-> > > Is this structure easily extensible for future offloads,
-> > > such as USO?
-> > 
-> > We can append more field. What do we need for USO? Something akin
-> > to gso_size/gso_segs/gso_type ?
-> 
-> Yes, a bit to set the feature (gso_type) and a field to store the
-> segment size (gso_size).
-> 
-> Pacing offload is the other feature that comes to mind. That could
-> conceivably use the tx_timestamp field.
+This time, the bisection points out to v6.4 networking pull, so:
 
-Right, so we can append to this struct and add more XDP_TX_METADATA_$(FLAG)s
-to signal various features. Jakub mentioned that it might be handy
-to pass l2_offset/l3_offset/l4_offset, but I'm not sure whether
-he was talking about xSO offloads or something else.
+#regzbot introduced: 6e98b09da931a0
+
+(also Cc: Linus.)
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--OUAsi7azhbgmAo1h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZMBf0wAKCRD2uYlJVVFO
+o+/YAP0Z6eCcYl71Y1kT2UYGDBIwMXXiM7+aR40lhmu0mcdmbAEA9m/ui3/uZX51
+DmktMr6iQDC9/1h00DKNiilDimu++go=
+=+BBU
+-----END PGP SIGNATURE-----
+
+--OUAsi7azhbgmAo1h--
 
