@@ -1,266 +1,340 @@
-Return-Path: <netdev+bounces-20806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988B97610DC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:28:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE6A7610F8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:35:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8F041C20DBF
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:28:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5AAC281880
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DEC1EA7E;
-	Tue, 25 Jul 2023 10:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654049440;
+	Tue, 25 Jul 2023 10:35:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7091B14ABC
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:28:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38B2E3
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:28:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690280879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MDKpKxn/TUwlWtyjfTz8EsZgChePB/9F1/tzCT53qQc=;
-	b=Gzq+1jFiuIYwdIGNBes+Ljxxk1jcAWXfqXFLrE3L2qoD2X1O1jQOJFmkp6vQjb57loJvg8
-	bOI/AnpdM578zrX8SkVvwOKk5Ly3d0WyhjXepbFuSBsGTQdRVOgofQSrrUmLz6zJlUs3HZ
-	ohQ5TI84UNO8w+y0eVKQCwy6rGB7Pv0=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-311-GnkWetymOP-BQrMG7EiNNw-1; Tue, 25 Jul 2023 06:27:57 -0400
-X-MC-Unique: GnkWetymOP-BQrMG7EiNNw-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-405512b12f5so8871091cf.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:27:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690280877; x=1690885677;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MDKpKxn/TUwlWtyjfTz8EsZgChePB/9F1/tzCT53qQc=;
-        b=ZE/1+FuIzPRM4/XM4MKRoRiwH2jlsMFQn4tC40UUTwIrM6n3yHJvi2EZGKB3XSsgo2
-         RfV5K5bqIsFuUItr/pbHBx8tTw4l4in+1gMiMsReoq+Dr3lJv+FosOkGSsEkIsbL9czQ
-         DgunUzNUUOIYcP2yJU8k5zMp7OTYV8Jj/B18prf7swSkD6B/YJU0SdLE7OUcXrBTuV8A
-         e56wGOp5s/e2UquH8VkAllvngFVxtiRcSKmkKTrjqn3EiqI09J4Er7J5m8g8a+OT6PDS
-         qLEA1p+VNStBNyw0CYeQfnRHxVF4QYs/y6K0Nx/7Lcnzhc6nnHUBJXYBwv+McN4poFXV
-         iPgw==
-X-Gm-Message-State: ABy/qLZDcGPJeCJxd5hsQGu1eTRIhdZYwpd3dnLkd4oTRbk5tdvrKJHt
-	cjCpn5gbEVRnORaFefFCRH/17O9oeCwxSCKs+9QcSiOXtSn5dV3Sf7soPVn0MqIizQlvMm+0ST2
-	NMDUryshP5/aPylyV
-X-Received: by 2002:a05:622a:1b9f:b0:400:a9a4:8517 with SMTP id bp31-20020a05622a1b9f00b00400a9a48517mr14697745qtb.4.1690280877143;
-        Tue, 25 Jul 2023 03:27:57 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGDZ0zMxY2bu4jMXAw6insEXU+9dUZ1IrzXU6vRBlXNYK31Kk7cft1It2m2smn5yN0tOq/Pzg==
-X-Received: by 2002:a05:622a:1b9f:b0:400:a9a4:8517 with SMTP id bp31-20020a05622a1b9f00b00400a9a48517mr14697731qtb.4.1690280876782;
-        Tue, 25 Jul 2023 03:27:56 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-225-81.dyn.eolo.it. [146.241.225.81])
-        by smtp.gmail.com with ESMTPSA id h21-20020ac85495000000b004053dc8365esm3917471qtq.23.2023.07.25.03.27.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 03:27:56 -0700 (PDT)
-Message-ID: <f7ba3fc5327f88a0e9b20e177a0ce599b77833db.camel@redhat.com>
-Subject: Re: [PATCH net-next v4 2/2] selftests: fib_tests: Add a test case
- for IPv6 garbage collection
-From: Paolo Abeni <pabeni@redhat.com>
-To: kuifeng@meta.com, dsahern@kernel.org, davem@davemloft.net, 
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- martin.lau@linux.dev,  kernel-team@meta.com, yhs@meta.com
-Cc: thinker.li@gmail.com
-Date: Tue, 25 Jul 2023 12:27:52 +0200
-In-Reply-To: <20230722003839.897682-3-kuifeng@meta.com>
-References: <20230722003839.897682-1-kuifeng@meta.com>
-	 <20230722003839.897682-3-kuifeng@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594641ED43
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:35:02 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5921A12E;
+	Tue, 25 Jul 2023 03:35:00 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36P0Wmqm019445;
+	Tue, 25 Jul 2023 03:34:52 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=61/557pYAs+12TGw7apxERd4cIHa0ru1KSilQz+Glf0=;
+ b=DRKAuQi46v3L430sESAVZp/Dp1NEFGGZrV4ET3gC+zm7ecw0n9j1iRsta1oHr8i5tz9S
+ MfSo9UWZQ/0CUruRacZJmqu6rfRLJ3gcMsfhIwPShLOKWnsA4GSt6VGgF3nZf7Sq8HDC
+ /zUtA/BOZSexFtrjbL4zeErERQIeSLoWOmGuvFZvEHPi3i0Cyw9+gtAmurEqfeEbUXn8
+ 0IfA/PY00tm7ShJvFOC6Jd/+4MEclXOMJ41XrL6Z5OmBGblzI9HVTQ4v5vo2BK1Pb3zz
+ QiclaOWYt7U+oN/UxaSabFE3rEZehm8tOiAx5zKyZiWCKOPePosqk5BppK+St42SAoXi +Q== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3s18r25nt9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jul 2023 03:34:52 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 25 Jul
+ 2023 03:34:50 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 25 Jul 2023 03:34:50 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 1F83E3F7040;
+	Tue, 25 Jul 2023 03:34:45 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH] octeontx2-af: Tc flower offload support for inner VLAN
+Date: Tue, 25 Jul 2023 16:04:42 +0530
+Message-ID: <20230725103442.2749183-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: wR7hB1VLeLqG0xiG1cSeEjMYuInGTdGi
+X-Proofpoint-ORIG-GUID: wR7hB1VLeLqG0xiG1cSeEjMYuInGTdGi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-25_05,2023-07-25_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-07-21 at 17:38 -0700, kuifeng@meta.com wrote:
-> From: Kui-Feng Lee <kuifeng@meta.com>
->=20
-> Add 10 IPv6 routes with expiration time.  Wait for a few seconds
-> to make sure they are removed correctly.
->=20
-> Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
-> ---
->  tools/testing/selftests/net/fib_tests.sh | 90 +++++++++++++++++++++++-
->  1 file changed, 87 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/sel=
-ftests/net/fib_tests.sh
-> index 35d89dfa6f11..4c92fb3c3844 100755
-> --- a/tools/testing/selftests/net/fib_tests.sh
-> +++ b/tools/testing/selftests/net/fib_tests.sh
-> @@ -9,13 +9,16 @@ ret=3D0
->  ksft_skip=3D4
-> =20
->  # all tests in this script. Can be overridden with -t option
-> -TESTS=3D"unregister down carrier nexthop suppress ipv6_notify ipv4_notif=
-y ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4=
-_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_ma=
-ngle ipv4_bcast_neigh"
-> +TESTS=3D"unregister down carrier nexthop suppress ipv6_notify ipv4_notif=
-y \
-> +       ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metr=
-ics \
-> +       ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
-> +       ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test"
-> =20
->  VERBOSE=3D0
->  PAUSE_ON_FAIL=3Dno
->  PAUSE=3Dno
-> -IP=3D"ip -netns ns1"
-> -NS_EXEC=3D"ip netns exec ns1"
-> +IP=3D"$(which ip) -netns ns1"
-> +NS_EXEC=3D"$(which ip) netns exec ns1"
-> =20
->  which ping6 > /dev/null 2>&1 && ping6=3D$(which ping6) || ping6=3D$(whic=
-h ping)
-> =20
-> @@ -747,6 +750,86 @@ fib_notify_test()
->  	cleanup &> /dev/null
->  }
-> =20
-> +fib6_gc_test()
-> +{
-> +	setup
-> +
-> +	echo
-> +	echo "Fib6 garbage collection test"
-> +	set -e
-> +
-> +	# Check expiration of routes every 3 seconds (GC)
-> +	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=3D300
-> +
-> +	$IP link add dummy_10 type dummy
-> +	$IP link set dev dummy_10 up
-> +	$IP -6 address add 2001:10::1/64 dev dummy_10
-> +
-> +	$NS_EXEC sysctl -wq net.ipv6.route.flush=3D1
-> +
-> +	# Temporary routes
-> +	for i in $(seq 1 1000); do
-> +	    # Expire route after 4 seconds
-> +	    $IP -6 route add 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10 expires 4
-> +	done
-> +	N_EXP=3D$($IP -6 route list |grep expires|wc -l)
-> +	if [ $N_EXP -ne 1000 ]; then
-> +		echo "FAIL: expected 1000 routes with expires, got $N_EXP"
-> +		ret=3D1
-> +	else
-> +	    sleep 5
-> +	    REALTM_P=3D$($NS_EXEC strace -T sysctl \
-> +		       -wq net.ipv6.route.flush=3D1 2>&1 | \
-> +		       awk -- '/write\(.*"1\\n", 2\)/ { gsub("(.*<|>.*)", ""); print $=
-0;}')
+This patch extends current TC flower offload support to allow filters
+involving inner VLAN matching, to be offloaded to HW.
 
-I guess the above works somehow ?!?
+Example command:
+tc filter add dev eth2 protocol 802.1AD parent ffff: flower vlan_id 10
+vlan_ethtype 802.1Q cvlan_id 20 skip_sw action drop
 
-But I think something alike:
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |   3 +
+ .../marvell/octeontx2/af/rvu_debugfs.c        |   5 +
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  13 +++
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 106 +++++++++++-------
+ 5 files changed, 90 insertions(+), 38 deletions(-)
 
-	# just after printing the banner
-	TIME=3D$(which time)
-	if [ -z "$TIME" ]; then
-		echo "command 'time' is missing, skipping test"
-		return
-	fi
-	# ...
-
-		# replacing the strace command
-		REALTM_P=3D$(time -f %e $NS_EXEC sysctl \
-		       -wq net.ipv6.route.flush=3D1 2>&1)
-
-would be better.
-
-In any case you should check explicitly for the additionally needed
-command ('strace' in your code, 'time' here).
-
-And you could include the expected output in the commit message (just a
-line, right?)
-
-Cheers
-
-Paolo
-
-
-> +	    N_EXP_s5=3D$($IP -6 route list |grep expires|wc -l)
-> +
-> +	    if [ $N_EXP_s5 -ne 0 ]; then
-> +		echo "FAIL: expected 0 routes with expires, got $N_EXP_s5"
-> +		ret=3D1
-> +	    else
-> +		ret=3D0
-> +	    fi
-> +	fi
-> +
-> +	# Permanent routes
-> +	for i in $(seq 1 5000); do
-> +	    $IP -6 route add 2001:30::$i \
-> +		via 2001:10::2 dev dummy_10
-> +	done
-> +	# Temporary routes
-> +	for i in $(seq 1 1000); do
-> +	    # Expire route after 4 seconds
-> +	    $IP -6 route add 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10 expires 4
-> +	done
-> +	N_EXP=3D$($IP -6 route list |grep expires|wc -l)
-> +	if [ $N_EXP -ne 1000 ]; then
-> +	    echo
-> +	    "FAIL: expected 1000 routes with expires, got $N_EXP (5000 permanen=
-t routes)"
-> +		ret=3D1
-> +	else
-> +	    sleep 5
-> +	    REALTM_T=3D$($NS_EXEC strace -T sysctl \
-> +		       -wq net.ipv6.route.flush=3D1 2>&1 | \
-> +		       awk -- '/write\(.*"1\\n", 2\)/ { gsub("(.*<|>.*)", ""); print $=
-0;}')
-> +	    N_EXP_s5=3D$($IP -6 route list |grep expires|wc -l)
-> +
-> +	    if [ $N_EXP_s5 -ne 0 ]; then
-> +		echo "FAIL: expected 0 routes with expires, got $N_EXP_s5 (5000 perman=
-ent routes)"
-> +		ret=3D1
-> +	    else
-> +		ret=3D0
-> +	    fi
-> +	fi
-> +
-> +	set +e
-> +
-> +	log_test $ret 0 "ipv6 route garbage collection (${REALTM_P}s, ${REALTM_=
-T}s)"
-> +
-> +	cleanup &> /dev/null
-> +}
-> +
->  fib_suppress_test()
->  {
->  	echo
-> @@ -2217,6 +2300,7 @@ do
->  	ipv4_mangle)			ipv4_mangle_test;;
->  	ipv6_mangle)			ipv6_mangle_test;;
->  	ipv4_bcast_neigh)		ipv4_bcast_neigh_test;;
-> +	fib6_gc_test|ipv6_gc)		fib6_gc_test;;
-> =20
->  	help) echo "Test names: $TESTS"; exit 0;;
->  	esac
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index ed66c5989102..382764f39702 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -1461,6 +1461,7 @@ struct flow_msg {
+ 		u8 ip_flag;
+ 		u8 next_header;
+ 	};
++	__be16 vlan_itci;
+ };
+ 
+ struct npc_install_flow_req {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
+index 9beeead56d7b..5b6a1b941ccc 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
+@@ -184,6 +184,7 @@ enum key_fields {
+ 	NPC_VLAN_ETYPE_CTAG, /* 0x8100 */
+ 	NPC_VLAN_ETYPE_STAG, /* 0x88A8 */
+ 	NPC_OUTER_VID,
++	NPC_INNER_VID,
+ 	NPC_TOS,
+ 	NPC_IPFRAG_IPV4,
+ 	NPC_SIP_IPV4,
+@@ -229,6 +230,8 @@ enum key_fields {
+ 	NPC_VLAN_TAG1,
+ 	/* outer vlan tci for double tagged frame */
+ 	NPC_VLAN_TAG2,
++	/* inner vlan tci for double tagged frame */
++	NPC_VLAN_TAG3,
+ 	/* other header fields programmed to extract but not of our interest */
+ 	NPC_UNKNOWN,
+ 	NPC_KEY_FIELDS_MAX,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index 3b26893efdf8..3d0825c0685a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -2787,6 +2787,11 @@ static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
+ 			seq_printf(s, "mask 0x%x\n",
+ 				   ntohs(rule->mask.vlan_tci));
+ 			break;
++		case NPC_INNER_VID:
++			seq_printf(s, "0x%x ", ntohs(rule->packet.vlan_itci));
++			seq_printf(s, "mask 0x%x\n",
++				   ntohs(rule->mask.vlan_itci));
++			break;
+ 		case NPC_TOS:
+ 			seq_printf(s, "%d ", rule->packet.tos);
+ 			seq_printf(s, "mask 0x%x\n", rule->mask.tos);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index 9c365cc3e736..f2a7599aa9de 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -20,6 +20,7 @@ static const char * const npc_flow_names[] = {
+ 	[NPC_VLAN_ETYPE_CTAG] = "vlan ether type ctag",
+ 	[NPC_VLAN_ETYPE_STAG] = "vlan ether type stag",
+ 	[NPC_OUTER_VID]	= "outer vlan id",
++	[NPC_INNER_VID]	= "inner vlan id",
+ 	[NPC_TOS]	= "tos",
+ 	[NPC_IPFRAG_IPV4] = "fragmented IPv4 header ",
+ 	[NPC_SIP_IPV4]	= "ipv4 source ip",
+@@ -327,6 +328,8 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
+ 	 */
+ 	struct npc_key_field *vlan_tag1;
+ 	struct npc_key_field *vlan_tag2;
++	/* Inner VLAN TCI for double tagged frames */
++	struct npc_key_field *vlan_tag3;
+ 	u64 *features;
+ 	u8 start_lid;
+ 	int i;
+@@ -349,6 +352,7 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
+ 	etype_tag2 = &key_fields[NPC_ETYPE_TAG2];
+ 	vlan_tag1 = &key_fields[NPC_VLAN_TAG1];
+ 	vlan_tag2 = &key_fields[NPC_VLAN_TAG2];
++	vlan_tag3 = &key_fields[NPC_VLAN_TAG3];
+ 
+ 	/* if key profile programmed does not extract Ethertype at all */
+ 	if (!etype_ether->nr_kws && !etype_tag1->nr_kws && !etype_tag2->nr_kws) {
+@@ -430,6 +434,12 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
+ 		goto done;
+ 	}
+ 	*features |= BIT_ULL(NPC_OUTER_VID);
++
++	/* If key profile extracts inner vlan tci */
++	if (vlan_tag3->nr_kws) {
++		key_fields[NPC_INNER_VID] = *vlan_tag3;
++		*features |= BIT_ULL(NPC_INNER_VID);
++	}
+ done:
+ 	return;
+ }
+@@ -512,6 +522,7 @@ do {									       \
+ 	NPC_SCAN_HDR(NPC_ETYPE_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 8, 2);
+ 	NPC_SCAN_HDR(NPC_VLAN_TAG1, NPC_LID_LB, NPC_LT_LB_CTAG, 2, 2);
+ 	NPC_SCAN_HDR(NPC_VLAN_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 2, 2);
++	NPC_SCAN_HDR(NPC_VLAN_TAG3, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 6, 2);
+ 	NPC_SCAN_HDR(NPC_DMAC, NPC_LID_LA, la_ltype, la_start, 6);
+ 	/* SMAC follows the DMAC(which is 6 bytes) */
+ 	NPC_SCAN_HDR(NPC_SMAC, NPC_LID_LA, la_ltype, la_start + 6, 6);
+@@ -932,6 +943,8 @@ do {									      \
+ 
+ 	NPC_WRITE_FLOW(NPC_OUTER_VID, vlan_tci, ntohs(pkt->vlan_tci), 0,
+ 		       ntohs(mask->vlan_tci), 0);
++	NPC_WRITE_FLOW(NPC_INNER_VID, vlan_itci, ntohs(pkt->vlan_itci), 0,
++		       ntohs(mask->vlan_itci), 0);
+ 
+ 	NPC_WRITE_FLOW(NPC_IPFRAG_IPV6, next_header, pkt->next_header, 0,
+ 		       mask->next_header, 0);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 1e6fc23eca4f..a102f6e63fb3 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -439,6 +439,63 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
+ 	return 0;
+ }
+ 
++static int otx2_tc_process_vlan(struct otx2_nic *nic, struct flow_msg *flow_spec,
++				struct flow_msg *flow_mask, struct flow_rule *rule,
++				struct npc_install_flow_req *req, bool is_inner)
++{
++	struct flow_match_vlan match;
++	u16 vlan_tci, vlan_tci_mask;
++
++	if (!is_inner)
++		flow_rule_match_vlan(rule, &match);
++	else
++		flow_rule_match_cvlan(rule, &match);
++
++	if ((ntohs(match.key->vlan_tpid) != ETH_P_8021Q) &&
++	    (ntohs(match.key->vlan_tpid) != ETH_P_8021AD)) {
++		netdev_err(nic->netdev, "vlan tpid 0x%x not supported\n",
++			   ntohs(match.key->vlan_tpid));
++		return -EOPNOTSUPP;
++	}
++
++	if (!match.mask->vlan_id) {
++		struct flow_action_entry *act;
++		int i;
++
++		flow_action_for_each(i, act, &rule->action) {
++			if (act->id == FLOW_ACTION_DROP) {
++				netdev_err(nic->netdev, "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
++					   ntohs(match.key->vlan_tpid), match.key->vlan_id);
++				return -EOPNOTSUPP;
++			}
++		}
++	}
++
++	if (match.mask->vlan_id ||
++	    match.mask->vlan_dei ||
++	    match.mask->vlan_priority) {
++		vlan_tci = match.key->vlan_id |
++			   match.key->vlan_dei << 12 |
++			   match.key->vlan_priority << 13;
++
++		vlan_tci_mask = match.mask->vlan_id |
++				match.mask->vlan_dei << 12 |
++				match.mask->vlan_priority << 13;
++
++		if (!is_inner) {
++			flow_spec->vlan_tci = htons(vlan_tci);
++			flow_mask->vlan_tci = htons(vlan_tci_mask);
++			req->features |= BIT_ULL(NPC_OUTER_VID);
++		} else {
++			flow_spec->vlan_itci = htons(vlan_tci);
++			flow_mask->vlan_itci = htons(vlan_tci_mask);
++			req->features |= BIT_ULL(NPC_INNER_VID);
++		}
++	}
++
++	return 0;
++}
++
+ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 				struct flow_cls_offload *f,
+ 				struct npc_install_flow_req *req)
+@@ -458,6 +515,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 	      BIT(FLOW_DISSECTOR_KEY_BASIC) |
+ 	      BIT(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
+ 	      BIT(FLOW_DISSECTOR_KEY_VLAN) |
++	      BIT(FLOW_DISSECTOR_KEY_CVLAN) |
+ 	      BIT(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+ 	      BIT(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+ 	      BIT(FLOW_DISSECTOR_KEY_PORTS) |
+@@ -564,47 +622,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 	}
+ 
+ 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_VLAN)) {
+-		struct flow_match_vlan match;
+-		u16 vlan_tci, vlan_tci_mask;
+-
+-		flow_rule_match_vlan(rule, &match);
+-
+-		if (ntohs(match.key->vlan_tpid) != ETH_P_8021Q) {
+-			netdev_err(nic->netdev, "vlan tpid 0x%x not supported\n",
+-				   ntohs(match.key->vlan_tpid));
+-			return -EOPNOTSUPP;
+-		}
++		int ret;
+ 
+-		if (!match.mask->vlan_id) {
+-			struct flow_action_entry *act;
+-			int i;
+-
+-			flow_action_for_each(i, act, &rule->action) {
+-				if (act->id == FLOW_ACTION_DROP) {
+-					netdev_err(nic->netdev,
+-						   "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
+-						   ntohs(match.key->vlan_tpid),
+-						   match.key->vlan_id);
+-					return -EOPNOTSUPP;
+-				}
+-			}
+-		}
+-
+-		if (match.mask->vlan_id ||
+-		    match.mask->vlan_dei ||
+-		    match.mask->vlan_priority) {
+-			vlan_tci = match.key->vlan_id |
+-				   match.key->vlan_dei << 12 |
+-				   match.key->vlan_priority << 13;
++		ret = otx2_tc_process_vlan(nic, flow_spec, flow_mask, rule, req, false);
++		if (ret)
++			return ret;
++	}
+ 
+-			vlan_tci_mask = match.mask->vlan_id |
+-					match.mask->vlan_dei << 12 |
+-					match.mask->vlan_priority << 13;
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CVLAN)) {
++		int ret;
+ 
+-			flow_spec->vlan_tci = htons(vlan_tci);
+-			flow_mask->vlan_tci = htons(vlan_tci_mask);
+-			req->features |= BIT_ULL(NPC_OUTER_VID);
+-		}
++		ret = otx2_tc_process_vlan(nic, flow_spec, flow_mask, rule, req, true);
++		if (ret)
++			return ret;
+ 	}
+ 
+ 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
+-- 
+2.25.1
 
 
