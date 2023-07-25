@@ -1,133 +1,175 @@
-Return-Path: <netdev+bounces-20725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33D4760C75
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:53:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04BFD760C80
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C0DD281655
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:53:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD7072815CF
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7191C134A1;
-	Tue, 25 Jul 2023 07:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5362134A3;
+	Tue, 25 Jul 2023 07:58:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A7512B92
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:53:19 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3FC5BF
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:53:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690271597;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PWQd09CkgUEL/rfURKCBaafhE1vCc8Dv/cUNXDFlRRE=;
-	b=AGDQ9UZ0/NQAi4wR6OmtGEnHLtnhSs4kaAqvjrs0y+zxv8x9IrjDlKcsdV0NMpcp28SHk8
-	uvAf21xx5R4JVOP0oBXLlJTylJvtb5mB1RqNRGQ8+AoeBABefDuN68tjI3GXZ8QNef1xsN
-	agQGqp7Ie2M7HA+YJdFZDmUzMczhmwI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-41KBW0QVO-awLRrssva5dw-1; Tue, 25 Jul 2023 03:53:14 -0400
-X-MC-Unique: 41KBW0QVO-awLRrssva5dw-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-51e0fc38f16so4119771a12.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:53:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690271593; x=1690876393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PWQd09CkgUEL/rfURKCBaafhE1vCc8Dv/cUNXDFlRRE=;
-        b=Caez7dl6YoanQ5EcXyZtXDz2gH9GHRbcOycsokCJN1MxUKWrY1fMaJH3Ryoe2gkAH/
-         j9hgl+JeQLcwbt8GEvsbx4915NwFOWRBQTEK7xSbJjTqpkU95kIbn6ZUT1ZqGCnPar+P
-         0IBpdmCAgmtLhQXR8Y/wTTsZe5Du31qeQtfzsKLSjr/TB5H9fLcTKoiicwkre8Ai8GvE
-         NLT7GcVIv9GdvYLQxiJRVIhr3ES9ZGLsU1TOw5GKrShY3hG+zIl0+94gs2PJwumowkAz
-         iHBeX/BzXQG9zroWO9xeSsZLyvDHjy/apS5x2DZTqkocENPPWSgkGQOZHPi1t/sNrXV6
-         kNNA==
-X-Gm-Message-State: ABy/qLZRhdr8y2RwDzAsTsU0YKSlyeUwIfnRagiLnld37Km8OVRYqASR
-	EEbEzgVKDHTCICi/+I68BSAhxKg8YccBU7omnftpGXLz48jCBFN23h16iOm903xYd5dPZbIe1bL
-	RR6nQYrs8Ob1gyGwx
-X-Received: by 2002:a05:6402:b11:b0:51d:e2c4:f94a with SMTP id bm17-20020a0564020b1100b0051de2c4f94amr10599773edb.20.1690271593633;
-        Tue, 25 Jul 2023 00:53:13 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGMsygKA53ZagpKmLPph+kYwIqwDrCuyagGjgnUA/UfkItMnc3GeQVj+FzWHvPMnAT7Zuyh3w==
-X-Received: by 2002:a05:6402:b11:b0:51d:e2c4:f94a with SMTP id bm17-20020a0564020b1100b0051de2c4f94amr10599757edb.20.1690271593305;
-        Tue, 25 Jul 2023 00:53:13 -0700 (PDT)
-Received: from redhat.com ([2.55.164.187])
-        by smtp.gmail.com with ESMTPSA id g1-20020aa7c841000000b0051e576dbb57sm7165932edt.61.2023.07.25.00.53.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 00:53:12 -0700 (PDT)
-Date: Tue, 25 Jul 2023 03:53:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] virtio-net: fix race between set queues and probe
-Message-ID: <20230725035120-mutt-send-email-mst@kernel.org>
-References: <20230725072049.617289-1-jasowang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA59F12B69
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:58:54 +0000 (UTC)
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AFE5E5;
+	Tue, 25 Jul 2023 00:58:52 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36P7wROP083164;
+	Tue, 25 Jul 2023 02:58:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1690271907;
+	bh=KLs1UfhwOOeaUBOV26Gx4K3vBuDMVvonxjcwLCj13Hg=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=y12Wzw4Iu2TXxeCPAFt+QG7cv9UIyRzGc0ybdSAuKvI+MLImJuTBhOZ9dGXCuAchB
+	 nndIJBPS/Nbatc8vdIJleFimwainDuHqXDKO+CxUMxi2cABTxU5UVl1PS/ZS0LQMDs
+	 9wBUXKTJ75mV8OKi5/S/Q/XgunmrCDaanCoR8wrA=
+Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36P7wRZL121042
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 25 Jul 2023 02:58:27 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 25
+ Jul 2023 02:58:27 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 25 Jul 2023 02:58:27 -0500
+Received: from [172.24.227.217] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36P7wLPJ102460;
+	Tue, 25 Jul 2023 02:58:22 -0500
+Message-ID: <5a4b293f-7729-ee03-2432-cd49ff92d809@ti.com>
+Date: Tue, 25 Jul 2023 13:28:21 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725072049.617289-1-jasowang@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v11 03/10] net: ti:
+ icssg-prueth: Add Firmware config and classification APIs.
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>
+CC: MD Danish Anwar <danishanwar@ti.com>,
+        Randy Dunlap
+	<rdunlap@infradead.org>,
+        Roger Quadros <rogerq@kernel.org>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20230724112934.2637802-1-danishanwar@ti.com>
+ <20230724112934.2637802-4-danishanwar@ti.com> <ZL94/L1RMlU5TiAb@corigine.com>
+ <b2016718-b8e4-a1f8-92ed-f0d9e3cb9c17@ti.com> <ZL99WfF7iuzeMP78@corigine.com>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <ZL99WfF7iuzeMP78@corigine.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 03:20:49AM -0400, Jason Wang wrote:
-> A race were found where set_channels could be called after registering
-> but before virtnet_set_queues() in virtnet_probe(). Fixing this by
-> moving the virtnet_set_queues() before netdevice registering. While at
-> it, use _virtnet_set_queues() to avoid holding rtnl as the device is
-> not even registered at that time.
+On 25/07/23 1:14 pm, Simon Horman wrote:
+> On Tue, Jul 25, 2023 at 01:10:30PM +0530, Md Danish Anwar wrote:
+>> Hi Simon,
+>>
+>> On 25/07/23 12:55 pm, Simon Horman wrote:
+>>> On Mon, Jul 24, 2023 at 04:59:27PM +0530, MD Danish Anwar wrote:
+>>>> Add icssg_config.h / .c and icssg_classifier.c files. These are firmware
+>>>> configuration and classification related files. These will be used by
+>>>> ICSSG ethernet driver.
+>>>>
+>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>>>
+>>> Hi Danish,
+>>>
+>>> some feedback from my side.
+>>>
+>>
+>> Thanks for the feedback.
+>>
+>>> ...
+>>>
+>>>> diff --git a/drivers/net/ethernet/ti/icssg_classifier.c b/drivers/net/ethernet/ti/icssg_classifier.c
+>>>
+>>> ...
+>>>
+>>>> +void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
+>>>
+>>> This function appears to be unused.
+>>> Perhaps it would be better placed in a later patch?
+>>>
+>>> Or perhaps not, if it makes it hard to split up the patches nicely.
+>>> In which case, perhaps the __maybe_unused annotation could be added,
+>>> temporarily.
+>>>
+>>
+>> Due to splitting the patch into 8-9 patches, I had to introduce these helper
+>> APIs earlier. All these APIs are helper APIs, they will be used in patch 6
+>> (Introduce ICSSG Prueth driver).
+>>
+>> I had this concern that some APIs which will be used later but introduced
+>> earlier can create some warnings, before splitting the patches.
+>>
+>> I had raised this concern in [1] and asked Jakub if it would be OK to introduce
+>> these APIs earlier. Jakub said it would be fine [2], so I went ahead with this
+>> approach.
+>>
+>> It will make very hard to break patches if these APIs are introduced and used
+>> in same patch.
 > 
-> Fixes: a220871be66f ("virtio-net: correctly enable multiqueue")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-stable material I guess?
-
-> ---
->  drivers/net/virtio_net.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Thanks, I understand.
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 0db14f6b87d3..1270c8d23463 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4219,6 +4219,8 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	if (vi->has_rss || vi->has_rss_hash_report)
->  		virtnet_init_default_rss(vi);
->  
-> +	_virtnet_set_queues(vi, vi->curr_queue_pairs);
-> +
->  	/* serialize netdev register + virtio_device_ready() with ndo_open() */
->  	rtnl_lock();
->  
-> @@ -4257,8 +4259,6 @@ static int virtnet_probe(struct virtio_device *vdev)
->  		goto free_unregister_netdev;
->  	}
->  
-> -	virtnet_set_queues(vi, vi->curr_queue_pairs);
-> -
->  	/* Assume link up if device can't report link status,
->  	   otherwise get link status from config. */
->  	netif_carrier_off(dev);
-> -- 
-> 2.39.3
+> In that case my suggestion is to, temporarily, add __maybe_unused,
+> which will allow static analysis tools to work more cleanly over the
+> series. It is just a suggestion, not a hard requirement.
+> 
+> Probably something along those lines applies to all the
+> review I provided in my previous email. Please use your discretion here.
 
+For now I think I will leave it as it is. Let reviewers review all other
+patches. Let's see if there are any other comments on all the patches in this
+series. If there are any more comments on other patches, then while re-spinning
+next revision I will keep this in mind and try to add __maybe_unused tags in
+all APIs that are used later.
+
+The idea behind splitting the patches was to get them reviewed individually as
+it is quite difficult to get one big patch reviewed as explained by Jakub. And
+these warnings were expected. If there are any other comments on this series, I
+will try to address all of them together in next revision.
+
+Meanwhile, Please let me know if you have any comments on other patches in this
+series.
+
+-- 
+Thanks and Regards,
+Danish.
 
