@@ -1,183 +1,132 @@
-Return-Path: <netdev+bounces-21040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815AC7623AE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:41:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EDC27623B2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA307281A28
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:41:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD71128125B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A97B26B1D;
-	Tue, 25 Jul 2023 20:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A72026B25;
+	Tue, 25 Jul 2023 20:41:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8763F25937
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:41:08 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2072.outbound.protection.outlook.com [40.107.20.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DF7E47;
-	Tue, 25 Jul 2023 13:40:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YSAkJeMLVn1qbS3BzkUupMnoMPCU36xMg3FgCckMgmE34pH/uHqQ91+lSrDDbWW2F1VnMwEo1YO+STpTtUDYlrH47+0HiMTG2KDLusK4oX10KSPkxNqHApR5ItlssOhgwvqxnRhFSL1FyNujfcNR6E7mW25f4IFKrdHUTVsowHncytdmbOCzSe223hVt8SlL/OOph9LhpcFU8vrkz0KASKGGXjmyz/RMQqOM5LaYkJOYqu9tkkVjn6A6FpJ5/DFjmvoS/5N3OVTQ2zYEOJuILQbO6e7Ts5vmFJy8DXTA/zH97eC8HhIAdF5NARbr0Ynuj3boX2A5O+N64vedKorphg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=apvFxtoO/tk765HvcwYfAB6Rg23L41Uwl15m6SnpfLo=;
- b=J6jSyDnG3pnMhcn78z+E5O8tFDzj/sXrnJ/zNpW+Fn+hA+R32Ei+XSYeHF/up/L+KtM9lbHJhRhgdn6CppoeqwVBcVZveIKGN5cECKUmY8mtmPbduVehd4eMc/WVlixyppCEAy2EGdtkb5+xXV/mWiPfOEDhz5pEZi9YZ72H7z8ShBohxOnXWZ2PnrrQA8dNjhQ8R8AK8lBJpy50bGIA0OQCqIPOPzz0rL9yyJ4CF/qfADA/44ISjLQN5x4ETKLVYxXildDcv7kflERqW/ehcVSfb8mB7cdfm1sALugEUa9HmTmavLZV3d7RriwEl3h3Z14mcevkN7O1pnDYYDDc8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=apvFxtoO/tk765HvcwYfAB6Rg23L41Uwl15m6SnpfLo=;
- b=W78MIQ+DmZtQ0Xez7YgzG/DmE/+eJA4RCy+ahWeh4WkZ/2bWU7ywWqG++Z/ZpUO0vSkkx1u6rrmCngrz9fTiPIwd5ftkEf6E/Sbck7ll5TZUFDmRtu7F6eMmNvnWsFHDeFSzPNmwfvfrpQNe0/cLxj/1q4KV3+j62/N3p95txt8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBAPR04MB7430.eurprd04.prod.outlook.com (2603:10a6:10:1aa::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
- 2023 20:40:46 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 20:40:46 +0000
-Date: Tue, 25 Jul 2023 23:40:42 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Simon Horman <simon.horman@corigine.com>,
-	Arnd Bergmann <arnd@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Robert-Ionut Alexa <robert-ionut.alexa@nxp.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Josua Mayer <josua@solid-run.com>, Netdev <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dpaa: avoid linking objects into multiple modules
-Message-ID: <20230725204042.opemku5oerpkpsqi@skbuf>
-References: <20230725064403.581634-1-arnd@kernel.org>
- <ZMAqPdO2XcIXOCFs@corigine.com>
- <990b6871-169b-4d03-b202-f19294730f8c@app.fastmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <990b6871-169b-4d03-b202-f19294730f8c@app.fastmail.com>
-X-ClientProxiedBy: FR3P281CA0045.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:4a::16) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2F925937
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:41:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F86C433C9;
+	Tue, 25 Jul 2023 20:41:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690317684;
+	bh=4V1XXxIW5oRnhknxJ2XuysM/hqs0Fd0JpSgwRpnx7JU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lSlUdVfKUV9Bh3jPsCExGKGOHdD0ZuAjtGsICKq/f602KKHb0qrjBkeao1pS6rIr3
+	 EFCYA16xqDhktZ7IauZuuydw13btbP1YFtBRMZqbqK+XjRzAaP82lxo6bvX5mWH8xZ
+	 Zp8B1U/m0WbH0MeRA63iFVFFOF20EVRFd4ehPGOik00L0JaaFw8Zqedb6TbzX4vWra
+	 GdY7bnKcad4IYrseznj/yhAhKUcrzS9R+peSXaLi5HPkFqy1iLVjor9yTVxwOFs60U
+	 VC4qfhy2tN1MDlEgzzyhpdY6SV5YOCCqqG3vccTDgNd+0O+COUi0+FhmUwn1O0oAF5
+	 7yhUrOg1CHquA==
+Date: Tue, 25 Jul 2023 13:41:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, corbet@lwn.net, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net] docs: net: clarify the NAPI rules around XDP Tx
+Message-ID: <20230725134122.1684a2f1@kernel.org>
+In-Reply-To: <CAKgT0UdKWmogiFD_Gip3TCi8-ydy+CVjwca1hPTYBRQQZ8_mGQ@mail.gmail.com>
+References: <20230720161323.2025379-1-kuba@kernel.org>
+	<c429298e279bd549de923deba09952e7540e534a.camel@gmail.com>
+	<20230725115528.596b5305@kernel.org>
+	<CAKgT0UdKWmogiFD_Gip3TCi8-ydy+CVjwca1hPTYBRQQZ8_mGQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBAPR04MB7430:EE_
-X-MS-Office365-Filtering-Correlation-Id: 20321a81-6030-4ae9-3157-08db8d4f6c69
-X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
- FE/uZYdCfpbF4uKEaIywhpI1chfDEkWbsH+o+NRdN9MBMD82dM1Ye/Vo6pH15q+/CIJ9a8BnNnZZwyGrhAveqxzKkrW3FFgEuN8JQKN3pMOFtJYulwOG7d5/16p2vwOP1eambTGYZItCJdQ81UbMT425MIrNbqoLD/h6byp/DXONCqnO3jGH299X2iJlrKrAk9McMfbpiykCER+K8q8mL+7AdC6+PacH297QTrANk3PAuJx4ca47oLP/eUqBoZOeAxerLKb2u+IQKnvFBb695TaAJk793oPhsoqtWogpQo6WLQNcsy1XY1/7ytDxbw2glro99Vyg6xBYyBzoIRaEPWKv3RIqcSmEvWbyxohpA6nQ0h3YQ0HaqQMu0etClVnjExdUFXx5rTKyGneP4DFH0chthk9UKCHilsXgoq9cpiO7MgcEkieTLxHPgAVe0vYEfxSLehiUtLhREB1hAVKalQ4gkSb17a6gWk/IeGzE84bXuBb04pKeaLJ59Bwx0qjqcx3fe0xP8zWSih3DY6Xz4Y5E9yvKRy6s9te8wC1sB/tnlF/UVtdYjhcJbiFM/IPa
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(136003)(376002)(346002)(39860400002)(396003)(366004)(451199021)(33716001)(6486002)(54906003)(66476007)(66556008)(66946007)(83380400001)(86362001)(38100700002)(478600001)(6512007)(9686003)(26005)(186003)(1076003)(6506007)(6666004)(41300700001)(5660300002)(316002)(2906002)(6916009)(4326008)(7416002)(8676002)(8936002)(44832011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?lEHQuEG2iGHnnXtiNAoHsgsAtOdXoHdnkt4yhylOGVchvEdWX5y48L03c3pW?=
- =?us-ascii?Q?VFUjuyllCBGlVKva+bjD4/Cb/A3dk0df2DPJGI3Fu6MZRoBubm+Flj8pGJxe?=
- =?us-ascii?Q?neZKYyaas4Nwr5JFudqw8Tglpo01JZUQUBwdZ3ByPSKmgZ/B5Q9qXTk8rk/9?=
- =?us-ascii?Q?XRFl31WOQBycmvuKPr4vp1mbD8L36t+VL3JL9/6IO1jKUgc+lc2e0hRXAXCJ?=
- =?us-ascii?Q?jzoSUPPudNajz/EGvwdnNEri9eEVGCIhzibgRd6plDfLtI7HfbMR02F8e2PG?=
- =?us-ascii?Q?rEZxWuFHyPoMG/e4BOI80us/hk3tA0v5XE+VvTrHNeakAK7dKDh585QkIdaO?=
- =?us-ascii?Q?9SLbjmQlm0MxaDozj3DWTEStHHbhFQiaXmPDOJk4Wt1pdY077JNJYTicIqu8?=
- =?us-ascii?Q?ABQnJiWtAA40CgnfHzAVoSndq//a1W42swv85W7o/fz5vhJ2c6stM6tD0STU?=
- =?us-ascii?Q?UtRFljALdmFWYccC6/fn57ZKKUgDCXDk3gih28B42nYwj5LsLkKP0IOM0sss?=
- =?us-ascii?Q?iQESclRqfsuXV96ntEyl3CcsqDCGmAt50GHOs0/VVa/fO+qxRjw1FV7Xdn6b?=
- =?us-ascii?Q?sy4B8g98/MvXNmgxWMvemaHx2RHhZA69GDdFvJCp7BLpP/sl98l6B8PAv043?=
- =?us-ascii?Q?GESMJ+1qRTYvbuhG5LuhFln2dI4SzygLaGYKc+lAZeiHWP8G0fPD7lrn4bP6?=
- =?us-ascii?Q?SowiyYrLoVzBwLl5LvSChiLwETF0zpyes6fiPjWX9wzD0hzIBLFmx/Zee78h?=
- =?us-ascii?Q?hAmV6U0hMf+KHSHOoS+zvhznG78Q/Khc2VSQoelWfABx32z/TjvPS6v+ET9J?=
- =?us-ascii?Q?Hoax42g4gctBsu6peZM9EzacTCnTf7l1OyGehfgNWmWAe7EowGAIIn/Kby44?=
- =?us-ascii?Q?1jthNDnQLDGqOnvX3/I3hyZD/5/VoWxuS8L4U1tCR5WBqYrP/2kBnlrxqYCE?=
- =?us-ascii?Q?t57wXedRW7FZeGD1AyUfExmD5uEepJL1H2eUGkPKEY4x1yWaWTt8iflqjbjV?=
- =?us-ascii?Q?cqImhlV4oYAyaOw8CIn0Jdj2E64m2JfFcZosiiniUFaWxZV0tM75VYkbUjqH?=
- =?us-ascii?Q?OZ3FENN40E/i/xcDm4IGalo/CgzYsRE7iORVWLRVgMOqrFIXjJiZEj8rJD+g?=
- =?us-ascii?Q?gaA9lwGRGnxTxZ7axm2yqSupTAY2jRNavzj1jep7UtV1oguT4KfXz2Rl43hh?=
- =?us-ascii?Q?anRxInCsQ3d+/pNDSi1UdDG+t7q7cgFibBAigpPxOAbHKz6/cOTAeBUTcGfM?=
- =?us-ascii?Q?t5c9pEIXHmS73sgpUCF/t7ozKXTp+BSphrnVLh5g1L+m+czZCV+zsCMmYJ9n?=
- =?us-ascii?Q?MQOhwKOSWT6fqtqndA/3VkszgUg1wDzA5r990VpMFsKoSJ5QoxFrc/6m3cRc?=
- =?us-ascii?Q?+3Jqqa4ISPyoq9Pz17uV4DzsU0QevhATEfunKsf7YEJbIdC1dnoWwV+4GJNR?=
- =?us-ascii?Q?vYRYAQO2ibwno18G9QlorwjLfmMxQAyxWQPhpFoYSGp57SReQ55mSofw0VfZ?=
- =?us-ascii?Q?EUmJD5ef7HVZCN8yJfgAP8CpRpKcP2i/sUAvIEi8c0/GxltSGavMIqwF7DMf?=
- =?us-ascii?Q?C+rYiFGjgSO7b0MN+ID/fIy9XhsaK2CHcyUIIRlSmtQri084NpNHXoulP/P3?=
- =?us-ascii?Q?Lg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20321a81-6030-4ae9-3157-08db8d4f6c69
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 20:40:46.5213
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Shd2aAjwXH2OUPU4rFCq0tfuCSuTLa3bzPD5KeQxXo1JnDH7VXKfuvRTliGI4238vo4HYuZp0pJt4Kht8kuf9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7430
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 25, 2023 at 10:37:07PM +0200, Arnd Bergmann wrote:
-> On Tue, Jul 25, 2023, at 22:02, Simon Horman wrote:
-> > On Tue, Jul 25, 2023 at 08:43:40AM +0200, Arnd Bergmann wrote:
-> >> From: Arnd Bergmann <arnd@arndb.de>
-> >> 
-> >> Each object file contains information about which module it gets linked
-> >> into, so linking the same file into multiple modules now causes a warning:
-> >> 
-> >> scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-> >> scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-> >> 
-> >> Chang the way that dpaa2 is built by moving the two common files into a
-> >> separate module with exported symbols instead.
-> >> 
-> >> To avoid a link failure when the switch driver is built-in, but the dpio driver
-> >> is a loadable module, add the same dependency in there that exists for
-> >> the ethernet driver.
-> >> 
-> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Tue, 25 Jul 2023 13:10:18 -0700 Alexander Duyck wrote:
+> On Tue, Jul 25, 2023 at 11:55=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> > > This isn't accurate, and I would say it is somewhat dangerous advice.
+> > > The Tx still needs to be processed regardless of if it is processing
+> > > page_pool pages or XDP pages. I agree the Rx should not be processed,
+> > > but the Tx must be processed using mechanisms that do NOT make use of
+> > > NAPI optimizations when budget is 0.
+> > >
+> > > So specifically, xdp_return_frame is safe in non-NAPI Tx cleanup. The
+> > > xdp_return_frame_rx_napi is not.
+> > >
+> > > Likewise there is napi_consume_skb which will use either a NAPI or no=
+n-
+> > > NAPI version of things depending on if budget is 0 or not.
+> > >
+> > > For the page_pool calls there is the "allow_direct" argument that is
+> > > meant to decide between recycling in directly into the page_pool cache
+> > > or not. It should only be used in the Rx handler itself when budget is
+> > > non-zero.
+> > >
+> > > I realise this was written up in response to a patch on the Mellanox
+> > > driver. Based on the patch in question it looks like they were calling
+> > > page_pool_recycle_direct outside of NAPI context. There is an explicit
+> > > warning above that function about NOT calling it outside of NAPI
+> > > context. =20
 > >
-> > Hi Arnd,
-> >
-> > overall this looks good to me.
-> > One thing that I noticed, and I'm not sure if we care,
-> > is that an x86_64 allmodconfig now reports:
-> >
-> > WARNING: modpost: missing MODULE_DESCRIPTION() in 
-> > drivers/net/ethernet/freescale/dpaa2/fsl-dpaa2-common.o
-> 
-> My mistake, I had disabled the warning in modpost.c as it was
-> generating too much output while I tried to address some
-> other warnings, so I missed the regression I introduced.
-> 
-> I'll send a v2, adding
-> 
-> MODULE_DESCRIPTION("DPAA2 Ethernet core library");
-> 
->       Arnd
+> > Unless I'm missing something budget=3D0 can be called from hard IRQ
+> > context. And page pool takes _bh() locks. So unless we "teach it"
+> > not to recycle _anything_ in hard IRQ context, it is not safe to call. =
+=20
+>=20
+> That is the thing. We have to be able to free the pages regardless of
+> context. Otherwise we make a huge mess of things. Also there isn't
+> much way to differentiate between page_pool and non-page_pool pages
+> because an skb can be composed of page pool pages just as easy as an
+> XDP frame can be. All you would just have to enable routing or
+> bridging for Rx frames to end up with page pool pages in the Tx path.
+>=20
+> As far as netpoll itself we are safe because it has BH disabled and so
 
-Hi Arnd,
+We do? Can you point me to where netpoll disables BH?
 
-Don't send a v2 yet, I'm writing a more detailed response.
+> as a result page_pool doesn't use the _bh locks. There is code in
+> place to account for that in the producer locking code, and if it were
+> an issue we would have likely blown up long before now. The fact is
+> that page_pool has proliferated into skbs, so you are still freeing
+> page_pool pages indirectly anyway.
+>=20
+> That said, there are calls that are not supposed to be used outside of
+> NAPI context, such as page_pool_recycle_direct(). Those have mostly
+> been called out in the page_pool.h header itself, so if someone
+> decides to shoot themselves in the foot with one of those, that is on
+> them. What we need to watch out for are people abusing the "direct"
+> calls and such or just passing "true" for allow_direct in the
+> page_pool calls without taking proper steps to guarantee the context.
+>
+> > > We cannot make this distinction if both XDP and skb are processed in
+> > > the same Tx queue. Otherwise you will cause the Tx to stall and break
+> > > netpoll. If the ring is XDP only then yes, it can be skipped like what
+> > > they did in the Mellanox driver, but if it is mixed then the XDP side
+> > > of things needs to use the "safe" versions of the calls. =20
+> >
+> > IDK, a rare delay in sending of a netpoll message is not a major
+> > concern. =20
+>=20
+> The whole point of netpoll is to get data out after something like a
+> crash. Otherwise we could have just been using regular NAPI. If the Tx
+> ring is hung it might not be a delay but rather a complete stall that
+> prevents data on the Tx queue from being transmitted on since the
+> system will likely not be recovering. Worse yet is if it is a scenario
+> where the Tx queue can recover it might trigger the Tx watchdog since
+> I could see scenarios where the ring fills, but interrupts were
+> dropped because of the netpoll.
+
+I'm not disagreeing with you. I just don't have time to take a deeper
+look and add the IRQ checks myself and I'm 90% sure the current code
+can't work with netpoll. So I thought I'd at least document that :(
 
