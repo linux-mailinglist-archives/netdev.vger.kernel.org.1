@@ -1,88 +1,126 @@
-Return-Path: <netdev+bounces-20991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1C5876217C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:35:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D1476218C
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 174791C21011
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 187421C20D16
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5986D263B2;
-	Tue, 25 Jul 2023 18:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C832B2517B;
+	Tue, 25 Jul 2023 18:37:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3C72416D;
-	Tue, 25 Jul 2023 18:35:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7F5C43391;
-	Tue, 25 Jul 2023 18:34:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690310099;
-	bh=CeGxhrvZHThEsyTOEnPxSmGBdhmosALuz9k50d2C/S8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Kvfz9Lp36y6TgtEnpT2UiDb2SVPbspS7uCWkLDYO4E+KJQxrTWqGIcXNBmQPivAWM
-	 ziBT5ndTF+PXxGJ6xGn/A5R7909d5ZniwH7c2B2y06vvIBwo0SS4LtR9r5FqRR2Rrs
-	 7q4LwCalSL0ts65kEPAgKyRR6lOv8MWevy5AbSYuo9g40G85HHbvcCP/BziFw7rHOe
-	 lBqjRRWbJ9z53w3kvjIbAnDOPxnEaCyTkS9dILyAO09CSGzIPCnEqkIT41shFRPwQt
-	 rjxg2ASmURXM4YPKcKZGX+tAPWtkX0s0pfqKgB056+fG9osNz9NX/mrKH4V9GzAcwh
-	 uvWg1CkfBNMeQ==
-From: Mat Martineau <martineau@kernel.org>
-Date: Tue, 25 Jul 2023 11:34:56 -0700
-Subject: [PATCH net 2/2] mptcp: more accurate NL event generation
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD84B21D52
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:37:45 +0000 (UTC)
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92142A3;
+	Tue, 25 Jul 2023 11:37:42 -0700 (PDT)
+Received: from localhost.localdomain (unknown [46.242.14.200])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 2441A40737C9;
+	Tue, 25 Jul 2023 18:37:40 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 2441A40737C9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1690310260;
+	bh=Fab9GIRqttp0ydbdVKfgoFyEoFMbYfoPhmXpg6WhCHs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ddcaE4I/VzTy3aKJgfWeYWGmrOmkYBy5F4v+Tl+RBOJ4vPinRUv3me4AIANvpFpp6
+	 qDUn/b4SzwGhpEM8P/5uR1E5bbFFMp/VVoRtPBnyF6iZQunyUm/M4jZ54Zx17SFmrI
+	 uQSU26BsLa6BiIW0ScfzrLMgyhKKX8SY13BqBhTI=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org
+Subject: [PATCH] tipc: stop tipc crypto on failure in tipc_node_create
+Date: Tue, 25 Jul 2023 21:36:44 +0300
+Message-ID: <20230725183646.5668-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230725-send-net-20230725-v1-2-6f60fe7137a9@kernel.org>
-References: <20230725-send-net-20230725-v1-0-6f60fe7137a9@kernel.org>
-In-Reply-To: <20230725-send-net-20230725-v1-0-6f60fe7137a9@kernel.org>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Geliang Tang <geliang.tang@suse.com>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, stable@vger.kernel.org, 
- Mat Martineau <martineau@kernel.org>
-X-Mailer: b4 0.12.3
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Paolo Abeni <pabeni@redhat.com>
+If tipc_link_bc_create() fails inside tipc_node_create() for a newly
+allocated tipc node then we should stop its tipc crypto and free the
+resources allocated with a call to tipc_crypto_start().
 
-Currently the mptcp code generate a "new listener" event even
-if the actual listen() syscall fails. Address the issue moving
-the event generation call under the successful branch.
+Call tipc_crypto_stop() in that case. Also extract the similar error exit
+paths into a goto statement.
 
-Fixes: f8c9dfbd875b ("mptcp: add pm listener events")
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Mat Martineau <martineau@kernel.org>
+Found by Linux Verification Center (linuxtesting.org).
+
+Fixes: cb8092d70a6f ("tipc: move bc link creation back to tipc_node_create")
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 ---
- net/mptcp/protocol.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ net/tipc/node.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 3613489eb6e3..3317d1cca156 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3723,10 +3723,9 @@ static int mptcp_listen(struct socket *sock, int backlog)
- 	if (!err) {
- 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
- 		mptcp_copy_inaddrs(sk, ssock->sk);
-+		mptcp_event_pm_listener(ssock->sk, MPTCP_EVENT_LISTENER_CREATED);
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 5e000fde8067..0d64005a803b 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -546,9 +546,7 @@ struct tipc_node *tipc_node_create(struct net *net, u32 addr, u8 *peer_id,
+ #ifdef CONFIG_TIPC_CRYPTO
+ 	if (unlikely(tipc_crypto_start(&n->crypto_rx, net, n))) {
+ 		pr_warn("Failed to start crypto RX(%s)!\n", n->peer_id_string);
+-		kfree(n);
+-		n = NULL;
+-		goto exit;
++		goto free_node;
  	}
+ #endif
+ 	n->addr = addr;
+@@ -583,9 +581,7 @@ struct tipc_node *tipc_node_create(struct net *net, u32 addr, u8 *peer_id,
+ 				 n->capabilities, &n->bc_entry.inputq1,
+ 				 &n->bc_entry.namedq, snd_l, &n->bc_entry.link)) {
+ 		pr_warn("Broadcast rcv link creation failed, no memory\n");
+-		kfree(n);
+-		n = NULL;
+-		goto exit;
++		goto stop_crypto;
+ 	}
+ 	tipc_node_get(n);
+ 	timer_setup(&n->timer, tipc_node_timeout, 0);
+@@ -610,6 +606,15 @@ struct tipc_node *tipc_node_create(struct net *net, u32 addr, u8 *peer_id,
+ exit:
+ 	spin_unlock_bh(&tn->node_list_lock);
+ 	return n;
++stop_crypto:
++
++#ifdef CONFIG_TIPC_CRYPTO
++	tipc_crypto_stop(&n->crypto_rx);
++free_node:
++#endif
++	kfree(n);
++	spin_unlock_bh(&tn->node_list_lock);
++	return NULL;
+ }
  
--	mptcp_event_pm_listener(ssock->sk, MPTCP_EVENT_LISTENER_CREATED);
--
- unlock:
- 	release_sock(sk);
- 	return err;
-
+ static void tipc_node_calculate_timer(struct tipc_node *n, struct tipc_link *l)
 -- 
 2.41.0
 
