@@ -1,125 +1,106 @@
-Return-Path: <netdev+bounces-20797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ED77761056
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:12:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3EF1761061
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C36281238
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:12:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDD5E1C20D5B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E49B182C8;
-	Tue, 25 Jul 2023 10:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EA718AE8;
+	Tue, 25 Jul 2023 10:15:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B4015AEF
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:12:53 +0000 (UTC)
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531C510E3;
-	Tue, 25 Jul 2023 03:12:52 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.west.internal (Postfix) with ESMTP id EA5DF32008FB;
-	Tue, 25 Jul 2023 06:12:50 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Tue, 25 Jul 2023 06:12:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690279970; x=1690366370; bh=xgUVqqNdgbniF
-	Ku43r5PV8GdNxqPVdClT1x0fcn2Eiw=; b=zS/A2pyjZnF4kvWcirBt5OlRqnuVY
-	t+BE+RRUQvF2Ruvx7K72DOWdQddydkr8HOV45r0zSsPsLhzK5IZopyDsmw5H3vHK
-	2Oz+DX/OF/5SQGBHQisMgv1FJGGq1V9TPInEKhDdBYV0Jz3Zbu+vCcBKoEFCKN/c
-	L1K1ARsDWqW89K4CqdUTDnY/b8da4BHIp/2p0C0Ahm5t1YszMZQtYlNOLkbhNWBZ
-	E1+qXZxGJG94Ln1wpIcicgc8czpDyFHZOacNlxWEKZ0QFlE9RJ0+PGt7UfG6HGT9
-	hoVca3T9YpHkXP5vdoXxHOLMvnH/puK//qRB10Ahqf8TSq7sL+sfS1CpQ==
-X-ME-Sender: <xms:IqC_ZCnrpiqzcEgfAXkTWrJ53ye3iZxcMnhntjEMDCj0uZPh2E1KZw>
-    <xme:IqC_ZJ0SG8CpHH_7j1SVSFn-JGPk8TSZ_B1hllguyHIDMzCz3AL0V18o_QuVsCd5j
-    wPsFQpzFDLTnJ0>
-X-ME-Received: <xmr:IqC_ZApTXGSmLNQlN3G6sUcBFkhTmm_gNUiFhhK6EwaLBfPrzjXn89o-hgoH9G81Pe1xUMr0Ou2OYdGiu8cUWuSvVBY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedriedtgddvgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:IqC_ZGnDBSw3seLQQa3Q6H39fiVJ6iq9ngSccYu99kYt32q1yMvigw>
-    <xmx:IqC_ZA1OFFt9nGhGqXd9jC_0u4AMMLFcuRI2fb0yNiLyMlUaAyZs0Q>
-    <xmx:IqC_ZNuFp8BZVQQvn03PII2UeMFELez5pPRVB0zdTagflbaEOs7m1g>
-    <xmx:IqC_ZBl-kj4Fg1ZdXut26qyxgUCboRi5ImL-2Srusu007D49aVtmnw>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Jul 2023 06:12:49 -0400 (EDT)
-Date: Tue, 25 Jul 2023 13:12:46 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next] flow_dissector: Add IPSEC dissectors
-Message-ID: <ZL+gHkLnLE91YBkS@shredder>
-References: <20230725032451.505189-1-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D9714A91
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:15:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93909C433CC;
+	Tue, 25 Jul 2023 10:15:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690280125;
+	bh=hk8s9U4aku/7NMyH7BUL+F1PpRRQQ59PN2hfITnjTVE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Uz9Uq3ekZhN/d14VXs/7apxFaWgqYSAciN9aaNWebnJzaQ/vv0RZx60oviF9aDFfO
+	 FfxNlWWofAxBgmtJ2GqCG5bc/UCeU6cmwDqSG5gu+2xdAlW84SWC66T/9Ea2h7vDTl
+	 zV+6GDjOMafbZ21OI8RWKkbr5LYCBY5ynlZ2aYCuG7bk1eyMFF+SLPiliYdhRRg0Ge
+	 wk8fkI7FEn+Jnr81WjrdwGz6BOO+K7b5gdki13Wo6OnhE/7raVtR1MwjBHHew18MH7
+	 /u6jmcyx6zKDeUvsfRwp1edvfq0rzT5JvREVEdHf3KS70mRH+LddTl//mrNuPJ390e
+	 Y2mJ1cvaRRMpw==
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4fb41682472so8052178e87.2;
+        Tue, 25 Jul 2023 03:15:25 -0700 (PDT)
+X-Gm-Message-State: ABy/qLbioqWNxf3bZCu6oUgsYgmGW8DqjZMBYFRQVxo3IztU+axJBazO
+	rqEj2dKX4Rk5HxboIjOu2ZBapw2RZU0b6ys/wDY=
+X-Google-Smtp-Source: APBJJlFL5PlFPlTKZlnrORr+4EFa8QloNsr9WS714msWOKtWqsR7UdEi8SMfTyPM8k2z6Gm1c2rghgvQOYLYIbgqR7g=
+X-Received: by 2002:a05:6512:2109:b0:4fc:ab2e:8751 with SMTP id
+ q9-20020a056512210900b004fcab2e8751mr7113692lfr.1.1690280123489; Tue, 25 Jul
+ 2023 03:15:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725032451.505189-1-rkannoth@marvell.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <20230724090044.2668064-1-ilia.lin@kernel.org> <20230724181105.GD11388@unreal>
+ <CA+5LGR3ifQbn4x9ncyjJLxsFU4NRs90rVcqECJ+-UC=pP35OjA@mail.gmail.com>
+ <20230725051917.GH11388@unreal> <CA+5LGR2oDFEjJL5j715Pi9AtmJ7LXM82a63+rcyYow-E5trXtg@mail.gmail.com>
+ <20230725093826.GO11388@unreal>
+In-Reply-To: <20230725093826.GO11388@unreal>
+From: Ilia Lin <ilia.lin@kernel.org>
+Date: Tue, 25 Jul 2023 13:15:12 +0300
+X-Gmail-Original-Message-ID: <CA+5LGR1K-=-c8_pjyPTbT9B=SinHv8f61jzeOnjRDODffrPbsQ@mail.gmail.com>
+Message-ID: <CA+5LGR1K-=-c8_pjyPTbT9B=SinHv8f61jzeOnjRDODffrPbsQ@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: kconfig: Fix XFRM_OFFLOAD dependency on XFRM
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Ilia Lin <ilia.lin@kernel.org>, steffen.klassert@secunet.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, jeffrey.t.kirsher@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 25, 2023 at 08:54:51AM +0530, Ratheesh Kannoth wrote:
->  Support for dissecting IPSEC field SPI (which is
->  32bits in size) for ESP and AH packets.
-> 
->  This implementation does not support NAT-T
->  (encapsulation of ESP packets over UDP).
-> 
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> ---
->  include/net/flow_dissector.h |  9 ++++++
->  include/net/flow_offload.h   |  6 ++++
->  include/uapi/linux/pkt_cls.h |  3 ++
->  net/core/flow_dissector.c    | 53 +++++++++++++++++++++++++++++++++++-
->  net/core/flow_offload.c      |  7 +++++
->  net/sched/cls_flower.c       | 18 ++++++++++++
+On Tue, Jul 25, 2023 at 12:38=E2=80=AFPM Leon Romanovsky <leon@kernel.org> =
+wrote:
+>
+> On Tue, Jul 25, 2023 at 12:11:06PM +0300, Ilia Lin wrote:
+> > On Tue, Jul 25, 2023 at 8:19=E2=80=AFAM Leon Romanovsky <leon@kernel.or=
+g> wrote:
+> > >
+> > > On Tue, Jul 25, 2023 at 07:41:49AM +0300, Ilia Lin wrote:
+> > > > Hi Leon,
+> > >
+> > > You was already asked do not top-post.
+> > > https://lore.kernel.org/netdev/20230718105446.GD8808@unreal/
+> > > Please stop it.
+> > >
+> > > >
+> > > > This is exactly like I described:
+> > > > * xfrm.h is included from the net/core/sock.c unconditionally.
+> > > > * If CONFIG_XFRM_OFFLOAD is set, then the xfrm_dst_offload_ok() is
+> > > > being compiled.
+> > > > * If CONFIG_XFRM is not set, the struct dst_entry doesn't have the =
+xfrm member.
+> > > > * xfrm_dst_offload_ok() tries to access the dst->xfrm and that fail=
+s to compile.
+> > >
+> > > I asked two questions. First one was "How did you set XFRM_OFFLOAD
+> > > without XFRM?".
+> > >
+> > > Thanks
+> > >
+> > In driver Kconfig: "select XFRM_OFFLOAD"
+>
+> In driver Kconfig, one should use "depends on XFRM_OFFLOAD" and not "sele=
+ct XFRM_OFFLOAD".
+> Drivers shouldn't enable XFRM_OFFLOAD directly and all upstream users are=
+ safe here.
 
-Please split flow dissector and flower changes into separate patches.
-Also, you can't add the flow offload bits without a corresponding driver
-change. Nobody calls the exported flow_rule_match_ipsec() function.
+Thank you for that information, but the XFRM_OFFLOAD doesn't depend on
+XFRM either.
 
-[...]
-
-> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-> index 7865f5a9885b..a90b0e3d351f 100644
-> --- a/include/uapi/linux/pkt_cls.h
-> +++ b/include/uapi/linux/pkt_cls.h
-> @@ -594,6 +594,9 @@ enum {
->  
->  	TCA_FLOWER_KEY_L2TPV3_SID,	/* be32 */
->  
-> +	TCA_FLOWER_KEY_SPI,		/* be32 */
-> +	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
-> +
-
-This will break existing user space on new kernels. New attributes must
-be added at the end.
-
->  	TCA_FLOWER_L2_MISS,		/* u8 */
->  
->  	TCA_FLOWER_KEY_CFM,		/* nested */
+>
+> Thanks
 
