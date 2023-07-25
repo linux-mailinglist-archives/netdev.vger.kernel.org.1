@@ -1,122 +1,149 @@
-Return-Path: <netdev+bounces-20652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7624876062E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:01:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C44D3760627
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1BEB1C20921
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:01:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 545592816CB
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E5F1876;
-	Tue, 25 Jul 2023 03:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33AE71876;
+	Tue, 25 Jul 2023 03:01:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADE520E1
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:01:50 +0000 (UTC)
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83DBD173D;
-	Mon, 24 Jul 2023 20:01:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Y7Db9
-	CtYu9IW3X/wWavIFjW3pwP0JBOPHcat5DJxUPQ=; b=RIRF2W4aI3DUUx39z4OG9
-	6v5Rz2dG6AjeONNuuML9MW2NRCODYyvWmVmZpNYpiZOWefl+5OT8yGrRKmgyEnac
-	IRiTO13k/Aa8QajqA79MbT55ZwFSnhz38Bi55aelv5dFicALob56UF+FwOtBVUc6
-	ORWNfK4LtN2IpIIIXTiSik=
-Received: from leanderwang-LC2.localdomain (unknown [111.206.145.21])
-	by zwqz-smtp-mta-g1-2 (Coremail) with SMTP id _____wC3TZbMOr9kRW7dBA--.23188S2;
-	Tue, 25 Jul 2023 11:00:29 +0800 (CST)
-From: Zheng Wang <zyytlz.wz@163.com>
-To: s.shtylyov@omp.ru
-Cc: lee@kernel.org,
-	linyunsheng@huawei.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	p.zabel@pengutronix.de,
-	geert+renesas@glider.be,
-	magnus.damm@gmail.com,
-	yoshihiro.shimoda.uh@renesas.com,
-	biju.das.jz@bp.renesas.com,
-	wsa+renesas@sang-engineering.com,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hackerzheng666@gmail.com,
-	1395428693sheep@gmail.com,
-	alex000young@gmail.com,
-	Zheng Wang <zyytlz.wz@163.com>
-Subject: [PATCH v4] net: ravb: Fix possible UAF bug in ravb_remove
-Date: Tue, 25 Jul 2023 11:00:26 +0800
-Message-Id: <20230725030026.1664873-1-zyytlz.wz@163.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4361114
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:01:24 +0000 (UTC)
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E8D10FD
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:01:22 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-682a5465e9eso1177314b3a.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:01:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690254081; x=1690858881;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BOm9JtzAMmxvhoSbX2NtL3QoGfALrOaBCsSuiN3HvS8=;
+        b=S6qTrQW9jNBAqKkMe5A0Cu8+HbQDlzC3TLro07t5ACviirx/XqhnqUPjiclTs78MVw
+         L8tR0RX+uwWODTuNUCn9GO7p4bXpfIsdbkjqpY0PqVfJilI1CACHVzYlY/iV0sWP5V/3
+         T3P+fsJZrl/T8/61jZYJY4PyQofvYiMvXNGAlNPnqvgQIdqIJpCErJLddWxt9/CHMYvA
+         fQfQW01/Y2q+AlIExOo9mNzILsmJhUWs4VPYn88so7T3w1Nn66xNTb/c35K8Neo4b+tp
+         wg91etpXIESM3veFJOsmMl9xQ0iXGYxs+8+DAjrpr00+sWBSXajvrars1puw7bQqkMd4
+         /qUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690254081; x=1690858881;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BOm9JtzAMmxvhoSbX2NtL3QoGfALrOaBCsSuiN3HvS8=;
+        b=Es2NiGlogvnswAjubWtUeaRcwpj+PeVBPL5b4mkJaXAfcCguvavGvdwk2pq5AWtHcH
+         SyO8adOkp4hf4eQLz+ZsRHENdgI2uK+/U5DC4lEVM8PS6RCSTym0lsORp0Pfo3i78ia0
+         XLIWSot9Aw9I8p4HEBj/LvALKszkU4SdshqY94pNEwu5crtgAYjfO3DVzsy3l2SgvoD1
+         c1C+yAFk7CzGwoCctBqSua2m+AvzDhzuqGXxsFkGWOz7OiP1MCRiujOt9i6zUYWy5Gpl
+         hU4IE9LsYPBw74FKk5BTKJXhS5lV3AZ8xmNurkf8ZYb/RaMlfSP2Q17zDQBPoibTl0gj
+         MyCg==
+X-Gm-Message-State: ABy/qLbABYCttIG+eA6DUNrMfWR/3FmfEd5YcgG6wULTIYJIEt9cQV08
+	Zb7jw3Vv9SpyEjlO5t+OjGDP+w==
+X-Google-Smtp-Source: APBJJlFM6WPSihXOKl0X4zg92CAAfeqIP/jkVagMNd5II31TO+klkQLkXzKhhJFyUFA6pGL+niCVGA==
+X-Received: by 2002:a05:6a20:160d:b0:111:a0e5:d2b7 with SMTP id l13-20020a056a20160d00b00111a0e5d2b7mr15056320pzj.4.1690254081364;
+        Mon, 24 Jul 2023 20:01:21 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id fe15-20020a056a002f0f00b0066ccb8e8024sm8472563pfb.30.2023.07.24.20.01.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 20:01:20 -0700 (PDT)
+Message-ID: <9b149dd9-1617-9af4-4252-6d0df01f93b1@bytedance.com>
+Date: Tue, 25 Jul 2023 11:01:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wC3TZbMOr9kRW7dBA--.23188S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7CF1DZF48JrWrZryUtr1xGrg_yoW8Xry3p3
-	9xKa4F9ws5J3WUWa1xJFs7ZFWrCw17Kr909FZ7Aw1rZ3Zay3WDXr1FgFy8Aw1UJFZ5t3Wa
-	vrWUZ3Wxu3WDAa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pM4E_DUUUUU=
-X-Originating-IP: [111.206.145.21]
-X-CM-SenderInfo: h2113zf2oz6qqrwthudrp/xtbBRw+3U2I0Ut2f+wAAsR
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v2 03/47] mm: shrinker: add infrastructure for dynamically
+ allocating shrinker
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+ vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+ brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+ cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+ gregkh@linuxfoundation.org, muchun.song@linux.dev,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-4-zhengqi.arch@bytedance.com>
+ <20230724122549.GA3731903@hirez.programming.kicks-ass.net>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <20230724122549.GA3731903@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
-If timeout occurs, it will start the work. And if we call
-ravb_remove without finishing the work, there may be a
-use-after-free bug on ndev.
+Hi Peter,
 
-Fix it by finishing the job before cleanup in ravb_remove.
+On 2023/7/24 20:25, Peter Zijlstra wrote:
+> On Mon, Jul 24, 2023 at 05:43:10PM +0800, Qi Zheng wrote:
+> 
+>> +void shrinker_unregister(struct shrinker *shrinker)
+>> +{
+>> +	struct dentry *debugfs_entry;
+>> +	int debugfs_id;
+>> +
+>> +	if (!shrinker || !(shrinker->flags & SHRINKER_REGISTERED))
+>> +		return;
+>> +
+>> +	down_write(&shrinker_rwsem);
+>> +	list_del(&shrinker->list);
+>> +	shrinker->flags &= ~SHRINKER_REGISTERED;
+>> +	if (shrinker->flags & SHRINKER_MEMCG_AWARE)
+>> +		unregister_memcg_shrinker(shrinker);
+>> +	debugfs_entry = shrinker_debugfs_detach(shrinker, &debugfs_id);
+>> +	up_write(&shrinker_rwsem);
+>> +
+>> +	shrinker_debugfs_remove(debugfs_entry, debugfs_id);
+> 
+> Should there not be an rcu_barrier() right about here?
 
-Note that this bug is found by static analysis, it might be
-false positive.
+The shrinker_debugfs_remove() will wait for debugfs_file_put() to
+return, so when running here, all shrinker debugfs operations have
+been completed. And the slab shrink will hold the read lock of
+shrinker_rwsem to traverse the shrinker_list, so when we hold the
+write lock of shrinker_rwsem to delete the shrinker from the
+shrinker_list, the shrinker will not be executed again.
 
-Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
-v4:
-- add information about the bug was found suggested by Yunsheng Lin
-v3:
-- fix typo in commit message
-v2:
-- stop dev_watchdog so that handle no more timeout work suggested by Yunsheng Lin,
-add an empty line to make code clear suggested by Sergey Shtylyov
----
- drivers/net/ethernet/renesas/ravb_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+So I think there is no need to add a rcu_barrier() here. Please let
+me know if I missed something.
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 4d6b3b7d6abb..ce2da5101e51 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2885,6 +2885,9 @@ static int ravb_remove(struct platform_device *pdev)
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
- 
-+	netif_carrier_off(ndev);
-+	netif_tx_disable(ndev);
-+	cancel_work_sync(&priv->work);
- 	/* Stop PTP Clock driver */
- 	if (info->ccc_gac)
- 		ravb_ptp_stop(ndev);
--- 
-2.25.1
+Thanks,
+Qi
 
+> 
+>> +
+>> +	kfree(shrinker->nr_deferred);
+>> +	shrinker->nr_deferred = NULL;
+>> +
+>> +	kfree(shrinker);
+>> +}
+>> +EXPORT_SYMBOL(shrinker_unregister);
+> 
 
