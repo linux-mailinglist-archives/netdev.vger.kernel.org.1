@@ -1,214 +1,183 @@
-Return-Path: <netdev+bounces-21039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 095147623A7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:40:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815AC7623AE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3806A1C20FD4
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:40:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA307281A28
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA5E26B1A;
-	Tue, 25 Jul 2023 20:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A97B26B1D;
+	Tue, 25 Jul 2023 20:41:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7306A25937
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:40:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DD7FC433C7;
-	Tue, 25 Jul 2023 20:40:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690317611;
-	bh=ud1chLoFe+VFXLyMYNzCTP55aWLaNfDqCtujCPEbZLM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b2jkYwIFBM86tzbrzQ0/O6LPwNds5JN6XmzkIBywaeurcOuY62ju3ymuOPULiITNh
-	 sfStsmtNaFhoTVG5YC3+1pWmSaXCdiSVtfE+K+WsgdP9M1CoV4mIjBFY6hFOC5mez1
-	 aP/RQqhjavZl/jq799o7lhhRMx1nvWjUwgrEHdKe96FfEq0aLUYxgXtzsauzexvfOO
-	 ZT0Xv/nAqxYdGELf2hTZh0E42jXbWeEaK3vWh47rJycBGCcO7DNKDN/nLd89S8sR9P
-	 1dX2tmdnj+yKPKsl+4gZVkFqo6CK/oPPSUotFNM5YQxaZYxJIW9EjBgOv9NYYCYBGb
-	 hkug796qVFAeQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8763F25937
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:41:08 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2072.outbound.protection.outlook.com [40.107.20.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DF7E47;
+	Tue, 25 Jul 2023 13:40:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YSAkJeMLVn1qbS3BzkUupMnoMPCU36xMg3FgCckMgmE34pH/uHqQ91+lSrDDbWW2F1VnMwEo1YO+STpTtUDYlrH47+0HiMTG2KDLusK4oX10KSPkxNqHApR5ItlssOhgwvqxnRhFSL1FyNujfcNR6E7mW25f4IFKrdHUTVsowHncytdmbOCzSe223hVt8SlL/OOph9LhpcFU8vrkz0KASKGGXjmyz/RMQqOM5LaYkJOYqu9tkkVjn6A6FpJ5/DFjmvoS/5N3OVTQ2zYEOJuILQbO6e7Ts5vmFJy8DXTA/zH97eC8HhIAdF5NARbr0Ynuj3boX2A5O+N64vedKorphg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=apvFxtoO/tk765HvcwYfAB6Rg23L41Uwl15m6SnpfLo=;
+ b=J6jSyDnG3pnMhcn78z+E5O8tFDzj/sXrnJ/zNpW+Fn+hA+R32Ei+XSYeHF/up/L+KtM9lbHJhRhgdn6CppoeqwVBcVZveIKGN5cECKUmY8mtmPbduVehd4eMc/WVlixyppCEAy2EGdtkb5+xXV/mWiPfOEDhz5pEZi9YZ72H7z8ShBohxOnXWZ2PnrrQA8dNjhQ8R8AK8lBJpy50bGIA0OQCqIPOPzz0rL9yyJ4CF/qfADA/44ISjLQN5x4ETKLVYxXildDcv7kflERqW/ehcVSfb8mB7cdfm1sALugEUa9HmTmavLZV3d7RriwEl3h3Z14mcevkN7O1pnDYYDDc8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=apvFxtoO/tk765HvcwYfAB6Rg23L41Uwl15m6SnpfLo=;
+ b=W78MIQ+DmZtQ0Xez7YgzG/DmE/+eJA4RCy+ahWeh4WkZ/2bWU7ywWqG++Z/ZpUO0vSkkx1u6rrmCngrz9fTiPIwd5ftkEf6E/Sbck7ll5TZUFDmRtu7F6eMmNvnWsFHDeFSzPNmwfvfrpQNe0/cLxj/1q4KV3+j62/N3p95txt8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DBAPR04MB7430.eurprd04.prod.outlook.com (2603:10a6:10:1aa::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 20:40:46 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 20:40:46 +0000
+Date: Tue, 25 Jul 2023 23:40:42 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Arnd Bergmann <arnd@arndb.de>
 Cc: Simon Horman <simon.horman@corigine.com>,
-	Arnd Bergmann <arnd@arndb.de>,
+	Arnd Bergmann <arnd@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
 	Russell King <linux@armlinux.org.uk>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Josua Mayer <josua@solid-run.com>,
+	Robert-Ionut Alexa <robert-ionut.alexa@nxp.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
 	Wolfram Sang <wsa+renesas@sang-engineering.com>,
 	Sean Anderson <sean.anderson@seco.com>,
-	netdev@vger.kernel.org,
+	Josua Mayer <josua@solid-run.com>, Netdev <netdev@vger.kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] dpaa: avoid linking objects into multiple modules
-Date: Tue, 25 Jul 2023 22:39:40 +0200
-Message-Id: <20230725204004.3366679-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+Subject: Re: [PATCH] dpaa: avoid linking objects into multiple modules
+Message-ID: <20230725204042.opemku5oerpkpsqi@skbuf>
+References: <20230725064403.581634-1-arnd@kernel.org>
+ <ZMAqPdO2XcIXOCFs@corigine.com>
+ <990b6871-169b-4d03-b202-f19294730f8c@app.fastmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <990b6871-169b-4d03-b202-f19294730f8c@app.fastmail.com>
+X-ClientProxiedBy: FR3P281CA0045.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4a::16) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBAPR04MB7430:EE_
+X-MS-Office365-Filtering-Correlation-Id: 20321a81-6030-4ae9-3157-08db8d4f6c69
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+ FE/uZYdCfpbF4uKEaIywhpI1chfDEkWbsH+o+NRdN9MBMD82dM1Ye/Vo6pH15q+/CIJ9a8BnNnZZwyGrhAveqxzKkrW3FFgEuN8JQKN3pMOFtJYulwOG7d5/16p2vwOP1eambTGYZItCJdQ81UbMT425MIrNbqoLD/h6byp/DXONCqnO3jGH299X2iJlrKrAk9McMfbpiykCER+K8q8mL+7AdC6+PacH297QTrANk3PAuJx4ca47oLP/eUqBoZOeAxerLKb2u+IQKnvFBb695TaAJk793oPhsoqtWogpQo6WLQNcsy1XY1/7ytDxbw2glro99Vyg6xBYyBzoIRaEPWKv3RIqcSmEvWbyxohpA6nQ0h3YQ0HaqQMu0etClVnjExdUFXx5rTKyGneP4DFH0chthk9UKCHilsXgoq9cpiO7MgcEkieTLxHPgAVe0vYEfxSLehiUtLhREB1hAVKalQ4gkSb17a6gWk/IeGzE84bXuBb04pKeaLJ59Bwx0qjqcx3fe0xP8zWSih3DY6Xz4Y5E9yvKRy6s9te8wC1sB/tnlF/UVtdYjhcJbiFM/IPa
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(136003)(376002)(346002)(39860400002)(396003)(366004)(451199021)(33716001)(6486002)(54906003)(66476007)(66556008)(66946007)(83380400001)(86362001)(38100700002)(478600001)(6512007)(9686003)(26005)(186003)(1076003)(6506007)(6666004)(41300700001)(5660300002)(316002)(2906002)(6916009)(4326008)(7416002)(8676002)(8936002)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?lEHQuEG2iGHnnXtiNAoHsgsAtOdXoHdnkt4yhylOGVchvEdWX5y48L03c3pW?=
+ =?us-ascii?Q?VFUjuyllCBGlVKva+bjD4/Cb/A3dk0df2DPJGI3Fu6MZRoBubm+Flj8pGJxe?=
+ =?us-ascii?Q?neZKYyaas4Nwr5JFudqw8Tglpo01JZUQUBwdZ3ByPSKmgZ/B5Q9qXTk8rk/9?=
+ =?us-ascii?Q?XRFl31WOQBycmvuKPr4vp1mbD8L36t+VL3JL9/6IO1jKUgc+lc2e0hRXAXCJ?=
+ =?us-ascii?Q?jzoSUPPudNajz/EGvwdnNEri9eEVGCIhzibgRd6plDfLtI7HfbMR02F8e2PG?=
+ =?us-ascii?Q?rEZxWuFHyPoMG/e4BOI80us/hk3tA0v5XE+VvTrHNeakAK7dKDh585QkIdaO?=
+ =?us-ascii?Q?9SLbjmQlm0MxaDozj3DWTEStHHbhFQiaXmPDOJk4Wt1pdY077JNJYTicIqu8?=
+ =?us-ascii?Q?ABQnJiWtAA40CgnfHzAVoSndq//a1W42swv85W7o/fz5vhJ2c6stM6tD0STU?=
+ =?us-ascii?Q?UtRFljALdmFWYccC6/fn57ZKKUgDCXDk3gih28B42nYwj5LsLkKP0IOM0sss?=
+ =?us-ascii?Q?iQESclRqfsuXV96ntEyl3CcsqDCGmAt50GHOs0/VVa/fO+qxRjw1FV7Xdn6b?=
+ =?us-ascii?Q?sy4B8g98/MvXNmgxWMvemaHx2RHhZA69GDdFvJCp7BLpP/sl98l6B8PAv043?=
+ =?us-ascii?Q?GESMJ+1qRTYvbuhG5LuhFln2dI4SzygLaGYKc+lAZeiHWP8G0fPD7lrn4bP6?=
+ =?us-ascii?Q?SowiyYrLoVzBwLl5LvSChiLwETF0zpyes6fiPjWX9wzD0hzIBLFmx/Zee78h?=
+ =?us-ascii?Q?hAmV6U0hMf+KHSHOoS+zvhznG78Q/Khc2VSQoelWfABx32z/TjvPS6v+ET9J?=
+ =?us-ascii?Q?Hoax42g4gctBsu6peZM9EzacTCnTf7l1OyGehfgNWmWAe7EowGAIIn/Kby44?=
+ =?us-ascii?Q?1jthNDnQLDGqOnvX3/I3hyZD/5/VoWxuS8L4U1tCR5WBqYrP/2kBnlrxqYCE?=
+ =?us-ascii?Q?t57wXedRW7FZeGD1AyUfExmD5uEepJL1H2eUGkPKEY4x1yWaWTt8iflqjbjV?=
+ =?us-ascii?Q?cqImhlV4oYAyaOw8CIn0Jdj2E64m2JfFcZosiiniUFaWxZV0tM75VYkbUjqH?=
+ =?us-ascii?Q?OZ3FENN40E/i/xcDm4IGalo/CgzYsRE7iORVWLRVgMOqrFIXjJiZEj8rJD+g?=
+ =?us-ascii?Q?gaA9lwGRGnxTxZ7axm2yqSupTAY2jRNavzj1jep7UtV1oguT4KfXz2Rl43hh?=
+ =?us-ascii?Q?anRxInCsQ3d+/pNDSi1UdDG+t7q7cgFibBAigpPxOAbHKz6/cOTAeBUTcGfM?=
+ =?us-ascii?Q?t5c9pEIXHmS73sgpUCF/t7ozKXTp+BSphrnVLh5g1L+m+czZCV+zsCMmYJ9n?=
+ =?us-ascii?Q?MQOhwKOSWT6fqtqndA/3VkszgUg1wDzA5r990VpMFsKoSJ5QoxFrc/6m3cRc?=
+ =?us-ascii?Q?+3Jqqa4ISPyoq9Pz17uV4DzsU0QevhATEfunKsf7YEJbIdC1dnoWwV+4GJNR?=
+ =?us-ascii?Q?vYRYAQO2ibwno18G9QlorwjLfmMxQAyxWQPhpFoYSGp57SReQ55mSofw0VfZ?=
+ =?us-ascii?Q?EUmJD5ef7HVZCN8yJfgAP8CpRpKcP2i/sUAvIEi8c0/GxltSGavMIqwF7DMf?=
+ =?us-ascii?Q?C+rYiFGjgSO7b0MN+ID/fIy9XhsaK2CHcyUIIRlSmtQri084NpNHXoulP/P3?=
+ =?us-ascii?Q?Lg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20321a81-6030-4ae9-3157-08db8d4f6c69
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 20:40:46.5213
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Shd2aAjwXH2OUPU4rFCq0tfuCSuTLa3bzPD5KeQxXo1JnDH7VXKfuvRTliGI4238vo4HYuZp0pJt4Kht8kuf9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7430
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Tue, Jul 25, 2023 at 10:37:07PM +0200, Arnd Bergmann wrote:
+> On Tue, Jul 25, 2023, at 22:02, Simon Horman wrote:
+> > On Tue, Jul 25, 2023 at 08:43:40AM +0200, Arnd Bergmann wrote:
+> >> From: Arnd Bergmann <arnd@arndb.de>
+> >> 
+> >> Each object file contains information about which module it gets linked
+> >> into, so linking the same file into multiple modules now causes a warning:
+> >> 
+> >> scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
+> >> scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
+> >> 
+> >> Chang the way that dpaa2 is built by moving the two common files into a
+> >> separate module with exported symbols instead.
+> >> 
+> >> To avoid a link failure when the switch driver is built-in, but the dpio driver
+> >> is a loadable module, add the same dependency in there that exists for
+> >> the ethernet driver.
+> >> 
+> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> >
+> > Hi Arnd,
+> >
+> > overall this looks good to me.
+> > One thing that I noticed, and I'm not sure if we care,
+> > is that an x86_64 allmodconfig now reports:
+> >
+> > WARNING: modpost: missing MODULE_DESCRIPTION() in 
+> > drivers/net/ethernet/freescale/dpaa2/fsl-dpaa2-common.o
+> 
+> My mistake, I had disabled the warning in modpost.c as it was
+> generating too much output while I tried to address some
+> other warnings, so I missed the regression I introduced.
+> 
+> I'll send a v2, adding
+> 
+> MODULE_DESCRIPTION("DPAA2 Ethernet core library");
+> 
+>       Arnd
 
-Each object file contains information about which module it gets linked
-into, so linking the same file into multiple modules now causes a warning:
+Hi Arnd,
 
-scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-
-Chang the way that dpaa2 is built by moving the two common files into a
-separate module with exported symbols instead.
-
-To avoid a link failure when the switch driver is built-in, but the dpio driver
-is a loadable module, add the same dependency in there that exists for
-the ethernet driver.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: add missing module description
----
- drivers/net/ethernet/freescale/Makefile          |  4 +---
- drivers/net/ethernet/freescale/dpaa2/Kconfig     |  1 +
- drivers/net/ethernet/freescale/dpaa2/Makefile    |  9 +++++----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c | 12 ++++++++++++
- 4 files changed, 19 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/Makefile b/drivers/net/ethernet/freescale/Makefile
-index de7b318422330..c63e0c090f8f7 100644
---- a/drivers/net/ethernet/freescale/Makefile
-+++ b/drivers/net/ethernet/freescale/Makefile
-@@ -22,6 +22,4 @@ ucc_geth_driver-objs := ucc_geth.o ucc_geth_ethtool.o
- obj-$(CONFIG_FSL_FMAN) += fman/
- obj-$(CONFIG_FSL_DPAA_ETH) += dpaa/
- 
--obj-$(CONFIG_FSL_DPAA2_ETH) += dpaa2/
--
--obj-y += enetc/
-+obj-y += enetc/ dpaa2/
-diff --git a/drivers/net/ethernet/freescale/dpaa2/Kconfig b/drivers/net/ethernet/freescale/dpaa2/Kconfig
-index d029b69c3f183..4e26b5a4bc5c4 100644
---- a/drivers/net/ethernet/freescale/dpaa2/Kconfig
-+++ b/drivers/net/ethernet/freescale/dpaa2/Kconfig
-@@ -32,6 +32,7 @@ config FSL_DPAA2_PTP_CLOCK
- 
- config FSL_DPAA2_SWITCH
- 	tristate "Freescale DPAA2 Ethernet Switch"
-+	depends on FSL_MC_BUS && FSL_MC_DPIO
- 	depends on BRIDGE || BRIDGE=n
- 	depends on NET_SWITCHDEV
- 	help
-diff --git a/drivers/net/ethernet/freescale/dpaa2/Makefile b/drivers/net/ethernet/freescale/dpaa2/Makefile
-index 1b05ba8d1cbff..c042d2c27926c 100644
---- a/drivers/net/ethernet/freescale/dpaa2/Makefile
-+++ b/drivers/net/ethernet/freescale/dpaa2/Makefile
-@@ -3,15 +3,16 @@
- # Makefile for the Freescale DPAA2 Ethernet controller
- #
- 
--obj-$(CONFIG_FSL_DPAA2_ETH)		+= fsl-dpaa2-eth.o
-+obj-$(CONFIG_FSL_DPAA2_ETH)		+= fsl-dpaa2-eth.o fsl-dpaa2-common.o
- obj-$(CONFIG_FSL_DPAA2_PTP_CLOCK)	+= fsl-dpaa2-ptp.o
--obj-$(CONFIG_FSL_DPAA2_SWITCH)		+= fsl-dpaa2-switch.o
-+obj-$(CONFIG_FSL_DPAA2_SWITCH)		+= fsl-dpaa2-switch.o fsl-dpaa2-common.o
- 
--fsl-dpaa2-eth-objs	:= dpaa2-eth.o dpaa2-ethtool.o dpni.o dpaa2-mac.o dpmac.o dpaa2-eth-devlink.o dpaa2-xsk.o
-+fsl-dpaa2-eth-objs	:= dpaa2-eth.o dpaa2-ethtool.o dpni.o dpaa2-eth-devlink.o dpaa2-xsk.o
- fsl-dpaa2-eth-${CONFIG_FSL_DPAA2_ETH_DCB} += dpaa2-eth-dcb.o
- fsl-dpaa2-eth-${CONFIG_DEBUG_FS} += dpaa2-eth-debugfs.o
- fsl-dpaa2-ptp-objs	:= dpaa2-ptp.o dprtc.o
--fsl-dpaa2-switch-objs	:= dpaa2-switch.o dpaa2-switch-ethtool.o dpsw.o dpaa2-switch-flower.o dpaa2-mac.o dpmac.o
-+fsl-dpaa2-switch-objs	:= dpaa2-switch.o dpaa2-switch-ethtool.o dpsw.o dpaa2-switch-flower.o
-+fsl-dpaa2-common-objs	+= dpaa2-mac.o dpmac.o
- 
- # Needed by the tracing framework
- CFLAGS_dpaa2-eth.o := -I$(src)
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-index a69bb22c37eab..c51dbd84d199e 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-@@ -348,6 +348,7 @@ void dpaa2_mac_start(struct dpaa2_mac *mac)
- 
- 	phylink_start(mac->phylink);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_start);
- 
- void dpaa2_mac_stop(struct dpaa2_mac *mac)
- {
-@@ -358,6 +359,7 @@ void dpaa2_mac_stop(struct dpaa2_mac *mac)
- 	if (mac->serdes_phy)
- 		phy_power_off(mac->serdes_phy);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_stop);
- 
- int dpaa2_mac_connect(struct dpaa2_mac *mac)
- {
-@@ -450,6 +452,7 @@ int dpaa2_mac_connect(struct dpaa2_mac *mac)
- 
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_connect);
- 
- void dpaa2_mac_disconnect(struct dpaa2_mac *mac)
- {
-@@ -462,6 +465,7 @@ void dpaa2_mac_disconnect(struct dpaa2_mac *mac)
- 	of_phy_put(mac->serdes_phy);
- 	mac->serdes_phy = NULL;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_disconnect);
- 
- int dpaa2_mac_open(struct dpaa2_mac *mac)
- {
-@@ -510,6 +514,7 @@ int dpaa2_mac_open(struct dpaa2_mac *mac)
- 	dpmac_close(mac->mc_io, 0, dpmac_dev->mc_handle);
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_open);
- 
- void dpaa2_mac_close(struct dpaa2_mac *mac)
- {
-@@ -519,6 +524,7 @@ void dpaa2_mac_close(struct dpaa2_mac *mac)
- 	if (mac->fw_node)
- 		fwnode_handle_put(mac->fw_node);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_close);
- 
- static char dpaa2_mac_ethtool_stats[][ETH_GSTRING_LEN] = {
- 	[DPMAC_CNT_ING_ALL_FRAME]		= "[mac] rx all frames",
-@@ -557,6 +563,7 @@ int dpaa2_mac_get_sset_count(void)
- {
- 	return DPAA2_MAC_NUM_STATS;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_sset_count);
- 
- void dpaa2_mac_get_strings(u8 *data)
- {
-@@ -568,6 +575,7 @@ void dpaa2_mac_get_strings(u8 *data)
- 		p += ETH_GSTRING_LEN;
- 	}
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_strings);
- 
- void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
- {
-@@ -587,3 +595,7 @@ void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
- 		*(data + i) = value;
- 	}
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_ethtool_stats);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("DPAA2 Ethernet core library");
--- 
-2.39.2
-
+Don't send a v2 yet, I'm writing a more detailed response.
 
