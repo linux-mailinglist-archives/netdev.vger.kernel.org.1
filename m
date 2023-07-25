@@ -1,105 +1,137 @@
-Return-Path: <netdev+bounces-21106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85AC9762774
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 01:36:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8862762776
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 01:38:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5E721C20F56
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:36:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7387B281B24
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383282AB23;
-	Tue, 25 Jul 2023 23:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C0027714;
+	Tue, 25 Jul 2023 23:38:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9328462
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:35:30 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB19213C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:35:27 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5840614b107so27366237b3.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:35:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690328126; x=1690932926;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VDndtUhTmjZhFwzFz2FDQYmgm5v0x87/y1zJ2WzSNM=;
-        b=iPm678ls4yjZB+VZaqhzezPsLnVigGxTOJ1cO84MW0QvJFaYUqn8iTSrkOt0IeXiwg
-         BU7wQLMcfWg7vYoGSaN0uPvXhyv985ATbA1zXBYfvBMhy76V1afGJrCmzBbo72Bj+OT4
-         VHT29N/3MJw043NA25EJSeVk2JA6pj8CTQah/B2gMzMYWRzbLKNkJPA1GaNtfHaxWtvq
-         xPEJmDXyxMcHqLUMKCWB/gJI89N+MUPHbrFLLXcCxHTnNrbEEScbt7ur5EKKhMRQKI7a
-         Aa7VuKu+cgO7/ed67I993Vv/Sy3yxZJ6MK4g7Fo1qonsSFSU+kSsZTo+Y4hok7CGZx5n
-         RU6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690328126; x=1690932926;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VDndtUhTmjZhFwzFz2FDQYmgm5v0x87/y1zJ2WzSNM=;
-        b=X8zGDzk7oyDhhtACQzaeXBTdwjFzU5Sopw3RrxasefMLBjI0K94k37JF4pvkGTkjZ/
-         4oXmZnr4uVuxKYL5QPafDQujFVy6MZ96UqBNbipCfNV3rYcjDwTImd6g09wrsN9W/5q6
-         E93cCgxJdpjfkZH54MXFFPewiz39e0DRz0C3KDSIeuNSEUy805R9Bf7hfube4L+oKSd7
-         IbnEXZhjik0HRF4onxbv3Ny+M6OoB0IWwRWNS6tjURItWe8G+0NabBU12EXWwqbbDLa6
-         4y7aUA0ziBVMy/Q8/kT6yhyRvjT6D8CawXfMTbYWiqAHeQVxNEai1CUERLAcDgdUKbRS
-         x89g==
-X-Gm-Message-State: ABy/qLb9jiN6f0+MdY/P8yFmX7dic1prjR1UsMxBN7MCYK4dFrIj7nMN
-	o1R4YbF+Ug1r/fnO0RG+UkFcw/DD2SH1DoOlXPAnsoqDQKKdHgxc/BQrvxlR0589B5+ebRrgv/v
-	v0rFPjaI52WsoWzP1A2BagFU/kQzkBwa7FL1XwnFwc/Hpxw5ZoerAWg==
-X-Google-Smtp-Source: APBJJlEOoqTbeWvN7Fh7sHgKSUiVp2bhzEna/PzsGrrIY3s13rkSLfjnWHzv71Ly8TNokJdpNwFdVO8=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:aca4:0:b0:d00:a25a:1a54 with SMTP id
- x36-20020a25aca4000000b00d00a25a1a54mr2795ybi.11.1690328126144; Tue, 25 Jul
- 2023 16:35:26 -0700 (PDT)
-Date: Tue, 25 Jul 2023 16:35:17 -0700
-In-Reply-To: <20230725233517.2614868-1-sdf@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A368462
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:38:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E402C433C8;
+	Tue, 25 Jul 2023 23:38:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690328293;
+	bh=984JfVzqe/2uLEFyh6EUp3Mgr+B3z66EwSwgATFg6JM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=M8RkHHJlmclbWyqMypVfrYwkaYk5JpmJMn3JlLzsUwJix7Gb1BafcWy3phK63LvK0
+	 QuS8BjIXM41f8j9jvh30qznvw8p2zDhyqWD2YfNFPylqbCXMMJyPBdFJbO5UAGXdjP
+	 lw7Sf9/m7hAORp/Job3bX5WIntYFDWrhAHc6E//RI+SXgkY4eLpuPxbzZc8UNGajb8
+	 70+YDsNFKrC1isRXfEAZXHs3gjKbkqiGckhrb6JfsWLDtEnSWgEjOPRiC8JAfjW3aL
+	 3WVgY+RSyFRaC+/wDFxU5ojS/zmUnTwyeiB8lWg6DFpMAkJQS8OqRNjwfsVxLC6L5U
+	 8BhgUSAVLCpHw==
+Message-ID: <a9854c98-627f-a496-5c0a-1cbf3f050e4f@kernel.org>
+Date: Tue, 25 Jul 2023 17:38:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230725233517.2614868-1-sdf@google.com>
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230725233517.2614868-5-sdf@google.com>
-Subject: [PATCH net-next 4/4] ynl: print xdp-zc-max-segs in the sample
-From: Stanislav Fomichev <sdf@google.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, Stanislav Fomichev <sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCHv3 net-next] IPv6: add extack info for IPv6 address
+ add/delete
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@idosch.org>,
+ Beniamino Galvani <bgalvani@redhat.com>
+References: <20230724075051.20081-1-liuhangbin@gmail.com>
+ <1c9f75cc-b9c0-0f5d-9b92-b37f639ce25b@kernel.org>
+ <ZL99lOAlwAsvsJU1@Laptop-X1>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ZL99lOAlwAsvsJU1@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Technically we don't have to keep extending the sample, but it
-feels useful to run these tools locally to confirm everything
-is working.
+On 7/25/23 1:45 AM, Hangbin Liu wrote:
+>>> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+>>> index 19eb4b3d26ea..53dea18a4a07 100644
+>>> --- a/net/ipv6/addrconf.c
+>>> +++ b/net/ipv6/addrconf.c
+>>> @@ -1068,15 +1068,19 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>>>  	     !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) ||
+>>>  	    (!(idev->dev->flags & IFF_LOOPBACK) &&
+>>>  	     !netif_is_l3_master(idev->dev) &&
+>>> -	     addr_type & IPV6_ADDR_LOOPBACK))
+>>> +	     addr_type & IPV6_ADDR_LOOPBACK)) {
+>>> +		NL_SET_ERR_MSG(extack, "Cannot assign requested address");
+>>>  		return ERR_PTR(-EADDRNOTAVAIL);
+>>> +	}
+>>
+>> It would be good to split the above checks into separate ones with more
+>> specific messages.
+> 
+> How about this.
+> 
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index 53dea18a4a07..e6c3fe413441 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -1063,13 +1063,17 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
+>         struct fib6_info *f6i = NULL;
+>         int err = 0;
+> 
+> -       if (addr_type == IPV6_ADDR_ANY ||
+> -           (addr_type & IPV6_ADDR_MULTICAST &&
+> -            !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) ||
+> -           (!(idev->dev->flags & IFF_LOOPBACK) &&
+> -            !netif_is_l3_master(idev->dev) &&
+> -            addr_type & IPV6_ADDR_LOOPBACK)) {
+> -               NL_SET_ERR_MSG(extack, "Cannot assign requested address");
+> +       if (addr_type == IPV6_ADDR_ANY) {
+> +               NL_SET_ERR_MSG(extack, "IPv6: Cannot assign unspecified address");
 
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- tools/net/ynl/samples/netdev.c | 2 ++
- 1 file changed, 2 insertions(+)
+Maybe just "IPv6: Invalid address".
 
-diff --git a/tools/net/ynl/samples/netdev.c b/tools/net/ynl/samples/netdev.c
-index d31268aa47c5..06433400dddd 100644
---- a/tools/net/ynl/samples/netdev.c
-+++ b/tools/net/ynl/samples/netdev.c
-@@ -38,6 +38,8 @@ static void netdev_print_device(struct netdev_dev_get_rsp *d, unsigned int op)
- 			printf(" %s", netdev_xdp_act_str(1 << i));
- 	}
- 
-+	printf(" xdp-zc-max-segs=%u", d->xdp_zc_max_segs);
-+
- 	name = netdev_op_str(op);
- 	if (name)
- 		printf(" (ntf: %s)", name);
--- 
-2.41.0.487.g6d72f3e995-goog
+Also, that reminds me that IPv6 should be using NL_SET_ERR_MSG_MOD which
+will add the IPv6 part.
+
+
+
+> +               return ERR_PTR(-EADDRNOTAVAIL);
+> +       } else if (addr_type & IPV6_ADDR_MULTICAST &&
+> +                  !(cfg->ifa_flags & IFA_F_MCAUTOJOIN)) {
+> +               NL_SET_ERR_MSG(extack, "IPv6: Cannot assign multicast address without \"IFA_F_MCAUTOJOIN\" flag");
+> +               return ERR_PTR(-EADDRNOTAVAIL);
+> +       } else if (!(idev->dev->flags & IFF_LOOPBACK) &&
+> +                  !netif_is_l3_master(idev->dev) &&
+> +                  addr_type & IPV6_ADDR_LOOPBACK) {
+> +               NL_SET_ERR_MSG(extack, "IPv6: Cannot assign loopback address on this device");
+>                 return ERR_PTR(-EADDRNOTAVAIL);
+>         }
+> 
+>> ...
+>>
+>>>  
+>>>  	if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+>>>  		int ret = ipv6_mc_config(net->ipv6.mc_autojoin_sk,
+>>>  					 true, cfg->pfx, ifindex);
+>>
+>> and pass extack to this one for better message as well.
+> 
+> This one looks a little deep. We need pass extack to
+> - ipv6_mc_config
+>   - ipv6_sock_mc_join
+>     - __ipv6_sock_mc_join
+>       - __ipv6_dev_mc_inc	maybe also this one??
+> 
+> to get more detailed message. And all these are "Join multicast group failed".
+> Do you still want to do this?
+
+ok, staring at the errors for that stack, not much value I guess.
+
 
 
