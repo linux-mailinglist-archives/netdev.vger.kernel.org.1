@@ -1,62 +1,71 @@
-Return-Path: <netdev+bounces-20796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3601E761044
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:08:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ED77761056
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D5301C20DF2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:08:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C36281238
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4627E15AF7;
-	Tue, 25 Jul 2023 10:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E49B182C8;
+	Tue, 25 Jul 2023 10:12:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF5015AC5
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:08:28 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38BD310CB
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:08:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZTG07ih6maDURnxD42sPRSsHT7XH4z+cZ7kTvarUF80=; b=YyUQ1kCc4XyZkxZHY5tochrYWX
-	wd7k2n56PBb4rrqmV6iM7OFmUQliLVXyTzcduqi3WE46LGjiZErWkLnzz4jdq3HieZOQrEtpmSuCV
-	kd4M9p42e3/7fvqrFq0E9brzjbn4Obw85b91putqfXJ7nCKXfiP4VcC+hXq1wSTs9mpL83ccaYOyq
-	WJXfaDkJWFGklkuMsxztJHf+rk3QAWJAJ/YIQ5HDlGMjQNDE02DeS2E26mIx/rddpveivfPafJGau
-	68JsG9qISFoRrdo2KPSGhP9Uzg+2EhBuDEf53YJ5GyyWVAXQ6b8SkUD6x26s4e/VX923XnJGZP3k/
-	y4EN2GUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42108)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qOExs-0001sk-0V;
-	Tue, 25 Jul 2023 11:08:24 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qOExr-0001jA-8A; Tue, 25 Jul 2023 11:08:23 +0100
-Date: Tue, 25 Jul 2023 11:08:23 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	Jose.Abreu@synopsys.com, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next 4/7] net: pcs: xpcs: adapt Wangxun NICs for
- SGMII mode
-Message-ID: <ZL+fF4365f0Q9QDD@shell.armlinux.org.uk>
-References: <20230724102341.10401-1-jiawenwu@trustnetic.com>
- <20230724102341.10401-5-jiawenwu@trustnetic.com>
- <ZL5TujWbCDuFUXb2@shell.armlinux.org.uk>
- <03cc01d9be9c$6e51cad0$4af56070$@trustnetic.com>
- <ZL9+XZA8t1vaSVmG@shell.armlinux.org.uk>
- <03f101d9bedd$763b06d0$62b11470$@trustnetic.com>
- <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B4015AEF
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:12:53 +0000 (UTC)
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531C510E3;
+	Tue, 25 Jul 2023 03:12:52 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id EA5DF32008FB;
+	Tue, 25 Jul 2023 06:12:50 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Tue, 25 Jul 2023 06:12:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690279970; x=1690366370; bh=xgUVqqNdgbniF
+	Ku43r5PV8GdNxqPVdClT1x0fcn2Eiw=; b=zS/A2pyjZnF4kvWcirBt5OlRqnuVY
+	t+BE+RRUQvF2Ruvx7K72DOWdQddydkr8HOV45r0zSsPsLhzK5IZopyDsmw5H3vHK
+	2Oz+DX/OF/5SQGBHQisMgv1FJGGq1V9TPInEKhDdBYV0Jz3Zbu+vCcBKoEFCKN/c
+	L1K1ARsDWqW89K4CqdUTDnY/b8da4BHIp/2p0C0Ahm5t1YszMZQtYlNOLkbhNWBZ
+	E1+qXZxGJG94Ln1wpIcicgc8czpDyFHZOacNlxWEKZ0QFlE9RJ0+PGt7UfG6HGT9
+	hoVca3T9YpHkXP5vdoXxHOLMvnH/puK//qRB10Ahqf8TSq7sL+sfS1CpQ==
+X-ME-Sender: <xms:IqC_ZCnrpiqzcEgfAXkTWrJ53ye3iZxcMnhntjEMDCj0uZPh2E1KZw>
+    <xme:IqC_ZJ0SG8CpHH_7j1SVSFn-JGPk8TSZ_B1hllguyHIDMzCz3AL0V18o_QuVsCd5j
+    wPsFQpzFDLTnJ0>
+X-ME-Received: <xmr:IqC_ZApTXGSmLNQlN3G6sUcBFkhTmm_gNUiFhhK6EwaLBfPrzjXn89o-hgoH9G81Pe1xUMr0Ou2OYdGiu8cUWuSvVBY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedriedtgddvgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
+    hoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:IqC_ZGnDBSw3seLQQa3Q6H39fiVJ6iq9ngSccYu99kYt32q1yMvigw>
+    <xmx:IqC_ZA1OFFt9nGhGqXd9jC_0u4AMMLFcuRI2fb0yNiLyMlUaAyZs0Q>
+    <xmx:IqC_ZNuFp8BZVQQvn03PII2UeMFELez5pPRVB0zdTagflbaEOs7m1g>
+    <xmx:IqC_ZBl-kj4Fg1ZdXut26qyxgUCboRi5ImL-2Srusu007D49aVtmnw>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Jul 2023 06:12:49 -0400 (EDT)
+Date: Tue, 25 Jul 2023 13:12:46 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next] flow_dissector: Add IPSEC dissectors
+Message-ID: <ZL+gHkLnLE91YBkS@shredder>
+References: <20230725032451.505189-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,57 +74,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230725032451.505189-1-rkannoth@marvell.com>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 10:58:25AM +0100, Russell King (Oracle) wrote:
-> > The information obtained from the IC designer is that "PHY/MAC side SGMII"
-> > is configured by experimentation. For these different kinds of NICs:
-> > 1) fiber + SFP-RJ45 module: PHY side SGMII
-> > 2) copper (pcs + external PHY): MAC side SGMII
+On Tue, Jul 25, 2023 at 08:54:51AM +0530, Ratheesh Kannoth wrote:
+>  Support for dissecting IPSEC field SPI (which is
+>  32bits in size) for ESP and AH packets.
 > 
-> This makes no sense. a PHY on a RJ45 SFP module is just the same as a
-> PHY integrated into a board with the MAC.
+>  This implementation does not support NAT-T
+>  (encapsulation of ESP packets over UDP).
+> 
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> ---
+>  include/net/flow_dissector.h |  9 ++++++
+>  include/net/flow_offload.h   |  6 ++++
+>  include/uapi/linux/pkt_cls.h |  3 ++
+>  net/core/flow_dissector.c    | 53 +++++++++++++++++++++++++++++++++++-
+>  net/core/flow_offload.c      |  7 +++++
+>  net/sched/cls_flower.c       | 18 ++++++++++++
 
+Please split flow dissector and flower changes into separate patches.
+Also, you can't add the flow offload bits without a corresponding driver
+change. Nobody calls the exported flow_rule_match_ipsec() function.
 
-MAC ---- PCS <----- sgmii -----> PHY (whether on a board or SFP)
+[...]
 
-Control word flow:
-             <------------------ link, speed, duplex
-	     ------------------> acknowledge (value = 0x4001)
+> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+> index 7865f5a9885b..a90b0e3d351f 100644
+> --- a/include/uapi/linux/pkt_cls.h
+> +++ b/include/uapi/linux/pkt_cls.h
+> @@ -594,6 +594,9 @@ enum {
+>  
+>  	TCA_FLOWER_KEY_L2TPV3_SID,	/* be32 */
+>  
+> +	TCA_FLOWER_KEY_SPI,		/* be32 */
+> +	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
+> +
 
-Sometimes, it's possible to connect two MACs/PCSs together:
+This will break existing user space on new kernels. New attributes must
+be added at the end.
 
-MAC ---- PCS <----- sgmii -----> PCS ---- MAC
-
-and in this case, one PCS would need to be configured in "MAC" mode
-and the other would need to be configured in "PHY" mode because SGMII
-is fundamentally asymmetric.
-
-Here is the definition of the control word sent by either end:
-
-Bit	MAC->PHY	PHY->MAC
-15	0: Reserved	Link status, 1 = link up
-14	1: Acknowledge	Reserved for AN acknowledge
-13	0: Reserved	0: Reserved
-12	0: Reserved	Duplex mode 1 = full, 0 = half
-11:10	0: Reserved	Speed 11 = Reserved 10=1G, 01=100M, 00=10M
-9:1	0: Reserved	0: Reserved
-0	1		1
-
-So my guess would be that "PHY side SGMII" means the device generates
-the "PHY->MAC" format word whereas "MAC side SGMII" generates the
-"MAC->PHY" format word - and it's the latter that you want to be using
-both for Copper SFPs, which are no different from PHYs integrated onto
-the board connected with SGMII.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  	TCA_FLOWER_L2_MISS,		/* u8 */
+>  
+>  	TCA_FLOWER_KEY_CFM,		/* nested */
 
