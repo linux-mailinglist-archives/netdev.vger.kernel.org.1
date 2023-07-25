@@ -1,129 +1,103 @@
-Return-Path: <netdev+bounces-20672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4AD07608C3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 06:42:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F9F7608D1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 06:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8802817B0
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:42:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422662817C5
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3532186F;
-	Tue, 25 Jul 2023 04:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5A21FB5;
+	Tue, 25 Jul 2023 04:44:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DD8110B
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 04:42:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C66BC433CC;
-	Tue, 25 Jul 2023 04:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E69186F;
+	Tue, 25 Jul 2023 04:44:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C42BC433C7;
+	Tue, 25 Jul 2023 04:44:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690260123;
-	bh=9xmLr5/SpwYPrO0t5OmP14xdMu9QQB8l/VYyS/cO+r8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ul69iYXkJmam1GUGJy/8oyYaGKYYZqCv1IooPEqIJAPloVQuj3Rkt7/pmw8X/pL/u
-	 9wb65jYb0pdr0t5nEni6wxFmmcsjwJEq+P6IGCohPPoRzMRny96OgqEicXxKFJm7nU
-	 HxnX0ZGs8ig7WXONybrQEMehS2VFJxDwsNw9Tqv8QReaVDgg4iaT+Q8lO8L9yAfCCo
-	 mtmjBLXslM5zmURhXe4fz2gY4klsbRgix89Dwm9m7pJYLhncabl0qVKteBaw3UOlxm
-	 L+XvCFL76dQz7P04UDQM2S9LEo1LkrD6NPmTviDPq+fHMSK77OjVx9lYzwpXmmsw4E
-	 HtB0FkF4SyXQQ==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-4fb7589b187so7721587e87.1;
-        Mon, 24 Jul 2023 21:42:03 -0700 (PDT)
-X-Gm-Message-State: ABy/qLas06e0YiMhptpW2X9WSMwAtiJHXILpFrUX2OBPj4TSEfTqD3xI
-	BwldGqlo8WqwqaLAb/FwOD8gv00y1L5nL3AJBAQ=
-X-Google-Smtp-Source: APBJJlFyAtElYyCfGJawPIpDGRfQKoZBHaUMfu6wlS9BjtKBT27GNCsuhDzHyvmFmL9/bO6ckhxumh8R8ccwgK3sBbE=
-X-Received: by 2002:a05:6512:220f:b0:4fd:f84a:9901 with SMTP id
- h15-20020a056512220f00b004fdf84a9901mr3455408lfu.66.1690260121101; Mon, 24
- Jul 2023 21:42:01 -0700 (PDT)
+	s=k20201202; t=1690260254;
+	bh=+ACqNdes4jmCi8Obnif4i7hbEQJMXGCeCk+pRu6qhsg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hOgwA36ZJTCd8ep9foyK0Ml6RVutpQV8FWOfYn7vpM+S6O0aWLUKjFZoTDm3u8Y+3
+	 jWWWu6hOO00usmnVc/wGuEbZzZPEU+i/cSm9N+l1uUXJuZxV4w3P2VDzq1Kmf8tHyo
+	 yXf8qsQwLVFfEN8rE39M9L8iCe/FQkzOUAtzuUNwe/cDH4lUNlPCbzjEiOumg+WgNu
+	 jVDPn8W+a3poZOXFm/5eQgf+iAD1JmZyuMbnhIGf+OqKlbb+LANjw6lxOVUWFU/yRB
+	 nBnE73BheMbhgboucKa9fjeYxDfvkbwhVJeo23Pmj1EzCgbxVinfshWVOw8bGU0Bf3
+	 8xrmZxrTB2KTA==
+Date: Tue, 25 Jul 2023 07:44:09 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Lin Ma <linma@zju.edu.cn>, kuba@kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	ast@kernel.org, martin.lau@kernel.org, yhs@fb.com,
+	void@manifault.com, andrii@kernel.org, houtao1@huawei.com,
+	inwardvessel@gmail.com, kuniyu@amazon.com, songliubraving@fb.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v2] bpf: Add length check for
+ SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
+Message-ID: <20230725044409.GF11388@unreal>
+References: <20230725023330.422856-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230724090044.2668064-1-ilia.lin@kernel.org> <20230724181105.GD11388@unreal>
-In-Reply-To: <20230724181105.GD11388@unreal>
-From: Ilia Lin <ilia.lin@kernel.org>
-Date: Tue, 25 Jul 2023 07:41:49 +0300
-X-Gmail-Original-Message-ID: <CA+5LGR3ifQbn4x9ncyjJLxsFU4NRs90rVcqECJ+-UC=pP35OjA@mail.gmail.com>
-Message-ID: <CA+5LGR3ifQbn4x9ncyjJLxsFU4NRs90rVcqECJ+-UC=pP35OjA@mail.gmail.com>
-Subject: Re: [PATCH] xfrm: kconfig: Fix XFRM_OFFLOAD dependency on XFRM
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Ilia Lin <ilia.lin@kernel.org>, steffen.klassert@secunet.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jeffrey.t.kirsher@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725023330.422856-1-linma@zju.edu.cn>
 
-Hi Leon,
+On Tue, Jul 25, 2023 at 10:33:30AM +0800, Lin Ma wrote:
+> The nla_for_each_nested parsing in function bpf_sk_storage_diag_alloc
+> does not check the length of the nested attribute. This can lead to an
+> out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
+> be viewed as a 4 byte integer.
+> 
+> This patch adds an additional check when the nlattr is getting counted.
+> This makes sure the latter nla_get_u32 can access the attributes with
+> the correct length.
+> 
+> Fixes: 1ed4d92458a9 ("bpf: INET_DIAG support in bpf_sk_storage")
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> ---
+> V1 -> V2: moves the check to the counting loop as Jakub suggested,
+>           alters the commit message accordingly.
+> 
+>  net/core/bpf_sk_storage.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+> index d4172534dfa8..cca7594be92e 100644
+> --- a/net/core/bpf_sk_storage.c
+> +++ b/net/core/bpf_sk_storage.c
+> @@ -496,8 +496,11 @@ bpf_sk_storage_diag_alloc(const struct nlattr *nla_stgs)
+>  		return ERR_PTR(-EPERM);
+>  
+>  	nla_for_each_nested(nla, nla_stgs, rem) {
+> -		if (nla_type(nla) == SK_DIAG_BPF_STORAGE_REQ_MAP_FD)
+> +		if (nla_type(nla) == SK_DIAG_BPF_STORAGE_REQ_MAP_FD) {
+> +			if (nla_len(nla) != sizeof(u32))
 
-This is exactly like I described:
-* xfrm.h is included from the net/core/sock.c unconditionally.
-* If CONFIG_XFRM_OFFLOAD is set, then the xfrm_dst_offload_ok() is
-being compiled.
-* If CONFIG_XFRM is not set, the struct dst_entry doesn't have the xfrm mem=
-ber.
-* xfrm_dst_offload_ok() tries to access the dst->xfrm and that fails to com=
-pile.
+Jakub, it seems like Lin adds this check to all nla_for_each_nested() loops.
+IMHO, the better change will be to change nla_for_each_nested() skip empty/not valid NLAs.
 
+Thanks
 
-Thanks,
-Ilia Lin
-
-On Mon, Jul 24, 2023 at 9:11=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> On Mon, Jul 24, 2023 at 12:00:44PM +0300, Ilia Lin wrote:
-> > If XFRM_OFFLOAD is configured, but XFRM is not
->
-> How did you do it?
->
-> >, it will cause
-> > compilation error on include xfrm.h:
-> >  C 05:56:39 In file included from /src/linux/kernel_platform/msm-kernel=
-/net/core/sock.c:127:
-> >  C 05:56:39 /src/linux/kernel_platform/msm-kernel/include/net/xfrm.h:19=
-32:30: error: no member named 'xfrm' in 'struct dst_entry'
-> >  C 05:56:39         struct xfrm_state *x =3D dst->xfrm;
-> >  C 05:56:39                                ~~~  ^
-> >
-> > Making the XFRM_OFFLOAD select the XFRM.
-> >
-> > Fixes: 48e01e001da31 ("ixgbe/ixgbevf: fix XFRM_ALGO dependency")
-> > Reported-by: Ilia Lin <ilia.lin@kernel.org>
-> > Signed-off-by: Ilia Lin <ilia.lin@kernel.org>
-> > ---
-> >  net/xfrm/Kconfig | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
-> > index 3adf31a83a79a..3fc2c1bcb5bbe 100644
-> > --- a/net/xfrm/Kconfig
-> > +++ b/net/xfrm/Kconfig
-> > @@ -10,6 +10,7 @@ config XFRM
-> >
-> >  config XFRM_OFFLOAD
-> >       bool
-> > +     select XFRM
->
-> struct dst_entry depends on CONFIG_XFRM and not on CONFIG_XFRM_OFFLOAD,
-> so it is unclear to me why do you need to add new "select XFRM" line.
->
->    26 struct dst_entry {
->    27         struct net_device       *dev;
->    28         struct  dst_ops         *ops;
->    29         unsigned long           _metrics;
->    30         unsigned long           expires;
->    31 #ifdef CONFIG_XFRM
->    32         struct xfrm_state       *xfrm;
->    33 #else
->    34         void                    *__pad1;
->    35 #endif
->    36         int
->
-> Thanks
+> +				return ERR_PTR(-EINVAL);
+>  			nr_maps++;
+> +		}
+>  	}
+>  
+>  	diag = kzalloc(struct_size(diag, maps, nr_maps), GFP_KERNEL);
+> -- 
+> 2.17.1
+> 
+> 
 
