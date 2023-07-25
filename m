@@ -1,135 +1,88 @@
-Return-Path: <netdev+bounces-20647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49D17605EC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:44:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3637605F2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EBE2281725
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC9D281716
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58B81114;
-	Tue, 25 Jul 2023 02:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D751FCA;
+	Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A576EA1
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:44:56 +0000 (UTC)
-X-Greylist: delayed 489 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Jul 2023 19:44:28 PDT
-Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [IPv6:2001:41d0:203:375::30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1FF173E
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:44:28 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690252555;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0+VnVPZa4UeOCG7Yrfiew8gKr6k3ViuPV5Oe7aKEwA0=;
-	b=OouSnERnVUq8t87+qMJi+ElF1O+pkB5HJ/XjlEV4XPIdaL5qKz/r9JLMMUeUfOnb3ZMOdj
-	khOpzTQ2idnb6S4y6b+9cHD3wy9I4UTOUPXGpsseW4bB+Gm8jsDjdu3ImL8BlNp++kk+K8
-	DDellGRauVWKhKhaf7FrGB51gwHD7wU=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765311FBC
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E9A19AD
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:44:29 -0700 (PDT)
+X-QQ-mid:Yeas43t1690252906t971t64959
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.128.134.159])
+X-QQ-SSF:00400000000000F0FQF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 886477351447398798
+To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
+Cc: <netdev@vger.kernel.org>,
+	<andrew@lunn.ch>,
+	<hkallweit1@gmail.com>,
+	<Jose.Abreu@synopsys.com>,
+	<mengyuanlou@net-swift.com>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com> <20230724102341.10401-7-jiawenwu@trustnetic.com> <ZL5VyBb9cUTq/y3Y@shell.armlinux.org.uk>
+In-Reply-To: <ZL5VyBb9cUTq/y3Y@shell.armlinux.org.uk>
+Subject: RE: [PATCH net-next 6/7] net: txgbe: support copper NIC with external PHY
+Date: Tue, 25 Jul 2023 10:41:46 +0800
+Message-ID: <03d201d9bea1$8dc4d740$a94e85c0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 01/47] mm: vmscan: move shrinker-related code into a
- separate file
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-2-zhengqi.arch@bytedance.com>
-Date: Tue, 25 Jul 2023 10:35:01 +0800
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- david@fromorbit.com,
- tkhai@ya.ru,
- Vlastimil Babka <vbabka@suse.cz>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- djwong@kernel.org,
- Christian Brauner <brauner@kernel.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- tytso@mit.edu,
- steven.price@arm.com,
- cel@kernel.org,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- yujie.liu@intel.com,
- Greg KH <gregkh@linuxfoundation.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Linux Memory Management List <linux-mm@kvack.org>,
- x86@kernel.org,
- kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com,
- linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org,
- rcu@vger.kernel.org,
- netdev <netdev@vger.kernel.org>,
- dri-devel@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com,
- linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org,
- virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org,
- linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <97E80C37-8872-4C5A-A027-A0B35F39152A@linux.dev>
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-2-zhengqi.arch@bytedance.com>
-To: Qi Zheng <zhengqi.arch@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJQc7ZImbL9NUPTrDJxH1gVz1U29QJ+Bk4MARxYyuauv4Vi4A==
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Monday, July 24, 2023 6:43 PM, Russell King (Oracle) wrote:
+> On Mon, Jul 24, 2023 at 06:23:40PM +0800, Jiawen Wu wrote:
+> > @@ -22,6 +25,9 @@ static int txgbe_get_link_ksettings(struct net_device *netdev,
+> >  {
+> >  	struct txgbe *txgbe = netdev_to_txgbe(netdev);
+> >
+> > +	if (txgbe->wx->media_type == sp_media_copper)
+> > +		return phy_ethtool_get_link_ksettings(netdev, cmd);
+> 
+> Why? If a PHY is attached via phylink, then phylink will automatically
+> forward the call below to phylib.
 
+No, there is no phylink implemented for sp_media_copper.
 
-> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> =
-wrote:
->=20
-> The mm/vmscan.c file is too large, so separate the shrinker-related
-> code from it into a separate file. No functional changes.
->=20
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
-> ---
-> include/linux/shrinker.h |   3 +
-> mm/Makefile              |   4 +-
-> mm/shrinker.c            | 707 +++++++++++++++++++++++++++++++++++++++
-> mm/vmscan.c              | 701 --------------------------------------
-> 4 files changed, 712 insertions(+), 703 deletions(-)
-> create mode 100644 mm/shrinker.c
->=20
-> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
-> index 224293b2dd06..961cb84e51f5 100644
-> --- a/include/linux/shrinker.h
-> +++ b/include/linux/shrinker.h
-> @@ -96,6 +96,9 @@ struct shrinker {
->  */
-> #define SHRINKER_NONSLAB (1 << 3)
->=20
-> +unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup =
-*memcg,
-> +			   int priority);
+> > +
+> >  	return phylink_ethtool_ksettings_get(txgbe->phylink, cmd);
+> 
+> If you implement it correctly, you also don't need two entirely
+> separate paths to configure the MAC/PCS for the results of the PHY's
+> negotiation, because phylink gives you a _generic_ set of interfaces
+> between whatever is downstream from the MAC and the MAC.
 
-A good cleanup, vmscan.c is so huge.
+For sp_media_copper, only mii bus is registered for attaching PHY.
+Most MAC/PCS configuration is done in firmware, so it is not necessary
+to implement phylink as sp_media_fiber.
 
-I'd like to introduce a new header in mm/ directory and contains those
-declarations of functions (like this and other debug function in
-shrinker_debug.c) since they are used internally across mm.
-
-Thanks.
 
 
