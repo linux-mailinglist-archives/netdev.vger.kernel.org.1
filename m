@@ -1,223 +1,178 @@
-Return-Path: <netdev+bounces-21042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912527623D3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:44:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 983F77623D7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EC71C20FAC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53515281AAA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68BE126B31;
-	Tue, 25 Jul 2023 20:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5839626B33;
+	Tue, 25 Jul 2023 20:45:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CD61F188
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:44:56 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC39B26BB;
-	Tue, 25 Jul 2023 13:44:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I1T6VPBeaM1JHWtLPdJNgrvi5eiGg1jZdzyc1JdbI8YwWQ/XHK/uxW8e7ff8SkwQDjON26QbaGTsw4MAFrIz8PfPaNDIAYxT7JzrbypQPx1LA0Tlofc7kAYfOoycMr6gMX+TOWag/iCacAOyildvcqfOErqA6KRvla88ei/2nwZAv/6vUyhn96hkAF3249H0TIWFNhoh7ZHtN4wqWUtczHPS1Lj7PB3qzmmJtivxUS05U973SgF8PCQLiKutZYCSvCDNxBH1pD+ApJrVPqKoRgSXrfG3Yb4heIHHzh/T9B32NzmyqwKKQgBSAalxRNDsWNxbo228V2cXgOuEW2VW9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y6k4EUt8qHCAK9dvSVnWkfkvSJXXZKggAUGnJG3EkyI=;
- b=OhGX+UPQtounqkMU9m5oCLfMZ+asuYlYP34luvG+r4Cu6YNTQYe4E+ba88BeOF0qZ8rkZn4pXEYUtk4q8XxyDE1saw55YFim/mYIkvViKgm173mm6PAwtdjk0I0FHvpzOqkNqkV8KQhxBkhk7kSd6AFcRCKXCDakJI/zk52IKeuKt2jHQCOcL+I5J7PNSQIpKeb0GzcUAf34IrzK6E2t37qSiEI3Afe98N6ZiLbDhmDzVCoqN6pdjPj9Ddve/nHAWdGpCsD2jT4y9SWCSrjegf/t0416R/4STExjtM0TkJEjET9p32kwk7CoAn3GGLUWQMnhkEcwt9i7V6A6Y9Xd1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y6k4EUt8qHCAK9dvSVnWkfkvSJXXZKggAUGnJG3EkyI=;
- b=wJ1Qj0a1DafLSiz6bily1OGROkK62ApkfOpgHRChb7XMbqTM0xvcBptnKpIp+rU5Q8eohkt3BUbTPepF44Rjxo/eekBDFX0MUxiugTEKeHfMYkEt3BV4O2oXqVj/A3n4IpduB06hkdc9HC84TTUDjU/BzpjljBMHbUNunTfZzJc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
- by CH0PR12MB5299.namprd12.prod.outlook.com (2603:10b6:610:d6::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
- 2023 20:44:37 +0000
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::36f9:ffa7:c770:d146]) by MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::36f9:ffa7:c770:d146%7]) with mapi id 15.20.6609.031; Tue, 25 Jul 2023
- 20:44:36 +0000
-Message-ID: <1f4c1c2f-ba17-63fb-2f55-9265cc3d31fb@amd.com>
-Date: Tue, 25 Jul 2023 15:44:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH V7 4/9] wifi: mac80211: Add support for ACPI WBRF
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Quan, Evan" <Evan.Quan@amd.com>, "rafael@kernel.org"
- <rafael@kernel.org>, "lenb@kernel.org" <lenb@kernel.org>,
- "Deucher, Alexander" <Alexander.Deucher@amd.com>,
- "Koenig, Christian" <Christian.Koenig@amd.com>,
- "Pan, Xinhui" <Xinhui.Pan@amd.com>, "airlied@gmail.com" <airlied@gmail.com>,
- "daniel@ffwll.ch" <daniel@ffwll.ch>,
- "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
- "maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
- "tzimmermann@suse.de" <tzimmermann@suse.de>,
- "hdegoede@redhat.com" <hdegoede@redhat.com>,
- "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
- "Lazar, Lijo" <Lijo.Lazar@amd.com>,
- "jim.cromie@gmail.com" <jim.cromie@gmail.com>,
- "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
- "andrealmeid@igalia.com" <andrealmeid@igalia.com>,
- "trix@redhat.com" <trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>,
- "arnd@arndb.de" <arnd@arndb.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
- "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
- "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
- "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20230719090020.2716892-1-evan.quan@amd.com>
- <20230719090020.2716892-5-evan.quan@amd.com>
- <9b1f45f9-02a3-4c03-b9d5-cc3b9ab3a058@lunn.ch>
- <7d059aed-fac0-cdcd-63d5-58185bb345db@amd.com>
- <DM6PR12MB26196A993B3BA93392AA0FEDE403A@DM6PR12MB2619.namprd12.prod.outlook.com>
- <d4cfbbae-9cd0-4767-8c80-ec09d1dbaf9c@lunn.ch>
- <6aa9061b-1702-b8f2-9cb8-982895b9def4@amd.com>
- <5e92b45a-d99b-4a8a-9987-46c75a5fcb3c@lunn.ch>
-From: Mario Limonciello <mario.limonciello@amd.com>
-In-Reply-To: <5e92b45a-d99b-4a8a-9987-46c75a5fcb3c@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR03CA0043.namprd03.prod.outlook.com
- (2603:10b6:610:b3::18) To MN0PR12MB6101.namprd12.prod.outlook.com
- (2603:10b6:208:3cb::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D121F188
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:45:16 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1301FDF
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:45:03 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-98e011f45ffso872538266b.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:45:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690317902; x=1690922702;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7wAxlkINBbNFBtVNpZoiQdhZS2vHcfIUKcWpV42FDkA=;
+        b=5u7aC/4RJZIsOpklaQfDi3kpQYBAD0ULkUHZU2byz12ZdvuO1iZhkRIuStQBpH0ksc
+         ICmmx1c9pVrtRQ/OEHVXMBTyFye7D8FqxgTXCwLqh/3VvEQ9o1FyBvY/h/LaC3znIBVS
+         TfYQNuCHHRZ3WK+NY7LghraLfVna+xSvJrQEslyAyd3S27+uG/uMyN/IcaxRnzZYtEbY
+         llMPZ7oMRkbJwHkoi4FiN61GuO1H1c+RD9N+RQOReJOzQaoKLsM+Xei763wFWFmKmqA3
+         mbofhraaU1agKHbx43lxvUYc+DfwznIZy3H4B8tfv0AfFiFNO3TDxrKAWf8H+cBAPAXt
+         az4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690317902; x=1690922702;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7wAxlkINBbNFBtVNpZoiQdhZS2vHcfIUKcWpV42FDkA=;
+        b=gTOzIFs1KNSot9xtYTYou9eVhAKiVcfCc3Lul/gqrD6G4ELHtGlxvQRS7wpCZ/C7Ci
+         nHJgEL9HRrxZKP/Pu9MeB52XDw32DNzqobU3GICulIAe0Ex6d0itHqe/U08bGNy1/HEF
+         ob7b0uiZEB2FNETZ2ixv3CSURhv76M66A1EZ/bvu/JehZJ4s5mc04PM8oOSZ419zWgZr
+         JGxhlXnIdiOESpfUeisATjJ16nFrJZQGQARVPVyKWAqvB/ctSJ+NpTMfblq8Sv1Zj0d6
+         K+jf3Urf9/1wYuhtMrmLA7sIIZP79Z2tZRwOLrdZrutRhOKZTHkca8r/8Z3/q4PbtsJD
+         hGLQ==
+X-Gm-Message-State: ABy/qLZw91an5/Rsi3GQsj72+ehE+amvXKGhu5TR6N1fdBo/bQZ8buP8
+	sxMtHM2YlFk/8IJfe2B1PJp2xA==
+X-Google-Smtp-Source: APBJJlGd2L69+S0wL7VA1fs6HKsMk7zV6jl0TrmeNQvRwf1IBDbnx7rBVnpU2qCythmanygFZqrplA==
+X-Received: by 2002:a17:907:60c6:b0:99b:b505:eede with SMTP id hv6-20020a17090760c600b0099bb505eedemr1888507ejc.65.1690317902343;
+        Tue, 25 Jul 2023 13:45:02 -0700 (PDT)
+Received: from google.com (107.187.32.34.bc.googleusercontent.com. [34.32.187.107])
+        by smtp.gmail.com with ESMTPSA id k27-20020a1709063e1b00b00982842ea98bsm8544779eji.195.2023.07.25.13.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 13:45:01 -0700 (PDT)
+Date: Tue, 25 Jul 2023 20:44:56 +0000
+From: Matt Bobrowski <mattbobrowski@google.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, andrii@kernel.org,
+	ast@kernel.org
+Cc: davem@davemloft.net, daniel@iogearbox.net, martin.lau@kernel.org,
+	void@manifault.com, davemarchevsky@meta.com, tj@kernel.org,
+	memxor@gmail.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	kernel-team@fb.com
+Subject: Re: [PATCH v2 bpf-next 0/4] bpf: Add detection of kfuncs.
+Message-ID: <ZMA0SFhEDRp0UFGc@google.com>
+References: <20230317201920.62030-1-alexei.starovoitov@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|CH0PR12MB5299:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27918d82-8500-4a0d-5135-08db8d4ff59e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mJVZxhRVqmI14EhjWYD10LCIrFqyHoXDoB0Vu6qlQCqrY8hE6AKErxnS3ahYJ+68Zl8LEXleFw0jX2yaGM45q2Rf3PnbdN1ls1HfApMSezQNIjJKjp+hMZ1tAeSr5jegN5HBiVGEuzQ16S+YNLMlwlN6+qD7CXY78wlzqIvU5+XfPWF9sC223VbATbaTkzK7vGrDQHtN6RS7jepIFeIxiGTNvCoZhh9qSzJKPdBgGvbgcMBM3E5iUfMLClpZ/etfg47oHrTR1IYpt7F4kUl3g2uzxdwh33cmROWWjCZWYmD+1DdAaAyHHGFktK2ySicU7oGPODpnUcL3Unfd039fZXJNnxTEuI6VnX3M0U0E1wQxpVUBKfy7eJFUVx7efjuYRdH3ZQJM/pUstdYl3Cv6bxXOnjoLaUzShgR/BamriPvOdA4WqQ1ZszKE5ayz0Lrhn2SHZ4pfSWuhpPJl0iUeM0cP2o+OYigZIYQhPkN2EafcCkCU9/b3CwC9H8HmymxuMWOKLLyWQj2X3GKuvWs7vhr/loFRzXxzz0Yl3StWUgtzJArqao/oYEkcOquFFKJe87HFBDlyKRHByq66Et8SDhu1JegSfqHA173R6SEjkiKmOoQOCSPiXirly61jyDZTmd2wc+rSsjbI+k2gtxhAIg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(136003)(376002)(366004)(451199021)(31686004)(7416002)(44832011)(8936002)(8676002)(5660300002)(41300700001)(316002)(6916009)(4326008)(54906003)(2906002)(66476007)(66556008)(66946007)(6486002)(6512007)(53546011)(478600001)(186003)(6506007)(6666004)(31696002)(86362001)(36756003)(2616005)(83380400001)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Vjg1SnhFWVRUQk9wODFuVDNUMlpqOEp1aklBeloyMVd6ekNQNnZPOVpIMFBt?=
- =?utf-8?B?ZXkrbitNL2ZnVHdwNWNJbjc4YUhGY0pmT2JOUjhPWVB2NGxSeE1IU0V4Q01H?=
- =?utf-8?B?ZG9JeTViWmNUeXJrd2h1bVJIRVJtbGdIazRLVmVsakI0d3lYMWp2Z0hEaTFH?=
- =?utf-8?B?ZFdGcThGVHNQYU10TmtmQVk5TytMbFRncjZxSVNNRnlVcU9YczgxYlIwZGxN?=
- =?utf-8?B?d21rOVJFZHpSNU9nOGdEOFBpQnJRWEpMcVo1VE9BRzBmZDJYc1laVEthZWtX?=
- =?utf-8?B?d2l0bGpKbkt0MFhhbEU2dG5pVHBhMFZWMk9WNnZJQjI2N3gyVjZsQnhlUWhj?=
- =?utf-8?B?Y0E5dnJkNHY2TERpN3ZxTVFvNmMzSlpEMHJBeEJKdU9jVjAwS05rTTlITjNq?=
- =?utf-8?B?emtUM0FWcTNEME42eFdJaTFzdGlHTlkyTTNCNXFBVjYvZnA3SjlFWXpyTnFu?=
- =?utf-8?B?K1Y1S3A0RjZoNnN4Q1lFWkdXT2FYS00xblRQcnlOdE5aV21sUEVnUmV2VHdx?=
- =?utf-8?B?QmZuVE5rc2FmcFFaWEh3bHpWL05pZlphMFh3Y0VOWngyTCtGQmExUitmYVg2?=
- =?utf-8?B?Q1hmdDFHOW96U2RXa2Q4Ym5CUy9pNVhiQ2c2ZGF1QzY2Zk41TngxbVVBZ2J6?=
- =?utf-8?B?WUU2djE5TmE5US8yQndqVko1NFBzeW1MdmxXSUhIejJxRjhJWnRlL2pOWVZM?=
- =?utf-8?B?YkVVWExFU3VkZlNNNWVvWHhNTGRZYnBHcHhTR3AwQTY3MHo3S0NHMmgvWEx5?=
- =?utf-8?B?Q0trc0xKVWZoaEtJN240cm5UT2xQSHpEZUhBTm5Kcy9RRElMcnZGZTR2L09o?=
- =?utf-8?B?WmtIL0EzL1NOdWh2bW9RZitaalhPUjRBVWh0bnUxMWpPeXF6TEVtRWpWZWl1?=
- =?utf-8?B?ZS9QdVdWbUNNRHNUSXRCa1RYK3lVVnhGbS8xeTdpRU1vb0xuNkVpaXZsSTJ2?=
- =?utf-8?B?YmkxMWRBaXdKWmZSL29aa2REOElZNWVOcWlFZEtab3BWVDlSZk1BY2RjY1U5?=
- =?utf-8?B?bE5DOXJLNmk0U3l2R21zQXpoQUpqRTI1YXpHOWJPbjZJNFdBWWlESW1ldU02?=
- =?utf-8?B?TUMrQnRaenplWUphTmJFc1ltSVpZemF2TnlTNXpNL1NPZEZmaTI4RWFpeHpC?=
- =?utf-8?B?L0sxVS9LMXpmeVlNVGhMRjl3MXMvTHJQalQ0NG01ckMvbDZHUXdTZG5DSjNO?=
- =?utf-8?B?L3VrVVhSM0tMREVOWWtJdU51d2JaT1dPMmpQbjJGZVBNY0Y0WTBsRHdVRVh3?=
- =?utf-8?B?ek04NWZ0eUVvUUFYZDFlMEZOMldwV09RZXJvMFp5bmltWVZjL1kraGhLTksv?=
- =?utf-8?B?c0ZiQ2RyeHZsb2d4SncvMG02dUNsb290ZmVkRkJCdkxiM3NuRkxJNkFIczJY?=
- =?utf-8?B?Z2VvTlczYjRXYS9TRjQ1eEdvTHdHbzlrMzNmNnliRk53MncwSjF3dEdERzZu?=
- =?utf-8?B?YmR1ZWRvcGg2b0NncEc4aUVHdkRqbUxKalVpNnl3NG5Gc0NSUzNZTzZsQU05?=
- =?utf-8?B?OUVMY1Zmb29VV1puSWRmQVp6TENISHgyYmxPa2ZXM091cVFaL3BDM2VEMHVO?=
- =?utf-8?B?cEQ4MkQ4aWRSZGVUUE9zcDV6NnR2VTVJZFFkT3ZaVGlkcE82c1lySGI5V3VD?=
- =?utf-8?B?S2Z6eTQ2c2l1VkVObTg3MEhmVkh0dkpHT1B6UmFocHlLSWpJSnkrRDRVank1?=
- =?utf-8?B?UFFRUm0veTlRbFV5NkM4bkNzckE1dVhabmZqL2xMVThnQlQ5OFNUeFRoVFE1?=
- =?utf-8?B?UWEzRHdKZTF4bHBTSkN3SnVmbzFzelgrdWRuNXU4NVVoZy80aHhJUWJwbTdq?=
- =?utf-8?B?NVJ2TmhHTmg0cUY1MEpCQ0JjMzA3d0thUFcvVTBJeEp1aC9zRlBIQjJuQXhr?=
- =?utf-8?B?UW1qR3diNk1xazlCY1lEQjBucjZDQXZoaGxFS2xXNXc5V3hVNStsRURnV0Fw?=
- =?utf-8?B?NkNWa0FvSkxFclM5Zm0yR0ZidnlkMXRabkpiRzhmYUpPSFZ2Y0ZFMHNxNnBP?=
- =?utf-8?B?L0Q2Z1lmYVNXUWt1NHJSOU9FZlBHQ2I3RjZBQUpOS05FVXZ2WlhVUDZ6RjJQ?=
- =?utf-8?B?L3NwVVBlcUhIY2U2bC9uQ2NQYnpPM0hpS2FkWDU2bWxZdUVPMFRjT2NMV0pQ?=
- =?utf-8?B?N0ZUL213WUZyNUx0ellsNHhMMDB0eU8xaExLMlI0aW1PQW51d3oxR3ZIR0dm?=
- =?utf-8?Q?FBE63AEvA1/okTCl0B6KovtDJoFVOathJgzG6KCrkUmN?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27918d82-8500-4a0d-5135-08db8d4ff59e
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 20:44:36.7004
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XTwf2cy+6E6r2v2Ddk17agf6nop5w0Es3i+trTK1DDcoLY1+HPcH32dlmJ7AVivoc5dqUeOsJqFD7FiGi8KzXw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5299
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230317201920.62030-1-alexei.starovoitov@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/25/23 15:09, Andrew Lunn wrote:
->> This comes back to the point that was mentioned by Johannes - you need to
->> have deep design understanding of the hardware to know whether or not you
->> will have producers that a consumer need to react to.
-> Yes, this is the policy is keep referring to. I would expect that
-> there is something somewhere in ACPI which says for this machine, the
-> policy is Yes/No.
-It's not yes/no for a "model" or "machine".  It's yes/no for a given 
-*device*
-within a machine.
->
-> It could well be that AMD based machine has a different ACPI extension
-> to indicate this policy to what Intel machine has. As far as i
-> understand it, you have not submitted this yet for formal approval,
-> this is all vendor specific, so Intel could do it completely
-> differently. Hence i would expect a generic API to tell the core what
-> the policy is, and your glue code can call into ACPI to find out that
-> information, and then tell the core.
-Which is exactly what wbrf_supported_producer() and 
-wbrf_supported_consumer() do.
-If there is another vendor's implementation introduced they can make 
-those functions
-return TRUE for their implementations.
->> If all producers indicate their frequency and all consumers react to it you
->> may have activated mitigations that are unnecessary. The hardware designer
->> may have added extra shielding or done the layout such that they're not
->> needed.
-> And the policy will indicate No, nothing needs to be done. The core
-> can then tell produces and consumes not to bother telling the core
-> anything.
->
->> So I don't think we're ever going to be in a situation that the generic
->> implementation should be turned on by default.  It's a "developer knob".
-> Wrong. You should have a generic core, which your AMD CPU DDR device
-> plugs into. The Intel CPU DDR device can plug into, the nvidea GPU can
-> plug into, your Radeon GPU can plug into, the intel ARC can plug into,
-> the generic WiFi core plugs into, etc.
-It's not a function of "device" though, it's "device within machine".
->
->> If needed these can then be enabled using the AMD ACPI interface, a DT one
->> if one is developed or maybe even an allow-list of SMBIOS strings.
-> Notice i've not mentioned DT for a while. I just want a generic core,
-> which AMD, Intel, nvidea, Ampare, Graviton, Qualcomm, Marvell, ...,
-> etc can use. We should be solving this problem once, for everybody,
-> not adding a solution for just one vendor.
->
->        Andrew
-I don't see why other implementations can't just come up with other
-platform specific ways to respond affirmatively to
-wbrf_supported_producer() or
-wbrf_supported_consumer().
+Hey Alexei/Andrii,
+
+On Fri, Mar 17, 2023 at 01:19:16PM -0700, Alexei Starovoitov wrote:
+> From: Alexei Starovoitov <ast@kernel.org>
+> 
+> Allow BPF programs detect at load time whether particular kfunc exists.
+
+So, I'm running a GCC built 6.3.7 Linux kernel and I'm attempting to
+detect whether a specific kfunc i.e. bpf_rcu_read_lock/unlock() exists
+using the bpf_ksym_exists() macro. However, I'm running into several
+BPF verifier constraints that I'm not entirely sure how to work around
+on the aforementioned Linux kernel version, and hence why I'm reaching
+out for some guidance.
+
+The first BPF verifier constraint that I'm running into is that prior
+to commit 58aa2afbb1e6 ("bpf: Allow ld_imm64 instruction to point to
+kfunc"), it seems that the ld_imm64 instruction with BPF_PSEUDO_BTF_ID
+can only hold a ksym address for the kind KIND_VAR. However, when
+attempting to use the kfuncs bpf_rcu_read_lock/unlock() from a BPF
+program, the kind associated with the BPF_PSEUDO_BTF_ID is actually
+KIND_FUNC, and therefore trips over this BPF verifier.
+
+The code within the example BPF program is along the lines of the
+following:
+```
+...
+void bpf_rcu_read_lock(void) __ksym __weak;
+void bpf_rcu_read_unlock(void) __ksym __weak;
+...
+if (bpf_ksym_exists(bpf_rcu_read_lock)) {
+   bpf_rcu_read_lock();
+}
+...
+if (bpf_ksym_exists(bpf_rcu_read_unlock)) {
+   bpf_rcu_read_unlock();
+}
+...
+```
+
+The BPF verifier error message that is generated on a 6.3.7 Linux
+kernel when attempting to load a BPF program that makes use of the
+above approach is as follows:
+   * "pseudo btf_id {BTF_ID} in ldimm64 isn't KIND_VAR"
+
+The second BPF verifier constraint comes from attempting to work
+around the first BPF verifier constraint that I've mentioned
+above. This is trivially by dropping the conditionals that contain the
+bpf_ksym_exists() check and unconditionally calling the kfuncs
+bpf_rcu_read_lock/unlock().
+
+The code within the example BPF program is along the lines of the
+following:
+```
+...
+void bpf_rcu_read_lock(void) __ksym __weak;
+void bpf_rcu_read_unlock(void) __ksym __weak;
+...
+bpf_rcu_read_lock();
+...
+bpf_rcu_read_unlock();
+...
+```
+
+However, in this case the BPF verifier error message that is generated
+on a 6.3.7 Linux kernel is as follows:
+   * "no vmlinux btf rcu tag support for kfunc bpf_rcu_read_lock"
+
+This approach would be suboptimal anyway as the BPF program would fail
+to load on older Linux kernels complaining that the kfunc is
+referenced but couldn't be resolved.
+
+Having said this, what's the best way to resolve this on a 6.3.7 Linux
+kernel? The first BPF program I mentioned above making use of the
+bpf_ksym_exists() macro works on a 6.4 Linux kernel with commit
+58aa2afbb1e6 ("bpf: Allow ld_imm64 instruction to point to kfunc")
+applied. Also, the first BPF program I mentioned above works on a
+6.1.* Linux kernel...
+
+> Patch 1: Allow ld_imm64 to point to kfunc in the kernel.
+> Patch 2: Fix relocation of kfunc in ld_imm64 insn when kfunc is in kernel module.
+> Patch 3: Introduce bpf_ksym_exists() macro.
+> Patch 4: selftest.
+> 
+> NOTE: detection of kfuncs from light skeleton is not supported yet.
+> 
+> Alexei Starovoitov (4):
+>   bpf: Allow ld_imm64 instruction to point to kfunc.
+>   libbpf: Fix relocation of kfunc ksym in ld_imm64 insn.
+>   libbpf: Introduce bpf_ksym_exists() macro.
+>   selftests/bpf: Add test for bpf_ksym_exists().
+
+/M
 
