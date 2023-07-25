@@ -1,140 +1,123 @@
-Return-Path: <netdev+bounces-20812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69200761148
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:49:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77EAB7611D9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2597A281839
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:49:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A07571C20446
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3904314ABC;
-	Tue, 25 Jul 2023 10:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF7615AC5;
+	Tue, 25 Jul 2023 10:56:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA6F14A82
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:49:32 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916D71990;
-	Tue, 25 Jul 2023 03:49:30 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fbf1f6c771so8343909e87.1;
-        Tue, 25 Jul 2023 03:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690282169; x=1690886969;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xKaUQGPjdDfYhdrv9D3r8wNt4DpcmSXfx9EIaio0fng=;
-        b=LXifjZ/mWLZLJKXUG1XZqUsk1oAAJ3pVW9sAqnUn03nM32YdNrljcxEpUHsCPFO4iH
-         WgGXpaVPLa4Q+eJm+c27T/IzKHrb9NqTmVq49XhlPfQuN+3/5E6eC13Zee4K82ON9D0F
-         /KMoYGpj2F2nQLA8B/Zl6XoINJPwrjzRjbX/wM0wOqOX8LecLwS15XnkgGJs8EM6vo+c
-         dzS5/Uvj5djmTI/pUfCdy/inviuUarpn8d2BDbBmrrRKGa0pTa64MV4EEfs/L5CERjsD
-         l8sCuqhUDkubDcqIxYe75AxGYWoAfSXnvhfU8dDZNN9Orjb6LczeiVNlIFAbm7VQ+fFX
-         xD1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690282169; x=1690886969;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xKaUQGPjdDfYhdrv9D3r8wNt4DpcmSXfx9EIaio0fng=;
-        b=j78iCSgvNgZGkuQzg4F/ITiT0XUsAMDjUe2eROdxzCjQU2T+x5U8UDciVAXm/1NVN0
-         NlkSk+Q0AJw94wYZW1YwNYKQ4xIylbfgxanIGLoLGp1CYTp6EkFyuUJcjVWb8p4phca6
-         3FOjkEGgbOdiLRnY+Osx1YfGwQruw+mT8r7j5FioW6jqb3LnLUQle6nX1veA1i5rDJCu
-         cVZB1hnWfoq1EURCP3zBoUf55zn43dPFIMOCPpxNDMhI+KzzGiiXgAXdi6iDpOUU168u
-         uNtQfkcTYkuYt7tUfiQljSYOlZixdSMG8Z2TnwR8LvNMecKnlF4sDwbTYv4Mh3gOD+Ae
-         gT9Q==
-X-Gm-Message-State: ABy/qLYG3wnaKMHVp9//840yrHkfM4IIB7oo4wjMkaCHVWItrD9l0oMH
-	4jv3AHsUjMSTXI52v7KOo8fi/uPxNSTRZgrQ
-X-Google-Smtp-Source: APBJJlFHZDa5JGiPNcdmSGdDvacm6f4uAn24FLGnr6AtF453L+WG4jkhfRjsQnNjWdBVI1BQRpG/eg==
-X-Received: by 2002:a19:6755:0:b0:4f8:5bf7:db05 with SMTP id e21-20020a196755000000b004f85bf7db05mr7354401lfj.27.1690282168453;
-        Tue, 25 Jul 2023 03:49:28 -0700 (PDT)
-Received: from akanner-r14. ([77.222.25.78])
-        by smtp.gmail.com with ESMTPSA id c20-20020a197614000000b004edc72be17csm2695943lff.2.2023.07.25.03.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 03:49:27 -0700 (PDT)
-Message-ID: <64bfa8b7.190a0220.b6db7.53b7@mx.google.com>
-X-Google-Original-Message-ID: <ZL+otOFR1r507Opz@akanner-r14.>
-Date: Tue, 25 Jul 2023 13:49:24 +0300
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org, brouer@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-Subject: Re: [PATCH 2/2] drivers: net: prevent tun_can_build_skb() to exceed
- xdp size limits
-References: <20230724221326.384-1-andrew.kanner@gmail.com>
- <20230724221326.384-2-andrew.kanner@gmail.com>
- <CACGkMEt+LW8FBNwcn6f0cBwTOuKy+ZPy3Smg6fJgo9OrCUAOjQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4117714263
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:56:50 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0DC2720;
+	Tue, 25 Jul 2023 03:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Zxup0ZB33r1kbm3A7ozwR394TBd/65UqUOTZ/imQrpM=; b=EV4JAqedVH1oP+vTphQdjR8flZ
+	RhPLXAB2RLG7/YyJl9jozEEGlKNShGEFGp5ItcpcbufPePAwscYZ9KvP2z0RCI/VftJQsNizCihlk
+	F1BuKhiIkTEXTiD+Rww55kaQoctwvYVYV3BRDxZmIOuJ9h/Nw1gNvBQ53nPvGhgOt+VdvQ5gA5+tU
+	vxla2LHRtrY7dCBpa/vH90DRDyySyca5Rxq/v0zxfa9ayIcfZgFgT0dpROHeA8ttiBTuccFQ76C4x
+	GWSNFqPV3X0mK1ZrM004w7+w/wmSF/FXFDQXA32BB25SvTy6N0qx1CPhamFbr/A+qxgrKObjJ/fY5
+	1t/xTOqg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53228)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qOFid-0001wE-0m;
+	Tue, 25 Jul 2023 11:56:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qOFic-0001lh-11; Tue, 25 Jul 2023 11:56:42 +0100
+Date: Tue, 25 Jul 2023 11:56:41 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Ante Knezic <ante.knezic@helmholz.de>, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, f.fainelli@gmail.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, olteanv@gmail.com
+Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for
+ 88E6390X and 88E6190X
+Message-ID: <ZL+qafwCqeDytFRt@shell.armlinux.org.uk>
+References: <30e262679bfdfd975c2880b990fe8375b9860aab.camel@redhat.com>
+ <20230725095925.25121-1-ante.knezic@helmholz.de>
+ <e1cdc94be0e515a5de9d4af8fccfd99e25435b73.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEt+LW8FBNwcn6f0cBwTOuKy+ZPy3Smg6fJgo9OrCUAOjQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <e1cdc94be0e515a5de9d4af8fccfd99e25435b73.camel@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 11:39:46AM +0800, Jason Wang wrote:
-> On Tue, Jul 25, 2023 at 6:15 AM Andrew Kanner <andrew.kanner@gmail.com> wrote:
-> >
-> > Tested with syzkaller repro with reduced packet size. It was
-> > discovered that XDP_PACKET_HEADROOM is not checked in
-> > tun_can_build_skb(), although pad may be incremented in
-> > tun_build_skb().
-> >
-> > Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
-> > Link: https://syzkaller.appspot.com/text?tag=ReproC&x=12b2593ea80000
-> > Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
-> > ---
-> >  drivers/net/tun.c | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 18ccbbe9830a..cdf2bd85b383 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -1582,7 +1582,13 @@ static void tun_rx_batched(struct tun_struct *tun, struct tun_file *tfile,
-> >  static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
-> >                               int len, int noblock, bool zerocopy, int *skb_xdp)
-> >  {
-> > -       if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
-> > +       int pad = TUN_RX_PAD;
-> > +       struct bpf_prog *xdp_prog = rcu_dereference(tun->xdp_prog);
+On Tue, Jul 25, 2023 at 12:47:43PM +0200, Paolo Abeni wrote:
+> [adding Russell]
+> On Tue, 2023-07-25 at 11:59 +0200, Ante Knezic wrote:
+> > On Tue, 25 Jul 2023 10:56:25 +0200 Paolo Abeni wrote
+> > > It looks like you are ignoring the errors reported by
+> > > mv88e6390_erratum_3_14(). Should the above be:
+> > > 
+> > > 		return mv88e6390_erratum_3_14(mpcs);
+> > > 
+> > > instead?
+> > > 
+> > 
+> > I guess you are right. Would it make sense to do the evaluation for the 
+> > 	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
+> > above as well?
 > 
-> This misses rcu read lock.
-> 
-> I wonder if things could be simpler if we move the limit check from
-> tun_can_build_skb() to tun_build_skb():
-> 
-> rcu_read_lock();
-> xdp_prog = rcu_dereference(tun->xdp_prog);
->         if (xdp_prog)
->                 pad += XDP_PACKET_HEADROOM;
-> buflen += SKB_DATA_ALIGN(len + pad);
-> rcu_read_unlock();
-> 
-> Thanks
-> 
+> Good question ;) it looks like pcs_post_config() errors are always
+> ignored by the core, but I guess it's better to report them as
+> accurately as possible.
 
-Thanks, I missed the part with rcu read lock for some reason.
+... because if they occur, it's way too late to attempt to unwind the
+changes that have already occurred.
 
-It's a good idea to move / reduce duplication. Let me think and try to
-fix according to your comments, I will resend it as v2.
+> @Russell, what it your preference here, should we just ignore the
+> generate errors earlier, or try to propagate them to the core/phylink,
+> should that later be changed to deal with them?
+
+How would we deal with an error?
+
+If it's a "we can't support this configuration" then that's a driver
+problem, and means that the validation failed to exclude the
+unsupported configuration.
+
+If it's a communication error of some sort, then we're unlikely to
+be able to back out the configuration change, because we probably
+can't communicate with some device anymore - and there are paths
+in phylink where these methods are called where there is no
+possibility of propagating an error (due to being called in a
+workqueue.)
+
+I did decide that phylink_major_config() ought not proceed if
+mac_prepare() fails, but really once mac_prepare() has been called
+we're committed - and if an error happens after that, the network
+interface is dead.
 
 -- 
-Andrew Kanner
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
