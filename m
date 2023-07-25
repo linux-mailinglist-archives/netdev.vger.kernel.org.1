@@ -1,248 +1,271 @@
-Return-Path: <netdev+bounces-20656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BF7760670
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:12:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F694760656
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 507811C20D80
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:12:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A05A81C20D6B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BFE20F6;
-	Tue, 25 Jul 2023 03:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283F41FB7;
+	Tue, 25 Jul 2023 03:07:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB831FD1
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:12:41 +0000 (UTC)
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C3819B4
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:05:25 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-268160d99ccso259900a91.1
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:05:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690254325; x=1690859125;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=niSMZqBCvW/Me9jsMaxXz5gtuZ44llk1Ot3soT0LhIs=;
-        b=FniJo6cfZiXO48N3LrJPbrRtsXuGwEsrxL+rPNcNzpIfBU8e0vwfaKRVcngIxQ6/Nq
-         uV6IwXjWItzg/7IWT04hxNl0ft8u0yvH7EyRJ6POcXsP6dFyjR2vvuievKT7V7wXKj9i
-         Hs4OFXg82m4uyRZZDGIHYrUPf7Daiin7owJFDMH9ALFzGhGiMR/jo54iE9PQ2yCszEax
-         GduXKZlfrLf0f1lI69b+SeFKsM1fBAPgAwEi9/QiPJB5pr3rcwSAawR7U6Bt6cbBHX1B
-         l+6jljnScvspLgnoIuyzCCNBX+9PGgFUwcZiZbmROS7agCNCVVXov8LOv0CsZfjvTopq
-         9j6w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AE620E1
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:07:58 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75691E7B
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:07:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690254475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VsrFcx7CKuChRWMATh1+NSjWHNvI5lnlCZ+wKzBTyhE=;
+	b=BnKozPRiTrK8Bllwqg+dlerJSSnRz5wyizWdq7HCGuZl3SeFyu/JCB2JyPSZ1k0lzptyNy
+	eKT5mrnA09nPz8m9C2ylh92q9D8hEPcOmU8U58iM5ExtJQ4AwsywZrWFt600KB+h/xIRVt
+	Ub9zrgdmpr5r8Do7IuRy3sB4hWVCYkg=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-638-Mn4DPrnzOZKKcjS4Fmgd_A-1; Mon, 24 Jul 2023 23:07:53 -0400
+X-MC-Unique: Mn4DPrnzOZKKcjS4Fmgd_A-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b6f0527454so41146291fa.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:07:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690254325; x=1690859125;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=niSMZqBCvW/Me9jsMaxXz5gtuZ44llk1Ot3soT0LhIs=;
-        b=aEn9oxj8RI67hPJ23AuAY6Okdb0GfZEQnc3C1l3qojONA0JxBSAPA6oh2KzGVkjOJh
-         GZZv5ZUHkdO79VYsXmi94cSf3u5VxF6TsPtRH3nA2Yx4ifF+pzpC2vhOtu9R8pnoBsM0
-         nJvulbBv+eabFUVJkDNxSyhpH2wvyFIo1fQPMuTHNNaxU1JSV1d5u5AoXxOgkJkdSJ7G
-         e5/B3Fyt46czIGuCkg1h/CZgFUdgKLlOFmNzbLPMzvry5D009Dsau39EbDTyKpXzMZp5
-         Vjf2aayAOoDDkgAeagjv5WkCplMDnIroDRTwiVaDh0FaD+ydQVpHAh2nVouBvG02TUEk
-         pdpA==
-X-Gm-Message-State: ABy/qLZH/oAYixty7zTNyF0VXFw8PB06SG18vJe40yB0eZL0sqBWiyvA
-	Zett0YkWdMtwmSzwWgztXFYbEw==
-X-Google-Smtp-Source: APBJJlFB/cQTGj3IlIfGF+HAM8hU50IJB+Lr29ujA3cHbbDSAB3N90HdGCOpa8iydTeMw+f8qxyL2Q==
-X-Received: by 2002:a17:90a:1d46:b0:268:abc:83d5 with SMTP id u6-20020a17090a1d4600b002680abc83d5mr6012554pju.4.1690254324674;
-        Mon, 24 Jul 2023 20:05:24 -0700 (PDT)
-Received: from ?IPV6:fdbd:ff1:ce00:1c25:884:3ed:e1db:b610? ([2408:8000:b001:1:1f:58ff:f102:103])
-        by smtp.gmail.com with ESMTPSA id t10-20020a17090aba8a00b002681d44071csm2043968pjr.46.2023.07.24.20.05.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 20:05:24 -0700 (PDT)
-Message-ID: <6049aa99-aa47-5137-f66e-350bc4723914@bytedance.com>
-Date: Tue, 25 Jul 2023 11:05:04 +0800
+        d=1e100.net; s=20221208; t=1690254472; x=1690859272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VsrFcx7CKuChRWMATh1+NSjWHNvI5lnlCZ+wKzBTyhE=;
+        b=IBI2uFa+a1cm2bugq5haeg5PQY0Qnaol3SchZJ14MD+K20sMBf2ioSz2856xIupLNm
+         ThhWWS2qcy7Ou5ZVusmLm7Vo6/krkAhbNeuYYYx7YJWmg0uJjvZz95GLP/gsVJT517F3
+         W/7ocal9L3er/xVNR+CqoyiG45Mx3syRd7oQ5B5d6wLR2EmNysFleXyi6Hv0Pfs6KabY
+         rQpeO2QI+6Mr4bCYtOqHt0kN1k0ETw/BW5Oy+aJdwl1Ep18LnPOsX1/WMD7XL4ZPFUYu
+         axVXjmD83NHzaBo2vqVp+jkDyMl56i5eezcWH+Vy6GzndjhT5M8E5W64D8gh1lW9P5RN
+         8Slw==
+X-Gm-Message-State: ABy/qLa9k3PS0U20+apPcdmQNn+uALsxowj8ed5BsDfhjjv8dLlv7m8R
+	UETAeA36ICMTE2io5bntQ/HnTooRCHjOnijESAzQUP2Q6mCIjPrJ4+SG0chY1G1UQ5LDgoFf9xH
+	mjYVZj2Wm1k+1XGuX9/s6JDOqydkVbfID
+X-Received: by 2002:a2e:92d0:0:b0:2b4:65bf:d7b with SMTP id k16-20020a2e92d0000000b002b465bf0d7bmr6750642ljh.2.1690254471984;
+        Mon, 24 Jul 2023 20:07:51 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFldEasInu8/EU/4WmFQMOs6DD/Y7YsaR0vjQ1PPmGDpzLFjM8Ou0Nzwjk+3kPaljEexhz/8vzlaUYQeVLu7N4=
+X-Received: by 2002:a2e:92d0:0:b0:2b4:65bf:d7b with SMTP id
+ k16-20020a2e92d0000000b002b465bf0d7bmr6750625ljh.2.1690254471671; Mon, 24 Jul
+ 2023 20:07:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v2 24/47] drm/panfrost: dynamically allocate the
- drm-panfrost shrinker
-Content-Language: en-US
-To: Steven Price <steven.price@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com, linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
- akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
- roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
- paulmck@kernel.org, tytso@mit.edu, cel@kernel.org, senozhatsky@chromium.org,
- yujie.liu@intel.com, gregkh@linuxfoundation.org, muchun.song@linux.dev
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-25-zhengqi.arch@bytedance.com>
- <cdd08c9e-81d3-a85f-5426-5db738aa73ec@arm.com>
-From: Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <cdd08c9e-81d3-a85f-5426-5db738aa73ec@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230720083839.481487-1-jasowang@redhat.com> <20230720083839.481487-3-jasowang@redhat.com>
+ <e4eb0162-d303-b17c-a71d-ca3929380b31@amd.com> <20230720170001-mutt-send-email-mst@kernel.org>
+ <263a5ad7-1189-3be3-70de-c38a685bebe0@redhat.com> <20230721104445-mutt-send-email-mst@kernel.org>
+ <6278a4aa-8901-b0e3-342f-5753a4bf32af@redhat.com> <20230721110925-mutt-send-email-mst@kernel.org>
+ <e3490755-35ac-89b4-b0fa-b63720a9a5c9@redhat.com> <CACGkMEv1B9xFE7-LrLQC3FbH6CxTZC+toHXoLHFvJWn6wgobrA@mail.gmail.com>
+ <20230724025720-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230724025720-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 25 Jul 2023 11:07:40 +0800
+Message-ID: <CACGkMEs7zTXk77h-v_ORhvbtQ4FgehY6w6xCfFeVTeCnzChYkw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
+ command waiting loop
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, Shannon Nelson <shannon.nelson@amd.com>, 
+	xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Steven,
+On Mon, Jul 24, 2023 at 3:17=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Mon, Jul 24, 2023 at 02:52:05PM +0800, Jason Wang wrote:
+> > On Sat, Jul 22, 2023 at 4:18=E2=80=AFAM Maxime Coquelin
+> > <maxime.coquelin@redhat.com> wrote:
+> > >
+> > >
+> > >
+> > > On 7/21/23 17:10, Michael S. Tsirkin wrote:
+> > > > On Fri, Jul 21, 2023 at 04:58:04PM +0200, Maxime Coquelin wrote:
+> > > >>
+> > > >>
+> > > >> On 7/21/23 16:45, Michael S. Tsirkin wrote:
+> > > >>> On Fri, Jul 21, 2023 at 04:37:00PM +0200, Maxime Coquelin wrote:
+> > > >>>>
+> > > >>>>
+> > > >>>> On 7/20/23 23:02, Michael S. Tsirkin wrote:
+> > > >>>>> On Thu, Jul 20, 2023 at 01:26:20PM -0700, Shannon Nelson wrote:
+> > > >>>>>> On 7/20/23 1:38 AM, Jason Wang wrote:
+> > > >>>>>>>
+> > > >>>>>>> Adding cond_resched() to the command waiting loop for a bette=
+r
+> > > >>>>>>> co-operation with the scheduler. This allows to give CPU a br=
+eath to
+> > > >>>>>>> run other task(workqueue) instead of busy looping when preemp=
+tion is
+> > > >>>>>>> not allowed on a device whose CVQ might be slow.
+> > > >>>>>>>
+> > > >>>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > >>>>>>
+> > > >>>>>> This still leaves hung processes, but at least it doesn't pin =
+the CPU any
+> > > >>>>>> more.  Thanks.
+> > > >>>>>> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> > > >>>>>>
+> > > >>>>>
+> > > >>>>> I'd like to see a full solution
+> > > >>>>> 1- block until interrupt
+> >
+> > I remember in previous versions, you worried about the extra MSI
+> > vector. (Maybe I was wrong).
+> >
+> > > >>>>
+> > > >>>> Would it make sense to also have a timeout?
+> > > >>>> And when timeout expires, set FAILED bit in device status?
+> > > >>>
+> > > >>> virtio spec does not set any limits on the timing of vq
+> > > >>> processing.
+> > > >>
+> > > >> Indeed, but I thought the driver could decide it is too long for i=
+t.
+> > > >>
+> > > >> The issue is we keep waiting with rtnl locked, it can quickly make=
+ the
+> > > >> system unusable.
+> > > >
+> > > > if this is a problem we should find a way not to keep rtnl
+> > > > locked indefinitely.
+> >
+> > Any ideas on this direction? Simply dropping rtnl during the busy loop
+> > will result in a lot of races. This seems to require non-trivial
+> > changes in the networking core.
+> >
+> > >
+> > >  From the tests I have done, I think it is. With OVS, a reconfigurati=
+on
+> > > is performed when the VDUSE device is added, and when a MLX5 device i=
+s
+> > > in the same bridge, it ends up doing an ioctl() that tries to take th=
+e
+> > > rtnl lock. In this configuration, it is not possible to kill OVS beca=
+use
+> > > it is stuck trying to acquire rtnl lock for mlx5 that is held by virt=
+io-
+> > > net.
+> >
+> > Yeah, basically, any RTNL users would be blocked forever.
+> >
+> > And the infinite loop has other side effects like it blocks the freezer=
+ to work.
+> >
+> > To summarize, there are three issues
+> >
+> > 1) busy polling
+> > 2) breaks freezer
+> > 3) hold RTNL during the loop
+> >
+> > Solving 3 may help somehow for 2 e.g some pm routine e.g wireguard or
+> > even virtnet_restore() itself may try to hold the lock.
+>
+> Yep. So my feeling currently is, the only real fix is to actually
+> queue up the work in software.
 
-On 2023/7/24 19:17, Steven Price wrote:
-> On 24/07/2023 10:43, Qi Zheng wrote:
->> In preparation for implementing lockless slab shrink, use new APIs to
->> dynamically allocate the drm-panfrost shrinker, so that it can be freed
->> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
->> read-side critical section when releasing the struct panfrost_device.
->>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
-> 
-> One nit below, but otherwise:
-> 
-> Reviewed-by: Steven Price <steven.price@arm.com>
-> 
->> ---
->>   drivers/gpu/drm/panfrost/panfrost_device.h    |  2 +-
->>   drivers/gpu/drm/panfrost/panfrost_drv.c       |  6 +++-
->>   drivers/gpu/drm/panfrost/panfrost_gem.h       |  2 +-
->>   .../gpu/drm/panfrost/panfrost_gem_shrinker.c  | 32 ++++++++++++-------
->>   4 files changed, 27 insertions(+), 15 deletions(-)
->>
->> diff --git a/drivers/gpu/drm/panfrost/panfrost_device.h b/drivers/gpu/drm/panfrost/panfrost_device.h
->> index b0126b9fbadc..e667e5689353 100644
->> --- a/drivers/gpu/drm/panfrost/panfrost_device.h
->> +++ b/drivers/gpu/drm/panfrost/panfrost_device.h
->> @@ -118,7 +118,7 @@ struct panfrost_device {
->>   
->>   	struct mutex shrinker_lock;
->>   	struct list_head shrinker_list;
->> -	struct shrinker shrinker;
->> +	struct shrinker *shrinker;
->>   
->>   	struct panfrost_devfreq pfdevfreq;
->>   };
->> diff --git a/drivers/gpu/drm/panfrost/panfrost_drv.c b/drivers/gpu/drm/panfrost/panfrost_drv.c
->> index bbada731bbbd..f705bbdea360 100644
->> --- a/drivers/gpu/drm/panfrost/panfrost_drv.c
->> +++ b/drivers/gpu/drm/panfrost/panfrost_drv.c
->> @@ -598,10 +598,14 @@ static int panfrost_probe(struct platform_device *pdev)
->>   	if (err < 0)
->>   		goto err_out1;
->>   
->> -	panfrost_gem_shrinker_init(ddev);
->> +	err = panfrost_gem_shrinker_init(ddev);
->> +	if (err)
->> +		goto err_out2;
->>   
->>   	return 0;
->>   
->> +err_out2:
->> +	drm_dev_unregister(ddev);
->>   err_out1:
->>   	pm_runtime_disable(pfdev->dev);
->>   	panfrost_device_fini(pfdev);
->> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem.h b/drivers/gpu/drm/panfrost/panfrost_gem.h
->> index ad2877eeeccd..863d2ec8d4f0 100644
->> --- a/drivers/gpu/drm/panfrost/panfrost_gem.h
->> +++ b/drivers/gpu/drm/panfrost/panfrost_gem.h
->> @@ -81,7 +81,7 @@ panfrost_gem_mapping_get(struct panfrost_gem_object *bo,
->>   void panfrost_gem_mapping_put(struct panfrost_gem_mapping *mapping);
->>   void panfrost_gem_teardown_mappings_locked(struct panfrost_gem_object *bo);
->>   
->> -void panfrost_gem_shrinker_init(struct drm_device *dev);
->> +int panfrost_gem_shrinker_init(struct drm_device *dev);
->>   void panfrost_gem_shrinker_cleanup(struct drm_device *dev);
->>   
->>   #endif /* __PANFROST_GEM_H__ */
->> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
->> index bf0170782f25..9a90dfb5301f 100644
->> --- a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
->> +++ b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
->> @@ -18,8 +18,7 @@
->>   static unsigned long
->>   panfrost_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
->>   {
->> -	struct panfrost_device *pfdev =
->> -		container_of(shrinker, struct panfrost_device, shrinker);
->> +	struct panfrost_device *pfdev = shrinker->private_data;
->>   	struct drm_gem_shmem_object *shmem;
->>   	unsigned long count = 0;
->>   
->> @@ -65,8 +64,7 @@ static bool panfrost_gem_purge(struct drm_gem_object *obj)
->>   static unsigned long
->>   panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
->>   {
->> -	struct panfrost_device *pfdev =
->> -		container_of(shrinker, struct panfrost_device, shrinker);
->> +	struct panfrost_device *pfdev = shrinker->private_data;
->>   	struct drm_gem_shmem_object *shmem, *tmp;
->>   	unsigned long freed = 0;
->>   
->> @@ -97,13 +95,24 @@ panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
->>    *
->>    * This function registers and sets up the panfrost shrinker.
->>    */
->> -void panfrost_gem_shrinker_init(struct drm_device *dev)
->> +int panfrost_gem_shrinker_init(struct drm_device *dev)
->>   {
->>   	struct panfrost_device *pfdev = dev->dev_private;
->> -	pfdev->shrinker.count_objects = panfrost_gem_shrinker_count;
->> -	pfdev->shrinker.scan_objects = panfrost_gem_shrinker_scan;
->> -	pfdev->shrinker.seeks = DEFAULT_SEEKS;
->> -	WARN_ON(register_shrinker(&pfdev->shrinker, "drm-panfrost"));
->> +
->> +	pfdev->shrinker = shrinker_alloc(0, "drm-panfrost");
->> +	if (!pfdev->shrinker) {
->> +		WARN_ON(1);
-> 
-> I don't think this WARN_ON is particularly useful - if there's a failed
-> memory allocation we should see output from the kernel anyway. And we're
-> changing the semantics from "continue just without a shrinker" (which
-> argueably justifies the warning) to "probe fails, device doesn't work"
-> which will be obvious to the user so I don't feel we need the additional
-> warn.
+Do you mean something like:
 
-Make sense. Will delete this WARN_ON() in the next version.
+rtnl_lock();
+queue up the work
+rtnl_unlock();
+return success;
 
-Thanks,
-Qi
+?
 
-> 
->> +		return -ENOMEM;
->> +	}
->> +
->> +	pfdev->shrinker->count_objects = panfrost_gem_shrinker_count;
->> +	pfdev->shrinker->scan_objects = panfrost_gem_shrinker_scan;
->> +	pfdev->shrinker->seeks = DEFAULT_SEEKS;
->> +	pfdev->shrinker->private_data = pfdev;
->> +
->> +	shrinker_register(pfdev->shrinker);
->> +
->> +	return 0;
->>   }
->>   
->>   /**
->> @@ -116,7 +125,6 @@ void panfrost_gem_shrinker_cleanup(struct drm_device *dev)
->>   {
->>   	struct panfrost_device *pfdev = dev->dev_private;
->>   
->> -	if (pfdev->shrinker.nr_deferred) {
->> -		unregister_shrinker(&pfdev->shrinker);
->> -	}
->> +	if (pfdev->shrinker)
->> +		shrinker_unregister(pfdev->shrinker);
->>   }
-> 
+> It's mostly trivial to limit
+> memory consumption, vid's is the
+> only one where it would make sense to have more than
+> 1 command of a given type outstanding.
+
+And rx mode so this implies we will fail any command if the previous
+work is not finished.
+
+> have a tree
+> or a bitmap with vids to add/remove?
+
+Probably.
+
+Thanks
+
+>
+>
+>
+> > >
+> > > >
+> > > >>>>> 2- still handle surprise removal correctly by waking in that ca=
+se
+> >
+> > This is basically what version 1 did?
+> >
+> > https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redha=
+t.com/t/
+> >
+> > Thanks
+>
+> Yes - except the timeout part.
+>
+>
+> > > >>>>>
+> > > >>>>>
+> > > >>>>>
+> > > >>>>>>> ---
+> > > >>>>>>>      drivers/net/virtio_net.c | 4 +++-
+> > > >>>>>>>      1 file changed, 3 insertions(+), 1 deletion(-)
+> > > >>>>>>>
+> > > >>>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_ne=
+t.c
+> > > >>>>>>> index 9f3b1d6ac33d..e7533f29b219 100644
+> > > >>>>>>> --- a/drivers/net/virtio_net.c
+> > > >>>>>>> +++ b/drivers/net/virtio_net.c
+> > > >>>>>>> @@ -2314,8 +2314,10 @@ static bool virtnet_send_command(struc=
+t virtnet_info *vi, u8 class, u8 cmd,
+> > > >>>>>>>              * into the hypervisor, so the request should be =
+handled immediately.
+> > > >>>>>>>              */
+> > > >>>>>>>             while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> > > >>>>>>> -              !virtqueue_is_broken(vi->cvq))
+> > > >>>>>>> +              !virtqueue_is_broken(vi->cvq)) {
+> > > >>>>>>> +               cond_resched();
+> > > >>>>>>>                     cpu_relax();
+> > > >>>>>>> +       }
+> > > >>>>>>>
+> > > >>>>>>>             return vi->ctrl->status =3D=3D VIRTIO_NET_OK;
+> > > >>>>>>>      }
+> > > >>>>>>> --
+> > > >>>>>>> 2.39.3
+> > > >>>>>>>
+> > > >>>>>>> _______________________________________________
+> > > >>>>>>> Virtualization mailing list
+> > > >>>>>>> Virtualization@lists.linux-foundation.org
+> > > >>>>>>> https://lists.linuxfoundation.org/mailman/listinfo/virtualiza=
+tion
+> > > >>>>>
+> > > >>>
+> > > >
+> > >
+>
+
 
