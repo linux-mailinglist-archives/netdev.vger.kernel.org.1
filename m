@@ -1,134 +1,112 @@
-Return-Path: <netdev+bounces-20686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4947609E6
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:57:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBE27609EE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17701280FC0
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:57:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C63711C20DF8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 06:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143DB8C09;
-	Tue, 25 Jul 2023 05:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F5D8C0A;
+	Tue, 25 Jul 2023 06:01:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0611B8F40
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:57:38 +0000 (UTC)
-X-Greylist: delayed 554 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Jul 2023 22:57:35 PDT
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9DF34E69;
-	Mon, 24 Jul 2023 22:57:35 -0700 (PDT)
-Received: from localhost.localdomain (unknown [183.128.129.228])
-	by mail-app2 (Coremail) with SMTP id by_KCgD3TRg0ZL9kpBKFCg--.13835S4;
-	Tue, 25 Jul 2023 13:57:08 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	razor@blackwall.org,
-	idosch@nvidia.com,
-	lucien.xin@gmail.com,
-	liuhangbin@gmail.com,
-	edwin.peer@broadcom.com,
-	jiri@resnulli.us,
-	md.fahad.iqbal.polash@intel.com,
-	anirudh.venkataramanan@intel.com,
-	jeffrey.t.kirsher@intel.com,
-	neerav.parikh@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v2] rtnetlink: let rtnl_bridge_setlink checks IFLA_BRIDGE_MODE length
-Date: Tue, 25 Jul 2023 13:57:06 +0800
-Message-Id: <20230725055706.498774-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:by_KCgD3TRg0ZL9kpBKFCg--.13835S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr4rAw15KF4Dtr45WrWkXrb_yoW8uF4fp3
-	W8Ka47JF4DXrn2vFsrZF17Xa4fZFZ3KFW5Gr42ywn2yr1jqFyUCryqkrn09ry3CFsaqa45
-	tr4DCFyYvw1DWFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6r4rMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JU9189UUUUU=
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4468F40
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 06:01:39 +0000 (UTC)
+Received: from mail.svario.it (mail.svario.it [IPv6:2a02:2770:13::112:0:1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC4AE69
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 23:01:37 -0700 (PDT)
+Received: from [192.168.1.35] (193-154-248-35.hdsl.highway.telekom.at [193.154.248.35])
+	by mail.svario.it (Postfix) with ESMTPSA id 07F3FD94D8;
+	Tue, 25 Jul 2023 08:01:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
+	t=1690264895; bh=fvxeHvaBgd5YTQGff8UMeQlRzwY7V7xvfIjHaerf0Z8=;
+	h=Date:From:To:Cc:References:Subject:In-Reply-To:From;
+	b=tppB46llavH/U6bCwxy0NumSqUDFkr7Fg8169ElMIFGBCXMMnhPq5R7z7kChHjtzM
+	 FJU33s+GS9LEOlMwwG7sFwLa/P+x5FcNoquAC0a07ATAQ8HIxebdDFmHwjda+1Pdxm
+	 hm4hfeoYvI8BPtQ09D9bvHdnJF7RE/1zyp/yZaejaJpTKOCLWfJ/pbQYDY55Y/khp9
+	 cofCz07to4TP6Sm8SKYZEX5KkFojOZn/A5UpKmJvdpetfU8J93lHB7KdB5EigqWN40
+	 naZ5XiboECpde9I2R1Fo8PBzZbKKuX3O6cfBUqKD7hyuUEEDkgPVVpNVT4k4TxHTcA
+	 Igq2KD6ynyTeQ==
+Message-ID: <a28d60f7-0bea-68aa-5c86-2a141cc81bf3@svario.it>
+Date: Tue, 25 Jul 2023 08:01:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+From: Gioele Barabucci <gioele@svario.it>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Petr Machata <petrm@nvidia.com>
+References: <20230719185106.17614-1-gioele@svario.it>
+ <20230724184020.41c53f5f@hermes.local>
+Content-Language: en-US
+Subject: Re: [iproute2 00/22] Support for stateless configuration (read from
+ /etc and /usr)
+In-Reply-To: <20230724184020.41c53f5f@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-There are totally 9 ndo_bridge_setlink handlers in the current kernel,
-which are 1) bnxt_bridge_setlink, 2) be_ndo_bridge_setlink 3)
-i40e_ndo_bridge_setlink 4) ice_bridge_setlink 5)
-ixgbe_ndo_bridge_setlink 6) mlx5e_bridge_setlink 7)
-nfp_net_bridge_setlink 8) qeth_l2_bridge_setlink 9) br_setlink.
+On 25/07/23 03:40, Stephen Hemminger wrote:
+> On Wed, 19 Jul 2023 20:50:44 +0200
+> Gioele Barabucci <gioele@svario.it> wrote:
+> 
+>> Dear iproute2 maintainers,
+>>
+>> this patch series adds support for the so called "stateless" configuration
+>> pattern, i.e. reading the default configuration from /usr while allowing
+>> overriding it in /etc, giving system administrators a way to define local
+>> configuration without changing any distro-provided files.
+>>
+>> In practice this means that each configuration file FOO is loaded
+>> from /usr/lib/iproute2/FOO unless /etc/iproute2/FOO exists.
+> 
+> These files are not something the typical user ever looks at or changes.
+> Please explain why all this churn is necessary
 
-By investigating the code, we find that 1-7 parse and use nlattr
-IFLA_BRIDGE_MODE but 3 and 4 forget to do the nla_len check. This can
-lead to an out-of-attribute read and allow a malformed nlattr (e.g.,
-length 0) to be viewed as a 2 byte integer.
+Dear Stephen,
 
-To avoid such issues, also for other ndo_bridge_setlink handlers in the
-future. This patch adds the nla_len check in rtnl_bridge_setlink and
-does an early error return if length mismatches. To make it works, the
-break is removed from the parsing for IFLA_BRIDGE_FLAGS to make sure
-this nla_for_each_nested iterates every attribute.
+I fully agree that these files are rarely if ever modified.
 
-Fixes: b1edc14a3fbf ("ice: Implement ice_bridge_getlink and ice_bridge_setlink")
-Fixes: 51616018dd1b ("i40e: Add support for getlink, setlink ndo ops")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
-V1 -> V2: removes the break in parsing for IFLA_BRIDGE_FLAGS suggested
-          by Hangbin Liu <liuhangbin@gmail.com>
+However I assumed that you wished them to remain configurable given that:
 
- net/core/rtnetlink.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+1) these files are in /etc, suggesting that they are normal system-wide 
+configuration files, and
+2) the const is called CONFDIR,
+3) the man pages refer to these files as modifiable files, for example, 
+ip-link: «GROUP may be a number or a string from the file 
+/etc/iproute2/group which can be manually filled.».
+4) there are a few guides around the Web that suggest to add entries to 
+these files.
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 3ad4e030846d..aef25aa5cf1d 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -5140,13 +5140,17 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	br_spec = nlmsg_find_attr(nlh, sizeof(struct ifinfomsg), IFLA_AF_SPEC);
- 	if (br_spec) {
- 		nla_for_each_nested(attr, br_spec, rem) {
--			if (nla_type(attr) == IFLA_BRIDGE_FLAGS) {
-+			if (nla_type(attr) == IFLA_BRIDGE_FLAGS && !have_flags) {
- 				if (nla_len(attr) < sizeof(flags))
- 					return -EINVAL;
- 
- 				have_flags = true;
- 				flags = nla_get_u16(attr);
--				break;
-+			}
-+
-+			if (nla_type(attr) == IFLA_BRIDGE_MODE) {
-+				if (nla_len(attr) < sizeof(u16))
-+					return -EINVAL;
- 			}
- 		}
- 	}
+If these files are to be configurable, then they should follow the 
+stateless pattern (default provided by distro in /usr, local sysadmin 
+override /etc).
+
+If these files are not supposed to be configurable and are just 
+convenience listings of settings to be considered hard-coded, then 
+changing CONFDIR to /usr/lib/iproute2 is the simplest way to make 
+iproute2 stateless (i.e. working in cases where /etc is not present).
+
+Would you prefer, instead of this patch series, a patch that simply 
+changes CONFDIR to /usr/lib/iproute2/?
+
+Regards,
+
 -- 
-2.17.1
-
+Gioele Barabucci
 
