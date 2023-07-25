@@ -1,73 +1,74 @@
-Return-Path: <netdev+bounces-21063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28A25762447
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:23:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA36762466
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 599001C20E4F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:23:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3941C20F98
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C01D26B84;
-	Tue, 25 Jul 2023 21:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CC826B8D;
+	Tue, 25 Jul 2023 21:28:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDAD1F188
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:23:49 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF551FC4
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:23:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=k3dAODVHORSOZQMEzHOInE6cKRASnUOiUaEILfURGrU=; b=G0I+SzldzyEqaLnKR359ucaHC3
-	xPr815kbkvXR3Ek62JCsIQZOkEGtFXvRjb08r7i/YAs4WGtvwhI/J59AN/xFPk3hy/UTNiwiLL2/c
-	VjtdFnL4e9BXdVvI3/cVb4RzWrOws5QUXTWlcyAXyqSwpP7NFFEYdWYCd1wjx6SRZq3U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qOPVM-002J6z-JW; Tue, 25 Jul 2023 23:23:40 +0200
-Date: Tue, 25 Jul 2023 23:23:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mdio_bus: validate "addr" for
- mdiobus_is_registered_device()
-Message-ID: <5859250e-1a36-4c39-821b-049f81787b85@lunn.ch>
-References: <E1qNxvu-00111m-1V@rmk-PC.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CB21F188;
+	Tue, 25 Jul 2023 21:28:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB03C433C7;
+	Tue, 25 Jul 2023 21:28:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690320493;
+	bh=MlVasKHUR67c8YAUaXJTiStk2sj8JIq65rkbxf8GQDs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YVe5VQBtbrwoSD8W5d5GkTH5OY7Q+4U285lD7Wx+E/a93wFdw9JV6cnK4RW2XskfX
+	 kubj3MFPvztw8G3FMQf7GwZ9Fdzsdyw3fei7b3L2vccVXaXAShDHm4JpUkn3bTY4pd
+	 iTMetUQ0PvpsK+u3Zt3rMI/9sZV7VsnaGVy/leWmr7VsduoPNIM/0hj8Ro2NUhhOpC
+	 SdL8EKXw/ZB9kRB3sDlOCtA97HP1gCG+JVeQF0rbR5OWtclUbk7HgN3+Gwg/oAsP9C
+	 75vdOsOlU3pJZrCLFI/qfNF4Gj+QfI18G2pfTM7L8nnb0fHYRIoHKxnSfBJ5334G2b
+	 3NloLyLtZP+UQ==
+Date: Tue, 25 Jul 2023 14:28:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Simon Horman <simon.horman@corigine.com>, bpf@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org,
+ magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com,
+ hawk@kernel.org, netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Subject: Re: [RFC net-next v4 2/8] xsk: add TX timestamp and TX checksum
+ offload support
+Message-ID: <20230725142811.07f4faa2@kernel.org>
+In-Reply-To: <ZMAxAmg187DgPCAr@google.com>
+References: <20230724235957.1953861-1-sdf@google.com>
+	<20230724235957.1953861-3-sdf@google.com>
+	<ZMAiYibjYzVTBjEF@corigine.com>
+	<ZMAxAmg187DgPCAr@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1qNxvu-00111m-1V@rmk-PC.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 24, 2023 at 04:57:14PM +0100, Russell King (Oracle) wrote:
-> mdiobus_is_registered_device() doesn't checking that "addr" was valid
-> before dereferencing bus->mdio_map[]. Extract the code that checks
-> this from mdiobus_get_phy(), and use it here as well.
+On Tue, 25 Jul 2023 13:30:58 -0700 Stanislav Fomichev wrote:
+> > I know that it isn't the practice in this file.
+> > but adding the following makes kernel-doc happier
+> > about NETDEV_XSK_FLAGS_MASK not being documented.
+> > 
+> > 	/* private: */  
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> This is autogenerated file :-( But I guess I can try to extend ynl
+> scripts to put this comment before the mask. Let me look into that...
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Yes, please! I think I even wrote a patch for it at some point...
+but then we realized that enums didn't support /* private: */.
+Commit e27cb89a22ada4 has added the support, so we can get back
+to getting the YNL changes in place.
 
