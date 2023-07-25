@@ -1,134 +1,118 @@
-Return-Path: <netdev+bounces-20971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73BC762068
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:44:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A77076206A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DAC5281984
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:44:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20DA71C20F3A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025582591F;
-	Tue, 25 Jul 2023 17:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC5F2592A;
+	Tue, 25 Jul 2023 17:44:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A8525140
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:44:51 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A1501BE2
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:50 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-5222bc91838so3861231a12.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445AB25140
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:44:54 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0149C1B8
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:53 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b9e9765f2cso30406265ad.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1690307088; x=1690911888;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=f8Lnh2cN2fCwNiMV2rli+hamhX5V5blCl9Mb/T4hAT8=;
-        b=ZdWQQuCOEbZslxacmZ9uIrdSmPA1M7KRTfmkFreCeiQb7D/CtXtgpNAhgOXamKDgKG
-         4i1ag7fgSuYaAzc5jj4SJUpcXy6PX9t3LiKV6gzC7qvvS2rABKKK9o0qLsnVhL3ayfvS
-         w95WEgqdhoPBqXhsD0ctSLtRLmFd307WO/Spo=
+        d=gmail.com; s=20221208; t=1690307092; x=1690911892;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=B59pjqUqoLv5eR+alBSWwxoWyuJwcimZEAnDNC7SrgM=;
+        b=h4yrpp1ziP1V/lGwZHWFnYUKZTeKO/5Wf8zQVnu1G3UjsNrHqP8/mfxtNErUXYQGTY
+         bxOYckEytR7hMuGinCnZxHiCyg7G7/CH7PLBi70BWepBQfOEmX2UFi6H2NNLK9+6S4DN
+         5EXmzq/7t8nVzKKvrjQEn4hE/phUxBtGOjfd/nGy1o1micSVyXaUR7cixXGJcI1cJW3a
+         R/CJGdD94dNxLpFRa2EZEXpS/zW1u91yUNdLPNe/jtwiMzFTekPt0F7RZHxEfhncK8Ch
+         hUrf0srXJhycktrGb4HTTvK/xtr6JGRC8I/2uTqHrc4yKqZyTXV6iQHaAxqFawkZXK8N
+         fOtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690307088; x=1690911888;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f8Lnh2cN2fCwNiMV2rli+hamhX5V5blCl9Mb/T4hAT8=;
-        b=dlkA1Tz/oIE3v0djBLn4IaG6k9d0P7DkuDWruJ9AbpX7g29fKhCmKs0/2qVtqzKpMX
-         ricpxCQqtnvZ4wT9uwwomBQcnPR6G+eKjrLead06Z/ohtw29xWPpwzcr/ZVywSAKCpsF
-         IxFlHDGlcsMFVil2CyDrTiHSZEqz7TdYzrdg281U5A9l1TstviWHl13Z2vqvh+kcApOS
-         uZbnO983hSkL5RUVGeYzAPvCQ9mTvztiwkpbmkXc+RTgPb34tVEDfwpt0rSudw0yxptl
-         8D3YLE5asZRx1jb0tl2PZkgNkcc+cAnLHNM641fOn2gdMToJYnm0fAiToIgQ/C519Gnu
-         dC4A==
-X-Gm-Message-State: ABy/qLaQXttv1y3VDR4yA2W43nKscqeXgsLbAS//oTzIvuin3nplfp3a
-	h0Q52DK+CUvWtPFTw5O0XTnl+LeRbVbiJiv72VPb1nTJ
-X-Google-Smtp-Source: APBJJlF2wTjNpBQsDYx0Q8dg/d/S0BDekj4xdhMf9dX2N8Vr/QthatLU5b7EoAfUCys1YtyI/CXyPA==
-X-Received: by 2002:aa7:d14d:0:b0:522:4200:e20b with SMTP id r13-20020aa7d14d000000b005224200e20bmr3213142edo.36.1690307088614;
-        Tue, 25 Jul 2023 10:44:48 -0700 (PDT)
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
-        by smtp.gmail.com with ESMTPSA id h19-20020aa7c613000000b0052237839229sm2541159edq.21.2023.07.25.10.44.47
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 10:44:47 -0700 (PDT)
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-991da766865so969295666b.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:47 -0700 (PDT)
-X-Received: by 2002:a17:906:2012:b0:992:d013:1135 with SMTP id
- 18-20020a170906201200b00992d0131135mr11627983ejo.63.1690307087439; Tue, 25
- Jul 2023 10:44:47 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690307092; x=1690911892;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B59pjqUqoLv5eR+alBSWwxoWyuJwcimZEAnDNC7SrgM=;
+        b=L5sY2rrXyUgFlFafW3jo83u3dSjpwZP+j1xuofew8HCzvyWSwU3LInU4AAbVYML6Mp
+         9UNhgMSkIAhIhgC6ODYQI6CWrEvBbz0jGKzoSnhF8JZPCyvB/SBpUcxq+Pv7hQxw47hB
+         XeRkUckaILCYdestfSA7AYTmbdWuV0H8YUDyYeG2MvB1vrAm1APszu622DAz4/pROJ7L
+         o97nBAtW0LXRwWbH1qIh7nEPnX3TLgVbmI16ADSj0oNae3WOkVTiCd18WQW3uC94Ndn9
+         A9qLU/5w104beCjy73TGwJM+0swNr/GSlViVf20JegsNcQxubiqok/DEIH8DMhfDYFq0
+         OZaA==
+X-Gm-Message-State: ABy/qLYqp8B8xtmCOvpCIjLwpm0snYjY+98MQVaZeh3EUXNczGqKdfEU
+	0DwgsPpSrCtmkYJxKhpRciYwHNJgEGY=
+X-Google-Smtp-Source: APBJJlHd+ErsVOyCiC1NmXqwPjPpr9Jkl/5LOfWqRs6eANJ6fOtYoZMVrOWkpxEhY8RHpwez6KtZkQ==
+X-Received: by 2002:a17:902:ec8c:b0:1b9:dea2:800f with SMTP id x12-20020a170902ec8c00b001b9dea2800fmr12752872plg.8.1690307092295;
+        Tue, 25 Jul 2023 10:44:52 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id a12-20020a170902eccc00b001bbc9bd51a8sm118678plh.229.2023.07.25.10.44.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 10:44:51 -0700 (PDT)
+Message-ID: <50201d64ba71669422c9bc2900179887d11a974e.camel@gmail.com>
+Subject: Re: [PATCH v2 1/1] net: ipv4: fix return value check in
+ esp_remove_trailer()
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yuanjun Gong <ruc_gongyuanjun@163.com>, dsahern@kernel.org
+Cc: herbert@gondor.apana.org.au, netdev@vger.kernel.org, 
+	steffen.klassert@secunet.com
+Date: Tue, 25 Jul 2023 10:44:50 -0700
+In-Reply-To: <20230725064031.4472-1-ruc_gongyuanjun@163.com>
+References: <f6831ace-df6c-f0bd-188e-a2b23a75c1a8@kernel.org>
+	 <20230725064031.4472-1-ruc_gongyuanjun@163.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230724151849.323497-1-jhs@mojatatu.com> <CAHk-=wiH27m7UeddwD8JPUxjxXHMs=kv8x1WrLAho=dZ8CUhyg@mail.gmail.com>
- <CAM0EoMmKa1U8nOKNnuXZ4UYB3S+eR+Xyt7VfmjSoCnR9xBBWYw@mail.gmail.com>
-In-Reply-To: <CAM0EoMmKa1U8nOKNnuXZ4UYB3S+eR+Xyt7VfmjSoCnR9xBBWYw@mail.gmail.com>
-From: Linus Torvalds <torvalds@linuxfoundation.org>
-Date: Tue, 25 Jul 2023 10:44:29 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi43Y7Osoa2NYr2FFxsajLjJUJSgAUdJmVPJfV8ggFYRg@mail.gmail.com>
-Message-ID: <CAHk-=wi43Y7Osoa2NYr2FFxsajLjJUJSgAUdJmVPJfV8ggFYRg@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] net: sched: cls_u32: Fix match key mis-addressing
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	netdev@vger.kernel.org, mgcho.minic@gmail.com, security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 at 10:04, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
->
-> > I would also like to see some explanation of this pattern
-> >
-> >                 handle = htid | TC_U32_NODE(handle);
-> >
-> > and why that "binary or" makes sense. Are the node bits in 'htid'
-> > guaranteed to be zero?
->
-> Per existing user space tools, yes - they are guaranteed to be zero
-> (per my gitchelogy of both kernel +  iproute2 since inception this has
-> been the behavior);
+On Tue, 2023-07-25 at 14:40 +0800, Yuanjun Gong wrote:
+> return an error number if an unexpected result is returned by
+> pskb_tirm() in esp_remove_trailer().
+>=20
+> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
+> ---
+>  net/ipv4/esp4.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+> index ba06ed42e428..b435e3fe4dc6 100644
+> --- a/net/ipv4/esp4.c
+> +++ b/net/ipv4/esp4.c
+> @@ -732,7 +732,9 @@ static inline int esp_remove_trailer(struct sk_buff *=
+skb)
+>  		skb->csum =3D csum_block_sub(skb->csum, csumdiff,
+>  					   skb->len - trimlen);
+>  	}
+> -	pskb_trim(skb, skb->len - trimlen);
+> +	ret =3D pskb_trim(skb, skb->len - trimlen);
+> +	if (ret)
+> +		goto out;
+> =20
+>  	ret =3D nexthdr[1];
+> =20
 
-Ok, if the htid bits are zero, it's all good.  It's fine to use a
-binary 'or' as a way to 'insert bits in the word', but only if the old
-bits were zero, and that wasn't obvious to me.
-
-The *normal* pattern would be to explicitly mask off the bits you want
-to use, so that you don't get some random mixing of bits of the
-fields.
-
-Of course, that's a bit inconvenient here, since you don't have the
-obvious accessors.
-
-And while using bitfields would make the source code look fine,
-bitfields are *horrible* for any ABI, since they have very weakly
-defined semantics (ie litte-endian vs big-endian, and the *bit* order
-is not at all guaranteed to match the *byte* order).
-
-> > Because if 'htid' can have node bits set, what's the logical reason
-> > for or'ing things together?
->
-> Hrm. I am not sure if this is what you are getting to: but you caught
-> a different bug there.
-
-So what I'm getting at was just that *if* you can have mixing of bits
-of that NODE part of the variable, I think the end result doesn't end
-up being very sensible.
-
-It's not that 'binary or' isn't a valid operation. But it normally
-isn't all that sane to randomly just mix bits in these kinds of
-things. What would it mean to mix node bits from an old value with the
-user-supplied one?
-
-So that pattern just looked odd to me.
-
-                     Linus
+In what case would you encounter this error? From what I can tell it
+looks like there are checks in the callers, specifically the call to
+pskb_may_pull() at the start of esp_input() that will go through and
+automatically eliminate all the potential reasons for this to fail. So
+I am not sure what the point is in adding exception handling for an
+exception that is already handled.
 
