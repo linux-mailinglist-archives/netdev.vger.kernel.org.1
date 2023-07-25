@@ -1,243 +1,390 @@
-Return-Path: <netdev+bounces-20787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7167A760FBC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:51:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2990760FD7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498711C20D5B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:51:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580BB2817D9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D51415AC5;
-	Tue, 25 Jul 2023 09:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159C315AD4;
+	Tue, 25 Jul 2023 09:56:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0150156C2
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:51:51 +0000 (UTC)
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 787611B8;
-	Tue, 25 Jul 2023 02:51:46 -0700 (PDT)
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-9922d6f003cso910117866b.0;
-        Tue, 25 Jul 2023 02:51:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B4213AEB
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:56:46 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA8010C8
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:56:43 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2659b1113c2so706749a91.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:56:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690279003; x=1690883803;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/casiWQBa8FLPDyI/Gjog1Q/iFy65e/7JWaM5Gwrppw=;
+        b=kzP9jxhdW7EUIP2JpY6nQ4V3KB8KzHZHwXd+bJOEeLU9gCN3lvtKTIOyV+D6pg6POw
+         Q2+Agk0fHs6Wf0nJIf8rf8T9VZNFr/hsapg2zga11FSk7AOs0JkWfaLjemq0FDeG0Uw5
+         HhEk2mitTuKDolaaQqjf+O9IL+c+U5F1pPsQI+4eucs75jhsRhGM9fqq3uQDPTEvroq0
+         /U4/CVAvtL3Xk0W286vaVtW9MXQ1p85A5kNQw+kxMFfLtXWo8Tn1go6QyxS1jqmnrw9a
+         uFzHc2WhcIqVkW0xdKzdkJ+42hQ6tNSe2IXCsgIEyfURXIjl60ODrk022w8+JVfo8hQI
+         ne/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690278705; x=1690883505;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9iSEd/zlhQUpki7xyVHvNMs7mBkWGGLATKxWLhRRQxE=;
-        b=OVhAdKVwzkni8PcT6iIyfK0K5CP6RIhNj6AQ2udIpgDhZ75ZPz9RYfkGIC7hV5nHIO
-         qVsKeU9smVVcGE+rQA0QR3yof3F8dZXRfUdEmFl/niR44EiKfM5Si06peM8j25fzsaVj
-         4s+W9PzCZWfuY8CCsiD4aZqdmZzUdxEfRNgBdrFO+StD0+ngHqoEazrMX4n2h+fB0Set
-         5umiDAF+6Tz4hJU573Cc/IayONS/HcWCs3mgKGr31v0eT/UQYR/5a9cEi6qSG7ycs5IY
-         BtWOq6BGAidktbY9VPmQ0zqpT5UujtphDaCRnXMMC5UemCZpUWooP8OJ57ZKm2ynkBcc
-         QcnA==
-X-Gm-Message-State: ABy/qLa+75qKMCiTckHEHMbrgZYypzuTVKgZS4K4OjQhPSV51Fr4skHg
-	ubm6/2u++byM5746HvTFZ3U=
-X-Google-Smtp-Source: APBJJlHQf1kTga4kg6x0/K5B/uVhbsmb0HNitIU9KTi8Yt7DDaCg5T3fj+Q1haDLh8Lilguvx8s60A==
-X-Received: by 2002:a17:906:300e:b0:993:eef2:5d5f with SMTP id 14-20020a170906300e00b00993eef25d5fmr12739535ejz.27.1690278704489;
-        Tue, 25 Jul 2023 02:51:44 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-015.fbsv.net. [2a03:2880:31ff:f::face:b00c])
-        by smtp.gmail.com with ESMTPSA id k20-20020a1709065fd400b009934b1eb577sm8077781ejv.77.2023.07.25.02.51.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 02:51:43 -0700 (PDT)
-Date: Tue, 25 Jul 2023 02:51:42 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: asml.silence@gmail.com, axboe@kernel.dk, io-uring@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, leit@meta.com
-Subject: Re: [PATCH 2/4] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
-Message-ID: <ZL+bLoZxIdqmh5m5@gmail.com>
-References: <20230724142237.358769-1-leitao@debian.org>
- <20230724142237.358769-3-leitao@debian.org>
- <64bf01fc80d67_3b637629452@willemb.c.googlers.com.notmuch>
+        d=1e100.net; s=20221208; t=1690279003; x=1690883803;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/casiWQBa8FLPDyI/Gjog1Q/iFy65e/7JWaM5Gwrppw=;
+        b=FpXj5ik6jFHxUvXlO1xNs/LcoNLA036ZsYEx4vcDgVG47Iy89WE+AQMk907wChSjkZ
+         1lkHJZCIH62OYa4BvqpO6W2uWhrKNwfgMRXEsdzizla0WxOWfJ3K8fbm3c8P3ZlF220a
+         dkoeLhuxpcXFPbyDSkx49SjrKzRjlPHZUBg8K51SG2OPn/sxJDGWTCUi/HdaSqCifeOJ
+         uhfYsyTcGRXgXg6JH7/+n6+wtDf/GZ82MOWIGEQQjBt7i1BEs+wsWYJtJA6k/mOs+tj3
+         hy7ZmAhM2pzxRH6r2leY8kgkr7X/lgszAaOw8vMKv/x9dPS6j0geUB3L8ha1f6wdHXbD
+         0fSw==
+X-Gm-Message-State: ABy/qLYxbzlohJ+BT0V6CEU3xeXs9V/jmWXWM+Fp0A97vqIjCZ7Tz3h8
+	jOQ0f7teAePTfY4F42epDO2Eqg==
+X-Google-Smtp-Source: APBJJlE4g3zxacKAsn4H4YysRKAp71VN9gqUpsqodFXfAXxBRsoAel6FjePiWo+WkUy1agkNvA6LJQ==
+X-Received: by 2002:a17:90a:74cf:b0:268:196f:9656 with SMTP id p15-20020a17090a74cf00b00268196f9656mr4627258pjl.1.1690279003192;
+        Tue, 25 Jul 2023 02:56:43 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id j8-20020a170902da8800b001b39ffff838sm10605398plx.25.2023.07.25.02.56.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jul 2023 02:56:42 -0700 (PDT)
+Message-ID: <c1a1952f-0c3e-2fa1-fdf9-8b3b8a592b23@bytedance.com>
+Date: Tue, 25 Jul 2023 17:56:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64bf01fc80d67_3b637629452@willemb.c.googlers.com.notmuch>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v2 03/47] mm: shrinker: add infrastructure for dynamically
+ allocating shrinker
+Content-Language: en-US
+To: Muchun Song <muchun.song@linux.dev>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
+ roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+ paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
+ senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-4-zhengqi.arch@bytedance.com>
+ <3648ca69-d65e-8431-135a-a5738586bc25@linux.dev>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <3648ca69-d65e-8431-135a-a5738586bc25@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 06:58:04PM -0400, Willem de Bruijn wrote:
-> Breno Leitao wrote:
-> > Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
-> > level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
-> > where a sockptr_t is either userspace or kernel space, and handled as
-> > such.
-> > 
-> > Function io_uring_cmd_getsockopt() is inspired by __sys_getsockopt().
-> > 
-> > Differently from the getsockopt(2), the optlen field is not a userspace
-> > pointers. In getsockopt(2), userspace provides optlen pointer, which is
-> > overwritten by the kernel.  In this implementation, userspace passes a
-> > u32, and the new value is returned in cqe->res. I.e., optlen is not a
-> > pointer.
-> > 
-> > Important to say that userspace needs to keep the pointer alive until
-> > the CQE is completed.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  include/uapi/linux/io_uring.h |  7 ++++++
-> >  io_uring/uring_cmd.c          | 43 +++++++++++++++++++++++++++++++++++
-> >  2 files changed, 50 insertions(+)
-> > 
-> > diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> > index 9fc7195f25df..8152151080db 100644
-> > --- a/include/uapi/linux/io_uring.h
-> > +++ b/include/uapi/linux/io_uring.h
-> > @@ -43,6 +43,10 @@ struct io_uring_sqe {
-> >  	union {
-> >  		__u64	addr;	/* pointer to buffer or iovecs */
-> >  		__u64	splice_off_in;
-> > +		struct {
-> > +			__u32	level;
-> > +			__u32	optname;
-> > +		};
-> >  	};
-> >  	__u32	len;		/* buffer size or number of iovecs */
-> >  	union {
-> > @@ -79,6 +83,7 @@ struct io_uring_sqe {
-> >  	union {
-> >  		__s32	splice_fd_in;
-> >  		__u32	file_index;
-> > +		__u32	optlen;
-> >  		struct {
-> >  			__u16	addr_len;
-> >  			__u16	__pad3[1];
-> > @@ -89,6 +94,7 @@ struct io_uring_sqe {
-> >  			__u64	addr3;
-> >  			__u64	__pad2[1];
-> >  		};
-> > +		__u64	optval;
-> >  		/*
-> >  		 * If the ring is initialized with IORING_SETUP_SQE128, then
-> >  		 * this field is used for 80 bytes of arbitrary command data
-> > @@ -729,6 +735,7 @@ struct io_uring_recvmsg_out {
-> >  enum {
-> >  	SOCKET_URING_OP_SIOCINQ		= 0,
-> >  	SOCKET_URING_OP_SIOCOUTQ,
-> > +	SOCKET_URING_OP_GETSOCKOPT,
-> >  };
-> >  
-> >  #ifdef __cplusplus
-> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> > index 8e7a03c1b20e..16c857cbf3b0 100644
-> > --- a/io_uring/uring_cmd.c
-> > +++ b/io_uring/uring_cmd.c
-> > @@ -166,6 +166,47 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
-> >  }
-> >  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
-> >  
-> > +static inline int io_uring_cmd_getsockopt(struct socket *sock,
-> > +					  struct io_uring_cmd *cmd)
-> > +{
-> > +	void __user *optval = u64_to_user_ptr(READ_ONCE(cmd->sqe->optval));
-> > +	int optname = READ_ONCE(cmd->sqe->optname);
-> > +	int optlen = READ_ONCE(cmd->sqe->optlen);
-> > +	int level = READ_ONCE(cmd->sqe->level);
-> > +	void *koptval;
-> > +	int err;
-> > +
-> > +	err = security_socket_getsockopt(sock, level, optname);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	koptval = kmalloc(optlen, GFP_KERNEL);
-> > +	if (!koptval)
-> > +		return -ENOMEM;
+Hi Muchun,
+
+On 2023/7/25 17:02, Muchun Song wrote:
 > 
-> This will try to kmalloc any length that userspace passes?
-
-Yes, this value is coming directly from userspace.
-
-> That is unnecessary ..
-> > +
-> > +	err = copy_from_user(koptval, optval, optlen);
-> > +	if (err)
-> > +		goto fail;
-> > +
-> > +	err = -EOPNOTSUPP;
-> > +	if (level == SOL_SOCKET) {
-> > +		err = sk_getsockopt(sock->sk, level, optname,
-> > +				    KERNEL_SOCKPTR(koptval),
-> > +				    KERNEL_SOCKPTR(&optlen));
 > 
-> .. sk_getsockopt defines a union of acceptable fields, which
-> are all fairly small.
+> On 2023/7/24 17:43, Qi Zheng wrote:
+>> Currently, the shrinker instances can be divided into the following three
+>> types:
+>>
+>> a) global shrinker instance statically defined in the kernel, such as
+>>     workingset_shadow_shrinker.
+>>
+>> b) global shrinker instance statically defined in the kernel modules, 
+>> such
+>>     as mmu_shrinker in x86.
+>>
+>> c) shrinker instance embedded in other structures.
+>>
+>> For case a, the memory of shrinker instance is never freed. For case b,
+>> the memory of shrinker instance will be freed after synchronize_rcu() 
+>> when
+>> the module is unloaded. For case c, the memory of shrinker instance will
+>> be freed along with the structure it is embedded in.
+>>
+>> In preparation for implementing lockless slab shrink, we need to
+>> dynamically allocate those shrinker instances in case c, then the memory
+>> can be dynamically freed alone by calling kfree_rcu().
+>>
+>> So this commit adds the following new APIs for dynamically allocating
+>> shrinker, and add a private_data field to struct shrinker to record and
+>> get the original embedded structure.
+>>
+>> 1. shrinker_alloc()
+>>
+>> Used to allocate shrinker instance itself and related memory, it will
+>> return a pointer to the shrinker instance on success and NULL on failure.
+>>
+>> 2. shrinker_free_non_registered()
+>>
+>> Used to destroy the non-registered shrinker instance.
+> 
+> At least I don't like this name. I know you want to tell others
+> this function only should be called when shrinker has not been
+> registed but allocated. Maybe shrinker_free() is more simple.
+> And and a comment to tell the users when to use it.
 
-Right, and they are all I need for SOL_SOCKET level for now.
+OK, if no one else objects, I will change it to shrinker_free() in
+the next version.
 
-> I notice that BPF added BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN to
-> work around the issue of pre-allocating for the worst case.
+> 
+>>
+>> 3. shrinker_register()
+>>
+>> Used to register the shrinker instance, which is same as the current
+>> register_shrinker_prepared().
+>>
+>> 4. shrinker_unregister()
+>>
+>> Used to unregister and free the shrinker instance.
+>>
+>> In order to simplify shrinker-related APIs and make shrinker more
+>> independent of other kernel mechanisms, subsequent submissions will use
+>> the above API to convert all shrinkers (including case a and b) to
+>> dynamically allocated, and then remove all existing APIs.
+>>
+>> This will also have another advantage mentioned by Dave Chinner:
+>>
+>> ```
+>> The other advantage of this is that it will break all the existing
+>> out of tree code and third party modules using the old API and will
+>> no longer work with a kernel using lockless slab shrinkers. They
+>> need to break (both at the source and binary levels) to stop bad
+>> things from happening due to using uncoverted shrinkers in the new
+>> setup.
+>> ```
+>>
+>> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+>> ---
+>>   include/linux/shrinker.h |   6 +++
+>>   mm/shrinker.c            | 113 +++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 119 insertions(+)
+>>
+>> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+>> index 961cb84e51f5..296f5e163861 100644
+>> --- a/include/linux/shrinker.h
+>> +++ b/include/linux/shrinker.h
+>> @@ -70,6 +70,8 @@ struct shrinker {
+>>       int seeks;    /* seeks to recreate an obj */
+>>       unsigned flags;
+>> +    void *private_data;
+>> +
+>>       /* These are for internal use */
+>>       struct list_head list;
+>>   #ifdef CONFIG_MEMCG
+>> @@ -98,6 +100,10 @@ struct shrinker {
+>>   unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup 
+>> *memcg,
+>>                 int priority);
+>> +struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, 
+>> ...);
+>> +void shrinker_free_non_registered(struct shrinker *shrinker);
+>> +void shrinker_register(struct shrinker *shrinker);
+>> +void shrinker_unregister(struct shrinker *shrinker);
+>>   extern int __printf(2, 3) prealloc_shrinker(struct shrinker *shrinker,
+>>                           const char *fmt, ...);
+>> diff --git a/mm/shrinker.c b/mm/shrinker.c
+>> index 0a32ef42f2a7..d820e4cc5806 100644
+>> --- a/mm/shrinker.c
+>> +++ b/mm/shrinker.c
+>> @@ -548,6 +548,119 @@ unsigned long shrink_slab(gfp_t gfp_mask, int 
+>> nid, struct mem_cgroup *memcg,
+>>       return freed;
+>>   }
+>> +struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, 
+>> ...)
+>> +{
+>> +    struct shrinker *shrinker;
+>> +    unsigned int size;
+>> +    va_list __maybe_unused ap;
+>> +    int err;
+>> +
+>> +    shrinker = kzalloc(sizeof(struct shrinker), GFP_KERNEL);
+>> +    if (!shrinker)
+>> +        return NULL;
+>> +
+>> +#ifdef CONFIG_SHRINKER_DEBUG
+>> +    va_start(ap, fmt);
+>> +    shrinker->name = kvasprintf_const(GFP_KERNEL, fmt, ap);
+>> +    va_end(ap);
+>> +    if (!shrinker->name)
+>> +        goto err_name;
+>> +#endif
+> 
+> So why not introduce another helper to handle this and declare it
+> as a void function when !CONFIG_SHRINKER_DEBUG? Something like the
+> following:
+> 
+> #ifdef CONFIG_SHRINKER_DEBUG
+> static int shrinker_debugfs_name_alloc(struct shrinker *shrinker, const 
+> char *fmt,
+>                                         va_list vargs)
+> 
+> {
+>      shrinker->name = kvasprintf_const(GFP_KERNEL, fmt, vargs);
+>      return shrinker->name ? 0 : -ENOMEM;
+> }
+> #else
+> static int shrinker_debugfs_name_alloc(struct shrinker *shrinker, const 
+> char *fmt,
+>                                         va_list vargs)
+> {
+>      return 0;
+> }
+> #endif
 
-I am having a hard time how to understand how
-BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN gets the MAX_OPTLEN. Reading this
-function, it seems it is conditionally get_user().
+Will do in the next version.
 
+> 
+>> +    shrinker->flags = flags;
+>> +
+>> +    if (flags & SHRINKER_MEMCG_AWARE) {
+>> +        err = prealloc_memcg_shrinker(shrinker);
+>> +        if (err == -ENOSYS)
+>> +            shrinker->flags &= ~SHRINKER_MEMCG_AWARE;
+>> +        else if (err == 0)
+>> +            goto done;
+>> +        else
+>> +            goto err_flags;
+>> +    }
+>> +
+>> +    /*
+>> +     * The nr_deferred is available on per memcg level for memcg aware
+>> +     * shrinkers, so only allocate nr_deferred in the following cases:
+>> +     *  - non memcg aware shrinkers
+>> +     *  - !CONFIG_MEMCG
+>> +     *  - memcg is disabled by kernel command line
+>> +     */
+>> +    size = sizeof(*shrinker->nr_deferred);
+>> +    if (flags & SHRINKER_NUMA_AWARE)
+>> +        size *= nr_node_ids;
+>> +
+>> +    shrinker->nr_deferred = kzalloc(size, GFP_KERNEL);
+>> +    if (!shrinker->nr_deferred)
+>> +        goto err_flags;
+>> +
+>> +done:
+>> +    return shrinker;
+>> +
+>> +err_flags:
+>> +#ifdef CONFIG_SHRINKER_DEBUG
+>> +    kfree_const(shrinker->name);
+>> +    shrinker->name = NULL;
+> 
+> This could be shrinker_debugfs_name_free()
 
-	#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen)
-	({
-		int __ret = 0;
-		if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))
-			get_user(__ret, optlen);
-		__ret;
-	})
+Will do.
 
-That said, how is BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN being used to
-workaroundthe pre-allocating for the worst case?
+> 
+>> +err_name:
+>> +#endif
+>> +    kfree(shrinker);
+>> +    return NULL;
+>> +}
+>> +EXPORT_SYMBOL(shrinker_alloc);
+>> +
+>> +void shrinker_free_non_registered(struct shrinker *shrinker)
+>> +{
+>> +#ifdef CONFIG_SHRINKER_DEBUG
+>> +    kfree_const(shrinker->name);
+>> +    shrinker->name = NULL;
+> 
+> This could be shrinker_debugfs_name_free()
+> 
+>> +#endif
+>> +    if (shrinker->flags & SHRINKER_MEMCG_AWARE) {
+>> +        down_write(&shrinker_rwsem);
+>> +        unregister_memcg_shrinker(shrinker);
+>> +        up_write(&shrinker_rwsem);
+>> +    }
+>> +
+>> +    kfree(shrinker->nr_deferred);
+>> +    shrinker->nr_deferred = NULL;
+>> +
+>> +    kfree(shrinker);
+>> +}
+>> +EXPORT_SYMBOL(shrinker_free_non_registered);
+>> +
+>> +void shrinker_register(struct shrinker *shrinker)
+>> +{
+>> +    down_write(&shrinker_rwsem);
+>> +    list_add_tail(&shrinker->list, &shrinker_list);
+>> +    shrinker->flags |= SHRINKER_REGISTERED;
+>> +    shrinker_debugfs_add(shrinker);
+>> +    up_write(&shrinker_rwsem);
+>> +}
+>> +EXPORT_SYMBOL(shrinker_register);
+>> +
+>> +void shrinker_unregister(struct shrinker *shrinker)
+> 
+> You have made all shrinkers to be dynamically allocated, so
+> we should prevent users from allocating shrinkers statically and
+> use this function to unregister it. It is better to add a
+> flag like SHRINKER_ALLOCATED which is set in shrinker_alloc(),
+> and check whether it is set in shrinker_unregister(), if not
+> maybe a warning should be added to tell the users what happened.
 
-> But that also needs to deal woth other getsockopt levels.
+Make sense, will do.
 
-Right, and we also have a similar kmalloc() on the setsockopt path
-(SOCKET_URING_OP_SETSOCKOPT).
+> 
+>> +{
+>> +    struct dentry *debugfs_entry;
+>> +    int debugfs_id;
+>> +
+>> +    if (!shrinker || !(shrinker->flags & SHRINKER_REGISTERED))
+>> +        return;
+>> +
+>> +    down_write(&shrinker_rwsem);
+>> +    list_del(&shrinker->list);
+>> +    shrinker->flags &= ~SHRINKER_REGISTERED;
+>> +    if (shrinker->flags & SHRINKER_MEMCG_AWARE)
+>> +        unregister_memcg_shrinker(shrinker);
+>> +    debugfs_entry = shrinker_debugfs_detach(shrinker, &debugfs_id);
+> 
+> In the internal of this function, you also could use
+> shrinker_debugfs_name_free().
 
-What about if I pass the userspace sockptr (USER_SOCKPTR) to the
-{g,s}etsockopt callback directly, instead of kmalloc() in io_uring(), as
-I was doing int the RFC[1]? It avoids any extra kmalloc at all.
+Yeah, will do.
 
-Something as:
+Thanks,
+Qi
 
-	static inline int io_uring_cmd_getsockopt(struct socket *sock,
-						  struct io_uring_cmd *cmd)
-	{
-		void __user *optval = u64_to_user_ptr(READ_ONCE(cmd->sqe->optval));
-		int optlen = READ_ONCE(cmd->sqe->optlen);
-		int optname = READ_ONCE(cmd->sqe->optname);
-		int level = READ_ONCE(cmd->sqe->level);
-		int err;
-
-		err = security_socket_getsockopt(sock, level, optname);
-		if (err)
-			return err;
-
-		if (level == SOL_SOCKET) {
-			err = sk_getsockopt(sock->sk, level, optname,
-					    USER_SOCKPTR(optval),
-					    KERNEL_SOCKPTR(&optlen));
-			if (err < 0)
-				return err;
-			return optlen;
-		}
-
-		return -EOPNOTSUPP;
-
-Thanks for the review!
-
-[1] Link: https://lore.kernel.org/all/20230719102737.2513246-3-leitao@debian.org/
+> 
+> Thanks.
+> 
+>> +    up_write(&shrinker_rwsem);
+>> +
+>> +    shrinker_debugfs_remove(debugfs_entry, debugfs_id);
+>> +
+>> +    kfree(shrinker->nr_deferred);
+>> +    shrinker->nr_deferred = NULL;
+>> +
+>> +    kfree(shrinker);
+>> +}
+>> +EXPORT_SYMBOL(shrinker_unregister);
+>> +
+>>   /*
+>>    * Add a shrinker callback to be called from the vm.
+>>    */
+> 
 
