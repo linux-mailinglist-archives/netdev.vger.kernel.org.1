@@ -1,121 +1,114 @@
-Return-Path: <netdev+bounces-20824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6722076161A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:36:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B69761125
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:46:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FC3B1C20E70
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:36:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B98F281805
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6369D1ED5A;
-	Tue, 25 Jul 2023 11:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651B314270;
+	Tue, 25 Jul 2023 10:46:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261871ED38;
-	Tue, 25 Jul 2023 11:36:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE60C433C7;
-	Tue, 25 Jul 2023 11:36:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1690284983;
-	bh=123xCEYGnpn+piNqbBZPYIz4kJgdrO9rqpOz9zcCZl0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BRVSnKXvtUFV0M/OK1kpO400peUFxe4Z/cwmFv1UOs7VId7PwGHQGM9WrFYNlG+9H
-	 jT8a5i8najN18IlbzLevmHp3La1gJK7PoLSafmrrVLLJyPhZ49qkP8X6KHw/LanfcX
-	 9rdqoOR62oTmKNB7Wx4WhyvEMthfUhXhSvgZbYaM=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Kalle Valo <kvalo@codeaurora.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Fox Chen <mhchen@golf.ccl.itri.org.tw>,
-	de Melo <acme@conectiva.com.br>,
-	Gustavo Niemeyer <niemeyer@conectiva.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Lee Jones <lee.jones@linaro.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.4 042/313] wl3501_cs: Fix misspelling and provide missing documentation
-Date: Tue, 25 Jul 2023 12:43:15 +0200
-Message-ID: <20230725104522.896757523@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230725104521.167250627@linuxfoundation.org>
-References: <20230725104521.167250627@linuxfoundation.org>
-User-Agent: quilt/0.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A089447
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:46:23 +0000 (UTC)
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F4410CC
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:46:17 -0700 (PDT)
+X-QQ-mid:Yeas49t1690281905t157t45884
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.128.134.159])
+X-QQ-SSF:00400000000000F0FQF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 14067757563934950869
+To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
+Cc: <netdev@vger.kernel.org>,
+	<andrew@lunn.ch>,
+	<hkallweit1@gmail.com>,
+	<Jose.Abreu@synopsys.com>,
+	<mengyuanlou@net-swift.com>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com> <20230724102341.10401-5-jiawenwu@trustnetic.com> <ZL5TujWbCDuFUXb2@shell.armlinux.org.uk> <03cc01d9be9c$6e51cad0$4af56070$@trustnetic.com> <ZL9+XZA8t1vaSVmG@shell.armlinux.org.uk> <03f101d9bedd$763b06d0$62b11470$@trustnetic.com> <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk> <ZL+fF4365f0Q9QDD@shell.armlinux.org.uk>
+In-Reply-To: <ZL+fF4365f0Q9QDD@shell.armlinux.org.uk>
+Subject: RE: [PATCH net-next 4/7] net: pcs: xpcs: adapt Wangxun NICs for SGMII mode
+Date: Tue, 25 Jul 2023 18:45:04 +0800
+Message-ID: <03f501d9bee5$11fc0ea0$35f42be0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJQc7ZImbL9NUPTrDJxH1gVz1U29QHlV8ySAerVjK8CRWbPqwHK0atUAh0aDJIDPJCjsQIjPZH8rmHvzIA=
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,T_SPF_HELO_TEMPERROR,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Lee Jones <lee.jones@linaro.org>
+On Tuesday, July 25, 2023 6:08 PM, Russell King (Oracle) wrote:
+> On Tue, Jul 25, 2023 at 10:58:25AM +0100, Russell King (Oracle) wrote:
+> > > The information obtained from the IC designer is that "PHY/MAC side SGMII"
+> > > is configured by experimentation. For these different kinds of NICs:
+> > > 1) fiber + SFP-RJ45 module: PHY side SGMII
+> > > 2) copper (pcs + external PHY): MAC side SGMII
+> >
+> > This makes no sense. a PHY on a RJ45 SFP module is just the same as a
+> > PHY integrated into a board with the MAC.
+> 
+> 
+> MAC ---- PCS <----- sgmii -----> PHY (whether on a board or SFP)
+> 
+> Control word flow:
+>              <------------------ link, speed, duplex
+> 	     ------------------> acknowledge (value = 0x4001)
+> 
+> Sometimes, it's possible to connect two MACs/PCSs together:
+> 
+> MAC ---- PCS <----- sgmii -----> PCS ---- MAC
+> 
+> and in this case, one PCS would need to be configured in "MAC" mode
+> and the other would need to be configured in "PHY" mode because SGMII
+> is fundamentally asymmetric.
+> 
+> Here is the definition of the control word sent by either end:
+> 
+> Bit	MAC->PHY	PHY->MAC
+> 15	0: Reserved	Link status, 1 = link up
+> 14	1: Acknowledge	Reserved for AN acknowledge
+> 13	0: Reserved	0: Reserved
+> 12	0: Reserved	Duplex mode 1 = full, 0 = half
+> 11:10	0: Reserved	Speed 11 = Reserved 10=1G, 01=100M, 00=10M
+> 9:1	0: Reserved	0: Reserved
+> 0	1		1
+> 
+> So my guess would be that "PHY side SGMII" means the device generates
+> the "PHY->MAC" format word whereas "MAC side SGMII" generates the
+> "MAC->PHY" format word - and it's the latter that you want to be using
+> both for Copper SFPs, which are no different from PHYs integrated onto
+> the board connected with SGMII.
 
-[ Upstream commit 8b8a6f8c3b50193d161c598a6784e721128d6dc3 ]
+Thanks for the detailed explanation, I can understand it.
 
-Fixes the following W=1 kernel build warning(s):
+So I need to find out why config it in MAC mode doesn't work. When I config
+it in MAC mode, PHY would not change state to callback the xpcs_get_state().
+I dump the PCS register through the tool at this time, VR_MII_AN_INTR_STS
+is not always the same value, sometimes AN complete, sometimes not.
 
- In file included from drivers/net/wireless/wl3501_cs.c:57:
- drivers/net/wireless/wl3501_cs.c:143: warning: Function parameter or member 'reg_domain' not described in 'iw_valid_channel'
- drivers/net/wireless/wl3501_cs.c:143: warning: Excess function parameter 'reg_comain' description in 'iw_valid_channel'
- drivers/net/wireless/wl3501_cs.c:469: warning: Function parameter or member 'data' not described in 'wl3501_send_pkt'
- drivers/net/wireless/wl3501_cs.c:469: warning: Function parameter or member 'len' not described in 'wl3501_send_pkt'
-
-Cc: Kalle Valo <kvalo@codeaurora.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Fox Chen <mhchen@golf.ccl.itri.org.tw>
-Cc: de Melo <acme@conectiva.com.br>
-Cc: Gustavo Niemeyer <niemeyer@conectiva.com>
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
-Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
-Link: https://lore.kernel.org/r/20201102112410.1049272-25-lee.jones@linaro.org
-Stable-dep-of: 391af06a02e7 ("wifi: wl3501_cs: Fix an error handling path in wl3501_probe()")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/wireless/wl3501_cs.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/wireless/wl3501_cs.c b/drivers/net/wireless/wl3501_cs.c
-index cf67ea13dd8dc..115bb408d4f20 100644
---- a/drivers/net/wireless/wl3501_cs.c
-+++ b/drivers/net/wireless/wl3501_cs.c
-@@ -134,7 +134,7 @@ static const struct {
- 
- /**
-  * iw_valid_channel - validate channel in regulatory domain
-- * @reg_comain: regulatory domain
-+ * @reg_domain: regulatory domain
-  * @channel: channel to validate
-  *
-  * Returns 0 if invalid in the specified regulatory domain, non-zero if valid.
-@@ -458,11 +458,9 @@ static int wl3501_pwr_mgmt(struct wl3501_card *this, int suspend)
- /**
-  * wl3501_send_pkt - Send a packet.
-  * @this: Card
-- *
-- * Send a packet.
-- *
-- * data = Ethernet raw frame.  (e.g. data[0] - data[5] is Dest MAC Addr,
-+ * @data: Ethernet raw frame.  (e.g. data[0] - data[5] is Dest MAC Addr,
-  *                                   data[6] - data[11] is Src MAC Addr)
-+ * @len: Packet length
-  * Ref: IEEE 802.11
-  */
- static int wl3501_send_pkt(struct wl3501_card *this, u8 *data, u16 len)
--- 
-2.39.2
-
+I'm not sure if this is related to the anomaly, log often shows:
+"i2c_designware i2c_designware.1024: timeout in disabling adapter"
 
 
 
