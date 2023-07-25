@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-20976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AF3076208E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C7CF76208D
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEDAE2819B8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:50:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC9ED280D2B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E4325926;
-	Tue, 25 Jul 2023 17:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D537925924;
+	Tue, 25 Jul 2023 17:49:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7437525140
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:49:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89EBC433C9;
-	Tue, 25 Jul 2023 17:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5509925140
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:49:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6AB4C433CA;
+	Tue, 25 Jul 2023 17:49:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690307380;
-	bh=RU1yt+0Cu3kvPsoECxJVmwUh0wZQeJo4rj4qI+5pd+0=;
+	s=k20201202; t=1690307375;
+	bh=WJL53er2hn/3EEx4DOJfAbOjXZnKjKBtRagFrtg05jg=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=luJ/sojL/eju59UKvv7KPRUv5zpARMbC8f1KoW1mcTCaBI95NpBwjsFS+jjMlnEra
-	 UwRBdCUoOpeQ+PRT23Y9eKuLemPcL8WAUCKUwypqaKayAms4+JmGoK7UpHX8glvsqL
-	 WcsQ5CafV2BdB6y5os43l4smEcGY8FPjbW0ZYz7uYTYdwzTmoReIhsKN7y/IaCuWHd
-	 8qSOXqN6EeKAJ8r6RE1UO/5CxmHKtnm4hVP4txEBXkBTttne30yHuWBkHkKp6A9S5q
-	 HMCvrugtwMy1R9TziQ8J6Ie10YG/5nmHIJBy++pNRTbOPeVG/gsG31kFEfY1eZUmIN
-	 uGJVoAGjxh2PQ==
-Received: (nullmailer pid 3497937 invoked by uid 1000);
+	b=CPO6RMRPaMRtVah/1RA1wO5FXxmP2DhlHptZXjtjeJZn524snzFNmGkI4PM2ckIo6
+	 7FXzBD4qXePRo3PzLIkOFhZGyDj+4aolBAs7lhubS+/sugRBmEv5uwY2APQucc4EIz
+	 1nGGt64bGnlel2IpehCbvoOPhAXT8wnt5XPyu8AhkROpI7dA7thAncucJtelJljMnw
+	 atiZpLOBvBZ0F/r5WTJZfurX5L65y1q7LeSvDTjmcEUXR6SWW06bn+O1CXh/QQgkcV
+	 FpqLMVfkRM4VMT0UlbHKmPRIUz4d0EWFPpNeyuIHEERTM60aZDTVat5SY/xyjqL5hf
+	 qQXqITOBkCDlA==
+Received: (nullmailer pid 3497939 invoked by uid 1000);
 	Tue, 25 Jul 2023 17:49:25 -0000
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -42,38 +42,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Rob Herring <robh@kernel.org>
 To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Oleksii_Moisieiev@epam.com, linux-media@vger.kernel.org,
-	linux-usb@vger.kernel.org, hugues.fruchet@foss.st.com,
-	herbert@gondor.apana.org.au, devicetree@vger.kernel.org,
-	mchehab@kernel.org, robh+dt@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, lee@kernel.org, will@kernel.org,
-	Frank Rowand <frowand.list@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, linux-mmc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kuba@kernel.org,
-	olivier.moysan@foss.st.com, arnd@kernel.org,
-	dmaengine@vger.kernel.org, alexandre.torgue@foss.st.com,
-	linux-iio@vger.kernel.org, ulf.hansson@linaro.org,
-	edumazet@google.com, linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	alsa-devel@alsa-project.org, linux-spi@vger.kernel.org,
-	gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, andi.shyti@kernel.org,
-	arnaud.pouliquen@foss.st.com, fabrice.gasnier@foss.st.com,
-	vkoul@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
-	jic23@kernel.org, linux-i2c@v.smtp.subspace.kernel.org,
-	ger.kernel.org@web.codeaurora.org, linux-serial@vger.kernel.org,
-	catalin.marinas@arm.com, krzysztof.kozlowski+dt@linaro.org
-In-Reply-To: <20230725164104.273965-3-gatien.chevallier@foss.st.com>
+Cc: kuba@kernel.org, lee@kernel.org, andi.shyti@kernel.org, alsa-devel@alsa-project.org, linux-i2c@vger.kernel.org, richardcochran@gmail.com, linux-mmc@vger.kernel.org, arnaud.pouliquen@foss.st.com, olivier.moysan@foss.st.com, vkoul@kernel.org, linux-serial@vger.kernel.org, robh+dt@kernel.org, alexandre.torgue@foss.st.com, krzysztof.kozlowski+dt@linaro.org, ulf.hansson@linaro.org, linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org, hugues.fruchet@foss.st.com, mchehab@kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-phy@lists.infradead.org, pabeni@redhat.com, devicetree@vger.kernel.org, gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, edumazet@google.com, linux-crypto@vger.kernel.org, jic23@kernel.org, Frank Rowand <frowand.list@gmail.com>, arnd@kernel.org, linux-usb@vger.kernel.org, catalin.marinas@arm.com, linux-iio@vger.kernel.org, davem@davemloft.net, Oleksii_Moisieiev@epam.com, will@kernel.org, dmaengine@vger.kernel.org, netdev@vger.kernel.org, 
+ fabrice.gasnier@foss.st.com, linux-spi@vger.kernel.org, conor+dt@kernel.org, herbert@gondor.apana.org.au
+In-Reply-To: <20230725164104.273965-4-gatien.chevallier@foss.st.com>
 References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
- <20230725164104.273965-3-gatien.chevallier@foss.st.com>
-Message-Id: <169030736432.3497864.4682647411146090051.robh@kernel.org>
-Subject: Re: [PATCH v2 02/11] dt-bindings: bus: document RIFSC
+ <20230725164104.273965-4-gatien.chevallier@foss.st.com>
+Message-Id: <169030736534.3497905.9507005013968358402.robh@kernel.org>
+Subject: Re: [PATCH v2 03/11] dt-bindings: bus: document ETZPC
 Date: Tue, 25 Jul 2023 11:49:25 -0600
 
 
-On Tue, 25 Jul 2023 18:40:55 +0200, Gatien Chevallier wrote:
-> Document RIFSC (RIF security controller). RIFSC is a firewall controller
-> composed of different kinds of hardware resources.
+On Tue, 25 Jul 2023 18:40:56 +0200, Gatien Chevallier wrote:
+> Document ETZPC (Extended TrustZone protection controller). ETZPC is a
+> firewall controller.
 > 
 > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 > ---
@@ -86,10 +67,12 @@ On Tue, 25 Jul 2023 18:40:55 +0200, Gatien Chevallier wrote:
 > 	- Declare "feature-domain-names" as an optional
 > 	  property for child nodes
 > 	- Fix description of "feature-domains" property
+> 	- Reorder the properties so it matches RIFSC
+> 	- Add missing "feature-domain-controller" property
 > 
->  .../bindings/bus/st,stm32mp25-rifsc.yaml      | 105 ++++++++++++++++++
->  1 file changed, 105 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
+>  .../bindings/bus/st,stm32-etzpc.yaml          | 96 +++++++++++++++++++
+>  1 file changed, 96 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
 > 
 
 My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
@@ -98,12 +81,12 @@ on your patch (DT_CHECKER_FLAGS is new in v5.13):
 yamllint warnings/errors:
 
 dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.example.dtb: serial@400e0000: Unevaluated properties are not allowed ('feature-domains' was unexpected)
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32-etzpc.example.dtb: serial@4c001000: Unevaluated properties are not allowed ('feature-domains' was unexpected)
 	from schema $id: http://devicetree.org/schemas/serial/st,stm32-uart.yaml#
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230725164104.273965-3-gatien.chevallier@foss.st.com
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230725164104.273965-4-gatien.chevallier@foss.st.com
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
