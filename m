@@ -1,92 +1,160 @@
-Return-Path: <netdev+bounces-21012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1C9762297
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:46:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 655B976229B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:47:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15AB01C20F69
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:46:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D8972813F6
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6B826B04;
-	Tue, 25 Jul 2023 19:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8995126B07;
+	Tue, 25 Jul 2023 19:47:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA191D2FD
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:46:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB0C7C433C8;
-	Tue, 25 Jul 2023 19:45:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690314360;
-	bh=1Uh4TPOBk512aHbEuk/jYdhaFBhXhA8L86v0n5StCTw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EshMDONLk/elSPudh0bxJeunrwrXjZv3Q4645Xfb35/+y5SYc/u8a6stQWthW4gJR
-	 ig1nSV8kq0kf00HeC59957FxKencxY3JAm+GI7lrr1cTH/nfWQMlpwPC78yCBmsnxS
-	 6MDOEDZ7wQSysw2zEQ/NfnoXR5/iFmXOfjFMsa6try9IeF7kox//BM4QAUpk2R2+ub
-	 o4TGyXSkfiRnNxiOjsE3D8uqtJnO/Mr9pEh2BG8iTMsKVQy/SVx9xzgoPuAFl5aOnK
-	 FujdHkQgG42bdkmiQGm4zbTRZ0ZTkhCPo/wbn482oq1inhzryIhY4wPkAUn43K3RC5
-	 N6JQk+nhkPlrQ==
-Date: Tue, 25 Jul 2023 12:45:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, mkubecek@suse.cz,
- lorenzo@kernel.org
-Subject: Re: [PATCH net-next 1/2] net: store netdevs in an xarray
-Message-ID: <20230725124559.1dc930cd@kernel.org>
-In-Reply-To: <ZMAMY0MTj7PbJazi@hog>
-References: <20230722014237.4078962-1-kuba@kernel.org>
-	<20230722014237.4078962-2-kuba@kernel.org>
-	<20788d4df9bbcdce9453be3fd047fdf8e0465714.camel@redhat.com>
-	<20230724084126.38d55715@kernel.org>
-	<2a531e60a0ea8187f1781d4075f127b01970321a.camel@redhat.com>
-	<20230724102741.469c0e42@kernel.org>
-	<20230724120718.4f01113a@kernel.org>
-	<ZMAMY0MTj7PbJazi@hog>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDB11D2FD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:47:21 +0000 (UTC)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079871FF5;
+	Tue, 25 Jul 2023 12:47:20 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d1c988afebfso153481276.2;
+        Tue, 25 Jul 2023 12:47:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690314439; x=1690919239;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qeJhTxpV2KdMMMSZLbWge8qm6rDJ0HM+acsXY0ytlKU=;
+        b=PA8xavyt2HOc4k97SAdgucxOUb3/+ImBN0gn0fioaV5W7ZXer4eSAu5M8BGv/3eRWE
+         zhnXJU6OHzjfhVfABYLNdRTWxq9A4xYiX8Wl7v0rzzay3LYVquG2a2RScYvOEUTRwekI
+         KUz+Tafe9+FElePdyBczThkkG5IMK7Blre42rTJRxXJq/D4uA6AXbwc8KwenybeJFBds
+         DsyMMNByA8XSUg7+L2E9pMBEmzBUnOjShg/Au8+v527dXfAPrUNKtHGs/Dcee8wTQXVH
+         rYlTVSWNHl6ldbo60kazW5+mQ+scbOdGhCsm7oA7erwxmacAdo/1TzyV6akyg/SQw7lX
+         xF4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690314439; x=1690919239;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qeJhTxpV2KdMMMSZLbWge8qm6rDJ0HM+acsXY0ytlKU=;
+        b=M3mP1cYpH8BFNzGeaixrNOxOuit1OyGwgIrlplbbifNovroOiS+JfRLB2EJhpwsYMo
+         8sSAVs92KjnBnkuexFXnMqgPBquMIDujRFZWd/6c8Ovbdp3kzS1oymsyhTYEdIdvx8jn
+         fNraJB945L+llzYX5/Q95ICJcYlMvs3D1Vbc+4qsgCrrOhK3bhgihPgn+Mh3ODKw9cm0
+         Bc5JQWvlyVX5Cz3Fm1RkMRYtSavkpS2tXLoBTA5PYU3rLMEgj7N3j73M8fLY7CLgKQ6r
+         HRdTuIzTWsgbJPQ7K/H3+hAGsfJ+vQVB3DonjDf51J6VBIZcuhDTG7sDdkPJcLh3ZSOK
+         GMKw==
+X-Gm-Message-State: ABy/qLb57eKvjiP9B6R9F1MicVyn1OVDE3kv05Sb6EGC7OwIJ1Rop8Fj
+	BwQpJkSJ9MmX0vfF7MNLTGUvg7CXwLvxfwyFGQg=
+X-Google-Smtp-Source: APBJJlH3O1N0+A/LhmIX/UCjjCLprcxDzwP9u1Pgqo1ZYHVk7bomcjWnNWvdljBnCzytABCnQ5kTgfY4xxBUvevldvs=
+X-Received: by 2002:a25:2986:0:b0:d06:66be:b22 with SMTP id
+ p128-20020a252986000000b00d0666be0b22mr9621709ybp.19.1690314439137; Tue, 25
+ Jul 2023 12:47:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230725183646.5668-1-pchelkin@ispras.ru>
+In-Reply-To: <20230725183646.5668-1-pchelkin@ispras.ru>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 25 Jul 2023 15:46:57 -0400
+Message-ID: <CADvbK_dN4Z3kOqmJcNcUGHp56KLF87tKLHt-3BNbyRa=QOR0dw@mail.gmail.com>
+Subject: Re: [PATCH] tipc: stop tipc crypto on failure in tipc_node_create
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	Alexey Khoroshilov <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 19:54:43 +0200 Sabrina Dubroca wrote:
-> > > And if that's not enough we can make the iteration index ulong 
-> > > (i.e. something separate from ifindex as ifindex is hardwired to 31b
-> > > by uAPI).  
-> > 
-> > We can get the create, delete ordering with this or the list, but the
-> > inverse theoretical case of delete, create ordering can't be covered.
-> > A case where user wants to make sure at most one device is visible.
-> > 
-> > I'm not sure how much we should care about this. The basic hash table
-> > had the very real problem of hiding devices which were there *before
-> > and after* the dump.
-> > 
-> > Inconsistent info on devices which were created / deleted *during* the
-> > dump seems to me like something that's best handled with notifications.
-> > 
-> > I'm not sure whether we should set the inconsistency mark on the dump
-> > when del/add operation happened in the meantime either, as 
-> > the probability that the user space will care is minuscule.  
-> 
-> The inconsistent dump mark may be more relevant for changes in device
-> properties than link creation/removal. If the MTU on 2 devices changes
-> while the dump is running (one low ifindex, one high ifindex), we'll
-> see the old MTU for the first device and the new MTU for the 2nd. Or
-> by adding/removing bridge ports while the dump runs, I can make it
-> look like bridge0 has mulitple ports with the same port_no.
-> 
-> I don't know how likely those cases are, but if they happen I think
-> they'd be more confusing than a missing/extra device.
+On Tue, Jul 25, 2023 at 2:37=E2=80=AFPM Fedor Pchelkin <pchelkin@ispras.ru>=
+ wrote:
+>
+> If tipc_link_bc_create() fails inside tipc_node_create() for a newly
+> allocated tipc node then we should stop its tipc crypto and free the
+> resources allocated with a call to tipc_crypto_start().
+>
+> Call tipc_crypto_stop() in that case. Also extract the similar error exit
+> paths into a goto statement.
+>
+> Found by Linux Verification Center (linuxtesting.org).
+>
+> Fixes: cb8092d70a6f ("tipc: move bc link creation back to tipc_node_creat=
+e")
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> ---
+>  net/tipc/node.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/tipc/node.c b/net/tipc/node.c
+> index 5e000fde8067..0d64005a803b 100644
+> --- a/net/tipc/node.c
+> +++ b/net/tipc/node.c
+> @@ -546,9 +546,7 @@ struct tipc_node *tipc_node_create(struct net *net, u=
+32 addr, u8 *peer_id,
+>  #ifdef CONFIG_TIPC_CRYPTO
+>         if (unlikely(tipc_crypto_start(&n->crypto_rx, net, n))) {
+>                 pr_warn("Failed to start crypto RX(%s)!\n", n->peer_id_st=
+ring);
+> -               kfree(n);
+> -               n =3D NULL;
+> -               goto exit;
+> +               goto free_node;
+>         }
+>  #endif
+>         n->addr =3D addr;
+> @@ -583,9 +581,7 @@ struct tipc_node *tipc_node_create(struct net *net, u=
+32 addr, u8 *peer_id,
+>                                  n->capabilities, &n->bc_entry.inputq1,
+>                                  &n->bc_entry.namedq, snd_l, &n->bc_entry=
+.link)) {
+>                 pr_warn("Broadcast rcv link creation failed, no memory\n"=
+);
+> -               kfree(n);
+> -               n =3D NULL;
+> -               goto exit;
+> +               goto stop_crypto;
+>         }
+>         tipc_node_get(n);
+Can you please try moving up tipc_node_get(n) ahead tipc_link_bc_create()
+and use tipc_node_put(n) to replace kfree(n) to avoid the extra
+tipc_crypto_stop() call below?
 
-I believe that for netdevs dev_base_seq_inc() is used to indicate 
-a change. It's only called when listing / unlisting devices so
-the changes to device config are already not covered :(
+Thanks.
+
+>         timer_setup(&n->timer, tipc_node_timeout, 0);
+> @@ -610,6 +606,15 @@ struct tipc_node *tipc_node_create(struct net *net, =
+u32 addr, u8 *peer_id,
+>  exit:
+>         spin_unlock_bh(&tn->node_list_lock);
+>         return n;
+> +stop_crypto:
+> +
+> +#ifdef CONFIG_TIPC_CRYPTO
+> +       tipc_crypto_stop(&n->crypto_rx);
+> +free_node:
+> +#endif
+> +       kfree(n);
+> +       spin_unlock_bh(&tn->node_list_lock);
+> +       return NULL;
+>  }
+>
+>  static void tipc_node_calculate_timer(struct tipc_node *n, struct tipc_l=
+ink *l)
+> --
+> 2.41.0
+>
 
