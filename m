@@ -1,83 +1,107 @@
-Return-Path: <netdev+bounces-20894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 582C8761D60
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:29:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52064761D61
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:29:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 861E71C20DDE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:29:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D7ED28173B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3052D23BD1;
-	Tue, 25 Jul 2023 15:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A9923BD3;
+	Tue, 25 Jul 2023 15:29:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C7F1549F
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:29:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34141BF8
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690298956;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LbqsLIkGShHuil5PLSxaVfXhTRQLAs653axfRAT5yC0=;
-	b=V4SQmsY9o66PCgpG/WZMB8+EApI1MQ/Vex5omGiaoS8rNWmKMiVtE+VWxxS7f5VVA1exKt
-	uJMN5nrqO0vDKgVnpDCeGof/SAvdjO3hbQGvYQkoJCVFhP9DPg19r7UukH5dlQ8/iQ+P7T
-	7X4crHyBmL6fgDONVLqld7oO6nc/uHo=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-48-hhpy8Cq1NDGZylDbFVrJRg-1; Tue, 25 Jul 2023 11:29:12 -0400
-X-MC-Unique: hhpy8Cq1NDGZylDbFVrJRg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E0FA1C07827;
-	Tue, 25 Jul 2023 15:29:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.242])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3AFAE1121330;
-	Tue, 25 Jul 2023 15:29:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <0000000000000cb2c305fdeb8e30@google.com>
-References: <0000000000000cb2c305fdeb8e30@google.com>
-To: syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
-Cc: dhowells@redhat.com, davem@davemloft.net,
-    herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-    pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] general protection fault in cryptd_hash_export
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC0C23BD1
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:29:29 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A181BF6
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:29:27 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-993a37b79e2so901271866b.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:29:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690298966; x=1690903766;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SjlrbfT1i6tI7AFt+LbMcfKublLdL5rytJvECbAgqhw=;
+        b=3Av3W/H9AvKC2xhec4wLU32kj/ocz3g21KXV7GBjN2+pb/CcPWxxNsHubEAKO2s1VV
+         qL4rlCWHhLNJhcn+6v8C5QObtLUPh41uYbKHJ+MlNkWxx2dXMMYw9zw+vhujizbK8HQR
+         9YsF2kUpTqzM84WO8JSSw0A3zBYX5Zgswlw1OX4uQ3vV5DPCzlNjyIf5g1qDGBfw9uD3
+         L9jFvuIHE6yOUAZIeG31nSA3brM3h3Wo9/qU3XlAs+LPe1Fn0mI2mvINcyzuX2aZIQI8
+         yC//Kc0nFeA9CwPhp6FaXIfwCC42X4lHvGfNEU84qUyYileAjyAh5heW1ummpI+0iH0n
+         BFog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690298966; x=1690903766;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SjlrbfT1i6tI7AFt+LbMcfKublLdL5rytJvECbAgqhw=;
+        b=YOV7rHD+RqjWSS1WswCriFInxuT3MK+CTi6nEEhMBCNz3hYCNUdbmwHqeRESAwXG+h
+         g40vQZm0GPT6ehtNI7L/FPDrssBGsFhzw2hPPJGYFgQV91iGU99by2/TiGlwGNen0NOe
+         /sX2tvJ6ZRpQl2bdQpvzVzf+LQWs4UkTH4lVKq9wwn0B3vZnJGKwOVksB4FBNmnSokhL
+         QR76eEwwo+pY2rvEQ5x5d8WYbkLAGFvY/qr87Y0DHsCBVn6zkSuLdplw1/AX5d1uvT/n
+         ejJmv3oZ0sVqVae/YeJ9kfyL5R5jyh1Bt+6b1nxRQPK2o2/Jf8uCb/1MlyfL4WIr8ArX
+         0UCA==
+X-Gm-Message-State: ABy/qLZPQkpJZaz68EVCEGogc4dNAWt8NAnzECssGMHaCGgSafnXb5mD
+	FL8G3aXWOPnenwzZ5TiIsjPksA==
+X-Google-Smtp-Source: APBJJlE0hYqOUIltZnICvYfM/7nxuYFidgVxNNz28KNMxH/AG+NBkY4dQ7R3+Tzf1zDzfBAammcJIQ==
+X-Received: by 2002:a17:907:2cf7:b0:993:f8b2:d6fa with SMTP id hz23-20020a1709072cf700b00993f8b2d6famr11234456ejc.21.1690298965867;
+        Tue, 25 Jul 2023 08:29:25 -0700 (PDT)
+Received: from localhost ([91.218.191.82])
+        by smtp.gmail.com with ESMTPSA id lv19-20020a170906bc9300b00989257be620sm8216409ejb.200.2023.07.25.08.29.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 08:29:24 -0700 (PDT)
+Date: Tue, 25 Jul 2023 17:29:23 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 00/11] devlink: introduce dump selector attr
+ and use it for per-instance dumps
+Message-ID: <ZL/qU/cwvPlLR3ek@nanopsycho>
+References: <20230720121829.566974-1-jiri@resnulli.us>
+ <ZL+C3xMq3Er79qDD@nanopsycho>
+ <87ca1394a3110cad376d9bfb6d576f0f90674a2d.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <104260.1690298950.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 25 Jul 2023 16:29:10 +0100
-Message-ID: <104261.1690298950@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ca1394a3110cad376d9bfb6d576f0f90674a2d.camel@redhat.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t b6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
+Tue, Jul 25, 2023 at 10:36:31AM CEST, pabeni@redhat.com wrote:
+>On Tue, 2023-07-25 at 10:07 +0200, Jiri Pirko wrote:
+>> I see that this patchset got moved to "changes requested" in patchwork.
+>> Why exacly? There was no comment so far. Petr's splat is clearly not
+>> caused by this patchset.
+>
+>Quickly skimming over the series I agree the reported splat looks
+>possibly more related to core netlink and/or rhashtable but it would
+>help if you could express your reasoning on the splat itself, possibly
+>with a decoded back-trace.
+>
 
+Well, since I'm touching only devlink, this is underlated to this
+patchset. I don't see why I would need to care about the splat.
+I will repost, if that is ok.
+
+
+>Thanks!
+>
+>Paolo
+>> 
+>
 
