@@ -1,113 +1,114 @@
-Return-Path: <netdev+bounces-20790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FFE4760FE5
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:57:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 367E8760FFB
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDF322817CE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:57:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 316B41C20D2D
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1F915AD5;
-	Tue, 25 Jul 2023 09:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0652C15AD9;
+	Tue, 25 Jul 2023 09:58:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0276614A91
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:57:25 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA2019A1
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=EQLUig3Re9LcJ5mfyjD3+YbubofBeqbAurKOO5MYjuE=; b=QPzFytEVJ8x0h7xQWIcFUsxBvU
-	9StUmtWVWbcsmM4sHaRHd0NEEATJBxLIflPhnULaBvDZECuETW/ngeTdShu+gCLthe4sN7IFoY8RK
-	dSjRXR9RS0Vkjat/Mbl9jww2Q2uE6O6pq/Bj3Q1s9emy9UKWtznKazBOJUbZLfEWtxu60F5XcTbrU
-	PAyEfzx7muoImrbIFRRJIghqdq7quUdRBwZ+vjbJdTbEP7ELqVAfQV68tTUfQqd/cVI/QhOwAzEef
-	5ql+kJdD2e9JEe3X2N883FawILiYPFLHP+wz1fK8Raxzb5y2tz8kbi6mc2rOY+YXGoRkK/MzxYNeX
-	Q1/IpgcA==;
-Received: from [192.168.1.4] (port=54635 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAF415AD5
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:58:49 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B9251BCC
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:58:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oaoymqNN5F7RKeVZED25akK7U0MsO2FW6J7h4go8q30=; b=GK/7KDJzg8bMRSwKPqk12BNc+n
+	QWEuDiyAf+9w3LtiT5cUp2zotO1SzUWlz/CqSZ0vekCWtcQzik3VKDbe831ZzNkwmrpv+Nh3C2Rkn
+	o3RJpfkB791XJEuANmk5i5kqQMMRS69xlYXORKxjegHsFC+W6F4Qa1OnLeoAEZ367O/gnU+mFaPqo
+	XeMrwRkafZDO37n66SgdnhFxQTnZ11O78WrzIlwHg1iKsLAfxjm6+EAwTH9z5yi620A+CW1TU5iyn
+	sQQ63rjKtpvvmp+zD0A6Ax34SGazTSqxqarJzHSPeoPqOpkm2FplRB91lJiKDn8OOBZ2jEupb5BZh
+	r+HlFtpQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56326)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qOEn5-0007Pg-2Q;
-	Tue, 25 Jul 2023 11:57:15 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 25 Jul 2023 11:57:14 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <andrew@lunn.ch>
-CC: <ante.knezic@helmholz.de>, <davem@davemloft.net>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>
-Subject: [PATCH net-next] net: dsa: mv88e6xxx: enable automedia on 6190x and 6390x devices
-Date: Tue, 25 Jul 2023 11:57:12 +0200
-Message-ID: <20230725095712.24771-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <d3f45312-882d-4667-89da-c562e0828589@lunn.ch>
-References: <d3f45312-882d-4667-89da-c562e0828589@lunn.ch>
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qOEoE-0001rq-0s;
+	Tue, 25 Jul 2023 10:58:26 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qOEoD-0001j0-5e; Tue, 25 Jul 2023 10:58:25 +0100
+Date: Tue, 25 Jul 2023 10:58:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	Jose.Abreu@synopsys.com, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next 4/7] net: pcs: xpcs: adapt Wangxun NICs for
+ SGMII mode
+Message-ID: <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com>
+ <20230724102341.10401-5-jiawenwu@trustnetic.com>
+ <ZL5TujWbCDuFUXb2@shell.armlinux.org.uk>
+ <03cc01d9be9c$6e51cad0$4af56070$@trustnetic.com>
+ <ZL9+XZA8t1vaSVmG@shell.armlinux.org.uk>
+ <03f101d9bedd$763b06d0$62b11470$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <03f101d9bedd$763b06d0$62b11470$@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 24 Jul 2023 20:34:27 +0200 Anrew Lunn wrote:
->By auto-media, you mean both a copper PHY and an SFP? And whichever
->gets link first wins the MAC?
->
+On Tue, Jul 25, 2023 at 05:50:36PM +0800, Jiawen Wu wrote:
+> On Tuesday, July 25, 2023 3:49 PM, Russell King (Oracle) wrote:
+> > On Tue, Jul 25, 2023 at 10:05:05AM +0800, Jiawen Wu wrote:
+> > > On Monday, July 24, 2023 6:35 PM, Russell King (Oracle) wrote:
+> > > > On Mon, Jul 24, 2023 at 06:23:38PM +0800, Jiawen Wu wrote:
+> > > > > Wangxun NICs support the connection with SFP to RJ45 module. In this case,
+> > > > > PCS need to be configured in SGMII mode.
+> > > > >
+> > > > > Accroding to chapter 6.11.1 "SGMII Auto-Negitiation" of DesignWare Cores
+> > > > > Ethernet PCS (version 3.20a) and custom design manual, do the following
+> > > > > configuration when the interface mode is SGMII.
+> > > > >
+> > > > > 1. program VR_MII_AN_CTRL bit(3) [TX_CONFIG] = 1b (PHY side SGMII)
+> > > > > 2. program VR_MII_AN_CTRL bit(8) [MII_CTRL] = 1b (8-bit MII)
+> > > > > 3. program VR_MII_DIG_CTRL1 bit(0) [PHY_MODE_CTRL] = 1b
+> > > >
+> > > > I'm confused by "PHY side SGMII" - what does this mean for the
+> > > > transmitted 16-bit configuration word? Does it mean that _this_ side
+> > > > is acting as if it were a PHY?
+> > >
+> > > I'm not sure, because the datasheet doesn't explicitly describe it. In this
+> > > case, the PHY is integrated in the SFP to RJ45 module. From my point of
+> > > view, TX control occurs on the PHY side. So program it as PHY side SGMII.
+> > 
+> > Let me ask the question a different way. Would you use "PHY side SGMII"
+> > if the PHY was directly connected to the PCS with SGMII?
+> 
+> The information obtained from the IC designer is that "PHY/MAC side SGMII"
+> is configured by experimentation. For these different kinds of NICs:
+> 1) fiber + SFP-RJ45 module: PHY side SGMII
+> 2) copper (pcs + external PHY): MAC side SGMII
 
-Yes, that is correct.
+This makes no sense. a PHY on a RJ45 SFP module is just the same as a
+PHY integrated into a board with the MAC.
 
-On Mon, 24 Jul 2023 20:34:27 +0200 Anrew Lunn wrote:
->auto-media has been discussed a few times, and rejected, since Linux
->has no concept of multiple 'phy like devices' connected to one MAC.
->
->How are you representing this in DT? I assume you have both an SFP
->socket, and a phy-handle pointing to a PHY? phylink will not drive
->both at the same time. So you cannot have them admin up at the same
->time? How do you get the SFP out of TX disable, when phylink sees a
->PHY? What does ethtool return? What the PHY is advertising as its link
->modes? Or nothing since an SFP does not advertise speeds?
-
-Patch simply covers the automedia aspect of the device while the
-exact mode is specified by the DT. So for example if you would like
-to connect an SFP to port 3 of the device you would create a "regular"
-sfp node just like for ports 9/10 along the lines of:
-                        port@3 {
-                                reg = <3>;
-                                label = "SFP";
-                                phy-mode = "1000base-x";
-                                managed = "in-band-status";
-                                sfp = <&sfp1>;
-                        };
-
-From then on, phylink will handle the sfp just as if it was connected
-to ports 9/10 - the ethtool reports advertised and supported link mode
-as 1000baseX, "Port" is "FIBRE", etc.
-
-Patch looks for "1000base-x" phy-mode in the dt node so in case it
-is not found the device can be linked only against a copper PHY.
-
-The "real" automedia you are refering to is of course not covered here
-and maybe the commit message is a "bit" misleading.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
