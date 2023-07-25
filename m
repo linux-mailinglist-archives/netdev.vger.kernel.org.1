@@ -1,126 +1,118 @@
-Return-Path: <netdev+bounces-21019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859357622CB
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F037622DE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 415FD2819E7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:59:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0955C2819AF
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F14B26B1B;
-	Tue, 25 Jul 2023 19:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE9326B1D;
+	Tue, 25 Jul 2023 20:01:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B22226B17
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:59:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82604C4167D;
-	Tue, 25 Jul 2023 19:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1EA26B03
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:01:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74C47C433C7;
+	Tue, 25 Jul 2023 20:01:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690315169;
-	bh=jVkGbzOh79AEXIeMVY1s/WgLpPOOReQVmsy9pu11HgA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RK+5U9OHGM5kVctFC0fXVoH/MPRkxl3yqjH0JkiqY14J62a84cAuHHldU+QJmZwJw
-	 m+XqPzyLakTqHV2HXVcWKWGF1mJiOi483ksql83UAjacp2W+449PAc1Gy7ne7EwyeR
-	 MsoU56g+i2jjsXGJeJINbc52BCaV8HU0tYJJ7er833v7XkogTWiQi1fNS2kICYDa74
-	 P8CPb6B9Topo5JelE0Q1Pj/c79T5XDlopvnCrd/HqoNTziMh4A4pI0EHt0afJyJ7vk
-	 ha8zpcp3YQiQ9ilYgEvI8y/bppIY1jkW6W5qaFxm4Z0AGFxqSgeeGZwG6UB78Vkakt
-	 mzVNJZl4/0d6w==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2b74fa5e7d7so86559981fa.2;
-        Tue, 25 Jul 2023 12:59:29 -0700 (PDT)
-X-Gm-Message-State: ABy/qLbI9Y5P+8UuUMiQS5vzxtUz9KqZZjgFLvu9EGq2SorJqdtBXn4t
-	LKHbvRFikbW9zfYVyMFFWmvhSHIWureFQRetTg==
-X-Google-Smtp-Source: APBJJlFwGjXaJCJydGIeGV4iVYCIq6ysqPH1CxKSwb/h2lZDdMtrrV65McGRvNB57SLo+rUN/j76IhUhQXfq96gAGDg=
-X-Received: by 2002:a2e:8786:0:b0:2b6:dd26:c02a with SMTP id
- n6-20020a2e8786000000b002b6dd26c02amr8693672lji.14.1690315146580; Tue, 25 Jul
- 2023 12:59:06 -0700 (PDT)
+	s=k20201202; t=1690315281;
+	bh=lwzgyo/hKAuFK/GizHWHih6d+oZtsu+UCV4ITL+g4X4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mrvRwTSL077Nhz2abeL01Pl1y5Rq3ZIGKTyA15Yk5lIHqflXYSmAf+nqBLIYPHEzx
+	 a8MWyRLwFC+YS1tlEKiB+fWJ6FLK6yJ6IEYceXAZwhmfp6djVDfP4x8cEmnqjSYdig
+	 qU6qH8X/47ooz+FIbb4yLDlz/UjMtIUGoHjdDE7T9RnpUMQ6s+vMio1PZ+n7rWvqTI
+	 gtXCqKTgriWfMH+6lP3p4Cd4gGmRYwB7Z1878yE5ZbWsREG8MF+cZoXxtNccdDKJyO
+	 mvJ65AnJTJdWs1i9qAu8FqfVBb1WtAgjakwNOJjswfVuy1bGQDHJQZrSH9EQtCB3MX
+	 sTc5OfTuyUwYg==
+Date: Tue, 25 Jul 2023 21:01:16 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: qca,ar803x: add missing
+ unevaluatedProperties for each regulator
+Message-ID: <20230725-suggest-juggle-c062521399f9@spud>
+References: <20230725123711.149230-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230724212222.809909-1-robh@kernel.org> <ZMAD25Yp6gCNq+wH@corigine.com>
-In-Reply-To: <ZMAD25Yp6gCNq+wH@corigine.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 25 Jul 2023 13:58:54 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+UYF79tUWvHh=5AfrERJPvFRaV4vh1mnbYn_nNjOQTcw@mail.gmail.com>
-Message-ID: <CAL_Jsq+UYF79tUWvHh=5AfrERJPvFRaV4vh1mnbYn_nNjOQTcw@mail.gmail.com>
-Subject: Re: [PATCH v2] net: Explicitly include correct DT includes
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Andreas Larsson <andreas@gaisler.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>, 
-	Keyur Chudgar <keyur@os.amperecomputing.com>, Chris Snook <chris.snook@gmail.com>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@microchip.com>, 
-	Madalin Bucur <madalin.bucur@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Sean Anderson <sean.anderson@seco.com>, 
-	Pantelis Antoniou <pantelis.antoniou@gmail.com>, Li Yang <leoyang.li@nxp.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Douglas Miller <dougmill@linux.ibm.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Taras Chorny i <taras.chornyi@plvision.eu>, 
-	Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, 
-	Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Timur Tabi <timur@kernel.org>, 
-	Sergey Shtylyov <s.shtylyov@omp.ru>, Steve Glendinning <steve.glendinning@shawell.net>, 
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
-	Jerome Brunet <jbrunet@baylibre.com>, 
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Emil Renner Berthing <kernel@esmil.dk>, 
-	Samin Guo <samin.guo@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, 
-	Grygorii Strashko <grygorii.strashko@ti.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, 
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Alex Elder <elder@kernel.org>, A ndrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Alex Elder <elder@linaro.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-amlogic@lists.infradead.org, 
-	linux-oxnas@groups.io, linux-arm-msm@vger.kernel.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-omap@vger.kernel.org, linux-wpan@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Ot+MAbhOrYmNPSVw"
+Content-Disposition: inline
+In-Reply-To: <20230725123711.149230-1-krzysztof.kozlowski@linaro.org>
+
+
+--Ot+MAbhOrYmNPSVw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 25, 2023 at 11:18=E2=80=AFAM Simon Horman <simon.horman@corigin=
-e.com> wrote:
->
-> On Mon, Jul 24, 2023 at 03:22:16PM -0600, Rob Herring wrote:
->
-> ...
->
-> >  90 files changed, 88 insertions(+), 92 deletions(-)
->
-> Hi Rob,
->
-> I suppose that it's reasonable to take this patch through netdev.
-> But it does have a pretty wide surface, and netdev moves a lot.
->
-> As it stands the patch doesn't apply due to a conflict
-> in dwmac-qcom-ethqos.c
+On Tue, Jul 25, 2023 at 02:37:11PM +0200, Krzysztof Kozlowski wrote:
+> Each regulator node, which references common regulator.yaml schema,
+> should disallow additional or unevaluated properties.  Otherwise
+> mistakes in properties will go unnoticed.
+>=20
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-It did yesterday... Anyways, looks like 0-day decided to find something els=
-e.
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-Rob
+
+> ---
+>  Documentation/devicetree/bindings/net/qca,ar803x.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/qca,ar803x.yaml b/Docu=
+mentation/devicetree/bindings/net/qca,ar803x.yaml
+> index 161d28919316..3acd09f0da86 100644
+> --- a/Documentation/devicetree/bindings/net/qca,ar803x.yaml
+> +++ b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
+> @@ -75,6 +75,7 @@ properties:
+>      description:
+>        Initial data for the VDDIO regulator. Set this to 1.5V or 1.8V.
+>      $ref: /schemas/regulator/regulator.yaml
+> +    unevaluatedProperties: false
+> =20
+>    vddh-regulator:
+>      type: object
+> @@ -82,6 +83,7 @@ properties:
+>        Dummy subnode to model the external connection of the PHY VDDH
+>        regulator to VDDIO.
+>      $ref: /schemas/regulator/regulator.yaml
+> +    unevaluatedProperties: false
+> =20
+>  unevaluatedProperties: false
+> =20
+> --=20
+> 2.34.1
+>=20
+
+--Ot+MAbhOrYmNPSVw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMAqDAAKCRB4tDGHoIJi
+0pTaAP4xqWscNl1Z2K7dWlggYN0rr87fskelc5n8AGihPxrlWgEAlBqN8MbJJRlI
+GgDx+30oEkC/nReimgsm95+i0bISdgU=
+=UjTP
+-----END PGP SIGNATURE-----
+
+--Ot+MAbhOrYmNPSVw--
 
