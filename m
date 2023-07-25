@@ -1,144 +1,126 @@
-Return-Path: <netdev+bounces-20886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF731761BE3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:37:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F671761C07
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E65EE1C20EDE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:37:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 539D1281956
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC3E1F93F;
-	Tue, 25 Jul 2023 14:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FFF21D49;
+	Tue, 25 Jul 2023 14:41:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38ED51ED5E
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:37:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB3AC433C8;
-	Tue, 25 Jul 2023 14:37:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690295870;
-	bh=0Oz8CD4VYFS2ZuWfX7wJBu37DvBUA5Ei6YCtywcVAJ8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RjgpozTiR71X12HVv4uWfmqME0LfYVB0EGiFG5NLtDqBAGpAGUmaWsf5EtG6V6p3X
-	 e/VQ2LwHiX7pN/MP9pZvIZvEaX3ryp7lSbS9qv197eiJMwN4zsU/mklEATWW/zMKqK
-	 w3tVhignBpyq1RW4ONerAnkJVhqWqgWieGD+oWU85TBKhW03jNvSLMcYhHQ4Qg0hSJ
-	 rsHsLMIB8WlKIF3W+CpiAndKVp3nIW4kwT9+x4JM3ipBG0Tzvvk9SGtm9d2Fw3ExTr
-	 IgxLpgA2V4gfM0MBE7dtKa8YWwU/X0cE7EQDhh5hsUgka46+JuZHO3/9TTooGI3Rn7
-	 9fO0HKpjFiXZg==
-Message-ID: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
-Date: Tue, 25 Jul 2023 16:37:44 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5661F17C
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:41:22 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4645619B0
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:40:55 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-52222562f1eso4389509a12.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:40:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1690296051; x=1690900851;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IThHZKgOu2CI5lLaW4+dohujcbudp1VuPGinJk5/sjg=;
+        b=YycOgFH4zQyYEHbalkot5ZX4yBrIJRW7H0IyiNBqCjc4D8OlAEz+b4bIO59iZ49fRx
+         zXsyax8B84PncxwgOuAD/wa5ujUzvNlDDELrEwV0QP2mM/De2ayWTLG3zzwXIzsbf26B
+         t7ubBySeNUCXq+H8Dmcw5oqpgp3RwpGP1rIOw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690296051; x=1690900851;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IThHZKgOu2CI5lLaW4+dohujcbudp1VuPGinJk5/sjg=;
+        b=U9ON3IEHYQ7sj2xupAm2RFbk2ej57khWJy5N0lT6qBn4YKKP9XT9AIDTwBDMjiJkxo
+         WWO3vUXxYhbPX6xcex+scP/FXIUbNBk3Z11gAR/VgTV+4Bp440dq5FEkkqN/R9y5TbIf
+         7Lz6Pn+a7FiQ2r165B3zCop8ZtAEmvpD7h5Ag5JtMCM/iA+JWdLdnzFbsyvXGiOZr++S
+         NSkBQmN+P8XOC9c+qysNLyTYZGKlxMv4jB7zTgmT/63qfx53h/J2o1TjVZ8V3sE8V8+f
+         N+Hp2yMO/xMV35GFkt/CGLWxUFD86WRxr81WzbRo9BDEroH5tEKCdVhrvw5thqBt1EeZ
+         wVWg==
+X-Gm-Message-State: ABy/qLbMTIFEkrnlgWXCRuoSzlU8LrcLPFTNp/gL5oV2gl0/HAbisAwq
+	7e1EWZXIj2l2mFJgmtc8J0XHucxDc89VmpvnxgnSKg==
+X-Google-Smtp-Source: APBJJlF68pzIjDwAzPGMKcrhOEyk9TWf/oRIMQEj1J4deHdSxGb7fnpo7ceaea8lfJeFMZmiLVLVP2G2Gj0o1TJx2JU=
+X-Received: by 2002:a05:6402:10cb:b0:521:7ab6:b95d with SMTP id
+ p11-20020a05640210cb00b005217ab6b95dmr11439677edu.29.1690296051014; Tue, 25
+ Jul 2023 07:40:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature 1/2] dt-bindings:
- net: snps,dwmac: Add description for rx-vlan-offload
-To: Joe Perches <joe@perches.com>,
- Mario Limonciello <mario.limonciello@amd.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- workflows@vger.kernel.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230721062617.9810-1-boon.khai.ng@intel.com>
- <20230721062617.9810-2-boon.khai.ng@intel.com>
- <e552cea3-abbb-93e3-4167-aebe979aac6b@kernel.org>
- <DM8PR11MB5751EAB220E28AECF6153522C13FA@DM8PR11MB5751.namprd11.prod.outlook.com>
- <8e2f9c5f-6249-4325-58b2-a14549eb105d@kernel.org>
- <20230721185557.199fb5b8@kernel.org>
- <c690776ce6fd247c2b2aeb805744d5779b6293ab.camel@perches.com>
- <20230724180428.783866cc@kernel.org>
- <213f5d2b13225f9ed4bdadda3c492ffc79940b13.camel@perches.com>
- <CAMuHMdX0DpNSDRSJ7D85NGV2ri2kFHjTtXJE5aOaTD3jNoyc-w@mail.gmail.com>
- <d2f7d5dd-cada-a3a2-2962-9c93d847f491@amd.com>
- <03ace72f8c8796e2a2f24a86e089a617daef9688.camel@perches.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-In-Reply-To: <03ace72f8c8796e2a2f24a86e089a617daef9688.camel@perches.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <cdbbc9df16044b568448ed9cd828d406f0851bfb.1690255889.git.yan@cloudflare.com>
+ <9a5c27e4-a1a3-1fe5-a179-bfd0072e7c59@web.de>
+In-Reply-To: <9a5c27e4-a1a3-1fe5-a179-bfd0072e7c59@web.de>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Tue, 25 Jul 2023 09:40:39 -0500
+Message-ID: <CAO3-PbokoLz8S8YhV_nNjq+Oq3P_SXqbj-TNJmrC56DV8KLb7Q@mail.gmail.com>
+Subject: Re: [PATCH v3 bpf 1/2] bpf: fix skb_do_redirect return values
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: kernel-team@cloudflare.com, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Mykola Lysenko <mykolal@fb.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Jordan Griege <jgriege@cloudflare.com>, 
+	Stanislav Fomichev <sdf@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 25/07/2023 15:43, Joe Perches wrote:
-> On Tue, 2023-07-25 at 08:19 -0500, Mario Limonciello wrote:
->> On 7/25/23 02:33, Geert Uytterhoeven wrote:
->>> Hi Joe,
->>>
->>> On Tue, Jul 25, 2023 at 6:22 AM Joe Perches <joe@perches.com> wrote:
->>>> I do suggest you instead write wrapper scripts to get
->>>> the output you want rather than updating the defaults
->>>> for the script and update the process documentation
->>>> to let other people know what do to as well.
->>>>
->>>> Something akin to Mario Limonciello's suggestion back in 2022:
->>>>
->>>> https://lore.kernel.org/lkml/20220617183215.25917-1-mario.limonciello@amd.com/
->>>
->>> FTR, this is more or less what I am using to generate a script
->>> to send out patches:
->>>
->>>      OUT=...
->>>      echo git send-email \\ > $OUT
->>>      # Add -cc
->>>      # Wrap comment inside $(: ...)
->>>      # Replace (...) in comment by [...]
->>>      # Replace ] at EOL by ) again
->>>      # Add continuation to EOL
->>>      scripts/get_maintainer.pl $* | \
->>>      tr -d \" | \
->>>      sed -e 's/^/--cc "/' \
->>>          -e 's/ (/" $(: /' \
->>>          -e 's/ (/ [/' -e 's/)/]/' \
->>>          -e 's/]$/)/' \
->>>          -e 's/$/ \\/' | \
->>>      tee -a $OUT
->>>      echo "*[0-9][0-9][0-9][0-9]-*.*" >> $OUT
->>>
->>> After generation, I edit the script to
->>>    - Replace some --cc by --to,
->>>    - Add/remove some people,
->>> and run "source $OUT" to send the patches...
->>>
->>> Gr{oetje,eeting}s,
->>
->> My script is great for single subsystem patches as it gets all the right 
->> people but I've found problems whenever it crosses multiple subsystems.
->>
->> Many subsystem owners want to see the whole series of patches to 
->> understand how they interact.  So the group of patches needs to be 
->> treated together which would need the wrapper to look at all patches 
->> instead.
-> 
-> Which can't really work all the time as vger has a recipient limit
-> and subsystem spanning patches frequently exceed that limit.
-> 
-> bcc's don't work well either as the reply-to chain is broken.
-> 
-> No great solution to that.
-> 
+On Tue, Jul 25, 2023 at 12:11=E2=80=AFAM Markus Elfring <Markus.Elfring@web=
+.de> wrote:
+>
+> >                                      =E2=80=A6 unexpected problems. Thi=
+s change
+> > converts the positive status code to proper error code.
+>
+> Please choose a corresponding imperative change suggestion.
+>
+> See also:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/process/submitting-patches.rst?h=3Dv6.5-rc3#n94
+>
+>
+> Did you provide sufficient justification for a possible addition of the t=
+ag =E2=80=9CFixes=E2=80=9D?
+>
+>
+> =E2=80=A6
+> > v2: code style change suggested by Stanislav Fomichev
+> > ---
+> >  net/core/filter.c | 12 +++++++++++-
+> =E2=80=A6
+>
+> How do you think about to replace this marker by a line break?
+>
+> See also:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/process/submitting-patches.rst?h=3Dv6.5-rc3#n711
+>
+> Regards,
+> Markus
 
-For small patchsets (and recipients list) I recommend:
-https://github.com/krzk/tools/blob/master/linux/.bash_aliases_linux#L91
+Hi Markus,
 
-For bigger patchsets - Rob's sendemail identity could work:
-https://lore.kernel.org/all/CAL_JsqLubWBr2W3xZPsuPLOGav7CFgBdH=aCfT22F_m0_cx3cQ@mail.gmail.com/
-but cover letter has to be treated separately.
+   Thanks for the suggestions, those are what I could use more help with.
+   Will address these in the next version.
 
-Anyway, it is not the case here. This is small patchset and the
-submitter should run get_maintainers.pl on *the patchset*, not on one
-chosen file. Running it one one file, ignoring maintainers of all other
-patches, does not make sense. There is nothing to fix in
-get_maintainers.pl. I believe our docs are also correct here.
-
-Best regards,
-Krzysztof
-
+Yan
 
