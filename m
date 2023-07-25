@@ -1,170 +1,163 @@
-Return-Path: <netdev+bounces-20700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9095B760B44
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:15:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0963A760B85
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 961F11C20D5D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:15:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 329BB281059
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:19:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E0E8F6D;
-	Tue, 25 Jul 2023 07:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D80D8F70;
+	Tue, 25 Jul 2023 07:19:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642DC8F63
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:15:33 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0DAB12C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:15:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690269330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KWk1QNmGdF3nvk5gdxdbBJcvckgMM8MpVQ7sj6/rxuY=;
-	b=fhW7WltycetBR52UPZFfNFNQ8cOcOLHMQJ1xNpvxjpb4UF2hIfqZhN/xwbBbh2/nCE/r1n
-	eUUUP1RL7Txyr80AnzuZE+qqsYA+Iw3+eMdhKbaNV6mh4dMS+C8inXXvA2xAeVVGdFFi+8
-	XYl1hAX0RYm8sS7mLRU8vGqLRRWfdh0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-155-7ikqE5vTPo-kI2gk2rwdew-1; Tue, 25 Jul 2023 03:15:29 -0400
-X-MC-Unique: 7ikqE5vTPo-kI2gk2rwdew-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3176f5796ecso4379f8f.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:15:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690269328; x=1690874128;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KWk1QNmGdF3nvk5gdxdbBJcvckgMM8MpVQ7sj6/rxuY=;
-        b=Agjon0GHt3aqoo17kvSo02qqgzV+v9MF9BZrOxlhETTwi2zlz3+MPlmNEklR1ryVMk
-         +ESnBA1lP51Jwj5F4xiu5NRd3cBDUq30C5a/fLBrGvrZY5zaWPpF8UqyDISoY9mbcqF7
-         6FB7qPmBNqxG4roOqceWP8WNKuXmtW7zknuVHYR6f8L3wyOMpjFKTNzmiFPaKNTHw2ww
-         SQQMs+adWHSWcnPs3DFTdpf+u0uMbG8YQXoHFOKrpofHitGv2caSdIyYCGl4jgHsneJS
-         KIhK27Pl4DyDs8POHP9RhtZRTKzKO1raJXIz5C1lghod/P259pV3/mSmN1I48Oo3sQ2N
-         TgWg==
-X-Gm-Message-State: ABy/qLY5xLoSRz9EC6MQC0PDXRXtKsGHjUw4AUlsbHJoB8j1JA7QZFkK
-	bx/GOPvB2dnf6P/OD6dx19jhd8mN0zHHGsVnNoASMbTHj+HGyXUvuCAmV/crFOpaD6EIQNgk3nF
-	2kUgGfHHjPV6v8EnE
-X-Received: by 2002:a5d:5948:0:b0:317:5f08:329f with SMTP id e8-20020a5d5948000000b003175f08329fmr3375762wri.1.1690269328068;
-        Tue, 25 Jul 2023 00:15:28 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG3FJsaKirPS9RCkbt4lNXMtrL1cLC0EIjPJ2Gg0I27op4L4ECGqs0qtSHRxpN+luxQd1WZbA==
-X-Received: by 2002:a5d:5948:0:b0:317:5f08:329f with SMTP id e8-20020a5d5948000000b003175f08329fmr3375746wri.1.1690269327693;
-        Tue, 25 Jul 2023 00:15:27 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-225-81.dyn.eolo.it. [146.241.225.81])
-        by smtp.gmail.com with ESMTPSA id t7-20020a5d6a47000000b00313f7b077fesm15305129wrw.59.2023.07.25.00.15.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 00:15:27 -0700 (PDT)
-Message-ID: <17b4e630c63657249a7268943f8806004de4cdca.camel@redhat.com>
-Subject: Re: [PATCH v2 1/1] net: gro: fix misuse of CB in udp socket lookup
-From: Paolo Abeni <pabeni@redhat.com>
-To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, willemdebruijn.kernel@gmail.com, 
-	dsahern@kernel.org, tom@herbertland.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, gal@nvidia.com
-Date: Tue, 25 Jul 2023 09:15:25 +0200
-In-Reply-To: <20230720162624.GA16428@debian>
-References: <20230720161322.GA16323@debian> <20230720162624.GA16428@debian>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B7719F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:19:54 +0000 (UTC)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2101.outbound.protection.outlook.com [40.107.14.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225C946AC
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:19:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MSeKpUAOAxQQgfupys/jVppY5zuqK7X0BHsLzzvsCpsdLOoAP2ejhPQl+5XrZ3xh/uVSY6H2FgOxT4EGWPDx59UhLBgAjT4H+SaNwJSpbQhEhZ3QShqw7kEx6jwzRwVNqBbO+Kh2y8VvbzSLVKboPqcp5ai51TesYT12xgOS5cxYEMC8H0eErdqKUrgZLNGfusKG3bRsBsGxNShS4AR480NgIlgfFddrmSdZgfCDlZsJqAh1wNYZ1sR2KH1gSPE3/ip7A1Bq2pmhCLzyrKRaiXPyD8p5wgWhgRxPRf+y2w/aa6KX4HHJQLxsmMJ1T3WHUU8zDtHU0mzeE4EjPRh4fA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hFDjRVFrsX+XNRTC5FYez6Sha/M1EpfwnOrzZsSS9yU=;
+ b=gfdeaomWbUS6bOVGxN6fDol783fKoY4PTUc9iWypvGk9wrQHxr98KQ+XnM7Nd+LMGiKsvqBjgu/vwlIfD/QIoFYRKp25ajVSKvG9qKBo1/XTd72YOxO6n5q71WpvYjaLSYsFVhrq+IcPSO3YfHcU+YiV2CTkAUb0YPnRxnkOLum0qTQuDbrg8t82I85XNoxvMFAyyRJeORoJN5sUNbZHC+LfKwNA1qCS/xTOyGPasnLckdgOXTHRvIuyKgusIEbHU59pFMS6juaxAeLDTLPF8RrHH6J9JufTgH5O3Yc2O2h6dtRdVYfRcUdfP3dwYCbFAJZOWvesXYeRhxkunfQl9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=dektech.com.au; dmarc=pass action=none
+ header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hFDjRVFrsX+XNRTC5FYez6Sha/M1EpfwnOrzZsSS9yU=;
+ b=QDe0KfhLiLdDOZoZ72LL+XqKVOKR7NPwSZ30aPm2tMJwkyOtP8wF90RdkLBg0YM7dCtYV2j54ofkRe7he56++ufjdGMA3GksMbYZou6zIc6dyey/5yzAOOEqLOiKHHHH3OHvvfvwcJ8iu6ue4b8KNCW9IZeMlq1/pZgW8K8+eoE=
+Received: from DB9PR05MB9078.eurprd05.prod.outlook.com (2603:10a6:10:36a::7)
+ by DU0PR05MB10571.eurprd05.prod.outlook.com (2603:10a6:10:426::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.23; Tue, 25 Jul
+ 2023 07:19:29 +0000
+Received: from DB9PR05MB9078.eurprd05.prod.outlook.com
+ ([fe80::85b:aaea:a5bb:e08d]) by DB9PR05MB9078.eurprd05.prod.outlook.com
+ ([fe80::85b:aaea:a5bb:e08d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 07:19:29 +0000
+From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
+To: Yuanjun Gong <ruc_gongyuanjun@163.com>
+CC: "jmaloy@redhat.com" <jmaloy@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "ying.xue@windriver.com" <ying.xue@windriver.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>
+Subject: RE: [PATCH v2 1/1] tipc: check return value of pskb_trim()
+Thread-Topic: [PATCH v2 1/1] tipc: check return value of pskb_trim()
+Thread-Index: AQHZvsYwisSsI43XKkmaP/yNSycLH6/KEr5A
+Date: Tue, 25 Jul 2023 07:19:29 +0000
+Message-ID:
+ <DB9PR05MB90784178D27E1ACF9AECD3F18803A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+References: <20230717185710.93256-1-kuniyu@amazon.com>
+ <20230725064810.5820-1-ruc_gongyuanjun@163.com>
+In-Reply-To: <20230725064810.5820-1-ruc_gongyuanjun@163.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=dektech.com.au;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR05MB9078:EE_|DU0PR05MB10571:EE_
+x-ms-office365-filtering-correlation-id: 0b4e8634-d524-4a20-2f12-08db8cdf7c5f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ AJe9qGrGjBVhG1U5tsw/i3VtBZStRo3cb2eY1GLVyHIPqnzlrwmdlxbYk+lzWu7mgC4Qf0doerPCPxL66GvbbzE2PT7d9AspC311GZZt6N4R8naBjFYuHXVkCJw3xOb0XRNsbaFopIxm9DWAu1YVBU/0HHgv4sJN48/YCmINFISmuPWwHogPu/9hfUXFb9hybNMVDsgYNk5gbqFRdMQ359C0712AqKWmpNhcRBUNLH5vOc3zpwNI6lfqJ//ZCcE1dGgPI8s9MT9zxndkk5KkN3SDgGN9nt2+5zE8qPzK+vzVAdNVwUbmknltjKpYgcvvBS3/I3ptUEAD/znSw+avVfTYENXQGghyetnpadkbiSANWpS347hZtPMQuQOpoOnmbrVAq15CzBFjrjb5sA39EpwCJl7DowB+nZzLK84LBCYljcY+/91S70ub1fA7VDYzXn0e8LziBNmBObsT4If7KW76jMQcgqQnfJZynk7J9cjoqbPmLszyvrz/tLZPP6p53ohtgVelqTqXoFNlo9gSBWy2RewKGTE3DIlycAzu4yQ+t1ai/Zj6wGHOK8dRqhiJQ/bCNbvEBzNsuScxAnNz0WV+iJpqFqxTnkO9PeSYghER6mwH+9EXG+aroFK/e3d6
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR05MB9078.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(346002)(136003)(39840400004)(396003)(451199021)(6506007)(478600001)(66446008)(26005)(122000001)(54906003)(186003)(7696005)(71200400001)(66476007)(64756008)(66946007)(76116006)(6916009)(4326008)(83380400001)(66556008)(9686003)(38100700002)(52536014)(5660300002)(38070700005)(41300700001)(8936002)(33656002)(4744005)(2906002)(8676002)(316002)(86362001)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?WJ03zVWXhcJH86KxWAOLGwm5bPG0K/hIEiUPMA7iysm3cSAkpEt0xxsD3eSX?=
+ =?us-ascii?Q?NPHqL/sFVziJ9IN4Pw6up0wBtgzPypX7frtmNoCruJas37yS6mkq75Fr6irK?=
+ =?us-ascii?Q?jozkspohMN4vJ0oU+fwBSpyxvjW9B3VTRJNcTLaIF9r9oVTZJKSUlLgLQ5SJ?=
+ =?us-ascii?Q?icCPMJRMo6613i2sjudmpFC24+n0RThGmfSyCjgqq743Ud0wW+A+86KjgSuP?=
+ =?us-ascii?Q?aOtqcFgXnzDFkSvq6T0kfwi6E4AeUqOQBLtDkNaLfwt1eOG8rB/QmzZm+iRJ?=
+ =?us-ascii?Q?HZYBjjpyb4LjTPQ2xrodwd1S0bfe1Czr6dgckbmwQQNROy1JcUeZTKNK8jQT?=
+ =?us-ascii?Q?xSyNZW+sMfsq//j4v+U3ul6d93B0eFZV0MpfDSpqGHNRujejRIiR8jps1reR?=
+ =?us-ascii?Q?oCYl330+MpS4mIvNTjAWEqXzDScLJ/EXC7Lh++ZsUg9gunSPbfzRPmHaSQ0g?=
+ =?us-ascii?Q?tVWfvyBGgGjV4PPDW/a8jjchnJcFxd+Na26GY5BCE8kG4/qYdvdybQGzXn23?=
+ =?us-ascii?Q?DeRA9b+i9oAJNwUf2ZwIrpGIamuifiGngr9nAGJoJsigXfSYgJLCG3ctmQBC?=
+ =?us-ascii?Q?6fQkaw4/H6UR/KL22nMgAO5/5IWTMnWeAiQmusMoTMTrnkF/X+iPf4+6U3me?=
+ =?us-ascii?Q?+PWrc+mh1QiHJ+t1ZGuLsv4i9vSjEvj+Q7Of1Gy9ssVomYf/f2I9sz6BjVG/?=
+ =?us-ascii?Q?MDJRTVAP5MvNdhqJ41Ezhn96UDfPPtZh29Yr2Ob3S7gkgdH9UBTrT498vfeL?=
+ =?us-ascii?Q?ZNXVwO6Tmc5+5g1za/soGfltU9SUy6u+PaNO/S+SKzBez8Tpar2zckFSgKqN?=
+ =?us-ascii?Q?1++FDdYWyTuZDSGeE7JAxEEpvo2LtxfmMzNrHwbDOh5tPoi4owxpuw1Nh5rD?=
+ =?us-ascii?Q?9Us8AGZFqgPrPZmEKVygnsBD5roH48j26oqkJUhuX1hLwqmh4pERvzNUlPh3?=
+ =?us-ascii?Q?4B+XGFjGyzUqxaBhj28KRsB092tw1TsQjnTvGjT3dhlH1k6jyPJJ7YS+6qpa?=
+ =?us-ascii?Q?mV0LTdToqP4WyNrF4TOLca206gPcb7pkiPLGmRGgmRGp5DA/tsmA+I/yKlUI?=
+ =?us-ascii?Q?dCwZkD3QKIF/cgFmHyqOEG5dHRRkMHwfA62+s/z+i5rck+fySw4r2UTLQIO7?=
+ =?us-ascii?Q?OEcWa29wznTCLd+v4nsVtL0bu4I6g0Hj+aFoKfQeUYxKZLxBA6g4EMQsXHXp?=
+ =?us-ascii?Q?5iLMyPn+CdQYr7DtQkdnSz2obY92pKhbElJXiFrewNpl09oWP4vpoodz7/Ph?=
+ =?us-ascii?Q?Pw6eVu4cvMVEF01i8RVUlNupyAz4pAjfwkWgwoKz4TlWKinrvIbkp8QHbmY8?=
+ =?us-ascii?Q?eg8yM3iUboIpQ5hG6okcrZ8VVlkBXvoasOHsMc3mrCtT+BQ7+dTsqLWSFeZ8?=
+ =?us-ascii?Q?LiAQsvqvaA5oR9PtV7k6zidbiM+imv7heMwJlaXr8iW1K19Cw9XRBV5FpYn4?=
+ =?us-ascii?Q?YNGXexjx1d2vVhAKuf4XehO01JtxJQe49eOgkgCjHmhhBNdJ/ZmZ0Z6fTfdV?=
+ =?us-ascii?Q?f2Mj3fqoTvI2ZU98q3AZd3DwzSUtNkxMncZ8tyNIpYiOwzFdr0o2R4nKwDn6?=
+ =?us-ascii?Q?94798Fvz80JyxhC7yg6EZALqu5sDofrDLdzM9b1d?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-OriginatorOrg: dektech.com.au
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR05MB9078.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b4e8634-d524-4a20-2f12-08db8cdf7c5f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2023 07:19:29.4906
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PrxyRRCWMHckDH2OWIL4sdhsjIpe6Y799XTY2qeLehMlI80fuLJG446LBdyrX+3Ii4NPXwvGJT5acBOoqWhsr2H86IIqU+2D+ExNY/zuFCs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR05MB10571
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Richard,
-
-On Thu, 2023-07-20 at 18:26 +0200, Richard Gobert wrote:
-> This patch fixes a misuse of IP{6}CB(skb) in GRO, while calling to
-> `udp6_lib_lookup2` when handling udp tunnels. `udp6_lib_lookup2` fetch th=
-e
-> device from CB. The fix changes it to fetch the device from `skb->dev`.
-> l3mdev case requires special attention since it has a master and a slave
-> device.
->=20
-> Fixes: a6024562ffd7 ("udp: Add GRO functions to UDP socket")
-> Reported-by: Gal Pressman <gal@nvidia.com>
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  include/net/udp.h      |  2 ++
->  net/ipv4/udp.c         | 28 ++++++++++++++++++++++++++--
->  net/ipv4/udp_offload.c |  7 +++++--
->  net/ipv6/udp.c         | 29 +++++++++++++++++++++++++++--
->  net/ipv6/udp_offload.c |  7 +++++--
->  5 files changed, 65 insertions(+), 8 deletions(-)
->=20
-> diff --git a/include/net/udp.h b/include/net/udp.h
-> index 4d13424f8f72..48af1479882f 100644
-> --- a/include/net/udp.h
-> +++ b/include/net/udp.h
-> @@ -299,6 +299,7 @@ int udp_lib_getsockopt(struct sock *sk, int level, in=
-t optname,
->  int udp_lib_setsockopt(struct sock *sk, int level, int optname,
->  		       sockptr_t optval, unsigned int optlen,
->  		       int (*push_pending_frames)(struct sock *));
-> +void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
->  struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport=
-,
->  			     __be32 daddr, __be16 dport, int dif);
->  struct sock *__udp4_lib_lookup(struct net *net, __be32 saddr, __be16 spo=
-rt,
-> @@ -310,6 +311,7 @@ struct sock *udp6_lib_lookup(struct net *net,
->  			     const struct in6_addr *saddr, __be16 sport,
->  			     const struct in6_addr *daddr, __be16 dport,
->  			     int dif);
-> +void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
->  struct sock *__udp6_lib_lookup(struct net *net,
->  			       const struct in6_addr *saddr, __be16 sport,
->  			       const struct in6_addr *daddr, __be16 dport,
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 8c3ebd95f5b9..85eb9977db2c 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -550,15 +550,39 @@ static inline struct sock *__udp4_lib_lookup_skb(st=
-ruct sk_buff *skb,
->  				 inet_sdif(skb), udptable, skb);
->  }
-> =20
-> +/* This function is the alternative to 'inet_iif' and 'inet_sdif'
-> + * functions in case we can not rely on fields of IPCB.
-> + *
-> + * The caller must verify skb_valid_dst(skb) is false and skb->dev is in=
-itialized.
-> + * The caller must hold the RCU read lock.
-> + */
-> +inline void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *=
-sdif)
-
-I think you misread David Ahern's suggestion on v1. The idea would be
-to move this function (and udp6_get_iif_sdif) in an header file, as
-'static inline'[1]. Additionally there is nothing specific about UDP
-here so I would rename them inet{,6}_gro_iif_sdif and place them in
-include/net/gro.h.
-
-Otherwise LGTM.
-
-Thanks,
-
-Paolo
-
-[1] the usage of the "inline" keyword is basically allowed only in
-header files
-
+>Subject: [PATCH v2 1/1] tipc: check return value of pskb_trim()
+>
+>goto free_skb if an unexpected result is returned by pskb_tirm() in tipc_c=
+rypto_rcv_complete().
+>
+>Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+>Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
+>---
+> net/tipc/crypto.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+>diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c index 577fa5af33ec..302=
+fd749c424 100644
+>--- a/net/tipc/crypto.c
+>+++ b/net/tipc/crypto.c
+>@@ -1960,7 +1960,8 @@ static void tipc_crypto_rcv_complete(struct net *net=
+, struct tipc_aead *aead,
+>
+> 	skb_reset_network_header(*skb);
+> 	skb_pull(*skb, tipc_ehdr_size(ehdr));
+>-	pskb_trim(*skb, (*skb)->len - aead->authsize);
+>+	if (pskb_trim(*skb, (*skb)->len - aead->authsize))
+>+		goto free_skb;
+>
+> 	/* Validate TIPCv2 message */
+> 	if (unlikely(!tipc_msg_validate(skb))) {
+>--
+>2.17.1
+>
+Reviewed-by: Tung Nguyen <tung.q.nguyen@dektech.com.au>
 
