@@ -1,91 +1,77 @@
-Return-Path: <netdev+bounces-20634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACB707604B8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:33:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D0287604D4
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 898181C20D00
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 01:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98157281563
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 01:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA2B137B;
-	Tue, 25 Jul 2023 01:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1DA1390;
+	Tue, 25 Jul 2023 01:40:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA867C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:33:39 +0000 (UTC)
-X-Greylist: delayed 5541 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Jul 2023 18:33:36 PDT
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8B7F0170E;
-	Mon, 24 Jul 2023 18:33:36 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.62] ) by
- ajax-webmail-mail-app2 (Coremail) ; Tue, 25 Jul 2023 09:33:12 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.62]
-Date: Tue, 25 Jul 2023 09:33:12 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Joe Perches" <joe@perches.com>, jhs@mojatatu.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net/sched: mqprio: Add length check for
- TCA_MQPRIO_{MAX/MIN}_RATE64
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20230724175612.0649ef67@kernel.org>
-References: <20230724014625.4087030-1-linma@zju.edu.cn>
- <20230724160214.424573ac@kernel.org>
- <63d69a72.e2656.1898a66ca22.Coremail.linma@zju.edu.cn>
- <20230724175612.0649ef67@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C387C
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:40:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DAB8C433C7;
+	Tue, 25 Jul 2023 01:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690249220;
+	bh=DXOnBDlZw4xfAif0iHSszj8IchUMGm4DrmfhSqOoTtI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FKdh6qcRtaYc9wnWbdTzWYvALu8wypNqRuvmGYF85ubRrmDAt9sbQclhiBvPTmjpy
+	 HbmvXNK4+ayN/2wWbLThFp36RnLD3CGhr5ZNe8ntGAmVEtqIkfZ3fezwGlGrPoHjWf
+	 szyhmyb13fnlp75waRpltxUh7yXeX3M731+e+p2LinMjzJ5sEEqqy2lIq4bWCvhF6W
+	 Jby2BtiL3gxnoEXbdoQQ29arb0n22BJZwfzDDspZBDO/2k3bQmZgI1mAs0TqpfsUrC
+	 z5RMY1Mox1kSMRRQr85P1IGTo+F5b1lNY55+V5ML756Y7h4boVEdSNQiBJtOkeLFiR
+	 vOxDv/ll4HhQg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F0AC5E21ED9;
+	Tue, 25 Jul 2023 01:40:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <150f7e19.e27f3.1898aadc871.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgDn74tZJr9kNXyBCg--.39653W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwMHEmS91fkWAgADs3
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/2] tc: fix a wrong file name in comment
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169024921997.19916.3427881254511155476.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Jul 2023 01:40:19 +0000
+References: <20230723164257.1262759-1-yamato@redhat.com>
+In-Reply-To: <20230723164257.1262759-1-yamato@redhat.com>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: netdev@vger.kernel.org
 
-SGkgSmFrdWIsCgo+ID4gPiA+IFRoZSBubGFfZm9yX2VhY2hfbmVzdGVkIHBhcnNpbmcgaW4gZnVu
-Y3Rpb24gbXFwcmlvX3BhcnNlX25sYXR0cigpIGRvZXMKPiA+ID4gPiBub3QgY2hlY2sgdGhlIGxl
-bmd0aCBvZiB0aGUgbmVzdGVkIGF0dHJpYnV0ZS4gVGhpcyBjYW4gbGVhZCB0byBhbgo+ID4gPiA+
-IG91dC1vZi1hdHRyaWJ1dGUgcmVhZCBhbmQgYWxsb3cgYSBtYWxmb3JtZWQgbmxhdHRyIChlLmcu
-LCBsZW5ndGggMCkgdG8KPiA+ID4gPiBiZSB2aWV3ZWQgYXMgOCBieXRlIGludGVnZXIgYW5kIHBh
-c3NlZCB0byBwcml2LT5tYXhfcmF0ZS9taW5fcmF0ZS4KPiA+ID4gPiAKPiA+ID4gPiBUaGlzIHBh
-dGNoIGFkZHMgdGhlIGNoZWNrIGJhc2VkIG9uIG5sYV9sZW4oKSB3aGVuIGNoZWNrIHRoZSBubGFf
-dHlwZSgpLAo+ID4gPiA+IHdoaWNoIGVuc3VyZXMgdGhhdCB0aGUgbGVuZ3RoIG9mIHRoZXNlIHR3
-byBhdHRyaWJ1dGUgbXVzdCBlcXVhbHMKPiA+ID4gPiBzaXplb2YodTY0KS4gIAo+ID4gPiAKPiA+
-ID4gSG93IGRvIHlvdSBydW4gZ2V0X21haW50YWluZXI/IFlvdSBkaWRuJ3QgQ0MgdGhlIGF1dGhv
-ciBvZiB0aGUgY29kZS4gIAo+ID4gCj4gPiBUaGF0J3Mgd2VpcmQsIEkganVzdCByYW4gY29kZSBi
-ZWxvdyBhbmQgc2VuZCB0aGlzIHBhdGNoIHRvIGFsbCA5IGVtYWlscyBwb3BlZCBvdXQuCj4gPiAK
-PiA+ICMgLi9zY3JpcHRzL2dldF9tYWludGFpbmVyLnBsIG5ldC9zY2hlZC9zY2hfbXFwcmlvLmMK
-PiAKPiBKb2UsIGhlcmUncyBhbm90aGVyIGNhc2UuCj4gCj4gTGluIE1hLCB5b3UgbmVlZCB0byBy
-dW4gdGhlIHNjcmlwdCBvbiB0aGUgZmlsZSBnZW5lcmF0ZWQgYnkgCj4gZ2l0IGZvcm1hdC1wYXRj
-aCwgcmF0aGVyIHRoYW4gdGhlIGZpbGUgcGF0aC4gVGhhdCBnaXZlcyBiZXR0ZXIKPiBjb3ZlcmFn
-ZSBmb3Iga2V5d29yZHMgaW5jbHVkZWQgaW4gdGhlIGNvbW1pdCBtZXNzYWdlIChlc3BlY2lhbGx5
-IAo+IHRoZSBGaXhlcyB0YWcpLiBQbGVhc2UgcmVydW4gaXQgb24gdGhlIHBhdGNoIGFuZCByZXBv
-c3Qgd2l0aCAKPiB0aGUgcmlnaHQgQ0MgbGlzdC4KCkNvcHkgdGhhdC4gU29ycnkgZm9yIHRoZSBp
-bmNvbnZlbmllbmNlIHRoYXQgd2FzIHJhaXNlZCBieSB0aGF0LiBXaWxsIApyZXNlbmQgdGhlIHBh
-dGNoIHdpdGggdGhlIGNvcnJlY3QgQ0MgbGlzdCBBU0FQLgoKUmVnYXJkcwpMaW4KCj4gLS0gCj4g
-cHctYm90OiBjcgo=
+Hello:
+
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Mon, 24 Jul 2023 01:42:56 +0900 you wrote:
+> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+> ---
+>  tc/q_plug.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Here is the summary with links:
+  - [1/2] tc: fix a wrong file name in comment
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=3a75c7a28605
+  - [2/2] man: (ss) fix wrong margin
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=02ea021446f9
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
