@@ -1,109 +1,91 @@
-Return-Path: <netdev+bounces-20782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB1A760F4D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:33:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78CCC760F53
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:34:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFE9E1C20E3B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:33:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331762811AC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3191D15AD5;
-	Tue, 25 Jul 2023 09:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC31C156E4;
+	Tue, 25 Jul 2023 09:33:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B0C200CC
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:26:59 +0000 (UTC)
-X-Greylist: delayed 1411 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 25 Jul 2023 02:26:38 PDT
-Received: from out-3.mta1.migadu.com (out-3.mta1.migadu.com [95.215.58.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5D72113
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:26:37 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690277165;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kJwBPug4K2o2Rsg3Nl512ID6Vx26wyYZeksPouOPBIo=;
-	b=UsXWV/BrmTb/Mzt4qG2L6aakkxaQdFwUIWYXPaL2lks9qA3so8IOOprpfwKsyfOszGQNhK
-	441qHddwlHklaskCeo1UAHikFDlDH211gEZQvhiMM0ozG4kf9A5oDb6k5ulzt7O+uqRDww
-	PXrlU0RxHN6exb+unDnSMMStapEjRew=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B3014A90;
+	Tue, 25 Jul 2023 09:33:09 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE08944AE;
+	Tue, 25 Jul 2023 02:32:38 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-99342a599e9so917908766b.3;
+        Tue, 25 Jul 2023 02:32:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690277248; x=1690882048;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xlOFKCeP+4hVLbD69I004lHDv56Nbmt05BTtQgudZs4=;
+        b=eSLDJIzinf8TLMkeDXBYeOsHYt8l/voNitBMIIYNaSx6NAbQ7JuxkkZq9jCnQLVWcv
+         KOLaNVkKuR3jrNeGCfyUqMYh7vBBbUUUXoktIqOvlbFVguoqJWsVQANMuqi32m+PNBEU
+         ztpJtbF0wBcSTrRvEmbCs7sfMuL9VtgWEpeKSynMg8oMN4ZvZ3cqnUV+izBSZvMjyc8H
+         x5hhUv9C9l5TJqhQny1XPg8VDcrFdFUvspCGH1Jwu4W5tuGm1WCp4kDEST781KpO9N81
+         xwDnBihP1oUp/QLH1oUF3AF6WOqZ1lO6k27t4k3eHLYVo/Z/5Vnf4n9Gyp+TfMmPYvlO
+         mymQ==
+X-Gm-Message-State: ABy/qLb2/zQbqg7wgZzadMo4XXTwDhSTAWGVD4GpSLaweZUHnz2/APBM
+	dtN77Rc/C9hrFwMz2LPPnh/ezMpulHk=
+X-Google-Smtp-Source: APBJJlHT3V/1QY83Hn6Q8+8JyqL3OEJLhTClEq/l18a51Yfc9VPCcKK34BhhyZJYKET9soqC4Ur5yw==
+X-Received: by 2002:a17:906:7a0f:b0:987:4e89:577f with SMTP id d15-20020a1709067a0f00b009874e89577fmr11829450ejo.24.1690277248142;
+        Tue, 25 Jul 2023 02:27:28 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-014.fbsv.net. [2a03:2880:31ff:e::face:b00c])
+        by smtp.gmail.com with ESMTPSA id jx16-20020a170906ca5000b00993664a9987sm7955470ejb.103.2023.07.25.02.27.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 02:27:27 -0700 (PDT)
+Date: Tue, 25 Jul 2023 02:27:25 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: asml.silence@gmail.com, axboe@kernel.dk, io-uring@vger.kernel.org,
+	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, leit@meta.com, bpf@vger.kernel.org
+Subject: Re: [PATCH 2/4] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
+Message-ID: <ZL+VfRiJQqrrLe/9@gmail.com>
+References: <20230724142237.358769-1-leitao@debian.org>
+ <20230724142237.358769-3-leitao@debian.org>
+ <ZL61cIrQuo92Xzbu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 09/47] f2fs: dynamically allocate the f2fs-shrinker
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-10-zhengqi.arch@bytedance.com>
-Date: Tue, 25 Jul 2023 17:25:26 +0800
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- david@fromorbit.com,
- tkhai@ya.ru,
- Vlastimil Babka <vbabka@suse.cz>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- djwong@kernel.org,
- Christian Brauner <brauner@kernel.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- tytso@mit.edu,
- steven.price@arm.com,
- cel@kernel.org,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- yujie.liu@intel.com,
- gregkh@linuxfoundation.org,
- linux-kernel@vger.kernel.org,
- linux-mm@kvack.org,
- x86@kernel.org,
- kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com,
- linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org,
- rcu@vger.kernel.org,
- netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com,
- linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org,
- virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org,
- linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <3D511473-EBD7-4FDF-B85E-AD911A31A260@linux.dev>
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-10-zhengqi.arch@bytedance.com>
-To: Qi Zheng <zhengqi.arch@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZL61cIrQuo92Xzbu@google.com>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
+On Mon, Jul 24, 2023 at 10:31:28AM -0700, Stanislav Fomichev wrote:
+> On 07/24, Breno Leitao wrote:
+> > Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
+> > level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
+> > where a sockptr_t is either userspace or kernel space, and handled as
+> > such.
+> > 
+> > Function io_uring_cmd_getsockopt() is inspired by __sys_getsockopt().
 > 
-> Use new APIs to dynamically allocate the f2fs-shrinker.
-> 
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> We probably need to also have bpf bits in the new
+> io_uring_cmd_getsockopt?
 
-Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-
-Thanks.
-
+It might be interesting to have the BPF hook for this function as
+well, but I would like to do it in a following patch, so, I can
+experiment with it better, if that is OK.
 
