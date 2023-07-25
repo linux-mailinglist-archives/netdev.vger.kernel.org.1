@@ -1,156 +1,369 @@
-Return-Path: <netdev+bounces-20710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E391D760BD7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4E6760BD9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:33:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CF6128140B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:33:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56741C20DFE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929018F7C;
-	Tue, 25 Jul 2023 07:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CAE9444;
+	Tue, 25 Jul 2023 07:33:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDC19442
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:33:27 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2091.outbound.protection.outlook.com [40.107.212.91])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6431FE5;
-	Tue, 25 Jul 2023 00:33:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kAvhXLx5yuzlCA2Oi4n50dcM0Ousl/2uaqSwYHDPljdeiExIOVv+sfAfFoYZrP9W903FUX3Y7ZhRcTOPEvq1+S86X03p69Eie+VIygwgCXulR5Nkq/pKnSEf2O1kAZUz7olNCZg7mwsjsivaTBtpVfwh7Lvd2TfmZZ8M/u39zJ0ImBtHsazvpKZAUs67NQrH+8QR801hus+nvKwrdq5RGwKDmKbVLBO3YjT37XGLd1za6TCAUhzudWIg2xUXWFUzPv6murqygG/WHSJrf4qqwFbjrWKfnVbnc9qBnYso6quEvYJHR3IdhCa9t7u5I+Xke9f/W+fjQ4uMSlA1RDTIRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9Bo+Obeocgp4uj8k0K7ht5yvYQm3ejuW0kIlfLsFe50=;
- b=bMdo6wL9CGpsfcah0EehXkKKsht9BW7jYrxGY+A8se1bY86y6yqeyKsVNSvjRh8dkvgAyNrsUJX5y2hAiG4NEwg776RCyO+vqZnr7BQHkzro8nECzAkmhb7DYAiZpD+3RqQx7UI0FgHUSrDdpNVXKdcgDWFc/Hp+FB6GjrkyyhuMNq3/946HvKCkaOXVtGzrAT0K3CvqlUEZvuc7Xur7OS/1Yctlubmbmrs7XicnpvoMokvWixnI8ZU37PmSe2aIEuf8BRNpues+aiKGNtsOX0IeeI7bfUxbnfROYwoJJfmr2DG00V2u+h96yC7vRKVUbcNVnKB0nwZzcIL1jjAdHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BBD19F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:33:49 +0000 (UTC)
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189C61BD2
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:33:47 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-40631c5b9e9so158741cf.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:33:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9Bo+Obeocgp4uj8k0K7ht5yvYQm3ejuW0kIlfLsFe50=;
- b=L9H641+W+n+VDMmmr0yC2M1zOT3sfGOatFNMqEgG1fWLrW6qfEBPJOt9J/c5GaWWz+59OS1BLZh2dBNKOZDIIgXTbCGKTFbWAaXFssWAOH3L2UN2BNObGTkbceKAzttLJsUCUG6zXWIuxCUs7XmKakneGgAMxm4LIRsyGy9bxjU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SN7PR13MB6131.namprd13.prod.outlook.com (2603:10b6:806:359::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Tue, 25 Jul
- 2023 07:33:21 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 07:33:21 +0000
-Date: Tue, 25 Jul 2023 09:33:14 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH net] s390/lcs: Remove FDDI option
-Message-ID: <ZL96ut0OJdY8F3s+@corigine.com>
-References: <20230724131546.3597001-1-wintera@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724131546.3597001-1-wintera@linux.ibm.com>
-X-ClientProxiedBy: AS4P191CA0047.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:20b:657::22) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=google.com; s=20221208; t=1690270426; x=1690875226;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dRwyW3+mbk6fXtXJFfRXjmT5wtykuSyfrvdH/y+/1HA=;
+        b=SUIOUZ/38P4bs1smQKZ9yCv3A/XAxDi6q6gfcrlX1CbpIchvyIoaYEUNY9gMxpf6Fq
+         gBeC1XJ1M+vLFl13PAMgLV9JUryA3SOQ2qrvFCkG1XKIf9P+esnsqhibCR3tgo4wPyrd
+         QNxPQ897RSJnJZNT62Ua7QNsJ/OMpHaaXZHZGvdyzfkRGM4gbkb2U4p5EMJWZxVf6Rbl
+         vG9baSVZq5QyxiYN7iQIK8ox8aPt+vk4w2ORszrRy2RUd8NDwcZZR6BE/lN4c42ZwZE1
+         PSXqFJLVp/rjfCpB4Z2hzCKX6HjHXa5/RPtqeJRx1k/AMhQyI2DreoLS77OVOphanQsi
+         7sIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690270426; x=1690875226;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dRwyW3+mbk6fXtXJFfRXjmT5wtykuSyfrvdH/y+/1HA=;
+        b=d6GS6CMIVq4c3y6Ojnj7xvdy85jqxRrpFcsvctmmrEwvB32/CFTjaUGcU6vDKAuSPY
+         Z/KcPvpcGAfN9ww71BhzquqHIHSL5BxWPlMgw8mDNfBwdg2xnWxmNCx3jS2GdQHIEvvh
+         3cUmwtzRKqzVg7NCP7bR2CDN2YVUkqS2TAv27ZBOOj/qjbYIcnAl+GjOzKMG45EKDRZV
+         zpxVULc54ejLNzlHyovCH6sRfXDrlqTSii5Z+ICAbIQYPe21q0BO8GFjJyaRkysnv8XL
+         jM8D8jk0hpwZLACMW+uckSkQ4uK3hZH49K+xP+qZrJddN2vp8hxut338U0C3wTutEvzx
+         l30g==
+X-Gm-Message-State: ABy/qLb2ryocvwSAR4s11W9/SSzCGidDqTO+rkY+3TKVAoIEv1chRA/r
+	tf8DgDToaN2o3s6f51nm6Fq9WXCx3hKi4llfLCd7IA==
+X-Google-Smtp-Source: APBJJlFLkxULvYVpKpviqifFl587r4JHp6vFeOLBTcxBDwFSW3u8/JerMFFUstpGop7Wp810W/R6fZaNZX0y5CiH5PE=
+X-Received: by 2002:ac8:4e86:0:b0:403:59cb:66c4 with SMTP id
+ 6-20020ac84e86000000b0040359cb66c4mr65531qtp.23.1690270425985; Tue, 25 Jul
+ 2023 00:33:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN7PR13MB6131:EE_
-X-MS-Office365-Filtering-Correlation-Id: a7a6bd60-c6c2-42eb-848a-08db8ce16c27
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	//GRzlTEzExas6YKMosB48glHBzdBl6I9hOrIY8aKPqLTvVBYZhzNwazZ+hGJSSQIjDSM48pnJvLN7IJA08x7w2+67ikN3EhqIrbcLXqsrUXTDvrXu0ppFgz2d5kQkdTNo1Hp8/F2ijcsS89+baIxV52pSBUvGQNHpcmoaNnbwBQn4Arh4siayLqyXnu1PeuWkQW7o7I3uwgK0ODeH8qKIUX4FtQvcVtgNYYco6hnMUmNMvGa1f5UXeVsFtOYFMMDmja4fQdwMqELaAtccFewhTl4JaS2PDdhPFZOmuPjzqqiNJjZuAUkcKpqcu8DXqnZ0oPbO66jfJzeIHsmxfoSvHaIbvaSmKnxESixUcZ22Ba+1nARMCcB5yqOtBU2d405capCOtSAuhz5OWzOvLUP9gOMOcrL2g5h2VVQjrAahk6xGTT5hFYeXLB+ggQWsqXgZWq4mQDEsYfkOv4HSUBiL7CAgO6GoUiTfrYjX5rcgt7tuqC/88hJ4/ofGb7E6xKgksUPQkEx5fpM6sR1T84dFxBwE4v0d8m14bDBvFOCQ4AA4t3SZW5J5ulT1EKNB4bs4S3S2sTbi85kJAqYhxf5FNfB8r4y/c8CEJzusjvPY0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(346002)(136003)(39840400004)(376002)(451199021)(66556008)(66476007)(54906003)(66946007)(6506007)(6666004)(4326008)(6486002)(966005)(6916009)(6512007)(316002)(478600001)(86362001)(44832011)(5660300002)(38100700002)(7416002)(8676002)(8936002)(36756003)(2616005)(186003)(41300700001)(2906002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?NGJvA2l6RnHqH4G/cKWcN6dmGKvdBYhcSKBU1cbMRcLItfwDfgLogZEoajm4?=
- =?us-ascii?Q?jNigdFRUS8BIKxeTB9yOeGwi3djJJijkD5UUXWZV52bn5z2jlv+maZt6k5AX?=
- =?us-ascii?Q?h50aztQ9wCmTnhZK6PCQU4gFQ2DFFLUNtVjWtLbjGtxtqyYeT9Mb05lbgmjm?=
- =?us-ascii?Q?AHWJVEl7r20WzPgM81cRQb2EJ66+0LJXqx2j78Kxy4gGzqQLVKysDAyak8G8?=
- =?us-ascii?Q?/kwQKHy0VJ1ZymTpCjvPwm43Buss+oyDgD4u2SPYRB8qCiiGKn7IJ0GqzuF+?=
- =?us-ascii?Q?81fGL0rSmYy7IOdpHU608/kL/IMnE17Bqnqu7MQLaxGyMDx2Wld5ObihaU1L?=
- =?us-ascii?Q?69+6PYSV8momjId7fXhhaPCiecGmnl+73JjJwFxEzInF0DIUs7GGsg1MmPUC?=
- =?us-ascii?Q?8p4HvFk9A0DZkBCUX+/0yeZU3LMRh5RHCBc6ZxDzgUWUxDU5KPT3B9LqjOKW?=
- =?us-ascii?Q?V3n9mdcuf36SlydAuXvlM34FNq9/8S3GtbsGzcOHhO39BW8vG40o4OGIQIdS?=
- =?us-ascii?Q?z10yQNkvexX+LoT4Vh8xm6Rx+pqnZppCLYa1NyEofeC5MU/DIF8tV2oJpi0m?=
- =?us-ascii?Q?pQLerokLtNpFmlKb3p2PVAqesQfQybm0acB5Z0P4j6XPrv2+DkyEZKyakFgR?=
- =?us-ascii?Q?4KTve6Ym4VQDUUIar6R7eKASEVUPRy1D0eSH7/vmPIn1mMvyShsVn5jLppC/?=
- =?us-ascii?Q?/yR99meZ0HX5Oo5/JiPumZ3ChQMB5WLiEaYzbafjYpu2aGeeik6UdNdGpZMY?=
- =?us-ascii?Q?rQ7gPxG6Nl/GLGF3E4IQKMos+cE3xL+qq7KnjTrVuE4eMCAFm31Mwk7a8D5v?=
- =?us-ascii?Q?CNsXtno4F4LWQUXdm+32j3l5dj3/ZdemvykGA1WkvwXjDqCZEUd70kwBVTbh?=
- =?us-ascii?Q?oDHJSL9jhD19YzMt7J0tIuPix+fiwmg+u1VNWr2qeHYxkMLrtL6pWCxT5QQ5?=
- =?us-ascii?Q?nvi57EAcKRW3Ag+Z5hsB2CHiymSkCcECHKzL48SOGgKcRp4p4OzKq+oPACL0?=
- =?us-ascii?Q?Nd/Iok213eFYvF/yHdAx6I+yTmcwdTfjU5c0fjxA7URc5w32gTYY85/SDbst?=
- =?us-ascii?Q?A1A2TrgvJjTu9L8h6bLl+6sYe9Q8G0Af6gOxSO0Omlv3zLpxa3Pah2k6zfV6?=
- =?us-ascii?Q?Ncnuc5ysvM7GQKaYpMWnQcWg4PFGKdSaJ6jTOOXxpHtgwiNm1h4vIH7xk94V?=
- =?us-ascii?Q?+K/9y7wFrYkVpC9/cB6JJfRewHOVXtp/rx/c+mjvUax3xZxvwbmvbOlEGoyT?=
- =?us-ascii?Q?qsZK3oe5c1KN5uht7xqajuBLjJXmFMwRo+1xsKMpDIS1N7J1a4Ms1y8HGDhQ?=
- =?us-ascii?Q?7FgWs8EOWwNltDMiHG5eEjdkwDGd//fTMHX+XGWmEer50WRzAaLsvHYGs5+N?=
- =?us-ascii?Q?aDaDOQqgaOB10tLhAnmLF0Vdgm1+NZaLzD92cNSNbBP/xi4485kG1aogEoNw?=
- =?us-ascii?Q?B5LwcNCIsG3m8yXV+t/IY0qvGBt+4q7IBhu1RibnnIGkGiZmcd2hq3HE7kh6?=
- =?us-ascii?Q?C+HfC3nOK51/atGIfwhY8JB8fyR9FDOTsTEoAV36WSWtPQo+N5Itn2MVulgb?=
- =?us-ascii?Q?6qSV3UeWy4A0TuYnMXST+8kyJSpQNn/4dZubXTOF+v4XBN8NpBuxjWj2giLQ?=
- =?us-ascii?Q?1pE2otxlkaJL4PJIpyetj2u1thaWLFE8V9M64z320BQVwPMH5XfuMbGLNXrD?=
- =?us-ascii?Q?t3SyuQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7a6bd60-c6c2-42eb-848a-08db8ce16c27
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 07:33:21.6913
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KZjt1qgNRPCr5AOgGjaMI9e5VnVEla11X/pRiqnGAbMfIcwNN6NsrFN42elBir4omqbHspnHIc4CVPfVUfgrAeEDCKb+MhDmfJz0MH77Y2s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR13MB6131
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230724111206.3067352-1-howardchung@google.com>
+ <CABBYNZ+UrWFNULhn8Nu79rvS-NZ4Rt4X4y=s+-DHEwjfKuX8Gg@mail.gmail.com>
+ <CAPHZWUejzqz5=tHPwib6gfSjcd6K90dyfw8m_3CgaLqjdYRa3A@mail.gmail.com> <CABBYNZ+BbNQr6-RbXABF0TeUUgBuoVUABqwfkfHgHkZ09vyY4Q@mail.gmail.com>
+In-Reply-To: <CABBYNZ+BbNQr6-RbXABF0TeUUgBuoVUABqwfkfHgHkZ09vyY4Q@mail.gmail.com>
+From: Yun-hao Chung <howardchung@google.com>
+Date: Tue, 25 Jul 2023 15:33:34 +0800
+Message-ID: <CAPHZWUfh2kPDA+_wtEisw85NwHwDik0A60Dc7zKwVur+SeqTOQ@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Add timeout in disconnect when power off
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	Archie Pusaka <apusaka@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 03:15:46PM +0200, Alexandra Winter wrote:
-> The last s390 machine that supported FDDI was z900 ('7th generation',
-> released in 2000). The oldest machine generation currently supported by
-> the Linux kernel is MARCH_Z10 (released 2008). If there is still a usecase
-> for connecting a Linux on s390 instance to a LAN Channel Station (LCS), it
-> can only do so via Ethernet.
-> 
-> Randy Dunlap[1] found that LCS over FDDI has never worked, when FDDI
-> was compiled as module. Instead of fixing that, remove the FDDI option
-> from the lcs driver.
-> 
-> While at it, make the CONFIG_LCS description a bit more helpful.
-> 
-> References:
-> [1] https://lore.kernel.org/netdev/20230621213742.8245-1-rdunlap@infradead.org/
-> 
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Yun-hao,
+>
+> On Mon, Jul 24, 2023 at 9:56=E2=80=AFPM Yun-hao Chung <howardchung@google=
+.com> wrote:
+> >
+> > Thanks Paul for the review. I'll fix them in the next patch.
+> >
+> > Hi Luiz,
+> >
+> > I think the controller did reset its internal state in the link layer, =
+so the next time we asked the controller to create a connection to the same=
+ remote, the controller didn't reply the error in the command complete even=
+t but the connection was rejected by the remote. If we really want the cont=
+roller to complete the disconnect procedure on reset, the power-off procedu=
+re could be stuck for tens of seconds if the remote was not responding. A s=
+imilar problem was found and solved in this patch [Bluetooth: hci_sync: Don=
+'t wait peer's reply when powering off].
+> >
+> > The other reason why we think this is better to be solved in the softwa=
+re layer is this is not only observed in Intel's AX211 but also MTK's MT792=
+1 and maybe more.
+>
+> Interesting, but in this case shouldn't the link-layer attempt to
+> cleanup _before_ it reset the state? Because as far I recall doing a
+> HCI_Reset shall cause a Disconnection even if not initiated by the
+> host stack with HCI_Disconnect, also there is something really odd
+> with the fact that the link-layer is generating such an error, because
+> in case that happens isn't it clear the states are out of sync and it
+> shall disconnect or something, I'm also curious what would happen if
+> one quickly toggle power then the same problem should manifest, at
+> least I don't see a difference between HCI_Reset and power off/on
+> within the connection supervision timeout.
 
-Probably this is for 'net-next' rather than 'net'.
-But in any case this looks good to me.
+Do you think it's better to do this instead: Set HCI Supervision
+timeout with a configurable or just a small value and then it's more
+safe to wait for disconnect complete because the result should be
+returned within the supervision timeout.
+In this way, we don't need the controller to do a graceful
+disconnection on HCI_Reset and the controller state won't be
+out-of-sync.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>
+> > Since this is a tradeoff problem, I make it a configurable parameter so=
+ that each user can decide a good number from their perspective. If it is 0=
+, which is the default value, the behavior should remain the same.
+> >
+> > Do you think this sounds good to you?
+> >
+> > Thanks,
+> > Howard
+> >
+> >
+> >
+> >
+> >
+> >
+> > On Tue, Jul 25, 2023 at 6:31=E2=80=AFAM Luiz Augusto von Dentz <luiz.de=
+ntz@gmail.com> wrote:
+> >>
+> >> Hi Howard,
+> >>
+> >> On Mon, Jul 24, 2023 at 4:12=E2=80=AFAM Howard Chung <howardchung@goog=
+le.com> wrote:
+> >> >
+> >> > For some controllers, it is known that when the HCI disconnect and H=
+CI
+> >> > Reset are too close to each other, the LMP disconnect command might =
+not
+> >> > been sent out yet and the command will be dropped by the controoler =
+when
+> >> > it is asked to reset itself. This could happen on powering off adapt=
+er.
+> >> >
+> >> > One possible issue is that if a connection exists, and then powering=
+ off
+> >> > and on adapter within a short time, then our host stack assumes the
+> >> > conntection was disconnected but this might not be true, so if we is=
+sue
+> >> > a connection to the peer, it will fail with ACL Already Connected er=
+ror.
+> >>
+> >> That sounds more like a bug in the controller though, the spec is
+> >> quite clear that it must reset the link-layer state:
+> >>
+> >> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+> >> page 1972
+> >>
+> >> ...HCI_Reset command shall reset the Link Manager, Baseband and Link L=
+ayer.
+> >>
+> >> So it sounds like the controller shall perform and the necessary
+> >> procedures before it respond with a Command Complete.
+> >>
+> >> > This CL makes the host stack to wait for |HCI_EV_DISCONN_COMPLETE| w=
+hen
+> >> > powering off with a configurable timeout unless the timeout is set t=
+o 0.
+> >> >
+> >> > Reviewed-by: Archie Pusaka <apusaka@google.com>
+> >> > Signed-off-by: Howard Chung <howardchung@google.com>
+> >> > ---
+> >> > Hi upstream maintainers, this is tested with an AX211 device and Log=
+i
+> >> > K580 keyboard by the following procedures:
+> >> > 1. pair the peer and stay connected.
+> >> > 2. power off and on immediately
+> >> > 3. observe that the btsnoop log is consistent with the configured
+> >> >    timeout.
+> >> >
+> >> >  include/net/bluetooth/hci_core.h |  1 +
+> >> >  net/bluetooth/hci_core.c         |  2 +-
+> >> >  net/bluetooth/hci_sync.c         | 38 +++++++++++++++++++++++------=
+---
+> >> >  net/bluetooth/mgmt_config.c      |  6 +++++
+> >> >  4 files changed, 35 insertions(+), 12 deletions(-)
+> >> >
+> >> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetoot=
+h/hci_core.h
+> >> > index 8200a6689b39..ce44f9c60059 100644
+> >> > --- a/include/net/bluetooth/hci_core.h
+> >> > +++ b/include/net/bluetooth/hci_core.h
+> >> > @@ -432,6 +432,7 @@ struct hci_dev {
+> >> >         __u16           advmon_allowlist_duration;
+> >> >         __u16           advmon_no_filter_duration;
+> >> >         __u8            enable_advmon_interleave_scan;
+> >> > +       __u16           discon_on_poweroff_timeout;
+> >> >
+> >> >         __u16           devid_source;
+> >> >         __u16           devid_vendor;
+> >> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> >> > index 0fefa6788911..769865494f45 100644
+> >> > --- a/net/bluetooth/hci_core.c
+> >> > +++ b/net/bluetooth/hci_core.c
+> >> > @@ -2479,7 +2479,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_=
+priv)
+> >> >         hdev->adv_instance_cnt =3D 0;
+> >> >         hdev->cur_adv_instance =3D 0x00;
+> >> >         hdev->adv_instance_timeout =3D 0;
+> >> > -
+> >> > +       hdev->discon_on_poweroff_timeout =3D 0;   /* Default to no t=
+imeout */
+> >> >         hdev->advmon_allowlist_duration =3D 300;
+> >> >         hdev->advmon_no_filter_duration =3D 500;
+> >> >         hdev->enable_advmon_interleave_scan =3D 0x00;     /* Default=
+ to disable */
+> >> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> >> > index 3348a1b0e3f7..260e9f05359c 100644
+> >> > --- a/net/bluetooth/hci_sync.c
+> >> > +++ b/net/bluetooth/hci_sync.c
+> >> > @@ -5250,6 +5250,8 @@ static int hci_disconnect_sync(struct hci_dev =
+*hdev, struct hci_conn *conn,
+> >> >                                u8 reason)
+> >> >  {
+> >> >         struct hci_cp_disconnect cp;
+> >> > +       unsigned long timeout;
+> >> > +       int err;
+> >> >
+> >> >         if (conn->type =3D=3D AMP_LINK)
+> >> >                 return hci_disconnect_phy_link_sync(hdev, conn->hand=
+le, reason);
+> >> > @@ -5258,19 +5260,33 @@ static int hci_disconnect_sync(struct hci_de=
+v *hdev, struct hci_conn *conn,
+> >> >         cp.handle =3D cpu_to_le16(conn->handle);
+> >> >         cp.reason =3D reason;
+> >> >
+> >> > -       /* Wait for HCI_EV_DISCONN_COMPLETE, not HCI_EV_CMD_STATUS, =
+when the
+> >> > -        * reason is anything but HCI_ERROR_REMOTE_POWER_OFF. This r=
+eason is
+> >> > -        * used when suspending or powering off, where we don't want=
+ to wait
+> >> > -        * for the peer's response.
+> >> > +       /* The HCI_ERROR_REMOTE_POWER_OFF is used when suspending or=
+ powering off,
+> >> > +        * so we don't want to waste time waiting for the reply of t=
+he peer.
+> >> > +        * However, if the configuration specified, we'll wait some =
+time to give the
+> >> > +        * controller chance to actually send the disconnect command=
+.
+> >> >          */
+> >> > -       if (reason !=3D HCI_ERROR_REMOTE_POWER_OFF)
+> >> > -               return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONN=
+ECT,
+> >> > -                                               sizeof(cp), &cp,
+> >> > -                                               HCI_EV_DISCONN_COMPL=
+ETE,
+> >> > -                                               HCI_CMD_TIMEOUT, NUL=
+L);
+> >> > +       if (reason =3D=3D HCI_ERROR_REMOTE_POWER_OFF && !hdev->disco=
+n_on_poweroff_timeout) {
+> >> > +               return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT=
+,
+> >> > +                                            sizeof(cp), &cp, HCI_CM=
+D_TIMEOUT);
+> >> > +       }
+> >> >
+> >> > -       return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT, sizeof=
+(cp), &cp,
+> >> > -                                    HCI_CMD_TIMEOUT);
+> >> > +       if (reason =3D=3D HCI_ERROR_REMOTE_POWER_OFF)
+> >> > +               timeout =3D msecs_to_jiffies(hdev->discon_on_powerof=
+f_timeout);
+> >> > +       else
+> >> > +               timeout =3D HCI_CMD_TIMEOUT;
+> >> > +
+> >> > +       err =3D __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
+> >> > +                                      sizeof(cp), &cp,
+> >> > +                                      HCI_EV_DISCONN_COMPLETE,
+> >> > +                                      timeout, NULL);
+> >> > +
+> >> > +       /* Ignore the error in suspending or powering off case to av=
+oid the procedure being
+> >> > +        * aborted.
+> >> > +        */
+> >> > +       if (reason =3D=3D HCI_ERROR_REMOTE_POWER_OFF)
+> >> > +               return 0;
+> >> > +
+> >> > +       return err;
+> >> >  }
+> >> >
+> >> >  static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
+> >> > diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config=
+.c
+> >> > index 6ef701c27da4..f3194e3642d9 100644
+> >> > --- a/net/bluetooth/mgmt_config.c
+> >> > +++ b/net/bluetooth/mgmt_config.c
+> >> > @@ -78,6 +78,7 @@ int read_def_system_config(struct sock *sk, struct=
+ hci_dev *hdev, void *data,
+> >> >                 HDEV_PARAM_U16(advmon_allowlist_duration);
+> >> >                 HDEV_PARAM_U16(advmon_no_filter_duration);
+> >> >                 HDEV_PARAM_U8(enable_advmon_interleave_scan);
+> >> > +               HDEV_PARAM_U16(discon_on_poweroff_timeout);
+> >> >         } __packed rp =3D {
+> >> >                 TLV_SET_U16(0x0000, def_page_scan_type),
+> >> >                 TLV_SET_U16(0x0001, def_page_scan_int),
+> >> > @@ -111,6 +112,7 @@ int read_def_system_config(struct sock *sk, stru=
+ct hci_dev *hdev, void *data,
+> >> >                 TLV_SET_U16(0x001d, advmon_allowlist_duration),
+> >> >                 TLV_SET_U16(0x001e, advmon_no_filter_duration),
+> >> >                 TLV_SET_U8(0x001f, enable_advmon_interleave_scan),
+> >> > +               TLV_SET_U16(0x0020, discon_on_poweroff_timeout),
+> >> >         };
+> >> >
+> >> >         bt_dev_dbg(hdev, "sock %p", sk);
+> >> > @@ -186,6 +188,7 @@ int set_def_system_config(struct sock *sk, struc=
+t hci_dev *hdev, void *data,
+> >> >                 case 0x001b:
+> >> >                 case 0x001d:
+> >> >                 case 0x001e:
+> >> > +               case 0x0020:
+> >> >                         exp_type_len =3D sizeof(u16);
+> >> >                         break;
+> >> >                 case 0x001f:
+> >> > @@ -314,6 +317,9 @@ int set_def_system_config(struct sock *sk, struc=
+t hci_dev *hdev, void *data,
+> >> >                 case 0x0001f:
+> >> >                         hdev->enable_advmon_interleave_scan =3D TLV_=
+GET_U8(buffer);
+> >> >                         break;
+> >> > +               case 0x00020:
+> >> > +                       hdev->discon_on_poweroff_timeout =3D TLV_GET=
+_LE16(buffer);
+> >> > +                       break;
+> >> >                 default:
+> >> >                         bt_dev_warn(hdev, "unsupported parameter %u"=
+, type);
+> >> >                         break;
+> >> > --
+> >> > 2.41.0.487.g6d72f3e995-goog
+> >> >
+> >>
+> >>
+> >> --
+> >> Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
