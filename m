@@ -1,162 +1,77 @@
-Return-Path: <netdev+bounces-20889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0184761C31
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:46:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9FBF761C36
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:47:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A6481C20EAD
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:46:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63850280EF5
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FDD21D49;
-	Tue, 25 Jul 2023 14:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E1521D4B;
+	Tue, 25 Jul 2023 14:47:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42701F17C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:46:54 +0000 (UTC)
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2242319B;
-	Tue, 25 Jul 2023 07:46:53 -0700 (PDT)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-583f99641adso26075787b3.2;
-        Tue, 25 Jul 2023 07:46:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690296412; x=1690901212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0kxOdPyZyaJv5gxG+QtuGeWvPDhLsU0ZIVKhTdMmlNw=;
-        b=X0LxQB7X99KnCUyv3+DnZNuo4sUL6GUapEvNdqPxoRlDaJc0KKREC6yn+Q2BEmaIfh
-         8ah2YYrxZWyOmgVTlydnhN7OBzppK4+JebbHdWFfQVRMX1mdgaZPcJiQF71C88tOD0PU
-         UidLKUFhvy+LiswFphm4q7XSRGODrxb2a7z9TYT7ACrdlBM2nrx0H+0OwPv2p0msaylM
-         tpMJ26mAq6eMBtct86spgV+KqNi2XVhMA59eTwp6e2JGo6iTvBG9UjrRoPcT3T4MWWGW
-         u0Iv+U6Tajs4F1igevacOMYyYR+HbITRRZCGXGEdvctPsDtDZQ30oqQ4pZPMR0FPxNNx
-         WwLA==
-X-Gm-Message-State: ABy/qLajEW7uKuAXzjkAqvo7amR6RbIhfrWJVOxDk3xscmhiIx4TZJ7+
-	sx8YW0Nq1AFPM8Zo0E/pNsxMPWhzwic/yg==
-X-Google-Smtp-Source: APBJJlH1/GgAaLm9I9Ev8XypDOwyhl9MGgeOHlP1baA0DBCE4RSWv5XEN2Nh+/7ily0Yqg7c+bgjgA==
-X-Received: by 2002:a0d:c8c7:0:b0:57d:24e9:e7f3 with SMTP id k190-20020a0dc8c7000000b0057d24e9e7f3mr8176525ywd.38.1690296412031;
-        Tue, 25 Jul 2023 07:46:52 -0700 (PDT)
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com. [209.85.219.170])
-        by smtp.gmail.com with ESMTPSA id j131-20020a819289000000b00570253fc3e5sm3544519ywg.105.2023.07.25.07.46.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 07:46:51 -0700 (PDT)
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-c01e1c0402cso4820537276.0;
-        Tue, 25 Jul 2023 07:46:51 -0700 (PDT)
-X-Received: by 2002:a05:6902:1350:b0:c83:27d4:c0d6 with SMTP id
- g16-20020a056902135000b00c8327d4c0d6mr8607825ybu.37.1690296411349; Tue, 25
- Jul 2023 07:46:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0241E1549F;
+	Tue, 25 Jul 2023 14:47:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA407C433C7;
+	Tue, 25 Jul 2023 14:47:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690296439;
+	bh=Bo0L8NVAyrHOgGQCPLhEipmIw8MhpD2MSjL5nHcNdsA=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=aTwLe2S/soCzZmmI2FjM24eQj/SpC2A5oY2AfGtxo+LczogipNM3KYOe7h0nzUYeM
+	 NIt6FPH2RkGimz1HDPBKdPgQkDOpCXPe5VN3kQ3+K7qEUIwIG7yQoe7NRPBOdEJwFm
+	 df9A9JRMsNSOZL0kqy17+5K7UXuXE3nJw0fJgBX+1Sz6DsnBHJur54LkX482WxRepE
+	 avfYJ9V0FqigXslCrZr5ruo35nt0QMfyuAFaS/e/R2BwcKVLfoBZ+X4eCdilR2aqHy
+	 0b7nt/cbddP5/Rbdv4lPFddDYWsIeNPAjVfLqAox5XCTzPDvnpePEHVRHlBmjCOVgZ
+	 1c7g/pXq5OdlQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230511181931.869812-1-tj@kernel.org> <20230511181931.869812-7-tj@kernel.org>
- <ZF6WsSVGX3O1d0pL@slm.duckdns.org> <CAMuHMdVCQmh6V182q4g---jvsWiTOP2hBPZKvma6oUN6535LEg@mail.gmail.com>
- <CAMuHMdW1kxZ1RHKTRVRqDNAbj1Df2=v0fPn5KYK3kfX_kiXR6A@mail.gmail.com>
- <ZK3MBfPS-3-tJgjO@slm.duckdns.org> <ZK30CR196rs-OWLq@slm.duckdns.org>
- <CAMuHMdUCXPi+aS-7bR3qRetKF9T3W9jk_HKjvaXmfHv5SEeuFg@mail.gmail.com>
- <ZLXIvXBvhsnL-ik_@slm.duckdns.org> <CAMuHMdU8CGhsU-1PZNdWH1xjbWcWSg2s2RFAegXi+vs=d-0t8Q@mail.gmail.com>
- <ZLcLnoAoJmQ9WTuM@slm.duckdns.org>
-In-Reply-To: <ZLcLnoAoJmQ9WTuM@slm.duckdns.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 25 Jul 2023 16:46:38 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUo=17kYsNEYr=qyVceRpJ4D3jMFrMOiqaH--OOhJOM4w@mail.gmail.com>
-Message-ID: <CAMuHMdUo=17kYsNEYr=qyVceRpJ4D3jMFrMOiqaH--OOhJOM4w@mail.gmail.com>
-Subject: Re: Consider switching to WQ_UNBOUND messages (was: Re: [PATCH v2
- 6/7] workqueue: Report work funcs that trigger automatic CPU_INTENSIVE mechanism)
-To: Tejun Heo <tj@kernel.org>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, 
-	"torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-team@meta.com, 
-	Linux PM list <linux-pm@vger.kernel.org>, 
-	DRI Development <dri-devel@lists.freedesktop.org>, linux-rtc@vger.kernel.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>, netdev <netdev@vger.kernel.org>, 
-	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, Linux MMC List <linux-mmc@vger.kernel.org>, 
-	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>, 
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 7bit
+Subject: Re: [3/8] wifi: zd1211rw: fix typo "tranmits"
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20230622012627.15050-4-shamrocklee@posteo.net>
+References: <20230622012627.15050-4-shamrocklee@posteo.net>
+To: Yueh-Shun Li <shamrocklee@posteo.net>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "James E . J . Bottomley" <jejb@linux.ibm.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yueh-Shun Li <shamrocklee@posteo.net>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <169029643392.3309254.342001893123754863.kvalo@kernel.org>
+Date: Tue, 25 Jul 2023 14:47:15 +0000 (UTC)
 
-Hi Tejun,
+Yueh-Shun Li <shamrocklee@posteo.net> wrote:
 
-On Wed, Jul 19, 2023 at 12:01=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
-> On Tue, Jul 18, 2023 at 11:54:58AM +0200, Geert Uytterhoeven wrote:
-> > I gave it a try on a system with an 800 MHz Cortex A9, only to discover
-> > it makes no difference, as that machine has 1600 BogoMIPS:
->
-> Oops.
->
-> > workqueue: blk_mq_run_work_fn hogged CPU for >10000us 4 times,
-> > consider switching to WQ_UNBOUND
->
-> It could be that we actually want to switch to UNBOUND for some reports b=
-ut
-> the above triggering most likely indicates that the threshold is too
-> aggressive.
->
-> > Artificially low BogoMIPS numbers only happen on systems that have
-> > the related timers (Cortex A7/A15 and later, Cortex A9 MPCore,
-> > and arm64).
->
-> Ah, I see. Thanks for the explanation.
->
-> > I will test on more systems, but that will probably not happen until
-> > next week...
->
-> Thanks, really appreciate it. Can you try the following instead when you
-> have time? I just pushed up the lower boundary to 4000 MIPS. The scaling =
-is
-> still capped at 1s.
+> Spell "transmits" properly.
+> 
+> Found by searching for keyword "tranm".
+> 
+> Signed-off-by: Yueh-Shun Li <shamrocklee@posteo.net>
 
-Thanks, with the below, I see no more WQ_UNBOUND messages.
+Patch applied to wireless-next.git, thanks.
 
-> From 8555cbd4b22e5f85eb2bdcb84fd1d1f519a0a0d3 Mon Sep 17 00:00:00 2001
-> From: Tejun Heo <tj@kernel.org>
-> Date: Mon, 17 Jul 2023 12:50:02 -1000
-> Subject: [PATCH] workqueue: Scale up wq_cpu_intensive_thresh_us if BogoMI=
-PS is
->  below 4000
+2d5947830868 wifi: zd1211rw: fix typo "tranmits"
 
-> --- a/kernel/workqueue.c
-> +++ b/kernel/workqueue.c
+-- 
+https://patchwork.kernel.org/project/linux-wireless/patch/20230622012627.15050-4-shamrocklee@posteo.net/
 
-> @@ -6513,6 +6516,42 @@ void __init workqueue_init_early(void)
->                !system_freezable_power_efficient_wq);
->  }
->
-> +static void __init wq_cpu_intensive_thresh_init(void)
-> +{
-> +       unsigned long thresh;
-> +       unsigned long mips;
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
-This fails to build on mips.
-Apparently mips is a predefined preprocessor macro:
-
-$ echo | mipsel-linux-gnu-gcc -dM -E - | grep -w mips
-#define mips 1
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
