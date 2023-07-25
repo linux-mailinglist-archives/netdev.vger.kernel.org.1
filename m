@@ -1,100 +1,120 @@
-Return-Path: <netdev+bounces-20642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DDC0760527
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:21:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3D876052B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B526B281700
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:21:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09621281715
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3FF1852;
-	Tue, 25 Jul 2023 02:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FBD187B;
+	Tue, 25 Jul 2023 02:22:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB967C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:21:07 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11434CD
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:21:06 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id D9EF0207D8;
-	Tue, 25 Jul 2023 04:21:03 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Owl_UwH7-u7I; Tue, 25 Jul 2023 04:21:03 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 6571C207C6;
-	Tue, 25 Jul 2023 04:21:03 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id 53FF880004A;
-	Tue, 25 Jul 2023 04:21:03 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 25 Jul 2023 04:21:03 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 25 Jul
- 2023 04:21:02 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 473303183CE6; Tue, 25 Jul 2023 04:21:02 +0200 (CEST)
-Date: Tue, 25 Jul 2023 04:21:02 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Simon Horman <simon.horman@corigine.com>, Ilia Lin
-	<quic_ilial@quicinc.com>
-Subject: Re: [PATCH net-next 4/4] xfrm: Support UDP encapsulation in packet
- offload mode
-Message-ID: <ZL8xjo40TSPxnvLD@gauss3.secunet.de>
-References: <cover.1689757619.git.leon@kernel.org>
- <051ea7f99b08e90bedb429123bf5e0a1ae0b0757.1689757619.git.leon@kernel.org>
- <20230724152256.32812a67@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151AE7C
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:22:29 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BF068CD;
+	Mon, 24 Jul 2023 19:22:25 -0700 (PDT)
+Received: from localhost.localdomain (unknown [39.174.92.167])
+	by mail-app3 (Coremail) with SMTP id cC_KCgA3HbzAMb9kOIKkCw--.4468S4;
+	Tue, 25 Jul 2023 10:21:53 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	razor@blackwall.org,
+	idosch@nvidia.com,
+	lucien.xin@gmail.com,
+	liuhangbin@gmail.com,
+	edwin.peer@broadcom.com,
+	jiri@resnulli.us,
+	md.fahad.iqbal.polash@intel.com,
+	anirudh.venkataramanan@intel.com,
+	jeffrey.t.kirsher@intel.com,
+	neerav.parikh@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH v1] rtnetlink: let rtnl_bridge_setlink checks IFLA_BRIDGE_MODE length
+Date: Tue, 25 Jul 2023 10:21:51 +0800
+Message-Id: <20230725022151.417450-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgA3HbzAMb9kOIKkCw--.4468S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zr4rAw15KF4Dtr45WrWkXrb_yoW8XF4xpa
+	4rKa4xJF1DXr97Za17AFyrX3s7ZFZIgrW5Wr42ywn2yF9YqFyUCr98CFn0vry3AFsIqa43
+	tr17Gr1avr1DGFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_Wryl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQvt
+	AUUUUU=
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230724152256.32812a67@kernel.org>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 03:22:56PM -0700, Jakub Kicinski wrote:
-> On Wed, 19 Jul 2023 12:26:56 +0300 Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Since mlx5 supports UDP encapsulation in packet offload, change the XFRM
-> > core to allow users to configure it.
-> > 
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Steffen, any opinion on this one? Would you like to take the whole series?
+There are totally 9 ndo_bridge_setlink handlers in the current kernel,
+which are 1) bnxt_bridge_setlink, 2) be_ndo_bridge_setlink 3)
+i40e_ndo_bridge_setlink 4) ice_bridge_setlink 5)
+ixgbe_ndo_bridge_setlink 6) mlx5e_bridge_setlink 7)
+nfp_net_bridge_setlink 8) qeth_l2_bridge_setlink 9) br_setlink.
 
-The xfrm changes are quite trivial compared to the driver changes.
-So it will likely create less conflicts if you take it directly.
+By investigating the code, we find that 1-7 parse and use nlattr
+IFLA_BRIDGE_MODE but 3 and 4 forget to do the nla_len check. This can
+lead to an out-of-attribute read and allow a malformed nlattr (e.g.,
+length 0) to be viewed as a 2 byte integer.
 
-In case you want to do that:
+To avoid such issues, also for other ndo_bridge_setlink handlers in the
+future. This patch adds the nla_len check in rtnl_bridge_setlink and
+does an early error return if length mismatches.
 
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Fixes: b1edc14a3fbf ("ice: Implement ice_bridge_getlink and ice_bridge_setlink")
+Fixes: 51616018dd1b ("i40e: Add support for getlink, setlink ndo ops")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+ net/core/rtnetlink.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Otherwise I can take it of course.
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 3ad4e030846d..1e51291007ea 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -5148,6 +5148,11 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 				flags = nla_get_u16(attr);
+ 				break;
+ 			}
++
++			if (nla_type(attr) == IFLA_BRIDGE_MODE) {
++				if (nla_len(attr) < sizeof(u16))
++					return -EINVAL;
++			}
+ 		}
+ 	}
+ 
+-- 
+2.17.1
+
 
