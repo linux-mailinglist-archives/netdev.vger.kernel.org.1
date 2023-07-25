@@ -1,202 +1,156 @@
-Return-Path: <netdev+bounces-20709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B97760BCA
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:32:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E391D760BD7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 912631C20DBA
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:32:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CF6128140B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72BB9444;
-	Tue, 25 Jul 2023 07:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929018F7C;
+	Tue, 25 Jul 2023 07:33:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDF8111B9
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:31:34 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BD5DC18D;
-	Tue, 25 Jul 2023 00:31:31 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 36P7V1Ni8028318, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 36P7V1Ni8028318
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-	Tue, 25 Jul 2023 15:31:01 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Tue, 25 Jul 2023 15:31:12 +0800
-Received: from fc38.localdomain (172.22.228.98) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Tue, 25 Jul
- 2023 15:31:10 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: <kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
-        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        Hayes Wang
-	<hayeswang@realtek.com>
-Subject: [PATCH net-next 2/2] r8152: set bp in bulk
-Date: Tue, 25 Jul 2023 15:30:50 +0800
-Message-ID: <20230725073051.5150-416-nic_swsd@realtek.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230725073051.5150-414-nic_swsd@realtek.com>
-References: <20230725073051.5150-414-nic_swsd@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDC19442
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:33:27 +0000 (UTC)
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2091.outbound.protection.outlook.com [40.107.212.91])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6431FE5;
+	Tue, 25 Jul 2023 00:33:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kAvhXLx5yuzlCA2Oi4n50dcM0Ousl/2uaqSwYHDPljdeiExIOVv+sfAfFoYZrP9W903FUX3Y7ZhRcTOPEvq1+S86X03p69Eie+VIygwgCXulR5Nkq/pKnSEf2O1kAZUz7olNCZg7mwsjsivaTBtpVfwh7Lvd2TfmZZ8M/u39zJ0ImBtHsazvpKZAUs67NQrH+8QR801hus+nvKwrdq5RGwKDmKbVLBO3YjT37XGLd1za6TCAUhzudWIg2xUXWFUzPv6murqygG/WHSJrf4qqwFbjrWKfnVbnc9qBnYso6quEvYJHR3IdhCa9t7u5I+Xke9f/W+fjQ4uMSlA1RDTIRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9Bo+Obeocgp4uj8k0K7ht5yvYQm3ejuW0kIlfLsFe50=;
+ b=bMdo6wL9CGpsfcah0EehXkKKsht9BW7jYrxGY+A8se1bY86y6yqeyKsVNSvjRh8dkvgAyNrsUJX5y2hAiG4NEwg776RCyO+vqZnr7BQHkzro8nECzAkmhb7DYAiZpD+3RqQx7UI0FgHUSrDdpNVXKdcgDWFc/Hp+FB6GjrkyyhuMNq3/946HvKCkaOXVtGzrAT0K3CvqlUEZvuc7Xur7OS/1Yctlubmbmrs7XicnpvoMokvWixnI8ZU37PmSe2aIEuf8BRNpues+aiKGNtsOX0IeeI7bfUxbnfROYwoJJfmr2DG00V2u+h96yC7vRKVUbcNVnKB0nwZzcIL1jjAdHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9Bo+Obeocgp4uj8k0K7ht5yvYQm3ejuW0kIlfLsFe50=;
+ b=L9H641+W+n+VDMmmr0yC2M1zOT3sfGOatFNMqEgG1fWLrW6qfEBPJOt9J/c5GaWWz+59OS1BLZh2dBNKOZDIIgXTbCGKTFbWAaXFssWAOH3L2UN2BNObGTkbceKAzttLJsUCUG6zXWIuxCUs7XmKakneGgAMxm4LIRsyGy9bxjU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SN7PR13MB6131.namprd13.prod.outlook.com (2603:10b6:806:359::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Tue, 25 Jul
+ 2023 07:33:21 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 07:33:21 +0000
+Date: Tue, 25 Jul 2023 09:33:14 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH net] s390/lcs: Remove FDDI option
+Message-ID: <ZL96ut0OJdY8F3s+@corigine.com>
+References: <20230724131546.3597001-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724131546.3597001-1-wintera@linux.ibm.com>
+X-ClientProxiedBy: AS4P191CA0047.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:20b:657::22) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.22.228.98]
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN7PR13MB6131:EE_
+X-MS-Office365-Filtering-Correlation-Id: a7a6bd60-c6c2-42eb-848a-08db8ce16c27
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	//GRzlTEzExas6YKMosB48glHBzdBl6I9hOrIY8aKPqLTvVBYZhzNwazZ+hGJSSQIjDSM48pnJvLN7IJA08x7w2+67ikN3EhqIrbcLXqsrUXTDvrXu0ppFgz2d5kQkdTNo1Hp8/F2ijcsS89+baIxV52pSBUvGQNHpcmoaNnbwBQn4Arh4siayLqyXnu1PeuWkQW7o7I3uwgK0ODeH8qKIUX4FtQvcVtgNYYco6hnMUmNMvGa1f5UXeVsFtOYFMMDmja4fQdwMqELaAtccFewhTl4JaS2PDdhPFZOmuPjzqqiNJjZuAUkcKpqcu8DXqnZ0oPbO66jfJzeIHsmxfoSvHaIbvaSmKnxESixUcZ22Ba+1nARMCcB5yqOtBU2d405capCOtSAuhz5OWzOvLUP9gOMOcrL2g5h2VVQjrAahk6xGTT5hFYeXLB+ggQWsqXgZWq4mQDEsYfkOv4HSUBiL7CAgO6GoUiTfrYjX5rcgt7tuqC/88hJ4/ofGb7E6xKgksUPQkEx5fpM6sR1T84dFxBwE4v0d8m14bDBvFOCQ4AA4t3SZW5J5ulT1EKNB4bs4S3S2sTbi85kJAqYhxf5FNfB8r4y/c8CEJzusjvPY0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(346002)(136003)(39840400004)(376002)(451199021)(66556008)(66476007)(54906003)(66946007)(6506007)(6666004)(4326008)(6486002)(966005)(6916009)(6512007)(316002)(478600001)(86362001)(44832011)(5660300002)(38100700002)(7416002)(8676002)(8936002)(36756003)(2616005)(186003)(41300700001)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NGJvA2l6RnHqH4G/cKWcN6dmGKvdBYhcSKBU1cbMRcLItfwDfgLogZEoajm4?=
+ =?us-ascii?Q?jNigdFRUS8BIKxeTB9yOeGwi3djJJijkD5UUXWZV52bn5z2jlv+maZt6k5AX?=
+ =?us-ascii?Q?h50aztQ9wCmTnhZK6PCQU4gFQ2DFFLUNtVjWtLbjGtxtqyYeT9Mb05lbgmjm?=
+ =?us-ascii?Q?AHWJVEl7r20WzPgM81cRQb2EJ66+0LJXqx2j78Kxy4gGzqQLVKysDAyak8G8?=
+ =?us-ascii?Q?/kwQKHy0VJ1ZymTpCjvPwm43Buss+oyDgD4u2SPYRB8qCiiGKn7IJ0GqzuF+?=
+ =?us-ascii?Q?81fGL0rSmYy7IOdpHU608/kL/IMnE17Bqnqu7MQLaxGyMDx2Wld5ObihaU1L?=
+ =?us-ascii?Q?69+6PYSV8momjId7fXhhaPCiecGmnl+73JjJwFxEzInF0DIUs7GGsg1MmPUC?=
+ =?us-ascii?Q?8p4HvFk9A0DZkBCUX+/0yeZU3LMRh5RHCBc6ZxDzgUWUxDU5KPT3B9LqjOKW?=
+ =?us-ascii?Q?V3n9mdcuf36SlydAuXvlM34FNq9/8S3GtbsGzcOHhO39BW8vG40o4OGIQIdS?=
+ =?us-ascii?Q?z10yQNkvexX+LoT4Vh8xm6Rx+pqnZppCLYa1NyEofeC5MU/DIF8tV2oJpi0m?=
+ =?us-ascii?Q?pQLerokLtNpFmlKb3p2PVAqesQfQybm0acB5Z0P4j6XPrv2+DkyEZKyakFgR?=
+ =?us-ascii?Q?4KTve6Ym4VQDUUIar6R7eKASEVUPRy1D0eSH7/vmPIn1mMvyShsVn5jLppC/?=
+ =?us-ascii?Q?/yR99meZ0HX5Oo5/JiPumZ3ChQMB5WLiEaYzbafjYpu2aGeeik6UdNdGpZMY?=
+ =?us-ascii?Q?rQ7gPxG6Nl/GLGF3E4IQKMos+cE3xL+qq7KnjTrVuE4eMCAFm31Mwk7a8D5v?=
+ =?us-ascii?Q?CNsXtno4F4LWQUXdm+32j3l5dj3/ZdemvykGA1WkvwXjDqCZEUd70kwBVTbh?=
+ =?us-ascii?Q?oDHJSL9jhD19YzMt7J0tIuPix+fiwmg+u1VNWr2qeHYxkMLrtL6pWCxT5QQ5?=
+ =?us-ascii?Q?nvi57EAcKRW3Ag+Z5hsB2CHiymSkCcECHKzL48SOGgKcRp4p4OzKq+oPACL0?=
+ =?us-ascii?Q?Nd/Iok213eFYvF/yHdAx6I+yTmcwdTfjU5c0fjxA7URc5w32gTYY85/SDbst?=
+ =?us-ascii?Q?A1A2TrgvJjTu9L8h6bLl+6sYe9Q8G0Af6gOxSO0Omlv3zLpxa3Pah2k6zfV6?=
+ =?us-ascii?Q?Ncnuc5ysvM7GQKaYpMWnQcWg4PFGKdSaJ6jTOOXxpHtgwiNm1h4vIH7xk94V?=
+ =?us-ascii?Q?+K/9y7wFrYkVpC9/cB6JJfRewHOVXtp/rx/c+mjvUax3xZxvwbmvbOlEGoyT?=
+ =?us-ascii?Q?qsZK3oe5c1KN5uht7xqajuBLjJXmFMwRo+1xsKMpDIS1N7J1a4Ms1y8HGDhQ?=
+ =?us-ascii?Q?7FgWs8EOWwNltDMiHG5eEjdkwDGd//fTMHX+XGWmEer50WRzAaLsvHYGs5+N?=
+ =?us-ascii?Q?aDaDOQqgaOB10tLhAnmLF0Vdgm1+NZaLzD92cNSNbBP/xi4485kG1aogEoNw?=
+ =?us-ascii?Q?B5LwcNCIsG3m8yXV+t/IY0qvGBt+4q7IBhu1RibnnIGkGiZmcd2hq3HE7kh6?=
+ =?us-ascii?Q?C+HfC3nOK51/atGIfwhY8JB8fyR9FDOTsTEoAV36WSWtPQo+N5Itn2MVulgb?=
+ =?us-ascii?Q?6qSV3UeWy4A0TuYnMXST+8kyJSpQNn/4dZubXTOF+v4XBN8NpBuxjWj2giLQ?=
+ =?us-ascii?Q?1pE2otxlkaJL4PJIpyetj2u1thaWLFE8V9M64z320BQVwPMH5XfuMbGLNXrD?=
+ =?us-ascii?Q?t3SyuQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7a6bd60-c6c2-42eb-848a-08db8ce16c27
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 07:33:21.6913
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KZjt1qgNRPCr5AOgGjaMI9e5VnVEla11X/pRiqnGAbMfIcwNN6NsrFN42elBir4omqbHspnHIc4CVPfVUfgrAeEDCKb+MhDmfJz0MH77Y2s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR13MB6131
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PLA_BP_0 ~ PLA_BP_15 (0xfc28 ~ 0xfc46) are continuous registers, so we
-could combine the control transfers into one control transfer.
+On Mon, Jul 24, 2023 at 03:15:46PM +0200, Alexandra Winter wrote:
+> The last s390 machine that supported FDDI was z900 ('7th generation',
+> released in 2000). The oldest machine generation currently supported by
+> the Linux kernel is MARCH_Z10 (released 2008). If there is still a usecase
+> for connecting a Linux on s390 instance to a LAN Channel Station (LCS), it
+> can only do so via Ethernet.
+> 
+> Randy Dunlap[1] found that LCS over FDDI has never worked, when FDDI
+> was compiled as module. Instead of fixing that, remove the FDDI option
+> from the lcs driver.
+> 
+> While at it, make the CONFIG_LCS description a bit more helpful.
+> 
+> References:
+> [1] https://lore.kernel.org/netdev/20230621213742.8245-1-rdunlap@infradead.org/
+> 
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 
-Signed-off-by: Hayes Wang <hayeswang@realtek.com>
----
- drivers/net/usb/r8152.c | 75 ++++++++++++++---------------------------
- 1 file changed, 25 insertions(+), 50 deletions(-)
+Probably this is for 'net-next' rather than 'net'.
+But in any case this looks good to me.
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index f6578a99dbac..db9897e825b4 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -3978,29 +3978,10 @@ static void rtl_reset_bmu(struct r8152 *tp)
- /* Clear the bp to stop the firmware before loading a new one */
- static void rtl_clear_bp(struct r8152 *tp, u16 type)
- {
--	switch (tp->version) {
--	case RTL_VER_01:
--	case RTL_VER_02:
--	case RTL_VER_07:
--		break;
--	case RTL_VER_03:
--	case RTL_VER_04:
--	case RTL_VER_05:
--	case RTL_VER_06:
--		ocp_write_byte(tp, type, PLA_BP_EN, 0);
--		break;
--	case RTL_VER_14:
--		ocp_write_word(tp, type, USB_BP2_EN, 0);
-+	u16 bp[16] = {0};
-+	u16 bp_num;
- 
--		ocp_write_word(tp, type, USB_BP_8, 0);
--		ocp_write_word(tp, type, USB_BP_9, 0);
--		ocp_write_word(tp, type, USB_BP_10, 0);
--		ocp_write_word(tp, type, USB_BP_11, 0);
--		ocp_write_word(tp, type, USB_BP_12, 0);
--		ocp_write_word(tp, type, USB_BP_13, 0);
--		ocp_write_word(tp, type, USB_BP_14, 0);
--		ocp_write_word(tp, type, USB_BP_15, 0);
--		break;
-+	switch (tp->version) {
- 	case RTL_VER_08:
- 	case RTL_VER_09:
- 	case RTL_VER_10:
-@@ -4008,32 +3989,31 @@ static void rtl_clear_bp(struct r8152 *tp, u16 type)
- 	case RTL_VER_12:
- 	case RTL_VER_13:
- 	case RTL_VER_15:
--	default:
- 		if (type == MCU_TYPE_USB) {
- 			ocp_write_word(tp, MCU_TYPE_USB, USB_BP2_EN, 0);
--
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_8, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_9, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_10, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_11, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_12, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_13, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_14, 0);
--			ocp_write_word(tp, MCU_TYPE_USB, USB_BP_15, 0);
--		} else {
--			ocp_write_byte(tp, MCU_TYPE_PLA, PLA_BP_EN, 0);
-+			bp_num = 16;
-+			break;
- 		}
-+		fallthrough;
-+	case RTL_VER_03:
-+	case RTL_VER_04:
-+	case RTL_VER_05:
-+	case RTL_VER_06:
-+		ocp_write_byte(tp, type, PLA_BP_EN, 0);
-+		fallthrough;
-+	case RTL_VER_01:
-+	case RTL_VER_02:
-+	case RTL_VER_07:
-+		bp_num = 8;
-+		break;
-+	case RTL_VER_14:
-+	default:
-+		ocp_write_word(tp, type, USB_BP2_EN, 0);
-+		bp_num = 16;
- 		break;
- 	}
- 
--	ocp_write_word(tp, type, PLA_BP_0, 0);
--	ocp_write_word(tp, type, PLA_BP_1, 0);
--	ocp_write_word(tp, type, PLA_BP_2, 0);
--	ocp_write_word(tp, type, PLA_BP_3, 0);
--	ocp_write_word(tp, type, PLA_BP_4, 0);
--	ocp_write_word(tp, type, PLA_BP_5, 0);
--	ocp_write_word(tp, type, PLA_BP_6, 0);
--	ocp_write_word(tp, type, PLA_BP_7, 0);
-+	generic_ocp_write(tp, PLA_BP_0, BYTE_EN_DWORD, bp_num << 1, bp, type);
- 
- 	/* wait 3 ms to make sure the firmware is stopped */
- 	usleep_range(3000, 6000);
-@@ -5007,10 +4987,9 @@ static void rtl8152_fw_phy_nc_apply(struct r8152 *tp, struct fw_phy_nc *phy)
- 
- static void rtl8152_fw_mac_apply(struct r8152 *tp, struct fw_mac *mac)
- {
--	u16 bp_en_addr, bp_index, type, bp_num, fw_ver_reg;
-+	u16 bp_en_addr, type, fw_ver_reg;
- 	u32 length;
- 	u8 *data;
--	int i;
- 
- 	switch (__le32_to_cpu(mac->blk_hdr.type)) {
- 	case RTL_FW_PLA:
-@@ -5052,12 +5031,8 @@ static void rtl8152_fw_mac_apply(struct r8152 *tp, struct fw_mac *mac)
- 	ocp_write_word(tp, type, __le16_to_cpu(mac->bp_ba_addr),
- 		       __le16_to_cpu(mac->bp_ba_value));
- 
--	bp_index = __le16_to_cpu(mac->bp_start);
--	bp_num = __le16_to_cpu(mac->bp_num);
--	for (i = 0; i < bp_num; i++) {
--		ocp_write_word(tp, type, bp_index, __le16_to_cpu(mac->bp[i]));
--		bp_index += 2;
--	}
-+	generic_ocp_write(tp, __le16_to_cpu(mac->bp_start), BYTE_EN_DWORD,
-+			  __le16_to_cpu(mac->bp_num) << 1, mac->bp, type);
- 
- 	bp_en_addr = __le16_to_cpu(mac->bp_en_addr);
- 	if (bp_en_addr)
--- 
-2.41.0
-
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
